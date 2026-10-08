@@ -331,6 +331,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba"
 dependencies = [
  "serde_core",
+ "serde_derive",
 ]
 
 [[package]]
@@ -572,6 +573,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "wasm-bindgen-futures"
+version = "0.4.79"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "3cbab34de2d982e9b48e18d216d04c4a6f641066ff19ffb699980f591ee3610e"
+dependencies = [
+ "js-sys",
+ "tokio",
+ "wasm-bindgen",
+]
+
+[[package]]
 name = "wasm-bindgen-macro"
 version = "0.2.129"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -629,6 +641,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "yetlet-actions"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "tokio",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+]
+
+[[package]]
 name = "yetlet-core"
 version = "0.1.0"
 
@@ -649,16 +673,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "yetlet-server-axum"
-version = "0.1.0"
-dependencies = [
- "axum",
- "yetlet-core",
- "yetlet-html",
-]
-
-[[package]]
-name = "yetlet-todo-browser"
+name = "yetlet-search-island"
 version = "0.1.0"
 dependencies = [
  "wasm-bindgen",
@@ -668,14 +683,44 @@ dependencies = [
 ]
 
 [[package]]
+name = "yetlet-server-axum"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "http-body",
+ "http-body-util",
+ "serde",
+ "tokio",
+ "tower",
+ "tower-http",
+ "yetlet-core",
+ "yetlet-html",
+]
+
+[[package]]
+name = "yetlet-todo-browser"
+version = "0.1.0"
+dependencies = [
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "yetlet-actions",
+ "yetlet-dom",
+ "yetlet-todo-ui",
+]
+
+[[package]]
 name = "yetlet-todo-server"
 version = "0.1.0"
 dependencies = [
  "axum",
+ "serde",
  "serde_json",
  "tokio",
  "tower",
  "tower-http",
+ "yetlet-actions",
+ "yetlet-core",
  "yetlet-server-axum",
  "yetlet-todo-ui",
 ]
@@ -684,6 +729,9 @@ dependencies = [
 name = "yetlet-todo-ui"
 version = "0.1.0"
 dependencies = [
+ "serde",
+ "serde_json",
+ "yetlet-actions",
  "yetlet-core",
  "yetlet-html",
 ]

@@ -1,45 +1,51 @@
-# ADR 0002 — Local DOM events, typed actions across boundaries
+# ADR 0002 — Local DOM events and typed actions across boundaries
 
-- **Status:** Proposed for MVP
+- **Status:** M4 typed LocalExecutor/HttpExecutor prototype validated locally; custom transport and production security remain proposed
 - **Date:** 2026-10-08
 - **Related:** [Architecture](../ARCHITECTURE.md), [Backlog](../BACKLOG.md)
 
 ## Context
 
-將 DOM click/input/keyboard 等 raw event 序列化送到 server，使每次互動依賴網路、產生 circuit state、跨序列化界線和 reconnect protocol。Yetlet 不以這類 remote-event 模型作為 default。
+Serializing raw DOM click, input, and keyboard events to a server makes normal interaction network-dependent and introduces circuit state, event serialization contracts, and reconnect protocols. Yetlet does not use remote-event replication as its default interaction model.
 
 ## Proposal
 
-1. DOM event listener 屬於 browser component/local runtime。
-2. UI state transition 優先在 browser local executor 完成。
-3. 若需 server 資料或 mutation，component 產生**語意明確、可驗證、可序列化的 typed command/action**。
-4. ActionExecutor 決定該 command 在 local 或 HTTP endpoint 執行；custom transport 為未來 opt-in。
-5. SSR 不載入 runtime 時，普通 `<form method="post">` 仍可以使用；progressive enhancement 不應破壞 HTML semantics。
+1. A DOM event listener belongs to the browser component/local runtime.
+2. Prefer to complete local UI state transitions in a browser-local executor.
+3. When server data or mutation is necessary, issue an **explicit, validated, serializable, typed semantic command/action**, not a DOM event.
+4. An `ActionExecutor` selects local or HTTP execution. Custom transports will require explicit opt-in.
+5. Ordinary `<form method="post">` must remain usable without browser runtime; progressive enhancement must preserve native HTML semantics.
+
+The M4 prototype implements this interface with browser-local, intentionally non-`Send` futures. **Purely local commands require no serialization**; only the HTTP executor requires serde input/output bounds:
 
 ```rust
-// 概念草案；traits 與 error type 仍待驗證：
+trait Command {
+    type Response;
+}
 trait ActionExecutor<C: Command> {
-    async fn execute(&self, command: C) -> Result<C::Output, C::Error>;
+    async fn execute(&self, command: C) -> Result<C::Response, ActionError>;
 }
 ```
 
-實作順序先是 `LocalExecutor` 與 `HttpExecutor`。一開始**不提供**「序列化 Browser Event 並在 server 執行 listener」的自動方案。
+The first implementation contains both `LocalExecutor` and a browser-only `HttpExecutor`. They share typed Todo commands and do **not** automatically serialize browser events to execute their listeners remotely. See [M4 verification](../M4-VERIFICATION.md).
 
 ## Security requirements
 
-- 每個 remote action 在 server **重新**驗證認證、授權與輸入；client state 非可信。
-- Cookie-based mutation 必須有明確 CSRF 防護 / SameSite policy；不是「typed」就自動安全。
-- 針對可重試 action 設計 idempotency；不得盲目重送非冪等請求。
-- 避免在 serialization、logging、HTML hydration state 中洩露 private fields。
-- 明確定義 timeout、network error、validation error、user-facing error 的處理。
+- Re-validate authentication, authorization, and inputs **on the server** for every remote action; browser state is untrusted.
+- Cookie-based mutations require deliberate CSRF prevention and a SameSite policy. A typed API is not inherently secure.
+- Define idempotency for retryable commands; do not automatically retry non-idempotent actions.
+- Avoid leaking private fields in serialized state, logging, or HTML hydration metadata.
+- Specify timeout, network, validation, server, and user-facing error behavior.
 
-## Tradeoffs
+## Trade-offs
 
-此設計將不同於透過 compiler 自動實作所有 server functions 的魔法 RPC，開發者需明確管理 service/action 邊界。但代價是更好的可觀測性、HTTP semantics、testing 與 security review。
+Developers must explicitly manage their service/action boundary rather than relying on arbitrary compiler-generated magic RPC. This costs some boilerplate in exchange for better visibility, HTTP semantics, testability, and security review.
 
 ## Verification
 
-- browser local click 無 remote request。
-- 遠端 mutation 僅送出 semantic input，不送 `MouseEvent` 等 raw event。
-- API 4xx、timeout、server 5xx 的 client state 不可靜默視為成功。
-- 無 framework 專用 persistent socket，custom executor 啟用後才允許 custom transport。
+M4 locally verified both executor paths, typed successful/error HTTP responses, origin/content-type/body limits, and absence of a remote event circuit. This is an anonymous demonstration, not production-grade authorization or session CSRF protection.
+
+- Browser-local clicks do not trigger remote requests.
+- Remote mutations send only semantic input, never a `MouseEvent` or other raw DOM event.
+- API validation failures, timeouts, and 5xx responses must not silently count as successful UI updates.
+- No framework-specific persistent socket is established unless a future custom executor is explicitly installed.

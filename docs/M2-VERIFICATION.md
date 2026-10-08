@@ -1,16 +1,16 @@
 # M2 Browser/WASM verification
 
 **Date:** 2026-10-08
-**Status:** Local evidence confirmed; NOT a remotely executed CI run or independent formal review.
+**Status:** Local evidence confirmed. This is neither a remotely executed CI run nor an independent formal review.
 **Backlog:** YT-008, YT-009, YT-010
 
 ## Code and architecture
 
-- `yetlet-dom`：Browser `Document.createElement` / `createTextNode` DOM renderer；無 `innerHTML`，僅安全的 tag/attribute subset。
-- `examples/todo-ui`：Native/Wasm 同源 `TodoList`、本地純函數 `toggle_first`。
-- `examples/todo-browser`：Rust/WASM mount + local click event listener（重掛載時會移除舊 listener）。
-- `scripts/build_browser.py`：`wasm-bindgen --target web`；`dist/manifest.json` + 內容 hash 版本化的 JS/Wasm/CSS assets。
-- `examples/todo-server`：`GET /app` shell 與 `/assets/*`；`GET /` 維持零 JS/Wasm SSR。無 server-side UI event circuit。
+- `yetlet-dom` uses `Document.createElement` and `createTextNode` with a restricted safe HTML tag/attribute subset. It does not use `innerHTML`.
+- `examples/todo-ui` provides the shared native/WASM `TodoList` source and pure local `toggle_first` state transition.
+- `examples/todo-browser` mounts through Rust/WASM and registers a local click listener that can be detached on remount.
+- `scripts/build_browser.py` runs `wasm-bindgen --target web` and produces content-addressed JS/WASM/CSS assets plus `dist/manifest.json`.
+- `examples/todo-server` serves the `GET /app` shell and `/assets/*` files, while `GET /` remains script-free SSR. No server-side UI event circuit exists.
 
 ## Local verification commands
 
@@ -24,20 +24,20 @@ python3 scripts/smoke_browser.py
 
 | Assertion | Observed |
 |---|---|
-| Native Rust tests | 16/16 PASS (post-format final validation) |
-| Browser target compilation | PASS；包含 shared UI 與 DOM renderer |
-| Build-time asset manifest | PASS，使用 SHA-256 內容 digest 生成版本化 URL |
-| WASM mount | Headless Chrome 155 成功載入並 mount |
-| Cross-target TodoList parity | Browser `outerHTML` 與 native SSR `ul.todo-list` byte-equal |
-| Local click behavior | 兩次 click：完成狀態 false → true → false，更新 class 與 status text |
-| Network boundary | Click 沒有發送 HTTP；無 WebSocket |
-| Browser errors | 無資源 4xx/5xx、JavaScript exceptions 或 console errors |
-| CSP | SSR 無 script；Browser `'wasm-unsafe-eval'`、無 `'unsafe-eval'`/`'unsafe-inline'` |
+| Native Rust tests | 16/16 PASS at the M2 post-format final validation |
+| Browser target compilation | PASS, including shared UI and DOM renderer |
+| Build-time asset manifest | PASS; SHA-256 content digest produces versioned URLs |
+| WASM mount | Successful in headless Chrome 155 |
+| Cross-target TodoList parity | Browser `outerHTML` byte-identical to native SSR `ul.todo-list` |
+| Local click behavior | Two clicks switched completed state false → true → false and updated class/status text |
+| Network boundary | Click dispatched no HTTP requests; no WebSocket |
+| Browser errors | No 4xx/5xx asset responses, JS exceptions, or console errors |
+| CSP | SSR ships no script; Browser mode allows `'wasm-unsafe-eval'` but not `'unsafe-eval'` or `'unsafe-inline'` |
 
-測得 debug build `yetlet_browser_bg.wasm` **281,324 bytes（未壓縮）**。這不是正式效能基準，尚未測 TTFB、interactivity latency、release size 或其他瀏覽器。
+The debug build's `yetlet_browser_bg.wasm` was **281,324 bytes uncompressed**. This is a single snapshot, not a production performance baseline; TTFB, interactivity latency, release size, and compatibility in other browsers were not measured.
 
-## Decisions / open gates
+## Decisions and open gates
 
-M2 選擇最小的 shared `View` tree + owned-subtree replacement，而不是提早承諾 fine-grained VDOM diff 或 compile-time static-template IR。此版仍是 prototype：有限 HTML 子集、尚無 island hydration/state manifest、typed remote action、IME/keyboard 測試矩陣、資安正式審查。
+M2 chose a minimal shared `View` tree with owned-subtree replacement instead of prematurely committing to fine-grained VDOM diffing or compile-time static-template IR. This is a prototype with a restricted HTML subset. At M2, island hydration/state manifests, typed remote actions, IME/keyboard test matrices, and formal security review were still pending.
 
-下一階段：YT-011–YT-013 SSR + Islands；YT-014 typed local action abstraction 可並行獨立做。參閱 [ADR 0003](adr/0003-renderers-and-loading.md)。
+The subsequent M3 work is documented separately. See [M3 verification](M3-VERIFICATION.md), [Roadmap](ROADMAP.md), and [ADR 0003](adr/0003-renderers-and-loading.md).

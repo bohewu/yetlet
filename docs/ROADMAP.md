@@ -1,16 +1,17 @@
-# Yetlet Roadmap — evidence-gated
+# Yetlet Roadmap — Evidence-Gated Milestones
 
-**Status:** Draft (2026-10-08)
-**計畫方式：** 依能力與依賴關係排序，**不虛構交付日期**。以 [MVP spec](MVP.md) 的 acceptance matrix 為完成判準。每個里程碑須保留測試命令、結果與必要的架構決策紀錄。
+**Status:** Draft, last reviewed 2026-10-08.
 
-| Milestone | 目標 | 對應 Backlog | Gate / 交付證據 |
+Milestones are sequenced by capability and dependencies rather than invented delivery dates. The [MVP specification](MVP.md) provides acceptance criteria. Each gate must retain real commands, results, and relevant architectural decisions.
+
+| Milestone | Outcome | Backlog | Exit evidence |
 |---|---|---|---|
-| **M0 — Design baseline** | 規格、架構、ADR、backlog、repo instructions | YT-001 | 文件互相鏈結，task ID / 依賴清楚；決策不冒稱已驗證 |
-| **M1 — Native SSR foundation** | Cargo workspace、共享元件雛形、HTML renderer、HTTP adapter | YT-002–YT-007 | `GET /` 能回 escaped HTML；關閉 JS 可用；native tests pass |
-| **M2 — Browser DOM/WASM** | browser build、DOM mount、local signals、共用元件 | YT-008–YT-010 | 同一元件 source 在 server/browser 可編譯，local click 更新 DOM |
-| **M3 — Selective islands** | external loader、asset manifest、island activation、初始 state | YT-011–YT-013、YT-017 | `/search` 初始 SSR 完整；browser 僅載 island；無 raw event forwarding |
-| **M4 — API/action integration** | typed actions、HTTP executor、JSON API、strict CSP | YT-014–YT-016、YT-018 | local/remote 界線清晰；API/error & CSP E2E pass |
-| **M5 — MVP validation / docs** | 跨 target tests、browser smoke、perf baseline、examples | YT-019–YT-020 | [A01–A10](MVP.md#3-acceptance-matrix) 的證據齊備；公開限制 |
+| **M0 — Design baseline** | Specifications, architecture, ADRs, backlog, repository agent guidance | YT-001 | Linked docs, unique task IDs and dependencies, proposals distinguished from verified facts |
+| **M1 — Native SSR foundation** | Cargo workspace, minimal shared components, safe HTML renderer, HTTP adapter | YT-002–YT-007 | `GET /` produces escaped HTML without JS; native tests pass |
+| **M2 — Browser DOM/WASM** | Browser build, DOM mount/local state, shared components | YT-008–YT-010 | One component source compiles for both targets; local click updates DOM |
+| **M3 — Selective islands** | External loader, asset manifest, island activation, bounded initial state | YT-011–YT-013, YT-017 | `/search` renders complete SSR, loads only the island on interaction, never forwards raw events |
+| **M4 — API/action integration** | Typed actions, HTTP executor, JSON API, strict CSP/security evidence | YT-014–YT-016, YT-018 | Clear local/remote boundary, correct API errors, working browser/CSP E2E |
+| **M5 — MVP validation/docs** | Cross-target regression, browser smoke, baseline measurements, examples | YT-019–YT-020 | Evidence for [A01–A10](MVP.md#3-acceptance-matrix) and public limitations |
 
 ## Critical path
 
@@ -25,65 +26,87 @@ YT-010 → YT-011 (loader) → YT-012 (islands) → YT-013 (search demo)
 YT-003 → YT-014 (actions) → YT-015 (HTTP executor) → YT-016 (API integration)
 YT-012 → YT-017 (state manifest)
 YT-013 + YT-016 + YT-017 → YT-018 (CSP test)
-YT-006 + YT-010 + YT-013 + YT-016 + YT-018 → YT-019 (E2E/perf)
+YT-006 + YT-010 + YT-013 + YT-016 + YT-018 → YT-019 (E2E/performance)
 YT-019 → YT-020 (release documentation)
 ```
 
-先滿足 native SSR，才為 browser renderer 選 UI IR。避免早期同時對 DOM、SSR、islands、GPU 作過多抽象設計。
+Prove native SSR before committing to an elaborate browser view IR. Avoid simultaneously designing DOM, SSR, islands, and GPU abstraction layers before the smallest dual-target implementation works.
 
 ## Gate checklist
 
-### M0 — files only
+### M0 — Documentation-only design baseline
 
-- [x] `README.md` / `AGENTS.md` / `docs/*` exists，所有相對連結有效。
-- [x] Backlog ID 唯一、每個 work item 具有驗收標準和依賴。
-- [x] ADR 區分 proposal 與已驗證選項。
-- [x] `python3 scripts/check_docs.py` 通過（含未追蹤文件的 whitespace/link check）。
+- [x] `README.md`, `AGENTS.md`, and `docs/*` exist with valid relative links.
+- [x] All backlog IDs are unique; every work item has acceptance evidence requirements and dependencies.
+- [x] ADRs distinguish proposed choices from tested behavior.
+- [x] `python3 scripts/check_docs.py` passes across tracked and untracked documentation, including links and whitespace.
 
-**M0 evidence (2026-10-08):** `python3 scripts/check_docs.py` → PASS（9 documents、25 backlog items、dependency DAG）；`git diff --check` → PASS（僅涵蓋 tracked changes）。
+**M0 evidence (2026-10-08):** `python3 scripts/check_docs.py` PASS (initially 9 documents, 25 backlog items, dependency DAG). `git diff --check` PASS for tracked changes; untracked documents were checked separately by the script.
 
-### M1 — server proof
+### M1 — Native SSR foundation
 
-- [x] `cargo test --workspace --all-targets --locked` 通過（11 tests）。
-- [x] `cargo build -p yetlet-todo-server --locked` 的 native binary 已實際啟動並完成 HTTP smoke。
-- [x] `GET /` 包含 escaped HTML、沒有 browser JS/WASM 引用；strict CSP 正常。
-- [x] `yetlet-server-axum` 使用 Axum/Tower HTTP stack，`/api/ping` 為獨立 JSON API。
+- [x] `cargo test --workspace --all-targets --locked` passed at the M1 baseline (11 tests).
+- [x] `cargo build -p yetlet-todo-server --locked` produced a binary started during an HTTP smoke run.
+- [x] `GET /` returns escaped content with no mandatory browser runtime; strict CSP is active.
+- [x] `yetlet-server-axum` uses the established Axum/Tower stack and `/api/ping` is a separate JSON route.
 
-**M1 evidence (2026-10-08):** Rust 1.99 native tests 11/11；`cargo fmt --all -- --check`、`cargo clippy --workspace --all-targets --locked -- -D warnings`、`cargo check --locked -p yetlet-core -p yetlet-todo-ui --target wasm32-unknown-unknown` 均 PASS。一次 bounded localhost smoke：`GET /` 200 HTML、`/healthz` 200，CSP 無 unsafe-inline，SSR 無 script/WASM（當時 423 bytes HTML，非性能基準）。CI workflow 已新增，但尚未在 GitHub 執行；Browser renderer 仍未實作。
+**M1 evidence (2026-10-08):** Rust 1.99, 11/11 tests, format/Clippy and native plus WASM shared UI compile PASS. A bounded localhost smoke returned 200 HTML for `GET /` and 200 for `/healthz`, without script/WASM references or unsafe-inline CSP. HTML was 423 bytes at that snapshot; **not** a performance baseline. CI YAML was created but had not run on GitHub at that time.
 
-### M2 — browser proof
+### M2 — Browser renderer
 
-- [x] Browser WASM 實際 mount 並更新 DOM（非只有 cargo check），headless Chrome E2E PASS。
-- [x] 同一個 `todo_list` Rust source 在 native SSR 與 browser DOM 渲染出相同初始 HTML。
-- [x] 兩次本地 click 狀態切換，沒有額外 HTTP request 或 WebSocket。
+- [x] Browser WASM mounted and updated actual DOM in headless Chrome, not merely compiled.
+- [x] The same `todo_list` Rust source rendered identical initial HTML in native SSR and browser DOM.
+- [x] Two local clicks updated state without network requests or WebSockets.
 
-**M2 evidence (2026-10-08; 16/16 Rust tests + Clippy PASS):** `python3 scripts/build_browser.py` 生成帶 hash 的 `dist/manifest.json`/JS/Wasm；`cargo check -p yetlet-todo-browser --target wasm32-unknown-unknown --locked` PASS；`python3 scripts/smoke_browser.py` 於 Chrome 155 PASS（SSR/DOM byte-equal、兩次 local click 更新與無 network event bridge）。詳見 [M2 verification](M2-VERIFICATION.md)。GitHub CI workflow 已更新，但未遠端執行。
+**M2 evidence (2026-10-08):** 16/16 Rust tests and Clippy PASS at the M2 gate. `scripts/build_browser.py` generated a hashed manifest and browser modules. The headless Chrome `scripts/smoke_browser.py` confirmed byte-identical SSR/DOM TodoList, state changes, and no remote event circuit. See [M2 verification](M2-VERIFICATION.md). Remote GitHub Actions execution was not verified.
 
-### M3–M4 — island + actions proof
+### M3 — SSR islands and bounded state v1
 
-- [ ] 首屏 SSR 可讀；island 有一致 state schema。
-- [ ] 外部 loader / hashed assets 正確載入。
-- [ ] Browser local events 和 HTTP command transport 可觀測並區分。
-- [ ] API validation + CSP E2E passing。
+- [x] `GET /search` renders a complete usable SSR input and result list without eagerly importing Search WASM.
+- [x] Small external `search-loader.js` and versioned assets activate Search WASM on local interaction.
+- [x] Input events remain in the browser; initial SSR results/input/heading are preserved.
+- [x] `YT-017`: Explicit allowlisted, size-bounded Search Island v1 JSON state, escaped as an HTML attribute. Invalid versions fail closed and preserve readable SSR markup.
 
-### M5 — evidence freeze
+**M3 evidence (2026-10-08):** Native/WASM builds, `scripts/build_browser.py`, and headless Chrome `scripts/smoke_browser.py` verified lazy loading, DOM preservation, local search/empty/reset, versioned state acceptance, and incompatible-state fallback. See [M3 verification](M3-VERIFICATION.md). YT-011–YT-013 and YT-017 are complete at **prototype** scope; generalized resumability is not claimed.
 
-- [ ] MVP A01–A09 的測試結果可重現。
-- [ ] Perf baseline 紀錄環境、方法、數值及限制。
-- [ ] docs 與真實實作一致；未完成功能不能寫成已支援。
+### M4 — Explicit actions, API, and security
 
-## Post-MVP research（不阻塞核心）
+- [x] `YT-014`: Typed `Command`/`ActionExecutor` and injected `LocalExecutor` with unit and browser event-boundary evidence.
+- [x] `YT-015`: Explicit same-origin-path `HttpExecutor` sends only semantic JSON commands; no raw DOM-event forwarding or automatic mutation retries.
+- [x] `YT-016`: `GET/POST /api/todos` in-memory snapshot API validates body, command, and error status; failed mutations preserve state.
+- [x] `YT-018`: Prototype strict CSP and browser checks, typed HTTP 4xx responses, nonmatching Origin rejection, and bounded JSON body handling.
 
-| Track | Question / experiment |
+**M4 evidence (2026-10-08):** Native Cargo/Clippy, browser WASM build and headless Chrome E2E demonstrate the local/HTTP action separation, one typed Create POST, server snapshot rendering, visible typed 422 error, and regression of SSR/Islands. See [M4 verification](M4-VERIFICATION.md). This is an **anonymous single-origin HTTP demo**, not an authenticated production security review.
+
+### M4.1 — User-approved HTTP pipeline integration
+
+This bounded extension comes from the Middleware Pipeline & RequestContext handoff and preserves the existing implementation sequence. See [ADR 0004](adr/0004-request-context-and-middleware.md) and [HTTP pipeline](HTTP-PIPELINE.md).
+
+- [x] `YT-026`: Request-only context, request-local typed extensions and distinct application state.
+- [x] `YT-027`: Native Tower pre-routing global layer, nested groups, route layers and explicit 404/405/error semantics.
+- [x] `YT-028`: Actual API/SSR integration, streaming/request-isolation tests and browser boundary regression.
+
+**M4.1 evidence (2026-10-08):** 46/46 tests, strict Clippy/format, English docs, browser compile and one headless regression PASS. Two browser WASM artifacts remain byte-identical. Native overhead/production assurance remain unmeasured; see [HTTP pipeline](HTTP-PIPELINE.md).
+- [ ] Deferred `YT-029`: Optional providers/deadlines and measured native overhead; not required to close P0.
+
+### M5 — MVP release-evidence freeze
+
+- [ ] Reproducible results for A01–A09.
+- [ ] Performance baseline with environment, method, values, and limitations.
+- [ ] Documentation accurately distinguishes implemented features from proposals.
+
+## Post-MVP research
+
+| Track | Research question |
 |---|---|
-| Streaming SSR | SSR API 是否需要 first-byte/streamed suspense？ |
-| Compile-time template IR | 實際需要 macro static slots 還是簡單 reactive DOM bindings 已足夠？ |
-| Resumability | 能否明確限制 serializable handlers + stable IDs？ |
-| Custom transport | 可插拔 action executor 的最低必要 interface 是什麼？ |
-| WebGPU renderer | 是否能在 10k–100k scene nodes 獲得顯著且可量測的收益？ |
-| Worker compute | 哪些 diff/計算可 off-main-thread 而不犧牲 DOM correctness？ |
-| Tooling | 何時值得做 HMR、asset bundler integration、devtools？ |
+| Streaming SSR | Does the API need streamed suspense and a measured first-byte advantage? |
+| Compile-time template IR | Are static slot macros necessary, or are direct reactive DOM bindings sufficient? |
+| Resumability | Can stable IDs and serialized, constrained handler captures work in Rust? |
+| Custom transport | What is the smallest truly pluggable action executor interface? |
+| WebGPU renderer | Can a separate renderer measurably improve 10k–100k scene-node workloads? |
+| Worker compute | Which computations can leave the main thread without compromising DOM correctness? |
+| Tooling | When do HMR, bundler integration, and devtools justify their complexity? |
 
 ## Decision rule
 
-每個新增功能必須回答：它屬於 kernel、renderer、transport、server adapter，還是 optional tooling？不能回答、或造成同一責任重複時，先新增 ADR/spike，而不是直接寫入 core。
+For every proposed feature, identify its owner: kernel, renderer, transport, server adapter, or optional tooling. If ownership is unclear or responsibilities overlap, document the decision or run a bounded spike before adding core abstractions.

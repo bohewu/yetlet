@@ -3,9 +3,11 @@ members = [
     "crates/yetlet-core",
     "crates/yetlet-html",
     "crates/yetlet-dom",
+    "crates/yetlet-actions",
     "crates/yetlet-server-axum",
     "examples/todo-ui",
     "examples/todo-browser",
+    "examples/search-island",
     "examples/todo-server",
 ]
 resolver = "3"

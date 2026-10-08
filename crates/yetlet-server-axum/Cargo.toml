@@ -7,5 +7,15 @@ rust-version.workspace = true
 
 [dependencies]
 axum.workspace = true
+serde = "1"
+tower = "0.5"
 yetlet-core = { path = "../yetlet-core" }
 yetlet-html = { path = "../yetlet-html" }
+
+[dev-dependencies]
+tokio.workspace = true
+serde = { version = "1", features = ["derive"] }
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.6", features = ["set-header"] }
+http-body = "1"
+http-body-util = "0.1"

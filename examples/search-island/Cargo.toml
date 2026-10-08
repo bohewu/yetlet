@@ -1,0 +1,17 @@
+[package]
+name = "yetlet-search-island"
+description = "Lazy, locally interactive search island on SSR HTML"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+yetlet-dom = { path = "../../crates/yetlet-dom" }
+yetlet-todo-ui = { path = "../todo-ui" }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "=0.2.129"
+web-sys = { version = "0.3", features = ["Window", "Document", "Element", "Event", "EventTarget", "HtmlInputElement", "console"] }

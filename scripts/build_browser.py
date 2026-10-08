@@ -64,12 +64,13 @@ def main():
     release = ["--release"] if options.release else []
     execute(
         cargo, "build", "--locked", "--target", "wasm32-unknown-unknown",
-        "-p", "yetlet-todo-browser", *release
+        "-p", "yetlet-todo-browser", "-p", "yetlet-search-island", *release
     )
     profile = "release" if options.release else "debug"
     source = ROOT / "target/wasm32-unknown-unknown" / profile / "yetlet_todo_browser.wasm"
-    if not source.is_file():
-        raise RuntimeError(f"Missing {source}")
+    island_source = ROOT / "target/wasm32-unknown-unknown" / profile / "yetlet_search_island.wasm"
+    if not source.is_file() or not island_source.is_file():
+        raise RuntimeError(f"Missing browser Wasm build artifacts: {source}, {island_source}")
     DIST.mkdir(exist_ok=True)
 
     with tempfile.TemporaryDirectory(prefix=".stage-", dir=DIST) as temp:
@@ -77,13 +78,20 @@ def main():
             bindgen, "--target", "web", "--out-dir", temp,
             "--out-name", "yetlet_browser", source
         )
+        execute(
+            bindgen, "--target", "web", "--out-dir", temp,
+            "--out-name", "yetlet_search", island_source
+        )
         stage = Path(temp)
         files = {
             "app.js": JS.encode(),
+            "search-loader.js": (ROOT / "assets/search-loader.js").read_bytes(),
             "styles.css": CSS.encode(),
             "favicon.svg": ICON.encode(),
             "yetlet_browser.js": (stage / "yetlet_browser.js").read_bytes(),
             "yetlet_browser_bg.wasm": (stage / "yetlet_browser_bg.wasm").read_bytes(),
+            "yetlet_search.js": (stage / "yetlet_search.js").read_bytes(),
+            "yetlet_search_bg.wasm": (stage / "yetlet_search_bg.wasm").read_bytes(),
         }
         digest = hashlib.sha256(b"yetlet-v1\0" + b"".join(
             k.encode() + b"\0" + v + b"\0" for k, v in sorted(files.items())
@@ -119,6 +127,9 @@ def main():
         "wasm": urls["yetlet_browser_bg.wasm"],
         "stylesheet": urls["styles.css"],
         "favicon": urls["favicon.svg"],
+        "search_loader": urls["search-loader.js"],
+        "search_module": urls["yetlet_search.js"],
+        "search_wasm": urls["yetlet_search_bg.wasm"],
     }
     (DIST / "app.html").write_text(page, encoding="utf-8")
     (DIST / "manifest.json").write_text(

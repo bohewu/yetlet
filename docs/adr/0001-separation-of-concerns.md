@@ -1,44 +1,44 @@
-# ADR 0001 — Separate execution, rendering, interactivity and transport
+# ADR 0001 — Separate execution, rendering, interactivity, and transport
 
 - **Status:** Proposed for MVP
 - **Date:** 2026-10-08
-- **Owners:** project maintainers
+- **Owners:** Project maintainers
 - **Related:** [Architecture](../ARCHITECTURE.md), [MVP](../MVP.md)
 
 ## Context
 
-傳統 full-stack 框架常將元件 renderer、瀏覽器 hydration、client/server 通訊和 HTTP server 特定選擇綁在一起。Yetlet 需要讓同一套 Rust component model 支援 native SSR 與 browser UI，但使用者不應被迫負擔不需要的 runtime 或 persistent event circuit。
+Many full-stack frameworks couple component rendering, browser hydration, client/server communication, and a specific HTTP server. Yetlet needs a shared Rust component model for native SSR and browser UI without forcing every page to pay for an unnecessary client runtime or persistent remote event circuit.
 
 ## Proposal
 
-把四個維度分開：execution target（native/wasm）、renderer（HTML/DOM/scene）、interactivity（none/island/full）、action executor（local/HTTP/custom）。真正支援的組合由 target capability 驗證，不能只靠 run-time enum 接受不可能的配置。
+Keep four independent dimensions: **execution target** (native or WASM), **renderer** (HTML, DOM, or scene), **interactivity** (none, island, or full browser), and **action executor** (local, HTTP, or custom). Validate supported combinations against target capabilities rather than accepting impossible runtime configurations.
 
-HTTP API 經既有 router/middleware；SSR render 直接使用 native domain capability。預設沒有 persistent session/circuit，不建立 framework 專用 event WebSocket。
+Use an existing HTTP router and middleware pipeline for APIs. SSR may call native domain capabilities directly, without loopback HTTP calls. The framework must not establish a persistent session/circuit or proprietary event WebSocket by default.
 
-For MVP, only support three well-tested presets:
+For the MVP, validate three presets:
 
 1. Native static SSR without a browser runtime.
-2. Native SSR with one optional browser island.
-3. Browser full UI runtime backed by explicit HTTP data API.
+2. Native SSR with an optional interactive browser island.
+3. Full browser UI backed by an explicit HTTP data API.
 
 ## Expected benefits
 
-- 靜態頁沒有 client-side application cost。
-- 以相同 component semantics 組合 SSR/CSR，而不是重複撰寫畫面。
-- 事件傳輸可更換而不修改 UI renderer。
-- renderer 可延伸至 Canvas/WebGPU，但不污染一般 HTML/DOM。
+- Static pages have zero browser application-runtime cost.
+- SSR and CSR reuse component semantics instead of duplicating UI definitions.
+- Event/action transport can change independently of the UI renderer.
+- A future Canvas/WebGPU renderer can be added without affecting normal HTML/DOM behavior.
 
 ## Alternatives considered
 
-- **Blazor Server/LiveView-like remote event circuit:** 開發模型直接，但所有互動的網路依賴不符合 local-event-first 原則。
-- **All CSR:** 架構簡單，但首屏 HTML 和 minimal runtime 目標難達成。
-- **Only static SSR:** 體積小，但 browser stateful app 無法達到共用程式碼目的。
-- **One universal runtime binary:** native/browser capabilities/target 區別大，容易把 server-only deps 拉進 browser。
+- **Blazor Server/LiveView-like remote event circuit:** Convenient programming model, but requiring network round-trips for routine interaction conflicts with the local-event-first principle.
+- **CSR-only:** Simple architecture, but poor alignment with immediately usable HTML and minimum-runtime goals.
+- **Static SSR-only:** Very small client footprint but does not support the required stateful browser applications.
+- **One universal runtime binary:** Native and browser capabilities differ substantially; this approach risks introducing server-only dependencies into browser bundles.
 
-## Risks and tests
+## Risks and validation
 
-模式矩陣可能膨脹。MVP 僅驗證三種 preset；對每種 preset 都提供 smoke test。沒有證據的特徵不宣布支援。當四維分離反而導致大量 adapter boilerplate，再回頭簡化 API。
+The combination matrix could grow without bounds. The MVP must expose only the three validated presets, each with a smoke test. Do not advertise configurations without evidence. If separating all four dimensions produces excessive adapter boilerplate, simplify the public configuration without coupling internal responsibilities.
 
 ## Consequences
 
-使用者明確決定互動與 remote boundary；框架內部需維持小而清晰的 trait/module 邊界。此提案不是已確定的 public API contract。
+Developers explicitly select interactivity and remote action boundaries. Internal traits/modules must stay small and well-defined. This ADR remains a **proposal**, not a finalized public API contract.

@@ -44,6 +44,8 @@ pub fn validate(view: &View) -> Result<(), DomPolicyError> {
                     | "li"
                     | "button"
                     | "strong"
+                    | "input"
+                    | "label"
             ) {
                 return Err(DomPolicyError::UnsupportedTag(element.tag().to_owned()));
             }
@@ -56,6 +58,10 @@ pub fn validate(view: &View) -> Result<(), DomPolicyError> {
                         | "data-completed"
                         | "aria-live"
                         | "aria-pressed"
+                        | "for"
+                        | "placeholder"
+                        | "maxlength"
+                        | "autocomplete"
                 ) {
                     return Err(DomPolicyError::UnsupportedAttribute(
                         attribute.name.to_owned(),

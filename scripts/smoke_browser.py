@@ -46,6 +46,7 @@ class ChromeDevTools:
         self.buffer = b""
         self.next_id = 0
         self.requests: list[str] = []
+        self.api_posts: list[dict[str, str]] = []
         self.websockets: list[str] = []
         self.exceptions: list[str] = []
         self.failed_responses: list[str] = []
@@ -129,6 +130,13 @@ class ChromeDevTools:
             event = message.get("method")
             if event == "Network.requestWillBeSent":
                 self.requests.append(message["params"]["request"]["url"])
+                request = message["params"]["request"]
+                if request.get("method") == "POST":
+                    self.api_posts.append({
+                        "url": request["url"],
+                        "method": request["method"],
+                        "postData": request.get("postData", ""),
+                    })
             elif event == "Network.responseReceived":
                 response = message["params"]["response"]
                 if response["status"] >= 400:
@@ -286,6 +294,287 @@ def main() -> None:
                 assert not client.exceptions, (
                     f"Browser errors: {client.exceptions}; requests: {client.requests}"
                 )
+
+                # M4: exactly one semantic HTTP command, not a raw DOM event.
+                remote_requests_before = len(client.requests)
+                client.evaluate(
+                    "(function(){"
+                    "document.getElementById('remote-title').value='Remote E2E task';"
+                    "document.getElementById('create-remote').click();"
+                    "return true;"
+                    "})()"
+                )
+                wait_until(
+                    lambda: client.evaluate(
+                        "document.getElementById('remote-status').textContent"
+                    ) == "Saved on server (revision 1)",
+                    "typed HTTP action completion",
+                )
+                assert client.evaluate(
+                    "document.querySelectorAll('#remote-list-host li').length"
+                ) == 3
+                assert client.evaluate(
+                    "document.querySelector('#remote-list-host [data-id=\"3\"]').textContent"
+                ) == "Remote E2E task"
+                remote_requests = client.requests[remote_requests_before:]
+                assert len(remote_requests) == 1, (
+                    f"Expected exactly one remote API request, got: {remote_requests}"
+                )
+                assert remote_requests[0].endswith("/api/todos")
+                posts = [item for item in client.api_posts if item["url"].endswith("/api/todos")]
+                assert len(posts) == 1, posts
+                assert posts[0]["method"] == "POST"
+                if posts[0]["postData"]:
+                    assert json.loads(posts[0]["postData"]) == {
+                        "type": "create",
+                        "title": "Remote E2E task",
+                    }, posts
+                status, headers, saved = http(base + "/api/todos")
+                assert status == 200
+                assert headers["content-type"].startswith("application/json")
+                snapshot = json.loads(saved)
+                assert snapshot["revision"] == 1
+                assert snapshot["items"][-1]["title"] == "Remote E2E task"
+                assert not client.failed_responses, client.failed_responses
+                assert not client.exceptions, client.exceptions
+                print("PASS: explicit typed JSON POST through HttpExecutor")
+                print("PASS: remote snapshot updates from server; local clicks issue no HTTP")
+
+                # M3: one SSR page with an interaction-activated search island.
+                search_status, search_headers, search_body = http(base + "/search")
+                assert search_status == 200
+                assert "'wasm-unsafe-eval'" in search_headers["content-security-policy"]
+                assert "'unsafe-inline'" not in search_headers["content-security-policy"]
+                search_html = search_body.decode()
+                assert 'data-yetlet-island="search"' in search_html
+                assert "search-loader.js" in search_html
+                assert "data-island-state=" in search_html
+                assert 'type="module"' in search_html
+                search_fixture = re.search(r'<ul class="todo-list">.*?</ul>', search_html)
+                assert search_fixture, "SSR Search must include real results"
+
+                search_request_start = len(client.requests)
+                client.call("Page.navigate", {"url": base + "/search"})
+                wait_until(
+                    lambda: client.evaluate(
+                        "location.pathname === '/search' && document.readyState === 'complete'"
+                    ),
+                    "SSR search navigation",
+                )
+                wait_until(
+                    lambda: client.evaluate(
+                        "document.querySelector('#search-island')"
+                        ".getAttribute('data-yetlet-loader-ready') === 'true'"
+                    ),
+                    "search loader installation",
+                )
+                time.sleep(0.4)
+                assert client.evaluate(
+                    "document.querySelector('#search-island').getAttribute('data-yetlet-activated')"
+                ) is None, "Island activated before input/focus"
+                assert client.evaluate(
+                    "document.querySelector('#search-results ul.todo-list').outerHTML"
+                ) == search_fixture.group(0)
+                assert client.evaluate(
+                    "(function(){"
+                    "const state=JSON.parse("
+                    "document.getElementById('search-island').getAttribute('data-island-state'));"
+                    "return state.schema_version===1 && state.component==='yetlet-search'"
+                    " && state.items.length===2;"
+                    "})()"
+                )
+                initial_search_requests = client.requests[search_request_start:]
+                assert any("search-loader.js" in url for url in initial_search_requests)
+                assert not any(
+                    "yetlet_search.js" in url or "yetlet_search_bg.wasm" in url
+                    for url in initial_search_requests
+                ), "Search Wasm should not load without interaction"
+
+                client.evaluate(
+                    "window.__yetlet_original_input = document.getElementById('search-query');"
+                    "window.__yetlet_original_heading = document.querySelector('#search-page h1');"
+                    "document.getElementById('search-query').focus();"
+                    "document.getElementById('search-query')"
+                    ".dispatchEvent(new Event('input',{bubbles:true}))"
+                )
+                try:
+                    wait_until(
+                        lambda: client.evaluate(
+                            "document.querySelector('#search-island')"
+                            ".getAttribute('data-yetlet-activated') === 'true'"
+                        ),
+                        "lazy search WASM activation",
+                    )
+                except TimeoutError:
+                    print("Activation state:", client.evaluate(
+                        "JSON.stringify({"
+                        "active:document.activeElement?.id,"
+                        "island:document.querySelector('#search-island')?.outerHTML.slice(0,180),"
+                        "error:document.querySelector('#search-island')?.getAttribute('data-yetlet-error'),"
+                        "loaded:document.readyState"
+                        "})"
+                    ))
+                    print("Relevant requests:", [
+                        url.split("?")[0].split("/")[-1]
+                        for url in client.requests[search_request_start:]
+                    ])
+                    print("Browser exceptions:", client.exceptions)
+                    print("Failed responses:", client.failed_responses)
+                    raise
+                assert client.evaluate(
+                    "document.getElementById('search-results').firstElementChild.outerHTML"
+                ) == search_fixture.group(0), "Activation replaced unmodified SSR results"
+                assert any("yetlet_search.js" in url for url in client.requests[search_request_start:])
+                assert any("yetlet_search_bg.wasm" in url for url in client.requests[search_request_start:])
+                time.sleep(0.3)
+                lazy_load_request_count = len(client.requests)
+
+                def type_search(text):
+                    client.evaluate(
+                        "(function(){"
+                        "const input = document.getElementById('search-query');"
+                        f"input.value={json.dumps(text)};"
+                        "input.dispatchEvent(new Event('input',{bubbles:true}));"
+                        "return true;"
+                        "})()"
+                    )
+
+                type_search("ReNdErErS")
+                wait_until(
+                    lambda: client.evaluate(
+                        "document.getElementById('search-count').textContent"
+                    ) == "1 matching tasks",
+                    "local search filtering",
+                )
+                assert client.evaluate(
+                    "document.querySelectorAll('#search-results li').length"
+                ) == 1
+                assert client.evaluate(
+                    "document.querySelector('#search-results li').getAttribute('data-id')"
+                ) == "1"
+                assert client.evaluate(
+                    "document.getElementById('search-query') === window.__yetlet_original_input"
+                )
+                assert client.evaluate(
+                    "document.querySelector('#search-page h1') === window.__yetlet_original_heading"
+                )
+
+                type_search("not-a-title")
+                wait_until(
+                    lambda: client.evaluate(
+                        "document.querySelector('#search-results #search-empty')?.textContent"
+                    ) == "No matching tasks",
+                    "empty local search",
+                )
+                type_search("")
+                wait_until(
+                    lambda: client.evaluate(
+                        "document.querySelector('#search-results ul.todo-list')?.outerHTML"
+                    ) == search_fixture.group(0),
+                    "SSR fixture restored after clear",
+                )
+                time.sleep(0.2)
+                assert len(client.requests) == lazy_load_request_count, (
+                    "Typing unexpectedly made network requests: "
+                    f"{client.requests[lazy_load_request_count:]}"
+                )
+                assert not client.websockets, f"Unexpected WebSocket: {client.websockets}"
+                assert not client.failed_responses, (
+                    f"HTTP resource failures: {client.failed_responses}"
+                )
+                assert not client.exceptions, (
+                    f"Browser errors: {client.exceptions}"
+                )
+                print("PASS: /search SSR has real HTML; search Wasm deferred until interaction")
+                print("PASS: island activates without replacing SSR or input/heading nodes")
+                print("PASS: local case-insensitive filtering, empty state and reset")
+                print("PASS: no typing-triggered HTTP, WebSocket, or browser errors")
+
+
+                # YT-017: an incompatible serialized schema must not take over
+                # the server DOM. The loader reports an expected enhancement
+                # failure and preserves the readable native SSR results.
+                client.call("Page.navigate", {"url": base + "/search"})
+                wait_until(
+                    lambda: client.evaluate(
+                        "location.pathname === '/search' &&"
+                        "document.querySelector('#search-island')"
+                        "?.getAttribute('data-yetlet-loader-ready') === 'true'"
+                    ),
+                    "incompatible-state fixture",
+                )
+                client.evaluate(
+                    "(function(){"
+                    "const root=document.getElementById('search-island');"
+                    "const state=JSON.parse(root.getAttribute('data-island-state'));"
+                    "state.schema_version=99;"
+                    "root.setAttribute('data-island-state',JSON.stringify(state));"
+                    "document.getElementById('search-query').dispatchEvent("
+                    "new Event('input',{bubbles:true}));"
+                    "return true;"
+                    "})()"
+                )
+                wait_until(
+                    lambda: client.evaluate(
+                        "document.getElementById('search-island')"
+                        ".getAttribute('data-yetlet-error') === 'load-failed'"
+                    ),
+                    "invalid-state safe fallback",
+                )
+                assert client.evaluate(
+                    "document.querySelector('#search-results ul.todo-list')?.outerHTML"
+                ) == search_fixture.group(0)
+                assert client.evaluate(
+                    "document.getElementById('search-island')"
+                    ".getAttribute('data-yetlet-activated')"
+                ) is None
+                print("PASS: version-mismatched state fails closed; SSR DOM preserved")
+
+
+                # Remote failure must remain a typed, visible error and must
+                # not be mistaken for a successful local/server state update.
+                client.call("Page.navigate", {"url": base + "/app"})
+                wait_until(
+                    lambda: client.evaluate(
+                        "location.pathname === '/app' && "
+                        "document.documentElement.getAttribute('data-yetlet-ready') === 'true'"
+                    ),
+                    "browser action error scenario",
+                )
+                invalid_start = len(client.requests)
+                client.evaluate(
+                    "(function(){"
+                    "document.getElementById('remote-title').value='  ';"
+                    "document.getElementById('create-remote').click();"
+                    "return true;"
+                    "})()"
+                )
+                wait_until(
+                    lambda: client.evaluate(
+                        "document.getElementById('remote-status').textContent"
+                    ) == "Remote error: invalid_title",
+                    "remote typed validation error",
+                )
+                invalid_requests = client.requests[invalid_start:]
+                assert len(invalid_requests) == 1, invalid_requests
+                assert invalid_requests[0].endswith("/api/todos")
+                assert client.api_posts[-1]["method"] == "POST"
+                if client.api_posts[-1]["postData"]:
+                    assert json.loads(client.api_posts[-1]["postData"]) == {
+                        "type": "create", "title": "  "
+                    }
+                assert any(
+                    "422" in failure and "/api/todos" in failure
+                    for failure in client.failed_responses
+                ), client.failed_responses
+                assert client.evaluate(
+                    "document.getElementById('remote-list-host').textContent"
+                ) == "Server data appears after a remote action"
+                _, _, after_invalid = http(base + "/api/todos")
+                assert json.loads(after_invalid)["revision"] == 1
+                assert not client.websockets
+                print("PASS: typed 422 HTTP error is visible; failed action preserves state")
+
                 print("PASS: SSR HTML without JS/WASM + strict CSP")
                 print("PASS: browser WASM mounts shared TodoList, byte-equal to SSR fixture")
                 print("PASS: two local click transitions, class/text updates")

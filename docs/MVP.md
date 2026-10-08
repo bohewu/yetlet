@@ -1,65 +1,64 @@
-# Yetlet MVP — vertical-slice specification
+# Yetlet MVP — Vertical-Slice Specification
 
-**Status:** Draft / M0–M2 validated locally; M3–M5 still pending
-**Product goal:** 證明「同一份 Rust component source 可在 native SSR 與 browser WASM 使用」，而 SSR 不強制下載 JavaScript、不依賴 server event circuit。
+**Status:** Draft; M0–M4 prototype gates verified locally; M5 full acceptance and performance baseline pending.
+**Product goal:** Demonstrate that the same Rust component source can serve native SSR and browser WASM without mandatory client JavaScript on SSR-only routes or a persistent server-side event circuit.
 
-本文件是完整 MVP 的驗收契約。已完成 M1 Native SSR 與 M2 Browser/WASM DOM demo（`/app`，本地事件、共用 TodoList）；`/search` Islands、Todo API/typed actions、hydration state、production metrics 仍未完成。請參閱 [M2 實測](M2-VERIFICATION.md)。
+This remains the acceptance contract for the **complete MVP**. M1 native SSR, M2 browser/WASM DOM, M3 lazy Search Island with state v1, and M4 typed local/HTTP commands plus the Todo API have passed local prototype tests. The Search Island-specific state format is **not** generic resumability, and the Todo API has no production authentication. Broader browser/security compatibility and measured performance remain M5. See [M2](M2-VERIFICATION.md), [M3](M3-VERIFICATION.md), and [M4 verification](M4-VERIFICATION.md).
 
-## 1. 使用情境與範圍
+## 1. Scenarios and scope
 
-Demo 是一個簡單的 Todo / Search app，有四個 routes：
+The demo is a minimal Todo/Search application with four application routes:
 
-| Route | 初始輸出 | Browser runtime | 必須展示 |
+| Route | Initial output | Browser runtime | Required demonstration |
 |---|---|---|---|
-| `GET /` | SSR HTML | 無 JS、無 WASM | 純 HTML 呈現共用元件資料；導航可用 |
-| `GET /search` | SSR HTML | 小 JS loader + 單一 Rust/WASM island | 搜尋輸入、本地 state、HTTP 查詢 |
-| `GET /app` | shell HTML | full Rust/WASM DOM runtime | client mount、local updates、共用 TodoList |
-| `GET/POST /api/todos` | JSON | 無特定要求 | typed input/error/status；供 browser actions 使用 |
+| `GET /` | SSR HTML | No JS or WASM | Readable shared-component HTML and working navigation |
+| `GET /search` | SSR HTML | Tiny JS loader plus interaction-activated Rust/WASM island | Local search/filter; remote data API is a separate M4 feature |
+| `GET /app` | Browser shell HTML | Full Rust/WASM DOM runtime | Client mount, local state updates, shared TodoList |
+| `GET/POST /api/todos` | JSON | None required | Typed input/output/error and HTTP status semantics for browser commands |
 
-可使用 in-memory store / deterministic fixtures，初期不接資料庫、auth provider、router plugin 或 multi-tenancy。可提供 progressive enhancement 的 native HTML form fallback。
+An in-memory store and deterministic fixtures are sufficient. The MVP does not require a database, external identity provider, general router plugin, or multi-tenancy. Native form fallback may be implemented as progressive enhancement.
 
-## 2. Normative behavioral requirements
+## 2. Normative requirements
 
 ### Functional (F)
 
-- **F01**：共用 Rust `TodoList`/`TodoItem` component source 在 native 與 browser target 都可編譯並正確 render。
-- **F02**：`/` 的 response 未包含強制執行的 JS/WASM assets；關閉 JavaScript 仍有可讀的完整頁面。
-- **F03**：`/search` SSR 初始 HTML 可讀；互動 island 才載入對應 Wasm，輸入處理在 browser 本地。
-- **F04**：`/app` 的 browser runtime 可完成 mount 與至少一個 local state transition（例如切換完成狀態）。
-- **F05**：跨網路互動使用明確 `/api/todos` HTTP call，不傳送 raw DOM events，也不建立預設 WebSocket/SignalR-like circuit。
-- **F06**：SSR 初始化所需 state 有清楚 schema 與 version；非法/過期資料不得無聲接管 DOM。
-- **F07**：API 輸入不合法時提供 4xx + typed error；未預期錯誤不外洩敏感堆疊/設定。
+- **F01:** The same Rust `TodoList`/`TodoItem` source must compile and render correctly for both native and browser targets.
+- **F02:** `GET /` must not include mandatory JS/WASM references; the page must be complete and readable with JavaScript disabled.
+- **F03:** `GET /search` must initially render usable SSR HTML. Only interactive islands load browser WASM, and input events are processed locally.
+- **F04:** `GET /app` must mount a browser UI and perform at least one local state change (such as toggling completion).
+- **F05:** Remote operations must use explicit `/api/todos` HTTP requests; raw DOM events must not be forwarded and no default persistent SignalR-like circuit may be created.
+- **F06:** SSR initial state must have an explicit schema and version; invalid or incompatible state must not silently take over existing DOM.
+- **F07:** Invalid API input must yield an appropriate 4xx status and typed error response. Unexpected errors must not leak internal stack traces or configuration.
 
 ### Nonfunctional (N)
 
-- **N01**：Rust stable + lockfile 可重現 build，並能編譯 native 與 `wasm32-unknown-unknown` target。
-- **N02**：HTML text/attribute 可證明 escaped；Hydration state 不含 secret 且不產生可執行注入。
-- **N03**：strict CSP 可不依賴 `unsafe-inline` 運作（island/js loader 以 external asset 載入）。
-- **N04**：keyboard、focus 與常見 IME/browser native text input 正常；勿攔截一般 HTML 行為。
-- **N05**：測試須能在 CI 或有明確記錄的本機命令執行，文件說明所需 toolchain。
-- **N06**：保留 baseline measurement：SSR TTFB、HTML bytes、初始必要 JS/WASM compressed size、首個可互動 island 的時間。**不預設未測過的性能結果。**
+- **N01:** Use Rust stable with a checked-in Cargo lockfile and reproducible native and `wasm32-unknown-unknown` builds.
+- **N02:** Prove context-appropriate escaping for dynamic HTML text/attributes. Hydration state must not carry secrets or executable injection.
+- **N03:** Operate under strict CSP without `unsafe-inline`; use external island/bootstrap JS assets.
+- **N04:** Preserve keyboard focus, ordinary input behavior, and common IME/browser text interactions. Avoid intercepting native HTML behavior unnecessarily.
+- **N05:** Tests must run in CI or through documented reproducible local commands, with required toolchains stated.
+- **N06:** Establish a measured baseline for SSR TTFB, HTML bytes, required initial compressed JS/WASM size, and time until an island becomes interactive. **Do not report unmeasured performance claims.**
 
 ## 3. Acceptance matrix
 
 | Test ID | Case | Expected |
 |---|---|---|
-| A01 | native Rust unit test: HTML escaping | HTML/attribute 特殊字元不能跨 context 注入 |
-| A02 | integration: `GET /` with JS disabled | 有 TodoList HTML；0 script/wasm dependency |
-| A03 | integration: `GET /search` | 有初始 HTML、external asset reference、well-formed island state |
-| A04 | browser E2E: `/search` typing | input 在本地處理、需要查詢時只發明確 HTTP request |
-| A05 | browser E2E: `/app` click | state 更新；網路沒有 event circuit 傳輸 |
-| A06 | SSR/CSR cross-target: common component | 相同 fixture 符合明確 DOM/HTML snapshot contract |
-| A07 | integration: API bad input | 4xx + typed error JSON；不洩露內部細節 |
-| A08 | CSP E2E | strict policy 下沒被擋的必要資源、不需要 unsafe-inline |
-| A09 | build native + browser | 編譯成功；無 server-only capability 進 browser build |
-| A10 | toolchain & perf report | 命令、環境、測量值、限制完整；不宣稱未量測的 KPI |
+| A01 | Native HTML escaping unit test | Dynamic text/attributes cannot break their intended HTML context |
+| A02 | `GET /` with JavaScript disabled | TodoList HTML remains usable; no mandatory script/WASM |
+| A03 | `GET /search` integration | Initial HTML, external asset references, well-formed versioned island state |
+| A04 | `/search` browser typing E2E | Local input filtering; only explicit HTTP requests when remote data is requested |
+| A05 | `/app` browser click E2E | Local state update; no remote-event circuit traffic |
+| A06 | Native/browser shared component | Same fixture satisfies the declared SSR/DOM snapshot contract |
+| A07 | Invalid API input integration | Typed 4xx error JSON without internal details |
+| A08 | Browser CSP E2E | Required assets load with strict policy and no unsafe-inline |
+| A09 | Native and browser builds | Both targets compile without server-only capabilities in browser output |
+| A10 | Toolchain/performance report | Reproducible commands, environment, measured data, limitations; no invented metrics |
 
-**Definition of Done for MVP:** A01–A09 均有實際可查證的執行結果，A10 有可重現命令與 baseline。僅有 passing unit tests 不等於 browser/Wasm 或 CSP 已驗證。
+**Full MVP Definition of Done:** Real, inspectable evidence for A01–A09 plus a reproducible A10 baseline. Passing Rust unit tests alone does not prove browser/WASM or CSP behavior.
 
-## 4. Proposed ergonomic API (illustrative only)
+## 4. Proposed ergonomic API (illustrative, not implemented)
 
 ```rust
-// 提案用 DSL，不是已存在的公開 API：
 App::new()
     .page("/", HomePage::ssr())
     .page("/search", SearchPage::island())
@@ -70,30 +69,30 @@ App::new()
 ```
 
 ```rust
-// typed action 的方向；API 形狀尚待 spike：
+// Draft semantic actions; the exact contract will be validated in M4.
 enum TodoAction {
     Toggle { id: u64 },
     Create { title: String },
 }
 
-// Local events decide when to issue an action.
-// Only semantic action input may cross the server boundary.
+// DOM events remain local; only explicitly typed action input crosses
+// a remote boundary when a developer chooses an HTTP executor.
 ```
 
-初期可以使用顯式 Rust builder/render calls，先確認能力，再引入 `#[component]` 和 `ui!` macro。請勿為追求 API 外觀推遲最早的可執行驗證。
+Start with explicit Rust builder/render calls and prove the capability before introducing `#[component]` or `ui!` macros. Public API cosmetics must not delay the first functional vertical slice.
 
 ## 5. Build and release envelope
 
-- Native: Rust stable，Cargo workspace，可執行測試與一個 server binary（採既有 HTTP stack）。
-- Browser: Rust `wasm32-unknown-unknown` target + 打包工具；輸出版本化 Wasm/JS/assets。
-- Loader: 盡可能小的 external JavaScript；MVP **不要求** loader 本身以 Rust/Wasm 實作。
-- Public docs: README build/run、route screenshot/smoke instructions、已測試的環境矩陣。
-- Default dev mode: server 開發與 browser assets build 可以分開執行，但最終 smoke test 要驗證同一份可重現 artifact set。
+- **Native:** Rust stable, Cargo workspace, executable tests, and one server binary using an established HTTP stack.
+- **Browser:** `wasm32-unknown-unknown` plus packaging tooling, generating versioned WASM/JS assets.
+- **Loader:** Small external JavaScript. The MVP **does not require** the loader itself to be compiled from Rust.
+- **Documentation:** Accurate README build/run steps, per-route smoke procedures, and an observed compatibility matrix.
+- **Development flow:** Server and browser assets may be built separately; final smoke verification must use a coherent reproducible set of deployed artifacts.
 
-## 6. Explicitly out of scope
+## 6. Explicit exclusions
 
-LiveView / SignalR 類遠端 UI event replication、WebGPU DOM acceleration、完整 CSS/layout 引擎、full resumability、native desktop/mobile、多 backend ORM、自製 HTTP parser、自動 magical RPC、完整生態系 plugin API、server 上 request-time 編譯 Wasm。
+LiveView/SignalR-like remote event replication, WebGPU acceleration of ordinary DOM, full CSS/layout engines, complete resumability, native desktop/mobile, multiple ORM providers, a custom HTTP parser, arbitrary magical RPC, a complete plugin ecosystem, and request-time WASM compilation on the server.
 
-## 7. Milestone proof
+## 7. Evidence gates
 
-依 [Roadmap](ROADMAP.md) 的 M1 → M2 → M3 → M4 建立證據。若 dual renderer 共享模型有基本缺陷，先回到 [ADR 0003](adr/0003-renderers-and-loading.md) 重審元件 IR 假設，而不是繼續擴大 crate 清單。
+Collect evidence in the order M1 → M2 → M3 → M4 per [Roadmap](ROADMAP.md). If the shared renderer model has a fundamental problem, revisit [ADR 0003](adr/0003-renderers-and-loading.md) and the component IR assumptions before expanding the crate architecture.

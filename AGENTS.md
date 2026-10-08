@@ -6,6 +6,10 @@ Build a **small, HTML-first Rust universal UI framework**. The guiding contract 
 
 This repository is currently in the design / pre-MVP phase. Do not assume undocumented crate interfaces exist.
 
+## Documentation language
+
+Write **all repository documentation in English**, including the README, ADRs, architecture, roadmap, backlog, validation records, and future Markdown files. Preserve the original technical meaning, acceptance evidence, links, IDs, and decision status when editing. Run `python3 scripts/check_docs.py` to verify language, references, and backlog structure.
+
 ## Work sequence
 
 1. Read this file, the relevant ADR(s), the targeted backlog item(s), and any higher-priority workspace policies before making changes.

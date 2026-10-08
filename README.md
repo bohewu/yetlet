@@ -1,33 +1,39 @@
 # Yetlet
 
-**Yetlet** 是實驗中的 HTML-first Rust universal UI runtime：以共用 Rust `View`/元件來源支援 native SSR 與 Browser WASM DOM renderer，預設不需要遠端 event circuit。
+**Yetlet** is an experimental, HTML-first Rust universal UI runtime. A shared Rust `View`/component source supports native SSR and browser WASM/DOM without a default remote event circuit.
 
-> **狀態：M2 Browser prototype 已驗證，完整 MVP 尚未完成。** Islands、typed HTTP actions、resumability 和 WebGPU 均未實作；public API 尚不穩定。
+> **Status:** M0–M4 prototype milestones have passed local validation; the complete MVP is still pending M5. The Search Island uses versioned state v1, and the browser/server now support explicit typed LocalExecutor/HttpExecutor Todo actions. Generic hydration/resumability and WebGPU remain unimplemented. APIs are experimental.
 
-## 設計原則
+## Design principles
 
-- HTML-first：純 SSR 無 JS/WASM；server 與 browser 使用獨立 build outputs。
-- Local-event-first：DOM events 只在 browser 處理；如需 remote work，未來由 typed HTTP action 完成。
-- Render/transport 分離：沒有 SignalR/LiveView-like persistent circuit，也不自行實作 HTTP/TLS/CSS engine。
-- Strict CSP：SSR 安全 escaping，DOM renderer 限定安全 tag/attribute subset；`/app` 的 CSP 只額外允許 `'wasm-unsafe-eval'`（不允許 `'unsafe-eval'` 或 `'unsafe-inline'`）。
+- **HTML first:** Pure SSR requires no client JS/WASM. Server and browser targets produce separate build outputs.
+- **Local events first:** DOM events remain in the browser. Remote work will use explicit typed HTTP commands instead of transmitting raw events.
+- **Independent rendering and transport:** No default SignalR/LiveView-like circuit, custom HTTP/TLS stack, or CSS engine.
+- **Strict CSP:** Escaped SSR output and an allowlisted browser DOM subset. The `/app` CSP allows `'wasm-unsafe-eval'` where necessary, but not `'unsafe-eval'` or `'unsafe-inline'`.
 
-## 已實作與未實作
+## Implemented and planned functionality
 
-| Mode / path | 狀態 | 行為 |
+| Mode / route | Status | Behavior |
 |---|---|---|
-| `GET /` | 已實作 | Native SSR TodoList，沒有 browser runtime |
-| `GET /app` | M2 已實作 | 外部 JS loader + Rust/WASM，Browser DOM mount / local toggle |
-| `GET /healthz` | 已實作 | 健康探針 |
-| `GET /api/ping` | 已實作 | 獨立 JSON API 路徑 |
-| `GET /search` | M3 規劃 | SSR + lazy island |
-| `GET/POST /api/todos` | M4 規劃 | Typed data API / actions |
-| Canvas/WebGPU | 後續研究 | 與 HTML DOM 獨立的 scene renderer |
+| `GET /` | Implemented (M1) | Native SSR TodoList; zero browser runtime |
+| `GET /app` | Implemented (M2) | External JS loader and Rust/WASM DOM mount with a local toggle |
+| `GET /healthz` | Implemented | Health check |
+| `GET /api/ping` | Implemented | Standalone JSON API endpoint |
+| `GET /search` | Implemented (M3) | Complete SSR search page; Search WASM loads only after interaction and filters locally |
+| `GET/POST /api/todos` | Implemented (M4) | Typed snapshot API and validated semantic Create/Toggle commands, with structured errors |
+| Canvas/WebGPU | Deferred research | Independent scene renderer, not a DOM replacement |
 
-同一份 `examples/todo-ui` 的 `TodoList` Rust 原始碼會在 server 與 browser targets 被編譯；browser 透過 `yetlet-dom` 直接建立 DOM、透過本地 listener 改變第一筆 Todo 狀態（不發出 HTTP 請求）。
+Server and browser targets compile the same `TodoList` source from `examples/todo-ui`. On `/app`, the local toggle uses an injected `LocalExecutor` without a request; the separate server-create button uses an injected `HttpExecutor` to POST a typed Todo command, then renders the server's snapshot. `/search` continues to render HTML immediately and activate Search WASM lazily from escaped versioned state. **DOM events are never forwarded as remote events.**
 
-## 執行範例
+## HTTP middleware and request context
 
-需 Rust stable（宣告 MSRV 1.85，**尚未實際測試 MSRV**）、Python 3.11+ 與 wasm32 target。已於 Rust 1.99、wasm-bindgen 0.2.129、Chrome 155 測試。
+`yetlet-server-axum` now provides an owning `RequestContext<S>` with typed request-local extensions and separate application state. Middleware uses native Axum `Next`/`from_fn_with_state`, nested Router scopes and Tower layers. `with_global` adds an explicit pre-routing boundary around a completed Router. API and SSR routes share this pipeline; browser/WASM code does not depend on it.
+
+See [HTTP pipeline usage and limits](docs/HTTP-PIPELINE.md) and [ADR 0004](docs/adr/0004-request-context-and-middleware.md). The existing anonymous API remains a prototype; request context is not authentication, a DI container or a session subsystem.
+
+## Run the examples
+
+Requirements: Rust stable (declared MSRV 1.85, **not separately verified**), Python 3.11+, and the WASM target. Locally validated with Rust 1.99, wasm-bindgen 0.2.129, and Chrome 155.
 
 ```bash
 rustup target add wasm32-unknown-unknown
@@ -38,47 +44,51 @@ python3 scripts/build_browser.py
 cargo run -p yetlet-todo-server
 ```
 
-可開啟 `http://127.0.0.1:3000/`（SSR）及 `http://127.0.0.1:3000/app`（Browser/WASM）。`dist/` 是 build-time 生成的 Git-ignored 資產與 hash manifest；server 不會在 request time 編譯 Wasm。未先執行 browser build 時，`/app` 明確回傳 503。
+Open `http://127.0.0.1:3000/` (SSR), `http://127.0.0.1:3000/app` (browser/WASM), and `http://127.0.0.1:3000/search` (SSR plus lazy Search Island). The Git-ignored `dist/` directory contains build-time generated assets and the content-hash manifest. The server never compiles WASM on request; `/app` explicitly returns HTTP 503 when browser assets have not been built.
 
-`python3 scripts/build_browser.py --release` 可產生 optimized browser bundle；不要用 debug Wasm bytes 代表 production 性能。
+`python3 scripts/build_browser.py --release` produces an optimized browser bundle. Do not confuse debug WASM bytes with production transfer sizes or performance.
 
-## 驗證
+## Verify
 
 ```bash
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --all-targets --locked
-cargo check --locked -p yetlet-todo-browser --target wasm32-unknown-unknown
+cargo check --locked -p yetlet-todo-browser -p yetlet-search-island --target wasm32-unknown-unknown
 
 python3 scripts/check_docs.py
 cargo build --locked -p yetlet-todo-server
 python3 scripts/smoke_browser.py
 ```
 
-Browser smoke 會使用獨立的 headless Chrome profile 和暫時 localhost server，只停止自己啟動的程序。驗證 SSR/DOM TodoList 完全一致、兩次 click 本地更新 class/data/text、無 click HTTP/WS、無 browser errors。執行命令與結果整理於 [M2 驗證紀錄](docs/M2-VERIFICATION.md)。
+Browser smoke tests use an isolated headless Chrome profile and temporary localhost server, stopping only their own processes. M2 checks cover shared DOM and local clicks; M3 covers lazy islands, SSR preservation, local filtering, and version-incompatible fail-closed behavior. M4 checks cover an explicit typed HTTP POST, the returned server snapshot, typed 422 failure visibility, and no network traffic from local clicks. See [M2](docs/M2-VERIFICATION.md), [M3](docs/M3-VERIFICATION.md), and [M4 verification](docs/M4-VERIFICATION.md).
 
-## Workspace
+## Workspace structure
 
-- `yetlet-core`：Renderer-neutral View
-- `yetlet-html`：Safe native HTML serializer
-- `yetlet-dom`：Browser direct DOM renderer（有限安全 HTML subset）
-- `yetlet-server-axum`：HTTP response / CSP adapter
-- `examples/todo-ui`：共用 TodoList + state transition
-- `examples/todo-browser`：Rust/WASM entrypoint + local event binding
-- `examples/todo-server`：SSR / Browser / API routes
-- `scripts/build_browser.py`：Hashed browser asset pipeline
+- `yetlet-core` — Renderer-neutral `View` model.
+- `yetlet-html` — HTML serializer with escaping and a safe element/attribute policy.
+- `yetlet-dom` — Direct browser DOM renderer with a restricted HTML subset.
+- `yetlet-actions` — Typed commands and injectable LocalExecutor/HttpExecutor contracts.
+- `yetlet-server-axum` — RequestContext, native Tower middleware boundary, HTTP response/CSP adapter.
+- `examples/todo-ui` — Shared TodoList, local transitions, and versioned search state.
+- `examples/todo-browser` — Rust/WASM entrypoint with local event binding.
+- `examples/search-island` — Lazy Search WASM, SSR DOM preservation, and local input handling.
+- `examples/todo-server` — SSR/browser routes and in-memory typed GET/POST Todo API.
+- `scripts/build_browser.py` — Content-addressed browser asset pipeline.
 
-**目前限制：** Browser 更新是 owned-subtree replacement，尚無 fine-grained signal graph、hydration/resumability 或跨網路 typed actions；也沒有跨框架性能比較。此版本為 prototype，不宣稱 production-ready。
+**Known limitations:** Browser and island updates use owned-subtree replacement. M3's bounded Search Island v1 schema is **not** generic hydration/resumability. M4's anonymous in-memory Todo API is a demo, **not** an authenticated or production-ready service. HTTPS reverse proxies need trusted origin/scheme handling; complete CSRF/authentication, idempotency, fine-grained reactivity, browser compatibility, and comparative benchmarks are outside the current proof.
 
-## 文件
+## Documentation
 
-- [架構與模組邊界](docs/ARCHITECTURE.md)
-- [完整 MVP 規格](docs/MVP.md)
+- [Architecture and module boundaries](docs/ARCHITECTURE.md)
+- [Full MVP specification](docs/MVP.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Backlog](docs/BACKLOG.md)
-- [M2 驗證紀錄](docs/M2-VERIFICATION.md)
+- [M2 verification record](docs/M2-VERIFICATION.md)
+- [M3 verification record](docs/M3-VERIFICATION.md)
+- [M4 typed actions/API verification](docs/M4-VERIFICATION.md)
 - [ADR 0001](docs/adr/0001-separation-of-concerns.md)
 - [ADR 0002](docs/adr/0002-events-and-actions.md)
 - [ADR 0003](docs/adr/0003-renderers-and-loading.md)
 
-下一條主路徑為 `YT-011` 的 SSR island loader → `YT-012`/`YT-013`；`YT-014` typed LocalExecutor 可獨立推進。授權由維護者後續決定。
+The next milestone is M5 (`YT-019`–`YT-020`): a full acceptance/performance baseline and release-ready documentation. M3/M4 changes remain uncommitted and unpushed. Licensing remains a maintainer decision.

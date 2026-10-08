@@ -17,14 +17,20 @@ REQUIRED = (
     "docs/ARCHITECTURE.md",
     "docs/MVP.md",
     "docs/M2-VERIFICATION.md",
+    "docs/M3-VERIFICATION.md",
+    "docs/M4-VERIFICATION.md",
     "docs/ROADMAP.md",
     "docs/BACKLOG.md",
     "docs/adr/0001-separation-of-concerns.md",
     "docs/adr/0002-events-and-actions.md",
     "docs/adr/0003-renderers-and-loading.md",
+    "docs/adr/0004-request-context-and-middleware.md",
+    "docs/HTTP-PIPELINE.md",
 )
 TASK_RE = re.compile(r"^\|\s*(YT-\d{3})\s*\|")
 LINK_RE = re.compile(r"\]\(([^)]+)\)")
+CJK_RE = re.compile(r"[\u3400-\u9fff\u3000-\u303f]")
+SKIPPED_DOC_DIRS = {".git", ".codex", "target", "dist", "node_modules", ".cache"}
 
 
 def check() -> list[str]:
@@ -48,6 +54,14 @@ def check() -> list[str]:
                 continue
             if not (path.parent / file_part).is_file():
                 failures.append(f"broken link: {name} -> {target}")
+
+    # Enforce English-only prose across existing and newly added Markdown docs.
+    for path in ROOT.rglob("*.md"):
+        if any(part in SKIPPED_DOC_DIRS for part in path.relative_to(ROOT).parts):
+            continue
+        for number, line in enumerate(path.read_text(encoding="utf-8").splitlines(), 1):
+            if CJK_RE.search(line):
+                failures.append(f"non-English CJK content: {path.relative_to(ROOT)}:{number}")
 
     backlog = ROOT / "docs/BACKLOG.md"
     if not backlog.is_file():

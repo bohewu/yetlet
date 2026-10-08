@@ -1,34 +1,34 @@
-# Yetlet Architecture — v0 design baseline
+# Yetlet Architecture — v0 Design Baseline
 
-**Status:** Proposal / pre-MVP (2026-10-08)
-**Scope:** Rust native server, HTML SSR, browser DOM/WASM, HTTP data API, optional islands.
-**Related:** [MVP](MVP.md) · [Roadmap](ROADMAP.md) · [Backlog](BACKLOG.md) · [ADRs](adr/0001-separation-of-concerns.md)
+**Status:** Evolving proposal with locally validated M0–M3 prototype slices (2026-10-08).
+**Scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
+**Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md).
 
 ## 1. Problem statement
 
-Yetlet 要降低 web framework 的概念與 runtime 成本：不要求開發者為一般 SSR 頁面負擔整個 client framework，也不把每個 browser input/click 透過持久連線轉送後端。Rust component code 應能共用於 native server 與 browser target，但 renderer、互動策略及動作執行位置可獨立選擇。
+Yetlet aims to reduce the conceptual and runtime costs of fat web frameworks. Static SSR pages should not require an entire client framework, and routine browser input/click events should not travel to a backend via a persistent event circuit. Rust component code may be shared between native server and browser targets, while renderers, interactivity policies, and action execution locations remain independently selectable.
 
-這不等於重新實作瀏覽器、HTTP stack、WebSocket protocol 或 CSS layout engine。
+This is **not** a proposal to rebuild a browser, HTTP transport stack, WebSocket protocol, or CSS layout engine.
 
-### 不變原則
+### Invariants
 
-- SSR 初始 HTML 必須可獨立呈現；沒有互動需求時 **0 browser JS / WASM**。
-- 有互動需求時，以可明確識別的 island 或 browser app 載入 client code。
-- DOM event 的 ownership 在 browser；remote command 並非 event replication。
-- server 和 browser 可能共用 Rust 型別與 component code，但一定是不同 build artifact。
-- 在 request path 僅做 rendering、state serialization 與 build-time asset lookup；不即時編譯 Rust、Wasm 或 JS。
-- HTTP routing 與 API middleware 接現有生態系的 server adapter，不強制自造 webserver。
+- Native SSR must produce meaningful initial HTML; non-interactive pages require **zero browser JS/WASM**.
+- Interactive behavior must be activated through explicit islands or a full browser application.
+- The browser owns DOM events; remote commands are semantic operations, not event replication.
+- Server and browser may share Rust types and component source, but compile into distinct build artifacts.
+- HTTP request handlers may render HTML, serialize bounded state, and reference build-time assets. They must never compile JS/Rust/WASM per request.
+- HTTP routing and API middleware integrate with a mature server ecosystem, initially Axum/Tower.
 
-## 2. 分離四個維度
+## 2. Separate four dimensions
 
-| 維度 | 候選值 | 是否受其他維度綁定 |
+| Dimension | Options | Coupled to other dimensions? |
 |---|---|---|
-| Execution | native server / browser WASM | 否 |
-| Render backend | HTML stream / browser DOM / future GPU scene | 否（但須檢查 target capability） |
-| Interactivity | none / island / full browser / future resume | 否 |
-| Remote action | none / plain form / typed HTTP / future custom executor | 否 |
+| Execution | Native server / browser WASM | No |
+| Render backend | HTML stream / browser DOM / future GPU scene | No, subject to target capabilities |
+| Interactivity | None / island / full browser / future resume | No |
+| Remote action | None / plain form / typed HTTP / future custom executor | No |
 
-**重要：** `render(server)` 並不代表 `events(server)`。一條 SSR route 可使用 native form POST；一個 CSR component 可以完全離線工作。
+**Important:** `render(server)` does **not** imply `events(server)`. An SSR route can use native form POST, and a CSR component can operate entirely offline.
 
 ## 3. Logical architecture
 
@@ -37,7 +37,7 @@ Yetlet 要降低 web framework 的概念與 runtime 成本：不要求開發者�
                        │ Rust component declarations│
                        │  + signals + typed actions │
                        └──────────────┬─────────────┘
-                                      │ compiler / macros
+                                      │ compiler/macros (future)
                            Component description / IR
                              (shape under evaluation)
                                       │
@@ -51,7 +51,7 @@ Yetlet 要降低 web framework 的概念與 runtime 成本：不要求開發者�
                     │                                    │
                     └──────────┬─────────────────────────┘
                                │
-                     Local semantic action
+                      Local semantic action
                                │
                       Action executor port
                         │               │
@@ -62,7 +62,7 @@ Yetlet 要降低 web framework 的概念與 runtime 成本：不要求開發者�
                                └─ API routes
 ```
 
-Renderer 永遠不應偷偷建立 remote session/circuit。Transport 是可選 adapter；API request 僅由正規 middleware/pipeline 處理。
+Renderers must never implicitly establish a remote session or circuit. Action transport is an optional adapter. API requests follow ordinary server middleware and authorization boundaries.
 
 ## 4. Request paths
 
@@ -73,7 +73,13 @@ HTTP request → router → auth/middleware → typed API handler
                                              → JSON/status/body
 ```
 
-API handler 與 UI SSR 不必共享 HTTP path。跨網路驗證、授權、限流在 server boundary 執行。
+UI SSR and API handlers do not need to share a URL path. Authentication, authorization, input validation, and rate limits belong at the server trust boundary.
+
+### 4.1.1 RequestContext and middleware (P0 extension)
+
+The server adapter now exposes a request-only `RequestContext<S>` and native Axum/Tower composition. It owns the original request head/body, retains typed request Extensions, and keeps shared application state separate. `with_global` wraps the completed Router before application route matching; groups/routes use native nested routers and layers. API and SSR pass through the same HTTP middleware, without coupling browser actions to server requests.
+
+Scope order, 404/405 semantics, error responses, body ownership and the safe SSR data boundary are specified in [ADR 0004](adr/0004-request-context-and-middleware.md). The [implementation note](HTTP-PIPELINE.md) includes tested integration points, costs and P1 limits. No browser runtime dependency or general DI/session subsystem is introduced.
 
 ### 4.2 Static SSR route
 
@@ -82,82 +88,86 @@ GET / → router → loader (native capability) → component
     → HTML renderer (context-aware escaping) → response
 ```
 
-沒有互動 component 時，回傳 HTML+CSS 即可。後端可以直接呼叫 application service，**不經 localhost HTTP loopback**。
+Without interactive components, HTML and CSS are sufficient. SSR may call application services directly without localhost HTTP loopback.
 
 ### 4.3 SSR + island route
 
 ```text
-GET /search → native SSR → HTML + data-state + hashed asset references
-                                 │
-                         tiny external JS loader
-                                 │ on visible / interaction
-                         lazy load island WASM
-                                 │
-                         browser-local DOM events
+GET /search → native SSR → complete HTML + escaped state + hashed assets
+                                  │
+                          tiny external JS loader
+                                  │ on focus/input
+                          lazy Search Island WASM
+                                  │
+                          local browser DOM events
 ```
 
-MVP 採「island mount/hydration」而非 full resumability；只由該 island 擁有的 DOM 子樹參與 client updates。Loader 是 bootstrap，不必強制使用 Wasm。State 應安全序列化、含 version/component identity，且不能含 credentials。
+The MVP uses progressive island activation/mounting, not full resumability. Only the island-owned subtree participates in client updates. The loader can be plain JavaScript rather than Wasm. Serialized state requires an explicit schema/version/component ID and may not contain credentials or server capabilities.
+
+**M3 prototype evidence (2026-10-08):** `/search` uses a small external loader that imports Search WASM after a local focus/input event. Native SSR emits an explicitly allowlisted versioned JSON state, escaped as an attribute. Browser WASM validates the payload and updates only the results subtree. Invalid schema/version prevents activation while preserving the readable SSR page. This is **not** generalized component hydration or resumability.
 
 ### 4.4 Full browser route
 
 ```text
 GET /app → shell HTML + compiled client artifacts
-    → loader → browser WASM → DOM mount → API when needed
+    → loader → browser WASM → DOM mount → explicit API if needed
 ```
 
-共用 component source 不代表每個 server-side domain dependency 都會進入 browser bundle；browser 透過 capability interface 綁定 HTTP implementation。
+Shared component source does not imply inclusion of server-side repositories or other privileged dependencies in browser artifacts. Browser data access is through capabilities that bind to explicit HTTP APIs.
 
 ## 5. Proposed module boundaries
 
-| Candidate module | 單一職責 | MVP 時機 |
+| Candidate module | Responsibility | Timing |
 |---|---|---|
-| `yetlet-core` | Component/View、state/signal、renderer-neutral types | M1 |
-| `yetlet-html` | deterministic escaping + HTML renderer | M1 |
-| `yetlet-server-axum` | UI/API routing、HTTP adapter、response headers | M1 |
-| `yetlet-dom` | browser DOM mount / dynamic updates | M2 |
-| `yetlet-browser` | Wasm bootstrapping + browser capabilities | M2 |
-| `yetlet-islands` | island identity/state/loader manifest | M3 |
-| `yetlet-actions` | typed command + local/HTTP executor interfaces | M4 |
-| `yetlet-macros` | compile-time `ui!` DSL & static template extraction | M2+ spike |
-| `yetlet-gpu` | independent retained scene renderer | 後續研究 |
+| `yetlet-core` | Renderer-neutral component/View and state primitives | M1 |
+| `yetlet-html` | Deterministic HTML serializer and escaping | M1 |
+| `yetlet-server-axum` | HTTP/UI/API routing integration, headers | M1 |
+| `yetlet-dom` | Browser DOM mount and updates | M2 |
+| `examples/todo-browser` | Browser WASM bootstrap/example | M2 |
+| `examples/search-island` | Search-specific lazy island runtime | M3 |
+| `yetlet-actions` | Typed commands and pluggable executor boundaries | M4 |
+| `yetlet-macros` | Compile-time `ui!` DSL and template extraction | Future spike |
+| `yetlet-gpu` | Independent retained scene renderer | Later research |
 
-These are **candidate crates**, not committed public package boundaries. 優先確認兩個 render targets 的最小可行介面，再決定是否拆 crate，避免在 MVP 前為假想 extensibility 增加 complexity。
+These are conceptual boundaries, **not** a promise that each one will become a public crate. Use the smallest validated interfaces across the two renderer targets before adding extra abstractions or splitting packages.
 
-## 6. Components, templates and state
+## 6. Components, templates, and state
 
-### Shared source
+### Shared component source
 
 ```rust
-// 介面示意，尚非 Yetlet API：
+// Proposed DSL only; not a released Yetlet API.
 #[component]
 fn TodoList(items: &[Todo]) -> View {
     ui! { <ul>{ for item in items { <li>{item.title}</li> } }</ul> }
 }
 ```
 
-Native target 輸出 HTML；browser target 建立及更新 DOM。元件要有 deterministic boundaries 和 stable IDs，否則 hydration 容易 mismatch。
+The native target outputs HTML; the browser target creates and updates DOM. Component boundaries and stable identifiers must be deterministic to avoid hydration mismatches.
 
-**Design hypothesis：** macro 在編譯時擷取 static template 與 dynamic slots。這可能避開 full VDOM diff；但初期允許簡化 `View`/node representation，以建立可驗證的基準。是否必須做 template IR 是 spike decision，而非已落實的設計。
+**Design hypothesis:** A future macro may extract static templates and dynamic slots, potentially reducing VDOM diff costs. For the MVP, a minimal `View`/node representation is sufficient to establish a measured baseline. Whether a template IR is warranted remains an open spike decision.
 
-### Data access
+### Data-access capabilities
 
 ```rust
-// 概念介面；瀏覽器 target 不能依賴 server-only repository。
+// Conceptual interface; the browser target cannot depend on server repositories.
 trait TodoSource {
     async fn list(&self) -> Result<Vec<Todo>, TodoError>;
 }
 ```
 
-Native implementation 對 application/domain service 直呼；browser implementation 對 HTTP JSON API 呼叫。這不應變成隱藏於 compiler 的 arbitrary RPC。
+A native implementation can call domain/repository services directly. The browser implementation uses explicit HTTP JSON endpoints. Do not hide arbitrary RPC generation inside a compiler macro.
 
 ### State transfer
 
-Native HTML 輸出時可以送出可序列化的初始 state，但要：
+Native HTML may carry serializable initial state, subject to all of the following:
 
-- 控制 component/instance identity、schema version、asset manifest version。
-- 使用上下文正確的 HTML/attribute/JSON escaping；避免 `</script>`、`&` 或 Unicode separator 注入問題。
-- 對不可信 state 做大小限制，及在 browser hydration 時執行 version validation。
-- 不將 server context、token、密碼、資料庫連線或具特權的 closure capture 序列化。
+- Explicit component and instance identity, schema version, and asset manifest version.
+- Context-sensitive HTML/attribute/JSON escaping; avoid `</script>`, ampersand, or Unicode separator injection.
+- Payload size limits, browser-side version validation, and a deterministic safe fallback.
+- Never serialize server request context, access tokens, passwords, database connections, or privileged closure captures.
+
+M3 demonstrates these constraints for the Search Island's bounded v1 payload. A generalized state protocol remains outside the current proof.
 
 ## 7. Events and commands
 
@@ -166,7 +176,7 @@ pointer/keyboard/input DOM event
           │ local browser listener
           ▼
   component-local state transition
-          │ when remote work needed
+          │ when remote work is needed
           ▼
  typed command / explicit HTTP form
           │
@@ -175,33 +185,37 @@ pointer/keyboard/input DOM event
           └─ Future CustomExecutor (explicit opt-in)
 ```
 
-MVP 不提供 raw DOM event forwarding。遠端 action 需要明確的 input/output/error schema，server 必須重新授權驗證。HTTP mutation 需考慮 CSRF、idempotency、replay 和 retry policy。較晚才決定 custom transport API。
+The MVP does not forward raw DOM events. Remote actions need explicit input/output/error schemas; the server must validate permissions again. HTTP mutations must address CSRF, idempotency, replay, and retries. Keep future custom transports separate from renderer interfaces.
 
-## 8. Security, accessibility and operations
+**M4 prototype evidence (2026-10-08):** `yetlet-actions` exposes `Command` and injected `ActionExecutor<C>` implementations: `LocalExecutor` runs a shared domain transition; `HttpExecutor` makes an explicit JSON POST to `/api/todos`. `examples/todo-ui` owns `TodoCommand`/`TodoSnapshot`; the server uses the same transition behind an Axum adapter with a per-router in-memory store. Browser E2E confirmed local toggle with no HTTP and a separate semantic Create POST. Typed errors are surfaced without executing untrusted HTML. See [M4 verification](M4-VERIFICATION.md).
 
-- 以 strict CSP 為基準；無 inline `on*`、無 `eval`；loader 使用 external static assets。
-- SSR output 使用正確 context escaping；hydration metadata 視為 hostile input。
-- DOM renderer 優先原生 semantic HTML、label/input、focus、keyboard navigation、IME、native scroll。
-- browser bundle 不可 import server-only code/secrets；feature boundary 應在 compile time fail。
-- 每種模式都需可辨識 metrics（SSR render time、HTML bytes、Wasm compressed bytes、mount latency、requests count）。
-- 錯誤語意應清楚：server render fail 回 status；client action fail 回 typed error；browser mount error 可回退到 HTML/form。
-- 對 browser bundle 與 HTML 注入作 CSP、XSS 及 dependency audit，避免為性能犧牲安全。
+**Security boundary:** This prototype is anonymous and listens directly over HTTP. Content-type/Origin restrictions and JSON body limits are demonstrated, but they do not implement user authentication, credentialed CSRF protection, or HTTPS reverse-proxy identity. These remain requirements for any real deployment.
 
-## 9. GPU / parallelization boundary (post-MVP)
+## 8. Security, accessibility, and operations
 
-WebGPU 不會直接加速一般 DOM/CSS layout。若要支援 WebGPU，應新增 **Canvas/scene renderer**；其 scene graph、focus/IME/ARIA/accessibility 職責與 HTML renderer 不同。DOM 情境中的 Worker 可做 background compute，但 DOM commit 仍由 main thread 執行。GPU 將以可重現的節點量、frame time、memory 指標作為獨立 spike，而非 MVP 阻塞條件。
+- Strict CSP as the default: no inline `on*` handlers and no `eval`. Bootstrap scripts are static external assets.
+- Context-correct SSR escaping. Treat hydration metadata and client state as hostile.
+- Prefer native semantic HTML with labels, keyboard focus, IME, and built-in scrolling.
+- Browser builds cannot import server-only secrets/capabilities; invalid target imports should fail at compile time.
+- Instrument by mode: SSR render time, HTML bytes, compressed WASM payload, mount time, and request count.
+- Distinct error semantics: server renderer errors produce a status code; client actions expose typed errors; failed islands leave usable SSR content.
+- Keep CSP, XSS, and dependency checks alongside performance work.
 
-## 10. Architecture risks and decisions awaiting experiment
+## 9. GPU and parallelism boundary (post-MVP)
 
-| Risk | First test / mitigation |
+WebGPU cannot accelerate ordinary DOM/CSS layout directly. A future WebGPU target must be a separate **Canvas/scene renderer**, which carries its own scene graph, focus, IME, text, and accessibility responsibilities. Workers may move computation away from the main thread, but DOM commits still occur on the main thread. Measure scene-node count, frame time, and memory in a separate spike; do not make GPU development an MVP gate.
+
+## 10. Risks and experiments
+
+| Risk | Initial test / mitigation |
 |---|---|
-| Rust UI macro 限制/編譯複雜度 | 先做 shared view + dual renderer spike，再決定 IR / `ui!` |
-| SSR/client state mismatch | deterministic identity + SSR fixture / hydrate snapshot assertions |
-| WASM bundle 體積或啟動過慢 | 記錄 gzip/brotli bytes & mount timing，loader 分拆 islands |
-| DOM update 過度抽象 | 先驗證 direct node updates，再比較 VDOM / static slots |
-| server-only code 意外編入瀏覽器 | target-specific features + browser CI compile |
-| 遠端 command 越界成 circuit | typed actions only，無預設 WebSocket 連線 |
-| 模式組合爆炸 | MVP 固定三種 route，traits 範圍最小化 |
-| GPU renderer 與 HTML semantics 不一致 | GPU 完全排除 MVP，另建 scene interface |
+| Rust UI macro limits and compile complexity | Prove shared View plus dual renderer first; decide on IR/`ui!` later |
+| SSR/client state mismatch | Deterministic IDs and SSR/hydration snapshot assertions |
+| WASM bundle size and startup | Measure compressed sizes/mount time and split islands where useful |
+| Over-abstracted DOM updates | Validate direct updates before comparing VDOM/static slots |
+| Server-only dependencies in browser | Target-specific compilation and browser CI |
+| Remote commands accidentally becoming a circuit | Semantic actions only, no default WebSocket |
+| Exploding combinations of modes | MVP exposes only three tested route presets |
+| GPU renderer not matching HTML semantics | Keep GPU outside MVP and provide a separate scene interface |
 
-參閱 [ADR 0001](adr/0001-separation-of-concerns.md)、[ADR 0002](adr/0002-events-and-actions.md)、[ADR 0003](adr/0003-renderers-and-loading.md)。
+See [ADR 0001](adr/0001-separation-of-concerns.md), [ADR 0002](adr/0002-events-and-actions.md), and [ADR 0003](adr/0003-renderers-and-loading.md).

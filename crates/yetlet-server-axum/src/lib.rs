@@ -1,5 +1,9 @@
 //! Axum HTTP response integration. Yetlet deliberately does not reimplement HTTP.
 
+mod context;
+pub mod middleware;
+pub use context::RequestContext;
+
 use axum::{
     http::{HeaderValue, StatusCode, header},
     response::{Html, IntoResponse, Response},
