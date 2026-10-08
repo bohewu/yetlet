@@ -29,6 +29,7 @@ Write **all repository documentation in English**, including the README, ADRs, a
 - Do not put server-only secrets or capabilities into browser builds or serialized hydration state.
 - WebGPU is a separate optional renderer, **not** an accelerator for normal DOM/CSS.
 - Do not replace a mature HTTP parser/server implementation with an in-house transport stack.
+- M6 application ergonomics are **handler-first and component-first**; MVC and Controllers are optional. Do not introduce mandatory Controller scaffolding, duplicate model binding/filters, a broad result hierarchy, or a DI container. Preserve native Axum/Tower interoperability (see ADR 0006).
 
 ## Work reporting
 

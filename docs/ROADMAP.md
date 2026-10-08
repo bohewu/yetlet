@@ -12,6 +12,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M3 — Selective islands** | External loader, asset manifest, island activation, bounded initial state | YT-011–YT-013, YT-017 | `/search` renders complete SSR, loads only the island on interaction, never forwards raw events |
 | **M4 — API/action integration** | Typed actions, HTTP executor, JSON API, strict CSP/security evidence | YT-014–YT-016, YT-018 | Clear local/remote boundary, correct API errors, working browser/CSP E2E |
 | **M5 — MVP validation/docs** | Cross-target regression, browser smoke, baseline measurements, examples | YT-019–YT-020 | Evidence for [A01–A10](MVP.md#3-acceptance-matrix) and public limitations |
+| **M6 — Handler-first API and optional extensions (proposed)** | Thin App builder, concise typed handlers/results, opt-in capability contract, optional proof and demo | YT-030–YT-034 | No required MVC Controller or DI; native Axum/Tower and SSR/browser contracts preserved |
 
 ## Critical path
 
@@ -28,6 +29,10 @@ YT-012 → YT-017 (state manifest)
 YT-013 + YT-016 + YT-017 → YT-018 (CSP test)
 YT-006 + YT-010 + YT-013 + YT-016 + YT-018 → YT-019 (E2E/performance)
 YT-019 → YT-020 (release documentation)
+YT-027 + YT-016 → YT-030 (thin App facade) → YT-031 (handler/results DX)
+YT-030 + YT-026 → YT-032 (opt-in contract) → YT-033 (optional proof)
+YT-030 + YT-031 + YT-033 → YT-034 (Todo handler-first demo)
+# M6 is not blocked by separate public-release ticket YT-020.
 ```
 
 Prove native SSR before committing to an elaborate browser view IR. Avoid simultaneously designing DOM, SSR, islands, and GPU abstraction layers before the smallest dual-target implementation works.
@@ -97,6 +102,18 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 - [ ] **Public-release authorization:** license, supported MSRV/API/browser matrix, authentication/security posture, and independent qualification remain open.
 
 **M5 local evidence (2026-10-08):** [M5 acceptance and measurements](M5-VERIFICATION.md) documents A01–A10, release Rust/Chrome 155, Firefox 157 physical-keyboard E2E, 30 SSR timing samples, 5 Chrome navigation/activation samples, and asset sizes. `YT-019` is locally Done; `YT-020` is Blocked for publication, with explicit owners in [Release readiness](RELEASE-READINESS.md). GitHub CI has not executed the new M5 workflow changes.
+
+### M6 — Handler-first developer API and opt-in modules (approved direction; not implemented)
+
+**Goal:** Let developers build a small SSR site or typed JSON API with ordinary Rust handlers and components, without mandatory MVC Controllers, source layouts, model binders, DI containers or result hierarchies. Expose a **thin Axum/Tower facade**, not a second router. Keep all optional capabilities explicitly installed and browser-safe. See [ADR 0006](adr/0006-handler-first-mvc-optional.md) and [ADR 0005](adr/0005-opt-in-capability-modules.md).
+
+- [ ] `YT-030 / M6a`: Ergonomic `App`, route and group registration over native Axum/Tower for ordinary function handlers.
+- [ ] `YT-031 / M6b`: Minimal View/SSR, Json, redirect, typed input and error/result conveniences; reuse Axum `Path/Query/Json/State/IntoResponse`; `RequestContext` stays optional.
+- [ ] `YT-032 / M6c`: Explicit typed opt-in capability installation without global DI/service locator or forced runtime dependencies.
+- [ ] `YT-033 / M6d`: Prove a small independently installed capability, opt-out behavior, scoped middleware and unchanged browser graph.
+- [ ] `YT-034 / M6e`: Migrate Todo example with no regression in SSR, local/remote actions, CSP, browser E2E or measured M5 baseline.
+
+**Deferred:** MVC-specific helpers are optional future choices, **not required** for M6; so are Controller inheritance, convention discovery, `#[controller]` macros, full template DSL, Session/Authentication/Redis/Cache providers, a dynamic Plugin Manager and a mandatory DI container.
 
 ## Post-MVP research
 

@@ -25,6 +25,8 @@ REQUIRED = (
     "docs/adr/0002-events-and-actions.md",
     "docs/adr/0003-renderers-and-loading.md",
     "docs/adr/0004-request-context-and-middleware.md",
+    "docs/adr/0005-opt-in-capability-modules.md",
+    "docs/adr/0006-handler-first-mvc-optional.md",
     "docs/HTTP-PIPELINE.md",
     "docs/M5-VERIFICATION.md",
     "docs/RELEASE-READINESS.md",

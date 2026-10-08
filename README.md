@@ -10,6 +10,8 @@
 - **Local events first:** DOM events remain in the browser. Remote work will use explicit typed HTTP commands instead of transmitting raw events.
 - **Independent rendering and transport:** No default SignalR/LiveView-like circuit, custom HTTP/TLS stack, or CSS engine.
 - **Strict CSP:** Escaped SSR output and an allowlisted browser DOM subset. The `/app` CSP allows `'wasm-unsafe-eval'` where necessary, but not `'unsafe-eval'` or `'unsafe-inline'`.
+- **Modular, opt-in capabilities (approved direction):** Optional Session, Cookie Authentication, Cache and similar functionality will use independent providers and native Tower integration; none are currently built-in. See [ADR 0005](docs/adr/0005-opt-in-capability-modules.md).
+- **Handler-first, Component-first, MVC optional (approved direction):** Ordinary Rust handlers and shared Views, typed HTTP results with minimal scaffolding. Full Controllers, model binders, DI and a mandatory MVC file layout are not required. See [ADR 0006](docs/adr/0006-handler-first-mvc-optional.md).
 
 ## Implemented and planned functionality
 
@@ -104,5 +106,8 @@ Browser smoke tests use an isolated headless Chrome profile and temporary localh
 - [ADR 0001](docs/adr/0001-separation-of-concerns.md)
 - [ADR 0002](docs/adr/0002-events-and-actions.md)
 - [ADR 0003](docs/adr/0003-renderers-and-loading.md)
+- [ADR 0004 — RequestContext and middleware](docs/adr/0004-request-context-and-middleware.md)
+- [ADR 0005 — Optional capability modules](docs/adr/0005-opt-in-capability-modules.md)
+- [ADR 0006 — Handler-first and optional MVC](docs/adr/0006-handler-first-mvc-optional.md)
 
-The M5 acceptance/performance baseline (`YT-019`) is locally verified. Public-release readiness (`YT-020`) remains **Blocked** pending maintainer licensing and a stable support/security policy. The M3/M4/middleware code has been committed locally; M5 changes are not committed or pushed.
+The M5 acceptance/performance baseline (`YT-019`) is locally verified and committed on `master`. Public-release readiness (`YT-020`) is **Blocked** pending licensing and support/security policy. Proposed M6 (`YT-030`–`YT-034`) targets a thin App facade, ergonomic handler/result APIs, and opt-in extension composition; MVC, Controllers, and Session/Auth/Cache modules remain optional and unimplemented.

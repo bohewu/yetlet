@@ -70,7 +70,7 @@ fn app() -> Router {
 }
 ```
 
-This deliberately follows the established Axum Router style instead of introducing a second App/group builder. Existing State/Request handlers remain compatible.
+This is the **currently implemented** Axum Router integration; it does not introduce a second router. M6 proposes a thin, handler-first App/group facade over this machinery—not mandatory MVC Controllers or a new middleware engine. Existing State/Request handlers must remain compatible. See [ADR 0006](adr/0006-handler-first-mvc-optional.md).
 
 ## Scope and execution order
 
@@ -97,6 +97,14 @@ Use ServiceBuilder for multiple middleware within one scope; first registered is
 Axum MethodRouter::route_layer (different from Router::route_layer) skips its method fallback; using it intentionally changes 405 behavior. Custom group fallbacks likewise require an explicit policy instead of assuming the default unmatched-path contract.
 
 `with_global` uses an outer fallback-only Router to preserve `Router` and `axum::serve` compatibility. Add all application routes before calling it; adding a route to the returned outer wrapper bypasses its fallback/global service. The global layer sees no *application* match metadata. Capture values needed for after-processing before moving the request to Next; response Extensions do not automatically inherit request Extensions.
+
+## Built-in context versus optional RequestId
+
+`RequestContext<S>` has three fields: original HTTP `parts`, the streaming `body`, and typed application `state`. The core does **not** automatically create `RequestId`, trace/span metadata, sessions, cookie jars, principals or cache handles. Existing request fields come from the incoming HTTP request; matched-route metadata becomes available only after routing; query/path parameters are decoded on demand.
+
+The Todo example **explicitly registers** `assign_request_id` as a global middleware. A per-app `Arc<AtomicU64>` initialized to 1 generates a numeric identifier, inserts `RequestId(u64)` into request-local typed extensions, and adds `x-yetlet-request-id` to the response. The native home SSR route intentionally selects only that numeric value for an inert `data-request-id` attribute. No request extensions are automatically serialized.
+
+The example counter resets for a new application instance and is not globally unique across server nodes. Applications needing trace correlation should opt into a provider with an intentional ID and trusted propagation policy. See [ADR 0005](adr/0005-opt-in-capability-modules.md).
 
 ## Existing demo integration
 
