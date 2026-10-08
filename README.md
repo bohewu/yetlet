@@ -2,7 +2,7 @@
 
 **Yetlet** is an experimental, HTML-first Rust universal UI runtime. A shared Rust `View`/component source supports native SSR and browser WASM/DOM without a default remote event circuit.
 
-> **Status:** M0–M4 prototype milestones have passed local validation; the complete MVP is still pending M5. The Search Island uses versioned state v1, and the browser/server now support explicit typed LocalExecutor/HttpExecutor Todo actions. Generic hydration/resumability and WebGPU remain unimplemented. APIs are experimental.
+> **Status:** M0–M4 and M5's A01–A10 acceptance/performance baseline have been validated locally as an **experimental prototype**. Public release is blocked by licensing, a stable API/support policy, and outstanding production/security qualification. Generic hydration/resumability and WebGPU remain unimplemented.
 
 ## Design principles
 
@@ -33,7 +33,7 @@ See [HTTP pipeline usage and limits](docs/HTTP-PIPELINE.md) and [ADR 0004](docs/
 
 ## Run the examples
 
-Requirements: Rust stable (declared MSRV 1.85, **not separately verified**), Python 3.11+, and the WASM target. Locally validated with Rust 1.99, wasm-bindgen 0.2.129, and Chrome 155.
+Requirements: Rust stable (declared MSRV 1.85, **not separately verified**), Python 3.11+, and the WASM target. Locally validated with Rust 1.99, wasm-bindgen 0.2.129, Chrome 155 and Firefox 157 (headless Firefox requires geckodriver).
 
 ```bash
 rustup target add wasm32-unknown-unknown
@@ -61,6 +61,18 @@ cargo build --locked -p yetlet-todo-server
 python3 scripts/smoke_browser.py
 ```
 
+For the **release-mode** informational baseline and a separate Firefox E2E check:
+
+```bash
+cargo build --release --locked -p yetlet-todo-server
+python3 scripts/build_browser.py --release
+python3 scripts/smoke_firefox.py --profile release
+python3 scripts/measure_baseline.py --profile release --samples 30 \
+  --browser-runs 5 --out target/m5-baseline-release.json
+```
+
+Do not mix debug and release asset builds. Results are recorded in [M5 verification](docs/M5-VERIFICATION.md); size estimates refer to local gzip artifacts, not actual transfer bytes.
+
 Browser smoke tests use an isolated headless Chrome profile and temporary localhost server, stopping only their own processes. M2 checks cover shared DOM and local clicks; M3 covers lazy islands, SSR preservation, local filtering, and version-incompatible fail-closed behavior. M4 checks cover an explicit typed HTTP POST, the returned server snapshot, typed 422 failure visibility, and no network traffic from local clicks. See [M2](docs/M2-VERIFICATION.md), [M3](docs/M3-VERIFICATION.md), and [M4 verification](docs/M4-VERIFICATION.md).
 
 ## Workspace structure
@@ -76,7 +88,7 @@ Browser smoke tests use an isolated headless Chrome profile and temporary localh
 - `examples/todo-server` — SSR/browser routes and in-memory typed GET/POST Todo API.
 - `scripts/build_browser.py` — Content-addressed browser asset pipeline.
 
-**Known limitations:** Browser and island updates use owned-subtree replacement. M3's bounded Search Island v1 schema is **not** generic hydration/resumability. M4's anonymous in-memory Todo API is a demo, **not** an authenticated or production-ready service. HTTPS reverse proxies need trusted origin/scheme handling; complete CSRF/authentication, idempotency, fine-grained reactivity, browser compatibility, and comparative benchmarks are outside the current proof.
+**Known limitations:** Browser/island updates use owned-subtree replacement; SearchStateV1 is **not** generic hydration/resumability. The Todo API is an anonymous in-memory demo, not a user-data service. HTTP origin checks need a trusted scheme/host behind TLS reverse proxies, and there is no production auth/CSRF, persistence, stable API, full IME/a11y matrix, or comparative benchmark. Only Chrome 155 and Firefox 157 headless browser scenarios were tested; see [release readiness](docs/RELEASE-READINESS.md).
 
 ## Documentation
 
@@ -87,8 +99,10 @@ Browser smoke tests use an isolated headless Chrome profile and temporary localh
 - [M2 verification record](docs/M2-VERIFICATION.md)
 - [M3 verification record](docs/M3-VERIFICATION.md)
 - [M4 typed actions/API verification](docs/M4-VERIFICATION.md)
+- [M5 acceptance and measured baseline](docs/M5-VERIFICATION.md)
+- [Prototype release readiness and blockers](docs/RELEASE-READINESS.md)
 - [ADR 0001](docs/adr/0001-separation-of-concerns.md)
 - [ADR 0002](docs/adr/0002-events-and-actions.md)
 - [ADR 0003](docs/adr/0003-renderers-and-loading.md)
 
-The next milestone is M5 (`YT-019`–`YT-020`): a full acceptance/performance baseline and release-ready documentation. M3/M4 changes remain uncommitted and unpushed. Licensing remains a maintainer decision.
+The M5 acceptance/performance baseline (`YT-019`) is locally verified. Public-release readiness (`YT-020`) remains **Blocked** pending maintainer licensing and a stable support/security policy. The M3/M4/middleware code has been committed locally; M5 changes are not committed or pushed.

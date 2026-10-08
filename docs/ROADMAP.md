@@ -91,9 +91,12 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 
 ### M5 — MVP release-evidence freeze
 
-- [ ] Reproducible results for A01–A09.
-- [ ] Performance baseline with environment, method, values, and limitations.
-- [ ] Documentation accurately distinguishes implemented features from proposals.
+- [x] Reproducible **local** results for A01–A09, mapped to actual Rust/Chrome/Firefox tests.
+- [x] Release-mode baseline measured for local SSR first-byte, HTML, gzip artifact estimates, Browser/WASM and Search Island readiness; environment and limitations recorded.
+- [x] Documentation distinguishes locally tested prototype capabilities from production/public release gates.
+- [ ] **Public-release authorization:** license, supported MSRV/API/browser matrix, authentication/security posture, and independent qualification remain open.
+
+**M5 local evidence (2026-10-08):** [M5 acceptance and measurements](M5-VERIFICATION.md) documents A01–A10, release Rust/Chrome 155, Firefox 157 physical-keyboard E2E, 30 SSR timing samples, 5 Chrome navigation/activation samples, and asset sizes. `YT-019` is locally Done; `YT-020` is Blocked for publication, with explicit owners in [Release readiness](RELEASE-READINESS.md). GitHub CI has not executed the new M5 workflow changes.
 
 ## Post-MVP research
 

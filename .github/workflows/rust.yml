@@ -37,3 +37,11 @@ jobs:
         run: google-chrome --version
       - name: Browser E2E smoke
         run: python3 scripts/smoke_browser.py
+      - name: M5 local-style baseline (informational only)
+        run: python3 scripts/measure_baseline.py --profile debug --samples 15 --browser-runs 3 --out target/m5-baseline-ci.json
+      - name: Retain M5 baseline artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: yetlet-m5-baseline
+          path: target/m5-baseline-ci.json
+          if-no-files-found: error

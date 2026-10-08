@@ -1,6 +1,6 @@
 # Yetlet Architecture — v0 Design Baseline
 
-**Status:** Evolving proposal with locally validated M0–M3 prototype slices (2026-10-08).
+**Status:** Evolving architecture with locally validated M0–M4 functionality and an informational M5 acceptance/performance baseline (2026-10-08); no production release assurance.
 **Scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
 **Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md).
 

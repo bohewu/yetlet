@@ -26,8 +26,8 @@ Priority: `P0` is the critical path, `P1` is required for the MVP, and `P2` cove
 | YT-016 | P1 | M | M4 | `/api/todos` JSON handlers | YT-005, YT-015 | GET/POST tests: state/revisions, 400/403/404/413/415/422 typed errors PASS | Done |
 | YT-017 | P1 | M | M3 | Island state schema/version/security | YT-012 | Bounded v1 JSON, HTML escaping, invalid state tests and Chrome fail-closed SSR fallback PASS | Done |
 | YT-018 | P1 | M | M4 | Strict CSP and browser security verification | YT-013, YT-016, YT-017 | Headless Chrome/CSP, JSON errors, origin/media/body limits PASS at anonymous prototype scope | Done |
-| YT-019 | P1 | L | M5 | Cross-target/E2E tests and performance baseline | YT-006, YT-010, YT-013, YT-016, YT-018 | MVP A01–A10 verification report | Todo |
-| YT-020 | P1 | S | M5 | Build/run docs and release readiness | YT-019 | Accurate README, limits, compatibility; maintainer selects license before publishing | Todo |
+| YT-019 | P1 | L | M5 | Cross-target/E2E tests and performance baseline | YT-006, YT-010, YT-013, YT-016, YT-018 | [M5 verification](M5-VERIFICATION.md): A01–A10 local proof, release metrics, Chrome 155/Firefox 157 smoke | Done |
+| YT-020 | P1 | S | M5 | Build/run docs and release readiness | YT-019 | [Release readiness](RELEASE-READINESS.md) prepared; public release blocked by license, MSRV/support/security decisions | Blocked |
 | YT-021 | P2 | M | Later | Streaming SSR benchmark | YT-006 | Measured TTFB/throughput; ADR if selected | Deferred |
 | YT-022 | P2 | L | Later | Serializable handler/resumability spike | YT-017 | Demonstrate stable handler identity and safe capture serialization | Deferred |
 | YT-023 | P2 | L | Later | Independent WebGPU scene renderer spike | YT-009 | Reproducible frame/memory results, not a DOM/CSS rewrite | Deferred |
@@ -47,9 +47,9 @@ The middleware/RequestContext handoff adds these scoped tasks after M4 without r
 
 ## Ready queue
 
-**First:** Resume `YT-019` full acceptance/performance baseline. The user-approved HTTP P0 extension (`YT-026`–`YT-028`) is complete at local prototype scope; M0–M4 items retain their recorded evidence. P1 `YT-029` remains optional follow-up.
+**First:** `YT-019` has reproducible local acceptance/measurement evidence. `YT-020` cannot close the public release gate without maintainer licensing and declared support/security decisions; see [release readiness](RELEASE-READINESS.md).
 
-**Next:** `YT-020` release documentation/compatibility/limitations, after measured M5 evidence. Production authentication, robust CSRF, and real multi-browser testing remain explicit future requirements, not properties of this anonymous demo.
+**Next:** Obtain maintainer decisions before publication. Optional `YT-029` middleware providers remain deferred. Production authentication, CSRF, and expanded browser/IME/accessibility testing are separate requirements, not proven by the current demo.
 
 **Do not start before prerequisites:** Generalized hydration, arbitrary event forwarding, WebGPU, and resumability remain out of scope.
 

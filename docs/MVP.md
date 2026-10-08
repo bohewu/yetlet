@@ -1,9 +1,9 @@
 # Yetlet MVP — Vertical-Slice Specification
 
-**Status:** Draft; M0–M4 prototype gates verified locally; M5 full acceptance and performance baseline pending.
+**Status:** Draft; M0–M5 A01–A10 locally verified at prototype scope; public release remains blocked by licensing and production-support decisions.
 **Product goal:** Demonstrate that the same Rust component source can serve native SSR and browser WASM without mandatory client JavaScript on SSR-only routes or a persistent server-side event circuit.
 
-This remains the acceptance contract for the **complete MVP**. M1 native SSR, M2 browser/WASM DOM, M3 lazy Search Island with state v1, and M4 typed local/HTTP commands plus the Todo API have passed local prototype tests. The Search Island-specific state format is **not** generic resumability, and the Todo API has no production authentication. Broader browser/security compatibility and measured performance remain M5. See [M2](M2-VERIFICATION.md), [M3](M3-VERIFICATION.md), and [M4 verification](M4-VERIFICATION.md).
+This remains the acceptance contract for the **complete MVP**. M1 native SSR, M2 browser/WASM DOM, M3 lazy Search Island/state v1, M4 typed actions/API and M4.1 RequestContext/middleware passed local prototype tests. M5 provides a bounded [A01–A10 acceptance and performance baseline](M5-VERIFICATION.md) using Chrome 155 and Firefox 157. This does not establish generic resumability, production authentication/CSRF, complete IME/accessibility compatibility, or release approval. Consult [Release readiness](RELEASE-READINESS.md) before publishing.
 
 ## 1. Scenarios and scope
 

@@ -26,6 +26,8 @@ REQUIRED = (
     "docs/adr/0003-renderers-and-loading.md",
     "docs/adr/0004-request-context-and-middleware.md",
     "docs/HTTP-PIPELINE.md",
+    "docs/M5-VERIFICATION.md",
+    "docs/RELEASE-READINESS.md",
 )
 TASK_RE = re.compile(r"^\|\s*(YT-\d{3})\s*\|")
 LINK_RE = re.compile(r"\]\(([^)]+)\)")
