@@ -1,0 +1,39 @@
+name: Yetlet Rust baseline
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  native-and-wasm-core:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Rust tools
+        run: |
+          rustup update stable
+          rustup default stable
+          rustup component add rustfmt clippy
+          rustup target add wasm32-unknown-unknown
+      - name: Documentation / backlog
+        run: python3 scripts/check_docs.py
+      - name: Format
+        run: cargo fmt --all -- --check
+      - name: Clippy
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
+      - name: Native tests
+        run: cargo test --workspace --all-targets --locked
+      - name: Shared UI native + wasm target
+        run: cargo check --locked -p yetlet-core -p yetlet-todo-ui --target wasm32-unknown-unknown
+      - name: Browser WASM build
+        run: |
+          cargo install wasm-bindgen-cli --version 0.2.129 --locked
+          python3 scripts/build_browser.py
+      - name: Native server binary
+        run: cargo build --locked -p yetlet-todo-server
+      - name: Chrome version
+        run: google-chrome --version
+      - name: Browser E2E smoke
+        run: python3 scripts/smoke_browser.py

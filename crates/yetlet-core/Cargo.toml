@@ -1,0 +1,8 @@
+[package]
+name = "yetlet-core"
+description = "Renderer-neutral UI view model for Yetlet"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]

@@ -1,0 +1,12 @@
+[package]
+name = "yetlet-todo-ui"
+description = "Shared renderer-independent Yetlet Todo components"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+yetlet-core = { path = "../../crates/yetlet-core" }
+
+[dev-dependencies]
+yetlet-html = { path = "../../crates/yetlet-html" }

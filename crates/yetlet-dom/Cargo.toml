@@ -1,0 +1,13 @@
+[package]
+name = "yetlet-dom"
+description = "Direct browser DOM renderer for Yetlet views (M2 subset)"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+yetlet-core = { path = "../yetlet-core" }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "=0.2.129"
+web-sys = { version = "0.3", features = ["Document", "Element", "Node", "Text"] }

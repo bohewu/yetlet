@@ -1,0 +1,11 @@
+[package]
+name = "yetlet-server-axum"
+description = "Axum response adapter for native Yetlet HTML"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+axum.workspace = true
+yetlet-core = { path = "../yetlet-core" }
+yetlet-html = { path = "../yetlet-html" }
