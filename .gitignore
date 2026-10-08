@@ -1,0 +1,48 @@
+# Rust build output (keep Cargo.lock tracked)
+target/
+*.rs.bk
+
+# Web dependencies and generated output (keep package lockfiles tracked)
+node_modules/
+dist/
+build/
+.next/
+.nuxt/
+.output/
+.svelte-kit/
+.cache/
+.wrangler/
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local environment and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# Local agent configuration, caches, and scratch files
+.codex/
+.opencode/
+.codegraph/
+.pipeline-output/
+.patches/
+/.tmp/
+/tmp/
+
+# Test and coverage output
+coverage/
+test-results/
+playwright-report/
+.playwright-cli/
+
+# Editor and OS files
+.vscode/
+.cursor/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
