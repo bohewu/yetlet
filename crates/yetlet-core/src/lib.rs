@@ -2,6 +2,9 @@
 //!
 //! This is an MVP spike, not a stable public component or template API.
 
+/// Validated renderer-neutral identity, key, and dynamic-slot vocabulary.
+pub mod binding;
+
 /// A UI tree that can be consumed by either a native HTML or a browser renderer.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum View {

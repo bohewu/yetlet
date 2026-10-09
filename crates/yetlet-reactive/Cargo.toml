@@ -1,0 +1,8 @@
+[package]
+name = "yetlet-reactive"
+description = "Explicitly owned synchronous local update graph for Yetlet"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]

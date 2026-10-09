@@ -1,6 +1,6 @@
 # Yetlet Architecture — v0 Design Baseline
 
-**Status:** Evolving architecture with locally validated M0–M4 functionality and an informational M5 acceptance/performance baseline (2026-10-08); no production release assurance.
+**Status:** Evolving architecture with locally validated M0–M7 functionality and a frozen bounded M7 architecture (2026-10-09); the reviewer-found runtime-lifetime repair, replacement validation and repeat final review pass, while production release assurance remains open.
 **Scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
 **Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md).
 
@@ -35,7 +35,7 @@ This is **not** a proposal to rebuild a browser, HTTP transport stack, WebSocket
 ```text
                        ┌────────────────────────────┐
                        │ Rust component declarations│
-                       │  + signals + typed actions │
+                       │ + local state + typed actions│
                        └──────────────┬─────────────┘
                                       │ compiler/macros (future)
                            Component description / IR
@@ -115,15 +115,19 @@ GET /app → shell HTML + compiled client artifacts
 
 Shared component source does not imply inclusion of server-side repositories or other privileged dependencies in browser artifacts. Browser data access is through capabilities that bind to explicit HTTP APIs.
 
+**M7i production evidence (2026-10-09):** `/app` now preflights and binds its local Todo list through optional `yetlet-dom-keyed`, then drives typed `TodoCommand` values through one strongly owned `yetlet-reactive::LocalGraph`. Existing keyed rows are updated in place; the separate Create button remains an explicit `HttpExecutor` path. Chrome and Firefox verify identity, disposal, remount and no local request circuit. The Search Island does not acquire either dependency. See [M7i verification](M7I-VERIFICATION.md).
+
 ## 5. Proposed module boundaries
 
 | Candidate module | Responsibility | Timing |
 |---|---|---|
 | `yetlet-core` | Renderer-neutral component/View and state primitives | M1 |
+| `yetlet-reactive` | Optional explicitly owned synchronous local update graph | M7g |
 | `yetlet-html` | Deterministic HTML serializer and escaping | M1 |
 | `yetlet-server-axum` | HTTP/UI/API routing integration, headers | M1 |
 | `yetlet-dom` | Browser DOM mount and updates | M2 |
-| `examples/todo-browser` | Browser WASM bootstrap/example | M2 |
+| `yetlet-dom-keyed` | Optional keyed child reconciliation and listener ownership | M7h |
+| `examples/todo-browser` | Browser WASM bootstrap; production keyed local Todo path | M2 / M7i |
 | `examples/search-island` | Search-specific lazy island runtime | M3 |
 | `yetlet-actions` | Typed commands and pluggable executor boundaries | M4 |
 | `yetlet-macros` | Compile-time `ui!` DSL and template extraction | Future spike |
@@ -159,7 +163,27 @@ fn TodoList(items: &[Todo]) -> View {
 
 The native target outputs HTML; the browser target creates and updates DOM. Component boundaries and stable identifiers must be deterministic to avoid hydration mismatches.
 
-**Design hypothesis:** A future macro may extract static templates and dynamic slots, potentially reducing VDOM diff costs. For the MVP, a minimal `View`/node representation is sufficient to establish a measured baseline. Whether a template IR is warranted remains an open spike decision.
+**M7a measured evidence:** An isolated release benchmark compared current subtree replacement, a positional `View` patch, keyed direct DOM and runtime-cloned static slots over 200 rows × 500 updates × 10 rounds. The retained `2026-10-09T02:02:22+00:00` report recorded median round totals of 213.500, 41.700, 2.000 and 1.900 ms respectively on one local Chrome 155 environment. Whole replacement lost owned input/keyed-row identity; the positional patch preserved the input but not keyed identity after reorder; keyed/slot prototypes preserved both. Production Browser/Search assets remained byte-identical. See [M7a verification](M7A-VERIFICATION.md).
+
+**M7b prototype evidence:** The isolated `yetlet-keyed-bindings` crate expresses one fixed keyed-list shape with native SSR, allowlisted typed text/attributes, one conditional slot and one local typed row action. Browser binding preflights component/instance/key/slot/shape identity before attaching listeners, preserves existing SSR nodes, reconciles keyed insert/remove/reorder, and supports explicit disposal. Production Browser/Search assets and dependency graphs remain unchanged. See [M7b verification](M7B-VERIFICATION.md).
+
+**M7c prototype evidence:** The same isolated crate now contains one explicitly owned synchronous local graph. Strong ownership stays in `LocalGraph`; dispatch handles and subscriptions are weak. FIFO batches reduce into one draft and one commit, re-entrant messages run in a later bounded pass, reducer errors preserve the previous commit, renderer errors fault the graph, and disposal releases observers/listeners/captures. Chrome verifies the graph driving the M7b binding without HTTP or WebSocket traffic. See [M7c verification](M7C-VERIFICATION.md).
+
+**M7d prototype evidence:** The fixed row now optionally owns one controlled text input. Model-aware live-value updates avoid resetting caret selection; successful keyed reconciliation captures/restores a connected focused input and selection, while focused row removal deliberately leaves the detached node unfocused. Chrome 155 and Firefox 157 verify input identity/value/focus/selection across reorder plus listener cleanup after row removal and owner disposal. See [M7d verification](M7D-VERIFICATION.md).
+
+**M7e evidence freeze:** The complete native/wasm32/Chrome/Firefox regression, M7a benchmark rerun, production asset comparison and dependency isolation pass without changing production Browser/Search bytes. The evidence identifies small identity, slot, keyed reconciliation, ownership/disposal and weak-handle patterns as candidates for later extraction, but promotes none of the current APIs. See [M7e verification](M7E-VERIFICATION.md).
+
+**M7f promoted contract:** `yetlet-core::binding` now owns renderer-neutral `ComponentIdentity`, `BindingKey`, `SlotName`, `InertAttributeName` and `SlotDescriptor` types. The fixed M7b authoring prototype consumes these contracts, eliminating duplicate validation while remaining experimental. This promotion selects only the shared trust-boundary vocabulary; it does not select a template IR, DOM reconciler, scheduler or hydration protocol. See [M7f verification](M7F-VERIFICATION.md).
+
+**M7g optional graph:** The exact synchronous graph proven in M7c now lives in dependency-free `yetlet-reactive`. It retains one strong owner, weak dispatch/subscription handles, FIFO batching, bounded later-pass re-entrancy, recoverable reducer errors, faulted commit errors and deterministic disposal. It is an explicit local message/commit primitive, not field-level signals, automatic effects or an async scheduler. See [M7g verification](M7G-VERIFICATION.md).
+
+**M7h optional keyed DOM:** `yetlet-dom-keyed` now owns validated keyed order, element-plus-state entries, insert/remove/reorder reconciliation and disposable event-listener ownership. The M7b–M7d fixture consumes the primitive and retains its Chrome/Firefox identity, controlled-input and cleanup evidence. Keeping it independent from `yetlet-dom` is required for pre-adoption production asset isolation; attempts to place or feature-gate it inside the existing renderer changed compiled Browser/Search bytes. The update/DOM mutation failure boundary remains explicit and non-transactional. See [M7h verification](M7H-VERIFICATION.md).
+
+**M7i production adoption:** Todo Browser now binds its local list to the promoted keyed owner and uses a graph-backed adapter at the existing `ActionExecutor<TodoCommand>` boundary. Route runtime ownership is explicit; disposal invalidates the runtime lifetime before dropping local/remote listeners, so queued actions cannot start and in-flight HTTP completions cannot update retired DOM. Readable DOM remains, and remount creates exactly one fresh action path. The remote result list and Search results retain their prior bounded subtree strategy. Separate Cargo builds prevent Todo's expanded browser features from perturbing Search assets. See [M7i verification](M7I-VERIFICATION.md).
+
+**M7j architecture freeze:** [ADR 0007](adr/0007-bounded-keyed-dom-and-local-graph.md) accepts the renderer-neutral binding vocabulary, optional explicitly owned local graph, separate optional keyed DOM owner and one production Todo local-list adoption. It retains direct subtree mounting for simpler/independent surfaces and explicitly rejects inferring a general VDOM, template DSL, signals/forms framework or resumability design from the benchmark. The first final reviewer found one queued/in-flight disposal race; explicit lifetime invalidation plus Chrome/Firefox debug/release regressions repair it. Replacement validation and repeat reviewer Job `wc_job_XZzdXEOIx6owj1o5` PASS are recorded in [M7j verification](M7J-VERIFICATION.md).
+
+M7a–M7e made the keyed/static-slot/local-ownership direction concrete and ended in a no-decision freeze. M7f–M7h promote only independently proven low-level contracts; M7i adopts them for one production Todo local-list path; M7j freezes the bounded decision, repaired runtime lifetime, complete regression evidence and repeat reviewer PASS. The fixed authoring shape, current text-input API, focus policy and conditional-slot shape remain experimental. No public VDOM, dependency-tracked signals/forms runtime, macro DSL or general template compiler is selected.
 
 ### Data-access capabilities
 
@@ -194,7 +218,7 @@ pointer/keyboard/input DOM event
           ▼
  typed command / explicit HTTP form
           │
-          ├─ LocalExecutor
+          ├─ LocalExecutor / LocalGraph adapter
           ├─ HttpExecutor
           └─ Future CustomExecutor (explicit opt-in)
 ```
@@ -202,6 +226,8 @@ pointer/keyboard/input DOM event
 The MVP does not forward raw DOM events. Remote actions need explicit input/output/error schemas; the server must validate permissions again. HTTP mutations must address CSRF, idempotency, replay, and retries. Keep future custom transports separate from renderer interfaces.
 
 **M4 prototype evidence (2026-10-08):** `yetlet-actions` exposes `Command` and injected `ActionExecutor<C>` implementations: `LocalExecutor` runs a shared domain transition; `HttpExecutor` makes an explicit JSON POST to `/api/todos`. `examples/todo-ui` owns `TodoCommand`/`TodoSnapshot`; the server uses the same transition behind an Axum adapter with a per-router in-memory store. Browser E2E confirmed local toggle with no HTTP and a separate semantic Create POST. Typed errors are surfaced without executing untrusted HTML. See [M4 verification](M4-VERIFICATION.md).
+
+**M7i local adapter evidence (2026-10-09):** Todo Browser's local executor now dispatches the same typed command through a weak graph handle and returns only the last successfully committed snapshot. Graph ownership, rendering and listener lifetime remain local to the route runtime; `HttpExecutor` remains the only remote path. This changes local scheduling/DOM ownership, not the command or transport contract.
 
 **Security boundary:** This prototype is anonymous and listens directly over HTTP. Content-type/Origin restrictions and JSON body limits are demonstrated, but they do not implement user authentication, credentialed CSRF protection, or HTTPS reverse-proxy identity. These remain requirements for any real deployment.
 
@@ -225,11 +251,11 @@ WebGPU cannot accelerate ordinary DOM/CSS layout directly. A future WebGPU targe
 |---|---|
 | Rust UI macro limits and compile complexity | Prove shared View plus dual renderer first; decide on IR/`ui!` later |
 | SSR/client state mismatch | Deterministic IDs and SSR/hydration snapshot assertions |
-| WASM bundle size and startup | Measure compressed sizes/mount time and split islands where useful |
-| Over-abstracted DOM updates | Validate direct updates before comparing VDOM/static slots |
+| WASM bundle size and startup | Repaired M7i/M7j records a +82,726 raw / +20,042 local-gzip Browser runtime delta; retain the final baseline and split optional islands where useful |
+| Over-abstracted DOM updates | M7i adopts low-level keyed ownership for one Todo list only; remote/Search subtree paths and fixed authoring remain independent |
 | Server-only dependencies in browser | Target-specific compilation and browser CI |
 | Remote commands accidentally becoming a circuit | Semantic actions only, no default WebSocket |
 | Exploding combinations of modes | MVP exposes only three tested route presets |
 | GPU renderer not matching HTML semantics | Keep GPU outside MVP and provide a separate scene interface |
 
-See [ADR 0001](adr/0001-separation-of-concerns.md), [ADR 0002](adr/0002-events-and-actions.md), and [ADR 0003](adr/0003-renderers-and-loading.md).
+See [ADR 0001](adr/0001-separation-of-concerns.md), [ADR 0002](adr/0002-events-and-actions.md), [ADR 0003](adr/0003-renderers-and-loading.md), and [ADR 0007](adr/0007-bounded-keyed-dom-and-local-graph.md).

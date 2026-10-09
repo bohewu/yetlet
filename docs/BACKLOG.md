@@ -32,7 +32,7 @@ Priority: `P0` is the critical path, `P1` is required for the MVP, and `P2` cove
 | YT-022 | P2 | L | Later | Serializable handler/resumability spike | YT-017 | Demonstrate stable handler identity and safe capture serialization | Deferred |
 | YT-023 | P2 | L | Later | Independent WebGPU scene renderer spike | YT-009 | Reproducible frame/memory results, not a DOM/CSS rewrite | Deferred |
 | YT-024 | P2 | M | Later | Custom action executor transport | YT-015 | Opt-in interface without UI/runtime/server coupling | Deferred |
-| YT-025 | P2 | M | Later | Static-template IR versus VDOM benchmark | YT-009 | Compare update cost/complexity before committing to macros | Deferred |
+| YT-025 | P2 | M | M7a | Static-template IR versus VDOM benchmark | YT-009 | [M7a evidence](M7A-VERIFICATION.md): 4 isolated strategies, equivalent output, identity/focus and release asset isolation measured | Done |
 
 ## User-approved HTTP core extension
 
@@ -59,11 +59,27 @@ The middleware/RequestContext handoff adds these scoped tasks after M4 without r
 
 **M6 is locally complete at prototype scope**, not production or independent security certification. Session/Cookie Auth/Redis/Cache/Output Cache are candidate providers, not M6 deliverables. The request-correlation proof does not implement all deferred `YT-029` providers or operational controls.
 
+## M7 — Component authoring, keyed DOM and local reactivity
+
+M7a–M7e completed the research evidence freeze. The maintainer then authorized a bounded continuation: promote only independently proven low-level contracts, adopt them in the production Todo Browser, and close M7 with a fresh decision/evidence freeze. Fixed-shape authoring, generic forms, a general VDOM/signals framework and macro DSL remain out of scope.
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-035 | P1 | M | M7b | Keyed binding/static-slot component authoring prototype | YT-025 | [M7b evidence](M7B-VERIFICATION.md): compiled API, SSR identity preflight, typed slots/local events, keyed structure and disposal PASS in isolated Chrome fixture | Done |
+| YT-036 | P1 | L | M7c | Browser-local reactive update graph | YT-035 | [M7c evidence](M7C-VERIFICATION.md): weak handles/subscriptions, one-commit batches, bounded re-entrancy, fail-closed errors, capture/listener disposal and isolated Chrome behavior PASS | Done |
+| YT-037 | P1 | M | M7d | Keyed lifecycle, focus and form-state preservation | YT-036 | [M7d evidence](M7D-VERIFICATION.md): controlled input, keyed reorder/removal, focus/selection and input/click listener cleanup PASS in Chrome 155 and Firefox 157 | Done |
+| YT-038 | P1 | M | M7e | SSR/WASM renderer regression and production bundle review | YT-036, YT-037 | [M7e evidence](M7E-VERIFICATION.md): 86 tests + 5 doctests, wasm32/Chrome/Firefox regressions, retained M5/M7 measurements, byte-identical production assets and no-decision API classification | Done |
+| YT-039 | P1 | M | M7f | Renderer-neutral identity, key and safe slot contracts | YT-038 | [M7f evidence](M7F-VERIFICATION.md): core contract extraction, prototype reuse, 22 targeted tests + 1 doctest, strict Clippy and wasm32 PASS | Done |
+| YT-040 | P1 | L | M7g | Extract synchronous local graph into an optional production crate | YT-039 | [M7g evidence](M7G-VERIFICATION.md): 13 graph tests, strong owner/weak handles, batching, bounded re-entrancy, failure/disposal semantics and native/wasm32 isolation PASS | Done |
+| YT-041 | P1 | L | M7h | General keyed DOM reconciliation and binding ownership primitive | YT-039 | [M7h evidence](M7H-VERIFICATION.md): optional isolated crate, prevalidated unique keys, stable identity, listener disposal, Chrome/Firefox lifecycle and production asset isolation PASS | Done |
+| YT-042 | P1 | L | M7i | Migrate production Todo Browser local list to promoted M7 primitives | YT-040, YT-041 | [M7i evidence](M7I-VERIFICATION.md): SSR parity, Chrome/Firefox keyed identity, queued/in-flight task retirement, disposal/remount, local graph dispatch, explicit HTTP separation, bundle delta and Search isolation PASS | Done |
+| YT-043 | P1 | M | M7j | Final M7 regression, architecture decision and evidence freeze | YT-042 | [M7j evidence](M7J-VERIFICATION.md): 91 tests + 5 doctests, six-package wasm32, debug/release Chrome/Firefox including lifetime races, benchmark, bundle/performance and dependency freeze PASS; repeat reviewer `wc_job_XZzdXEOIx6owj1o5` PASS | Done |
+
 ## Ready queue
 
 **First:** `YT-019` has reproducible local acceptance/measurement evidence. `YT-020` cannot close the public release gate without maintainer licensing and declared support/security decisions; see [release readiness](RELEASE-READINESS.md).
 
-**Current implementation milestone:** YT-030–YT-034 are locally Done. [M6 evidence](M6-VERIFICATION.md) and [Extensions](EXTENSIONS.md) record APIs, limitations and measurements. Public publication (`YT-020`) remains separately blocked; deferred providers/research require an explicit next scope rather than automatic expansion.
+**Current implementation milestone:** YT-030–YT-043 are locally Done. M7 source, bounded decision, reviewer-found lifetime repair, replacement validation and repeat reviewer PASS are frozen. Public publication (`YT-020`) remains separately blocked.
 
 **Do not start before prerequisites:** Generalized hydration, arbitrary event forwarding, WebGPU, and resumability remain out of scope.
 

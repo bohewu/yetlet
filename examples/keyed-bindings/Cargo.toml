@@ -1,0 +1,34 @@
+[package]
+name = "yetlet-keyed-bindings"
+description = "Isolated M7b/M7c/M7d keyed authoring, reactivity, and lifecycle prototype; not a stable runtime API"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[[bin]]
+name = "render-ssr"
+path = "src/bin/render_ssr.rs"
+
+[dependencies]
+yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-dom-keyed = { path = "../../crates/yetlet-dom-keyed" }
+yetlet-html = { path = "../../crates/yetlet-html" }
+yetlet-reactive = { path = "../../crates/yetlet-reactive" }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = "=0.2.129"
+web-sys = { version = "0.3", features = [
+    "console",
+    "Document",
+    "Element",
+    "Event",
+    "HtmlCollection",
+    "HtmlElement",
+    "HtmlInputElement",
+    "Node",
+    "Text",
+    "Window",
+] }

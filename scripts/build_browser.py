@@ -13,7 +13,12 @@ import tomllib
 
 ROOT = Path(__file__).resolve().parent.parent
 DIST = ROOT / "dist"
-JS = 'import init, { mount } from "./yetlet_browser.js";\nawait init();\nmount();\n'
+JS = (
+    'import init, { dispose, mount } from "./yetlet_browser.js";\n'
+    "await init();\n"
+    "globalThis.__yetletTodoRuntime = Object.freeze({ dispose, mount });\n"
+    "mount();\n"
+)
 CSS = """
 :root { color-scheme: light dark; font-family: system-ui, sans-serif; }
 body { max-width: 48rem; margin: 0 auto; padding: 1.5rem; line-height: 1.6; }
@@ -62,9 +67,15 @@ def main():
         raise RuntimeError(f"CLI {cli_version} does not match crate {version}")
 
     release = ["--release"] if options.release else []
+    # Build each browser entry separately so Cargo feature unification from one
+    # application cannot perturb the generated Wasm/JS of the other bundle.
     execute(
         cargo, "build", "--locked", "--target", "wasm32-unknown-unknown",
-        "-p", "yetlet-todo-browser", "-p", "yetlet-search-island", *release
+        "-p", "yetlet-todo-browser", *release
+    )
+    execute(
+        cargo, "build", "--locked", "--target", "wasm32-unknown-unknown",
+        "-p", "yetlet-search-island", *release
     )
     profile = "release" if options.release else "debug"
     source = ROOT / "target/wasm32-unknown-unknown" / profile / "yetlet_todo_browser.wasm"

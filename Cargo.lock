@@ -666,10 +666,48 @@ dependencies = [
 ]
 
 [[package]]
+name = "yetlet-dom-keyed"
+version = "0.1.0"
+dependencies = [
+ "wasm-bindgen",
+ "web-sys",
+ "yetlet-core",
+]
+
+[[package]]
 name = "yetlet-html"
 version = "0.1.0"
 dependencies = [
  "yetlet-core",
+]
+
+[[package]]
+name = "yetlet-keyed-bindings"
+version = "0.1.0"
+dependencies = [
+ "wasm-bindgen",
+ "web-sys",
+ "yetlet-core",
+ "yetlet-dom-keyed",
+ "yetlet-html",
+ "yetlet-reactive",
+]
+
+[[package]]
+name = "yetlet-reactive"
+version = "0.1.0"
+
+[[package]]
+name = "yetlet-render-bench"
+version = "0.1.0"
+dependencies = [
+ "js-sys",
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+ "web-sys",
+ "yetlet-core",
+ "yetlet-dom",
 ]
 
 [[package]]
@@ -715,7 +753,10 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "yetlet-actions",
+ "yetlet-core",
  "yetlet-dom",
+ "yetlet-dom-keyed",
+ "yetlet-reactive",
  "yetlet-todo-ui",
 ]
 

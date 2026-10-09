@@ -174,6 +174,19 @@ def smoke(profile: str) -> str:
                 assert driver.evaluate(
                     "document.querySelectorAll('#todo-list-host li').length"
                 ) == 2
+                assert driver.evaluate(
+                    "document.getElementById('todo-list-host')"
+                    ".getAttribute('data-yetlet-local-runtime')"
+                ) == "keyed-graph"
+                assert driver.evaluate(
+                    "(()=>{"
+                    "window.__yetlet_local_list="
+                    "document.querySelector('#todo-list-host ul.todo-list');"
+                    "window.__yetlet_local_row="
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]');"
+                    "return true;"
+                    "})()"
+                ) is True
                 driver.click("#toggle-first")
                 await_value(
                     lambda: driver.evaluate(
@@ -182,6 +195,12 @@ def smoke(profile: str) -> str:
                     ),
                     "first local action",
                 )
+                assert driver.evaluate(
+                    "document.querySelector('#todo-list-host ul.todo-list') === "
+                    "window.__yetlet_local_list && "
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]') === "
+                    "window.__yetlet_local_row"
+                ) is True
                 driver.click("#toggle-first")
                 await_value(
                     lambda: driver.evaluate(
@@ -190,12 +209,190 @@ def smoke(profile: str) -> str:
                     ),
                     "second local action",
                 )
+                assert driver.evaluate(
+                    "document.querySelector('#todo-list-host ul.todo-list') === "
+                    "window.__yetlet_local_list && "
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]') === "
+                    "window.__yetlet_local_row"
+                ) is True
                 _, _, response = http(base + "/api/todos")
                 assert json.loads(response)["revision"] == 0
                 assert driver.evaluate(
                     "performance.getEntriesByType('resource')"
                     ".filter(e => e.name.endsWith('/api/todos')).length"
                 ) == 0
+
+                assert driver.evaluate(
+                    "(()=>{"
+                    "window.__yetlet_lifecycle_row="
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]');"
+                    "window.__yetlet_queued_local_status="
+                    "document.getElementById('todo-status').textContent;"
+                    "window.__yetlet_queued_remote_status="
+                    "document.getElementById('remote-status').textContent;"
+                    "const runtime=window.__yetletTodoRuntime;"
+                    "if(!runtime || typeof runtime.dispose!=='function' || "
+                    "typeof runtime.mount!=='function'){return false;}"
+                    "document.getElementById('remote-title').value="
+                    "'Firefox queued action must not run';"
+                    "document.getElementById('toggle-first').click();"
+                    "document.getElementById('create-remote').click();"
+                    "runtime.dispose();"
+                    "window.__yetlet_lifecycle='disposed';"
+                    "return true;"
+                    "})()"
+                ) is True
+                time.sleep(0.4)
+                assert driver.evaluate(
+                    "document.getElementById('todo-status').textContent === "
+                    "window.__yetlet_queued_local_status && "
+                    "document.getElementById('remote-status').textContent === "
+                    "window.__yetlet_queued_remote_status"
+                ) is True
+                assert driver.evaluate(
+                    "document.documentElement.getAttribute('data-yetlet-ready')"
+                ) is None
+                assert driver.evaluate(
+                    "document.documentElement.getAttribute('data-yetlet-disposed')"
+                ) == "true"
+                assert driver.evaluate(
+                    "window.__yetlet_lifecycle_row.isConnected && "
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]') === "
+                    "window.__yetlet_lifecycle_row"
+                ) is True
+                driver.click("#toggle-first")
+                driver.click("#create-remote")
+                time.sleep(0.4)
+                assert driver.evaluate(
+                    "window.__yetlet_lifecycle_row.getAttribute('data-completed')"
+                ) == "false"
+                assert driver.evaluate(
+                    "document.getElementById('todo-status').textContent"
+                ) == "First task: active"
+                assert driver.evaluate(
+                    "document.getElementById('remote-status').textContent"
+                ) == "No remote action sent"
+                assert driver.evaluate(
+                    "performance.getEntriesByType('resource')"
+                    ".filter(e => e.name.endsWith('/api/todos')).length"
+                ) == 0
+
+                assert driver.evaluate(
+                    "(()=>{window.__yetletTodoRuntime.mount();return true;})()"
+                ) is True
+                await_value(
+                    lambda: driver.evaluate(
+                        "document.documentElement.getAttribute('data-yetlet-ready') === 'true'"
+                    ),
+                    "Todo runtime remount",
+                )
+                assert driver.evaluate(
+                    "document.documentElement.getAttribute('data-yetlet-disposed')"
+                ) is None
+                assert driver.evaluate(
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]') !== "
+                    "window.__yetlet_lifecycle_row && "
+                    "!window.__yetlet_lifecycle_row.isConnected"
+                ) is True
+                assert driver.evaluate(
+                    "(()=>{window.__yetlet_remount_row="
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]');"
+                    "return true;})()"
+                ) is True
+                driver.click("#toggle-first")
+                await_value(
+                    lambda: driver.evaluate(
+                        "window.__yetlet_remount_row.getAttribute('data-completed') === 'true'"
+                    ),
+                    "single local action after remount",
+                )
+                assert driver.evaluate(
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]') === "
+                    "window.__yetlet_remount_row"
+                ) is True
+                assert driver.evaluate(
+                    "document.getElementById('todo-status').textContent"
+                ) == "First task: completed"
+                assert driver.evaluate(
+                    "performance.getEntriesByType('resource')"
+                    ".filter(e => e.name.endsWith('/api/todos')).length"
+                ) == 0
+                driver.click("#toggle-first")
+                await_value(
+                    lambda: driver.evaluate(
+                        "window.__yetlet_remount_row.getAttribute('data-completed') === 'false'"
+                    ),
+                    "second local action after remount",
+                )
+                assert driver.evaluate(
+                    "(()=>{"
+                    "window.__yetlet_original_fetch=window.fetch.bind(window);"
+                    "window.__yetlet_fetch_gate={started:false,ready:false};"
+                    "window.fetch=(...args)=>{"
+                    "window.__yetlet_fetch_gate.started=true;"
+                    "return window.__yetlet_original_fetch(...args).then(response=>"
+                    "new Promise(resolve=>{"
+                    "window.__yetlet_fetch_gate.ready=true;"
+                    "window.__yetlet_fetch_gate.release=()=>resolve(response);"
+                    "}));"
+                    "};"
+                    "window.__yetlet_retired_remote_status="
+                    "document.getElementById('remote-status');"
+                    "window.__yetlet_retired_remote_host="
+                    "document.getElementById('remote-list-host');"
+                    "window.__yetlet_retired_remote_host_before="
+                    "window.__yetlet_retired_remote_host.textContent;"
+                    "document.getElementById('remote-title').value='  ';"
+                    "document.getElementById('create-remote').click();"
+                    "return true;"
+                    "})()"
+                ) is True
+                await_value(
+                    lambda: driver.evaluate(
+                        "Boolean(window.__yetlet_fetch_gate?.ready && "
+                        "typeof window.__yetlet_fetch_gate.release === 'function')"
+                    ),
+                    "retired HTTP response gate",
+                )
+                assert driver.evaluate(
+                    "window.__yetlet_retired_remote_status.textContent"
+                ) == "Saving to server..."
+                assert driver.evaluate(
+                    "performance.getEntriesByType('resource')"
+                    ".filter(e => e.name.endsWith('/api/todos')).length"
+                ) == 1
+                assert driver.evaluate(
+                    "(()=>{"
+                    "window.__yetletTodoRuntime.dispose();"
+                    "window.__yetletTodoRuntime.mount();"
+                    "window.__yetlet_fetch_gate.release();"
+                    "return true;"
+                    "})()"
+                ) is True
+                await_value(
+                    lambda: driver.evaluate(
+                        "document.documentElement.getAttribute('data-yetlet-ready') === 'true'"
+                    ),
+                    "Todo runtime remount before retired response completion",
+                )
+                time.sleep(0.4)
+                assert driver.evaluate(
+                    "window.__yetlet_retired_remote_status.textContent"
+                ) == "Saving to server..."
+                assert driver.evaluate(
+                    "window.__yetlet_retired_remote_host.textContent === "
+                    "window.__yetlet_retired_remote_host_before"
+                ) is True
+                assert driver.evaluate(
+                    "document.getElementById('remote-status').textContent"
+                ) == "No remote action sent"
+                driver.evaluate("(window.fetch=window.__yetlet_original_fetch)")
+                _, _, response = http(base + "/api/todos")
+                assert json.loads(response)["revision"] == 0
+                print("PASS: Firefox queued actions are retired by disposal")
+                print("PASS: Firefox retired HTTP completion cannot update remounted DOM")
+                print("PASS: Firefox keyed local row/list identity survives updates")
+                print("PASS: Firefox dispose detaches listeners and remount avoids duplicates")
 
                 driver.evaluate(
                     "(document.getElementById('remote-title').value='Firefox saved task')"

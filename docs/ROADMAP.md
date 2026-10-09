@@ -1,6 +1,6 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**Status:** Draft, last reviewed 2026-10-08.
+**Status:** Draft, last reviewed 2026-10-09.
 
 Milestones are sequenced by capability and dependencies rather than invented delivery dates. The [MVP specification](MVP.md) provides acceptance criteria. Each gate must retain real commands, results, and relevant architectural decisions.
 
@@ -13,6 +13,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M4 — API/action integration** | Typed actions, HTTP executor, JSON API, strict CSP/security evidence | YT-014–YT-016, YT-018 | Clear local/remote boundary, correct API errors, working browser/CSP E2E |
 | **M5 — MVP validation/docs** | Cross-target regression, browser smoke, baseline measurements, examples | YT-019–YT-020 | Evidence for [A01–A10](MVP.md#3-acceptance-matrix) and public limitations |
 | **M6 — Handler-first API and optional extensions (locally complete)** | App/Page APIs, explicit module functions, independent Request ID proof and migrated Todo | YT-030–YT-034 | Native/Chrome/Firefox contracts PASS; release assets unchanged; measured latency comparison, no mandatory MVC or DI |
+| **M7 — Bounded keyed DOM and local reactivity (locally complete)** | Measured strategies, promoted low-level contracts, production Todo keyed graph and final decision freeze | YT-025, YT-035–YT-043 | Equivalent output, ownership/disposal, cross-browser lifecycle, measured bundle cost, Search isolation, complete regression and repeat reviewer PASS |
 
 ## Critical path
 
@@ -33,6 +34,12 @@ YT-027 + YT-016 → YT-030 (thin App facade) → YT-031 (handler/results DX)
 YT-030 + YT-026 → YT-032 (opt-in contract) → YT-033 (optional proof)
 YT-030 + YT-031 + YT-033 → YT-034 (Todo handler-first demo)
 # M6 is not blocked by separate public-release ticket YT-020.
+YT-009 → YT-025 (M7a strategy benchmark) → YT-035 (authoring prototype)
+YT-035 → YT-036 (local reactive graph) → YT-037 (keyed lifecycle)
+YT-036 + YT-037 → YT-038 (SSR/WASM regression)
+YT-038 → YT-039 (binding contracts)
+YT-039 → YT-040 (local graph) + YT-041 (keyed DOM)
+YT-040 + YT-041 → YT-042 (production Todo adoption) → YT-043 (final freeze)
 ```
 
 Prove native SSR before committing to an elaborate browser view IR. Avoid simultaneously designing DOM, SSR, islands, and GPU abstraction layers before the smallest dual-target implementation works.
@@ -119,12 +126,45 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 
 **Deferred:** MVC-specific helpers are optional future choices, **not required** for M6; so are Controller inheritance, convention discovery, `#[controller]` macros, full template DSL, Session/Authentication/Redis/Cache providers, a dynamic Plugin Manager and a mandatory DI container.
 
+### M7 — Component authoring, keyed DOM and local reactivity (locally complete)
+
+- [x] `YT-025 / M7a`: Isolated release benchmark compares current subtree replacement, positional View patch, keyed direct DOM and static template slots with identical seeded workloads.
+- [x] `YT-035 / M7b`: Isolated keyed/static-slot authoring API covers native SSR, identity preflight, typed text/attributes, one conditional/local event, keyed structure and explicit disposal.
+- [x] `YT-036 / M7c`: Explicit owner plus weak handles/subscriptions, FIFO batching, bounded re-entrant passes, fail-closed errors and local keyed-render commits without remote events.
+- [x] `YT-037 / M7d`: Controlled row input, keyed insert/remove/reorder, focus/selection and listener cleanup verified in Chrome 155 and Firefox 157.
+- [x] `YT-038 / M7e`: Complete native/SSR/WASM/CSP/bundle/performance regression and freeze a no-decision API classification.
+- [x] `YT-039 / M7f`: Promote renderer-neutral component/instance/key/slot and inert-attribute contracts into `yetlet-core`; retain fixed authoring as experimental.
+- [x] `YT-040 / M7g`: Extract the proven synchronous strong-owner/weak-handle local graph into an optional production crate.
+- [x] `YT-041 / M7h`: Implement a general keyed DOM reconciliation and explicit binding/listener ownership primitive.
+- [x] `YT-042 / M7i`: Migrate the production Todo Browser local list path and prove Chrome/Firefox identity/lifecycle behavior.
+- [x] `YT-043 / M7j`: Run the final full regression, bundle/performance comparison, architecture decision and evidence freeze.
+
+**M7a local evidence (2026-10-09, retained report `2026-10-09T02:02:22+00:00`):** 200 rows, 500 updates, 10 measured rounds in Chrome 155. Median total round: subtree replacement 213.500 ms; positional View patch 41.700 ms; keyed direct DOM 2.000 ms; static template slots 1.900 ms. All strategies produced equivalent final states. Only keyed/slot prototypes preserved the untouched keyed row after reorder; whole replacement also lost owned input identity/focus. Production Browser/Search digest remained `3f3c5f074478c525`. See [M7a verification](M7A-VERIFICATION.md). This is architecture evidence, not a selected production renderer or framework comparison.
+
+**M7b local evidence (2026-10-09):** Four native authoring/SSR tests, one compiling rustdoc example, wasm32/release build and an isolated Chrome 155 E2E passed. Mismatched instance/key or actual child-node/slot shape fails before binding; successful bind preserves SSR root/row/label/text identity, handles local typed events and conditional insertion/removal, preserves keyed rows across reverse/append/remove, and disposes listeners explicitly without stale handles affecting newer owners. Production digest remains `3f3c5f074478c525`. See [M7b verification](M7B-VERIFICATION.md).
+
+**M7c local evidence (2026-10-09):** Thirteen reactive-core tests plus the existing four M7b tests and one doctest pass. The isolated Chrome fixture verifies a three-message/one-commit batch, deferred re-entrant dispatch, explicit observer/owner disposal, recoverable reducer failure, faulted renderer failure with keyed DOM identity preserved, and no HTTP/WebSocket circuit. Reviewer regressions prove nested subscription cleanup, caller iterator/state release and reducer/commit failure cleanup occur outside graph borrows without retaining replayable queue work; reducer-triggered owner disposal skips remaining messages/commit. See [M7c verification](M7C-VERIFICATION.md).
+
+**M7d local evidence (2026-10-09):** The fixed keyed row adds one allowlisted controlled text input. Chrome 155 and Firefox 157 preserve its node identity, live value, focus and selection through keyed reorder; focused row removal and owner disposal remove input/click listeners so detached events cannot update the graph. Native SSR escaping/authoring checks and strict CSP remain intact. See [M7d verification](M7D-VERIFICATION.md).
+
+**M7e local evidence (2026-10-09):** 86 workspace tests, 5 doctests, strict Clippy/format, four-package wasm32 checks, production Chrome 155 and Firefox 157 regressions, the complete M7a workload, and isolated M7b/M7c/M7d Chrome/Firefox release regressions pass. Production Browser/Search assets remain byte-identical at `3f3c5f074478c525`, and dependency graphs exclude both M7 experimental crates. The outcome is a no-decision evidence freeze: several small primitives are candidates for later extraction, but no current M7 API or renderer is promoted. See [M7e verification](M7E-VERIFICATION.md).
+
+**M7f local evidence (2026-10-09):** `yetlet-core` now owns validated `ComponentIdentity`, `BindingKey`, `SlotName`, `InertAttributeName` and `SlotDescriptor` contracts. The isolated authoring prototype consumes those types while retaining its experimental fixed shape. Five core tests, seventeen prototype tests, one doctest, strict targeted Clippy and wasm32 compile pass. See [M7f verification](M7F-VERIFICATION.md).
+
+**M7g local evidence (2026-10-09):** The exact M7c graph implementation and its thirteen ownership/batching/re-entrancy/failure/teardown tests now live in dependency-free `yetlet-reactive`. The keyed-binding fixture uses a compatibility re-export and retains four authoring tests plus one doctest. Strict targeted Clippy and native/wasm32 checks pass. See [M7g verification](M7G-VERIFICATION.md).
+
+**M7h local evidence (2026-10-09):** Optional `yetlet-dom-keyed` now owns unique-order validation, keyed entry state, reconciliation and disposable listener lifetimes. The existing fixed-shape fixture consumes it and passes Chrome 155/Firefox 157 reorder, form-state and teardown regressions. Direct/feature-gated placement in `yetlet-dom` changed production bytes; the independent crate restored the canonical production digest `3f3c5f074478c525`. See [M7h verification](M7H-VERIFICATION.md).
+
+**M7i local evidence (2026-10-09):** The production Todo Browser local list uses `yetlet-reactive` plus `yetlet-dom-keyed`, while the remote typed HTTP path and Search Island remain separate. Chrome 155 and Firefox 157 preserve local list/row identity, verify queued click→dispose retirement, ignore a delayed HTTP completion after disposal/remount, and retain SSR/CSP/API/Search regressions. The repaired production digest is `faebb0709dccd863`; the Browser runtime increases by 82,726 raw / 20,042 local-gzip bytes relative to M7e, while Search JS/WASM remain byte-identical after separate package builds. See [M7i verification](M7I-VERIFICATION.md).
+
+**M7j final evidence (2026-10-09):** Replacement validation passes 91 workspace tests, 5 doctests, strict Clippy/format, six-package wasm32, debug/release Chrome 155 and Firefox 157 regressions including queued/in-flight lifetime races, the full M7a workload, isolated keyed lifecycle suites, dependency checks and a repeated release baseline. ADR 0007 selects only bounded identity/graph/keyed-DOM primitives and the Todo local-list adoption. Production digest is `faebb0709dccd863`; Search remains byte-identical. The first final reviewer found the lifetime P2 that this source repairs; repeat reviewer `wc_job_XZzdXEOIx6owj1o5` returned PASS with no issues or follow-ups. See [M7j verification](M7J-VERIFICATION.md).
+
 ## Post-MVP research
 
 | Track | Research question |
 |---|---|
 | Streaming SSR | Does the API need streamed suspense and a measured first-byte advantage? |
-| Compile-time template IR | Are static slot macros necessary, or are direct reactive DOM bindings sufficient? |
+| Compile-time template IR | M7b–M7e prove one fixed shape; M7f–M7i promote only low-level contracts and one production keyed-list path. General trees remain required before any macro decision |
 | Resumability | Can stable IDs and serialized, constrained handler captures work in Rust? |
 | Custom transport | What is the smallest truly pluggable action executor interface? |
 | WebGPU renderer | Can a separate renderer measurably improve 10k–100k scene-node workloads? |

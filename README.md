@@ -2,7 +2,7 @@
 
 **Yetlet** is an experimental, HTML-first Rust universal UI runtime. A shared Rust `View`/component source supports native SSR and browser WASM/DOM without a default remote event circuit.
 
-> **Status:** M0–M6 are implemented and locally verified at **experimental prototype** scope. M6 includes handler/SSR results, explicit module composition, an independent optional Request ID provider and the migrated Todo example. Public release still needs licensing, support policy and production/security qualification; generic resumability and WebGPU are not implemented.
+> **Status:** M0–M7 are implemented and locally verified at **experimental prototype** scope. M7 closes with renderer-neutral binding contracts, optional local graph/keyed-DOM ownership and one production Todo local-list adoption. A first final review found a queued/in-flight action disposal race; the lifetime repair, replacement full validation and repeat read-only reviewer now pass. No general VDOM, template macro, dependency-tracked signals/forms framework, resumability or WebGPU renderer is selected.
 
 ## Design principles
 
@@ -12,20 +12,21 @@
 - **Strict CSP:** Escaped SSR output and an allowlisted browser DOM subset. The `/app` CSP allows `'wasm-unsafe-eval'` where necessary, but not `'unsafe-eval'` or `'unsafe-inline'`.
 - **Modular, opt-in capabilities:** `configure`/`try_configure` use ordinary setup functions, not a plugin manager. `yetlet-request-id` proves independent scoped/global installation; Session, Cookie Auth and Cache remain future providers. See [Extensions](docs/EXTENSIONS.md) and [ADR 0005](docs/adr/0005-opt-in-capability-modules.md).
 - **Handler-first, Component-first, MVC optional (approved direction):** Ordinary Rust handlers and shared Views, typed HTTP results with minimal scaffolding. Full Controllers, model binders, DI and a mandatory MVC file layout are not required. See [ADR 0006](docs/adr/0006-handler-first-mvc-optional.md).
+- **Bounded keyed updates, not a global renderer mandate:** Applications opt into explicit local graph and keyed ownership for proven surfaces; simple/independent subtrees may retain direct mount replacement. See [ADR 0007](docs/adr/0007-bounded-keyed-dom-and-local-graph.md).
 
 ## Implemented and planned functionality
 
 | Mode / route | Status | Behavior |
 |---|---|---|
 | `GET /` | Implemented (M1) | Native SSR TodoList; zero browser runtime |
-| `GET /app` | Implemented (M2) | External JS loader and Rust/WASM DOM mount with a local toggle |
+| `GET /app` | Implemented (M2/M7i) | Rust/WASM mount; keyed local Todo graph plus separate typed HTTP action |
 | `GET /healthz` | Implemented | Health check |
 | `GET /api/ping` | Implemented | Standalone JSON API endpoint |
 | `GET /search` | Implemented (M3) | Complete SSR search page; Search WASM loads only after interaction and filters locally |
 | `GET/POST /api/todos` | Implemented (M4) | Typed snapshot API and validated semantic Create/Toggle commands, with structured errors |
 | Canvas/WebGPU | Deferred research | Independent scene renderer, not a DOM replacement |
 
-Server and browser targets compile the same `TodoList` source from `examples/todo-ui`. On `/app`, the local toggle uses an injected `LocalExecutor` without a request; the separate server-create button uses an injected `HttpExecutor` to POST a typed Todo command, then renders the server's snapshot. `/search` continues to render HTML immediately and activate Search WASM lazily from escaped versioned state. **DOM events are never forwarded as remote events.**
+Server and browser targets compile the same `TodoList` source from `examples/todo-ui`. On `/app`, the local toggle dispatches a typed command through an explicitly owned local graph and keyed DOM binding without a request; the separate server-create button uses `HttpExecutor` to POST a typed Todo command, then renders the server snapshot in its own host. `/search` continues to render HTML immediately and activate Search WASM lazily from escaped versioned state. **DOM events are never forwarded as remote events.**
 
 ## HTTP middleware and request context
 
@@ -79,7 +80,14 @@ Open `http://127.0.0.1:3000/` (SSR), `http://127.0.0.1:3000/app` (browser/WASM),
 cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --all-targets --locked
-cargo check --locked -p yetlet-todo-browser -p yetlet-search-island --target wasm32-unknown-unknown
+cargo check --locked \
+  -p yetlet-todo-browser \
+  -p yetlet-search-island \
+  -p yetlet-reactive \
+  -p yetlet-dom-keyed \
+  -p yetlet-render-bench \
+  -p yetlet-keyed-bindings \
+  --target wasm32-unknown-unknown
 
 python3 scripts/check_docs.py
 cargo build --locked -p yetlet-todo-server
@@ -96,25 +104,50 @@ python3 scripts/measure_baseline.py --profile release --samples 30 \
   --browser-runs 5 --out target/m5-baseline-release.json
 ```
 
+The isolated M7a render benchmark is built and measured separately; it does not modify production `dist/`:
+
+```bash
+python3 scripts/build_browser.py --release
+python3 scripts/measure_render_strategies.py \
+  --capture-production-before target/m7a-production-before.json
+python3 scripts/build_render_bench.py --release
+python3 scripts/measure_render_strategies.py --profile release \
+  --rows 200 --updates 500 --rounds 10 --seed 7 \
+  --production-before target/m7a-production-before.json \
+  --out target/m7a-render-strategies.json
+```
+
+The combined M7b/M7c/M7d authoring, local-reactivity and lifecycle prototype is also isolated from production routes/assets. M7e reruns both this fixture and the production regressions before freezing the evidence:
+
+```bash
+python3 scripts/build_keyed_bindings.py --release
+python3 scripts/smoke_keyed_bindings.py --profile release
+python3 scripts/smoke_keyed_bindings_firefox.py --profile release
+```
+
 Do not mix debug and release asset builds. Results are recorded in [M5 verification](docs/M5-VERIFICATION.md); size estimates refer to local gzip artifacts, not actual transfer bytes.
 
-Browser smoke tests use an isolated headless Chrome profile and temporary localhost server, stopping only their own processes. M2 checks cover shared DOM and local clicks; M3 covers lazy islands, SSR preservation, local filtering, and version-incompatible fail-closed behavior. M4 checks cover an explicit typed HTTP POST, the returned server snapshot, typed 422 failure visibility, and no network traffic from local clicks. See [M2](docs/M2-VERIFICATION.md), [M3](docs/M3-VERIFICATION.md), and [M4 verification](docs/M4-VERIFICATION.md).
+Browser smoke tests use isolated headless profiles and temporary localhost servers, stopping only their own processes. M2 checks shared DOM/local clicks; M3 covers lazy islands and fail-closed state; M4 covers the explicit typed HTTP boundary. M7i additionally checks stable keyed row/list identity, explicit graph/listener disposal, readable detached DOM and duplicate-free remount in Chrome and Firefox. See [M7i verification](docs/M7I-VERIFICATION.md).
 
 ## Workspace structure
 
-- `yetlet-core` — Renderer-neutral `View` model.
+- `yetlet-core` — Renderer-neutral `View` model plus validated component/instance/key/slot and inert-attribute binding contracts.
+- `yetlet-reactive` — Optional strong-owner/weak-handle synchronous local message, batching and commit graph.
 - `yetlet-html` — HTML serializer with escaping and a safe element/attribute policy.
 - `yetlet-dom` — Direct browser DOM renderer with a restricted HTML subset.
+- `yetlet-dom-keyed` — Optional keyed child reconciliation, entry-state ownership and disposable browser listeners.
 - `yetlet-actions` — Typed commands and injectable LocalExecutor/HttpExecutor contracts.
 - `yetlet-server-axum` — Thin App Builder, Page response, explicit setup composition, RequestContext and native Tower middleware.
 - `yetlet-request-id` — Optional process-local numeric request correlation; the core does not depend on it.
 - `examples/todo-ui` — Shared TodoList, local transitions, and versioned search state.
-- `examples/todo-browser` — Rust/WASM entrypoint with local event binding.
+- `examples/todo-browser` — Rust/WASM entrypoint with a keyed local graph and separate typed HTTP action path.
 - `examples/search-island` — Lazy Search WASM, SSR DOM preservation, and local input handling.
+- `examples/render-bench` — Isolated M7a strategy fixture; not a production route or public renderer API.
+- `examples/keyed-bindings` — Isolated fixed-shape authoring and cross-browser lifecycle/form-state prototype; its reactive module re-exports optional `yetlet-reactive`.
 - `examples/todo-server` — SSR/browser routes and in-memory typed GET/POST Todo API.
-- `scripts/build_browser.py` — Content-addressed browser asset pipeline.
+- `scripts/build_browser.py` — Content-addressed browser asset pipeline with isolated Todo/Search Cargo builds.
 
-**Known limitations:** Browser/island updates use owned-subtree replacement; SearchStateV1 is **not** generic hydration/resumability. The Todo API is an anonymous in-memory demo, not a user-data service. HTTP origin checks need a trusted scheme/host behind TLS reverse proxies, and there is no production auth/CSRF, persistence, stable API, full IME/a11y matrix, or comparative benchmark. Only Chrome 155 and Firefox 157 headless browser scenarios were tested; see [release readiness](docs/RELEASE-READINESS.md).
+**Known limitations:** Only the production Todo local list uses the promoted keyed graph; remote Todo results and Search result updates retain bounded subtree replacement. The fixed keyed/static-slot authoring shape, text-input/focus policy and conditional slot remain experimental. Nested/general component trees, async effects, IME/mobile/WebKit coverage and generic hydration/resumability remain absent. The Todo API is anonymous/in-memory, and production auth/CSRF, persistence, stable API, full IME/a11y matrix and cross-framework benchmarks remain absent. See [M7i verification](docs/M7I-VERIFICATION.md) and [release readiness](docs/RELEASE-READINESS.md).
 
 ## Documentation
 
@@ -128,6 +161,16 @@ Browser smoke tests use an isolated headless Chrome profile and temporary localh
 - [M5 acceptance and measured baseline](docs/M5-VERIFICATION.md)
 - [M6a App Builder verification](docs/M6A-VERIFICATION.md)
 - [Complete M6 verification and performance comparison](docs/M6-VERIFICATION.md)
+- [M7a render-strategy benchmark](docs/M7A-VERIFICATION.md)
+- [M7b keyed/static-slot authoring prototype](docs/M7B-VERIFICATION.md)
+- [M7c explicitly owned local-reactivity prototype](docs/M7C-VERIFICATION.md)
+- [M7d keyed lifecycle and form-state verification](docs/M7D-VERIFICATION.md)
+- [M7e renderer regression and no-decision evidence freeze](docs/M7E-VERIFICATION.md)
+- [M7f renderer-neutral binding contracts](docs/M7F-VERIFICATION.md)
+- [M7g optional synchronous local graph](docs/M7G-VERIFICATION.md)
+- [M7h optional keyed DOM ownership](docs/M7H-VERIFICATION.md)
+- [M7i production Todo keyed-graph adoption](docs/M7I-VERIFICATION.md)
+- [M7j final architecture and evidence freeze](docs/M7J-VERIFICATION.md)
 - [Module composition and optional providers](docs/EXTENSIONS.md)
 - [Prototype release readiness and blockers](docs/RELEASE-READINESS.md)
 - [ADR 0001](docs/adr/0001-separation-of-concerns.md)
@@ -136,5 +179,6 @@ Browser smoke tests use an isolated headless Chrome profile and temporary localh
 - [ADR 0004 — RequestContext and middleware](docs/adr/0004-request-context-and-middleware.md)
 - [ADR 0005 — Optional capability modules](docs/adr/0005-opt-in-capability-modules.md)
 - [ADR 0006 — Handler-first and optional MVC](docs/adr/0006-handler-first-mvc-optional.md)
+- [ADR 0007 — Bounded keyed DOM and local graph](docs/adr/0007-bounded-keyed-dom-and-local-graph.md)
 
-The M5 acceptance/performance baseline (`YT-019`) is locally verified and committed on `master`. Public-release readiness (`YT-020`) is **Blocked** pending licensing and support/security policy. All M6 tasks (`YT-030`–`YT-034`) are locally complete, including Todo migration and before/after measurement. MVC/Controllers remain unnecessary; Session/Auth/Cache implementations were not part of the M6 capability proof and remain unimplemented. Current code is not a production release.
+M0–M7 are locally complete at prototype scope. M7a–M7j implementation, bounded decision, reviewer-found lifetime repair, replacement validation and repeat reviewer PASS are frozen. Public-release readiness (`YT-020`) is **Blocked** pending licensing and support/security policy. Current code is not a production release.

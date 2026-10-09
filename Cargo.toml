@@ -1,14 +1,18 @@
 [workspace]
 members = [
     "crates/yetlet-core",
+    "crates/yetlet-reactive",
     "crates/yetlet-html",
     "crates/yetlet-dom",
+    "crates/yetlet-dom-keyed",
     "crates/yetlet-actions",
     "crates/yetlet-server-axum",
     "crates/yetlet-request-id",
     "examples/todo-ui",
     "examples/todo-browser",
     "examples/search-island",
+    "examples/render-bench",
+    "examples/keyed-bindings",
     "examples/todo-server",
 ]
 resolver = "3"

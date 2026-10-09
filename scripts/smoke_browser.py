@@ -261,6 +261,16 @@ def main() -> None:
                     f"SSR/DOM mismatch\nSSR: {list_html.group(0)}\nDOM: {rendered}"
                 )
                 assert client.evaluate(
+                    "document.getElementById('todo-list-host')"
+                    ".getAttribute('data-yetlet-local-runtime')"
+                ) == "keyed-graph"
+                client.evaluate(
+                    "window.__yetlet_local_list="
+                    "document.querySelector('#todo-list-host ul.todo-list');"
+                    "window.__yetlet_local_row="
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]');true"
+                )
+                assert client.evaluate(
                     "document.querySelector('[data-id=\"1\"]').getAttribute('data-completed')"
                 ) == "false"
                 time.sleep(0.3)
@@ -278,6 +288,12 @@ def main() -> None:
                 assert client.evaluate(
                     "document.getElementById('todo-status').textContent"
                 ) == "First task: completed"
+                assert client.evaluate(
+                    "document.querySelector('#todo-list-host ul.todo-list') === "
+                    "window.__yetlet_local_list && "
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]') === "
+                    "window.__yetlet_local_row"
+                ) is True
                 client.evaluate("document.getElementById('toggle-first').click()")
                 wait_until(
                     lambda: client.evaluate(
@@ -285,6 +301,12 @@ def main() -> None:
                     ) == "false",
                     "second click state update",
                 )
+                assert client.evaluate(
+                    "document.querySelector('#todo-list-host ul.todo-list') === "
+                    "window.__yetlet_local_list && "
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]') === "
+                    "window.__yetlet_local_row"
+                ) is True
                 time.sleep(0.3)
                 assert len(client.requests) == request_count, (
                     f"Click unexpectedly made HTTP requests: {client.requests[request_count:]}"
@@ -574,6 +596,222 @@ def main() -> None:
                 assert json.loads(after_invalid)["revision"] == 1
                 assert not client.websockets
                 print("PASS: typed 422 HTTP error is visible; failed action preserves state")
+
+                # M7i/M7j: queued action microtasks must be retired by disposal,
+                # then detached listeners must remain inert until a clean remount.
+                queued_request_count = len(client.requests)
+                assert client.evaluate(
+                    "(function(){"
+                    "window.__yetlet_lifecycle_row="
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]');"
+                    "window.__yetlet_queued_local_status="
+                    "document.getElementById('todo-status').textContent;"
+                    "window.__yetlet_queued_remote_status="
+                    "document.getElementById('remote-status').textContent;"
+                    "const runtime=window.__yetletTodoRuntime;"
+                    "if(!runtime || typeof runtime.dispose!=='function' || "
+                    "typeof runtime.mount!=='function'){return false;}"
+                    "document.getElementById('remote-title').value="
+                    "'Queued action must not run';"
+                    "document.getElementById('toggle-first').click();"
+                    "document.getElementById('create-remote').click();"
+                    "runtime.dispose();"
+                    "window.__yetlet_lifecycle='disposed';"
+                    "return true;"
+                    "})()"
+                ) is True
+                time.sleep(0.4)
+                assert client.evaluate(
+                    "window.__yetlet_lifecycle_row.getAttribute('data-completed')"
+                ) == "false"
+                assert client.evaluate(
+                    "document.getElementById('todo-status').textContent === "
+                    "window.__yetlet_queued_local_status && "
+                    "document.getElementById('remote-status').textContent === "
+                    "window.__yetlet_queued_remote_status"
+                ) is True
+                assert len(client.requests) == queued_request_count, (
+                    "Retired queued actions unexpectedly issued requests: "
+                    f"{client.requests[queued_request_count:]}"
+                )
+                assert client.evaluate(
+                    "document.documentElement.getAttribute('data-yetlet-ready')"
+                ) is None
+                assert client.evaluate(
+                    "document.documentElement.getAttribute('data-yetlet-disposed')"
+                ) == "true"
+                assert client.evaluate(
+                    "window.__yetlet_lifecycle_row.isConnected && "
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]') === "
+                    "window.__yetlet_lifecycle_row"
+                ) is True
+                assert client.evaluate(
+                    "window.__yetlet_lifecycle_row.getAttribute('data-completed')"
+                ) == "false"
+                disposed_request_count = len(client.requests)
+                client.evaluate(
+                    "document.getElementById('toggle-first').click();"
+                    "document.getElementById('create-remote').click();true"
+                )
+                time.sleep(0.4)
+                assert client.evaluate(
+                    "window.__yetlet_lifecycle_row.getAttribute('data-completed')"
+                ) == "false"
+                assert client.evaluate(
+                    "document.getElementById('todo-status').textContent"
+                ) == "First task: active"
+                assert client.evaluate(
+                    "document.getElementById('remote-status').textContent"
+                ) == "Remote error: invalid_title"
+                assert len(client.requests) == disposed_request_count, (
+                    "Disposed listeners unexpectedly issued requests: "
+                    f"{client.requests[disposed_request_count:]}"
+                )
+
+                client.evaluate("window.__yetletTodoRuntime.mount();true")
+                wait_until(
+                    lambda: client.evaluate(
+                        "document.documentElement.getAttribute('data-yetlet-ready') === 'true'"
+                    ),
+                    "Todo runtime remount",
+                )
+                assert client.evaluate(
+                    "document.documentElement.getAttribute('data-yetlet-disposed')"
+                ) is None
+                assert client.evaluate(
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]') !== "
+                    "window.__yetlet_lifecycle_row && "
+                    "!window.__yetlet_lifecycle_row.isConnected"
+                ) is True
+                assert client.evaluate(
+                    "document.getElementById('todo-list-host')"
+                    ".getAttribute('data-yetlet-local-runtime')"
+                ) == "keyed-graph"
+                client.evaluate(
+                    "window.__yetlet_remount_row="
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]');true"
+                )
+                remount_local_request_count = len(client.requests)
+                client.evaluate("document.getElementById('toggle-first').click()")
+                wait_until(
+                    lambda: client.evaluate(
+                        "window.__yetlet_remount_row.getAttribute('data-completed')"
+                    ) == "true",
+                    "single local action after remount",
+                )
+                assert client.evaluate(
+                    "document.querySelector('#todo-list-host [data-id=\"1\"]') === "
+                    "window.__yetlet_remount_row"
+                ) is True
+                assert client.evaluate(
+                    "document.getElementById('todo-status').textContent"
+                ) == "First task: completed"
+                assert len(client.requests) == remount_local_request_count
+                client.evaluate("document.getElementById('toggle-first').click()")
+                wait_until(
+                    lambda: client.evaluate(
+                        "window.__yetlet_remount_row.getAttribute('data-completed')"
+                    ) == "false",
+                    "second local action after remount",
+                )
+
+                # Hold a completed fetch response until after disposal/remount.
+                # The retired task may finish, but it must not update old or new DOM.
+                pending_remote_start = len(client.requests)
+                assert client.evaluate(
+                    "(function(){"
+                    "window.__yetlet_original_fetch=window.fetch.bind(window);"
+                    "window.__yetlet_fetch_gate={started:false,ready:false};"
+                    "window.fetch=(...args)=>{"
+                    "window.__yetlet_fetch_gate.started=true;"
+                    "return window.__yetlet_original_fetch(...args).then(response=>"
+                    "new Promise(resolve=>{"
+                    "window.__yetlet_fetch_gate.ready=true;"
+                    "window.__yetlet_fetch_gate.release=()=>resolve(response);"
+                    "}));"
+                    "};"
+                    "window.__yetlet_retired_remote_status="
+                    "document.getElementById('remote-status');"
+                    "window.__yetlet_retired_remote_host="
+                    "document.getElementById('remote-list-host');"
+                    "window.__yetlet_retired_remote_host_before="
+                    "window.__yetlet_retired_remote_host.textContent;"
+                    "document.getElementById('remote-title').value='  ';"
+                    "document.getElementById('create-remote').click();"
+                    "return true;"
+                    "})()"
+                ) is True
+                wait_until(
+                    lambda: client.evaluate(
+                        "Boolean(window.__yetlet_fetch_gate?.ready && "
+                        "typeof window.__yetlet_fetch_gate.release === 'function')"
+                    ),
+                    "retired HTTP response gate",
+                )
+                assert client.evaluate(
+                    "window.__yetlet_retired_remote_status.textContent"
+                ) == "Saving to server..."
+                pending_remote_requests = client.requests[pending_remote_start:]
+                assert len(pending_remote_requests) == 1, pending_remote_requests
+                assert client.evaluate(
+                    "(function(){"
+                    "window.__yetletTodoRuntime.dispose();"
+                    "window.__yetletTodoRuntime.mount();"
+                    "window.__yetlet_fetch_gate.release();"
+                    "return true;"
+                    "})()"
+                ) is True
+                wait_until(
+                    lambda: client.evaluate(
+                        "document.documentElement.getAttribute('data-yetlet-ready') === 'true'"
+                    ),
+                    "Todo runtime remount before retired response completion",
+                )
+                time.sleep(0.4)
+                assert client.evaluate(
+                    "window.__yetlet_retired_remote_status.textContent"
+                ) == "Saving to server..."
+                assert client.evaluate(
+                    "window.__yetlet_retired_remote_host.textContent === "
+                    "window.__yetlet_retired_remote_host_before"
+                ) is True
+                assert client.evaluate(
+                    "document.getElementById('remote-status').textContent"
+                ) == "No remote action sent"
+                client.evaluate("window.fetch=window.__yetlet_original_fetch;true")
+                _, _, after_retired_response = http(base + "/api/todos")
+                assert json.loads(after_retired_response)["revision"] == 1
+                print("PASS: disposal retires queued actions before they start")
+                print("PASS: retired HTTP completion cannot update DOM after remount")
+
+                lifecycle_remote_start = len(client.requests)
+                client.evaluate(
+                    "document.getElementById('remote-title').value='Lifecycle remote task';"
+                    "document.getElementById('create-remote').click();true"
+                )
+                wait_until(
+                    lambda: client.evaluate(
+                        "document.getElementById('remote-status').textContent"
+                    ) == "Saved on server (revision 2)",
+                    "single remote action after remount",
+                )
+                lifecycle_remote_requests = client.requests[lifecycle_remote_start:]
+                assert len(lifecycle_remote_requests) == 1, lifecycle_remote_requests
+                assert lifecycle_remote_requests[0].endswith("/api/todos")
+                assert client.api_posts[-1]["method"] == "POST"
+                if client.api_posts[-1]["postData"]:
+                    assert json.loads(client.api_posts[-1]["postData"]) == {
+                        "type": "create",
+                        "title": "Lifecycle remote task",
+                    }
+                _, _, lifecycle_snapshot = http(base + "/api/todos")
+                lifecycle_snapshot = json.loads(lifecycle_snapshot)
+                assert lifecycle_snapshot["revision"] == 2
+                assert lifecycle_snapshot["items"][-1]["title"] == "Lifecycle remote task"
+                assert not client.websockets
+                print("PASS: keyed local list preserves row/root identity across updates")
+                print("PASS: runtime disposal detaches local/remote listeners and keeps DOM readable")
+                print("PASS: remount installs exactly one local and one remote action path")
 
                 print("PASS: SSR HTML without JS/WASM + strict CSP")
                 print("PASS: browser WASM mounts shared TodoList, byte-equal to SSR fixture")
