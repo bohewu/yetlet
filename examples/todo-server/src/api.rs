@@ -7,7 +7,7 @@ use std::sync::{Arc, Mutex};
 
 use axum::{
     Json,
-    body::to_bytes,
+    extract::{State, rejection::JsonRejection},
     http::{HeaderMap, Method, StatusCode, header},
     response::{IntoResponse, Response},
 };
@@ -15,7 +15,7 @@ use yetlet_actions::{ActionError, ActionExecutor, ApiErrorBody, ApiErrorEnvelope
 use yetlet_server_axum::{RequestContext, middleware::Next};
 use yetlet_todo_ui::{TodoCommand, TodoSnapshot, apply_todo_command};
 
-const MAX_ACTION_BODY: usize = 4 * 1024;
+pub(crate) const MAX_ACTION_BODY: usize = 4 * 1024;
 
 #[derive(Clone)]
 pub struct TodoApiState {
@@ -69,8 +69,8 @@ fn command_error(error: ActionError) -> Response {
     api_error(status, error.code(), message)
 }
 
-pub async fn list_todos(context: RequestContext<TodoApiState>) -> Response {
-    match context.state().snapshot.lock() {
+pub async fn list_todos(State(state): State<TodoApiState>) -> Response {
+    match state.snapshot.lock() {
         Ok(snapshot) => response_json(StatusCode::OK, snapshot.clone()),
         Err(_) => api_error(
             StatusCode::INTERNAL_SERVER_ERROR,
@@ -82,7 +82,7 @@ pub async fn list_todos(context: RequestContext<TodoApiState>) -> Response {
 
 /// Route-level, header-only guard. It never consumes the streaming body.
 /// Origin is not authentication; preserve the existing direct-HTTP demo policy.
-pub async fn action_headers(context: RequestContext<TodoApiState>, next: Next) -> Response {
+pub async fn action_headers(context: RequestContext, next: Next) -> Response {
     if context.method() == Method::POST {
         if !same_origin_or_no_origin(context.headers()) {
             return api_error(
@@ -102,22 +102,21 @@ pub async fn action_headers(context: RequestContext<TodoApiState>, next: Next) -
     next.run(context.into_request()).await
 }
 
-pub async fn mutate_todos(context: RequestContext<TodoApiState>) -> Response {
-    let state = context.state().clone();
-    // The handler explicitly chooses the existing 4 KiB JSON limit. There is
-    // no framework-wide body buffer and ownership is consumed exactly once.
-    let bytes = match to_bytes(context.into_body(), MAX_ACTION_BODY).await {
-        Ok(bytes) => bytes,
-        Err(_) => {
+pub async fn mutate_todos(
+    State(state): State<TodoApiState>,
+    payload: Result<Json<TodoCommand>, JsonRejection>,
+) -> Response {
+    // Native Axum binding consumes the body exactly once. The route installs
+    // the existing 4 KiB limit; preserve the demo's typed error envelope/status.
+    let command = match payload {
+        Ok(Json(command)) => command,
+        Err(JsonRejection::BytesRejection(_)) => {
             return api_error(
                 StatusCode::PAYLOAD_TOO_LARGE,
                 "payload_too_large",
                 "Command body exceeds size limit",
             );
         }
-    };
-    let command: TodoCommand = match serde_json::from_slice(&bytes) {
-        Ok(command) => command,
         Err(_) => {
             return api_error(
                 StatusCode::BAD_REQUEST,

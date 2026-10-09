@@ -12,7 +12,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M3 — Selective islands** | External loader, asset manifest, island activation, bounded initial state | YT-011–YT-013, YT-017 | `/search` renders complete SSR, loads only the island on interaction, never forwards raw events |
 | **M4 — API/action integration** | Typed actions, HTTP executor, JSON API, strict CSP/security evidence | YT-014–YT-016, YT-018 | Clear local/remote boundary, correct API errors, working browser/CSP E2E |
 | **M5 — MVP validation/docs** | Cross-target regression, browser smoke, baseline measurements, examples | YT-019–YT-020 | Evidence for [A01–A10](MVP.md#3-acceptance-matrix) and public limitations |
-| **M6 — Handler-first API and optional extensions (proposed)** | Thin App builder, concise typed handlers/results, opt-in capability contract, optional proof and demo | YT-030–YT-034 | No required MVC Controller or DI; native Axum/Tower and SSR/browser contracts preserved |
+| **M6 — Handler-first API and optional extensions (locally complete)** | App/Page APIs, explicit module functions, independent Request ID proof and migrated Todo | YT-030–YT-034 | Native/Chrome/Firefox contracts PASS; release assets unchanged; measured latency comparison, no mandatory MVC or DI |
 
 ## Critical path
 
@@ -103,15 +103,19 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 
 **M5 local evidence (2026-10-08):** [M5 acceptance and measurements](M5-VERIFICATION.md) documents A01–A10, release Rust/Chrome 155, Firefox 157 physical-keyboard E2E, 30 SSR timing samples, 5 Chrome navigation/activation samples, and asset sizes. `YT-019` is locally Done; `YT-020` is Blocked for publication, with explicit owners in [Release readiness](RELEASE-READINESS.md). GitHub CI has not executed the new M5 workflow changes.
 
-### M6 — Handler-first developer API and opt-in modules (approved direction; not implemented)
+### M6 — Handler-first developer API and opt-in modules (locally complete)
 
 **Goal:** Let developers build a small SSR site or typed JSON API with ordinary Rust handlers and components, without mandatory MVC Controllers, source layouts, model binders, DI containers or result hierarchies. Expose a **thin Axum/Tower facade**, not a second router. Keep all optional capabilities explicitly installed and browser-safe. See [ADR 0006](adr/0006-handler-first-mvc-optional.md) and [ADR 0005](adr/0005-opt-in-capability-modules.md).
 
-- [ ] `YT-030 / M6a`: Ergonomic `App`, route and group registration over native Axum/Tower for ordinary function handlers.
-- [ ] `YT-031 / M6b`: Minimal View/SSR, Json, redirect, typed input and error/result conveniences; reuse Axum `Path/Query/Json/State/IntoResponse`; `RequestContext` stays optional.
-- [ ] `YT-032 / M6c`: Explicit typed opt-in capability installation without global DI/service locator or forced runtime dependencies.
-- [ ] `YT-033 / M6d`: Prove a small independently installed capability, opt-out behavior, scoped middleware and unchanged browser graph.
-- [ ] `YT-034 / M6e`: Migrate Todo example with no regression in SSR, local/remote actions, CSP, browser E2E or measured M5 baseline.
+- [x] `YT-030 / M6a`: Thin `App<S>` facade supports ordinary GET/POST handlers, native `MethodRouter`, nested groups, scoped middleware, explicit state and raw Router escape hatches.
+- [x] `YT-031 / M6b`: Page and async View route convenience; native typed inputs/results/rejections, redirects and errors; RequestContext remains optional.
+- [x] `YT-032 / M6c`: configure/try_configure execute typed setup functions once; no plugin registry, service locator or mandatory provider dependency.
+- [x] `YT-033 / M6d`: Independent yetlet-request-id crate proves opt-out, scoping, error/short-circuit/concurrent behavior and core/browser dependency isolation.
+- [x] `YT-034 / M6e`: Todo migration preserves SSR, API and middleware contracts; Chrome/Firefox regression and release before/after measurement completed. No zero-overhead performance claim.
+
+**M6a local evidence (2026-10-09):** Five App Builder integration tests and a compiling rustdoc example passed; the existing RequestContext/Tower integration remains intact. [M6a verification](M6A-VERIFICATION.md) documents API surface, native semantics and remaining gaps. This is neither the M6b result API nor a performance/production release claim.
+
+**Complete M6 local evidence (2026-10-09):** 66 workspace tests and 4 doctests, strict Clippy, native/minimal/wasm32 builds, Chrome 155 and Firefox 157 regressions passed. Release asset hashes and HTML sizes are unchanged. The same-session native first-byte median changed from 0.019 to 0.033 ms; historical M5 was 0.034 ms. See [M6 verification](M6-VERIFICATION.md) for unrounded methodology/limits and [Extensions](EXTENSIONS.md) for the actual composition contract. Production/release gates remain separate.
 
 **Deferred:** MVC-specific helpers are optional future choices, **not required** for M6; so are Controller inheritance, convention discovery, `#[controller]` macros, full template DSL, Session/Authentication/Redis/Cache providers, a dynamic Plugin Manager and a mandatory DI container.
 

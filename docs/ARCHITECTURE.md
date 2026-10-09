@@ -131,19 +131,19 @@ Shared component source does not imply inclusion of server-side repositories or 
 
 These are conceptual boundaries, **not** a promise that each one will become a public crate. Use the smallest validated interfaces across the two renderer targets before adding extra abstractions or splitting packages.
 
-### Optional application capabilities (approved direction; not implemented)
+### Optional application capabilities (M6 composition contract implemented)
 
 Future server features such as cookies, sessions, authentication, data caching, output caching, request tracing and rate limiting are **modular, opt-in, and pay-for-what-you-use**. Integrate them through independent Rust crates/providers, native Tower/Axum layers, typed `RequestContext` extensions and explicit application state. Do not add an always-on DI container or plugin manager. Application cache and HTTP output cache have different safety constraints; cookie-based authentication need not require a server session.
 
-`RequestContext` itself never generates a Request ID. The Todo example explicitly installs a global `assign_request_id` middleware. Server extensions, sensitive identities and storage dependencies must not leak into Browser WASM or automatically become hydration state. [ADR 0005](adr/0005-opt-in-capability-modules.md) records this decision and M6 extension gates.
+`App::configure` and `try_configure` now compose ordinary typed setup functions once, while providers reuse native Tower scopes, explicit state and Extensions. The independent `yetlet-request-id` crate is the M6 opt-in proof: the Todo app installs `RequestIds::new().global(app)`, and a scoped provider can be configured only on selected groups. The core has no dependency on this provider. `RequestContext` itself still generates no ID. No server extension or provider dependency is copied into Browser WASM/hydration. See [Extensions](EXTENSIONS.md), [ADR 0005](adr/0005-opt-in-capability-modules.md) and [M6 evidence](M6-VERIFICATION.md).
 
-### Handler-first application API (approved M6 direction; not implemented)
+### Handler-first application API (M6 implemented)
 
-**Handler-first, Component-first, MVC optional, minimal boilerplate.** MVC is a code organization convention, not an application requirement. A simple SSR page or typed JSON endpoint should be written as ordinary Rust handler functions with shared `View`/components, without a Controller superclass, mandatory folder structure, custom model binder, broad `ActionResult` hierarchy or service locator.
+**Handler-first, Component-first, MVC optional, minimal boilerplate.** MVC is a code organization convention, not an application requirement. A simple SSR page or typed JSON endpoint uses ordinary Rust handler functions and shared `View`/components, with no Controller superclass, mandatory folder structure, custom model binder, broad `ActionResult` hierarchy or service locator.
 
-A future `App`/route-group facade must remain a thin layer over Axum/Tower. Preserve native `Path`/`Query`/`Json`/`State` extractors, `IntoResponse`, redirects, middleware layering and explicit error/status behavior. `RequestContext<S>` remains an opt-in extractor for handlers that actually need it. `View` SSR response conveniences may remove repeated rendering code, but must not hide CSP, escaping or HTTP semantics. Use Rust feature modules for larger applications; MVC-style grouping is optional and needs no framework runtime.
+M6a now implements `yetlet-server-axum::App<S>`, a thin facade over `axum::Router<S>`. `get`, `post`, `route`, `group`, `route_layer`, `with_state`, `map_router` and conversion to/from native Router preserve Axum/Tower handler, extractor, middleware, 404/405 and response semantics. `RequestContext<S>` remains optional. [M6a verification](M6A-VERIFICATION.md) records the native integration tests and reproducible commands.
 
-These are **proposed M6 ergonomics**, not current compiled APIs. See [ADR 0006](adr/0006-handler-first-mvc-optional.md) for a clearly labeled API sketch and acceptance criteria.
+M6 now adds `App::page(path, title, handler)` for no-argument async View functions and the small `Page` HTTP result for handlers with native typed extractors or `Result<Page, E>` errors. Json, Redirect and status/header results use native Axum semantics. The Todo server now uses App, Page, native State/Json and explicit provider registration. There is still no Controller runtime, discovery macro, custom model binder or full MVC framework. See [ADR 0006](adr/0006-handler-first-mvc-optional.md).
 
 ## 6. Components, templates, and state
 

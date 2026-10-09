@@ -5,6 +5,8 @@
 
 This remains the acceptance contract for the **complete MVP**. M1 native SSR, M2 browser/WASM DOM, M3 lazy Search Island/state v1, M4 typed actions/API and M4.1 RequestContext/middleware passed local prototype tests. M5 provides a bounded [A01–A10 acceptance and performance baseline](M5-VERIFICATION.md) using Chrome 155 and Firefox 157. This does not establish generic resumability, production authentication/CSRF, complete IME/accessibility compatibility, or release approval. Consult [Release readiness](RELEASE-READINESS.md) before publishing.
 
+**M6 follow-on:** The completed handler/result/module API and Todo migration retain this MVP contract. See [M6 verification](M6-VERIFICATION.md) for 66 tests, four compiled documentation examples, existing Chrome/Firefox scenarios, dependency isolation and disclosed before/after latency measurements. M6 completion does not imply production-release approval.
+
 ## 1. Scenarios and scope
 
 The demo is a minimal Todo/Search application with four application routes:

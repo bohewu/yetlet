@@ -28,6 +28,10 @@ Existing handlers using State/Request and existing raw Axum/Tower layers remain 
 
 The integration must preserve existing routes, status/error JSON, SSR/Islands, and browser source/dependency graphs. The performance claim is **bounded architecture**, not measured latency: no eager buffering, duplicated type maps, runtime reflection, or client-side payload from this server-only change.
 
+## Subsequent M6 integration
+
+M6 now implements the thin App facade, Page result, typed module setup and an independent opt-in Request ID provider, and migrates the Todo route assembly to those APIs. Native Axum/Tower remains authoritative. The original P0 acceptance and historical counts below are unchanged; see [M6 verification](../M6-VERIFICATION.md) and [Extensions](../EXTENSIONS.md) for the current integration and measured comparison. General authentication/session/tracing providers and production qualification remain deferred.
+
 ## Validation gate
 
 Focused real-router tests must prove order, before/after, short-circuit, typed state, concurrent isolation, nested scopes, 404/405/Allow, error responses, API and SSR sharing, lazy request/response streaming, on-demand query/path decoding and Tower-layer interoperation. Run native formatting/lint/tests, browser compilation and a bounded regression smoke. Record actual results in the linked implementation note; do not turn this ADR into independent security assurance.

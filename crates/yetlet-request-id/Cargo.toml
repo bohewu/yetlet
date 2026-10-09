@@ -1,0 +1,14 @@
+[package]
+name = "yetlet-request-id"
+description = "Explicit opt-in request correlation example for Yetlet"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+axum.workspace = true
+yetlet-server-axum = { path = "../yetlet-server-axum" }
+
+[dev-dependencies]
+tokio.workspace = true
+tower = { version = "0.5", features = ["util"] }

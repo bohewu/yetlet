@@ -7,6 +7,8 @@ This document separates completed local tests from genuine release certification
 
 ## What is working
 
+**M6 update (2026-10-09):** The full handler-first App/Page API, typed setup composition, optional request-ID proof and migrated Todo are locally complete; see [M6 evidence](M6-VERIFICATION.md). Existing licensing, MSRV, support and production/security blockers below remain unchanged.
+
 - Native Rust/Axum HTTP server, ordinary JSON APIs, and script-free `GET /` SSR.
 - `GET /app` Browser WASM with independent local and explicit typed HTTP actions.
 - `GET /search` SSR with a small external loader, lazy WASM, bounded SearchStateV1 and fail-closed fallback.

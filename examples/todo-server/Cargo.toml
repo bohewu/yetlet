@@ -14,6 +14,7 @@ yetlet-actions = { path = "../../crates/yetlet-actions" }
 tower-http = { version = "0.6", features = ["fs"] }
 yetlet-todo-ui = { path = "../todo-ui" }
 yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
+yetlet-request-id = { path = "../../crates/yetlet-request-id" }
 yetlet-core = { path = "../../crates/yetlet-core" }
 
 [dev-dependencies]

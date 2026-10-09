@@ -29,6 +29,9 @@ REQUIRED = (
     "docs/adr/0006-handler-first-mvc-optional.md",
     "docs/HTTP-PIPELINE.md",
     "docs/M5-VERIFICATION.md",
+    "docs/M6A-VERIFICATION.md",
+    "docs/M6-VERIFICATION.md",
+    "docs/EXTENSIONS.md",
     "docs/RELEASE-READINESS.md",
 )
 TASK_RE = re.compile(r"^\|\s*(YT-\d{3})\s*\|")

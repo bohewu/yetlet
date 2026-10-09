@@ -70,7 +70,7 @@ fn app() -> Router {
 }
 ```
 
-This is the **currently implemented** Axum Router integration; it does not introduce a second router. M6 proposes a thin, handler-first App/group facade over this machinery—not mandatory MVC Controllers or a new middleware engine. Existing State/Request handlers must remain compatible. See [ADR 0006](adr/0006-handler-first-mvc-optional.md).
+This is the **original native** Axum Router integration; M6a also implements a thin handler-first `App<S>`/group facade **over the same Router**, not a second router, MVC Controller runtime or middleware engine. Native `State`/`Request` handlers, `MethodRouter`, group-scoped `route_layer` and pre-routing `with_global` remain compatible. Use `App::into_router()` before adding the outer global layer. See [M6a verification](M6A-VERIFICATION.md) and [ADR 0006](adr/0006-handler-first-mvc-optional.md).
 
 ## Scope and execution order
 
@@ -102,17 +102,17 @@ Axum MethodRouter::route_layer (different from Router::route_layer) skips its me
 
 `RequestContext<S>` has three fields: original HTTP `parts`, the streaming `body`, and typed application `state`. The core does **not** automatically create `RequestId`, trace/span metadata, sessions, cookie jars, principals or cache handles. Existing request fields come from the incoming HTTP request; matched-route metadata becomes available only after routing; query/path parameters are decoded on demand.
 
-The Todo example **explicitly registers** `assign_request_id` as a global middleware. A per-app `Arc<AtomicU64>` initialized to 1 generates a numeric identifier, inserts `RequestId(u64)` into request-local typed extensions, and adds `x-yetlet-request-id` to the response. The native home SSR route intentionally selects only that numeric value for an inert `data-request-id` attribute. No request extensions are automatically serialized.
+The Todo example **explicitly installs** `RequestIds::new().global(app)` from the optional `yetlet-request-id` crate. A per-provider Arc<AtomicU64> starting at 1 generates a numeric RequestId extension and x-yetlet-request-id response header. M6 also supports group-scoped installation; the core has no dependency on this provider. The native home route intentionally selects only the number for an inert data-request-id attribute. No request extensions are automatically serialized.
 
 The example counter resets for a new application instance and is not globally unique across server nodes. Applications needing trace correlation should opt into a provider with an intentional ID and trusted propagation policy. See [ADR 0005](adr/0005-opt-in-capability-modules.md).
 
 ## Existing demo integration
 
-`examples/todo-server/src/pipeline.rs` assigns a server-generated numeric RequestId from a per-app Arc<AtomicU64>, stores it in the request, and adds `x-yetlet-request-id` after processing. The API group's middleware adds its own marker and `x-yetlet-scope: api` only to matching API paths.
+M6 moved numeric correlation into `crates/yetlet-request-id`; the Todo app installs it explicitly at finalization. The example's `pipeline::with_api_scope` remains an ordinary `App::configure` setup function applying the API marker/header only to matching API paths.
 
-The existing POST header checks moved from `mutate_todos` to `action_headers`, a header-only route middleware. Status codes and error envelopes remain unchanged. The mutation handler alone explicitly chooses the existing 4 KiB JSON buffer; it consumes the body once. This is not unconditional framework buffering.
+The header-only `action_headers` middleware remains before handler body extraction. M6 uses native State/Json handler parameters and an explicit route-level DefaultBodyLimit::max(4096). Json consumes the body once; rejection mapping preserves the original error envelope/status. This is route-selected JSON buffering, not unconditional framework buffering.
 
-The SSR root constructs a separate `RenderRequest` containing only the numeric RequestId, and emits a corresponding data attribute. Tests prove raw cookies/private headers are not copied. SearchStateV1 and the browser/source dependency graph remain untouched. Existing M4 authentication/origin limitations still apply: this work does not turn the anonymous demo into a production identity system.
+The SSR root now uses Option<Extension<RequestId>> and returns Page, selecting only the numeric ID for its data attribute rather than receiving or serializing the whole RequestContext. Existing tests still prove raw cookies/private headers are not copied. SearchStateV1 and browser source remain untouched. M4 authentication/origin limitations still apply; correlation is not a production identity system.
 
 ## Why this remains a small integration
 
@@ -121,6 +121,8 @@ Two production modules are added to the existing server adapter. They reuse http
 This is **not zero overhead**: S is cloned during extraction, native middleware has its own future/service costs, and with_global adds a fallback-only router envelope. RequestId/scope middleware are demo behavior with their own small per-request work. Native latency, allocation counts and throughput are not benchmarked here. The browser build comparison below is separate from those unmeasured native costs.
 
 ## Validation and evidence
+
+The counts and byte comparisons below record the original P0 checkpoint. Complete M6 integration and its migrated Todo results are recorded separately in [M6 verification](M6-VERIFICATION.md); the original evidence is retained, not relabeled as a new run.
 
 Focused commands observed passing during implementation:
 
@@ -159,7 +161,7 @@ The two new server adapter modules contain **142 lines including comments/blank 
 ## Deferred P1 and remaining compatibility limits
 
 - Reusable tracing/authentication/CORS/session/rate-limit providers remain separate opt-in components, not P0 defaults.
-- Native infallible Tower layers are supported and an existing tower-http layer is tested. Fallible services must use an explicit error-to-response adapter; arbitrary fallible-service convenience APIs and a general App facade are deferred.
+- Native infallible Tower layers are supported and an existing tower-http layer is tested. Fallible services must use an explicit error-to-response adapter. The thin App facade is implemented in M6; arbitrary fallible-service convenience APIs remain deferred.
 - Deadline/cancellation policy, timeout layers, more streaming/backpressure edge cases and native overhead benchmarks remain follow-up work.
 - Request-local extensions do not prevent a developer from deliberately inserting the same Arc into every request; the framework only avoids doing so implicitly.
-- M5 performance/release evidence remains open; no rollout, commit, push or production security certification occurs in this integration.
+- M5 and M6 record local measurements, not a production performance/security certification. Public release and remaining operational-provider gates remain separate.

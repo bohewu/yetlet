@@ -1,6 +1,6 @@
 # ADR 0006 — Handler-first application APIs; MVC is optional
 
-- **Status:** Approved design direction for M6; ergonomic `App` and handler/result APIs are proposed, **not implemented**.
+- **Status:** M6a–M6e implemented and locally verified. APIs remain experimental; no mandatory MVC, DI or Controller layer.
 - **Date:** 2026-10-08
 - **Authority:** Maintainer decision to avoid ASP.NET Core MVC-style heavyweight scaffolding and unnecessary boilerplate.
 - **Related:** [Architecture](../ARCHITECTURE.md), [Roadmap](../ROADMAP.md), [Backlog](../BACKLOG.md), [ADR 0004](0004-request-context-and-middleware.md), [ADR 0005](0005-opt-in-capability-modules.md).
@@ -22,26 +22,28 @@ Yetlet already uses Axum/Tower routing, request extraction, typed JSON responses
 7. **Pay for what you use.** Session, Cookie Authentication, Caching, Tracing and other provider modules remain explicitly installed and independent as approved by [ADR 0005](0005-opt-in-capability-modules.md). A route handler does not implicitly enable them.
 8. **Do not chase "zero boilerplate" via hidden magic.** Simple behavior should be concise, while authorization, CSRF, response caching, remote boundaries and failures must remain explicit. Macros such as `#[controller]`, `#[component]` or a `ui!` compiler are optional future research, not requirements for M6.
 
-## Illustrative API (not implemented)
+## Implemented M6 API
 
 ```rust
-// Proposed application API. Function signatures, render conversions and
-// registration method names require validation in M6.
-fn home() -> View {
-    home_page()
-}
+use yetlet_core::View;
+use yetlet_server_axum::{App, Page, extract::Path, response::Json};
 
-async fn list_todos() -> Json<Vec<Todo>> {
-    Json(load_todos().await)
+async fn home() -> View { View::text("Hello") }
+async fn item(Path(id): Path<u64>) -> Page {
+    Page::new("Item", View::text(format!("Item {id}")))
 }
+async fn status() -> Json<&'static str> { Json("ready") }
 
-let app = App::new()
-    .page("/", home)                // Native SSR adapter renders the shared View
-    .get("/api/todos", list_todos)  // Ordinary typed HTTP handler
-    .group("/admin", |group| group.get("/", dashboard));
+let app: axum::Router = App::new()
+    .page("/", "Home", home)
+    .get("/items/{id}", item)
+    .group("/api", |api| api.get("/status", status))
+    .into_router();
 ```
 
-The MVP currently uses explicit `axum::Router` and `render_page`. Do **not** present the illustration above as compiled/runnable Yetlet syntax.
+`page(path, title, handler)` supports no-argument async View functions. Parameterized or fallible handlers use ordinary `.get` and return Page or Result<Page, E>. Page delegates to escaped SSR, preserves strict CSP and returns a generic 500 for rendering failure. Json, Redirect, error/status/header tuples and typed bindings are native Axum, not Yetlet-specific class hierarchies. The working API patterns are covered by rustdoc and integration tests in [M6 evidence](../M6-VERIFICATION.md).
+
+`configure`/`try_configure` accept typed setup functions, and an independent optional request-ID module demonstrates scoped/global registration. The Todo routes now use the facade and typed results/bindings; shared browser UI source and release assets remain unchanged. See [Extensions](../EXTENSIONS.md).
 
 ## M6 acceptance and anti-boilerplate checks
 
@@ -59,4 +61,4 @@ The MVP currently uses explicit `axum::Router` and `render_page`. Do **not** pre
 - A second HTTP router, filters pipeline or general-purpose model-binding system.
 - Always-on DI container, server session, auth providers or runtime plugin registry.
 
-**Scope:** ADR 0006 records architectural intent and updates the M6 plan. It does not implement `App`, `yetlet-mvc`, macros or new handler conversion traits.
+**Scope:** M6 is complete at local prototype scope: thin App, small Page result, ordinary native handlers, typed setup functions, one optional provider and the migrated Todo. A general direct-View IntoResponse implementation, generic component macros, MVC helpers, production Session/Auth/Cache providers and public-release guarantees are not included.

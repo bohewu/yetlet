@@ -1,6 +1,6 @@
 # ADR 0005 — Opt-in capability modules and application composition
 
-- **Status:** Approved direction; proposed M6 integration APIs are not implemented.
+- **Status:** M6 composition APIs and independent request-ID proof implemented and locally verified; Session/Auth/Cache providers remain future choices.
 - **Date:** 2026-10-08
 - **Authority:** Maintainer approval of extensible opt-in Session, Cache, Cookie Authentication, and related features.
 - **Related:** [Architecture](../ARCHITECTURE.md), [Backlog](../BACKLOG.md), [Roadmap](../ROADMAP.md), [ADR 0004](0004-request-context-and-middleware.md), [ADR 0006](0006-handler-first-mvc-optional.md).
@@ -14,7 +14,7 @@ Yetlet's baseline SSR/HTTP and browser WASM must remain useful without sessions,
 1. **Dependency and runtime opt-in.** Capabilities should be in independent Rust crates, or narrow opt-in crate features when simpler. Applications without a dependency and explicit registration must not initialize the provider, run its middleware, or pull storage/security dependencies into the base crate.
 2. **Native composition.** Integrate HTTP features through existing Tower `Layer`/`Service`, Axum middleware and routing scopes, typed `RequestContext` extensions and explicit application state `S`. Avoid a parallel middleware engine, framework-wide DI container, ambient global state or service locator.
 3. **Small RequestContext.** Keep `RequestContext<S>` focused on the original request parts/body, typed request-local extensions and shared application state. Do not add fixed `Session`, `User`, `Cookies`, `Cache`, `TraceId` or `RequestId` fields. Modules may expose their own strongly typed extractors/helpers.
-4. **Request ID is not a core default.** The current Todo example deliberately registers `assign_request_id`: a per-app `AtomicU64` counter starting at 1, inserted as a typed `RequestId` extension, returned via `x-yetlet-request-id` header and explicitly selected for its home SSR attribute. It is not a globally unique trace identity or a built-in `RequestContext` field. A future tracing/correlation provider may opt into a different strategy.
+4. **Request ID is not a core default.** M6 moves the Todo correlation example into the independent `yetlet-request-id` crate. The app explicitly installs `RequestIds::new().global(app)`; scoped installation is also available. A per-provider AtomicU64 generates numeric IDs starting at 1, stored as typed RequestId extensions and response headers. The root explicitly selects the number for SSR. This is not globally unique, persistent or authentication identity, and RequestContext does not generate it.
 5. **Separate feature boundaries.** Cookies manage HTTP cookies; sessions manage session identity/storage/expiry; authentication manages identity/authorization; data cache stores application data; output cache stores HTTP responses; rate limiting and tracing remain separate. Cookie-auth need not imply server-side sessions, and anonymous sessions need not imply authentication.
 6. **Narrow optional providers.** Storage backends may use memory, Redis, SQL or a custom implementation via a small provider contract; a Redis dependency belongs to its provider rather than the core. Do not invent broad provider factories before demonstrating a real consumer.
 7. **Target and security isolation.** Optional server-side crates must not enter browser WASM, and request extensions/server handles must not be automatically serialized into SSR/hydration. Cookies and authentication need real Secure/HttpOnly/SameSite, CSRF, key rotation, session fixation/revocation and authorization rules where applicable. Authenticated output caching must handle `Cache-Control`, `Vary` and per-user isolation.
@@ -34,7 +34,7 @@ Yetlet's baseline SSR/HTTP and browser WASM must remain useful without sessions,
 
 These are **candidate names**, not existing Cargo workspace crates, and not a commitment to build all of them. Simpler features need not each become a crate.
 
-## Proposed M6 acceptance evidence
+## M6 acceptance criteria (locally verified)
 
 - SSR-only application builds and runs without any optional capability crate.
 - One explicitly installed capability integrates through Tower/Axum and typed extensions/state; scoped registration does not affect unrelated routes.
@@ -47,4 +47,4 @@ These are **candidate names**, not existing Cargo workspace crates, and not a co
 
 An always-on session/auth/cache layer, a global service locator, a central dynamic plugin registry, and a mega-crate with every provider enabled by default all impose unnecessary coupling or per-application cost.
 
-**Current implementation:** Only typed request extensions, explicit app state and Tower middleware composition exist. This ADR records an architectural choice and M6 plan; it does **not** implement the candidate modules or change request handling defaults.
+**Current implementation:** `App::configure` takes an ordinary typed setup function, and `try_configure` propagates its chosen error type. They execute once during construction, not per request. `yetlet-request-id` proves independent optional registration, scoped/global native middleware, typed state, and absence from the core/browser dependency graphs. Its setup and request failure paths are tested. The candidate Session/Auth/Cache modules above remain unimplemented. See [Extensions](../EXTENSIONS.md) and [M6 evidence](../M6-VERIFICATION.md).

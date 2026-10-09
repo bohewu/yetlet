@@ -5,6 +5,7 @@ members = [
     "crates/yetlet-dom",
     "crates/yetlet-actions",
     "crates/yetlet-server-axum",
+    "crates/yetlet-request-id",
     "examples/todo-ui",
     "examples/todo-browser",
     "examples/search-island",

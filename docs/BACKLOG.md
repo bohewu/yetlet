@@ -45,25 +45,25 @@ The middleware/RequestContext handoff adds these scoped tasks after M4 without r
 | YT-028 | P0 | M | M4.1 | API/SSR integration and request isolation/streaming proof | YT-027, YT-018 | 46/46 workspace tests, Chrome regression, 12 concurrent requests and byte-identical WASM PASS | Done |
 | YT-029 | P1 | M | Later | Optional HTTP providers, deadlines and overhead measurements | YT-028 | Opt-in middleware providers and measured native costs; not P0 scope | Deferred |
 
-## Proposed M6 — Handler-first framework APIs and opt-in extensions
+## M6 — Handler-first framework APIs and opt-in extensions (locally complete)
 
-**Approved architecture:** Handler-first, Component-first, MVC optional, minimal boilerplate. M6 remains **planned, not implemented**. MVC/Controller modules, large DI/filters/model-binding systems and macro-based discovery are not prerequisites. [ADR 0006](adr/0006-handler-first-mvc-optional.md) defines handler/results DX, and [ADR 0005](adr/0005-opt-in-capability-modules.md) defines opt-in modules. M6 does not depend on the separately blocked publication item `YT-020`.
+**Approved architecture:** Handler-first, Component-first, MVC optional, minimal boilerplate. **M6a–M6e are implemented and locally verified.** MVC/Controller modules, large DI/filters/model-binding systems and macro-based discovery are not prerequisites. [ADR 0006](adr/0006-handler-first-mvc-optional.md) defines handler/results DX, and [ADR 0005](adr/0005-opt-in-capability-modules.md) defines opt-in modules. M6 does not depend on the separately blocked publication item `YT-020`.
 
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
-| YT-030 | P0 | M | M6a | Minimal App/group/route facade over Axum/Tower | YT-027, YT-016 | SSR and JSON route registration through ordinary handler functions; native Axum interoperability; no second router/Controller required | Todo |
-| YT-031 | P0 | M | M6b | Handler/typed result ergonomics with minimal boilerplate | YT-030, YT-004 | View/SSR, Json, Path/Query/body, redirect, typed errors/status via existing extractors/results; no mandatory RequestContext, Controller, custom binder/filters or broad result hierarchy | Todo |
-| YT-032 | P0 | M | M6c | Explicit opt-in capability registration and typed access contract | YT-030, YT-026 | Module registration reuses Tower scopes, typed extensions and app state; SSR-only app needs no Session/Auth/Cache/DI dependency | Todo |
-| YT-033 | P1 | M | M6d | Verify one independent optional capability in isolation | YT-032 | Capability absent by default, no unrelated-route behavior or browser dependencies, scoped middleware tests; choose simplest real proof | Todo |
-| YT-034 | P1 | M | M6e | Todo demo migration and baseline regression | YT-030, YT-031, YT-033 | Existing native/SSR/WASM/API tests pass with handler-first app API; measure overhead against M5 without invented performance claims | Todo |
+| YT-030 | P0 | M | M6a | Minimal App/group/route facade over Axum/Tower | YT-027, YT-016 | [M6a verification](M6A-VERIFICATION.md): 5 real-Router integration tests + rustdoc example; SSR/JSON, nested groups, state and scoped middleware PASS | Done |
+| YT-031 | P0 | M | M6b | Handler/typed result ergonomics with minimal boilerplate | YT-030, YT-004 | [M6 evidence](M6-VERIFICATION.md): Page, async View route and native typed extraction/results; 5 targeted tests and compiled docs PASS | Done |
+| YT-032 | P0 | M | M6c | Explicit opt-in capability registration and typed access contract | YT-030, YT-026 | configure/try_configure setup functions, 3 scoped/absence/error tests PASS; no registry or DI | Done |
+| YT-033 | P1 | M | M6d | Verify one independent optional capability in isolation | YT-032 | Separate yetlet-request-id: 7 opt-in/global/scoped/error/concurrency tests PASS; normal dependency graphs prove isolation | Done |
+| YT-034 | P1 | M | M6e | Todo demo migration and baseline regression | YT-030, YT-031, YT-033 | 66 native tests + 4 doctests, Chrome/Firefox PASS; release assets byte-identical; [measured M5 and before/after comparison](M6-VERIFICATION.md) retained | Done |
 
-These are **future tasks**, not implemented or independently verified. Session/Cookie Auth/Redis/Cache/Output Cache are candidate providers, not automatic deliverables. `YT-029` remains deferred.
+**M6 is locally complete at prototype scope**, not production or independent security certification. Session/Cookie Auth/Redis/Cache/Output Cache are candidate providers, not M6 deliverables. The request-correlation proof does not implement all deferred `YT-029` providers or operational controls.
 
 ## Ready queue
 
 **First:** `YT-019` has reproducible local acceptance/measurement evidence. `YT-020` cannot close the public release gate without maintainer licensing and declared support/security decisions; see [release readiness](RELEASE-READINESS.md).
 
-**Next implementation stage:** Start `YT-030` (thin handler-first App/route/group facade), then `YT-031` (minimal handler/typed result conveniences). Opt-in module composition follows in `YT-032`. [ADR 0006](adr/0006-handler-first-mvc-optional.md) and [ADR 0005](adr/0005-opt-in-capability-modules.md) are the design contracts. Public publication (`YT-020`) is separately blocked.
+**Current implementation milestone:** YT-030–YT-034 are locally Done. [M6 evidence](M6-VERIFICATION.md) and [Extensions](EXTENSIONS.md) record APIs, limitations and measurements. Public publication (`YT-020`) remains separately blocked; deferred providers/research require an explicit next scope rather than automatic expansion.
 
 **Do not start before prerequisites:** Generalized hydration, arbitrary event forwarding, WebGPU, and resumability remain out of scope.
 

@@ -5,33 +5,29 @@
 mod api;
 mod pipeline;
 
-use std::sync::{Arc, atomic::AtomicU64};
-
 use axum::{
     Json, Router,
+    extract::{DefaultBodyLimit, Extension},
     http::{HeaderValue, StatusCode, header},
     response::{Html, IntoResponse, Response},
     routing::get,
 };
 use serde_json::{Value, json};
 use tower_http::services::ServeDir;
-use yetlet_server_axum::{
-    DEFAULT_CSP, HtmlPageError, RequestContext,
-    middleware::{from_fn, from_fn_with_state, with_global},
-    render_document, render_page,
-};
+use yetlet_request_id::{RequestId, RequestIds};
+use yetlet_server_axum::{App, DEFAULT_CSP, Page, middleware::from_fn, render_document};
 use yetlet_todo_ui::{home_page, search_page};
 
-async fn root(context: RequestContext<api::TodoApiState>) -> Result<Response, HtmlPageError> {
-    let safe_render = pipeline::RenderRequest::from_context(&context);
+async fn root(request_id: Option<Extension<RequestId>>) -> Page {
     let mut view = home_page();
-    if let Some(id) = safe_render.request_id {
+    // Select only this numeric extension; never serialize the request/context.
+    if let Some(Extension(RequestId(id))) = request_id {
         view = yetlet_core::Element::new("div")
             .attribute("data-request-id", id.to_string())
             .child(view)
             .into();
     }
-    render_page("Yetlet | Todo", &view)
+    Page::new("Yetlet | Todo", view)
 }
 
 async fn api_ping() -> Json<Value> {
@@ -121,28 +117,26 @@ async fn search_route() -> Response {
 }
 
 pub fn app() -> Router {
-    let state = api::TodoApiState::default();
-    let api_routes = Router::new()
-        .route("/ping", get(api_ping))
-        .route(
-            "/todos",
-            get(api::list_todos)
-                .post(api::mutate_todos)
-                .layer(from_fn_with_state(state.clone(), api::action_headers)),
-        )
-        .route_layer(from_fn(pipeline::api_scope));
-    let routes = Router::new()
-        .route("/", get(root))
-        .route("/app", get(browser_shell))
-        .route("/search", get(search_route))
-        .route("/healthz", get(|| async { "ok" }))
-        .nest("/api", api_routes)
-        .nest_service("/assets", ServeDir::new("dist/assets"))
-        .with_state(state);
-    with_global(
-        routes,
-        from_fn_with_state(Arc::new(AtomicU64::new(1)), pipeline::assign_request_id),
-    )
+    let app = App::new()
+        .get("/", root)
+        .get("/app", browser_shell)
+        .get("/search", search_route)
+        .get("/healthz", || async { "ok" })
+        .group("/api", |api| {
+            api.get("/ping", api_ping)
+                .route(
+                    "/todos",
+                    get(api::list_todos)
+                        .post(api::mutate_todos)
+                        .layer(DefaultBodyLimit::max(api::MAX_ACTION_BODY))
+                        .layer(from_fn(api::action_headers)),
+                )
+                .configure(pipeline::with_api_scope)
+        })
+        .map_router(|router| router.nest_service("/assets", ServeDir::new("dist/assets")))
+        .with_state(api::TodoApiState::default());
+    // Correlation is explicitly selected by this app, not enabled in core.
+    RequestIds::new().global(app)
 }
 
 #[cfg(test)]

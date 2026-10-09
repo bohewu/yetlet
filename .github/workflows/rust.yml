@@ -25,6 +25,8 @@ jobs:
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - name: Native tests
         run: cargo test --workspace --all-targets --locked
+      - name: Compiled public API examples
+        run: cargo test --workspace --doc --locked
       - name: Shared UI native + wasm target
         run: cargo check --locked -p yetlet-core -p yetlet-todo-ui --target wasm32-unknown-unknown
       - name: Browser WASM build

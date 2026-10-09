@@ -1,8 +1,21 @@
 //! Axum HTTP response integration. Yetlet deliberately does not reimplement HTTP.
 
+mod app;
 mod context;
 pub mod middleware;
+pub mod response;
+pub use app::App;
+pub use axum::http;
 pub use context::RequestContext;
+pub use response::Page;
+
+/// Native Axum extractors; no separate Yetlet model-binding implementation.
+pub mod extract {
+    pub use axum::{
+        Extension, Json,
+        extract::{DefaultBodyLimit, Path, Query, State},
+    };
+}
 
 use axum::{
     http::{HeaderValue, StatusCode, header},

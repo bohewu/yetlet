@@ -2,15 +2,15 @@
 
 **Yetlet** is an experimental, HTML-first Rust universal UI runtime. A shared Rust `View`/component source supports native SSR and browser WASM/DOM without a default remote event circuit.
 
-> **Status:** M0–M4 and M5's A01–A10 acceptance/performance baseline have been validated locally as an **experimental prototype**. Public release is blocked by licensing, a stable API/support policy, and outstanding production/security qualification. Generic hydration/resumability and WebGPU remain unimplemented.
+> **Status:** M0–M6 are implemented and locally verified at **experimental prototype** scope. M6 includes handler/SSR results, explicit module composition, an independent optional Request ID provider and the migrated Todo example. Public release still needs licensing, support policy and production/security qualification; generic resumability and WebGPU are not implemented.
 
 ## Design principles
 
 - **HTML first:** Pure SSR requires no client JS/WASM. Server and browser targets produce separate build outputs.
-- **Local events first:** DOM events remain in the browser. Remote work will use explicit typed HTTP commands instead of transmitting raw events.
+- **Local events first:** DOM events remain in the browser. Remote work uses explicit typed HTTP commands instead of transmitting raw events.
 - **Independent rendering and transport:** No default SignalR/LiveView-like circuit, custom HTTP/TLS stack, or CSS engine.
 - **Strict CSP:** Escaped SSR output and an allowlisted browser DOM subset. The `/app` CSP allows `'wasm-unsafe-eval'` where necessary, but not `'unsafe-eval'` or `'unsafe-inline'`.
-- **Modular, opt-in capabilities (approved direction):** Optional Session, Cookie Authentication, Cache and similar functionality will use independent providers and native Tower integration; none are currently built-in. See [ADR 0005](docs/adr/0005-opt-in-capability-modules.md).
+- **Modular, opt-in capabilities:** `configure`/`try_configure` use ordinary setup functions, not a plugin manager. `yetlet-request-id` proves independent scoped/global installation; Session, Cookie Auth and Cache remain future providers. See [Extensions](docs/EXTENSIONS.md) and [ADR 0005](docs/adr/0005-opt-in-capability-modules.md).
 - **Handler-first, Component-first, MVC optional (approved direction):** Ordinary Rust handlers and shared Views, typed HTTP results with minimal scaffolding. Full Controllers, model binders, DI and a mandatory MVC file layout are not required. See [ADR 0006](docs/adr/0006-handler-first-mvc-optional.md).
 
 ## Implemented and planned functionality
@@ -32,6 +32,29 @@ Server and browser targets compile the same `TodoList` source from `examples/tod
 `yetlet-server-axum` now provides an owning `RequestContext<S>` with typed request-local extensions and separate application state. Middleware uses native Axum `Next`/`from_fn_with_state`, nested Router scopes and Tower layers. `with_global` adds an explicit pre-routing boundary around a completed Router. API and SSR routes share this pipeline; browser/WASM code does not depend on it.
 
 See [HTTP pipeline usage and limits](docs/HTTP-PIPELINE.md) and [ADR 0004](docs/adr/0004-request-context-and-middleware.md). The existing anonymous API remains a prototype; request context is not authentication, a DI container or a session subsystem.
+
+## M6 — Minimal handlers, results and opt-in composition
+
+`App<S>` remains a thin native Axum Router facade. A complete minimal SSR/JSON application needs no Controller, mandatory RequestContext, DI container or optional module:
+
+```rust
+use yetlet_core::View;
+use yetlet_server_axum::{App, response::Json};
+
+async fn home() -> View { View::text("Hello") }
+async fn status() -> Json<&'static str> { Json("ready") }
+
+let app: axum::Router = App::new()
+    .page("/", "Home", home)
+    .group("/api", |api| api.get("/status", status))
+    .into_router();
+```
+
+For typed parameters or application errors, use `.get` with native `Path`, `Query`, `State`, `Json` extractors and return `Page::new(title, view)` or `Result<Page, E>`. `App::page` is specifically a no-argument async View-handler convenience; no duplicate model binder is introduced. `Page` retains escaped SSR, strict CSP and generic 500 rendering errors. Json, Redirect and status/header tuples retain Axum semantics.
+
+`configure`/`try_configure` execute ordinary module setup functions once at application construction. Providers compose native scoped middleware and typed request/application state. The Todo server explicitly selects `RequestIds::new().global(app)` from the separate `yetlet-request-id` crate; a minimal app does not depend on or initialize it. See [Extensions](docs/EXTENSIONS.md) and [complete M6 evidence](docs/M6-VERIFICATION.md).
+
+A runnable provider-free example is available with `cargo run -p yetlet-server-axum --example minimal`.
 
 ## Run the examples
 
@@ -83,7 +106,8 @@ Browser smoke tests use an isolated headless Chrome profile and temporary localh
 - `yetlet-html` — HTML serializer with escaping and a safe element/attribute policy.
 - `yetlet-dom` — Direct browser DOM renderer with a restricted HTML subset.
 - `yetlet-actions` — Typed commands and injectable LocalExecutor/HttpExecutor contracts.
-- `yetlet-server-axum` — RequestContext, native Tower middleware boundary, HTTP response/CSP adapter.
+- `yetlet-server-axum` — Thin App Builder, Page response, explicit setup composition, RequestContext and native Tower middleware.
+- `yetlet-request-id` — Optional process-local numeric request correlation; the core does not depend on it.
 - `examples/todo-ui` — Shared TodoList, local transitions, and versioned search state.
 - `examples/todo-browser` — Rust/WASM entrypoint with local event binding.
 - `examples/search-island` — Lazy Search WASM, SSR DOM preservation, and local input handling.
@@ -102,6 +126,9 @@ Browser smoke tests use an isolated headless Chrome profile and temporary localh
 - [M3 verification record](docs/M3-VERIFICATION.md)
 - [M4 typed actions/API verification](docs/M4-VERIFICATION.md)
 - [M5 acceptance and measured baseline](docs/M5-VERIFICATION.md)
+- [M6a App Builder verification](docs/M6A-VERIFICATION.md)
+- [Complete M6 verification and performance comparison](docs/M6-VERIFICATION.md)
+- [Module composition and optional providers](docs/EXTENSIONS.md)
 - [Prototype release readiness and blockers](docs/RELEASE-READINESS.md)
 - [ADR 0001](docs/adr/0001-separation-of-concerns.md)
 - [ADR 0002](docs/adr/0002-events-and-actions.md)
@@ -110,4 +137,4 @@ Browser smoke tests use an isolated headless Chrome profile and temporary localh
 - [ADR 0005 — Optional capability modules](docs/adr/0005-opt-in-capability-modules.md)
 - [ADR 0006 — Handler-first and optional MVC](docs/adr/0006-handler-first-mvc-optional.md)
 
-The M5 acceptance/performance baseline (`YT-019`) is locally verified and committed on `master`. Public-release readiness (`YT-020`) is **Blocked** pending licensing and support/security policy. Proposed M6 (`YT-030`–`YT-034`) targets a thin App facade, ergonomic handler/result APIs, and opt-in extension composition; MVC, Controllers, and Session/Auth/Cache modules remain optional and unimplemented.
+The M5 acceptance/performance baseline (`YT-019`) is locally verified and committed on `master`. Public-release readiness (`YT-020`) is **Blocked** pending licensing and support/security policy. All M6 tasks (`YT-030`–`YT-034`) are locally complete, including Todo migration and before/after measurement. MVC/Controllers remain unnecessary; Session/Auth/Cache implementations were not part of the M6 capability proof and remain unimplemented. Current code is not a production release.
