@@ -1,6 +1,6 @@
 # Explicit Module Composition
 
-**Status:** M6 implemented and locally verified (2026-10-09).
+**Status:** M6 composition and request correlation are verified; M8c adds a bounded opt-in Session provider.
 **Contract:** Ordinary Rust setup functions, native Axum/Tower middleware, typed application state and request extensions. No runtime plugin manager, Controller registry or DI container.
 
 ## The baseline has no optional capability
@@ -55,10 +55,34 @@ For validated configuration, use `RequestIds::try_new(first)` and propagate `Inv
 
 The provider adds the typed request extension and response header only. It does not read/clone/buffer the body or serialize request context into HTML. The Todo root explicitly selects the numeric ID using an optional native `Extension<RequestId>` extractor; no whole request is transferred to SSR.
 
+## Bounded opt-in Session provider
+
+`yetlet-session` is another optional crate, depending on the server adapter rather than the reverse. An application supplies a validated `SessionConfig` and installs `SessionManager<T>` only on the routes that need anonymous server-side state:
+
+```rust
+use std::time::Duration;
+use yetlet_server_axum::App;
+use yetlet_session::{SessionConfig, SessionManager};
+
+#[derive(Clone, Default)]
+struct Cart;
+let sessions = SessionManager::<Cart>::new(
+    SessionConfig::new("cart", Duration::from_secs(1800), 1024)?,
+);
+let app = App::new().group("/cart", move |group| {
+    group.get("/", page).configure(|group| sessions.scoped(group))
+});
+# Ok::<_, yetlet_session::SessionConfigError>(app)
+```
+
+The provider generates opaque IDs and CSRF tokens from the operating-system RNG, stores data and absolute expiry in a bounded memory map, rejects malformed/duplicate cookies, never adopts an unknown supplied ID, and exposes typed synchronous read/update/rotate/destroy operations. It applies `HttpOnly`, `SameSite=Lax`, `Path=/`, bounded `Max-Age`, `no-store`, `Vary: Cookie` and `nosniff`; `Secure` is the default. The localhost cart opts out of Secure explicitly because it runs without TLS.
+
+The Session lock is never held across downstream `await`. `try_update` mutates a clone and commits only on application success. Session is still not authentication, durable storage, a distributed provider or a substitute for authorization and production security review. See [M8c evidence](M8C-VERIFICATION.md).
+
 ## Designing another module
 
 Use a normal setup function where it suffices. Add narrow traits only for genuine replaceable resource contracts (for example a cache store), not for a central plugin registry. Keep storage-specific dependencies in the module/provider crate. A handler that does not need context, auth or session should remain an ordinary function.
 
-Cookie/session/auth/cache providers have not been implemented by M6. They must define their own security, lifecycle and error contracts before shipping. Session is not authentication; data cache is not HTTP output caching. Key rotation, revocation, CSRF, personalized response isolation and trusted proxy identity cannot be inferred from typed registration.
+M8c implements only the bounded memory Session provider described above. Cookie authentication, authorization and cache providers remain unimplemented. Session is not authentication; data cache is not HTTP output caching. Key rotation for protected client-side data, shared/distributed storage, login-time fixation rules, authorization, trusted proxy identity and production qualification cannot be inferred from typed registration.
 
 See [ADR 0005](adr/0005-opt-in-capability-modules.md), [ADR 0006](adr/0006-handler-first-mvc-optional.md), [HTTP pipeline](HTTP-PIPELINE.md), and [M6 evidence](M6-VERIFICATION.md).

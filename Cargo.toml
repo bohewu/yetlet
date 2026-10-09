@@ -8,11 +8,14 @@ members = [
     "crates/yetlet-actions",
     "crates/yetlet-server-axum",
     "crates/yetlet-request-id",
+    "crates/yetlet-session",
     "examples/todo-ui",
     "examples/todo-browser",
     "examples/search-island",
     "examples/render-bench",
     "examples/keyed-bindings",
+    "examples/rest-api",
+    "examples/cart-server",
     "examples/todo-server",
 ]
 resolver = "3"

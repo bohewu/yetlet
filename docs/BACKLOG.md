@@ -75,11 +75,23 @@ M7a–M7e completed the research evidence freeze. The maintainer then authorized
 | YT-042 | P1 | L | M7i | Migrate production Todo Browser local list to promoted M7 primitives | YT-040, YT-041 | [M7i evidence](M7I-VERIFICATION.md): SSR parity, Chrome/Firefox keyed identity, queued/in-flight task retirement, disposal/remount, local graph dispatch, explicit HTTP separation, bundle delta and Search isolation PASS | Done |
 | YT-043 | P1 | M | M7j | Final M7 regression, architecture decision and evidence freeze | YT-042 | [M7j evidence](M7J-VERIFICATION.md): 91 tests + 5 doctests, six-package wasm32, debug/release Chrome/Firefox including lifetime races, benchmark, bundle/performance and dependency freeze PASS; repeat reviewer `wc_job_XZzdXEOIx6owj1o5` PASS | Done |
 
+## M8 — Sample-driven application experience
+
+M8 validates ordinary application development before considering broader authoring abstractions. Each item must complete task-fit validation and an independent read-only reviewer before the next item begins.
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-044 | P1 | S | M8a | Standardize runnable sample structure, catalog and documentation | YT-043 | [M8a evidence](M8A-VERIFICATION.md): repository-backed catalog, focused malformed/false-claim suite, 10 Todo tests and final reviewer `wc_job_vQ6pGDE0slh9gV8c` PASS | Done |
+| YT-045 | P1 | M | M8b | API-only REST sample with typed CRUD and HTTP errors | YT-044 | [M8b evidence](M8B-VERIFICATION.md): 7 tests, localhost CRUD/policy smoke, native dependency isolation, material findings repaired and final reviewer `wc_job_d911MsTpbwT6fZY3` PASS | Done |
+| YT-046 | P1 | L | M8c | SSR shopping cart with explicit opt-in Session provider | YT-045 | [M8c evidence](M8C-VERIFICATION.md): 114 tests + 5 doctests, lifecycle/CSRF/isolation, stage reviewer PASS and M8e stale-destroy follow-up repaired | Done |
+| YT-047 | P1 | M | M8d | Developer-experience and boilerplate audit across Todo, REST and Cart | YT-045, YT-046 | [M8d evidence](M8D-VERIFICATION.md): reproducible source/dependency audit, 32 tests, no-runtime-API-change decision and reviewer `wc_job_lZSDSBgMKWu1X5X7` PASS | Done |
+| YT-048 | P1 | M | M8e | Full M8 regression, dependency/bundle review and evidence freeze | YT-047 | [M8e evidence](M8E-VERIFICATION.md): 114 tests + 5 doctests, Chrome/Firefox/native/sample/artifact isolation PASS and reviewer `wc_job_J_MVNzFaVgTH1Gr1` PASS | Done |
+
 ## Ready queue
 
 **First:** `YT-019` has reproducible local acceptance/measurement evidence. `YT-020` cannot close the public release gate without maintainer licensing and declared support/security decisions; see [release readiness](RELEASE-READINESS.md).
 
-**Current implementation milestone:** YT-030–YT-043 are locally Done. M7 source, bounded decision, reviewer-found lifetime repair, replacement validation and repeat reviewer PASS are frozen. Public publication (`YT-020`) remains separately blocked.
+**Current implementation milestone:** YT-030–YT-048 are locally Done. M8 sample contract, REST, Session Cart, DX audit, complete regression and final reviewer PASS are frozen. Public publication (`YT-020`) remains separately blocked.
 
 **Do not start before prerequisites:** Generalized hydration, arbitrary event forwarding, WebGPU, and resumability remain out of scope.
 

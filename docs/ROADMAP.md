@@ -14,6 +14,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M5 — MVP validation/docs** | Cross-target regression, browser smoke, baseline measurements, examples | YT-019–YT-020 | Evidence for [A01–A10](MVP.md#3-acceptance-matrix) and public limitations |
 | **M6 — Handler-first API and optional extensions (locally complete)** | App/Page APIs, explicit module functions, independent Request ID proof and migrated Todo | YT-030–YT-034 | Native/Chrome/Firefox contracts PASS; release assets unchanged; measured latency comparison, no mandatory MVC or DI |
 | **M7 — Bounded keyed DOM and local reactivity (locally complete)** | Measured strategies, promoted low-level contracts, production Todo keyed graph and final decision freeze | YT-025, YT-035–YT-043 | Equivalent output, ownership/disposal, cross-browser lifecycle, measured bundle cost, Search isolation, complete regression and repeat reviewer PASS |
+| **M8 — Sample-driven application experience** | Standardized sample contract, API-only REST app, opt-in Session cart, DX audit and evidence freeze | YT-044–YT-048 | Copyable applications, pay-for-what-you-use dependencies, security/lifecycle evidence and per-stage reviewer PASS |
 
 ## Critical path
 
@@ -40,6 +41,8 @@ YT-036 + YT-037 → YT-038 (SSR/WASM regression)
 YT-038 → YT-039 (binding contracts)
 YT-039 → YT-040 (local graph) + YT-041 (keyed DOM)
 YT-040 + YT-041 → YT-042 (production Todo adoption) → YT-043 (final freeze)
+YT-043 → YT-044 (sample contract) → YT-045 (REST) → YT-046 (Session cart)
+YT-046 → YT-047 (DX audit) → YT-048 (M8 freeze)
 ```
 
 Prove native SSR before committing to an elaborate browser view IR. Avoid simultaneously designing DOM, SSR, islands, and GPU abstraction layers before the smallest dual-target implementation works.
@@ -158,6 +161,26 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 **M7i local evidence (2026-10-09):** The production Todo Browser local list uses `yetlet-reactive` plus `yetlet-dom-keyed`, while the remote typed HTTP path and Search Island remain separate. Chrome 155 and Firefox 157 preserve local list/row identity, verify queued click→dispose retirement, ignore a delayed HTTP completion after disposal/remount, and retain SSR/CSP/API/Search regressions. The repaired production digest is `faebb0709dccd863`; the Browser runtime increases by 82,726 raw / 20,042 local-gzip bytes relative to M7e, while Search JS/WASM remain byte-identical after separate package builds. See [M7i verification](M7I-VERIFICATION.md).
 
 **M7j final evidence (2026-10-09):** Replacement validation passes 91 workspace tests, 5 doctests, strict Clippy/format, six-package wasm32, debug/release Chrome 155 and Firefox 157 regressions including queued/in-flight lifetime races, the full M7a workload, isolated keyed lifecycle suites, dependency checks and a repeated release baseline. ADR 0007 selects only bounded identity/graph/keyed-DOM primitives and the Todo local-list adoption. Production digest is `faebb0709dccd863`; Search remains byte-identical. The first final reviewer found the lifetime P2 that this source repairs; repeat reviewer `wc_job_XZzdXEOIx6owj1o5` returned PASS with no issues or follow-ups. See [M7j verification](M7J-VERIFICATION.md).
+
+### M8 — Sample-driven application experience
+
+**Goal:** Validate that Yetlet's existing handler-first, component-first and opt-in capability model produces understandable applications with low accidental boilerplate. Samples are evidence, not excuses to add Controllers, DI, a macro DSL or a general client framework.
+
+- [x] `YT-044 / M8a`: Standardize a versioned runnable-sample catalog, local READMEs and validation gate.
+- [x] `YT-045 / M8b`: Add an API-only REST sample with no browser/WASM dependencies.
+- [x] `YT-046 / M8c`: Add an SSR shopping cart with an explicit opt-in Session provider and bounded security contract.
+- [x] `YT-047 / M8d`: Audit repeated boilerplate and dependency cost across the three applications.
+- [x] `YT-048 / M8e`: Run the complete regression and freeze the M8 evidence/architecture decision.
+
+**M8a local evidence (2026-10-09):** `examples/samples.toml`, sample-local READMEs and `scripts/check_samples.py` now validate repository-contained paths, exact launch commands, complete documented routes, companion/browser mappings and direct optional dependencies. The focused negative suite covers false declarations and malformed types; 10 Todo tests pass. Final reviewer `wc_job_vQ6pGDE0slh9gV8c` returned PASS with no issues. M8a changes no runtime behavior. See [M8a verification](M8A-VERIFICATION.md).
+
+**M8b local evidence (2026-10-09):** The API-only Book CRUD sample passes 7 tests, strict Clippy, a real localhost smoke, catalog/docs gates and native dependency isolation. Independent reviews found routing-contract, authority-parser and no-Origin Host-validation defects; all material findings were repaired with focused regressions and complete M8b validation. Final reviewer `wc_job_d911MsTpbwT6fZY3` returned PASS with no issues or required follow-ups. See [M8b verification](M8B-VERIFICATION.md).
+
+**M8c local evidence (2026-10-09):** The independent `yetlet-session` provider and native-only SSR cart implement random opaque identity, absolute expiry/capacity, fixation resistance, cookie lifecycle, session-bound CSRF, refresh persistence, bounded cart/form state and explicit absence from unrelated dependency graphs. Stage reviewers repaired atomic-rotation, stale-cookie and non-loopback-listener defects; M8e later found and repaired the stale-destroy removal-cookie variant. Final replacement validation passes 114 tests and 5 doctests. See [M8c verification](M8C-VERIFICATION.md).
+
+**M8d local evidence (2026-10-09):** A reproducible audit compares application-owned Rust source, tests, routes, direct dependencies and optional capabilities across Todo, REST and Cart. Repeated patterns are either already handled, small native bootstrap or application/security-specific; no runtime API promotion is justified. Reviewer `wc_job_lZSDSBgMKWu1X5X7` returned PASS with no issues or required follow-ups. See [M8d verification](M8D-VERIFICATION.md).
+
+**M8e final evidence (2026-10-09):** The complete workspace/native/browser/sample matrix, release artifact/dependency isolation, retained render/keyed fixtures, local baseline and M8d metrics pass. Final reviewer `wc_job_dospP8AM0wUmvHFd` found one stale-destroy cookie race; it was repaired with a deterministic two-request regression and 114-test replacement validation. Repeat reviewer `wc_job_J_MVNzFaVgTH1Gr1` returned PASS with no issues or required follow-ups. M8 is locally complete. See [M8e verification](M8E-VERIFICATION.md).
 
 ## Post-MVP research
 

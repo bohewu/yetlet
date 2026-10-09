@@ -1,0 +1,66 @@
+schema_version = 1
+
+[[sample]]
+id = "todo"
+title = "Todo SSR and Browser"
+package = "yetlet-todo-server"
+path = "examples/todo-server"
+kind = "full-stack"
+status = "verified"
+command = "python3 scripts/build_browser.py && cargo run -p yetlet-todo-server"
+companion_packages = ["yetlet-todo-browser", "yetlet-search-island"]
+routes = [
+  { path = "/", source = "examples/todo-server/src/lib.rs", markers = ['.get("/", root)'] },
+  { path = "/app", source = "examples/todo-server/src/lib.rs", markers = ['.get("/app", browser_shell)'] },
+  { path = "/search", source = "examples/todo-server/src/lib.rs", markers = ['.get("/search", search_route)'] },
+  { path = "/api/todos", source = "examples/todo-server/src/lib.rs", markers = ['.group("/api"', '"/todos"'] },
+]
+browser_runtime = true
+browser_packages = ["yetlet-todo-browser", "yetlet-search-island"]
+browser_build = "scripts/build_browser.py"
+optional_dependencies = ["yetlet-request-id", "yetlet-reactive", "yetlet-dom-keyed"]
+evidence = "docs/M7J-VERIFICATION.md"
+
+[[sample]]
+id = "rest-api"
+title = "API-only Typed REST"
+package = "yetlet-rest-api"
+path = "examples/rest-api"
+kind = "api"
+status = "verified"
+command = "cargo run -p yetlet-rest-api"
+companion_packages = []
+routes = [
+  { path = "/healthz", source = "examples/rest-api/src/lib.rs", markers = ['.get("/healthz", health)'] },
+  { path = "/api/books", source = "examples/rest-api/src/lib.rs", markers = ['.group("/api"', '.route("/books", get(list_books).post(create_book))'] },
+  { path = "/api/books/{id}", source = "examples/rest-api/src/lib.rs", markers = ['"/books/{id}"', 'get(get_book).put(update_book).delete(delete_book)'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = ["yetlet-request-id"]
+evidence = "docs/M8B-VERIFICATION.md"
+
+[[sample]]
+id = "session-cart"
+title = "SSR Session Cart"
+package = "yetlet-cart-server"
+path = "examples/cart-server"
+kind = "server-rendered"
+status = "verified"
+command = "cargo run -p yetlet-cart-server"
+companion_packages = []
+routes = [
+  { path = "/healthz", source = "examples/cart-server/src/lib.rs", markers = ['.get("/healthz"'] },
+  { path = "/cart", source = "examples/cart-server/src/lib.rs", markers = ['.group("/cart"', '.get("/", cart_page)'] },
+  { path = "/cart/add", source = "examples/cart-server/src/lib.rs", markers = ['.post("/add", add)'] },
+  { path = "/cart/decrement", source = "examples/cart-server/src/lib.rs", markers = ['.post("/decrement", decrement)'] },
+  { path = "/cart/remove", source = "examples/cart-server/src/lib.rs", markers = ['.post("/remove", remove)'] },
+  { path = "/cart/clear", source = "examples/cart-server/src/lib.rs", markers = ['.post("/clear", clear)'] },
+  { path = "/cart/end", source = "examples/cart-server/src/lib.rs", markers = ['.post("/end", end_session)'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = ["yetlet-session"]
+evidence = "docs/M8C-VERIFICATION.md"

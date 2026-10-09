@@ -1,0 +1,17 @@
+[package]
+name = "yetlet-cart-server"
+description = "SSR shopping cart with explicit Yetlet sessions"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+axum.workspace = true
+tokio.workspace = true
+serde = { version = "1", features = ["derive"] }
+yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
+yetlet-session = { path = "../../crates/yetlet-session" }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }

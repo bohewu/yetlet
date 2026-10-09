@@ -53,7 +53,7 @@ let app: axum::Router = App::new()
 
 For typed parameters or application errors, use `.get` with native `Path`, `Query`, `State`, `Json` extractors and return `Page::new(title, view)` or `Result<Page, E>`. `App::page` is specifically a no-argument async View-handler convenience; no duplicate model binder is introduced. `Page` retains escaped SSR, strict CSP and generic 500 rendering errors. Json, Redirect and status/header tuples retain Axum semantics.
 
-`configure`/`try_configure` execute ordinary module setup functions once at application construction. Providers compose native scoped middleware and typed request/application state. The Todo server explicitly selects `RequestIds::new().global(app)` from the separate `yetlet-request-id` crate; a minimal app does not depend on or initialize it. See [Extensions](docs/EXTENSIONS.md) and [complete M6 evidence](docs/M6-VERIFICATION.md).
+`configure`/`try_configure` execute ordinary module setup functions once at application construction. Providers compose native scoped middleware and typed request/application state. The Todo server explicitly selects `yetlet-request-id`; the M8c cart explicitly selects `yetlet-session` only for `/cart`. A minimal app depends on neither. See [Extensions](docs/EXTENSIONS.md), [complete M6 evidence](docs/M6-VERIFICATION.md) and [M8c evidence](docs/M8C-VERIFICATION.md).
 
 A runnable provider-free example is available with `cargo run -p yetlet-server-axum --example minimal`.
 
@@ -71,6 +71,24 @@ cargo run -p yetlet-todo-server
 ```
 
 Open `http://127.0.0.1:3000/` (SSR), `http://127.0.0.1:3000/app` (browser/WASM), and `http://127.0.0.1:3000/search` (SSR plus lazy Search Island). The Git-ignored `dist/` directory contains build-time generated assets and the content-hash manifest. The server never compiles WASM on request; `/app` explicitly returns HTTP 503 when browser assets have not been built.
+
+User-facing runnable applications are listed in `examples/samples.toml` and [the sample guide](docs/SAMPLES.md). Validate the catalog with `python3 scripts/check_samples.py`; internal browser entry crates and research fixtures are deliberately not presented as standalone application samples.
+
+The native-only REST sample requires no browser toolchain:
+
+```bash
+cargo run -p yetlet-rest-api
+```
+
+It listens on `http://127.0.0.1:3001` by default and exposes `/healthz`, `/api/books` and `/api/books/{id}`.
+
+The native SSR Session cart also requires no browser toolchain:
+
+```bash
+cargo run -p yetlet-cart-server
+```
+
+It listens on `http://127.0.0.1:3002` by default and rejects non-loopback listeners while using its explicit insecure-localhost cookie override. `/healthz` stays outside Session scope; `/cart` uses strict-CSP forms, a server-side cart and a session-bound CSRF token.
 
 `python3 scripts/build_browser.py --release` produces an optimized browser bundle. Do not confuse debug WASM bytes with production transfer sizes or performance.
 
@@ -92,6 +110,9 @@ cargo check --locked \
 python3 scripts/check_docs.py
 cargo build --locked -p yetlet-todo-server
 python3 scripts/smoke_browser.py
+cargo test --locked -p yetlet-session -p yetlet-cart-server --all-targets
+cargo build --locked -p yetlet-cart-server
+python3 scripts/smoke_cart.py
 ```
 
 For the **release-mode** informational baseline and a separate Firefox E2E check:
@@ -139,15 +160,18 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 - `yetlet-actions` — Typed commands and injectable LocalExecutor/HttpExecutor contracts.
 - `yetlet-server-axum` — Thin App Builder, Page response, explicit setup composition, RequestContext and native Tower middleware.
 - `yetlet-request-id` — Optional process-local numeric request correlation; the core does not depend on it.
+- `yetlet-session` — Optional process-local server-side Session, expiry, CSRF and cookie lifecycle provider.
 - `examples/todo-ui` — Shared TodoList, local transitions, and versioned search state.
 - `examples/todo-browser` — Rust/WASM entrypoint with a keyed local graph and separate typed HTTP action path.
 - `examples/search-island` — Lazy Search WASM, SSR DOM preservation, and local input handling.
 - `examples/render-bench` — Isolated M7a strategy fixture; not a production route or public renderer API.
 - `examples/keyed-bindings` — Isolated fixed-shape authoring and cross-browser lifecycle/form-state prototype; its reactive module re-exports optional `yetlet-reactive`.
 - `examples/todo-server` — SSR/browser routes and in-memory typed GET/POST Todo API.
+- `examples/rest-api` — Native-only typed Book CRUD with RequestContext policy and no browser/WASM dependency.
+- `examples/cart-server` — Native-only SSR cart with explicitly scoped `yetlet-session` and no browser/WASM dependency.
 - `scripts/build_browser.py` — Content-addressed browser asset pipeline with isolated Todo/Search Cargo builds.
 
-**Known limitations:** Only the production Todo local list uses the promoted keyed graph; remote Todo results and Search result updates retain bounded subtree replacement. The fixed keyed/static-slot authoring shape, text-input/focus policy and conditional slot remain experimental. Nested/general component trees, async effects, IME/mobile/WebKit coverage and generic hydration/resumability remain absent. The Todo API is anonymous/in-memory, and production auth/CSRF, persistence, stable API, full IME/a11y matrix and cross-framework benchmarks remain absent. See [M7i verification](docs/M7I-VERIFICATION.md) and [release readiness](docs/RELEASE-READINESS.md).
+**Known limitations:** Only the production Todo local list uses the promoted keyed graph; remote Todo results and Search result updates retain bounded subtree replacement. The fixed keyed/static-slot authoring shape, text-input/focus policy and conditional slot remain experimental. Nested/general component trees, async effects, IME/mobile/WebKit coverage and generic hydration/resumability remain absent. The Todo API and Session cart are process-local/in-memory; the Session proof is anonymous, single-node and not production auth/CSRF qualification. Durable persistence, stable API, full IME/a11y matrix and cross-framework benchmarks remain absent. See [M7i verification](docs/M7I-VERIFICATION.md), [M8c verification](docs/M8C-VERIFICATION.md) and [release readiness](docs/RELEASE-READINESS.md).
 
 ## Documentation
 
@@ -171,6 +195,12 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 - [M7h optional keyed DOM ownership](docs/M7H-VERIFICATION.md)
 - [M7i production Todo keyed-graph adoption](docs/M7I-VERIFICATION.md)
 - [M7j final architecture and evidence freeze](docs/M7J-VERIFICATION.md)
+- [Sample application contract and catalog](docs/SAMPLES.md)
+- [M8a sample contract verification](docs/M8A-VERIFICATION.md)
+- [M8b API-only REST verification](docs/M8B-VERIFICATION.md)
+- [M8c Session and SSR cart verification](docs/M8C-VERIFICATION.md)
+- [M8d sample developer-experience audit](docs/M8D-VERIFICATION.md)
+- [M8e final sample architecture and evidence freeze](docs/M8E-VERIFICATION.md)
 - [Module composition and optional providers](docs/EXTENSIONS.md)
 - [Prototype release readiness and blockers](docs/RELEASE-READINESS.md)
 - [ADR 0001](docs/adr/0001-separation-of-concerns.md)
@@ -181,4 +211,4 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 - [ADR 0006 — Handler-first and optional MVC](docs/adr/0006-handler-first-mvc-optional.md)
 - [ADR 0007 — Bounded keyed DOM and local graph](docs/adr/0007-bounded-keyed-dom-and-local-graph.md)
 
-M0–M7 are locally complete at prototype scope. M7a–M7j implementation, bounded decision, reviewer-found lifetime repair, replacement validation and repeat reviewer PASS are frozen. Public-release readiness (`YT-020`) is **Blocked** pending licensing and support/security policy. Current code is not a production release.
+M0–M8 are locally complete at prototype scope. M8 freezes the runnable sample contract, native REST and Session Cart applications, no-runtime-API-change DX decision, full regression and final reviewer PASS. Public-release readiness (`YT-020`) is **Blocked** pending licensing and support/security policy. Current code is not a production release.

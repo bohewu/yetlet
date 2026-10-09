@@ -42,6 +42,12 @@ REQUIRED = (
     "docs/M7H-VERIFICATION.md",
     "docs/M7I-VERIFICATION.md",
     "docs/M7J-VERIFICATION.md",
+    "docs/M8A-VERIFICATION.md",
+    "docs/M8B-VERIFICATION.md",
+    "docs/M8C-VERIFICATION.md",
+    "docs/M8D-VERIFICATION.md",
+    "docs/M8E-VERIFICATION.md",
+    "docs/SAMPLES.md",
     "docs/EXTENSIONS.md",
     "docs/RELEASE-READINESS.md",
 )

@@ -125,6 +125,7 @@ Shared component source does not imply inclusion of server-side repositories or 
 | `yetlet-reactive` | Optional explicitly owned synchronous local update graph | M7g |
 | `yetlet-html` | Deterministic HTML serializer and escaping | M1 |
 | `yetlet-server-axum` | HTTP/UI/API routing integration, headers | M1 |
+| `yetlet-session` | Optional server-side session identity, memory storage, expiry and CSRF token | M8c |
 | `yetlet-dom` | Browser DOM mount and updates | M2 |
 | `yetlet-dom-keyed` | Optional keyed child reconciliation and listener ownership | M7h |
 | `examples/todo-browser` | Browser WASM bootstrap; production keyed local Todo path | M2 / M7i |
@@ -135,11 +136,15 @@ Shared component source does not imply inclusion of server-side repositories or 
 
 These are conceptual boundaries, **not** a promise that each one will become a public crate. Use the smallest validated interfaces across the two renderer targets before adding extra abstractions or splitting packages.
 
-### Optional application capabilities (M6 composition contract implemented)
+### Optional application capabilities (M6 composition; M8c Session proof)
 
-Future server features such as cookies, sessions, authentication, data caching, output caching, request tracing and rate limiting are **modular, opt-in, and pay-for-what-you-use**. Integrate them through independent Rust crates/providers, native Tower/Axum layers, typed `RequestContext` extensions and explicit application state. Do not add an always-on DI container or plugin manager. Application cache and HTTP output cache have different safety constraints; cookie-based authentication need not require a server session.
+Server features such as sessions, authentication, data caching, output caching, request tracing and rate limiting are **modular, opt-in, and pay-for-what-you-use**. Integrate them through independent Rust crates/providers, native Tower/Axum layers, typed request extensions and explicit application state. Do not add an always-on DI container or plugin manager. Application cache and HTTP output cache have different safety constraints; cookie-based authentication need not require a server session.
 
 `App::configure` and `try_configure` now compose ordinary typed setup functions once, while providers reuse native Tower scopes, explicit state and Extensions. The independent `yetlet-request-id` crate is the M6 opt-in proof: the Todo app installs `RequestIds::new().global(app)`, and a scoped provider can be configured only on selected groups. The core has no dependency on this provider. `RequestContext` itself still generates no ID. No server extension or provider dependency is copied into Browser WASM/hydration. See [Extensions](EXTENSIONS.md), [ADR 0005](adr/0005-opt-in-capability-modules.md) and [M6 evidence](M6-VERIFICATION.md).
+
+M8c adds the independent `yetlet-session` crate as a second, security-bounded proof. The cart explicitly installs `SessionManager<Cart>` only on its `/cart` group. IDs and CSRF tokens are OS-random, state and expiry remain server-side, unknown IDs are not adopted, mutations use a session-bound token, and clear/end demonstrate rotation and revocation. The server adapter, Todo, REST and Browser packages do not depend on Session. This is an anonymous process-local provider, not authentication or production qualification. See [M8c evidence](M8C-VERIFICATION.md).
+
+M8d's measured three-sample audit retains these boundaries rather than introducing another runtime API: Todo pays for Browser/keyed/reactive capabilities, REST remains a native one-package API, and Cart remains a native one-package SSR application selecting Session. Shared candidates such as listener helpers, JSON errors, origin policy and forms remain application-specific until more examples converge. M8e freezes the complete artifact/dependency regression and final reviewer PASS without changing these boundaries. See [M8d evidence](M8D-VERIFICATION.md) and [M8e evidence](M8E-VERIFICATION.md).
 
 ### Handler-first application API (M6 implemented)
 

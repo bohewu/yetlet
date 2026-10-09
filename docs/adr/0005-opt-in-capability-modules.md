@@ -1,6 +1,6 @@
 # ADR 0005 — Opt-in capability modules and application composition
 
-- **Status:** M6 composition APIs and independent request-ID proof implemented and locally verified; Session/Auth/Cache providers remain future choices.
+- **Status:** M6 composition/request-ID proof and the bounded M8c memory Session provider are implemented; Auth/Cache and distributed Session providers remain future choices.
 - **Date:** 2026-10-08
 - **Authority:** Maintainer approval of extensible opt-in Session, Cache, Cookie Authentication, and related features.
 - **Related:** [Architecture](../ARCHITECTURE.md), [Backlog](../BACKLOG.md), [Roadmap](../ROADMAP.md), [ADR 0004](0004-request-context-and-middleware.md), [ADR 0006](0006-handler-first-mvc-optional.md).
@@ -20,19 +20,19 @@ Yetlet's baseline SSR/HTTP and browser WASM must remain useful without sessions,
 7. **Target and security isolation.** Optional server-side crates must not enter browser WASM, and request extensions/server handles must not be automatically serialized into SSR/hydration. Cookies and authentication need real Secure/HttpOnly/SameSite, CSRF, key rotation, session fixation/revocation and authorization rules where applicable. Authenticated output caching must handle `Cache-Control`, `Vary` and per-user isolation.
 8. **Incremental, handler-first DX.** M6 should prove a thin App/route builder, ordinary function handlers with lightweight View/JSON/redirect results, typed optional capability installation using the existing Tower boundary, and one independently opt-in example. MVC is optional application organization; never require Controllers, an extra model binder, a plugin manager, or full dependency injection. See [ADR 0006](0006-handler-first-mvc-optional.md).
 
-## Possible modules — none implemented yet
+## Capability modules
 
 | Candidate name | Responsibility | Optional dependency |
 |---|---|---|
 | `yetlet-cookies` | Read/set/protect cookies | HTTP only |
-| `yetlet-session` | Session identity, expiry, storage | Optional cookie + store provider |
+| `yetlet-session` | Session identity, absolute expiry, bounded memory storage and CSRF token | Implemented in M8c; other stores remain future |
 | `yetlet-auth` | Authentication and authorization | Optional cookie, bearer or OIDC scheme |
 | `yetlet-cache` | Application data caching | Optional memory/Redis/other store |
 | `yetlet-output-cache` | HTTP/SSR response caching | Explicit cache policy; avoid private data leakage |
 | `yetlet-rate-limit` | Admission policies | Optional limiter/provider |
 | `yetlet-tracing` | Correlation IDs and request tracing | Optional span/ID strategy |
 
-These are **candidate names**, not existing Cargo workspace crates, and not a commitment to build all of them. Simpler features need not each become a crate.
+`yetlet-session` and `yetlet-request-id` now exist as bounded opt-in crates. The other names remain candidates, not a commitment to build all of them. Simpler features need not each become a crate.
 
 ## M6 acceptance criteria (locally verified)
 
@@ -47,4 +47,4 @@ These are **candidate names**, not existing Cargo workspace crates, and not a co
 
 An always-on session/auth/cache layer, a global service locator, a central dynamic plugin registry, and a mega-crate with every provider enabled by default all impose unnecessary coupling or per-application cost.
 
-**Current implementation:** `App::configure` takes an ordinary typed setup function, and `try_configure` propagates its chosen error type. They execute once during construction, not per request. `yetlet-request-id` proves independent optional registration, scoped/global native middleware, typed state, and absence from the core/browser dependency graphs. Its setup and request failure paths are tested. The candidate Session/Auth/Cache modules above remain unimplemented. See [Extensions](../EXTENSIONS.md) and [M6 evidence](../M6-VERIFICATION.md).
+**Current implementation:** `App::configure` takes an ordinary typed setup function, and `try_configure` propagates its chosen error type. They execute once during construction, not per request. `yetlet-request-id` proves independent optional correlation. M8c adds `yetlet-session`, with scoped native middleware, typed `Session<T>`, OS-random identity/CSRF, absolute expiry/capacity, rotation/revocation and an SSR cart consumer. Both remain absent from the core/browser dependency graphs unless explicitly selected. Auth, Cache and distributed Session providers remain unimplemented. See [Extensions](../EXTENSIONS.md), [M6 evidence](../M6-VERIFICATION.md) and [M8c evidence](../M8C-VERIFICATION.md).

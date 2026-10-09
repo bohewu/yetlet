@@ -1,0 +1,17 @@
+[package]
+name = "yetlet-session"
+description = "Explicit opt-in server-side sessions for Yetlet"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+axum.workspace = true
+cookie = "0.18"
+getrandom = "0.2"
+subtle = "2.6"
+yetlet-server-axum = { path = "../yetlet-server-axum" }
+
+[dev-dependencies]
+tokio.workspace = true
+tower = { version = "0.5", features = ["util"] }
