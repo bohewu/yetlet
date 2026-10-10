@@ -81,6 +81,7 @@ REQUIRED = (
     "docs/M10G-VERIFICATION.md",
     "docs/EXTERNAL-SECURITY-REVIEW.md",
     "docs/M10H-VERIFICATION.md",
+    "docs/M10-DELIVERY-VERIFICATION.md",
     "CONTRIBUTING.md",
     "SECURITY.md",
     "docs/SAMPLES.md",
