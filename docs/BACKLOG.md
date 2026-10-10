@@ -87,11 +87,29 @@ M8 validates ordinary application development before considering broader authori
 | YT-047 | P1 | M | M8d | Developer-experience and boilerplate audit across Todo, REST and Cart | YT-045, YT-046 | [M8d evidence](M8D-VERIFICATION.md): reproducible source/dependency audit, 32 tests, no-runtime-API-change decision and reviewer `wc_job_lZSDSBgMKWu1X5X7` PASS | Done |
 | YT-048 | P1 | M | M8e | Full M8 regression, dependency/bundle review and evidence freeze | YT-047 | [M8e evidence](M8E-VERIFICATION.md): 114 tests + 5 doctests, Chrome/Firefox/native/sample/artifact isolation PASS and reviewer `wc_job_J_MVNzFaVgTH1Gr1` PASS | Done |
 
+## M9 — Sample expansion and API contract qualification (planned)
+
+The [M9 plan](M9-PLAN.md) owns detailed per-sample positive/negative tests, SQL-first opt-in boundaries and the API contract inventory. YT-049 is a documentation-only **independent reviewer gate**; YT-050–YT-059 must not start until that gate passes. Each bounded item needs its own independent read-only reviewer before the next item.
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-049 | P1 | M | M9p | Plan, document and independently review M9 before code | YT-048 | [Planning evidence](M9-PLANNING-VERIFICATION.md): 40 docs/59 items, 12-sample matrix, SQL-first no built-in ORM, independent reviewer `wc_job_fr93PI1YLOtR3KjE` PASS | Done |
+| YT-050 | P1 | S | M9a | Promote `hello-world` to verified runnable catalog | YT-049 | [M9a evidence](M9A-VERIFICATION.md): 117 tests/5 doctests, 4-sample catalog, escaping/CSP/native 404/405, optional-dependency isolation and reviewer `wc_job_Htk-Quo_aFExMJs3` PASS | Done |
+| YT-051 | P1 | M | M9b | Build `middleware-lab` | YT-050 | [M9b evidence](M9B-VERIFICATION.md): 124 tests/5 doctests, native Tower group/method/404/405/stream errors and reviewer `wc_job_UnKflDaA8ZQHXCce` PASS | Done |
+| YT-052 | P1 | M | M9c | Build `forms-validation` | YT-051 | [M9c evidence](M9C-VERIFICATION.md): 130 tests/5 doctests, escaped SSR/422/no-state 303 PRG, accessible English content; final reviewer `wc_job_lGtk_ZIoAvK4F6PW` PASS | Done |
+| YT-053 | P1 | L | M9d | Build `file-server` | YT-052 | [M9d evidence](M9D-VERIFICATION.md): 144 tests/5 doctests, static/stream/auth/path/symlink/cancellation and asset isolation PASS; reviewer `wc_job_g8JSu80-Jseg6lmG` PASS | Done |
+| YT-054 | P1 | L | M9e | Build SQL-first, opt-in `sqlite-crud` without ORM | YT-053 | [M9e evidence](M9E-VERIFICATION.md): 153 tests/5 doctests, direct SQL/rollback/restart/schema fail-closed and isolation; reviewer `wc_job_aVBprnEsYc8o3ubi` PASS | Done |
+| YT-055 | P1 | M | M9f | Build `sse-notifications` | YT-054 | Bounded SSE/replay/cancel/reconnect, no default circuit + reviewer PASS | Todo |
+| YT-056 | P1 | L | M9g | Build `multi-island-dashboard` | YT-055 | SSR fallback, independent lazy bundles/teardown/late action isolation, Chrome/Firefox + reviewer PASS | Todo |
+| YT-057 | P1 | L | M9h | Build security-bounded `auth-notes` | YT-056, YT-046 | Test-identity authn/authz, user isolation, CSRF/fixation/cookie gates; security-focused reviewer PASS | Todo |
+| YT-058 | P1 | L | M9i | Build `modular-shop` reference application | YT-057, YT-054, YT-056 | Catalog/cart/orders/identity composition, failure/isolation, no plugin/DI/ORM + reviewer PASS | Todo |
+| YT-059 | P1 | L | M9j | Audit API friction, classify contracts and freeze M9 evidence | YT-058 | Public API inventory, Stable Candidate/Experimental/Internal, complete regression, final reviewer PASS | Todo |
+
 ## Ready queue
 
 **First:** `YT-019` has reproducible local acceptance/measurement evidence. `YT-020` cannot close the public release gate without maintainer licensing and declared support/security decisions; see [release readiness](RELEASE-READINESS.md).
 
-**Current implementation milestone:** YT-030–YT-048 are locally Done. M8 sample contract, REST, Session Cart, DX audit, complete regression and final reviewer PASS are frozen. Public publication (`YT-020`) remains separately blocked.
+**Current implementation milestone:** YT-030–YT-054 are locally Done. M9e SQLite CRUD repaired a reviewer-discovered incomplete-schema P2; repeat reviewer `wc_job_aVBprnEsYc8o3ubi` returned PASS and the exact eighth catalog entry was promoted. YT-055 SSE Notifications is next; YT-056–YT-059 remain Todo. Public publication (`YT-020`) remains separately blocked.
 
 **Do not start before prerequisites:** Generalized hydration, arbitrary event forwarding, WebGPU, and resumability remain out of scope.
 

@@ -16,6 +16,11 @@ members = [
     "examples/keyed-bindings",
     "examples/rest-api",
     "examples/cart-server",
+    "examples/hello-world",
+    "examples/middleware-lab",
+    "examples/forms-validation",
+    "examples/file-server",
+    "examples/sqlite-crud",
     "examples/todo-server",
 ]
 resolver = "3"

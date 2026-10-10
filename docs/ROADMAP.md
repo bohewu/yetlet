@@ -15,6 +15,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M6 — Handler-first API and optional extensions (locally complete)** | App/Page APIs, explicit module functions, independent Request ID proof and migrated Todo | YT-030–YT-034 | Native/Chrome/Firefox contracts PASS; release assets unchanged; measured latency comparison, no mandatory MVC or DI |
 | **M7 — Bounded keyed DOM and local reactivity (locally complete)** | Measured strategies, promoted low-level contracts, production Todo keyed graph and final decision freeze | YT-025, YT-035–YT-043 | Equivalent output, ownership/disposal, cross-browser lifecycle, measured bundle cost, Search isolation, complete regression and repeat reviewer PASS |
 | **M8 — Sample-driven application experience** | Standardized sample contract, API-only REST app, opt-in Session cart, DX audit and evidence freeze | YT-044–YT-048 | Copyable applications, pay-for-what-you-use dependencies, security/lifecycle evidence and per-stage reviewer PASS |
+| **M9 — Sample expansion and API contract qualification (planned)** | Nine canonical sample names plus three supplements, SQL-first persistence, contract classification | YT-049–YT-059 | Independent planning review before code; reviewer per sample; compatibility inventory and full regression |
 
 ## Critical path
 
@@ -43,6 +44,10 @@ YT-039 → YT-040 (local graph) + YT-041 (keyed DOM)
 YT-040 + YT-041 → YT-042 (production Todo adoption) → YT-043 (final freeze)
 YT-043 → YT-044 (sample contract) → YT-045 (REST) → YT-046 (Session cart)
 YT-046 → YT-047 (DX audit) → YT-048 (M8 freeze)
+YT-048 → YT-049 (review M9 plan) → YT-050 (Hello) → YT-051 (Middleware)
+YT-051 → YT-052 (Forms) → YT-053 (Files) → YT-054 (SQLite)
+YT-054 → YT-055 (SSE) → YT-056 (Multi-Island) → YT-057 (Auth)
+YT-057 → YT-058 (Modular Shop) → YT-059 (API contract review/freeze)
 ```
 
 Prove native SSR before committing to an elaborate browser view IR. Avoid simultaneously designing DOM, SSR, islands, and GPU abstraction layers before the smallest dual-target implementation works.
@@ -181,6 +186,30 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 **M8d local evidence (2026-10-09):** A reproducible audit compares application-owned Rust source, tests, routes, direct dependencies and optional capabilities across Todo, REST and Cart. Repeated patterns are either already handled, small native bootstrap or application/security-specific; no runtime API promotion is justified. Reviewer `wc_job_lZSDSBgMKWu1X5X7` returned PASS with no issues or required follow-ups. See [M8d verification](M8D-VERIFICATION.md).
 
 **M8e final evidence (2026-10-09):** The complete workspace/native/browser/sample matrix, release artifact/dependency isolation, retained render/keyed fixtures, local baseline and M8d metrics pass. Final reviewer `wc_job_dospP8AM0wUmvHFd` found one stale-destroy cookie race; it was repaired with a deterministic two-request regression and 114-test replacement validation. Repeat reviewer `wc_job_J_MVNzFaVgTH1Gr1` returned PASS with no issues or required follow-ups. M8 is locally complete. See [M8e verification](M8E-VERIFICATION.md).
+
+### M9 — Sample expansion and API contract qualification (implementation underway)
+
+**Goal:** Challenge M8 application ergonomics using the original nine-sample catalog sequence plus three targeted supplements, then classify real API compatibility maturity. The [M9 implementation plan](M9-PLAN.md) is the authoritative scope and test matrix; M9p planning is complete, and implementation begins with bounded independently reviewed samples.
+
+- [x] **YT-049 / M9p:** Documentation, unique task/dependency graph, SQL-first/no-ORM policy and independent read-only planning reviewer PASS before any M9 code.
+- [x] **YT-050 / M9a:** Minimal native Hello World sample is cataloged and independently reviewed.
+- [x] **YT-051 / M9b:** Middleware Lab with native global/group/route scopes, streaming/error validation and independent reviewer PASS.
+- [x] **YT-052 / M9c:** Stateless SSR Forms Validation with field errors, native PRG, English language override and independent repeat reviewer PASS.
+- [x] **YT-053 / M9d:** Bounded File Server, static/download headers, protected multipart, private storage, interrupted-write cleanup, dependency/asset isolation and independent reviewer PASS.
+- [x] **YT-054 / M9e:** SQL-first SQLite CRUD using application-local `rusqlite`, complete regression and repeat reviewer PASS.
+- [ ] **YT-055 / M9f:** Bounded SSE Notifications with replay/cancellation/backpressure and independent reviewer.
+- [ ] **YT-056–YT-058 / M9g–M9i:** One bounded sample per reviewer: Multi-Island, Auth Notes and Modular Shop. Display order remains canonical; implementation order reflects dependency/security gates.
+- [ ] **YT-059 / M9j:** API friction/compatibility inventory, Stable Candidate versus Experimental versus Internal classification, full native/browser/provider regression, independent final reviewer.
+
+**Explicit data-access boundary:** No built-in Yetlet ORM, ORM runtime, mandatory repository/DbContext, query DSL, migration framework or hidden database provider. YT-054 evaluates existing SQL-first `rusqlite` or `sqlx`-style direct/typed query libraries as **app-selected optional dependencies**. Any third-party ORM is external and opt-in only, never a default dependency. See [M9 plan](M9-PLAN.md#3-sql-first-data-access-policy-no-yetlet-orm).
+
+**Planning evidence (2026-10-09):** [M9 planning verification](M9-PLANNING-VERIFICATION.md) records 40 documents, 59 backlog items, the unchanged three-entry runnable catalog, SQL-first opt-in policy, complete task DAG and reviewer `wc_job_fr93PI1YLOtR3KjE` PASS with zero findings. At the planning freeze YT-049 was Done and YT-050–YT-059 were Todo; current per-stage progress follows below.
+**M9a / YT-050 evidence (2026-10-09):** A distinct, cataloged native-only `yetlet-hello-world` proves deterministic SSR, an escaped dynamic route, strict CSP, native 404/405 and absence of optional providers or browser dependencies. Workspace tests 117/117, doctests 5/5, strict Clippy, real HTTP smoke, four-sample catalog and native release build pass; independent reviewer `wc_job_Htk-Quo_aFExMJs3` returned PASS. See [M9a verification](M9A-VERIFICATION.md).
+**M9b / YT-051 evidence (2026-10-09):** The native-only Middleware Lab demonstrates global/group/method routing, short-circuit, typed RequestContext state, real third-party Tower interoperability and streamed/failing bodies. Workspace tests 124/124, doctests 5/5, strict Clippy, localhost smoke, five-sample catalog and optional-dependency isolation PASS; independent reviewer `wc_job_UnKflDaA8ZQHXCce` returned PASS with no issues. See [M9b verification](M9B-VERIFICATION.md).
+**M9c / YT-052 evidence (2026-10-09):** Native SSR form validation and semantic error associations, escaped untrusted attributes, bounded 2 KiB bodies, strict CSP and no-side-effect 303 PRG pass 130 tests, five doctests and a real localhost smoke. First reviewer `wc_job_7D2rtHdGEfwW1Aet` found an inherited-language accessibility P2; a sample-owned `lang="en"` override on both main views and GET/error/success regressions repaired it. Repeat reviewer `wc_job_lGtk_ZIoAvK4F6PW` returned PASS with no required followups. No DB/ORM/Session/CSRF claim. See [M9c verification](M9C-VERIFICATION.md).
+
+**M9d / YT-053 evidence (2026-10-09):** The bounded File Server passes 14 focused tests, 144 workspace tests, five doctests, full Clippy/format, six WASM packages and one localhost smoke including interrupted-upload cleanup. Browser/Search release digest remains `faebb0709dccd863`, all 136 retained assets byte-identical; file dependencies stay application-local. Independent read-only reviewer `wc_job_g8JSu80-Jseg6lmG` returned PASS with no findings, and runtime telemetry matched the saved `gpt-6-astra`/high configuration. The exact reviewed seventh catalog entry was promoted. See [M9d verification](M9D-VERIFICATION.md).
+**M9e / YT-054 evidence (2026-10-09):** A bounded `rusqlite` versus compatible `sqlx` spike selected direct application-local `rusqlite`; explicit SQL/migration/transactions run behind a bounded `spawn_blocking` gate. Nine focused tests, 153 workspace tests, five doctests, three-process persistence/concurrency smoke, 22 dependency trees, six WASM packages and 136 byte-identical production assets pass. First reviewer `wc_job_Q3pBfUqPYGYNSIrD` found incomplete required-column validation; the fail-closed schema check and regressions were repaired, the full matrix rerun, and repeat reviewer `wc_job_aVBprnEsYc8o3ubi` returned PASS. The exact eighth catalog entry was then promoted. See [comparison](M9E-DATA-ACCESS-COMPARISON.md) and [M9e verification](M9E-VERIFICATION.md).
 
 ## Post-MVP research
 

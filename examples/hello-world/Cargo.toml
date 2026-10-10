@@ -1,0 +1,15 @@
+[package]
+name = "yetlet-hello-world"
+description = "Minimal native Yetlet SSR sample without optional providers"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+axum.workspace = true
+tokio.workspace = true
+yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }

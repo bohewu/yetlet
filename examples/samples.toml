@@ -1,6 +1,25 @@
 schema_version = 1
 
 [[sample]]
+id = "hello-world"
+title = "Hello World Native SSR"
+package = "yetlet-hello-world"
+path = "examples/hello-world"
+kind = "server-rendered"
+status = "verified"
+command = "cargo run -p yetlet-hello-world"
+companion_packages = []
+routes = [
+  { path = "/", source = "examples/hello-world/src/lib.rs", markers = ['.page("/", "Yetlet Hello", home)'] },
+  { path = "/hello/{name}", source = "examples/hello-world/src/lib.rs", markers = ['.get("/hello/{name}", hello)'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = []
+evidence = "docs/M9A-VERIFICATION.md"
+
+[[sample]]
 id = "todo"
 title = "Todo SSR and Browser"
 package = "yetlet-todo-server"
@@ -64,3 +83,87 @@ browser_packages = []
 browser_build = ""
 optional_dependencies = ["yetlet-session"]
 evidence = "docs/M8C-VERIFICATION.md"
+
+[[sample]]
+id = "middleware-lab"
+title = "Native Middleware Pipeline Lab"
+package = "yetlet-middleware-lab"
+path = "examples/middleware-lab"
+kind = "api"
+status = "verified"
+command = "cargo run -p yetlet-middleware-lab"
+companion_packages = []
+routes = [
+  { path = "/outside", source = "examples/middleware-lab/src/lib.rs", markers = ['.get("/outside", outside)'] },
+  { path = "/lab/plain", source = "examples/middleware-lab/src/lib.rs", markers = ['.group("/lab"', '.get("/plain", handled)'] },
+  { path = "/lab/guarded", source = "examples/middleware-lab/src/lib.rs", markers = ['.route("/guarded", get(handled).layer(from_fn(route_guard)))'] },
+  { path = "/lab/stream", source = "examples/middleware-lab/src/lib.rs", markers = ['.get("/stream", stream_ok)'] },
+  { path = "/lab/broken-stream", source = "examples/middleware-lab/src/lib.rs", markers = ['.get("/broken-stream", stream_failure)'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = []
+evidence = "docs/M9B-VERIFICATION.md"
+
+[[sample]]
+id = "file-server"
+title = "Bounded Native File Server"
+package = "yetlet-file-server"
+path = "examples/file-server"
+kind = "server-rendered"
+status = "verified"
+command = "cargo run -p yetlet-file-server"
+companion_packages = []
+routes = [
+  { path = "/", source = "examples/file-server/src/lib.rs", markers = ['.get("/", home)'] },
+  { path = "/healthz", source = "examples/file-server/src/lib.rs", markers = ['.get("/healthz",'] },
+  { path = "/static/welcome.txt", source = "examples/file-server/src/lib.rs", markers = ['"/static/welcome.txt"', 'ServeFile::new(static_file)'] },
+  { path = "/uploads", source = "examples/file-server/src/lib.rs", markers = ['.post("/uploads", upload)'] },
+  { path = "/files/{id}", source = "examples/file-server/src/lib.rs", markers = ['.get("/files/{id}", download)'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = []
+evidence = "docs/M9D-VERIFICATION.md"
+
+[[sample]]
+id = "forms-validation"
+title = "Stateless SSR Forms and Validation"
+package = "yetlet-forms-validation"
+path = "examples/forms-validation"
+kind = "server-rendered"
+status = "verified"
+command = "cargo run -p yetlet-forms-validation"
+companion_packages = []
+routes = [
+  { path = "/form", source = "examples/forms-validation/src/lib.rs", markers = ['.get("/form", form_page)'] },
+  { path = "/form/submit", source = "examples/forms-validation/src/lib.rs", markers = ['.post("/form/submit", submit)'] },
+  { path = "/form/success", source = "examples/forms-validation/src/lib.rs", markers = ['.get("/form/success", success)'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = []
+evidence = "docs/M9C-VERIFICATION.md"
+
+[[sample]]
+id = "sqlite-crud"
+title = "SQL-first SQLite CRUD"
+package = "yetlet-sqlite-crud"
+path = "examples/sqlite-crud"
+kind = "api"
+status = "verified"
+command = "cargo run -p yetlet-sqlite-crud"
+companion_packages = []
+routes = [
+  { path = "/healthz", source = "examples/sqlite-crud/src/lib.rs", markers = ['.get("/healthz", health)'] },
+  { path = "/api/notes", source = "examples/sqlite-crud/src/lib.rs", markers = ['.route("/api/notes", get(list_notes).post(create_note))'] },
+  { path = "/api/notes/{id}", source = "examples/sqlite-crud/src/lib.rs", markers = ['"/api/notes/{id}"', 'get(get_note).put(update_note).delete(delete_note)'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = []
+evidence = "docs/M9E-VERIFICATION.md"

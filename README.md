@@ -74,6 +74,14 @@ Open `http://127.0.0.1:3000/` (SSR), `http://127.0.0.1:3000/app` (browser/WASM),
 
 User-facing runnable applications are listed in `examples/samples.toml` and [the sample guide](docs/SAMPLES.md). Validate the catalog with `python3 scripts/check_samples.py`; internal browser entry crates and research fixtures are deliberately not presented as standalone application samples.
 
+A minimal native-only Hello World application has no optional providers or browser toolchain:
+
+```bash
+cargo run -p yetlet-hello-world
+```
+
+It listens on `http://127.0.0.1:3003` by default, with a script-free SSR `/` and a safely escaped `/hello/{name}` route. See [M9a evidence](docs/M9A-VERIFICATION.md); independent reviewer `wc_job_Htk-Quo_aFExMJs3` PASS.
+
 The native-only REST sample requires no browser toolchain:
 
 ```bash
@@ -89,6 +97,38 @@ cargo run -p yetlet-cart-server
 ```
 
 It listens on `http://127.0.0.1:3002` by default and rejects non-loopback listeners while using its explicit insecure-localhost cookie override. `/healthz` stays outside Session scope; `/cart` uses strict-CSP forms, a server-side cart and a session-bound CSRF token.
+
+The native Middleware Lab demonstrates request/context scope and streaming without new Yetlet infrastructure:
+
+```bash
+cargo run -p yetlet-middleware-lab
+```
+
+It listens on `http://127.0.0.1:3004` by default; inspect `/outside`, `/lab/plain`, `/lab/guarded`, `/lab/stream` and `/lab/broken-stream` for global/group/method-specific middleware, reverse unwind, 404/405 and streaming failure semantics. See [M9b evidence](docs/M9B-VERIFICATION.md); independent reviewer `wc_job_UnKflDaA8ZQHXCce` PASS.
+
+The optional, **stateless** SSR Forms Validation sample demonstrates accessible field errors and no-side-effect PRG without JavaScript or Session:
+
+```bash
+cargo run -p yetlet-forms-validation
+```
+
+It listens on `http://127.0.0.1:3005` by default. Routes are `/form`, POST `/form/submit`, and `/form/success`. A valid POST redirects with HTTP 303, but **stores nothing**; this is not a claim of credentialed CSRF defense. See [M9c evidence](docs/M9C-VERIFICATION.md); final independent reviewer `wc_job_lGtk_ZIoAvK4F6PW` PASS.
+
+The native File Server passed M9d independent acceptance review:
+
+```bash
+cargo run -p yetlet-file-server
+```
+
+It requires loopback (default port 3006), exposes a fixed static fixture and token-gated uploads/downloads, and stores only bounded temporary text files. See the [File Server README](examples/file-server/README.md) for the private local development token and curl workflow, and [M9d evidence](docs/M9D-VERIFICATION.md) for verification status. It is not a public file-hosting or identity service.
+
+The SQL-first SQLite CRUD sample passed M9e independent repeat review:
+
+```bash
+cargo run -p yetlet-sqlite-crud
+```
+
+It defaults to loopback port 3007 and `target/yetlet-sqlite-crud.sqlite3`. It uses application-local direct `rusqlite`, explicit SQL migrations/transactions and bounded `spawn_blocking`; no Yetlet ORM or mandatory data layer is introduced. Reviewer `wc_job_Q3pBfUqPYGYNSIrD` found and prompted a fail-closed schema-column repair; repeat reviewer `wc_job_aVBprnEsYc8o3ubi` returned PASS. See the [comparison](docs/M9E-DATA-ACCESS-COMPARISON.md) and [M9e evidence](docs/M9E-VERIFICATION.md).
 
 `python3 scripts/build_browser.py --release` produces an optimized browser bundle. Do not confuse debug WASM bytes with production transfer sizes or performance.
 
@@ -201,6 +241,10 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 - [M8c Session and SSR cart verification](docs/M8C-VERIFICATION.md)
 - [M8d sample developer-experience audit](docs/M8D-VERIFICATION.md)
 - [M8e final sample architecture and evidence freeze](docs/M8E-VERIFICATION.md)
+- [M9 proposed sample expansion and API contract qualification plan](docs/M9-PLAN.md)
+- [M9 planning reviewer gate](docs/M9-PLANNING-VERIFICATION.md)
+- [M9e SQLite data-access comparison](docs/M9E-DATA-ACCESS-COMPARISON.md)
+- [M9e SQL-first SQLite CRUD verification](docs/M9E-VERIFICATION.md)
 - [Module composition and optional providers](docs/EXTENSIONS.md)
 - [Prototype release readiness and blockers](docs/RELEASE-READINESS.md)
 - [ADR 0001](docs/adr/0001-separation-of-concerns.md)
@@ -211,4 +255,4 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 - [ADR 0006 — Handler-first and optional MVC](docs/adr/0006-handler-first-mvc-optional.md)
 - [ADR 0007 — Bounded keyed DOM and local graph](docs/adr/0007-bounded-keyed-dom-and-local-graph.md)
 
-M0–M8 are locally complete at prototype scope. M8 freezes the runnable sample contract, native REST and Session Cart applications, no-runtime-API-change DX decision, full regression and final reviewer PASS. Public-release readiness (`YT-020`) is **Blocked** pending licensing and support/security policy. Current code is not a production release.
+M0–M8 are locally complete at prototype scope. M8 freezes the runnable sample contract, native REST and Session Cart applications, no-runtime-API-change DX decision, full regression and final reviewer PASS. M9 planning and M9a–M9e have passed independent reviewer gates. SQL access remains application opt-in and Yetlet has no built-in ORM or mandatory DB layer. Public-release readiness (`YT-020`) is **Blocked** pending licensing and support/security policy. Current code is not a production release.

@@ -34,7 +34,8 @@ class SampleCatalogChecks(unittest.TestCase):
 
     def mutated(self, field: str, value: object) -> dict:
         data = deepcopy(self.catalog)
-        data["sample"][0][field] = value
+        todo = next(sample for sample in data["sample"] if sample["id"] == "todo")
+        todo[field] = value
         return data
 
     def test_current_catalog_passes(self) -> None:
