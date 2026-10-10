@@ -1,0 +1,15 @@
+# YT-064: cargo-deny 0.20.2 license/source preflight, not release authorization.
+[licenses]
+allow = ["MIT", "Apache-2.0", "BSD-3-Clause", "Unicode-3.0"]
+confidence-threshold = 0.95
+include-dev = true
+include-build = true
+
+[licenses.private]
+ignore = false
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = []

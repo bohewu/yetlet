@@ -4,6 +4,9 @@ description = "Isolated M7b/M7c/M7d keyed authoring, reactivity, and lifecycle p
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]

@@ -78,13 +78,15 @@ def main() -> None:
                 assert "form-action 'self'" in headers["content-security-policy"]
                 assert "for=\"name\"" in html and "for=\"email\"" in html
                 assert "<script" not in html and "set-cookie" not in headers
-                assert '<main lang="en">' in html
+                assert html.startswith('<!doctype html><html lang="en">')
+                assert '<main lang=' not in html
 
                 status, headers, html = call(base, "/form/submit", {
                     "name": "<script>", "email": 'a" onfocus=alert(1)'
                 })
                 assert status == 422
-                assert '<main lang="en">' in html
+                assert html.startswith('<!doctype html><html lang="en">')
+                assert '<main lang=' not in html
                 assert "&lt;script&gt;" in html and "&quot;" in html
                 assert "aria-describedby" in html and "email-error" in html
                 assert "autofocus" in html
@@ -105,7 +107,8 @@ def main() -> None:
                 assert "set-cookie" not in headers
                 status, _, html = call(base, "/form/success")
                 assert status == 200 and "No data was saved." in html
-                assert '<main lang="en">' in html
+                assert html.startswith('<!doctype html><html lang="en">')
+                assert '<main lang=' not in html
                 assert "Ada Lovelace" not in html
                 assert call(base, "/form")[0] == 200
                 print("PASS: native SSR forms, escaped field errors, strict CSP and 422")

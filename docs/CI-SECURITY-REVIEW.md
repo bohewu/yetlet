@@ -63,7 +63,7 @@ Other supply-chain controls in this round:
 - tool installs use explicit versions and Cargo locked resolution;
 - tracked-source secret-marker inspection found no obvious token/private-key pattern.
 
-Open supply-chain gaps remain: no `cargo-deny` license/source allowlist, no SBOM or build provenance, no artifact signing, no secret-scanning/code-scanning service, and no dependency-update automation.
+YT-064 now supplies a passing cargo-deny license/source policy, an actual native CycloneDX inventory and bounded unsigned checksum preflight. Open release gaps remain: trusted build provenance, signing, independent reproducibility and immutable release inputs; secret/code scanning and scheduled version-update configuration also remain unavailable/unconfigured beyond enabled Dependabot vulnerability alerts/security fixes and per-CI cargo-audit. Local inventory and hashes do not authenticate a release.
 
 ## 4. Demonstrated security controls
 
@@ -84,41 +84,42 @@ These controls apply to the bounded samples and their stated topology. They are 
 
 ## 5. Current security and repository gaps
 
-Observed GitHub repository settings on 2026-10-10:
+Observed GitHub repository settings after the authorized YT-061 update on 2026-10-10:
 
-- repository visibility is Private;
-- Actions are enabled and default workflow token permission is read-only;
-- all third-party Actions are allowed and repository-wide SHA pinning is not enforced by settings;
-- `master` has no branch protection;
-- Dependabot alerts are disabled;
-- secret scanning is disabled;
-- code scanning is not enabled;
-- web commit sign-off is not required.
-
+- repository visibility remains Private;
+- pull-request creation is `collaborators_only`; the sole direct collaborator is the repository owner;
+- `master` is protected for administrators, requires a PR, zero approvals in the sole-maintainer phase, both existing CI checks, conversation resolution and linear history;
+- force pushes and branch deletion are disabled;
+- Actions use a read-only default token, are restricted to GitHub-owned actions and require full commit-SHA pinning;
+- Dependabot vulnerability alerts and automated security fixes are enabled;
+- private vulnerability reporting is unavailable on the current private repository (HTTP 404);
+- secret scanning/push protection is unavailable on the current private repository/account plan (HTTP 422);
+- CodeQL default setup is unavailable because code scanning is not enabled/available (HTTP 403);
+- web commit sign-off remains disabled because the project does not accept external code contributions or require DCO sign-off.
 Product/operations gaps:
 
 - Auth Notes uses terminal-only synthetic identities, not a production IdP, passkey, password, MFA or recovery flow;
-- no brute-force/rate-limit policy, trusted TLS reverse-proxy/header contract or deployment threat model exists;
+- [M10d Threat Model](THREAT-MODEL.md) now defines the required TLS edge, trusted forwarding-header, OIDC, rate-limit, CSRF/CORS, secrets and authorization contracts, but no production deployment/provider has implemented or qualified them;
 - Session state is in-memory and single-process; no distributed persistence, revocation or multi-node semantics are qualified;
-- SQLite and temporary-file samples do not define backup, encryption-at-rest, retention, restore or multi-process operations;
+- YT-066 adds actual local SQLite two-process concurrency and online backup/isolated restore evidence; encryption/retention, off-host durability, production recovery budgets and multi-node operations remain unqualified;
 - no production secrets/key-management integration exists;
-- no complete screen-reader, IME, WebKit, mobile or multi-OS test matrix exists;
+- YT-065 defines scheduled/manual multi-OS and browser/accessibility matrices; four local Firefox suites passed, but new hosted and real screen-reader/IME/WebKit/mobile results remain unverified;
 - no fuzzing/property program covers cookie/form/path/HTML/SSE parsers;
 - no external penetration test, formal security audit or incident-response policy has been performed;
-- repository/crate licensing, public SemVer support and release ownership remain undecided.
+- repository/crate licensing is selected as `MIT OR Apache-2.0`, but public SemVer activation, scanner availability and release ownership remain unresolved.
 
 ## 6. Prioritized next qualification work
 
-1. **Maintainer decision — licensing and vulnerability policy.** Select repository/crate licenses and a supported vulnerability-reporting channel before any distribution.
-2. **Repository governance.** Require the CI checks on protected `master`; enable dependency, secret and code scanning; restrict or require SHA-pinned Actions; decide signed-commit/tag policy.
-3. **Compatibility contract.** Add compile-level API compatibility fixtures, define SemVer scope across crates and replace or explicitly freeze the document language/head metadata contract.
-4. **Production edge threat model.** Specify TLS termination and trusted headers, real authentication, rate limiting, CSRF/CORS policy, secret/key rotation and authorization ownership.
-5. **Release supply chain.** Add license/source policy, SBOM, checksums, provenance/attestation, signing and immutable artifact promotion; do not publish directly from a mutable build job.
+1. **Public-transition activation.** Re-enable/verify GitHub Private Vulnerability Reporting, secret scanning/push protection and CodeQL immediately after changing repository visibility; retain the private channel in `SECURITY.md` until then.
+2. **Repository governance review.** Keep the two required checks and collaborator-only PR policy; revisit approval count/bypass policy only when another maintainer is added and define signed release-tag policy in YT-064.
+3. **Compatibility activation.** YT-062 already completed the bounded compile-level compatibility fixtures, provisional coordinated SemVer policy and additive title/language document contract. Public SemVer/support activation and broader compatibility qualification remain future release decisions; do not reimplement the completed slice.
+4. **Production edge implementation.** Apply the reviewed [Threat Model](THREAT-MODEL.md) to a selected proxy/IdP/Session store/limiter/secrets topology and prove every required abuse case.
+5. **Release activation.** YT-064 already completed release design/preflight, the passing license/source policy, native SBOM experiment and unsigned checksum tooling. Clean release candidates, independent reproducibility, trusted provenance/signing and approved immutable promotion remain unperformed activation gates; do not publish directly from a mutable build job.
 6. **Scheduled qualification matrix.** Add hosted Firefox and additional OS/browser/accessibility/IME coverage without making flaky browser timing a product threshold.
 7. **Provider operations.** Qualify distributed Session/storage behavior, backup/restore, concurrency/load, cancellation, observability and incident recovery.
 8. **External security review.** Perform an independent review only after the production topology and release inputs are defined.
 
-The first technically unblockable work after a green hosted CI run is the API/document-metadata compatibility contract. Repository-governance settings can proceed in parallel when the maintainer authorizes those external changes. Licensing remains the first public-release blocker and requires a maintainer decision.
+Licensing/private governance and YT-064 release design/preflight are independently reviewed. YT-065 and YT-066 source/local slices passed review; their hosted/manual and actual distributed gates remain open. YT-067 has an external assessment handoff, not an audit result. Public-transition scanner/reporting activation and YT-020 remain Blocked.
 
 ## 7. Delivery evidence boundary
 

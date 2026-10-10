@@ -4,7 +4,7 @@
 **Scope:** M9j/YT-059 compatibility inventory for the current `0.1.0` prototype.
 **Status:** Complete regression and repeat independent final reviewer `wc_job_QkQkovlBlvrhPxCE` support this classification. It remains pre-SemVer evidence, not a stability guarantee.
 
-This document inventories the actual public Rust surface exercised by M0–M9. It separates **Stable Candidate**, **Experimental**, and **Internal/support-only** contracts. These labels are evidence classifications, not SemVer guarantees, production approval or a promise that package names and signatures will never change.
+This document inventories the actual public Rust surface exercised by M0–M10c. It separates **Stable Candidate**, **Experimental**, and **Internal/support-only** contracts. These labels are evidence classifications, not SemVer guarantees, production approval or a promise that package names and signatures will never change. The provisional change discipline is recorded in [Compatibility Policy](COMPATIBILITY.md).
 
 Public release remains blocked by licensing, browser/support and SemVer policy, document metadata, repository governance and production security expectations. A post-M9 security round raises the declared MSRV to Rust 1.88 and validates that toolchain, but a future release decision must still adopt an MSRV upgrade policy before any Stable Candidate becomes stable.
 
@@ -51,7 +51,8 @@ Public release remains blocked by licensing, browser/support and SemVer policy, 
 
 | Public surface | Why experimental |
 |---|---|
-| `Page`, `Page::new`, `App::page`, `render_document`, `render_page`, `HtmlPageError` | Extensively used, but the complete-document contract still fixes root language/head metadata. M9c had to add sample-owned `lang="en"` because the current document root is `zh-Hant`. A typed document metadata/language contract may require a breaking signature change before stability. |
+| `Page`, `Page::new`, `App::page`, `render_document`, `render_page`, `HtmlPageError` | Extensively used and retained source-compatible, but the convenience/default-language policy remains experimental until the metadata contract has more independent consumers. |
+| `LanguageTag`, `LanguageTagError`, `DocumentMetadata`, `Page::with_metadata`, `render_document_with_metadata`, `render_page_with_metadata` | M10c resolves the root-language ownership gap additively and removes the Forms sample's nested-language workaround. The contract is intentionally title + language only; it remains Experimental while consumer and migration evidence is limited. |
 | `yetlet_server_axum::DEFAULT_CSP` | Every SSR/browser regression verifies the current default, but the exact directive string is security policy that may be tightened or made configurable with document metadata; callers should not rely on byte-for-byte permanence yet. |
 
 ### `yetlet-actions`, `yetlet-dom`, `yetlet-dom-keyed`, and `yetlet-reactive`
@@ -92,8 +93,8 @@ Before a public stability declaration:
 
 1. choose and publish repository/crate licensing;
 2. retain CI for the declared Rust 1.88 MSRV and define the future upgrade policy;
-3. define SemVer scope across crates and upstream Axum/Tower compatibility;
-4. replace or deliberately freeze the complete-document language/head metadata contract;
+3. activate or revise the provisional cross-crate SemVer policy at the first public release;
+4. gather additional consumers before promoting the bounded document metadata API;
 5. declare supported browsers/OS/toolchains and CI coverage;
 6. decide which optional provider security claims require independent audit;
 7. add migration notes and compile-level compatibility fixtures for adopted Stable Candidates.

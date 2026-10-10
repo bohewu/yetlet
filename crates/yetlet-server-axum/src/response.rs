@@ -3,16 +3,15 @@
 //! JSON, redirects, status/header tuples and Result<T, E> use Axum directly.
 //! No ActionResult hierarchy or exception-to-status mapping is introduced.
 
-use std::borrow::Cow;
-
 use axum::http::{HeaderValue, header};
 pub use axum::{
     Json,
     response::{IntoResponse, Redirect, Response},
 };
+use std::borrow::Cow;
 use yetlet_core::View;
 
-use crate::{DEFAULT_CSP, render_page};
+use crate::{DEFAULT_CSP, DocumentMetadata, render_page_with_metadata};
 
 /// An owned SSR page rendered only when converted into an HTTP response.
 ///
@@ -31,14 +30,21 @@ use crate::{DEFAULT_CSP, render_page};
 /// ```
 #[derive(Debug)]
 pub struct Page {
-    title: Cow<'static, str>,
+    metadata: DocumentMetadata,
     view: View,
 }
 
 impl Page {
+    /// Create a page with the legacy `zh-Hant` root language.
     pub fn new(title: impl Into<Cow<'static, str>>, view: impl Into<View>) -> Self {
+        let title: Cow<'static, str> = title.into();
+        Self::with_metadata(DocumentMetadata::new(title.into_owned()), view)
+    }
+
+    /// Create a page with explicitly owned, bounded document metadata.
+    pub fn with_metadata(metadata: DocumentMetadata, view: impl Into<View>) -> Self {
         Self {
-            title: title.into(),
+            metadata,
             view: view.into(),
         }
     }
@@ -46,7 +52,7 @@ impl Page {
 
 impl IntoResponse for Page {
     fn into_response(self) -> Response {
-        let mut response = render_page(self.title.as_ref(), &self.view)
+        let mut response = render_page_with_metadata(&self.metadata, &self.view)
             .unwrap_or_else(IntoResponse::into_response);
         response.headers_mut().insert(
             header::CONTENT_SECURITY_POLICY,

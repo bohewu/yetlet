@@ -1,0 +1,91 @@
+# Release Supply-Chain Design
+
+**Task:** YT-064 / M10e
+**Status:** Design and local preflight accepted; independent reviewer `wc_job_CeUNYnHsO1yI_kBz` PASS. Actual experiments are recorded in M10e verification. Release activation, signing and independent rebuild are not performed; YT-020 remains Blocked.
+
+## Source and package identity
+
+Use the [coordinated release train](COMPATIBILITY.md): all nine Yetlet library candidates share one workspace version, currently `0.1.0`. No crate is authorized for publication. A future release requires a clean reviewed immutable commit, an approved immutable tag bound to that commit, an unchanged recorded `Cargo.lock` digest, and package archive digests. Reject dirty trees, moved tags, unreviewed source and lockfile drift at the release boundary.
+
+Record exact Rust/Cargo versions (`rustc -vV`, `cargo -V`), tool binary versions and digests, host/build target triples, package/Cargo target, default-feature state, explicit features, profile, relevant build environment and complete commands. Browser artifacts also identify the pinned wasm-bindgen/loader inputs. Hash the reviewed source snapshot and release evidence; HEAD alone cannot identify uncommitted files.
+
+Actual `target/m10-remaining/cargo-metadata.json` contains 131 packages: 28 workspace members and 103 crates.io registry packages, with no Git dependencies. All workspace packages are `0.1.0` and dual licensed `MIT OR Apache-2.0`. The candidate order below is a dependency order, not a publishing script:
+
+| Candidate | Yetlet dependencies | Publication prerequisite |
+|---|---|---|
+| `yetlet-core` | None | Reviewed archive and release approval |
+| `yetlet-actions` | None | Reviewed archive and release approval |
+| `yetlet-reactive` | None | Reviewed archive and release approval |
+| `yetlet-html` | core | Versioned core dependency |
+| `yetlet-dom` | core | Versioned core dependency |
+| `yetlet-dom-keyed` | core | Versioned core dependency |
+| `yetlet-server-axum` | core, html | Versioned core/html dependencies |
+| `yetlet-request-id` | server-axum | Versioned server-axum dependency |
+| `yetlet-session` | server-axum | Versioned server-axum dependency |
+
+The last six candidates currently have path-only Yetlet dependencies whose metadata version requirement is `*`. They are publication blockers: a separately authorized change must add compatible coordinated version requirements, preserve local paths, and verify packaged resolution against already available registry dependencies in dependency order. A local build or dirty `cargo package --list` cannot prove registry publication readiness. Cargo manifests and lockfile are unchanged by this task.
+
+The 19 packages with `publish = false` are `yetlet-auth-notes`, `yetlet-cart-server`, `yetlet-dashboard-counter-island`, `yetlet-dashboard-filter-island`, `yetlet-file-server`, `yetlet-forms-validation`, `yetlet-hello-world`, `yetlet-keyed-bindings`, `yetlet-middleware-lab`, `yetlet-modular-shop`, `yetlet-multi-island-dashboard`, `yetlet-render-bench`, `yetlet-rest-api`, `yetlet-search-island`, `yetlet-sqlite-crud`, `yetlet-sse-notifications`, `yetlet-todo-browser`, `yetlet-todo-server` and `yetlet-todo-ui`. Their artifacts may be qualification fixtures; they are not publication candidates.
+
+## License and source gate
+
+`deny.toml` targets cargo-deny **0.20.2**. It allows only MIT, Apache-2.0, BSD-3-Clause and Unicode-3.0, checks development/build dependencies, and sets private-package ignore to false. All other licenses remain denied unless the checker can satisfy an alternative expression with an allowed license. Observed LLVM-exception, BSL, LGPL and Unlicense alternatives do not require approving those additional licenses when MIT or Apache-2.0 satisfies the expression. Combined BSD/Unicode obligations remain required; retain notices in distributed artifacts.
+
+Unknown registries and Git sources are denied; only the crates.io registry is accepted. Workspace paths belong to the reviewed source snapshot, not a registry trust exemption. Do not suppress failures, add blanket exceptions or change package licenses to obtain a pass. A future dependency change requires renewed license/source review. Vulnerability audit remains the separate existing RustSec gate.
+
+The main session can run this command against the retained actual metadata (not executed by this slice):
+
+```bash
+target/m10-tools/bin/cargo-deny --locked --offline --workspace \
+  --metadata-path target/m10-remaining/cargo-metadata.json \
+  --config deny.toml check licenses sources
+```
+
+For release, regenerate metadata with the same target/features as each build; the unfiltered workspace check is additional coverage, not proof of every feature/target configuration. Preserve exit status, diagnostics, counts, input/policy/tool digests and exact coverage. The installed `--help` confirms the options above. See the upstream [license policy](https://embarkstudios.github.io/cargo-deny/checks/licenses/cfg.html) and [source policy](https://embarkstudios.github.io/cargo-deny/checks/sources/cfg.html).
+
+## Tool-generated SBOM and artifact binding
+
+Use [cargo-cyclonedx 0.5.9](https://github.com/CycloneDX/cyclonedx-rust-cargo/tree/cargo-cyclonedx-0.5.9), not a custom SBOM/SPDX implementation. Generate CycloneDX JSON per package/Cargo target and build platform with the exact build features. Request transitive dependencies with `--all`; retain build dependencies by omitting `--no-build-deps`. Record whether development dependencies occur in generated output, compare coverage with Cargo metadata, and list exclusions explicitly. Rust sysroot, tool binaries, native/system libraries, JS glue and external deployment assets need separate inventories when not represented; do not silently treat the Cargo SBOM as covering them.
+
+The installed CLI writes beside package manifests. For a dirty local experiment, the main session must prepare an isolated copy of the actual workspace inputs under `target/m10-remaining/sbom-input/`, retaining Cargo.lock and a source-digest record. It must not run the generator against the live workspace and write new files outside this slice's allowlist. The following inspected-help command is a proposed all-features native inventory experiment, not a release-equivalent build or an executed result:
+
+```bash
+target/m10-tools/bin/cargo-cyclonedx cyclonedx \
+  --manifest-path target/m10-remaining/sbom-input/Cargo.toml \
+  --format json --spec-version 1.5 --describe all-cargo-targets \
+  --all --all-features --target x86_64-unknown-linux-gnu --target-in-filename
+```
+
+No `--locked` option is advertised by this generator: compare lockfile digests before/after and reject drift. Repeat separately for selected `wasm32-unknown-unknown` Cargo targets and the actual release feature sets before claiming browser coverage. Native inventory cannot stand in for WASM or other platforms. Retain exact output names/digests, generator identity, source/lock identity, selected dependencies/targets/features and omissions. SBOM generator timestamps/identifiers may vary; the local checksum manifest alone is deterministic.
+
+Bind each distributed artifact's SHA-256 to its SBOM digest and build identity in release provenance. Put the artifact, SBOM and coverage/build-identity record into the same checksum bundle. An SBOM is an inventory, not proof that an artifact is reproducible, trustworthy, or even built from those dependencies.
+
+## Bounded unsigned checksum preflight
+
+```bash
+python3 scripts/release_checksums.py create target/m10-remaining/artifacts
+python3 scripts/release_checksums.py verify target/m10-remaining/artifacts
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_release_checksums.py
+```
+
+Supply an existing flat directory of regular files. The CLI fixes the manifest name to `RELEASE-CHECKSUMS.json`, excludes it from artifacts, and requires at least one artifact. Names are 1–128 ASCII characters, start with an alphanumeric character and use only alphanumerics, dot, underscore or hyphen. No absolute/relative nested manifest paths, traversal, backslashes, symlinks, symlink ancestors, directories or other nonregular files are accepted. The explicitly supplied directory itself may be absolute; its ancestors are opened without following symlinks, and `..` directory components are rejected.
+
+Limits are 128 artifacts, 64 MiB per file, 256 MiB total and 64 KiB manifest JSON. Hashing streams bounded chunks. Verification rejects duplicate JSON keys/entries, malformed sizes/hashes, missing/extra files and changed hashes/sizes. Creation uses exclusive creation and never overwrites existing artifacts or a manifest. Canonical sorted JSON contains no time/random fields and explicitly says `unsigned local verification; not trusted provenance`. Errors do not echo filesystem paths or content.
+
+This is a POSIX local preflight, not an archive extractor, provenance verifier or hostile multiwriter filesystem service. Freeze and isolate the supplied directory; do not mutate it concurrently. The manifest cannot authenticate itself: replacing artifacts and manifest together can pass unsigned verification. Trusted external digest/signature verification is a separate release gate.
+
+## Independent rebuild, provenance and approvals
+
+A future reproducibility claim requires a second isolated builder with independently controlled execution to rebuild the same reviewed source/lock/toolchain/target/features and compare every intended distributable digest. Retain both build records and explain mismatches before promotion. Rehashing existing files or two builds sharing a potentially compromised workspace/cache is not independent rebuild evidence. No such rebuild has run for M10e.
+
+Design pin: use mature [Cosign v3.1.3](https://github.com/sigstore/cosign/releases/tag/v3.1.3) for signature/bundle verification; before activation, approve and record its platform binary SHA-256 and trusted-root material. Installation, verification experiments and all signing remain pending. Fail closed if the verifier version/digest or policy identity is absent or mismatched; do not use floating `latest` or a custom verifier. Follow upstream [verification guidance](https://docs.sigstore.dev/cosign/verifying/verify/).
+
+Before promotion, independently verify the signed subject digest against downloaded bytes and require the approved provenance predicate/build type, immutable source commit, tag/ref, toolchain/target/features, inputs and builder identity. For GitHub OIDC, require exact issuer `https://token.actions.githubusercontent.com`, approved repository `bohewu/yetlet`, exact release workflow identity/path, and the approved immutable tag ref/commit association; reject a valid signature from another repository, workflow, ref or issuer. Require certificate/chain and transparency/inclusion verification under the pinned verifier and approved trust roots. A valid signature alone does not prove source, build behavior or reproducibility. The release workflow path, signing identity, tag approval policy, binary digest and trust roots are unresolved activation gates, not broad wildcard permissions.
+
+Human release/source and security approvers must record approval of the concrete commit/tag, artifact/checksum/SBOM/provenance digests, independent rebuild evidence, support matrix, resolved findings and rollback target. Keep independent technical review separate from release authorization; the sole-maintainer merge configuration does not constitute a release approval. No key creation, signing service, registry upload, environment mutation, publication or deployment is performed here.
+
+Promote only already verified immutable digests: do not rebuild, repackage or substitute a mutable filename/tag during promotion. Consumers verify signature identity and provenance policy again, then checksum-bound bytes. Roll back only to a previously approved, still acceptable digest with retained evidence. For compromised source/builder/key/identity, stop promotion, revoke affected trust/identity, mark affected digests rejected, notify through the approved security process and issue a new reviewed version; do not overwrite old release bytes or repoint a released version/tag. Registry yank/revocation and deployment rollback require separate authorization and an incident record.
+
+## Current boundary
+
+The current dirty checkout and its local evidence are development-only, not an immutable release source, trusted provenance, signed artifacts or independent reproducibility evidence. [M10e verification](M10E-VERIFICATION.md) records executed commands separately from pending experiments. Independent reviewer PASS may close YT-064 at design/preflight scope only; public release, production qualification and external security review remain separate unmet gates.

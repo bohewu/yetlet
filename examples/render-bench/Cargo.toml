@@ -4,6 +4,9 @@ description = "Isolated M7a render strategy benchmark; not a public runtime API"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]

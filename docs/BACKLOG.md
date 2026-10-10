@@ -111,20 +111,20 @@ M10 converts evidence from [M9](M9J-VERIFICATION.md) and the [CI/security review
 
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
-| YT-060 | P0 | S | M10a | Choose repository/crate licenses and vulnerability-reporting policy | YT-059 | Committed license files, crate metadata and reviewed `SECURITY.md`; maintainer decision recorded | Blocked |
-| YT-061 | P0 | M | M10b | Protect `master` and enable repository security automation | YT-059 | Required CI checks, branch rules, Dependabot, secret/code scanning and action policy verified from GitHub settings | Todo |
-| YT-062 | P1 | L | M10c | Define SemVer/API compatibility and document metadata contract | YT-059 | Compile-level compatibility fixtures, migration policy and typed language/head decision with independent reviewer | Todo |
-| YT-063 | P0 | L | M10d | Produce production edge/authentication threat model | YT-057, YT-059 | TLS/trusted-header, IdP, rate-limit, CSRF/CORS, secret rotation and authorization ownership reviewed | Todo |
-| YT-064 | P1 | L | M10e | Design reproducible release artifacts and supply-chain evidence | YT-060, YT-062 | License/source allowlist, SBOM, checksums, provenance/signing, approvals and rollback evidence | Todo |
-| YT-065 | P1 | L | M10f | Add scheduled platform/browser/accessibility qualification | YT-059 | Hosted Firefox plus declared OS/browser/IME/accessibility matrix with bounded artifacts and cleanup | Todo |
-| YT-066 | P1 | L | M10g | Qualify distributed providers and operational behavior | YT-046, YT-054, YT-057, YT-059 | Session/storage topology, backup/restore, load, cancellation, observability and recovery evidence | Todo |
-| YT-067 | P0 | M | M10h | Obtain external production-security review | YT-063, YT-064, YT-066 | Independent findings resolved or explicitly accepted against a fixed production topology | Todo |
+| YT-060 | P0 | S | M10a | Choose repository/crate licenses and vulnerability-reporting policy | YT-059 | [M10a evidence](M10A-VERIFICATION.md): `MIT OR Apache-2.0`, 28-package metadata, security/no-external-PR policy; reviewer `wc_job_MPF4l2t8JaJXBguv` PASS | Done |
+| YT-061 | P0 | M | M10b | Protect `master` and enable repository security automation | YT-059 | [M10b evidence](M10B-VERIFICATION.md): collaborator-only PRs, protected `master`, required CI, SHA-pinned GitHub-owned Actions and Dependabot; repeat reviewer `wc_job_lu2WynqvKYemLlmd` PASS | Done |
+| YT-062 | P1 | L | M10c | Define SemVer/API compatibility and document metadata contract | YT-059 | [M10c evidence](M10C-VERIFICATION.md): additive title/language metadata, legacy generic compatibility fixture, 196 tests/5 doctests on stable and Rust 1.88; repeat reviewer `wc_job_rz9Ci3gWOLfLKdqN` PASS | Done |
+| YT-063 | P0 | L | M10d | Produce production edge/authentication threat model | YT-057, YT-059 | [M10d evidence](M10D-VERIFICATION.md): 20-threat/15-scenario trusted-edge/OIDC/Session/authz model; cache/CSRF reviewer findings repaired; repeat reviewer `wc_job_AlEmAzdabqC_tuHv` PASS | Done |
+| YT-064 | P1 | L | M10e | Design reproducible release artifacts and supply-chain evidence | YT-060, YT-062 | [M10e evidence](M10E-VERIFICATION.md): license/source PASS, 41 native SBOMs, 16 checksum tests; design/preflight reviewer `wc_job_CeUNYnHsO1yI_kBz` PASS, not release activation | Done |
+| YT-065 | P1 | L | M10f | Add scheduled platform/browser/accessibility qualification | YT-059 | [M10f evidence](M10F-VERIFICATION.md): four local Firefox suites and source reviewer `wc_job_FH0L7fH4UH6ICPoW` PASS; new hosted results/manual matrix pending | In progress |
+| YT-066 | P1 | L | M10g | Qualify distributed providers and operational behavior | YT-046, YT-054, YT-057, YT-059 | [M10g evidence](M10G-VERIFICATION.md): actual local operations and reviewer `wc_job_YclpZ0R5tS4m8Y1I` PASS; distributed topology, failover/load/production recovery remain unqualified | In progress |
+| YT-067 | P0 | M | M10h | Obtain external production-security review | YT-063, YT-064, YT-066 | [Handoff preparation](M10H-VERIFICATION.md) reviewer `wc_job_tHTDY79-fLUFKJ_G` PASS; actual external assessor/report and qualified immutable topology/release prerequisites absent | Blocked |
 
 ## Ready queue
 
-**First public-release decision:** `YT-060` requires the maintainer to choose licensing and a vulnerability-reporting policy. **First technically unblockable item:** `YT-062` can define the SemVer/document-metadata compatibility contract; `YT-061` can proceed in parallel when external GitHub setting changes are authorized. `YT-020` remains Blocked; see [release readiness](RELEASE-READINESS.md).
+**Completed:** YT-060–YT-064 at their policy, requirements or design/preflight scopes. **Next gates:** YT-065 needs an authorized maintainer PR/merge and actual hosted/manual qualification; YT-066 needs an application-selected external topology and distributed operations evidence. YT-067 has a prepared handoff but awaits an explicitly authorized real external assessment on fixed inputs. Local reviewers do not replace these gates. Repository remains Private; YT-020 remains Blocked.
 
-**Current implementation milestone:** YT-030–YT-059 and M9 are Done at prototype scope. The post-M9 CI/security round patches a RustSec advisory, verifies Rust 1.88 and passes GitHub Actions run `38024582602` on commit `86c30a42114ca74f4197f0389707861308a844a7`. M10 tasks YT-060–YT-067 remain decision/qualification work. Public publication (`YT-020`) stays Blocked.
+**Current implementation milestone:** YT-030–YT-064 are Done at their bounded scopes. YT-065 and YT-066 source/local evidence have independent PASS but their hosted/manual and distributed gates remain In progress. YT-067 external assessment is Blocked, with handoff preparation tracked separately. No current-turn commit, push, settings/visibility change, publication or deployment occurred. `YT-020` stays Blocked.
 
 **Do not start before prerequisites:** Generalized hydration, arbitrary event forwarding, WebGPU, and resumability remain out of scope.
 
@@ -139,7 +139,7 @@ M10 converts evidence from [M9](M9J-VERIFICATION.md) and the [CI/security review
 - Acceptance commands / assertions:
 - Risks / affected ADRs:
 - Evidence (filled only after verification):
-- State: Todo | In progress | Blocked | Done
+- State: Todo | In progress | Pending | Blocked | Done
 ```
 
 ## Update rules

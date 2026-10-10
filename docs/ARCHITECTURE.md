@@ -75,6 +75,8 @@ HTTP request → router → auth/middleware → typed API handler
 
 UI SSR and API handlers do not need to share a URL path. Authentication, authorization, input validation, and rate limits belong at the server trust boundary.
 
+Production deployments place the application behind a trusted TLS edge and keep the native listener private. The edge strips caller-supplied forwarding headers and injects one canonical configured set; the application trusts them only from that edge. Authentication uses an external IdP, while opaque Session continuity, CSRF and resource authorization remain distinct server-side checks. Yetlet does not provide a mandatory proxy, IdP, limiter, secrets or authorization subsystem. See [Threat Model](THREAT-MODEL.md).
+
 ### 4.1.1 RequestContext and middleware (P0 extension)
 
 The server adapter now exposes a request-only `RequestContext<S>` and native Axum/Tower composition. It owns the original request head/body, retains typed request Extensions, and keeps shared application state separate. `with_global` wraps the completed Router before application route matching; groups/routes use native nested routers and layers. API and SSR pass through the same HTTP middleware, without coupling browser actions to server requests.
@@ -195,6 +197,12 @@ M7a–M7e made the keyed/static-slot/local-ownership direction concrete and ende
 M9's twelve independently reviewed applications provide enough evidence to classify—but not stabilize—the actual public Rust surface. [Public API Contract Classification](API-CONTRACTS.md) records renderer-neutral `View`/binding values, escaped HTML, handler-first `App`/`RequestContext`/Tower composition and bounded Request ID/Session application APIs as **Stable Candidates**. The complete-document `Page`/language/head contract and browser Actions/DOM/keyed/reactive surfaces remain **Experimental**. Adapter constructors, direct provider middleware and generated implementation details remain **Internal/support-only**.
 
 This classification does not change crate versions or establish SemVer compatibility. M9j froze 190 tests, native/browser/provider/dependency and exact-asset evidence; after reviewer-discovered inventory/reexport corrections, repeat reviewer `wc_job_QkQkovlBlvrhPxCE` accepted the classification. Licensing, historical MSRV, browser/support policy, the root document metadata design, external CI and production security expectations remain release blockers.
+
+### M10c minimal document ownership
+
+The native server adapter owns one bounded complete-document value: escaped title plus a validated root language. `Page::new`, `App::page` and the original render functions retain the `zh-Hant` default; explicit-language handlers use `DocumentMetadata` and `Page::with_metadata`. Charset and viewport remain fixed correctness defaults, while CSP remains response policy rather than page metadata.
+
+This resolves the M9c nested-language workaround without introducing a head tree, SEO collection, raw head markup, scripts/styles, per-page CSP, DI or another rendering framework. The conservative `LanguageTag` shape is serialization-safe but not a full BCP 47 registry implementation. See [Compatibility Policy](COMPATIBILITY.md) and [M10c verification](M10C-VERIFICATION.md).
 
 ### Data-access capabilities
 

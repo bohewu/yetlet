@@ -1,0 +1,143 @@
+name: Yetlet scheduled qualification
+
+# Activation requires a separately authorized merge onto the default branch.
+on:
+  schedule:
+    - cron: '17 3 * * 3'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yetlet-qualification-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: never
+  PYTHONDONTWRITEBYTECODE: '1'
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  native:
+    name: Qualification native (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      max-parallel: 2
+      matrix:
+        os: [ubuntu-24.04, windows-2025, macos-15]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Install and record Rust and runner identity
+        run: |
+          set -euo pipefail
+          mkdir -p target/qualification
+          {
+            printf 'ImageOS=%s\nImageVersion=%s\nSource=%s\n' "$ImageOS" "$ImageVersion" "$GITHUB_SHA"
+            rustup toolchain install stable --profile minimal
+            rustc +stable -vV
+            cargo +stable --version
+          } 2>&1 | tee target/qualification/native-identity.log
+      - name: Check and test nine reusable library crates
+        run: |
+          set -euo pipefail
+          packages=(-p yetlet-core -p yetlet-reactive -p yetlet-html -p yetlet-dom
+                    -p yetlet-dom-keyed -p yetlet-actions -p yetlet-server-axum
+                    -p yetlet-request-id -p yetlet-session)
+          cargo +stable check --locked --all-targets "${packages[@]}" 2>&1 | tee target/qualification/native-check.log
+          cargo +stable test --locked --all-targets "${packages[@]}" 2>&1 | tee target/qualification/native-test.log
+          cargo +stable test --locked --doc "${packages[@]}" 2>&1 | tee target/qualification/native-doc.log
+      - name: Retain native qualification logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qualification-native-${{ matrix.os }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: target/qualification/native-*.log
+          if-no-files-found: warn
+          retention-days: 7
+
+  firefox:
+    name: Qualification Firefox and forms keyboard (Linux)
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: '3.12'
+      - name: Observe image and fail closed on browser prerequisites
+        run: |
+          set -euo pipefail
+          mkdir -p target/qualification
+          # The official Ubuntu2404 image documents Firefox and this driver directory.
+          {
+            printf 'ImageOS=%s\nImageVersion=%s\nSource=%s\n' "$ImageOS" "$ImageVersion" "$GITHUB_SHA"
+            test -n "${GECKOWEBDRIVER:-}"
+            test -x "$GECKOWEBDRIVER/geckodriver"
+            export PATH="$GECKOWEBDRIVER:$PATH"
+            command -v firefox
+            command -v geckodriver
+            firefox --version
+            geckodriver --version
+            python --version
+          } 2>&1 | tee target/qualification/firefox-prerequisites.log
+          printf '%s\n' "$GECKOWEBDRIVER" >> "$GITHUB_PATH"
+      - name: Install and record build tools
+        run: |
+          set -euo pipefail
+          {
+            rustup toolchain install stable --profile minimal
+            rustup default stable
+            rustup target add wasm32-unknown-unknown
+            rustc -vV
+            cargo --version
+            cargo install wasm-bindgen-cli --version 0.2.129 --locked
+            wasm-bindgen --version
+          } 2>&1 | tee target/qualification/firefox-toolchain.log
+      - name: Build three release asset sets and native sample binaries
+        run: |
+          set -euo pipefail
+          {
+            python scripts/build_browser.py --release
+            python scripts/build_keyed_bindings.py --release
+            python scripts/build_multi_island_dashboard.py --release
+            cargo build --release --locked -p yetlet-todo-server -p yetlet-multi-island-dashboard -p yetlet-forms-validation
+          } 2>&1 | tee target/qualification/firefox-build.log
+      - name: Todo and Search Firefox release suite
+        run: |
+          set -euo pipefail
+          python scripts/smoke_firefox.py --profile release 2>&1 | tee target/qualification/firefox-todo.log
+      - name: Keyed bindings Firefox release suite
+        run: |
+          set -euo pipefail
+          python scripts/smoke_keyed_bindings_firefox.py --profile release 2>&1 | tee target/qualification/firefox-keyed.log
+      - name: Multi-island Firefox release suite
+        run: |
+          set -euo pipefail
+          python scripts/smoke_multi_island_dashboard_firefox.py --profile release 2>&1 | tee target/qualification/firefox-dashboard.log
+      - name: Forms keyboard and semantic accessibility checks
+        run: |
+          set -euo pipefail
+          python scripts/smoke_forms_accessibility_firefox.py --profile release 2>&1 | tee target/qualification/firefox-forms.log
+      - name: Retain Firefox qualification logs and sanitized forms report
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qualification-firefox-ubuntu-24.04-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            target/qualification/firefox-*.log
+            target/qualification/forms-accessibility-firefox.json
+          if-no-files-found: warn
+          retention-days: 7

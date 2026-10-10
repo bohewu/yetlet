@@ -42,27 +42,27 @@ The complete sample/browser matrix is recorded in M9 evidence and the checked-in
 | M0–M9 prototype contracts | Verified locally | Per-stage evidence and independent reviewers |
 | Rust 1.88 MSRV | Verified locally; hosted job added | Native tests/doctests and wasm32 checks are required in CI |
 | Current stable Rust | Verified locally | Format, strict Clippy, tests, doctests, smokes and wasm32 |
-| Dependency vulnerability audit | Passing after repair | `RUSTSEC-2026-0009` fixed by `time 0.3.47`; continuous service still absent |
+| Dependency vulnerability audit | Passing after repair | `RUSTSEC-2026-0009` fixed by `time 0.3.47`; Dependabot alerts/security fixes and per-CI `cargo-audit` are enabled, but no scheduled version-update PR configuration or broader continuous monitor exists |
 | Hosted GitHub Actions | **Verified on commit `86c30a4`** | Run `38024582602` completed successfully: Rust 1.88 MSRV and stable native/samples/Chrome jobs both passed |
-| Browser compatibility | **Partial** | Chrome 155 and Firefox 157 retained; no WebKit/mobile/IME matrix |
-| Accessibility | **Partial** | Semantic/error/focus tests exist; no complete screen-reader or IME audit |
-| Authentication/authorization | **Prototype only** | Synthetic Auth Notes is not an IdP/password/passkey/MFA design |
+| Browser compatibility | **Partial** | Four local Firefox 157 suites pass; new scheduled/manual multi-OS workflow source exists but actual hosted, WebKit/mobile and IME results remain unverified |
+| Accessibility | **Partial** | Actual Tab/Enter/Unicode, labels/errors/focus and root-language checks pass; real IME, screen readers, zoom and conformance are not verified |
+| Authentication/authorization | **Threat model specified; implementation prototype only** | M10d requires external OIDC plus server-side resource authorization; Auth Notes remains synthetic and is not an IdP/password/passkey/MFA design |
 | Credentialed CSRF/Session | **Prototype only** | Bounded in-memory Session/CSRF works; no distributed provider or production topology |
-| HTTPS/reverse-proxy trust and rate limiting | **Missing** | No trusted-header, TLS termination or brute-force policy |
-| Persistence/transactions | **Prototype only** | SQLite samples prove rollback/restart; no backup, encryption, retention or multi-node operations |
+| HTTPS/reverse-proxy trust and rate limiting | **Specified, not implemented** | M10d defines the trusted-edge/header and layered limiting contract; a selected deployment and abuse/load evidence remain required |
+| Persistence/transactions | **Local qualification only** | Actual two-process local WAL conflict, online backup, exact isolated restore and corrupt candidate rejection PASS; encryption/retention, off-host durability and distributed production operations remain unqualified |
 | Observability/load/cancellation | **Partial** | Lifecycle/cancellation tests exist; no production tracing, SLO, soak or incident evidence |
-| Repository security controls | **Missing** | No protected branch; Dependabot, secret scanning and code scanning are disabled |
-| Package license and vulnerability policy | **BLOCKED** | Maintainer must choose licenses and reporting channel |
-| Stable API/SemVer/support policy | **BLOCKED** | Stable Candidate classification is not a compatibility commitment |
-| Artifact integrity/release supply chain | **Missing** | No SBOM, provenance, signing or immutable promotion pipeline |
-| Independent production security review | **Not performed** | Local role reviewers are not penetration testing or formal assurance |
+| Repository security controls | **Partial, private-state configured** | Collaborator-only PRs, protected `master`, required CI, SHA-pinned GitHub-owned Actions and Dependabot enabled; private vulnerability reporting, secret scanning and CodeQL unavailable until Public/current-plan support |
+| Package license and vulnerability policy | **Selected and independently reviewed** | `MIT OR Apache-2.0`, `SECURITY.md` and maintainer-directed/no-external-PR policy PASS; GitHub private reporting must be enabled at Public transition |
+| Stable API/SemVer/support policy | **Partial** | M10c defines a provisional one-release-train/change-discipline policy and additive document metadata; public activation still requires an explicit release decision and YT-064 supply-chain evidence |
+| Artifact integrity/release supply chain | **Design/preflight complete; activation missing** | License/source policy, 41 native SBOMs and checksum tooling PASS; no signed provenance, independent reproducibility or immutable release promotion |
+| Independent production security review | **Blocked; handoff prepared** | No appointed external assessor or qualified deployment/release inputs; local role reviewers do not satisfy an external assessment |
 
 ## Decisions before publication
 
-1. **Maintainer:** Choose repository/crate licensing and a supported vulnerability-reporting policy.
-2. **Repository owner:** Protect `master`, require CI and decide dependency/secret/code scanning plus action restrictions.
-3. **Maintainer/team:** Define SemVer scope, Rust upgrade policy, supported browsers/OS and the document language/head metadata contract.
-4. **Security/team:** Define production authentication, authorization, TLS proxy trust, rate limiting, secret management, Session/storage topology and incident response.
+1. **Public-transition owner:** Enable and verify GitHub Private Vulnerability Reporting, secret scanning/push protection and CodeQL after changing visibility; preserve collaborator-only PRs.
+2. **Maintainer:** Retain or revise the current zero-approval sole-maintainer PR rule when adding another maintainer, and define signed release-tag policy in the release-supply-chain gate.
+3. **Maintainer/team:** Activate or revise the provisional SemVer/MSRV policy at public release and declare supported browsers/OS; the bounded title/language document contract remains Experimental pending more consumers.
+4. **Security/team:** Implement and test the [M10d Threat Model](THREAT-MODEL.md) against selected external proxy/IdP/Session/limiter/secrets/storage products; YT-066 qualifies provider operations.
 5. **Release owners:** Define reproducible artifacts, license/source policy, SBOM, checksums, provenance, signing, approval and rollback.
 6. **QA:** Add scheduled Firefox/additional-platform/accessibility/IME coverage and external security review after the production topology is fixed.
 
@@ -70,4 +70,4 @@ The complete sample/browser matrix is recorded in M9 evidence and the checked-in
 
 Yetlet keeps native HTTP, renderer, browser and optional provider dependencies separable. Auth, Session, database, files, SSE, tracing, CORS, rate limiting and deployment capabilities remain explicit opt-ins. The SQLite examples do not introduce an ORM, `DbContext`, repository framework or default data provider.
 
-**Backlog status:** M0–M9 are Done at prototype scope. `YT-020` remains **Blocked** and must not be closed by a green CI run alone.
+**Backlog status:** M0–M9 and YT-060–YT-064 are Done at their bounded prototype/policy/design scopes. YT-065 and YT-066 retain hosted/manual and distributed gates despite local reviewer PASS. YT-067 is Blocked with handoff preparation only. YT-020 remains Blocked; no local review, license, checksum or green CI automatically authorizes production or publication.

@@ -18,6 +18,8 @@ The default listener is `127.0.0.1:3005`, overridable for local testing through 
 
 The `name` limit is 2–40 characters; email validation is deliberately **illustrative**, not a deliverable email-address validator. HTML attribute values and text are escaped. Responses use `Cache-Control: no-store` and `nosniff`. Forms include no CSRF token only because **there is no authentication, persistence, transaction or state-changing side effect**. A credentialed or mutating form requires its own explicitly selected Session/Auth/CSRF policy and separate security review. `SameSite` or lack of a Session does not prove CSRF protection.
 
+The sample owns English at the root document through `DocumentMetadata` and `LanguageTag`; it does not add a nested `lang` workaround or an arbitrary head manager. The default Yetlet document language remains unchanged for applications that keep using `Page::new`.
+
 ## Verify
 
 ```bash

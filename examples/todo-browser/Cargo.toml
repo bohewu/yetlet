@@ -4,6 +4,9 @@ description = "Yetlet browser-only Rust/WASM Todo demo"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
 
 [lib]
 crate-type = ["cdylib", "rlib"]
