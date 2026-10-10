@@ -142,7 +142,7 @@ fn timing_summary(mut values: Vec<f64>) -> TimingSummary {
         .min(samples - 1);
     TimingSummary {
         samples,
-        median_ms: round_micros(if samples % 2 == 0 {
+        median_ms: round_micros(if samples.is_multiple_of(2) {
             (values[samples / 2 - 1] + values[samples / 2]) / 2.0
         } else {
             values[samples / 2]

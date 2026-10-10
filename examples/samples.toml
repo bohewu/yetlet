@@ -85,6 +85,30 @@ optional_dependencies = ["yetlet-session"]
 evidence = "docs/M8C-VERIFICATION.md"
 
 [[sample]]
+id = "auth-notes"
+title = "Synthetic Authentication and Private Notes"
+package = "yetlet-auth-notes"
+path = "examples/auth-notes"
+kind = "server-rendered"
+status = "verified"
+command = "cargo run -p yetlet-auth-notes"
+companion_packages = []
+routes = [
+  { path = "/healthz", source = "examples/auth-notes/src/lib.rs", markers = ['.get("/healthz"'] },
+  { path = "/auth/login", source = "examples/auth-notes/src/lib.rs", markers = ['.group("/auth"', '.get("/login", login_page)', '.post("/login", login)'] },
+  { path = "/auth/notes", source = "examples/auth-notes/src/lib.rs", markers = ['.get("/notes", notes_page)', '.post("/notes", create_note)'] },
+  { path = "/auth/notes/{id}", source = "examples/auth-notes/src/lib.rs", markers = ['.get("/notes/{id}", note_page)'] },
+  { path = "/auth/notes/{id}/update", source = "examples/auth-notes/src/lib.rs", markers = ['.post("/notes/{id}/update", update_note)'] },
+  { path = "/auth/notes/{id}/delete", source = "examples/auth-notes/src/lib.rs", markers = ['.post("/notes/{id}/delete", delete_note)'] },
+  { path = "/auth/logout", source = "examples/auth-notes/src/lib.rs", markers = ['.post("/logout", logout)'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = ["yetlet-session"]
+evidence = "docs/M9H-VERIFICATION.md"
+
+[[sample]]
 id = "middleware-lab"
 title = "Native Middleware Pipeline Lab"
 package = "yetlet-middleware-lab"
@@ -129,6 +153,52 @@ optional_dependencies = []
 evidence = "docs/M9D-VERIFICATION.md"
 
 [[sample]]
+id = "sse-notifications"
+title = "Bounded Native SSE Notifications"
+package = "yetlet-sse-notifications"
+path = "examples/sse-notifications"
+kind = "api"
+status = "verified"
+command = "cargo run -p yetlet-sse-notifications"
+companion_packages = []
+routes = [
+  { path = "/healthz", source = "examples/sse-notifications/src/lib.rs", markers = ['.get("/healthz", health)'] },
+  { path = "/metrics", source = "examples/sse-notifications/src/lib.rs", markers = ['.get("/metrics", metrics)'] },
+  { path = "/events", source = "examples/sse-notifications/src/lib.rs", markers = ['.get("/events", events)'] },
+  { path = "/notifications", source = "examples/sse-notifications/src/lib.rs", markers = ['.post("/notifications", publish)'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = []
+evidence = "docs/M9F-VERIFICATION.md"
+
+[[sample]]
+id = "modular-shop"
+title = "Explicit Modular Shop Reference Application"
+package = "yetlet-modular-shop"
+path = "examples/modular-shop"
+kind = "server-rendered"
+status = "verified"
+command = "cargo run -p yetlet-modular-shop"
+companion_packages = []
+routes = [
+  { path = "/healthz", source = "examples/modular-shop/src/lib.rs", markers = ['.get("/healthz", || async { "ok" })'] },
+  { path = "/identity/login", source = "examples/modular-shop/src/identity.rs", markers = ['.get("/identity/login", login_page)', '.post("/identity/login", login)'] },
+  { path = "/identity/logout", source = "examples/modular-shop/src/identity.rs", markers = ['.post("/identity/logout", logout)'] },
+  { path = "/shop/catalog", source = "examples/modular-shop/src/catalog.rs", markers = ['.get("/shop/catalog", page)'] },
+  { path = "/shop/cart", source = "examples/modular-shop/src/cart.rs", markers = ['.get("/shop/cart", page)'] },
+  { path = "/shop/orders", source = "examples/modular-shop/src/orders.rs", markers = ['.get("/shop/orders", list)'] },
+  { path = "/shop/orders/{id}", source = "examples/modular-shop/src/orders.rs", markers = ['.get("/shop/orders/{id}", detail)'] },
+  { path = "/shop/orders/checkout", source = "examples/modular-shop/src/orders.rs", markers = ['.post("/shop/orders/checkout", checkout)'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = ["yetlet-session"]
+evidence = "docs/M9I-VERIFICATION.md"
+
+[[sample]]
 id = "forms-validation"
 title = "Stateless SSR Forms and Validation"
 package = "yetlet-forms-validation"
@@ -167,3 +237,22 @@ browser_packages = []
 browser_build = ""
 optional_dependencies = []
 evidence = "docs/M9E-VERIFICATION.md"
+
+[[sample]]
+id = "multi-island-dashboard"
+title = "Independent Multi-Island Dashboard"
+package = "yetlet-multi-island-dashboard"
+path = "examples/multi-island-dashboard"
+kind = "full-stack"
+status = "verified"
+command = "python3 scripts/build_multi_island_dashboard.py && cargo run -p yetlet-multi-island-dashboard"
+companion_packages = ["yetlet-dashboard-counter-island", "yetlet-dashboard-filter-island"]
+routes = [
+  { path = "/healthz", source = "examples/multi-island-dashboard/src/lib.rs", markers = ['.get("/healthz"'] },
+  { path = "/dashboard", source = "examples/multi-island-dashboard/src/lib.rs", markers = ['.get("/dashboard", dashboard)'] },
+]
+browser_runtime = true
+browser_packages = ["yetlet-dashboard-counter-island", "yetlet-dashboard-filter-island"]
+browser_build = "scripts/build_multi_island_dashboard.py"
+optional_dependencies = []
+evidence = "docs/M9G-VERIFICATION.md"

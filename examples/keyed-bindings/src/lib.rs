@@ -278,10 +278,10 @@ impl<T, K, Message> KeyedListTemplate<T, K, Message> {
         if self.conditional.is_some() {
             return Err(TemplateError::InvalidSlot("duplicate"));
         }
-        if let Some(class_name) = class {
-            if class_name.is_empty() || class_name.chars().any(char::is_control) {
-                return Err(TemplateError::InvalidSlot("class"));
-            }
+        if let Some(class_name) = class
+            && (class_name.is_empty() || class_name.chars().any(char::is_control))
+        {
+            return Err(TemplateError::InvalidSlot("class"));
         }
         self.conditional = Some(ConditionalText {
             slot,
@@ -392,16 +392,16 @@ impl<T, K, Message> KeyedListTemplate<T, K, Message> {
                     .attribute("value", (input.value)(item)),
             );
         }
-        if let Some(conditional) = &self.conditional {
-            if let Some(value) = (conditional.value)(item) {
-                let mut node = ViewElement::new("span")
-                    .attribute("data-yetlet-slot", conditional.slot)
-                    .child(View::text(value));
-                if let Some(class_name) = conditional.class {
-                    node = node.attribute("class", class_name);
-                }
-                row = row.child(node);
+        if let Some(conditional) = &self.conditional
+            && let Some(value) = (conditional.value)(item)
+        {
+            let mut node = ViewElement::new("span")
+                .attribute("data-yetlet-slot", conditional.slot)
+                .child(View::text(value));
+            if let Some(class_name) = conditional.class {
+                node = node.attribute("class", class_name);
             }
+            row = row.child(node);
         }
         if let Some(action) = &self.action {
             row = row.child(

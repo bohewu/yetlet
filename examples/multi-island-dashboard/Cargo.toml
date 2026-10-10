@@ -1,0 +1,18 @@
+[package]
+name = "yetlet-multi-island-dashboard"
+description = "SSR-first dashboard with two independently owned optional WASM islands"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+axum.workspace = true
+tokio = { workspace = true, features = ["fs", "signal"] }
+serde_json = "1"
+tower-http = { version = "0.6", features = ["fs"] }
+yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
+
+[dev-dependencies]
+tempfile = "3"
+tower = { version = "0.5", features = ["util"] }

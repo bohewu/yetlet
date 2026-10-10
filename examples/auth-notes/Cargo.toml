@@ -1,0 +1,19 @@
+[package]
+name = "yetlet-auth-notes"
+description = "Loopback-only synthetic authentication and per-user SSR notes sample"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+axum.workspace = true
+tokio = { workspace = true, features = ["signal"] }
+serde = { version = "1", features = ["derive"] }
+getrandom = "0.3"
+subtle = "2"
+yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
+yetlet-session = { path = "../../crates/yetlet-session" }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }

@@ -1,0 +1,22 @@
+[package]
+name = "yetlet-modular-shop"
+description = "Modular SSR shop composing identity, catalog, cart and transactional orders"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+axum.workspace = true
+tokio = { workspace = true, features = ["signal", "sync"] }
+serde = { version = "1", features = ["derive"] }
+getrandom = "0.3"
+subtle = "2"
+rusqlite = { version = "0.40.2", default-features = false, features = ["bundled"] }
+yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
+yetlet-session = { path = "../../crates/yetlet-session" }
+
+[dev-dependencies]
+serde_json = "1"
+tempfile = "3"
+tower = { version = "0.5", features = ["util"] }

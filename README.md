@@ -59,7 +59,7 @@ A runnable provider-free example is available with `cargo run -p yetlet-server-a
 
 ## Run the examples
 
-Requirements: Rust stable (declared MSRV 1.85, **not separately verified**), Python 3.11+, and the WASM target. Locally validated with Rust 1.99, wasm-bindgen 0.2.129, Chrome 155 and Firefox 157 (headless Firefox requires geckodriver).
+Requirements: Rust stable with a declared MSRV of 1.88, Python 3.11+, and the WASM target. The current CI/security hardening round verifies the native workspace against Rust 1.88 after upgrading the transitive `time` dependency to its patched release; browser/WASM validation remains on current stable. Locally validated with Rust 1.99, wasm-bindgen 0.2.129, Chrome 155 and Firefox 157 (headless Firefox requires geckodriver).
 
 ```bash
 rustup target add wasm32-unknown-unknown
@@ -129,6 +129,38 @@ cargo run -p yetlet-sqlite-crud
 ```
 
 It defaults to loopback port 3007 and `target/yetlet-sqlite-crud.sqlite3`. It uses application-local direct `rusqlite`, explicit SQL migrations/transactions and bounded `spawn_blocking`; no Yetlet ORM or mandatory data layer is introduced. Reviewer `wc_job_Q3pBfUqPYGYNSIrD` found and prompted a fail-closed schema-column repair; repeat reviewer `wc_job_aVBprnEsYc8o3ubi` returned PASS. See the [comparison](docs/M9E-DATA-ACCESS-COMPARISON.md) and [M9e evidence](docs/M9E-VERIFICATION.md).
+
+The native SSE Notifications sample passed M9f independent repeat review:
+
+```bash
+cargo run -p yetlet-sse-notifications
+```
+
+It listens on loopback port 3008 by default. `/events` uses bounded replay, heartbeat comments and `Last-Event-ID`; `/notifications` is a loopback command-oriented JSON publisher. No browser runtime, WebSocket or framework-global event circuit is introduced. First reviewer `wc_job_LF-i2IsQxFXO-obd` found control-character validation occurred after trim; raw-input validation fixed it and repeat reviewer `wc_job_fa8KJiTxGRuWIEDF` returned PASS. See [M9f evidence](docs/M9F-VERIFICATION.md).
+
+The isolated Multi-Island Dashboard passed M9g final independent review:
+
+```bash
+python3 scripts/build_multi_island_dashboard.py && cargo run -p yetlet-multi-island-dashboard
+```
+
+It listens on loopback port 3009 and keeps generated Counter/Filter bundles under `target/multi-island-dashboard-dist/`, outside production `dist/`. Complete SSR remains when either bundle or the whole manifest is missing/invalid. Final reviewer `wc_job_OMstvGrtDiKZ5p6C` returned PASS after retained Chrome/Firefox fallback evidence was supplied. See [M9g evidence](docs/M9G-VERIFICATION.md).
+
+The loopback-only Auth Notes fixture passed M9h security-focused review:
+
+```bash
+cargo run -p yetlet-auth-notes
+```
+
+It generates synthetic Alice/Bob login codes in the local terminal, uses opt-in Session rotation/CSRF, and rechecks note ownership on every request. Reviewer `wc_job_EgSLng_VafIvs3ju` returned PASS. It is not a password, OIDC, MFA or production identity provider. See [M9h evidence](docs/M9H-VERIFICATION.md).
+
+The larger Modular Shop reference application passed M9i repeat independent review:
+
+```bash
+cargo run -p yetlet-modular-shop
+```
+
+It listens on loopback port 3008, composes synthetic identity, SQL catalog, Session cart and transactional orders through explicit Rust modules, and can disable Orders with `YETLET_SHOP_DISABLE_ORDERS=1`. First reviewer `wc_job_a_WnhFSftzNoYYgf` found and prompted smoke readiness cleanup; repeat reviewer `wc_job_zbWS7OSbUtaKzYcn` returned PASS. It is not a payment or production commerce system. See [M9i evidence](docs/M9I-VERIFICATION.md).
 
 `python3 scripts/build_browser.py --release` produces an optimized browser bundle. Do not confuse debug WASM bytes with production transfer sizes or performance.
 
@@ -245,6 +277,13 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 - [M9 planning reviewer gate](docs/M9-PLANNING-VERIFICATION.md)
 - [M9e SQLite data-access comparison](docs/M9E-DATA-ACCESS-COMPARISON.md)
 - [M9e SQL-first SQLite CRUD verification](docs/M9E-VERIFICATION.md)
+- [M9f bounded SSE Notifications verification](docs/M9F-VERIFICATION.md)
+- [M9g independent multi-island dashboard verification](docs/M9G-VERIFICATION.md)
+- [M9h synthetic authentication and private-notes verification](docs/M9H-VERIFICATION.md)
+- [M9i modular shop integration verification](docs/M9I-VERIFICATION.md)
+- [Public API contract classification](docs/API-CONTRACTS.md)
+- [M9j final compatibility and evidence freeze](docs/M9J-VERIFICATION.md)
+- [Post-M9 CI and security review](docs/CI-SECURITY-REVIEW.md)
 - [Module composition and optional providers](docs/EXTENSIONS.md)
 - [Prototype release readiness and blockers](docs/RELEASE-READINESS.md)
 - [ADR 0001](docs/adr/0001-separation-of-concerns.md)
@@ -255,4 +294,4 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 - [ADR 0006 — Handler-first and optional MVC](docs/adr/0006-handler-first-mvc-optional.md)
 - [ADR 0007 — Bounded keyed DOM and local graph](docs/adr/0007-bounded-keyed-dom-and-local-graph.md)
 
-M0–M8 are locally complete at prototype scope. M8 freezes the runnable sample contract, native REST and Session Cart applications, no-runtime-API-change DX decision, full regression and final reviewer PASS. M9 planning and M9a–M9e have passed independent reviewer gates. SQL access remains application opt-in and Yetlet has no built-in ORM or mandatory DB layer. Public-release readiness (`YT-020`) is **Blocked** pending licensing and support/security policy. Current code is not a production release.
+M0–M9 are locally complete at prototype scope. M8 freezes the runnable sample contract; M9 adds twelve independently reviewed applications, a 170-export compatibility classification and complete native/browser/provider evidence freeze. The post-M9 CI/security round patches `RUSTSEC-2026-0009`, raises and locally verifies the Rust 1.88 MSRV, and hardens hosted CI; its new remote run must still be observed to terminal success after push. Repeat reviewers do not make Yetlet SemVer-stable or production-ready. SQL access remains application opt-in and Yetlet has no built-in ORM or mandatory DB layer. Public-release readiness (`YT-020`) is **Blocked** pending licensing, compatibility/support, document metadata, repository governance and production security policy. Current code is not a production release.

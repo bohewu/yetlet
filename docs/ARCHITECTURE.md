@@ -190,6 +190,12 @@ The native target outputs HTML; the browser target creates and updates DOM. Comp
 
 M7a–M7e made the keyed/static-slot/local-ownership direction concrete and ended in a no-decision freeze. M7f–M7h promote only independently proven low-level contracts; M7i adopts them for one production Todo local-list path; M7j freezes the bounded decision, repaired runtime lifetime, complete regression evidence and repeat reviewer PASS. The fixed authoring shape, current text-input API, focus policy and conditional-slot shape remain experimental. No public VDOM, dependency-tracked signals/forms runtime, macro DSL or general template compiler is selected.
 
+### M9 compatibility classification
+
+M9's twelve independently reviewed applications provide enough evidence to classify—but not stabilize—the actual public Rust surface. [Public API Contract Classification](API-CONTRACTS.md) records renderer-neutral `View`/binding values, escaped HTML, handler-first `App`/`RequestContext`/Tower composition and bounded Request ID/Session application APIs as **Stable Candidates**. The complete-document `Page`/language/head contract and browser Actions/DOM/keyed/reactive surfaces remain **Experimental**. Adapter constructors, direct provider middleware and generated implementation details remain **Internal/support-only**.
+
+This classification does not change crate versions or establish SemVer compatibility. M9j froze 190 tests, native/browser/provider/dependency and exact-asset evidence; after reviewer-discovered inventory/reexport corrections, repeat reviewer `wc_job_QkQkovlBlvrhPxCE` accepted the classification. Licensing, historical MSRV, browser/support policy, the root document metadata design, external CI and production security expectations remain release blockers.
+
 ### Data-access capabilities
 
 ```rust

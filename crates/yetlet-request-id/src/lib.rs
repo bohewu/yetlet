@@ -62,8 +62,8 @@ impl RequestIds {
         })
     }
 
-    // compare_exchange_weak keeps this compatible with the declared Rust 1.85
-    // baseline without using AtomicU64 APIs renamed in later Rust releases.
+    // compare_exchange_weak preserves the established atomic allocation
+    // semantics across the workspace's supported Rust baseline.
     fn next_id(&self) -> Option<RequestId> {
         let mut current = self.next.load(Ordering::Relaxed);
         loop {

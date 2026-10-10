@@ -6,44 +6,125 @@ on:
     branches:
       - master
 
+permissions:
+  contents: read
+
+concurrency:
+  group: yetlet-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
-  native-and-wasm-core:
-    runs-on: ubuntu-latest
+  msrv:
+    name: Rust 1.88 MSRV
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Install declared toolchain
+        run: |
+          rustup toolchain install 1.88.0 --profile minimal
+          rustup target add --toolchain 1.88.0 wasm32-unknown-unknown
+      - name: Native MSRV tests and doctests
+        run: |
+          cargo +1.88.0 test --workspace --all-targets --locked
+          cargo +1.88.0 test --workspace --doc --locked
+      - name: Browser and renderer MSRV targets
+        run: |
+          cargo +1.88.0 check --locked --target wasm32-unknown-unknown \
+            -p yetlet-todo-browser -p yetlet-search-island \
+            -p yetlet-reactive -p yetlet-dom-keyed \
+            -p yetlet-render-bench -p yetlet-keyed-bindings \
+            -p yetlet-dashboard-counter-island -p yetlet-dashboard-filter-island
+
+  native-and-browser:
+    name: Stable native, samples, and Chrome
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
       - name: Rust tools
         run: |
           rustup update stable
           rustup default stable
           rustup component add rustfmt clippy
           rustup target add wasm32-unknown-unknown
-      - name: Documentation / backlog
-        run: python3 scripts/check_docs.py
+      - name: Documentation, catalog, and Python harness checks
+        run: |
+          python3 scripts/check_docs.py
+          python3 scripts/check_samples.py
+          python3 scripts/test_check_samples.py
+          python3 scripts/test_smoke_modular_shop.py
+          python3 scripts/test_smoke_browser_harness.py
       - name: Format
         run: cargo fmt --all -- --check
       - name: Clippy
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
-      - name: Native tests
-        run: cargo test --workspace --all-targets --locked
-      - name: Compiled public API examples
-        run: cargo test --workspace --doc --locked
-      - name: Shared UI native + wasm target
-        run: cargo check --locked -p yetlet-core -p yetlet-todo-ui --target wasm32-unknown-unknown
-      - name: Browser WASM build
+      - name: Native tests and doctests
+        run: |
+          cargo test --workspace --all-targets --locked
+          cargo test --workspace --doc --locked
+      - name: RustSec dependency audit
+        run: |
+          cargo install cargo-audit --version 0.22.2 --locked
+          cargo audit
+      - name: Native application binaries and smokes
+        run: |
+          cargo build --workspace --bins --locked
+          python3 scripts/smoke_hello_world.py
+          python3 scripts/smoke_rest_api.py
+          python3 scripts/smoke_cart.py
+          python3 scripts/smoke_middleware_lab.py
+          python3 scripts/smoke_forms_validation.py
+          python3 scripts/smoke_file_server.py
+          python3 scripts/smoke_sqlite_crud.py
+          python3 scripts/smoke_sse_notifications.py
+          python3 scripts/smoke_auth_notes.py
+          python3 scripts/smoke_modular_shop.py
+      - name: Browser and renderer wasm32 targets
+        run: |
+          cargo check --locked --target wasm32-unknown-unknown \
+            -p yetlet-todo-browser -p yetlet-search-island \
+            -p yetlet-reactive -p yetlet-dom-keyed \
+            -p yetlet-render-bench -p yetlet-keyed-bindings \
+            -p yetlet-dashboard-counter-island -p yetlet-dashboard-filter-island
+      - name: Browser tooling and release assets
         run: |
           cargo install wasm-bindgen-cli --version 0.2.129 --locked
-          python3 scripts/build_browser.py
-      - name: Native server binary
-        run: cargo build --locked -p yetlet-todo-server
+          python3 scripts/build_browser.py --release
+          python3 scripts/build_keyed_bindings.py --release
+          python3 scripts/build_multi_island_dashboard.py --release
+          cargo build --release --locked \
+            -p yetlet-todo-server -p yetlet-multi-island-dashboard
       - name: Chrome version
         run: google-chrome --version
-      - name: Browser E2E smoke
-        run: python3 scripts/smoke_browser.py
+      - name: Chrome E2E suites
+        run: |
+          python3 scripts/smoke_browser.py --profile release
+          python3 scripts/smoke_keyed_bindings.py --profile release
+          python3 scripts/smoke_multi_island_dashboard.py --profile release
       - name: M5 local-style baseline (informational only)
-        run: python3 scripts/measure_baseline.py --profile debug --samples 15 --browser-runs 3 --out target/m5-baseline-ci.json
+        run: python3 scripts/measure_baseline.py --profile release --samples 15 --browser-runs 3 --out target/m5-baseline-ci.json
+      - name: Retain browser diagnostics on failure
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: yetlet-browser-failure-logs
+          path: target/ci-browser-logs/
+          if-no-files-found: ignore
+          retention-days: 7
       - name: Retain M5 baseline artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: yetlet-m5-baseline
           path: target/m5-baseline-ci.json
           if-no-files-found: error
+          retention-days: 14

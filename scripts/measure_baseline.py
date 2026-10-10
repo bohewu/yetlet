@@ -24,7 +24,14 @@ import sys
 import tempfile
 import time
 
-from smoke_browser import ChromeDevTools, http, port_number, wait_until
+from smoke_browser import (
+    ChromeDevTools,
+    http,
+    port_number,
+    remove_owned_tree,
+    stop_owned_process,
+    wait_until,
+)
 
 ROOT = Path(__file__).resolve().parent.parent
 DIST = ROOT / "dist"
@@ -120,6 +127,7 @@ def response_first_byte_ms(port: int, resource: str) -> float:
 
 def chrome_measurements(base: str, temp: Path, chrome: str, runs: int, log) -> dict:
     devtools_port = port_number()
+    profile_dir = temp / "chrome-profile"
     chrome_process = subprocess.Popen(
         [
             chrome, "--headless=new", "--no-sandbox", "--disable-gpu",
@@ -127,9 +135,10 @@ def chrome_measurements(base: str, temp: Path, chrome: str, runs: int, log) -> d
             "--disable-extensions", "--remote-debugging-address=127.0.0.1",
             "--remote-allow-origins=*",
             f"--remote-debugging-port={devtools_port}",
-            f"--user-data-dir={temp / 'chrome-profile'}", "about:blank",
+            f"--user-data-dir={profile_dir}", "about:blank",
         ],
         stdout=log, stderr=subprocess.STDOUT,
+        start_new_session=os.name == "posix",
     )
     browser = None
     try:
@@ -150,7 +159,7 @@ def chrome_measurements(base: str, temp: Path, chrome: str, runs: int, log) -> d
             browser.call("Page.navigate", {"url": base + "/app"})
             wait_until(
                 lambda: browser.evaluate(
-                    "document.documentElement.getAttribute('data-yetlet-ready') === 'true'"
+                    "document.documentElement?.getAttribute('data-yetlet-ready') === 'true'"
                 ),
                 "client WASM mount",
             )
@@ -211,14 +220,8 @@ def chrome_measurements(base: str, temp: Path, chrome: str, runs: int, log) -> d
     finally:
         if browser is not None:
             browser.close()
-        if chrome_process.poll() is None:
-            chrome_process.terminate()
-            try:
-                chrome_process.wait(timeout=5)
-            except subprocess.TimeoutExpired:
-                chrome_process.kill()
-                chrome_process.wait(timeout=5)
-
+        stop_owned_process(chrome_process, process_group=True)
+        remove_owned_tree(profile_dir)
 
 def measure(profile: str, samples: int, browser_runs: int) -> dict:
     binary = ROOT / "target" / profile / "yetlet-todo-server"

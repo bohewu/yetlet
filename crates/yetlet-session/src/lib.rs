@@ -268,15 +268,15 @@ where
         let mut store = self.store().map_err(|_| OpenError::Session)?;
         store.records.retain(|_, record| record.expires_at > now);
 
-        if let Some(id) = supplied {
-            if let Some(record) = store.records.get(&id) {
-                return Ok(Session::new(
-                    self.clone(),
-                    id,
-                    record.csrf_token.clone(),
-                    CookieDirective::None,
-                ));
-            }
+        if let Some(id) = supplied
+            && let Some(record) = store.records.get(&id)
+        {
+            return Ok(Session::new(
+                self.clone(),
+                id,
+                record.csrf_token.clone(),
+                CookieDirective::None,
+            ));
         }
 
         if store.records.len() >= self.inner.config.max_sessions {

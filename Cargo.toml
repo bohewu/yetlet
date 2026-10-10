@@ -21,6 +21,12 @@ members = [
     "examples/forms-validation",
     "examples/file-server",
     "examples/sqlite-crud",
+    "examples/sse-notifications",
+    "examples/dashboard-counter-island",
+    "examples/dashboard-filter-island",
+    "examples/multi-island-dashboard",
+    "examples/auth-notes",
+    "examples/modular-shop",
     "examples/todo-server",
 ]
 resolver = "3"
@@ -28,7 +34,7 @@ resolver = "3"
 [workspace.package]
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.85"
+rust-version = "1.88"
 
 [workspace.dependencies]
 axum = "0.8"

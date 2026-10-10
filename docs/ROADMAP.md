@@ -1,6 +1,6 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**Status:** Draft, last reviewed 2026-10-09.
+**Status:** Draft, last reviewed 2026-10-10.
 
 Milestones are sequenced by capability and dependencies rather than invented delivery dates. The [MVP specification](MVP.md) provides acceptance criteria. Each gate must retain real commands, results, and relevant architectural decisions.
 
@@ -15,7 +15,8 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M6 — Handler-first API and optional extensions (locally complete)** | App/Page APIs, explicit module functions, independent Request ID proof and migrated Todo | YT-030–YT-034 | Native/Chrome/Firefox contracts PASS; release assets unchanged; measured latency comparison, no mandatory MVC or DI |
 | **M7 — Bounded keyed DOM and local reactivity (locally complete)** | Measured strategies, promoted low-level contracts, production Todo keyed graph and final decision freeze | YT-025, YT-035–YT-043 | Equivalent output, ownership/disposal, cross-browser lifecycle, measured bundle cost, Search isolation, complete regression and repeat reviewer PASS |
 | **M8 — Sample-driven application experience** | Standardized sample contract, API-only REST app, opt-in Session cart, DX audit and evidence freeze | YT-044–YT-048 | Copyable applications, pay-for-what-you-use dependencies, security/lifecycle evidence and per-stage reviewer PASS |
-| **M9 — Sample expansion and API contract qualification (planned)** | Nine canonical sample names plus three supplements, SQL-first persistence, contract classification | YT-049–YT-059 | Independent planning review before code; reviewer per sample; compatibility inventory and full regression |
+| **M9 — Sample expansion and API contract qualification (locally complete)** | Nine canonical sample names plus three supplements, SQL-first persistence, contract classification | YT-049–YT-059 | Twelve samples, 170-export inventory, complete regression and repeat final reviewer PASS |
+| **M10 — Release engineering and production-security qualification** | Licensing, governance, compatibility, threat model, supply-chain and operational qualification | YT-060–YT-067 | Maintainer decisions, hosted controls, reproducible release evidence and external security review |
 
 ## Critical path
 
@@ -48,6 +49,13 @@ YT-048 → YT-049 (review M9 plan) → YT-050 (Hello) → YT-051 (Middleware)
 YT-051 → YT-052 (Forms) → YT-053 (Files) → YT-054 (SQLite)
 YT-054 → YT-055 (SSE) → YT-056 (Multi-Island) → YT-057 (Auth)
 YT-057 → YT-058 (Modular Shop) → YT-059 (API contract review/freeze)
+YT-059 → YT-060 (license/policy) → YT-064 (release supply chain)
+YT-059 → YT-061 (repository governance)
+YT-059 → YT-062 (SemVer/document metadata) → YT-064
+YT-057 + YT-059 → YT-063 (production threat model)
+YT-059 → YT-065 (scheduled compatibility matrix)
+YT-046 + YT-054 + YT-057 + YT-059 → YT-066 (provider operations)
+YT-063 + YT-064 + YT-066 → YT-067 (external security review)
 ```
 
 Prove native SSR before committing to an elaborate browser view IR. Avoid simultaneously designing DOM, SSR, islands, and GPU abstraction layers before the smallest dual-target implementation works.
@@ -197,9 +205,11 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 - [x] **YT-052 / M9c:** Stateless SSR Forms Validation with field errors, native PRG, English language override and independent repeat reviewer PASS.
 - [x] **YT-053 / M9d:** Bounded File Server, static/download headers, protected multipart, private storage, interrupted-write cleanup, dependency/asset isolation and independent reviewer PASS.
 - [x] **YT-054 / M9e:** SQL-first SQLite CRUD using application-local `rusqlite`, complete regression and repeat reviewer PASS.
-- [ ] **YT-055 / M9f:** Bounded SSE Notifications with replay/cancellation/backpressure and independent reviewer.
-- [ ] **YT-056–YT-058 / M9g–M9i:** One bounded sample per reviewer: Multi-Island, Auth Notes and Modular Shop. Display order remains canonical; implementation order reflects dependency/security gates.
-- [ ] **YT-059 / M9j:** API friction/compatibility inventory, Stable Candidate versus Experimental versus Internal classification, full native/browser/provider regression, independent final reviewer.
+- [x] **YT-055 / M9f:** Bounded SSE Notifications with replay/cancellation/backpressure, complete isolation and independent repeat reviewer PASS.
+- [x] **YT-056 / M9g:** Multi-Island Dashboard with separate bundles/state/lifetimes, missing/invalid fallback, Chrome/Firefox and final reviewer PASS.
+- [x] **YT-057 / M9h:** Security-bounded Auth Notes with login/logout rotation, CSRF, per-user authorization/isolation and security-focused reviewer PASS.
+- [x] **YT-058 / M9i:** Modular Shop explicit-module integration, transactional/idempotent orders, disabled-module behavior and repeat independent reviewer PASS.
+- [x] **YT-059 / M9j:** [API contract inventory](API-CONTRACTS.md), Stable Candidate/Experimental/Internal classification, full native/browser/provider regression and repeat independent final reviewer PASS.
 
 **Explicit data-access boundary:** No built-in Yetlet ORM, ORM runtime, mandatory repository/DbContext, query DSL, migration framework or hidden database provider. YT-054 evaluates existing SQL-first `rusqlite` or `sqlx`-style direct/typed query libraries as **app-selected optional dependencies**. Any third-party ORM is external and opt-in only, never a default dependency. See [M9 plan](M9-PLAN.md#3-sql-first-data-access-policy-no-yetlet-orm).
 
@@ -210,6 +220,26 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 
 **M9d / YT-053 evidence (2026-10-09):** The bounded File Server passes 14 focused tests, 144 workspace tests, five doctests, full Clippy/format, six WASM packages and one localhost smoke including interrupted-upload cleanup. Browser/Search release digest remains `faebb0709dccd863`, all 136 retained assets byte-identical; file dependencies stay application-local. Independent read-only reviewer `wc_job_g8JSu80-Jseg6lmG` returned PASS with no findings, and runtime telemetry matched the saved `gpt-6-astra`/high configuration. The exact reviewed seventh catalog entry was promoted. See [M9d verification](M9D-VERIFICATION.md).
 **M9e / YT-054 evidence (2026-10-09):** A bounded `rusqlite` versus compatible `sqlx` spike selected direct application-local `rusqlite`; explicit SQL/migration/transactions run behind a bounded `spawn_blocking` gate. Nine focused tests, 153 workspace tests, five doctests, three-process persistence/concurrency smoke, 22 dependency trees, six WASM packages and 136 byte-identical production assets pass. First reviewer `wc_job_Q3pBfUqPYGYNSIrD` found incomplete required-column validation; the fail-closed schema check and regressions were repaired, the full matrix rerun, and repeat reviewer `wc_job_aVBprnEsYc8o3ubi` returned PASS. The exact eighth catalog entry was then promoted. See [comparison](M9E-DATA-ACCESS-COMPARISON.md) and [M9e verification](M9E-VERIFICATION.md).
+**M9f / YT-055 evidence (2026-10-10):** Native HTTP SSE uses an application-owned bounded Hub with finite IDs, a 16-event replay buffer, eight subscribers, four-event per-client queues, heartbeat comments and disconnect cleanup. Ten focused tests, 163 workspace tests, five doctests, real heartbeat/live/reconnect smoke, all 23 package trees, six wasm32 packages and 136 byte-identical production assets pass. First reviewer `wc_job_LF-i2IsQxFXO-obd` found control characters could be trimmed before validation; raw-input rejection and regressions repaired it, the full matrix reran, and repeat reviewer `wc_job_fa8KJiTxGRuWIEDF` returned PASS. See [M9f verification](M9F-VERIFICATION.md).
+**M9g / YT-056 evidence (2026-10-10):** Complete SSR hosts separately built Counter/Filter islands with independent manifests, versions, listeners and disposal. Six server tests, 169 workspace tests, five doctests, release Chrome/Firefox identity/focus/late-callback/failure-recovery and missing/malformed-manifest fallback pass. Eight wasm32 packages, all 26 dependency trees and 136 byte-identical production assets pass. Reviewers `wc_job_63A__nJFK3BgNWPk` and `wc_job_6pk1_UnsnH8WR4Ns` exposed missing browser fallback and retained-log evidence; both were repaired without runtime expansion, and final reviewer `wc_job_OMstvGrtDiKZ5p6C` returned PASS. See [M9g verification](M9G-VERIFICATION.md).
+**M9h / YT-057 evidence (2026-10-10):** Loopback-only synthetic terminal codes authenticate Alice/Bob; `yetlet-session` separately owns opaque identity/CSRF; every note route enforces server-owned ownership. Login/logout rotate Session ID and CSRF. Twelve focused tests, 181 workspace tests, five doctests, a real two-user smoke, all 27 dependency trees, eight wasm32 packages and 136 byte-identical production assets pass. Security-focused reviewer `wc_job_EgSLng_VafIvs3ju` returned PASS with no findings; the exact eleventh catalog entry was promoted. See [M9h verification](M9H-VERIFICATION.md).
+**M9i / YT-058 evidence (2026-10-10):** Identity, catalog, Session cart and direct-SQL orders compose through ordinary Rust modules. Nine focused tests, 190 workspace tests, five doctests, a three-process restart/authorization/disabled-module smoke, 28 dependency trees, eight wasm32 packages and 136 byte-identical production assets pass. First reviewer `wc_job_a_WnhFSftzNoYYgf` found a readiness-failure leak in the Python smoke harness; terminate/kill/reap/stream-close regressions repaired it, and repeat reviewer `wc_job_zbWS7OSbUtaKzYcn` returned PASS. The exact twelfth catalog entry was promoted. See [M9i verification](M9I-VERIFICATION.md).
+**M9j / YT-059 evidence (2026-10-10):** The [API inventory](API-CONTRACTS.md) classifies 170 public declarations/constants. Complete regression passes 190 tests, five doctests, 11 native smokes, eight wasm32 packages, three Chrome and three Firefox suites, 28 dependency trees and 136 byte-identical production files. First reviewer `wc_job_BzkzTPcKr4FKATTr` found omitted constants/errors and over-broad upstream reexport classification; both were repaired without runtime changes, and repeat reviewer `wc_job_QkQkovlBlvrhPxCE` returned PASS. Stable Candidates remain pre-SemVer evidence; YT-020 remains Blocked. See [M9j verification](M9J-VERIFICATION.md).
+
+### M10 — Release engineering and production-security qualification
+
+**Goal:** turn prototype evidence into explicit support, governance and production-security decisions without expanding Yetlet core or implying release approval.
+
+- [ ] **YT-060 / M10a:** Maintainer selects licenses and vulnerability-reporting policy; currently Blocked on an explicit decision.
+- [ ] **YT-061 / M10b:** Protect `master`, require CI and enable dependency/secret/code-scanning controls after external-setting authorization.
+- [ ] **YT-062 / M10c:** Define SemVer scope, compile-level compatibility fixtures and a typed document language/head contract.
+- [ ] **YT-063 / M10d:** Define the production TLS/IdP/rate-limit/CSRF/secret/authorization threat model.
+- [ ] **YT-064 / M10e:** Define reproducible artifacts, license/source policy, SBOM, provenance, signing and rollback.
+- [ ] **YT-065 / M10f:** Add a scheduled platform/browser/accessibility/IME matrix.
+- [ ] **YT-066 / M10g:** Qualify distributed Session/storage, backup/restore, load, observability and recovery.
+- [ ] **YT-067 / M10h:** Obtain external production-security review after the target topology is fixed.
+
+**Post-M9 hardening evidence (2026-10-10):** [CI/security review](CI-SECURITY-REVIEW.md) records the first hosted CI failure, bounded browser-harness repair, full-SHA Action pins, read-only permissions, patched `RUSTSEC-2026-0009`, Rust 1.88 local verification and the remaining GitHub/security/release gaps. A new pushed workflow must still reach terminal success before hosted CI repair is considered complete.
 
 ## Post-MVP research
 

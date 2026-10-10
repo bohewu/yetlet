@@ -6,6 +6,7 @@ ephemeral headless Chrome instance. Never touches the user's browser session.
 """
 from __future__ import annotations
 
+import argparse
 import base64
 import hashlib
 import json
@@ -13,6 +14,7 @@ import os
 from pathlib import Path
 import re
 import shutil
+import signal
 import socket
 import struct
 import subprocess
@@ -183,8 +185,65 @@ def wait_until(predicate, description, seconds=18):
     raise TimeoutError(f"Timed out waiting for {description}")
 
 
-def main() -> None:
-    binary = ROOT / "target/debug/yetlet-todo-server"
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(
+        description="Bounded Chrome E2E for Yetlet Todo/Search browser behavior."
+    )
+    parser.add_argument("--profile", choices=("debug", "release"), default="debug")
+    return parser.parse_args(argv)
+
+
+def stop_owned_process(process: subprocess.Popen | None, *, process_group: bool = False) -> None:
+    """Stop and reap one process, including its owned POSIX process group."""
+    if process is None:
+        return
+    if process_group and os.name == "posix":
+        try:
+            os.killpg(process.pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pass
+    elif process.poll() is None:
+        process.terminate()
+    try:
+        process.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        if process_group and os.name == "posix":
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+        elif process.poll() is None:
+            process.kill()
+        process.wait(timeout=5)
+    finally:
+        # Chrome may let helper children outlive the browser parent briefly.
+        # The group belongs exclusively to this harness, so terminate any
+        # survivor before the temporary profile is removed.
+        if process_group and os.name == "posix":
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except ProcessLookupError:
+                pass
+
+
+def remove_owned_tree(path: Path, seconds: float = 5.0) -> None:
+    """Remove an owned temporary tree, retrying late Chrome profile writes."""
+    deadline = time.monotonic() + seconds
+    while path.exists():
+        try:
+            shutil.rmtree(path)
+            return
+        except FileNotFoundError:
+            return
+        except OSError:
+            if time.monotonic() >= deadline:
+                raise
+            time.sleep(0.1)
+
+
+def main(argv=None) -> None:
+    args = parse_args(argv)
+    binary = ROOT / "target" / args.profile / "yetlet-todo-server"
     chrome = shutil.which("google-chrome-stable") or shutil.which("google-chrome")
     if not binary.is_file():
         raise RuntimeError("Build the native server first: cargo build -p yetlet-todo-server")
@@ -194,6 +253,7 @@ def main() -> None:
     with tempfile.TemporaryDirectory(prefix="yetlet-e2e-") as temp:
         server_port, chrome_port = port_number(), port_number()
         base = f"http://127.0.0.1:{server_port}"
+        profile_dir = Path(temp) / "chrome-profile"
         env = dict(os.environ, YETLET_LISTEN=f"127.0.0.1:{server_port}")
         with (Path(temp) / "server.log").open("w") as server_log, (
             Path(temp) / "chrome.log"
@@ -229,10 +289,11 @@ def main() -> None:
                         "--remote-debugging-address=127.0.0.1",
                         "--remote-allow-origins=*",
                         f"--remote-debugging-port={chrome_port}",
-                        f"--user-data-dir={Path(temp) / 'chrome-profile'}",
+                        f"--user-data-dir={profile_dir}",
                         "about:blank",
                     ],
                     stdout=chrome_log, stderr=subprocess.STDOUT,
+                    start_new_session=os.name == "posix",
                 )
                 endpoint = f"http://127.0.0.1:{chrome_port}/json/list"
 
@@ -250,7 +311,7 @@ def main() -> None:
                 client.call("Page.navigate", {"url": base + "/app"})
                 wait_until(
                     lambda: client.evaluate(
-                        "document.documentElement.getAttribute('data-yetlet-ready') === 'true'"
+                        "document.documentElement?.getAttribute('data-yetlet-ready') === 'true'"
                     ),
                     "WASM mount",
                 )
@@ -559,7 +620,7 @@ def main() -> None:
                 wait_until(
                     lambda: client.evaluate(
                         "location.pathname === '/app' && "
-                        "document.documentElement.getAttribute('data-yetlet-ready') === 'true'"
+                        "document.documentElement?.getAttribute('data-yetlet-ready') === 'true'"
                     ),
                     "browser action error scenario",
                 )
@@ -635,10 +696,10 @@ def main() -> None:
                     f"{client.requests[queued_request_count:]}"
                 )
                 assert client.evaluate(
-                    "document.documentElement.getAttribute('data-yetlet-ready')"
+                    "document.documentElement?.getAttribute('data-yetlet-ready')"
                 ) is None
                 assert client.evaluate(
-                    "document.documentElement.getAttribute('data-yetlet-disposed')"
+                    "document.documentElement?.getAttribute('data-yetlet-disposed')"
                 ) == "true"
                 assert client.evaluate(
                     "window.__yetlet_lifecycle_row.isConnected && "
@@ -671,12 +732,12 @@ def main() -> None:
                 client.evaluate("window.__yetletTodoRuntime.mount();true")
                 wait_until(
                     lambda: client.evaluate(
-                        "document.documentElement.getAttribute('data-yetlet-ready') === 'true'"
+                        "document.documentElement?.getAttribute('data-yetlet-ready') === 'true'"
                     ),
                     "Todo runtime remount",
                 )
                 assert client.evaluate(
-                    "document.documentElement.getAttribute('data-yetlet-disposed')"
+                    "document.documentElement?.getAttribute('data-yetlet-disposed')"
                 ) is None
                 assert client.evaluate(
                     "document.querySelector('#todo-list-host [data-id=\"1\"]') !== "
@@ -763,7 +824,7 @@ def main() -> None:
                 ) is True
                 wait_until(
                     lambda: client.evaluate(
-                        "document.documentElement.getAttribute('data-yetlet-ready') === 'true'"
+                        "document.documentElement?.getAttribute('data-yetlet-ready') === 'true'"
                     ),
                     "Todo runtime remount before retired response completion",
                 )
@@ -818,20 +879,29 @@ def main() -> None:
                 print("PASS: two local click transitions, class/text updates")
                 print("PASS: no click network requests, no WebSocket, no browser errors")
                 print(f"Browser asset requests observed: {request_count}")
+            except BaseException:
+                # Preserve bounded diagnostics without masking the original
+                # failure. GitHub Actions uploads this directory on failure.
+                for stream in (server_log, chrome_log):
+                    stream.flush()
+                artifact_dir = ROOT / "target" / "ci-browser-logs"
+                artifact_dir.mkdir(parents=True, exist_ok=True)
+                for name in ("server.log", "chrome.log"):
+                    try:
+                        shutil.copy2(Path(temp) / name, artifact_dir / name)
+                    except OSError as error:
+                        print(f"WARN: could not retain {name}: {error}")
+                raise
             finally:
                 if client is not None:
                     client.close()
-                for process in (browser, server):
-                    if process is not None and process.poll() is None:
-                        process.terminate()
-                        try:
-                            process.wait(timeout=5)
-                        except subprocess.TimeoutExpired:
-                            process.kill()
-                            process.wait(timeout=5)
+                try:
+                    stop_owned_process(browser, process_group=True)
+                    remove_owned_tree(profile_dir)
+                finally:
+                    stop_owned_process(server)
                 assert server.poll() is not None
                 assert browser is None or browser.poll() is not None
-
 
 if __name__ == "__main__":
     main()

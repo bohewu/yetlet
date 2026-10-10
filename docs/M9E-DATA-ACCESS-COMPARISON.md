@@ -8,7 +8,7 @@
 - `rusqlite 0.40.2`, `default-features = false`, `bundled`: direct synchronous SQLite statements and row closures.
 - `sqlx 0.8.6`, `default-features = false`, features `runtime-tokio`, `sqlite`, `macros`: asynchronous pool/query API and derive-based row mapping.
 
-The current registry metadata for `sqlx 0.9.0` declares Rust 1.94, while this workspace declares—but has not yet verified—MSRV 1.85. The bounded comparison therefore used `sqlx 0.8.6`, not the incompatible current major. `rusqlite 0.40.2` registry metadata does not declare a Rust version, so this spike makes **no** new MSRV claim; the repository's historical-toolchain gate remains open.
+At the time of this M9e comparison, the workspace declared an unverified MSRV of 1.85; current `sqlx 0.9.0` registry metadata declared Rust 1.94, so the bounded spike used `sqlx 0.8.6`. A later CI/security hardening round raised the workspace baseline to Rust 1.88 to consume the patched `time 0.3.47` transitive dependency. That later change does not alter this comparison's dependency choice or retroactively turn the spike into a broad MSRV claim.
 
 ## Measured fixture
 

@@ -99,17 +99,32 @@ The [M9 plan](M9-PLAN.md) owns detailed per-sample positive/negative tests, SQL-
 | YT-052 | P1 | M | M9c | Build `forms-validation` | YT-051 | [M9c evidence](M9C-VERIFICATION.md): 130 tests/5 doctests, escaped SSR/422/no-state 303 PRG, accessible English content; final reviewer `wc_job_lGtk_ZIoAvK4F6PW` PASS | Done |
 | YT-053 | P1 | L | M9d | Build `file-server` | YT-052 | [M9d evidence](M9D-VERIFICATION.md): 144 tests/5 doctests, static/stream/auth/path/symlink/cancellation and asset isolation PASS; reviewer `wc_job_g8JSu80-Jseg6lmG` PASS | Done |
 | YT-054 | P1 | L | M9e | Build SQL-first, opt-in `sqlite-crud` without ORM | YT-053 | [M9e evidence](M9E-VERIFICATION.md): 153 tests/5 doctests, direct SQL/rollback/restart/schema fail-closed and isolation; reviewer `wc_job_aVBprnEsYc8o3ubi` PASS | Done |
-| YT-055 | P1 | M | M9f | Build `sse-notifications` | YT-054 | Bounded SSE/replay/cancel/reconnect, no default circuit + reviewer PASS | Todo |
-| YT-056 | P1 | L | M9g | Build `multi-island-dashboard` | YT-055 | SSR fallback, independent lazy bundles/teardown/late action isolation, Chrome/Firefox + reviewer PASS | Todo |
-| YT-057 | P1 | L | M9h | Build security-bounded `auth-notes` | YT-056, YT-046 | Test-identity authn/authz, user isolation, CSRF/fixation/cookie gates; security-focused reviewer PASS | Todo |
-| YT-058 | P1 | L | M9i | Build `modular-shop` reference application | YT-057, YT-054, YT-056 | Catalog/cart/orders/identity composition, failure/isolation, no plugin/DI/ORM + reviewer PASS | Todo |
-| YT-059 | P1 | L | M9j | Audit API friction, classify contracts and freeze M9 evidence | YT-058 | Public API inventory, Stable Candidate/Experimental/Internal, complete regression, final reviewer PASS | Todo |
+| YT-055 | P1 | M | M9f | Build `sse-notifications` | YT-054 | [M9f evidence](M9F-VERIFICATION.md): 163 tests/5 doctests, bounded replay/heartbeat/backpressure/reconnect and isolation; reviewer `wc_job_fa8KJiTxGRuWIEDF` PASS | Done |
+| YT-056 | P1 | L | M9g | Build `multi-island-dashboard` | YT-055 | [M9g evidence](M9G-VERIFICATION.md): 169 tests/5 doctests, separate bundles/lifecycles, Chrome/Firefox fallback/isolation; reviewer `wc_job_OMstvGrtDiKZ5p6C` PASS | Done |
+| YT-057 | P1 | L | M9h | Build security-bounded `auth-notes` | YT-056, YT-046 | [M9h evidence](M9H-VERIFICATION.md): 181 tests/5 doctests, synthetic auth, Session rotation, CSRF/IDOR/isolation; reviewer `wc_job_EgSLng_VafIvs3ju` PASS | Done |
+| YT-058 | P1 | L | M9i | Build `modular-shop` reference application | YT-057, YT-054, YT-056 | [M9i evidence](M9I-VERIFICATION.md): 190 tests/5 doctests, typed modules, rollback/idempotency/auth/disabled-module isolation; final reviewer `wc_job_zbWS7OSbUtaKzYcn` PASS | Done |
+| YT-059 | P1 | L | M9j | Audit API friction, classify contracts and freeze M9 evidence | YT-058 | [M9j evidence](M9J-VERIFICATION.md): 190 tests/5 doctests, native/browser/provider/isolation freeze, 170-export inventory; final reviewer `wc_job_QkQkovlBlvrhPxCE` PASS | Done |
+
+## M10 — Release engineering and production-security qualification
+
+M10 converts evidence from [M9](M9J-VERIFICATION.md) and the [CI/security review](CI-SECURITY-REVIEW.md) into explicit release gates. These items do not authorize publication or deployment. External repository-setting changes and release decisions require separate maintainer approval.
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-060 | P0 | S | M10a | Choose repository/crate licenses and vulnerability-reporting policy | YT-059 | Committed license files, crate metadata and reviewed `SECURITY.md`; maintainer decision recorded | Blocked |
+| YT-061 | P0 | M | M10b | Protect `master` and enable repository security automation | YT-059 | Required CI checks, branch rules, Dependabot, secret/code scanning and action policy verified from GitHub settings | Todo |
+| YT-062 | P1 | L | M10c | Define SemVer/API compatibility and document metadata contract | YT-059 | Compile-level compatibility fixtures, migration policy and typed language/head decision with independent reviewer | Todo |
+| YT-063 | P0 | L | M10d | Produce production edge/authentication threat model | YT-057, YT-059 | TLS/trusted-header, IdP, rate-limit, CSRF/CORS, secret rotation and authorization ownership reviewed | Todo |
+| YT-064 | P1 | L | M10e | Design reproducible release artifacts and supply-chain evidence | YT-060, YT-062 | License/source allowlist, SBOM, checksums, provenance/signing, approvals and rollback evidence | Todo |
+| YT-065 | P1 | L | M10f | Add scheduled platform/browser/accessibility qualification | YT-059 | Hosted Firefox plus declared OS/browser/IME/accessibility matrix with bounded artifacts and cleanup | Todo |
+| YT-066 | P1 | L | M10g | Qualify distributed providers and operational behavior | YT-046, YT-054, YT-057, YT-059 | Session/storage topology, backup/restore, load, cancellation, observability and recovery evidence | Todo |
+| YT-067 | P0 | M | M10h | Obtain external production-security review | YT-063, YT-064, YT-066 | Independent findings resolved or explicitly accepted against a fixed production topology | Todo |
 
 ## Ready queue
 
-**First:** `YT-019` has reproducible local acceptance/measurement evidence. `YT-020` cannot close the public release gate without maintainer licensing and declared support/security decisions; see [release readiness](RELEASE-READINESS.md).
+**First public-release decision:** `YT-060` requires the maintainer to choose licensing and a vulnerability-reporting policy. **First technically unblockable item:** `YT-062` can define the SemVer/document-metadata compatibility contract; `YT-061` can proceed in parallel when external GitHub setting changes are authorized. `YT-020` remains Blocked; see [release readiness](RELEASE-READINESS.md).
 
-**Current implementation milestone:** YT-030–YT-054 are locally Done. M9e SQLite CRUD repaired a reviewer-discovered incomplete-schema P2; repeat reviewer `wc_job_aVBprnEsYc8o3ubi` returned PASS and the exact eighth catalog entry was promoted. YT-055 SSE Notifications is next; YT-056–YT-059 remain Todo. Public publication (`YT-020`) remains separately blocked.
+**Current implementation milestone:** YT-030–YT-059 and M9 are locally Done at prototype scope. The post-M9 CI/security round patches a RustSec advisory, verifies Rust 1.88 locally and prepares a stronger hosted workflow; remote terminal CI evidence remains required after push. M10 tasks YT-060–YT-067 remain decision/qualification work. Public publication (`YT-020`) stays Blocked.
 
 **Do not start before prerequisites:** Generalized hydration, arbitrary event forwarding, WebGPU, and resumability remain out of scope.
 

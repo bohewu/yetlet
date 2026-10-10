@@ -2,7 +2,7 @@
 
 **Planning task:** YT-049 / M9p
 **Date:** 2026-10-09
-**Status:** Planning independently reviewed (`wc_job_fr93PI1YLOtR3KjE` PASS); implementation proceeds through the per-stage gates recorded below and in the Backlog.
+**Status:** Complete. Planning and YT-050–YT-059 implementation/freeze each passed their independent reviewer gates; public release remains separately Blocked.
 **Baseline:** M8 milestone commit `742e0d4909cc9b132d81b78e12bbb66d5bf60f57`, locally complete at prototype scope.
 **Related:** [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [Samples](SAMPLES.md), [Extensions](EXTENSIONS.md), [Release readiness](RELEASE-READINESS.md), [ADR 0005](adr/0005-opt-in-capability-modules.md), [ADR 0006](adr/0006-handler-first-mvc-optional.md), [ADR 0007](adr/0007-bounded-keyed-dom-and-local-graph.md).
 
@@ -27,14 +27,14 @@ The **display order** preserves the agreed nine-sample list. The three supplemen
 | 2 | `todo` | Verified in M8 catalog | Shared SSR/browser UI, typed actions, keyed local updates and Search Island |
 | 3 | `rest-api` | Verified in M8 catalog | Native JSON API, validation, typed HTTP errors, no WASM |
 | 4 | `session-cart` | Verified in M8 catalog | Explicit Session, strict SSR forms, CSRF and cookie lifecycle |
-| 5 | `auth-notes` | Planned; security-sensitive | Authentication versus authorization, private notes and identity isolation |
+| 5 | `auth-notes` | M9h verified; security-focused reviewer PASS | Authentication versus authorization, private notes and identity isolation |
 | 6 | `middleware-lab` | M9b verified; reviewer PASS | Global/group/route Tower middleware, `RequestContext`, short circuit |
 | 7 | `file-server` | M9d verified; independent reviewer PASS | Static files, safe upload/download, streaming and response headers |
-| 8 | `sse-notifications` | Planned | Optional SSE, bounded event streams, disconnect and reconnection |
-| 9 | `modular-shop` | Planned; integration reference app | Explicit feature modules, catalog/cart/orders, selected capabilities |
+| 8 | `sse-notifications` | M9f verified; repeat reviewer PASS after input-validation repair | Optional SSE, bounded event streams, disconnect and reconnection |
+| 9 | `modular-shop` | M9i verified; repeat reviewer PASS | Explicit feature modules, catalog/cart/orders, selected capabilities |
 | 10 | `forms-validation` | M9c verified; reviewer PASS after accessibility repair | SSR-only form input, errors, accessibility and PRG boundary |
 | 11 | `sqlite-crud` | M9e verified; repeat reviewer PASS after schema repair | Direct SQL, transaction/persistence behavior, opt-in DB driver |
-| 12 | `multi-island-dashboard` | Planned supplement | Multiple independently loaded/mounted/disposed browser islands |
+| 12 | `multi-island-dashboard` | M9g verified; final reviewer PASS after fallback-evidence repairs | Multiple independently loaded/mounted/disposed browser islands |
 
 M8 catalogued `todo`, `rest-api` and `session-cart`; M9a adds independently reviewed, runnable `hello-world` (reviewer `wc_job_Htk-Quo_aFExMJs3` PASS). Merely discussing a planned sample **must not** mark it `verified` or insert a non-runnable catalog entry. `hello-world` must become a distinct, user-facing sample or be deliberately cataloged with a verified supported command; the existing `yetlet-server-axum --example minimal` is not automatically a verified catalog application.
 
