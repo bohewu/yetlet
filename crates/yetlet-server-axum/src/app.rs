@@ -86,7 +86,7 @@ where
 
     /// Compose an explicitly selected module at setup, not on each request.
     ///
-    /// A module is an ordinary Rust function/closure App<S> -> App<S>. It can
+    /// A module is an ordinary Rust function/closure `App<S> -> App<S>`. It can
     /// install native Tower layers, routes and typed extensions. No scanning,
     /// global registry, implicit initialization or capability field is added.
     pub fn configure(self, configure: impl FnOnce(Self) -> Self) -> Self {

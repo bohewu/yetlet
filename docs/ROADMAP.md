@@ -230,16 +230,26 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 
 **Goal:** turn prototype evidence into explicit support, governance and production-security decisions without expanding Yetlet core or implying release approval.
 
-- [ ] **YT-060 / M10a:** Maintainer selects licenses and vulnerability-reporting policy; currently Blocked on an explicit decision.
-- [ ] **YT-061 / M10b:** Protect `master`, require CI and enable dependency/secret/code-scanning controls after external-setting authorization.
-- [ ] **YT-062 / M10c:** Define SemVer scope, compile-level compatibility fixtures and a typed document language/head contract.
-- [ ] **YT-063 / M10d:** Define the production TLS/IdP/rate-limit/CSRF/secret/authorization threat model.
-- [ ] **YT-064 / M10e:** Define reproducible artifacts, license/source policy, SBOM, provenance, signing and rollback.
-- [ ] **YT-065 / M10f:** Add a scheduled platform/browser/accessibility/IME matrix.
-- [ ] **YT-066 / M10g:** Qualify distributed Session/storage, backup/restore, load, observability and recovery.
-- [ ] **YT-067 / M10h:** Obtain external production-security review after the target topology is fixed.
+- [x] **YT-060 / M10a:** Dual `MIT OR Apache-2.0` license, package metadata, security policy and maintainer-directed/no-external-PR contribution policy; independent reviewer PASS.
+- [x] **YT-061 / M10b:** Collaborator-only PRs, protected `master`, required checks, SHA-pinned GitHub-owned Actions and Dependabot configured; unsupported private-state security services recorded; repeat reviewer PASS.
+- [x] **YT-062 / M10c:** Minimal title/language document metadata, provisional compatibility policy, legacy generic compile fixtures, complete stable/MSRV validation and repeat reviewer PASS.
+- [x] **YT-063 / M10d:** Product-neutral production edge/authentication threat model, private-cache/CSRF repair, documentation validation and repeat security-focused reviewer PASS.
+- [x] **YT-064 / M10e:** Release design/preflight, actual license/source checker, 41 native CycloneDX SBOMs, 16 checksum tests and independent reviewer PASS; not signed/reproducible release activation.
+- [ ] **YT-065 / M10f — In progress:** Scheduled/manual Ubuntu/Windows/macOS and Firefox workflow source plus four local Firefox suites and source reviewer PASS; new hosted/manual qualification pending.
+- [ ] **YT-066 / M10g — In progress:** Actual local Session isolation/restart and two-process SQLite backup/restore/concurrency PASS with reviewer; distributed topology, HA, outage/load and production recovery remain unqualified.
+- [ ] **YT-067 / M10h — Blocked:** External assessment handoff prepared; no appointed auditor, approved immutable release/deployment or completed distributed gate. Local document review does not satisfy an external audit.
 
 **Post-M9 hardening evidence (2026-10-10):** [CI/security review](CI-SECURITY-REVIEW.md) records the first hosted CI failure, bounded browser-harness repair, full-SHA Action pins, read-only permissions, patched `RUSTSEC-2026-0009`, Rust 1.88 verification and the remaining GitHub/security/release gaps. GitHub Actions run `38024582602` completed successfully for commit `86c30a42114ca74f4197f0389707861308a844a7`, including both required jobs and all Chrome release suites.
+
+**M10 sequencing decision (2026-10-10):** The maintainer selected `MIT OR Apache-2.0` and a maintainer-directed model that does not accept public pull requests. YT-060/YT-061 now implement those policies without changing repository visibility. YT-062 retains the tiny/handler-first contract: title plus validated root language only, no arbitrary head manager, CSP DSL, DI, MVC or plugin subsystem. See [M10a](M10A-VERIFICATION.md), [M10b](M10B-VERIFICATION.md), and [M10c planning verification](M10C-PLANNING-VERIFICATION.md).
+
+**M10a/M10b evidence (2026-10-10):** All 28 workspace packages carry `MIT OR Apache-2.0` and the canonical repository URL; all 19 examples are nonpublishable, and all nine library package archives contain both license texts. Reviewer `wc_job_MPF4l2t8JaJXBguv` returned PASS. GitHub remains Private with collaborator-only PR creation, squash-only merging, admin-enforced protected `master`, both required CI checks, GitHub-owned SHA-pinned Actions, read-only workflow tokens and Dependabot alerts/security fixes. First governance reviewer found missing check-run evidence and stale monitoring wording; both were repaired, and repeat reviewer `wc_job_lu2WynqvKYemLlmd` returned PASS. Public-only PVR/secret-scanning/CodeQL activation remains a visibility-transition checklist item.
+
+**M10c / YT-062 evidence (2026-10-10):** Legacy page/render signatures remain; `LanguageTag`, `DocumentMetadata`, metadata-aware render functions and one compile compatibility fixture add explicit root-language ownership. Forms Validation adopts root `lang="en"` and removes its nested workaround. First reviewer `wc_job_VWOJoR-lV3PAyS_-` found a narrowed `Page::new` generic bound; the exact `Into<Cow<'static, str>>` contract and borrowed/owned generic regression were restored, complete stable/MSRV evidence reran, and repeat reviewer `wc_job_rz9Ci3gWOLfLKdqN` returned PASS. The bounded API remains Experimental; see [M10c verification](M10C-VERIFICATION.md).
+
+**M10d / YT-063 evidence (2026-10-10):** Planning reviewer `wc_job__wg1bHF6DG3ztjjg` passed. The [Threat Model](THREAT-MODEL.md) defines a product-neutral TLS edge, forwarding-header, OIDC, Session/CSRF, authorization, rate-limit, CORS, secrets, telemetry and availability contract while keeping those capabilities external/opt-in. First completed reviewer `wc_job_UPiINEJpZ28tLFyl` found missing private-cache isolation and an overbroad CSRF-token prohibition; both were repaired, documentation validation reran, and repeat reviewer `wc_job_AlEmAzdabqC_tuHv` returned PASS. The document remains requirements evidence, not production certification; see [M10d verification](M10D-VERIFICATION.md).
+
+**Remaining M10 execution evidence (2026-10-10):** [Approved plan](M10-REMAINING-PLAN.md), [release preflight](M10E-VERIFICATION.md), [compatibility matrix](M10F-VERIFICATION.md), [local operations](M10G-VERIFICATION.md) and [external audit handoff](M10H-VERIFICATION.md) keep executed evidence separate from unperformed hosted/distributed/external gates. No runtime dependencies, core subsystems or ORM were added.
 
 ## Post-MVP research
 

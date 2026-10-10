@@ -4,6 +4,9 @@ description = "Minimal native Yetlet SSR sample without optional providers"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
 
 [dependencies]
 axum.workspace = true

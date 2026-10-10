@@ -4,6 +4,9 @@ description = "Shared renderer-independent Yetlet Todo components"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
 
 [dependencies]
 yetlet-core = { path = "../../crates/yetlet-core" }

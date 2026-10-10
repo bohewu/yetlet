@@ -9,7 +9,7 @@ use axum::{
 };
 use serde::Deserialize;
 use yetlet_core::{Element, View};
-use yetlet_server_axum::{App, Page};
+use yetlet_server_axum::{App, DocumentMetadata, LanguageTag, Page};
 
 const MAX_FORM_BYTES: usize = 2 * 1024;
 
@@ -124,13 +124,22 @@ fn form_view(name: &str, email: &str, errors: &Validation) -> View {
                 .child(View::text("Validate (no data saved)")),
         );
     Element::new("main")
-        .attribute("lang", "en")
         .child(Element::new("h1").child(View::text("Yetlet Stateless Form")))
         .child(Element::new("p").child(View::text(
             "This demonstration validates input but never saves or authenticates a user.",
         )))
         .child(form)
         .into()
+}
+
+fn english_page(title: &str, view: impl Into<View>) -> Page {
+    Page::with_metadata(
+        DocumentMetadata::with_language(
+            title,
+            LanguageTag::new("en").expect("static language tag"),
+        ),
+        view,
+    )
 }
 
 fn no_store(value: impl IntoResponse) -> Response {
@@ -146,7 +155,7 @@ fn no_store(value: impl IntoResponse) -> Response {
 }
 
 async fn form_page() -> Response {
-    no_store(Page::new(
+    no_store(english_page(
         "Yetlet | Stateless Form",
         form_view("", "", &Validation::default()),
     ))
@@ -161,7 +170,7 @@ async fn submit(form: Result<Form<Input>, FormRejection>) -> Response {
     if errors.has_errors() {
         return no_store((
             StatusCode::UNPROCESSABLE_ENTITY,
-            Page::new(
+            english_page(
                 "Yetlet | Form errors",
                 form_view(&input.name, &input.email, &errors),
             ),
@@ -173,10 +182,9 @@ async fn submit(form: Result<Form<Input>, FormRejection>) -> Response {
 }
 
 async fn success() -> Response {
-    no_store(Page::new(
+    no_store(english_page(
         "Yetlet | Form accepted",
         Element::new("main")
-            .attribute("lang", "en")
             .child(Element::new("h1").child(View::text("Form accepted")))
             .child(Element::new("p").child(View::text("No data was saved."))),
     ))
@@ -231,7 +239,8 @@ mod tests {
         let (status, headers, html) = send(Method::GET, "/form", None, None).await;
         assert_eq!(status, StatusCode::OK);
         assert!(html.contains("Yetlet Stateless Form"));
-        assert!(html.contains("<main lang=\"en\">"));
+        assert!(html.starts_with("<!doctype html><html lang=\"en\">"));
+        assert!(!html.contains("<main lang="));
         assert!(html.contains("for=\"name\""));
         assert!(html.contains("for=\"email\""));
         assert!(html.contains("action=\"/form/submit\""));
@@ -256,7 +265,8 @@ mod tests {
         )
         .await;
         assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
-        assert!(html.contains("<main lang=\"en\">"));
+        assert!(html.starts_with("<!doctype html><html lang=\"en\">"));
+        assert!(!html.contains("<main lang="));
         assert!(html.contains("name-error"));
         assert!(html.contains("email-error"));
         assert!(html.contains("aria-invalid=\"true\""));
@@ -303,7 +313,8 @@ mod tests {
         let (status, _, html) = send(Method::GET, "/form/success", None, None).await;
         assert_eq!(status, StatusCode::OK);
         assert!(html.contains("No data was saved."));
-        assert!(html.contains("<main lang=\"en\">"));
+        assert!(html.starts_with("<!doctype html><html lang=\"en\">"));
+        assert!(!html.contains("<main lang="));
         assert!(!html.contains("Ada Lovelace"));
         let (_, _, empty_form) = send(Method::GET, "/form", None, None).await;
         assert!(empty_form.contains("value=\"\""));

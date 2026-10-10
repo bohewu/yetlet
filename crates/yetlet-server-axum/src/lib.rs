@@ -2,11 +2,13 @@
 
 mod app;
 mod context;
+mod document;
 pub mod middleware;
 pub mod response;
 pub use app::App;
 pub use axum::http;
 pub use context::RequestContext;
+pub use document::{DocumentMetadata, LanguageTag, LanguageTagError};
 pub use response::Page;
 
 /// Native Axum extractors; no separate Yetlet model-binding implementation.
@@ -47,21 +49,40 @@ impl IntoResponse for HtmlPageError {
     }
 }
 
-/// Build a complete HTML document without inline scripts or external runtime.
+/// Build a complete HTML document with the legacy default language.
+///
+/// Existing callers remain source-compatible. Use
+/// [`render_document_with_metadata`] when the root language is explicit.
 pub fn render_document(title: &str, view: &View) -> Result<String, RenderError> {
-    let mut html = String::from(
-        "<!doctype html><html lang=\"zh-Hant\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>",
-    );
-    html.push_str(&escape_text(title));
+    render_document_with_metadata(&DocumentMetadata::new(title), view)
+}
+
+/// Build a complete HTML document from bounded title/language metadata.
+pub fn render_document_with_metadata(
+    metadata: &DocumentMetadata,
+    view: &View,
+) -> Result<String, RenderError> {
+    let mut html = String::from("<!doctype html><html lang=\"");
+    html.push_str(metadata.language().as_str());
+    html.push_str("\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>");
+    html.push_str(&escape_text(metadata.title()));
     html.push_str("</title></head><body>");
     html.push_str(&render_to_string(view)?);
     html.push_str("</body></html>");
     Ok(html)
 }
 
-/// Turn the view into a normal HTTP response. No websocket/circuit is created.
+/// Turn a view into a normal HTTP response using the legacy metadata default.
 pub fn render_page(title: &str, view: &View) -> Result<Response, HtmlPageError> {
-    let body = render_document(title, view)?;
+    render_page_with_metadata(&DocumentMetadata::new(title), view)
+}
+
+/// Turn a view and bounded document metadata into a normal HTTP response.
+pub fn render_page_with_metadata(
+    metadata: &DocumentMetadata,
+    view: &View,
+) -> Result<Response, HtmlPageError> {
+    let body = render_document_with_metadata(metadata, view)?;
     let mut response = Html(body).into_response();
     response.headers_mut().insert(
         header::CONTENT_SECURITY_POLICY,
@@ -72,7 +93,10 @@ pub fn render_page(title: &str, view: &View) -> Result<Response, HtmlPageError> 
 
 #[cfg(test)]
 mod tests {
-    use super::{DEFAULT_CSP, render_document, render_page};
+    use super::{
+        DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document, render_document_with_metadata,
+        render_page, render_page_with_metadata,
+    };
     use axum::http::header;
     use yetlet_core::{Element, View};
 
@@ -81,17 +105,34 @@ mod tests {
         let view: View = Element::new("main").child(View::text("<safe>")).into();
         let document = render_document("Page <title>", &view).unwrap();
 
-        assert!(document.starts_with("<!doctype html>"));
+        assert!(document.starts_with("<!doctype html><html lang=\"zh-Hant\">"));
         assert!(document.contains("<title>Page &lt;title&gt;</title>"));
         assert!(document.contains("<main>&lt;safe&gt;</main>"));
         assert!(!document.contains("<script"));
     }
 
     #[test]
-    fn response_emits_strict_csp() {
-        let response = render_page("Todo", &View::text("ok")).unwrap();
+    fn explicit_metadata_owns_the_root_language_only() {
+        let metadata =
+            DocumentMetadata::with_language("Page <title>", LanguageTag::new("en").unwrap());
+        let document = render_document_with_metadata(&metadata, &View::text("<safe>")).unwrap();
+        assert!(document.starts_with("<!doctype html><html lang=\"en\">"));
+        assert!(document.contains("<title>Page &lt;title&gt;</title>"));
+        assert!(!document.contains("<script"));
+        assert!(!document.contains("unsafe-inline"));
+    }
+
+    #[test]
+    fn response_paths_emit_the_same_strict_csp() {
+        let legacy = render_page("Todo", &View::text("ok")).unwrap();
+        let metadata = DocumentMetadata::with_language("Todo", LanguageTag::new("en").unwrap());
+        let explicit = render_page_with_metadata(&metadata, &View::text("ok")).unwrap();
         assert_eq!(
-            response.headers()[header::CONTENT_SECURITY_POLICY],
+            legacy.headers()[header::CONTENT_SECURITY_POLICY],
+            DEFAULT_CSP
+        );
+        assert_eq!(
+            explicit.headers()[header::CONTENT_SECURITY_POLICY],
             DEFAULT_CSP
         );
         assert!(!DEFAULT_CSP.contains("unsafe-inline"));

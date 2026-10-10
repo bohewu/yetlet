@@ -4,6 +4,9 @@ description = "Runnable native Axum/Tower middleware and RequestContext lab"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
 
 [dependencies]
 axum.workspace = true

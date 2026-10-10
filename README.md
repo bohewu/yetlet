@@ -53,6 +53,23 @@ let app: axum::Router = App::new()
 
 For typed parameters or application errors, use `.get` with native `Path`, `Query`, `State`, `Json` extractors and return `Page::new(title, view)` or `Result<Page, E>`. `App::page` is specifically a no-argument async View-handler convenience; no duplicate model binder is introduced. `Page` retains escaped SSR, strict CSP and generic 500 rendering errors. Json, Redirect and status/header tuples retain Axum semantics.
 
+Pages needing an explicit root language use the bounded metadata API without changing the default path:
+
+```rust
+use yetlet_core::View;
+use yetlet_server_axum::{DocumentMetadata, LanguageTag, Page};
+
+let page = Page::with_metadata(
+    DocumentMetadata::with_language(
+        "Hello",
+        LanguageTag::new("en").expect("static language tag"),
+    ),
+    View::text("Welcome"),
+);
+```
+
+The metadata contract is deliberately only title + language. Charset/viewport stay fixed and CSP remains server response policy; Yetlet does not add an arbitrary head manager or DSL. See [Compatibility Policy](docs/COMPATIBILITY.md) and [M10c plan](docs/M10C-PLAN.md).
+
 `configure`/`try_configure` execute ordinary module setup functions once at application construction. Providers compose native scoped middleware and typed request/application state. The Todo server explicitly selects `yetlet-request-id`; the M8c cart explicitly selects `yetlet-session` only for `/cart`. A minimal app depends on neither. See [Extensions](docs/EXTENSIONS.md), [complete M6 evidence](docs/M6-VERIFICATION.md) and [M8c evidence](docs/M8C-VERIFICATION.md).
 
 A runnable provider-free example is available with `cargo run -p yetlet-server-axum --example minimal`.
@@ -245,6 +262,16 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 
 **Known limitations:** Only the production Todo local list uses the promoted keyed graph; remote Todo results and Search result updates retain bounded subtree replacement. The fixed keyed/static-slot authoring shape, text-input/focus policy and conditional slot remain experimental. Nested/general component trees, async effects, IME/mobile/WebKit coverage and generic hydration/resumability remain absent. The Todo API and Session cart are process-local/in-memory; the Session proof is anonymous, single-node and not production auth/CSRF qualification. Durable persistence, stable API, full IME/a11y matrix and cross-framework benchmarks remain absent. See [M7i verification](docs/M7I-VERIFICATION.md), [M8c verification](docs/M8C-VERIFICATION.md) and [release readiness](docs/RELEASE-READINESS.md).
 
+## Governance, security, and license
+
+Yetlet is a maintainer-directed project. External pull requests are not accepted; repository settings restrict pull-request creation to collaborators so maintainers can still use PRs and required CI internally. Reproducible bugs, compatibility reports, documentation feedback, and focused design proposals are welcome through Issues. Security reports must follow [SECURITY.md](SECURITY.md) and must not be posted publicly. See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete policy.
+
+Yetlet is dual-licensed under your choice of [MIT](LICENSE-MIT) or [Apache License 2.0](LICENSE-APACHE). Workspace packages carry the SPDX expression `MIT OR Apache-2.0`; example and application packages remain `publish = false`. The license permits forks and independent modifications but does not require the upstream project to accept external code contributions.
+
+## Qualification status
+
+M10 release-supply-chain design/preflight is independently reviewed. Four local Firefox release/keyboard suites and real local Session/SQLite operations passed with owned resource cleanup. The new scheduled/manual workflow is source-only until a separately authorized maintainer PR/merge and actual hosted execution. Windows/macOS, real IME/screen-reader coverage, distributed-provider qualification and external production-security assessment remain open. See the evidence matrix below; local checksums/SBOMs are unsigned development evidence, not publication approval.
+
 ## Documentation
 
 - [Architecture and module boundaries](docs/ARCHITECTURE.md)
@@ -284,6 +311,27 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 - [Public API contract classification](docs/API-CONTRACTS.md)
 - [M9j final compatibility and evidence freeze](docs/M9J-VERIFICATION.md)
 - [Post-M9 CI and security review](docs/CI-SECURITY-REVIEW.md)
+- [Pre-public compatibility policy](docs/COMPATIBILITY.md)
+- [M10c compatibility/document metadata plan](docs/M10C-PLAN.md)
+- [M10c planning reviewer evidence](docs/M10C-PLANNING-VERIFICATION.md)
+- [M10c implementation verification](docs/M10C-VERIFICATION.md)
+- [M10d production edge/authentication threat-model plan](docs/M10D-PLAN.md)
+- [M10d planning reviewer evidence](docs/M10D-PLANNING-VERIFICATION.md)
+- [Production edge and authentication threat model](docs/THREAT-MODEL.md)
+- [M10d threat-model verification](docs/M10D-VERIFICATION.md)
+- [M10a license/security-policy verification](docs/M10A-VERIFICATION.md)
+- [M10b repository-governance verification](docs/M10B-VERIFICATION.md)
+- [Remaining M10 qualification plan](docs/M10-REMAINING-PLAN.md)
+- [Release supply-chain design and preflight](docs/RELEASE-SUPPLY-CHAIN.md)
+- [M10e release verification](docs/M10E-VERIFICATION.md)
+- [Platform/browser/accessibility matrix](docs/QUALIFICATION-MATRIX.md)
+- [M10f local and pending hosted evidence](docs/M10F-VERIFICATION.md)
+- [Provider operations and local limitations](docs/PROVIDER-OPERATIONS.md)
+- [M10g local operational evidence](docs/M10G-VERIFICATION.md)
+- [External security review handoff](docs/EXTERNAL-SECURITY-REVIEW.md)
+- [M10h handoff preparation status](docs/M10H-VERIFICATION.md)
+- [Contribution policy](CONTRIBUTING.md)
+- [Security policy](SECURITY.md)
 - [Module composition and optional providers](docs/EXTENSIONS.md)
 - [Prototype release readiness and blockers](docs/RELEASE-READINESS.md)
 - [ADR 0001](docs/adr/0001-separation-of-concerns.md)
@@ -294,4 +342,4 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 - [ADR 0006 — Handler-first and optional MVC](docs/adr/0006-handler-first-mvc-optional.md)
 - [ADR 0007 — Bounded keyed DOM and local graph](docs/adr/0007-bounded-keyed-dom-and-local-graph.md)
 
-M0–M9 are locally complete at prototype scope. M8 freezes the runnable sample contract; M9 adds twelve independently reviewed applications, a 170-export compatibility classification and complete native/browser/provider evidence freeze. The post-M9 CI/security round patches `RUSTSEC-2026-0009`, raises and verifies the Rust 1.88 MSRV, and hardens hosted CI. GitHub Actions run `38024582602` completed successfully for commit `86c30a42114ca74f4197f0389707861308a844a7`, including both the Rust 1.88 job and the stable native/samples/Chrome job. Repeat reviewers and green CI do not make Yetlet SemVer-stable or production-ready. SQL access remains application opt-in and Yetlet has no built-in ORM or mandatory DB layer. Public-release readiness (`YT-020`) is **Blocked** pending licensing, compatibility/support, document metadata, repository governance and production security policy. Current code is not a production release.
+M0–M9 are locally complete at prototype scope. M8 freezes the runnable sample contract; M9 adds twelve independently reviewed applications, a 170-export compatibility classification and complete native/browser/provider evidence freeze. The post-M9 CI/security round patches `RUSTSEC-2026-0009`, raises and verifies the Rust 1.88 MSRV, and hardens hosted CI. GitHub Actions run `38024582602` completed successfully for commit `86c30a42114ca74f4197f0389707861308a844a7`, including both the Rust 1.88 job and the stable native/samples/Chrome job. M10 adds the bounded document contract, threat model, dual-license/security policy and maintainer-only governance configuration. Repeat reviewers and green CI do not make Yetlet SemVer-stable or production-ready. SQL access remains application opt-in and Yetlet has no built-in ORM or mandatory DB layer. Public-release readiness (`YT-020`) is **Blocked** pending final public-transition scanner/reporting activation, compatibility/support, release supply chain, provider operations and external production-security review. Current code is not a production release.

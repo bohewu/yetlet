@@ -4,6 +4,8 @@ description = "Safe native HTML serializer for Yetlet views"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
 
 [dependencies]
 yetlet-core = { path = "../yetlet-core" }

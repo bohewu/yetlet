@@ -4,6 +4,9 @@ description = "Bounded native file upload and streaming download sample"
 version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
 
 [dependencies]
 axum = { workspace = true, features = ["multipart"] }
