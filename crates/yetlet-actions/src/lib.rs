@@ -97,7 +97,10 @@ impl HttpExecutor {
     pub fn new(endpoint: &str) -> Result<Self, ActionError> {
         if !endpoint.starts_with('/')
             || endpoint.starts_with("//")
-            || endpoint.contains(['?', '#', '\\', '\r', '\n'])
+            || endpoint.contains(['?', '#', '\\'])
+            // URL parsing strips ASCII TAB/CR/LF and can turn /<TAB>/host
+            // into an off-origin //host URL unless controls are rejected.
+            || endpoint.bytes().any(|byte| byte.is_ascii_control())
         {
             return Err(ActionError::InvalidEndpoint);
         }
@@ -192,9 +195,29 @@ mod tests {
 
     #[test]
     fn http_executor_requires_explicit_same_origin_path() {
-        assert!(HttpExecutor::new("/api/todos").is_ok());
-        assert!(HttpExecutor::new("https://example.org/api").is_err());
-        assert!(HttpExecutor::new("//example.org/api").is_err());
-        assert!(HttpExecutor::new("/api/todos?token=secret").is_err());
+        assert_eq!(
+            HttpExecutor::new("/api/todos").unwrap().endpoint(),
+            "/api/todos"
+        );
+        assert!(HttpExecutor::new("/api/items/v2").is_ok());
+        for endpoint in [
+            "https://example.org/api",
+            "//example.org/api",
+            "/api/todos?token=secret",
+            "/api/todos#fragment",
+            "/api\\commands",
+            "/\t/attacker.example/api",
+            "/\r/attacker.example/api",
+            "/\n/attacker.example/api",
+            "/\0/attacker.example/api",
+            "/\u{7f}/attacker.example/api",
+            "/api/\tcommands",
+        ] {
+            assert_eq!(
+                HttpExecutor::new(endpoint).unwrap_err(),
+                ActionError::InvalidEndpoint,
+                "unexpectedly accepted {endpoint:?}",
+            );
+        }
     }
 }

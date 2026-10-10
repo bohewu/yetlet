@@ -55,7 +55,7 @@ The complete sample/browser matrix is recorded in M9 evidence and the checked-in
 | Package license and vulnerability policy | **Selected and independently reviewed** | `MIT OR Apache-2.0`, `SECURITY.md` and maintainer-directed/no-external-PR policy PASS; GitHub private reporting must be enabled at Public transition |
 | Stable API/SemVer/support policy | **Partial** | M10c defines a provisional one-release-train/change-discipline policy and additive document metadata; public activation still requires an explicit release decision and YT-064 supply-chain evidence |
 | Artifact integrity/release supply chain | **Design/preflight complete; activation missing** | License/source policy, 41 native SBOMs and checksum tooling PASS; no signed provenance, independent reproducibility or immutable release promotion |
-| Codex-assisted internal security assessment | **Blocked; scan incomplete** | Maintainer replaced the external-assessor requirement; initial installed security-scan has no complete report after storage/platform blockers. No clean-result, external audit or certification claimed |
+| Codex-assisted internal security assessment | **Done at internal source/fix scope** | Official Standard scan on pre-patch `25bff77` reviewed 227/227 regular files and found one Low issue; local control-character guard, Rust/MSRV/WASM/Chrome regressions and independent reviewer PASS. Original older-source scan incomplete; patched tree not rescanned; no external audit/certification |
 
 ## Decisions before publication
 
@@ -70,4 +70,4 @@ The complete sample/browser matrix is recorded in M9 evidence and the checked-in
 
 Yetlet keeps native HTTP, renderer, browser and optional provider dependencies separable. Auth, Session, database, files, SSE, tracing, CORS, rate limiting and deployment capabilities remain explicit opt-ins. The SQLite examples do not introduce an ORM, `DbContext`, repository framework or default data provider.
 
-**Backlog status:** M0–M9 and YT-060–YT-064 are Done at their bounded prototype/policy/design scopes. YT-065 and YT-066 retain hosted/manual and distributed gates despite local reviewer PASS. Revised YT-067 is Blocked because its internal scan is incomplete, not because an outside assessor has not been hired. YT-020 remains Blocked; no local review, license, checksum or green CI automatically authorizes production or publication.
+**Backlog status:** M0–M9 and YT-060–YT-064 are Done at their bounded prototype/policy/design scopes. YT-065 and YT-066 retain hosted/manual and distributed gates despite local reviewer PASS. Revised YT-067 is Done at internal pre-patch source-scan and independently reviewed local Low finding correction scope. The earlier scan of an older snapshot remains incomplete, and no post-fix repository-wide rescan or production certification is claimed. YT-020 remains Blocked; no local review, license, checksum or green CI automatically authorizes production or publication.
