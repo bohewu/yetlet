@@ -43,7 +43,7 @@ The complete sample/browser matrix is recorded in M9 evidence and the checked-in
 | Rust 1.88 MSRV | Verified locally; hosted job added | Native tests/doctests and wasm32 checks are required in CI |
 | Current stable Rust | Verified locally | Format, strict Clippy, tests, doctests, smokes and wasm32 |
 | Dependency vulnerability audit | Passing after repair | `RUSTSEC-2026-0009` fixed by `time 0.3.47`; continuous service still absent |
-| Hosted GitHub Actions | **Pending new pushed run** | Earlier run failed only in Browser E2E harness; repaired workflow must reach terminal success |
+| Hosted GitHub Actions | **Verified on commit `86c30a4`** | Run `38024582602` completed successfully: Rust 1.88 MSRV and stable native/samples/Chrome jobs both passed |
 | Browser compatibility | **Partial** | Chrome 155 and Firefox 157 retained; no WebKit/mobile/IME matrix |
 | Accessibility | **Partial** | Semantic/error/focus tests exist; no complete screen-reader or IME audit |
 | Authentication/authorization | **Prototype only** | Synthetic Auth Notes is not an IdP/password/passkey/MFA design |

@@ -124,7 +124,7 @@ M10 converts evidence from [M9](M9J-VERIFICATION.md) and the [CI/security review
 
 **First public-release decision:** `YT-060` requires the maintainer to choose licensing and a vulnerability-reporting policy. **First technically unblockable item:** `YT-062` can define the SemVer/document-metadata compatibility contract; `YT-061` can proceed in parallel when external GitHub setting changes are authorized. `YT-020` remains Blocked; see [release readiness](RELEASE-READINESS.md).
 
-**Current implementation milestone:** YT-030–YT-059 and M9 are locally Done at prototype scope. The post-M9 CI/security round patches a RustSec advisory, verifies Rust 1.88 locally and prepares a stronger hosted workflow; remote terminal CI evidence remains required after push. M10 tasks YT-060–YT-067 remain decision/qualification work. Public publication (`YT-020`) stays Blocked.
+**Current implementation milestone:** YT-030–YT-059 and M9 are Done at prototype scope. The post-M9 CI/security round patches a RustSec advisory, verifies Rust 1.88 and passes GitHub Actions run `38024582602` on commit `86c30a42114ca74f4197f0389707861308a844a7`. M10 tasks YT-060–YT-067 remain decision/qualification work. Public publication (`YT-020`) stays Blocked.
 
 **Do not start before prerequisites:** Generalized hydration, arbitrary event forwarding, WebGPU, and resumability remain out of scope.
 

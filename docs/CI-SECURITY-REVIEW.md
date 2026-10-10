@@ -38,6 +38,8 @@ The checked-in workflow uses read-only repository permissions, cancels supersede
 | Browser/WASM | Eight wasm32 packages; Todo/Search, keyed lifecycle and multi-island Chrome release suites | Firefox is retained locally but not yet hosted/scheduled; no WebKit/mobile/IME matrix |
 | Artifacts | Release browser build, digest checks in repository tests and retained baseline artifact | No release SBOM, provenance, signing or public promotion pipeline |
 
+GitHub Actions run `38024582602` subsequently completed successfully for commit `86c30a42114ca74f4197f0389707861308a844a7`. The `Rust 1.88 MSRV` job passed native tests/doctests and the eight wasm32 packages. The `Stable native, samples, and Chrome` job passed documentation/catalog checks, format, strict Clippy, native tests/doctests, RustSec, all native smokes, eight wasm32 packages, release asset builds, all three Chrome E2E suites and the informational baseline artifact. This hosted result closes the prior Browser E2E repair gate for that commit.
+
 This workflow is intentionally a CI baseline, not a release pipeline. Renderer benchmarks remain informational and are not pass/fail performance thresholds.
 
 ## 3. Dependency and supply-chain finding
@@ -127,4 +129,4 @@ The `run-ci` artifacts under `.pipeline-output/20261010-yetlet-ci-audit/` are ig
 3. commit guard, milestone commit and push;
 4. a new GitHub Actions run observed to terminal status, with every required job/step reported.
 
-Until that remote run succeeds, the hosted CI repair is not complete. Regardless of CI outcome, public-release task `YT-020` remains Blocked.
+GitHub Actions run `38024582602` is the terminal hosted evidence for commit `86c30a42114ca74f4197f0389707861308a844a7`; both required jobs completed successfully. Future commits require their own terminal CI result. A green CI run does not close public-release task `YT-020`, which remains Blocked.

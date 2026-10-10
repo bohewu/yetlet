@@ -239,7 +239,7 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 - [ ] **YT-066 / M10g:** Qualify distributed Session/storage, backup/restore, load, observability and recovery.
 - [ ] **YT-067 / M10h:** Obtain external production-security review after the target topology is fixed.
 
-**Post-M9 hardening evidence (2026-10-10):** [CI/security review](CI-SECURITY-REVIEW.md) records the first hosted CI failure, bounded browser-harness repair, full-SHA Action pins, read-only permissions, patched `RUSTSEC-2026-0009`, Rust 1.88 local verification and the remaining GitHub/security/release gaps. A new pushed workflow must still reach terminal success before hosted CI repair is considered complete.
+**Post-M9 hardening evidence (2026-10-10):** [CI/security review](CI-SECURITY-REVIEW.md) records the first hosted CI failure, bounded browser-harness repair, full-SHA Action pins, read-only permissions, patched `RUSTSEC-2026-0009`, Rust 1.88 verification and the remaining GitHub/security/release gaps. GitHub Actions run `38024582602` completed successfully for commit `86c30a42114ca74f4197f0389707861308a844a7`, including both required jobs and all Chrome release suites.
 
 ## Post-MVP research
 
