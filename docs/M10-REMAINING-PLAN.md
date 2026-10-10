@@ -38,6 +38,8 @@ Write the future application-selected distributed-provider acceptance contract: 
 
 Local operations tests can PASS while **distributed-provider qualification remains blocked**. YT-066 must remain In progress until a concrete external topology/store is selected and its real cross-node/outage/rotation tests pass. Preserve this unmet gate; no substitute Python model counts as provider validation.
 
+> **Later maintainer decision (2026-10-10):** The following YT-067 external-review proposal is historical and **superseded**. The active acceptance now requires the internal Codex Security Standard scan with a canonical source/coverage/findings report and disposition of actionable issues. Paid outside assessment is optional, not a release or YT-067 prerequisite. See [M10h verification](M10H-VERIFICATION.md).
+
 ### YT-067 / M10h — External security review handoff
 
 Prepare `docs/EXTERNAL-SECURITY-REVIEW.md` with scope, threat-model links, exclusions, release/build identity, evidence index, known gaps, rules of engagement, required auditor deliverables, severity/fix/retest/acceptance and redaction requirements. Include an unambiguous gate checklist and blank attestation fields rather than invented results.

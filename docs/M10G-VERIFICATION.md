@@ -112,4 +112,4 @@ smallest authorized repair; do not add redundant soak/repeat runs.
 Open decisions: external topology/store integration, ownership of production
 RPO/RTO, backup encryption/retention, safe telemetry and actual distributed
 failure/rotation tests. YT-066 stays In progress. The next unblockable step is
-selection and qualification of the external topology. Main-agent local execution and independent source review have passed; YT-067's external assessment still requires its original prerequisites, and YT-020 stays Blocked.
+selection and qualification of the external topology. Main-agent local execution and independent source review have passed. The maintainer subsequently replaced YT-067's paid external-assessment requirement with an internal Codex Security source scan; see its separate current [M10h record](M10H-VERIFICATION.md). YT-020 stays Blocked.

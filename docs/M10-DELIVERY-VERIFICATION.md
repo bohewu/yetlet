@@ -34,15 +34,19 @@ WebCodex Job `wc_job_MUaVCKwQYsrSwseh` reached terminal exit 0:
 
 The image/vendor/build caches remain local development inputs. No deployment image or application container service was published or left running. Evidence lives under `target/m10-delivery/docker/`; this tests native behavior in one container environment, not container orchestration, distributed providers or production availability.
 
-## Codex-assisted security scan: incomplete
+## Original Codex-assisted security scan attempt: incomplete
 
-The installed `security-scan` skill from Codex Security 0.1.32 was actually invoked once against the current entire repository, not a diff or Deep scan. Coordinator Job `wc_job_oCTu5__mlpWYcsLr` completed as a process, but its semantic outcome was **incomplete**, not PASS.
+The installed `security-scan` skill from Codex Security 0.1.32 was invoked for an earlier then-current repository commit `3128d23591feee15ce976d7b83a56dcd587048d7`, not a diff or Deep scan. Coordinator Job `wc_job_oCTu5__mlpWYcsLr` completed as a process, but its semantic outcome was **incomplete**, not PASS.
 
 The authoritative scan ID is `580f6c9a-ded9-4f69-a3c9-16bbcc29ab97`. Capability preflight was ready. The coordinator reported ten fully reviewed files and terminated source-review workers; repository coverage and findings/severity totals were not finalized. The first canonical checkpoint failed because an ancestor of the scan output directory was group-writable without a sticky bit. After verifying ownership, the main session removed only the group-write bit from the owned Codex home directory (0775 to 0755); no credential or configuration file was edited.
 
 A continuation of the **same** scan was then rejected by the platform safety check before returning an execution/Job identity. It was not retried with different wording/tools, emulated, replaced by another scan, or converted into a handwritten report. There is no completed canonical report and no valid repository-wide clean-result or vulnerability count. The original coordinator is terminal; the registered incomplete scan is not evidence of active background workers.
 
-Under the maintainer's revised scope, YT-067 concerns internal automated/Codex-assisted source assessment only. It remains Blocked because this scan has no final report, not because an external auditor is unappointed. Neither successful CI nor a document reviewer closes this gap. An external engagement is optional future work and would need separate authorization.
+Under the maintainer's revised scope, YT-067 concerns internal automated/Codex-assisted source assessment only. At the time of this original attempt it remained Blocked because that scan had no final report, not because an external auditor was unappointed. Neither successful CI nor a document reviewer closes such a scan gap. An external engagement is optional future work and would need separate authorization.
+
+## Later current-source Standard scan
+
+A new official Codex Security 0.1.32 Standard scan was admitted for the independently updated, clean `master` source `25bff77ccc5a3641b30be27c4ca5d862c06f535d`. Scan `fc4d4af8-5864-4ace-b098-23ebfe249b31` reached terminal semantic completion, generating all canonical metadata and `report.md`; it reviewed 227/227 regular tracked files and 18 license symlinks and reported one Low finding (medium confidence), no Critical/High/Medium findings. The initial older-source scan remains incomplete and was neither resumed nor retroactively finalized. See [M10h verification](M10H-VERIFICATION.md) for the bounded `HttpExecutor` validation patch and actual regression/reviewer evidence. The detailed report remains in private scanner-owned state, not in the repository. Neither scan is an external audit or certification.
 
 ## Hosted qualification evidence
 
@@ -61,4 +65,4 @@ Real OS IME, screen-reader output, WebKit/mobile, zoom/conformance, production S
 
 ## Documentation closeout review
 
-The first documentation-only reviewer `wc_job_Ml51hE5u64rltNhd` found a P2: three older CI/security-summary statements still described completed hosted qualification as pending. Those statements were corrected to reference actual run `38043565238` while retaining unverified manual and distributed scopes. No platform test or source scan was rerun for this prose repair. A repeat document review checks evidence accounting only; it is not a substitute for the incomplete security scan.
+The first documentation-only reviewer `wc_job_Ml51hE5u64rltNhd` found a P2: three older CI/security-summary statements still described completed hosted qualification as pending. Those statements were corrected to reference actual run `38043565238` while retaining unverified manual and distributed scopes. No platform test or source scan was rerun for this prose repair. A repeat document review checks evidence accounting only; it was not a substitute for an actual security source scan. The later completed current-source scan and local finding remediation are independently recorded in M10h.
