@@ -1,16 +1,16 @@
 # Platform, Browser and Accessibility Qualification Matrix
 
-**Task:** YT-065 / M10f. **Current status:** In progress. Local Firefox release and forms keyboard tests passed; all new hosted lanes and manual IME/assistive-technology gates remain pending. This matrix supplies no accessibility conformance, SLA or production guarantee.
+**Task:** YT-065 / M10f. **Current status:** Automated local and hosted lanes PASS; In progress for manual IME/assistive-technology/device qualification. Run `38043565238` tested source `c38837835dac683b09194b475baab2d8eda5a875`. This matrix supplies no accessibility conformance, SLA or production guarantee.
 
 ## Coverage and evidence boundaries
 
 | Lane | Defined scope | Current YT-065 evidence | Historical evidence |
 |---|---|---|---|
-| Ubuntu 24.04 native | Stable Rust check, library tests and doctests for nine reusable crates | Not verified on hosted runner; source only | [M9j](M9J-VERIFICATION.md) local native workspace freeze; not this hosted lane |
-| Windows 2025 native | Same nine crates, native runner host target | Not verified; source only | No Windows qualification claimed |
-| macOS 15 native | Same nine crates, native runner host target | Not verified; source only | No macOS qualification claimed |
-| Ubuntu 24.04 Firefox | Release Todo/Search, keyed bindings, multi-island suites; SSR forms keyboard/semantic checks | Local Firefox 157.0: all four suites PASS; hosted lane not verified | M9j: three release suites PASS on local Firefox 157/geckodriver 0.37.1; forms keyboard suite did not exist |
-| Local Chrome | Existing required baseline workflow and existing three release suites | Current run pending; no new Chrome lane | M9j: three local release suites PASS on Chrome 155 |
+| Ubuntu 24.04 native | Stable Rust check, library tests and doctests for nine reusable crates | Hosted Rust 1.99, x86_64-unknown-linux-gnu: 80 tests/four doctests PASS | [M9j](M9J-VERIFICATION.md) local native workspace freeze; not this hosted lane |
+| Windows 2025 native | Same nine crates, native runner host target | Hosted Rust 1.99, x86_64-pc-windows-msvc: 80 tests/four doctests PASS | Separate authorized local Windows GNU Rust 1.88 run: 80/four PASS; not local MSVC |
+| macOS 15 native | Same nine crates, native runner host target | Hosted Rust 1.99, aarch64-apple-darwin: 80 tests/four doctests PASS | No x86_64 macOS qualification claimed |
+| Ubuntu 24.04 Firefox | Release Todo/Search, keyed bindings, multi-island suites; SSR forms keyboard/semantic checks | Local and hosted Firefox 157.0: all four suites PASS; hosted forms report cleanup PASS | M9j: three release suites PASS on local Firefox 157/geckodriver 0.37.1; forms keyboard suite did not exist |
+| Hosted Chrome baseline | Existing required baseline workflow and existing three release suites | Candidate PR run `38042614403`: all three Chrome release suites PASS; not a new local Chrome claim | M9j: three local release suites PASS on Chrome 155 |
 | WebKit/Safari desktop | Manual application journeys below | Not verified; no automated WebKit lane | No qualification claimed |
 | iOS Safari / Android Chrome | Real device touch, soft keyboard, viewport and zoom | Not verified; no mobile lane | No qualification claimed |
 | Real OS IME | Composition, candidate selection, caret and keyed input lifetime | Not verified; manual only | Existing synthetic keyboard/selection checks do not prove OS composition |
@@ -41,8 +41,7 @@ permissions. The existing `Rust 1.88 MSRV` and
 GitHub requires this workflow on the default branch for activation; schedules
 run there and may be delayed or dropped. Manual dispatch also depends on the
 default-branch workflow. Local uncommitted YAML cannot establish hosted PASS.
-A separately authorized maintainer PR/merge is required before actual hosted
-qualification. This task performs no push, dispatch or settings change. See
+The maintainer authorized that delivery: PR #1 was merged without bypass and run `38043565238` completed successfully. The workflow is now on the default branch; future schedule execution is not preclaimed. No repository visibility or branch-protection setting was changed by this delivery. See
 [GitHub trigger documentation](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows).
 
 The [official Ubuntu2404 runner image inventory](https://github.com/actions/runner-images/blob/main/images/ubuntu/Ubuntu2404-Readme.md)

@@ -1,12 +1,12 @@
 # External Security Review Handoff
 
-**Task:** YT-067 / M10h
-**Status:** Preparation only. No external assessment performed. YT-067 is Blocked; this handoff does not satisfy it.
+**Scope:** Optional future external engagement template; former YT-067 / M10h preparation.
+**Status:** Superseded as a current milestone requirement by the maintainer on 2026-10-10. YT-067 now uses an internal Codex-assisted scan; no external assessment has been purchased or performed. This template does not create a paid-assessor prerequisite.
 **Repository:** `bohewu/yetlet`, Private, maintainer-controlled contributions.
 
 ## 1. Mandate and independence
 
-Commission an external production-security assessment only after the maintainer approves the precise source, deployable artifacts, topology, auditor and rules of engagement. A local Codex role-directed reviewer can inspect this handoff and source changes, but cannot issue the independent external audit result requested by YT-067. Passing CI, checksums, a vulnerability scanner or a documentation review is not a substitute.
+Commission an external production-security assessment only after the maintainer approves the precise source, deployable artifacts, topology, auditor and rules of engagement. A local Codex role-directed reviewer can inspect this handoff and source changes, but cannot issue an independent external audit result. That distinction remains true even though current YT-067 no longer requires an external engagement. Passing CI, checksums, a vulnerability scanner or a documentation review is not a substitute.
 
 The current work authorizes no engagement, purchase, disclosure of the private repository, remote penetration testing, credentials, production access, release or deployment. No auditor identity, date, sign-off or assessment outcome has been invented. Do not send this repository or evidence to an outside service without separate approval.
 
@@ -70,9 +70,9 @@ For each material finding, maintain a record of owner, accepted fix, commit/buil
 
 ## 7. Acceptance and release separation
 
-YT-067 may become Done only when the actual approved external report is received, its identity/scope/input digests verified, required fixes independently retested, remaining risks explicitly accepted by the authorized owner and evidence stored through the approved private channel. A blank template or local role review is insufficient.
+An optional future external engagement may be accepted only when its actual approved external report is received, its identity/scope/input digests verified, required fixes independently retested, remaining risks explicitly accepted by the authorized owner and evidence stored through the approved private channel. A blank template or local role review is insufficient.
 
-Even a completed YT-067 does not automatically publish Yetlet or open the repository. Public transition, package publication, release signing and deployment remain separate actions requiring explicit maintainer authorization and all relevant YT-020 gates.
+Even a completed optional external engagement does not automatically publish Yetlet or open the repository. Public transition, package publication, release signing and deployment remain separate actions requiring explicit maintainer authorization and all relevant YT-020 gates.
 
 ## 8. Unfilled acceptance record
 
@@ -86,7 +86,7 @@ Report identifier and date: NOT ISSUED
 Findings and severity inventory: NOT ASSESSED
 Independent remediation retest: NOT PERFORMED
 Authorized residual-risk acceptance: NOT ISSUED
-YT-067 external assessment result: BLOCKED
+Optional external assessment: NOT COMMISSIONED; NOT A CURRENT YT-067 REQUIREMENT
 ```
 
-[Handoff verification](M10H-VERIFICATION.md) records only this preparation and its local independent document-review result.
+[M10h verification](M10H-VERIFICATION.md) records the maintainer's scope revision, historical handoff review and actual incomplete internal scan; it is not an external report.

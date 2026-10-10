@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-10
 **Task:** YT-065 / M10f
-**Status:** In progress. Source/local evidence independently reviewed with PASS; actual new hosted qualification and manual coverage remain pending. No production/accessibility/SLA guarantee is established.
+**Status:** Automated local and hosted qualification PASS. YT-065 remains In progress for its declared manual IME/assistive-technology/device coverage; no production/accessibility/SLA guarantee is established.
 
 ## Authority and written scope
 
@@ -82,9 +82,9 @@ All three asset builders and native Todo/dashboard/forms release binaries succee
 | Local three existing Firefox release suites | Main-session Job `wc_job_sv9TmUH_rdBF2DdM`, terminal exit 0; Todo/Search, keyed and multi-island each PASS on Firefox 157.0 |
 | Local new forms keyboard/semantic suite and JSON report | Main-session release execution PASS, five keyboard/semantic groups; `target/qualification/forms-accessibility-firefox.json` parsed |
 | Current browser/CSP assertions and owned teardown | PASS locally; no surviving owned servers/profiles; forms geckodriver exited 0, server terminated -15, report cleanup PASS |
-| Ubuntu/Windows/macOS native hosted check/test/doctest lanes | Not verified; source-defined, unexecuted |
-| Linux hosted Firefox and forms lane | Not verified; source-defined, unexecuted |
-| Hosted run ID, source SHA, ImageOS/ImageVersion, Rust host, browser versions | Pending actual workflow |
+| Ubuntu/Windows/macOS native hosted check/test/doctest lanes | Run `38043565238` PASS: each nine-crate lane executed 80 tests and four doctests on Rust 1.99; Linux x86_64, Windows MSVC x86_64 and macOS ARM64 |
+| Linux hosted Firefox and forms lane | Same run PASS: Firefox 157.0/geckodriver 0.37.1, all four release suites, parsed forms report cleanup PASS |
+| Hosted run ID, source SHA, ImageOS/ImageVersion, Rust host, browser versions | Run `38043565238`, source `c38837835dac683b09194b475baab2d8eda5a875`; named artifacts downloaded and parsed, see delivery verification |
 | Independent YT-065 implementation reviewer | `wc_job_FH0L7fH4UH6ICPoW` terminal exit 0, `gpt-6-astra`/high requested, read-only, PASS with no issues/followups; source/local gate only |
 | Real OS IME, NVDA/VoiceOver, WebKit/mobile and zoom | Not verified; manual instructions only |
 
@@ -94,10 +94,6 @@ and exit statuses, and separately record compile/browser/CSP evidence. Failure
 must be classified under the materiality gate before a focused repair. No
 repeated visible probe or broad harness rewrite is authorized.
 
-A successful local run does not satisfy new hosted Windows/macOS/Firefox
-qualification. The uncommitted workflow needs a separately authorized maintainer
-PR/merge onto the default branch before activation; no remote schedule is
-enabled here. YT-065 remains In progress pending the actual new workflow's
-terminal success. Historical M9 local evidence remains identified separately.
+The maintainer subsequently authorized PR/merge and actual hosted execution. PR #1 merged as `c38837835dac683b09194b475baab2d8eda5a875`; the new qualification workflow was dispatched and reached terminal success in run `38043565238`. Its three native lanes and Linux Firefox lane are independently observed hosted evidence, not inferred from the earlier local tests. The weekly schedule is now present on the default branch; future scheduled outcomes are not preclaimed. Additional local Windows GNU and offline Docker runs passed on the identical candidate tree. See [delivery verification](M10-DELIVERY-VERIFICATION.md).
 
-Open decisions: supported OS/architecture/browser version policy, real-device and assistive-technology test ownership, and manual evidence acceptance. The local source/review slice is complete; the next gate requires an authorized maintainer PR/merge and actual hosted execution. Independent provider-operations work can proceed without pretending this hosted gate passed. YT-020 remains Blocked.
+Open decisions: supported OS/architecture/browser version policy, real-device and assistive-technology test ownership, and manual evidence acceptance. Automated hosted execution is complete for the recorded platforms, while OS IME, screen reader, WebKit/mobile and zoom remain unverified. YT-065 retains those manual gates; independent provider-operations work remains separate. YT-020 remains Blocked.

@@ -428,7 +428,7 @@ A specific application deployment is not production-qualified until all applicab
 - [ ] storage encryption, backup/restore, retention/deletion and recovery objectives are qualified;
 - [ ] cancellation, draining, outage/degraded behavior, load and incident exercises pass;
 - [ ] release artifacts have approved source/license policy, SBOM, checksums, provenance/signing and immutable promotion;
-- [ ] an external security review evaluates the fixed production topology;
+- [ ] the maintainer reviews complete internal security-assessment results and residual risk against the selected deployment; no external certification is claimed;
 - [ ] YT-020 publication/release gates are explicitly approved.
 
 ## 20. Residual risk and follow-up ownership
@@ -437,6 +437,6 @@ A specific application deployment is not production-qualified until all applicab
 - **YT-064:** release design and unsigned local preflight are complete; signing, immutable release inputs and independent reproducibility remain activation gates.
 - **YT-065:** browser/OS/accessibility compatibility qualification is independent of this threat model.
 - **YT-066:** distributed Session/storage, backup/restore, load, cancellation, observability and recovery must prove the operational controls identified here.
-- **YT-067:** external production-security review begins only after YT-063, YT-064 and YT-066 establish a fixed topology and release inputs.
+- **YT-067:** the maintainer now requires a Codex-assisted internal current-source scan, not a paid external assessment. Complete reports, findings disposition and explicit limits are required; the initial attempt is incomplete. YT-066 remains independently necessary for any distributed-deployment claims.
 
 This document is a requirements boundary. Passing its documentation review does not prove any external IdP, proxy, limiter, store, secret manager or production deployment meets it.

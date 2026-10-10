@@ -103,7 +103,7 @@ Product/operations gaps:
 - Session state is in-memory and single-process; no distributed persistence, revocation or multi-node semantics are qualified;
 - YT-066 adds actual local SQLite two-process concurrency and online backup/isolated restore evidence; encryption/retention, off-host durability, production recovery budgets and multi-node operations remain unqualified;
 - no production secrets/key-management integration exists;
-- YT-065 defines scheduled/manual multi-OS and browser/accessibility matrices; four local Firefox suites passed, but new hosted and real screen-reader/IME/WebKit/mobile results remain unverified;
+- YT-065 hosted run `38043565238` passed Ubuntu, Windows MSVC, macOS ARM64 and Linux Firefox/form-keyboard qualification; local Windows GNU and Docker also passed. Real screen-reader/IME/WebKit/mobile/zoom results remain unverified;
 - no fuzzing/property program covers cookie/form/path/HTML/SSE parsers;
 - no external penetration test, formal security audit or incident-response policy has been performed;
 - repository/crate licensing is selected as `MIT OR Apache-2.0`, but public SemVer activation, scanner availability and release ownership remain unresolved.
@@ -115,11 +115,11 @@ Product/operations gaps:
 3. **Compatibility activation.** YT-062 already completed the bounded compile-level compatibility fixtures, provisional coordinated SemVer policy and additive title/language document contract. Public SemVer/support activation and broader compatibility qualification remain future release decisions; do not reimplement the completed slice.
 4. **Production edge implementation.** Apply the reviewed [Threat Model](THREAT-MODEL.md) to a selected proxy/IdP/Session store/limiter/secrets topology and prove every required abuse case.
 5. **Release activation.** YT-064 already completed release design/preflight, the passing license/source policy, native SBOM experiment and unsigned checksum tooling. Clean release candidates, independent reproducibility, trusted provenance/signing and approved immutable promotion remain unperformed activation gates; do not publish directly from a mutable build job.
-6. **Scheduled qualification matrix.** Add hosted Firefox and additional OS/browser/accessibility/IME coverage without making flaky browser timing a product threshold.
+6. **Manual compatibility qualification.** Hosted platform/Firefox execution is complete in run `38043565238`; retain future scheduled evidence and complete the explicitly unverified real-device, screen-reader, IME and zoom coverage without redoing successful automated lanes or making timing a product threshold.
 7. **Provider operations.** Qualify distributed Session/storage behavior, backup/restore, concurrency/load, cancellation, observability and incident recovery.
-8. **External security review.** Perform an independent review only after the production topology and release inputs are defined.
+8. **Internal security assessment.** The maintainer selected the installed Codex security-scan instead of paid external engagement. Require complete source/coverage/findings evidence and honest limitations. The actual initial scan is incomplete; do not substitute CI or document-review PASS for its report.
 
-Licensing/private governance and YT-064 release design/preflight are independently reviewed. YT-065 and YT-066 source/local slices passed review; their hosted/manual and actual distributed gates remain open. YT-067 has an external assessment handoff, not an audit result. Public-transition scanner/reporting activation and YT-020 remain Blocked.
+Licensing/private governance and YT-064 release design/preflight are independently reviewed. YT-065 automated hosted qualification passed run `38043565238`; its manual gates remain open. YT-066 source/local slices passed review, but actual distributed qualification remains open. Revised YT-067 uses an internal Codex-assisted scan; no external assessor is required, and the incomplete initial scan has no final report. The former external handoff is an optional future template. Public-transition scanner/reporting activation and YT-020 remain Blocked.
 
 ## 7. Delivery evidence boundary
 

@@ -16,7 +16,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M7 — Bounded keyed DOM and local reactivity (locally complete)** | Measured strategies, promoted low-level contracts, production Todo keyed graph and final decision freeze | YT-025, YT-035–YT-043 | Equivalent output, ownership/disposal, cross-browser lifecycle, measured bundle cost, Search isolation, complete regression and repeat reviewer PASS |
 | **M8 — Sample-driven application experience** | Standardized sample contract, API-only REST app, opt-in Session cart, DX audit and evidence freeze | YT-044–YT-048 | Copyable applications, pay-for-what-you-use dependencies, security/lifecycle evidence and per-stage reviewer PASS |
 | **M9 — Sample expansion and API contract qualification (locally complete)** | Nine canonical sample names plus three supplements, SQL-first persistence, contract classification | YT-049–YT-059 | Twelve samples, 170-export inventory, complete regression and repeat final reviewer PASS |
-| **M10 — Release engineering and production-security qualification** | Licensing, governance, compatibility, threat model, supply-chain and operational qualification | YT-060–YT-067 | Maintainer decisions, hosted controls, reproducible release evidence and external security review |
+| **M10 — Release engineering and production-security qualification** | Licensing, governance, compatibility, threat model, supply-chain and operational qualification | YT-060–YT-067 | Maintainer decisions, hosted controls, reproducible release evidence and internal Codex-assisted security assessment |
 
 ## Critical path
 
@@ -55,7 +55,7 @@ YT-059 → YT-062 (SemVer/document metadata) → YT-064
 YT-057 + YT-059 → YT-063 (production threat model)
 YT-059 → YT-065 (scheduled compatibility matrix)
 YT-046 + YT-054 + YT-057 + YT-059 → YT-066 (provider operations)
-YT-063 + YT-064 + YT-066 → YT-067 (external security review)
+YT-063 + YT-064 → YT-067 (Codex-assisted internal security scan)
 ```
 
 Prove native SSR before committing to an elaborate browser view IR. Avoid simultaneously designing DOM, SSR, islands, and GPU abstraction layers before the smallest dual-target implementation works.
@@ -235,9 +235,9 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 - [x] **YT-062 / M10c:** Minimal title/language document metadata, provisional compatibility policy, legacy generic compile fixtures, complete stable/MSRV validation and repeat reviewer PASS.
 - [x] **YT-063 / M10d:** Product-neutral production edge/authentication threat model, private-cache/CSRF repair, documentation validation and repeat security-focused reviewer PASS.
 - [x] **YT-064 / M10e:** Release design/preflight, actual license/source checker, 41 native CycloneDX SBOMs, 16 checksum tests and independent reviewer PASS; not signed/reproducible release activation.
-- [ ] **YT-065 / M10f — In progress:** Scheduled/manual Ubuntu/Windows/macOS and Firefox workflow source plus four local Firefox suites and source reviewer PASS; new hosted/manual qualification pending.
+- [ ] **YT-065 / M10f — In progress:** Hosted run `38043565238` passed Ubuntu, Windows MSVC, macOS ARM64 and Linux Firefox jobs; local Windows GNU and offline Docker passed. Manual IME/assistive-technology/device qualification remains unverified.
 - [ ] **YT-066 / M10g — In progress:** Actual local Session isolation/restart and two-process SQLite backup/restore/concurrency PASS with reviewer; distributed topology, HA, outage/load and production recovery remain unqualified.
-- [ ] **YT-067 / M10h — Blocked:** External assessment handoff prepared; no appointed auditor, approved immutable release/deployment or completed distributed gate. Local document review does not satisfy an external audit.
+- [ ] **YT-067 / M10h — Blocked:** Maintainer replaced external engagement with an installed Codex security-scan. The actual standard scan did not finalize due to storage/platform blockers; no completed report or clean-result claim. External-audit certification is neither required nor claimed.
 
 **Post-M9 hardening evidence (2026-10-10):** [CI/security review](CI-SECURITY-REVIEW.md) records the first hosted CI failure, bounded browser-harness repair, full-SHA Action pins, read-only permissions, patched `RUSTSEC-2026-0009`, Rust 1.88 verification and the remaining GitHub/security/release gaps. GitHub Actions run `38024582602` completed successfully for commit `86c30a42114ca74f4197f0389707861308a844a7`, including both required jobs and all Chrome release suites.
 

@@ -52,4 +52,4 @@ Rust 1.88 is the current declared and CI-verified MSRV. Before public release, a
 
 ## Still pending
 
-Licensing/security policy (YT-060) and private-state maintainer-only governance (YT-061) are complete and independently reviewed. Release design/preflight (YT-064) is complete at that scope, not signed publication. Hosted/manual browser/OS coverage (YT-065), distributed-provider operations (YT-066), external assessment (YT-067), trusted release provenance and explicit public activation remain open. Public release YT-020 remains Blocked.
+Licensing/security policy (YT-060) and private-state maintainer-only governance (YT-061) are complete and independently reviewed. Release design/preflight (YT-064) is complete at that scope, not signed publication. Hosted/manual browser/OS coverage (YT-065), distributed-provider operations (YT-066), complete internal Codex-assisted security assessment (revised YT-067; no external certification), trusted release provenance and explicit public activation remain open. Public release YT-020 remains Blocked.
