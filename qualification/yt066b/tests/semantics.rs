@@ -28,6 +28,35 @@ async fn ok(a: &Store, ticket: &Ticket) -> Mutation {
     assert!(r.status == "ok");
     r
 }
+
+#[tokio::test]
+#[ignore = "requires the disposable Redis fixture"]
+async fn corrupt_integer_metadata_is_rejected_before_mutation() {
+    let a = store(&random_id().unwrap()).await;
+    for field in ["issuance", "revision", "generation", "expires"] {
+        let initial = create(&a, 7, 60000).await;
+        let ticket = a
+            .prepare("rotate", Some(initial.identity()), 0, &State::new(0), 60000)
+            .await
+            .unwrap();
+        let key = a.record_key(initial.identity()).unwrap();
+        a.command(command("HSET", &[&key, field, "1.5"]))
+            .await
+            .unwrap();
+        assert!(a.read(initial.identity()).await.is_err());
+        assert!(a.execute(&ticket).await.unwrap().status == "invalid");
+        let replacement = a.record_key(ticket.replacement().unwrap()).unwrap();
+        let exists: u8 =
+            redis::from_redis_value(a.command(command("EXISTS", &[&replacement])).await.unwrap())
+                .unwrap();
+        assert!(exists == 0);
+        let status: String =
+            redis::from_redis_value(a.command(command("HGET", &[&key, "status"])).await.unwrap())
+                .unwrap();
+        assert!(status == "active");
+    }
+    a.shutdown().await.unwrap();
+}
 fn command(name: &str, args: &[&str]) -> redis::Cmd {
     let mut c = redis::cmd(name);
     c.arg(args);

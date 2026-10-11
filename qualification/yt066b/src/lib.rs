@@ -1,4 +1,5 @@
 //! Unpublished, single-primary semantics experiment; not a Session provider.
+pub mod cookies;
 use redis::aio::{ConnectionManager, ConnectionManagerConfig};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -23,6 +24,7 @@ pub const DRAIN_TIMEOUT: Duration = Duration::from_secs(2);
 pub const PAYLOAD_LIMIT: usize = 1024;
 pub const OPERATION_TTL_MS: u64 = 5000;
 pub const TOMBSTONE_TTL_MS: u64 = 400;
+pub const MAX_SESSION_TTL_MS: u64 = 60000;
 
 #[derive(Clone, Serialize, Deserialize, PartialEq, Eq)]
 #[serde(deny_unknown_fields)]
@@ -44,6 +46,7 @@ pub struct Snapshot {
     pub revision: u64,
     pub expires: u64,
     pub generation: u64,
+    pub issuance: u64,
     pub csrf: String,
 }
 
@@ -263,6 +266,7 @@ impl Store {
             format!("{}unused-result", self.prefix),
             format!("{}unused-replacement", self.prefix),
             format!("{}operations", self.prefix),
+            format!("{}issuance", self.prefix),
         ])
     }
     fn args(kind: &str) -> Vec<String> {
@@ -283,7 +287,7 @@ impl Store {
                 Error::Lifecycle(code)
             });
         }
-        if row.len() != 6 || row[2].len() > PAYLOAD_LIMIT || !valid_id(&row[3]) {
+        if row.len() != 7 || row[2].len() > PAYLOAD_LIMIT || !valid_id(&row[3]) {
             return Err(Error::InvalidRecord);
         }
         Ok(Snapshot {
@@ -292,6 +296,7 @@ impl Store {
             csrf: row[3].clone(),
             expires: row[4].parse().map_err(|_| Error::InvalidRecord)?,
             generation: row[5].parse().map_err(|_| Error::InvalidRecord)?,
+            issuance: row[6].parse().map_err(|_| Error::InvalidRecord)?,
         })
     }
 

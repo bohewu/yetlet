@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-11
 **Task:** YT-066 / M10g, bounded YT-066b1 private spike
-**Status:** Bounded private prototype completed and independently reviewed PASS. The full-provider cookie-ordering gate remains unsatisfied. YT-066 remains In progress and YT-020 remains Blocked.
+**Status:** Bounded private prototype completed and independently reviewed PASS at its recorded source. The cookie-ordering gate was unsatisfied at that checkpoint; the [later explicit pure-SSR decision and separate correction](YT-066B-COOKIE-ORDERING.md) do not rewrite this historical evidence. YT-066 remains In progress and YT-020 remains Blocked.
 **Related:** [Design](YT-066B-REDIS-SESSION-DESIGN.md), [design review](YT-066B-PLANNING-VERIFICATION.md), [accepted plan](YT-065-066-PLAN.md), [fixture/runbook](../qualification/yt066b/README.md), [M10g](M10G-VERIFICATION.md).
 
 ## Authority and scope
@@ -120,3 +120,7 @@ The independent reviewer accepted this bounded prototype and its evidence. This 
 | Local evidence | Ignored `target/yt066b1-20261011/review/review-evidence.json`, `before.json`, `process.json` and `result.json` |
 
 This is an independent role-directed review, not native managed-role identity or formal assurance. After terminal PASS, only this record and the M10g/backlog summaries were updated to record the result; runtime bytes and all reviewed implementation/test files remain unchanged. Final document/link/whitespace checks passed. No commit or push occurred.
+
+## Later maintainer decision — 2026-10-11
+
+After a separate cookie-name candidate failed review and a real-Chrome storage probe, the maintainer explicitly accepted pure SSR without mandatory JS, with possible login loss after extreme reordering and unchanged rejection of retired credentials. The [separate cookie gate](YT-066B-COOKIE-ORDERING.md) records that approved availability tradeoff, corrected implementation, focused execution and independent review status. The original tests, source identities and PASS above remain historical; they do not certify the later implementation or the earlier unconditional retention requirement.

@@ -112,7 +112,7 @@ Reviewer PASS closes only the YT-066b design slice. It authorizes planning for t
 
 This is independent ordinary design review, not native managed-role identity, a Redis execution result or formal assurance. Only these factual review-status records were added after PASS. The next bounded stage is YT-066b1, the private real-Redis dependency/API and semantics spike; the full provider stage remains gated on actual semantic proof and the unresolved cookie-ordering decision. No Docker qualification was repeated, no new service was launched, and these YT-066b documents remain unstaged and uncommitted.
 
-## Current open gates
+## Open gates at the design-review checkpoint
 
 - exact Redis client/features/MSRV selection;
 - serialization/migration format;
@@ -122,3 +122,7 @@ This is independent ordinary design review, not native managed-role identity, a 
 - actual three-application Redis qualification.
 
 YT-066 remains In progress. YT-020 remains Blocked.
+
+## Later cookie-contract decision — 2026-10-11
+
+The maintainer subsequently selected pure SSR without mandatory JavaScript, preserved retired-ID rejection and accepted possible login loss from extreme response reordering. See the [current design section 10](YT-066B-REDIS-SESSION-DESIGN.md#10-rotation-revocation-and-stale-responses) and [cookie gate evidence](YT-066B-COOKIE-ORDERING.md). This explicitly supersedes the earlier unconditional retention requirement; it does not change the historical planning review or mark the failed cookie candidate PASS. A separate reviewer must accept the corrected implementation before YT-066b2.

@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-10
 **Task:** YT-066 / M10g, bounded YT-066b design
-**Status:** Revised design independently reviewed PASS on 2026-10-11 after four material corrections. The subsequent private YT-066b1 prototype and pinned dependency experiment are recorded in [execution evidence](YT-066B1-VERIFICATION.md); the public/full provider remains unimplemented and its cookie-ordering guarantee remains unresolved.
+**Status:** Original revised design independently reviewed PASS on 2026-10-11 after four material corrections; [YT-066b1 execution](YT-066B1-VERIFICATION.md) subsequently passed its bounded review. A later explicit maintainer decision selects the pure-SSR cookie contract in section 10; its focused tests and [independent review](YT-066B-COOKIE-ORDERING.md) passed. The [experimental provider implementation](YT-066B2-VERIFICATION.md) has passing focused integration tests after its test barrier correction and independent implementation reviewer PASS at bounded YT-066b2 scope. No stable/full distributed provider is accepted.
 **Related:** [Provider operations](PROVIDER-OPERATIONS.md), [M10g verification](M10G-VERIFICATION.md), [YT-065 / YT-066 plan](YT-065-066-PLAN.md), [ADR 0005](adr/0005-opt-in-capability-modules.md), [M8c verification](M8C-VERIFICATION.md), [planning verification](YT-066B-PLANNING-VERIFICATION.md).
 
 ## 1. Goal and non-goals
@@ -220,22 +220,23 @@ The design distinguishes two boundaries:
 
 ### 10.1 Staleness observed at final revalidation
 
-Before adding `Set-Cookie` or a clearing cookie, the async response finalizer must revalidate the request identity, record revision and pending cookie directive. If that check observes rotation/revocation, the finalizer suppresses the stale directive. This is a mandatory prototype scenario, not a guarantee covering every instant before header emission or proof of parity with all Memory behavior.
+Only a positively resolved create/rotate/replace may supply `Set-Cookie`. The async finalizer verifies that operation's committed result and authoritatively loads its issued identity. If the identity is retired, expired, invalid or unavailable, it supplies no credential. Reads, ordinary updates, errors and successful logout emit no Set/Clear cookie; logout revokes in Redis. This suppresses observed staleness, not every race after the check or parity with all Memory behavior.
 
 ### 10.2 After the final check, including before emission
 
-There is still a reachable race: finalizer A validates identity X; instance B rotates X to Y; A then appends and emits `Set-Cookie: X`. No response bytes need have been emitted when B rotated. Another Redis read merely moves this gap. The same analysis applies to stale clear directives and competing rotations. A final store check alone does not close the pre-emission boundary.
+There is still a reachable race: finalizer A validates identity X; instance B rotates X to Y; A then appends and emits `Set-Cookie: X`. No response bytes need have been emitted when B rotated. Another Redis read merely moves this gap. The original prototype also reproduced a stale clear deleting a newer login. The selected protocol emits no clear, removing that path; competing rotations still require atomic store validation. A final store check alone does not close the pre-emission Set boundary.
 
 ### 10.3 A response already emitted or in flight
 
 Redis cannot retract bytes that have already been committed to an HTTP response. Arbitrary cross-stream/network delivery order may still allow an older response to overwrite a newer browser cookie even though Redis correctly rejects the retired server identity.
 
-The first prototype must reproduce both the check-to-emission race and reordered delivery with a real HTTP cookie jar. Assert retired-identity rejection separately from whether the jar retains the replacement identity. It may not claim complete stale-cookie ordering merely because scripts are atomic. An unresolved race blocks the full provider stage. Before that stage can be accepted, the maintainer must choose one of these evidence-backed directions:
+The original prototype reproduced both races with a real HTTP cookie jar. The later unique-name candidate failed independent review because accumulated older cookies can evict the replacement or logout marker. These historical failures remain valid evidence, not successes under a renamed contract.
 
-- add and test a client/transport-aware fencing or response-serialization protocol that prevents an older emitted cookie directive from winning; or
-- explicitly narrow the provider guarantee, keep the provider experimental/private and accept that a reordered stale response can cause fail-closed Session loss, never old-identity authorization.
+**Explicit maintainer decision, 2026-10-11:** Select pure SSR without mandatory client JavaScript. A late prepared response may lose the usable replacement and require login again; retired/revoked/expired identities must never regain authorization. This explicitly narrows the earlier unconditional retention guarantee. The provider stays experimental/private. See [decision and evidence](YT-066B-COOKIE-ORDERING.md).
 
-Neither direction is selected by this design. Do not silently narrow the guarantee, add mandatory client JavaScript or use the design review PASS as acceptance of the unresolved cookie behavior.
+Use exactly one configured `__Host-` cookie name, Secure, HttpOnly, SameSite=Lax, Path=/ and no Domain; a distinct insecure name is allowed only in the loopback fixture. Accept exactly one valid opaque identity under that name, reject duplicates, and ignore legacy per-issuance names. Every load checks Redis; a failed load neither creates state nor selects another cookie. There is no sliding refresh or logout-clear response. Session state does not define application login policy: independent still-live Sessions are not implicitly revoked by another Session's creation, and concurrent account-switch intent is not globally ordered by this contract.
+
+The corrected pure-SSR implementation needs focused tests and a new independent reviewer PASS before YT-066b2. The prior design review does not accept this later implementation. No JavaScript coordinator or persistent event circuit is selected.
 
 Following a rotation tombstone to the replacement and granting access to a holder of the old cookie is forbidden: it would let a compromised retired identity recover the new Session.
 
@@ -320,9 +321,9 @@ No phase marks YT-066 Done while the in-flight cookie-ordering decision, actual 
 | Closure behavior | Application closure executes once per explicit call; application error writes nothing; an arbitrary non-serializable `R` returns only on acknowledged success and is deliberately lost after unknown outcome/cancellation; resolution returns status without replay |
 | Rotation | One atomic replacement is visible across A/B/C; old identity is rejected everywhere |
 | Revocation | Destroy/revoke is visible across A/B/C and cannot resurrect through retry or recovery |
-| Staleness observed by finalizer | A final check observing rotate/revoke suppresses stale Set/Clear directives |
+| Staleness observed by finalizer | Only proven create/rotate/replace can set; a check observing retirement suppresses it; read/update/error/logout emit no Set/Clear |
 | Check-to-emission race | Pause A after final validation, rotate X to Y on B, then emit A's stale Set/Clear response; observe both server rejection and the real HTTP cookie jar, without claiming the final read prevents this race |
-| In-flight response boundary | Force older prepared/emitted responses to arrive after replacement responses, including stale clear and competing rotations; unsupported guarantees remain explicit until a chosen strategy passes |
+| In-flight response boundary | Force prepared old Set after replacement: login loss is permitted, retired-ID authorization is forbidden; delayed logout emits no Clear, and competing rotations cannot issue a losing credential; verify actual browser behavior without JS |
 | TTL | Absolute expiry and Redis TTL agree within documented clock assumptions; expired state never becomes a new authenticated Session |
 | Outage | Pool wait, connect and command failures fail closed; no Memory fallback |
 | Uncertain mutation | Lose A's mutation reply, then update/rotate/revoke with B; resolve A from its dedicated result key without duplicate mutation or callback replay, independently of the current Session record |
@@ -342,7 +343,7 @@ Still open after design review:
 - redis-rs direct connection manager versus deadpool fallback after the API/bounds spike;
 - concrete serialization format and migration policy;
 - operation-reconciliation retention and tombstone TTL;
-- the in-flight cookie-ordering guarantee and whether client/transport cooperation is acceptable;
+- independent acceptance of the explicitly selected pure-SSR cookie implementation (section 10), not a promise of unconditional cookie retention;
 - Redis persistence mode for qualification;
 - production TLS/ACL/secret ownership; and
 - any future Sentinel/Cluster/HA work.

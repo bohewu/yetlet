@@ -127,7 +127,7 @@ failure domains, store/cookie settings and responsible owner first.
 |---|---|
 | Dependent mutation | CAS or equivalent atomic mutation; simultaneous dependent updates retain every successful change without read/modify/write loss |
 | Rotation and revocation | Atomic mutate/rotate/revoke, retired identities cannot resurrect, successful concurrent updates are preserved, revoked identity is rejected by all workers |
-| Stale cookie responses | Deliver an old response after rotation/revocation; its `Set-Cookie` must not clear or restore the replacement identity |
+| Stale cookie responses | Under the [explicitly selected pure-SSR contract](YT-066B-COOKIE-ORDERING.md), suppress observed-stale Set and emit no logout Clear. A late prepared Set may cause login loss, but a retired identity must never authenticate; no old-cookie fallback |
 | TTL and consistency | Expiry and revocation enforcement across workers, cache invalidation, clock/lease assumptions, explicit behavior during partitions and recovery |
 | Outage and recovery | Store unavailable, timeout, partial failure and failover fail closed; no authorization through a stale or invented fallback Session; replay/retry cannot resurrect revoked identities |
 | Bounds and shutdown | Bounded concurrency, pools, queues, timeouts/retries, admission/backpressure and drain/cancellation under real contention; no unbounded work or abandoned owned resources |
