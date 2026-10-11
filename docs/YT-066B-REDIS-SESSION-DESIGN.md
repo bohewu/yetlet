@@ -338,7 +338,7 @@ No phase marks YT-066 Done while the in-flight cookie-ordering decision, actual 
 
 This design can be marked reviewed without selecting a production topology. YT-066b implementation cannot begin until an independent read-only reviewer accepts the design.
 
-Still open after design review:
+Historical questions at the original design-review stage:
 
 - redis-rs direct connection manager versus deadpool fallback after the API/bounds spike;
 - concrete serialization format and migration policy;
@@ -348,4 +348,13 @@ Still open after design review:
 - production TLS/ACL/secret ownership; and
 - any future Sentinel/Cluster/HA work.
 
-These are explicit gates, not reasons to weaken the current Memory provider or to claim distributed qualification prematurely. YT-066 remains In progress and YT-020 remains Blocked.
+Later b1/Cookie/b2/b3 evidence resolves the bounded provider choices at its
+recorded stages; the list is not a fresh task queue. The [responsibility
+clarification](YT-066-PERSISTENCE-RECOVERY-PLAN.md) keeps provider semantics,
+supported configuration/error behavior and honest persistence limits within
+Yetlet scope. Production TLS/ACL policy, backup protection, RPO/RTO and operator
+ownership are application concerns, not prerequisites for bounded YT-066
+completion. Sentinel/Cluster/HA remains optional future scope. The [parent closeout](M10G-VERIFICATION.md#yt-066-bounded-framework-closeout--2026-10-11) marks
+YT-066 Done at single-host Docker multi-instance and selected Redis-provider scope;
+its final documentation review is separate from this historical design review.
+YT-020 remains Blocked.

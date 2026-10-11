@@ -1,18 +1,27 @@
 # Provider Operations — Local Evidence and Open Qualification
 
-**Task:** YT-066 / M10g. **Status:** In progress; distributed qualification remains
-unmet. This document follows the approved [remaining plan](M10-REMAINING-PLAN.md)
+**Task:** YT-066 / M10g. **Status:** Done at single-host Docker multi-instance and selected Redis-provider scope.
+Application operations are not framework blockers; the [final documentation review gate](M10G-VERIFICATION.md#yt-066-bounded-framework-closeout--2026-10-11) is recorded separately. This document follows the approved [remaining plan](M10-REMAINING-PLAN.md)
 and [ADR 0005](adr/0005-opt-in-capability-modules.md). It introduces no runtime
 provider API, store implementation or default dependency.
 
-## Current topology
+## Memory and selected experimental Redis topology
 
-`yetlet-session` owns an in-memory map within each `SessionManager`; there is no
-external-store integration or pluggable distributed-store contract. The
+`yetlet-session` owns an in-memory map within each `SessionManager`; that Memory
+crate has no external-store integration or pluggable distributed-store contract. The
 `auth-notes` sample creates a separate manager in each process. Identical
 synthetic Alice/Bob login codes do not make Session records shared. Restart
 discards the map, and a second worker cannot authenticate the first worker's
 cookie. Sticky routing alone cannot provide durable Session recovery.
+
+The separately selected experimental Redis provider now has reviewed b2
+implementation and [b3](YT-066B3-VERIFICATION.md) three-application qualification
+at single-host/single-primary/no-persistence scope. Peon committed b3 as `4da0f6c`.
+The [persistence/recovery boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md)
+is a later documentation-only responsibility clarification: AOF clean-restart
+retention and fenced fresh-generation invalidation rehearsals remain Not verified
+optional proposals, not required framework stages.
+This does not change the Memory provider or establish production durability.
 
 The SQL-first `sqlite-crud` sample uses a local SQLite WAL database with explicit
 transactions, optimistic versions and transactional audit rows. Two local
@@ -138,11 +147,15 @@ load separate Session snapshots. A pluggable Redis backend by itself therefore
 does not prove the stronger atomicity/rotation/revocation contract above. This
 is a reason to qualify the selected integration, not to write an in-house store.
 
-## Production ownership and unverified gates
+## Application/operator responsibilities and unverified deployments
 
 No production topology, recovery budget, retention policy or SLA is chosen by
-this experiment. The application owner, storage operator and security owner
-must be designated; these roles are pending, not assigned to fictional people.
+this experiment. An application deploying to production designates its own
+application, storage and security owners. These responsibilities are deployment
+guidance, not Yetlet deliverables or blockers for bounded YT-066 completion.
+Provider correctness, supported configuration/error behavior and redaction remain
+framework responsibilities; deployment policy, backup protection, business RPO/RTO
+and on-call staffing belong to the application/operator.
 
 | Pending control | Owner to designate and required test/decision |
 |---|---|
@@ -155,10 +168,12 @@ must be designated; these roles are pending, not assigned to fictional people.
 The [YT-066b3 fixture](YT-066B3-VERIFICATION.md) is Done at bounded three-application single-host/single-primary scope after actual Session/CAS/rotation/revocation/outage/restart execution, cleanup and final independent reviewer PASS under an explicit no-persistence configuration. Production provider outage/recovery, Redis failover, cross-host consistency, HA, load/performance SLO,
 production backup durability/RPO/RTO, real OIDC and key rotation remain **not
 qualified**. Retained Session, file, SSE and YT-066a Docker/Memory results cannot
-replace those tests. YT-066 remains **In progress** pending the separately selected
-production Redis/provider ownership and recovery decisions beyond this bounded topology. YT-066a's final
-review PASS does not close the provider gate
-or unblock YT-020. The earlier local execution and reviewer
+replace application-specific deployment qualification. YT-066 is **Done at single-host Docker multi-instance and selected Redis-provider scope**,
+with the separate final documentation review gate recorded in M10g. Production
+ownership or recovery-target selection is not a prerequisite for this scope. Its scope is the tested single-host
+Docker topology and experimental single-primary provider. No bounded PASS
+unblocks YT-020 publication. The earlier local execution and reviewer
 `wc_job_YclpZ0R5tS4m8Y1I` passed; the Docker/Memory behavior execution passed,
 and its six earlier review outcomes, bounded repairs and final PASS are recorded in M10g verification.
-The experimental single-primary provider is explicitly selected; production ownership and broader distributed acceptance remain open gates.
+The experimental single-primary provider is explicitly selected; broader
+deployment guarantees remain unverified and belong to application qualification.

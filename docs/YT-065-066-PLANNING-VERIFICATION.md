@@ -6,6 +6,8 @@
 
 > **Follow-on status:** The subsequent YT-065 documentation closeout is recorded in [M10f verification](M10F-VERIFICATION.md). Statements below that both YT-065 and YT-066 remain In progress describe this planning snapshot. The closeout candidate marks YT-065 Done only at the bounded automated desktop/native/browser scope while retaining real-device/IME/assistive-technology/WebKit/mobile/zoom as explicit optional unknowns; YT-066 remains In progress.
 
+> **Later bounded parent closeout (2026-10-11):** YT-066 is Done only at single-host Docker multi-instance and selected Redis-provider scope, with the separate final documentation review gate in [M10g](M10G-VERIFICATION.md#yt-066-bounded-framework-closeout--2026-10-11). The earlier In progress, unimplemented and unstaged statements below are historical planning/stage states, not the current task queue. No source/run identity or untested deployment cell is changed. YT-020 remains Blocked.
+
 ## Authorized delivery and exact source identity
 
 The maintainer explicitly authorized delivery of the existing 12 reviewed YT-067 files, followed by documentation-only planning for YT-065 and YT-066. The original single worktree and all 12 changes were preserved. No unrelated source change, detached worktree, reset, clean, hook bypass, repository-setting change, publication or deployment was used.

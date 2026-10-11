@@ -37,6 +37,13 @@ The complete sample/browser matrix is recorded in M9 evidence and the checked-in
 
 ## Readiness and unresolved gates
 
+The table records both framework evidence and application deployment concerns.
+TLS/ACL deployment policy, backup protection, business RPO/RTO, on-call ownership
+and real production rollout are application/operator responsibilities, not
+prerequisites for bounded YT-066 framework completion. See the [responsibility
+boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md). YT-020 remains Blocked for its
+separate framework publication/activation gates; no release is authorized here.
+
 | Gate | State | Detail |
 |---|---|---|
 | M0–M9 prototype contracts | Verified locally | Per-stage evidence and independent reviewers |
@@ -47,7 +54,7 @@ The complete sample/browser matrix is recorded in M9 evidence and the checked-in
 | Platform/browser compatibility | **YT-065 automated scope complete; optional coverage unverified** | Hosted Linux, Windows MSVC, macOS ARM64 and Firefox four-suite execution PASS; local Windows GNU and offline Docker PASS. WebKit/mobile, real IME, screen readers and zoom remain explicitly Not verified and are not supported-platform claims |
 | Accessibility | **Partial** | Actual Tab/Enter/Unicode, labels/errors/focus and root-language checks pass; real IME, screen readers, zoom and conformance are not verified |
 | Authentication/authorization | **Threat model specified; implementation prototype only** | M10d requires external OIDC plus server-side resource authorization; Auth Notes remains synthetic and is not an IdP/password/passkey/MFA design |
-| Credentialed CSRF/Session | **Prototype; single-host limitation observed** | Bounded in-memory Session/CSRF works. YT-066a three-instance Docker execution proves stateless routing but also proves Memory Session is rejected cross-instance and lost on issuer restart; final independent review passed. The separate experimental Redis provider has reviewed b2 implementation and [b3](YT-066B3-VERIFICATION.md) passing single-host/no-persistence execution, cleanup and final independent review; production distributed-provider qualification remains pending |
+| Credentialed CSRF/Session | **Prototype; single-host limitation observed** | Bounded in-memory Session/CSRF works. YT-066a three-instance Docker execution proves stateless routing but also proves Memory Session is rejected cross-instance and lost on issuer restart; final independent review passed. The separate experimental Redis provider has reviewed b2 implementation and [b3](YT-066B3-VERIFICATION.md) passing single-host/no-persistence execution, cleanup and final independent review; broader deployment durability/recovery is unverified and application-specific, not a bounded YT-066 completion prerequisite |
 | HTTPS/reverse-proxy trust and rate limiting | **Specified, not implemented** | M10d defines the trusted-edge/header and layered limiting contract; a selected deployment and abuse/load evidence remain required |
 | Persistence/transactions | **Local qualification only** | Actual two-process local WAL conflict, online backup, exact isolated restore and corrupt candidate rejection PASS; encryption/retention, off-host durability and distributed production operations remain unqualified |
 | Observability/load/cancellation | **Partial** | Lifecycle/cancellation tests exist; no production tracing, SLO, soak or incident evidence |
@@ -62,7 +69,7 @@ The complete sample/browser matrix is recorded in M9 evidence and the checked-in
 1. **Public-transition owner:** Enable and verify GitHub Private Vulnerability Reporting, secret scanning/push protection and CodeQL after changing visibility; preserve collaborator-only PRs.
 2. **Maintainer:** Retain or revise the current zero-approval sole-maintainer PR rule when adding another maintainer, and define signed release-tag policy in the release-supply-chain gate.
 3. **Maintainer/team:** Activate or revise the provisional SemVer/MSRV policy at public release and declare supported browsers/OS; the bounded title/language document contract remains Experimental pending more consumers.
-4. **Security/team:** Implement and test the [M10d Threat Model](THREAT-MODEL.md) against selected external proxy/IdP/Session/limiter/secrets/storage products; YT-066 qualifies provider operations.
+4. **Application deployment owner (not a framework publication prerequisite):** Implement and test the [M10d Threat Model](THREAT-MODEL.md) against that application's selected external proxy/IdP/Session/limiter/secrets/storage products. Yetlet documents these opt-in boundaries; YT-066 qualifies the bounded framework provider contract.
 5. **Release owners:** Define reproducible artifacts, license/source policy, SBOM, checksums, provenance, signing, approval and rollback.
 6. **QA/security owner:** Retain actual scheduled platform/browser evidence, treat manual accessibility/IME/device work as separately selected application/support qualification, and require a complete internal security-scan report with residual-risk decisions. External assessment is optional and needs separate authorization.
 
@@ -70,4 +77,4 @@ The complete sample/browser matrix is recorded in M9 evidence and the checked-in
 
 Yetlet keeps native HTTP, renderer, browser and optional provider dependencies separable. Auth, Session, database, files, SSE, tracing, CORS, rate limiting and deployment capabilities remain explicit opt-ins. The SQLite examples do not introduce an ORM, `DbContext`, repository framework or default data provider.
 
-**Backlog status:** M0–M9 and YT-060–YT-065 are Done at their bounded prototype/policy/design/automated-qualification scopes. YT-065's real-device/IME/assistive-technology/WebKit/mobile/zoom cells remain explicit optional unknowns; YT-066 retains required distributed gates. Revised YT-067 is Done at internal pre-patch source-scan and independently reviewed local Low finding correction scope. The earlier scan of an older snapshot remains incomplete, and no post-fix repository-wide rescan or production certification is claimed. YT-020 remains Blocked; no local review, license, checksum or green CI automatically authorizes production or publication.
+**Backlog status:** M0–M9 and YT-060–YT-065 are Done at their bounded prototype/policy/design/automated-qualification scopes. YT-065's real-device/IME/assistive-technology/WebKit/mobile/zoom cells remain explicit optional unknowns; YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability/recovery remains Not verified. Application TLS/ACL policy, backup protection, RPO/RTO and operational staffing are not framework completion prerequisites. Revised YT-067 is Done at internal pre-patch source-scan and independently reviewed local Low finding correction scope. The earlier scan of an older snapshot remains incomplete, and no post-fix repository-wide rescan or production certification is claimed. YT-020 remains Blocked; no local review, license, checksum or green CI automatically authorizes production or publication.

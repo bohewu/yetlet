@@ -2,18 +2,21 @@
 
 **Date:** 2026-10-10
 **Task:** YT-066 / M10g
-**Status:** YT-066 remains In progress. Existing local Session/SQLite operations and their independent reviewer passed. YT-066a is complete at single-host Docker/Memory proof scope after retained actual execution and final independent closeout review PASS on 2026-10-11. Redis/distributed-provider qualification remains unimplemented.
+**Status:** Done at single-host Docker multi-instance and selected Redis-provider scope. Redis is experimental, single-primary and explicitly no-persistence.
+**Final closeout review:** PASS; independent read-only reviewer thread `01a12a61-fd85-7d40-8df2-4ce9b5977dd7` reached terminal exit 0 with verified `gpt-6-astra` / `high` and unchanged inputs. Local commit is authorized; push is not. See the [current closeout](#yt-066-bounded-framework-closeout--2026-10-11). YT-020 remains Blocked.
+
+The original local/Memory sections and later b1/Cookie/b2/b3 entries below retain their historical task, source, review and delivery states. Their In progress or unstaged statements are not current task-state assertions; they do not become new executions at the final closeout HEAD.
 
 ## Authority and bounded scopes
 
-This work follows the [M10 remaining plan](M10-REMAINING-PLAN.md), [provider operations contract](PROVIDER-OPERATIONS.md), [ADR 0005](adr/0005-opt-in-capability-modules.md) and the independently reviewed [YT-065 / YT-066 plan](YT-065-066-PLAN.md). It preserves the existing synchronous process-local `SessionManager<T>` / `Session<T>` API and does not introduce Redis, a generic store trait, a second HTTP stack, DI, ORM or production deployment.
+The original local/Memory work follows the [M10 remaining plan](M10-REMAINING-PLAN.md), [provider operations contract](PROVIDER-OPERATIONS.md), [ADR 0005](adr/0005-opt-in-capability-modules.md) and the independently reviewed [YT-065 / YT-066 plan](YT-065-066-PLAN.md). It preserves the existing synchronous process-local `SessionManager<T>` / `Session<T>` API and does not introduce Redis, a generic store trait, a second HTTP stack, DI, ORM or production deployment.
 
 Two different evidence slices must remain separate:
 
 1. the earlier local-process Session isolation and local SQLite concurrency/backup/restore experiment; and
 2. YT-066a, a single Ubuntu host running three isolated Auth Notes containers behind one loopback-published reverse proxy.
 
-Neither slice proves a shared Session store, Redis semantics, physical-host HA, production failover, load/SLOs or recovery objectives. YT-066c cross-VM work remains cancelled. All repository changes remain unstaged and uncommitted.
+Neither slice proves a shared Session store, Redis semantics, physical-host HA, production failover, load/SLOs or recovery objectives. YT-066c cross-VM work remains cancelled. The changes were unstaged and uncommitted at that local/Memory checkpoint; later deliveries and the current closeout are recorded separately below.
 
 ## Existing local-process and SQLite evidence
 
@@ -150,3 +153,204 @@ The maintainer then explicitly authorized the barrier correction, requiring conf
 The maintainer explicitly authorized peon to commit reviewed b2 before proceeding. Commit `1f38d20b8ebaf9b679aa69ce461b495db1856db2` contains the exact 24 reviewed provider/Cookie paths; staged guard exited 0 under the existing audit/builtin configuration with four document-path warnings, and working bytes were preserved. No push occurred.
 
 The separately authorized [b3 qualification](YT-066B3-VERIFICATION.md) then passed one actual offline Rust 1.88 build and three-app/Nginx/single-Redis execution. Cross-process CAS, rotation/revocation, pre-finalizer stale suppression, prepared HTTP Cookie reorder, no-JS Chrome behavior, TTL, unknown-result reconciliation/expiry, caller cancellation/admission/drain, application restart and controlled Redis outage/no-persistence restart passed. The five service containers, two networks, build container, generated image, work and browser resources were removed. Exact execution source/build identities and retained evidence are recorded in b3 verification. A first independent reviewer found one material browser-cancellation cleanup defect; the smallest cleanup repair and four affected checks passed without rerunning Docker. Final local read-only reviewer thread `01a129d2-3cce-72d3-a0de-bd286565dade` reached terminal exit 0 with observed `gpt-6-astra` / `high`, 286 inputs unchanged, no issues or required followups. YT-066b3 is Done at bounded single-host/single-primary/no-persistence scope; YT-066 remains In progress and YT-020 Blocked. These b3 changes are unstaged/uncommitted, with no push.
+
+### Later b3 local delivery and persistence/recovery planning — 2026-10-11
+
+The next explicit instruction authorized peon to commit the reviewed b3 scope.
+Commit `4da0f6c1879c9a56598caec7cad449cd9127c7de` has parent `1f38d20b8ebaf9b679aa69ce461b495db1856db2`
+and tree `e500a7baeed459e5a32ca7dedfe1da104f3fafd6`; exactly 18 paths committed,
+all 286 working-input hashes preserved, index/worktree clean immediately afterward.
+Native peon trace matched `gpt-6-luna` / `high`. Direct staged guard exited 0 with
+audit/builtin first-screen coverage, `warn` and two findings; no bypass or policy
+change. No push or redundant test execution occurred.
+
+The [production persistence/recovery scope](YT-066-PERSISTENCE-RECOVERY-PLAN.md)
+is now drafted as documentation only. Proposed persistent clean restart and
+fenced invalidation after crash/older restore remain Not verified and unapproved
+for implementation. Production decisions remain open; YT-066 In progress,
+YT-020 Blocked. The earlier unstaged b3 statement is its historical closeout state.
+
+### Framework/application responsibility clarification — 2026-10-11
+
+The maintainer challenged treating production operations as framework work and
+requested independent review of the corrected documents. The [reconciled
+boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md) removes TLS/ACL deployment policy,
+backup protection, business RPO/RTO and operational ownership from mandatory
+Yetlet delivery and YT-066 completion gates. Provider semantics, supported
+configuration/error behavior, redaction and explicit recovery assumptions remain
+within framework scope. Proposed persistence/restore rehearsals are optional,
+unexecuted and not newly required tests. This correction does not establish
+production durability or alter the recorded b1/b2/b3/Cookie evidence.
+YT-066 remains In progress pending bounded framework documentation closeout;
+YT-020 remains Blocked. Independent review of this reconciliation passed.
+
+The ordinary local read-only reviewer process used the saved repository reviewer
+contract and shared-resolver effort. Thread `01a12a04-d58f-7210-a995-c6f35860437c`
+reached terminal exit 0 with runtime `gpt-6-astra` / `high`, valid canonical PASS,
+no issues or required followups, and all 287 working inputs, HEAD/status and the
+empty index unchanged. No WebCodex Job or native managed-role identity is claimed.
+The [full receipt and exact 11-file list](YT-066-PERSISTENCE-RECOVERY-PLAN.md#independent-responsibility-scope-review--2026-10-11)
+retain the reviewed input identity. Existing documentation checks passed at
+75 required / 100 total Markdown documents and 67 backlog items; no runtime
+tests were repeated. Only these outcome receipts were added after review.
+The documentation changes remain unstaged/uncommitted; no push or implementation
+occurred. Next is bounded framework documentation closeout, not mandatory
+production deployment work.
+
+## YT-066 bounded framework closeout — 2026-10-11
+
+### Authority, completion label and preserved contract
+
+The maintainer explicitly requested completing this documentation-only closeout,
+then independent repository reviewer review, without WebCodex, a new checkout or
+repeating tests with sufficient retained evidence. A local commit is authorized
+only after the final independent PASS; push, publication and deployment are not
+authorized. The preceding responsibility-scope review is not reused as the new
+final closeout review.
+
+YT-066 is **Done at single-host Docker multi-instance and selected Redis-provider
+scope**, accepted by the final independent documentation review PASS.
+That label includes the unchanged synchronous Memory limitations, selected
+experimental async Redis provider and one single-host/single-primary topology
+with `appendonly no`, `save ""`, tmpfs and no persistent volume. It is not a broad
+distributed-provider, durable-storage or production support label. The terminal
+final review gate is recorded below; it is not new runtime qualification.
+
+Keep native Axum/Tower composition, handler/component-first APIs, opt-in
+Session/Auth/DB/Cache/SSE, SQL-first application access and Core/default/browser
+dependency isolation. No generic store framework, mandatory DI, registry, ORM,
+Controller hierarchy, second HTTP stack or persistent browser event circuit is
+introduced. The selected Cookie contract stays pure SSR: a retired identity
+cannot authenticate, while a prepared late Set may cause login loss and require
+explicit login. This does not claim the former unconditional Cookie-retention
+guarantee passed or change Memory's recorded API/test contract.
+
+### Retained acceptance evidence, kept source-aware
+
+| Slice | Retained acceptance and boundary |
+|---|---|
+| Local Session/SQLite | Actual process-local isolation/restart limitations, local WAL conflict, backup/isolated restore/corrupt rejection and owned cleanup; reviewer `wc_job_YclpZ0R5tS4m8Y1I` PASS; no shared-memory-to-distributed inference |
+| YT-066a | Actual three-app Docker/Memory stateless distribution, worker stop/restart, cross-worker rejection and issuer-restart loss; retained execution plus focused cleanup repairs; final reviewer `01a1286a-5829-7411-9ecc-dbc3f00fe001` PASS |
+| YT-066b1 | [Real-Redis private spike](YT-066B1-VERIFICATION.md), direct mature-client choice and actual CAS/lifecycle/uncertain-result/bounds evidence at its recorded source; original Cookie gate failure remains historical, not relabeled PASS |
+| Selected Cookie gate | [Explicit pure-SSR contract](YT-066B-COOKIE-ORDERING.md), focused Redis/HTTP/no-JS Chrome evidence; separate reviewer `01a128b4-dbc6-7922-87e7-ab67c171665a` PASS |
+| YT-066b2 | [Provider implementation](YT-066B2-VERIFICATION.md), applied barrier correction, five Rust 1.88 provider tests and retained cancellation/drain, Clippy/format/isolation checks; reviewer `01a128d5-37d1-7f40-a7c7-84fc0c923771` PASS |
+| YT-066b3 | [Actual three-application Redis fixture](YT-066B3-VERIFICATION.md), cross-worker CAS/rotate/revoke, TTL, Cookie boundary, unknown results, cancellation/drain, app restart and fail-closed outage/no-persistence restart; focused cleanup repair; final reviewer `01a129d2-3cce-72d3-a0de-bd286565dade` PASS |
+| Responsibility boundary | [Framework/application reconciliation](YT-066-PERSISTENCE-RECOVERY-PLAN.md), reviewer `01a12a04-d58f-7210-a995-c6f35860437c` PASS; this is prior documentation evidence, not the final closeout review |
+
+The existing records retain each exact source/lock/image/process/run identity.
+For example, b3 executed at baseline `1f38d20b8ebaf9b679aa69ce461b495db1856db2`
+plus 285 working inputs, source-map SHA-256
+`0378994d46c5eb52a98a3de3cd5ce47c464207098bae8efbf8ac0291182e9ece`, with
+runtime-input map `47f8376be53e4404319e6b5ae2090622ad805a8fcbf2bddeeffa0d17b8decd77`.
+Its later 286-input review and commit `4da0f6c1879c9a56598caec7cad449cd9127c7de`
+are separate identities. The final closeout starts from that commit and changes
+Markdown only; none of these historical executions is described as a fresh run
+of the final documentation source. Hosted qualification run `38043565238` remains
+bound to `c38837835dac683b09194b475baab2d8eda5a875`, not this checkout.
+
+A read-only comparison of the 16 b3 execution inputs finds only its later
+fixture README and two cleanup scripts (`run.py`, `browser.py`) differ; the other
+13 inputs, including provider/application/dependency/topology bytes, still match.
+The script delta has retained focused runner/browser cleanup checks, the four
+affected final browser checks and final independent b3 review. Current
+non-Markdown inputs match the committed baseline and pre-closeout snapshot. No concrete changed runtime behavior lacks retained evidence, so no
+Docker, Redis, Rust or browser qualification is rerun to refresh dates or SHAs.
+Only existing documentation/language/link/backlog and whitespace checks run for
+this closeout; no validator framework is added.
+
+### Explicit unknowns and deployment responsibilities
+
+Automatic client reconnect recovery, `rediss://`/TLS/ACL qualification,
+AOF/RDB durability, fsync acknowledgment, crash/older-backup restore, Redis
+failover/Cluster/HA, cross-host partitions, load/soak/SLO, SQL Session and production
+support remain **Not verified / optional future qualification**. An application
+requiring them must select and qualify its own environment. Older storage may
+lose revocation history: documented traffic fencing and reconciliation or fresh
+namespace invalidation preconditions still apply; arbitrary restore safety is
+not established. The existing provider accepts `redis://` only.
+
+Production certificate/ACL policy, backup protection/retention, business RPO/RTO,
+SLA and operational/on-call ownership belong to applications/operators. They are
+not framework completion blockers. Provider semantics, supported configuration
+and error behavior, bounds and redaction remain framework responsibilities.
+The p1/p2 rehearsals remain unexecuted optional proposals; cancelled YT-066c stays
+cancelled. Real IME, spoken assistive-technology output, WebKit/mobile, touch/soft
+keyboard and zoom/reflow remain optional unverified YT-065 cells. No accessibility
+conformance, device certification, external audit or production guarantee follows.
+
+### Task states and next decision
+
+YT-065 is Done at automated native/desktop-browser qualification scope; YT-066
+has the bounded label above; YT-067 is Done at its internal pre-patch source-scan
+and independently reviewed small-fix scope. No post-fix whole-repository scan is
+claimed. YT-020 remains Blocked and the repository remains Private. Required CI
+checks and the scheduled/manual workflow are unchanged.
+
+The 67-item backlog contains 61 bounded Done items, five Deferred research items
+and one Blocked item (YT-020), with no automatically ready implementation task.
+A future public-release activation or application-driven provider/deployment
+qualification requires separate scope and authority. No package, release, PR,
+push, visibility or GitHub-setting change is included here.
+
+### Final independent documentation review
+
+The final reviewer inspected the actual 16-file documentation diff, the new
+responsibility/persistence document and adjacent authoritative contracts and
+retained evidence. Fresh workspace profile status was healthy/current/eligible;
+the saved repository reviewer model was `gpt-6-astra`, tier strong. The shared
+resolver selected ordinary adaptive `review` / `ad-hoc-review`, effort `high`.
+The exact role contract was `/home/bohe/.codex/agents-pipeline/agents/reviewer.md`.
+
+A separate ordinary local `codex exec` process used that contract and read-only
+sandbox, not WebCodex, `codex exec review`, self-review or native managed-role
+dispatch. Thread `01a12a61-fd85-7d40-8df2-4ce9b5977dd7` reached terminal exit **0**;
+the exact process is gone. Runtime metadata matched expected `gpt-6-astra` and
+requested `high`, read-only sandbox and approval policy `never`; observed-effort
+resolution had no conflict or degradation. Canonical JSON:
+
+```json
+{"overall_status":"pass","issues":[],"required_followups":[],"optional_notes":[]}
+```
+
+All 287 tracked/nonignored working-input hashes, HEAD, Git status and empty index
+were identical before/after review, using symlink target text for Git symlinks.
+Reviewed source-map SHA-256:
+`088eda860f147bcee523e843e6b15d26150d8a892c32da2910050b18988c7a20`.
+Reviewed baseline HEAD: `4da0f6c1879c9a56598caec7cad449cd9127c7de`.
+Ignored `target/yt066-closeout-20261011/` retains source delta, doc validation,
+exact input/output and bounded runtime evidence. No WebCodex Job ID or native
+child trace is claimed.
+
+The exact final changed-file list is:
+
+- `README.md`
+- `docs/BACKLOG.md`
+- `docs/COMPATIBILITY.md`
+- `docs/EXTENSIONS.md`
+- `docs/M10-REMAINING-PLAN.md`
+- `docs/M10G-VERIFICATION.md`
+- `docs/M10H-VERIFICATION.md`
+- `docs/PROVIDER-OPERATIONS.md`
+- `docs/RELEASE-READINESS.md`
+- `docs/ROADMAP.md`
+- `docs/YT-065-066-PLAN.md`
+- `docs/YT-065-066-PLANNING-VERIFICATION.md`
+- `docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md`
+- `docs/YT-066B-REDIS-SESSION-DESIGN.md`
+- `docs/YT-066B3-VERIFICATION.md`
+- `docs/adr/0005-opt-in-capability-modules.md`
+
+Existing `python3 scripts/check_docs.py` passed 75 required documents and 67
+backlog items. The same checker also passed all 100 repository Markdown documents
+selected in memory without checker changes. Tracked/new-file whitespace, English,
+internal links, Markdown/backlog structure and DAG checks passed. Non-Markdown
+inputs matched the baseline/pre-closeout snapshot. No Rust, Redis, Docker or
+browser test was rerun and no runtime resource was started for this closeout.
+
+After terminal PASS, only this factual gate/status/receipt was added; reviewed
+completion scope, limitations and non-Markdown inputs did not change. The same
+bounded doc/whitespace checks cover the receipt. This is the review record before
+local delivery: the maintainer explicitly authorized committing these 16 documents
+after PASS. The deterministic staged guard must run against exactly that final
+index and match `git write-tree` immediately before commit. No push or release is
+authorized, and later commit metadata does not change historical execution IDs.

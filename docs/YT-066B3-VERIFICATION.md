@@ -2,6 +2,8 @@
 
 **Date:** 2026-10-11
 **Status:** Done at bounded single-host, single-primary, no-persistence qualification scope: actual execution, owned cleanup and final independent reviewer PASS. YT-066 remains In progress; YT-020 remains Blocked.
+> **Later parent closeout:** [M10g](M10G-VERIFICATION.md#yt-066-bounded-framework-closeout--2026-10-11) marks YT-066 Done only at single-host Docker multi-instance and selected Redis-provider scope, with a separate final documentation review. This record retains b3's execution/review/delivery identities and its parent-task state at that stage; no new b3 run or durability result is claimed.
+
 **Related:** [fixture](../qualification/yt066b3/README.md), [design](YT-066B-REDIS-SESSION-DESIGN.md), [b2 evidence](YT-066B2-VERIFICATION.md), [Cookie decision](YT-066B-COOKIE-ORDERING.md), [M10g](M10G-VERIFICATION.md).
 
 ## Authority and prior delivery
@@ -194,8 +196,10 @@ The b3 changes consist of these 18 files:
 - `qualification/yt066b3/browser.py`
 
 YT-066b2 is locally committed; YT-066b3 is Done only at the bounded scope above.
-The next open YT-066 decision is production topology/persistence/recovery and
-operational ownership, requiring its own explicit scope before implementation.
+The later [responsibility clarification](YT-066-PERSISTENCE-RECOVERY-PLAN.md)
+keeps production topology/recovery policy and operational ownership with the
+application/operator. The next framework step is bounded documentation closeout
+and review; those deployment decisions are not mandatory Yetlet implementation.
 Cancelled YT-066c is not reopened.
 
 This qualifies only the selected single-host, single-primary, no-persistence
@@ -203,3 +207,20 @@ configuration. Automatic client reconnect recovery, durable AOF/RDB/crash/restor
 TLS/ACL/secrets, HA/Cluster, partitions/cross-host operations, load/SLO/RPO/RTO,
 production ownership, SQL Session and public release remain unqualified. YT-066
 remains In progress, YT-020 Blocked, YT-065/YT-067 Done at their prior bounded scopes.
+
+## Later authorized local delivery — 2026-10-11
+
+After the closeout above, the maintainer explicitly authorized peon to commit b3
+before planning production persistence/recovery. Commit
+`4da0f6c1879c9a56598caec7cad449cd9127c7de`, parent
+`1f38d20b8ebaf9b679aa69ce461b495db1856db2`, tree
+`e500a7baeed459e5a32ca7dedfe1da104f3fafd6`, contains exactly the 18 paths above.
+All 286 input hashes were preserved and index/worktree were clean immediately
+afterward. Saved/native peon model and effort matched `gpt-6-luna` / `high`.
+The direct staged guard exited 0 under existing audit/builtin settings with
+first-screen coverage, `warn` and two findings. No bypass, policy change, push
+or new qualification execution occurred. The earlier unstaged/uncommitted
+statements record the review closeout before this later authorization.
+
+The [next planning document](YT-066-PERSISTENCE-RECOVERY-PLAN.md) is a separate,
+unstaged documentation-only proposal, not production implementation or review PASS.
