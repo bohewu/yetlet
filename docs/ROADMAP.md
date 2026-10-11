@@ -122,9 +122,11 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 - [x] Reproducible **local** results for A01–A09, mapped to actual Rust/Chrome/Firefox tests.
 - [x] Release-mode baseline measured for local SSR first-byte, HTML, gzip artifact estimates, Browser/WASM and Search Island readiness; environment and limitations recorded.
 - [x] Documentation distinguishes locally tested prototype capabilities from production/public release gates.
-- [ ] **Public-release authorization:** license, supported MSRV/API/browser matrix, authentication/security posture, and independent qualification remain open.
+- [ ] **Public-release authorization:** The license and bounded qualification work are complete. [Private experimental 0.1.0 preparation](YT-020-PRIVATE-RELEASE-PREP.md) selects the original nine libraries and prepared API/MSRV/maintenance scope; immutable-source/registry, trusted release integrity, public reporting/scanner activation and explicit approval remain open. Application deployment qualification is separate.
 
 **M5 local evidence (2026-10-08):** [M5 acceptance and measurements](M5-VERIFICATION.md) documents A01–A10, release Rust/Chrome 155, Firefox 157 physical-keyboard E2E, 30 SSR timing samples, 5 Chrome navigation/activation samples, and asset sizes. `YT-019` is locally Done; `YT-020` is Blocked for publication, with explicit owners in [Release readiness](RELEASE-READINESS.md). GitHub CI has not executed the new M5 workflow changes.
+
+**Later delivery/preparation update (2026-10-11):** The earlier hosted-CI statement above records the M5 checkpoint. Maintainer PR #4 and post-merge `a61f409` required CI passed. YT-065/066/067 retain their bounded completion and historical source identities. The maintainer authorized private `0.1.0` preparation only; local package verification is not a hosted run on these uncommitted changes, signed release evidence or publication approval. YT-020 remains Blocked for actual activation.
 
 ### M6 — Handler-first developer API and opt-in modules (locally complete)
 
