@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-10
 **Task:** YT-066 / M10g, bounded YT-066b design
-**Status:** Original revised design independently reviewed PASS on 2026-10-11 after four material corrections; [YT-066b1 execution](YT-066B1-VERIFICATION.md) subsequently passed its bounded review. A later explicit maintainer decision selects the pure-SSR cookie contract in section 10; its focused tests and [independent review](YT-066B-COOKIE-ORDERING.md) passed. The [experimental provider implementation](YT-066B2-VERIFICATION.md) has passing focused integration tests after its test barrier correction and independent implementation reviewer PASS at bounded YT-066b2 scope. No stable/full distributed provider is accepted.
+**Status:** Original revised design independently reviewed PASS on 2026-10-11 after four material corrections; [YT-066b1 execution](YT-066B1-VERIFICATION.md) subsequently passed its bounded review. A later explicit maintainer decision selects the pure-SSR cookie contract in section 10; its focused tests and [independent review](YT-066B-COOKIE-ORDERING.md) passed. The [experimental provider implementation](YT-066B2-VERIFICATION.md) has passing focused integration tests after its test barrier correction and independent implementation reviewer PASS at bounded YT-066b2 scope. [Three-application qualification](YT-066B3-VERIFICATION.md) is Done at single-host/single-primary/no-persistence scope after actual execution, cleanup and final independent reviewer PASS. No stable/full distributed production provider is accepted.
 **Related:** [Provider operations](PROVIDER-OPERATIONS.md), [M10g verification](M10G-VERIFICATION.md), [YT-065 / YT-066 plan](YT-065-066-PLAN.md), [ADR 0005](adr/0005-opt-in-capability-modules.md), [M8c verification](M8C-VERIFICATION.md), [planning verification](YT-066B-PLANNING-VERIFICATION.md).
 
 ## 1. Goal and non-goals
@@ -344,7 +344,7 @@ Still open after design review:
 - concrete serialization format and migration policy;
 - operation-reconciliation retention and tombstone TTL;
 - independent acceptance of the explicitly selected pure-SSR cookie implementation (section 10), not a promise of unconditional cookie retention;
-- Redis persistence mode for qualification;
+- production Redis persistence/recovery qualification beyond the selected no-persistence b3 fixture;
 - production TLS/ACL/secret ownership; and
 - any future Sentinel/Cluster/HA work.
 

@@ -152,13 +152,13 @@ must be designated; these roles are pending, not assigned to fictional people.
 | Secret redaction | Security owner defines cookie/token/code/credential/log exclusions and tests failure paths, exports, metrics and retained evidence; do not attach raw sensitive logs |
 | Observability | Application/operator owners define safe correlation, conflict/outage/queue/drain/backup metrics, alerts and recovery procedures; verify them under the real failure scenarios |
 
-Provider outage, Redis failover, multinode consistency, HA, load/performance SLO,
+The [YT-066b3 fixture](YT-066B3-VERIFICATION.md) is Done at bounded three-application single-host/single-primary scope after actual Session/CAS/rotation/revocation/outage/restart execution, cleanup and final independent reviewer PASS under an explicit no-persistence configuration. Production provider outage/recovery, Redis failover, cross-host consistency, HA, load/performance SLO,
 production backup durability/RPO/RTO, real OIDC and key rotation remain **not
 qualified**. Retained Session, file, SSE and YT-066a Docker/Memory results cannot
 replace those tests. YT-066 remains **In progress** pending the separately selected
-Redis/provider topology with actual distributed qualification. YT-066a's final
+production Redis/provider ownership and recovery decisions beyond this bounded topology. YT-066a's final
 review PASS does not close the provider gate
 or unblock YT-020. The earlier local execution and reviewer
 `wc_job_YclpZ0R5tS4m8Y1I` passed; the Docker/Memory behavior execution passed,
 and its six earlier review outcomes, bounded repairs and final PASS are recorded in M10g verification.
-Provider selection, ownership and actual distributed acceptance remain open gates.
+The experimental single-primary provider is explicitly selected; production ownership and broader distributed acceptance remain open gates.
