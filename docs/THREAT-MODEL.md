@@ -435,7 +435,7 @@ A specific application deployment is not production-qualified until all applicab
 
 - **YT-060 / YT-061:** dual licensing/security policy and private-state repository governance are complete; public-transition scanner/reporting activation remains separate.
 - **YT-064:** release design and unsigned local preflight are complete; signing, immutable release inputs and independent reproducibility remain activation gates.
-- **YT-065:** browser/OS/accessibility compatibility qualification is independent of this threat model.
+- **YT-065:** bounded automated desktop/native/browser qualification is complete; optional real-device/IME/assistive-technology/WebKit/mobile/zoom evidence and any support/conformance declaration remain independent of this threat model.
 - **YT-066:** distributed Session/storage, backup/restore, load, cancellation, observability and recovery must prove the operational controls identified here.
 - **YT-067:** the maintainer requires an internal Codex Security Standard source scan rather than a paid external assessment. The updated-source scan completed with a canonical report (227/227 regular files, one Low finding); its local corrective patch passed regressions and independent reviewer `wc_job_sTA8TdP3N3Veu9uC` (0 material findings). The earlier scan remains incomplete. YT-066 is independently necessary for any distributed-deployment claims.
 

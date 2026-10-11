@@ -1,0 +1,105 @@
+x-yetlet-app: &yetlet-app
+  image: "${YT066B3_APP_IMAGE:?set YT066B3_APP_IMAGE}"
+  environment:
+    YT_ISOLATED_LAB: "1"
+    YT_REDIS_URL: "redis://redis:6379/"
+    YT_NAMESPACE: "${YT066B3_NAMESPACE:?set isolated namespace}"
+    YT_INSTANCE: "unset"
+  depends_on:
+    redis:
+      condition: service_healthy
+  expose:
+    - "3010"
+  read_only: true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,nodev,size=16m
+  user: "10001:10001"
+  cap_drop:
+    - ALL
+  security_opt:
+    - no-new-privileges:true
+  pids_limit: 64
+  mem_limit: 192m
+  cpus: 0.50
+  stop_signal: SIGINT
+  stop_grace_period: 5s
+  restart: "no"
+  networks:
+    - lab
+
+services:
+  app-a:
+    <<: *yetlet-app
+    environment:
+      YT_ISOLATED_LAB: "1"
+      YT_REDIS_URL: "redis://redis:6379/"
+      YT_NAMESPACE: "${YT066B3_NAMESPACE:?set isolated namespace}"
+      YT_INSTANCE: "a"
+  app-b:
+    <<: *yetlet-app
+    environment:
+      YT_ISOLATED_LAB: "1"
+      YT_REDIS_URL: "redis://redis:6379/"
+      YT_NAMESPACE: "${YT066B3_NAMESPACE:?set isolated namespace}"
+      YT_INSTANCE: "b"
+  app-c:
+    <<: *yetlet-app
+    environment:
+      YT_ISOLATED_LAB: "1"
+      YT_REDIS_URL: "redis://redis:6379/"
+      YT_NAMESPACE: "${YT066B3_NAMESPACE:?set isolated namespace}"
+      YT_INSTANCE: "c"
+
+  redis:
+    image: redis@sha256:47670742d7924adbcdb404d1288b6327815b23141969c0939b8e5d61f78c2634
+    user: "999:999"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 1
+    mem_limit: 128m
+    pids_limit: 64
+    tmpfs:
+      - /data:uid=999,gid=999,mode=0700
+      - /tmp:uid=999,gid=999,mode=0700
+    # No persisted state or external listener; only the isolated app backend.
+    expose: ["6379"]
+    networks: [lab]
+    command: [redis-server, --bind, 0.0.0.0, --protected-mode, "no", --save, "", --appendonly, "no", --maxmemory, 64mb, --maxmemory-policy, noeviction]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 1s
+      timeout: 1s
+      retries: 10
+
+  proxy:
+    image: "nginx@sha256:0985e772fb9f729e6fa0980da05fca5d9c468e870eed43071545afa9d2e27d94"
+    entrypoint: ["/usr/sbin/nginx", "-g", "daemon off;"]
+    depends_on:
+      - app-a
+      - app-b
+      - app-c
+    ports:
+      - "127.0.0.1:${YT066B3_HOST_PORT:?set YT066B3_HOST_PORT}:8080"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,nodev,size=16m
+    user: "101:101"
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 96m
+    cpus: 0.50
+    restart: "no"
+    networks:
+      - front
+      - lab
+
+networks:
+  front: {}
+  lab:
+    internal: true

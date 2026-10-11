@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-10
 **Task:** YT-065 / M10f
-**Status:** Automated local and hosted qualification PASS. YT-065 remains In progress for its declared manual IME/assistive-technology/device coverage; no production/accessibility/SLA guarantee is established.
+**Status:** **Done at automated desktop/native/browser qualification scope.** Automated local and hosted qualification passed. Real IME, assistive-technology speech, WebKit/mobile and zoom remain explicitly Not verified optional coverage; no supported-device, accessibility-conformance, production or SLA guarantee is established.
 
 ## Authority and written scope
 
@@ -75,7 +75,7 @@ hosted-run result. The workflow observes actual tools and fails closed.
 
 All three asset builders and native Todo/dashboard/forms release binaries succeeded before browser execution. The existing 136 production dist files were byte-identical before/after builds. Three existing Firefox suites ran once, followed by one new forms suite with real WebDriver Tab/Enter/Unicode actions, error associations and first-error focus, root language, no-state 303 PRG and owned cleanup. The forms report explicitly lists OS IME, screen reader, WebKit/mobile, zoom and conformance as `not_verified`. Logs/results are retained under `target/m10-remaining/065-firefox-*` and `target/qualification/`; these are local Linux observations, not new hosted results.
 
-## Pending runtime and hosted evidence
+## Recorded runtime and hosted evidence
 
 | Required observation | Current result |
 |---|---|
@@ -88,12 +88,12 @@ All three asset builders and native Todo/dashboard/forms release binaries succee
 | Independent YT-065 implementation reviewer | `wc_job_FH0L7fH4UH6ICPoW` terminal exit 0, `gpt-6-astra`/high requested, read-only, PASS with no issues/followups; source/local gate only |
 | Real OS IME, NVDA/VoiceOver, WebKit/mobile and zoom | Not verified; manual instructions only |
 
-Main session should execute one bounded headless sequence from the
-[matrix/runbook](QUALIFICATION-MATRIX.md), parse its report, retain exact logs
-and exit statuses, and separately record compile/browser/CSP evidence. Failure
-must be classified under the materiality gate before a focused repair. No
-repeated visible probe or broad harness rewrite is authorized.
-
 The maintainer subsequently authorized PR/merge and actual hosted execution. PR #1 merged as `c38837835dac683b09194b475baab2d8eda5a875`; the new qualification workflow was dispatched and reached terminal success in run `38043565238`. Its three native lanes and Linux Firefox lane are independently observed hosted evidence, not inferred from the earlier local tests. The weekly schedule is now present on the default branch; future scheduled outcomes are not preclaimed. Additional local Windows GNU and offline Docker runs passed on the identical candidate tree. See [delivery verification](M10-DELIVERY-VERIFICATION.md).
 
-Open decisions: supported OS/architecture/browser version policy, real-device and assistive-technology test ownership, and manual evidence acceptance. Automated hosted execution is complete for the recorded platforms, while OS IME, screen reader, WebKit/mobile and zoom remain unverified. YT-065 retains those manual gates; independent provider-operations work remains separate. YT-020 remains Blocked.
+## Bounded completion decision
+
+YT-065 is Done at the recorded automated desktop/native/browser qualification scope. The required evidence is the existing Rust 1.88 baseline, the hosted native matrix, the Linux Chrome/Firefox suites, SSR fallback, DOM/event/lifecycle behavior, keyboard/labels/focus checks, escaping/CSP observations and owned cleanup. Historical run and source identities remain exactly as recorded; this documentation closeout does not rerun a lane or relabel those results as evidence for the later YT-067 source.
+
+Real OS IME, NVDA/VoiceOver or other spoken assistive-technology output, WebKit/Safari, iOS/Android and zoom/reflow remain **Not verified** and optional future qualification. They are not prerequisites for this bounded task, do not imply unsupported environments passed, and do not establish WCAG/accessibility conformance or a general browser-support range. An application that targets one of those environments must qualify its own required behavior.
+
+Public support/version policy and manual-evidence ownership remain future release decisions. Independent provider-operations work remains separate under YT-066, and YT-020 remains Blocked.

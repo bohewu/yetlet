@@ -1,6 +1,6 @@
 # Platform, Browser and Accessibility Qualification Matrix
 
-**Task:** YT-065 / M10f. **Current status:** Automated local and hosted lanes PASS; In progress for manual IME/assistive-technology/device qualification. Run `38043565238` tested source `c38837835dac683b09194b475baab2d8eda5a875`. This matrix supplies no accessibility conformance, SLA or production guarantee.
+**Task:** YT-065 / M10f. **Current status:** **Done at automated desktop/native/browser qualification scope.** Run `38043565238` tested source `c38837835dac683b09194b475baab2d8eda5a875`. Real IME, assistive-technology speech, WebKit/mobile and zoom remain explicitly Not verified optional coverage. This matrix supplies no supported-device range, accessibility conformance, SLA or production guarantee.
 
 ## Coverage and evidence boundaries
 
@@ -105,7 +105,7 @@ codes; raw process output and exception messages are discarded. `not_verified`
 must retain real IME, screen-reader and other untested scopes even after PASS.
 Cleanup failure prevents PASS. No screenshots or visible browser are needed.
 
-## Manual qualification runbook (all pending)
+## Optional future manual qualification runbook (currently Not verified)
 
 Record tester/date, source/build identity, OS/architecture, browser version,
 assistive technology or IME version/settings, profile and observed result for
@@ -146,12 +146,8 @@ for failures. A blank record or successful automation is not manual evidence.
    errors and islands. Record observed defects and exact settings. No general
    WCAG certification follows from these bounded journeys.
 
-## Acceptance still open
+## Bounded task acceptance and optional future coverage
 
-Add current local/browser and hosted run IDs, terminal results, observed
-versions/architectures and artifact references to [M10f verification](M10F-VERIFICATION.md).
-YT-065 remains In progress until the separately authorized merge and actual
-new workflow terminal success; pending/manual cells keep their explicit
-Not verified status. Supported platform/version policy, real-device/AT owners
-and manual evidence are open decisions. YT-020 release qualification remains
-Blocked. YT-066 is a separate backlog item and is not started by this slice.
+The local/browser and hosted run IDs, terminal results, observed versions/architectures and artifact references are recorded in [M10f verification](M10F-VERIFICATION.md). The authorized workflow merge and actual hosted run reached terminal success. YT-065 is therefore Done at the bounded automated desktop/native/browser scope.
+
+The manual cells above remain explicitly Not verified and optional. They do not block this bounded task, do not become supported-platform or accessibility-conformance claims, and must not be inferred from typed Unicode or DOM assertions. Supported platform/version policy, real-device/assistive-technology ownership and any application-specific manual evidence remain future decisions. YT-020 release qualification remains Blocked. YT-066 is a separate backlog item.

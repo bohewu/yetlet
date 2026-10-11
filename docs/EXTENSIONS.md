@@ -79,6 +79,18 @@ The provider generates opaque IDs and CSRF tokens from the operating-system RNG,
 
 The Session lock is never held across downstream `await`. `try_update` mutates a clone and commits only on application success. Session is still not authentication, durable storage, a distributed provider or a substitute for authorization and production security review. See [M8c evidence](M8C-VERIFICATION.md).
 
+## Separately selected experimental Redis Session
+
+M10g qualifies the opt-in `yetlet-session-redis` nested workspace at single-host
+Docker multi-instance, single-primary and no-persistence scope. It uses explicit
+async operations and native scoped Axum middleware; the synchronous Memory API
+and Core/default-server/browser graphs remain unchanged. See the [provider
+README](../crates/yetlet-session-redis/README.md), [selected Cookie contract](YT-066B-COOKIE-ORDERING.md)
+and [bounded closeout](M10G-VERIFICATION.md#yt-066-bounded-framework-closeout--2026-10-11).
+The pure-SSR Cookie contract preserves retired-ID rejection but permits login
+loss under extreme response reordering. This is not a Stable Candidate API,
+authentication system, production durability/HA result or mandatory dependency.
+
 ## Designing another module
 
 Use a normal setup function where it suffices. Add narrow traits only for genuine replaceable resource contracts (for example a cache store), not for a central plugin registry. Keep storage-specific dependencies in the module/provider crate. A handler that does not need context, auth or session should remain an ordinary function.

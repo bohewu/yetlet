@@ -1,5 +1,5 @@
 use std::net::SocketAddr;
-use yetlet_auth_notes::{DemoIdentities, app};
+use yetlet_auth_notes::{DemoIdentities, app, app_for_isolated_container_lab};
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -29,7 +29,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             );
         }
     };
-    let application = app(address, identities)?;
+    let application = match std::env::var("YETLET_AUTH_ISOLATED_CONTAINER_LAB") {
+        Err(std::env::VarError::NotPresent) => app(address, identities)?,
+        Ok(value) if value == "1" => {
+            eprintln!("Isolated container HTTP lab mode enabled; do not publish the app container");
+            app_for_isolated_container_lab(address, identities)?
+        }
+        _ => {
+            return Err("YETLET_AUTH_ISOLATED_CONTAINER_LAB must be exactly 1 when enabled".into());
+        }
+    };
     let listener = tokio::net::TcpListener::bind(address).await?;
     println!(
         "Yetlet Auth Notes sample on http://{}",

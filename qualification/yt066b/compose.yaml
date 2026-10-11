@@ -1,0 +1,21 @@
+services:
+  redis:
+    image: redis@sha256:47670742d7924adbcdb404d1288b6327815b23141969c0939b8e5d61f78c2634
+    user: "999:999"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    cpus: 1
+    mem_limit: 128m
+    pids_limit: 64
+    tmpfs:
+      - /data:uid=999,gid=999,mode=0700
+      - /tmp:uid=999,gid=999,mode=0700
+    # No persisted state, no shared app network, and no external listener.
+    ports: ["127.0.0.1::6379"]
+    command: [redis-server, --bind, 0.0.0.0, --protected-mode, "no", --save, "", --appendonly, "no", --maxmemory, 64mb, --maxmemory-policy, noeviction]
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 1s
+      timeout: 1s
+      retries: 10
