@@ -244,6 +244,7 @@ struct AppState {
 #[derive(Debug)]
 pub enum AuthAppError {
     NonLoopbackListener,
+    NonIsolatedContainerListener,
     Session(SessionConfigError),
 }
 
@@ -253,6 +254,8 @@ impl fmt::Display for AuthAppError {
             Self::NonLoopbackListener => {
                 formatter.write_str("the insecure local auth demo must bind a loopback address")
             }
+            Self::NonIsolatedContainerListener => formatter
+                .write_str("the isolated container lab must bind a loopback or wildcard address"),
             Self::Session(error) => error.fmt(formatter),
         }
     }
@@ -261,7 +264,7 @@ impl fmt::Display for AuthAppError {
 impl std::error::Error for AuthAppError {
     fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
         match self {
-            Self::NonLoopbackListener => None,
+            Self::NonLoopbackListener | Self::NonIsolatedContainerListener => None,
             Self::Session(error) => Some(error),
         }
     }
@@ -763,10 +766,7 @@ fn map_note(error: NoteError) -> Failure {
     }
 }
 
-pub fn app(listener: SocketAddr, identities: DemoIdentities) -> Result<Router, AuthAppError> {
-    if !listener.ip().is_loopback() {
-        return Err(AuthAppError::NonLoopbackListener);
-    }
+fn build_app(identities: DemoIdentities) -> Result<Router, AuthAppError> {
     let sessions = SessionManager::<AuthSession>::new(
         SessionConfig::new("yetlet-auth-notes", SESSION_TTL, SESSION_CAPACITY)?
             .insecure_for_local_http(),
@@ -796,5 +796,26 @@ pub fn app(listener: SocketAddr, identities: DemoIdentities) -> Result<Router, A
         .into_router())
 }
 
+pub fn app(listener: SocketAddr, identities: DemoIdentities) -> Result<Router, AuthAppError> {
+    if !listener.ip().is_loopback() {
+        return Err(AuthAppError::NonLoopbackListener);
+    }
+    build_app(identities)
+}
+
+/// Build the insecure HTTP fixture for an explicitly isolated container lab.
+///
+/// A wildcard listener is accepted only through this separately named entrypoint.
+/// The caller must keep the container network private and publish any reverse proxy
+/// only on host loopback. This does not make the sample production deployable.
+pub fn app_for_isolated_container_lab(
+    listener: SocketAddr,
+    identities: DemoIdentities,
+) -> Result<Router, AuthAppError> {
+    if !(listener.ip().is_loopback() || listener.ip().is_unspecified()) {
+        return Err(AuthAppError::NonIsolatedContainerListener);
+    }
+    build_app(identities)
+}
 #[cfg(test)]
 mod tests;

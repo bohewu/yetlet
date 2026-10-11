@@ -166,6 +166,12 @@ fn local_http_exception_is_loopback_only_and_secure_is_the_provider_default() {
         app("0.0.0.0:3010".parse().unwrap(), identities()),
         Err(AuthAppError::NonLoopbackListener)
     ));
+    assert!(app_for_isolated_container_lab("0.0.0.0:3010".parse().unwrap(), identities()).is_ok());
+    assert!(app_for_isolated_container_lab("[::]:3010".parse().unwrap(), identities()).is_ok());
+    assert!(matches!(
+        app_for_isolated_container_lab("192.0.2.10:3010".parse().unwrap(), identities()),
+        Err(AuthAppError::NonIsolatedContainerListener)
+    ));
 }
 
 #[tokio::test]
