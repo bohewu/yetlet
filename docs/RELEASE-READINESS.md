@@ -3,6 +3,8 @@
 **Date:** 2026-10-10
 **Decision:** **M0–M9 are demonstrable and independently reviewed at prototype scope; public package publication and production deployment remain blocked.**
 
+**Private preparation update (2026-10-11):** The maintainer selected experimental `0.1.0` and the original nine library candidates. [YT-020 preparation](YT-020-PRIVATE-RELEASE-PREP.md) records the prepared compatibility/maintenance scope, package metadata, actual local preflight and remaining activation gates. YT-020 remains Blocked; this is not publication approval or a visibility change.
+
 This document separates bounded repository evidence from a support or security commitment. See [M9 final evidence](M9J-VERIFICATION.md), [API contract classification](API-CONTRACTS.md) and the [post-M9 CI/security review](CI-SECURITY-REVIEW.md).
 
 ## What is working
@@ -47,10 +49,10 @@ separate framework publication/activation gates; no release is authorized here.
 | Gate | State | Detail |
 |---|---|---|
 | M0–M9 prototype contracts | Verified locally | Per-stage evidence and independent reviewers |
-| Rust 1.88 MSRV | Verified locally; hosted job added | Native tests/doctests and wasm32 checks are required in CI |
+| Rust 1.88 MSRV | Verified locally and by retained hosted required CI | Native tests/doctests and wasm32 checks remain required; private package verification also uses Rust 1.88 |
 | Current stable Rust | Verified locally | Format, strict Clippy, tests, doctests, smokes and wasm32 |
 | Dependency vulnerability audit | Passing after repair | `RUSTSEC-2026-0009` fixed by `time 0.3.47`; Dependabot alerts/security fixes and per-CI `cargo-audit` are enabled, but no scheduled version-update PR configuration or broader continuous monitor exists |
-| Hosted GitHub Actions | **Candidate, merged baseline and qualification verified** | PR run `38042614403` passed on `3128d23`; merged baseline `38043547271` passed both required jobs and qualification `38043565238` passed all four platform/Firefox jobs on identical-tree `c388378` |
+| Hosted GitHub Actions | **Candidate, merged baseline and qualification verified** | PR #4 run `38131601428` passed both required jobs on `dda30de`; post-merge run `38132515711` passed on identical-tree `a61f409`. Earlier PR #1 and qualification evidence retain their recorded `c388378` source. No hosted CI result is claimed for the uncommitted YT-020 preparation |
 | Platform/browser compatibility | **YT-065 automated scope complete; optional coverage unverified** | Hosted Linux, Windows MSVC, macOS ARM64 and Firefox four-suite execution PASS; local Windows GNU and offline Docker PASS. WebKit/mobile, real IME, screen readers and zoom remain explicitly Not verified and are not supported-platform claims |
 | Accessibility | **Partial** | Actual Tab/Enter/Unicode, labels/errors/focus and root-language checks pass; real IME, screen readers, zoom and conformance are not verified |
 | Authentication/authorization | **Threat model specified; implementation prototype only** | M10d requires external OIDC plus server-side resource authorization; Auth Notes remains synthetic and is not an IdP/password/passkey/MFA design |
@@ -60,18 +62,19 @@ separate framework publication/activation gates; no release is authorized here.
 | Observability/load/cancellation | **Partial** | Lifecycle/cancellation tests exist; no production tracing, SLO, soak or incident evidence |
 | Repository security controls | **Partial, private-state configured** | Collaborator-only PRs, protected `master`, required CI, SHA-pinned GitHub-owned Actions and Dependabot enabled; private vulnerability reporting, secret scanning and CodeQL unavailable until Public/current-plan support |
 | Package license and vulnerability policy | **Selected and independently reviewed** | `MIT OR Apache-2.0`, `SECURITY.md` and maintainer-directed/no-external-PR policy PASS; GitHub private reporting must be enabled at Public transition |
-| Stable API/SemVer/support policy | **Partial** | M10c defines a provisional one-release-train/change-discipline policy and additive document metadata; public activation still requires an explicit release decision and YT-064 supply-chain evidence |
-| Artifact integrity/release supply chain | **Design/preflight complete; activation missing** | License/source policy, 41 native SBOMs and checksum tooling PASS; no signed provenance, independent reproducibility or immutable release promotion |
+| Stable API/SemVer/support policy | **Experimental policy prepared; activation missing** | Original nine candidates, coordinated `0.1.x`, patch API/MSRV preservation and best-effort maintenance are selected privately. API classifications stay intact; no released supported version, SLA or production stability is claimed |
+| Source-package metadata | **Private preflight verified; real registry gate open** | Six dependent manifests retain paths and add compatible `0.1.0` requirements; nine archives compile from extracted contents with Rust 1.88 using current Cargo's temporary local registry. Real registry name/ownership and resolution remain unverified |
+| Artifact integrity/release supply chain | **Design and private preflight complete; activation missing** | Retained M10e evidence remains historical. Current private bundle binds nine archives, nine all-target dependency inventories and build identity with unsigned checksums; no signed provenance, independent rebuild or immutable promotion is claimed |
 | Codex-assisted internal security assessment | **Done at internal source/fix scope** | Official Standard scan on pre-patch `25bff77` reviewed 227/227 regular files and found one Low issue; local control-character guard, Rust/MSRV/WASM/Chrome regressions and independent reviewer PASS. Original older-source scan incomplete; patched tree not rescanned; no external audit/certification |
 
 ## Decisions before publication
 
-1. **Public-transition owner:** Enable and verify GitHub Private Vulnerability Reporting, secret scanning/push protection and CodeQL after changing visibility; preserve collaborator-only PRs.
-2. **Maintainer:** Retain or revise the current zero-approval sole-maintainer PR rule when adding another maintainer, and define signed release-tag policy in the release-supply-chain gate.
-3. **Maintainer/team:** Activate or revise the provisional SemVer/MSRV policy at public release and declare supported browsers/OS; the bounded title/language document contract remains Experimental pending more consumers.
-4. **Application deployment owner (not a framework publication prerequisite):** Implement and test the [M10d Threat Model](THREAT-MODEL.md) against that application's selected external proxy/IdP/Session/limiter/secrets/storage products. Yetlet documents these opt-in boundaries; YT-066 qualifies the bounded framework provider contract.
-5. **Release owners:** Define reproducible artifacts, license/source policy, SBOM, checksums, provenance, signing, approval and rollback.
-6. **QA/security owner:** Retain actual scheduled platform/browser evidence, treat manual accessibility/IME/device work as separately selected application/support qualification, and require a complete internal security-scan report with residual-risk decisions. External assessment is optional and needs separate authorization.
+1. **Maintainer `bohewu`:** Activate only the selected experimental `0.1.0`/nine-library scope after its concrete gates pass. The prepared [compatibility policy](COMPATIBILITY.md) preserves API/MSRV in patches, limits maintenance to the latest approved experimental patch and retains source-aware qualification. No stable API or production support is declared.
+2. **Release approver `bohewu`:** Approve a clean reviewed immutable source/tag, registry name/ownership and resolution, selected-target inventory/license evidence, independent rebuild, trusted provenance/signatures, exact digests and rollback target. The existing [supply-chain requirements](RELEASE-SUPPLY-CHAIN.md) are not replaced by local checksums or green CI.
+3. **Public-transition owner `bohewu`:** After separate authorization, verify a reachable private reporting route/fallback and enable/verify GitHub Private Vulnerability Reporting, secret scanning/push protection and CodeQL. Preserve collaborator-only PRs, protected `master`, both required checks and the current sole-maintainer approval rule; revisit governance only if another maintainer is added.
+4. **Security acceptance owner `bohewu`:** Record acceptance of the concrete release source delta and findings/residual risks while retaining the YT-067 scan/fix identity boundary. Retain scheduled evidence; optional IME/AT/device/WebKit/mobile/zoom work is required only by a separately selected support/application scope. No automatic full rescan or paid external assessment is required by this preparation.
+
+Application deployment owners apply the [M10d Threat Model](THREAT-MODEL.md) to their chosen proxy/IdP/Session/limiter/secrets/storage products. Production TLS/ACL, backups, RPO/RTO, staffing, durability/HA and rollout are not framework source-package publication prerequisites.
 
 ## Scope protection
 

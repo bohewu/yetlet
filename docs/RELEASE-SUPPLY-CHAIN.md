@@ -3,13 +3,15 @@
 **Task:** YT-064 / M10e
 **Status:** Design and local preflight accepted; independent reviewer `wc_job_CeUNYnHsO1yI_kBz` PASS. Actual experiments are recorded in M10e verification. Release activation, signing and independent rebuild are not performed; YT-020 remains Blocked.
 
+**Private preparation update (2026-10-11):** The maintainer selected experimental `0.1.0` and the original nine library candidates. [YT-020 preparation](YT-020-PRIVATE-RELEASE-PREP.md) records current metadata, source-package preflight, prepared support/release policies and remaining activation gates. It preserves this integrity contract and does not authorize a tag, signing, publication or visibility change. The M10e experiments below retain their original source identity.
+
 ## Source and package identity
 
 Use the [coordinated release train](COMPATIBILITY.md): all nine Yetlet library candidates share one workspace version, currently `0.1.0`. No crate is authorized for publication. A future release requires a clean reviewed immutable commit, an approved immutable tag bound to that commit, an unchanged recorded `Cargo.lock` digest, and package archive digests. Reject dirty trees, moved tags, unreviewed source and lockfile drift at the release boundary.
 
 Record exact Rust/Cargo versions (`rustc -vV`, `cargo -V`), tool binary versions and digests, host/build target triples, package/Cargo target, default-feature state, explicit features, profile, relevant build environment and complete commands. Browser artifacts also identify the pinned wasm-bindgen/loader inputs. Hash the reviewed source snapshot and release evidence; HEAD alone cannot identify uncommitted files.
 
-Actual `target/m10-remaining/cargo-metadata.json` contains 131 packages: 28 workspace members and 103 crates.io registry packages, with no Git dependencies. All workspace packages are `0.1.0` and dual licensed `MIT OR Apache-2.0`. The candidate order below is a dependency order, not a publishing script:
+The retained M10e `target/m10-remaining/cargo-metadata.json` contains 131 packages: 28 workspace members and 103 crates.io registry packages, with no Git dependencies. Its root-workspace packages are `0.1.0` and dual licensed `MIT OR Apache-2.0`; the later separately isolated Redis provider is not a publication candidate. The candidate order below is a dependency order, not a publishing script:
 
 | Candidate | Yetlet dependencies | Publication prerequisite |
 |---|---|---|
@@ -23,7 +25,7 @@ Actual `target/m10-remaining/cargo-metadata.json` contains 131 packages: 28 work
 | `yetlet-request-id` | server-axum | Versioned server-axum dependency |
 | `yetlet-session` | server-axum | Versioned server-axum dependency |
 
-The last six candidates currently have path-only Yetlet dependencies whose metadata version requirement is `*`. They are publication blockers: a separately authorized change must add compatible coordinated version requirements, preserve local paths, and verify packaged resolution against already available registry dependencies in dependency order. A local build or dirty `cargo package --list` cannot prove registry publication readiness. Cargo manifests and lockfile are unchanged by this task.
+At the M10e checkpoint, the last six candidates had path-only Yetlet dependencies whose metadata version requirement was `*`. Authorized YT-020 private preparation now adds compatible `0.1.0` requirements while preserving local paths and the original lockfile. Cargo batch-package verification can exercise unpublished dependencies in its temporary local registry; it does not establish name ownership, availability or resolution from the real crates.io registry. Those remain actual activation gates in dependency order. A local build, dirty package archive or `cargo package --list` alone cannot prove registry publication readiness. M10e itself changed no manifest or lockfile.
 
 The 19 packages with `publish = false` are `yetlet-auth-notes`, `yetlet-cart-server`, `yetlet-dashboard-counter-island`, `yetlet-dashboard-filter-island`, `yetlet-file-server`, `yetlet-forms-validation`, `yetlet-hello-world`, `yetlet-keyed-bindings`, `yetlet-middleware-lab`, `yetlet-modular-shop`, `yetlet-multi-island-dashboard`, `yetlet-render-bench`, `yetlet-rest-api`, `yetlet-search-island`, `yetlet-sqlite-crud`, `yetlet-sse-notifications`, `yetlet-todo-browser`, `yetlet-todo-server` and `yetlet-todo-ui`. Their artifacts may be qualification fixtures; they are not publication candidates.
 
@@ -88,4 +90,4 @@ Promote only already verified immutable digests: do not rebuild, repackage or su
 
 ## Current boundary
 
-The current dirty checkout and its local evidence are development-only, not an immutable release source, trusted provenance, signed artifacts or independent reproducibility evidence. [M10e verification](M10E-VERIFICATION.md) records executed commands separately from pending experiments. Independent reviewer PASS may close YT-064 at design/preflight scope only; public release, production qualification and external security review remain separate unmet gates.
+The M10e dirty snapshot and current uncommitted YT-020 preparation are development-only, not an immutable release source, trusted provenance, signed artifacts or independent reproducibility evidence. [M10e verification](M10E-VERIFICATION.md) and [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md) separate executed commands from pending activation. Independent reviewer PASS may accept their bounded design/preparation scopes only. Public activation and any application-selected production qualification remain separate; paid external security review is optional, not a framework publication prerequisite.

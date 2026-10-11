@@ -1,14 +1,18 @@
 # Yetlet Compatibility Policy — Pre-Public Draft
 
 **Date:** 2026-10-10
-**Scope:** YT-062 / M10c
-**Status:** Provisional policy for the private `0.1.0` workspace. It becomes a public compatibility commitment only after explicit release decisions.
+**Scope:** YT-062 / M10c, with YT-020 private preparation selected on 2026-10-11.
+**Status:** Prepared policy for experimental `0.1.0` and the original nine library candidates. Public activation remains blocked; no released supported version exists.
+
+The maintainer authorized [Private release preparation](YT-020-PRIVATE-RELEASE-PREP.md), not publication or a visibility change. Existing API classifications remain unchanged.
 
 ## Release train
 
 Yetlet-owned crates use one workspace version and one coordinated release train. Runnable examples, benchmark fixtures, generated WASM glue and Python harnesses are validation assets, not independently versioned public packages.
 
 The current `0.y` version remains experimental under SemVer. The classifications in [API Contracts](API-CONTRACTS.md) impose repository discipline but do not yet promise downstream compatibility.
+
+For the selected `0.1.x` train, patches preserve documented API behavior and MSRV. An incompatible change requires the next coordinated minor release with rationale, migration notes and the gates below. Publication alone does not promote an Experimental API to Stable Candidate or promise 1.0 stability.
 
 ## Change discipline
 
@@ -44,7 +48,13 @@ The complete-document API owns only:
 
 ## MSRV policy
 
-Rust 1.88 is the current declared and CI-verified MSRV. Before public release, an MSRV increase requires a documented technical/security reason and CI evidence. After public release, the release policy must state which version class may raise MSRV; no silent increase is permitted.
+Rust 1.88 is the current declared and CI-verified MSRV. The selected experimental `0.1.x` policy preserves it in patches. An MSRV increase requires a coordinated minor release, a documented technical/security reason, migration notes and CI evidence; no silent increase is permitted. Preparing packages with newer Cargo tooling does not raise the consumer compiler baseline.
+
+## Prepared maintenance and qualification scope
+
+After separate public activation, the latest approved `0.1.x` patch is the maintained experimental line on a best-effort basis; older patches are upgrade targets rather than separate maintenance branches. No production support, security response deadline or SLA is promised. Until publication, reports target private `master` and there is no released supported version.
+
+The [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md) selects the bounded native and Linux desktop Chrome/Firefox qualification/reporting scope. The [qualification matrix](QUALIFICATION-MATRIX.md) retains actual versions and source identities. That selection does not make historical lanes current-source execution or promise arbitrary versions, mobile support, device certification or accessibility conformance. Optional real IME/AT/WebKit/mobile/zoom cells remain Not verified.
 
 ## Compile fixtures
 
@@ -52,4 +62,4 @@ Rust 1.88 is the current declared and CI-verified MSRV. Before public release, a
 
 ## Still pending
 
-Licensing/security policy (YT-060) and private-state maintainer-only governance (YT-061) are complete and independently reviewed. Release design/preflight (YT-064) is complete at that scope, not signed publication. YT-065 is complete at its bounded automated desktop/native/browser scope; real-device/IME/assistive-technology/WebKit/mobile/zoom evidence remains optional and Not verified, and no general support range or conformance claim follows. YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability/HA/TLS/recovery remains Not verified. Production-specific security qualification beyond the completed YT-067 internal source scan and independently reviewed Low finding fix (no external certification or post-patch whole-repository scan), trusted release provenance and explicit public activation remain open. Public release YT-020 remains Blocked.
+Licensing/security policy (YT-060) and private-state maintainer-only governance (YT-061) are complete and independently reviewed. Release design/preflight (YT-064) is complete at that scope, not signed publication. YT-065 is complete at its bounded automated desktop/native/browser scope; real-device/IME/assistive-technology/WebKit/mobile/zoom evidence remains optional and Not verified. YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability/HA/TLS/recovery remains Not verified. The selected experimental policy is prepared privately, with [remaining activation gates](YT-020-PRIVATE-RELEASE-PREP.md#remaining-yt-020-blockers) for immutable source, registry resolution, release integrity, public reporting/scanner controls and explicit approval. The completed YT-067 scan/fix retains its source boundary; no external certification or post-patch whole-repository scan is claimed. Public release YT-020 remains Blocked.
