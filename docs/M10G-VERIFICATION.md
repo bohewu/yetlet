@@ -1,115 +1,130 @@
-# M10g Verification — Local Operations Source Handoff
+# M10g Verification — Local and Docker Operations
 
 **Date:** 2026-10-10
 **Task:** YT-066 / M10g
-**Status:** In progress. Actual local fixture execution and independent source/local reviewer `wc_job_YclpZ0R5tS4m8Y1I` PASS. Distributed-provider qualification remains unmet regardless of local results.
+**Status:** YT-066 remains In progress. Existing local Session/SQLite operations and their independent reviewer passed. YT-066a is complete at single-host Docker/Memory proof scope after retained actual execution and final independent closeout review PASS on 2026-10-11. Redis/distributed-provider qualification remains unimplemented.
 
-## Authority and scope
+## Authority and bounded scopes
 
-This single bounded executor task follows [M10 remaining plan](M10-REMAINING-PLAN.md)
-and the explicit operational handoff. Planning PASS
-`wc_job_n6i2DoBNKaltAWs2`, YT-064 PASS `wc_job_CeUNYnHsO1yI_kBz`, and YT-065
-source/local review PASS `wc_job_FH0L7fH4UH6ICPoW` are handoff-supplied prior
-evidence; none reviews this new source. The executor reads the installed
-executor contract, materiality gate, repository instructions, targeted YT-066
-backlog/plan and ADR 0005. This is direct existing YT-066 operations tooling,
-not a provider implementation or generic verification framework.
+This work follows the [M10 remaining plan](M10-REMAINING-PLAN.md), [provider operations contract](PROVIDER-OPERATIONS.md), [ADR 0005](adr/0005-opt-in-capability-modules.md) and the independently reviewed [YT-065 / YT-066 plan](YT-065-066-PLAN.md). It preserves the existing synchronous process-local `SessionManager<T>` / `Session<T>` API and does not introduce Redis, a generic store trait, a second HTTP stack, DI, ORM or production deployment.
 
-Allowed source changes are exactly:
+Two different evidence slices must remain separate:
 
-- `scripts/qualify_local_operations.py`: prebuilt real sample CLI, bounded
-  lifecycle/backup/concurrency experiments and sanitized post-cleanup report.
-- `scripts/test_local_operations.py`: mocked lifecycle/redaction/deadline tests
-  and a direct stdlib SQLite online-backup check; no sample server launches.
-- `docs/PROVIDER-OPERATIONS.md`: current limits, exact local runbook, future
-  application-selected mature store contract and pending production ownership.
-- `docs/M10G-VERIFICATION.md`: this evidence/pending-execution record.
+1. the earlier local-process Session isolation and local SQLite concurrency/backup/restore experiment; and
+2. YT-066a, a single Ubuntu host running three isolated Auth Notes containers behind one loopback-published reverse proxy.
 
-Ignored test artifacts stay under `target/m10-remaining/`. Shared backlog,
-roadmap and catalog/status updates belong to the main agent. All prior dirty
-files in the sole `master` checkout based on `7c5d126` are preserved. No runtime,
-Cargo or dependency edits; no Rust build, server launch, Docker, Redis, remote
-service, stage, commit, push, settings/branch/worktree, publication or deployment
-is performed by this executor.
+Neither slice proves a shared Session store, Redis semantics, physical-host HA, production failover, load/SLOs or recovery objectives. YT-066c cross-VM work remains cancelled. All repository changes remain unstaged and uncommitted.
 
-## Executor evidence
+## Existing local-process and SQLite evidence
 
-The following executor commands actually ran and exited 0.
-Mocked process tests do not establish actual application/process behavior.
-The direct backup fixture tests Python SQLite rather than a provider model.
+The prior source/lifecycle tests passed 10/10. Main-session execution then used actual Auth Notes and SQLite CRUD binaries and produced `target/m10-remaining/local-operations.json`:
+
+- an Auth Notes cookie was valid on its issuing process (200), rejected by a second process (401), and rejected after issuer restart (401);
+- two SQLite processes sharing one local WAL file produced one 200 and one 409 for synchronized same-version updates, final version 2 and exactly two successful audit rows;
+- online backup, integrity/foreign-key/schema checks, exact isolated restore, excluded late write and corrupt-candidate rejection passed;
+- seven owned processes and all temporary database/WAL/SHM state were removed; and
+- raw cookies, CSRF values, fixture codes, response bodies and process logs were excluded from the report.
+
+Independent read-only reviewer `wc_job_YclpZ0R5tS4m8Y1I` returned PASS for that local slice. It remains local evidence only.
+
+## YT-066a source and topology
+
+The Docker/Memory slice adds or changes only the bounded fixture surface:
+
+- `examples/auth-notes/src/lib.rs`, `main.rs`, tests and README: preserve the default loopback-only sample, plus a separately named `app_for_isolated_container_lab` entrypoint that accepts only loopback or wildcard listeners when `YETLET_AUTH_ISOLATED_CONTAINER_LAB=1` is explicitly selected;
+- `qualification/yt066a/Dockerfile`, `compose.yaml` and `nginx.conf`: pinned images, three nonpublished application containers, an internal backend network and a separate front bridge for a proxy published only on host `127.0.0.1`;
+- `scripts/qualify_multi_instance.py`: offline build, bounded execution, fixed observations, redacted post-cleanup report and ownership cleanup; and
+- `scripts/test_qualify_multi_instance.py`: source-shape, redaction, temp-path, report and cleanup tests.
+
+The default Auth Notes path still rejects `0.0.0.0`. The opt-in lab path is explicitly insecure HTTP fixture behavior, not a production listener mode. App containers run read-only as UID/GID 10001, drop all capabilities, use `no-new-privileges`, have bounded CPU/memory/PIDs and publish no host ports. Nginx 1.30.5 runs read-only as UID/GID 101 with all temp paths on its `/tmp` tmpfs, drops all capabilities and publishes exactly one host-loopback port. The backend network is Docker-internal; the front bridge exists only because Docker 29.9 suppresses published ports for a container attached solely to an internal network.
+
+## Source validation
+
+The current harness recovery checks and retained validation of unchanged application/topology inputs are:
 
 | Check | Actual result |
 |---|---|
-| `PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_local_operations.py` | PASS, 10 tests in 0.050 seconds; no sample servers |
-| Python source `compile()` without bytecode writes | PASS, both new scripts |
-| `python3 scripts/check_docs.py` | PASS, 70 documents / 67 backlog items; language, links, structure, whitespace and DAG |
-| `git diff --check` | PASS for tracked changes; new files checked separately below |
-| `git diff --no-index --check /dev/null <each new source file>` | No whitespace diagnostics for all four files; exit 1 indicates the expected new-file diff |
-| `PYTHONDONTWRITEBYTECODE=1 python3 scripts/qualify_local_operations.py --help` | Exit 0; help only, no server launch |
+| Python compile without bytecode | PASS for both YT-066a scripts after the 2026-10-11 syntax repair |
+| `scripts/test_qualify_multi_instance.py` | 18/18 PASS on 2026-10-11; existing cleanup/finalization/IO and SIGTERM/SIGINT regressions, no Docker launch |
+| Compose configuration | PASS for the dual-network topology |
+| Pinned Nginx read-only `nginx -t` | PASS |
+| `cargo fmt --all -- --check` | PASS |
+| `cargo test --locked -p yetlet-auth-notes --all-targets` | 12/12 PASS |
+| `cargo clippy --locked -p yetlet-auth-notes --all-targets -- -D warnings` | PASS |
+| `python3 scripts/check_samples.py` | 12 samples PASS |
+| `git diff --check` | PASS |
 
-The ten tests cover registration before failed readiness, bounded SIGINT timeout
-escalation to kill/wait, attempting all cleanup after a failure, readiness
-deadline and corrupt-candidate health rejection, second spawn failure with
-redacted output, cancellation after spawn, report ordering after directory
-cleanup, cleanup failure preventing PASS, direct online backup with an excluded
-late write/0600/no-overwrite, and backup progress deadline during a busy retry.
-The direct SQLite fixture is a small real Python database; mocked child
-processes are never interpreted as provider or real application evidence.
-All owned test directories were removed. No application logs were created,
-no real server/process was launched, and the main real-fixture report has not
-been generated by these tests. There were no failed checks, product repairs,
-harness repairs or operational retries. The final source files are untracked;
-the index remains empty. Main-agent catalog/status updates are still pending.
+The actual application build used pinned `rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0`, Rust/Cargo 1.88.0, locked vendored dependencies, no build-network access and a read-only source mount. The release binary SHA-256 was `41bc64432004e84101d3c917dd4f7a58decf4988ec5fdfb23848d3bb087cba45`. The proxy used pinned `nginx@sha256:0985e772fb9f729e6fa0980da05fca5d9c468e870eed43071545afa9d2e27d94` and reported nginx 1.30.5.
 
-The script reuses `smoke_sqlite_crud.call/decoded/free_port` and
-`smoke_auth_notes.call/login` (whose implementation uses `cookie/csrf`). It
-suppresses child logs and never records sensitive HTTP values or exception
-text. Startup is tracked before readiness; cleanup attempts every owned process
-and removes only the owned temporary directory, including database sidecars.
-Report success requires cleanup success. Backup/restore creates fresh owner-only
-candidates using SQLite's online backup API with a deadline/progress callback.
+## Actual YT-066a execution
 
-The executor consulted primary [SQLite backup](https://sqlite.org/backup.html),
-[SQLite WAL](https://sqlite.org/wal.html) and
-[tower-sessions concurrency](https://docs.rs/tower-sessions/latest/tower_sessions/#data-races-under-concurrent-conditions)
-documentation for these operational constraints. Documentation is design/source
-evidence, not runtime qualification.
+Final WebCodex validation Job `wc_job_cgCLjWo0A9YvXAK1` reached terminal exit 0. The sanitized report is `target/yt066a/multi-instance.json`, SHA-256 `912b8c463371bfe1c1579d1937b128f3090bf3c28e733441ce463bec461af219`. It records source HEAD `8e157b43244be38c9afc22ed7bcd7bf06351416e` and working-source digest `1deb6e81bbfdd6e1de06195e12d3ac221c051a63b624b472acc87c23a8163e4d` before the later documentation and harness-only repairs. It is retained historical execution evidence, not a run of the final repaired harness.
 
-## Main-agent actual local execution
+Observed results:
 
-After executor `wc_job_bM89LVbf32yLdsND` reached terminal exit 0, the main session used already-built actual Auth Notes and SQLite CRUD debug binaries (build log `target/m10-remaining/066-fixture-build.log`). The ten focused tests passed, then one real `qualify_local_operations.py` run exited 0. Its parsed report `target/m10-remaining/local-operations.json` records:
+- initial pooled health traffic reached all three distinct application instances with no Session cookie;
+- after stopping app A, 18 pooled requests succeeded through exactly two remaining upstreams;
+- after restarting app A, the pool again reached three upstreams;
+- the measured stop/degraded observation was 3.194 seconds and rejoin observation was 2.167 seconds; these are observations, not thresholds or SLOs;
+- login on app A produced an authenticated Session accepted on A (200) and rejected on B and C (401 each);
+- after restarting A, A rejected the old cookie (401), proving current Memory Session is neither cross-instance nor restart-persistent; and
+- private success/rejection responses retained `Cache-Control: no-store`.
 
-- Two live Auth Notes processes: cookie valid on its issuing process (200), rejected by the other (401); separate cookies remain isolated. Restart rejects the original cookie (401). Sensitive responses are `no-store`. This demonstrates **non-distributed, nonpersistent Session limitations**, not provider portability.
-- Two live SQLite workers sharing one local WAL file: synchronized same-version updates yield exactly 200/409, final version 2 and only two successful audit rows (create/update).
-- Actual online backup and isolated restore: one checkpoint note/two audit rows and schema version 1 match exactly; integrity is `ok`, no foreign-key violations, late write absent. The actual app rejects a separate corrupted candidate before health; original checkpoint digest stays unchanged; candidates are 0600.
-- Seven owned child processes are reaped, all private temporary database/WAL/SHM state removed, cleanup PASS. The report contains no raw cookies, codes, CSRF, response bodies or process logs.
-- Python SQLite is 3.46.1; the Rust application's linked SQLite version remains `not_exposed`, not inferred. Binary hashes and checkout version are separately recorded.
-- Both scenarios are `pass-for-local`; distributed provider, multinode, HA, provider outage/failover, load/SLO, real OIDC/key rotation and production RPO/RTO remain `not_verified`.
+Cleanup was part of PASS: four owned service containers, the build container, two owned networks, zero volumes and the generated application image were removed. Fresh Docker and process checks found zero related containers, networks, volumes, generated images or host processes. The retained report contains fixed statuses, counts, durations, digests and versions, not raw cookies, CSRF tokens, fixture codes, response bodies, environment dumps or service logs.
 
-The executor-only pending observations below are historical; real local results are established by this section. New hosted/distributed results are not established.
+## Classified operational failures
 
-## Main-agent evidence still required
+Two terminal attempts preceded the successful topology, and both cleaned up fully:
 
-| Required observation | Current result |
+1. Job `wc_job__gNGzQ1M5HD-6iML` timed out at readiness because read-only Nginx still used default FastCGI/UWSGI/SCGI temp paths under `/var/cache/nginx`. A pinned no-service `nginx -t` reproduced the exact failure. Moving every temp path to `/tmp` repaired only the fixture configuration. The retained report is `target/yt066a/first-attempt-readiness-timeout.json`, SHA-256 `118d3ae795301752adecba70a7fa78f394333e8812df6711e72ccf9d2f48baf7`.
+2. Job `wc_job_GPKY1fnmtpWILo6P` reached four running containers but host readiness still timed out. Captured Compose state showed `PublishedPort: 0`; bounded diagnostic Job `wc_job_TfzzyZ6JfDzKwrrK` confirmed Docker 29.9 suppresses publication when the proxy is attached only to an internal network. A one-container dual-network diagnostic then proved loopback publication with an internal backend plus ordinary front bridge. The retained second report is `target/yt066a/second-attempt-internal-network-port-disabled.json`, SHA-256 `bdc7304d564621972193c3b4882daf75f87e36692f5629ee1ccae71eb0dc833e`.
+
+These were operational fixture failures, not Yetlet product defects or evidence for wider retries. The final acceptance condition passed once after the minimum evidenced topology repair and was not rerun.
+
+## Reviewer findings, repair and remaining work
+
+First independent read-only reviewer Job `wc_job_B-D4_gtfJX2FtYcR` reached terminal exit 0 with the saved `gpt-6-astra` model and high effort, but returned **FAIL** with two material P2 findings. The review target manifests, retained reports, Git status and HEAD stayed unchanged.
+
+1. Cleanup could falsely report PASS when a final Docker query failed, because an unsuccessful query's empty output was indistinguishable from verified absence. The generated application image was also missing from the final existence check, including the interruption window after Docker created it but before the harness recorded `image_built`.
+2. `SIGTERM` was not converted into a controlled cancellation, so process termination after Compose startup could bypass the Python `finally` block and leave detached owned resources.
+
+The bounded repair changes only the existing harness and focused tests:
+
+- Docker list/recheck commands now return an explicit unknown state on exception or nonzero exit; cleanup passes only when every final query succeeds and every owned-resource result is empty.
+- The run-unique application image is always removal-attempted and is queried by exact tag during final verification, independent of an in-memory build flag.
+- `SIGTERM` raises a controlled cancellation before cleanup, records a nonpassing outcome, captures bounded diagnostics when Compose started and enters cleanup.
+- Mocked regressions prove all-query failure cannot pass, a retained image cannot pass and SIGTERM after Compose startup runs diagnostics/cleanup yet remains nonpassing.
+
+Repeat reviewer Job `wc_job_zyL9q109gG0IEJVL` then reached terminal exit 0 with `gpt-6-astra`/high and found one remaining P2: the harness installed `SIG_IGN` immediately on entering cleanup, so a **first** SIGTERM received only during cleanup could be discarded and leave an otherwise successful run as PASS. The reviewer again explicitly required only a focused mocked repair and no Docker rerun.
+
+The second bounded repair installs a cleanup-time handler when no earlier cancellation exists. Its first SIGTERM records cancellation without interrupting resource removal, switches only subsequent SIGTERM signals to ignore, and prevents PASS even when cleanup itself succeeds. When cancellation was already recorded before cleanup, a cleanup-time SIGTERM is already subsequent and may be ignored. Both paths restore the previous handler.
+
+Third reviewer Job `wc_job_wRoP0ELjQoxNNmw_` reached terminal exit 0 with `gpt-6-astra`/high and found one final P2 in the same state machine: the cancellation flag was reconciled before `write_report` and owned work-directory removal, so a first SIGTERM at report-write entry could be recorded yet leave exit 0 and a PASS report. The reviewer again explicitly prohibited a redundant Docker rerun and requested one focused mocked regression.
+
+The third bounded repair keeps the recording handler active through the candidate report write and remaining owned-work cleanup. It then closes the cancellable finalization window, checks whether a signal arrived, and if so forces cancelled/non-PASS status, exit 1 and an atomic replacement report. A focused test injects the first SIGTERM at report-write entry and verifies completed cleanup, removed work state, nonzero exit, final cancelled/non-PASS content and restored handler.
+
+Fourth reviewer Job `wc_job_bOM29UZoZ9E8pn4s` reached terminal exit 0 with `gpt-6-astra`/high and found two finalizer P2 findings. First, the raising handler could still fire at the transition into the old `finally` block before its cleanup handler was installed, escaping without Docker cleanup, report output or handler restoration. Second, `shutil.rmtree(..., ignore_errors=True)` could hide work-directory removal failure and still permit PASS, while report-writer failure occurred before that removal and could skip it entirely. The reviewer again required focused regressions and no Docker rerun.
+
+The fourth-round repair made the finalizer a single phase-aware state machine. The SIGTERM handler marks cleanup mode before raising, and an outer recovery boundary catches a signal at any transition into teardown. During cleanup/finalization the first signal records cancellation without raising, switches only subsequent signals to ignore and is reconciled before success. Docker cleanup and owned-work removal are independent required gates; removal errors are recorded and prevent PASS. Work state is removed before report writing, report-I/O failure exits nonzero and removes any stale provisional report, and the original signal handler is restored by the outermost `finally`. Three tests inject SIGTERM at the cleanup transition, force report-write failure and force work-directory deletion failure. That historical candidate passed 15 focused tests.
+
+Fifth reviewer Codex thread `01a1267b-aa58-77e2-b842-1f03cceb9014` reached terminal exit 0 but returned FAIL because SIGINT could still interrupt cleanup/finalization and leave resources or a provisional PASS. The existing follow-up extended the same phase-aware handler to SIGINT, ignores either subsequent cancellation signal during teardown and restores both original handlers. It added three focused regressions for first SIGINT during cleanup and mixed SIGTERM/SIGINT sequences.
+
+Sixth reviewer Codex thread `01a12684-0c67-7aa0-8fab-b80ad54653b5` reached terminal exit 0 but returned FAIL: a stale duplicated finalization fragment caused `IndentationError`, so that candidate could not import and its claimed current-candidate 18-test PASS was invalid. The 2026-10-11 recovery reproduced that failure, removed only the eight stale lines, then actually compiled both scripts in memory and ran the existing 18 focused tests successfully. No test source, Rust source, Cargo input or container configuration changed in this recovery.
+
+All six earlier reviewer results require only focused verification for these repairs, not a Docker qualification rerun. The three retained Docker report digests still match their recorded values. The seven Auth Notes and container-topology files are byte-identical to the first YT-066a review manifest. The successful behavior report therefore remains bounded application/topology evidence; the current focused tests cover the repaired termination, transition, IO and false-PASS paths. Review and recovery evidence is retained under ignored `target/yt066a-closeout-local-20261011/`.
+
+## Final independent closeout review — 2026-10-11
+
+| Observation | Result |
 |---|---|
-| Verified prebuilt debug sample identities and build/source relationship | Pending main-agent check; CLI records binary digests and labels source versions separately |
-| Two simultaneous Auth Notes workers, cookie 200/401 isolation and restart 401 | Not run by executor |
-| Two simultaneous SQLite workers, one local WAL file, synchronized 200/409 update, exact successful audit writes | Not run by executor |
-| Online checkpoint, integrity/foreign-key/schema checks, late write, isolated restore and exact application state | Not run by executor |
-| Real app rejects separate corrupt candidate before health; checkpoint unchanged | Not run by executor |
-| Real children reaped and private directory/WAL/SHM removed; parsed post-cleanup report | Not run by executor |
-| New compile/browser/CSP qualification | Not run; no runtime changes; earlier evidence remains separate |
-| Independent source/local implementation reviewer | `wc_job_YclpZ0R5tS4m8Y1I` terminal exit 0, `gpt-6-astra`/high requested, read-only, PASS; no issues/followups, no fixture rerun or edits |
-| Distributed provider, multinode, HA, outage/failover, load/SLO, real OIDC/key rotation, production RPO/RTO | Not verified |
+| Dispatch | Local ordinary `codex exec`, role-directed with the saved repository reviewer configuration and canonical reviewer contract; no WebCodex Job or native managed-role identity claimed |
+| Reviewer thread | `01a1286a-5829-7411-9ecc-dbc3f00fe001` |
+| Execution | Terminal exit 0; observed model `gpt-6-astra`, requested and observed effort high, read-only sandbox |
+| Verdict | Valid canonical JSON: PASS, zero issues, zero required followups, zero optional notes |
+| Review boundary | Corrected harness, existing focused tests, application/topology inputs, retained reports and adjacent status documents; target contents, reports, HEAD and Git status unchanged during review |
+| Current checks | Both scripts compile in memory; 18 existing focused tests PASS; documentation/link/whitespace checks PASS for 75 configured documents and 79 with the four new Markdown paths included in memory, 67 backlog items |
+| Preservation and resources | Original single `master` checkout; no staged files, commit or push; no Docker qualification rerun; passive checks found no owned containers, networks, volumes, generated app images, application processes or work directories |
 
-The main agent should read the source and run the single bounded real fixture
-command in [Provider operations](PROVIDER-OPERATIONS.md), parse
-`target/m10-remaining/local-operations.json`, and retain its exact command/exit
-status, runtime identities, local durations and cleanup outcome. A local
-`pass-for-local` is not a distributed PASS. Classify a failure before the
-smallest authorized repair; do not add redundant soak/repeat runs.
+Only factual review-outcome and task-status records were updated after PASS; the reviewed harness and application/topology inputs remain unchanged. The report at `target/yt066a-closeout-local-20261011/review-evidence.json` retains the result and bounded execution observations. This closes YT-066a at single-host Docker/Memory proof scope, not distributed Session or production qualification.
 
-Open decisions: external topology/store integration, ownership of production
-RPO/RTO, backup encryption/retention, safe telemetry and actual distributed
-failure/rotation tests. YT-066 stays In progress. The next unblockable step is
-selection and qualification of the external topology. Main-agent local execution and independent source review have passed. The maintainer subsequently replaced YT-067's paid external-assessment requirement with an internal Codex Security source scan; see its separate current [M10h record](M10H-VERIFICATION.md). YT-020 stays Blocked.
+YT-066 remains **In progress**. The next separately authorized stage is YT-066b design and real Redis semantics prototype: async opt-in provider shape, versioned/CAS update, rotation/revocation, stale cookie response ordering, TTL, fail-closed outage behavior, bounded pool/queue/timeouts, ambiguous writes, serialization/version handling and selected persistence boundary. Existing YT-066b design documents were preserved and not advanced by this closeout. Redis HA/Cluster, physical-host HA, production RPO/RTO, load/SLOs, SQL Session and YT-020 publication remain outside this slice.

@@ -270,7 +270,7 @@ Yetlet is dual-licensed under your choice of [MIT](LICENSE-MIT) or [Apache Licen
 
 ## Qualification status
 
-M10 release-supply-chain design/preflight is independently reviewed. Four local Firefox release/keyboard suites and real local Session/SQLite operations passed with owned resource cleanup. The new scheduled/manual workflow is source-only until a separately authorized maintainer PR/merge and actual hosted execution. Windows/macOS, real IME/screen-reader coverage, distributed-provider qualification and external production-security assessment remain open. See the evidence matrix below; local checksums/SBOMs are unsigned development evidence, not publication approval.
+M10 release-supply-chain design/preflight is independently reviewed. Four local Firefox release/keyboard suites, real local Session/SQLite operations and the YT-066a three-instance Docker/Memory proof passed with owned resource cleanup. The scheduled/manual qualification workflow was merged and hosted run `38043565238` passed Linux, Windows MSVC, macOS ARM64 and Linux Firefox lanes; separate local Windows GNU and offline Docker evidence also passed. YT-065 is complete at that bounded automated scope. Real IME, spoken screen-reader output, WebKit/mobile and zoom remain explicitly Not verified optional coverage. YT-066a demonstrates stateless multi-instance serving and current Memory Session limitations only; its final independent review passed, while Redis/distributed-provider semantics remain open under YT-066. No result establishes a supported-device range, accessibility conformance, production deployment or publication approval.
 
 ## Documentation
 
@@ -325,7 +325,7 @@ M10 release-supply-chain design/preflight is independently reviewed. Four local 
 - [Release supply-chain design and preflight](docs/RELEASE-SUPPLY-CHAIN.md)
 - [M10e release verification](docs/M10E-VERIFICATION.md)
 - [Platform/browser/accessibility matrix](docs/QUALIFICATION-MATRIX.md)
-- [M10f local and pending hosted evidence](docs/M10F-VERIFICATION.md)
+- [M10f automated platform/browser qualification evidence](docs/M10F-VERIFICATION.md)
 - [Provider operations and local limitations](docs/PROVIDER-OPERATIONS.md)
 - [M10g local operational evidence](docs/M10G-VERIFICATION.md)
 - [Optional future external-assessment template](docs/EXTERNAL-SECURITY-REVIEW.md)

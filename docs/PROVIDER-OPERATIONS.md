@@ -91,6 +91,30 @@ Python's SQLite version is observed separately and must not be attributed to
 the Rust app's bundled SQLite library. The main agent must retain build/source
 identity if it needs to connect a prebuilt binary to a particular source freeze.
 
+## Single-host Docker/Memory qualification
+
+YT-066a adds a bounded deployment-shape proof without adding a Session provider. Run the focused source tests, then the owned Docker fixture:
+
+```sh
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_qualify_multi_instance.py
+PYTHONDONTWRITEBYTECODE=1 python3 scripts/qualify_multi_instance.py
+```
+
+The second command performs an offline Rust 1.88 release build from locked vendored inputs, builds one local nonroot application image, pulls only the pinned Nginx digest, creates three Auth Notes containers and one reverse proxy, exercises the topology, writes `target/yt066a/multi-instance.json` only after cleanup, and removes its generated image. The application containers publish no ports and attach only to an internal backend. The proxy attaches to that backend plus a front bridge and publishes only an ephemeral host-loopback port; Docker 29.9 does not publish ports for a container attached solely to an internal network.
+
+The Auth Notes default remains loopback-only. `YETLET_AUTH_ISOLATED_CONTAINER_LAB=1` selects a separately named fixture entrypoint that permits a wildcard listener only inside this isolated arrangement. It is not a production deployment option and does not change Session security semantics.
+
+Actual final execution passed:
+
+- pooled stateless requests reached three instances, then two surviving instances while A was stopped, then all three after A restarted;
+- a Session created and authenticated on A returned 200 on A, 401 on B and C, and 401 on restarted A using the old cookie;
+- application containers had zero host bindings; the proxy host address was `127.0.0.1`; backend network `Internal=true`; and
+- four service containers, the build container, two networks, zero volumes and the generated application image were removed, with no related process or Docker object left.
+
+This is `pass-for-docker-memory`: it demonstrates stateless multi-instance serving and the current Memory provider's limitations. It does **not** demonstrate distributed Session, sticky-session correctness, Redis, cross-host HA, failover, load/SLOs, production recovery or a deployment image. Durations are observations without acceptance thresholds. Exact source/image/Job identities and the two classified operational fixture failures are recorded in [M10g verification](M10G-VERIFICATION.md).
+
+The YT-066a reviewers found cleanup-proof, signal/finalization and report-I/O defects in the harness, followed by a duplicated-fragment syntax failure; these do not invalidate the retained successful Yetlet behavior observation. The corrected harness uses one phase-aware SIGTERM/SIGINT state, an outer transition recovery boundary, fail-closed Docker queries, exact image verification, required owned-work removal and report-I/O failure handling. A first cancellation signal at the covered teardown/finalization stages records nonpassing cancellation while cleanup continues; subsequent cancellation signals are ignored and both prior handlers are restored. In-memory compilation and the existing 18 focused mocked regressions pass after the 2026-10-11 syntax repair. The successful Docker qualification was not rerun. Final independent read-only reviewer thread `01a1286a-5829-7411-9ecc-dbc3f00fe001` returned PASS, completing YT-066a at single-host Docker/Memory proof scope. See [M10g verification](M10G-VERIFICATION.md) for the historical source identities and each review outcome.
+
 ## Application-selected mature store acceptance contract
 
 Select a concrete application topology and mature external integration before
@@ -130,8 +154,11 @@ must be designated; these roles are pending, not assigned to fictional people.
 
 Provider outage, Redis failover, multinode consistency, HA, load/performance SLO,
 production backup durability/RPO/RTO, real OIDC and key rotation remain **not
-qualified**. Retained Session, file and SSE tests cannot replace these tests.
-YT-066 remains **In progress** pending selected external topology and actual
-distributed qualification. Local success does not close its gate or unblock
-the external production-security review prerequisite by itself. YT-020 remains
-Blocked. Local execution and source/local review `wc_job_YclpZ0R5tS4m8Y1I` passed. Provider selection, ownership and actual distributed acceptance remain open gates.
+qualified**. Retained Session, file, SSE and YT-066a Docker/Memory results cannot
+replace those tests. YT-066 remains **In progress** pending the separately selected
+Redis/provider topology with actual distributed qualification. YT-066a's final
+review PASS does not close the provider gate
+or unblock YT-020. The earlier local execution and reviewer
+`wc_job_YclpZ0R5tS4m8Y1I` passed; the Docker/Memory behavior execution passed,
+and its six earlier review outcomes, bounded repairs and final PASS are recorded in M10g verification.
+Provider selection, ownership and actual distributed acceptance remain open gates.

@@ -4,6 +4,8 @@
 **Tasks:** YT-064–YT-067
 **Status:** Independent planning reviewer `wc_job_n6i2DoBNKaltAWs2` PASS (terminal exit 0, requested/observed `gpt-6-astra`, high, read-only). No release, deployment, external audit engagement, commit or push is authorized by this plan.
 
+> **Later execution update (2026-10-10):** Protected YT-067 delivery through PR #3 and post-merge CI is complete. The independently reviewed [YT-065 / YT-066 plan](YT-065-066-PLAN.md) now governs the bounded follow-on work. YT-065 is closed at the recorded automated desktop/native/browser scope; real-device/IME/assistive-technology/WebKit/mobile/zoom cells remain Not verified optional coverage. YT-066 remains In progress for the Docker/Memory and Redis-provider stages. Earlier acceptance wording below is historical input. See [planning and delivery verification](YT-065-066-PLANNING-VERIFICATION.md). No provider implementation or publication is performed by this documentation update.
+
 ## Baseline and constraints
 
 The sole development checkout was on branch `master`, baseline HEAD `7c5d1267fd2ea3490738da105b476e271278ae7a`. Existing uncommitted YT-060–YT-063 work must be preserved. Dual licensing, maintainer-only PR creation and protected master are established. Only a maintainer branch/PR may eventually merge new work; no protection bypass is permitted.

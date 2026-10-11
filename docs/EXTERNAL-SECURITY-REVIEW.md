@@ -19,11 +19,11 @@ The current work authorizes no engagement, purchase, disclosure of the private r
 | Release build identity | Design/preflight only | Toolchain/target/features, artifact/SBOM/checksum/provenance binding and independent rebuild/signature verification |
 | Production topology | Not selected/deployed | Edge, private network, IdP, Session store, database/storage and secrets/telemetry products, versions and owners |
 | Distributed-provider qualification | YT-066 remains In progress | Cross-node update/rotate/revoke, TTL, outage/failover and restore/load evidence |
-| Hosted compatibility | YT-065 source/local ready | Actual new hosted workflow results and approved manual/browser/OS scope |
+| Hosted compatibility | YT-065 automated scope complete | Recorded hosted workflow/source identities are available; any manual browser/OS/assistive-technology scope is selected explicitly for the engagement and is not implied complete |
 | Legal/security policy | YT-060 local policy complete | Current license/security policy plus agreed confidentiality, reporting and access handling |
 | Findings lifecycle | Not assigned | Maintainer/security owner, severity decisions, fix and independent retest process |
 
-The existing source HEAD `7c5d1267fd2ea3490738da105b476e271278ae7a` only identifies the last committed baseline; it does not identify the uncommitted M10 source or an auditable release. Replace the pending candidate identity with a real approved immutable snapshot before engagement. Do not use a mutable branch name or the baseline HEAD as if it included current changes.
+At this template's original preparation, source HEAD `7c5d1267fd2ea3490738da105b476e271278ae7a` identified only that historical committed baseline and did not include the then-uncommitted M10 source. Later merges and qualification runs are recorded elsewhere, but none is automatically an auditable release candidate. Before any engagement, select a current approved immutable source/archive and artifact digest; do not use a mutable branch name or any historical baseline as if it were the engagement target.
 
 ## 3. Evidence index and limitations
 
@@ -31,7 +31,7 @@ The existing source HEAD `7c5d1267fd2ea3490738da105b476e271278ae7a` only identif
 |---|---|---|
 | [Threat model](THREAT-MODEL.md) | Twenty threats, fifteen abuse scenarios, control ownership, private-cache/CSRF boundaries | Implemented production controls |
 | [Release design](RELEASE-SUPPLY-CHAIN.md), [M10e](M10E-VERIFICATION.md) | License/source policy, native SBOM experiment, checksum tests, promotion/rollback design | Signed release, independent reproducibility or trusted build origin |
-| [Qualification matrix](QUALIFICATION-MATRIX.md), [M10f](M10F-VERIFICATION.md) | Actual local Firefox/keyboard evidence and proposed hosted/manual matrix | New hosted Windows/macOS results, real IME or screen-reader conformance |
+| [Qualification matrix](QUALIFICATION-MATRIX.md), [M10f](M10F-VERIFICATION.md) | Actual local and hosted native/Firefox/keyboard evidence with recorded source identities | Real IME, spoken screen-reader output, WebKit/mobile/zoom behavior, accessibility conformance or a general support range |
 | [Provider operations](PROVIDER-OPERATIONS.md), [M10g](M10G-VERIFICATION.md) | Real process-local Session limits, two-process local SQLite concurrency and isolated backup/restore | Distributed Session, HA, failover, production RPO/RTO or load/SLO |
 | [API contracts](API-CONTRACTS.md), [compatibility](COMPATIBILITY.md) | Experimental/Stable Candidate boundaries and source compatibility fixtures | Stable framework or production support contract |
 | [Security policy](../SECURITY.md), [governance](M10B-VERIFICATION.md) | Reporting/contribution controls and private-state repository settings | Complete security-service coverage or incident response execution |

@@ -19,6 +19,8 @@ cargo run -p yetlet-auth-notes
 
 The app listens on `127.0.0.1:3010` by default and rejects non-loopback listeners. At startup it prints separate 256-bit lowercase-hex codes for `alice` and `bob` to the local terminal. For deterministic local automation, set **both** `YETLET_AUTH_ALICE_CODE` and `YETLET_AUTH_BOB_CODE`; setting only one fails startup. `YETLET_AUTH_LISTEN` overrides the loopback listener.
 
+The YT-066a qualification fixture may additionally set `YETLET_AUTH_ISOLATED_CONTAINER_LAB=1` and bind `0.0.0.0` inside its private Docker bridge. This opt-in uses a separately named application entrypoint, does not weaken the default loopback rejection, and is valid only when app containers publish no host ports and the reverse proxy is bound to host loopback. It is not a production deployment mode.
+
 Routes:
 
 - `/healthz` — outside Session scope and never creates a cookie.
