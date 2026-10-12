@@ -26,3 +26,7 @@ Because external code contributions are not accepted, Yetlet does not require a 
 ## Security reports
 
 Do not report a suspected vulnerability through a public Issue. Follow [SECURITY.md](SECURITY.md) and use the private reporting channel available for the repository.
+
+## Developer entry points
+
+Start with the [native SSR quickstart](README.md#start-with-native-ssr), [documentation index](docs/README.md) and [sample guide](docs/SAMPLES.md). The repository remains Private and unpublished at experimental `0.1.0` scope; retained verification is not release approval. Follow [repository instructions](AGENTS.md) for bounded changes and applicable checks.

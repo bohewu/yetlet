@@ -1,0 +1,5 @@
+adapter=AdapterInfo { name: "NVIDIA GeForce RTX 4090", vendor: 4318, device: 9860, device_type: DiscreteGpu, driver: "NVIDIA", driver_info: "595.99.02", backend: Vulkan }
+proof nodes=10000 verified_centers=10000 colored_pixels=490000 rgba_fnv1a=2c38d159746971ab
+proof nodes=50000 verified_centers=50000 colored_pixels=450000 rgba_fnv1a=b4c8f76aa6f48b7b
+proof nodes=100000 verified_centers=100000 colored_pixels=900000 rgba_fnv1a=011024551c1c9e1b
+cleanup=all_workloads_destroyed_device_and_instance_dropped

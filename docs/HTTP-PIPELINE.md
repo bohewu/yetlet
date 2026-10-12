@@ -2,7 +2,7 @@
 
 **Scope:** User-approved middleware handoff, focused P0 extension to the existing M0–M4 implementation.
 **Decision authority:** [ADR 0004](adr/0004-request-context-and-middleware.md).
-**Status:** P0 integrated and locally verified on 2026-10-08. P1 providers/benchmarks and independent review are not claimed.
+**Status:** P0 integrated and locally verified on 2026-10-08. P1 providers/benchmarks and independent review were not claimed at that checkpoint. Subsequent bounded YT-029 deadline/overhead evidence is linked below.
 
 ## Gap assessment and integration
 
@@ -118,7 +118,7 @@ The SSR root now uses Option<Extension<RequestId>> and returns Page, selecting o
 
 Two production modules are added to the existing server adapter. They reuse http request parts, Body/Extensions, Axum extractors/Next, and Tower Layer/Service. There is no custom dynamic middleware registry, new crate family, duplicate response model, general dependency injection, persistent session, or browser event channel.
 
-This is **not zero overhead**: S is cloned during extraction, native middleware has its own future/service costs, and with_global adds a fallback-only router envelope. RequestId/scope middleware are demo behavior with their own small per-request work. Native latency, allocation counts and throughput are not benchmarked here. The browser build comparison below is separate from those unmeasured native costs.
+This is **not zero overhead**: S is cloned during extraction, native middleware has its own future/service costs, and with_global adds a fallback-only router envelope. RequestId/scope middleware are demo behavior with their own small per-request work. Native latency, allocation counts and throughput were not benchmarked at this P0 checkpoint. The browser build comparison below is separate from those unmeasured native costs.
 
 ## Validation and evidence
 
@@ -162,6 +162,6 @@ The two new server adapter modules contain **142 lines including comments/blank 
 
 - Reusable tracing/authentication/CORS/session/rate-limit providers remain separate opt-in components, not P0 defaults.
 - Native infallible Tower layers are supported and an existing tower-http layer is tested. Fallible services must use an explicit error-to-response adapter. The thin App facade is implemented in M6; arbitrary fallible-service convenience APIs remain deferred.
-- Deadline/cancellation policy, timeout layers, more streaming/backpressure edge cases and native overhead benchmarks remain follow-up work.
+- [YT-029 deadline/overhead research](YT-029-HTTP-DEADLINE-RESEARCH.md) now records an opt-in application-owned native Tower timeout, cancellation/body limits and matched in-process release measurements. This completes the bounded research item, not a supported core API or production benchmark. General provider policy and additional streaming/backpressure qualification remain deferred.
 - Request-local extensions do not prevent a developer from deliberately inserting the same Arc into every request; the framework only avoids doing so implicitly.
 - M5 and M6 record local measurements, not a production performance/security certification. Public release and remaining operational-provider gates remain separate.

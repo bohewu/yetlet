@@ -2,9 +2,19 @@
 
 **Date:** 2026-10-12
 **Decision:** Select Cosign public-key trust for bounded Private preparation and crates.io for a future, separately authorized public source-package release.
-**Execution state:** Documentation only. No key, fingerprint, signature, tag, registry ownership or publication is activated. YT-020 remains **Blocked** for formal release activation.
+**Original policy execution state:** Documentation only. No key, fingerprint, signature, tag, registry ownership or publication is activated. YT-020 remains **Blocked** for formal release activation.
 
-## Authority and scope
+**Later explicit execution authorization (2026-10-12):** The maintainer subsequently authorized committing the reviewed policy, dedicated key creation/fingerprint enrollment, bounded Private signing and independent verification/review, with no push/publication/visibility change. [Actual signing evidence](YT-020-PRIVATE-SIGNING-VERIFICATION.md) records this later execution separately. The original documentation-only and Pending/Not verified statements below describe the policy checkpoint; the later evidence updates only Private execution status and never waives formal release guarantees.
+
+**Historical bounded execution at signed source `8e557e7`:** The dedicated ECDSA P-256 key is enrolled with SHA-256 DER SubjectPublicKeyInfo fingerprint `6e995c563c322fe14912c8660932bb8b8c803bb837007b596c883bd9b4da5fef`. Three canonical signed objects, their 37-artifact set and six negative cases passed separate public-only verification. Cosign's no-log flag is confined to this explicitly selected preparation mode; requiring the original log proof rejects the bundle. Formal OIDC/certificate/log/builder approval and registry activation remain Not verified. The next activation decision is the formal release service/identity/root/builder/tag policy, not duplicate preparation verification.
+
+## Current preparation applicability (2026-10-12)
+
+The [T08 source/package boundary](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) separates signed source `8e557e760407a3d4b3f5a8b8f833748946be1387`, policy HEAD `abb2cce1253afe1d87a97e0a50f3f47efffe7280` and the current dirty research/documentation checkout. The enrolled key and three signatures/37-artifact verification remain historical Private preparation successes. They do not attest the new READMEs, changed root manifest/lock or research. A separately approved immutable candidate needs its own package preflight, rebuild/provenance, selected SBOM/license evidence and signing verification under separate execution authority. The independent delivery gate/result for this documentation is recorded separately in the run; documentation-stage checks do not attest that gate; no key access or signing occurs here.
+
+The original authority and Pending statements below describe the policy checkpoint, superseded only at historical Private execution scope by the signing record. Formal service/identity/roots/builder/tag approval, certificate/chain and transparency/inclusion guarantees, real registry/disclosure/reporting controls and concrete digest approval remain open. YT-020 stays Blocked; a future local commit does not activate release.
+
+## Original policy authority and scope
 
 The maintainer authorized this policy and independent repository review in the original checkout. Key creation, signing, staging, commit, push, publication, visibility changes and external configuration changes are not authorized for this task. Document approval does not prove unperformed execution.
 
@@ -72,8 +82,12 @@ Prepare exact release archives before signature/digest approval. Upload those ap
 
 Partial publication stops the remaining train until assessed. Retain actual versions/digests and outcomes. Do not overwrite versions, move approved tags or publish empty name reservations. Yank, replacement versions and incident actions need explicit authority under the existing release contract.
 
-## Pending inputs and next bounded task
+## Original policy pending inputs and next bounded task
 
 Selected: preparation trust mode, future destination, intended owner and candidate names. Pending: actual key/algorithm/fingerprint/custody approval, qualified offline invocation, permission for key/signing operations, crates.io account/email/rights and first-publish credentials, final source/tag/archives, formal service/roots/builder/build type/tag mechanism, concrete security/release acceptance, reporting/applicable transition controls and actual registry/consumer evidence. Document approval fabricates none of these.
 
 The next bounded task is qualifying Private public-key preparation against a concrete approved trust anchor after separate key/signing authorization. Reuse retained immutable-source evidence when inputs and subjects match. YT-020 remains Blocked; YT-065/066/067 retain bounded Done states. No public disclosure, device lab, application deployment or broad rerun is required to complete this documentation task.
+
+## Current next preparation action
+
+The dedicated algorithm/fingerprint and bounded Private signing/verification were subsequently qualified for the historical source; repeating that old preparation is not the next task. Prepare the source/package and formal release-policy decision record for a separately approved immutable new candidate. Its actual preflight, rebuild, provenance, SBOM/license and signing verification remain separately authorized future work. Real crates.io rights/resolution, reporting/scanner controls and concrete release/security approval remain open. YT-020 stays Blocked; YT-030/YT-065/YT-066/YT-067 retain their bounded Done scopes.

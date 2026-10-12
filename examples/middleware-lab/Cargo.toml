@@ -1,5 +1,6 @@
 [package]
 name = "yetlet-middleware-lab"
+default-run = "yetlet-middleware-lab"
 description = "Runnable native Axum/Tower middleware and RequestContext lab"
 version.workspace = true
 edition.workspace = true
@@ -10,12 +11,13 @@ publish = false
 
 [dependencies]
 axum.workspace = true
-tokio.workspace = true
-tower = "0.5"
+tokio = { workspace = true, features = ["time"] }
+tower = { version = "0.5", features = ["timeout", "util"] }
 tower-http = { version = "0.6", features = ["set-header"] }
 futures-util = "0.3"
 yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
 
 [dev-dependencies]
+tokio = { workspace = true, features = ["test-util"] }
 tower = { version = "0.5", features = ["util"] }
 http-body = "1"

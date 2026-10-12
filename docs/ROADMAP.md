@@ -1,6 +1,6 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**Status:** Draft, last reviewed 2026-10-10.
+**Status:** Evidence-gated prototype roadmap; developer entry/status refresh 2026-10-12. Historical qualification dates and source identities remain unchanged.
 
 Milestones are sequenced by capability and dependencies rather than invented delivery dates. The [MVP specification](MVP.md) provides acceptance criteria. Each gate must retain real commands, results, and relevant architectural decisions.
 
@@ -17,6 +17,10 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M8 — Sample-driven application experience** | Standardized sample contract, API-only REST app, opt-in Session cart, DX audit and evidence freeze | YT-044–YT-048 | Copyable applications, pay-for-what-you-use dependencies, security/lifecycle evidence and per-stage reviewer PASS |
 | **M9 — Sample expansion and API contract qualification (locally complete)** | Nine canonical sample names plus three supplements, SQL-first persistence, contract classification | YT-049–YT-059 | Twelve samples, 170-export inventory, complete regression and repeat final reviewer PASS |
 | **M10 — Release engineering and production-security qualification** | Licensing, governance, compatibility, threat model, supply-chain and operational qualification | YT-060–YT-067 | Maintainer decisions, hosted controls, reproducible release evidence and internal Codex-assisted security assessment |
+
+## Developer documentation refresh — YT-068
+
+The [developer documentation index](README.md) and root README now separate native SSR setup, optional browser behavior and the nine unpublished candidates from retained qualification history. The nine candidate guides, current/history navigation and [final Private source/package boundary](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) are reconciled. YT-068 is Done at documentation scope after bounded validation; the independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate; YT-020 stays Blocked and established YT-030/YT-065/YT-066/YT-067 bounds are retained. YT-029 is Done at bounded deadline/overhead research scope; YT-021 is Done at bounded incremental SSR comparison scope, retaining the app-owned prototype and rejecting core streaming/suspense promotion. YT-024 is Done at bounded typed network adapter proof scope, adopting the app-owned adapter pattern and rejecting core transport framework promotion. YT-022 is Done at bounded data-only handler/capture research scope, retaining explicit application-owned descriptors and rejecting generic/core resumability promotion. YT-023 is Done at bounded native wgpu/Vulkan scene research scope, retaining an opt-in app-owned prototype with actual draw/readback and frame/allocation-byte observations while rejecting core/browser-portability promotion. The next unblockable YT-020 preparation action is the explicit immutable-candidate/source/package and formal release-policy decision record; any new preflight/rebuild/provenance/SBOM/license/signing execution needs separate authority. Historical `8e557e7` signed bytes do not attest policy HEAD `abb2cce` plus current dirty research, root manifest/lock and candidate READMEs. A later local commit alone cannot activate release. No release gate or historical qualification result changes through this entry refresh.
 
 ## Critical path
 
@@ -115,7 +119,7 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 - [x] `YT-028`: Actual API/SSR integration, streaming/request-isolation tests and browser boundary regression.
 
 **M4.1 evidence (2026-10-08):** 46/46 tests, strict Clippy/format, English docs, browser compile and one headless regression PASS. Two browser WASM artifacts remain byte-identical. Native overhead/production assurance remain unmeasured; see [HTTP pipeline](HTTP-PIPELINE.md).
-- [ ] Deferred `YT-029`: Optional providers/deadlines and measured native overhead; not required to close P0.
+- [x] `YT-029`: [Opt-in deadline and measured native overhead research](YT-029-HTTP-DEADLINE-RESEARCH.md), completed 2026-10-12 at application-owned example scope. Adopt native Tower/Axum composition for explicitly selected use; general providers, supported core API promotion and production qualification remain deferred. Original P0 evidence above is unchanged.
 
 ### M5 — MVP release-evidence freeze
 
@@ -232,7 +236,9 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 **M9i / YT-058 evidence (2026-10-10):** Identity, catalog, Session cart and direct-SQL orders compose through ordinary Rust modules. Nine focused tests, 190 workspace tests, five doctests, a three-process restart/authorization/disabled-module smoke, 28 dependency trees, eight wasm32 packages and 136 byte-identical production assets pass. First reviewer `wc_job_a_WnhFSftzNoYYgf` found a readiness-failure leak in the Python smoke harness; terminate/kill/reap/stream-close regressions repaired it, and repeat reviewer `wc_job_zbWS7OSbUtaKzYcn` returned PASS. The exact twelfth catalog entry was promoted. See [M9i verification](M9I-VERIFICATION.md).
 **M9j / YT-059 evidence (2026-10-10):** The [API inventory](API-CONTRACTS.md) classifies 170 public declarations/constants. Complete regression passes 190 tests, five doctests, 11 native smokes, eight wasm32 packages, three Chrome and three Firefox suites, 28 dependency trees and 136 byte-identical production files. First reviewer `wc_job_BzkzTPcKr4FKATTr` found omitted constants/errors and over-broad upstream reexport classification; both were repaired without runtime changes, and repeat reviewer `wc_job_QkQkovlBlvrhPxCE` returned PASS. Stable Candidates remain pre-SemVer evidence; YT-020 remains Blocked. See [M9j verification](M9J-VERIFICATION.md).
 
-**Explicit trust/registry policy (2026-10-12):** [Private public-key preparation and future crates.io distribution](YT-020-PRIVATE-TRUST-POLICY.md) are selected for the original nine experimental `0.1.0` libraries. Only documentation and independent review are authorized now. Actual key/signing, real registry rights/resolution and formal release integrity/approval remain unverified; OIDC, certificate/chain, transparency/inclusion and builder/source guarantees are preserved. YT-020 stays Blocked and no repository visibility transition is implied.
+**Historical trust/registry policy checkpoint (2026-10-12):** [Private public-key preparation and future crates.io distribution](YT-020-PRIVATE-TRUST-POLICY.md) are selected for the original nine experimental `0.1.0` libraries. Only documentation and independent review are authorized now. Actual key/signing, real registry rights/resolution and formal release integrity/approval remain unverified; OIDC, certificate/chain, transparency/inclusion and builder/source guarantees are preserved. YT-020 stays Blocked and no repository visibility transition is implied.
+
+**Later authorized Private signing (2026-10-12):** The reviewed policy was locally committed as `abb2cce`. [Dedicated-key signing and separate verification](YT-020-PRIVATE-SIGNING-VERIFICATION.md) now pass for three preparation signatures, 37 artifacts and six negative cases. Formal log-required verification rejects the no-log bundle; all release guarantees remain mandatory. Source/build/inventory identities are retained without broad reruns. YT-020 stays Blocked for formal activation; no push, publication or visibility change occurred.
 
 ### M10 — Release engineering and production-security qualification
 
@@ -263,11 +269,11 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 
 | Track | Research question |
 |---|---|
-| Streaming SSR | Does the API need streamed suspense and a measured first-byte advantage? |
+| Streaming SSR | [YT-021 comparison](YT-021-STREAMING-SSR-RESEARCH.md) retains app-owned incremental fragments; large/delayed first-body gains trade off lower throughput, so supported-core streaming/suspense promotion is rejected |
 | Compile-time template IR | M7b–M7e prove one fixed shape; M7f–M7i promote only low-level contracts and one production keyed-list path. General trees remain required before any macro decision |
-| Resumability | Can stable IDs and serialized, constrained handler captures work in Rust? |
-| Custom transport | What is the smallest truly pluggable action executor interface? |
-| WebGPU renderer | Can a separate renderer measurably improve 10k–100k scene-node workloads? |
+| Resumability | [YT-022 study](YT-022-RESUMABILITY-RESEARCH.md) proves two finite versioned local handlers with bounded numeric captures and native size/cost evidence; retain explicit app-owned descriptors, reject generic/core resumability promotion |
+| Custom transport | [YT-024 proof](YT-024-CUSTOM-TRANSPORT-RESEARCH.md) uses existing ActionExecutor for one opt-in typed TCP adapter with bounded loopback/error/cancellation evidence; adopt the app-owned pattern, reject core framework promotion |
+| WebGPU renderer | [YT-023 study](YT-023-WEBGPU-RESEARCH.md) proves opt-in native wgpu/Vulkan draws at 10k–100k with raw completion-wall-time and explicit allocation-byte observations; retain the app-owned prototype, reject core/browser-portability promotion; no matched DOM/CPU speedup is established |
 | Worker compute | Which computations can leave the main thread without compromising DOM correctness? |
 | Tooling | When do HMR, bundler integration, and devtools justify their complexity? |
 

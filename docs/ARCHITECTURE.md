@@ -1,8 +1,12 @@
-# Yetlet Architecture — v0 Design Baseline
+# Yetlet Architecture
 
-**Status:** Evolving architecture with locally validated M0–M7 functionality and a frozen bounded M7 architecture (2026-10-09); the reviewer-found runtime-lifetime repair, replacement validation and repeat final review pass, while production release assurance remains open.
+**Status:** Experimental, unpublished `0.1.0`: M0–M9 implementation and selected M10 qualification are complete at their recorded scopes. Five application-owned research prototypes are complete; none promotes a supported core streaming, resumability, transport-framework or GPU API. YT-020 remains Blocked.
 **Scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
 **Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md).
+
+Current usage is documented in the [nine library guides](README.md#library-guides), [HTTP pipeline](HTTP-PIPELINE.md) and [sample guide](SAMPLES.md). Shared owned Views feed escaped native HTML or explicitly built browser DOM/WASM. App/Page preserve native Axum/Tower handlers; local graph, keyed children, request correlation and Memory Session are explicit opt-ins. SQL/storage stay application-owned. No Controller, DI, plugin registry or ORM is required.
+
+The design rationale and dated evidence below retain the original proposal and M7 decision history. Diagram references to compiler/macros and candidate IR are exploratory, not implemented authoring APIs. Current research decisions are in the [completed studies index](README.md#completed-research-prototypes); historical execution is not transferred to today's dirty source.
 
 ## 1. Problem statement
 
@@ -119,7 +123,7 @@ Shared component source does not imply inclusion of server-side repositories or 
 
 **M7i production evidence (2026-10-09):** `/app` now preflights and binds its local Todo list through optional `yetlet-dom-keyed`, then drives typed `TodoCommand` values through one strongly owned `yetlet-reactive::LocalGraph`. Existing keyed rows are updated in place; the separate Create button remains an explicit `HttpExecutor` path. Chrome and Firefox verify identity, disposal, remount and no local request circuit. The Search Island does not acquire either dependency. See [M7i verification](M7I-VERIFICATION.md).
 
-## 5. Proposed module boundaries
+## 5. Implemented and proposed module boundaries
 
 | Candidate module | Responsibility | Timing |
 |---|---|---|
@@ -134,7 +138,7 @@ Shared component source does not imply inclusion of server-side repositories or 
 | `examples/search-island` | Search-specific lazy island runtime | M3 |
 | `yetlet-actions` | Typed commands and pluggable executor boundaries | M4 |
 | `yetlet-macros` | Compile-time `ui!` DSL and template extraction | Future spike |
-| `yetlet-gpu` | Independent retained scene renderer | Later research |
+| `yetlet-gpu` (concept only) | Independent scene renderer; no supported crate selected | Bounded app-owned [YT-023 study](YT-023-WEBGPU-RESEARCH.md) complete |
 
 These are conceptual boundaries, **not** a promise that each one will become a public crate. Use the smallest validated interfaces across the two renderer targets before adding extra abstractions or splitting packages.
 
@@ -262,7 +266,7 @@ The MVP does not forward raw DOM events. Remote actions need explicit input/outp
 
 ## 9. GPU and parallelism boundary (post-MVP)
 
-WebGPU cannot accelerate ordinary DOM/CSS layout directly. A future WebGPU target must be a separate **Canvas/scene renderer**, which carries its own scene graph, focus, IME, text, and accessibility responsibilities. Workers may move computation away from the main thread, but DOM commits still occur on the main thread. Measure scene-node count, frame time, and memory in a separate spike; do not make GPU development an MVP gate.
+WebGPU cannot accelerate ordinary DOM/CSS layout directly. A future WebGPU target must be a separate **Canvas/scene renderer**, which carries its own scene graph, focus, IME, text, and accessibility responsibilities. Workers may move computation away from the main thread, but DOM commits still occur on the main thread. The completed [YT-023 study](YT-023-WEBGPU-RESEARCH.md) retains native Vulkan draw/readback, completion-wall-time and explicit allocation-byte observations. Browser WebGPU, broad scene/text/accessibility support and matched DOM/CPU speedups remain unverified; no supported core renderer is selected. GPU development is not an MVP gate.
 
 ## 10. Risks and experiments
 

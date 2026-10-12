@@ -1,0 +1,22 @@
+[package]
+name = "yetlet-streaming-ssr-research"
+description = "App-owned incremental HTML research, not a supported SSR API"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+axum.workspace = true
+tokio = { workspace = true, features = ["time", "sync"] }
+futures-util = "0.3"
+http-body-util = "0.1"
+hyper = { version = "1", features = ["client", "http1"] }
+hyper-util = { version = "0.1", features = ["tokio"] }
+yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-html = { path = "../../crates/yetlet-html" }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }

@@ -6,7 +6,11 @@
 
 **Later authorized delivery (2026-10-12):** The maintainer subsequently authorized committing this reviewed snapshot and continuing the Private follow-up. Native reviewer thread `01a12dab-b825-7ba0-a389-0757a5896306` returned PASS with no issues/followups, observed `gpt-6-astra` / effective `high`. Commit `9ec9b7b2e2291f649fd659bcbdb8e9fe17f7ad2f` retains the historical working-overlay evidence below. [Hosted rebuilding](YT-020-HOSTED-REBUILD.md) records the separately prepared immutable-source builder and exact delivery/activation boundary. Earlier unstaged/no-delivery statements below describe the original reviewed checkpoint; they do not cancel that later authorization or relabel its older evidence.
 
-## Authority and source boundary
+## Current source applicability (2026-10-12)
+
+The experiments below are retained historical evidence, including the later delivered review and hosted rebuild. The [T08 preparation boundary](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) records policy HEAD `abb2cce1253afe1d87a97e0a50f3f47efffe7280` plus dirty documentation/research, a changed root manifest/lock and nine new candidate READMEs. Historical signed packages are bound to `8e557e760407a3d4b3f5a8b8f833748946be1387`; retained overlay inventories and earlier native/browser/CI results keep their original inputs and limits. They do not attest this current source or new package bytes. Current-source package preflight, rebuild/provenance, selected SBOM/license evidence and signing verification await a separately approved immutable candidate and execution authority. YT-020 remains Blocked; this documentation phase neither repeats those experiments nor activates release. Its independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate.
+
+## Historical preparation authority and source boundary
 
 The maintainer authorized Private preparation, use of another Windows runner through WebCodex, Rust-version unification before first publication, and independent repository review. No staging, commit, push, tag, Yetlet signing request, package/Release publication or visibility/settings change is authorized here. The original Ubuntu checkout is retained. A pre-existing detached checkout was observed and left untouched; none was created or used by this task.
 
@@ -82,7 +86,7 @@ There are 14 successful expectation checks: three positive verifier cases and 11
 
 No Yetlet artifact/digest was uploaded to an attestation/signing/transparency service. No Yetlet OIDC call, signing operation or release workflow was activated. These experiments qualify verifier invocation and rejection behavior on public fixtures; actual signed Yetlet provenance, issuer/repository/workflow/tag/source binding and trusted builder acceptance remain **Not verified**.
 
-## Bounded validation and preserved state
+## Historical bounded validation and preserved state
 
 Current Rust 1.99 workspace strict Clippy, formatting and the eight existing wasm32 package checks pass. Strict Clippy also passes for the isolated Redis provider and both b/b3 fixture manifests. The existing `test_qualify_multi_instance.py` passes all 18 checks; a read-only, network-disabled, automatically removed compiler container observes the new pinned image's Rust/Cargo/OS identity. That container is not a repeated multi-instance qualification run.
 
@@ -90,8 +94,10 @@ Retained master CI already executed the unchanged runtime source with Rust 1.99,
 
 Final `python3 scripts/check_docs.py`, `git diff --check`, exact changed-file/index/source checks and resource observations are recorded with the independent review receipt. All working changes remain unstaged. Windows rebuilding is terminal; no owned server/browser/container or active build Job is left running. The reviewer uses the repository role without WebCodex, inspects actual final files/evidence and has no edit/stage/commit/push authority.
 
-## Remaining activation gates
+## Historical remaining activation gates
 
 YT-020 remains **Blocked** for a clean reviewed immutable source/tag, actual registry name/ownership and resolution in dependency order, authorized protected-check migration/new hosted CI, approved release-equivalent target/feature inventories/licenses, independently controlled trusted-release rebuilding, actual signed Yetlet provenance/signature verification with approved tools/roots/builder/build type/exact identity/source policy, reachable private reporting/fallback and scanner activation, concrete maintainer/security acceptance and immutable promotion/rollback digests. Unsigned drafts and public verifier fixtures do not replace any gate.
 
 YT-065 remains Done at automated native/desktop browser qualification scope; YT-066 remains Done at single-host Docker multi-instance and selected Redis-provider scope; YT-067 remains Done at internal pre-patch source/fix scope. Real IME/composition/caret, NVDA/VoiceOver speech, WebKit/Safari, iOS/Android, touch/soft keyboard, 200%/400% zoom and broad accessibility conformance remain **Not verified / optional future qualification**. Application TLS/ACL, backup protection, RPO/RTO, operational staffing, production support and SLA are outside this framework preparation. No devices, broad certification or new deployment work are required here.
+
+**Current activation boundary:** The later hosted delivery completed the recorded protected-check migration and historical source rebuilding; Private signing was subsequently qualified for `8e557e7`. Neither applies current-source artifact assurance to the dirty research/documentation checkout. The [T08 record](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) owns the new preparation boundary and still-unmet formal guarantees. YT-020 remains Blocked; the independent documentation delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate.

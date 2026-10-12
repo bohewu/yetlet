@@ -1,0 +1,40 @@
+{
+  "task_id": "T06",
+  "backlog_id": "YT-023",
+  "head": "abb2cce1253afe1d87a97e0a50f3f47efffe7280",
+  "checkout": "dirty delivery checkout after T01-T05; current T06 source, not signed/historical source",
+  "measured_at_utc": "2026-10-12T09:06:29+00:00",
+  "backend": "native Vulkan",
+  "adapter": "NVIDIA GeForce RTX 4090",
+  "driver": "595.99.02",
+  "device_type": "DiscreteGpu",
+  "vendor": 4318,
+  "device": 9860,
+  "cpu": "Intel Core i5-13600K",
+  "kernel": "Linux 7.0.0-38-generic x86_64",
+  "rustc": "rustc 1.99.0 (b940084d7 2026-09-28)",
+  "cargo": "cargo 1.99.0 (5f94df478 2026-08-27)",
+  "graphics_versions": {
+    "wgpu": "27.0.1",
+    "wgpu-core": "27.0.3",
+    "wgpu-hal": "27.0.4",
+    "wgpu-types": "27.0.1",
+    "naga": "27.0.3",
+    "pollster": "0.4.0"
+  },
+  "source_sha256": {
+    "Cargo.toml": "9021c3c3fd0404c0899f80215b3c35e5d89c785e2f31bb1ee58c507053fd128a",
+    "Cargo.lock": "130daf71eb0f3e0c0fa8d53ae78037eb197bd59a4868ae1fd4a328da0c6d980d",
+    "examples/webgpu-scene-research/Cargo.toml": "e3c371bbcb53589f9d2a9b8f98b6b5038fbf971d30ed670cb896855f546d73cd",
+    "examples/webgpu-scene-research/src/lib.rs": "249a9924499b30afd746574c6347cf01682428bec02b0a677af5a0d40b6574b7",
+    "examples/webgpu-scene-research/src/bin/scene-bench.rs": "c1768b14920707605dbf9f981f4f5935d275fff85423c7001da307cf68d7cb46",
+    "examples/webgpu-scene-research/src/scene.wgsl": "3222f3db8de3a1d22c31be2896692f7865d0459a880d5078bbd8bff1a1db11a7"
+  },
+  "raw_result_sha256": {
+    "examples/webgpu-scene-research/measurements.csv": "e1f40e61dbb011dff0406c845b0e8d374736082dd8cf92ae4546d055638646e0",
+    "examples/webgpu-scene-research/render-proof.txt": "0a39bfa065e6b8e30d78a8bdd2301280df4f757fd67f0e8f2cf61212e687debe"
+  },
+  "timing_method": "Instant CPU encode+submit+exact-submission-completion walltime; no GPU timestamps or displayed FPS",
+  "memory_method": "requested buffer lengths and logical RGBA8 texture bytes; no measured VRAM/RSS",
+  "cleanup": "all per-workload buffers/textures destroyed; device destroyed and instance/adapter/queue dropped; foreground command exit 0; no browser/server resources"
+}

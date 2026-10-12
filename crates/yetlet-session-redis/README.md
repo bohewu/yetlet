@@ -1,6 +1,6 @@
 # Experimental Redis Session provider — YT-066b2
 
-**Status: focused integration tests and independent implementation review passed at bounded YT-066b2 scope. Do not treat this crate as production-qualified.** See [current verification](../../docs/YT-066B2-VERIFICATION.md). It is unpublished and has its own workspace/lockfile, outside the default framework build and dependency graphs. The existing synchronous Memory provider is unchanged.
+**Status: focused integration tests and independent implementation review passed at bounded YT-066b2 scope. Do not treat this crate as production-qualified.** See [provider implementation verification](../../docs/YT-066B2-VERIFICATION.md) and the later [three-application qualification](../../docs/YT-066B3-VERIFICATION.md). It is unpublished and has its own workspace/lockfile, outside the default framework build and dependency graphs. The existing synchronous Memory provider is unchanged.
 
 This is a separate, explicitly selected async Session implementation, not an authentication system. It uses the reviewed single-primary Lua semantics and [selected pure-SSR Cookie contract](../../docs/YT-066B-COOKIE-ORDERING.md). No JavaScript, plugin registry, DI container, implicit Memory fallback or synchronous Redis facade is added.
 
@@ -30,7 +30,7 @@ Configuration accepts a 1–64 character isolated namespace, a 1–20 character 
 
 The fixed experimental bounds are: 400 ms shared caller deadline across request-lock/queue/Redis phases, 80 ms operation queue wait, 200 ms connect timeout, one reconnect retry with 10–20 ms backoff, immutable one-second server dispatch window, five-second operation-result retention, 64 result records per namespace, 400 ms tombstones and two-second shutdown drain. A synchronous callback cannot be interrupted; if it exhausts the caller deadline, the next phase refuses dispatch. Caller timeout does not cancel a dispatched Redis write; owned work retains its permits until a reply/disconnect or shutdown.
 
-Lua script isolation is not rollback on runtime/OOM failure. Session capacity, persistence/restart/restore, production TLS/ACL/secrets, three application processes, HA/Cluster, SLO/RPO/RTO and public release remain unqualified. Never restore an older namespace and assume revoked credentials remain invalid. YT-066 remains In progress; YT-020 remains Blocked.
+Lua script isolation is not rollback on runtime/OOM failure. Later [YT-066b3 qualification](../../docs/YT-066B3-VERIFICATION.md) passed actual three-application execution, owned cleanup and independent review at single-host/single-primary/no-persistence scope. YT-066 is Done at the selected single-host Docker/Redis-provider scope; YT-020 remains Blocked and this isolated provider remains outside the nine library candidates and nonpublishable. Session capacity beyond the selected bounds, persistence/restart/restore, production TLS/ACL/secrets, HA/Cluster and SLO/RPO/RTO remain unqualified. Never restore an older namespace and assume revoked credentials remain invalid.
 
 ## Local checks
 

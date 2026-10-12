@@ -31,3 +31,26 @@ python3 scripts/check_samples.py
 ```
 
 This is a bounded anonymous local HTTP demonstration. It does not claim production instrumentation, distributed tracing, TLS/reverse-proxy trust, a separate middleware engine or zero runtime overhead. The streaming error route deliberately demonstrates an HTTP body failure, not a successful error recovery. See [M9b verification](../../docs/M9B-VERIFICATION.md).
+
+## Opt-in deadline research — YT-029
+
+The normal listener and `app()` retain their existing behavior. The separate example-owned `deadline::with_deadline` composes native Tower `TimeoutLayer` inside Axum `HandleErrorLayer`, using Yetlet's existing global envelope. Explicit installation after route registration is required:
+
+```rust
+let router = yetlet_middleware_lab::deadline::with_deadline(
+    yetlet_middleware_lab::app(),
+    std::time::Duration::from_millis(100),
+);
+```
+
+The example maps elapsed service execution to HTTP 504. Its cooperative timeout drops the pending service future; earlier completed effects are not rolled back. Detached tasks, started blocking work and externally dispatched operations need their own cancellation/transaction policy. The timer ends when a Response is returned: later body streaming has no whole-body deadline. Non-yielding work can delay or defeat timely timeout observation.
+
+Run the bounded tests and in-process release comparison without a listener:
+
+```bash
+cargo test --locked --offline -p yetlet-middleware-lab --all-targets
+cargo build --release --locked --offline -p yetlet-middleware-lab --bins
+target/release/deadline-bench
+```
+
+The comparison uses the same empty GET and two-byte response for a plain Router, global envelope, no-op RequestContext middleware and explicitly installed deadline. It prints ten raw batch samples after warmup; it does not measure network latency or production load. See [YT-029 research and adoption decision](../../docs/YT-029-HTTP-DEADLINE-RESEARCH.md) for measurements, cancellation/body limits, source identity and validation. The helper is an application-owned research example, not a supported core deadline/provider API.

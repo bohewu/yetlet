@@ -1,0 +1,927 @@
+{
+  "protocol_version": "1.0",
+  "items": [
+    {
+      "id": "YT-001",
+      "summary": "Repository docs / ADR / roadmap / backlog",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size S; milestone M0. Acceptance/evidence: `python3 scripts/check_docs.py` PASS (2026-10-08)"
+    },
+    {
+      "id": "YT-002",
+      "summary": "Cargo workspace + native/WASM targets",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-001"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size S; milestone M1. Acceptance/evidence: Native workspace and wasm32 checks PASS (2026-10-08)"
+    },
+    {
+      "id": "YT-003",
+      "summary": "Minimal shared `Component/View` model",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-002"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size M; milestone M1. Acceptance/evidence: `yetlet-core` and `yetlet-todo-ui` native/wasm32 compile PASS"
+    },
+    {
+      "id": "YT-004",
+      "summary": "HTML renderer with safe escaping",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-003"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size M; milestone M1. Acceptance/evidence: Four `yetlet-html` escaping/security tests PASS"
+    },
+    {
+      "id": "YT-005",
+      "summary": "Axum/Tower server adapter",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-004"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size M; milestone M1. Acceptance/evidence: Native `/` and JSON `/api/ping` routing tests PASS"
+    },
+    {
+      "id": "YT-006",
+      "summary": "Static SSR demo at `GET /`",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-005"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size S; milestone M1. Acceptance/evidence: Bounded localhost HTTP smoke: 200, strict CSP, no scripts/WASM"
+    },
+    {
+      "id": "YT-007",
+      "summary": "Native checks and CI baseline",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-002"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size S; milestone M1. Acceptance/evidence: Local fmt/clippy/tests/WASM PASS; CI YAML created but not executed remotely"
+    },
+    {
+      "id": "YT-008",
+      "summary": "Browser WASM build pipeline",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-003"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size M; milestone M2. Acceptance/evidence: `build_browser.py`, hashed manifest, Chrome asset load PASS"
+    },
+    {
+      "id": "YT-009",
+      "summary": "DOM mount and local state updates",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-008"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size L; milestone M2. Acceptance/evidence: Chrome two-click state/class/text update, no HTTP/WS PASS"
+    },
+    {
+      "id": "YT-010",
+      "summary": "Shared TodoList across targets",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-006",
+        "YT-009"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size M; milestone M2. Acceptance/evidence: Same Rust `todo_list` source, SSR/browser outerHTML byte-identical PASS"
+    },
+    {
+      "id": "YT-011",
+      "summary": "Tiny external JS loader and hashed assets",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-008"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P1; size S; milestone M3. Acceptance/evidence: Loader and hashed assets; Chrome confirms no Search WASM before interaction"
+    },
+    {
+      "id": "YT-012",
+      "summary": "Island mount boundary",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-010",
+        "YT-011"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P1; size M; milestone M3. Acceptance/evidence: Chrome confirms initial SSR results preserved; input/heading nodes remain stable"
+    },
+    {
+      "id": "YT-013",
+      "summary": "Search island at `GET /search`",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-012"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P1; size M; milestone M3. Acceptance/evidence: SSR 200; browser case-insensitive search, empty/reset, no input-triggered HTTP/WS"
+    },
+    {
+      "id": "YT-014",
+      "summary": "Typed actions and LocalExecutor",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-003"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P1; size M; milestone M4. Acceptance/evidence: `yetlet-actions` unit tests + Browser local toggle, zero network requests PASS"
+    },
+    {
+      "id": "YT-015",
+      "summary": "HttpExecutor / explicit remote boundary",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-014",
+        "YT-005"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P1; size M; milestone M4. Acceptance/evidence: Chrome one typed Create POST; separate successful/error executor paths; no remote DOM event PASS"
+    },
+    {
+      "id": "YT-016",
+      "summary": "`/api/todos` JSON handlers",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-005",
+        "YT-015"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P1; size M; milestone M4. Acceptance/evidence: GET/POST tests: state/revisions, 400/403/404/413/415/422 typed errors PASS"
+    },
+    {
+      "id": "YT-017",
+      "summary": "Island state schema/version/security",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-012"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P1; size M; milestone M3. Acceptance/evidence: Bounded v1 JSON, HTML escaping, invalid state tests and Chrome fail-closed SSR fallback PASS"
+    },
+    {
+      "id": "YT-018",
+      "summary": "Strict CSP and browser security verification",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-013",
+        "YT-016",
+        "YT-017"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P1; size M; milestone M4. Acceptance/evidence: Headless Chrome/CSP, JSON errors, origin/media/body limits PASS at anonymous prototype scope"
+    },
+    {
+      "id": "YT-019",
+      "summary": "Cross-target/E2E tests and performance baseline",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-006",
+        "YT-010",
+        "YT-013",
+        "YT-016",
+        "YT-018"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M5-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M5. Acceptance/evidence: [M5 verification](M5-VERIFICATION.md): A01–A10 local proof, release metrics, Chrome 155/Firefox 157 smoke"
+    },
+    {
+      "id": "YT-020",
+      "summary": "Build/run docs and release readiness",
+      "status": "blocked",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-019"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/YT-020-PRIVATE-RELEASE-PREP.md",
+        "docs/YT-020-HOSTED-REBUILD.md",
+        "docs/YT-020-PRIVATE-TRUST-POLICY.md",
+        "docs/YT-020-PRIVATE-SIGNING-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size S; milestone M5. Acceptance/evidence: [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [hosted rebuilding](YT-020-HOSTED-REBUILD.md), [trust/registry policy](YT-020-PRIVATE-TRUST-POLICY.md) and [actual Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md): dedicated key/fingerprint, three signatures, separate public-only verification and six negative cases pass; formal source/tag/identity/certificate/log/builder trust, registry/reporting/scanner gates and explicit activation approval remain open"
+    },
+    {
+      "id": "YT-021",
+      "summary": "Streaming SSR benchmark",
+      "status": "done",
+      "priority": "low",
+      "related_task_ids": [
+        "YT-006"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/YT-021-STREAMING-SSR-RESEARCH.md"
+      ],
+      "notes": "Priority P2; size M; milestone Later. Acceptance/evidence: [Bounded incremental SSR research](YT-021-STREAMING-SSR-RESEARCH.md): equivalent escaped fragments, barrier/error proof, matched HTTP first-body/completion/throughput measurements; app-owned prototype retained, core promotion rejected",
+      "completed_at": "2026-10-12"
+    },
+    {
+      "id": "YT-022",
+      "summary": "Serializable handler/resumability spike",
+      "status": "done",
+      "priority": "low",
+      "related_task_ids": [
+        "YT-017"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/YT-022-RESUMABILITY-RESEARCH.md"
+      ],
+      "notes": "Priority P2; size L; milestone Later. Acceptance/evidence: [Bounded resumability research](YT-022-RESUMABILITY-RESEARCH.md): finite versioned handlers, constrained numeric capture round trips, rejection/trust tests and native encoded-size/cost measurements; app-owned descriptor pattern retained, generic/core promotion rejected",
+      "completed_at": "2026-10-12"
+    },
+    {
+      "id": "YT-023",
+      "summary": "Independent WebGPU scene renderer spike",
+      "status": "done",
+      "priority": "low",
+      "related_task_ids": [
+        "YT-009"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/YT-023-WEBGPU-RESEARCH.md"
+      ],
+      "notes": "Priority P2; size L; milestone Later. Acceptance/evidence: [Bounded native scene research](YT-023-WEBGPU-RESEARCH.md): opt-in wgpu/Vulkan instanced draw and all-center readback at 10k/50k/100k, raw completion-wall-time and explicit allocation-byte observations; retain app-owned prototype, reject core/browser-portability promotion",
+      "completed_at": "2026-10-12"
+    },
+    {
+      "id": "YT-024",
+      "summary": "Custom action executor transport",
+      "status": "done",
+      "priority": "low",
+      "related_task_ids": [
+        "YT-015"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/YT-024-CUSTOM-TRANSPORT-RESEARCH.md"
+      ],
+      "notes": "Priority P2; size M; milestone Later. Acceptance/evidence: [Bounded custom transport research](YT-024-CUSTOM-TRANSPORT-RESEARCH.md): typed opt-in TCP adapter, real loopback request/results, malformed/error/cancellation proof and joined cleanup; app-owned pattern adopted, core promotion rejected",
+      "completed_at": "2026-10-12"
+    },
+    {
+      "id": "YT-025",
+      "summary": "Static-template IR versus VDOM benchmark",
+      "status": "done",
+      "priority": "low",
+      "related_task_ids": [
+        "YT-009"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M7A-VERIFICATION.md"
+      ],
+      "notes": "Priority P2; size M; milestone M7a. Acceptance/evidence: [M7a evidence](M7A-VERIFICATION.md): 4 isolated strategies, equivalent output, identity/focus and release asset isolation measured"
+    },
+    {
+      "id": "YT-026",
+      "summary": "RequestContext ownership and typed request/app state",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-005"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size M; milestone M4.1. Acceptance/evidence: Context/state/metadata/query/path/streaming tests PASS; browser graphs unchanged"
+    },
+    {
+      "id": "YT-027",
+      "summary": "Native Tower global/group/route composition",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-026"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size M; milestone M4.1. Acceptance/evidence: Nested order, short-circuit, 404/405/Allow, error and third-party layer tests PASS"
+    },
+    {
+      "id": "YT-028",
+      "summary": "API/SSR integration and request isolation/streaming proof",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-027",
+        "YT-018"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size M; milestone M4.1. Acceptance/evidence: 46/46 workspace tests, Chrome regression, 12 concurrent requests and byte-identical WASM PASS"
+    },
+    {
+      "id": "YT-029",
+      "summary": "Optional HTTP providers, deadlines and overhead measurements",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-028"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/YT-029-HTTP-DEADLINE-RESEARCH.md"
+      ],
+      "notes": "Priority P1; size M; milestone Later. Acceptance/evidence: [Bounded deadline research](YT-029-HTTP-DEADLINE-RESEARCH.md): opt-in native Tower/Axum composition, cancellation/body limits, matched release overhead and application-owned adoption decision; general providers/core promotion remain deferred",
+      "completed_at": "2026-10-12"
+    },
+    {
+      "id": "YT-030",
+      "summary": "Minimal App/group/route facade over Axum/Tower",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-027",
+        "YT-016"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M6A-VERIFICATION.md"
+      ],
+      "notes": "Priority P0; size M; milestone M6a. Acceptance/evidence: [M6a verification](M6A-VERIFICATION.md): 5 real-Router integration tests + rustdoc example; SSR/JSON, nested groups, state and scoped middleware PASS"
+    },
+    {
+      "id": "YT-031",
+      "summary": "Handler/typed result ergonomics with minimal boilerplate",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-030",
+        "YT-004"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M6-VERIFICATION.md"
+      ],
+      "notes": "Priority P0; size M; milestone M6b. Acceptance/evidence: [M6 evidence](M6-VERIFICATION.md): Page, async View route and native typed extraction/results; 5 targeted tests and compiled docs PASS"
+    },
+    {
+      "id": "YT-032",
+      "summary": "Explicit opt-in capability registration and typed access contract",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-030",
+        "YT-026"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P0; size M; milestone M6c. Acceptance/evidence: configure/try_configure setup functions, 3 scoped/absence/error tests PASS; no registry or DI"
+    },
+    {
+      "id": "YT-033",
+      "summary": "Verify one independent optional capability in isolation",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-032"
+      ],
+      "source": "docs/BACKLOG.md",
+      "notes": "Priority P1; size M; milestone M6d. Acceptance/evidence: Separate yetlet-request-id: 7 opt-in/global/scoped/error/concurrency tests PASS; normal dependency graphs prove isolation"
+    },
+    {
+      "id": "YT-034",
+      "summary": "Todo demo migration and baseline regression",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-030",
+        "YT-031",
+        "YT-033"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M6-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M6e. Acceptance/evidence: 66 native tests + 4 doctests, Chrome/Firefox PASS; release assets byte-identical; [measured M5 and before/after comparison](M6-VERIFICATION.md) retained"
+    },
+    {
+      "id": "YT-035",
+      "summary": "Keyed binding/static-slot component authoring prototype",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-025"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M7B-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M7b. Acceptance/evidence: [M7b evidence](M7B-VERIFICATION.md): compiled API, SSR identity preflight, typed slots/local events, keyed structure and disposal PASS in isolated Chrome fixture"
+    },
+    {
+      "id": "YT-036",
+      "summary": "Browser-local reactive update graph",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-035"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M7C-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M7c. Acceptance/evidence: [M7c evidence](M7C-VERIFICATION.md): weak handles/subscriptions, one-commit batches, bounded re-entrancy, fail-closed errors, capture/listener disposal and isolated Chrome behavior PASS"
+    },
+    {
+      "id": "YT-037",
+      "summary": "Keyed lifecycle, focus and form-state preservation",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-036"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M7D-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M7d. Acceptance/evidence: [M7d evidence](M7D-VERIFICATION.md): controlled input, keyed reorder/removal, focus/selection and input/click listener cleanup PASS in Chrome 155 and Firefox 157"
+    },
+    {
+      "id": "YT-038",
+      "summary": "SSR/WASM renderer regression and production bundle review",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-036",
+        "YT-037"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M7E-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M7e. Acceptance/evidence: [M7e evidence](M7E-VERIFICATION.md): 86 tests + 5 doctests, wasm32/Chrome/Firefox regressions, retained M5/M7 measurements, byte-identical production assets and no-decision API classification"
+    },
+    {
+      "id": "YT-039",
+      "summary": "Renderer-neutral identity, key and safe slot contracts",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-038"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M7F-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M7f. Acceptance/evidence: [M7f evidence](M7F-VERIFICATION.md): core contract extraction, prototype reuse, 22 targeted tests + 1 doctest, strict Clippy and wasm32 PASS"
+    },
+    {
+      "id": "YT-040",
+      "summary": "Extract synchronous local graph into an optional production crate",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-039"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M7G-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M7g. Acceptance/evidence: [M7g evidence](M7G-VERIFICATION.md): 13 graph tests, strong owner/weak handles, batching, bounded re-entrancy, failure/disposal semantics and native/wasm32 isolation PASS"
+    },
+    {
+      "id": "YT-041",
+      "summary": "General keyed DOM reconciliation and binding ownership primitive",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-039"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M7H-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M7h. Acceptance/evidence: [M7h evidence](M7H-VERIFICATION.md): optional isolated crate, prevalidated unique keys, stable identity, listener disposal, Chrome/Firefox lifecycle and production asset isolation PASS"
+    },
+    {
+      "id": "YT-042",
+      "summary": "Migrate production Todo Browser local list to promoted M7 primitives",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-040",
+        "YT-041"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M7I-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M7i. Acceptance/evidence: [M7i evidence](M7I-VERIFICATION.md): SSR parity, Chrome/Firefox keyed identity, queued/in-flight task retirement, disposal/remount, local graph dispatch, explicit HTTP separation, bundle delta and Search isolation PASS"
+    },
+    {
+      "id": "YT-043",
+      "summary": "Final M7 regression, architecture decision and evidence freeze",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-042"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M7J-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M7j. Acceptance/evidence: [M7j evidence](M7J-VERIFICATION.md): 91 tests + 5 doctests, six-package wasm32, debug/release Chrome/Firefox including lifetime races, benchmark, bundle/performance and dependency freeze PASS; repeat reviewer `wc_job_XZzdXEOIx6owj1o5` PASS"
+    },
+    {
+      "id": "YT-044",
+      "summary": "Standardize runnable sample structure, catalog and documentation",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-043"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M8A-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size S; milestone M8a. Acceptance/evidence: [M8a evidence](M8A-VERIFICATION.md): repository-backed catalog, focused malformed/false-claim suite, 10 Todo tests and final reviewer `wc_job_vQ6pGDE0slh9gV8c` PASS"
+    },
+    {
+      "id": "YT-045",
+      "summary": "API-only REST sample with typed CRUD and HTTP errors",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-044"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M8B-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M8b. Acceptance/evidence: [M8b evidence](M8B-VERIFICATION.md): 7 tests, localhost CRUD/policy smoke, native dependency isolation, material findings repaired and final reviewer `wc_job_d911MsTpbwT6fZY3` PASS"
+    },
+    {
+      "id": "YT-046",
+      "summary": "SSR shopping cart with explicit opt-in Session provider",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-045"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M8C-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M8c. Acceptance/evidence: [M8c evidence](M8C-VERIFICATION.md): 114 tests + 5 doctests, lifecycle/CSRF/isolation, stage reviewer PASS and M8e stale-destroy follow-up repaired"
+    },
+    {
+      "id": "YT-047",
+      "summary": "Developer-experience and boilerplate audit across Todo, REST and Cart",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-045",
+        "YT-046"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M8D-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M8d. Acceptance/evidence: [M8d evidence](M8D-VERIFICATION.md): reproducible source/dependency audit, 32 tests, no-runtime-API-change decision and reviewer `wc_job_lZSDSBgMKWu1X5X7` PASS"
+    },
+    {
+      "id": "YT-048",
+      "summary": "Full M8 regression, dependency/bundle review and evidence freeze",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-047"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M8E-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M8e. Acceptance/evidence: [M8e evidence](M8E-VERIFICATION.md): 114 tests + 5 doctests, Chrome/Firefox/native/sample/artifact isolation PASS and reviewer `wc_job_J_MVNzFaVgTH1Gr1` PASS"
+    },
+    {
+      "id": "YT-049",
+      "summary": "Plan, document and independently review M9 before code",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-048"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M9-PLANNING-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M9p. Acceptance/evidence: [Planning evidence](M9-PLANNING-VERIFICATION.md): 40 docs/59 items, 12-sample matrix, SQL-first no built-in ORM, independent reviewer `wc_job_fr93PI1YLOtR3KjE` PASS"
+    },
+    {
+      "id": "YT-050",
+      "summary": "Promote `hello-world` to verified runnable catalog",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-049"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M9A-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size S; milestone M9a. Acceptance/evidence: [M9a evidence](M9A-VERIFICATION.md): 117 tests/5 doctests, 4-sample catalog, escaping/CSP/native 404/405, optional-dependency isolation and reviewer `wc_job_Htk-Quo_aFExMJs3` PASS"
+    },
+    {
+      "id": "YT-051",
+      "summary": "Build `middleware-lab`",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-050"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M9B-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M9b. Acceptance/evidence: [M9b evidence](M9B-VERIFICATION.md): 124 tests/5 doctests, native Tower group/method/404/405/stream errors and reviewer `wc_job_UnKflDaA8ZQHXCce` PASS"
+    },
+    {
+      "id": "YT-052",
+      "summary": "Build `forms-validation`",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-051"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M9C-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M9c. Acceptance/evidence: [M9c evidence](M9C-VERIFICATION.md): 130 tests/5 doctests, escaped SSR/422/no-state 303 PRG, accessible English content; final reviewer `wc_job_lGtk_ZIoAvK4F6PW` PASS"
+    },
+    {
+      "id": "YT-053",
+      "summary": "Build `file-server`",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-052"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M9D-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M9d. Acceptance/evidence: [M9d evidence](M9D-VERIFICATION.md): 144 tests/5 doctests, static/stream/auth/path/symlink/cancellation and asset isolation PASS; reviewer `wc_job_g8JSu80-Jseg6lmG` PASS"
+    },
+    {
+      "id": "YT-054",
+      "summary": "Build SQL-first, opt-in `sqlite-crud` without ORM",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-053"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M9E-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M9e. Acceptance/evidence: [M9e evidence](M9E-VERIFICATION.md): 153 tests/5 doctests, direct SQL/rollback/restart/schema fail-closed and isolation; reviewer `wc_job_aVBprnEsYc8o3ubi` PASS"
+    },
+    {
+      "id": "YT-055",
+      "summary": "Build `sse-notifications`",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-054"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M9F-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size M; milestone M9f. Acceptance/evidence: [M9f evidence](M9F-VERIFICATION.md): 163 tests/5 doctests, bounded replay/heartbeat/backpressure/reconnect and isolation; reviewer `wc_job_fa8KJiTxGRuWIEDF` PASS"
+    },
+    {
+      "id": "YT-056",
+      "summary": "Build `multi-island-dashboard`",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-055"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M9G-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M9g. Acceptance/evidence: [M9g evidence](M9G-VERIFICATION.md): 169 tests/5 doctests, separate bundles/lifecycles, Chrome/Firefox fallback/isolation; reviewer `wc_job_OMstvGrtDiKZ5p6C` PASS"
+    },
+    {
+      "id": "YT-057",
+      "summary": "Build security-bounded `auth-notes`",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-056",
+        "YT-046"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M9H-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M9h. Acceptance/evidence: [M9h evidence](M9H-VERIFICATION.md): 181 tests/5 doctests, synthetic auth, Session rotation, CSRF/IDOR/isolation; reviewer `wc_job_EgSLng_VafIvs3ju` PASS"
+    },
+    {
+      "id": "YT-058",
+      "summary": "Build `modular-shop` reference application",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-057",
+        "YT-054",
+        "YT-056"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M9I-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M9i. Acceptance/evidence: [M9i evidence](M9I-VERIFICATION.md): 190 tests/5 doctests, typed modules, rollback/idempotency/auth/disabled-module isolation; final reviewer `wc_job_zbWS7OSbUtaKzYcn` PASS"
+    },
+    {
+      "id": "YT-059",
+      "summary": "Audit API friction, classify contracts and freeze M9 evidence",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-058"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M9J-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M9j. Acceptance/evidence: [M9j evidence](M9J-VERIFICATION.md): 190 tests/5 doctests, native/browser/provider/isolation freeze, 170-export inventory; final reviewer `wc_job_QkQkovlBlvrhPxCE` PASS"
+    },
+    {
+      "id": "YT-060",
+      "summary": "Choose repository/crate licenses and vulnerability-reporting policy",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-059"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M10A-VERIFICATION.md"
+      ],
+      "notes": "Priority P0; size S; milestone M10a. Acceptance/evidence: [M10a evidence](M10A-VERIFICATION.md): `MIT OR Apache-2.0`, 28-package metadata, security/no-external-PR policy; reviewer `wc_job_MPF4l2t8JaJXBguv` PASS"
+    },
+    {
+      "id": "YT-061",
+      "summary": "Protect `master` and enable repository security automation",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-059"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M10B-VERIFICATION.md"
+      ],
+      "notes": "Priority P0; size M; milestone M10b. Acceptance/evidence: [M10b evidence](M10B-VERIFICATION.md): collaborator-only PRs, protected `master`, required CI, SHA-pinned GitHub-owned Actions and Dependabot; repeat reviewer `wc_job_lu2WynqvKYemLlmd` PASS"
+    },
+    {
+      "id": "YT-062",
+      "summary": "Define SemVer/API compatibility and document metadata contract",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-059"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M10C-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M10c. Acceptance/evidence: [M10c evidence](M10C-VERIFICATION.md): additive title/language metadata, legacy generic compatibility fixture, 196 tests/5 doctests on stable and Rust 1.88; repeat reviewer `wc_job_rz9Ci3gWOLfLKdqN` PASS"
+    },
+    {
+      "id": "YT-063",
+      "summary": "Produce production edge/authentication threat model",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-057",
+        "YT-059"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M10D-VERIFICATION.md"
+      ],
+      "notes": "Priority P0; size L; milestone M10d. Acceptance/evidence: [M10d evidence](M10D-VERIFICATION.md): 20-threat/15-scenario trusted-edge/OIDC/Session/authz model; cache/CSRF reviewer findings repaired; repeat reviewer `wc_job_AlEmAzdabqC_tuHv` PASS"
+    },
+    {
+      "id": "YT-064",
+      "summary": "Design reproducible release artifacts and supply-chain evidence",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-060",
+        "YT-062"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M10E-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M10e. Acceptance/evidence: [M10e evidence](M10E-VERIFICATION.md): license/source PASS, 41 native SBOMs, 16 checksum tests; design/preflight reviewer `wc_job_CeUNYnHsO1yI_kBz` PASS, not release activation"
+    },
+    {
+      "id": "YT-065",
+      "summary": "Add scheduled platform/browser/accessibility qualification",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-059"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M10F-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M10f. Acceptance/evidence: [M10f evidence](M10F-VERIFICATION.md): hosted run `38043565238` all four jobs PASS; Linux/Windows MSVC/macOS 80 tests/four doctests each and Firefox four suites; local Windows GNU/Docker PASS; real IME/AT/WebKit/mobile/zoom remain explicitly Not verified and optional"
+    },
+    {
+      "id": "YT-066",
+      "summary": "Qualify distributed providers and operational behavior",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-046",
+        "YT-054",
+        "YT-057",
+        "YT-059"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M10G-VERIFICATION.md",
+        "docs/YT-066B1-VERIFICATION.md",
+        "docs/YT-066B2-VERIFICATION.md",
+        "docs/YT-066B3-VERIFICATION.md"
+      ],
+      "notes": "Priority P1; size L; milestone M10g. Acceptance/evidence: [M10g evidence](M10G-VERIFICATION.md): local operations and YT-066a proof reviewed PASS; [YT-066b1](YT-066B1-VERIFICATION.md) private Redis prototype has actual passing tests and independent reviewer PASS; the selected Cookie contract passed review; [YT-066b2](YT-066B2-VERIFICATION.md) focused provider tests and independent implementation review passed after the barrier repair at bounded experimental-provider scope; [YT-066b3](YT-066B3-VERIFICATION.md) Done at single-host/no-persistence scope after actual execution, cleanup and final independent reviewer PASS; Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability remains unverified"
+    },
+    {
+      "id": "YT-067",
+      "summary": "Perform Codex-assisted internal security scan",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": [
+        "YT-063",
+        "YT-064"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/M10H-VERIFICATION.md"
+      ],
+      "notes": "Priority P0; size M; milestone M10h. Acceptance/evidence: [M10h evidence](M10H-VERIFICATION.md): Standard scan 227/227 files, one Low finding locally fixed, full regressions and reviewer `wc_job_sTA8TdP3N3Veu9uC` PASS; internal-source-only scope"
+    },
+    {
+      "id": "YT-068",
+      "summary": "Refresh developer entry, candidate documentation and evidence-preserving navigation/status",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": [
+        "YT-067"
+      ],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/README.md",
+        "docs/YT-020-PRIVATE-RELEASE-PREP.md"
+      ],
+      "notes": "Priority P1; size M; milestone Documentation. Acceptance/evidence: [Documentation-stage record](README.md#documentation-delivery-status--yt-068): native SSR quickstart, nine candidate package guides and current/history navigation after five completed research studies; docs/sample/diff and package-list checks recorded 2026-10-12; [final Private source/package boundary](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) reconciled with historical signing evidence retained; independent delivery gate/result recorded separately in the run",
+      "completed_at": "2026-10-12"
+    }
+  ]
+}

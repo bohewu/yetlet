@@ -1,0 +1,20 @@
+[package]
+name = "yetlet-custom-action-transport"
+description = "Application-owned one-request TCP action transport research"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+yetlet-actions = { path = "../../crates/yetlet-actions" }
+tokio = { workspace = true, features = ["time"] }
+tokio-util = { version = "0.7", features = ["codec"] }
+futures-util = { version = "0.3", features = ["sink"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["sync", "io-util"] }

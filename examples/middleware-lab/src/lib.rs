@@ -3,6 +3,8 @@
 //! Pre-routing global, group and method-route scopes are intentionally visible.
 //! No second HTTP pipeline, hidden Session or global request state is installed.
 
+pub mod deadline;
+
 use std::{
     io,
     sync::{Arc, Mutex},
