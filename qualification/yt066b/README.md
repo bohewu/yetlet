@@ -11,7 +11,7 @@ task_project="yt066b1-$(date +%s)-$$"
 docker compose -f qualification/yt066b/compose.yaml -p "$task_project" up -d --wait --wait-timeout 20
 redis_listener="$(docker compose -f qualification/yt066b/compose.yaml -p "$task_project" port redis 6379)"
 YT_REDIS_URL="redis://$redis_listener/" CARGO_TARGET_DIR="$PWD/target/yt066b1-build" \
-  cargo +1.88.0 test --manifest-path qualification/yt066b/Cargo.toml --locked -- --include-ignored --test-threads=1
+  cargo +1.99.0 test --manifest-path qualification/yt066b/Cargo.toml --locked -- --include-ignored --test-threads=1
 docker compose -f qualification/yt066b/compose.yaml -p "$task_project" down --volumes --remove-orphans --timeout 3
 ```
 
@@ -20,7 +20,7 @@ Run the `down` command even after test failure or interruption. Verify that the 
 Run compile/lint checks without starting Redis:
 
 ```sh
-CARGO_TARGET_DIR="$PWD/target/yt066b1-build" cargo +1.88.0 test --manifest-path qualification/yt066b/Cargo.toml --locked --no-run
+CARGO_TARGET_DIR="$PWD/target/yt066b1-build" cargo +1.99.0 test --manifest-path qualification/yt066b/Cargo.toml --locked --no-run
 CARGO_TARGET_DIR="$PWD/target/yt066b1-build" cargo clippy --manifest-path qualification/yt066b/Cargo.toml --locked --all-targets -- -D warnings
 cargo fmt --manifest-path qualification/yt066b/Cargo.toml --check
 ```
@@ -61,7 +61,7 @@ Focused command (inside the disposable fixture):
 
 ```sh
 YT_REDIS_URL="redis://$redis_listener/" CARGO_TARGET_DIR="$PWD/target/yt066b1-build" \
-  cargo +1.88.0 test --manifest-path qualification/yt066b/Cargo.toml --locked --test cookie_fencing -- --include-ignored --test-threads=1 --nocapture
+  cargo +1.99.0 test --manifest-path qualification/yt066b/Cargo.toml --locked --test cookie_fencing -- --include-ignored --test-threads=1 --nocapture
 ```
 
 The selected contract passed independent read-only review (thread `01a128b4-dbc6-7922-87e7-ab67c171665a`, exit 0, observed `gpt-6-astra` / `high`, unchanged inputs). This opens the separately authorized YT-066b2 stage; YT-066 remains In progress. This remains a private semantics experiment, not public provider qualification.

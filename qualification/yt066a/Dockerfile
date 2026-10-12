@@ -1,4 +1,4 @@
-FROM rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0
+FROM rust@sha256:b36c246742b4d323472588f789601be34eb4af053255e2af53969078ee8dcec7
 
 COPY --chmod=0555 yetlet-auth-notes /usr/local/bin/yetlet-auth-notes
 

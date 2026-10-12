@@ -37,7 +37,7 @@ Lua script isolation is not rollback on runtime/OOM failure. Session capacity, p
 Compile and lint without Redis:
 
 ```sh
-CARGO_TARGET_DIR="$PWD/target/yt066b2-build" cargo +1.88.0 test --manifest-path crates/yetlet-session-redis/Cargo.toml --locked --no-run
+CARGO_TARGET_DIR="$PWD/target/yt066b2-build" cargo +1.99.0 test --manifest-path crates/yetlet-session-redis/Cargo.toml --locked --no-run
 CARGO_TARGET_DIR="$PWD/target/yt066b2-build" cargo clippy --manifest-path crates/yetlet-session-redis/Cargo.toml --locked --all-targets -- -D warnings
 ```
 
