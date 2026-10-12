@@ -4,6 +4,8 @@
 **Scope:** Preparation for an experimental `0.1.0` release of the original nine library candidates.
 **Task state:** YT-020 remains **Blocked** for public activation. Completing this private preparation and its independent review does not authorize publication.
 
+**Later delivery and integrity update (2026-10-12):** This document retains the 2026-10-11 preflight snapshot below. It was subsequently reviewed and delivered through PR #5: candidate `c7f21b4d620a1b6836fb52a94bf19434af059368`, squash merge `633db585f3173f82c512689a09fd9a2065db6ffe`, equal tree `d9d6c4abe08a25ca753647a9149d8e16a80bffa9`. PR run `38144070219` tested synthetic checkout `269da96ea62e9a3b0c1184a0b387373b1d0aad09` with that same tree; master run `38145022739` tested `633db585`. Both original required checks passed. The maintainer then authorized separate Private integrity preparation, another Windows host through WebCodex, and Rust 1.99 unification before first publication. [Integrity preparation](YT-020-INTEGRITY-PREPARATION.md) records those new inputs and results. This follow-up has no commit/push/publication/visibility authorization; it does not relabel the older evidence or activate release trust.
+
 ## Authority and boundary
 
 The maintainer authorized preparation in the original checkout, experimental `0.1.0`, the original nine library candidates, and a final independent reviewer. Commit, push, package publication, Release creation and visibility changes are not authorized. The repository remains Private. No tag, release workflow, signing identity, registry credential or external service is activated here.
@@ -37,7 +39,7 @@ Every selected archive must contain both MIT and Apache-2.0 license texts and no
 ## Compatibility and maintenance policy prepared for activation
 
 - All nine candidates use one coordinated `0.1.x` release train. `0.1.0` is experimental, not a 1.0 or production-stability promise.
-- A `0.1.x` patch preserves documented API behavior and Rust 1.88. An incompatible API change or MSRV increase requires a coordinated minor release, explicit rationale, migration notes and the existing compatibility/reviewer/CI gates. MSRV does not rise silently in a patch.
+- The original 2026-10-11 preparation selected Rust 1.88 patch preservation. Before any publication, the maintainer explicitly replaced that baseline with Rust 1.99 on 2026-10-12. A future `0.1.x` patch preserves documented API behavior and that selected minimum. An incompatible API change or later MSRV increase requires a coordinated minor release, explicit rationale, migration notes and the existing compatibility/reviewer/CI gates. MSRV does not rise silently in a published patch.
 - Existing Stable Candidate, Experimental and upstream-boundary classifications remain intact; publication alone does not promote an Experimental API. [Compatibility policy](COMPATIBILITY.md) owns the detailed change discipline.
 - Once separately activated, the latest approved `0.1.x` patch is the maintained experimental line, on a best-effort basis. Older patches are upgrade targets, not separately maintained branches. No security response deadline, SLA or production support is promised. Before publication there is no released supported version; private `master` remains the reporting target.
 
@@ -67,7 +69,7 @@ Observed private-state controls are recorded in the local verification receipt. 
 
 Application proxy/IdP/TLS/ACL configuration, backup protection, business RPO/RTO, operational staffing, durable Redis recovery, HA/cross-host/load/SLO and production deployment belong to separately selected application work. They remain unverified where applicable and are not prerequisites for these source packages or bounded YT-066 completion.
 
-## Local preflight evidence
+## Historical local preflight evidence (2026-10-11)
 
 The working snapshot and generated artifacts are development evidence, not an immutable release candidate. Full command results, archive inventories/digests, metadata, tool identity and preservation checks are retained under ignored `target/yt020-private-prep-20261011/`. A separate final independent reviewer inspects this document, the actual diff and those receipts; acceptance is reported separately without modifying the reviewed source afterward.
 
@@ -85,7 +87,7 @@ The working snapshot and generated artifacts are development evidence, not an im
 
 Live private-state observation retained Private visibility, collaborator-only PRs, squash-only merging, the unchanged protected branch and both exact required checks. Dependabot alerts/security fixes remain enabled. PVR lookup returned 404, secret scanning reported disabled (404), and code scanning reported not enabled (403). No tags or Releases were present; these GET-only observations changed no settings.
 
-Current Cargo has native multi-package staging; Cargo 1.88's registry-resolution limitation does not require weakening dependencies, adding a custom registry or increasing the Rust 1.88 consumer baseline. The successful command packages all nine candidates together. It is not nine real registry uploads or proof that unpublished dependencies can already resolve from crates.io.
+At this checkpoint, current Cargo's native multi-package staging avoided Cargo 1.88's registry-resolution limitation without weakening dependencies, adding a custom registry or increasing the then-selected consumer baseline. The later explicit Rust 1.99 decision is separate. The successful historical command packages all nine candidates together. It is not nine real registry uploads or proof that unpublished dependencies can already resolve from crates.io.
 
 The package bundle records nine manifest digests, the original lock digest `7260eef21ce05abbe90ebccc4b255b3da07cdf5cd0acac51fdbb90ee7b3d4b57`, Rust source hashes, normalized dependency entries, archive/SBOM digests and actual Cargo/compiler/generator identity. The local receipts also record tool binary, policy and metadata digests. Cargo marks the six changed packages dirty; its clean VCS markers for the other three packages do not make the overall working snapshot immutable.
 

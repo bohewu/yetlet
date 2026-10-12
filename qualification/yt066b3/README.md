@@ -12,7 +12,7 @@ Run from the repository root:
 python3 qualification/yt066b3/run.py
 ```
 
-The fixture builds with pinned Rust 1.88 using locked, locally vendored inputs,
+The fixture builds with pinned Rust 1.99 using locked, locally vendored inputs,
 an offline container and read-only source. It creates one unique application
 image and one unique Compose project. The only published port is a random
 host-loopback Nginx listener. Applications and Redis share an internal backend;

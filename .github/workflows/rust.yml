@@ -18,7 +18,7 @@ env:
 
 jobs:
   msrv:
-    name: Rust 1.88 MSRV
+    name: Rust 1.99 MSRV
     runs-on: ubuntu-24.04
     timeout-minutes: 45
     steps:
@@ -28,15 +28,15 @@ jobs:
           persist-credentials: false
       - name: Install declared toolchain
         run: |
-          rustup toolchain install 1.88.0 --profile minimal
-          rustup target add --toolchain 1.88.0 wasm32-unknown-unknown
+          rustup toolchain install 1.99.0 --profile minimal
+          rustup target add --toolchain 1.99.0 wasm32-unknown-unknown
       - name: Native MSRV tests and doctests
         run: |
-          cargo +1.88.0 test --workspace --all-targets --locked
-          cargo +1.88.0 test --workspace --doc --locked
+          cargo +1.99.0 test --workspace --all-targets --locked
+          cargo +1.99.0 test --workspace --doc --locked
       - name: Browser and renderer MSRV targets
         run: |
-          cargo +1.88.0 check --locked --target wasm32-unknown-unknown \
+          cargo +1.99.0 check --locked --target wasm32-unknown-unknown \
             -p yetlet-todo-browser -p yetlet-search-island \
             -p yetlet-reactive -p yetlet-dom-keyed \
             -p yetlet-render-bench -p yetlet-keyed-bindings \
@@ -44,6 +44,8 @@ jobs:
 
   native-and-browser:
     name: Stable native, samples, and Chrome
+    env:
+      RUSTUP_TOOLCHAIN: stable
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:

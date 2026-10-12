@@ -6,7 +6,7 @@
 
 This document inventories the actual public Rust surface exercised by M0–M10c. It separates **Stable Candidate**, **Experimental**, and **Internal/support-only** contracts. These labels are evidence classifications, not SemVer guarantees, production approval or a promise that package names and signatures will never change. The provisional change discipline is recorded in [Compatibility Policy](COMPATIBILITY.md).
 
-Public release remains blocked by licensing, browser/support and SemVer policy, document metadata, repository governance and production security expectations. A post-M9 security round raises the declared MSRV to Rust 1.88 and validates that toolchain, but a future release decision must still adopt an MSRV upgrade policy before any Stable Candidate becomes stable.
+The original post-M9 security round validated Rust 1.88; that evidence remains historical. Licensing, document metadata, bounded qualification and private governance are now complete at their recorded scopes. The maintainer selected experimental `0.1.0` and Rust 1.99 before publication; [Compatibility Policy](COMPATIBILITY.md) defines patch preservation and future increases. Public activation remains blocked by [concrete release gates](YT-020-INTEGRITY-PREPARATION.md#remaining-activation-gates), not by a requirement to certify every platform or application deployment. These API classifications remain unchanged.
 
 ## Classification meanings
 
@@ -91,8 +91,8 @@ Application dependencies such as `rusqlite`, `tower-http`, `tempfile`, synthetic
 
 Before a public stability declaration:
 
-1. choose and publish repository/crate licensing;
-2. retain CI for the declared Rust 1.88 MSRV and define the future upgrade policy;
+1. retain the selected dual-license texts and verify the actual release inventories;
+2. deliver the declared Rust 1.99 baseline and migrate its protected required CI check under separate authorization;
 3. activate or revise the provisional cross-crate SemVer policy at the first public release;
 4. gather additional consumers before promoting the bounded document metadata API;
 5. declare supported browsers/OS/toolchains and CI coverage;

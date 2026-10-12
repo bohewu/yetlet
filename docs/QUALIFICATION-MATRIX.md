@@ -25,7 +25,11 @@ both x86_64 and ARM coverage. Sample binaries and Unix-specific sample smokes
 are outside these native portability lanes. No failing tests are skipped to
 manufacture a platform PASS. Browser packaging is qualified separately on
 Linux. Stable Rust is explicitly installed and observed; the unchanged
-baseline workflow remains responsible for the Rust 1.88 MSRV check.
+historical baseline workflow supplied the Rust 1.88 MSRV check. On 2026-10-12,
+the maintainer selected Rust 1.99 before first publication. The local baseline
+now pins 1.99.0; the new toolchain file does not override rolling stable lanes,
+which explicitly set `RUSTUP_TOOLCHAIN=stable`. [Integrity preparation](YT-020-INTEGRITY-PREPARATION.md)
+records the retained source boundaries and pending protected-check migration.
 
 ## Workflow source and activation
 
@@ -35,8 +39,11 @@ baseline workflow remains responsible for the Rust 1.88 MSRV check.
 actions, disables persisted checkout credentials, cancels superseded runs,
 limits native parallelism to two, and limits native/Firefox jobs to 35/60
 minutes. It neither supplies secrets nor requests token write or id-token
-permissions. The existing `Rust 1.88 MSRV` and
-`Stable native, samples, and Chrome` required job names/workflow stay unchanged.
+permissions. This schedule/manual behavior remains unchanged. Remote protection
+still requires `Rust 1.88 MSRV` and `Stable native, samples, and Chrome`.
+Uncommitted local baseline YAML renames only the minimum-version job to
+`Rust 1.99 MSRV`; the stable check name is unchanged. Its protected-check
+migration and hosted validation await separately authorized delivery.
 
 GitHub requires this workflow on the default branch for activation; schedules
 run there and may be delayed or dropped. Manual dispatch also depends on the
