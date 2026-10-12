@@ -16,3 +16,11 @@ Run the catalog gate with:
 ```bash
 python3 scripts/check_samples.py
 ```
+
+## Getting started
+
+Begin with [Hello World](hello-world/README.md) for native SSR or [REST API](rest-api/README.md) for HTTP-only development. [Todo](todo-server/README.md) adds explicitly built WASM; [Session cart](cart-server/README.md) adds an opt-in server capability. The [developer documentation index](../docs/README.md) separates current guidance from retained milestone evidence.
+
+## Research and internal fixtures
+
+The [five completed research prototypes](../docs/README.md#completed-research-prototypes) have separate bounded decisions and evidence: HTTP deadlines in Middleware Lab, incremental SSR, one custom typed transport, constrained handler/capture descriptors and an independent native scene renderer. They remain application-owned experiments. Browser companions, shared UI and benchmark fixtures also remain outside the twelve user-facing catalog entries. Use [the nine library guides](../docs/README.md#library-guides) for the candidate API boundaries.

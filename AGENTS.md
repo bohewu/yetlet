@@ -20,6 +20,10 @@ Write **all repository documentation in English**, including the README, ADRs, a
 6. Do not commit, push, deploy or alter external environments without explicit instruction. Preserve unrelated work.
 7. When changing a fundamental architectural decision, update the relevant ADR and explain tradeoffs.
 
+## Version-control guard
+
+Before committing or pushing, use Commit Guard with the explicit `strict` profile and `builtin` engine: scan the staged index before a commit and the exact outgoing commit range before a push. Any nonzero result stops the operation; do not fall back to audit, bypass hooks, or weaken the guard. A passing scan does not grant authorization to commit or push; preserve the user's explicit authorization requirement.
+
 ## Technical guardrails
 
 - Default SSR must work without JS/WASM and without a persistent server-side event circuit.

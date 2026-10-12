@@ -1,0 +1,50 @@
+   Compiling tokio v1.53.2
+   Compiling futures-util v0.3.34
+   Compiling yetlet-actions v0.1.0 (<repo>/crates/yetlet-actions)
+   Compiling tokio-util v0.7.19
+   Compiling yetlet-custom-action-transport v0.1.0 (<repo>/examples/custom-action-transport)
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 2.31s
+     Running unittests src/lib.rs (target/debug/deps/yetlet_custom_action_transport-966fdbba843eebe4)
+
+running 7 tests
+test tests::actual_wire_payloads_and_malformed_commands ... cleanup: peer joined; client dropped; 127.0.0.1:38323 reconnect refused
+wire request_bytes=22 request={"left":20,"right":22} reply_bytes=26 reply={"result":"ok","value":42}
+cleanup: peer joined; client dropped; 127.0.0.1:40345 reconnect refused
+wire request_bytes=8 request=not json reply_bytes=43 reply={"result":"error","code":"invalid_command"}
+cleanup: peer joined; client dropped; 127.0.0.1:44343 reconnect refused
+wire request_bytes=36 request={"left":1,"right":2,"event":"click"} reply_bytes=43 reply={"result":"error","code":"invalid_command"}
+ok
+test tests::deadline_and_caller_cancellation_close_owned_client ... cleanup: peer joined; client dropped; 127.0.0.1:37089 reconnect refused
+50ms deadline closes client socket; peer sees EOF
+cleanup: peer joined; client dropped; 127.0.0.1:45225 reconnect refused
+caller cancellation closes client socket; peer sees EOF
+ok
+test tests::endpoint_restriction_and_network_failure ... cleanup: dropped 127.0.0.1:37129 listener; refused connect -> Network
+ok
+test tests::explicit_selection_and_typed_network_result ... cleanup: peer joined; client dropped; 127.0.0.1:33585 reconnect refused
+typed real TCP Add(20,22) -> Sum(42); request=22B reply=26B (+4B each header); elapsed_ns=194230
+ok
+test tests::malformed_and_missing_responses_are_not_successes ... cleanup: peer joined; client dropped; 127.0.0.1:39419 reconnect refused
+bad peer reply Some("not json") -> InvalidResponse
+cleanup: peer joined; client dropped; 127.0.0.1:46727 reconnect refused
+bad peer reply Some("{\"result\":\"ok\",\"value\":\"bad\"}") -> InvalidResponse
+cleanup: peer joined; client dropped; 127.0.0.1:43307 reconnect refused
+bad peer reply None -> InvalidResponse
+ok
+test tests::oversized_and_truncated_frames_close_without_dispatch ... cleanup: peer joined; client dropped; 127.0.0.1:43063 reconnect refused
+invalid frame [0, 0, 4, 1] rejected before command decode
+cleanup: peer joined; client dropped; 127.0.0.1:34581 reconnect refused
+invalid frame [0, 0, 0, 10, 123] rejected before command decode
+ok
+test tests::remote_validation_is_not_a_success ... cleanup: peer joined; client dropped; 127.0.0.1:35137 reconnect refused
+typed overflow -> Remote(422, overflow); no retry
+ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.06s
+
+   Doc-tests yetlet_custom_action_transport
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+

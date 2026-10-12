@@ -6,13 +6,37 @@
 
 **Later delivery and integrity update (2026-10-12):** This document retains the 2026-10-11 preflight snapshot below. It was subsequently reviewed and delivered through PR #5: candidate `c7f21b4d620a1b6836fb52a94bf19434af059368`, squash merge `633db585f3173f82c512689a09fd9a2065db6ffe`, equal tree `d9d6c4abe08a25ca753647a9149d8e16a80bffa9`. PR run `38144070219` tested synthetic checkout `269da96ea62e9a3b0c1184a0b387373b1d0aad09` with that same tree; master run `38145022739` tested `633db585`. Both original required checks passed. The maintainer then authorized separate Private integrity preparation, another Windows host through WebCodex, and Rust 1.99 unification before first publication. [Integrity preparation](YT-020-INTEGRITY-PREPARATION.md) records those new inputs and results. This follow-up has no commit/push/publication/visibility authorization; it does not relabel the older evidence or activate release trust.
 
-## Authority and boundary
+## Current preparation boundary — T08 / YT-068 (2026-10-12)
+
+This is a preparation-time record of the original checkout at policy HEAD `abb2cce1253afe1d87a97e0a50f3f47efffe7280` **plus uncommitted changes**. It is not an immutable release candidate, an approved tag or a new artifact freeze. The earlier sections below retain their dated checkpoints and authority; their source/package counts and unchanged-lock statements describe those checkpoints.
+
+| Boundary | Evidence and meaning |
+|---|---|
+| Historical signed package source | Immutable `8e557e760407a3d4b3f5a8b8f833748946be1387`; primary/hosted run `38195517029` archive comparison and later Private signatures remain bound to those inputs |
+| Policy commit | `abb2cce1253afe1d87a97e0a50f3f47efffe7280`, parent `8e557e7`; policy documentation commit, not the signed package source |
+| Current preparation checkout | Policy HEAD plus the developer documentation, five research tracks, root manifest/lock changes and nine new candidate READMEs; no approved current archive or digest set |
+
+At this preparation checkpoint, root `Cargo.toml` SHA-256 is `9021c3c3fd0404c0899f80215b3c35e5d89c785e2f31bb1ee58c507053fd128a` and root `Cargo.lock` SHA-256 is `130daf71eb0f3e0c0fa8d53ae78037eb197bd59a4868ae1fd4a328da0c6d980d`. The historical signed lock digest remains `7260eef21ce05abbe90ebccc4b255b3da07cdf5cd0acac51fdbb90ee7b3d4b57`. These two current hashes identify only those files; they do not make HEAD identify the dirty checkout or approve a release.
+
+The original nine library candidates remain experimental `0.1.0`, unpublished and Private; the allowlist below is unchanged. Cargo discovers their nine new `README.md` files as package inputs. T07's nine `cargo package --list` checks passed with each README included; listing proves file inclusion, not extracted-package compilation, archive reproducibility, dependency resolution from crates.io or signature verification. The research adds four nonpublishable workspace examples alongside the earlier nineteen, while the HTTP deadline study extends Middleware Lab. Neither these fixtures nor the separate nonpublishable Redis provider becomes a library candidate.
+
+The [historical signing record](YT-020-PRIVATE-SIGNING-VERIFICATION.md) retains three successful canonical signatures, **37 artifacts plus the manifest**, the enrolled public fingerprint `6e995c563c322fe14912c8660932bb8b8c803bb837007b596c883bd9b4da5fef`, independent public-only verification and all six negative cases. Those unchanged signed bytes do **not** attest the new candidate READMEs, root manifest/lock changes, research or other current documentation. Historical SBOMs retain their original target/feature/source limits; no inventory or signature is transferred to current artifacts.
+
+T02–T06 retain actual bounded evidence and completion for [YT-029 deadlines](YT-029-HTTP-DEADLINE-RESEARCH.md), [YT-021 incremental SSR](YT-021-STREAMING-SSR-RESEARCH.md), [YT-024 custom transport](YT-024-CUSTOM-TRANSPORT-RESEARCH.md), [YT-022 handler/capture descriptors](YT-022-RESUMABILITY-RESEARCH.md) and [YT-023 native scene rendering](YT-023-WEBGPU-RESEARCH.md). Their application-owned prototypes and decisions do not promote supported core APIs. T01/T07 documentation and T08 boundary reconciliation complete YT-068 at documentation scope after the existing docs/sample/diff checks; the independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate. YT-030/YT-065/YT-066/YT-067 retain their established bounded Done states. Historical Windows, Firefox, native, CSP and hosted CI results are not new execution against this dirty source.
+
+**Next unblockable YT-020 action:** prepare the explicit source/package and release-policy decision record for a separately approved immutable candidate, including its intended target/features and evidence plan. New-source package preflight, rebuild comparison, provenance, release-equivalent SBOM/license checks and signing verification still require separate authority and actual execution against that approved candidate. This phase performs none of those operations. A later local commit alone cannot satisfy formal release activation.
+
+YT-020 remains **Blocked** for approved source/tag/digests, exact OIDC issuer/repository/workflow/ref/source binding, approved certificate/chain and transparency/inclusion proofs, authenticated builder/build policy and independently controlled rebuilding, source/lock/tool/target/feature and SBOM/license bindings, real registry rights/resolution/downloaded bytes, reporting/scanner controls, concrete maintainer/security approval and immutable promotion/rollback. Private public-key preparation remains distinct from that formal release mode. Real devices, IME, spoken assistive technology, WebKit/mobile/zoom, application HA, operational RPO/RTO and SLA do not become mandatory framework prerequisites through this reconciliation.
+
+## Historical preparation authority and boundary
 
 The maintainer authorized preparation in the original checkout, experimental `0.1.0`, the original nine library candidates, and a final independent reviewer. Commit, push, package publication, Release creation and visibility changes are not authorized. The repository remains Private. No tag, release workflow, signing identity, registry credential or external service is activated here.
 
 The baseline is clean `master` at `a61f409627a7b9004338a96b02d0ded91ceb2f51`, the squash merge of maintainer PR #4. Required PR run `38131601428` passed on `dda30de329b0347869a848544696343406e43a78`; automatic post-merge run `38132515711` passed both required checks on `a61f409`. Candidate and merged trees were identical. These runs precede this uncommitted preparation; they are not CI results for the changed manifests.
 
 YT-060–YT-067 retain their recorded bounded completion. Historical hosted qualification `38043565238` still belongs to `c38837835dac683b09194b475baab2d8eda5a875`. It is not relabeled as execution on `a61f409` or this working snapshot. The YT-067 full scan remains bound to its pre-patch source; no new full scan or external audit is claimed.
+
+**Later explicit policy decision (2026-10-12):** [Private trust and future registry policy](YT-020-PRIVATE-TRUST-POLICY.md) selects Cosign maintainer public-key preparation and future crates.io distribution. It defines custody/bootstrap, signed evidence, independent verification, rotation and actual registry gates. Formal release guarantees remain mandatory. This decision authorizes documentation and independent review only; no key/signing/token/publication or repository visibility change occurs.
 
 ## Selected artifacts
 

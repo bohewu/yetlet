@@ -1,0 +1,13 @@
+[package]
+name = "yetlet-resumability-research"
+description = "Finite data-only handler snapshot research, not a supported runtime API"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

@@ -4,6 +4,10 @@
 
 Yetlet samples exist to validate application ergonomics, dependency isolation and security boundaries. They are not a parallel tutorial framework and do not authorize new core abstractions merely to make a demo look shorter.
 
+## Choose a starting point
+
+Begin with [Hello World](../examples/hello-world/README.md) for native SSR or [REST API](../examples/rest-api/README.md) for HTTP-only development. Use [Todo](../examples/todo-server/README.md) for shared SSR/WASM Views and [Session cart](../examples/cart-server/README.md) for an explicit server capability. Each sample-local README provides exact commands and limitations. The [documentation index](README.md) separates current guidance from historical qualification.
+
 ## Catalog contract
 
 `examples/samples.toml` is the machine-readable catalog for user-facing runnable applications. `scripts/check_samples.py` validates the catalog using only the Python standard library.
@@ -47,6 +51,24 @@ Catalog paths, route sources, build scripts and evidence must resolve inside the
 | `sqlite-crud` | `yetlet-sqlite-crud` | API | No | Direct parameterized SQLite, explicit transactions, restart persistence and optimistic versions |
 | `multi-island-dashboard` | `yetlet-multi-island-dashboard` | Full stack | Yes | Complete SSR plus independently built/lazy Counter and Filter islands |
 
+## Research fixtures
+
+The five [completed research studies](README.md#completed-research-prototypes) are bounded application-owned prototypes, separate from this twelve-application catalog. Use their fixture READMEs and retained measurements to understand the decisions and limitations; they do not select additional supported core APIs or change application qualification.
+
+Run the existing navigation checks:
+
+```bash
+python3 scripts/check_samples.py
+python3 scripts/check_docs.py
+```
+
+## Retained sample delivery history
+
+The expandable record below preserves intermediate M8/M9 planning and promotion claims, reviewer identities and evidence links. Its references to remaining planned work describe those earlier stages; the current catalog above has all twelve applications verified at bounded prototype scope.
+
+<details>
+<summary>M8/M9 delivery sequence and promotion evidence</summary>
+
 ## M8 delivery sequence
 
 - **M8a / YT-044:** establish this catalog, documentation and validation gate;
@@ -73,9 +95,5 @@ M9h keeps authentication, Session, authorization and note storage distinct. OS-r
 
 The [Modular Shop](../examples/modular-shop/README.md) composes Identity, Catalog, Session Cart and SQL Orders through ordinary typed setup functions. Its rollback/idempotency/authorization/disabled-module matrix and repeat reviewer `wc_job_zbWS7OSbUtaKzYcn` passed before the exact twelfth catalog entry was promoted. No plugin registry, DI container or ORM is introduced.
 
-Run:
 
-```bash
-python3 scripts/check_samples.py
-python3 scripts/check_docs.py
-```
+</details>

@@ -1,4 +1,4 @@
-# Yetlet Compatibility Policy — Pre-Public Draft
+# Yetlet Experimental Compatibility Policy
 
 **Date:** 2026-10-10
 **Scope:** YT-062 / M10c, with YT-020 private preparation selected on 2026-10-11.
