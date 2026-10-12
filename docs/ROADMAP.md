@@ -17,6 +17,13 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M8 — Sample-driven application experience** | Standardized sample contract, API-only REST app, opt-in Session cart, DX audit and evidence freeze | YT-044–YT-048 | Copyable applications, pay-for-what-you-use dependencies, security/lifecycle evidence and per-stage reviewer PASS |
 | **M9 — Sample expansion and API contract qualification (locally complete)** | Nine canonical sample names plus three supplements, SQL-first persistence, contract classification | YT-049–YT-059 | Twelve samples, 170-export inventory, complete regression and repeat final reviewer PASS |
 | **M10 — Release engineering and production-security qualification** | Licensing, governance, compatibility, threat model, supply-chain and operational qualification | YT-060–YT-067 | Maintainer decisions, hosted controls, reproducible release evidence and internal Codex-assisted security assessment |
+| **M11 — Product readiness and optional scene rendering (planning only)** | Independent complete-product and browser-first opt-in renderer lines | YT-069–YT-081 | Reviewed plan; later separately authorized product/renderer evidence, isolation and independent implementation review; no release activation |
+
+## M11 — Product readiness and optional scene rendering (planning)
+
+[M11 plan](M11-PLAN.md) files YT-069–YT-081 after the completed bounded research. M11-P targets one small persisted, authorized, usable SSR-first product with existing CSS; M11-G independently targets browser proof and possible first-party opt-in Experimental `yetlet-wgpu`. Neither line depends on public release, and product readiness does not depend on GPU. [Product research](M11-PRODUCT-READINESS-RESEARCH.md) preserves handoff workstreams A–E and exactly three priority gaps; [GPU plan](M11-WGPU-PLAN.md) preserves native/browser, lifecycle, performance and fallback boundaries. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) is Proposed, not accepted implementation.
+
+YT-069 covers documentation and owner-permitted planning review only. YT-070–YT-081 remain Todo and require separate activation. Documentation/static checks and [self-review](M11-PLANNING-REVIEW.md) cannot qualify a runtime or satisfy later independent implementation/security gates. The original nine candidates and YT-020 remain unchanged. The YT-068/68-item status below is a retained pre-M11 checkpoint, not the current expanded backlog count.
 
 ## Developer documentation refresh — YT-068
 

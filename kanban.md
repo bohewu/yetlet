@@ -2,13 +2,32 @@
 
 Derived from [`todo-ledger.json`](todo-ledger.json). The project backlog source is [`docs/BACKLOG.md`](docs/BACKLOG.md).
 
-**Items:** 68 — 67 Done, 1 Blocked.
+**Items:** 81 — 68 Done, 1 Blocked, 12 Todo.
+
+M11 is filed for planning; Todo rows require separate implementation authority. Product readiness and optional wgpu rendering are independent. Historical completion scopes and YT-020 are unchanged.
 
 ## Blocked
 
 | ID | Priority | Work item | Depends on | Evidence |
 |---|---|---|---|---|
 | `YT-020` | medium | Build/run docs and release readiness | YT-019 | [Private preparation](docs/YT-020-PRIVATE-RELEASE-PREP.md)<br>[hosted rebuilding](docs/YT-020-HOSTED-REBUILD.md)<br>[trust/registry policy](docs/YT-020-PRIVATE-TRUST-POLICY.md)<br>[actual Private signing](docs/YT-020-PRIVATE-SIGNING-VERIFICATION.md) |
+
+## Todo — separately authorized M11 proposals
+
+| ID | Priority | Work item | Depends on | Plan |
+|---|---|---|---|---|
+| `YT-070` | medium | Realistic form and existing-CSS proof | YT-069 | [Product research](docs/M11-PRODUCT-READINESS-RESEARCH.md) |
+| `YT-071` | medium | Selected safe HTML/live form contracts | YT-070 | [M11 plan](docs/M11-PLAN.md) |
+| `YT-072` | medium | Minimal typed stylesheet decision/proof | YT-070 | [M11 plan](docs/M11-PLAN.md) |
+| `YT-073` | medium | Complete persisted Lab Operations Board | YT-071, YT-072 | [Product research](docs/M11-PRODUCT-READINESS-RESEARCH.md) |
+| `YT-074` | medium | Selected product operating-envelope qualification | YT-073 | [Product research](docs/M11-PRODUCT-READINESS-RESEARCH.md) |
+| `YT-075` | medium | Browser WebGPU island and SSR fallback | YT-069, YT-023 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-076` | medium | GPU lifecycle/resource ownership | YT-075 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-077` | medium | Matched dynamic renderer measurements | YT-076 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-078` | medium | Picking and semantic accessibility alternative | YT-077 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-079` | medium | Approved opt-in yetlet-wgpu candidate | YT-078 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-080` | medium | Selected renderer target qualification | YT-079 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-081` | medium | Selected M11 closeout and unmet gates | YT-074, YT-080 | [M11 plan](docs/M11-PLAN.md) |
 
 ## Done
 
@@ -81,3 +100,4 @@ Derived from [`todo-ledger.json`](todo-ledger.json). The project backlog source 
 | `YT-066` | medium | Qualify distributed providers and operational behavior | YT-046, YT-054, YT-057, YT-059 | [M10g evidence](docs/M10G-VERIFICATION.md)<br>[YT-066b1](docs/YT-066B1-VERIFICATION.md)<br>[YT-066b2](docs/YT-066B2-VERIFICATION.md)<br>[YT-066b3](docs/YT-066B3-VERIFICATION.md) |
 | `YT-067` | high | Perform Codex-assisted internal security scan | YT-063, YT-064 | [M10h evidence](docs/M10H-VERIFICATION.md) |
 | `YT-068` | medium | Refresh developer entry, candidate documentation and evidence-preserving navigation/status | YT-067 | [Documentation-stage record](docs/README.md#documentation-delivery-status--yt-068)<br>[final Private source/package boundary](docs/YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) |
+| `YT-069` | medium | Integrated M11 documentation and permitted self-review | YT-068, YT-023 | [Plan](docs/M11-PLAN.md), [documentation-only self-review](docs/M11-PLANNING-REVIEW.md) |

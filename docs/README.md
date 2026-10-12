@@ -10,6 +10,10 @@ Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 - [API contracts](API-CONTRACTS.md) and [Compatibility](COMPATIBILITY.md): implemented API classification and pre-public stability limits.
 - ADRs [0001](adr/0001-separation-of-concerns.md), [0002](adr/0002-events-and-actions.md), [0003](adr/0003-renderers-and-loading.md), [0004](adr/0004-request-context-and-middleware.md), [0005](adr/0005-opt-in-capability-modules.md), [0006](adr/0006-handler-first-mvc-optional.md) and [0007](adr/0007-bounded-keyed-dom-and-local-graph.md): retained decisions and tradeoffs.
 
+## M11 planning — product readiness and optional renderer
+
+The owner authorized documentation and review, not implementation. Start with [M11 plan](M11-PLAN.md), then [product-readiness research](M11-PRODUCT-READINESS-RESEARCH.md) for the capability matrix, CSS/product choice, three priority gaps and XSS/qualification boundary. [wgpu plan](M11-WGPU-PLAN.md) separately defines browser proof, lifecycle, measurements and possible first-party opt-in Experimental extraction. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) remains Proposed. [Planning review](M11-PLANNING-REVIEW.md) records actual documentation checks and current-session self-review, not independent assurance. YT-069 is the planning task; YT-070–YT-081 require later activation. No crate, browser support or production claim is added.
+
 ## Library guides
 
 These nine unpublished candidate pages describe the implemented APIs and their practical limits. Use the checkout's Rust 1.99 toolchain; native SSR needs no browser build.
@@ -50,7 +54,7 @@ The [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [integrity preparatio
 
 ## Documentation delivery status — YT-068
 
-The entry refresh, nine package guides and current/history navigation are reconciled after the five completed research studies. T08 has reconciled the [final Private source/package boundary](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12). YT-068 is **Done** at documentation scope; the independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate. YT-020 remains **Blocked**. All 68 backlog items are accounted for: 67 Done, one Blocked and zero In progress or Deferred, each at its stated scope. Established YT-030/YT-065/YT-066/YT-067 completion limits and optional unverified IME, speech, WebKit/mobile and zoom coverage remain unchanged.
+The entry refresh, nine package guides and current/history navigation are reconciled after the five completed research studies. T08 has reconciled the [final Private source/package boundary](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12). YT-068 is **Done** at documentation scope; the independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate. YT-020 remains **Blocked**. At that pre-M11 checkpoint, all 68 backlog items were accounted for: 67 Done, one Blocked and zero In progress or Deferred, each at its stated scope. M11 adds separately filed planning/implementation proposals above; consult Backlog/Kanban for current counts. Established YT-030/YT-065/YT-066/YT-067 completion limits and optional unverified IME, speech, WebKit/mobile and zoom coverage remain unchanged.
 
 Documentation-stage verification uses `python3 scripts/check_docs.py`, `python3 scripts/check_samples.py` and `git diff --check`, plus candidate package file listing. The code snippets in the root/server guide, core guide and request-ID guide are copied from existing source/test/rustdoc; this phase does not claim fresh compilation or execute historical qualification suites.
 

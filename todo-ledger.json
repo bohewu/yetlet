@@ -922,6 +922,137 @@
       ],
       "notes": "Priority P1; size M; milestone Documentation. Acceptance/evidence: [Documentation-stage record](README.md#documentation-delivery-status--yt-068): native SSR quickstart, nine candidate package guides and current/history navigation after five completed research studies; docs/sample/diff and package-list checks recorded 2026-10-12; [final Private source/package boundary](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) reconciled with historical signing evidence retained; independent delivery gate/result recorded separately in the run",
       "completed_at": "2026-10-12"
+    },
+    {
+      "id": "YT-069",
+      "summary": "Plan integrated product readiness and optional wgpu renderer; review documentation",
+      "status": "done",
+      "priority": "medium",
+      "related_task_ids": ["YT-068", "YT-023"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-PLAN.md", "docs/M11-PRODUCT-READINESS-RESEARCH.md", "docs/M11-WGPU-PLAN.md", "docs/M11-PLANNING-REVIEW.md", "docs/adr/0008-product-readiness-and-opt-in-scene-renderer.md"],
+      "notes": "M11p documentation only. Documentation/static consistency checks and owner-permitted current-session self-review complete; not independent assurance. Original 68 records preserved; later tasks await activation. No implementation, release or commit authority.",
+      "completed_at": "2026-10-12"
+    },
+    {
+      "id": "YT-070",
+      "summary": "Prove a realistic form and existing-CSS integration in isolation",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-069"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-PRODUCT-READINESS-RESEARCH.md", "docs/M11-PLAN.md"],
+      "notes": "M11-P proposed proof only; exact CSS/license/CSP, source/build/browser authority and independent review required before acceptance."
+    },
+    {
+      "id": "YT-071",
+      "summary": "Qualify selected safe HTML and live form contracts",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-070"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-PRODUCT-READINESS-RESEARCH.md", "docs/M11-PLAN.md"],
+      "notes": "M11-P proposed; selected tag/attribute/URL, boolean/property/reset/IME/lifecycle and targeted XSS evidence; independent security review; no general forms framework."
+    },
+    {
+      "id": "YT-072",
+      "summary": "Evaluate and qualify a minimal typed stylesheet contract",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-070"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-PRODUCT-READINESS-RESEARCH.md", "docs/M11-PLAN.md"],
+      "notes": "M11-P proposed; two-consumer evidence, minimal additive helper or explicit retain-wrapper decision; compatibility/CSP and independent review."
+    },
+    {
+      "id": "YT-073",
+      "summary": "Build the complete persisted Lab Operations Board",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-071", "YT-072"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-PRODUCT-READINESS-RESEARCH.md", "docs/M11-PLAN.md"],
+      "notes": "M11-P proposed; domain/identity/session authority, persisted CRUD/history/conflicts, authorization/CSRF and status recovery; independent review."
+    },
+    {
+      "id": "YT-074",
+      "summary": "Qualify the selected product operating envelope",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-073"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-PRODUCT-READINESS-RESEARCH.md", "docs/M11-PLAN.md"],
+      "notes": "M11-P proposed; approve numeric/source/browser/identity envelope before actual load, failure, restart, accessibility and cleanup evidence; no universal production claim."
+    },
+    {
+      "id": "YT-075",
+      "summary": "Prove a browser WebGPU scene island with SSR fallback",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-069", "YT-023"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-WGPU-PLAN.md", "docs/M11-PLAN.md"],
+      "notes": "M11-G proposed, independent of product line; approve exact dependency/browser execution, prove real canvas/SSR/asset isolation and review."
+    },
+    {
+      "id": "YT-076",
+      "summary": "Qualify GPU lifecycle and resource ownership",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-075"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-WGPU-PLAN.md", "docs/M11-PLAN.md"],
+      "notes": "M11-G proposed; resize/DPR/loss/suspend/dispose/remount, async retirement and bounded resources with actual cleanup and independent review."
+    },
+    {
+      "id": "YT-077",
+      "summary": "Measure dynamic scene updates against matched baselines",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-076"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-WGPU-PLAN.md", "docs/M11-PLAN.md"],
+      "notes": "M11-G proposed; approve workloads, compare Canvas2D/WebGPU and bounded relevant DOM/SVG lanes; retain raw correctness/startup/update/frame/bundle evidence and independent review."
+    },
+    {
+      "id": "YT-078",
+      "summary": "Qualify picking and semantic accessibility alternatives",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-077"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-WGPU-PLAN.md", "docs/M11-PLAN.md"],
+      "notes": "M11-G proposed; stable selection, coordinates, stale picks, keyboard/touch/reduced-motion and safe semantic alternatives; independent review."
+    },
+    {
+      "id": "YT-079",
+      "summary": "Decide and implement the explicitly approved opt-in yetlet-wgpu candidate",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-078"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-WGPU-PLAN.md", "docs/M11-PLAN.md"],
+      "notes": "M11-G proposed; separate promotion approval, first-party Experimental adapter, default dependency/asset isolation and independent API/security review. Deferral is not crate delivery."
+    },
+    {
+      "id": "YT-080",
+      "summary": "Qualify selected renderer targets and candidate support boundary",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-079"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-WGPU-PLAN.md", "docs/M11-PLAN.md"],
+      "notes": "M11-G proposed; exact selected browser/OS/adapter, real fallback/lifecycle/isolation and independent review; native expansion optional, no publication."
+    },
+    {
+      "id": "YT-081",
+      "summary": "Reconcile selected M11 delivery and unmet gates",
+      "status": "todo",
+      "priority": "medium",
+      "related_task_ids": ["YT-074", "YT-080"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": ["docs/M11-PLAN.md"],
+      "notes": "M11 proposed closeout; actual evidence and review, explicit amendments for deferred lines, retain unmet gates and YT-020 status."
     }
   ]
 }
