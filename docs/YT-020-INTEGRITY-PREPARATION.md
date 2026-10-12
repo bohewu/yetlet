@@ -4,6 +4,8 @@
 **Scope:** Original nine experimental `0.1.0` source-package candidates; Rust/Cargo 1.99.0, separate-host rebuilding, provenance drafts and mature verifier experiments.
 **Task state:** YT-020 remains **Blocked** for activation. The final independent reviewer result is reported separately against the frozen diff. No release or production assurance is claimed.
 
+**Later authorized delivery (2026-10-12):** The maintainer subsequently authorized committing this reviewed snapshot and continuing the Private follow-up. Native reviewer thread `01a12dab-b825-7ba0-a389-0757a5896306` returned PASS with no issues/followups, observed `gpt-6-astra` / effective `high`. Commit `9ec9b7b2e2291f649fd659bcbdb8e9fe17f7ad2f` retains the historical working-overlay evidence below. [Hosted rebuilding](YT-020-HOSTED-REBUILD.md) records the separately prepared immutable-source builder and exact delivery/activation boundary. Earlier unstaged/no-delivery statements below describe the original reviewed checkpoint; they do not cancel that later authorization or relabel its older evidence.
+
 ## Authority and source boundary
 
 The maintainer authorized Private preparation, use of another Windows runner through WebCodex, Rust-version unification before first publication, and independent repository review. No staging, commit, push, tag, Yetlet signing request, package/Release publication or visibility/settings change is authorized here. The original Ubuntu checkout is retained. A pre-existing detached checkout was observed and left untouched; none was created or used by this task.

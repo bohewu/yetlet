@@ -92,7 +92,7 @@ Application dependencies such as `rusqlite`, `tower-http`, `tempfile`, synthetic
 Before a public stability declaration:
 
 1. retain the selected dual-license texts and verify the actual release inventories;
-2. deliver the declared Rust 1.99 baseline and migrate its protected required CI check under separate authorization;
+2. retain the selected Rust 1.99 baseline, its migrated protected required check and actual CI for every delivered candidate;
 3. activate or revise the provisional cross-crate SemVer policy at the first public release;
 4. gather additional consumers before promoting the bounded document metadata API;
 5. declare supported browsers/OS/toolchains and CI coverage;

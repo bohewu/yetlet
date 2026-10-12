@@ -76,7 +76,7 @@ A runnable provider-free example is available with `cargo run -p yetlet-server-a
 
 ## Run the examples
 
-Requirements: Rust 1.99 or newer; `rust-toolchain.toml` pins development to Rust/Cargo 1.99.0. Browser samples additionally need Python 3.11+, the WASM target and wasm-bindgen 0.2.129; headless Firefox needs geckodriver. Native-only applications need no browser toolchain. The maintainer selected this unified baseline before the first experimental release. Historical Rust 1.88, Chrome 155 and Firefox 157 results retain their recorded sources; [integrity preparation](docs/YT-020-INTEGRITY-PREPARATION.md) records current checks and the pending hosted required-check migration.
+Requirements: Rust 1.99 or newer; `rust-toolchain.toml` pins development to Rust/Cargo 1.99.0. Browser samples additionally need Python 3.11+, the WASM target and wasm-bindgen 0.2.129; headless Firefox needs geckodriver. Native-only applications need no browser toolchain. The maintainer selected this unified baseline before the first experimental release. Historical Rust 1.88, Chrome 155 and Firefox 157 results retain their recorded sources; [integrity preparation](docs/YT-020-INTEGRITY-PREPARATION.md) and [hosted rebuilding](docs/YT-020-HOSTED-REBUILD.md) record current checks, the completed protected-check migration and the unsigned Private preparation boundary.
 
 ```bash
 rustup target add wasm32-unknown-unknown
