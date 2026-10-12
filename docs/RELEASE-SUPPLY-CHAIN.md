@@ -9,6 +9,8 @@
 
 **Later Private follow-up (2026-10-12):** The maintainer authorized committing the reviewed preparation and continuing delivery/Private rebuilding. [Hosted rebuild preparation](YT-020-HOSTED-REBUILD.md) records the first-head required CI and completed protected-check migration, a bounded manual builder with a separately operated GitHub execution environment, and actual execution evidence retained separately. It retains unsigned-provenance limits and the existing transparency/signature contract; Private attestation availability or a provider without a transparency log cannot silently waive that release gate. No public activation or signing policy is selected implicitly.
 
+**Explicit Private trust decision (2026-10-12):** The maintainer selected [Cosign public-key preparation and future crates.io distribution](YT-020-PRIVATE-TRUST-POLICY.md). This documentation-only mode authenticates maintainer-approved bytes after separately authorized execution; it does not establish OIDC identity, certificate/chain, transparency/inclusion or authenticated builder evidence and does not replace any formal release guarantee below. Actual keys, signatures, registry activation and visibility changes remain unperformed.
+
 ## Source and package identity
 
 Use the [coordinated release train](COMPATIBILITY.md): all nine Yetlet library candidates share one workspace version, currently `0.1.0`. No crate is authorized for publication. A future release requires a clean reviewed immutable commit, an approved immutable tag bound to that commit, an unchanged recorded `Cargo.lock` digest, and package archive digests. Reject dirty trees, moved tags, unreviewed source and lockfile drift at the release boundary.

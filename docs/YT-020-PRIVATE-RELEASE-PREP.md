@@ -14,6 +14,8 @@ The baseline is clean `master` at `a61f409627a7b9004338a96b02d0ded91ceb2f51`, th
 
 YT-060–YT-067 retain their recorded bounded completion. Historical hosted qualification `38043565238` still belongs to `c38837835dac683b09194b475baab2d8eda5a875`. It is not relabeled as execution on `a61f409` or this working snapshot. The YT-067 full scan remains bound to its pre-patch source; no new full scan or external audit is claimed.
 
+**Later explicit policy decision (2026-10-12):** [Private trust and future registry policy](YT-020-PRIVATE-TRUST-POLICY.md) selects Cosign maintainer public-key preparation and future crates.io distribution. It defines custody/bootstrap, signed evidence, independent verification, rotation and actual registry gates. Formal release guarantees remain mandatory. This decision authorizes documentation and independent review only; no key/signing/token/publication or repository visibility change occurs.
+
 ## Selected artifacts
 
 The proposed distributables are nine source package archives, in dependency order:
