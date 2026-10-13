@@ -23,6 +23,8 @@ members = [
     "examples/hello-world",
     "examples/middleware-lab",
     "examples/forms-validation",
+    "examples/form-css-proof",
+    "examples/lab-operations-board",
     "examples/file-server",
     "examples/sqlite-crud",
     "examples/sse-notifications",

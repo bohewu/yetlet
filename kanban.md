@@ -2,25 +2,21 @@
 
 Derived from [`todo-ledger.json`](todo-ledger.json). The project backlog source is [`docs/BACKLOG.md`](docs/BACKLOG.md).
 
-**Items:** 81 — 68 Done, 1 Blocked, 12 Todo.
+**Items:** 81 — 72 Done, 2 Blocked, 7 Todo.
 
-M11 is filed for planning; Todo rows require separate implementation authority. Product readiness and optional wgpu rendering are independent. Historical completion scopes and YT-020 are unchanged.
+Non-GPU YT-070–YT-073 are complete at their selected local scopes. YT-074 has passing bounded automated qualification but remains Blocked on unverified manual/broader acceptance cells. GPU remains unactivated. Review is current-session self-review, not independent assurance. See [qualification](docs/YT-074-QUALIFICATION.md), [startup](docs/BOARD-START.md) and [handoff](docs/M11-P-IMPLEMENTATION-HANDOFF.md).
 
 ## Blocked
 
 | ID | Priority | Work item | Depends on | Evidence |
 |---|---|---|---|---|
 | `YT-020` | medium | Build/run docs and release readiness | YT-019 | [Private preparation](docs/YT-020-PRIVATE-RELEASE-PREP.md)<br>[hosted rebuilding](docs/YT-020-HOSTED-REBUILD.md)<br>[trust/registry policy](docs/YT-020-PRIVATE-TRUST-POLICY.md)<br>[actual Private signing](docs/YT-020-PRIVATE-SIGNING-VERIFICATION.md) |
+| `YT-074` | medium | Automated local qualification passed; full manual/broader acceptance remains open | YT-073 | [Actual results and remaining gates](docs/YT-074-QUALIFICATION.md) |
 
-## Todo — separately authorized M11 proposals
+## Todo — remaining M11 work
 
 | ID | Priority | Work item | Depends on | Plan |
 |---|---|---|---|---|
-| `YT-070` | medium | Realistic form and existing-CSS proof | YT-069 | [Product research](docs/M11-PRODUCT-READINESS-RESEARCH.md) |
-| `YT-071` | medium | Selected safe HTML/live form contracts | YT-070 | [M11 plan](docs/M11-PLAN.md) |
-| `YT-072` | medium | Minimal typed stylesheet decision/proof | YT-070 | [M11 plan](docs/M11-PLAN.md) |
-| `YT-073` | medium | Complete persisted Lab Operations Board | YT-071, YT-072 | [Product research](docs/M11-PRODUCT-READINESS-RESEARCH.md) |
-| `YT-074` | medium | Selected product operating-envelope qualification | YT-073 | [Product research](docs/M11-PRODUCT-READINESS-RESEARCH.md) |
 | `YT-075` | medium | Browser WebGPU island and SSR fallback | YT-069, YT-023 | [GPU plan](docs/M11-WGPU-PLAN.md) |
 | `YT-076` | medium | GPU lifecycle/resource ownership | YT-075 | [GPU plan](docs/M11-WGPU-PLAN.md) |
 | `YT-077` | medium | Matched dynamic renderer measurements | YT-076 | [GPU plan](docs/M11-WGPU-PLAN.md) |
@@ -33,6 +29,10 @@ M11 is filed for planning; Todo rows require separate implementation authority. 
 
 | ID | Priority | Work item | Depends on | Evidence |
 |---|---|---|---|---|
+| `YT-073` | medium | Persisted Board, repaired native login and Chrome/Firefox journeys | YT-071, YT-072 | [Current evidence](docs/M11-P-BOARD-VERIFICATION.md), [screenshots](docs/screenshots/m11-board/README.md) |
+| `YT-070` | medium | Native form and existing-CSS proof | YT-069 | [Native and Chrome proof](docs/M11-P-FORM-ASSET-VERIFICATION.md) |
+| `YT-071` | medium | Selected native/application-owned form contract | YT-070 | [Bounded decision and limits](docs/M11-P-FORM-ASSET-VERIFICATION.md) |
+| `YT-072` | medium | Retain application stylesheet wrappers | YT-070 | [Consumer evidence](docs/M11-P-FORM-ASSET-VERIFICATION.md) |
 | `YT-001` | high | Repository docs / ADR / roadmap / backlog | — | — |
 | `YT-002` | high | Cargo workspace + native/WASM targets | YT-001 | — |
 | `YT-003` | high | Minimal shared `Component/View` model | YT-002 | — |

@@ -14,6 +14,10 @@ Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 
 The owner authorized documentation and review, not implementation. Start with [M11 plan](M11-PLAN.md), then [product-readiness research](M11-PRODUCT-READINESS-RESEARCH.md) for the capability matrix, CSS/product choice, three priority gaps and XSS/qualification boundary. [wgpu plan](M11-WGPU-PLAN.md) separately defines browser proof, lifecycle, measurements and possible first-party opt-in Experimental extraction. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) remains Proposed. [Planning review](M11-PLANNING-REVIEW.md) records actual documentation checks and current-session self-review, not independent assurance. YT-069 is the planning task; YT-070–YT-081 require later activation. No crate, browser support or production claim is added.
 
+### Activated non-GPU implementation
+
+The owner committed planning as `d96f7af` and [activated YT-070–YT-074](M11-P-ACTIVATION.md). [Form/asset evidence](M11-P-FORM-ASSET-VERIFICATION.md) records bounded YT-070–YT-072 decisions. YT-073 is locally complete after the native login repair, fourteen native tests and Chrome/Firefox journeys. [YT-074 qualification](YT-074-QUALIFICATION.md) records passing fault/load evidence, but full acceptance remains Blocked on unverified real IME/spoken AT and broader proposed duration/targets. See [startup instructions](BOARD-START.md), [actual screenshots](screenshots/m11-board/README.md), [historical/current Board evidence](M11-P-BOARD-VERIFICATION.md) and [handoff](M11-P-IMPLEMENTATION-HANDOFF.md). Implementation remains uncommitted; no independent assurance, GPU or public-release change is claimed.
+
 ## Library guides
 
 These nine unpublished candidate pages describe the implemented APIs and their practical limits. Use the checkout's Rust 1.99 toolchain; native SSR needs no browser build.

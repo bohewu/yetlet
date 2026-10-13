@@ -937,52 +937,56 @@
     {
       "id": "YT-070",
       "summary": "Prove a realistic form and existing-CSS integration in isolation",
-      "status": "todo",
+      "status": "done",
       "priority": "medium",
       "related_task_ids": ["YT-069"],
       "source": "docs/BACKLOG.md",
-      "artifact_paths": ["docs/M11-PRODUCT-READINESS-RESEARCH.md", "docs/M11-PLAN.md"],
-      "notes": "M11-P proposed proof only; exact CSS/license/CSP, source/build/browser authority and independent review required before acceptance."
+      "artifact_paths": ["docs/M11-P-FORM-ASSET-VERIFICATION.md", "examples/form-css-proof/README.md"],
+      "notes": "Native/CSS proof: 10 tests and actual Chrome lifecycle/CSP journey pass; owner-permitted self-review. Visual screenshot review, real IME and spoken AT remain unverified.",
+      "completed_at": "2026-10-12"
     },
     {
       "id": "YT-071",
       "summary": "Qualify selected safe HTML and live form contracts",
-      "status": "todo",
+      "status": "done",
       "priority": "medium",
       "related_task_ids": ["YT-070"],
       "source": "docs/BACKLOG.md",
-      "artifact_paths": ["docs/M11-PRODUCT-READINESS-RESEARCH.md", "docs/M11-PLAN.md"],
-      "notes": "M11-P proposed; selected tag/attribute/URL, boolean/property/reset/IME/lifecycle and targeted XSS evidence; independent security review; no general forms framework."
+      "artifact_paths": ["docs/M11-P-FORM-ASSET-VERIFICATION.md"],
+      "notes": "Bounded decision/proof selects native SSR controls and app-owned read-only enhancement; default/live/reset/text/ownership checks pass. No generic DOM/core URL widening, controlled forms or real IME/independent assurance claim.",
+      "completed_at": "2026-10-12"
     },
     {
       "id": "YT-072",
       "summary": "Evaluate and qualify a minimal typed stylesheet contract",
-      "status": "todo",
+      "status": "done",
       "priority": "medium",
       "related_task_ids": ["YT-070"],
       "source": "docs/BACKLOG.md",
-      "artifact_paths": ["docs/M11-PRODUCT-READINESS-RESEARCH.md", "docs/M11-PLAN.md"],
-      "notes": "M11-P proposed; two-consumer evidence, minimal additive helper or explicit retain-wrapper decision; compatibility/CSP and independent review."
+      "artifact_paths": ["docs/M11-P-FORM-ASSET-VERIFICATION.md"],
+      "notes": "Retain application wrappers after two independent existing consumers plus the new proof and focused regressions. No public stylesheet/head helper, default dependency or Page/CSP change.",
+      "completed_at": "2026-10-12"
     },
     {
       "id": "YT-073",
       "summary": "Build the complete persisted Lab Operations Board",
-      "status": "todo",
+      "status": "done",
       "priority": "medium",
       "related_task_ids": ["YT-071", "YT-072"],
       "source": "docs/BACKLOG.md",
-      "artifact_paths": ["docs/M11-PRODUCT-READINESS-RESEARCH.md", "docs/M11-PLAN.md"],
-      "notes": "M11-P proposed; domain/identity/session authority, persisted CRUD/history/conflicts, authorization/CSRF and status recovery; independent review."
+      "artifact_paths": ["docs/M11-P-BOARD-VERIFICATION.md", "docs/BOARD-START.md", "docs/screenshots/m11-board/README.md", "examples/lab-operations-board/README.md"],
+      "notes": "Local synthetic-identity application accepted after same-origin Referrer-Policy repair, 14 native tests, strict Clippy, release build, Chrome/Firefox native forms and persisted history/conflict/SSE journeys. Actual screenshots and current-session self-review retained; not independent or production assurance.",
+      "completed_at": "2026-10-13"
     },
     {
       "id": "YT-074",
       "summary": "Qualify the selected product operating envelope",
-      "status": "todo",
+      "status": "blocked",
       "priority": "medium",
       "related_task_ids": ["YT-073"],
       "source": "docs/BACKLOG.md",
-      "artifact_paths": ["docs/M11-PRODUCT-READINESS-RESEARCH.md", "docs/M11-PLAN.md"],
-      "notes": "M11-P proposed; approve numeric/source/browser/identity envelope before actual load, failure, restart, accessibility and cleanup evidence; no universal production claim."
+      "artifact_paths": ["docs/YT-074-QUALIFICATION.md", "docs/M11-P-IMPLEMENTATION-HANDOFF.md"],
+      "notes": "Bounded automated qualification passed: Job wc_job_dyJlYei47wcEM5Dq terminal completed exit 0, 10k items/90k initial history, 24k measured requests, 25 paced clients/10 SSE, fault/recovery and cleanup. Real OS IME/spoken AT and the broader proposed duration/target envelope remain unverified. Full acceptance requires remaining evidence or explicit owner scope amendment; self-review does not waive it."
     },
     {
       "id": "YT-075",

@@ -1731,6 +1731,19 @@ dependencies = [
 ]
 
 [[package]]
+name = "yetlet-form-css-proof"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "serde",
+ "serde_json",
+ "tokio",
+ "tower",
+ "yetlet-core",
+ "yetlet-server-axum",
+]
+
+[[package]]
 name = "yetlet-forms-validation"
 version = "0.1.0"
 dependencies = [
@@ -1770,6 +1783,26 @@ dependencies = [
  "yetlet-dom-keyed",
  "yetlet-html",
  "yetlet-reactive",
+]
+
+[[package]]
+name = "yetlet-lab-operations-board"
+version = "0.1.0"
+dependencies = [
+ "axum",
+ "futures-util",
+ "getrandom 0.3.4",
+ "rusqlite",
+ "serde",
+ "serde_json",
+ "serde_urlencoded",
+ "subtle",
+ "tempfile",
+ "tokio",
+ "tower",
+ "yetlet-core",
+ "yetlet-server-axum",
+ "yetlet-session",
 ]
 
 [[package]]
