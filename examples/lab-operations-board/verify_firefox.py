@@ -6,6 +6,7 @@ import os
 import re
 import subprocess
 import tempfile
+import time
 import socket
 import sys
 import hashlib
@@ -80,10 +81,16 @@ def run():
         report['checks'].append('native validation retains Unicode draft and exposes error relationship; correction saves')
         driver.navigate(base+'/board/projects/1/items?live=true')
         await_value(lambda:js("document.querySelector('[data-board-stream]')?.dataset.streamState==='current'"),'SSE initial snapshot')
+        js("(() => { window.statusMutations = []; const observer = new MutationObserver(records => { for (const record of records) window.statusMutations.push(record.target.hasAttribute('data-stream-message') ? 'message' : 'counts'); }); observer.observe(document.querySelector('[data-stream-message]'), {childList:true}); observer.observe(document.getElementById('record-counts'), {childList:true}); window.statusObserver = observer; })()")
+        time.sleep(2.2)
+        assert js('window.statusMutations.length')==0, 'unchanged SSE snapshots must not repeat text events'
         client=Client(port);client.login(codes)
         assert client.call('POST','/board/projects/1/items/1',client.fields('Firefox live update',2,'active'))[0]==303
         await_value(lambda:js("document.querySelector('[data-board-stream]')?.dataset.currentRevision==='3'"),'updated SSE')
         assert js("document.querySelector('[data-stream-message]').textContent.includes('Refresh authoritative records')")
+        assert js('window.statusMutations')==['message','counts'], 'live announcement must precede the adjacent count update'
+        js('window.statusObserver.disconnect()')
+        report['checks'].append('unchanged SSE snapshots do not mutate text; live message changes before counts to avoid Orca event coalescing')
         click('[data-stream-stop]')
         assert js("document.querySelector('[data-board-stream]').dataset.streamState==='paused'")
         report['checks'].append('Firefox actual persisted SSE update, authoritative refresh notice and pause')

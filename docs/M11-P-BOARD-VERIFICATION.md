@@ -1,9 +1,23 @@
 # M11-P — Board Implementation and Unmet Qualification Gates
 
+## Current live-status repair — 2026-10-13
+
+YT-073 remains locally Done. The uncommitted application delta repairs actual Firefox/Orca live announcements while retaining the status region, bounded stream and authoritative-refresh behavior. Final binary `dc2d6d16e310ed5df2b118251546fd3d2e5a7b0656862e58032c7813406f4228` passed 14 Board tests, strict Clippy/format/assets/build, both canonical browser journeys and [spoken AT](YT-074-DESKTOP-ACCEPTANCE.md). Real Chewing evidence is retained.
+
+[YT-074 qualification](YT-074-QUALIFICATION.md) is Done at the owner-amended local scope: the complete 62-minute mixed workload passed with 45,000 measured requests, zero errors, all latency gates passing and cleanup complete. Fresh independent review passed with zero material findings. The earlier synchronized-burst failure remains a limitation. Security, SQLite FULL durability, history/CAS/caps, core APIs and CORS/GPU scope are unchanged. The historical closeouts below retain prior failures and their original identities.
+
+## Historical blocked closeout — earlier 2026-10-13
+
+YT-073 remains Done at the loopback/synthetic-identity application scope. Candidate HEAD is `f00ec597e43f129a649fd1b8805fdd89edb93fbb`; this continuation does not change the application binary or its security/data contracts. **YT-074 remains Blocked:** real Chewing IME passed, but actual Board-content speech is unverified and the corrected full profile failed measured write p95 (548.299 ms > the <500 ms limit) after the first ten-minute round. The remaining rounds/soak were not started. The owner selected retained Chrome/Firefox instead of mandatory Edge.
+
+Read [current qualification and hashes](YT-074-QUALIFICATION.md), [desktop observations and remaining checklist](YT-074-DESKTOP-ACCEPTANCE.md) and [real IME screenshots](screenshots/yt074-ime/README.md). The full helper is the only program delta; existing fault/browser evidence is retained. Required asset/format/native-test/Clippy/release checks passed. Independent read-only review of the candidate and Blocked closeout passed with no material findings; it is not full acceptance or formal assurance. Both load attempts and all desktop resources reached cleanup; no commit or push occurred.
+
+The following date/baseline and earlier continuations are historical. They retain the original login/harness failures without overriding the current result above.
+
 **Date:** 2026-10-12. **Tasks:** YT-073 implementation in progress; YT-074 not accepted.
 **Baseline:** planning commit `d96f7af1073b12eab1a547d57f0d1b4d97589d7c` plus the uncommitted M11-P implementation. No implementation commit or push.
 
-## Continuation — 2026-10-13
+## Historical earlier continuation — 2026-10-13
 
 **Current:** YT-073 is Done at the selected loopback/synthetic-identity application scope after 14 native tests, Chrome and Firefox journeys and current-session self-review. YT-074 has passing bounded automated fault/load evidence but remains Blocked for the broader unverified acceptance cells. Read [current qualification](YT-074-QUALIFICATION.md), [startup](BOARD-START.md) and [actual screenshots](screenshots/m11-board/README.md). The 2026-10-12 sections below remain historical; their unresolved-cause/no-load wording is not the current state.
 

@@ -2,16 +2,15 @@
 
 Derived from [`todo-ledger.json`](todo-ledger.json). The project backlog source is [`docs/BACKLOG.md`](docs/BACKLOG.md).
 
-**Items:** 81 — 72 Done, 2 Blocked, 7 Todo.
+**Items:** 81 — 73 Done, 1 Blocked, 7 Todo.
 
-Non-GPU YT-070–YT-073 are complete at their selected local scopes. YT-074 has passing bounded automated qualification but remains Blocked on unverified manual/broader acceptance cells. GPU remains unactivated. Review is current-session self-review, not independent assurance. See [qualification](docs/YT-074-QUALIFICATION.md), [startup](docs/BOARD-START.md) and [handoff](docs/M11-P-IMPLEMENTATION-HANDOFF.md).
+Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing IME, repaired Firefox/Orca speech and final Chrome/Firefox PASS. The owner-amended full 62-minute mixed-load run passed with 45,000 measured requests and zero errors, followed by fresh independent review PASS. The original synchronized-burst failure remains a limitation. GPU is unactivated. See [qualification](docs/YT-074-QUALIFICATION.md), [desktop acceptance](docs/YT-074-DESKTOP-ACCEPTANCE.md) and [handoff](docs/M11-P-IMPLEMENTATION-HANDOFF.md).
 
 ## Blocked
 
 | ID | Priority | Work item | Depends on | Evidence |
 |---|---|---|---|---|
 | `YT-020` | medium | Build/run docs and release readiness | YT-019 | [Private preparation](docs/YT-020-PRIVATE-RELEASE-PREP.md)<br>[hosted rebuilding](docs/YT-020-HOSTED-REBUILD.md)<br>[trust/registry policy](docs/YT-020-PRIVATE-TRUST-POLICY.md)<br>[actual Private signing](docs/YT-020-PRIVATE-SIGNING-VERIFICATION.md) |
-| `YT-074` | medium | Automated local qualification passed; full manual/broader acceptance remains open | YT-073 | [Actual results and remaining gates](docs/YT-074-QUALIFICATION.md) |
 
 ## Todo — remaining M11 work
 
@@ -29,6 +28,7 @@ Non-GPU YT-070–YT-073 are complete at their selected local scopes. YT-074 has 
 
 | ID | Priority | Work item | Depends on | Evidence |
 |---|---|---|---|---|
+| `YT-074` | medium | Owner-amended full mixed load, IME, spoken AT, Chrome/Firefox and independent review PASS | YT-073 | [Current results and retained failures](docs/YT-074-QUALIFICATION.md) |
 | `YT-073` | medium | Persisted Board, repaired native login and Chrome/Firefox journeys | YT-071, YT-072 | [Current evidence](docs/M11-P-BOARD-VERIFICATION.md), [screenshots](docs/screenshots/m11-board/README.md) |
 | `YT-070` | medium | Native form and existing-CSS proof | YT-069 | [Native and Chrome proof](docs/M11-P-FORM-ASSET-VERIFICATION.md) |
 | `YT-071` | medium | Selected native/application-owned form contract | YT-070 | [Bounded decision and limits](docs/M11-P-FORM-ASSET-VERIFICATION.md) |

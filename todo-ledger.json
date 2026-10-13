@@ -981,12 +981,13 @@
     {
       "id": "YT-074",
       "summary": "Qualify the selected product operating envelope",
-      "status": "blocked",
+      "status": "done",
       "priority": "medium",
       "related_task_ids": ["YT-073"],
       "source": "docs/BACKLOG.md",
-      "artifact_paths": ["docs/YT-074-QUALIFICATION.md", "docs/M11-P-IMPLEMENTATION-HANDOFF.md"],
-      "notes": "Bounded automated qualification passed: Job wc_job_dyJlYei47wcEM5Dq terminal completed exit 0, 10k items/90k initial history, 24k measured requests, 25 paced clients/10 SSE, fault/recovery and cleanup. Real OS IME/spoken AT and the broader proposed duration/target envelope remain unverified. Full acceptance requires remaining evidence or explicit owner scope amendment; self-review does not waive it."
+      "artifact_paths": ["docs/YT-074-QUALIFICATION.md", "docs/YT-074-DESKTOP-ACCEPTANCE.md", "docs/YT-074-DESKTOP-EVIDENCE.json", "docs/YT-074-SPOKEN-AT-EVIDENCE.json", "docs/screenshots/yt074-ime/README.md", "docs/M11-P-IMPLEMENTATION-HANDOFF.md"],
+      "notes": "Done at owner-amended local scope. Retained bounded and real Chewing IME PASS; repaired Firefox/Orca actual speech and final Chrome/Firefox PASS. Owner authorized one new full run and accepted five staggered workload cohorts at unchanged 0.5 requests/sec/client, 25 clients, ten SSE readers, 62 minutes, thresholds and SQLite FULL durability. That complete 62-minute run passed all thresholds, 45,000 measured requests and zero errors; final 99,300 history rows and owned cleanup verified. Fresh independent review passed with zero material findings and trackers are reconciled. Original synchronized burst failed write p95 548.299 ms and remains an explicit limitation. Owner subsequently authorized a local delivery commit on 2026-10-13; no push requested.",
+      "completed_at": "2026-10-13"
     },
     {
       "id": "YT-075",

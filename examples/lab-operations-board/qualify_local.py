@@ -4,7 +4,9 @@
 No browser repetition, external services, production data, or automatic write retry.
 """
 from __future__ import annotations
+import argparse
 import concurrent.futures
+from datetime import datetime, timezone
 import hashlib
 from http.client import HTTPConnection
 import json
@@ -24,11 +26,19 @@ from verify_local import ROOT, Client, http, metrics, percentile, port_number, w
 
 OUT = ROOT / "target/m11-board/sustained"
 BINARY = ROOT / "target/release/yetlet-lab-operations-board"
+PROFILES = {
+    "bounded": {"warmup": 30, "rounds": [60, 60, 60], "soak": 300, "rps": 2},
+    # Owner-selected pace preserves all 62 minutes below the unchanged history cap.
+    "full": {"warmup": 120, "rounds": [600, 600, 600], "soak": 1800, "rps": 0.5, "stagger_cycle": True},
+}
 
 
-def run():
-    OUT.mkdir(parents=True, exist_ok=True)
-    temp = Path(tempfile.mkdtemp(prefix="owned-", dir=OUT))
+def run(profile="bounded"):
+    config = PROFILES[profile]
+    out = OUT if profile == "bounded" else ROOT / "target/m11-board" / (profile + datetime.now(timezone.utc).strftime("-%Y%m%dT%H%M%S%fZ"))
+    out.mkdir(parents=True, exist_ok=profile == "bounded")
+    print(f"ARTIFACT_DIRECTORY {out.relative_to(ROOT)}", flush=True)
+    temp = Path(tempfile.mkdtemp(prefix="owned-", dir=out))
     os.chmod(temp, 0o700)
     db = temp / "board.sqlite"
     server = None
@@ -36,15 +46,35 @@ def run():
     stop_event = threading.Event()
     port = port_number()
     base = f"http://127.0.0.1:{port}"
-    report = {"status": "fail", "checks": [], "rounds": [], "resources": [], "stream_errors": [], "stream_connections": [0] * 10, "cleanup": "pending"}
-    report["envelope"] = {"initial_items": 10000, "initial_history": 90000, "clients": 25, "sse_clients": 10, "request_pattern": "four reads then one update", "max_requests_per_second_per_client": 2, "warmup_seconds": 30, "round_seconds": [60,60,60], "soak_seconds": 300}
-    report["limits"] = ["single local Linux process and SQLite", "synthetic identity and data", "no real OS IME or spoken AT", "not the proposed 62-minute experiment", "no SLA, HA or production rollout claim"]
-    source_paths = sorted(p for p in (ROOT / "examples/lab-operations-board").rglob("*") if p.is_file() and "__pycache__" not in p.parts) + [ROOT / "Cargo.toml", ROOT / "Cargo.lock"]
+    report = {"status": "fail", "profile": profile, "started_utc": datetime.now(timezone.utc).isoformat(), "checks": [], "rounds": [], "resources": [], "stream_errors": [], "stream_connections": [0] * 10, "stream_logins": [0] * 10, "stream_events": [], "active_streams": 0, "cleanup": "pending"}
+    report["envelope"] = {"initial_items": 10000, "initial_history": 90000, "clients": 25, "sse_clients": 10, "request_pattern": "four reads then one update", "max_requests_per_second_per_client": 2, "selected_requests_per_second_per_client": config["rps"], "warmup_seconds": config["warmup"], "round_seconds": config["rounds"], "soak_seconds": config["soak"], "session_relogin_seconds": 1200}
+    report["envelope"]["initial_cycle_positions"] = [i % 5 if config.get("stagger_cycle", False) else 0 for i in range(25)]
+    report["envelope"]["cycle_scheduling"] = "five staggered cohorts; each slot has 20 reads and 5 writes" if config.get("stagger_cycle", False) else "all clients start at cycle position zero; synchronized write bursts"
+    report["thresholds"] = {"read_p95_ms_below": 250, "write_p95_ms_below": 500, "combined_p99_ms_below": 1000, "unexpected_response_fraction_below": 0.001}
+    report["limits"] = ["single local Linux process and SQLite", "synthetic identity and data", "no real OS IME or spoken AT", "paced throughput, not maximum capacity", "SQL queue depth: Not instrumented", "bounded RSS observations do not prove leak freedom", "no SLA, HA or production rollout claim"]
+    if profile == "bounded": report["limits"].append("not the proposed 62-minute experiment")
+    report["fault_evidence"] = "executed separately before timing" if profile == "bounded" else "retained bounded run target/m11-board/sustained/report.json; no repeated fault injections"
+    if profile == "full":
+        previous = ROOT / "target/m11-board/sustained/report.json"
+        report["retained_fault_report_sha256"] = hashlib.sha256(previous.read_bytes()).hexdigest()
+    candidates = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=ROOT).decode().split("\0")
+    source_paths = sorted(ROOT / p for p in candidates if p and (ROOT / p).is_file() and (p.endswith((".rs", "Cargo.toml")) or p in ["Cargo.lock", "rust-toolchain.toml", "scripts/smoke_browser.py"] or (p.startswith("examples/lab-operations-board/") and not p.endswith(".md"))))
     identity = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
     report["source_sha256"] = identity
     report["binary_sha256"] = hashlib.sha256(BINARY.read_bytes()).hexdigest()
     report["head"] = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
-    report["environment"] = {"kernel": os.uname().release, "machine": os.uname().machine, "logical_cpus": os.cpu_count(), "rustc": subprocess.check_output([str(Path.home()/".cargo/bin/rustc"), "--version"], text=True).strip()}
+    report["dirty_state"] = subprocess.check_output(["git", "status", "--porcelain=v1", "--untracked-files=all"], cwd=ROOT, text=True).splitlines()
+    report["diff_sha256"] = hashlib.sha256(subprocess.check_output(["git", "diff", "HEAD", "--binary"], cwd=ROOT)).hexdigest()
+    cpu_model = re.search(r"^model name\s*:\s*(.+)$", Path("/proc/cpuinfo").read_text(), re.M)
+    report["environment"] = {"os_release": Path("/etc/os-release").read_text().splitlines(), "kernel": os.uname().release, "machine": os.uname().machine, "cpu_model": cpu_model.group(1) if cpu_model else "unavailable", "logical_cpus": os.cpu_count(), "memory_total": Path("/proc/meminfo").read_text().splitlines()[0], "network": "same-host IPv4 loopback, no proxy", "rustc": subprocess.check_output([str(Path.home()/".cargo/bin/rustc"), "--version"], text=True).strip()}
+    stream_lock = threading.Lock()
+    observed_start = time.monotonic()
+
+    def stream_event(index, event):
+        with stream_lock:
+            report["stream_events"].append({"reader": index, "event": event, "elapsed_seconds": time.monotonic() - observed_start})
+            if event == "connected": report["active_streams"] += 1
+            if event == "closed": report["active_streams"] -= 1
 
     def start(path=db, expect_ready=True):
         nonlocal server
@@ -85,60 +115,72 @@ def run():
             c.executemany("INSERT INTO history(item_id,project,version,actor,action,title,status) VALUES(?,1,?,'alice',?,?,'open')", ((i,v,"create" if v == 1 else "update",f"Work record {i:05}") for i in range(1,10001) for v in range(1,10)))
             c.commit()
         codes = start()
-        c = client(codes)
-        print("STAGE contention and unread-response fault cases", flush=True)
-        with sqlite3.connect(db) as lock:
-            lock.execute("BEGIN IMMEDIATE")
-            status, _, _ = c.call("POST", "/board/projects/1/items/1", c.fields("Must not commit",9))
-            assert status == 503
-            assert c.call("GET", "/healthz")[0] == 200
-            lock.rollback()
-        with sqlite3.connect(db) as check:
-            assert check.execute("SELECT version FROM work_items WHERE id=1").fetchone()[0] == 9
-            assert check.execute("SELECT COUNT(*) FROM history").fetchone()[0] == 90000
-        assert c.call("POST", "/board/projects/1/items/1", c.fields("Recovered after contention",9))[0] == 303
-        report["checks"].append("actual writer-lock contention returns 503 without mutation; health remains 200; explicit later write succeeds")
-        body = urllib.parse.urlencode(c.fields("Committed after response loss",10)).encode()
-        request = (f"POST /board/projects/1/items/1 HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nOrigin: {base}\r\nCookie: {c.cookie}\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n").encode() + body
-        with socket.create_connection(("127.0.0.1",port),timeout=5) as lost:
-            lost.sendall(request)
-            # Leave response unread until authoritative storage confirms this exact write.
-            def committed():
-                with sqlite3.connect(db) as check:
-                    return check.execute("SELECT version FROM work_items WHERE id=1").fetchone()[0] == 11
-            wait_until(committed, "authoritative commit after response loss", seconds=5)
-        assert c.call("GET", "/board/projects/1/items/1")[2].count("Committed after response loss") >= 1
-        assert c.call("POST", "/board/projects/1/items/1", c.fields("Explicit stale draft",10))[0] == 409
-        report["checks"].append("real HTTP write committed with response unread; authoritative read resolves it; explicit stale version rejected with 409; no automatic replay")
-        old_cookie = c.cookie
-        for x in clients: x.close()
-        clients.clear()
-        stop()
-        backup = temp / "known-good.sqlite"
-        with sqlite3.connect(db) as original, sqlite3.connect(backup) as saved: original.backup(saved)
-        candidate = temp / "incompatible.sqlite"
-        with sqlite3.connect(backup) as saved, sqlite3.connect(candidate) as future:
-            saved.backup(future); future.execute("PRAGMA user_version=2")
-        start(candidate, expect_ready=False)
-        codes = start(backup)
-        retired = Client(port); clients.append(retired); retired.cookie = old_cookie
-        assert retired.call("GET", "/board/projects/1/items/1")[0] == 401
-        current = client(codes)
-        assert "Committed after response loss" in current.call("GET", "/board/projects/1/items/1")[2]
-        report["checks"].append("incompatible schema candidate refuses startup; rollback to known-good version-1 database retains latest data and requires fresh Memory login")
-        db = backup
-        versions = [11] + [9] * 24
-        sse_cookie = current.cookie
+        if profile == "bounded":
+            c = client(codes)
+            print("STAGE contention and unread-response fault cases", flush=True)
+            with sqlite3.connect(db) as lock:
+                lock.execute("BEGIN IMMEDIATE")
+                status, _, _ = c.call("POST", "/board/projects/1/items/1", c.fields("Must not commit",9))
+                assert status == 503
+                assert c.call("GET", "/healthz")[0] == 200
+                lock.rollback()
+            with sqlite3.connect(db) as check:
+                assert check.execute("SELECT version FROM work_items WHERE id=1").fetchone()[0] == 9
+                assert check.execute("SELECT COUNT(*) FROM history").fetchone()[0] == 90000
+            assert c.call("POST", "/board/projects/1/items/1", c.fields("Recovered after contention",9))[0] == 303
+            report["checks"].append("actual writer-lock contention returns 503 without mutation; health remains 200; explicit later write succeeds")
+            body = urllib.parse.urlencode(c.fields("Committed after response loss",10)).encode()
+            request = (f"POST /board/projects/1/items/1 HTTP/1.1\r\nHost: 127.0.0.1:{port}\r\nOrigin: {base}\r\nCookie: {c.cookie}\r\nContent-Type: application/x-www-form-urlencoded\r\nContent-Length: {len(body)}\r\nConnection: close\r\n\r\n").encode() + body
+            with socket.create_connection(("127.0.0.1",port),timeout=5) as lost:
+                lost.sendall(request)
+                # Leave response unread until authoritative storage confirms this exact write.
+                def committed():
+                    with sqlite3.connect(db) as check:
+                        return check.execute("SELECT version FROM work_items WHERE id=1").fetchone()[0] == 11
+                wait_until(committed, "authoritative commit after response loss", seconds=5)
+            assert c.call("GET", "/board/projects/1/items/1")[2].count("Committed after response loss") >= 1
+            assert c.call("POST", "/board/projects/1/items/1", c.fields("Explicit stale draft",10))[0] == 409
+            report["checks"].append("real HTTP write committed with response unread; authoritative read resolves it; explicit stale version rejected with 409; no automatic replay")
+            old_cookie = c.cookie
+            for x in clients: x.close()
+            clients.clear()
+            stop()
+            backup = temp / "known-good.sqlite"
+            with sqlite3.connect(db) as original, sqlite3.connect(backup) as saved: original.backup(saved)
+            candidate = temp / "incompatible.sqlite"
+            with sqlite3.connect(backup) as saved, sqlite3.connect(candidate) as future:
+                saved.backup(future); future.execute("PRAGMA user_version=2")
+            start(candidate, expect_ready=False)
+            codes = start(backup)
+            retired = Client(port); clients.append(retired); retired.cookie = old_cookie
+            assert retired.call("GET", "/board/projects/1/items/1")[0] == 401
+            current = client(codes)
+            assert "Committed after response loss" in current.call("GET", "/board/projects/1/items/1")[2]
+            report["checks"].append("incompatible schema candidate refuses startup; rollback to known-good version-1 database retains latest data and requires fresh Memory login")
+            db = backup
+            versions = [11] + [9] * 24
+        else:
+            current = client(codes)
+            versions = [9] * 25
         stream_ready = [threading.Event() for _ in range(10)]
         def stream_worker(index):
             connection = None
+            logged_in = Client(port)
+            login_time = 0
+            connected = False
             try:
                 while not stop_event.is_set():
+                    if time.monotonic() - login_time >= 1200:
+                        logged_in.login(codes)
+                        login_time = time.monotonic()
+                        report["stream_logins"][index] += 1
+                        stream_event(index, "login")
                     connection = HTTPConnection("127.0.0.1",port,timeout=12)
-                    connection.request("GET", "/board/projects/1/events", headers={"Cookie":sse_cookie})
+                    connection.request("GET", "/board/projects/1/events", headers={"Cookie":logged_in.cookie})
                     response = connection.getresponse()
                     assert response.status == 200
                     report["stream_connections"][index] += 1
+                    stream_event(index, "connected"); connected = True
                     while not stop_event.is_set():
                         line = response.readline(8192)
                         if not line: break
@@ -148,10 +190,15 @@ def run():
                             assert data["total"] == 10000
                             stream_ready[index].set()
                     connection.close(); connection = None
+                    stream_event(index, "closed"); connected = False
             except Exception as error:
-                if not stop_event.is_set(): report["stream_errors"].append(type(error).__name__)
+                if not stop_event.is_set():
+                    report["stream_errors"].append(type(error).__name__)
+                    stop_event.set()
             finally:
                 if connection is not None: connection.close()
+                if connected: stream_event(index, "closed")
+                logged_in.close()
         for index in range(10):
             thread = threading.Thread(target=stream_worker,args=(index,));thread.start();threads.append(thread)
         assert all(event.wait(12) for event in stream_ready)
@@ -161,7 +208,7 @@ def run():
             while not stop_event.wait(1):
                 try:
                     row=metrics(monitored_pid)
-                    row.update(elapsed_seconds=time.monotonic()-start_time,threads=len(list(Path(f"/proc/{monitored_pid}/task").iterdir())),fds=len(list(Path(f"/proc/{monitored_pid}/fd").iterdir())))
+                    row.update(elapsed_seconds=time.monotonic()-start_time,threads=len(list(Path(f"/proc/{monitored_pid}/task").iterdir())),fds=len(list(Path(f"/proc/{monitored_pid}/fd").iterdir())),active_sse=report["active_streams"])
                     report["resources"].append(row)
                 except (OSError,ProcessLookupError): break
         t = threading.Thread(target=monitor);t.start();threads.append(t)
@@ -169,17 +216,27 @@ def run():
         def phase(label,seconds,retain=True):
             print(f"STAGE {label} seconds={seconds}",flush=True)
             gate=threading.Barrier(25)
+            all_rows, errors, login_counts = [], [], [0] * 25
+            rows_lock = threading.Lock()
             def worker(index):
                 connection=Client(port)
                 try:
                     connection.login(codes)
+                    login_counts[index] += 1
+                    login_time=time.monotonic()
                     gate.wait(timeout=15)
-                    begin=time.monotonic(); end=begin+seconds; operation=0; rows=[]
-                    while time.monotonic()<end:
-                        due=begin+operation*.5
-                        delay=due-time.monotonic()
-                        if delay>0: time.sleep(delay)
+                    # Owner-approved mixed workload: rotate the same five-step
+                    # cycle without lowering any client's pace or write share.
+                    begin=time.monotonic(); end=begin+seconds; operation=index%5 if config.get("stagger_cycle", False) else 0; due=begin
+                    while time.monotonic()<end and not stop_event.is_set():
+                        if stop_event.wait(max(0,due-time.monotonic())): break
                         if time.monotonic()>=end: break
+                        if time.monotonic()-login_time >= 1200:
+                            connection.login(codes)
+                            login_counts[index] += 1
+                            login_time=time.monotonic()
+                        # No catch-up bursts after a slow operation or explicit re-login.
+                        due=time.monotonic()+1/config["rps"]
                         write=operation%5==4; then=time.perf_counter_ns()
                         if write:
                             status=connection.call("POST",f"/board/projects/1/items/{index+1}",connection.fields(f"Worker {index:02}",versions[index]))[0]
@@ -187,33 +244,45 @@ def run():
                         else:
                             status=connection.call("GET","/board/projects/1/items")[0]
                         elapsed=(time.perf_counter_ns()-then)/1e6
-                        rows.append(("write" if write else "read",elapsed,status))
+                        with rows_lock: all_rows.append(("write" if write else "read",elapsed,status))
                         if status!=(303 if write else 200): raise RuntimeError("unexpected response; no automatic mutation retry")
                         operation+=1
-                    return rows
+                except Exception as error:
+                    with rows_lock: errors.append({"client":index,"type":type(error).__name__})
+                    stop_event.set(); gate.abort()
                 finally: connection.close()
             before=metrics(server.pid); begin=time.monotonic()
             with concurrent.futures.ThreadPoolExecutor(max_workers=25) as pool:
-                all_rows=[row for group in pool.map(worker,range(25)) for row in group]
+                list(pool.map(worker,range(25)))
             wall=time.monotonic()-begin; after=metrics(server.pid)
-            result={"name":label,"configured_seconds":seconds,"wall_seconds_including_login":wall,"requests":len(all_rows),"unexpected_responses":0,"achieved_rps_including_login_wall":len(all_rows)/wall,"cpu_seconds":after["cpu_seconds"]-before["cpu_seconds"],"rss_before_kib":before["rss_kib"],"rss_after_kib":after["rss_kib"]}
+            unexpected=sum(status != (303 if kind=="write" else 200) for kind,_,status in all_rows)
+            result={"name":label,"configured_seconds":seconds,"wall_seconds_including_login":wall,"requests":len(all_rows),"unexpected_responses":unexpected,"errors":errors,"logins":sum(login_counts),"authentication_requests_excluded_from_mix":3*sum(login_counts),"achieved_rps_including_login_wall":len(all_rows)/wall,"cpu_seconds":after["cpu_seconds"]-before["cpu_seconds"],"rss_before_kib":before["rss_kib"],"rss_after_kib":after["rss_kib"]}
             for kind in ["read","write"]:
                 values=[r[1] for r in all_rows if r[0]==kind]
-                result[kind]={"count":len(values),"p50_ms":percentile(values,.5),"p95_ms":percentile(values,.95),"p99_ms":percentile(values,.99),"max_ms":max(values)}
-            result["combined_p99_ms"]=percentile([r[1] for r in all_rows],.99)
-            result["thresholds_pass"]=result["read"]["p95_ms"]<250 and result["write"]["p95_ms"]<500 and result["combined_p99_ms"]<1000
+                result[kind]={"count":len(values),"p50_ms":percentile(values,.5) if values else None,"p95_ms":percentile(values,.95) if values else None,"p99_ms":percentile(values,.99) if values else None,"max_ms":max(values) if values else None}
+            result["combined_p99_ms"]=percentile([r[1] for r in all_rows],.99) if all_rows else None
+            result["combined_max_ms"]=max((r[1] for r in all_rows),default=None)
+            result["thresholds_pass"]=bool(all_rows and result["write"]["count"] and result["read"]["count"] and result["read"]["p95_ms"]<250 and result["write"]["p95_ms"]<500 and result["combined_p99_ms"]<1000 and unexpected/len(all_rows)<0.001 and not errors and not stop_event.is_set())
+            (out/f"{label}-samples.json").write_text(json.dumps(all_rows)+"\n")
             if retain:
                 report["rounds"].append(result)
-                (OUT/f"{label}-samples.json").write_text(json.dumps(all_rows)+"\n")
+            else:
+                report["warmup"] = result
             print(json.dumps(result),flush=True)
-            assert result["thresholds_pass"]
+            assert not errors and not unexpected and not stop_event.is_set()
+            # Full-profile acceptance covers measured rounds; retain warmup tails
+            # as evidence without treating them as steady-state measurements.
+            if retain or profile == "bounded": assert result["thresholds_pass"]
             assert not report["stream_errors"]
-        phase("warmup",30,False)
-        for n in range(1,4): phase(f"round-{n}",60)
-        phase("soak",300)
+        phase("warmup",config["warmup"],False)
+        for n,seconds in enumerate(config["rounds"],1): phase(f"round-{n}",seconds)
+        phase("soak",config["soak"])
         with sqlite3.connect(db) as check:
             report["final_data"]={"items":check.execute("SELECT COUNT(*) FROM work_items").fetchone()[0],"history":check.execute("SELECT COUNT(*) FROM history").fetchone()[0]}
             assert report["final_data"]["items"]==10000 and report["final_data"]["history"]<100000
+            initial_history=90002 if profile=="bounded" else 90000
+            writes=report["warmup"]["write"]["count"]+sum(r["write"]["count"] for r in report["rounds"])
+            assert report["final_data"]["history"]==initial_history+writes
             assert check.execute("PRAGMA integrity_check").fetchone()[0]=="ok"
         stop_event.set()
         for x in clients:x.close()
@@ -221,8 +290,11 @@ def run():
         report["graceful_shutdown_seconds"] = stop()
         for t in threads:t.join(timeout=15);assert not t.is_alive()
         assert not report["stream_errors"] and all(n>=2 for n in report["stream_connections"])
+        assert report["active_streams"]==0
         report["checks"].append("ten SSE streams read throughout load and reconnect after the five-minute lifetime; graceful exit joins readers")
         assert identity == {str(p.relative_to(ROOT)):hashlib.sha256(p.read_bytes()).hexdigest() for p in source_paths}
+        assert report["binary_sha256"]==hashlib.sha256(BINARY.read_bytes()).hexdigest()
+        report["source_and_binary_unchanged"]=True
         report["status"]="pass"
     except Exception as error:
         report["failure_type"]=type(error).__name__
@@ -237,8 +309,14 @@ def run():
         remove_owned_tree(temp)
         with socket.socket() as s:assert s.connect_ex(("127.0.0.1",port))!=0
         report["cleanup"]="owned process reaped, threads joined, listener closed, private synthetic databases/logs removed"
-        (OUT/"report.json").write_text(json.dumps(report,indent=2)+"\n")
-        print(json.dumps({k:v for k,v in report.items() if k not in ['source_sha256','resources']},indent=2),flush=True)
+        report["finished_utc"]=datetime.now(timezone.utc).isoformat()
+        (out/"report.json").write_text(json.dumps(report,indent=2)+"\n")
+        artifacts=sorted(out.glob("*.json"))
+        (out/"SHA256SUMS").write_text("".join(f"{hashlib.sha256(p.read_bytes()).hexdigest()}  {p.name}\n" for p in artifacts))
+        print(json.dumps({k:v for k,v in report.items() if k not in ['source_sha256','resources','stream_events']},indent=2),flush=True)
 
 if __name__ == "__main__":
-    run()
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--profile",choices=PROFILES,default="bounded")
+    args=parser.parse_args()
+    run(args.profile)

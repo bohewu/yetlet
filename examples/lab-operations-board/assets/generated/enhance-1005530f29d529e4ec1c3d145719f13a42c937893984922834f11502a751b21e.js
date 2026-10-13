@@ -29,8 +29,12 @@ for (const root of document.querySelectorAll('[data-board-stream]')) {
         const data = JSON.parse(event.data);
         const keys = ['revision','total','open','active','blocked','closed'];
         if (Object.keys(data).length !== keys.length || !keys.every(key => Number.isSafeInteger(data[key]) && data[key] >= 0) || data.total > 10000 || data.open + data.active + data.blocked + data.closed !== data.total) throw new Error('snapshot shape');
-        counts.textContent = `${data.total} total · ${data.open} open · ${data.active} active · ${data.blocked} blocked · ${data.closed} closed`;
-        message.textContent = data.revision === initial ? 'Live status current. Records match the displayed revision.' : 'Status updated. Refresh authoritative records to see the latest work-item changes.';
+        // Send the live-region event before the adjacent count update; Orca
+        // coalesces rapid text events. Unchanged snapshots need no DOM writes.
+        const nextMessage = data.revision === initial ? 'Live status current. Records match the displayed revision.' : 'Status updated. Refresh authoritative records to see the latest work-item changes.';
+        if (message.textContent !== nextMessage) message.textContent = nextMessage;
+        const nextCounts = `${data.total} total · ${data.open} open · ${data.active} active · ${data.blocked} blocked · ${data.closed} closed`;
+        if (counts.textContent !== nextCounts) counts.textContent = nextCounts;
         root.dataset.currentRevision = String(data.revision);
         root.dataset.streamState = 'current';
         attempts = 0;

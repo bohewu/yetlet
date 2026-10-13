@@ -255,9 +255,16 @@ pub(crate) fn listing(user: Principal, csrf: &str, query: &ListQuery, values: &L
                     values.snapshot.revision.to_string(),
                 )
                 .child(
-                    text("p", "Stored snapshot shown. Connecting to live status...")
-                        .attribute("data-stream-message", "")
-                        .attribute("role", "status"),
+                    // Orca treats status-bar text as UI and coalesces adjacent
+                    // paragraph events. An explicit generic live child keeps
+                    // this message in its live-region event path.
+                    Element::new("div").attribute("role", "status").child(
+                        text("p", "Stored snapshot shown. Connecting to live status...")
+                            .attribute("data-stream-message", "")
+                            .attribute("role", "generic")
+                            .attribute("aria-live", "polite")
+                            .attribute("aria-atomic", "true"),
+                    ),
                 )
                 .child(
                     text("button", "Stop live status")

@@ -1,6 +1,32 @@
 # M11-P Implementation Handoff
 
-## Current continuation status — 2026-10-13
+## Current repair continuation — 2026-10-13
+
+The executed candidate was `master` at `f00ec597e43f129a649fd1b8805fdd89edb93fbb` with uncommitted changes. On 2026-10-13 the owner subsequently authorized a local delivery commit and asked to consider synchronized-burst retesting; push and new load execution are not requested by that instruction. [Qualification](YT-074-QUALIFICATION.md) is the current result source. Real Chewing IME is retained PASS; the repaired Firefox/Orca journey and final Chrome/Firefox canonical journeys are PASS. [Desktop acceptance](YT-074-DESKTOP-ACCEPTANCE.md) links actual speech and focus captures.
+
+The owner accepted five staggered workload cohorts and explicitly authorized one new full execution after repair. The new mixed-load run passed at `target/m11-board/full-20261013T040015634705Z/`, started `2026-10-13T04:00:15Z`; log `target/m11-board/full-mixed-20261013-execution.log`. It ended at `2026-10-13T05:02:16.801532Z`, exit 0, with 45,000 measured requests, zero errors, all latency gates passing and 99,300 final history rows. Source/binary hashes matched and owned cleanup completed. Fresh independent review passed with zero material findings; YT-074 is Done at this owner-amended local scope, with final trackers reconciled. Do not start a replacement or automatic rerun.
+
+The synchronized 25-write burst still failed its earlier write-p95 gate. Storage sync is the observed bottleneck; no durability, security, transaction, history or capacity contract was weakened. The traffic-shape amendment is explicit and does not qualify the earlier burst workload. The only application repair is optional live-status markup/event presentation for Orca; the canonical Firefox check now covers the changed behavior. All task-owned desktop resources were cleaned before this new load run. No GPU/CORS/real IdP/release work is active.
+
+## Historical blocked closeout — earlier 2026-10-13
+
+Candidate is `master` at `f00ec597e43f129a649fd1b8805fdd89edb93fbb`, ahead of `origin/master` by two commits. The M11-P implementation is already committed at that HEAD; this local continuation's qualification helper and documentation/evidence remain uncommitted. Preserve the checkout and prior failure records. No commit, push, GPU, CORS, real IdP or release activation is authorized.
+
+**YT-074: Blocked.** [Qualification](YT-074-QUALIFICATION.md) and [desktop acceptance](YT-074-DESKTOP-ACCEPTANCE.md) are the current evidence sources:
+
+- Real Ubuntu Fcitx5 Chewing IME **PASS**: actual candidates/composition, exact title and multiline description, persisted list/detail/history, 422 field relationship and 409 draft retention without overwrite. [Seven original screenshots](screenshots/yt074-ime/README.md) and sanitized event observations are retained.
+- Spoken AT **Blocked**: Orca/Speech Dispatcher produced startup/key echo, but the owned Firefox was absent from AT-SPI and no Board content was spoken. One bounded setup correction failed; the manual checklist remains open.
+- The owner selected retained Chrome/Firefox coverage instead of mandatory Windows Edge. Edge SSH authentication failed and remains unverified; no tunnel or Edge journey was started.
+- The owner approved 0.5 requests/second/client for the original 62-minute profile, then explicitly approved one corrected attempt after a warmup gate-placement error. The corrected run ended after 120 seconds warmup plus the first 600-second round: measured write p95 **548.299 ms**, exceeding <500 ms. Zero unexpected HTTP/SSE errors; remaining rounds/soak were not run. Both attempts and hashes are preserved. **Do not start another full run without renewed authorization.**
+- Independent read-only review of `d96f7af..HEAD` plus this delta **PASS**, no material findings. Native registered reviewer `gpt-6-astra`, verified effective `high`; ordinary review, not full acceptance or formal assurance. See qualification for the terminal result and hash.
+
+The only program change is in `examples/lab-operations-board/qualify_local.py`: explicit bounded/full profiles, owner-selected pacing and full-run evidence/session lifecycle handling. Application/binary inputs are unchanged. Required local asset, format, 24 native tests, strict Clippy and release-build checks passed; final documentation/sample checks and review are recorded in qualification.
+
+All task-owned load/desktop processes, listeners, threads, browser profiles, private logs and synthetic databases were cleaned. The original input method and screen-reader-enabled state were restored. No active or uncertain task-owned Job remains. Startup behavior is unchanged, so `BOARD-START.md` was not edited.
+
+The next bounded non-GPU work is diagnosis of the retained write-tail failure and a usable application-content Orca journey, followed only by separately authorized long-run execution. YT-075-080 remain Todo/unactivated; YT-020 stays Blocked. The historical sections below are not current instructions to redo login repair or previously passing browser suites.
+
+## Historical earlier continuation — 2026-10-13
 
 YT-073 is Done at the selected local application scope. The login blocker is fixed with `Referrer-Policy: same-origin`, retaining Host/Origin/CSRF rejection. Fourteen native tests, strict Clippy, Chrome and Firefox journeys pass. Five actual screenshots are retained under `docs/screenshots/m11-board/`; [startup instructions](BOARD-START.md) are complete. The historical failure analysis below is preserved, not an instruction to repeat the old login diagnosis.
 
