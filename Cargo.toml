@@ -36,6 +36,7 @@ members = [
     "examples/todo-server",
 ]
 resolver = "3"
+exclude = ["examples/webgpu-scene-island"]
 
 [workspace.package]
 version = "0.1.0"
