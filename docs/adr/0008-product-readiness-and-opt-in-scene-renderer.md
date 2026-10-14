@@ -5,6 +5,10 @@
 - **Task:** YT-069 / M11.
 - **Related:** [M11 plan](../M11-PLAN.md), [product research](../M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](../M11-WGPU-PLAN.md), [ADR 0003](0003-renderers-and-loading.md), [ADR 0005](0005-opt-in-capability-modules.md), [ADR 0007](0007-bounded-keyed-dom-and-local-graph.md).
 
+## Subsequent owner-approved experimental scope
+
+On 2026-10-14 the owner [explicitly approved the YT-079 Experimental opt-in candidate](../M11-G-EXPERIMENTAL-PROMOTION-DECISION.md), without performance guarantees and with a Reviewer PASS for every YT-078–YT-080 item. This accepts that bounded extraction direction, not unimplemented APIs, production support, a 3D engine or release. The original proposal below remains historical; implementation acceptance is established by the task evidence, not by this approval alone.
+
 ## Context
 
 Five bounded studies are complete, and a new product-readiness handoff asks for useful full workflows, existing CSS reuse and precise XSS responsibilities. The native wgpu/Vulkan study proves colored instanced rendering, not browser portability or supported scene APIs. The owner requests planning for both product readiness and `yetlet-wgpu`.

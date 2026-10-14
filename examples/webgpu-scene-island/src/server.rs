@@ -98,6 +98,12 @@ fn view(search: &Search) -> View {
             .child(text("button", "Activate GPU overview").attribute("id", "activate-scene").attribute("type", "button"))
             .child(text("button", "Dispose GPU overview").attribute("id", "dispose-scene").attribute("type", "button"))
             .child(text("p", "GPU inactive or assets unavailable. The HTML records remain available.").attribute("id", "scene-status").attribute("role", "status"))
+            .child(text("p", "Tap a rectangle to select its record. Scrolling or cancelling a touch leaves selection unchanged. Use the HTML list and search with or without GPU. Keyboard: focus Select record, use arrows or Home/End, then Enter or Space; Reset clears selection.").attribute("id", "selection-help"))
+            .child(Element::new("div").attribute("id", "selection-controls").attribute("hidden", "")
+                .child(text("button", "Select record 001").attribute("id", "scene-navigate").attribute("type", "button").attribute("aria-describedby", "selection-help"))
+                .child(text("button", "Reset selection").attribute("id", "scene-reset").attribute("type", "button")))
+            .child(text("p", "No scene record selected.").attribute("id", "scene-selection").attribute("role", "status"))
+            .child(text("a", "Open selected record in HTML").attribute("id", "scene-detail-link").attribute("hidden", ""))
             .child(Element::new("canvas").attribute("id", "scene-canvas").attribute("width", "600").attribute("height", "400").attribute("aria-label", "Optional synthetic record grid; use the HTML record list for accessible detail").child(View::text("Use the HTML records above."))))
         .child(Element::new("section").attribute("id", "counter-island").attribute("data-yetlet-island", "counter").attribute("data-island-version", "1")
             .attribute("data-island-state", r#"{"schema_version":1,"component":"yetlet-dashboard-counter","count":2}"#).attribute("data-current-count", "2")
@@ -210,7 +216,7 @@ pub fn app(root: PathBuf) -> Router {
             axum::routing::get(|| async {
                 (
                     [(header::CONTENT_TYPE, "text/css; charset=utf-8")],
-                    "#scene-canvas,#comparison-canvas{width:600px;height:400px;max-width:100%}",
+                    "#scene-canvas{display:block;width:600px;max-width:100%;height:auto;aspect-ratio:3/2;touch-action:pan-x pan-y pinch-zoom}#comparison-canvas{width:600px;height:400px;max-width:100%}button,input{font:inherit}#selection-controls{margin-block:0.5rem}button{min-height:44px;max-width:100%;white-space:normal}main{max-width:60rem}input[type=search]{max-width:100%;box-sizing:border-box}a:focus-visible,button:focus-visible,input:focus-visible{outline:3px solid currentColor;outline-offset:2px}@media(max-width:480px){main{overflow-wrap:anywhere}form label{display:block}input[type=search]{width:100%}#scene-island{margin-block:1rem}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}",
                 )
             }),
         )
@@ -261,6 +267,10 @@ mod tests {
         assert!(html.starts_with("<!doctype html><html lang=\"en\">"));
         assert!(html.contains("40 matches; page 2 of 4"));
         assert!(html.contains("Work record 038"));
+        assert_eq!(html.matches("<li>").count(), 12);
+        assert!(html.contains("aria-describedby=\"selection-help\""));
+        assert!(html.contains("id=\"scene-reset\""));
+        assert!(html.contains("No scene record selected."));
         assert!(!html.contains("<script"));
         let html = render_document(
             "test",
@@ -329,5 +339,32 @@ mod tests {
         assert!(html.contains("Work record 120"));
         assert!(!html.contains(&"x".repeat(65)));
         assert!(html.contains("0 matches; page 1 of 1"));
+    }
+    #[test]
+    fn semantic_detail_links_are_bounded_and_escape_text() {
+        for (id, expected) in [(1, "Work record 001"), (120, "Work record 120")] {
+            let html = render_document(
+                "test",
+                &view(&Search {
+                    record: id,
+                    ..Search::default()
+                }),
+            )
+            .unwrap();
+            assert!(html.contains(expected));
+            assert!(html.contains("href=\"/scene?record=1\""));
+            assert_eq!(html.matches("<li>").count(), 12);
+        }
+        for id in [0, 121, u32::MAX] {
+            let html = render_document(
+                "test",
+                &view(&Search {
+                    record: id,
+                    ..Search::default()
+                }),
+            )
+            .unwrap();
+            assert!(html.contains("Choose a record in the HTML list for detail."));
+        }
     }
 }

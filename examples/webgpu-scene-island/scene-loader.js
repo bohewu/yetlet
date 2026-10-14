@@ -4,6 +4,49 @@ const canvas = document.getElementById("scene-canvas");
 const status = document.getElementById("scene-status");
 const activateButton = document.getElementById("activate-scene");
 const disposeButton = document.getElementById("dispose-scene");
+const selection = document.getElementById("scene-selection");
+const detailLink = document.getElementById("scene-detail-link");
+const navigateButton = document.getElementById("scene-navigate");
+const resetButton = document.getElementById("scene-reset");
+let focusedRecord = 1;
+let selectedRecord = null;
+let tap = null;
+let rejectedPicks = 0;
+const recordCount = () => current?.runtime && !current.runtimeDisposed ? current.runtime.cpu_bytes() / 32 : 120;
+function resetSelection() {
+  tap = null;
+  focusedRecord = 1;
+  selectedRecord = null;
+  navigateButton.textContent = "Select record 001";
+  selection.textContent = "No scene record selected.";
+  detailLink.hidden = true;
+  detailLink.removeAttribute("href");
+}
+function showSelection(id) {
+  if (!Number.isInteger(id) || id < 1 || id > recordCount()) return false;
+  selectedRecord = id;
+  focusedRecord = id;
+  navigateButton.textContent = `Select record ${String(id).padStart(3, "0")}`;
+  selection.textContent = `Selected work record ${String(id).padStart(3, "0")}.`;
+  // The SSR product owns 120 records. Larger research batches have no SSR URL.
+  detailLink.hidden = id > 120;
+  if (id <= 120) detailLink.setAttribute("href", `/scene?record=${id}`);
+  else detailLink.removeAttribute("href");
+  return true;
+}
+function capturePick(clientX, clientY) {
+  const owner = current;
+  if (!alive(owner) || owner.runtimeDisposed || !owner.runtime || owner.state !== "ready") return null;
+  const box = canvas.getBoundingClientRect();
+  return Array.from(owner.runtime.pick(clientX - box.left, clientY - box.top, box.width, box.height, window.devicePixelRatio));
+}
+function commitPick(token) {
+  const owner = current;
+  if (!Array.isArray(token) || token.length !== 3 || !token.every(value => Number.isInteger(value) && value >= 0 && value <= 0xffffffff)
+      || !alive(owner) || owner.runtimeDisposed || !owner.runtime
+      || !owner.runtime.accepts_pick(...token)) { rejectedPicks++; return false; }
+  return showSelection(token[2]);
+}
 let current = null;
 let serial = 0;
 let modulePromise = null;
@@ -13,7 +56,7 @@ let lateSettled = 0;
 let lastRetired = null;
 let retainedCPU = null;
 let moduleTimes = null;
-const alive = owner => current === owner && !owner.retired;
+const alive = owner => !!owner && current === owner && !owner.retired;
 const setStatus = (owner, state, message) => {
   if (!alive(owner)) return;
   owner.state = state;
@@ -37,12 +80,8 @@ function releaseRuntime(owner) {
   if (!owner.runtimeDisposed) {
     owner.stats = stats(owner);
     owner.runtimeDisposed = true;
-    // wgpu 27's WebSurface Drop is a no-op. Release this generation's context
-    // explicitly, before a replacement can configure it; pending owners never do.
-    if (owner.configuredCanvas) {
-      canvas.getContext("webgpu")?.unconfigure();
-      owner.configuredCanvas = false;
-    }
+    // The extracted renderer releases its own configured surface exactly once.
+    owner.configuredCanvas = false;
     owner.runtime.dispose();
   }
   if (owner.settled && owner.completions === 0) { owner.runtime.free(); owner.runtime = null; }
@@ -50,6 +89,7 @@ function releaseRuntime(owner) {
 function dispose() {
   const owner = current;
   current = null; // Invalidate generation before cancel/destroy and late completion.
+  resetSelection();
   if (owner) {
     owner.retired = true;
     stopWatching(owner);
@@ -63,6 +103,7 @@ function dispose() {
 function fail(owner, category) {
   if (!alive(owner) || ["lost", "error", "unavailable"].includes(owner.state)) return;
   owner.fault = category;
+  tap = null;
   stopWatching(owner);
   releaseRuntime(owner);
   const state = category.endsWith("lost") ? "lost" : "error";
@@ -190,11 +231,67 @@ async function loadModule() {
 }
 activateButton.addEventListener("click", activate);
 disposeButton.addEventListener("click", dispose);
+// Input remains application-local, with no text/IME interception or drag/capture.
+document.getElementById("selection-controls").hidden = false;
+const selectFocused = () => showSelection(focusedRecord);
+const navigate = event => {
+  if (event.isComposing || event.altKey || event.ctrlKey || event.metaKey) return;
+  const count = recordCount();
+  const delta = { ArrowLeft: -1, ArrowRight: 1, ArrowUp: -12, ArrowDown: 12 }[event.key];
+  if (delta !== undefined) focusedRecord = Math.max(1, Math.min(count, focusedRecord + delta));
+  else if (event.key === "Home") focusedRecord = 1;
+  else if (event.key === "End") focusedRecord = count;
+  else return;
+  event.preventDefault();
+  navigateButton.textContent = `Select record ${String(focusedRecord).padStart(3, "0")}`;
+};
+const pointerDown = event => {
+  tap = null;
+  if (!event.isPrimary || event.button !== 0) return;
+  const token = capturePick(event.clientX, event.clientY);
+  if (token) tap = { pointerId: event.pointerId, x: event.clientX, y: event.clientY, token };
+};
+const pointerMove = event => {
+  if (tap?.pointerId === event.pointerId && Math.hypot(event.clientX - tap.x, event.clientY - tap.y) > 6) tap = null;
+};
+const cancelTap = () => { tap = null; };
+const pointerUp = event => {
+  const pendingTap = tap;
+  tap = null;
+  if (!pendingTap || pendingTap.pointerId !== event.pointerId
+      || Math.hypot(event.clientX - pendingTap.x, event.clientY - pendingTap.y) > 6) return;
+  const token = capturePick(event.clientX, event.clientY);
+  if (!token || token[0] !== pendingTap.token[0] || token[1] !== pendingTap.token[1]) { rejectedPicks++; return; }
+  // A deferred result must pass the generation/version check at the text sink.
+  queueMicrotask(() => commitPick(token));
+};
+navigateButton.addEventListener("keydown", navigate);
+navigateButton.addEventListener("click", selectFocused);
+resetButton.addEventListener("click", resetSelection);
+canvas.addEventListener("pointerdown", pointerDown);
+canvas.addEventListener("pointermove", pointerMove);
+canvas.addEventListener("pointerup", pointerUp);
+canvas.addEventListener("pointercancel", cancelTap);
+canvas.addEventListener("lostpointercapture", cancelTap);
+window.addEventListener("scroll", cancelTap, { passive: true, capture: true });
 window.addEventListener("pagehide", () => {
   dispose();
   activateButton.removeEventListener("click", activate);
   disposeButton.removeEventListener("click", dispose);
+  navigateButton.removeEventListener("keydown", navigate);
+  navigateButton.removeEventListener("click", selectFocused);
+  resetButton.removeEventListener("click", resetSelection);
+  canvas.removeEventListener("pointerdown", pointerDown);
+  canvas.removeEventListener("pointermove", pointerMove);
+  canvas.removeEventListener("pointerup", pointerUp);
+  canvas.removeEventListener("pointercancel", cancelTap);
+  canvas.removeEventListener("lostpointercapture", cancelTap);
+  window.removeEventListener("scroll", cancelTap, { capture: true });
 }, { once: true });
+window.__yt078Selection = Object.freeze({ capturePick, commitPick,
+  snapshot: () => ({ focusedRecord, selectedRecord, rejectedPicks, tapPending: tap !== null,
+    generation: current?.id ?? null, dataVersion: current?.runtime && !current.runtimeDisposed ? current.runtime.data_version() : null,
+    reducedMotion: matchMedia("(prefers-reduced-motion: reduce)").matches }) });
 // Typed application diagnostics: explicit handles/bytes, never measured VRAM.
 window.__yt075Scene = Object.freeze({
   // Application-owned dynamic entry; data never enters clone-per-dispatch LocalGraph.
@@ -207,6 +304,7 @@ window.__yt075Scene = Object.freeze({
     // Rust validates before retaining a replacement or scheduling affected GPU work.
     if (!current?.runtime || !alive(current)) throw new Error("GPU not ready");
     current.runtime.replace(data);
+    resetSelection();
     retainedCPU = data.slice();
     invalidate(current);
   },
@@ -214,6 +312,7 @@ window.__yt075Scene = Object.freeze({
     if (!current?.runtime || !alive(current)) throw new Error("GPU not ready");
     if (!retainedCPU) throw new Error("Dynamic replacement required before updates");
     current.runtime.update(start, data);
+    tap = null;
     retainedCPU.set(data, start * 32);
     invalidate(current);
   },

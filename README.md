@@ -85,6 +85,17 @@ These are the original nine unpublished `0.1.0` candidates. Use them from the ch
 
 The separate experimental Redis provider is outside these nine candidates and remains nonpublishable. Its retained qualification is limited to the selected single-host/single-primary/no-persistence scope.
 
+## Experimental opt-in scene renderer
+
+[`yetlet-wgpu`](crates/yetlet-wgpu/README.md) is a separate first-party
+**Experimental, unpublished, opt-in** flat-scene renderer. CPU defaults have no
+GPU dependency or initialization; only explicit wasm32 `browser` activation
+adds WebGPU. It does not accelerate ordinary DOM/CSS or alter the nine release
+candidates. The [support boundary](crates/yetlet-wgpu/SUPPORT.md) separates the
+qualified Firefox/X11/Intel opt-in configuration from unverified platforms.
+There is no performance, FPS, stable-API or production guarantee. Future 3D
+is motivation, not a shipped 3D API. See the [real consumer](examples/webgpu-scene-island/README.md).
+
 ## Design boundaries
 
 - Default SSR works without JS/WASM or a persistent server-side event circuit.
@@ -94,7 +105,7 @@ The separate experimental Redis provider is outside these nine candidates and re
 - Optional capabilities use explicit Rust setup functions and scoped middleware. The minimal app needs no Session or request-ID provider.
 - Keyed DOM/local reactivity are opt-in per owned surface. Only the Todo local list adopts them; remote Todo and Search results retain bounded subtree replacement.
 
-Generic hydration, resumability, general VDOM/template macros, dependency-tracked signals/forms and a WebGPU scene renderer remain unselected. The five authorized research tracks are complete as bounded application-owned prototypes; their [decisions and measurements](docs/README.md#completed-research-prototypes) do not promote supported core APIs. The scene study uses native wgpu/Vulkan, with browser portability unverified; it does not accelerate DOM/CSS. See [architecture decisions](docs/README.md#architecture-and-contracts).
+Generic hydration, resumability, general VDOM/template macros and dependency-tracked signals/forms remain unselected. The five original research tracks retain their bounded application-owned [decisions and measurements](docs/README.md#completed-research-prototypes), not supported core APIs. Separately approved M11 work now provides the Experimental opt-in scene candidate above; the old native Vulkan study does not establish its browser support or accelerate DOM/CSS. See [architecture decisions](docs/README.md#architecture-and-contracts).
 
 ## Developer documentation and checks
 

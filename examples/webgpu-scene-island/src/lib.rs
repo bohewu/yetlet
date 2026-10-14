@@ -1,98 +1,11 @@
-//! Application-owned YT-075 browser proof; no public scene API.
-use std::sync::{
-    Arc,
-    atomic::{AtomicU8, Ordering},
+//! Application-owned synthetic work records, SSR and thin Experimental renderer binding.
+pub use yetlet_wgpu::{
+    BackingSize, Batch, Lifetime, MAX_RECORDS, PickToken, PickViewport, RECORD_BYTES, backing_size,
+    pick_records, validate_records,
 };
-
 pub const RECORDS: u32 = 120;
-pub const MAX_RECORDS: u32 = 100_000;
-pub const RECORD_BYTES: usize = 32;
 pub const WIDTH: u32 = 600;
 pub const HEIGHT: u32 = 400;
-
-/// An initialization can commit only while its own lifetime is initializing.
-#[derive(Clone)]
-pub struct Lifetime(Arc<AtomicU8>);
-const INERT: u8 = 0;
-const INITIALIZING: u8 = 1;
-const READY: u8 = 2;
-const FAILED: u8 = 3;
-const DISPOSED: u8 = 4;
-impl Lifetime {
-    pub fn new() -> Self {
-        Self(Arc::new(AtomicU8::new(INERT)))
-    }
-    pub fn active(&self) -> bool {
-        self.0.load(Ordering::SeqCst) < FAILED
-    }
-    pub fn begin(&self) -> bool {
-        self.0
-            .compare_exchange(INERT, INITIALIZING, Ordering::SeqCst, Ordering::SeqCst)
-            .is_ok()
-    }
-    pub fn commit(&self) -> bool {
-        self.0
-            .compare_exchange(INITIALIZING, READY, Ordering::SeqCst, Ordering::SeqCst)
-            .is_ok()
-    }
-    pub fn fail(&self) -> bool {
-        self.0
-            .try_update(Ordering::SeqCst, Ordering::SeqCst, |state| {
-                (state < FAILED).then_some(FAILED)
-            })
-            .is_ok()
-    }
-    pub fn retire(&self) {
-        self.0.store(DISPOSED, Ordering::SeqCst);
-    }
-}
-impl Default for Lifetime {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub struct BackingSize {
-    pub width: u32,
-    pub height: u32,
-    pub dpr: f64,
-}
-
-/// CSS pixels and scene coordinates stay separate from bounded physical pixels.
-/// Zero/detached targets keep their previous backing allocation and suspend.
-pub fn backing_size(
-    width: f64,
-    height: f64,
-    dpr: f64,
-    connected: bool,
-    device_limit: u32,
-) -> Result<Option<BackingSize>, &'static str> {
-    if !width.is_finite()
-        || !height.is_finite()
-        || !dpr.is_finite()
-        || width < 0.0
-        || height < 0.0
-        || dpr <= 0.0
-        || device_limit == 0
-    {
-        return Err("Invalid viewport input");
-    }
-    if !connected || width == 0.0 || height == 0.0 {
-        return Ok(None);
-    }
-    let dpr = dpr.clamp(1.0, 2.0);
-    let pixels = |css: f64| {
-        (css.min(f64::from(device_limit) / dpr) * dpr)
-            .round()
-            .clamp(1.0, f64::from(device_limit)) as u32
-    };
-    Ok(Some(BackingSize {
-        width: pixels(width),
-        height: pixels(height),
-        dpr,
-    }))
-}
 
 /// Deterministic application grid. Default 120 geometry is retained byte-for-byte.
 /// Dynamic rectangles use integer CSS-pixel bounds, avoiding renderer-specific AA.
@@ -174,93 +87,6 @@ pub fn status_patch(
     }
     Ok(patch)
 }
-/// Validate the entire payload before mutation or affected GPU work.
-pub fn validate_records(bytes: &[u8]) -> Result<u32, &'static str> {
-    if bytes.is_empty()
-        || !bytes.len().is_multiple_of(RECORD_BYTES)
-        || bytes.len() > MAX_RECORDS as usize * RECORD_BYTES
-    {
-        return Err("invalid record byte length");
-    }
-    for record in bytes.as_chunks::<RECORD_BYTES>().0 {
-        let mut values = [0.0f32; 8];
-        for (slot, chunk) in values.iter_mut().zip(record.as_chunks::<4>().0) {
-            *slot = f32::from_le_bytes(*chunk);
-        }
-        if !values.iter().all(|v| v.is_finite())
-            || values[0].abs() > 1.0
-            || values[1].abs() > 1.0
-            || !(0.0..=1.0).contains(&values[2])
-            || values[2] == 0.0
-            || !(0.0..=1.0).contains(&values[3])
-            || values[3] == 0.0
-            || values[0].abs() + values[2] > 1.000_001
-            || values[1].abs() + values[3] > 1.000_001
-            || values[4..].iter().any(|v| !(0.0..=1.0).contains(v))
-        {
-            return Err("invalid finite bounded geometry/color");
-        }
-    }
-    Ok((bytes.len() / RECORD_BYTES) as u32)
-}
-/// Retained CPU state lives outside LocalGraph. One dirty bit per record, no queue.
-pub struct Batch {
-    pub bytes: Vec<u8>,
-    pub dirty: Vec<bool>,
-}
-impl Batch {
-    pub fn new(bytes: Vec<u8>) -> Result<Self, &'static str> {
-        let count = validate_records(&bytes)?;
-        Ok(Self {
-            bytes,
-            dirty: vec![true; count as usize],
-        })
-    }
-    pub fn replace(&mut self, bytes: &[u8]) -> Result<(), &'static str> {
-        let count = validate_records(bytes)?;
-        if self.bytes.capacity() < bytes.len() {
-            self.bytes = bytes.to_vec();
-        } else {
-            self.bytes.clear();
-            self.bytes.extend_from_slice(bytes);
-        }
-        if self.dirty.capacity() < count as usize {
-            self.dirty = vec![true; count as usize];
-        } else {
-            self.dirty.resize(count as usize, true);
-            self.dirty.fill(true);
-        }
-        Ok(())
-    }
-    pub fn update(&mut self, start: u32, bytes: &[u8]) -> Result<(), &'static str> {
-        let count = validate_records(bytes)?;
-        let end = start.checked_add(count).ok_or("invalid update range")?;
-        if end as usize > self.dirty.len() {
-            return Err("invalid update range");
-        }
-        self.bytes[start as usize * RECORD_BYTES..end as usize * RECORD_BYTES]
-            .copy_from_slice(bytes);
-        self.dirty[start as usize..end as usize].fill(true);
-        Ok(())
-    }
-    pub fn dirty_ranges(&self) -> impl Iterator<Item = std::ops::Range<usize>> + '_ {
-        let mut index = 0;
-        std::iter::from_fn(move || {
-            while index < self.dirty.len() && !self.dirty[index] {
-                index += 1;
-            }
-            if index == self.dirty.len() {
-                return None;
-            }
-            let start = index;
-            while index < self.dirty.len() && self.dirty[index] {
-                index += 1;
-            }
-            Some(start * RECORD_BYTES..index * RECORD_BYTES)
-        })
-    }
-}
-
 #[cfg(target_arch = "wasm32")]
 mod browser;
 #[cfg(not(target_arch = "wasm32"))]
@@ -271,6 +97,123 @@ pub use browser::SceneOwner;
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn picking_mapping_ids_invalids_bounds_and_last_drawn_overlap() {
+        let bytes = instances(RECORDS).unwrap();
+        for (width, height, dpr) in [
+            (600.0, 400.0, 1.0),
+            (300.0, 200.0, 2.0),
+            (240.0, 320.0, 3.0),
+        ] {
+            let viewport = PickViewport { width, height, dpr };
+            for id in [1, 2, 13, 120] {
+                let x = (f64::from((id - 1) % 12) + 0.5) * width / 12.0;
+                let y = (f64::from((id - 1) / 12) + 0.5) * height / 10.0;
+                assert_eq!(pick_records(&bytes, viewport, x, y), Ok(Some(id)));
+                let changed = status_patch(&bytes, 0, RECORDS, 2, 1).unwrap();
+                assert_eq!(pick_records(&changed, viewport, x, y), Ok(Some(id)));
+            }
+            for (x, y) in [
+                (-1.0, 0.0),
+                (width, 0.0),
+                (0.0, height),
+                (0.0, -1.0),
+                (0.0, 0.0),
+            ] {
+                assert_eq!(pick_records(&bytes, viewport, x, y), Ok(None));
+            }
+            assert!(pick_records(&bytes, viewport, f64::NAN, 10.0).is_err());
+            assert!(pick_records(&bytes, viewport, 10.0, f64::INFINITY).is_err());
+        }
+        let viewport = PickViewport {
+            width: 600.0,
+            height: 400.0,
+            dpr: 1.0,
+        };
+        let rectangle = [0f32, 0., 0.5, 0.5, 1., 0., 0., 1.]
+            .map(f32::to_le_bytes)
+            .concat();
+        let overlap = [rectangle.clone(), rectangle.clone()].concat();
+        for (x, y) in [(150., 100.), (450., 300.), (300., 200.)] {
+            assert_eq!(pick_records(&overlap, viewport, x, y), Ok(Some(2)));
+        }
+        assert_eq!(pick_records(&overlap, viewport, 149.0, 100.0), Ok(None));
+        assert!(pick_records(&[], viewport, 300., 200.).is_err());
+        for bad in [f64::NAN, f64::INFINITY, -1.0] {
+            assert!(
+                pick_records(
+                    &rectangle,
+                    PickViewport {
+                        width: bad,
+                        ..viewport
+                    },
+                    0.,
+                    0.
+                )
+                .is_err()
+            );
+            assert!(
+                pick_records(
+                    &rectangle,
+                    PickViewport {
+                        dpr: bad,
+                        ..viewport
+                    },
+                    0.,
+                    0.
+                )
+                .is_err()
+            );
+        }
+        assert_eq!(
+            pick_records(
+                &rectangle,
+                PickViewport {
+                    height: 0.,
+                    ..viewport
+                },
+                0.,
+                0.
+            ),
+            Ok(None)
+        );
+        let maximum = scene_records(MAX_RECORDS, 0).unwrap();
+        assert_eq!(pick_records(&maximum, viewport, 0.5, 0.5), Ok(Some(1)));
+    }
+    #[test]
+    fn picks_reject_stale_data_and_retired_generations() {
+        let mut batch = Batch::new(instances(RECORDS).unwrap()).unwrap();
+        let lifetime = Lifetime::new();
+        let generation = 7;
+        let token = PickToken {
+            generation,
+            version: batch.version(),
+            id: 1,
+        };
+        assert!(token.valid(&lifetime, generation, &batch));
+        assert!(!token.valid(&lifetime, generation + 1, &batch));
+        assert!(!batch.accepts_pick(token.version, 0));
+        assert!(!batch.accepts_pick(token.version, RECORDS + 1));
+        assert!(batch.replace(&[]).is_err());
+        assert!(token.valid(&lifetime, generation, &batch));
+        batch.replace(&instances(RECORDS).unwrap()).unwrap();
+        assert!(!token.valid(&lifetime, generation, &batch));
+        let version = batch.version();
+        batch.update(0, &instances(1).unwrap()).unwrap();
+        assert!(!batch.accepts_pick(version, 1));
+        let fresh = PickToken {
+            generation,
+            version: batch.version(),
+            id: 1,
+        };
+        assert!(fresh.valid(&lifetime, generation, &batch));
+        lifetime.retire();
+        assert!(!fresh.valid(&lifetime, generation, &batch));
+        // Version exhaustion and atomicity are exercised inside the extracted crate.
+        let before = batch.bytes().to_vec();
+        assert!(batch.replace(&[]).is_err());
+        assert_eq!(batch.bytes(), before);
+    }
     #[test]
     fn bounded_scene_has_exact_finite_records() {
         assert!(instances(0).is_err());
@@ -305,28 +248,28 @@ mod tests {
     fn sparse_full_replace_coalesce_and_invalid_atomicity() {
         let original = scene_records(1000, 7).unwrap();
         let mut batch = Batch::new(original.clone()).unwrap();
-        batch.dirty.fill(false);
+        batch.clear_dirty();
         for step in 1..=8 {
             batch
                 .update(0, &status_patch(&original, 0, 10, 7, step).unwrap())
                 .unwrap();
         }
         assert_eq!(batch.dirty_ranges().collect::<Vec<_>>(), vec![0..320]);
-        assert_eq!(&batch.bytes[320..], &original[320..]);
+        assert_eq!(&batch.bytes()[320..], &original[320..]);
         assert_eq!(
-            &batch.bytes[..320],
+            &batch.bytes()[..320],
             status_patch(&original, 0, 10, 7, 8).unwrap()
         );
         let full = status_patch(&original, 0, 1000, 7, 9).unwrap();
         batch.update(0, &full).unwrap();
         assert_eq!(batch.dirty_ranges().collect::<Vec<_>>(), vec![0..32000]);
         batch.replace(&scene_records(10000, 1).unwrap()).unwrap();
-        assert_eq!(batch.bytes.len(), 320000);
-        let before = batch.bytes.clone();
+        assert_eq!(batch.bytes().len(), 320000);
+        let before = batch.bytes().to_vec();
         for bad in [vec![], vec![0; 31], vec![0; 32], vec![0; 3_200_032]] {
             assert!(batch.replace(&bad).is_err());
             assert!(batch.update(0, &bad).is_err());
-            assert_eq!(batch.bytes, before);
+            assert_eq!(batch.bytes(), before);
         }
         for value in [f32::NAN, f32::INFINITY, -2.0, 2.0] {
             let mut bad = original[..32].to_vec();
@@ -339,7 +282,7 @@ mod tests {
         assert!(batch.update(u32::MAX, &original[..32]).is_err());
         assert!(batch.update(10000, &original[..32]).is_err());
         assert!(status_patch(&original, 999, 2, 0, 0).is_err());
-        assert_eq!(batch.bytes, before);
+        assert_eq!(batch.bytes(), before);
     }
     #[test]
     fn viewport_finite_bounded_and_suspended() {

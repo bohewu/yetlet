@@ -118,6 +118,8 @@ Respect reduced motion, pause offscreen/hidden rendering, reserve canvas dimensi
 
 ## 7. Extraction into `yetlet-wgpu`
 
+**Owner amendment, 2026-10-14:** [Explicit promotion approval](M11-G-EXPERIMENTAL-PROMOTION-DECISION.md) permits YT-079 as an **Experimental, opt-in** candidate without a speedup guarantee, after YT-078 and each independent review gate. The useful-envelope criterion above no longer blocks this experimental extraction; retain the YT-077 results and all correctness, lifecycle, isolation and target-limit requirements. Potential future 3D rendering does not add 3D implementation scope.
+
 YT-079 may proceed only after YT-075–YT-078 evidence, independent review and explicit promotion authorization. The useful first crate is a small adapter owning initialization, resize/invalidation, flat batch rendering, errors and deterministic disposal. Keep backend-neutral application data separate from device resources.
 
 The normal application surface should use narrow Yetlet-owned types. Do not expose wgpu types accidentally throughout core or claim that wrapping them guarantees effortless upstream upgrades. An advanced backend-coupled interop module may be considered separately with explicit version/lifetime expectations; it is not required by this first slice. Error categories and constructor names in planning are concepts, not compile-tested APIs.

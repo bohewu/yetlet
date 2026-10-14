@@ -17,6 +17,13 @@ Earlier Chrome/NVIDIA and Firefox headless failures are retained and do not
 extend the supported browser scope. See [selected Firefox evidence](../../docs/YT-075-UBUNTU-BROWSER-VERIFICATION.md) and
 [current verification](../../docs/YT-075-VERIFICATION.md).
 
+**Current extracted candidate:** [YT-079](../../docs/YT-079-VERIFICATION.md)
+passed actual browser qualification and independent API/dependency/security
+review. Final [YT-080 qualification](../../docs/YT-080-VERIFICATION.md) and the
+[Experimental support boundary](../../crates/yetlet-wgpu/SUPPORT.md) distinguish
+this source from the historical pre-extraction receipts below. This is not a
+speedup, stable-API, production or 3D promise.
+
 From the repository root, using the installed Rust 1.99 and wasm32 target:
 
 ```sh
@@ -201,3 +208,103 @@ Current-source raw/gzip bundle sizes, actual ResourceTiming transfer/body bytes
 (including zero-transfer cached/unknown cases), initialization, CPU preparation,
 bridge/apply, upload and encode/submit wall costs are separately retained.
 No speedup or 60 Hz acceptance is claimed before real measurement and review.
+
+### YT-078 selection and prepared product test
+
+**Current outcome:** [YT-078 is Done](../../docs/YT-078-VERIFICATION.md) after
+selected Firefox browser PASS and fresh independent Reviewer PASS, zero
+issues. The completed receipt is under `browser/viewport`; the first native
+window-size setup failure remains in `browser`. Portrait uses standard BiDi
+viewport emulation (390 x 700 CSS pixels), not a physical phone. The original
+implementation-only instructions below are historical, not a request to rerun.
+
+YT-078 remains **In progress**. CPU/build checks pass; browser execution and
+independent review are **NOT RUN**. See [YT-078 verification](../../docs/YT-078-VERIFICATION.md).
+
+The default 120-record scene supports CPU picking on taps, semantic selection
+text and a validated HTML detail link. Record slot + 1 is its stable semantic
+ID across status updates and row-major replacements. CSS-local coordinates map
+through bounded backing dimensions into normalized scene coordinates; DPR is
+not applied twice. Canvas exterior/right/bottom edges are excluded; rectangle
+edges inside the canvas are inclusive. Later drawn records win overlaps. A miss
+leaves selection unchanged. Picking validates and scans at most 100,000 existing
+flat records on selection only, without frame readback or a new scene graph.
+Generation and data-version tokens reject deferred picks after update,
+replacement, disposal or owner recovery. Replacement resets selection. The
+larger comparison-only batches retain bounded picking but do not gain invented
+SSR records or detail URLs beyond the product's existing 120 records.
+
+Focus the labeled Select record button: Left/Right move one record, Up/Down move
+12, Home/End choose first/last, and Enter/Space select. Reset clears selection.
+The controls work without GPU; without JavaScript, the real SSR search, 12-record
+pages and links remain the semantic alternative. Search text and native IME are
+not intercepted. Pointer handling never captures or prevents scrolling: a tap
+selects, movement over six CSS pixels, scroll, pointer cancellation or loss of
+capture cancels it. There is no drag-only action or hover requirement. The
+responsive portrait canvas keeps labels, data and actions; status is also text,
+and static demand rendering has no motion in either preference mode. No large
+hidden DOM mirror is created.
+
+The parent owns exactly one selected Firefox 158 headful X11 run:
+
+```sh
+YT075_FIREFOX_HEADFUL_X11=1 /usr/bin/python3 examples/webgpu-scene-island/verify_picking.py
+```
+
+The direct fixture reuses established WebDriver/PNG/process helpers and the
+exact native server/current Wasm assets. It refuses an existing
+`target/m11-gpu/yt078-20261014/browser`, uses one disposable profile with only
+`dom.webgpu.enabled=true`, and has a 180-second test deadline with cleanup
+reserved within a 240-second operational bound. Each input action resolves
+fresh WebDriver targets and live DOM/state before and after. Actual hardware
+canvas pixels use the established full-white top capture row mapping and
+per-channel tolerance 25. Mouse/keyboard DOM response, CSS/DPR mapping,
+stale picks, portrait layout, accessible names, fallback, independent counter
+and scriptless SSR navigation are selected checks. DPR overrides, capability
+failure, touch/cancel/scroll and composing-key events are labeled simulations.
+The actual reduced-motion match is recorded; static CSS/demand rendering is
+checked without modifying the OS preference. No screenreader speech or physical
+mobile hardware result is claimed. Source/binary/asset hashes and owned
+server/browser/process/profile/port cleanup are retained on success or failure.
+A different independent reviewer must follow the parent run before Done or
+YT-079 implementation. Prior successful browser/benchmark suites are not rerun.
+
+## YT-079 Experimental extracted candidate
+
+The real scene owner now delegates to the first-party
+[`yetlet-wgpu`](../../crates/yetlet-wgpu/README.md) nested-workspace candidate.
+Its default graph is CPU-only; its wasm32 `browser` feature is explicit in this
+application manifest. Synthetic work-record generation/status patches, business
+IDs/SSR labels, counter, safe DOM selection and `window.__yt076Fault` stay here.
+The crate owns trusted WGSL and configured context release; the application
+retains scheduling, visibility, semantic fallback and delayed Wasm wrapper free.
+The old application WGSL file remains a preserved pre-extraction fixture; the
+renderer compiles only `crates/yetlet-wgpu/src/scene.wgsl`.
+
+The existing `/scene` and `/scene-comparison` routes and all twelve focused
+native contracts remain. Exact dependency pins and the root lock/unrelated
+Todo/Search assets are preserved. No default framework GPU dependency is added.
+There is no speedup, performance, stable API, production or publication promise,
+and no 3D API. The extracted candidate itself now has Firefox 158 X11/Intel
+WebGPU opt-in browser and independent-review PASS, with source-bound evidence
+in YT-079. Windows JS baseline and Chrome failures are not candidate PASS.
+
+After announcing the visible launch, the parent runs exactly once:
+
+```sh
+YT075_FIREFOX_HEADFUL_X11=1 /usr/bin/python3 examples/webgpu-scene-island/verify_candidate.py
+```
+
+The test reserves `target/m11-gpu/yt079-20261014/browser` without overwrite.
+It reuses the proven BiDi narrow viewport seam and one headful Firefox 158 X11
+session with only disposable `dom.webgpu.enabled=true`. It checks actual pixels,
+pick/keyboard, bounded replacement/upload, controlled real device loss and
+explicit recovery, pending queue completion retirement, resources/counter and
+scriptless SSR. It is a direct candidate product fixture, not the full YT-077
+benchmark or a replay of old passing receipts. It hashes candidate source,
+manifest, binary and generated assets and always owns cleanup.
+The historical implementation leaf did not launch a server/browser. The parent
+subsequently completed the actual candidate browser run and independent review;
+see [YT-079 verification](../../docs/YT-079-VERIFICATION.md). Its passing receipt
+is under `browser/page-module-hook`; do not rerun it over existing evidence.
+YT-080 is recorded separately in the current qualification guide.

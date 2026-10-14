@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build only YT-075 and its independent existing counter; no browser execution."""
+"""Build the Experimental scene consumer and independent counter; no browser execution."""
 import hashlib
 import json
 from pathlib import Path
@@ -38,6 +38,11 @@ def main():
             for name, data in files.items(): (directory / name).write_bytes(data)
             manifest[key] = {"digest": digest, "loader": f"/scene-assets/{digest}/{key}-loader.js", "module": f"/scene-assets/{digest}/{module}.js", "wasm": f"/scene-assets/{digest}/{module}_bg.wasm"}
             print(f"{key}: {digest}; WASM {len(files[f'{module}_bg.wasm'])} bytes", flush=True)
+    candidate = ROOT / "crates/yetlet-wgpu"
+    sources = [HERE / "Cargo.toml", HERE / "Cargo.lock", *sorted((HERE / "src").glob("*.rs")),
+               candidate / "Cargo.toml", candidate / "Cargo.lock", *sorted((candidate / "src").glob("*"))]
+    manifest["candidate_sources"] = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
+                                     for path in sources if path.is_file()}
     (dist / "manifest.json").write_text(json.dumps(manifest, indent=2) + "\n")
 
 if __name__ == "__main__": main()

@@ -18,6 +18,21 @@ The owner authorized documentation and review, not implementation. Start with [M
 
 The owner committed planning as `d96f7af` and [activated YT-070–YT-074](M11-P-ACTIVATION.md); M11-P implementation is committed at `f00ec597`. [Form/asset evidence](M11-P-FORM-ASSET-VERIFICATION.md) records YT-070–YT-072; YT-073 is locally complete. [YT-074 qualification](YT-074-QUALIFICATION.md) is Done at the owner-amended local scope, with retained real Chewing IME, repaired Firefox/Orca speech and final Chrome/Firefox PASS. The new owner-authorized full 62-minute mixed-load execution passed with 45,000 measured requests and zero errors; fresh independent review also passed, and the earlier synchronized-burst failure is retained. Repairs and evidence remain uncommitted. See [desktop acceptance](YT-074-DESKTOP-ACCEPTANCE.md), [spoken transcript](YT-074-SPOKEN-AT-EVIDENCE.json), [IME screenshots](screenshots/yt074-ime/README.md), [startup](BOARD-START.md) and [handoff](M11-P-IMPLEMENTATION-HANDOFF.md). No GPU or public-release change is claimed.
 
+### Experimental opt-in WebGPU candidate
+
+The owner separately approved [Experimental renderer extraction](M11-G-EXPERIMENTAL-PROMOTION-DECISION.md),
+without a performance guarantee. [YT-078 picking](YT-078-VERIFICATION.md) and
+[YT-079 candidate extraction](YT-079-VERIFICATION.md) have individual browser
+and independent-review PASS at their selected scopes. Use the
+[`yetlet-wgpu` guide](../crates/yetlet-wgpu/README.md), its
+[support matrix](../crates/yetlet-wgpu/SUPPORT.md), and
+[YT-080 qualification](YT-080-VERIFICATION.md) and its
+[independent Reviewer PASS](YT-080-INDEPENDENT-REVIEW.md). YT-075–YT-080 are
+complete at their declared scopes; YT-081 and publication are not included.
+The candidate is CPU-only by default, explicitly browser-enabled, unpublished
+and outside the original nine
+release candidates. Future 3D is not implemented or guaranteed.
+
 ## Library guides
 
 These nine unpublished candidate pages describe the implemented APIs and their practical limits. Use the checkout's Rust 1.99 toolchain; native SSR needs no browser build.
@@ -48,7 +63,7 @@ All five authorized studies are Done at their recorded bounded scopes. Their fix
 | Handler/capture descriptors | [YT-022](YT-022-RESUMABILITY-RESEARCH.md): retain finite versioned handlers/numeric captures; reject generic/core resumability | [Resumability research](../examples/resumability-research/README.md) |
 | Independent scene rendering | [YT-023](YT-023-WEBGPU-RESEARCH.md): retain opt-in native wgpu/Vulkan draw/readback and frame/allocation observations; reject core/browser-portability promotion | [Scene research](../examples/webgpu-scene-research/README.md) |
 
-Generic hydration/resumability, a template macro or dependency-tracked signals/forms framework and a supported GPU renderer remain unselected. Default SSR, local browser events, typed remote boundaries and the existing ADR decisions remain intact.
+Generic hydration/resumability, a template macro, dependency-tracked signals/forms and a stable general-purpose GPU renderer remain unselected. The separately approved Experimental opt-in candidate is documented above and does not change those stable/core boundaries. Default SSR, local browser events, typed remote boundaries and the existing ADR decisions remain intact.
 
 ## Qualification and Private preparation
 

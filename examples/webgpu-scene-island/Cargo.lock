@@ -1191,9 +1191,18 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
- "wgpu",
  "yetlet-core",
  "yetlet-server-axum",
+ "yetlet-wgpu",
+]
+
+[[package]]
+name = "yetlet-wgpu"
+version = "0.1.0"
+dependencies = [
+ "wasm-bindgen",
+ "web-sys",
+ "wgpu",
 ]
 
 [[package]]
