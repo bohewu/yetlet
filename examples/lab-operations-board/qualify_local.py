@@ -30,6 +30,11 @@ PROFILES = {
     "bounded": {"warmup": 30, "rounds": [60, 60, 60], "soak": 300, "rps": 2},
     # Owner-selected pace preserves all 62 minutes below the unchanged history cap.
     "full": {"warmup": 120, "rounds": [600, 600, 600], "soak": 1800, "rps": 0.5, "stagger_cycle": True},
+    # Separately authorized once after the paired 12-minute diagnostics.
+    "full-sync": {"warmup": 120, "rounds": [600, 600, 600], "soak": 1800, "rps": 0.5, "stagger_cycle": False, "trace_sync": True},
+    # Owner-authorized paired diagnostic; only cycle positions differ.
+    "sync-12m": {"warmup": 120, "rounds": [600], "soak": 0, "rps": 0.5, "stagger_cycle": False, "trace_sync": True},
+    "staggered-12m": {"warmup": 120, "rounds": [600], "soak": 0, "rps": 0.5, "stagger_cycle": True, "trace_sync": True},
 }
 
 
@@ -51,10 +56,13 @@ def run(profile="bounded"):
     report["envelope"]["initial_cycle_positions"] = [i % 5 if config.get("stagger_cycle", False) else 0 for i in range(25)]
     report["envelope"]["cycle_scheduling"] = "five staggered cohorts; each slot has 20 reads and 5 writes" if config.get("stagger_cycle", False) else "all clients start at cycle position zero; synchronized write bursts"
     report["thresholds"] = {"read_p95_ms_below": 250, "write_p95_ms_below": 500, "combined_p99_ms_below": 1000, "unexpected_response_fraction_below": 0.001}
+    if config.get("trace_sync"):
+        report["sync_tracing"] = {"tool": "strace -D -f --seccomp-bpf -qq -ttt -T -yy -e trace=fsync,fdatasync -e signal=none", "invocations": [], "effect": "syscall tracing can affect timings; traced timings are not uninstrumented qualification"}
     report["limits"] = ["single local Linux process and SQLite", "synthetic identity and data", "no real OS IME or spoken AT", "paced throughput, not maximum capacity", "SQL queue depth: Not instrumented", "bounded RSS observations do not prove leak freedom", "no SLA, HA or production rollout claim"]
     if profile == "bounded": report["limits"].append("not the proposed 62-minute experiment")
+    if config.get("trace_sync") and profile != "full-sync": report["limits"].append("12-minute paired diagnostic only; no soak or full-duration qualification")
     report["fault_evidence"] = "executed separately before timing" if profile == "bounded" else "retained bounded run target/m11-board/sustained/report.json; no repeated fault injections"
-    if profile == "full":
+    if profile in ("full", "full-sync"):
         previous = ROOT / "target/m11-board/sustained/report.json"
         report["retained_fault_report_sha256"] = hashlib.sha256(previous.read_bytes()).hexdigest()
     candidates = subprocess.check_output(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=ROOT).decode().split("\0")
@@ -80,7 +88,11 @@ def run(profile="bounded"):
         nonlocal server
         log = temp / f"server-{len(handles)}.log"
         handle = log.open("x"); os.chmod(log, 0o600); handles.append(handle)
-        server = subprocess.Popen([str(BINARY)], cwd=ROOT, env=dict(os.environ,YETLET_BOARD_LISTEN=f"127.0.0.1:{port}",YETLET_BOARD_DB=str(path)), stdout=handle, stderr=handle, start_new_session=True)
+        command = [str(BINARY)]
+        if config.get("trace_sync"):
+            trace = out / f"fsync-start-{len(handles)}.trace"
+            command = ["/usr/bin/strace", "-D", "-f", "--seccomp-bpf", "-qq", "-ttt", "-T", "-yy", "-e", "trace=fsync,fdatasync", "-e", "signal=none", "-o", str(trace)] + command
+        server = subprocess.Popen(command, cwd=ROOT, env=dict(os.environ,YETLET_BOARD_LISTEN=f"127.0.0.1:{port}",YETLET_BOARD_DB=str(path)), stdout=handle, stderr=handle, start_new_session=True)
         if not expect_ready:
             server.wait(timeout=8)
             assert server.returncode != 0
@@ -88,6 +100,11 @@ def run(profile="bounded"):
             with socket.socket() as s: assert s.connect_ex(("127.0.0.1",port)) != 0
             return None
         wait_until(lambda: "READY " in log.read_text(), "Board startup", seconds=12)
+        if config.get("trace_sync"):
+            assert Path(f"/proc/{server.pid}/exe").resolve() == BINARY.resolve()
+            tracer = re.search(r"^TracerPid:\s+(\d+)$", Path(f"/proc/{server.pid}/status").read_text(), re.M)
+            assert tracer and int(tracer.group(1)) > 0
+            report["sync_tracing"]["invocations"].append({"application_pid": server.pid, "tracer_pid": int(tracer.group(1)), "trace": trace.name, "port": port})
         assert http(base + "/readyz")[0] == 200
         codes = {m.group(1):m.group(2) for m in re.finditer(r"^LOCAL_LOGIN (alice|bob|viewer) ([0-9a-f]{64})$", log.read_text(), re.M)}
         assert len(codes) == 3
@@ -166,11 +183,11 @@ def run(profile="bounded"):
         def stream_worker(index):
             connection = None
             logged_in = Client(port)
-            login_time = 0
+            login_time = None
             connected = False
             try:
                 while not stop_event.is_set():
-                    if time.monotonic() - login_time >= 1200:
+                    if login_time is None or time.monotonic() - login_time >= 1200:
                         logged_in.login(codes)
                         login_time = time.monotonic()
                         report["stream_logins"][index] += 1
@@ -251,12 +268,15 @@ def run(profile="bounded"):
                     with rows_lock: errors.append({"client":index,"type":type(error).__name__})
                     stop_event.set(); gate.abort()
                 finally: connection.close()
-            before=metrics(server.pid); begin=time.monotonic()
+            before=metrics(server.pid); started_unix=time.time(); begin=time.monotonic()
             with concurrent.futures.ThreadPoolExecutor(max_workers=25) as pool:
                 list(pool.map(worker,range(25)))
             wall=time.monotonic()-begin; after=metrics(server.pid)
+            finished_unix=time.time()
             unexpected=sum(status != (303 if kind=="write" else 200) for kind,_,status in all_rows)
             result={"name":label,"configured_seconds":seconds,"wall_seconds_including_login":wall,"requests":len(all_rows),"unexpected_responses":unexpected,"errors":errors,"logins":sum(login_counts),"authentication_requests_excluded_from_mix":3*sum(login_counts),"achieved_rps_including_login_wall":len(all_rows)/wall,"cpu_seconds":after["cpu_seconds"]-before["cpu_seconds"],"rss_before_kib":before["rss_kib"],"rss_after_kib":after["rss_kib"]}
+            if config.get("trace_sync"):
+                result.update(started_unix=started_unix, finished_unix=finished_unix)
             for kind in ["read","write"]:
                 values=[r[1] for r in all_rows if r[0]==kind]
                 result[kind]={"count":len(values),"p50_ms":percentile(values,.5) if values else None,"p95_ms":percentile(values,.95) if values else None,"p99_ms":percentile(values,.99) if values else None,"max_ms":max(values) if values else None}
@@ -276,7 +296,8 @@ def run(profile="bounded"):
             assert not report["stream_errors"]
         phase("warmup",config["warmup"],False)
         for n,seconds in enumerate(config["rounds"],1): phase(f"round-{n}",seconds)
-        phase("soak",config["soak"])
+        if config["soak"]:
+            phase("soak",config["soak"])
         with sqlite3.connect(db) as check:
             report["final_data"]={"items":check.execute("SELECT COUNT(*) FROM work_items").fetchone()[0],"history":check.execute("SELECT COUNT(*) FROM history").fetchone()[0]}
             assert report["final_data"]["items"]==10000 and report["final_data"]["history"]<100000
@@ -308,6 +329,11 @@ def run(profile="bounded"):
         for handle in handles:handle.close()
         remove_owned_tree(temp)
         with socket.socket() as s:assert s.connect_ex(("127.0.0.1",port))!=0
+        if config.get("trace_sync"):
+            for invocation in report["sync_tracing"]["invocations"]:
+                for pid in [invocation["application_pid"], invocation["tracer_pid"]]:
+                    wait_until(lambda pid=pid: not Path(f"/proc/{pid}").exists() or ") Z " in Path(f"/proc/{pid}/stat").read_text(), "owned app/tracer exit", seconds=5)
+            report["sync_tracing"]["cleanup"] = "owned applications exited; tracers exited (absent or zombie); loopback listener closed"
         report["cleanup"]="owned process reaped, threads joined, listener closed, private synthetic databases/logs removed"
         report["finished_utc"]=datetime.now(timezone.utc).isoformat()
         (out/"report.json").write_text(json.dumps(report,indent=2)+"\n")
