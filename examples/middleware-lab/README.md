@@ -25,9 +25,9 @@ Each response includes `x-mw-order` recording before/after unwinding and `x-nati
 ```bash
 cargo test --locked -p yetlet-middleware-lab --all-targets
 cargo build --locked -p yetlet-middleware-lab
-python3 scripts/smoke_middleware_lab.py
+cargo xtask smoke middleware-lab
 cargo tree --locked -p yetlet-middleware-lab
-python3 scripts/check_samples.py
+cargo xtask check samples
 ```
 
 This is a bounded anonymous local HTTP demonstration. It does not claim production instrumentation, distributed tracing, TLS/reverse-proxy trust, a separate middleware engine or zero runtime overhead. The streaming error route deliberately demonstrates an HTTP body failure, not a successful error recovery. See [M9b verification](../../docs/M9B-VERIFICATION.md).

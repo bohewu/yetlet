@@ -7,7 +7,7 @@
 From the repository root:
 
 ```sh
-python3 examples/lab-operations-board/build_assets.py --check
+cargo xtask build board-assets --check
 cargo run --release --locked -p yetlet-lab-operations-board
 ```
 
@@ -31,7 +31,7 @@ Default lists/forms require no JavaScript or WASM. `?live=true` explicitly adds 
 
 The module supports stop and explicit reconnect, retains last-known counts on error, and attempts at most five consecutive backoff retries. Page retirement closes its connection/timer/listeners. Chrome and Firefox now verify actual snapshot/update/pause behavior, with Chrome explicit reconnect and ten long-lived native SSE readers renewing during sustained load. Native tests also verify logout termination.
 
-The application owns a finite embedded asset table and document wrapper. Bootstrap 5.3.8 CSS and MIT notices are retained under `assets/upstream/`; `assets/inventory.json` records source and generated hashes. Build-time externalization removes embedded SVG data URLs without relaxing CSP. `build_assets.py` is an application-local copy of the proven transform, using a separate `/board-assets/` prefix and independent local CSS/JS. There is no public stylesheet/head API, Bootstrap JS, remote font, CDN dependency or new CSS engine. This deliberate small duplication preserves separate app asset ownership and release inputs.
+The application owns a finite embedded asset table and document wrapper. Bootstrap 5.3.8 CSS and MIT notices are retained under `assets/upstream/`; `assets/inventory.json` records source and generated hashes. Build-time externalization removes embedded SVG data URLs without relaxing CSP. `cargo xtask build board-assets` reproduces the application-owned transform, using a separate `/board-assets/` prefix and independent local CSS/JS. There is no public stylesheet/head API, Bootstrap JS, remote font, CDN dependency or new CSS engine. Separate prefixes and inventories preserve app asset ownership and release inputs; the original Python transform remains a reference oracle.
 
 Routes: `/` redirects to `/board`; `/board` resolves login or the current project; GET/POST `/board/login`; POST `/board/logout`; GET/POST `/board/projects/{project}/items`; GET `.../items/new`; GET/POST `.../items/{id}`; GET `.../items/{id}/edit`; GET `/board/projects/{project}/events`; `/healthz` is stateless liveness; `/readyz` checks storage/shutdown; `/board-assets/{name}` serves only embedded bytes; `/favicon.ico` returns 204. Unknown paths/methods retain native 404/405 and outer security headers.
 
@@ -44,12 +44,20 @@ cargo fmt -p yetlet-lab-operations-board -- --check
 cargo build --release --locked --offline -p yetlet-lab-operations-board
 ```
 
-These canonical bounded journeys now pass at their stated scopes. They start only owned temporary processes/data and clean them up; do not rerun sufficient passing evidence merely for another screenshot:
+These historical bounded journeys passed at their stated scopes using the original Python tools. Their retained receipts are not Rust qualification evidence; do not rerun sufficient passing evidence merely for another screenshot:
 
 ```sh
 python3 examples/lab-operations-board/verify_local.py
 python3 examples/lab-operations-board/verify_firefox.py
 python3 examples/lab-operations-board/qualify_local.py
+```
+
+Current Rust commands (YT-085 smoke accepted; YT-086 qualification pending independent review) create fresh outputs in `target/m12/yt085/board-*-*/` and `target/m12/yt086/board-bounded-*/`:
+
+```sh
+cargo xtask smoke board-chrome
+cargo xtask smoke board-firefox
+cargo xtask qualify board
 ```
 
 The historical import collision and failed login attempts remain documented. The material login fix changes Referrer-Policy from no-referrer to same-origin so native POST Origin survives the browser policy; null/foreign Origin and bad CSRF still fail. The intentional 409 console message is handled only at the known negative-test boundary. The repaired Chrome journey includes actual restart, three short 1,000-record diagnostic rounds and five fresh screenshots. The separate sustained check uses 10,000 records/90,000 initial history, three 60-second rounds and a 300-second soak after warmup: 24,000 measured requests, zero unexpected responses. These are not the original proposed 62-minute experiment.

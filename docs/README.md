@@ -10,6 +10,10 @@ Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 - [API contracts](API-CONTRACTS.md) and [Compatibility](COMPATIBILITY.md): implemented API classification and pre-public stability limits.
 - ADRs [0001](adr/0001-separation-of-concerns.md), [0002](adr/0002-events-and-actions.md), [0003](adr/0003-renderers-and-loading.md), [0004](adr/0004-request-context-and-middleware.md), [0005](adr/0005-opt-in-capability-modules.md), [0006](adr/0006-handler-first-mvc-optional.md) and [0007](adr/0007-bounded-keyed-dom-and-local-graph.md): retained decisions and tradeoffs.
 
+## M12 — Rust repository toolchain plan
+
+[M12 repository-toolchain plan](M12-RUST-TOOLCHAIN-PLAN.md) defines the ordered YT-082–YT-086 migration from active Python automation to isolated unpublished Rust xtask commands. The [complete migration ledger](M12-PYTHON-MIGRATION.md) maps all 52 tracked Python files, three workflows including inline private-rebuild code, and transitive Rust-test helpers. [YT-082 verification](YT-082-VERIFICATION.md) records the clean source baseline, directional review PASS and documentation-only checks. YT-082 passed separate independent document review; [YT-083 foundation](YT-083-VERIFICATION.md) is Done after corrected Linux/Windows MSVC tests and a separate independent Reviewer PASS; [YT-084 port evidence](YT-084-VERIFICATION.md) records seven builders and docs/catalog checks with 128 matched files and its separate independent Reviewer PASS; YT-085 is Done after its own Reviewer PASS; YT-086 is Done at bounded migration scope after separate independent Reviewer PASS; complete runtime graph and unavailable environment qualification remain unverified. Current build/catalog commands are adopted after parity; historical acceptance coverage is preserved. Public CLI YT-087 is Deferred and not activated; YT-020 remains Blocked.
+
 ## M11 — historical planning and selected product/renderer delivery
 
 The original [M11 plan](M11-PLAN.md), [product-readiness research](M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](M11-WGPU-PLAN.md) and [planning review](M11-PLANNING-REVIEW.md) were documentation-only at the YT-069 checkpoint. **Subsequent owner authorizations and independent reviewers** accepted YT-070–YT-080 at separately selected bounds. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) now accepts only the bounded Experimental opt-in architecture; it does not grant stable or broad browser support. See the [M11 reconciliation](YT-081-M11-CLOSEOUT.md) and [API consistency audit](YT-081-API-CONTRACT-AUDIT.md); historical planning statements retain their original date and evidence.
@@ -92,7 +96,7 @@ The [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [integrity preparatio
 
 The entry refresh, nine package guides and current/history navigation are reconciled after the five completed research studies. T08 has reconciled the [final Private source/package boundary](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12). YT-068 is **Done** at documentation scope; the independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate. YT-020 remains **Blocked**. At that pre-M11 checkpoint, all 68 backlog items were accounted for: 67 Done, one Blocked and zero In progress or Deferred, each at its stated scope. M11 adds separately filed planning/implementation proposals above; consult Backlog/Kanban for current counts. Established YT-030/YT-065/YT-066/YT-067 completion limits and optional unverified IME, speech, WebKit/mobile and zoom coverage remain unchanged.
 
-Documentation-stage verification uses `python3 scripts/check_docs.py`, `python3 scripts/check_samples.py` and `git diff --check`, plus candidate package file listing. The code snippets in the root/server guide, core guide and request-ID guide are copied from existing source/test/rustdoc; this phase does not claim fresh compilation or execute historical qualification suites.
+Documentation-stage verification uses `cargo xtask check docs`, `cargo xtask check samples` and `git diff --check`, plus candidate package file listing. The code snippets in the root/server guide, core guide and request-ID guide are copied from existing source/test/rustdoc; this phase does not claim fresh compilation or execute historical qualification suites.
 
 Candidate README additions are new package inputs: Cargo discovers the conventional `README.md` without a manifest change. Prior signed archives at source `8e557e760407a3d4b3f5a8b8f833748946be1387` do not bind these candidate bytes. Policy HEAD `abb2cce1253afe1d87a97e0a50f3f47efffe7280` and the current dirty checkout remain separate boundaries. The changed root manifest/lock and research also differ from the signed source. No archive/signature is regenerated or relabeled. A separately approved immutable candidate needs current-source package preflight, rebuild/provenance, selected SBOM/license and signing verification under separate authority; a later local commit alone does not activate release.
 
@@ -181,20 +185,20 @@ A runnable provider-free example is available with `cargo run -p yetlet-server-a
 
 #### Run the examples
 
-Requirements: Rust 1.99 or newer; `rust-toolchain.toml` pins development to Rust/Cargo 1.99.0. Browser samples additionally need Python 3.11+, the WASM target and wasm-bindgen 0.2.129; headless Firefox needs geckodriver. Native-only applications need no browser toolchain. The maintainer selected this unified baseline before the first experimental release. Historical Rust 1.88, Chrome 155 and Firefox 157 results retain their recorded sources; [integrity preparation](YT-020-INTEGRITY-PREPARATION.md) and [hosted rebuilding](YT-020-HOSTED-REBUILD.md) record current checks, the completed protected-check migration and the unsigned Private preparation boundary.
+Requirements: Rust 1.99 or newer; `rust-toolchain.toml` pins development to Rust/Cargo 1.99.0. Building browser samples additionally needs the WASM target and wasm-bindgen 0.2.129, but the adopted Rust `cargo xtask build` commands need no Python. The Rust verification/qualification candidate is recorded in [YT-086 verification](YT-086-VERIFICATION.md); Firefox verification also requires Firefox and geckodriver. Native-only applications need no browser toolchain. The maintainer selected this unified baseline before the first experimental release. Historical Rust 1.88, Chrome 155 and Firefox 157 results retain their recorded sources; [integrity preparation](YT-020-INTEGRITY-PREPARATION.md) and [hosted rebuilding](YT-020-HOSTED-REBUILD.md) record current checks, the completed protected-check migration and the unsigned Private preparation boundary.
 
 ```bash
 rustup target add wasm32-unknown-unknown
 cargo install wasm-bindgen-cli --version 0.2.129 --locked \
   --root "$HOME/.local/share/yetlet-tools"
 
-python3 scripts/build_browser.py
+cargo xtask build browser
 cargo run -p yetlet-todo-server
 ```
 
 Open `http://127.0.0.1:3000/` (SSR), `http://127.0.0.1:3000/app` (browser/WASM), and `http://127.0.0.1:3000/search` (SSR plus lazy Search Island). The Git-ignored `dist/` directory contains build-time generated assets and the content-hash manifest. The server never compiles WASM on request; `/app` explicitly returns HTTP 503 when browser assets have not been built.
 
-User-facing runnable applications are listed in `examples/samples.toml` and [the sample guide](SAMPLES.md). Validate the catalog with `python3 scripts/check_samples.py`; internal browser entry crates and research fixtures are deliberately not presented as standalone application samples.
+User-facing runnable applications are listed in `examples/samples.toml` and [the sample guide](SAMPLES.md). Validate the catalog with `cargo xtask check samples`; internal browser entry crates and research fixtures are deliberately not presented as standalone application samples.
 
 A minimal native-only Hello World application has no optional providers or browser toolchain:
 
@@ -263,7 +267,7 @@ It listens on loopback port 3008 by default. `/events` uses bounded replay, hear
 The isolated Multi-Island Dashboard passed M9g final independent review:
 
 ```bash
-python3 scripts/build_multi_island_dashboard.py && cargo run -p yetlet-multi-island-dashboard
+cargo xtask build multi-island-dashboard && cargo run -p yetlet-multi-island-dashboard
 ```
 
 It listens on loopback port 3009 and keeps generated Counter/Filter bundles under `target/multi-island-dashboard-dist/`, outside production `dist/`. Complete SSR remains when either bundle or the whole manifest is missing/invalid. Final reviewer `wc_job_OMstvGrtDiKZ5p6C` returned PASS after retained Chrome/Firefox fallback evidence was supplied. See [M9g evidence](M9G-VERIFICATION.md).
@@ -284,7 +288,7 @@ cargo run -p yetlet-modular-shop
 
 It listens on loopback port 3008, composes synthetic identity, SQL catalog, Session cart and transactional orders through explicit Rust modules, and can disable Orders with `YETLET_SHOP_DISABLE_ORDERS=1`. First reviewer `wc_job_a_WnhFSftzNoYYgf` found and prompted smoke readiness cleanup; repeat reviewer `wc_job_zbWS7OSbUtaKzYcn` returned PASS. It is not a payment or production commerce system. See [M9i evidence](M9I-VERIFICATION.md).
 
-`python3 scripts/build_browser.py --release` produces an optimized browser bundle. Do not confuse debug WASM bytes with production transfer sizes or performance.
+`cargo xtask build browser --release` produces an optimized browser bundle. Do not confuse debug WASM bytes with production transfer sizes or performance.
 
 #### Verify
 
@@ -301,32 +305,32 @@ cargo check --locked \
   -p yetlet-keyed-bindings \
   --target wasm32-unknown-unknown
 
-python3 scripts/check_docs.py
+cargo xtask check docs
 cargo build --locked -p yetlet-todo-server
-python3 scripts/smoke_browser.py
+cargo xtask smoke browser-chrome
 cargo test --locked -p yetlet-session -p yetlet-cart-server --all-targets
 cargo build --locked -p yetlet-cart-server
-python3 scripts/smoke_cart.py
+cargo xtask smoke cart
 ```
 
 For the **release-mode** informational baseline and a separate Firefox E2E check:
 
 ```bash
 cargo build --release --locked -p yetlet-todo-server
-python3 scripts/build_browser.py --release
-python3 scripts/smoke_firefox.py --profile release
-python3 scripts/measure_baseline.py --profile release --samples 30 \
+cargo xtask build browser --release
+cargo xtask smoke browser-firefox --profile release
+cargo xtask measure baseline --profile release --samples 30 \
   --browser-runs 5 --out target/m5-baseline-release.json
 ```
 
 The isolated M7a render benchmark is built and measured separately; it does not modify production `dist/`:
 
 ```bash
-python3 scripts/build_browser.py --release
-python3 scripts/measure_render_strategies.py \
+cargo xtask build browser --release
+cargo xtask measure render-strategies \
   --capture-production-before target/m7a-production-before.json
-python3 scripts/build_render_bench.py --release
-python3 scripts/measure_render_strategies.py --profile release \
+cargo xtask build render-bench --release
+cargo xtask measure render-strategies --profile release \
   --rows 200 --updates 500 --rounds 10 --seed 7 \
   --production-before target/m7a-production-before.json \
   --out target/m7a-render-strategies.json
@@ -335,9 +339,9 @@ python3 scripts/measure_render_strategies.py --profile release \
 The combined M7b/M7c/M7d authoring, local-reactivity and lifecycle prototype is also isolated from production routes/assets. M7e reruns both this fixture and the production regressions before freezing the evidence:
 
 ```bash
-python3 scripts/build_keyed_bindings.py --release
-python3 scripts/smoke_keyed_bindings.py --profile release
-python3 scripts/smoke_keyed_bindings_firefox.py --profile release
+cargo xtask build keyed-bindings --release
+cargo xtask smoke keyed-bindings-chrome --profile release
+cargo xtask smoke keyed-bindings-firefox --profile release
 ```
 
 Do not mix debug and release asset builds. Results are recorded in [M5 verification](M5-VERIFICATION.md); size estimates refer to local gzip artifacts, not actual transfer bytes.
@@ -363,7 +367,7 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 - `examples/todo-server` — SSR/browser routes and in-memory typed GET/POST Todo API.
 - `examples/rest-api` — Native-only typed Book CRUD with RequestContext policy and no browser/WASM dependency.
 - `examples/cart-server` — Native-only SSR cart with explicitly scoped `yetlet-session` and no browser/WASM dependency.
-- `scripts/build_browser.py` — Content-addressed browser asset pipeline with isolated Todo/Search Cargo builds.
+- `cargo xtask build browser` — Content-addressed browser asset pipeline with isolated Todo/Search Cargo builds.
 
 **Known limitations:** Only the production Todo local list uses the promoted keyed graph; remote Todo results and Search result updates retain bounded subtree replacement. The fixed keyed/static-slot authoring shape, text-input/focus policy and conditional slot remain experimental. Nested/general component trees, async effects, IME/mobile/WebKit coverage and generic hydration/resumability remain absent. The Todo API and Session cart are process-local/in-memory; the Session proof is anonymous, single-node and not production auth/CSRF qualification. Durable persistence, stable API, full IME/a11y matrix and cross-framework benchmarks remain absent. See [M7i verification](M7I-VERIFICATION.md), [M8c verification](M8C-VERIFICATION.md) and [release readiness](RELEASE-READINESS.md).
 

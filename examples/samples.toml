@@ -26,7 +26,7 @@ package = "yetlet-todo-server"
 path = "examples/todo-server"
 kind = "full-stack"
 status = "verified"
-command = "python3 scripts/build_browser.py && cargo run -p yetlet-todo-server"
+command = "cargo xtask build browser && cargo run -p yetlet-todo-server"
 companion_packages = ["yetlet-todo-browser", "yetlet-search-island"]
 routes = [
   { path = "/", source = "examples/todo-server/src/lib.rs", markers = ['.get("/", root)'] },
@@ -36,7 +36,7 @@ routes = [
 ]
 browser_runtime = true
 browser_packages = ["yetlet-todo-browser", "yetlet-search-island"]
-browser_build = "scripts/build_browser.py"
+browser_build = "cargo xtask build browser"
 optional_dependencies = ["yetlet-request-id", "yetlet-reactive", "yetlet-dom-keyed"]
 evidence = "docs/M7J-VERIFICATION.md"
 
@@ -245,7 +245,7 @@ package = "yetlet-multi-island-dashboard"
 path = "examples/multi-island-dashboard"
 kind = "full-stack"
 status = "verified"
-command = "python3 scripts/build_multi_island_dashboard.py && cargo run -p yetlet-multi-island-dashboard"
+command = "cargo xtask build multi-island-dashboard && cargo run -p yetlet-multi-island-dashboard"
 companion_packages = ["yetlet-dashboard-counter-island", "yetlet-dashboard-filter-island"]
 routes = [
   { path = "/healthz", source = "examples/multi-island-dashboard/src/lib.rs", markers = ['.get("/healthz"'] },
@@ -253,6 +253,6 @@ routes = [
 ]
 browser_runtime = true
 browser_packages = ["yetlet-dashboard-counter-island", "yetlet-dashboard-filter-island"]
-browser_build = "scripts/build_multi_island_dashboard.py"
+browser_build = "cargo xtask build multi-island-dashboard"
 optional_dependencies = []
 evidence = "docs/M9G-VERIFICATION.md"

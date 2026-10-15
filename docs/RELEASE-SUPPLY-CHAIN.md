@@ -79,9 +79,9 @@ Bind each distributed artifact's SHA-256 to its SBOM digest and build identity i
 ## Bounded unsigned checksum preflight
 
 ```bash
-python3 scripts/release_checksums.py create target/m10-remaining/artifacts
-python3 scripts/release_checksums.py verify target/m10-remaining/artifacts
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_release_checksums.py
+cargo xtask release checksums create target/m10-remaining/artifacts
+cargo xtask release checksums verify target/m10-remaining/artifacts
+cargo test --locked --manifest-path xtask/Cargo.toml --test release_checksums
 ```
 
 Supply an existing flat directory of regular files. The CLI fixes the manifest name to `RELEASE-CHECKSUMS.json`, excludes it from artifacts, and requires at least one artifact. Names are 1–128 ASCII characters, start with an alphanumeric character and use only alphanumerics, dot, underscore or hyphen. No absolute/relative nested manifest paths, traversal, backslashes, symlinks, symlink ancestors, directories or other nonregular files are accepted. The explicitly supplied directory itself may be absolute; its ancestors are opened without following symlinks, and `..` directory components are rejected.

@@ -22,9 +22,9 @@ Both routes return complete native SSR with strict CSP and no browser runtime. U
 ```bash
 cargo test --locked -p yetlet-hello-world --all-targets
 cargo build --locked -p yetlet-hello-world
-python3 scripts/smoke_hello_world.py
+cargo xtask smoke hello-world
 cargo tree --locked -p yetlet-hello-world
-python3 scripts/check_samples.py
+cargo xtask check samples
 ```
 
 See [M9a verification](../../docs/M9A-VERIFICATION.md) for reproducible evidence and independent reviewer outcome.

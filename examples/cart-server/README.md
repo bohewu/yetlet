@@ -27,7 +27,7 @@ Unknown session IDs are never adopted, expired records are replaced, clear rotat
 ```bash
 cargo test --locked -p yetlet-session -p yetlet-cart-server --all-targets
 cargo build --locked -p yetlet-cart-server
-python3 scripts/smoke_cart.py
+cargo xtask smoke cart
 ```
 
 This is a bounded anonymous-session example, not authentication, durable storage, multi-node session distribution or production security qualification. Retained evidence is in [M8c verification](../../docs/M8C-VERIFICATION.md).

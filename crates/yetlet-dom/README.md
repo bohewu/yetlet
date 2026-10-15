@@ -11,7 +11,7 @@
 The [Search Island caller](../../examples/search-island/src/lib.rs) keeps complete SSR readable and replaces only its results host after activation. Follow [Todo setup](../../examples/todo-server/README.md), or run from the repository root after installing the documented WASM build prerequisites:
 
 ```bash
-python3 scripts/build_browser.py
+cargo xtask build browser
 cargo run --locked -p yetlet-todo-server
 ```
 

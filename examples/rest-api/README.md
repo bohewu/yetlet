@@ -37,7 +37,7 @@ Validation, resource and middleware-policy failures on registered handlers use t
 ```bash
 cargo test --locked -p yetlet-rest-api --all-targets
 cargo build --locked -p yetlet-rest-api
-python3 scripts/smoke_rest_api.py
+cargo xtask smoke rest-api
 ```
 
 Retained scope and dependency evidence is recorded in [M8b verification](../../docs/M8B-VERIFICATION.md).

@@ -3,7 +3,7 @@
 An unpublished, loopback-only SSR proof for the M11 Lab Operations Board. It validates a draft but saves nothing and authenticates nobody. This is not the Board application or a generic forms API. Default pages require no JavaScript or WASM.
 
 ```sh
-python3 examples/form-css-proof/build_assets.py --check
+cargo xtask build form-css-proof --check
 cargo run --locked -p yetlet-form-css-proof
 ```
 
@@ -21,7 +21,7 @@ Bootstrap 5.3.8 CSS is MIT; retain `assets/upstream/LICENSE.bootstrap`. `assets/
 cargo test --locked --offline -p yetlet-form-css-proof --all-targets
 cargo clippy --locked --offline -p yetlet-form-css-proof --all-targets -- -D warnings
 cargo build --locked --offline -p yetlet-form-css-proof
-python3 examples/form-css-proof/verify_browser.py
+cargo xtask smoke form-css-proof-chrome
 ```
 
-The browser command reuses `scripts/smoke_browser.py`, opens one isolated headless Chrome and one ephemeral server, and closes only those resources. Actual reports and screenshots go to ignored `target/m11-form-proof/`. No new library dependencies or generic DOM policy are introduced. The proof stays outside the verified sample catalog until its recorded acceptance is complete.
+The browser command uses the native xtask DevTools helper, opens one isolated headless Chrome and one ephemeral server, and closes only those resources. Actual reports and screenshots go to fresh ignored `target/m12/yt085/`. No new library dependencies or generic DOM policy are introduced. The proof stays outside the verified sample catalog until its recorded acceptance is complete.

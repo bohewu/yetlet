@@ -39,10 +39,10 @@ This is **not** a payment gateway, financial ledger, production identity provide
 ```bash
 cargo test --locked -p yetlet-modular-shop --all-targets
 cargo build --release --locked -p yetlet-modular-shop
-python3 scripts/smoke_modular_shop.py
+cargo xtask smoke modular-shop
 cargo tree --locked -p yetlet-modular-shop --edges normal
-python3 scripts/check_samples.py
-python3 scripts/check_docs.py
+cargo xtask check samples
+cargo xtask check docs
 ```
 
 See [M9i verification](../../docs/M9I-VERIFICATION.md) for retained integration, rollback, reviewer and dependency-isolation evidence.

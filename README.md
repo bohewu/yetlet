@@ -51,17 +51,17 @@ Open `http://127.0.0.1:3003/` or `/hello/World`. See [Hello World](examples/hell
 
 The Todo application shares its Rust View between SSR and the browser. `/app` owns local keyed updates and a separate typed HTTP Create action; `/search` renders complete HTML before lazily loading its local Search Island.
 
-Browser builds additionally require Python 3.11+, `wasm32-unknown-unknown` and wasm-bindgen CLI 0.2.129:
+Browser builds additionally require `wasm32-unknown-unknown` and wasm-bindgen CLI 0.2.129. The unpublished Rust `cargo xtask` provides build, check, smoke, measure, qualification and release-preparation commands. Original Python files remain frozen reference oracles. YT-085 is accepted after its separate Reviewer PASS; [YT-086 verification](docs/YT-086-VERIFICATION.md) records the migration candidate and remaining acceptance boundaries. No Python interpreter is required by the migrated command implementations.
 
 ```bash
 rustup target add wasm32-unknown-unknown
 cargo install wasm-bindgen-cli --version 0.2.129 --locked \
   --root "$HOME/.local/share/yetlet-tools"
-python3 scripts/build_browser.py
+cargo xtask build browser
 cargo run --locked -p yetlet-todo-server
 ```
 
-Open `http://127.0.0.1:3000/`, `/app` and `/search`. Stop the minimal server first because both use port 3000. Assets are built ahead of time into ignored `dist/` with a content-hash manifest; requests never compile WASM. `/app` returns 503 if browser assets are absent. Use `python3 scripts/build_browser.py --release` for optimized assets; debug and release measurements are separate.
+Open `http://127.0.0.1:3000/`, `/app` and `/search`. Stop the minimal server first because both use port 3000. Assets are built ahead of time into ignored `dist/` with a content-hash manifest; requests never compile WASM. `/app` returns 503 if browser assets are absent. Use `cargo xtask build browser --release` for optimized assets; debug and release measurements are separate.
 
 ## Choose an application example
 
@@ -112,8 +112,8 @@ Generic hydration, resumability, general VDOM/template macros and dependency-tra
 Use the [documentation index](docs/README.md) for API guidance, architecture, qualification and historical evidence. [Roadmap](docs/ROADMAP.md) and [Backlog](docs/BACKLOG.md) own milestone and task status. Documentation and sample navigation checks are:
 
 ```bash
-python3 scripts/check_docs.py
-python3 scripts/check_samples.py
+cargo xtask check docs
+cargo xtask check samples
 ```
 
 For implementation validation, use the changed-path checks required by [repository instructions](AGENTS.md) and the relevant sample/verification record. Historical compiler, browser, CSP, benchmark and CI results retain their original dates and source identities; navigation changes do not rerun or transfer those results. [Retained history](docs/README.md#historical-evidence-and-maintainer-notes) includes the former detailed command and milestone notes.

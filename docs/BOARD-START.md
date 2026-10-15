@@ -4,10 +4,10 @@ This guide applies to the existing Yetlet checkout containing `examples/lab-oper
 
 ## Local startup
 
-Run from the repository root with the repository-pinned Rust 1.99 toolchain and Python 3:
+Run from the repository root with the repository-pinned Rust 1.99 toolchain:
 
 ```sh
-python3 examples/lab-operations-board/build_assets.py --check
+cargo xtask build board-assets --check
 cargo run --release --locked -p yetlet-lab-operations-board
 ```
 

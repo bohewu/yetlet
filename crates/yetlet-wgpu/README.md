@@ -108,7 +108,7 @@ preserves the root lock and unrelated bundles. Use explicit manifest commands:
 cargo test --offline --locked --manifest-path crates/yetlet-wgpu/Cargo.toml
 cargo check --offline --locked --manifest-path crates/yetlet-wgpu/Cargo.toml --target wasm32-unknown-unknown --features browser
 cargo test --offline --locked --manifest-path examples/webgpu-scene-island/Cargo.toml
-python3 examples/webgpu-scene-island/build.py
+cargo xtask build scene-island
 ```
 
 Exact existing pins remain wgpu `=27.0.1`, wasm-bindgen `=0.2.129`,

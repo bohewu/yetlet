@@ -46,9 +46,9 @@ Notes are bounded to 16 per user, 128 total, 80 title characters and 2,000 body 
 ```bash
 cargo test --locked -p yetlet-auth-notes --all-targets
 cargo build --locked -p yetlet-auth-notes
-python3 scripts/smoke_auth_notes.py
+cargo xtask smoke auth-notes
 cargo tree --locked -p yetlet-auth-notes --edges normal
-python3 scripts/check_samples.py
+cargo xtask check samples
 ```
 
 See [M9h verification](../../docs/M9H-VERIFICATION.md). This is a bounded authentication/authorization semantics fixture, not production security certification.

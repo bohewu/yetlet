@@ -59,13 +59,14 @@ jobs:
           rustup default stable
           rustup component add rustfmt clippy
           rustup target add wasm32-unknown-unknown
-      - name: Documentation, catalog, and Python harness checks
+      - name: Documentation, catalog, and Rust tool tests
         run: |
-          python3 scripts/check_docs.py
-          python3 scripts/check_samples.py
-          python3 scripts/test_check_samples.py
-          python3 scripts/test_smoke_modular_shop.py
-          python3 scripts/test_smoke_browser_harness.py
+          cargo xtask check docs
+          cargo xtask check samples
+          cargo test --locked --manifest-path xtask/Cargo.toml --test check_samples --test check_docs
+          cargo test --locked --manifest-path xtask/Cargo.toml
+          cargo fmt --manifest-path xtask/Cargo.toml --check
+          cargo clippy --locked --manifest-path xtask/Cargo.toml --all-targets -- -D warnings
       - name: Format
         run: cargo fmt --all -- --check
       - name: Clippy
@@ -81,16 +82,16 @@ jobs:
       - name: Native application binaries and smokes
         run: |
           cargo build --workspace --bins --locked
-          python3 scripts/smoke_hello_world.py
-          python3 scripts/smoke_rest_api.py
-          python3 scripts/smoke_cart.py
-          python3 scripts/smoke_middleware_lab.py
-          python3 scripts/smoke_forms_validation.py
-          python3 scripts/smoke_file_server.py
-          python3 scripts/smoke_sqlite_crud.py
-          python3 scripts/smoke_sse_notifications.py
-          python3 scripts/smoke_auth_notes.py
-          python3 scripts/smoke_modular_shop.py
+          cargo xtask smoke hello-world
+          cargo xtask smoke rest-api
+          cargo xtask smoke cart
+          cargo xtask smoke middleware-lab
+          cargo xtask smoke forms-validation
+          cargo xtask smoke file-server
+          cargo xtask smoke sqlite-crud
+          cargo xtask smoke sse-notifications
+          cargo xtask smoke auth-notes
+          cargo xtask smoke modular-shop
       - name: Browser and renderer wasm32 targets
         run: |
           cargo check --locked --target wasm32-unknown-unknown \
@@ -101,26 +102,29 @@ jobs:
       - name: Browser tooling and release assets
         run: |
           cargo install wasm-bindgen-cli --version 0.2.129 --locked
-          python3 scripts/build_browser.py --release
-          python3 scripts/build_keyed_bindings.py --release
-          python3 scripts/build_multi_island_dashboard.py --release
+          cargo xtask build browser --release
+          cargo xtask build keyed-bindings --release
+          cargo xtask build multi-island-dashboard --release
           cargo build --release --locked \
             -p yetlet-todo-server -p yetlet-multi-island-dashboard
       - name: Chrome version
         run: google-chrome --version
       - name: Chrome E2E suites
         run: |
-          python3 scripts/smoke_browser.py --profile release
-          python3 scripts/smoke_keyed_bindings.py --profile release
-          python3 scripts/smoke_multi_island_dashboard.py --profile release
+          cargo xtask smoke browser-chrome --profile release
+          cargo xtask smoke keyed-bindings-chrome --profile release
+          cargo xtask smoke multi-island-dashboard-chrome --profile release
       - name: M5 local-style baseline (informational only)
-        run: python3 scripts/measure_baseline.py --profile release --samples 15 --browser-runs 3 --out target/m5-baseline-ci.json
+        run: cargo xtask measure baseline --profile release --samples 15 --browser-runs 3 --out target/m5-baseline-ci.json
       - name: Retain browser diagnostics on failure
         if: failure()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: yetlet-browser-failure-logs
-          path: target/ci-browser-logs/
+          path: |
+            target/m12/yt085/browser-chrome-*/
+            target/m12/yt085/keyed-bindings-chrome-*/
+            target/m12/yt085/multi-island-dashboard-chrome-*/
           if-no-files-found: ignore
           retention-days: 7
       - name: Retain M5 baseline artifact

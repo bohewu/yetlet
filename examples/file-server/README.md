@@ -59,9 +59,9 @@ Downloads use `application/octet-stream`, `Content-Disposition: attachment`, `no
 cargo test --locked -p yetlet-file-server --all-targets
 cargo clippy --locked -p yetlet-file-server --all-targets -- -D warnings
 cargo build --locked -p yetlet-file-server
-python3 scripts/smoke_file_server.py
+cargo xtask smoke file-server
 cargo tree --locked -p yetlet-file-server --edges normal
-python3 scripts/check_samples.py
+cargo xtask check samples
 ```
 
 See [M9d evidence](../../docs/M9D-VERIFICATION.md) for source/validation/reviewer status. The libraries are ordinary application-selected dependencies; no file/upload/DB feature becomes a default in the Yetlet core or other samples.

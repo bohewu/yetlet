@@ -4,7 +4,7 @@ This unpublished experiment tests one Redis primary. It is a separate Cargo work
 
 `redis = 1.7.1` uses only `tokio-comp`, `connection-manager` and `script` (default features disabled). State is one typed counter/note encoded as JSON in an opaque Redis Hash field. Lua handles version/revision, primary-clock absolute expiry, CAS, atomic rotation/revocation and independent operation results. The Rust wrapper demonstrates once-only callbacks and explicit unknown outcomes. `command` and raw keys are fixture fault-injection seams, not proposed provider APIs.
 
-The eleven ignored integration tests require an explicitly selected disposable fixture; the focused browser case also requires local Chrome and Python 3. One additional cookie-policy test runs without Redis:
+The eleven ignored integration tests require an explicitly selected disposable fixture; the focused browser case also requires local Chrome and the prebuilt unpublished xtask. One additional cookie-policy test runs without Redis:
 
 ```sh
 task_project="yt066b1-$(date +%s)-$$"
@@ -55,7 +55,7 @@ On 2026-10-11 the maintainer explicitly accepted no mandatory JS, preserved auth
 
 A prepared old Set may overwrite a replacement; the next request must be unauthorized, even if the replacement's Redis record remains alive. Explicit login can recover. The fixed name prevents per-issuance cookie accumulation; independent browser deletion/eviction is not prevented. Separate still-live Sessions are not globally ordered or revoked by this Session layer. The Memory API remains unchanged.
 
-`cookie_fencing.rs` exercises emission eligibility, HTTP races before/after final checks, delayed logout, competing rotations, exact-name selection, no fallback and no automatic creation. Its browser case uses actual HTTP responses and Redis with Chrome script execution disabled and CSP `default-src 'none'`. It repeats one prepared retired cookie 180 times, checks a single stored cookie, observes unauthorized access, then explicit login and logout. It is not a broad browser/device qualification or the earlier 180-independent-cookie eviction experiment. The small Python driver reuses the existing repository DevTools helper and owns its temporary browser/profile.
+`cookie_fencing.rs` exercises emission eligibility, HTTP races before/after final checks, delayed logout, competing rotations, exact-name selection, no fallback and no automatic creation. Its browser case uses actual HTTP responses and Redis with Chrome script execution disabled and CSP `default-src 'none'`. It repeats one prepared retired cookie 180 times, checks a single stored cookie, observes unauthorized access, then explicit login and logout. It is not a broad browser/device qualification or the earlier 180-independent-cookie eviction experiment. The Rust fixture reuses the repository DevTools helper and owns its temporary browser/profile. Build it first with `cargo build --locked --manifest-path xtask/Cargo.toml` from the repository root; set `YETLET_XTASK_BIN` to an absolute executable path for a custom target directory. The isolated test invokes that binary directly and never recursively invokes Cargo.
 
 Focused command (inside the disposable fixture):
 

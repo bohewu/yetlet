@@ -11,7 +11,7 @@ Implement `Command` with an associated `Response`, then select an `ActionExecuto
 `HttpExecutor::new(path)` validates an explicit same-origin absolute path. Construction and `endpoint()` are available natively, but HTTP execution is implemented only on WASM. That implementation requires serde input and a deserializable response, sends a JSON POST, and decodes the result. The [shared Todo commands](../../examples/todo-ui/src/lib.rs) and [browser dispatch caller](../../examples/todo-browser/src/lib.rs) demonstrate both paths. Follow [Todo setup](../../examples/todo-server/README.md), or run from the repository root with its browser prerequisites:
 
 ```bash
-python3 scripts/build_browser.py
+cargo xtask build browser
 cargo run --locked -p yetlet-todo-server
 ```
 

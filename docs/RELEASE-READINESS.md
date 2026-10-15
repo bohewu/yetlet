@@ -43,12 +43,12 @@ cargo fmt --all -- --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --all-targets --locked
 cargo test --workspace --doc --locked
-python3 scripts/check_docs.py
-python3 scripts/check_samples.py
+cargo xtask check docs
+cargo xtask check samples
 
-python3 scripts/build_browser.py --release
+cargo xtask build browser --release
 cargo build --release --locked -p yetlet-todo-server
-python3 scripts/smoke_browser.py --profile release
+cargo xtask smoke browser-chrome --profile release
 ```
 
 The complete sample/browser matrix is recorded in M9 evidence and the checked-in workflow. Firefox needs geckodriver. Informational latency and renderer benchmarks are not CI performance thresholds.

@@ -133,6 +133,12 @@ cargo test -p yetlet-server-axum -p yetlet-todo-server --all-targets --offline
 
 The new 14 core integration tests cover scoped ordering, reverse unwind, early response, metadata, query/path failures, pre-routing rewriting, 12 simultaneous request contexts, error responses, native tower-http layer composition, deferred body polling, preserved trailers, stream errors and unread short-circuited bodies. Two demo integration tests cover actual API/SSR paths, safe render selection and outer response headers on 404/405/415.
 
+The following commands are the original historical closeout. Current Rust
+equivalents are `cargo xtask check docs`, `cargo xtask build browser` and
+`cargo xtask smoke browser-chrome`; fresh smoke evidence uses
+`target/m12/yt085/browser-chrome-*/`. Their migration acceptance is recorded
+separately in [YT-085 verification](YT-085-VERIFICATION.md).
+
 Final closeout commands executed successfully:
 
 ```bash

@@ -8,7 +8,7 @@ This repository is an experimental, locally verified M0–M9 prototype. Public r
 
 ## Documentation language
 
-Write **all repository documentation in English**, including the README, ADRs, architecture, roadmap, backlog, validation records, and future Markdown files. Preserve the original technical meaning, acceptance evidence, links, IDs, and decision status when editing. Run `python3 scripts/check_docs.py` to verify language, references, and backlog structure.
+Write **all repository documentation in English**, including the README, ADRs, architecture, roadmap, backlog, validation records, and future Markdown files. Preserve the original technical meaning, acceptance evidence, links, IDs, and decision status when editing. Run `cargo xtask check docs` to verify language, references, and backlog structure.
 
 ## Work sequence
 

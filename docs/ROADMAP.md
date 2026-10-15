@@ -18,6 +18,19 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M9 — Sample expansion and API contract qualification (locally complete)** | Nine canonical sample names plus three supplements, SQL-first persistence, contract classification | YT-049–YT-059 | Twelve samples, 170-export inventory, complete regression and repeat final reviewer PASS |
 | **M10 — Release engineering and production-security qualification** | Licensing, governance, compatibility, threat model, supply-chain and operational qualification | YT-060–YT-067 | Maintainer decisions, hosted controls, reproducible release evidence and internal Codex-assisted security assessment |
 | **M11 — Done at selected product and Experimental renderer scopes** | Independent complete-product and browser-first opt-in renderer lines | YT-069–YT-081 | Reviewed plan; later separately authorized product/renderer evidence, isolation and independent implementation review; no release activation |
+| **M12 — Done at bounded migration scope** | Rust-native active developer build/check/smoke/qualification/release tooling, isolated from framework dependencies | YT-082–YT-086 | Exact 52-file/three-workflow parity, preserved suite gates, actual Linux/Windows owned-child evidence, Python-free transitive command graph and separate independent review per item; no public CLI or release activation |
+
+## M12 — Repository-toolchain planning checkpoint
+
+The [Rust toolchain plan](M12-RUST-TOOLCHAIN-PLAN.md), [complete migration ledger](M12-PYTHON-MIGRATION.md) and [YT-082 verification](YT-082-VERIFICATION.md) file the dependency order `YT-081 → YT-082 → YT-083 → YT-084 → YT-085 → YT-086`. The independent directional backlog review passed; this does not accept implementation. YT-082 is Done after separate independent document review PASS; YT-083 is Done after corrected Linux/Windows MSVC tests and fresh independent Reviewer PASS; YT-084 is Done after [128-file builder parity, Rust checks and independent reviewer PASS](YT-084-VERIFICATION.md); YT-085 is Done after its separate independent Reviewer PASS, retaining its scoped evidence and unavailable environment boundaries. YT-086 is Done at bounded source/fixture migration scope after independent Reviewer `wc_job_6UfDDdHnNCBXkMhA` PASS ([evidence](YT-086-VERIFICATION.md)); full runtime-graph and environment qualifications remain unverified. The original YT-082 checkpoint changed documents only. Public CLI YT-087 is Deferred, unfiled and not activated; YT-020 remains Blocked.
+
+- [x] YT-082 plan and exact inventory independently accepted; documentation checks are recorded separately from software evidence.
+- [x] YT-083 isolated unpublished xtask/doctor/process foundation independently accepted, including actual Linux and Windows owned-child cleanup without global host changes.
+- [x] YT-084 seven builders and docs/catalog checks/tests accepted after parity and a separate independent Reviewer PASS.
+- [x] YT-085 thirty scenario/helper mappings accepted after scoped runtime evidence, status/cleanup repairs and a separate independent Reviewer PASS.
+- [x] YT-086 benchmarks/qualification/release/inline private rebuild and CI migration independently accepted at bounded source/fixture scope; controlled PATH proves executed commands interpreter-free, while unexecuted runtime graph remains Not verified.
+
+Each later gate needs its own independent Reviewer PASS. Historical receipts and failed qualification remain immutable. A bounded language-port check cannot claim full-load, physical IME/AT, GPU performance, production qualification or release acceptance. No Rust/CI implementation, downloads/installs, hosted trigger, new validation framework, commit or push occurs in YT-082.
 
 ## M11 — Product readiness and optional scene rendering (selected delivery)
 

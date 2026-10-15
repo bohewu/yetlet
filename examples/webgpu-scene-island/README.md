@@ -29,7 +29,7 @@ From the repository root, using the installed Rust 1.99 and wasm32 target:
 ```sh
 cargo test --offline --locked --manifest-path examples/webgpu-scene-island/Cargo.toml
 cargo build --offline --locked --manifest-path examples/webgpu-scene-island/Cargo.toml
-python3 examples/webgpu-scene-island/build.py
+cargo xtask build scene-island
 YETLET_SCENE_LISTEN=127.0.0.1:3010 cargo run --offline --locked --manifest-path examples/webgpu-scene-island/Cargo.toml
 ```
 
@@ -47,10 +47,23 @@ wasm-bindgen 0.2.129, web-sys 0.3.106 and matching bindgen CLI. wgpu defaults ar
 disabled; only `std`, `webgpu`, `wgsl` are enabled for wasm32, with no native
 backends. Cached version-source verification showed `webgpu` enables the browser
 bindings and `wgsl` gates `ShaderSource::Wgsl`. Native SSR has no wgpu edge.
-`build.py` builds the scene and existing counter independently, hashes each
+`cargo xtask build scene-island` builds the scene and existing counter independently, hashes each
 entry's loader/generated JS/WASM together, and writes exact local manifest paths.
 Do not hand-edit generated assets or reuse an old manifest after source changes.
 The root Cargo.lock and Todo/Search build procedure remain independent.
+
+Current Rust smoke equivalents are accepted at the separate YT-085 scope. Each
+writes a fresh `target/m12/yt085/<suite>-*/` directory. The Python commands and
+M11 receipts below describe historical runs; they do not attest a Rust rerun.
+Do not repeat completed evidence automatically.
+
+```sh
+cargo xtask smoke scene-chrome
+YT075_FIREFOX_HEADFUL_X11=1 cargo xtask smoke scene-firefox
+YT075_FIREFOX_HEADFUL_X11=1 cargo xtask smoke scene-lifecycle-firefox
+YT075_FIREFOX_HEADFUL_X11=1 cargo xtask smoke scene-picking-firefox
+YT075_FIREFOX_HEADFUL_X11=1 cargo xtask smoke scene-candidate-firefox
+```
 
 ### Selected Ubuntu Firefox browser proof
 
@@ -183,14 +196,18 @@ use identical Rust-generated, bounded 32-byte rectangles, colors, seed and updat
 Only the selected canvas paints. Scene data remains application-owned outside
 LocalGraph; no renderer crate, shared scene graph or dependency change is added.
 
-Prepared parent command (run once after parameter review, never in the leaf):
+Current Rust measurement candidate (YT-086 review pending; no automatic rerun):
 
 ```sh
-YT075_FIREFOX_HEADFUL_X11=1 /usr/bin/python3 examples/webgpu-scene-island/verify_dynamic.py
+YT075_FIREFOX_HEADFUL_X11=1 cargo xtask measure scene-dynamic
 ```
 
-The output is uniquely owned at `target/m11-gpu/yt077-20261014/browser`; the
-fixture refuses an existing directory. Three alternating independent rounds
+The current Rust candidate creates a fresh `target/m12/yt086/scene-dynamic-*/`
+directory. Its measurement is not yet independently accepted. Historical Python
+outputs under `target/m11-gpu/yt077-20261014/browser` remain separate and immutable;
+the original command was
+`YT075_FIREFOX_HEADFUL_X11=1 /usr/bin/python3 examples/webgpu-scene-island/verify_dynamic.py`.
+Three alternating independent rounds
 per renderer/size use 1k/10k/50k/100k records, fixed 600×400 CSS and actual DPR 1,
 5 warmups then 30 measured samples for sparse 1%, full status and eight-operation
 latest-state bursts. Each 10k lane also gets 10 seconds of sequential sustained

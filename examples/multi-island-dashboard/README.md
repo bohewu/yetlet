@@ -7,7 +7,7 @@ This sample renders one complete dashboard on the server and optionally activate
 From the repository root:
 
 ```bash
-python3 scripts/build_multi_island_dashboard.py && cargo run -p yetlet-multi-island-dashboard
+cargo xtask build multi-island-dashboard && cargo run -p yetlet-multi-island-dashboard
 ```
 
 The anonymous prototype listens on `127.0.0.1:3009` by default and rejects non-loopback listeners. Override local test paths with `YETLET_DASHBOARD_LISTEN` and `YETLET_DASHBOARD_ASSET_ROOT`.
@@ -35,11 +35,11 @@ cargo test --locked -p yetlet-multi-island-dashboard --all-targets
 cargo check --locked --target wasm32-unknown-unknown \
   -p yetlet-dashboard-counter-island \
   -p yetlet-dashboard-filter-island
-python3 scripts/build_multi_island_dashboard.py --release
+cargo xtask build multi-island-dashboard --release
 cargo build --release --locked -p yetlet-multi-island-dashboard
-python3 scripts/smoke_multi_island_dashboard.py --profile release
-python3 scripts/smoke_multi_island_dashboard_firefox.py --profile release
-python3 scripts/check_samples.py
+cargo xtask smoke multi-island-dashboard-chrome --profile release
+cargo xtask smoke multi-island-dashboard-firefox --profile release
+cargo xtask check samples
 ```
 
 See [M9g verification](../../docs/M9G-VERIFICATION.md) for retained Chrome/Firefox, manifest-fallback, lifecycle, bundle and dependency-isolation evidence. This remains a local prototype, not a generalized island/hydration contract or browser support guarantee.
