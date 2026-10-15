@@ -19,7 +19,7 @@
 //! let batch = Batch::new(bytes)?;
 //! let viewport = PickViewport { width: 600., height: 400., dpr: 1. };
 //! assert_eq!(pick_records(batch.bytes(), viewport, 300., 200.)?, Some(1));
-//! # Ok::<(), &'static str>(())
+//! # Ok::<(), yetlet_wgpu::SceneError>(())
 //! ```
 #![deny(missing_docs)]
 
@@ -32,6 +32,44 @@ use std::sync::{
 pub const MAX_RECORDS: u32 = 100_000;
 /// Experimental packed rectangle stride: eight little-endian f32 values.
 pub const RECORD_BYTES: usize = 32;
+
+/// Typed, non-exhaustive errors for Experimental CPU scene contracts.
+/// Browser APIs map these variants to bounded JS strings at the Wasm boundary.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
+pub enum SceneError {
+    /// Empty, oversized or misaligned packed record bytes.
+    InvalidRecordLength,
+    /// Nonfinite/out-of-bounds rectangle geometry or RGBA.
+    InvalidRecordData,
+    /// Nonfinite, negative or zero-invalid canvas/device dimensions.
+    InvalidViewport,
+    /// Nonfinite pointer coordinates.
+    InvalidPointer,
+    /// A packed update starts or ends outside the current batch.
+    InvalidUpdateRange,
+    /// A checked data version has exhausted its u32 sequence.
+    VersionExhausted,
+}
+impl SceneError {
+    /// Bounded compatibility string for logs and the Wasm/JS error boundary.
+    pub const fn as_str(self) -> &'static str {
+        match self {
+            Self::InvalidRecordLength => "invalid record byte length",
+            Self::InvalidRecordData => "invalid finite bounded geometry/color",
+            Self::InvalidViewport => "Invalid viewport input",
+            Self::InvalidPointer => "Invalid pointer input",
+            Self::InvalidUpdateRange => "invalid update range",
+            Self::VersionExhausted => "data version exhausted",
+        }
+    }
+}
+impl std::fmt::Display for SceneError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        formatter.write_str(self.as_str())
+    }
+}
+impl std::error::Error for SceneError {}
 
 /// An initialization can commit only while its own lifetime is initializing.
 #[derive(Clone)]
@@ -71,9 +109,10 @@ impl Lifetime {
             })
             .is_ok()
     }
-    /// Experimental idempotent terminal disposal, invalidating pending results.
-    pub fn retire(&self) {
-        self.0.store(DISPOSED, Ordering::SeqCst);
+    /// Idempotent retirement: true only on the first transition to disposed,
+    /// including after failure; false on later calls. Pending work is invalidated.
+    pub fn retire(&self) -> bool {
+        self.0.swap(DISPOSED, Ordering::SeqCst) != DISPOSED
     }
 }
 impl Default for Lifetime {
@@ -102,7 +141,7 @@ pub fn backing_size(
     dpr: f64,
     connected: bool,
     device_limit: u32,
-) -> Result<Option<BackingSize>, &'static str> {
+) -> Result<Option<BackingSize>, SceneError> {
     if !width.is_finite()
         || !height.is_finite()
         || !dpr.is_finite()
@@ -111,7 +150,7 @@ pub fn backing_size(
         || dpr <= 0.0
         || device_limit == 0
     {
-        return Err("Invalid viewport input");
+        return Err(SceneError::InvalidViewport);
     }
     if !connected || width == 0.0 || height == 0.0 {
         return Ok(None);
@@ -131,12 +170,12 @@ pub fn backing_size(
 
 /// Validate the entire payload before mutation or affected GPU work.
 /// Experimental CPU contract; no device or application domain state.
-pub fn validate_records(bytes: &[u8]) -> Result<u32, &'static str> {
+pub fn validate_records(bytes: &[u8]) -> Result<u32, SceneError> {
     if bytes.is_empty()
         || !bytes.len().is_multiple_of(RECORD_BYTES)
         || bytes.len() > MAX_RECORDS as usize * RECORD_BYTES
     {
-        return Err("invalid record byte length");
+        return Err(SceneError::InvalidRecordLength);
     }
     for record in bytes.as_chunks::<RECORD_BYTES>().0 {
         let mut values = [0.0f32; 8];
@@ -154,7 +193,7 @@ pub fn validate_records(bytes: &[u8]) -> Result<u32, &'static str> {
             || values[1].abs() + values[3] > 1.000_001
             || values[4..].iter().any(|v| !(0.0..=1.0).contains(v))
         {
-            return Err("invalid finite bounded geometry/color");
+            return Err(SceneError::InvalidRecordData);
         }
     }
     Ok((bytes.len() / RECORD_BYTES) as u32)
@@ -191,10 +230,10 @@ impl PickToken {
     }
 }
 impl PickViewport {
-    fn point(self, x: f64, y: f64) -> Result<Option<[f64; 2]>, &'static str> {
+    fn point(self, x: f64, y: f64) -> Result<Option<[f64; 2]>, SceneError> {
         let size = backing_size(self.width, self.height, self.dpr, true, u32::MAX)?;
         if !x.is_finite() || !y.is_finite() {
-            return Err("Invalid pointer input");
+            return Err(SceneError::InvalidPointer);
         }
         let Some(size) = size else { return Ok(None) };
         // Canvas exterior is excluded; rectangle edges inside it are inclusive.
@@ -219,7 +258,7 @@ pub fn pick_records(
     viewport: PickViewport,
     x: f64,
     y: f64,
-) -> Result<Option<u32>, &'static str> {
+) -> Result<Option<u32>, SceneError> {
     validate_records(bytes)?;
     let Some([x, y]) = viewport.point(x, y)? else {
         return Ok(None);
@@ -260,7 +299,7 @@ impl Batch {
     }
 
     /// Experimental constructor; no GPU initialization occurs.
-    pub fn new(bytes: Vec<u8>) -> Result<Self, &'static str> {
+    pub fn new(bytes: Vec<u8>) -> Result<Self, SceneError> {
         let count = validate_records(&bytes)?;
         Ok(Self {
             bytes,
@@ -269,12 +308,12 @@ impl Batch {
         })
     }
     /// Experimental atomic full replacement; invalid input/version exhaustion leaves data intact.
-    pub fn replace(&mut self, bytes: &[u8]) -> Result<(), &'static str> {
+    pub fn replace(&mut self, bytes: &[u8]) -> Result<(), SceneError> {
         let count = validate_records(bytes)?;
         let version = self
             .version
             .checked_add(1)
-            .ok_or("data version exhausted")?;
+            .ok_or(SceneError::VersionExhausted)?;
         if self.bytes.capacity() < bytes.len() {
             self.bytes = bytes.to_vec();
         } else {
@@ -291,16 +330,18 @@ impl Batch {
         Ok(())
     }
     /// Experimental validated contiguous update; invalid range/version leaves data intact.
-    pub fn update(&mut self, start: u32, bytes: &[u8]) -> Result<(), &'static str> {
+    pub fn update(&mut self, start: u32, bytes: &[u8]) -> Result<(), SceneError> {
         let count = validate_records(bytes)?;
-        let end = start.checked_add(count).ok_or("invalid update range")?;
+        let end = start
+            .checked_add(count)
+            .ok_or(SceneError::InvalidUpdateRange)?;
         if end as usize > self.dirty.len() {
-            return Err("invalid update range");
+            return Err(SceneError::InvalidUpdateRange);
         }
         let version = self
             .version
             .checked_add(1)
-            .ok_or("data version exhausted")?;
+            .ok_or(SceneError::VersionExhausted)?;
         self.bytes[start as usize * RECORD_BYTES..end as usize * RECORD_BYTES]
             .copy_from_slice(bytes);
         self.dirty[start as usize..end as usize].fill(true);

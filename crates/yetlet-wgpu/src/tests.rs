@@ -7,6 +7,75 @@ fn rectangle() -> Vec<u8> {
 }
 
 #[test]
+fn typed_cpu_errors_preserve_bounded_messages_and_atomicity() {
+    fn assert_std_error<E: std::error::Error>() {}
+    assert_std_error::<SceneError>();
+    let bytes = rectangle();
+    assert_eq!(validate_records(&[]), Err(SceneError::InvalidRecordLength));
+    assert_eq!(
+        validate_records(&[0; 32]),
+        Err(SceneError::InvalidRecordData)
+    );
+    let viewport = PickViewport {
+        width: 600.,
+        height: 400.,
+        dpr: 1.,
+    };
+    assert_eq!(
+        backing_size(f64::NAN, 400., 1., true, 4096),
+        Err(SceneError::InvalidViewport)
+    );
+    assert_eq!(
+        pick_records(&bytes, viewport, f64::INFINITY, 0.),
+        Err(SceneError::InvalidPointer)
+    );
+    let mut batch = Batch::new(bytes.clone()).unwrap();
+    let initial = batch.bytes().to_vec();
+    assert_eq!(batch.update(1, &bytes), Err(SceneError::InvalidUpdateRange));
+    assert_eq!(batch.bytes(), initial);
+    batch.version = u32::MAX;
+    assert_eq!(batch.replace(&bytes), Err(SceneError::VersionExhausted));
+    assert_eq!(batch.bytes(), initial);
+    assert_eq!(batch.version(), u32::MAX);
+
+    for (error, message) in [
+        (
+            SceneError::InvalidRecordLength,
+            "invalid record byte length",
+        ),
+        (
+            SceneError::InvalidRecordData,
+            "invalid finite bounded geometry/color",
+        ),
+        (SceneError::InvalidViewport, "Invalid viewport input"),
+        (SceneError::InvalidPointer, "Invalid pointer input"),
+        (SceneError::InvalidUpdateRange, "invalid update range"),
+        (SceneError::VersionExhausted, "data version exhausted"),
+    ] {
+        assert_eq!(error.as_str(), message);
+        assert_eq!(error.to_string(), message);
+    }
+}
+
+#[test]
+fn retirement_signals_first_transition_once_even_after_failure() {
+    let lifetime = Lifetime::new();
+    let cloned = lifetime.clone();
+    assert!(lifetime.begin());
+    assert!(cloned.retire());
+    assert!(!lifetime.retire());
+    assert!(!cloned.commit());
+    assert!(!lifetime.active());
+    let failed = Lifetime::new();
+    assert!(failed.begin());
+    assert!(failed.fail());
+    assert!(failed.retire());
+    assert!(!failed.retire());
+    assert!(!failed.fail());
+    assert!(!failed.commit());
+}
+
+#[test]
 fn bounded_validation_and_atomic_version_exhaustion() {
     let bytes = rectangle();
     assert_eq!(validate_records(&bytes), Ok(1));

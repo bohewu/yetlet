@@ -10,13 +10,13 @@ Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 - [API contracts](API-CONTRACTS.md) and [Compatibility](COMPATIBILITY.md): implemented API classification and pre-public stability limits.
 - ADRs [0001](adr/0001-separation-of-concerns.md), [0002](adr/0002-events-and-actions.md), [0003](adr/0003-renderers-and-loading.md), [0004](adr/0004-request-context-and-middleware.md), [0005](adr/0005-opt-in-capability-modules.md), [0006](adr/0006-handler-first-mvc-optional.md) and [0007](adr/0007-bounded-keyed-dom-and-local-graph.md): retained decisions and tradeoffs.
 
-## M11 planning — product readiness and optional renderer
+## M11 — historical planning and selected product/renderer delivery
 
-The owner authorized documentation and review, not implementation. Start with [M11 plan](M11-PLAN.md), then [product-readiness research](M11-PRODUCT-READINESS-RESEARCH.md) for the capability matrix, CSS/product choice, three priority gaps and XSS/qualification boundary. [wgpu plan](M11-WGPU-PLAN.md) separately defines browser proof, lifecycle, measurements and possible first-party opt-in Experimental extraction. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) remains Proposed. [Planning review](M11-PLANNING-REVIEW.md) records actual documentation checks and current-session self-review, not independent assurance. YT-069 is the planning task; YT-070–YT-081 require later activation. No crate, browser support or production claim is added.
+The original [M11 plan](M11-PLAN.md), [product-readiness research](M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](M11-WGPU-PLAN.md) and [planning review](M11-PLANNING-REVIEW.md) were documentation-only at the YT-069 checkpoint. **Subsequent owner authorizations and independent reviewers** accepted YT-070–YT-080 at separately selected bounds. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) now accepts only the bounded Experimental opt-in architecture; it does not grant stable or broad browser support. See the [M11 reconciliation](YT-081-M11-CLOSEOUT.md) and [API consistency audit](YT-081-API-CONTRACT-AUDIT.md); historical planning statements retain their original date and evidence.
 
 ### Activated non-GPU implementation
 
-The owner committed planning as `d96f7af` and [activated YT-070–YT-074](M11-P-ACTIVATION.md); M11-P implementation is committed at `f00ec597`. [Form/asset evidence](M11-P-FORM-ASSET-VERIFICATION.md) records YT-070–YT-072; YT-073 is locally complete. [YT-074 qualification](YT-074-QUALIFICATION.md) is Done at the owner-amended local scope, with retained real Chewing IME, repaired Firefox/Orca speech and final Chrome/Firefox PASS. The new owner-authorized full 62-minute mixed-load execution passed with 45,000 measured requests and zero errors; fresh independent review also passed, and the earlier synchronized-burst failure is retained. Repairs and evidence remain uncommitted. See [desktop acceptance](YT-074-DESKTOP-ACCEPTANCE.md), [spoken transcript](YT-074-SPOKEN-AT-EVIDENCE.json), [IME screenshots](screenshots/yt074-ime/README.md), [startup](BOARD-START.md) and [handoff](M11-P-IMPLEMENTATION-HANDOFF.md). No GPU or public-release change is claimed.
+The owner committed planning as `d96f7af` and [activated YT-070–YT-074](M11-P-ACTIVATION.md); M11-P implementation is committed at `f00ec597`. [Form/asset evidence](M11-P-FORM-ASSET-VERIFICATION.md) records YT-070–YT-072; YT-073 is locally complete. [YT-074 qualification](YT-074-QUALIFICATION.md) is Done at the owner-amended local scope, with retained real Chewing IME, repaired Firefox/Orca speech and final Chrome/Firefox PASS. The new owner-authorized full 62-minute mixed-load execution passed with 45,000 measured requests and zero errors; fresh independent review also passed, and the earlier synchronized-burst failure is retained. Historical repair/test records retain their original source and commit boundaries. See [desktop acceptance](YT-074-DESKTOP-ACCEPTANCE.md), [spoken transcript](YT-074-SPOKEN-AT-EVIDENCE.json), [IME screenshots](screenshots/yt074-ime/README.md), [startup](BOARD-START.md) and [handoff](M11-P-IMPLEMENTATION-HANDOFF.md). No GPU or public-release change is claimed.
 
 ### Experimental opt-in WebGPU candidate
 
@@ -28,10 +28,27 @@ and independent-review PASS at their selected scopes. Use the
 [support matrix](../crates/yetlet-wgpu/SUPPORT.md), and
 [YT-080 qualification](YT-080-VERIFICATION.md) and its
 [independent Reviewer PASS](YT-080-INDEPENDENT-REVIEW.md). YT-075–YT-080 are
-complete at their declared scopes; YT-081 and publication are not included.
+complete at their declared scopes; [YT-081](YT-081-M11-CLOSEOUT.md) reconciles the final evidence, while publication remains excluded.
 The candidate is CPU-only by default, explicitly browser-enabled, unpublished
 and outside the original nine
 release candidates. Future 3D is not implemented or guaranteed.
+
+### M11 selected-scope reconciliation and API contract review
+
+[YT-081 M11 closeout](YT-081-M11-CLOSEOUT.md) reconciles
+the complete selected SSR-first product and Experimental GPU lines,
+without upgrading their browser/host/production limitations into
+general support. The separate
+[cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) inventories
+handler-first setup, domain errors, sync Memory versus async Redis
+sessions, local/HTTP commands, lifecycle/disposal and opt-in GPU
+features. The owner also selected a narrow [Experimental GPU API
+refinement](YT-081-WGPU-API-REFINEMENT.md), which intentionally changes
+CPU validation errors and the retirement return type. It does **not**
+promote a Stable Candidate, publish a package or activate YT-020.
+The changed source passed its [own independent reviewer](YT-081-WGPU-API-INDEPENDENT-REVIEW.md)
+with zero issues and required followups. YT-081 is Done only at the
+selected documented scope.
 
 ## Library guides
 

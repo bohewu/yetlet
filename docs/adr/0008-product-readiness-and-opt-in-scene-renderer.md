@@ -1,6 +1,6 @@
 # ADR 0008 — Product Readiness and an Optional Scene Renderer
 
-- **Status:** Proposed; planning only. No implementation or API promotion accepted.
+- **Status:** Accepted only for the bounded Experimental opt-in M11 product/renderer separation; not a stable API, publication or production endorsement.
 - **Date:** 2026-10-12.
 - **Task:** YT-069 / M11.
 - **Related:** [M11 plan](../M11-PLAN.md), [product research](../M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](../M11-WGPU-PLAN.md), [ADR 0003](0003-renderers-and-loading.md), [ADR 0005](0005-opt-in-capability-modules.md), [ADR 0007](0007-bounded-keyed-dom-and-local-graph.md).
@@ -13,7 +13,7 @@ On 2026-10-14 the owner [explicitly approved the YT-079 Experimental opt-in cand
 
 Five bounded studies are complete, and a new product-readiness handoff asks for useful full workflows, existing CSS reuse and precise XSS responsibilities. The native wgpu/Vulkan study proves colored instanced rendering, not browser portability or supported scene APIs. The owner requests planning for both product readiness and `yetlet-wgpu`.
 
-## Proposed decision
+## Original proposed decision (accepted only at the bounded Experimental scope)
 
 Keep two independent M11 lines. Product readiness is established by one meaningful persisted, authorized, usable SSR-first application within an explicit operating envelope. Browser GPU work is an optional scene surface with its own lifecycle, performance, accessibility and support evidence. Neither is a prerequisite for publishing the original nine candidates, and GPU is not a prerequisite for the product.
 
@@ -33,4 +33,4 @@ The proposed `yetlet-wgpu` candidate is first-party maintained, explicitly linke
 
 Optional integration increases maintenance and qualification combinations, so supported surfaces/targets must be explicit. Default no-JS SSR, local events, typed remote commands, CSP/escaping and unrelated browser assets are regression gates. Controls/text/IME/accessibility stay in semantic HTML rather than a newly built canvas UI toolkit.
 
-This ADR remains Proposed until the owner authorizes a selected design and the relevant implementation/evidence passes the declared review gates. Documentation self-review is not independent implementation or security assurance. Existing YT-023 and M7/M10 results keep their original scope; YT-020 and the nine-candidate release inventory remain unchanged.
+The owner authorized the bounded Experimental opt-in design, and M11-P plus YT-075–YT-080 now have their own scoped implementation and independent reviewer evidence. The [YT-081 selected closeout](../YT-081-M11-CLOSEOUT.md) reconciles those limits and a separate [cross-crate API review](../YT-081-API-CONTRACT-AUDIT.md). This ADR accepts architectural separation **only at those selected scopes**; documentation self-review is not implementation/security assurance. Existing YT-023/M7/M10 history remains historical, and YT-020 and the nine-candidate release inventory remain unchanged.

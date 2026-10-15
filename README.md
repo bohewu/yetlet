@@ -2,7 +2,7 @@
 
 Yetlet is a small, HTML-first Rust universal UI framework. Write shared Rust Views for native server-rendered pages and opt-in browser WASM/DOM updates; use ordinary Axum handlers for HTTP and typed actions for explicit remote work.
 
-**Experimental `0.1.0`, unpublished, Private.** M0–M9 implementation and selected M10 qualification are complete at their recorded prototype scopes. APIs are pre-public and may change. Public release (`YT-020`) remains **Blocked**; this repository is not production-qualified.
+**Experimental `0.1.0`, unpublished, Private.** M0–M9 implementation, selected M10 qualification and M11-P/M11-G product/GPU work are complete at their recorded prototype scopes. [M11 closeout](docs/YT-081-M11-CLOSEOUT.md) reconciles those limits; APIs are pre-public and may change. Public release (`YT-020`) remains **Blocked**; this repository is not production-qualified.
 
 ## Start with native SSR
 
@@ -122,7 +122,7 @@ For implementation validation, use the changed-path checks required by [reposito
 
 The original nine candidates remain experimental `0.1.0`, unpublished and Private. [Release readiness](docs/RELEASE-READINESS.md) and [Private preparation](docs/YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) explain the Rust 1.99 minimum, best-effort maintenance and remaining approval gates. YT-068 is Done at documentation scope; the independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate. YT-020 remains **Blocked** for formal activation.
 
-Historical [Private signing](docs/YT-020-PRIVATE-SIGNING-VERIFICATION.md) authenticates the earlier `8e557e760407a3d4b3f5a8b8f833748946be1387` evidence set. It does not attest the current dirty research/documentation checkout, changed root manifest/lock or nine new package READMEs. A future release needs a separately approved immutable candidate and current-source package, rebuild, provenance, SBOM/license and signing evidence; a local commit alone cannot activate release.
+Historical [Private signing](docs/YT-020-PRIVATE-SIGNING-VERIFICATION.md) authenticates the earlier `8e557e760407a3d4b3f5a8b8f833748946be1387` evidence set. It does not attest this later committed source tree, evolved root manifest/lock, nine package guides or Experimental GPU candidate. A future release needs a separately approved immutable candidate and current-source package, rebuild, provenance, SBOM/license and signing evidence; a local commit alone cannot activate release.
 
 [Retained qualification](docs/QUALIFICATION-MATRIX.md) keeps its original native/browser/CI identities. YT-030/YT-065/YT-066/YT-067 remain Done at their stated bounded scopes. Real IME, spoken assistive technology, WebKit/mobile and zoom remain optional unverified coverage; no supported-device, conformance, production or SLA claim follows. The Redis provider remains nonpublishable and qualified only at selected single-host/single-primary/no-persistence scope. Application TLS/ACL, backups, business RPO/RTO and operational ownership remain application responsibilities. [Detailed history](docs/README.md#historical-evidence-and-maintainer-notes) preserves earlier commands, PASS results and limitations.
 

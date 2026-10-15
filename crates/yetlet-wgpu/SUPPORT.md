@@ -73,9 +73,17 @@ slots to their business identifiers; arbitrary semantic reordering is not implie
 DPR is bounded to 1–2 and physical dimensions to device limits; zero-size or
 detached canvases suspend. There is no built-in animation loop or device sharing.
 Dispose the old owner before configuring a replacement on the same canvas.
+`SceneOwner::dispose` and `Lifetime::retire` report `true` on the first
+retirement, `false` on repeated calls. This is logical retirement and
+owned-renderer drop, not permission to free a still-borrowed Wasm wrapper.
 Keep the Rust/Wasm object alive until borrowed initialization/completion futures
 settle, then free the wrapper once. The actual consumer demonstrates this rule.
 The crate unconfigures only its own configured context before dropping resources.
+
+CPU data, picking and viewport validation expose domain-local typed
+`SceneError` variants; error text is converted to bounded `JsValue` only
+at the browser/Wasm boundary. This does not introduce a shared framework
+error type or change the Browser WebGPU resource-failure categories.
 
 Unavailable capability and GPU errors must leave HTML data/actions usable.
 The fault sink receives bounded categories tagged with the generation, not raw

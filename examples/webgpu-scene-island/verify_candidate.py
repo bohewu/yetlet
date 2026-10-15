@@ -24,8 +24,11 @@ from verify_picking import portrait_viewport
 
 HERE = Path(__file__).resolve().parent
 ROOT = HERE.parent.parent
-# Same candidate test; preserve the first offscreen-setup failure.
-EVIDENCE = ROOT / "target/m11-gpu/yt079-20261014/browser/page-module-hook"
+# Historical YT-079 receipt is immutable. A separate opt-in run validates the
+# changed Experimental CPU errors and idempotent disposal in actual browser Wasm.
+API_REFINEMENT = os.environ.get("YT081_WGPU_API_REFINEMENT") == "1"
+EVIDENCE = ROOT / ("target/m11-closeout/yt081-20261015/browser/api-refinement"
+                   if API_REFINEMENT else "target/m11-gpu/yt079-20261014/browser/page-module-hook")
 
 
 def main():
@@ -57,7 +60,7 @@ def main():
     inputs = source_paths + asset_paths + [binary, ROOT / "Cargo.lock"]
     hashes = {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest() for p in inputs}
     (EVIDENCE / "input-hashes.json").write_text(json.dumps(hashes, indent=2) + "\n")
-    report = {"task_id": "YT-079", "status": "running", "checks": [], "snapshots": [],
+    report = {"task_id": "YT-081" if API_REFINEMENT else "YT-079", "status": "running", "checks": [], "snapshots": [],
               "pixels": [], "manifest": manifest, "input_hashes": hashes,
               "profile_changes": ["dom.webgpu.enabled=true (temporary only)"],
               "input_policy": "WebDriver mouse/keyboard; touch/cancel/scroll and DPR overrides are explicitly simulated; no physical mobile or screenreader speech claim",
@@ -289,6 +292,20 @@ def main():
                     # this single-purpose hook in the PAGE module world through a temporary
                     # same-origin external script. No inline script/CSP bypass or product edit.
                     hook_text = "import {SceneOwner} from './scene.js'; const free=SceneOwner.prototype.free; SceneOwner.prototype.free=function(){window.__yt079Held.frees++;return free.call(this)}; window.__yt079Held.hookInstalled=true;\n"
+                    if API_REFINEMENT:
+                        # Scope the test hook to a temporary same-origin module script.
+                        # Verify actual Wasm first/repeated dispose, then watch live owners.
+                        hook_text = ("import {SceneOwner} from './scene.js'; "
+                            "const inert=new SceneOwner(97531); "
+                            "window.__yt081DisposePair=[inert.dispose(),inert.dispose()]; "
+                            "inert.free(); "
+                            "window.__yt081DisposeCalls=[]; "
+                            "const rawDispose=SceneOwner.prototype.dispose; "
+                            "SceneOwner.prototype.dispose=function(){ "
+                            "const value=rawDispose.call(this);window.__yt081DisposeCalls.push(value);return value; }; "
+                            "const free=SceneOwner.prototype.free; "
+                            "SceneOwner.prototype.free=function(){window.__yt079Held.frees++;return free.call(this)}; "
+                            "window.__yt079Held.hookInstalled=true;\n")
                     hook_path = asset_root / "assets" / manifest["scene"]["digest"] / "yt079-free-hook.js"
                     hook_path.write_text(hook_text)
                     hook_url = "/scene-assets/" + manifest["scene"]["digest"] + "/yt079-free-hook.js"
@@ -314,6 +331,11 @@ def main():
                     report["completion_retirement"] = evaluate("const h=window.__yt079Held;return {held:h.held,destroyed:h.destroyed,buffers:h.buffers,unconfigured:h.unconfigured,frees:h.frees,settlement:window.__yt079Completion}")
                     click("#dispose-scene", "completion replacement teardown")
                     assert evaluate("return window.__yt079Held.frees===2 && window.__yt075Scene.snapshot().lastRetired.resourcesReleased")
+                    if API_REFINEMENT:
+                        report["idempotent_dispose"] = evaluate("return {inert:window.__yt081DisposePair,live:window.__yt081DisposeCalls}")
+                        assert report["idempotent_dispose"]["inert"] == [True, False], "Second Wasm dispose must be false"
+                        assert len(report["idempotent_dispose"]["live"]) >= 2, "Actual live owner retirement not observed"
+                        assert all(x is True for x in report["idempotent_dispose"]["live"]), "First live owner retire must report true"
 
                     fresh("unavailable")
                     script("#activate-scene", "INJECT unavailable GPU capability", "window.__yt079GPU=navigator.gpu;Object.defineProperty(navigator,'gpu',{value:undefined,configurable:true})")

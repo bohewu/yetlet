@@ -47,8 +47,14 @@ listeners, semantic alternative and explicit retry. Reserve canvas dimensions.
 Treat a false resize as suspension. Dispose the old owner before a replacement
 can configure the same canvas. Keep the Rust/Wasm owner alive until outstanding
 initialization/completion futures settle; only then free the JS wrapper exactly
-once. Disposal is idempotent and invalidates late callbacks/picks. A new owner
-gets a new generation and separately retained CPU data. No shared-device API is
+once. `SceneOwner::dispose(&self) -> bool` returns `true` exactly when the
+owner first transitions to disposed (including from a failed state), and
+`false` on repeated calls. `Lifetime::retire(&self) -> bool` follows that
+same one-time transition rule. This return value reports **logical
+retirement**, not completion of outstanding async borrows or immediate
+Wasm wrapper deallocation; the caller must still wait before `.free()`.
+Both invalidate late callbacks/picks. A new owner gets a new generation
+and separately retained CPU data. No shared-device API is
 provided. The application loader demonstrates deferred wrapper freeing and
 retained CPU data; the crate installs no listeners, RAF loop or ambient device.
 
@@ -65,9 +71,15 @@ when they want stable semantic identities. CSS-local coordinates exclude right/
 bottom exterior edges. DPR is clamped to [1,2]; dimensions are bounded by the
 negotiated device texture limit; zero/detached targets suspend.
 
-CPU errors distinguish invalid payload length, finite geometry/color, update
-range, viewport/pointer input and version exhaustion. Browser initialization
-errors mean unavailable canvas/adapter/device/configuration or retired owner;
+CPU validation, batch operations and picking return typed
+`Result<_, SceneError>`, with non-exhaustive variants:
+`InvalidRecordLength`, `InvalidRecordData`, `InvalidUpdateRange`,
+`VersionExhausted`, `InvalidViewport`, `InvalidPointer`. The variants
+can be matched without parsing error text. `Display` and `as_str()`
+preserve bounded existing diagnostic strings. At the Wasm-facing browser
+boundary the CPU error maps explicitly to a `JsValue` string; GPU device,
+surface, validation and lifecycle failures remain `Result<_, JsValue>`.
+Browser initialization errors mean unavailable canvas/adapter/device/configuration or retired owner;
 keep HTML usable, dispose and require explicit retry. Runtime categories are
 `device-lost`, `surface-lost` (including outdated), `surface-timeout`,
 `surface-error`, `resource-exhausted`, `validation-error` and `device-error`.

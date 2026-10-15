@@ -1,7 +1,7 @@
 //! Application-owned synthetic work records, SSR and thin Experimental renderer binding.
 pub use yetlet_wgpu::{
-    BackingSize, Batch, Lifetime, MAX_RECORDS, PickToken, PickViewport, RECORD_BYTES, backing_size,
-    pick_records, validate_records,
+    BackingSize, Batch, Lifetime, MAX_RECORDS, PickToken, PickViewport, RECORD_BYTES, SceneError,
+    backing_size, pick_records, validate_records,
 };
 pub const RECORDS: u32 = 120;
 pub const WIDTH: u32 = 600;
@@ -41,7 +41,7 @@ pub fn scene_records(count: u32, seed: u32) -> Result<Vec<u8>, String> {
             bytes.extend(value.to_le_bytes());
         }
     }
-    validate_records(&bytes).map_err(str::to_owned)?;
+    validate_records(&bytes).map_err(|error| error.to_string())?;
     Ok(bytes)
 }
 pub fn instances(count: u32) -> Result<Vec<u8>, &'static str> {
@@ -64,7 +64,7 @@ pub fn status_patch(
     seed: u32,
     step: u32,
 ) -> Result<Vec<u8>, String> {
-    let count = validate_records(data).map_err(str::to_owned)?;
+    let count = validate_records(data).map_err(|error| error.to_string())?;
     let end = start.checked_add(length).ok_or("invalid update range")?;
     if length == 0 || end > count {
         return Err("invalid update range".into());

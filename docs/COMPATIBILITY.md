@@ -14,6 +14,18 @@ The current `0.y` version remains experimental under SemVer. The classifications
 
 For the selected `0.1.x` train, patches preserve documented API behavior and MSRV. An incompatible change requires the next coordinated minor release with rationale, migration notes and the gates below. Publication alone does not promote an Experimental API to Stable Candidate or promise 1.0 stability.
 
+### Separately owned unpublished experimental workspaces
+
+The optional Redis Session provider and the owner-approved
+`yetlet-wgpu` candidate use **isolated nested Cargo workspaces/locks**,
+`publish = false`, and pre-public Experimental contracts. They are not
+among the original nine coordinated YT-020 release candidates; their
+`0.1.0` (GPU) or separate provider version is not evidence that they
+have entered the root release train. The default HTML/DOM/server
+dependency paths and root lock remain independent. See the
+[YT-081 source/API audit](YT-081-API-CONTRACT-AUDIT.md) before assuming
+cross-provider interchangeability or a GPU stability guarantee.
+
 ## Change discipline
 
 A change to a **Stable Candidate** requires all of the following before merge:

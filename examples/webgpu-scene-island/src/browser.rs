@@ -87,7 +87,8 @@ impl SceneOwner {
     pub fn draw(&self) -> Result<(), JsValue> {
         self.inner.draw()
     }
-    pub fn dispose(&self) {
+    /// True only on the first owner retirement; free the wrapper after futures settle.
+    pub fn dispose(&self) -> bool {
         self.inner.dispose()
     }
 }

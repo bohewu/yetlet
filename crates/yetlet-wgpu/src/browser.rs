@@ -1,11 +1,16 @@
 use crate::{
-    Batch, Lifetime, PickToken, PickViewport, RECORD_BYTES, backing_size, pick_records,
+    Batch, Lifetime, PickToken, PickViewport, RECORD_BYTES, SceneError, backing_size, pick_records,
     validate_records,
 };
 use std::{cell::RefCell, rc::Rc};
 use wasm_bindgen::{JsCast, JsValue, prelude::wasm_bindgen};
 use web_sys::HtmlCanvasElement;
 use wgpu::util::DeviceExt;
+
+// Keep CPU validation typed in Rust and translate only at the JS/Wasm boundary.
+fn cpu_error_js(error: SceneError) -> JsValue {
+    JsValue::from_str(error.as_str())
+}
 
 #[wasm_bindgen]
 extern "C" {
@@ -55,7 +60,7 @@ impl Renderer {
             connected,
             self.device.limits().max_texture_dimension_2d,
         )
-        .map_err(JsValue::from_str)?
+        .map_err(cpu_error_js)?
         else {
             return Ok(false);
         };
@@ -396,11 +401,8 @@ impl SceneOwner {
         if !self.lifetime.active() {
             return Err(JsValue::from_str("GPU owner retired"));
         }
-        validate_records(bytes).map_err(JsValue::from_str)?;
-        self.data
-            .borrow_mut()
-            .replace(bytes)
-            .map_err(JsValue::from_str)
+        validate_records(bytes).map_err(cpu_error_js)?;
+        self.data.borrow_mut().replace(bytes).map_err(cpu_error_js)
     }
     /// Experimental validated CPU range update, coalesced until the next draw.
     pub fn update(&self, start: u32, bytes: &[u8]) -> Result<(), JsValue> {
@@ -410,7 +412,7 @@ impl SceneOwner {
         self.data
             .borrow_mut()
             .update(start, bytes)
-            .map_err(JsValue::from_str)
+            .map_err(cpu_error_js)
     }
     /// Experimental retained packed CPU payload length.
     pub fn cpu_bytes(&self) -> u32 {
@@ -435,7 +437,7 @@ impl SceneOwner {
         }
         let data = self.data.borrow();
         let id = pick_records(&data.bytes, PickViewport { width, height, dpr }, x, y)
-            .map_err(JsValue::from_str)?
+            .map_err(cpu_error_js)?
             .unwrap_or(0);
         Ok(vec![self.generation, data.version, id])
     }
@@ -529,11 +531,13 @@ impl SceneOwner {
             .ok_or_else(|| JsValue::from_str("GPU not ready"))?
             .draw()
     }
-    /// Experimental idempotent retirement before releasing owned renderer resources.
-    /// Pending futures must settle before freeing the Wasm wrapper.
-    pub fn dispose(&self) {
-        self.lifetime.retire();
+    /// Retire the owner and release its renderer once. Returns `true` only on
+    /// the first retirement (also after device failure), `false` thereafter.
+    /// Pending futures must settle before the application frees the Wasm wrapper.
+    pub fn dispose(&self) -> bool {
+        let first = self.lifetime.retire();
         self.renderer.borrow_mut().take();
+        first
     }
 }
 impl Drop for SceneOwner {

@@ -72,6 +72,27 @@ The original post-M9 security round validated Rust 1.88; that evidence remains h
 | `SessionClock`, `SystemClock`, `SessionClockError`, `SessionManager::with_clock` | Valuable deterministic expiry hook, but clock/provider extensibility has only test consumers |
 | `session_middleware` | Low-level wiring entry used by `SessionManager::scoped`; direct installation is not the preferred application contract |
 
+### Subsequent separately selected Experimental providers (2026-10-14)
+
+These do **not** enlarge the original nine-candidate YT-020 release
+inventory or change any M9 Stable Candidate classification:
+
+| Public surface | Classification and observed limits |
+| --- | --- |
+| `yetlet-session-redis::{RedisSessionConfig,RedisSessionManager,RedisSession,RedisSessionError,RedisSessionUpdateError,RedisOperationId,RedisOperationStatus}` | **Experimental, unpublished, isolated workspace**; explicitly connected async Redis single-primary provider. `connect/read/try_update/rotate/destroy/shutdown` are async because they do I/O; `open` only parses a cookie. Memory `yetlet-session` remains synchronous, and behavior/cancellation/uncertain results are not interchangeable. [Provider guide](../crates/yetlet-session-redis/README.md) |
+| `yetlet-wgpu::{Batch,PickViewport,PickToken,Lifetime,SceneError}` and wasm32/browser `browser::SceneOwner` | **Experimental opt-in, `publish = false`**, CPU-only defaults; explicit browser feature. Bounded flat records, validation, picking, initialization, resize, queue completion and disposal were tested at one selected Firefox/X11/Intel Vulkan configuration. No GPU default dependency, 3D API, performance/stability/production claim or public wgpu type. [Crate guide](../crates/yetlet-wgpu/README.md) and [support matrix](../crates/yetlet-wgpu/SUPPORT.md) |
+
+The [YT-081 cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) records
+intentional API differences and remaining P2 design debt: the Experimental
+GPU CPU error surface now uses typed `SceneError` with explicit Wasm
+`JsValue` conversion, and first-retirement `dispose` reports a `bool`;
+other providers' lifetimes and error models remain domain-specific.
+`dispose` return shapes are intentionally domain-specific, and Memory
+and Redis methods should **not** be forced into syntactic parity at the
+cost of their correct sync/async semantics. There is no common
+`YetletError` promise, universal scheduler, default GPU graph, or public
+SemVer compatibility claim.
+
 ## Internal/support-only
 
 | Public surface | Reason |
