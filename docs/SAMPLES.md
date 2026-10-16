@@ -10,7 +10,7 @@ Begin with [Hello World](../examples/hello-world/README.md) for native SSR or [R
 
 ## Catalog contract
 
-`examples/samples.toml` is the machine-readable catalog for user-facing runnable applications. `scripts/check_samples.py` validates the catalog using only the Python standard library.
+`examples/samples.toml` is the machine-readable catalog for user-facing runnable applications. `cargo xtask check samples` validates the catalog with the isolated Rust tool. The browser build field names an exact supported Rust command; package identity, repository source, companions and README commands remain checked.
 
 Each entry declares:
 
@@ -58,8 +58,8 @@ The five [completed research studies](README.md#completed-research-prototypes) a
 Run the existing navigation checks:
 
 ```bash
-python3 scripts/check_samples.py
-python3 scripts/check_docs.py
+cargo xtask check samples
+cargo xtask check docs
 ```
 
 ## Retained sample delivery history

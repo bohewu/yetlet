@@ -9,7 +9,7 @@ behind the accepted YT-066a Nginx topology. See the
 Run from the repository root:
 
 ```sh
-python3 qualification/yt066b3/run.py
+cargo xtask qualify redis-three-app
 ```
 
 The fixture builds with pinned Rust 1.99 using locked, locally vendored inputs,

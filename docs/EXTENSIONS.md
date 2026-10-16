@@ -91,6 +91,23 @@ The pure-SSR Cookie contract preserves retired-ID rejection but permits login
 loss under extreme response reordering. This is not a Stable Candidate API,
 authentication system, production durability/HA result or mandatory dependency.
 
+## Separately selected Experimental scene renderer
+
+`yetlet-wgpu` is a first-party **Experimental opt-in** module, not a
+runtime plugin registry or automatic DOM/CSS accelerator. Its
+[nested crate](../crates/yetlet-wgpu/README.md) has dependency-free,
+CPU-only defaults and an explicit wasm32 `browser` feature. Consumers
+select it as a local path dependency and explicitly create a per-canvas
+owner; device initialization is never caused by default SSR, HTTP,
+HTML or ordinary DOM usage. The application retains the scheduler,
+semantic HTML alternatives, trusted selection IDs and lifecycle
+bridge. Browser errors are local to that capability; queue completion
+is not FPS. Its actual support is limited to the
+[documented Experimental configuration](../crates/yetlet-wgpu/SUPPORT.md),
+without a speedup or future-3D API claim. See the
+[YT-081 cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) for typed
+error and disposal-contract differences.
+
 ## Designing another module
 
 Use a normal setup function where it suffices. Add narrow traits only for genuine replaceable resource contracts (for example a cache store), not for a central plugin registry. Keep storage-specific dependencies in the module/provider crate. A handler that does not need context, auth or session should remain an ordinary function.

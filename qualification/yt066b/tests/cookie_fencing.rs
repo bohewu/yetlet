@@ -476,10 +476,23 @@ async fn real_chrome_without_js_keeps_one_cookie_and_rejects_retired_ids() {
         .route("/logout", get(browser_logout))
         .with_state(f.clone());
     let (url, shutdown, task) = serve(router).await;
-    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/cookie_browser.py");
+    let root = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("../..");
+    let binary = std::env::var_os("YETLET_XTASK_BIN")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| {
+            root.join(format!(
+                "xtask/target/debug/yetlet-xtask{}",
+                std::env::consts::EXE_SUFFIX
+            ))
+        });
+    assert!(
+        binary.is_file(),
+        "build the unpublished xtask first or set YETLET_XTASK_BIN"
+    );
     let output = tokio::task::spawn_blocking(move || {
-        std::process::Command::new("python3")
-            .arg(root)
+        std::process::Command::new(binary)
+            .current_dir(root)
+            .args(["fixture", "redis-cookie-browser"])
             .arg(url.as_str())
             .output()
     })

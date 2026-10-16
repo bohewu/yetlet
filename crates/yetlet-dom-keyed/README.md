@@ -13,7 +13,7 @@ On WASM, use `KeyedEntry<State>` for an element plus caller-defined cached slots
 The complete [Todo Browser binding](../../examples/todo-browser/src/lib.rs) demonstrates preflight, keyed reconciliation and owned listeners. Follow [Todo setup](../../examples/todo-server/README.md), or run from the repository root after installing its browser prerequisites:
 
 ```bash
-python3 scripts/build_browser.py
+cargo xtask build browser
 cargo run --locked -p yetlet-todo-server
 ```
 

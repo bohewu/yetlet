@@ -11,7 +11,7 @@ Construct `LocalGraph::new(state, reducer, commit)`, obtain a weak dispatch hand
 The complete [Todo Browser caller](../../examples/todo-browser/src/lib.rs) constructs the graph, reduces typed Todo commands, commits keyed DOM changes and owns its disposal lifetime. Follow [Todo's browser setup](../../examples/todo-server/README.md) or, from the repository root:
 
 ```bash
-python3 scripts/build_browser.py
+cargo xtask build browser
 cargo run --locked -p yetlet-todo-server
 ```
 

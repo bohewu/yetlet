@@ -43,9 +43,9 @@ See [M9e data-access comparison](../../docs/M9E-DATA-ACCESS-COMPARISON.md) for t
 ```bash
 cargo test --locked -p yetlet-sqlite-crud --all-targets
 cargo build --locked -p yetlet-sqlite-crud
-python3 scripts/smoke_sqlite_crud.py
+cargo xtask smoke sqlite-crud
 cargo tree --locked -p yetlet-sqlite-crud --edges normal
-python3 scripts/check_samples.py
+cargo xtask check samples
 ```
 
 This is a local persistence and transaction-semantics sample, not production authentication, encryption-at-rest, backup, multi-process clustering, online migration, load-test or durability certification.

@@ -1,0 +1,36 @@
+# ADR 0008 — Product Readiness and an Optional Scene Renderer
+
+- **Status:** Accepted only for the bounded Experimental opt-in M11 product/renderer separation; not a stable API, publication or production endorsement.
+- **Date:** 2026-10-12.
+- **Task:** YT-069 / M11.
+- **Related:** [M11 plan](../M11-PLAN.md), [product research](../M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](../M11-WGPU-PLAN.md), [ADR 0003](0003-renderers-and-loading.md), [ADR 0005](0005-opt-in-capability-modules.md), [ADR 0007](0007-bounded-keyed-dom-and-local-graph.md).
+
+## Subsequent owner-approved experimental scope
+
+On 2026-10-14 the owner [explicitly approved the YT-079 Experimental opt-in candidate](../M11-G-EXPERIMENTAL-PROMOTION-DECISION.md), without performance guarantees and with a Reviewer PASS for every YT-078–YT-080 item. This accepts that bounded extraction direction, not unimplemented APIs, production support, a 3D engine or release. The original proposal below remains historical; implementation acceptance is established by the task evidence, not by this approval alone.
+
+## Context
+
+Five bounded studies are complete, and a new product-readiness handoff asks for useful full workflows, existing CSS reuse and precise XSS responsibilities. The native wgpu/Vulkan study proves colored instanced rendering, not browser portability or supported scene APIs. The owner requests planning for both product readiness and `yetlet-wgpu`.
+
+## Original proposed decision (accepted only at the bounded Experimental scope)
+
+Keep two independent M11 lines. Product readiness is established by one meaningful persisted, authorized, usable SSR-first application within an explicit operating envelope. Browser GPU work is an optional scene surface with its own lifecycle, performance, accessibility and support evidence. Neither is a prerequisite for publishing the original nine candidates, and GPU is not a prerequisite for the product.
+
+Use the smallest layer that owns each concern. Safe View/HTML behavior remains a framework correctness contract. Selected live form semantics may justify bounded renderer helpers; existing CSS can remain an application asset choice, with a tiny additive server stylesheet helper only after repeated proof. Domain authorization, SQL, rich-content policy and deployment operations do not become mandatory core subsystems.
+
+The proposed `yetlet-wgpu` candidate is first-party maintained, explicitly linked/initialized and Experimental. It does not enter core/HTML/default server/simple DOM dependency graphs. A shared HTML View is not forced to describe GPU scenes. Browser-first proof, async lifecycle/loss handling, dynamic matched measurements and semantic alternatives precede any crate extraction. A future general scene crate requires another materially different consumer.
+
+## Alternatives not selected
+
+- Built-in GPU for ordinary DOM/CSS: wrong semantics and unnecessary dependency/startup cost.
+- Promoting all five studies into core: evidence does not justify the additional public contracts.
+- A broad form/VDOM/hydration/head/CSS framework: exceeds the selected product needs.
+- Requiring every native graphics backend, production HA, backups or public publication before a browser-only/private product proof: confuses target, application and release responsibilities.
+- Declaring an official crate by moving the native benchmark into `crates/`: skips browser consumers, lifetime, fallback and API evidence.
+
+## Consequences and acceptance
+
+Optional integration increases maintenance and qualification combinations, so supported surfaces/targets must be explicit. Default no-JS SSR, local events, typed remote commands, CSP/escaping and unrelated browser assets are regression gates. Controls/text/IME/accessibility stay in semantic HTML rather than a newly built canvas UI toolkit.
+
+The owner authorized the bounded Experimental opt-in design, and M11-P plus YT-075–YT-080 now have their own scoped implementation and independent reviewer evidence. The [YT-081 selected closeout](../YT-081-M11-CLOSEOUT.md) reconciles those limits and a separate [cross-crate API review](../YT-081-API-CONTRACT-AUDIT.md). This ADR accepts architectural separation **only at those selected scopes**; documentation self-review is not implementation/security assurance. Existing YT-023/M7/M10 history remains historical, and YT-020 and the nine-candidate release inventory remain unchanged.

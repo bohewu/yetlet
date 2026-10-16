@@ -42,16 +42,21 @@ From the current checkout, after the main agent verifies the two existing
 prebuilt debug binaries:
 
 ```sh
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_local_operations.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/qualify_local_operations.py
+cargo test --locked --manifest-path xtask/Cargo.toml --test local_operations
+cargo xtask qualify local-operations
 ```
 
-The first command runs direct stdlib SQLite and mocked process lifecycle tests;
+The first command runs Rust SQLite and direct owned-child lifecycle tests;
 it launches no sample server. The second command launches only
 `target/debug/yetlet-auth-notes` and `target/debug/yetlet-sqlite-crud` on ephemeral
 IPv4 loopback ports. It does not build Rust, use Docker/Redis, contact a remote
 service or install dependencies. Run it once; no repeated soak or latency gate
-is defined. [M10g verification](M10G-VERIFICATION.md) separates the ten source/lifecycle tests from the main-agent actual local run, which passed with seven processes reaped and temporary data removed.
+is defined. These current YT-086 commands remain pending independent review.
+The historical commands were `PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_local_operations.py`
+and `PYTHONDONTWRITEBYTECODE=1 python3 scripts/qualify_local_operations.py`.
+[M10g verification](M10G-VERIFICATION.md) separates those ten original Python
+source/lifecycle tests from the actual historical local run, which passed with
+seven processes reaped and temporary data removed.
 
 1. Start two real Auth Notes processes with the same explicit synthetic fixture
    codes. Authenticate Alice on A; her cookie returns 200 on A and 401 on B.
@@ -64,7 +69,7 @@ is defined. [M10g verification](M10G-VERIFICATION.md) separates the ten source/l
    note on A and read the exact committed value from both. Synchronize two HTTP
    updates with a barrier and the same expected version: require exactly one
    200 and one 409, final version 2, and exactly the create/update audit rows.
-3. With no mutations during backup, use Python `sqlite3.Connection.backup` into
+3. With no mutations during backup, use the Rust SQLite online backup API into
    a new owned 0600 checkpoint. Check integrity, foreign keys, schema version
    and exact notes/audit rows. Add one late note, stop both workers, then restore
    via the same API into a fresh isolated 0600 candidate. Start the actual app
@@ -85,8 +90,9 @@ Every child is tracked before readiness; all owned children receive bounded
 SIGINT/wait and kill/wait fallback as needed. An owned 0700 `TemporaryDirectory`
 contains databases and their WAL/SHM files and is removed after process cleanup
 on success, startup failure, exception or cancellation. Child output goes to
-the null device. Only after cleanup attempts does the script write
-`target/m10-remaining/local-operations.json`; cleanup failure prevents local
+private temporary logs. Only after cleanup attempts does the Rust tool write
+`target/m12/yt086/local-operations-evidence-*/local-operations.json`. The old
+Python receipt remains at `target/m10-remaining/local-operations.json`; cleanup failure prevents local
 PASS. Report values are fixed outcomes/counts/statuses, durations and version
 identity, never raw cookies, CSRF tokens, codes, environment, response bodies,
 logs or exception text. No arbitrary directory deletion is used.
@@ -96,7 +102,7 @@ multinode, HA and performance SLO qualification `not_verified`. Durations are
 observations without latency thresholds. Binary SHA-256 and current checkout
 package versions identify the inputs; the samples expose no binary-version or
 linked SQLite-version endpoint, so those runtime versions remain `not_exposed`.
-Python's SQLite version is observed separately and must not be attributed to
+The tool's SQLite version is observed separately and must not be attributed to
 the Rust app's bundled SQLite library. The main agent must retain build/source
 identity if it needs to connect a prebuilt binary to a particular source freeze.
 
@@ -105,15 +111,19 @@ identity if it needs to connect a prebuilt binary to a particular source freeze.
 YT-066a adds a bounded deployment-shape proof without adding a Session provider. Run the focused source tests, then the owned Docker fixture:
 
 ```sh
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_qualify_multi_instance.py
-PYTHONDONTWRITEBYTECODE=1 python3 scripts/qualify_multi_instance.py
+cargo test --locked --manifest-path xtask/Cargo.toml --test qualify_multi_instance
+cargo xtask qualify multi-instance
 ```
 
-The second command performs an offline build from locked vendored inputs with the pinned Rust 1.99 image, builds one local nonroot application image, pulls only the pinned Nginx digest, creates three Auth Notes containers and one reverse proxy, exercises the topology, writes `target/yt066a/multi-instance.json` only after cleanup, and removes its generated image. The retained YT-066a execution below used the earlier Rust 1.88 image; it is not relabeled or rerun for the compiler pin update. [Integrity preparation](YT-020-INTEGRITY-PREPARATION.md) records the new image identity and focused configuration checks. The application containers publish no ports and attach only to an internal backend. The proxy attaches to that backend plus a front bridge and publishes only an ephemeral host-loopback port; Docker 29.9 does not publish ports for a container attached solely to an internal network.
+The second command performs an offline build from locked vendored inputs with the pinned Rust 1.99 image, builds one local nonroot application image, pulls only the pinned Nginx digest, creates three Auth Notes containers and one reverse proxy, exercises the topology, writes a fresh `target/m12/yt086/docker-logs-*/multi-instance.json` only after cleanup, and removes its generated image. The retained YT-066a execution below used the earlier Rust 1.88 image; it is not relabeled or rerun for the compiler pin update. [Integrity preparation](YT-020-INTEGRITY-PREPARATION.md) records the new image identity and focused configuration checks. The application containers publish no ports and attach only to an internal backend. The proxy attaches to that backend plus a front bridge and publishes only an ephemeral host-loopback port; Docker 29.9 does not publish ports for a container attached solely to an internal network.
 
 The Auth Notes default remains loopback-only. `YETLET_AUTH_ISOLATED_CONTAINER_LAB=1` selects a separately named fixture entrypoint that permits a wildcard listener only inside this isolated arrangement. It is not a production deployment option and does not change Session security semantics.
 
-Actual final execution passed:
+The historical direct tests used `PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_qualify_multi_instance.py`.
+The historical command `PYTHONDONTWRITEBYTECODE=1 python3 scripts/qualify_multi_instance.py` wrote
+`target/yt066a/multi-instance.json`; its retained final execution passed. The
+current Rust YT-086 candidate has not completed an independently accepted Docker
+run. The historical observations were:
 
 - pooled stateless requests reached three instances, then two surviving instances while A was stopped, then all three after A restarted;
 - a Session created and authenticated on A returned 200 on A, 401 on B and C, and 401 on restarted A using the old cookie;

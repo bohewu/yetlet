@@ -2,7 +2,9 @@
 
 Derived from [`todo-ledger.json`](todo-ledger.json). The project backlog source is [`docs/BACKLOG.md`](docs/BACKLOG.md).
 
-**Items:** 68 — 67 Done, 1 Blocked.
+**Items:** 81 — 73 Done, 1 Blocked, 7 Todo.
+
+Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing IME, repaired Firefox/Orca speech and final Chrome/Firefox PASS. The owner-amended full 62-minute mixed-load run passed with 45,000 measured requests and zero errors, followed by fresh independent review PASS. The original synchronized-burst failure remains a limitation. GPU is unactivated. See [qualification](docs/YT-074-QUALIFICATION.md), [desktop acceptance](docs/YT-074-DESKTOP-ACCEPTANCE.md) and [handoff](docs/M11-P-IMPLEMENTATION-HANDOFF.md).
 
 ## Blocked
 
@@ -10,10 +12,27 @@ Derived from [`todo-ledger.json`](todo-ledger.json). The project backlog source 
 |---|---|---|---|---|
 | `YT-020` | medium | Build/run docs and release readiness | YT-019 | [Private preparation](docs/YT-020-PRIVATE-RELEASE-PREP.md)<br>[hosted rebuilding](docs/YT-020-HOSTED-REBUILD.md)<br>[trust/registry policy](docs/YT-020-PRIVATE-TRUST-POLICY.md)<br>[actual Private signing](docs/YT-020-PRIVATE-SIGNING-VERIFICATION.md) |
 
+## Todo — remaining M11 work
+
+| ID | Priority | Work item | Depends on | Plan |
+|---|---|---|---|---|
+| `YT-075` | medium | Browser WebGPU island and SSR fallback | YT-069, YT-023 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-076` | medium | GPU lifecycle/resource ownership | YT-075 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-077` | medium | Matched dynamic renderer measurements | YT-076 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-078` | medium | Picking and semantic accessibility alternative | YT-077 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-079` | medium | Approved opt-in yetlet-wgpu candidate | YT-078 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-080` | medium | Selected renderer target qualification | YT-079 | [GPU plan](docs/M11-WGPU-PLAN.md) |
+| `YT-081` | medium | Selected M11 closeout and unmet gates | YT-074, YT-080 | [M11 plan](docs/M11-PLAN.md) |
+
 ## Done
 
 | ID | Priority | Work item | Depends on | Evidence |
 |---|---|---|---|---|
+| `YT-074` | medium | Owner-amended full mixed load, IME, spoken AT, Chrome/Firefox and independent review PASS | YT-073 | [Current results and retained failures](docs/YT-074-QUALIFICATION.md) |
+| `YT-073` | medium | Persisted Board, repaired native login and Chrome/Firefox journeys | YT-071, YT-072 | [Current evidence](docs/M11-P-BOARD-VERIFICATION.md), [screenshots](docs/screenshots/m11-board/README.md) |
+| `YT-070` | medium | Native form and existing-CSS proof | YT-069 | [Native and Chrome proof](docs/M11-P-FORM-ASSET-VERIFICATION.md) |
+| `YT-071` | medium | Selected native/application-owned form contract | YT-070 | [Bounded decision and limits](docs/M11-P-FORM-ASSET-VERIFICATION.md) |
+| `YT-072` | medium | Retain application stylesheet wrappers | YT-070 | [Consumer evidence](docs/M11-P-FORM-ASSET-VERIFICATION.md) |
 | `YT-001` | high | Repository docs / ADR / roadmap / backlog | — | — |
 | `YT-002` | high | Cargo workspace + native/WASM targets | YT-001 | — |
 | `YT-003` | high | Minimal shared `Component/View` model | YT-002 | — |
@@ -81,3 +100,4 @@ Derived from [`todo-ledger.json`](todo-ledger.json). The project backlog source 
 | `YT-066` | medium | Qualify distributed providers and operational behavior | YT-046, YT-054, YT-057, YT-059 | [M10g evidence](docs/M10G-VERIFICATION.md)<br>[YT-066b1](docs/YT-066B1-VERIFICATION.md)<br>[YT-066b2](docs/YT-066B2-VERIFICATION.md)<br>[YT-066b3](docs/YT-066B3-VERIFICATION.md) |
 | `YT-067` | high | Perform Codex-assisted internal security scan | YT-063, YT-064 | [M10h evidence](docs/M10H-VERIFICATION.md) |
 | `YT-068` | medium | Refresh developer entry, candidate documentation and evidence-preserving navigation/status | YT-067 | [Documentation-stage record](docs/README.md#documentation-delivery-status--yt-068)<br>[final Private source/package boundary](docs/YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) |
+| `YT-069` | medium | Integrated M11 documentation and permitted self-review | YT-068, YT-023 | [Plan](docs/M11-PLAN.md), [documentation-only self-review](docs/M11-PLANNING-REVIEW.md) |

@@ -1,0 +1,477 @@
+{
+  "task": "YT-074",
+  "date": "2026-10-13",
+  "candidate_head": "f00ec597e43f129a649fd1b8805fdd89edb93fbb",
+  "binary_sha256": "085011ee5c237aa141283a08fab15975e45385c7feb35dca16e9ad4a8ef00346",
+  "real_ime": {
+    "head": "f00ec597e43f129a649fd1b8805fdd89edb93fbb",
+    "browser": "157.0.1",
+    "os": "Ubuntu 26.04.1 LTS / Xfce X11",
+    "fcitx5": "5.1.19-1",
+    "chewing": "5.1.10-1",
+    "input_route": "AT-SPI native key synthesis to foreground owned Firefox; Fcitx5 Chewing candidate composition",
+    "title": "\u59b3\u597d",
+    "description_control": "\u4f60\u597d\n\u6e2c\u8a66",
+    "description_stored": "\u4f60\u597d\r\n\u6e2c\u8a66",
+    "newer_title": "\u59b3\u597d\u597d",
+    "stale_title": "\u59b3\u597d\u6e2c\u8a66",
+    "composition_events": [
+      {
+        "type": "compositionstart",
+        "target": "title",
+        "data": "",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "title",
+        "data": "\u310b",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u310b",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "title",
+        "data": "\u310b\u3127",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u310b\u3127",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "title",
+        "data": "\u4f60",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u4f60",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u4f60",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "title",
+        "data": "\u59b3",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u59b3",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u59b3",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionend",
+        "target": "title",
+        "data": "\u59b3",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u59b3",
+        "isComposing": false,
+        "trusted": true
+      },
+      {
+        "type": "compositionstart",
+        "target": "title",
+        "data": "",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "title",
+        "data": "\u310f",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u310f",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "title",
+        "data": "\u310f\u3120",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u310f\u3120",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "title",
+        "data": "\u597d",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u597d",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u597d",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionend",
+        "target": "title",
+        "data": "\u597d",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "title",
+        "data": "\u597d",
+        "isComposing": false,
+        "trusted": true
+      },
+      {
+        "type": "compositionstart",
+        "target": "description",
+        "data": "",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "description",
+        "data": "\u310b",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u310b",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "description",
+        "data": "\u310b\u3127",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u310b\u3127",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "description",
+        "data": "\u59b3",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u59b3",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "description",
+        "data": "\u59b3\u310f",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u59b3\u310f",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "description",
+        "data": "\u59b3\u310f\u3120",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u59b3\u310f\u3120",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "description",
+        "data": "\u4f60\u597d",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u4f60\u597d",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u4f60\u597d",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionend",
+        "target": "description",
+        "data": "\u4f60\u597d",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u4f60\u597d",
+        "isComposing": false,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": null,
+        "isComposing": false,
+        "trusted": true
+      },
+      {
+        "type": "compositionstart",
+        "target": "description",
+        "data": "",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "description",
+        "data": "\u3118",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u3118",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "description",
+        "data": "\u3118\u311c",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u3118\u311c",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "description",
+        "data": "\u6e2c",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u6e2c",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "description",
+        "data": "\u6e2c\u3115",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u6e2c\u3115",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionupdate",
+        "target": "description",
+        "data": "\u6e2c\u8a66",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u6e2c\u8a66",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u6e2c\u8a66",
+        "isComposing": true,
+        "trusted": true
+      },
+      {
+        "type": "compositionend",
+        "target": "description",
+        "data": "\u6e2c\u8a66",
+        "isComposing": null,
+        "trusted": true
+      },
+      {
+        "type": "input",
+        "target": "description",
+        "data": "\u6e2c\u8a66",
+        "isComposing": false,
+        "trusted": true
+      }
+    ],
+    "validation": {
+      "http_status": 422,
+      "title": "\u59b3\u597d",
+      "description": "\u4f60\u597d\n\u6e2c\u8a66",
+      "focus": "BODY",
+      "alert": [
+        {
+          "text": "Reopen a closed item before changing it to Active or Blocked.",
+          "id": "",
+          "tabindex": null
+        }
+      ],
+      "describedby": null
+    },
+    "conflict": {
+      "status": 409,
+      "title": "\u59b3\u597d\u6e2c\u8a66",
+      "description": "\u4f60\u597d\n\u6e2c\u8a66",
+      "alert": "Another change was saved first. Your draft was not saved; review the latest version before retrying.",
+      "links": [
+        {
+          "text": "Back to work items",
+          "href": "/board/projects/1/items"
+        },
+        {
+          "text": "Open the latest stored version before reapplying this draft",
+          "href": "/board/projects/1/items/1"
+        }
+      ],
+      "focus": "BODY"
+    },
+    "storage_after_conflict": {
+      "title": "\u59b3\u597d\u597d",
+      "description": "\u4f60\u597d\r\n\u6e2c\u8a66",
+      "version": 3
+    },
+    "cleanup": "Logged out; owned Firefox/geckodriver/server closed; both loopback listeners closed; synthetic database, credential logs and owned temporary directories removed; original keyboard-us IME restored.",
+    "field_validation": {
+      "status": 422,
+      "title": "   ",
+      "description": "\u4f60\u597d\n\u6e2c\u8a66",
+      "title_invalid": "true",
+      "title_describedby": "title-error",
+      "field_text": "Enter 1 to 160 characters without control characters.",
+      "summary": "Correct the highlighted fields. Your draft has not been saved.",
+      "focus": "BODY"
+    },
+    "authoritative_read_after_conflict": true,
+    "status": "pass",
+    "notes": [
+      "Native form submission normalizes description LF to CRLF in storage; textarea reads back LF.",
+      "Two generic submit clicks selected Sign out; storage stayed at version 1. Explicit form-action selectors were then used. No mutation was blindly replayed.",
+      "An observation named error was rejected by the existing WebDriver wrapper; the fresh observation used a different key. No application or shared helper edit.",
+      "Capture 05 showed pre-navigation paint and is excluded from acceptance; capture 06 shows the settled 409 page."
+    ]
+  },
+  "spoken_at": {
+    "screen_reader": "Orca 50.2",
+    "speech_dispatcher": "0.12.1",
+    "browser": "Firefox 157.0.1",
+    "status": "blocked",
+    "reason": "Firefox did not register on the desktop AT-SPI bus; actual Orca speech contains startup, shutdown and key echo only, not Board content.",
+    "first_attempt_speech": [
+      "10:27:01.576866 - SPEECH OUTPUT: 'Screen reader on.' {'established': False}",
+      "10:27:26.177596 - SPEECH OUTPUT: 'tab' {'established': False, 'family': {'name': '', 'gender': None, 'lang': 'C', 'dialect': '', 'variant': None}}",
+      "10:27:56.787819 - SPEECH OUTPUT: '+' {'established': 'False', 'family': \"{'dialect': '', 'gender': 'None', 'lang': 'C', 'name': '', 'variant': 'None'}\"}",
+      "10:29:19.808643 - SPEECH OUTPUT: 'Screen reader off.' {'established': False}"
+    ],
+    "corrected_attempt_speech": [
+      "10:30:32.193213 - SPEECH OUTPUT: 'Screen reader on.' {'established': False}",
+      "10:30:48.960458 - SPEECH OUTPUT: 'tab' {'established': False, 'family': {'name': '', 'gender': None, 'lang': 'C', 'dialect': '', 'variant': None}}",
+      "10:30:49.114314 - SPEECH OUTPUT: 'return' {'established': False, 'family': {'name': '', 'gender': None, 'lang': 'C', 'dialect': '', 'variant': None}}",
+      "10:30:49.272547 - SPEECH OUTPUT: 'tab' {'established': False, 'family': {'name': '', 'gender': None, 'lang': 'C', 'dialect': '', 'variant': None}}",
+      "10:30:49.463621 - SPEECH OUTPUT: '+' {'established': 'False', 'family': \"{'dialect': '', 'gender': 'None', 'lang': 'C', 'name': '', 'variant': 'None'}\"}",
+      "10:30:49.611208 - SPEECH OUTPUT: 'Screen reader off.' {'established': False}"
+    ],
+    "correction": "Temporarily enabled org.a11y.Status.ScreenReaderEnabled from false; same browser remained absent. No further recovery.",
+    "cleanup": "Both owned Orca attempts exited 0; task-started Speech Dispatcher stopped; ScreenReaderEnabled restored to false; raw private debug logs/config removed."
+  }
+}

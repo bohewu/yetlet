@@ -25,9 +25,9 @@ The sample owns English at the root document through `DocumentMetadata` and `Lan
 ```bash
 cargo test --locked -p yetlet-forms-validation --all-targets
 cargo build --locked -p yetlet-forms-validation
-python3 scripts/smoke_forms_validation.py
+cargo xtask smoke forms-validation
 cargo tree --locked -p yetlet-forms-validation
-python3 scripts/check_samples.py
+cargo xtask check samples
 ```
 
 This is a bounded prototype for ergonomics and accessible markup, not a production identity, registration or email-verification flow. See [M9c verification](../../docs/M9C-VERIFICATION.md).

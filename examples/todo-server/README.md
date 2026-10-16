@@ -7,7 +7,7 @@ This is Yetlet's integrated full-stack sample. It combines native SSR, a browser
 From the repository root:
 
 ```bash
-python3 scripts/build_browser.py && cargo run -p yetlet-todo-server
+cargo xtask build browser && cargo run -p yetlet-todo-server
 ```
 
 Open:
@@ -23,8 +23,8 @@ The server never compiles WASM on request. Browser artifacts are built ahead of 
 
 ```bash
 cargo test --locked -p yetlet-todo-server --all-targets
-python3 scripts/build_browser.py
-python3 scripts/smoke_browser.py
+cargo xtask build browser
+cargo xtask smoke browser-chrome
 ```
 
 Complete retained evidence is in [M7j verification](../../docs/M7J-VERIFICATION.md).

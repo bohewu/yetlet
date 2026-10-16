@@ -43,7 +43,7 @@ async fn browser_shell() -> Response {
         Ok(html) => Html(html).into_response(),
         Err(_) => (
             StatusCode::SERVICE_UNAVAILABLE,
-            "Build browser assets first: python3 scripts/build_browser.py",
+            "Build browser assets first: cargo xtask build browser",
         )
             .into_response(),
     };

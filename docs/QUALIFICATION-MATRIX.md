@@ -36,7 +36,7 @@ records the later authorized protected-check migration after actual Rust 1.99 CI
 
 [Qualification workflow](../.github/workflows/qualification.yml) has only
 `schedule` (Wednesday 03:17 UTC) and `workflow_dispatch`. It grants only
-`contents: read`, uses full-SHA GitHub-owned checkout/setup-python/upload
+`contents: read`, uses full-SHA GitHub-owned checkout/upload
 actions, disables persisted checkout credentials, cancels superseded runs,
 limits native parallelism to two, and limits native/Firefox jobs to 35/60
 minutes. It neither supplies secrets nor requests token write or id-token
@@ -58,31 +58,31 @@ The Firefox job explicitly requires that directory's executable, puts it on
 PATH, and checks Firefox plus both versions before builds. Missing tools fail
 the job; no floating driver download or silent browser substitution occurs.
 Image software can change: each run records `ImageOS`, `ImageVersion`, source
-SHA, Rust host/tool versions, Python and browser/driver versions. Current
+SHA, Rust host/tool versions, Rust xtask and browser/driver versions. Current
 observations, rather than this inventory, establish the tested versions.
 
 Artifacts retain only named qualification build/test/identity logs and the
 sanitized forms JSON report for seven days, with unique lane/run/attempt names
 and `always()` upload. No entire `target` tree, profiles, raw page state,
-cookies or arbitrary environment dump is uploaded. Cargo and Python failures
+cookies or arbitrary environment dump is uploaded. Cargo and xtask failures
 propagate through Bash `set -euo pipefail` even when stderr/stdout feed `tee`.
 Job timeout/cancellation may prevent normal harness cleanup; the hosted runner
 is disposable, and an interrupted job is not a successful qualification.
 
 ## One bounded local sequence (main session only)
 
-Use prebuilt release assets from `build_browser.py --release`,
-`build_keyed_bindings.py --release` and
-`build_multi_island_dashboard.py --release`, plus release native binaries
+Use prebuilt release assets from `cargo xtask build browser --release`,
+`cargo xtask build keyed-bindings --release` and
+`cargo xtask build multi-island-dashboard --release`, plus release native binaries
 `yetlet-todo-server`, `yetlet-multi-island-dashboard` and
 `yetlet-forms-validation`. Require Firefox and geckodriver on PATH and record
 their versions together with Rust and source identity. Run each command once:
 
 ```sh
-python3 scripts/smoke_firefox.py --profile release
-python3 scripts/smoke_keyed_bindings_firefox.py --profile release
-python3 scripts/smoke_multi_island_dashboard_firefox.py --profile release
-python3 scripts/smoke_forms_accessibility_firefox.py --profile release
+cargo xtask smoke browser-firefox --profile release
+cargo xtask smoke keyed-bindings-firefox --profile release
+cargo xtask smoke multi-island-dashboard-firefox --profile release
+cargo xtask smoke forms-accessibility-firefox --profile release
 ```
 
 Stop at failure, classify it before repair, and retain exact exit statuses.

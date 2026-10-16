@@ -1,0 +1,152 @@
+{
+  "bootstrap_version": "5.3.8",
+  "license": "MIT",
+  "source_css_sri": "sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB",
+  "source": [
+    {
+      "file": "upstream/bootstrap.min.css",
+      "url": "https://raw.githubusercontent.com/twbs/bootstrap/v5.3.8/dist/css/bootstrap.min.css",
+      "sha256": "d85327d99c7a3ee1f9b5d0500d1370acea3ad2db39c163c2f51f232baedbdede"
+    },
+    {
+      "file": "upstream/LICENSE.bootstrap",
+      "url": "https://raw.githubusercontent.com/twbs/bootstrap/v5.3.8/LICENSE",
+      "sha256": "4620c84ad5ce8602ff65640ed6b7c8b78ebb9e036584f0ebc1ccc88206a4bb51"
+    }
+  ],
+  "externalized_svg_occurrences": 23,
+  "outputs": [
+    {
+      "file": "generated/app-3d02836b344025fc21cf614aaaa89e7fb1e8550eac9063ae4cc2c6b8ea70d034.css",
+      "sha256": "3d02836b344025fc21cf614aaaa89e7fb1e8550eac9063ae4cc2c6b8ea70d034",
+      "bytes": 2027,
+      "content_type": "text/css; charset=utf-8"
+    },
+    {
+      "file": "generated/bootstrap-27451ae61f2b2d18f57ee31e25900379462c0c6020797a37c7845e7f5c2dc3c7.css",
+      "sha256": "27451ae61f2b2d18f57ee31e25900379462c0c6020797a37c7845e7f5c2dc3c7",
+      "bytes": 229061,
+      "content_type": "text/css; charset=utf-8"
+    },
+    {
+      "file": "generated/enhance-1005530f29d529e4ec1c3d145719f13a42c937893984922834f11502a751b21e.js",
+      "sha256": "1005530f29d529e4ec1c3d145719f13a42c937893984922834f11502a751b21e",
+      "bytes": 3471,
+      "content_type": "text/javascript; charset=utf-8"
+    },
+    {
+      "file": "generated/icon-0134375b1ced2e2b36e9a34753f87b48b49dab1ce589ec8a2932764d31ada657.svg",
+      "sha256": "0134375b1ced2e2b36e9a34753f87b48b49dab1ce589ec8a2932764d31ada657",
+      "bytes": 93,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-0bceaa1baec505f40d769ab0e068ddbc26906a602252a082e55126188326565d.svg",
+      "sha256": "0bceaa1baec505f40d769ab0e068ddbc26906a602252a082e55126188326565d",
+      "bytes": 183,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-0c16c043cda72e1e62b62d185e9c41ba1b0e3bcf22f426fa1d85f29f8603b869.svg",
+      "sha256": "0c16c043cda72e1e62b62d185e9c41ba1b0e3bcf22f426fa1d85f29f8603b869",
+      "bytes": 166,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-4a55a7db84e9a6944938ab3bda5661c8ea8093813a7e7365b73d402bf9d87d4a.svg",
+      "sha256": "4a55a7db84e9a6944938ab3bda5661c8ea8093813a7e7365b73d402bf9d87d4a",
+      "bytes": 196,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-62a6e9d6aad62db5813930cd33dc57a13d6e0e65fa69fd8396cf1356ba1637bb.svg",
+      "sha256": "62a6e9d6aad62db5813930cd33dc57a13d6e0e65fa69fd8396cf1356ba1637bb",
+      "bytes": 207,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-678add1e84d8c9c25c1867cb090d4e67e2ec6702fd87dbdb1804adc44cecc4bb.svg",
+      "sha256": "678add1e84d8c9c25c1867cb090d4e67e2ec6702fd87dbdb1804adc44cecc4bb",
+      "bytes": 280,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-6f9349dc5c5def976a8588bdb2d19c146100b44d2e0b92a05b46b16d88935897.svg",
+      "sha256": "6f9349dc5c5def976a8588bdb2d19c146100b44d2e0b92a05b46b16d88935897",
+      "bytes": 114,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-77e67409caaf5014eaa2e2d96ac6210a1b4a987da0d5b3ff826221fe255d3def.svg",
+      "sha256": "77e67409caaf5014eaa2e2d96ac6210a1b4a987da0d5b3ff826221fe255d3def",
+      "bytes": 199,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-7fd467d27ef40cdaed73685e3d55006dd24a34223c2183d8d805f94f17b3aa1d.svg",
+      "sha256": "7fd467d27ef40cdaed73685e3d55006dd24a34223c2183d8d805f94f17b3aa1d",
+      "bytes": 181,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-84625a3b45c8eb5ee5a872d3337535244ddd936cef17fdc64a3b2be5cabc201e.svg",
+      "sha256": "84625a3b45c8eb5ee5a872d3337535244ddd936cef17fdc64a3b2be5cabc201e",
+      "bytes": 206,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-859790d507acd06e12295953099b5025fc6d49d41683e0af085c5f8513f3c3c7.svg",
+      "sha256": "859790d507acd06e12295953099b5025fc6d49d41683e0af085c5f8513f3c3c7",
+      "bytes": 93,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-8f27b2160255b0a3bbe960f0af6a1772a8514e2b3ba0acbeea1e622ebb5f3e4a.svg",
+      "sha256": "8f27b2160255b0a3bbe960f0af6a1772a8514e2b3ba0acbeea1e622ebb5f3e4a",
+      "bytes": 108,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-a878779be93e948ae1a8a98452a0b1b298388df10434ebccd94a7637f8ab7de0.svg",
+      "sha256": "a878779be93e948ae1a8a98452a0b1b298388df10434ebccd94a7637f8ab7de0",
+      "bytes": 192,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-a94a3d881f308b949c412d9a4ed0f43d523cc356add6ae98162b326d41a57bfd.svg",
+      "sha256": "a94a3d881f308b949c412d9a4ed0f43d523cc356add6ae98162b326d41a57bfd",
+      "bytes": 230,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-cd6b12f62f103ba1a2810c2de948046c8a8dc898ff0ebd9f6e8e13a8d85cf8e2.svg",
+      "sha256": "cd6b12f62f103ba1a2810c2de948046c8a8dc898ff0ebd9f6e8e13a8d85cf8e2",
+      "bytes": 96,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-d8c89b0459ec4d6069037002ff5d824395ff37dbf866bc4298fce22d336b182a.svg",
+      "sha256": "d8c89b0459ec4d6069037002ff5d824395ff37dbf866bc4298fce22d336b182a",
+      "bytes": 183,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-df765b1b79da2c8f2458794a718c2fe51b04b6a527bb80bb9cbef207aea70547.svg",
+      "sha256": "df765b1b79da2c8f2458794a718c2fe51b04b6a527bb80bb9cbef207aea70547",
+      "bytes": 175,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-ece2e95e0833a3ca202d786151532f388ff73be29ea66334534ed1fa597dfd7d.svg",
+      "sha256": "ece2e95e0833a3ca202d786151532f388ff73be29ea66334534ed1fa597dfd7d",
+      "bytes": 264,
+      "content_type": "image/svg+xml"
+    },
+    {
+      "file": "generated/icon-fecf7f86be3b36cad3e6d5a82c7735c9e5736776bee603c8d3418935b25731c7.svg",
+      "sha256": "fecf7f86be3b36cad3e6d5a82c7735c9e5736776bee603c8d3418935b25731c7",
+      "bytes": 166,
+      "content_type": "image/svg+xml"
+    }
+  ]
+}

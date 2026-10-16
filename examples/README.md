@@ -14,7 +14,7 @@ Every catalogued sample must provide:
 Run the catalog gate with:
 
 ```bash
-python3 scripts/check_samples.py
+cargo xtask check samples
 ```
 
 ## Getting started

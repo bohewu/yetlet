@@ -43,9 +43,9 @@ Publishing accepts exactly one `application/json` Content-Type, rejects all brow
 ```bash
 cargo test --locked -p yetlet-sse-notifications --all-targets
 cargo build --locked -p yetlet-sse-notifications
-python3 scripts/smoke_sse_notifications.py
+cargo xtask smoke sse-notifications
 cargo tree --locked -p yetlet-sse-notifications --edges normal
-python3 scripts/check_samples.py
+cargo xtask check samples
 ```
 
 See [M9f verification](../../docs/M9F-VERIFICATION.md) for retained regression, dependency-isolation and reviewer evidence.

@@ -1,0 +1,2360 @@
+{
+  "task": "YT-074",
+  "date": "2026-10-13",
+  "status": "pass",
+  "timezone": "Asia/Taipei (UTC+08:00)",
+  "head": "f00ec597e43f129a649fd1b8805fdd89edb93fbb",
+  "candidate": "Existing master plus uncommitted application live-status, canonical qualification-helper and evidence changes.",
+  "environment": {
+    "os": "Ubuntu 26.04.1 LTS",
+    "kernel": "7.0.0-38-generic",
+    "desktop": "Xfce X11 :0",
+    "browser": "Firefox 157.0.1 (headful, isolated profile)",
+    "screen_reader": "Orca 50.2",
+    "speech_dispatcher": "0.12.1",
+    "accessibility_startup": "GNOME_ACCESSIBILITY=1 and owned Firefox accessibility.force_disabled=-1 before startup; Firefox PID observed on desktop AT-SPI bus."
+  },
+  "method": {
+    "speech": "Actual Orca Speech Dispatcher backend Speaking <speak> records, XML markup removed and entities decoded; local timestamps retained. This is generated speech output, not an audio recording or an inference from ARIA.",
+    "input": "Native AT-SPI key synthesis through the owned X11 Firefox window, checked by foreground PID before each key. WebDriver selected controls and submitted real forms; it did not fabricate accessibility events or speech.",
+    "settings": "Private Orca configuration/data; GSETTINGS_BACKEND=memory. Temporary runtime speech rate and SayAllOnLoad settings were process-local. No software installed.",
+    "privacy": "Synthetic records only. No login code, Cookie, CSRF, raw request, browser profile or private debug log retained."
+  },
+  "transcripts": [
+    {
+      "id": "baseline_non_live",
+      "source_file": "target/m11-board/at-repair-20261013/speech-before-fix.json",
+      "source_sha256": "4cbdcedc0ce63cb4f9f65aa6896271d624300f432ff9e1345b9a4f067d3ea2b2",
+      "binary_sha256": "085011ee5c237aa141283a08fab15975e45385c7feb35dca16e9ad4a8ef00346",
+      "scope": "Accepted for unchanged non-live pages. The missing live announcement in this same recording is a preserved product failure.",
+      "utterances": [
+        {
+          "time_local": "11:09:22.483771",
+          "utterance": "Screen reader on."
+        },
+        {
+          "time_local": "11:09:43.926109",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:09:44.110966",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:09:44.111357",
+          "utterance": "link."
+        },
+        {
+          "time_local": "11:09:44.152975",
+          "utterance": "Browse mode"
+        },
+        {
+          "time_local": "11:10:00.779629",
+          "utterance": "return"
+        },
+        {
+          "time_local": "11:10:00.860637",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:10:00.861158",
+          "utterance": "Work items"
+        },
+        {
+          "time_local": "11:10:00.861598",
+          "utterance": "heading 1"
+        },
+        {
+          "time_local": "11:10:01.124626",
+          "utterance": "Work items | Lab Operations"
+        },
+        {
+          "time_local": "11:10:01.124829",
+          "utterance": "document web"
+        },
+        {
+          "time_local": "11:10:01.140075",
+          "utterance": "Finished loading Work items | Lab Operations."
+        },
+        {
+          "time_local": "11:10:01.142464",
+          "utterance": "Page has 5 landmarks, 1 heading, 2 forms, 2 visited links, 4 unvisited links."
+        },
+        {
+          "time_local": "11:10:01.204258",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:10:02.548842",
+          "utterance": "visited link"
+        },
+        {
+          "time_local": "11:10:03.720779",
+          "utterance": "Lab Operations"
+        },
+        {
+          "time_local": "11:10:05.017057",
+          "utterance": "link"
+        },
+        {
+          "time_local": "11:10:05.705678",
+          "utterance": "alice / Operator / Project 1"
+        },
+        {
+          "time_local": "11:10:08.183390",
+          "utterance": "Sign out"
+        },
+        {
+          "time_local": "11:10:09.060100",
+          "utterance": "button"
+        },
+        {
+          "time_local": "11:10:09.795500",
+          "utterance": "Work items"
+        },
+        {
+          "time_local": "11:10:10.926966",
+          "utterance": "visited link"
+        },
+        {
+          "time_local": "11:10:12.101426",
+          "utterance": "New work item"
+        },
+        {
+          "time_local": "11:10:13.364016",
+          "utterance": "link"
+        },
+        {
+          "time_local": "11:10:14.058166",
+          "utterance": "Work items"
+        },
+        {
+          "time_local": "11:10:15.190319",
+          "utterance": "heading 1"
+        },
+        {
+          "time_local": "11:10:16.206073",
+          "utterance": "0 total · 0 open · 0 active · 0 blocked · 0 closed"
+        },
+        {
+          "time_local": "11:10:22.232021",
+          "utterance": "Enable optional live status"
+        },
+        {
+          "time_local": "11:10:24.176386",
+          "utterance": "link"
+        },
+        {
+          "time_local": "11:10:24.930764",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:10:26.075064",
+          "utterance": "All"
+        },
+        {
+          "time_local": "11:10:26.680769",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:10:27.910584",
+          "utterance": "Sort"
+        },
+        {
+          "time_local": "11:10:28.606157",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:10:29.740517",
+          "utterance": "Latest update"
+        },
+        {
+          "time_local": "11:10:30.967220",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:10:32.205300",
+          "utterance": "Apply filters"
+        },
+        {
+          "time_local": "11:10:33.383486",
+          "utterance": "button"
+        },
+        {
+          "time_local": "11:10:34.114553",
+          "utterance": "New work item"
+        },
+        {
+          "time_local": "11:10:35.387868",
+          "utterance": "link"
+        },
+        {
+          "time_local": "11:10:36.087890",
+          "utterance": "No work items match this page and filter. "
+        },
+        {
+          "time_local": "11:10:38.263909",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:10:38.297745",
+          "utterance": "leaving main content."
+        },
+        {
+          "time_local": "11:10:38.298056",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:10:38.298428",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:11:02.985652",
+          "utterance": "escape"
+        },
+        {
+          "time_local": "11:11:03.354781",
+          "utterance": "landmark"
+        },
+        {
+          "time_local": "11:11:03.355010",
+          "utterance": "blank."
+        },
+        {
+          "time_local": "11:11:03.392340",
+          "utterance": "New work item | Lab Operations"
+        },
+        {
+          "time_local": "11:11:03.392560",
+          "utterance": "document web"
+        },
+        {
+          "time_local": "11:11:03.410918",
+          "utterance": "Finished loading New work item | Lab Operations."
+        },
+        {
+          "time_local": "11:11:03.413600",
+          "utterance": "Page has 4 landmarks, 1 heading, 2 forms, 3 visited links, 2 unvisited links."
+        },
+        {
+          "time_local": "11:11:03.471815",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:11:04.819720",
+          "utterance": "link"
+        },
+        {
+          "time_local": "11:11:05.509803",
+          "utterance": "Lab Operations"
+        },
+        {
+          "time_local": "11:11:06.807120",
+          "utterance": "link"
+        },
+        {
+          "time_local": "11:11:07.494612",
+          "utterance": "alice / Operator / Project 1"
+        },
+        {
+          "time_local": "11:11:10.004753",
+          "utterance": "Sign out"
+        },
+        {
+          "time_local": "11:11:10.893575",
+          "utterance": "button"
+        },
+        {
+          "time_local": "11:11:11.624010",
+          "utterance": "Work items"
+        },
+        {
+          "time_local": "11:11:12.754162",
+          "utterance": "visited link"
+        },
+        {
+          "time_local": "11:11:13.939703",
+          "utterance": "New work item"
+        },
+        {
+          "time_local": "11:11:15.202354",
+          "utterance": "visited link"
+        },
+        {
+          "time_local": "11:11:16.366673",
+          "utterance": "New work item"
+        },
+        {
+          "time_local": "11:11:17.631298",
+          "utterance": "heading 1"
+        },
+        {
+          "time_local": "11:11:18.670843",
+          "utterance": "Back to work items"
+        },
+        {
+          "time_local": "11:11:20.201733",
+          "utterance": "visited link"
+        },
+        {
+          "time_local": "11:11:21.497117",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:11:22.633579",
+          "utterance": "Open"
+        },
+        {
+          "time_local": "11:11:23.347220",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:11:24.573813",
+          "utterance": "Priority"
+        },
+        {
+          "time_local": "11:11:25.465680",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:11:26.599079",
+          "utterance": "Normal"
+        },
+        {
+          "time_local": "11:11:27.333512",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:11:28.564299",
+          "utterance": "Assignee"
+        },
+        {
+          "time_local": "11:11:29.372614",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:11:30.502275",
+          "utterance": "Unassigned"
+        },
+        {
+          "time_local": "11:11:31.403495",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:11:32.627878",
+          "utterance": "Closing preserves the record and its history. "
+        },
+        {
+          "time_local": "11:11:35.545945",
+          "utterance": "Reopen a closed item before moving it to Active or Blocked."
+        },
+        {
+          "time_local": "11:11:39.149142",
+          "utterance": "Create work item"
+        },
+        {
+          "time_local": "11:11:40.591572",
+          "utterance": "button"
+        },
+        {
+          "time_local": "11:11:41.316255",
+          "utterance": "Reset draft"
+        },
+        {
+          "time_local": "11:11:42.374761",
+          "utterance": "button"
+        },
+        {
+          "time_local": "11:11:43.106132",
+          "utterance": "information"
+        },
+        {
+          "time_local": "11:11:43.656579",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:11:43.968920",
+          "utterance": "return"
+        },
+        {
+          "time_local": "11:11:44.271722",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:11:44.297057",
+          "utterance": "banner"
+        },
+        {
+          "time_local": "11:11:44.297383",
+          "utterance": "Lab Operations"
+        },
+        {
+          "time_local": "11:11:44.297600",
+          "utterance": "link."
+        },
+        {
+          "time_local": "11:11:44.577103",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:11:44.609757",
+          "utterance": "Sign out"
+        },
+        {
+          "time_local": "11:11:44.610126",
+          "utterance": "button."
+        },
+        {
+          "time_local": "11:12:43.801001",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:12:43.834931",
+          "utterance": "leaving form."
+        },
+        {
+          "time_local": "11:12:43.835182",
+          "utterance": "leaving banner."
+        },
+        {
+          "time_local": "11:12:43.835496",
+          "utterance": "navigation"
+        },
+        {
+          "time_local": "11:12:43.835670",
+          "utterance": "Project navigation"
+        },
+        {
+          "time_local": "11:12:43.835893",
+          "utterance": "Work items"
+        },
+        {
+          "time_local": "11:12:43.836047",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:12:45.613648",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:12:45.646087",
+          "utterance": "New work item"
+        },
+        {
+          "time_local": "11:12:45.646468",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:12:47.418869",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:12:47.451702",
+          "utterance": "leaving navigation."
+        },
+        {
+          "time_local": "11:12:47.451987",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:12:47.452373",
+          "utterance": "Back to work items"
+        },
+        {
+          "time_local": "11:12:47.452651",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:12:49.225722",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:12:49.264014",
+          "utterance": "Title"
+        },
+        {
+          "time_local": "11:12:49.264334",
+          "utterance": "entry required."
+        },
+        {
+          "time_local": "11:12:49.265020",
+          "utterance": "invalid entry."
+        },
+        {
+          "time_local": "11:12:49.267890",
+          "utterance": "Focus mode"
+        },
+        {
+          "time_local": "11:12:51.041555",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:12:51.085006",
+          "utterance": "Description (plain text)"
+        },
+        {
+          "time_local": "11:12:51.085205",
+          "utterance": "entry."
+        },
+        {
+          "time_local": "11:12:52.837471",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:12:52.878110",
+          "utterance": "Status"
+        },
+        {
+          "time_local": "11:12:52.878440",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:12:52.878706",
+          "utterance": "Open."
+        },
+        {
+          "time_local": "11:12:52.879440",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:12:54.641489",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:12:54.677753",
+          "utterance": "Priority"
+        },
+        {
+          "time_local": "11:12:54.678197",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:12:54.678433",
+          "utterance": "Normal."
+        },
+        {
+          "time_local": "11:12:54.678668",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:12:56.449131",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:12:56.480941",
+          "utterance": "Assignee"
+        },
+        {
+          "time_local": "11:12:56.481286",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:12:56.481525",
+          "utterance": "Unassigned."
+        },
+        {
+          "time_local": "11:12:56.481732",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:12:58.259619",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:12:58.305662",
+          "utterance": "Create work item"
+        },
+        {
+          "time_local": "11:12:58.306162",
+          "utterance": "button."
+        },
+        {
+          "time_local": "11:12:58.311927",
+          "utterance": "Browse mode"
+        },
+        {
+          "time_local": "11:14:09.732466",
+          "utterance": "Title"
+        },
+        {
+          "time_local": "11:14:09.732839",
+          "utterance": "entry."
+        },
+        {
+          "time_local": "11:14:09.750909",
+          "utterance": "Focus mode"
+        },
+        {
+          "time_local": "11:14:09.783200",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:14:09.844077",
+          "utterance": "leaving form."
+        },
+        {
+          "time_local": "11:14:09.844480",
+          "utterance": "Correct fields | Lab Operations"
+        },
+        {
+          "time_local": "11:14:09.844737",
+          "utterance": "document web"
+        },
+        {
+          "time_local": "11:14:09.849048",
+          "utterance": "Browse mode"
+        },
+        {
+          "time_local": "11:14:09.887321",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:14:09.887512",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:14:09.907630",
+          "utterance": "Finished loading Correct fields | Lab Operations."
+        },
+        {
+          "time_local": "11:14:09.910203",
+          "utterance": "Page has 4 landmarks, 1 heading, 2 forms, 4 visited links, 1 unvisited link."
+        },
+        {
+          "time_local": "11:14:11.011937",
+          "utterance": "return"
+        },
+        {
+          "time_local": "11:14:11.066273",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:14:11.066826",
+          "utterance": "New work item"
+        },
+        {
+          "time_local": "11:14:11.067091",
+          "utterance": "heading 1"
+        },
+        {
+          "time_local": "11:14:12.331837",
+          "utterance": "New work item"
+        },
+        {
+          "time_local": "11:14:13.086348",
+          "utterance": "Back to work items"
+        },
+        {
+          "time_local": "11:14:13.959170",
+          "utterance": "visited link"
+        },
+        {
+          "time_local": "11:14:14.632288",
+          "utterance": "Title"
+        },
+        {
+          "time_local": "11:14:15.042558",
+          "utterance": "entry"
+        },
+        {
+          "time_local": "11:14:15.418978",
+          "utterance": "required"
+        },
+        {
+          "time_local": "11:14:15.934500",
+          "utterance": "invalid entry"
+        },
+        {
+          "time_local": "11:14:16.593559",
+          "utterance": "Enter 1 to 160 characters without control characters."
+        },
+        {
+          "time_local": "11:14:19.406595",
+          "utterance": "entry"
+        },
+        {
+          "time_local": "11:14:19.795194",
+          "utterance": "AT retained description\n                  Second line"
+        },
+        {
+          "time_local": "11:14:21.271506",
+          "utterance": "Status"
+        },
+        {
+          "time_local": "11:14:21.725264",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:14:22.342769",
+          "utterance": "Open"
+        },
+        {
+          "time_local": "11:14:22.698797",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:14:23.401784",
+          "utterance": "Priority"
+        },
+        {
+          "time_local": "11:14:23.876668",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:14:24.503786",
+          "utterance": "Normal"
+        },
+        {
+          "time_local": "11:14:24.869621",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:14:25.576375",
+          "utterance": "Assignee"
+        },
+        {
+          "time_local": "11:14:25.950490",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:14:26.568368",
+          "utterance": "Unassigned"
+        },
+        {
+          "time_local": "11:14:27.036674",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:14:27.730268",
+          "utterance": "Closing preserves the record and its history. "
+        },
+        {
+          "time_local": "11:14:29.478074",
+          "utterance": "Reopen a closed item before moving it to Active or Blocked."
+        },
+        {
+          "time_local": "11:14:31.638684",
+          "utterance": "Create work item"
+        },
+        {
+          "time_local": "11:14:32.449270",
+          "utterance": "button"
+        },
+        {
+          "time_local": "11:14:32.811425",
+          "utterance": "Reset draft"
+        },
+        {
+          "time_local": "11:14:33.395988",
+          "utterance": "button"
+        },
+        {
+          "time_local": "11:14:33.761451",
+          "utterance": "information"
+        },
+        {
+          "time_local": "11:14:34.322739",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:15:09.228549",
+          "utterance": "escape"
+        },
+        {
+          "time_local": "11:15:09.574060",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:15:09.574552",
+          "utterance": "Title"
+        },
+        {
+          "time_local": "11:15:09.574939",
+          "utterance": "entry"
+        },
+        {
+          "time_local": "11:15:09.575324",
+          "utterance": "required."
+        },
+        {
+          "time_local": "11:15:09.575579",
+          "utterance": "invalid entry."
+        },
+        {
+          "time_local": "11:15:09.575842",
+          "utterance": "Enter 1 to 160 characters without control characters."
+        },
+        {
+          "time_local": "11:15:09.578037",
+          "utterance": "Focus mode"
+        },
+        {
+          "time_local": "11:15:11.608292",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:15:11.656419",
+          "utterance": "Description (plain text)"
+        },
+        {
+          "time_local": "11:15:11.656725",
+          "utterance": "entry"
+        },
+        {
+          "time_local": "11:15:11.656966",
+          "utterance": "AT retained description\n                  "
+        },
+        {
+          "time_local": "11:16:58.395043",
+          "utterance": "Title"
+        },
+        {
+          "time_local": "11:16:58.395336",
+          "utterance": "entry"
+        },
+        {
+          "time_local": "11:16:58.395811",
+          "utterance": "selected required."
+        },
+        {
+          "time_local": "11:16:58.396026",
+          "utterance": "invalid entry."
+        },
+        {
+          "time_local": "11:16:58.396247",
+          "utterance": "Enter 1 to 160 characters without control characters."
+        },
+        {
+          "time_local": "11:16:59.700669",
+          "utterance": "leaving form."
+        },
+        {
+          "time_local": "11:16:59.701528",
+          "utterance": "Back to work items"
+        },
+        {
+          "time_local": "11:16:59.701964",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:16:59.710693",
+          "utterance": "Browse mode"
+        },
+        {
+          "time_local": "11:17:01.031176",
+          "utterance": "Correct the highlighted fields. Your draft has not been saved."
+        },
+        {
+          "time_local": "11:17:02.333698",
+          "utterance": "Title"
+        },
+        {
+          "time_local": "11:17:02.333911",
+          "utterance": "clickable."
+        },
+        {
+          "time_local": "11:17:03.644832",
+          "utterance": "Title"
+        },
+        {
+          "time_local": "11:17:03.645110",
+          "utterance": "entry"
+        },
+        {
+          "time_local": "11:17:03.645466",
+          "utterance": "required."
+        },
+        {
+          "time_local": "11:17:03.645672",
+          "utterance": "invalid entry."
+        },
+        {
+          "time_local": "11:17:03.645882",
+          "utterance": "Enter 1 to 160 characters without control characters."
+        },
+        {
+          "time_local": "11:18:41.386056",
+          "utterance": "AT sensor check"
+        },
+        {
+          "time_local": "11:18:41.390295",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:18:41.421747",
+          "utterance": "leaving form."
+        },
+        {
+          "time_local": "11:18:41.422195",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:18:41.422461",
+          "utterance": "link."
+        },
+        {
+          "time_local": "11:18:41.451266",
+          "utterance": "Finished loading Work item | Lab Operations."
+        },
+        {
+          "time_local": "11:18:41.455181",
+          "utterance": "Page has 4 landmarks, 3 headings, 1 form, 1 table, 3 visited links, 3 unvisited links."
+        },
+        {
+          "time_local": "11:18:42.686248",
+          "utterance": "return"
+        },
+        {
+          "time_local": "11:18:42.741461",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:18:42.741926",
+          "utterance": "Work item"
+        },
+        {
+          "time_local": "11:18:42.742123",
+          "utterance": "heading 1"
+        },
+        {
+          "time_local": "11:18:44.005790",
+          "utterance": "Work item"
+        },
+        {
+          "time_local": "11:18:44.559490",
+          "utterance": "Back to work items"
+        },
+        {
+          "time_local": "11:18:45.421084",
+          "utterance": "visited link"
+        },
+        {
+          "time_local": "11:18:46.088350",
+          "utterance": "AT sensor check"
+        },
+        {
+          "time_local": "11:18:46.738493",
+          "utterance": "heading 2"
+        },
+        {
+          "time_local": "11:18:47.232801",
+          "utterance": "open / normal / assignee Unassigned / version 1"
+        },
+        {
+          "time_local": "11:18:49.326865",
+          "utterance": "AT retained description\n                  Second line"
+        },
+        {
+          "time_local": "11:18:50.809611",
+          "utterance": "Created 1791861521 · Updated 1791861521 (Unix seconds)"
+        },
+        {
+          "time_local": "11:19:00.848848",
+          "utterance": "Edit work item"
+        },
+        {
+          "time_local": "11:19:01.562490",
+          "utterance": "link"
+        },
+        {
+          "time_local": "11:19:01.911870",
+          "utterance": "History"
+        },
+        {
+          "time_local": "11:19:02.319315",
+          "utterance": "heading 2"
+        },
+        {
+          "time_local": "11:19:02.857565",
+          "utterance": "table with 2 rows 6 columns"
+        },
+        {
+          "time_local": "11:19:04.204286",
+          "utterance": "Version"
+        },
+        {
+          "time_local": "11:19:04.628844",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:19:05.198564",
+          "utterance": "Actor"
+        },
+        {
+          "time_local": "11:19:05.538286",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:19:06.095866",
+          "utterance": "Action"
+        },
+        {
+          "time_local": "11:19:06.495165",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:19:07.056711",
+          "utterance": "Title at change"
+        },
+        {
+          "time_local": "11:19:07.860658",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:19:08.425258",
+          "utterance": "Status"
+        },
+        {
+          "time_local": "11:19:08.881961",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:19:09.442053",
+          "utterance": "Unix seconds"
+        },
+        {
+          "time_local": "11:19:10.229098",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:19:10.797687",
+          "utterance": "1"
+        },
+        {
+          "time_local": "11:19:11.107817",
+          "utterance": "row header"
+        },
+        {
+          "time_local": "11:19:11.531752",
+          "utterance": "alice"
+        },
+        {
+          "time_local": "11:19:11.861301",
+          "utterance": "create"
+        },
+        {
+          "time_local": "11:19:12.305685",
+          "utterance": "AT sensor check"
+        },
+        {
+          "time_local": "11:19:12.971515",
+          "utterance": "open"
+        },
+        {
+          "time_local": "11:19:13.340524",
+          "utterance": "1791861521"
+        },
+        {
+          "time_local": "11:19:17.250144",
+          "utterance": "information"
+        },
+        {
+          "time_local": "11:19:17.824742",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:20:24.530447",
+          "utterance": "escape"
+        },
+        {
+          "time_local": "11:20:24.921662",
+          "utterance": "blank."
+        },
+        {
+          "time_local": "11:20:24.926391",
+          "utterance": "Browse mode"
+        },
+        {
+          "time_local": "11:20:24.933578",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:20:24.993060",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:20:24.993771",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:20:26.219417",
+          "utterance": "return"
+        },
+        {
+          "time_local": "11:20:26.269736",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:20:26.270109",
+          "utterance": "Edit work item"
+        },
+        {
+          "time_local": "11:20:26.270290",
+          "utterance": "heading 1"
+        },
+        {
+          "time_local": "11:20:27.586328",
+          "utterance": "Back to work items"
+        },
+        {
+          "time_local": "11:20:27.586560",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:20:28.869239",
+          "utterance": "Another change was saved first. Your draft was not saved; review the latest version before retrying."
+        },
+        {
+          "time_local": "11:21:12.405846",
+          "utterance": "Open the latest stored version before reapplying this draft"
+        },
+        {
+          "time_local": "11:21:12.406061",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:21:13.673293",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:21:13.726366",
+          "utterance": "Title"
+        },
+        {
+          "time_local": "11:21:13.726960",
+          "utterance": "entry"
+        },
+        {
+          "time_local": "11:21:13.727575",
+          "utterance": "AT retained stale draft"
+        },
+        {
+          "time_local": "11:21:13.727956",
+          "utterance": "selected required."
+        },
+        {
+          "time_local": "11:21:13.734993",
+          "utterance": "Focus mode"
+        },
+        {
+          "time_local": "11:22:11.939765",
+          "utterance": "Open the latest stored version before reapplying this draft"
+        },
+        {
+          "time_local": "11:22:11.940141",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:22:11.959569",
+          "utterance": "Browse mode"
+        },
+        {
+          "time_local": "11:22:11.978226",
+          "utterance": "No more tables."
+        },
+        {
+          "time_local": "11:22:57.930830",
+          "utterance": "escape"
+        },
+        {
+          "time_local": "11:22:58.294025",
+          "utterance": "blank"
+        },
+        {
+          "time_local": "11:22:58.298861",
+          "utterance": "Browse mode"
+        },
+        {
+          "time_local": "11:22:58.345046",
+          "utterance": "Work items | Lab Operations"
+        },
+        {
+          "time_local": "11:22:58.345475",
+          "utterance": "document web"
+        },
+        {
+          "time_local": "11:22:58.365145",
+          "utterance": "Finished loading Work items | Lab Operations."
+        },
+        {
+          "time_local": "11:22:58.368070",
+          "utterance": "Page has 5 landmarks, 1 heading, 2 forms, 1 table, 5 visited links, 2 unvisited links."
+        },
+        {
+          "time_local": "11:22:58.426702",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:22:58.426994",
+          "utterance": "link."
+        },
+        {
+          "time_local": "11:22:58.427354",
+          "utterance": "Lab Operations"
+        },
+        {
+          "time_local": "11:22:58.427567",
+          "utterance": "link."
+        },
+        {
+          "time_local": "11:22:58.431902",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:22:58.455586",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:22:58.455786",
+          "utterance": "link."
+        },
+        {
+          "time_local": "11:22:59.693379",
+          "utterance": "return"
+        },
+        {
+          "time_local": "11:22:59.745397",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:22:59.746026",
+          "utterance": "Work items"
+        },
+        {
+          "time_local": "11:22:59.746701",
+          "utterance": "heading 1"
+        },
+        {
+          "time_local": "11:23:28.051637",
+          "utterance": "Work item"
+        },
+        {
+          "time_local": "11:23:28.051855",
+          "utterance": "column header."
+        },
+        {
+          "time_local": "11:23:30.336302",
+          "utterance": "Work item"
+        },
+        {
+          "time_local": "11:23:30.891074",
+          "utterance": "Status"
+        },
+        {
+          "time_local": "11:23:31.331522",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:23:31.894217",
+          "utterance": "Priority"
+        },
+        {
+          "time_local": "11:23:32.380795",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:23:32.935985",
+          "utterance": "Assignee"
+        },
+        {
+          "time_local": "11:23:33.308916",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:23:33.870238",
+          "utterance": "Version"
+        },
+        {
+          "time_local": "11:23:34.286621",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:23:34.891204",
+          "utterance": "row header"
+        },
+        {
+          "time_local": "11:23:35.313315",
+          "utterance": "AT authoritative version"
+        },
+        {
+          "time_local": "11:23:36.279765",
+          "utterance": "visited link"
+        },
+        {
+          "time_local": "11:23:36.963572",
+          "utterance": "open"
+        },
+        {
+          "time_local": "11:23:37.346499",
+          "utterance": "normal"
+        },
+        {
+          "time_local": "11:23:37.739325",
+          "utterance": "Unassigned"
+        },
+        {
+          "time_local": "11:23:38.235896",
+          "utterance": "2"
+        },
+        {
+          "time_local": "11:23:38.549694",
+          "utterance": "leaving table."
+        },
+        {
+          "time_local": "11:23:39.160731",
+          "utterance": "navigation"
+        },
+        {
+          "time_local": "11:23:39.745494",
+          "utterance": "Work item pages"
+        },
+        {
+          "time_local": "11:23:40.546452",
+          "utterance": "Page 1"
+        },
+        {
+          "time_local": "11:23:41.119158",
+          "utterance": "information"
+        },
+        {
+          "time_local": "11:23:41.689289",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:24:12.721088",
+          "utterance": "escape"
+        },
+        {
+          "time_local": "11:24:13.070031",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:24:13.070373",
+          "utterance": "Stop live status"
+        },
+        {
+          "time_local": "11:24:13.070636",
+          "utterance": "button."
+        },
+        {
+          "time_local": "11:24:13.091142",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:24:13.122244",
+          "utterance": "Reconnect live status"
+        },
+        {
+          "time_local": "11:24:13.122652",
+          "utterance": "button."
+        },
+        {
+          "time_local": "11:24:14.894618",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:24:14.921772",
+          "utterance": "Refresh authoritative records"
+        },
+        {
+          "time_local": "11:24:14.921955",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:24:58.554826",
+          "utterance": "Reconnect live status"
+        },
+        {
+          "time_local": "11:24:58.555151",
+          "utterance": "button."
+        },
+        {
+          "time_local": "11:24:58.593700",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:24:58.630053",
+          "utterance": "Refresh authoritative records"
+        },
+        {
+          "time_local": "11:24:58.630285",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:25:00.395804",
+          "utterance": "return"
+        },
+        {
+          "time_local": "11:25:00.451852",
+          "utterance": "Work items | Lab Operations"
+        },
+        {
+          "time_local": "11:25:00.452237",
+          "utterance": "document web"
+        },
+        {
+          "time_local": "11:25:00.474844",
+          "utterance": "Finished loading Work items | Lab Operations."
+        },
+        {
+          "time_local": "11:25:00.479552",
+          "utterance": "Page has 5 landmarks, 1 heading, 2 forms, 1 table, 6 visited links, 1 unvisited link."
+        },
+        {
+          "time_local": "11:25:00.509511",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:25:00.509785",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:26:45.043992",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:26:45.044418",
+          "utterance": "Stop live status"
+        },
+        {
+          "time_local": "11:26:45.044669",
+          "utterance": "button."
+        },
+        {
+          "time_local": "11:26:45.092795",
+          "utterance": "Screen reader off."
+        }
+      ]
+    },
+    {
+      "id": "accepted_live",
+      "source_file": "target/m11-board/at-repair-20261013/speech-accepted.json",
+      "source_sha256": "b4e053ce456e8ed84aa2f938fccc6bd6bc0772e6c37288b4f542d6cd73335c8c",
+      "binary_sha256": "dc2d6d16e310ed5df2b118251546fd3d2e5a7b0656862e58032c7813406f4228",
+      "scope": "Accepted for repaired live-status announcement, pause, reconnect, refresh link and authoritative result.",
+      "utterances": [
+        {
+          "time_local": "11:47:42.425640",
+          "utterance": "Screen reader on."
+        },
+        {
+          "time_local": "11:47:55.389218",
+          "utterance": "Work items | Lab Operations"
+        },
+        {
+          "time_local": "11:47:55.389417",
+          "utterance": "document web"
+        },
+        {
+          "time_local": "11:47:55.392975",
+          "utterance": "Browse mode"
+        },
+        {
+          "time_local": "11:47:55.414345",
+          "utterance": "Finished loading Work items | Lab Operations."
+        },
+        {
+          "time_local": "11:47:55.417467",
+          "utterance": "Page has 5 landmarks, 1 heading, 2 forms, 1 table, 7 visited links."
+        },
+        {
+          "time_local": "11:47:55.460300",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:47:55.460558",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:47:58.234623",
+          "utterance": "Work item"
+        },
+        {
+          "time_local": "11:47:58.771920",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:47:59.324599",
+          "utterance": "Status"
+        },
+        {
+          "time_local": "11:47:59.767727",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:48:00.327663",
+          "utterance": "Priority"
+        },
+        {
+          "time_local": "11:48:00.813549",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:48:01.382754",
+          "utterance": "Assignee"
+        },
+        {
+          "time_local": "11:48:01.761185",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:48:02.338085",
+          "utterance": "Version"
+        },
+        {
+          "time_local": "11:48:02.762453",
+          "utterance": "column header"
+        },
+        {
+          "time_local": "11:48:03.369801",
+          "utterance": "row header"
+        },
+        {
+          "time_local": "11:48:03.779493",
+          "utterance": "AT section live probe"
+        },
+        {
+          "time_local": "11:48:04.718481",
+          "utterance": "visited link"
+        },
+        {
+          "time_local": "11:48:05.385529",
+          "utterance": "open"
+        },
+        {
+          "time_local": "11:48:05.760354",
+          "utterance": "normal"
+        },
+        {
+          "time_local": "11:48:06.155925",
+          "utterance": "Unassigned"
+        },
+        {
+          "time_local": "11:48:06.656813",
+          "utterance": "8"
+        },
+        {
+          "time_local": "11:48:06.970237",
+          "utterance": "leaving table."
+        },
+        {
+          "time_local": "11:48:07.580600",
+          "utterance": "navigation"
+        },
+        {
+          "time_local": "11:48:08.166338",
+          "utterance": "Work item pages"
+        },
+        {
+          "time_local": "11:48:08.964408",
+          "utterance": "Page 1"
+        },
+        {
+          "time_local": "11:48:09.535651",
+          "utterance": "information"
+        },
+        {
+          "time_local": "11:48:10.113438",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:48:40.577628",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:48:40.577865",
+          "utterance": "blank"
+        },
+        {
+          "time_local": "11:48:40.625023",
+          "utterance": "Work items | Lab Operations"
+        },
+        {
+          "time_local": "11:48:40.625211",
+          "utterance": "document web"
+        },
+        {
+          "time_local": "11:48:40.653594",
+          "utterance": "Finished loading Work items | Lab Operations."
+        },
+        {
+          "time_local": "11:48:40.656764",
+          "utterance": "Page has 5 landmarks, 1 heading, 2 forms, 1 table, 7 visited links."
+        },
+        {
+          "time_local": "11:48:40.685398",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:48:40.685618",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:48:40.745639",
+          "utterance": "Live status current. Records match the displayed revision."
+        },
+        {
+          "time_local": "11:48:43.645682",
+          "utterance": "Status updated. Refresh authoritative records to see the latest work-item changes."
+        },
+        {
+          "time_local": "11:49:15.149823",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:49:15.150152",
+          "utterance": "Stop live status"
+        },
+        {
+          "time_local": "11:49:15.150512",
+          "utterance": "button."
+        },
+        {
+          "time_local": "11:49:15.270299",
+          "utterance": "Live status paused. The stored snapshot remains visible."
+        },
+        {
+          "time_local": "11:49:16.680226",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:49:16.703928",
+          "utterance": "Reconnect live status"
+        },
+        {
+          "time_local": "11:49:16.704112",
+          "utterance": "button."
+        },
+        {
+          "time_local": "11:49:16.984867",
+          "utterance": "return"
+        },
+        {
+          "time_local": "11:49:17.092464",
+          "utterance": "Connecting; the last stored snapshot remains visible."
+        },
+        {
+          "time_local": "11:49:17.193230",
+          "utterance": "Status updated. Refresh authoritative records to see the latest work-item changes."
+        },
+        {
+          "time_local": "11:49:18.795430",
+          "utterance": "tab"
+        },
+        {
+          "time_local": "11:49:18.828658",
+          "utterance": "Refresh authoritative records"
+        },
+        {
+          "time_local": "11:49:18.828905",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:54:17.449560",
+          "utterance": "Live status unavailable; the displayed snapshot may be stale. Reconnecting..."
+        },
+        {
+          "time_local": "11:54:18.448349",
+          "utterance": "Connecting; the last stored snapshot remains visible."
+        },
+        {
+          "time_local": "11:54:18.548805",
+          "utterance": "Status updated. Refresh authoritative records to see the latest work-item changes."
+        },
+        {
+          "time_local": "11:54:34.161329",
+          "utterance": "return"
+        },
+        {
+          "time_local": "11:54:34.227031",
+          "utterance": "Work items | Lab Operations"
+        },
+        {
+          "time_local": "11:54:34.227356",
+          "utterance": "document web"
+        },
+        {
+          "time_local": "11:54:34.230305",
+          "utterance": "Browse mode"
+        },
+        {
+          "time_local": "11:54:34.260751",
+          "utterance": "Finished loading Work items | Lab Operations."
+        },
+        {
+          "time_local": "11:54:34.263329",
+          "utterance": "Page has 5 landmarks, 1 heading, 2 forms, 1 table, 7 visited links."
+        },
+        {
+          "time_local": "11:54:34.304445",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:54:34.304651",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:54:34.355951",
+          "utterance": "Live status current. Records match the displayed revision."
+        },
+        {
+          "time_local": "11:54:38.150278",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:54:38.150505",
+          "utterance": "table with 2 rows 5 columns"
+        },
+        {
+          "time_local": "11:54:38.150801",
+          "utterance": "Work item"
+        },
+        {
+          "time_local": "11:54:38.150959",
+          "utterance": "column header."
+        },
+        {
+          "time_local": "11:54:38.151165",
+          "utterance": "row 1."
+        },
+        {
+          "time_local": "11:54:38.151361",
+          "utterance": "column 1"
+        },
+        {
+          "time_local": "11:54:38.151606",
+          "utterance": "Status"
+        },
+        {
+          "time_local": "11:54:38.151754",
+          "utterance": "column header."
+        },
+        {
+          "time_local": "11:54:38.151953",
+          "utterance": "row 1."
+        },
+        {
+          "time_local": "11:54:38.152146",
+          "utterance": "column 2"
+        },
+        {
+          "time_local": "11:54:38.152380",
+          "utterance": "Priority"
+        },
+        {
+          "time_local": "11:54:38.152527",
+          "utterance": "column header."
+        },
+        {
+          "time_local": "11:54:38.152722",
+          "utterance": "row 1."
+        },
+        {
+          "time_local": "11:54:38.152917",
+          "utterance": "column 3"
+        },
+        {
+          "time_local": "11:54:38.153156",
+          "utterance": "Assignee"
+        },
+        {
+          "time_local": "11:54:38.153297",
+          "utterance": "column header."
+        },
+        {
+          "time_local": "11:54:38.153496",
+          "utterance": "row 1."
+        },
+        {
+          "time_local": "11:54:38.153686",
+          "utterance": "column 4"
+        },
+        {
+          "time_local": "11:54:38.153926",
+          "utterance": "Version"
+        },
+        {
+          "time_local": "11:54:38.154074",
+          "utterance": "column header."
+        },
+        {
+          "time_local": "11:54:38.154271",
+          "utterance": "row 1."
+        },
+        {
+          "time_local": "11:54:38.154463",
+          "utterance": "column 5"
+        },
+        {
+          "time_local": "11:54:38.154697",
+          "utterance": "AT verified live result"
+        },
+        {
+          "time_local": "11:54:38.154857",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:54:38.155028",
+          "utterance": "AT verified live result."
+        },
+        {
+          "time_local": "11:54:38.155236",
+          "utterance": "active."
+        },
+        {
+          "time_local": "11:54:38.155427",
+          "utterance": "normal."
+        },
+        {
+          "time_local": "11:54:38.155620",
+          "utterance": "Unassigned."
+        },
+        {
+          "time_local": "11:54:38.155814",
+          "utterance": "9."
+        },
+        {
+          "time_local": "11:54:38.155945",
+          "utterance": "Priority column header normal."
+        },
+        {
+          "time_local": "11:54:38.156094",
+          "utterance": "Assignee column header Unassigned."
+        },
+        {
+          "time_local": "11:54:38.156238",
+          "utterance": "Version column header 9."
+        },
+        {
+          "time_local": "11:54:56.326095",
+          "utterance": "Entering flat review."
+        },
+        {
+          "time_local": "11:54:56.328861",
+          "utterance": "table"
+        },
+        {
+          "time_local": "11:54:57.335663",
+          "utterance": "table"
+        },
+        {
+          "time_local": "11:55:22.528329",
+          "utterance": "Screen reader off."
+        }
+      ]
+    },
+    {
+      "id": "accepted_linear",
+      "source_file": "target/m11-board/at-repair-20261013/speech-linear.json",
+      "source_sha256": "754ac2b6992de514ecdf178b3ec58165140db6befc3a572e74a317039a853f8d",
+      "binary_sha256": "dc2d6d16e310ed5df2b118251546fd3d2e5a7b0656862e58032c7813406f4228",
+      "scope": "Accepted for native Down-key reading of navigation, heading, table caption, column headers and row link in document order.",
+      "utterances": [
+        {
+          "time_local": "11:58:13.866431",
+          "utterance": "Screen reader on."
+        },
+        {
+          "time_local": "11:58:16.680161",
+          "utterance": "Work items | Lab Operations"
+        },
+        {
+          "time_local": "11:58:16.680390",
+          "utterance": "document web"
+        },
+        {
+          "time_local": "11:58:16.683571",
+          "utterance": "Browse mode"
+        },
+        {
+          "time_local": "11:58:16.699678",
+          "utterance": "Finished loading Work items | Lab Operations."
+        },
+        {
+          "time_local": "11:58:16.702445",
+          "utterance": "Page has 5 landmarks, 1 heading, 2 forms, 1 table, 7 visited links."
+        },
+        {
+          "time_local": "11:58:16.757189",
+          "utterance": "Skip to content"
+        },
+        {
+          "time_local": "11:58:18.098199",
+          "utterance": "visited link"
+        },
+        {
+          "time_local": "11:58:19.271951",
+          "utterance": "Lab Operations"
+        },
+        {
+          "time_local": "11:58:19.689166",
+          "utterance": "leaving form."
+        },
+        {
+          "time_local": "11:58:19.689717",
+          "utterance": "leaving banner."
+        },
+        {
+          "time_local": "11:58:19.690498",
+          "utterance": "navigation"
+        },
+        {
+          "time_local": "11:58:19.690816",
+          "utterance": "Project navigation"
+        },
+        {
+          "time_local": "11:58:19.691149",
+          "utterance": "Work items"
+        },
+        {
+          "time_local": "11:58:19.691430",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:58:19.990764",
+          "utterance": "leaving form."
+        },
+        {
+          "time_local": "11:58:19.991512",
+          "utterance": "leaving banner."
+        },
+        {
+          "time_local": "11:58:19.992125",
+          "utterance": "navigation"
+        },
+        {
+          "time_local": "11:58:19.992519",
+          "utterance": "Project navigation"
+        },
+        {
+          "time_local": "11:58:19.992968",
+          "utterance": "Work items"
+        },
+        {
+          "time_local": "11:58:19.993318",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:58:20.266450",
+          "utterance": "New work item"
+        },
+        {
+          "time_local": "11:58:20.266682",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:58:20.590912",
+          "utterance": "leaving navigation."
+        },
+        {
+          "time_local": "11:58:20.591317",
+          "utterance": "main content"
+        },
+        {
+          "time_local": "11:58:20.591853",
+          "utterance": "Work items"
+        },
+        {
+          "time_local": "11:58:20.592256",
+          "utterance": "heading 1"
+        },
+        {
+          "time_local": "11:58:20.886973",
+          "utterance": "1 total · 0 open · 1 active · 0 blocked · 0 closed."
+        },
+        {
+          "time_local": "11:58:21.195893",
+          "utterance": "Enable optional live status"
+        },
+        {
+          "time_local": "11:58:21.196123",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:58:21.510540",
+          "utterance": "Title contains (case-sensitive)"
+        },
+        {
+          "time_local": "11:58:21.510776",
+          "utterance": "clickable."
+        },
+        {
+          "time_local": "11:58:21.819554",
+          "utterance": "Title contains (case-sensitive)"
+        },
+        {
+          "time_local": "11:58:21.819823",
+          "utterance": "entry"
+        },
+        {
+          "time_local": "11:58:21.820003",
+          "utterance": "blank."
+        },
+        {
+          "time_local": "11:58:22.153804",
+          "utterance": "Filter status"
+        },
+        {
+          "time_local": "11:58:22.153999",
+          "utterance": "clickable."
+        },
+        {
+          "time_local": "11:58:22.421636",
+          "utterance": "Filter status"
+        },
+        {
+          "time_local": "11:58:22.421913",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:58:22.422190",
+          "utterance": "All."
+        },
+        {
+          "time_local": "11:58:22.422367",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:58:22.736172",
+          "utterance": "Sort"
+        },
+        {
+          "time_local": "11:58:22.737114",
+          "utterance": "clickable."
+        },
+        {
+          "time_local": "11:58:23.048025",
+          "utterance": "Sort"
+        },
+        {
+          "time_local": "11:58:23.048267",
+          "utterance": "combo box"
+        },
+        {
+          "time_local": "11:58:23.048525",
+          "utterance": "Latest update."
+        },
+        {
+          "time_local": "11:58:23.048708",
+          "utterance": "opens popup"
+        },
+        {
+          "time_local": "11:58:23.048987",
+          "utterance": "Apply filters"
+        },
+        {
+          "time_local": "11:58:23.049151",
+          "utterance": "button."
+        },
+        {
+          "time_local": "11:58:23.354495",
+          "utterance": "leaving form."
+        },
+        {
+          "time_local": "11:58:23.354856",
+          "utterance": "New work item"
+        },
+        {
+          "time_local": "11:58:23.355103",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:58:23.647456",
+          "utterance": "table with 2 rows 5 columns"
+        },
+        {
+          "time_local": "11:58:23.647828",
+          "utterance": "Project 1 — 1 matching items; 50 per page."
+        },
+        {
+          "time_local": "11:58:23.648080",
+          "utterance": "caption"
+        },
+        {
+          "time_local": "11:58:24.104602",
+          "utterance": "Work item"
+        },
+        {
+          "time_local": "11:58:24.105368",
+          "utterance": "column header."
+        },
+        {
+          "time_local": "11:58:24.105979",
+          "utterance": "Status"
+        },
+        {
+          "time_local": "11:58:24.106360",
+          "utterance": "column header."
+        },
+        {
+          "time_local": "11:58:24.106728",
+          "utterance": "column 2"
+        },
+        {
+          "time_local": "11:58:24.107298",
+          "utterance": "Priority"
+        },
+        {
+          "time_local": "11:58:24.107637",
+          "utterance": "column header."
+        },
+        {
+          "time_local": "11:58:24.107974",
+          "utterance": "column 3"
+        },
+        {
+          "time_local": "11:58:24.108469",
+          "utterance": "Assignee"
+        },
+        {
+          "time_local": "11:58:24.108803",
+          "utterance": "column header."
+        },
+        {
+          "time_local": "11:58:24.109137",
+          "utterance": "column 4"
+        },
+        {
+          "time_local": "11:58:24.109625",
+          "utterance": "Version"
+        },
+        {
+          "time_local": "11:58:24.109973",
+          "utterance": "column header."
+        },
+        {
+          "time_local": "11:58:24.110343",
+          "utterance": "column 5"
+        },
+        {
+          "time_local": "11:58:24.391040",
+          "utterance": "row header."
+        },
+        {
+          "time_local": "11:58:24.391355",
+          "utterance": "AT verified live result"
+        },
+        {
+          "time_local": "11:58:24.391580",
+          "utterance": "visited link."
+        },
+        {
+          "time_local": "11:58:24.391767",
+          "utterance": "AT verified live result row header Status column header active."
+        },
+        {
+          "time_local": "11:58:24.391952",
+          "utterance": "Priority column header normal."
+        },
+        {
+          "time_local": "11:58:24.392104",
+          "utterance": "Assignee column header Unassigned."
+        },
+        {
+          "time_local": "11:58:24.392274",
+          "utterance": "Version column header 9."
+        },
+        {
+          "time_local": "11:58:24.594011",
+          "utterance": "leaving table."
+        },
+        {
+          "time_local": "11:58:24.594529",
+          "utterance": "navigation"
+        },
+        {
+          "time_local": "11:58:24.594909",
+          "utterance": "Work item pages"
+        },
+        {
+          "time_local": "11:58:24.595181",
+          "utterance": "Page 1."
+        },
+        {
+          "time_local": "11:58:24.859101",
+          "utterance": "information"
+        },
+        {
+          "time_local": "11:58:24.859593",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:25.139677",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:25.448621",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:25.760208",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:26.063554",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:26.372463",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:26.678001",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:26.981522",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:27.293570",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:27.597603",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:27.903984",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:28.213218",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:28.516938",
+          "utterance": "Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control."
+        },
+        {
+          "time_local": "11:58:31.796612",
+          "utterance": "Screen reader off."
+        }
+      ]
+    }
+  ],
+  "observations": {
+    "focus_steps": [
+      {
+        "tag": "A",
+        "id": "",
+        "text": "Work items"
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "text": "New work item"
+      },
+      {
+        "tag": "A",
+        "id": "",
+        "text": "Back to work items"
+      },
+      {
+        "tag": "INPUT",
+        "id": "title",
+        "text": ""
+      },
+      {
+        "tag": "TEXTAREA",
+        "id": "description",
+        "text": ""
+      },
+      {
+        "tag": "SELECT",
+        "id": "status",
+        "text": "OpenActiveBlockedClosed"
+      },
+      {
+        "tag": "SELECT",
+        "id": "priority",
+        "text": "LowNormalHigh"
+      },
+      {
+        "tag": "SELECT",
+        "id": "assignee",
+        "text": "Unassignedalice"
+      },
+      {
+        "tag": "BUTTON",
+        "id": "",
+        "text": "Create work item"
+      }
+    ],
+    "conflict": {
+      "title": "Draft not saved | Lab Operations",
+      "notice": "Another change was saved first. Your draft was not saved; review the latest version before retrying.",
+      "draft": "AT retained stale draft",
+      "navigation": [
+        {
+          "status": 409,
+          "type": "navigate"
+        }
+      ]
+    },
+    "accepted_update_epoch": 1791863322.655683,
+    "live_before_refresh": {
+      "message": "Status updated. Refresh authoritative records to see the latest work-item changes.",
+      "counts": "1 total · 0 open · 1 active · 0 blocked · 0 closed",
+      "row": "AT section live probe\topen\tnormal\tUnassigned\t8",
+      "revision": "9"
+    },
+    "paused": "Live status paused. The stored snapshot remains visible.",
+    "after_authoritative_refresh": {
+      "row": "AT verified live result\tactive\tnormal\tUnassigned\t9",
+      "message": "Live status current. Records match the displayed revision.",
+      "caption": "Project 1 — 1 matching items; 50 per page."
+    },
+    "linear_navigation_steps": 30,
+    "final_binary_sha256": "dc2d6d16e310ed5df2b118251546fd3d2e5a7b0656862e58032c7813406f4228"
+  },
+  "images": [
+    {
+      "path": "docs/screenshots/yt074-at/conflict-focus.png",
+      "sha256": "3c568bfc63ba09a8165370100ea7cf3369cf8eeb215e934f9c0a983f59447a9a",
+      "observation": "Retained stale draft and visible keyboard focus on the current-record recovery link; unchanged form markup."
+    },
+    {
+      "path": "docs/screenshots/yt074-at/accepted-live-focus.png",
+      "sha256": "6c27883d4529bc027162c8d8dca4a64428b9d699ff08e26d0d1bd47ddd317255",
+      "observation": "Final binary: live counts/revision updated while the stored row remains version 8; visible focus on authoritative refresh."
+    },
+    {
+      "path": "docs/screenshots/yt074-at/accepted-authoritative.png",
+      "sha256": "aa3e083179137ad81a316a30d88167fc02d76cccb5d0e77269ac125f83d40f77",
+      "observation": "Final binary: explicit authoritative refresh shows the persisted version 9 row."
+    }
+  ],
+  "limitations": [
+    "Validation summary and conflict notice were discovered with native browse navigation; automatic alert announcement or automatic alert focus was not established.",
+    "Initial Say All and table-jump observations skipped the caption. Native linear Down navigation subsequently spoke the caption before headers and row content. Repeated footer output after end of document is retained.",
+    "A mixed-surface diagnostic overlapped a headless Chrome helper and is excluded from Firefox acceptance.",
+    "The status-wrapper-only and JavaScript-order-only prototypes did not close live speech. The final generic live child maps to AT-SPI SECTION, avoiding Orca status-bar UI classification and rapid-event filtering.",
+    "No broad accessibility conformance, other screen reader or Windows Edge result is claimed."
+  ],
+  "preserved_operator_failures": [
+    "FlatReview PresentObject was attempted before enabling flat review and returned an Orca missing-context error. Enabling flat review produced only table, not caption; neither attempt closed the caption cell.",
+    "Restarting Orca without a document activation produced window speech only. Fresh navigation established a Firefox script context.",
+    "Clicking a static caption did not reliably move Orca browse position. The accepted caption path uses normal linear Down navigation.",
+    "A sign-out selector used /board/sign-out instead of observed /board/logout; no element was found and no request was submitted. The corrected native sign-out succeeded."
+  ],
+  "cleanup": {
+    "signed_out": true,
+    "server_pid": 226538,
+    "geckodriver_pid": 175310,
+    "firefox_pid": 175387,
+    "speech_dispatcher_pid": 181770,
+    "pids_absent": true,
+    "listeners_closed": [
+      3012,
+      51769
+    ],
+    "private_database_logs_profile_removed": true,
+    "screen_reader_enabled": false,
+    "scope": "Owned resources only; no unrelated browser or remote desktop process stopped.",
+    "python_control_session_exit_code": 0,
+    "raw_debug_logs_removed": true,
+    "orca_processes_absent": true,
+    "ime": "This AT continuation did not switch or use an IME. With no focused input after cleanup, Fcitx CurrentInputMethod returned an empty string; the earlier IME lane separately verified keyboard-us restoration."
+  }
+}

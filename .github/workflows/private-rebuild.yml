@@ -19,17 +19,12 @@ jobs:
     env:
       RUSTUP_TOOLCHAIN: 1.99.0
       CARGO_BUILD_JOBS: '4'
-      PYTHONDONTWRITEBYTECODE: '1'
     steps:
       - name: Checkout immutable workflow source
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-      - name: Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-        with:
-          python-version: '3.14'
       - name: Install pinned compiler
         run: rustup toolchain install 1.99.0 --profile minimal
       - name: Build nine source packages from fresh inputs
@@ -38,118 +33,7 @@ jobs:
           BUILD_WORKFLOW_SHA: ${{ github.workflow_sha }}
         run: |
           set -euo pipefail
-          python3 - <<'PY'
-          from pathlib import Path
-          import datetime
-          import hashlib
-          import json
-          import os
-          import shutil
-          import subprocess
-          import tarfile
-
-          names = ['yetlet-core', 'yetlet-actions', 'yetlet-reactive',
-                   'yetlet-html', 'yetlet-dom', 'yetlet-dom-keyed',
-                   'yetlet-server-axum', 'yetlet-request-id', 'yetlet-session']
-          sha = lambda p: hashlib.sha256(Path(p).read_bytes()).hexdigest()
-          now = lambda: datetime.datetime.now(datetime.timezone.utc).isoformat()
-          commit = subprocess.check_output(['git', 'rev-parse', 'HEAD'], text=True).strip()
-          assert commit == os.environ['GITHUB_SHA']
-          assert not subprocess.check_output(['git', 'status', '--porcelain'])
-          work = Path(os.environ['RUNNER_TEMP']) / 'yetlet-private-rebuild'
-          work.mkdir()
-          source = work / 'source'
-          source.mkdir()
-          output = Path('target/private-rebuild')
-          output.mkdir(parents=True)
-          archive = work / 'source.tar'
-          subprocess.run(['git', 'archive', '--format=tar', '--output', str(archive), commit], check=True)
-          aliases = {f'crates/{n}/{license}': f'../../{license}'
-                     for n in names for license in ('LICENSE-MIT', 'LICENSE-APACHE')}
-          with tarfile.open(archive) as tar:
-              links = {m.name: m.linkname for m in tar.getmembers() if m.issym()}
-              assert links == aliases
-              assert all(m.isdir() or m.isfile() or m.issym() for m in tar.getmembers())
-              tar.extractall(source, members=[m for m in tar.getmembers() if not m.issym()], filter='data')
-          for name in aliases:
-              (source / name).write_bytes((source / Path(name).name).read_bytes())
-          selected = [source / f for f in ('Cargo.toml', 'Cargo.lock', 'LICENSE-MIT',
-                                          'LICENSE-APACHE', 'rust-toolchain.toml')]
-          selected += [f for n in names for f in (source / 'crates' / n).rglob('*') if f.is_file()]
-          inputs = {str(f.relative_to(source)): sha(f) for f in sorted(selected)}
-          digest = hashlib.sha256(json.dumps(inputs, sort_keys=True, separators=(',', ':')).encode()).hexdigest()
-          source_record = {'source_commit': commit, 'source_archive_sha256': sha(archive),
-                           'overlays': {}, 'selected_package_inputs': inputs,
-                           'selected_package_input_digest': digest}
-          (output / 'SOURCE-INPUTS.json').write_text(json.dumps(source_record, indent=2) + '\n')
-          tools = {n: Path(subprocess.check_output(['rustup', 'which', '--toolchain', '1.99.0', n], text=True).strip())
-                   for n in ('cargo', 'rustc', 'rustdoc')}
-          environment = os.environ.copy()
-          environment['CARGO_HOME'] = str(work / 'cargo-home')
-          environment['CARGO_TARGET_DIR'] = str(work / 'cargo-target')
-          environment['RUSTC'] = str(tools['rustc'])
-          environment['RUSTDOC'] = str(tools['rustdoc'])
-          environment['SOURCE_DATE_EPOCH'] = subprocess.check_output(['git', 'show', '-s', '--format=%ct', commit], text=True).strip()
-          Path(environment['CARGO_HOME']).mkdir()
-          Path(environment['CARGO_TARGET_DIR']).mkdir()
-          rustc = subprocess.check_output([str(tools['rustc']), '-vV'], text=True)
-          cargo = subprocess.check_output([str(tools['cargo']), '-V'], text=True).strip()
-          assert 'release: 1.99.0\n' in rustc and 'host: x86_64-unknown-linux-gnu\n' in rustc
-          assert cargo.startswith('cargo 1.99.0 ')
-          commands = [[str(tools['cargo']), 'fetch', '--locked', '--manifest-path', str(source / 'Cargo.toml')],
-                      [str(tools['cargo']), 'package', '--locked', '--offline', '--manifest-path', str(source / 'Cargo.toml'),
-                       '--target-dir', environment['CARGO_TARGET_DIR']]]
-          for name in names:
-              commands[1] += ['-p', name]
-          record = {'source_commit': commit, 'selected_package_input_digest': digest,
-                    'cargo': cargo, 'rustc': rustc,
-                    'tool_sha256': {n: sha(f) for n, f in tools.items()},
-                    'default_workspace_features': True, 'profile': 'dev verification',
-                    'fresh_cargo_home': True, 'fresh_target_directory': True,
-                    'cargo_lock_sha256': sha(source / 'Cargo.lock'),
-                    'source_date_epoch': environment['SOURCE_DATE_EPOCH'], 'build_jobs': 4,
-                    'commands': commands, 'started_at': now(),
-                    'github': {k: os.environ.get(k) for k in ('GITHUB_REPOSITORY', 'GITHUB_SHA', 'GITHUB_REF',
-                               'GITHUB_RUN_ID', 'GITHUB_RUN_ATTEMPT', 'BUILD_WORKFLOW_REF', 'BUILD_WORKFLOW_SHA',
-                               'RUNNER_OS', 'RUNNER_ARCH', 'ImageOS', 'ImageVersion')}}
-          for command, label in zip(commands, ('fetch', 'package')):
-              with (output / f'{label}.log').open('w') as log:
-                  result = subprocess.run(command, env=environment, stdout=log, stderr=subprocess.STDOUT)
-              record[f'{label}_exit_code'] = result.returncode
-              if result.returncode:
-                  (output / 'BUILD-RECORD.json').write_text(json.dumps(record, indent=2) + '\n')
-                  raise SystemExit(result.returncode)
-          assert all(sha(source / name) == value for name, value in inputs.items())
-          packages = list((Path(environment['CARGO_TARGET_DIR']) / 'package').glob('*.crate'))
-          assert {f.name for f in packages} == {f'{n}-0.1.0.crate' for n in names}
-          record['archives'] = {f.name: {'sha256': sha(f), 'size': f.stat().st_size} for f in sorted(packages)}
-          record['finished_at'] = now()
-          (output / 'BUILD-RECORD.json').write_text(json.dumps(record, indent=2) + '\n')
-          for package in packages:
-              shutil.copyfile(package, output / package.name)
-          workflow = {'repository': 'https://github.com/' + os.environ['GITHUB_REPOSITORY'],
-                      'path': '.github/workflows/private-rebuild.yml', 'ref': os.environ['GITHUB_REF']}
-          invocation = workflow['repository'] + '/actions/runs/' + os.environ['GITHUB_RUN_ID'] + '/attempts/' + os.environ['GITHUB_RUN_ATTEMPT']
-          statement = {'_type': 'https://in-toto.io/Statement/v1',
-                       'subject': [{'name': n, 'digest': {'sha256': v['sha256']}} for n, v in record['archives'].items()],
-                       'predicateType': 'https://slsa.dev/provenance/v1',
-                       'predicate': {'buildDefinition': {'buildType': 'https://actions.github.io/buildtypes/workflow/v1',
-                          'externalParameters': {'workflow': workflow, 'preparation_only': True,
-                              'rust_release': '1.99.0', 'target': 'x86_64-unknown-linux-gnu',
-                              'default_workspace_features': True, 'commands_record': 'BUILD-RECORD.json'},
-                          'resolvedDependencies': [{'uri': 'git+' + workflow['repository'], 'digest': {'gitCommit': commit}},
-                              {'name': 'Cargo.lock', 'digest': {'sha256': record['cargo_lock_sha256']}},
-                              {'name': 'source.tar', 'digest': {'sha256': source_record['source_archive_sha256']}}]},
-                          'runDetails': {'builder': {'id': 'https://github.com/actions/runner/github-hosted'},
-                              'metadata': {'invocationId': invocation, 'startedOn': record['started_at'], 'finishedOn': record['finished_at']},
-                              'byproducts': [{'name': n, 'digest': {'sha256': sha(output / n)}}
-                                             for n in ('SOURCE-INPUTS.json', 'BUILD-RECORD.json')]}}}
-          (output / 'PROVENANCE-UNSIGNED.json').write_text(json.dumps(statement, indent=2) + '\n')
-          subprocess.run(['python3', str(source / 'scripts/release_checksums.py'), 'create', str(output)], check=True)
-          subprocess.run(['python3', str(source / 'scripts/release_checksums.py'), 'verify', str(output)], check=True)
-          print(json.dumps({'source_commit': commit, 'archive_count': len(packages),
-                            'selected_package_input_digest': digest, 'package_exit_code': 0}))
-          PY
+          CARGO_TARGET_DIR="$RUNNER_TEMP/yt086-xtask-bootstrap" cargo run --locked --manifest-path xtask/Cargo.toml -- release private-rebuild
       - name: Retain private package and build evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

@@ -15,7 +15,6 @@ concurrency:
 
 env:
   CARGO_TERM_COLOR: never
-  PYTHONDONTWRITEBYTECODE: '1'
   RUSTUP_TOOLCHAIN: stable
 
 defaults:
@@ -74,10 +73,6 @@ jobs:
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           persist-credentials: false
-      - name: Python
-        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
-        with:
-          python-version: '3.12'
       - name: Observe image and fail closed on browser prerequisites
         run: |
           set -euo pipefail
@@ -92,7 +87,6 @@ jobs:
             command -v geckodriver
             firefox --version
             geckodriver --version
-            python --version
           } 2>&1 | tee target/qualification/firefox-prerequisites.log
           printf '%s\n' "$GECKOWEBDRIVER" >> "$GITHUB_PATH"
       - name: Install and record build tools
@@ -111,27 +105,27 @@ jobs:
         run: |
           set -euo pipefail
           {
-            python scripts/build_browser.py --release
-            python scripts/build_keyed_bindings.py --release
-            python scripts/build_multi_island_dashboard.py --release
+            cargo xtask build browser --release
+            cargo xtask build keyed-bindings --release
+            cargo xtask build multi-island-dashboard --release
             cargo build --release --locked -p yetlet-todo-server -p yetlet-multi-island-dashboard -p yetlet-forms-validation
           } 2>&1 | tee target/qualification/firefox-build.log
       - name: Todo and Search Firefox release suite
         run: |
           set -euo pipefail
-          python scripts/smoke_firefox.py --profile release 2>&1 | tee target/qualification/firefox-todo.log
+          cargo xtask smoke browser-firefox --profile release 2>&1 | tee target/qualification/firefox-todo.log
       - name: Keyed bindings Firefox release suite
         run: |
           set -euo pipefail
-          python scripts/smoke_keyed_bindings_firefox.py --profile release 2>&1 | tee target/qualification/firefox-keyed.log
+          cargo xtask smoke keyed-bindings-firefox --profile release 2>&1 | tee target/qualification/firefox-keyed.log
       - name: Multi-island Firefox release suite
         run: |
           set -euo pipefail
-          python scripts/smoke_multi_island_dashboard_firefox.py --profile release 2>&1 | tee target/qualification/firefox-dashboard.log
+          cargo xtask smoke multi-island-dashboard-firefox --profile release 2>&1 | tee target/qualification/firefox-dashboard.log
       - name: Forms keyboard and semantic accessibility checks
         run: |
           set -euo pipefail
-          python scripts/smoke_forms_accessibility_firefox.py --profile release 2>&1 | tee target/qualification/firefox-forms.log
+          cargo xtask smoke forms-accessibility-firefox --profile release 2>&1 | tee target/qualification/firefox-forms.log
       - name: Retain Firefox qualification logs and sanitized forms report
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -139,6 +133,6 @@ jobs:
           name: qualification-firefox-ubuntu-24.04-${{ github.run_id }}-${{ github.run_attempt }}
           path: |
             target/qualification/firefox-*.log
-            target/qualification/forms-accessibility-firefox.json
+            target/m12/yt085/forms-accessibility-firefox-*/forms-accessibility-firefox.json
           if-no-files-found: warn
           retention-days: 7
