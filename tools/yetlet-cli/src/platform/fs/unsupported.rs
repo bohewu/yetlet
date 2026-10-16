@@ -12,6 +12,12 @@ pub(crate) const NEW_DIAGNOSTIC: &str =
 const UNSUPPORTED_APP: &str = "build/dev are unsupported on this platform: native cwd/process ownership Not verified; no child started";
 
 pub(crate) struct App;
+pub(crate) fn app_entries(_app: &App, _child: bool) -> Result<Vec<String>, String> {
+    Err(UNSUPPORTED_APP.into())
+}
+pub(crate) fn read_app_file(_app: &App, _name: &str) -> Result<Vec<u8>, String> {
+    Err(UNSUPPORTED_APP.into())
+}
 pub(super) struct AppFiles;
 impl AppFiles {
     pub(super) fn open(_manifest: &Path) -> Result<Self, String> {

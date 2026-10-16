@@ -159,11 +159,12 @@ struct Temp {
     name: CString,
     dir: File,
     src: Option<File>,
+    child: &'static str,
     files: Vec<OwnedFile>,
 }
 
 impl Temp {
-    fn make(parent: &Anchor) -> io::Result<Self> {
+    fn make(parent: &Anchor, child: &'static str) -> io::Result<Self> {
         for _ in 0..8 {
             let mut random = [0_u8; 16];
             // SAFETY: valid writable buffer; flags=0 obtains kernel randomness.
@@ -189,6 +190,7 @@ impl Temp {
                         name,
                         dir,
                         src: None,
+                        child,
                         files: Vec::new(),
                     });
                 }
@@ -210,17 +212,23 @@ impl Temp {
     }
 
     fn write(&mut self, path: &str, data: &str) -> io::Result<()> {
-        let in_src = path == "src/main.rs";
+        let in_src = path.contains('/');
         if in_src && self.src.is_none() {
-            mkdir(&self.dir, c"src")?;
-            self.src = Some(directory(&self.dir, c"src")?);
+            let name = cstr(self.child.as_ref())?;
+            mkdir(&self.dir, &name)?;
+            self.src = Some(directory(&self.dir, &name)?);
         }
         let parent = if in_src {
             self.src.as_ref().unwrap()
         } else {
             &self.dir
         };
-        let name = CString::new(if in_src { "main.rs" } else { path }).unwrap();
+        let name = CString::new(if in_src {
+            path.split_once('/').unwrap().1
+        } else {
+            path
+        })
+        .unwrap();
         let file = open_at(
             parent,
             &name,
@@ -236,7 +244,7 @@ impl Temp {
 
     fn verify_contents(&self) -> io::Result<()> {
         if let Some(src) = &self.src {
-            let actual = directory(&self.dir, c"src")?;
+            let actual = directory(&self.dir, &cstr(self.child.as_ref())?)?;
             if !same(&actual.metadata()?, &src.metadata()?) {
                 return Err(io::Error::other("temporary src identity changed"));
             }
@@ -273,7 +281,7 @@ impl Temp {
             unlink(parent, &entry.name, false)?;
         }
         if self.src.is_some() {
-            unlink(&self.dir, c"src", true)?;
+            unlink(&self.dir, &cstr(self.child.as_ref())?, true)?;
         }
         self.verify(parent)?;
         unlink(parent.fd(), &self.name, true)
@@ -299,6 +307,10 @@ fn create_inner(
     files: &[(&str, String)],
     mut hook: impl FnMut(Step, &Path) -> io::Result<()>,
 ) -> Result<(), String> {
+    let child = super::super::generated_subdirectory(files)?;
+    if name.is_empty() || matches!(name, "." | "..") || name.contains(['/', '\\', '\0']) {
+        return Err("invalid destination component".into());
+    }
     let parent = Anchor::open(parent).map_err(|_| {
         "destination parent is unavailable, unsafe or contains a symlink".to_owned()
     })?;
@@ -312,7 +324,7 @@ fn create_inner(
         Err(e) if e.raw_os_error() == Some(libc::ENOENT) => (),
         Err(_) => return Err("destination cannot be safely inspected".into()),
     }
-    let mut temp = Temp::make(&parent).map_err(|e| {
+    let mut temp = Temp::make(&parent, child).map_err(|e| {
         format!(
             "cannot establish owned temporary directory (OS code {:?}); inspect parent",
             e.raw_os_error()
@@ -406,6 +418,96 @@ mod tests {
         let root = tempfile::tempdir().expect("create temporary test directory");
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
         root
+    }
+
+    #[test]
+    fn k8s_root_files_keep_no_replace_race_and_partial_cleanup() {
+        let entries = vec![
+            ("deployment.yaml", "{}\n".into()),
+            ("service.yaml", "{}\n".into()),
+            ("README.md", "owned instructions\n".into()),
+        ];
+        let root = private_root();
+        create(root.path(), "k8s", &entries).unwrap();
+        assert_eq!(fs::read_dir(root.path().join("k8s")).unwrap().count(), 3);
+        assert!(create(root.path(), "k8s", &entries).is_err());
+        for failure in [
+            Step::FileWritten(0),
+            Step::FileWritten(1),
+            Step::BeforePublish,
+        ] {
+            assert!(
+                create_inner(root.path(), "rollback", &entries, |step, _| {
+                    if step == failure {
+                        Err(io::Error::other("injected failure"))
+                    } else {
+                        Ok(())
+                    }
+                })
+                .is_err()
+            );
+            assert_eq!(fs::read_dir(root.path()).unwrap().count(), 1);
+        }
+        assert!(
+            create_inner(root.path(), "race", &entries, |step, _| {
+                if step == Step::ParentChecked {
+                    fs::write(root.path().join("race"), "foreign")?;
+                }
+                Ok(())
+            })
+            .is_err()
+        );
+        assert_eq!(fs::read(root.path().join("race")).unwrap(), b"foreign");
+        assert_eq!(fs::read_dir(root.path()).unwrap().count(), 2);
+    }
+
+    #[test]
+    fn compose_root_files_retain_no_replace_partial_cleanup_and_path_guards() {
+        let entries = vec![
+            ("compose.yaml", "owned YAML\n".into()),
+            ("README.md", "owned README\n".into()),
+        ];
+        let root = private_root();
+        create(root.path(), "compose", &entries).unwrap();
+        assert_eq!(
+            fs::read_dir(root.path().join("compose")).unwrap().count(),
+            2
+        );
+        assert!(create(root.path(), "compose", &entries).is_err());
+        for failure in [Step::FileWritten(0), Step::BeforePublish] {
+            assert!(
+                create_inner(root.path(), "rollback", &entries, |step, _| {
+                    if step == failure {
+                        Err(io::Error::other("injected failure"))
+                    } else {
+                        Ok(())
+                    }
+                })
+                .is_err()
+            );
+            assert!(!root.path().join("rollback").exists());
+            assert_eq!(fs::read_dir(root.path()).unwrap().count(), 1);
+        }
+        assert!(
+            create_inner(root.path(), "race", &entries, |step, _| {
+                if step == Step::ParentChecked {
+                    fs::write(root.path().join("race"), "foreign")?;
+                }
+                Ok(())
+            })
+            .is_err()
+        );
+        assert_eq!(fs::read(root.path().join("race")).unwrap(), b"foreign");
+        assert_eq!(fs::read_dir(root.path()).unwrap().count(), 2);
+        for path in [
+            "../escape",
+            "tree/compose.yaml",
+            "tree/../escape",
+            "tree\\compose.yaml",
+        ] {
+            assert!(create(root.path(), "bad", &[(path, "bad".into())]).is_err());
+            assert!(!root.path().join("bad").exists());
+        }
     }
 
     #[test]
@@ -652,5 +754,51 @@ mod tests {
             "owned"
         );
         assert_eq!(fs::read_dir(root.path()).unwrap().count(), 1);
+    }
+
+    #[test]
+    fn docker_overlay_uses_the_same_no_replace_partial_cleanup_and_identity_checks() {
+        let entries = vec![
+            ("Dockerfile", "owned config".into()),
+            ("cargo-overlay/Cargo.toml", "owned overlay".into()),
+        ];
+        for failure in [Step::FileWritten(1), Step::ParentChecked] {
+            let root = private_root();
+            let result = create_inner(
+                root.path(),
+                "container space 設定",
+                &entries,
+                |step, _| {
+                    if step == failure {
+                        if step == Step::ParentChecked {
+                            symlink("private-target", root.path().join("container space 設定"))?;
+                        } else {
+                            return Err(io::Error::other("injected overlay write failure"));
+                        }
+                    }
+                    Ok(())
+                },
+            );
+            assert!(result.is_err());
+            if failure == Step::ParentChecked {
+                assert_eq!(
+                    fs::read_link(root.path().join("container space 設定")).unwrap(),
+                    Path::new("private-target")
+                );
+                assert_eq!(fs::read_dir(root.path()).unwrap().count(), 1);
+            } else {
+                assert_eq!(fs::read_dir(root.path()).unwrap().count(), 0);
+            }
+        }
+        let root = private_root();
+        assert!(
+            create(
+                root.path(),
+                "out",
+                &[("cargo-overlay/../escape", "bad".into())]
+            )
+            .is_err()
+        );
+        assert_eq!(fs::read_dir(root.path()).unwrap().count(), 0);
     }
 }

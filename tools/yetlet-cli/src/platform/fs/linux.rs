@@ -19,12 +19,12 @@ use std::{
 pub(crate) struct App {
     pub(in crate::platform) directory: File,
     pub(in crate::platform) cwd: PathBuf,
+    parent: Anchor,
+    private_cwd: bool,
 }
 
 pub(super) struct AppFiles {
     app: App,
-    parent: Anchor,
-    private_cwd: bool,
 }
 
 fn trusted(metadata: &Metadata) -> bool {
@@ -75,22 +75,99 @@ impl AppFiles {
             & 0o077
             == 0;
         Ok(Self {
-            app: App { directory, cwd },
-            parent,
-            private_cwd,
+            app: App {
+                directory,
+                cwd,
+                parent,
+                private_cwd,
+            },
         })
     }
 
     pub(super) fn read(&self, name: &str) -> Result<File, String> {
-        read(&self.parent, name, self.private_cwd)
+        read(&self.app.parent, name, self.app.private_cwd)
     }
 
     pub(super) fn finish(self) -> Result<App, String> {
-        self.parent
+        self.app
+            .parent
             .verify()
             .map_err(|_| "app cwd identity changed")?;
         Ok(self.app)
     }
+}
+
+fn selected_directory(app: &App, child: bool) -> Result<Anchor, String> {
+    app.parent
+        .verify()
+        .map_err(|_| "app cwd identity changed")?;
+    let anchor = Anchor::open(&if child {
+        app.cwd.join("src")
+    } else {
+        app.cwd.clone()
+    })
+    .map_err(|_| "app directory is unavailable or unsafe")?;
+    let dir = anchor
+        .working_directory()
+        .map_err(|_| "cannot inspect app directory")?;
+    if !trusted(&dir.metadata().map_err(|_| "cannot inspect app directory")?) {
+        return Err("app directory must be owned and protected".into());
+    }
+    Ok(anchor)
+}
+
+pub(crate) fn app_entries(app: &App, child: bool) -> Result<Vec<String>, String> {
+    use std::os::fd::AsRawFd;
+    let anchor = selected_directory(app, child)?;
+    let dir = anchor
+        .working_directory()
+        .map_err(|_| "cannot pin app directory")?;
+    let entries = std::fs::read_dir(format!("/proc/self/fd/{}", dir.as_raw_fd()))
+        .map_err(|_| "cannot enumerate pinned app directory")?;
+    let mut names = Vec::new();
+    for entry in entries {
+        names.push(
+            entry
+                .map_err(|_| "cannot enumerate app")?
+                .file_name()
+                .into_string()
+                .map_err(|_| "app entry names must be Unicode")?,
+        );
+    }
+    anchor
+        .verify()
+        .map_err(|_| "app directory identity changed")?;
+    app.parent
+        .verify()
+        .map_err(|_| "app cwd identity changed")?;
+    names.sort();
+    Ok(names)
+}
+
+pub(crate) fn read_app_file(app: &App, name: &str) -> Result<Vec<u8>, String> {
+    use std::io::Read;
+    let (child, name) = match name {
+        "src/main.rs" => (true, "main.rs"),
+        "Cargo.toml" | "Cargo.lock" => (false, name),
+        _ => return Err("unsupported app input".into()),
+    };
+    let anchor = selected_directory(app, child)?;
+    let mut file = read(&anchor, name, app.private_cwd)?;
+    let mut bytes = Vec::new();
+    file.by_ref()
+        .take(1024 * 1024 + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|_| "cannot read app input")?;
+    if bytes.len() > 1024 * 1024 {
+        return Err("app input exceeds size limit".into());
+    }
+    anchor
+        .verify()
+        .map_err(|_| "app directory identity changed")?;
+    app.parent
+        .verify()
+        .map_err(|_| "app cwd identity changed")?;
+    Ok(bytes)
 }
 
 pub(crate) fn read_framework(path: &Path) -> std::io::Result<Vec<u8>> {

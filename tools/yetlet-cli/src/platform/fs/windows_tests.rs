@@ -125,6 +125,211 @@ fn unicode_bytes_and_private_stage_publish_on_ntfs() {
 }
 
 #[test]
+fn docker_overlay_unicode_output_rejects_junction_races_and_foreign_writable_parent() {
+    let entries = vec![
+        ("Dockerfile", "owned configuration\n".into()),
+        ("cargo-overlay/Cargo.toml", "owned overlay\n".into()),
+    ];
+    let root = tempfile::tempdir().unwrap();
+    // Construct the fixture parent atomically with the native owner-only DACL.
+    // Inherited TempDir ACLs can be group-writable, which the generator must reject.
+    let anchor = Anchor::open(root.path()).unwrap();
+    let sd = private_security().unwrap();
+    let owned = relative(
+        anchor.directory(),
+        "private-test-output".as_ref(),
+        true,
+        true,
+        Some(&sd),
+    )
+    .unwrap();
+    drop(owned);
+    drop(anchor);
+    let parent = root.path().join("private-test-output");
+    // The NtCreateFile traversal handle intentionally lacks READ_CONTROL.
+    // Reopen with the adapter's security access before checking the DACL.
+    let parent_anchor = Anchor::open(&parent).unwrap();
+    let security = parent_anchor.security_directory().unwrap();
+    protected(&security, true).unwrap();
+    drop(security);
+    drop(parent_anchor);
+    create_project(parent.as_path(), "container space 雪", &entries).unwrap();
+    assert_eq!(
+        fs::read(
+            parent
+                .as_path()
+                .join("container space 雪/cargo-overlay/Cargo.toml")
+        )
+        .unwrap(),
+        b"owned overlay\n"
+    );
+    assert!(create_project(parent.as_path(), "container space 雪", &entries).is_err());
+    assert!(
+        create(parent.as_path(), "race", &entries, || {
+            fs::write(parent.as_path().join("race"), "foreign")
+        })
+        .is_err()
+    );
+    assert_eq!(fs::read(parent.as_path().join("race")).unwrap(), b"foreign");
+    junction(
+        &parent.as_path().join("alias"),
+        &parent.as_path().join("container space 雪"),
+    );
+    assert!(create_project(&parent.as_path().join("alias"), "out", &entries).is_err());
+    let anchor = Anchor::open(parent.as_path()).unwrap();
+    let private = private_security().unwrap();
+    let hostile = foreign_writable_security(&private);
+    let directory = relative(
+        anchor.directory(),
+        "unsafe".as_ref(),
+        true,
+        true,
+        Some(&hostile),
+    )
+    .unwrap();
+    drop(directory);
+    drop(anchor);
+    assert!(create_project(&parent.as_path().join("unsafe"), "out", &entries).is_err());
+    assert!(names(&parent.as_path().join("unsafe")).is_empty());
+}
+
+#[test]
+fn k8s_root_files_require_protected_parent_and_keep_no_replace_junction_and_rollback() {
+    let entries = vec![
+        ("deployment.yaml", "{}\n".into()),
+        ("service.yaml", "{}\n".into()),
+        ("README.md", "owned instructions\n".into()),
+    ];
+    let root = tempfile::tempdir().unwrap();
+    let anchor = Anchor::open(root.path()).unwrap();
+    let sd = private_security().unwrap();
+    drop(
+        relative(
+            anchor.directory(),
+            "private-k8s".as_ref(),
+            true,
+            true,
+            Some(&sd),
+        )
+        .unwrap(),
+    );
+    let parent = root.path().join("private-k8s");
+    create_project(&parent, "k8s space 雪", &entries).unwrap();
+    assert_eq!(names(&parent.join("k8s space 雪")).len(), 3);
+    assert!(create_project(&parent, "k8s space 雪", &entries).is_err());
+    assert!(
+        create(&parent, "race", &entries, || fs::write(
+            parent.join("race"),
+            "foreign"
+        ))
+        .is_err()
+    );
+    assert_eq!(fs::read(parent.join("race")).unwrap(), b"foreign");
+    junction(&parent.join("alias"), &parent.join("k8s space 雪"));
+    assert!(create_project(&parent.join("alias"), "out", &entries).is_err());
+    let private_anchor = Anchor::open(&parent).unwrap();
+    let hostile = foreign_writable_security(&sd);
+    drop(
+        relative(
+            private_anchor.directory(),
+            "unsafe".as_ref(),
+            true,
+            true,
+            Some(&hostile),
+        )
+        .unwrap(),
+    );
+    assert!(create_project(&parent.join("unsafe"), "out", &entries).is_err());
+    assert!(names(&parent.join("unsafe")).is_empty());
+    assert!(
+        create(&parent, "rollback", &entries, || Err(io::Error::other(
+            "injected failure"
+        )))
+        .is_err()
+    );
+    assert!(!parent.join("rollback").exists());
+    assert!(
+        names(&parent)
+            .iter()
+            .all(|name| !name.starts_with(".yetlet-"))
+    );
+}
+
+#[test]
+fn compose_root_files_keep_owner_acl_junction_race_and_rollback_guards() {
+    let entries = vec![
+        ("compose.yaml", "owned YAML\n".into()),
+        ("README.md", "owned README\n".into()),
+    ];
+    let root = tempfile::tempdir().unwrap();
+    let anchor = Anchor::open(root.path()).unwrap();
+    let sd = private_security().unwrap();
+    drop(
+        relative(
+            anchor.directory(),
+            "private-output".as_ref(),
+            true,
+            true,
+            Some(&sd),
+        )
+        .unwrap(),
+    );
+    let parent = root.path().join("private-output");
+    create_project(&parent, "compose space 雪", &entries).unwrap();
+    assert_eq!(
+        fs::read(parent.join("compose space 雪/compose.yaml")).unwrap(),
+        b"owned YAML\n"
+    );
+    assert_eq!(names(&parent.join("compose space 雪")).len(), 2);
+    assert!(create_project(&parent, "compose space 雪", &entries).is_err());
+    assert!(
+        create(&parent, "race", &entries, || fs::write(
+            parent.join("race"),
+            "foreign"
+        ))
+        .is_err()
+    );
+    assert_eq!(fs::read(parent.join("race")).unwrap(), b"foreign");
+    junction(&parent.join("alias"), &parent.join("compose space 雪"));
+    assert!(create_project(&parent.join("alias"), "out", &entries).is_err());
+    let private_anchor = Anchor::open(&parent).unwrap();
+    let hostile = foreign_writable_security(&sd);
+    drop(
+        relative(
+            private_anchor.directory(),
+            "unsafe".as_ref(),
+            true,
+            true,
+            Some(&hostile),
+        )
+        .unwrap(),
+    );
+    assert!(create_project(&parent.join("unsafe"), "out", &entries).is_err());
+    assert!(names(&parent.join("unsafe")).is_empty());
+    assert!(
+        create(&parent, "rollback", &entries, || Err(io::Error::other(
+            "injected failure"
+        )))
+        .is_err()
+    );
+    assert!(!parent.join("rollback").exists());
+    assert!(
+        names(&parent)
+            .iter()
+            .all(|name| !name.starts_with(".yetlet-"))
+    );
+    for path in [
+        "../escape",
+        "tree/compose.yaml",
+        "tree/../escape",
+        "tree\\compose.yaml",
+    ] {
+        assert!(create_project(&parent, "bad", &[(path, "bad".into())]).is_err());
+        assert!(!parent.join("bad").exists());
+    }
+}
+
+#[test]
 fn existing_directory_file_and_locked_target_are_never_replaced() {
     let root = tempfile::tempdir().unwrap();
     fs::create_dir(root.path().join("directory")).unwrap();
@@ -260,7 +465,7 @@ fn rollback_retains_foreign_file_with_different_identity() {
     let root = tempfile::tempdir().unwrap();
     let parent = Anchor::open(root.path()).unwrap();
     let sd = private_security().unwrap();
-    let mut stage = Stage::make(&parent, &sd).unwrap();
+    let mut stage = Stage::make(&parent, &sd, "src").unwrap();
     stage
         .populate(&[("README.md", "original".into())], &sd)
         .unwrap();

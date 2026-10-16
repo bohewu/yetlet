@@ -1,5 +1,5 @@
 use std::process::ExitCode;
-use yetlet_cli::{Cli, HELP, app, doctor, parse, scaffold};
+use yetlet_cli::{Cli, HELP, app, compose, docker, doctor, parse, scaffold};
 
 fn main() -> ExitCode {
     let args = std::env::args_os().skip(1).collect::<Vec<_>>();
@@ -15,11 +15,58 @@ fn main() -> ExitCode {
         }
         Ok(Cli::Build { manifest, release }) => application(&manifest, false, release),
         Ok(Cli::Dev { manifest }) => application(&manifest, true, false),
+        Ok(command @ Cli::GenerateK8s { .. }) => match command.generate_k8s() {
+            Ok(()) => {
+                println!(
+                    "Created Kubernetes configuration. Read its README before operator-selected validation or deployment."
+                );
+                ExitCode::SUCCESS
+            }
+            Err(error) => {
+                eprintln!("generate k8s failed: {error}");
+                ExitCode::FAILURE
+            }
+        },
+        Ok(Cli::GenerateCompose {
+            manifest,
+            output,
+            image,
+        }) => match compose::generate(&manifest, &output, &image) {
+            Ok(()) => {
+                println!(
+                    "Created Compose configuration. Read its README before using your separately built local image."
+                );
+                ExitCode::SUCCESS
+            }
+            Err(error) => {
+                eprintln!("generate compose failed: {error}");
+                ExitCode::FAILURE
+            }
+        },
+        Ok(Cli::GenerateDocker { manifest, output }) => {
+            match docker::generate(&manifest, &output) {
+                Ok(()) => {
+                    println!(
+                        "Created Docker configuration. Read its README before preparing the two sanitized source exports."
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(error) => {
+                    eprintln!("generate docker failed: {error}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
         Ok(Cli::New {
             name,
             framework,
             dir,
-        }) => match scaffold::create(&name, &framework, &dir) {
+            cloud,
+        }) => match if cloud {
+            scaffold::create_cloud(&name, &framework, &dir)
+        } else {
+            scaffold::create(&name, &framework, &dir)
+        } {
             Ok(()) => {
                 println!(
                     "Created {name}. Follow its README for the explicit offline lockfile step."

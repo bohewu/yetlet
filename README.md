@@ -65,6 +65,21 @@ On **Windows GNU/MSVC**, the same CLI commands are available using `yetlet.exe` 
 
 New applications use explicit local Yetlet source paths; the CLI never creates the application's lockfile, resolves dependencies online or installs tools. The separate offline lock step requires cached dependencies. `build/dev` use Cargo `--frozen`, and `dev` has no HMR/watch mode. Linux process/PTY and Windows NTFS/ACL/Job Object/console behavior have separate bounded acceptance receipts. Other operating systems and unsupported console/filesystem configurations fail closed. This is not production or release qualification; see [YT-087](docs/YT-087C-VERIFICATION.md) and [YT-088](docs/YT-088-CROSS-PLATFORM-CLI-PLAN.md).
 
+## Optional Linux container and Kubernetes configuration
+
+The unpublished CLI can explicitly scaffold a [cloud-profile SSR app](docs/YT-089A-VERIFICATION.md) with local-process liveness/readiness, configurable bind address, and graceful SIGTERM/Ctrl-C handling. The separate [configuration-only generators](tools/yetlet-cli/README.md) emit Dockerfile, Compose and generic Linux/amd64 Kubernetes Deployment/Service files from a validated cloud-profile app with an explicit Cargo.lock:
+
+```sh
+YETLET=tools/yetlet-cli/target/debug/yetlet
+"$YETLET" new cloudapp --cloud --framework-path . --dir "$HOME/yetlet-apps"
+cargo generate-lockfile --offline --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml"
+"$YETLET" generate docker --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml" --output "$HOME/yetlet-apps/docker-output"
+"$YETLET" generate compose --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml" --output "$HOME/yetlet-apps/compose-output" --image localhost:5000/team/cloudapp:v1
+"$YETLET" generate k8s --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml" --output "$HOME/yetlet-apps/k8s-output" --image localhost:5000/team/cloudapp:v1
+```
+
+Generation **does not** run Docker or Kubernetes, fetch dependencies, export private source, publish images, or deploy a cluster. Docker builds require separate audited `app-src` and `yetlet-src` named BuildKit contexts; deployment images/credentials, ports and namespaces remain operator responsibilities. Linux OCI/K3s output and Windows GNU/MSVC generator parity have [separate source-bound evidence](docs/YT-089E-VERIFICATION.md). M15 is an unpublished preview, not production or YT-020 release qualification.
+
 ## Add browser behavior when needed
 
 The Todo application shares its Rust View between SSR and the browser. `/app` owns local keyed updates and a separate typed HTTP Create action; `/search` renders complete HTML before lazily loading its local Search Island.

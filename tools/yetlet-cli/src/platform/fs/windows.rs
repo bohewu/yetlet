@@ -134,6 +134,78 @@ impl App {
     }
 }
 
+pub(crate) fn app_entries(app: &App, child: bool) -> Result<Vec<String>, String> {
+    app.verify().map_err(|_| "app identity changed")?;
+    let path = if child {
+        app.cwd.join("src")
+    } else {
+        app.cwd.clone()
+    };
+    let anchor = Anchor::open(&path).map_err(|_| "app directory is unavailable or unsafe")?;
+    let security = anchor
+        .security_directory()
+        .map_err(|_| "cannot inspect app directory")?;
+    protected(&security, true).map_err(|_| "app directory must be owned and protected")?;
+    let mut names = Vec::new();
+    for entry in std::fs::read_dir(&path).map_err(|_| "cannot enumerate pinned app directory")? {
+        names.push(
+            entry
+                .map_err(|_| "cannot enumerate app")?
+                .file_name()
+                .into_string()
+                .map_err(|_| "app entry names must be Unicode")?,
+        );
+    }
+    anchor
+        .verify()
+        .map_err(|_| "app directory identity changed")?;
+    app.verify().map_err(|_| "app identity changed")?;
+    names.sort();
+    Ok(names)
+}
+
+pub(crate) fn read_app_file(app: &App, name: &str) -> Result<Vec<u8>, String> {
+    app.verify().map_err(|_| "app identity changed")?;
+    let (child, name) = match name {
+        "src/main.rs" => (true, "main.rs"),
+        "Cargo.toml" | "Cargo.lock" => (false, name),
+        _ => return Err("unsupported app input".into()),
+    };
+    let path = if child {
+        app.cwd.join("src")
+    } else {
+        app.cwd.clone()
+    };
+    let anchor = Anchor::open(&path).map_err(|_| "app directory is unavailable or unsafe")?;
+    let security = anchor
+        .security_directory()
+        .map_err(|_| "cannot inspect app directory")?;
+    protected(&security, true).map_err(|_| "app directory must be owned and protected")?;
+    let mut file = relative_access(
+        anchor.directory(),
+        name.as_ref(),
+        false,
+        false,
+        None,
+        READ_CONTROL,
+    )
+    .map_err(|_| "app input is unavailable or unsafe")?;
+    protected(&file, true).map_err(|_| "app input must be owned and protected")?;
+    let mut bytes = Vec::new();
+    Read::by_ref(&mut file)
+        .take(1024 * 1024 + 1)
+        .read_to_end(&mut bytes)
+        .map_err(|_| "cannot read app input")?;
+    if bytes.len() > 1024 * 1024 {
+        return Err("app input exceeds size limit".into());
+    }
+    anchor
+        .verify()
+        .map_err(|_| "app directory identity changed")?;
+    app.verify().map_err(|_| "app identity changed")?;
+    Ok(bytes)
+}
+
 // An explicit executable path, not CreateProcess's app-cwd-first search. Pin its
 // ancestry and bytes against substitution for the whole child lifetime too.
 pub(in crate::platform) struct Executable {
@@ -759,9 +831,10 @@ struct Stage {
     root: Option<Entry>,
     src: Option<Entry>,
     files: Vec<(bool, Entry)>,
+    child: &'static str,
 }
 impl Stage {
-    fn make(parent: &Anchor, sd: &Local) -> io::Result<Self> {
+    fn make(parent: &Anchor, sd: &Local, child: &'static str) -> io::Result<Self> {
         let mut random = [0_u8; 16];
         // SAFETY: output slice is writable; null algorithm selects system RNG.
         nt(unsafe {
@@ -778,6 +851,7 @@ impl Stage {
             root: Some(root),
             src: None,
             files: Vec::new(),
+            child,
         })
     }
     fn root(&self) -> &File {
@@ -828,10 +902,12 @@ impl Stage {
         }
     }
     fn populate(&mut self, entries: &[(&str, String)], sd: &Local) -> io::Result<()> {
-        self.src = Some(Entry::create(self.root(), "src", true, sd)?);
+        if entries.iter().any(|(path, _)| path.contains('/')) {
+            self.src = Some(Entry::create(self.root(), self.child, true, sd)?);
+        }
         for (path, bytes) in entries {
-            let (in_src, name) = match path.strip_prefix("src/") {
-                Some(name) => (true, name),
+            let (in_src, name) = match path.split_once('/') {
+                Some((_, name)) => (true, name),
                 None => (false, *path),
             };
             let parent = if in_src {
@@ -858,7 +934,9 @@ impl Stage {
         for (_, entry) in &mut self.files {
             entry.file.take();
         }
-        self.src.as_mut().unwrap().file.take();
+        if let Some(src) = &mut self.src {
+            src.file.take();
+        }
         rename(self.root(), parent.directory(), name)?;
         // Successful native rename is the sole ownership-transfer point. Never
         // delete the published destination, even if a later close fails.
@@ -923,10 +1001,24 @@ fn create(
     entries: &[(&str, String)],
     before_publish: impl FnOnce() -> io::Result<()>,
 ) -> io::Result<()> {
-    crate::scaffold::validate_name(name).map_err(io::Error::other)?;
+    component(name.as_ref())?;
+    let child = super::generated_subdirectory(entries).map_err(io::Error::other)?;
     let parent = Anchor::open(parent)?;
+    // Deployment configuration additionally requires the explicitly selected
+    // output parent to be owner-protected. Retain the historical new policy.
+    let parent_security = if child == "cargo-overlay"
+        || entries
+            .iter()
+            .any(|(path, _)| matches!(*path, "compose.yaml" | "deployment.yaml" | "service.yaml"))
+    {
+        let security = parent.security_directory()?;
+        protected(&security, true)?;
+        Some(security)
+    } else {
+        None
+    };
     let sd = private_security()?;
-    let mut stage = Stage::make(&parent, &sd)?;
+    let mut stage = Stage::make(&parent, &sd, child)?;
     let result = stage
         .populate(entries, &sd)
         .and_then(|()| before_publish())
@@ -939,6 +1031,7 @@ fn create(
             ))),
         };
     }
+    drop(parent_security);
     Ok(())
 }
 
