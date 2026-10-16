@@ -44,14 +44,15 @@ pub struct Options {
 }
 
 pub fn preflight(root: &Path, kind: Build) -> Result<(OsString, OsString)> {
-    let cargo = tool("cargo", ".cargo/bin")?;
-    let bindgen = tool("wasm-bindgen", ".local/share/yetlet-tools/bin")?;
+    // Validate lockfile consistency before depending on host-installed build tools.
     let version = lock_version(root, "Cargo.lock")?;
     if kind == Build::SceneIsland
         && lock_version(root, "examples/webgpu-scene-island/Cargo.lock")? != version
     {
         return Err(fail("nested/root wasm-bindgen locks disagree"));
     }
+    let cargo = tool("cargo", ".cargo/bin")?;
+    let bindgen = tool("wasm-bindgen", ".local/share/yetlet-tools/bin")?;
     let output = execute(root, &bindgen, &["--version".into()], true)?;
     if std::str::from_utf8(&output).unwrap_or("").trim() != format!("wasm-bindgen {version}") {
         return Err(fail(
