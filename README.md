@@ -47,6 +47,24 @@ cargo run --locked -p yetlet-hello-world
 
 Open `http://127.0.0.1:3003/` or `/hello/World`. See [Hello World](examples/hello-world/README.md).
 
+## Optional local Yetlet CLI preview
+
+The separate [unpublished CLI](tools/yetlet-cli/README.md) provides Linux and Windows `doctor`, `new`, `build` and foreground `dev` commands for native handler-first SSR applications. It is not installed globally or published to crates.io, and does not replace internal `cargo xtask`.
+
+```bash
+cargo build --offline --locked --manifest-path tools/yetlet-cli/Cargo.toml
+tools/yetlet-cli/target/debug/yetlet doctor --framework-path . --json
+mkdir -p -m 700 "$HOME/yetlet-apps"
+tools/yetlet-cli/target/debug/yetlet new sampleapp --framework-path . --dir "$HOME/yetlet-apps"
+cargo generate-lockfile --offline --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
+tools/yetlet-cli/target/debug/yetlet build --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
+tools/yetlet-cli/target/debug/yetlet dev --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
+```
+
+On **Windows GNU/MSVC**, the same CLI commands are available using `yetlet.exe` from a locally built CLI. See the [Windows PowerShell quick start](tools/yetlet-cli/README.md#windows-powershell-native-gnumsvc) for the explicit Cargo.lock step and protected NTFS/ACL/Cargo requirements. Windows `dev` needs a real console for Ctrl-C/Break and runs Cargo and its descendants in an owned Job Object. This preview remains unpublished.
+
+New applications use explicit local Yetlet source paths; the CLI never creates the application's lockfile, resolves dependencies online or installs tools. The separate offline lock step requires cached dependencies. `build/dev` use Cargo `--frozen`, and `dev` has no HMR/watch mode. Linux process/PTY and Windows NTFS/ACL/Job Object/console behavior have separate bounded acceptance receipts. Other operating systems and unsupported console/filesystem configurations fail closed. This is not production or release qualification; see [YT-087](docs/YT-087C-VERIFICATION.md) and [YT-088](docs/YT-088-CROSS-PLATFORM-CLI-PLAN.md).
+
 ## Add browser behavior when needed
 
 The Todo application shares its Rust View between SSR and the browser. `/app` owns local keyed updates and a separate typed HTTP Create action; `/search` renders complete HTML before lazily loading its local Search Island.
