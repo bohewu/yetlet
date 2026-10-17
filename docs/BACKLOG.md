@@ -217,6 +217,17 @@ The [bounded Vite experiment](VITE-SPIKE-VERIFICATION.md) passed Linux productio
 | YT-100 | P2 | M | M18 | Vite development server and HMR policy/lifecycle | YT-099 | [Opt-in implementation and verified acceptance](YT-100-VERIFICATION.md): `new --assets vite --with-vite-dev` preserves established scaffold bytes; Rust and Vite remain separate foreground processes. First Reviewer P1 pinned Vite8 `env.mjs` allowlist fixed with exact-path Linux/Windows Node 7/7 tests. Real Linux Plain and Cloud+Config+Tailwind Chrome 11/11 each: CSS 7→11→7 without reload, nonce/CSP, HMR WebSocket, no-JS SSR and protected paths. Actual `yetlet dev`/`npm run dev` PTY Ctrl-C, 503 fallback, restart, adversarial Origin rejection and owned cleanup PASS. Native Linux and source-bound Windows GNU/MSVC build/tests PASS; **Windows live HMR/console Ctrl-C unverified**. Independent Reviewer Job `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/required followups, 9/9 unchanged source hashes), closing prior P1/P2. No default/core/production CSP change, stable asset API, cloud delivery or release activation | Done |
 | YT-101 | P1 | M | M18 | Deliver optional assets and configuration through cloud generators | YT-099, YT-097, YT-089 | Explicit runtime config/asset roots instead of developer build paths, sanitized build contexts, exclusion of secrets/node_modules/source maps, built immutable assets and documented rollout retention. Extend existing exact-source generators only through reviewed contracts and bounded Linux Docker/Compose/Kubernetes proof; no registry publication or production deployment without separate authority; independent Reviewer PASS required | Todo |
 
+## M19 — Developer Experience research (planned)
+
+YT-102 is a research-only DX improvement study scheduled after YT-101.
+Other production-oriented M19/M20 plans remain separate maintainer work.
+No unified dev command, watcher, tooling installation or deployment is
+authorized by this registration.
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-102 | P1 | M | M19 | Developer Experience audit and improvement roadmap (research only) | YT-100, YT-101 | Audit real Linux/Windows developer journeys from `new`/`doctor` through dependency setup, local SSR/frontend development, rebuild/restart, testing, debugging, configuration and deployment preview. Evaluate opt-in unified `yetlet dev` supervision of Rust plus Vite (without displacing the verified two-terminal fallback), Rust watch/recompile/restart, CSS/JS/browser reload boundaries, process/port/signal ownership, errors/logs/tracing, typed settings/secrets, scaffold presets, troubleshooting/docs and frontend-tool neutrality. Compare existing tooling against minimal custom integration using measurable cold/warm start and change-feedback costs, compatibility, security, dependency/maintenance risk and cross-platform failure modes. Deliver an English, evidence-linked DX gap matrix, prioritized options/decision record, staged implementation proposals and focused verification plans; require independent Reviewer PASS for research closeout. **No code/toolchain/runtime implementation, automatic Node install/process startup, release or deployment is authorized by this research item** | Todo |
+
 ## Update rules
 
 1. Change status only after checking source changes and task-specific evidence.

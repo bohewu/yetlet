@@ -25,6 +25,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M16 — Done at bounded YT-090 / YT-097 scope** | Opt-in typed native configuration and optional CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](YT-090-VERIFICATION.md); [CLI integration Linux/Windows GNU/MSVC and independent Reviewer PASS](YT-097-VERIFICATION.md); no default/core/browser or release change |
 | **M17 — Done at bounded YT-091 Tailwind scope** | Opt-in build-time Tailwind CSS 4 application scaffolding | YT-091 | [Guide](../tools/yetlet-cli/README.md#opt-in-tailwind-css-4-yt-091-independently-reviewed), [evidence](YT-091-VERIFICATION.md); actual Linux HTTP/CSS/CSP/signals and native Windows GNU/MSVC Tailwind source-bound builds PASS; independent Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS, no core/browser change or release activation |
 | **M18 — In progress; YT-098–YT-100 Done at bounded scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; YT-101 Todo; no stable shared asset API, default/core/browser or release change |
+| **M19 — Planned Developer Experience research** | Optional developer workflow and feedback-loop study after cloud delivery | YT-102 | Research-only opt-in Rust/Vite supervision, watch/restart, diagnostics, onboarding, tests and Linux/Windows parity; evidence-backed DX gaps and independently reviewed staged proposals, without automatic implementation or production changes |
 
 ## M18 — Asset contract and Vite integration (in progress)
 
@@ -55,6 +56,18 @@ Tailwind templates remain unchanged. YT-020 remains Blocked; no CI/CD or
 release activation follows.
 The earlier experiment/planning Reviewer `wc_job_SuuEr3YetGlVbs_8` PASS
 remains separate historical evidence for the Vite experiment and plan.
+
+**YT-102, research-only Developer Experience:** following YT-101, study the
+real application authoring and feedback loop: opt-in unified Rust/Vite dev
+orchestration, Rust watch/rebuild/restart, failure reporting, diagnostics,
+scaffold/onboarding, typed configuration and development secrets, testing,
+preview/deployment ergonomics, and Linux/Windows parity. Compare reuse of
+existing tools with minimal Yetlet-specific integration; keep a separate
+frontend-independent and two-terminal fallback. Produce an evidence-based,
+prioritized DX research report and candidate future backlog slices with
+independent Reviewer PASS. Research does **not** implement a unified dev command,
+make Node/Vite mandatory, authorize process automation, or alter production
+runtime/CSP, release or deployment.
 
 ## M17 — Explicit build-time Tailwind CSS
 
