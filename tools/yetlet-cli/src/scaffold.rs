@@ -305,3 +305,242 @@ pub(crate) fn tailwind_files(
     ]);
     Ok(entries)
 }
+
+/// Opt-in Vite production sources only; no tool execution or dependency install.
+pub fn create_vite(
+    name: &str,
+    framework: &Path,
+    dir: &Path,
+    cloud: bool,
+    with_config: bool,
+    with_tailwind: bool,
+) -> Result<(), String> {
+    validate_name(name).map_err(str::to_owned)?;
+    crate::platform::fs::ensure_create_supported()?;
+    let framework = crate::framework::validate(framework).map_err(str::to_owned)?;
+    if with_config {
+        crate::framework::validate_config(&framework).map_err(str::to_owned)?;
+    }
+    let entries = vite_files(name, &framework, cloud, with_config, with_tailwind)?;
+    crate::platform::fs::create_project(dir, name, &entries)
+}
+
+fn vite_files(
+    name: &str,
+    framework: &Path,
+    cloud: bool,
+    with_config: bool,
+    with_tailwind: bool,
+) -> Result<Vec<(&'static str, String)>, String> {
+    // Never pass through the standalone Tailwind generator: Vite owns CSS here.
+    let mut entries = if with_config {
+        config_files(name, framework, cloud)?
+    } else {
+        files(name, framework, cloud)?
+    };
+    let serde = if with_config {
+        ""
+    } else {
+        "serde = { version = \"=1.0.229\", features = [\"derive\"] }\n"
+    };
+    entries[0].1 = entries[0].1.replacen(
+        "[dependencies]\n",
+        &format!("[dependencies]\n{serde}serde_json = \"=1.0.149\"\n"),
+        1,
+    );
+    entries[0].1.push_str(
+        "\n[dev-dependencies]\ntower = { version = \"0.5\", features = [\"util\"] }\ntempfile = \"=3.27.0\"\n",
+    );
+    let main = &mut entries[3].1;
+    let start = main.find("async fn home(").ok_or("missing built-in home")?;
+    let end = main
+        .find(if cloud {
+            "async fn live()"
+        } else {
+            "#[tokio::main]"
+        })
+        .ok_or("missing built-in entry point")?;
+    let handlers = include_str!("../templates/vite/handlers.rs")
+        .replace(
+            "@SETTINGS_FIELD@",
+            if with_config {
+                "    settings: config::Settings,\n"
+            } else {
+                ""
+            },
+        )
+        .replace(
+            "@MESSAGE@",
+            if with_config {
+                "&state.settings.service.public_message"
+            } else {
+                "\"Hello <Yetlet> & Rust!\""
+            },
+        )
+        .replace(
+            "@PROOF_ID@",
+            if with_tailwind {
+                "tailwind-proof"
+            } else {
+                "plain-proof"
+            },
+        );
+    main.replace_range(start..end, &format!("{handlers}\n"));
+    *main = format!("mod vite;\n\n{main}")
+        .replace("use yetlet_server_axum::{App, Page};", "use yetlet_server_axum::App;")
+        .replace("use axum::extract::{Path, State};", "use axum::extract::Path;")
+        .replace("extract::{Path, State},", "extract::Path,")
+        .replace("use std::sync::Arc;\n", "")
+        .replace("use axum::{\n    Extension,\n    extract::Path,\n    http::StatusCode,\n};", "use axum::{Extension, extract::Path, http::StatusCode};")
+        .replace(".page(\"/\", \"Yetlet\", home)", ".get(\"/\", home)")
+        .replace(".with_state(Arc::new(settings))", ".with_state(state)")
+        .replace(
+            "async fn main() -> Result<(), Box<dyn std::error::Error>> {",
+            "async fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let assets = vite::Snapshot::load_from_env()?;",
+        );
+    if !with_config {
+        *main = main.replace(
+            "        .into_router()",
+            "        .with_state(state)\n        .into_router()",
+        );
+    }
+    let state = format!(
+        "    let state = std::sync::Arc::new(AppState {{\n        assets: assets.clone(),\n{}    }});\n",
+        if with_config {
+            "        settings,\n"
+        } else {
+            ""
+        },
+    );
+    if cloud {
+        *main = main
+            .replace(
+                "fn router(settings: config::Settings, readiness: Arc<AtomicBool>)",
+                "fn router(state: Arc<AppState>, readiness: Arc<AtomicBool>)",
+            )
+            .replace(
+                "fn router(readiness: Arc<AtomicBool>)",
+                "fn router(state: Arc<AppState>, readiness: Arc<AtomicBool>)",
+            )
+            .replace(
+                "    let readiness = Arc::new(AtomicBool::new(true));",
+                &format!("{state}    let readiness = Arc::new(AtomicBool::new(true));"),
+            )
+            .replace("router(settings, readiness)", "router(state, readiness)")
+            .replace(
+                "axum::serve(listener, router(readiness))",
+                "axum::serve(listener, router(state, readiness))",
+            )
+            .replace(
+                "axum::serve(listener, router(state, readiness))",
+                "axum::serve(\n        listener,\n        router(state, readiness).merge(vite::router(assets)),\n    )",
+            )
+            .replace(
+                "        .with_graceful_shutdown(shutdown)\n        .await?;",
+                "    .with_graceful_shutdown(shutdown)\n    .await?;",
+            );
+    } else {
+        *main = main
+            .replace(
+                "    let app: axum::Router",
+                &format!("{state}    let app: axum::Router"),
+            )
+            .replace(
+                "axum::serve(listener, app)",
+                "axum::serve(listener, app.merge(vite::router(assets)))",
+            );
+    }
+    // Format only this opt-in copy; established template bytes are untouched.
+    *main = main.replace(
+        "let port: u16 = std::env::var(\"YETLET_PORT\").unwrap_or_else(|_| \"3000\".into()).parse()?;",
+        "let port: u16 = std::env::var(\"YETLET_PORT\")\n        .unwrap_or_else(|_| \"3000\".into())\n        .parse()?;",
+    );
+    entries[1].1 = entries[1]
+        .1
+        .replace(
+            "No JavaScript or WASM is loaded.",
+            "The selected Vite entry enhances native SSR; no WASM is loaded.",
+        )
+        .replace(
+            "No JS, DI container, secret discovery,",
+            "No DI container, secret discovery,",
+        )
+        .replace("No JS/WASM, Controller, DI,", "No WASM, Controller, DI,");
+    entries[1].1 = format!(
+        "{}\n\n{}",
+        include_str!("../templates/vite/README.md").replace("@NAME@", name),
+        entries[1].1
+    );
+    entries[2].1.push_str("/dist/\n/node_modules/\n");
+    let config = include_str!("../templates/vite/vite.config.mjs")
+        .replace(
+            "@PLUGIN_IMPORT@",
+            if with_tailwind {
+                "import tailwindcss from '@tailwindcss/vite';\n"
+            } else {
+                ""
+            },
+        )
+        .replace("@PLUGIN@", if with_tailwind { "tailwindcss()" } else { "" });
+    entries.extend([
+        (
+            "src/vite.rs",
+            include_str!("../templates/vite/vite.rs").into(),
+        ),
+        ("vite.config.mjs", config),
+        (
+            "tsconfig.json",
+            include_str!("../templates/vite/tsconfig.json").into(),
+        ),
+        (
+            "package.json",
+            if with_tailwind {
+                include_str!("../templates/vite/tailwind-package.json")
+            } else {
+                include_str!("../templates/vite/plain-package.json")
+            }
+            .into(),
+        ),
+        (
+            "package-lock.json",
+            if with_tailwind {
+                include_str!("../templates/vite/tailwind-package-lock.json")
+            } else {
+                include_str!("../templates/vite/plain-package-lock.json")
+            }
+            .into(),
+        ),
+        ("app.ts", include_str!("../templates/vite/app.ts").into()),
+        (
+            "app.css",
+            if with_tailwind {
+                include_str!("../templates/vite/tailwind.css")
+            } else {
+                include_str!("../templates/vite/plain.css")
+            }
+            .into(),
+        ),
+        (
+            "companion.ts",
+            include_str!("../templates/vite/companion.ts").into(),
+        ),
+        (
+            "shared.ts",
+            include_str!("../templates/vite/shared.ts").into(),
+        ),
+        (
+            "shared.css",
+            include_str!("../templates/vite/shared.css").into(),
+        ),
+        ("lazy.ts", include_str!("../templates/vite/lazy.ts").into()),
+        (
+            "lazy.css",
+            include_str!("../templates/vite/lazy.css").into(),
+        ),
+        (
+            "mark.svg",
+            include_str!("../templates/vite/mark.svg").into(),
+        ),
+    ]);
+    Ok(entries)
+}

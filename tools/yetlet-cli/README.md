@@ -123,6 +123,60 @@ signal, Windows GNU/MSVC and independent Reviewer PASS evidence; browser
 rendering and production qualification remain unverified. The canonical 12-sample catalog
 and YT-020 release gate are unchanged.
 
+### Opt-in Vite production assets (YT-099; independently accepted experimental scope)
+
+```sh
+yetlet new webapp --framework-path /absolute/path/to/yetlet --dir /existing/protected/apps --assets vite
+# Add --with-tailwind for @tailwindcss/vite; --cloud and --with-config compose.
+```
+
+Only the exact value `vite` is accepted. Duplicate, unknown and misplaced flags
+fail closed. Without `--assets`, all eight native/cloud/config/standalone-Tailwind
+combinations preserve their existing parse results, file inventories and bytes.
+The existing scaffold APIs are unchanged; `scaffold::create_vite` is additive.
+No Node, Vite or frontend dependency enters the CLI, Core or browser defaults.
+
+This production profile writes a finite set of root TypeScript/CSS/SVG, Vite
+configuration, tsconfig and pinned `package.json`/`package-lock.json` files, plus
+app-owned `src/vite.rs`. No frontend/dist directory is created by scaffolding.
+The native Linux/Windows no-replace/no-symlink writer still supports only the
+existing single child directory; its source allowlist adds exactly `src/vite.rs`.
+The root frontend package pins Vite 8.3.4 and TypeScript 7.0.2. Plain Vite has no
+Tailwind dependency. `--assets vite --with-tailwind` selects Tailwind and the
+official Vite plugin at 4.3.3, with no standalone compiler or second CSS build.
+The CLI never generates/resolves a lock, runs npm, accesses a registry, compiles
+assets, loads dotenv files or starts a Node process.
+
+From the generated app root, explicitly run:
+
+```sh
+npm ci --ignore-scripts --no-audit --no-fund
+npm run typecheck
+npm run build
+cargo generate-lockfile --offline
+cargo test --offline --locked
+export YETLET_ASSET_ROOT="$PWD/dist"
+# Set APP_SERVICE__TOKEN and any typed config overrides if selected.
+cargo run --offline --locked
+```
+
+The generated README includes full fmt/check/Clippy and Windows commands.
+Startup requires an explicit absolute, trusted and quiescent asset root; missing
+or invalid build output fails before listening. The bounded loader snapshots
+manifest-whitelisted JS/CSS/SVG once, uses native State/Arc, preserves escaped
+SSR and strict DEFAULT_CSP, and serves same-origin `/static/` bytes with fixed
+MIME, nosniff and no-store. Static dependency-first CSS is deduplicated; lazy CSS
+loads only after interaction. There is no dotenv/public directory copying,
+asset inlining, source map or dev-only HMR injection. Keep secrets out of
+`VITE_*` and frontend sources. Config retains SecretString validation and cloud
+retains local bind/health/graceful shutdown semantics.
+
+The adapter remains application-owned, unpublished and experimental; YT-098 did
+not establish a shared stable assets crate. No-store does not retain old build
+hashes for rolling deployments. Existing Docker/Compose/Kubernetes generators
+reject this source contract until YT-101; HMR belongs to YT-100. See
+[YT-099 verification and qualification limits](../../docs/YT-099-VERIFICATION.md).
+
 ### Opt-in Docker configuration (YT-089b; independently accepted)
 
 ```text

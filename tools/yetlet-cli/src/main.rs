@@ -57,6 +57,28 @@ fn main() -> ExitCode {
                 }
             }
         }
+        Ok(Cli::NewVite {
+            name,
+            framework,
+            dir,
+            cloud,
+            with_config,
+            with_tailwind,
+        }) => {
+            match scaffold::create_vite(&name, &framework, &dir, cloud, with_config, with_tailwind)
+            {
+                Ok(()) => {
+                    println!(
+                        "Created {name}. Follow its README for explicit frontend and Cargo builds."
+                    );
+                    ExitCode::SUCCESS
+                }
+                Err(error) => {
+                    eprintln!("new failed: {error}");
+                    ExitCode::FAILURE
+                }
+            }
+        }
         Ok(Cli::New {
             name,
             framework,
