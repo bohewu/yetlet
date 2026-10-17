@@ -1,0 +1,6 @@
+body { font-family: system-ui, sans-serif; margin: 2rem; color: #172033; }
+main { max-width: 42rem; }
+#shared-proof { border-left: 7px solid rgb(29, 78, 216); padding-left: 1rem; }
+#lazy-result { color: rgb(71, 85, 105); }
+button { cursor: pointer; padding: 0.5rem 1rem; }
+img { display: block; margin-block: 1rem; }

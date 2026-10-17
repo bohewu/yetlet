@@ -206,6 +206,17 @@ The owner requested Rust-native repository tooling before a public CLI. The inde
 |---|---|---|---|---|---|---|---|
 | YT-091 | P1 | M | M17 | Opt-in Tailwind CSS 4 application scaffolding (`new --with-tailwind`) | YT-097, YT-088 | [Guide](../tools/yetlet-cli/README.md#opt-in-tailwind-css-4-yt-091-independently-reviewed) and [implementation evidence](YT-091-VERIFICATION.md): explicit offline developer-selected pinned standalone compiler, native/cloud/config combinations, literal Rust scanning, bounded startup CSS snapshot, same-origin digest URL, strict CSP and unchanged no-flag templates. Linux actual HTTP/CSS/CSP/digest/health/SIGTERM/SIGINT and native Windows GNU/MSVC source-bound Tailwind CLI/generated-app checks PASS; independent changed-source Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS (zero issues/followups, 13/13 SHA-256 verified); no release activation | Done |
 
+## M18 — Asset contract and Vite integration (planned)
+
+The [bounded Vite experiment](VITE-SPIKE-VERIFICATION.md) passed Linux production-build and browser checks. These follow-ups are newly registered **Todo** items, not completed framework capabilities.
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-098 | P1 | M | M18 | Optional producer-neutral asset contract | YT-091 | Define validated entry/assets/dependency graph, explicit CSS cascade order/dedup, same-origin MIME/path rules, bounded startup snapshot, asset roots and honest cache/retention policy. Prove application-owned standalone Tailwind and Vite consumers before any additive shared API/ADR change. Keep no-asset/default/core/browser behavior unchanged; focused native/browser tests and independent Reviewer PASS required | Todo |
+| YT-099 | P1 | M | M18 | Opt-in Vite production CLI/profile integration | YT-098, YT-097 | Proposed `new --assets vite` composes with config and optional Tailwind via `@tailwindcss/vite`, never dual CSS compilation. Plain Vite profile has no Tailwind dependency. Pin public build tools/lockfiles, separate typecheck/build, validate actual manifest/static/dynamic assets, preserve current CLI defaults and no-Node mode; native Linux/Windows and strict-CSP browser evidence plus independent Reviewer PASS required | Todo |
+| YT-100 | P2 | M | M18 | Vite development server and HMR policy/lifecycle | YT-099 | Explicit dev-only origin/WebSocket/nonce strategy for injected CSS and client scripts; same-origin proxy alone is insufficient. Preserve production CSP, secret/public-env separation, strict host/fs access, bounded owned process cleanup and useful failure fallback; actual browser update and stop/restart evidence plus independent Reviewer PASS required | Todo |
+| YT-101 | P1 | M | M18 | Deliver optional assets and configuration through cloud generators | YT-099, YT-097, YT-089 | Explicit runtime config/asset roots instead of developer build paths, sanitized build contexts, exclusion of secrets/node_modules/source maps, built immutable assets and documented rollout retention. Extend existing exact-source generators only through reviewed contracts and bounded Linux Docker/Compose/Kubernetes proof; no registry publication or production deployment without separate authority; independent Reviewer PASS required | Todo |
+
 ## Update rules
 
 1. Change status only after checking source changes and task-specific evidence.
