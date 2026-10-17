@@ -52,6 +52,38 @@ The Docker generator below verifies the parsed source as well as this marker.
 See the generated cloud README and [accepted YT-089a evidence](../../docs/YT-089A-VERIFICATION.md)
 for its bounded Linux runtime and native Windows compile/build/unit gates.
 
+### Opt-in typed app configuration (YT-097; pending independent review)
+
+```sh
+yetlet new configured --framework-path /absolute/path/to/yetlet --dir /existing/protected/apps --with-config
+# Add --cloud for local health and graceful shutdown in the separate cloud app.
+```
+
+Both profiles generate root `base.toml`, `development.toml`, `staging.toml`,
+`production.toml`, synthetic `.env.example` and app-owned `src/config.rs` with
+strongly typed Deserialize settings, SecretString and native Axum State/Arc.
+The standalone manifest explicitly selects the unpublished local `yetlet-config`
+crate, versioned Serde derive and Secrecy serde. No configuration dependency is
+added to the CLI/core/default framework. Existing `create`/`create_cloud` APIs
+and files without `--with-config` retain their original bytes. Duplicate or
+misplaced flags fail usage parsing.
+
+The generated README covers explicit offline lock/check/test commands, injected
+`APP_SERVICE__TOKEN`, finite `APP_ENVIRONMENT` selection (Production default),
+`APP_SERVER__HOST`/`PORT`, PowerShell and optional absolute `YETLET_DEV_SECRETS`
+selection in Development only. Nothing auto-loads `.env.local`. Root files resolve
+from build-time CARGO_MANIFEST_DIR, not runtime cwd; relocation needs deliberate
+file provisioning/rebuild. Base and profile TOML are nonsecret. Missing/blank
+required token or invalid/unknown config fails before listening with fixed errors.
+Strings such as `000123` retain their shape. Only public data enters escaped SSR.
+
+**`--cloud --with-config` is a separate application contract and is rejected by
+existing `generate docker/compose/k8s`.** Their exact-source/fixed-dependency
+allowlists are unchanged, including the original `new --cloud` contract. A
+separate reviewed delivery design is required before container generators can
+accept configured apps. [YT-097 evidence](../../docs/YT-097-VERIFICATION.md)
+records actual local results and pending Windows/runtime/reviewer gates.
+
 ### Opt-in Docker configuration (YT-089b; independently accepted)
 
 ```text
@@ -165,7 +197,7 @@ If the chosen parent inherited unsafe ACLs, or Cargo's rustup proxy is writable 
 | Command | Behavior |
 |---|---|
 | `doctor [--framework-path PATH] [--json]` | Sanitized local Rust/Cargo and optional selected framework-source diagnostics; no installation or app launch |
-| `new NAME --framework-path PATH [--dir DIRECTORY] [--cloud]` | Linux safe directory-FD/no-replace or Windows local NTFS handle/reparse/ACL-safe no-overwrite scaffold; cloud app profile is explicit opt-in |
+| `new NAME --framework-path PATH [--dir DIRECTORY] [--cloud] [--with-config]` | Linux safe directory-FD/no-replace or Windows local NTFS handle/reparse/ACL-safe no-overwrite scaffold; cloud app profile is explicit opt-in |
 | `build --manifest-path PATH [--release]` | Explicit external standalone app, existing lockfile, native `cargo build --frozen`; no implicit resolution |
 | `generate docker --manifest-path PATH --output DIRECTORY` | New protected directory containing Linux/amd64 configuration only; operator prepares and verifies separate named source contexts |
 | `generate compose --manifest-path PATH --output DIRECTORY --image IMAGE` | Candidate: two deterministic files referencing an explicit operator-built Linux/amd64 image, localhost port only; no build/pull/launch |

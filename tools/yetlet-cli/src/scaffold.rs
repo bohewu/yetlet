@@ -146,3 +146,48 @@ pub(crate) fn files(
         ("src/main.rs", main.into()),
     ])
 }
+
+/// Explicit application-owned configuration; existing scaffold APIs stay unchanged.
+pub fn create_config(name: &str, framework: &Path, dir: &Path, cloud: bool) -> Result<(), String> {
+    validate_name(name).map_err(str::to_owned)?;
+    crate::platform::fs::ensure_create_supported()?;
+    let framework = crate::framework::validate(framework).map_err(str::to_owned)?;
+    crate::framework::validate_config(&framework).map_err(str::to_owned)?;
+    let entries = config_files(name, &framework, cloud)?;
+    crate::platform::fs::create_project(dir, name, &entries)
+}
+
+pub(crate) fn config_files(
+    name: &str,
+    framework: &Path,
+    cloud: bool,
+) -> Result<Vec<(&'static str, String)>, String> {
+    let mut entries = files(name, framework, cloud)?;
+    let path = framework.join("crates/yetlet-config");
+    let path = toml::Value::String(path.to_str().ok_or("framework path must be UTF-8")?.into());
+    let dependencies = format!(
+        "yetlet-config = {{ path = {path} }}\nserde = {{ version = \"=1.0.229\", features = [\"derive\"] }}\nsecrecy = {{ version = \"=0.10.3\", features = [\"serde\"] }}\n"
+    );
+    // Insert inside [dependencies], before the existing cloud metadata table.
+    entries[0].1 = entries[0].1.replacen(
+        "[dependencies]\n",
+        &format!("[dependencies]\n{dependencies}"),
+        1,
+    );
+    entries[1].1 = include_str!("../templates/config/README.md").replace("@NAME@", name);
+    entries[2].1.push_str("!.env.example\n");
+    entries[3].1 = if cloud {
+        include_str!("../templates/config/cloud.rs").into()
+    } else {
+        include_str!("../templates/config/main.rs").into()
+    };
+    entries.extend([
+        ("src/config.rs", include_str!("../templates/config/config.rs").into()),
+        ("base.toml", include_str!("../templates/config/base.toml").into()),
+        ("development.toml", "[service]\npublic_message = \"Development configuration\"\n".into()),
+        ("staging.toml", "[service]\npublic_message = \"Staging configuration\"\n".into()),
+        ("production.toml", "[service]\npublic_message = \"Production configuration\"\n".into()),
+        (".env.example", "# Synthetic empty declaration only; supply your own value in an explicit private file.\nAPP_SERVICE__TOKEN=\n".into()),
+    ]);
+    Ok(entries)
+}

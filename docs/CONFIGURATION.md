@@ -2,8 +2,9 @@
 
 **YT-090 / M16:** Done at the experimental, unpublished, Linux-tested scope after
 independent Reviewer PASS. This is an explicitly selected application dependency, outside
-the original nine public candidates. It does not change CLI templates, cloud
-configuration generators, core, default SSR or browser dependencies. See the
+the original nine public candidates. Its runtime APIs do not change core, default SSR or browser dependencies.
+The separate YT-097 CLI opt-in is implemented pending independent review;
+existing no-config templates and deployment generator acceptance stay unchanged. See the
 [scope and verification record](YT-090-VERIFICATION.md).
 
 ## Choose an application-owned settings type
@@ -92,7 +93,7 @@ bytes and OS values at most 64 KiB.
 Development secrets are disabled unless the caller explicitly selects a path.
 An ignored `.env.local` is a local convenience, **not an encrypted vault**. There
 is no secret write/import command. The committed
-[dotenv example](../crates/yetlet-config/examples/settings/dotenv-sample.txt)
+[dotenv example](../crates/yetlet-config/examples/settings/.env.example)
 contains synthetic placeholders only. The commands below require the pinned
 Rust 1.99 toolchain and the dependencies from this isolated workspace's lockfile.
 Before the first offline build, explicitly fetch those public dependencies into
@@ -110,7 +111,7 @@ development file without creating a secret file:
 ```sh
 YTCONFIG_ENVIRONMENT=Development cargo run --offline --locked \
   --manifest-path crates/yetlet-config/Cargo.toml --example typed -- \
-  --check --dev-secrets crates/yetlet-config/examples/settings/dotenv-sample.txt
+  --check --dev-secrets crates/yetlet-config/examples/settings/.env.example
 ```
 
 Dotenv parsing uses `dotenvy::from_read_iter`, never its process-environment
@@ -178,8 +179,10 @@ it does not implement a format parser or general provider system.
 
 External vaults, encrypted secret storage, certificates, hot reload, Tailwind
 (YT-091), DI, signing, production starters/admin, formal release and CI/CD are
-deferred. A distinct follow-up, [YT-097](BACKLOG.md#m16--opt-in-typed-application-configuration),
-proposes opt-in CLI scaffolding and is not implemented by this crate; no existing
-CLI command or template was changed. YT-020 stays Blocked. The separate
+deferred. The separate [YT-097 CLI opt-in](YT-097-VERIFICATION.md) now generates
+application-owned settings when `new --with-config` is explicitly selected,
+including a separate cloud application. Its changed source awaits independent
+review and Windows execution; the earlier YT-090 review does not cover it.
+Existing no-config CLI output and Docker/Compose/Kubernetes acceptance are unchanged. YT-020 stays Blocked. The separate
 independent read-only Reviewer passed the bounded YT-090 implementation; that
 acceptance does not activate publication, production qualification or any later task.

@@ -62,7 +62,10 @@ fn main() -> ExitCode {
             framework,
             dir,
             cloud,
-        }) => match if cloud {
+            with_config,
+        }) => match if with_config {
+            scaffold::create_config(&name, &framework, &dir, cloud)
+        } else if cloud {
             scaffold::create_cloud(&name, &framework, &dir)
         } else {
             scaffold::create(&name, &framework, &dir)

@@ -91,6 +91,34 @@ fn both_profiles_use_safe_no_replace_without_subprocess_lock_or_extra_files() {
         );
         assert_eq!(fs::read_dir(app.join("src")).unwrap().count(), 1);
         let manifest = fs::read(app.join("Cargo.toml")).unwrap();
+        // Frozen pre-YT-097 bytes, including dependency order and cloud marker.
+        let core = toml::Value::String(
+            framework
+                .join("crates/yetlet-core")
+                .to_str()
+                .unwrap()
+                .into(),
+        );
+        let server = toml::Value::String(
+            framework
+                .join("crates/yetlet-server-axum")
+                .to_str()
+                .unwrap()
+                .into(),
+        );
+        let signal = if cloud { ", \"signal\"" } else { "" };
+        let mut expected = format!(
+            "[package]\nname = \"{name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\nrust-version = \"1.99\"\ndescription = \"Native Yetlet SSR application preview\"\nlicense = \"MIT OR Apache-2.0\"\npublish = false\n\n[workspace]\nresolver = \"3\"\n\n[dependencies]\naxum = \"0.8\"\ntokio = {{ version = \"1\", features = [\"macros\", \"net\", \"rt-multi-thread\"{signal}] }}\nyetlet-core = {{ path = {core} }}\nyetlet-server-axum = {{ path = {server} }}\n"
+        );
+        if cloud {
+            expected.push_str("\n[package.metadata.yetlet]\ncloud-profile = \"native-ssr-v1\"\n");
+        }
+        assert_eq!(manifest, expected.as_bytes());
+        assert_eq!(
+            fs::read(app.join(".gitignore")).unwrap(),
+            b"/target/\n.env\n.env.*\n"
+        );
+
         assert_eq!(
             scaffold(&parent, &framework, name, !cloud).status.code(),
             Some(1)

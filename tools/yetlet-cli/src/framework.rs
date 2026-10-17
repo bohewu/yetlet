@@ -61,3 +61,20 @@ fn manifest(path: &Path) -> Result<toml::Value, &'static str> {
 fn read(path: &Path) -> io::Result<Vec<u8>> {
     crate::platform::fs::read_framework(path)
 }
+
+// Only the opted-in profile inspects this additional framework package.
+pub(crate) fn validate_config(root: &Path) -> Result<(), &'static str> {
+    let dir = root.join("crates/yetlet-config");
+    let value = manifest(&dir.join("Cargo.toml"))?;
+    if value
+        .get("package")
+        .and_then(|p| p.get("name"))
+        .and_then(toml::Value::as_str)
+        != Some("yetlet-config")
+    {
+        return Err("framework configuration package identity is invalid");
+    }
+    read(&dir.join("src/lib.rs"))
+        .map_err(|_| "framework configuration source is unavailable or unsafe")?;
+    Ok(())
+}

@@ -14,7 +14,7 @@ State consumer. This follows ADR 0005/0006 with no DI container or core changes.
 
 The new unpublished nested workspace is `crates/yetlet-config`: standalone
 manifest/lock, `src/lib.rs`, `tests/loading.rs`, `examples/typed.rs`, four
-`examples/settings/*.toml` inputs and one synthetic `dotenv-sample.txt`.
+`examples/settings/*.toml` inputs and one synthetic `.env.example`.
 Documentation changes are this record, the guide, README/docs index links, and
 one backlog row/matching M16 roadmap entry. The original nine public candidates
 are unchanged. Existing untracked `artifacts/` is preserved untouched.
@@ -42,7 +42,7 @@ exited 0, resolving 67 packages. No runtime network behavior is implemented.
   `YTCONFIG_SERVICE__TOKEN=000123-placeholder` and the task-local Cargo home:
   exit 0; each printed exactly `Configuration valid; listener not started.`
 - The guide's Development `--check --dev-secrets` command using only the tracked
-  `dotenv-sample.txt`: exit 0; the same fixed summary, no listener.
+  `.env.example`: exit 0; the same fixed summary, no listener.
 - `cargo xtask check docs`: exit 0; 75 required documents, 90 backlog items,
   English/link/structure/whitespace/DAG checks PASS. The existing command's link
   list is fixed; it is not a claim of a new all-document validator.
@@ -157,8 +157,9 @@ The required strict/builtin staged Commit Guard initially returned nonzero
 because the synthetic `.env.local.example` name matched
 `FILE_SENSITIVE_CONFIG`. The sensitive-path cleanup tool also refused deletion.
 That exact file was removed from the Git index, not read into a commit, and
-remains a local untracked item. The explicitly synthetic, equivalent
-`examples/settings/dotenv-sample.txt` is the tracked documentation example.
+remains a local untracked item. At that historical checkpoint the explicitly synthetic, equivalent
+`examples/settings/dotenv-sample.txt` was the tracked documentation example.
+The later safe-name update below changes that tracked example path.
 The updated check-only command, 16 loader tests, 2 native State example tests,
 `cargo xtask check docs` (91 recognized backlog IDs), and sample catalog check
 all pass. The second strict/builtin staged scan returned `warn` with one
@@ -175,3 +176,15 @@ through a separate read-only Codex process, not self-review or formal assurance.
 Only this factual review-closeout note was updated afterward; the Rust source,
 Cargo manifests/lock, sample inputs and CLI remain unchanged. No push, public
 release or deployment is authorized.
+
+
+## Safe example filename update — 2026-10-17
+
+The user authorized renaming only the tracked synthetic `dotenv-sample.txt`
+to `examples/settings/.env.example` and updating its guide/verification links.
+This is the exact allowlisted example basename; no guard/policy was changed.
+The old untracked sensitive-looking example and existing artifacts were not
+opened, inspected, edited, renamed or deleted. No index operation was performed.
+The historical runtime implementation and lockfile remain unchanged; prior
+review does not cover the separate YT-097 CLI source edits. Current verification
+of this filename update is recorded in [YT-097](YT-097-VERIFICATION.md).

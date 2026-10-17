@@ -22,7 +22,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M13 — Done at bounded Linux CLI preview scope** | Unpublished Rust `yetlet` binary, minimal handler-first scaffold and local doctor/build/dev | YT-087 | [CLI contract](YT-087-CLI-PLAN.md), fail-closed templates and processes, actual local HTTP/PTY evidence and final independent Reviewer PASS; no registry publication, Windows qualification or release activation |
 | **M14 — Done at bounded Linux/Windows CLI preview scope** | Two internal OS adapters for filesystem-safe scaffolding and foreground process ownership | YT-088 | [Cross-platform plan](YT-088-CROSS-PLATFORM-CLI-PLAN.md), real GNU/MSVC positive new/build/dev HTTP/console/cleanup and per-slice independent reviews; no public release |
 | **M15 — Done at bounded Linux OCI/Kubernetes configuration-generator preview scope** | Opt-in CLI emission of Dockerfile, Compose and portable Kubernetes manifests without platform SDK coupling | YT-089 | [Generator plan](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md), source-path-aware image build, app-owned bind/health/SIGTERM, offline generation and per-slice independent verification; no image publication or cluster deployment |
-| **M16 — YT-090 Done; YT-097 planned** | Opt-in typed native configuration and future CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](YT-090-VERIFICATION.md); separate opt-in CLI integration is Todo; no default/core/browser or release change |
+| **M16 — Done at bounded YT-090 / YT-097 scope** | Opt-in typed native configuration and optional CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](YT-090-VERIFICATION.md); [CLI integration Linux/Windows GNU/MSVC and independent Reviewer PASS](YT-097-VERIFICATION.md); no default/core/browser or release change |
 
 ## M16 — Typed application configuration
 
@@ -33,9 +33,15 @@ format/strict Clippy, check-only examples and documentation/catalog checks pass.
 Independent Reviewer `wc_job_6icPnMo4PotogYtw` returned PASS with zero issues or
 required followups, completing this bounded YT-090 scope; Windows native runtime
 and production qualification remain unverified.
-YT-097 is a separate Todo for explicit `yetlet new --with-config` scaffolding,
-including `--cloud`, with Linux/Windows parity and no behavior change for
-existing CLI callers. It has not been implemented or accepted. Tailwind YT-091,
+YT-097 is implemented in the working tree for explicit
+`yetlet new --with-config`, including `--cloud`, with passing local Linux
+CLI/offline generated-app checks and unchanged no-config output. The parent
+later verified actual Linux HTTP/CSP/health/SIGTERM/SIGINT and native Windows
+GNU/MSVC generated-app/Cargo tests. A new independent read-only Reviewer
+`wc_job_efQ_nYLzdZltPEjt` passed (zero issues and required followups), closing
+YT-097 at this bounded unpublished opt-in CLI scope.
+[Evidence](YT-097-VERIFICATION.md) preserves these limits. Existing
+Docker/Compose/Kubernetes generators reject the separate configuration cloud app. Tailwind YT-091,
 certificates, external vaults, hot reload, formal release and CI/CD remain
 deferred; YT-020 remains Blocked.
 
