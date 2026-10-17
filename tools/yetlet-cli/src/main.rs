@@ -57,6 +57,32 @@ fn main() -> ExitCode {
                 }
             }
         }
+        Ok(Cli::NewViteDev {
+            name,
+            framework,
+            dir,
+            cloud,
+            with_config,
+            with_tailwind,
+        }) => match scaffold::create_vite_dev(
+            &name,
+            &framework,
+            &dir,
+            cloud,
+            with_config,
+            with_tailwind,
+        ) {
+            Ok(()) => {
+                println!(
+                    "Created {name}. Read its README for the explicit two-terminal dev profile."
+                );
+                ExitCode::SUCCESS
+            }
+            Err(error) => {
+                eprintln!("new failed: {error}");
+                ExitCode::FAILURE
+            }
+        },
         Ok(Cli::NewVite {
             name,
             framework,

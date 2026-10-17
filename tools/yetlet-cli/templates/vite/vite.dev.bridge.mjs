@@ -1,0 +1,150 @@
+// App-owned YT-100 development bridge, never imported by production Rust/build.
+import { randomBytes } from 'node:crypto';
+import { get } from 'node:http';
+
+export const productionCsp = "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
+const maxHtmlBytes = 256 * 1024;
+const head = '<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Yetlet</title>';
+const assets = /^(?:<link rel="stylesheet" href="\/static\/assets\/[A-Za-z0-9_-]+\.css">){1,128}<script type="module" src="\/static\/assets\/[A-Za-z0-9_-]+\.js"><\/script><\/head><body>/;
+const mark = /<img id="local-mark" src="\/static\/assets\/[A-Za-z0-9_-]+\.svg" alt="Local check mark" width="80" height="48">/g;
+const publicPaths = new Set([
+  '/', '/@vite/client', '/@vite/env', '/app.ts', '/app.css',
+  '/shared.ts', '/shared.css', '/lazy.ts', '/lazy.css', '/mark.svg',
+  '/companion.ts', '/favicon.ico',
+  // Vite 8.3.4 normalizes its internal @vite/env import to this exact app-local module.
+  // The sole node_modules exception does not grant access to other packages/files.
+  '/node_modules/vite/dist/client/env.mjs',
+]);
+
+export function devPort(value = '5173') {
+  if (typeof value !== 'string' || !/^[1-9][0-9]{3,4}$/.test(value)) {
+    throw new Error('YETLET_VITE_PORT must be ASCII decimal 1024-65535, except 3000');
+  }
+  const port = Number(value);
+  if (port < 1024 || port > 65535 || port === 3000) throw new Error('Invalid Vite dev port');
+  return port;
+}
+
+export function allowedOrigin(headers, port, websocket = false) {
+  return headers.host === `127.0.0.1:${port}`
+    && (headers.origin === `http://127.0.0.1:${port}` || (!websocket && headers.origin === undefined));
+}
+
+export function allowedPath(raw) {
+  // Check the raw path before URL normalization; no encoded paths, traversal or files by extension.
+  if (typeof raw !== 'string' || raw.length > 2048) return false;
+  const [path, query, extra] = raw.split('?');
+  return publicPaths.has(path) && extra === undefined
+    && (query === undefined || /^(?:import|direct|t=[0-9]{1,16})$/.test(query));
+}
+
+export function devDocument(html, port) {
+  devPort(String(port));
+  if (typeof html !== 'string' || Buffer.byteLength(html) > maxHtmlBytes || !html.startsWith(head)) {
+    throw new Error('Unexpected backend HTML');
+  }
+  const tail = html.slice(head.length);
+  const block = assets.exec(tail)?.[0];
+  if (!block || (html.match(mark) ?? []).length !== 1 || !html.endsWith('</body></html>')) {
+    throw new Error('Expected generated production asset markup');
+  }
+  const nonce = randomBytes(18).toString('base64');
+  const body = tail.slice(block.length).replace(mark,
+    `<img id="local-mark" src="http://127.0.0.1:${port}/mark.svg" alt="Local check mark" width="80" height="48">`);
+  return {
+    nonce,
+    csp: productionCsp.replace("style-src 'self'", `style-src 'self' 'nonce-${nonce}'`)
+      .replace("connect-src 'self'", `connect-src 'self' ws://127.0.0.1:${port}`),
+    html: head + `<meta property="csp-nonce" nonce="${nonce}"><script type="module" src="/@vite/client"></script><script type="module" src="/app.ts"></script></head><body>` + body,
+  };
+}
+
+function reply(res, status, body, csp = productionCsp, html = false) {
+  res.writeHead(status, {
+    'Content-Type': html ? 'text/html; charset=utf-8' : 'text/plain; charset=utf-8',
+    'Content-Security-Policy': csp,
+    'X-Content-Type-Options': 'nosniff',
+    'Cache-Control': 'no-store',
+  });
+  res.end(body);
+}
+
+export function devBridge(port) {
+  devPort(String(port));
+  return {
+    name: 'yetlet-local-dev-bridge',
+    apply: 'serve',
+    configResolved(config) {
+      // CLI overrides must never silently select a public listener or another port.
+      if (config.server.host !== '127.0.0.1' || config.server.port !== port
+        || !config.server.strictPort || config.base !== '/' || config.server.https
+        || config.server.middlewareMode || config.server.ws?.port !== port
+        || config.server.ws?.host !== '127.0.0.1') {
+        throw new Error('Use the fixed loopback dev profile; select only YETLET_VITE_PORT');
+      }
+    },
+    configureServer(server) {
+      const pending = new Set();
+      const upgrade = (req, socket) => {
+        if (!allowedOrigin(req.headers, port, true) || !/^\/\?token=[A-Za-z0-9_-]{12}$/.test(req.url ?? '')) {
+          socket.destroy();
+        }
+      };
+      server.httpServer.prependListener('upgrade', upgrade);
+      server.httpServer.once('close', () => {
+        server.httpServer.removeListener('upgrade', upgrade);
+        for (const request of pending) request.destroy();
+      });
+      server.middlewares.use((req, res, next) => {
+        if (!allowedOrigin(req.headers, port) || !allowedPath(req.url)) {
+          reply(res, 403, 'Development request refused\n');
+          return;
+        }
+        if (!['GET', 'HEAD'].includes(req.method)) {
+          reply(res, 405, 'Read-only development profile\n');
+          return;
+        }
+        // All other explicitly allowed source requests stay with Vite, never Rust.
+        res.setHeader('X-Content-Type-Options', 'nosniff');
+        res.setHeader('Cache-Control', 'no-store');
+        if (req.url !== '/') { next(); return; }
+        let bytes = 0;
+        const chunks = [];
+        let finished = false;
+        const unavailable = () => {
+          if (finished) return;
+          finished = true;
+          reply(res, 503, 'Yetlet backend unavailable. Build dist, start Rust on 127.0.0.1:3000, then retry.\n');
+        };
+        // Fixed HTTP loopback root only. No client headers/cookies/credentials forwarded.
+        const backend = get({ hostname: '127.0.0.1', port: 3000, path: '/', agent: false,
+          headers: { Accept: 'text/html' } }, (incoming) => {
+          if (incoming.statusCode !== 200 || incoming.headers['content-type'] !== 'text/html; charset=utf-8'
+            || incoming.headers['content-security-policy'] !== productionCsp) {
+            unavailable(); backend.destroy(); return;
+          }
+          incoming.on('data', (chunk) => {
+            bytes += chunk.length;
+            if (bytes > maxHtmlBytes) { unavailable(); backend.destroy(); }
+            else chunks.push(chunk);
+          });
+          incoming.on('error', unavailable);
+          incoming.on('end', () => {
+            if (finished) return;
+            try {
+              const html = new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks));
+              const transformed = devDocument(html, port);
+              finished = true;
+              reply(res, 200, req.method === 'HEAD' ? undefined : transformed.html, transformed.csp, true);
+            } catch { unavailable(); }
+          });
+        });
+        pending.add(backend);
+        const timeout = setTimeout(() => { unavailable(); backend.destroy(); }, 3000);
+        backend.on('error', unavailable);
+        backend.once('close', () => { clearTimeout(timeout); pending.delete(backend); });
+        res.once('close', () => backend.destroy());
+      });
+    },
+  };
+}

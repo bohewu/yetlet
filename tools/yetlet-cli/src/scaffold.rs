@@ -325,6 +325,52 @@ pub fn create_vite(
     crate::platform::fs::create_project(dir, name, &entries)
 }
 
+/// App-owned, foreground Vite dev tooling. Rust and production sources are identical.
+pub fn create_vite_dev(
+    name: &str,
+    framework: &Path,
+    dir: &Path,
+    cloud: bool,
+    with_config: bool,
+    with_tailwind: bool,
+) -> Result<(), String> {
+    validate_name(name).map_err(str::to_owned)?;
+    crate::platform::fs::ensure_create_supported()?;
+    let framework = crate::framework::validate(framework).map_err(str::to_owned)?;
+    if with_config {
+        crate::framework::validate_config(&framework).map_err(str::to_owned)?;
+    }
+    let mut entries = vite_files(name, &framework, cloud, with_config, with_tailwind)?;
+    for (path, content) in &mut entries {
+        match *path {
+            "README.md" => {
+                *content = format!(
+                    "{}\n\n{content}",
+                    include_str!("../templates/vite/DEV-README.md").replace("@NAME@", name)
+                );
+            }
+            "package.json" => {
+                *content = content.replace(
+                    "\"build\": \"vite build\"",
+                    "\"build\": \"vite build\",\n    \"dev\": \"vite --config vite.dev.config.mjs\"",
+                );
+            }
+            _ => {}
+        }
+    }
+    entries.extend([
+        (
+            "vite.dev.config.mjs",
+            include_str!("../templates/vite/vite.dev.config.mjs").into(),
+        ),
+        (
+            "vite.dev.bridge.mjs",
+            include_str!("../templates/vite/vite.dev.bridge.mjs").into(),
+        ),
+    ]);
+    crate::platform::fs::create_project(dir, name, &entries)
+}
+
 fn vite_files(
     name: &str,
     framework: &Path,
