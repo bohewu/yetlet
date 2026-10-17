@@ -23,6 +23,24 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M14 — Done at bounded Linux/Windows CLI preview scope** | Two internal OS adapters for filesystem-safe scaffolding and foreground process ownership | YT-088 | [Cross-platform plan](YT-088-CROSS-PLATFORM-CLI-PLAN.md), real GNU/MSVC positive new/build/dev HTTP/console/cleanup and per-slice independent reviews; no public release |
 | **M15 — Done at bounded Linux OCI/Kubernetes configuration-generator preview scope** | Opt-in CLI emission of Dockerfile, Compose and portable Kubernetes manifests without platform SDK coupling | YT-089 | [Generator plan](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md), source-path-aware image build, app-owned bind/health/SIGTERM, offline generation and per-slice independent verification; no image publication or cluster deployment |
 | **M16 — Done at bounded YT-090 / YT-097 scope** | Opt-in typed native configuration and optional CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](YT-090-VERIFICATION.md); [CLI integration Linux/Windows GNU/MSVC and independent Reviewer PASS](YT-097-VERIFICATION.md); no default/core/browser or release change |
+| **M17 — Done at bounded YT-091 Tailwind scope** | Opt-in build-time Tailwind CSS 4 application scaffolding | YT-091 | [Guide](../tools/yetlet-cli/README.md#opt-in-tailwind-css-4-yt-091-independently-reviewed), [evidence](YT-091-VERIFICATION.md); actual Linux HTTP/CSS/CSP/signals and native Windows GNU/MSVC Tailwind source-bound builds PASS; independent Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS, no core/browser change or release activation |
+
+## M17 — Explicit build-time Tailwind CSS
+
+YT-091 adds `yetlet new NAME --with-tailwind`, optionally combined with cloud
+and typed configuration. Developers explicitly build root CSS with their
+selected verified standalone Tailwind 4.3.3 executable before Cargo/run;
+scaffolding, build/dev and requests never run or fetch a compiler. Literal Rust
+classes feed a bounded startup CSS snapshot served at its SHA-256 URL with
+strict CSP, CSS MIME, nosniff and immutable asset caching. Existing templates,
+core/browser APIs and the twelve-sample catalog remain unchanged. All generated
+source variants stay outside the deployment generators' accepted contract.
+[Implementation evidence](YT-091-VERIFICATION.md) records actual checks and
+operational limits. Parent native Linux HTTP/CSP/assets and Windows GNU/MSVC generated-app
+qualification passed on exact source. A separate independent read-only
+Reviewer `wc_job_T7Blu0CYQUOmaQTL` returned PASS with zero issues/followups,
+closing YT-091 at its bounded unpublished CLI scope. YT-097 remains Done;
+YT-020 release remains Blocked.
 
 ## M16 — Typed application configuration
 
@@ -41,9 +59,10 @@ GNU/MSVC generated-app/Cargo tests. A new independent read-only Reviewer
 `wc_job_efQ_nYLzdZltPEjt` passed (zero issues and required followups), closing
 YT-097 at this bounded unpublished opt-in CLI scope.
 [Evidence](YT-097-VERIFICATION.md) preserves these limits. Existing
-Docker/Compose/Kubernetes generators reject the separate configuration cloud app. Tailwind YT-091,
-certificates, external vaults, hot reload, formal release and CI/CD remain
-deferred; YT-020 remains Blocked.
+Docker/Compose/Kubernetes generators reject the separate configuration cloud app.
+Tailwind YT-091 is now separately authorized under M17 above. Certificates,
+external vaults, hot reload, formal release and CI/CD remain deferred;
+YT-020 remains Blocked.
 
 ## M15 — Opt-in Docker, Compose and Kubernetes generators
 

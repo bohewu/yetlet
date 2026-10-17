@@ -200,6 +200,12 @@ The owner requested Rust-native repository tooling before a public CLI. The inde
 | YT-090 | P1 | M | M16 | Opt-in typed native configuration and development secrets | YT-089 | [Guide](CONFIGURATION.md) and [verification](YT-090-VERIFICATION.md): isolated unpublished crate, finite profiles, explicit development secrets, strict typed overrides and native State consumer; 16 loader tests, 2 example tests and 1 doctest, fmt/strict Clippy and docs/sample checks PASS; independent Reviewer `wc_job_6icPnMo4PotogYtw` PASS (zero issues/followups), all 16 reviewed file hashes matched; Windows runtime unverified, YT-020 remains Blocked | Done |
 | YT-097 | P1 | M | M16 | Optional Yetlet CLI configuration scaffolding (`new --with-config`) | YT-090, YT-088 | [Implementation and local evidence](YT-097-VERIFICATION.md): opt-in SSR/cloud typed settings, explicit local config dependency, root finite profile TOML and synthetic `.env.example`, validation before listening, native State and unchanged no-config bytes/safe writer. Linux actual HTTP/CSP/health/signals and CLI/offline generated-app checks PASS; Windows GNU/MSVC source-bound CLI/generated-app tests PASS; independent changed-source Reviewer `wc_job_efQ_nYLzdZltPEjt` PASS (zero issues/followups, 19/19 file hashes verified). Existing Docker/Compose/Kubernetes acceptance is unchanged and rejects config apps. No implicit secrets, vault, network, lock/build, publishing or deployment; YT-091 remains Tailwind and YT-020 Blocked | Done |
 
+## M17 — Opt-in build-time Tailwind CSS
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-091 | P1 | M | M17 | Opt-in Tailwind CSS 4 application scaffolding (`new --with-tailwind`) | YT-097, YT-088 | [Guide](../tools/yetlet-cli/README.md#opt-in-tailwind-css-4-yt-091-independently-reviewed) and [implementation evidence](YT-091-VERIFICATION.md): explicit offline developer-selected pinned standalone compiler, native/cloud/config combinations, literal Rust scanning, bounded startup CSS snapshot, same-origin digest URL, strict CSP and unchanged no-flag templates. Linux actual HTTP/CSS/CSP/digest/health/SIGTERM/SIGINT and native Windows GNU/MSVC source-bound Tailwind CLI/generated-app checks PASS; independent changed-source Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS (zero issues/followups, 13/13 SHA-256 verified); no release activation | Done |
+
 ## Update rules
 
 1. Change status only after checking source changes and task-specific evidence.

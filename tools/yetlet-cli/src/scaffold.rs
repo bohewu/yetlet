@@ -191,3 +191,117 @@ pub(crate) fn config_files(
     ]);
     Ok(entries)
 }
+
+/// Opt-in build-time CSS. This writes sources only and never invokes a tool.
+pub fn create_tailwind(
+    name: &str,
+    framework: &Path,
+    dir: &Path,
+    cloud: bool,
+    with_config: bool,
+) -> Result<(), String> {
+    validate_name(name).map_err(str::to_owned)?;
+    crate::platform::fs::ensure_create_supported()?;
+    let framework = crate::framework::validate(framework).map_err(str::to_owned)?;
+    if with_config {
+        crate::framework::validate_config(&framework).map_err(str::to_owned)?;
+    }
+    let entries = tailwind_files(name, &framework, cloud, with_config)?;
+    crate::platform::fs::create_project(dir, name, &entries)
+}
+
+pub(crate) fn tailwind_files(
+    name: &str,
+    framework: &Path,
+    cloud: bool,
+    with_config: bool,
+) -> Result<Vec<(&'static str, String)>, String> {
+    let mut entries = if with_config {
+        config_files(name, framework, cloud)?
+    } else {
+        files(name, framework, cloud)?
+    };
+    entries[0].1 = entries[0].1.replacen(
+        "[dependencies]\n",
+        "[dependencies]\nsha2 = \"=0.10.9\"\n",
+        1,
+    );
+    entries[0]
+        .1
+        .push_str("\n[dev-dependencies]\ntower = { version = \"0.5\", features = [\"util\"] }\n");
+    // All replacements apply only to built-in, opt-in copies. The established
+    // no-Tailwind templates and public scaffold entry points stay byte-identical.
+    let main = &mut entries[3].1;
+    let start = main.find("async fn home(").ok_or("missing built-in home")?;
+    let end = if cloud {
+        main.find("async fn live()")
+    } else {
+        main.find("#[tokio::main]")
+    }
+    .ok_or("missing built-in entry point")?;
+    let (arguments, message) = if with_config {
+        (
+            "    State(settings): State<Arc<config::Settings>>,\n",
+            "&settings.service.public_message",
+        )
+    } else {
+        ("", "\"Hello <Yetlet> & Rust!\"")
+    };
+    let handlers = include_str!("../templates/tailwind/handlers.rs")
+        .replace("@ARGUMENTS@", arguments)
+        .replace("@MESSAGE@", message);
+    let (handlers, tests) = handlers
+        .split_once("#[cfg(test)]")
+        .ok_or("missing built-in tests")?;
+    main.replace_range(start..end, handlers);
+    *main = format!("mod tailwind;\n\n{main}");
+    *main = main
+        .replace("use yetlet_server_axum::{App, Page};", "use yetlet_server_axum::App;")
+        .replace(".page(\"/\", \"Yetlet\", home)", ".get(\"/\", home)")
+        .replace(
+            "async fn main() -> Result<(), Box<dyn std::error::Error>> {",
+            "async fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let stylesheet = tailwind::Stylesheet::load()?;",
+        );
+    if cloud {
+        let original = if with_config {
+            "router(settings, readiness)"
+        } else {
+            "router(readiness)"
+        };
+        *main = main.replace(
+            &format!("axum::serve(listener, {original})"),
+            &format!("let app = tailwind::install({original}, stylesheet);\n    axum::serve(listener, app)"),
+        );
+    } else {
+        *main = main.replace(
+            "axum::serve(listener, app)",
+            "axum::serve(listener, tailwind::install(app, stylesheet))",
+        );
+    }
+    *main = main.replace(
+        "let port: u16 = std::env::var(\"YETLET_PORT\").unwrap_or_else(|_| \"3000\".into()).parse()?;",
+        "let port: u16 = std::env::var(\"YETLET_PORT\")\n        .unwrap_or_else(|_| \"3000\".into())\n        .parse()?;",
+    );
+    main.push_str("\n#[cfg(test)]");
+    main.push_str(tests.trim_end());
+    main.push('\n');
+    // Plain SSR did not previously import Extension/Arc. Use qualified paths in
+    // the shared handlers so the original profile imports remain sufficient.
+    entries[1].1 = format!(
+        "{}\n\n{}",
+        include_str!("../templates/tailwind/README.md").replace("@NAME@", name),
+        entries[1].1,
+    );
+    entries[2].1.push_str("/dist/\n");
+    entries.extend([
+        (
+            "tailwind.css",
+            include_str!("../templates/tailwind/input.css").into(),
+        ),
+        (
+            "src/tailwind.rs",
+            include_str!("../templates/tailwind/tailwind.rs").into(),
+        ),
+    ]);
+    Ok(entries)
+}

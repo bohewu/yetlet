@@ -52,7 +52,7 @@ The Docker generator below verifies the parsed source as well as this marker.
 See the generated cloud README and [accepted YT-089a evidence](../../docs/YT-089A-VERIFICATION.md)
 for its bounded Linux runtime and native Windows compile/build/unit gates.
 
-### Opt-in typed app configuration (YT-097; pending independent review)
+### Opt-in typed app configuration (YT-097; independently reviewed)
 
 ```sh
 yetlet new configured --framework-path /absolute/path/to/yetlet --dir /existing/protected/apps --with-config
@@ -82,7 +82,46 @@ existing `generate docker/compose/k8s`.** Their exact-source/fixed-dependency
 allowlists are unchanged, including the original `new --cloud` contract. A
 separate reviewed delivery design is required before container generators can
 accept configured apps. [YT-097 evidence](../../docs/YT-097-VERIFICATION.md)
-records actual local results and pending Windows/runtime/reviewer gates.
+records actual Linux/Windows native verification and independent Reviewer PASS.
+
+### Opt-in Tailwind CSS 4 (YT-091; independently reviewed)
+
+```sh
+yetlet new styled --framework-path /absolute/path/to/yetlet --dir /existing/protected/apps --with-tailwind
+# --cloud, --with-config, or both can also be selected.
+```
+
+All four opt-in combinations generate root `tailwind.css` and fixed
+`src/tailwind.rs`, while retaining the selected native/cloud/config contract.
+Applications without `--with-tailwind` retain exactly their established source
+and configuration bytes. The generator invokes no tools and creates no output
+CSS, lockfile or Node dependencies. Duplicate, unknown and misplaced flags fail
+closed. The original native safe no-replace writer publishes every file.
+
+Select your own digest-verified official standalone Tailwind **v4.3.3** binary;
+the [generated README](templates/tailwind/README.md) pins Linux/Windows x64
+digests and gives shell/PowerShell commands. From the generated app root,
+explicitly run `TAILWIND_BINARY -i ./tailwind.css -o ./dist/tailwind.css --minify`
+before Cargo lock/check/test/run. The CSS input uses `source(none)` and
+`@source "./src"`; complete literal Rust utility strings are scanned without
+a `tailwind.config.js`. Rebuild CSS and restart after edits. The example uses
+system fonts, with no external CSS/JS/font requests, watch mode or HMR.
+
+Startup validates a bounded, fixed app-root compiled CSS file and pinned banner
+before listening. App-owned Axum code snapshots its bytes, computes SHA-256 and
+serves only the matching same-origin digest URL with CSS MIME, `nosniff` and
+immutable caching. Escaped SSR links that asset under unchanged `DEFAULT_CSP`;
+no core Page/rendering API or browser dependency changes. The banner is a sanity
+check, not a signature or CSS sanitizer; the operator owns trusted build input.
+Runtime relocation and old-asset retention limitations are in the generated
+README. No CLI or HTTP path implicitly compiles/downloads CSS.
+
+Existing `generate docker/compose/k8s` reject these source variants, including
+cloud combinations. [YT-091 evidence](../../docs/YT-091-VERIFICATION.md) separates
+generated-app and socketless HTTP tests from actual Linux HTTP/CSP/health/
+signal, Windows GNU/MSVC and independent Reviewer PASS evidence; browser
+rendering and production qualification remain unverified. The canonical 12-sample catalog
+and YT-020 release gate are unchanged.
 
 ### Opt-in Docker configuration (YT-089b; independently accepted)
 

@@ -45,7 +45,7 @@ fn generated_subdirectory(files: &[(&str, String)]) -> Result<&'static str, Stri
     let mut child = None;
     for (path, _) in files {
         let directory = match *path {
-            "src/main.rs" | "src/config.rs" => Some("src"),
+            "src/main.rs" | "src/config.rs" | "src/tailwind.rs" => Some("src"),
             "cargo-overlay/Cargo.toml" => Some("cargo-overlay"),
             name if !name.is_empty()
                 && !matches!(name, "." | "..")

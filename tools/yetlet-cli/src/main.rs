@@ -63,7 +63,10 @@ fn main() -> ExitCode {
             dir,
             cloud,
             with_config,
-        }) => match if with_config {
+            with_tailwind,
+        }) => match if with_tailwind {
+            scaffold::create_tailwind(&name, &framework, &dir, cloud, with_config)
+        } else if with_config {
             scaffold::create_config(&name, &framework, &dir, cloud)
         } else if cloud {
             scaffold::create_cloud(&name, &framework, &dir)
