@@ -193,6 +193,13 @@ The owner requested Rust-native repository tooling before a public CLI. The inde
 - State: Todo | In progress | Pending | Blocked | Done
 ```
 
+## M16 — Opt-in typed application configuration
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-090 | P1 | M | M16 | Opt-in typed native configuration and development secrets | YT-089 | [Guide](CONFIGURATION.md) and [verification](YT-090-VERIFICATION.md): isolated unpublished crate, finite profiles, explicit development secrets, strict typed overrides and native State consumer; 16 loader tests, 2 example tests and 1 doctest, fmt/strict Clippy and docs/sample checks PASS; independent Reviewer `wc_job_6icPnMo4PotogYtw` PASS (zero issues/followups), all 16 reviewed file hashes matched; Windows runtime unverified, YT-020 remains Blocked | Done |
+| YT-097 | P1 | M | M16 | Optional Yetlet CLI configuration scaffolding (`new --with-config`) | YT-090, YT-088 | Add an explicit opt-in to `yetlet new`, including `--cloud`, that safely generates typed application settings, `base.toml` and Development/Staging/Production overlays plus a synthetic `.env.local.example`; integrate the unpublished `yetlet-config` dependency and startup validation without implicitly loading real secrets. Preserve byte-for-byte behavior for existing `new` callers without this flag, protected/no-overwrite filesystem rules, existing explicit lockfile workflow and native Linux/Windows GNU/MSVC behavior. Focused tests, generated-app compilation/runs, cross-platform verification and independent Reviewer PASS are required. No vault/credential import, runtime provider coupling, release or publishing | Todo |
+
 ## Update rules
 
 1. Change status only after checking source changes and task-specific evidence.

@@ -22,6 +22,22 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M13 — Done at bounded Linux CLI preview scope** | Unpublished Rust `yetlet` binary, minimal handler-first scaffold and local doctor/build/dev | YT-087 | [CLI contract](YT-087-CLI-PLAN.md), fail-closed templates and processes, actual local HTTP/PTY evidence and final independent Reviewer PASS; no registry publication, Windows qualification or release activation |
 | **M14 — Done at bounded Linux/Windows CLI preview scope** | Two internal OS adapters for filesystem-safe scaffolding and foreground process ownership | YT-088 | [Cross-platform plan](YT-088-CROSS-PLATFORM-CLI-PLAN.md), real GNU/MSVC positive new/build/dev HTTP/console/cleanup and per-slice independent reviews; no public release |
 | **M15 — Done at bounded Linux OCI/Kubernetes configuration-generator preview scope** | Opt-in CLI emission of Dockerfile, Compose and portable Kubernetes manifests without platform SDK coupling | YT-089 | [Generator plan](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md), source-path-aware image build, app-owned bind/health/SIGTERM, offline generation and per-slice independent verification; no image publication or cluster deployment |
+| **M16 — YT-090 Done; YT-097 planned** | Opt-in typed native configuration and future CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](YT-090-VERIFICATION.md); separate opt-in CLI integration is Todo; no default/core/browser or release change |
+
+## M16 — Typed application configuration
+
+YT-090 implements an isolated unpublished native Serde configuration consumer
+with finite profiles, explicit development secrets, known-key typed overrides,
+safe diagnostics and app-owned validation before binding. The 19 focused tests,
+format/strict Clippy, check-only examples and documentation/catalog checks pass.
+Independent Reviewer `wc_job_6icPnMo4PotogYtw` returned PASS with zero issues or
+required followups, completing this bounded YT-090 scope; Windows native runtime
+and production qualification remain unverified.
+YT-097 is a separate Todo for explicit `yetlet new --with-config` scaffolding,
+including `--cloud`, with Linux/Windows parity and no behavior change for
+existing CLI callers. It has not been implemented or accepted. Tailwind YT-091,
+certificates, external vaults, hot reload, formal release and CI/CD remain
+deferred; YT-020 remains Blocked.
 
 ## M15 — Opt-in Docker, Compose and Kubernetes generators
 

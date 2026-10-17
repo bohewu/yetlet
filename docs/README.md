@@ -399,6 +399,9 @@ M10 release-supply-chain design/preflight is independently reviewed. Four local 
 
 #### Documentation
 
+- [Opt-in typed application configuration](CONFIGURATION.md)
+- [YT-090 configuration scope and verification](YT-090-VERIFICATION.md)
+
 - [Architecture and module boundaries](ARCHITECTURE.md)
 - [Full MVP specification](MVP.md)
 - [Roadmap](ROADMAP.md)

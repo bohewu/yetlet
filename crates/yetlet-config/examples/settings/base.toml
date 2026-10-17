@@ -1,0 +1,8 @@
+[server]
+bind = "127.0.0.1:3016"
+
+[service]
+public_message = "Base configuration example"
+token = ""
+attempts = 1
+enabled = true

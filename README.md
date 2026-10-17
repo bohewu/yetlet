@@ -80,6 +80,14 @@ cargo generate-lockfile --offline --manifest-path "$HOME/yetlet-apps/cloudapp/Ca
 
 Generation **does not** run Docker or Kubernetes, fetch dependencies, export private source, publish images, or deploy a cluster. Docker builds require separate audited `app-src` and `yetlet-src` named BuildKit contexts; deployment images/credentials, ports and namespaces remain operator responsibilities. Linux OCI/K3s output and Windows GNU/MSVC generator parity have [separate source-bound evidence](docs/YT-089E-VERIFICATION.md). M15 is an unpublished preview, not production or YT-020 release qualification.
 
+## Optional typed application configuration
+
+The separate unpublished [configuration guide](docs/CONFIGURATION.md) shows typed
+Serde settings, explicit Development/Staging/Production layers, development-only
+secret files and native Axum State. The isolated workspace leaves default/core/
+browser dependencies and CLI templates unchanged. [YT-090 verification](docs/YT-090-VERIFICATION.md)
+records focused Linux checks and independent Reviewer PASS at the unpublished scope.
+
 ## Add browser behavior when needed
 
 The Todo application shares its Rust View between SSR and the browser. `/app` owns local keyed updates and a separate typed HTTP Create action; `/search` renders complete HTML before lazily loading its local Search Island.

@@ -1,0 +1,27 @@
+[workspace]
+resolver = "3"
+
+[package]
+name = "yetlet-config"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+license = "MIT OR Apache-2.0"
+description = "Experimental opt-in native typed application configuration"
+
+[dependencies]
+serde = { version = "=1.0.229", features = ["derive"] }
+toml = { version = "=0.9.12", default-features = false, features = ["std", "parse", "serde"] }
+dotenvy = "=0.15.7"
+
+[target.'cfg(unix)'.dependencies]
+libc = "=0.2.186"
+
+[dev-dependencies]
+secrecy = { version = "=0.10.3", features = ["serde"] }
+axum = { version = "=0.8.9", default-features = false, features = ["http1", "tokio"] }
+tokio = { version = "=1.53.2", features = ["macros", "rt-multi-thread", "net"] }
+tower = { version = "=0.5.3", features = ["util"] }
+yetlet-core = { path = "../yetlet-core" }
+yetlet-server-axum = { path = "../yetlet-server-axum" }
