@@ -25,7 +25,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M16 — Done at bounded YT-090 / YT-097 scope** | Opt-in typed native configuration and optional CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](YT-090-VERIFICATION.md); [CLI integration Linux/Windows GNU/MSVC and independent Reviewer PASS](YT-097-VERIFICATION.md); no default/core/browser or release change |
 | **M17 — Done at bounded YT-091 Tailwind scope** | Opt-in build-time Tailwind CSS 4 application scaffolding | YT-091 | [Guide](../tools/yetlet-cli/README.md#opt-in-tailwind-css-4-yt-091-independently-reviewed), [evidence](YT-091-VERIFICATION.md); actual Linux HTTP/CSS/CSP/signals and native Windows GNU/MSVC Tailwind source-bound builds PASS; independent Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS, no core/browser change or release activation |
 | **M18 — In progress; YT-098–YT-100 Done at bounded scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; YT-101 Todo; no stable shared asset API, default/core/browser or release change |
-| **M19 — Planned Developer Experience research** | Optional developer workflow and feedback-loop study after cloud delivery | YT-102 | Research-only opt-in Rust/Vite supervision, watch/restart, diagnostics, onboarding, tests and Linux/Windows parity; evidence-backed DX gaps and independently reviewed staged proposals, without automatic implementation or production changes |
+| **M19 — Planned Developer Experience and rolling-asset qualification** | Research-only developer workflow improvements and separately opt-in HA/rolling asset-retention qualification | YT-102–YT-103 | Planned evidence-based DX gap/proposal research and future independently reviewed disposable two-version K3s rollout, old-client asset continuity and measured availability; no mandatory Yetlet Core/provider coupling or production support/release claim |
 
 ## M18 — Asset contract and Vite integration (in progress)
 
@@ -68,6 +68,20 @@ prioritized DX research report and candidate future backlog slices with
 independent Reviewer PASS. Research does **not** implement a unified dev command,
 make Node/Vite mandatory, authorize process automation, or alter production
 runtime/CSP, release or deployment.
+
+**YT-103, opt-in HA and rolling asset compatibility:** independently of the
+YT-102 developer workflow study, follow YT-101 with an application/deployment
+strategy for multi-replica readiness/draining and for older SSR pages that still
+request versioned CSS, JavaScript or lazy imports during and after a rolling
+update. Compare object storage/CDN, a separate static asset service and a bounded
+multi-version image approach before selecting a provider-neutral contract.
+A future task execution must demonstrate two-version K3s rolling replacement,
+old-tab lazy loading, rollback, a single-Pod disruption, retention and eventual
+safe cleanup using real HTTP/browser evidence with measured 404/5xx outcomes and
+independent Reviewer PASS. This registration authorizes **no** deployment,
+provider integration, core coupling, release or production HA claim; YT-096
+continues to record unsupported guarantees unless explicitly included in its
+owner-approved supported candidate.
 
 ## M17 — Explicit build-time Tailwind CSS
 
