@@ -33,6 +33,7 @@ yetlet --version | -V
 yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]
 yetlet doctor [--json]
 yetlet run [--manifest-path PATH]
+yetlet watch [--manifest-path PATH]
 yetlet build [--manifest-path PATH] [--release]
 yetlet generate docker [--manifest-path PATH] --output DIRECTORY
 yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE
@@ -46,7 +47,8 @@ yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE
 | `--release` | Common per-build Cargo profile selection; independent of application environment. |
 | `--output` / `--image` | Explicit generator destination and per-artifact image identity; keep existing bounded validation. |
 | `--json`, help/version | Machine/report/discovery formatting. |
-| Vite root, automatic startup/build, K8s replicas | Persistent settings, not more CLI options. `--replicas` moves to settings. |
+| Rust watch, Vite root, automatic startup/build, K8s replicas | Persistent settings, not more CLI options. `--replicas` moves to settings. |
+| `watch` | Common execution shortcut: share `run` and enable Rust watch for this invocation, without changing settings files. |
 
 `dev` is renamed to `run`: it executes the selected project. No second `dev` synonym, `--vite MODE`, `--assets`, `--dev-bridge`, runtime `--vite`, root/auto-start/auto-build flags, or framework-source flag is selected. No old-name aliases or deprecation window are required for this unpublished preview; fixed migration hints are allowed. Existing generated apps/instructions are never rewritten automatically.
 
@@ -71,6 +73,9 @@ The target adds public tool settings to the same `base.toml` and selected `devel
 Example public base declarations; selected profiles override existing declared keys:
 
 ```toml
+[cli.rust]
+watch = false
+
 [cli.vite]
 enabled = true
 root = "frontend/"
@@ -81,7 +86,7 @@ auto_build = true
 replicas = 1
 ```
 
-All new scaffolds declare this public CLI namespace. Without `--vite`, the default is `enabled = false`, `auto_start = false`, `auto_build = false`; root remains `frontend/`. `new --vite` selects the complete Vite build/development scaffold, implies the runtime `--settings` module, and writes the three true values shown above. Operators can change them through normal settings. `--settings` still controls whether app-runtime typed settings/code/dependencies are generated; CLI public settings alone do not add a runtime configuration dependency to a plain SSR app.
+All new scaffolds declare this public CLI namespace, including `cli.rust.watch = false`. The Rust watch setting is independent of Vite and the runtime `--settings` opt-in. An absent `cli.rust` section defaults to disabled for existing apps; a present section must contain a boolean `watch` and rejects unknown keys. Without `--vite`, the default is `enabled = false`, `auto_start = false`, `auto_build = false`; root remains `frontend/`. `new --vite` selects the complete Vite build/development scaffold, implies the runtime `--settings` module, and writes the three true values shown above. Operators can change them through normal settings. `--settings` still controls whether app-runtime typed settings/code/dependencies are generated; CLI public settings alone do not add a runtime configuration dependency to a plain SSR app.
 
 Keys use the existing loader's snake_case rules: `auto_start` and `auto_build`, not the earlier conversational hyphenated spelling. Current key/type/unknown-field failures remain errors. The shared source precedence, low to high, is:
 
@@ -94,6 +99,7 @@ For CLI public settings, step 3 is deliberately not enabled: no `YETLET_DEV_SECR
 
 | Environment variable | Public setting |
 |---|---|
+| `APP_CLI__RUST__WATCH` | `cli.rust.watch` |
 | `APP_CLI__VITE__ENABLED` | `cli.vite.enabled` |
 | `APP_CLI__VITE__ROOT` | `cli.vite.root` |
 | `APP_CLI__VITE__AUTO_START` | `cli.vite.auto_start` |
@@ -106,7 +112,7 @@ The earlier proposed `YETLET_VITE_AUTO_START`/`YETLET_VITE_AUTO_BUILD` names and
 
 Loader deserializes the whole merged root and has no section-projection API. The CLI reuses `Loader::load_from_env::<serde_json::Value>()` with only APP_ENVIRONMENT and related APP_CLI variables, leaves Development secrets disabled, then strictly deserializes the cli table. The shared parser owns merge/key/type/profile semantics. CLI public files receive native protected-path preflight. Selected generated runtime Settings explicitly contains the known strict CLI namespace; global unknown-field validation remains enabled. Legacy internal scaffold APIs retain their exact previous representation for generator qualification.
 
-New project settings files are required inputs once selected. For legacy standalone apps with no CLI namespace, retain disabled-Vite/default-generator behavior; do not infer tools from filenames/dependencies. Explicit CLI overrides require declared CLI keys. Missing required profile files, partial configuration, malformed sources and invalid values never trigger a silent fallback. No automatic edit of an old application's settings/Rust types occurs.
+New project settings files are required inputs once selected. For legacy standalone apps with no CLI namespace, retain disabled-watch/disabled-Vite/default-generator behavior; do not infer tools from filenames/dependencies. Explicit CLI overrides require declared CLI keys. Missing required profile files, partial configuration, malformed sources and invalid values never trigger a silent fallback. No automatic edit of an old application's settings/Rust types occurs.
 
 ## 4. Project, paths and frontend layout
 
@@ -147,13 +153,14 @@ A release-facing `new` emits the CLI release's qualified crate/version declarati
 |---|---|
 | `new` | Validate and atomically publish one owned scaffold tree; no lock generation, dependency resolution/install/download, child startup or listener. |
 | `doctor` | Bounded environment report only; no app/CLI settings or framework-source input, builds, package scripts, install or listener. |
-| `run` | Validate app/settings first. With Vite disabled or `auto_start = false`, run only the existing frozen Cargo/Rust tree. With Vite enabled and `auto_start = true`, supervise Rust plus the frontend dev server from the configured root. It does not execute a frontend production build or a Rust watcher implicitly. |
-| `build` | Validate app/settings first. With Vite disabled or `auto_build = false`, compile Rust only and state that frontend build was skipped. With Vite enabled and `auto_build = true`, complete the frontend production build first, then frozen Cargo build. Frontend failure stops before Rust compilation. Success identifies completed/skipped stages, not invented asset freshness. |
+| `run` | Validate app/settings first. Select Rust watch only when `cli.rust.watch = true`. With Vite disabled or `auto_start = false`, supervise only Rust and the optional watcher. With Vite enabled and `auto_start = true`, also supervise the frontend dev server from the configured root. No frontend production build is implicit. |
+| `watch` | Validate the same app/settings as `run`, then enable Rust watch for this invocation even when the setting is false or absent. Vite selection still uses `enabled && auto_start`; settings files are unchanged. |
+| `build` | Validate app/settings first. With Vite disabled or `auto_build = false`, compile Rust only and state that frontend build was skipped. With Vite enabled and `auto_build = true`, complete the frontend production build first, then frozen Cargo build. Frontend failure stops before Rust compilation. Success identifies completed/skipped stages, not invented asset freshness. `cli.rust.watch` has no execution effect and Watchexec is not required. |
 | `generate docker/compose/k8s` | Qualified source/lock inspection and revalidation, then protected no-replace configuration publication. No tool execution, source export, image build/pull, credentials lookup or deployment. K8s replicas come from settings (default 1, integer 1–100). |
 
 Presence/enabled status declares integration; it does not override `auto_start` or `auto_build`. The two switches are independent. A skipped frontend build requires separately prepared assets wherever the app needs them; no success claim about missing/stale assets. Auto-start likewise retains the current bridge's initial production dist prerequisite. Dependencies and tools are prepared separately; no npm install/ci, Rust install, lock refresh or network fallback is hidden in either action. Package scripts/build/app code still have their own effects; frozen toolchain resolution is not a sandbox.
 
-The selected frontend operations are the generated package's documented build/dev scripts, with literal argv and fixed action selection. No configurable arbitrary command strings or unknown-argument forwarding. Keep the bounded read-only root-page bridge, loopback/strict-port/CSP/nonce/no-auth/no-cookie/no-POST boundaries until a separate accepted extension changes them. No general proxy, browser launch, automatic Rust restart or production HMR is implied.
+The selected frontend operations are the generated package's documented build/dev scripts, with literal argv and fixed action selection. No configurable arbitrary command strings or unknown-argument forwarding. Keep the bounded read-only root-page bridge, loopback/strict-port/CSP/nonce/no-auth/no-cookie/no-POST boundaries until a separate accepted extension changes them. No general proxy, browser launch or production HMR is implied. Rust restart requires the explicit watch setting below.
 
 The generated Vite entry/shared/lazy modules now retain their interaction counter
 and DOM across accepted development HMR updates, with disposal of old listeners.
@@ -163,7 +170,17 @@ private/tooling-file refusals remain. The CLI owns configured run/stop/build;
 Vite owns HMR. [Implementation and integration evidence](YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
 records the state boundary, tested edits/restores and remaining scope.
 
-The pair supervisor uses bounded frontend readiness, native signal ownership, stage attribution and cleanup of both owned trees. Current native Linux tests cover failure, cancellation, descendants and PTY restoration; [native Windows GNU evidence](YT-102-WINDOWS-VITE-VERIFICATION.md) covers six selected real Vite/Rust cases for startup, failure, C/BREAK, port collision and disabled auto-start. Child failure must stop/reap the other owned tree; cleanup uncertainty is failure. Native Windows console/headless limits remain explicit; compile-only evidence cannot prove lifecycle support. Manual frontend startup and the current two-terminal fallback remain usable when automatic startup is disabled. Windows cross-compilation alone does not satisfy the native qualification gate.
+With Rust watch disabled, the pair supervisor uses bounded frontend readiness, native signal ownership, stage attribution and cleanup of both owned trees. Current native Linux tests cover failure, cancellation, descendants and PTY restoration; [native Windows GNU evidence](YT-102-WINDOWS-VITE-VERIFICATION.md) covers six selected real Vite/Rust cases for startup, failure, C/BREAK, port collision and disabled auto-start. In that non-watch mode, child failure must stop/reap the other owned tree; cleanup uncertainty is failure. Native Windows console/headless limits remain explicit; compile-only evidence cannot prove lifecycle support. Manual frontend startup and the current two-terminal fallback remain usable when automatic startup is disabled. Windows cross-compilation alone does not satisfy the native qualification gate.
+
+### Opt-in Rust watch
+
+Invoke `yetlet watch` to enable Rust watch for this invocation. It shares the `run` pipeline and overrides a false or absent watch setting after normal strict settings validation, without modifying settings files. Alternatively, set `[cli.rust] watch = true` in the selected public settings, or use `APP_CLI__RUST__WATCH=true` after declaring the key in base.toml, then invoke `yetlet run`. Prepare Watchexec separately on PATH; integration targets Watchexec 2.8.0 and does not install it. No runtime flag, Cargo metadata or watch-list settings are introduced. `yetlet build` ignores watch execution and does not require Watchexec.
+
+Watchexec emits JSON file events only. The parent CLI owns the initial frozen/offline Cargo run and each later Rust generation, separately from the watcher and optional Vite tree. A relevant event stops and reaps the old Rust tree before starting its replacement. A compile error or Rust runtime exit is reported and leaves watch waiting for the next change. Rust restarts retain the same Vite process. User cancellation, Vite exit or watcher death ends the session and cleans up all owned trees; cleanup uncertainty remains failure.
+
+Watch scope is the selected app root: Rust `*.rs` files (including `build.rs`), Cargo.toml and Cargo.lock. It excludes the configured frontend root, target, node_modules and dist directories, plus CARGO_TARGET_DIR when it is under the app root. Symlinks are not followed. Local dependencies outside the app root are not watched. Special target directories selected through Cargo configuration need separate exclusion if required; use CARGO_TARGET_DIR for an excluded in-root target directory or keep it outside the watched root.
+
+CLI policy settings are loaded once per run; restart the CLI to change that policy. Each fresh backend process reads its own runtime settings. Rust restart does not promise browser refresh, preservation of in-process state or graceful request draining. Native watch lifecycle evidence is recorded separately from the historical Vite-pair verification; the earlier pair results do not qualify this added mode.
 
 Generators still accept only the recorded YT-101 unedited local-source representation: service alone, service+settings, or service+production Vite with optional settings/plugin Tailwind. Existing dev-bridge, standalone Tailwind, edited/general apps and unknown dependencies/layouts remain refused. The new shared CLI namespace, full Vite scaffold/nested root and registry-backed declarations do **not** inherit acceptance; each requires an explicit future source/lock/export contract before generator support. Runtime token handling, sanitized three-context exports, bounded assets/public-config checks and no-overwrite remain unchanged.
 
@@ -216,7 +233,7 @@ Rows describe the intentional migration. Current evidence and uncovered qualific
 | AC-05 | Boolean --vite generates complete configured frontend/ output; no creation-time tools/installs. Dist, CSP/root-only bridge and package scripts retain qualified limits; old output/metadata/layout acceptance is not reused. |
 | AC-06 | Generators retain current source/lock/config/asset/export/refusal boundaries. New settings/layout/release representations require separate acceptance; replicas setting defaults/range are exact. |
 | AC-07 | Doctor scope/schema/status/streams/bounds/redaction are implemented with no app or Node-readiness PASS; real OS probe cleanup failures remain failures. |
-| AC-08 | run selects only auto_start and build selects only auto_build. Independent flags/env/profile combinations include disabled/skipped branches, no installs, ordered frontend-before-Rust builds and stop-on-frontend-failure. |
+| AC-08 | run selects Vite through auto_start and Rust watch through cli.rust.watch; watch shares run and enables Rust watch for this invocation after strict settings validation, with unchanged Vite selection; build selects Vite through auto_build and never starts watch. Independent flags/env/profile combinations include disabled/skipped branches, no installs, ordered frontend-before-Rust builds and stop-on-frontend-failure. |
 | AC-09 | Real Linux and Windows evidence proves owned Rust/frontend startup, native status/cancellation and cleanup of both trees; attached-console/headless limits remain honest. |
 | AC-10 | Current usage/evidence remain source-scoped; target features are not called implemented. No sandbox, release, general proxy/auth or production qualification claim. |
 | AC-11 | No CLI framework-source flag or execution metadata config; dependency versions/local overrides remain Cargo-owned with explicit lock and release gates. |
@@ -228,4 +245,4 @@ Rows describe the intentional migration. Current evidence and uncovered qualific
 
 The user explicitly authorized this CLI implementation and independent review. This authorization supersedes the former documentation-only next-step proposal. Current source-matched evidence is in [YT-102 implementation](YT-102-CLI-IMPLEMENTATION.md); prior design reviews remain historical evidence.
 
-Selected native Windows GNU startup/cancellation/cleanup has [direct bounded evidence](YT-102-WINDOWS-VITE-VERIFICATION.md). Additional platform/runtime qualification, new generator source/lock/export representations, usable registry templates and release qualification remain open. General Rust watch/recompile/restart, arbitrary proxy/auth/actions/multi-page bridging and alternative provider registries stay deferred. YT-102's broader journey audit, measured cold/warm/change-feedback comparison and prioritized DX roadmap remain Todo. YT-103 rolling asset retention and M20/YT-020 release remain separate. No commit, publication or deployment is implied.
+Selected native Windows GNU startup/cancellation/cleanup has [direct bounded evidence](YT-102-WINDOWS-VITE-VERIFICATION.md). Additional platform/runtime qualification, new generator source/lock/export representations, usable registry templates and release qualification remain open. Rust watch/recompile/restart is an explicit settings-controlled mode with the boundaries above; arbitrary proxy/auth/actions/multi-page bridging and alternative provider registries stay deferred. YT-102's broader journey audit, measured cold/warm/change-feedback comparison and prioritized DX roadmap remain Todo. YT-103 rolling asset retention and M20/YT-020 release remain separate. No commit, publication or deployment is implied.

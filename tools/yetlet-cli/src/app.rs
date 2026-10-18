@@ -11,6 +11,7 @@ pub struct Failure {
 pub enum Completion {
     Exited(ExitStatus),
     FrontendExited(ExitStatus),
+    WatcherExited(ExitStatus),
     Cancelled(i32),
 }
 
@@ -22,9 +23,27 @@ impl Completion {
 }
 
 pub fn run(manifest: &Path, dev: bool, release: bool) -> Result<Completion, Failure> {
+    execute(manifest, dev, release, false)
+}
+
+/// Run the selected app with Rust watch enabled for this invocation only.
+pub fn watch(manifest: &Path) -> Result<Completion, Failure> {
+    execute(manifest, true, false, true)
+}
+
+fn execute(
+    manifest: &Path,
+    dev: bool,
+    release: bool,
+    force_watch: bool,
+) -> Result<Completion, Failure> {
     let app =
         crate::platform::fs::open_app(manifest).map_err(|message| Failure { code: 1, message })?;
-    let settings = crate::settings::load(&app).map_err(|message| Failure { code: 1, message })?;
+    let mut settings =
+        crate::settings::load(&app).map_err(|message| Failure { code: 1, message })?;
+    if force_watch {
+        settings.rust.watch = true;
+    }
     let selected = settings.vite.enabled
         && if dev {
             settings.vite.auto_start
@@ -43,8 +62,12 @@ pub fn run(manifest: &Path, dev: bool, release: bool) -> Result<Completion, Fail
         if dev {
             crate::platform::fs::read_frontend_manifest(&frontend)
                 .map_err(|_| Failure { code: 1, message: "Vite startup requires an existing protected frontend dist; build it separately first".into() })?;
-            return crate::platform::process::run_with_frontend(&app, &frontend)
-                .map_err(process_failure);
+            return if settings.rust.watch {
+                crate::platform::process::run_watch(&app, Some(&frontend), &settings.vite.root)
+            } else {
+                crate::platform::process::run_with_frontend(&app, &frontend)
+            }
+            .map_err(process_failure);
         }
         println!("Frontend build selected by cli.vite.auto_build");
         match crate::platform::process::run_frontend_build(&app, &frontend)
@@ -58,7 +81,12 @@ pub fn run(manifest: &Path, dev: bool, release: bool) -> Result<Completion, Fail
     } else if !dev {
         println!("Frontend build skipped by public CLI settings");
     }
-    crate::platform::process::run_cargo(&app, dev, release).map_err(process_failure)
+    if dev && settings.rust.watch {
+        crate::platform::process::run_watch(&app, None, &settings.vite.root)
+            .map_err(process_failure)
+    } else {
+        crate::platform::process::run_cargo(&app, dev, release).map_err(process_failure)
+    }
 }
 
 fn process_failure(error: std::io::Error) -> Failure {

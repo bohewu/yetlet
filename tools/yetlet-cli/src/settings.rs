@@ -9,8 +9,16 @@ use std::{
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct Settings {
+    #[serde(default)]
+    pub(crate) rust: Rust,
     pub(crate) vite: Vite,
     pub(crate) generate: Generate,
+}
+
+#[derive(Debug, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct Rust {
+    pub(crate) watch: bool,
 }
 
 #[derive(Debug, Deserialize)]
@@ -37,6 +45,7 @@ pub(crate) struct K8s {
 impl Default for Settings {
     fn default() -> Self {
         Self {
+            rust: Rust::default(),
             vite: Vite {
                 enabled: false,
                 root: "frontend/".into(),
@@ -181,6 +190,78 @@ mod tests {
         .unwrap();
         assert!(!settings.vite.auto_start);
         assert!(settings.vite.auto_build);
+        assert!(!settings.rust.watch);
+    }
+
+    #[test]
+    fn rust_watch_defaults_to_false_and_uses_shared_profile_environment_precedence() {
+        let (_temp, app) = app();
+        assert!(!load_from_env(&app, []).unwrap().rust.watch);
+        std::fs::write(fs::app_root(&app).join("base.toml"), BASE).unwrap();
+        std::fs::write(fs::app_root(&app).join("production.toml"), "").unwrap();
+        assert!(!load_from_env(&app, []).unwrap().rust.watch);
+
+        std::fs::write(
+            fs::app_root(&app).join("base.toml"),
+            format!("{BASE}[cli.rust]\nwatch=false\n"),
+        )
+        .unwrap();
+        std::fs::write(
+            fs::app_root(&app).join("development.toml"),
+            "[cli.rust]\nwatch=true\n",
+        )
+        .unwrap();
+        assert!(!load_from_env(&app, []).unwrap().rust.watch);
+        let development = [("APP_ENVIRONMENT".into(), "Development".into())];
+        assert!(load_from_env(&app, development).unwrap().rust.watch);
+        for (profile, value, expected) in [
+            ("Production", "true", true),
+            ("Development", "false", false),
+        ] {
+            let settings = load_from_env(
+                &app,
+                [
+                    ("APP_ENVIRONMENT".into(), profile.into()),
+                    ("APP_CLI__RUST__WATCH".into(), value.into()),
+                ],
+            )
+            .unwrap();
+            assert_eq!(settings.rust.watch, expected);
+        }
+    }
+
+    #[test]
+    fn rust_watch_rejects_partial_unknown_and_wrong_type_settings() {
+        let (_temp, app) = app();
+        std::fs::write(fs::app_root(&app).join("production.toml"), "").unwrap();
+        for rust in [
+            "[cli.rust]\n",
+            "[cli.rust]\nwatch=true\nunknown=false\n",
+            "[cli.rust]\nwatch='true'\n",
+            "[cli.rust]\nwatch=1\n",
+        ] {
+            std::fs::write(
+                fs::app_root(&app).join("base.toml"),
+                format!("{BASE}{rust}"),
+            )
+            .unwrap();
+            assert_eq!(load_from_env(&app, []).unwrap_err(), INVALID);
+        }
+        std::fs::write(
+            fs::app_root(&app).join("base.toml"),
+            format!("{BASE}[cli.rust]\nwatch=false\n"),
+        )
+        .unwrap();
+        for (key, value) in [
+            ("APP_CLI__RUST__WATCH", "yes"),
+            ("APP_CLI__RUST__WATCH", "1"),
+            ("APP_CLI__RUST__UNKNOWN", "false"),
+        ] {
+            assert_eq!(
+                load_from_env(&app, [(key.into(), value.into())]).unwrap_err(),
+                INVALID
+            );
+        }
     }
     #[test]
     fn legacy_defaults_and_partial_or_invalid_configuration_refusals() {

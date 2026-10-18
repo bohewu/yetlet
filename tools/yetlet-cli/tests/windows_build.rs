@@ -176,38 +176,44 @@ fn private_cargo(app: &Path) {
     );
     let parent = directory(&private);
     assert_owner_only(&parent, owner);
-    let destination = private.join("cargo.exe");
-    let path: Vec<_> = destination.as_os_str().encode_wide().chain([0]).collect();
-    // SAFETY: create-new file with explicit owner/DACL and non-inherited handle.
-    let raw = unsafe {
-        CreateFileW(
-            path.as_ptr(),
-            GENERIC_WRITE | READ_CONTROL,
-            FILE_SHARE_READ,
-            &attributes,
-            CREATE_NEW,
-            FILE_ATTRIBUTE_NORMAL,
-            null_mut(),
-        )
-    };
-    assert_ne!(
-        raw,
-        INVALID_HANDLE_VALUE,
-        "private Cargo file creation failed: {}",
-        io::Error::last_os_error()
-    );
-    // SAFETY: successful CreateFileW transfers the owned handle.
-    let mut destination = unsafe { fs::File::from_raw_handle(raw) };
-    assert_owner_only(&destination, owner);
     let cargo = std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
         .filter(|directory| directory.is_absolute())
         .map(|directory| directory.join("cargo.exe"))
         .find(|candidate| candidate.is_file())
         .expect("native cargo proxy should be in absolute PATH");
-    let mut source = fs::File::open(cargo).unwrap();
-    let bytes = io::copy(&mut source, &mut destination).unwrap();
-    assert_eq!(bytes, source.metadata().unwrap().len());
-    assert_owner_only(&destination, owner);
+    let mut tools = vec![("cargo.exe", cargo)];
+    if let Some(watcher) = std::env::var_os("YETLET_TEST_WATCHEXEC") {
+        tools.push(("watchexec.exe", PathBuf::from(watcher)));
+    }
+    for (name, source_path) in tools {
+        let destination = private.join(name);
+        let path: Vec<_> = destination.as_os_str().encode_wide().chain([0]).collect();
+        // SAFETY: create-new file with explicit owner/DACL and non-inherited handle.
+        let raw = unsafe {
+            CreateFileW(
+                path.as_ptr(),
+                GENERIC_WRITE | READ_CONTROL,
+                FILE_SHARE_READ,
+                &attributes,
+                CREATE_NEW,
+                FILE_ATTRIBUTE_NORMAL,
+                null_mut(),
+            )
+        };
+        assert_ne!(
+            raw,
+            INVALID_HANDLE_VALUE,
+            "private Cargo file creation failed: {}",
+            io::Error::last_os_error()
+        );
+        // SAFETY: successful CreateFileW transfers the owned handle.
+        let mut destination = unsafe { fs::File::from_raw_handle(raw) };
+        assert_owner_only(&destination, owner);
+        let mut source = fs::File::open(source_path).unwrap();
+        let bytes = io::copy(&mut source, &mut destination).unwrap();
+        assert_eq!(bytes, source.metadata().unwrap().len());
+        assert_owner_only(&destination, owner);
+    }
     // All writer handles close before executable validation and CreateProcess.
 }
 
@@ -570,6 +576,25 @@ fn native_cli_vite_pair() {
     }
 }
 
+#[test]
+#[ignore = "requires YETLET_TEST_VITE_JS, YETLET_TEST_WATCHEXEC and a native Windows console"]
+fn native_cli_rust_watch() {
+    for key in ["YETLET_TEST_VITE_JS", "YETLET_TEST_WATCHEXEC"] {
+        let path = PathBuf::from(std::env::var_os(key).expect(key));
+        assert!(
+            path.is_absolute() && path.is_file(),
+            "absolute installed tool required: {key}"
+        );
+    }
+    for case in [
+        "vite-watch-ctrl-c",
+        "vite-watch-ctrl-break",
+        "vite-watch-frontend-exit",
+    ] {
+        console_fixture(case);
+    }
+}
+
 static FIXTURE_EVENT: AtomicU32 = AtomicU32::new(0);
 unsafe extern "system" fn fixture_control(event: u32) -> i32 {
     FIXTURE_EVENT.store(event + 1, Ordering::SeqCst);
@@ -788,6 +813,17 @@ export default { plugins: [{ name: 'native-pair-fixture', configureServer() {
 "#).unwrap();
     let auto_start = case != "vite-disabled";
     fs::write(app.join("base.toml"), format!("[cli.vite]\nenabled=true\nroot='frontend/'\nauto_start={auto_start}\nauto_build=false\n[cli.generate.k8s]\nreplicas=1\n")).unwrap();
+    if case.starts_with("vite-watch-") {
+        use std::io::Write;
+        writeln!(
+            fs::OpenOptions::new()
+                .append(true)
+                .open(app.join("base.toml"))
+                .unwrap(),
+            "[cli.rust]\nwatch=true"
+        )
+        .unwrap();
+    }
     fs::write(app.join("production.toml"), "").unwrap();
     let source = DEV_APP.replace(
         "fn main() {",
@@ -796,7 +832,7 @@ export default { plugins: [{ name: 'native-pair-fixture', configureServer() {
         "loop {\n        if EVENT",
         "loop {\n        if depth == 0 && std::path::Path::new(\"rust.exit\").is_file() { std::process::exit(23); }\n        if EVENT",
     );
-    fs::write(app.join("src/main.rs"), source).unwrap();
+    fs::write(app.join("src/main.rs"), &source).unwrap();
     fs::write(
         app.join("Cargo.lock"),
         "version=4\n[[package]]\nname='yt088c_fixture'\nversion='0.1.0'\n",
@@ -846,8 +882,11 @@ export default { plugins: [{ name: 'native-pair-fixture', configureServer() {
         .spawn()
         .unwrap();
     wait_marker(&sentinel_root.join("ready"));
-    if case == "vite-ctrl-break" {
+    if matches!(case, "vite-ctrl-break" | "vite-watch-ctrl-break") {
         command.creation_flags(CREATE_NEW_PROCESS_GROUP);
+    }
+    if case.starts_with("vite-watch-") {
+        command.stderr(fs::File::create(app.join("watch.stderr")).unwrap());
     }
     let mut child = command.spawn().unwrap();
     wait_marker(&frontend.join("frontend.trace"));
@@ -888,7 +927,7 @@ export default { plugins: [{ name: 'native-pair-fixture', configureServer() {
         wait_marker(&marker);
         pids.push(fs::read_to_string(marker).unwrap().parse::<u32>().unwrap());
     }
-    let owned: Vec<_> = pids
+    let mut owned: Vec<_> = pids
         .iter()
         .map(|&pid| {
             let raw = unsafe {
@@ -903,19 +942,92 @@ export default { plugins: [{ name: 'native-pair-fixture', configureServer() {
         })
         .collect();
     assert!(app.join("backend.marker").is_file());
+    if case.starts_with("vite-watch-") {
+        // Exercise the actual watcher and a real compile failure. Generation
+        // marker files are outside watched roots, so assertions cannot restart it.
+        for (revision, valid) in [("edited", true), ("broken", false), ("recovered", true)] {
+            for depth in 0..3 {
+                let marker = app.join(format!("pid-{depth}"));
+                if marker.exists() {
+                    fs::remove_file(marker).unwrap();
+                }
+            }
+            let changed = if valid {
+                format!("{source}\n// {revision}\n")
+            } else {
+                "fn main() { deliberate invalid Rust }".into()
+            };
+            fs::write(app.join("src/main.rs"), changed).unwrap();
+            let deadline = Instant::now() + Duration::from_secs(20);
+            for process in owned.iter().skip(1) {
+                while unsafe { WaitForSingleObject(process.as_raw_handle(), 0) } != WAIT_OBJECT_0 {
+                    assert!(
+                        Instant::now() < deadline,
+                        "previous Rust generation survived"
+                    );
+                    std::thread::sleep(Duration::from_millis(10));
+                }
+            }
+            if valid {
+                for depth in 0..3 {
+                    let marker = app.join(format!("pid-{depth}"));
+                    wait_marker(&marker);
+                    let pid = fs::read_to_string(marker).unwrap().parse::<u32>().unwrap();
+                    let raw = unsafe {
+                        OpenProcess(
+                            PROCESS_SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION,
+                            0,
+                            pid,
+                        )
+                    };
+                    assert!(!raw.is_null(), "replacement Rust process missing");
+                    owned.push(unsafe { OwnedHandle::from_raw_handle(raw) });
+                    pids.push(pid);
+                }
+            } else {
+                // Cargo's error must complete before restoring source. The CLI
+                // logs its native exit while the same session keeps watching.
+                let log = app.join("watch.stderr");
+                let deadline = Instant::now() + Duration::from_secs(20);
+                while !fs::read_to_string(&log)
+                    .unwrap()
+                    .contains("waiting for source changes")
+                {
+                    assert!(Instant::now() < deadline, "compile failure not observed");
+                    std::thread::sleep(Duration::from_millis(10));
+                }
+                assert!(!app.join("pid-0").exists());
+            }
+            assert!(child.try_wait().unwrap().is_none(), "watch session exited");
+            assert_ne!(
+                unsafe { WaitForSingleObject(owned[0].as_raw_handle(), 0) },
+                WAIT_OBJECT_0,
+                "Vite restarted/exited"
+            );
+            assert!(std::net::TcpStream::connect((std::net::Ipv4Addr::LOCALHOST, 5173)).is_ok());
+            let current: serde_json::Value =
+                serde_json::from_slice(&fs::read(frontend.join("frontend.trace")).unwrap())
+                    .unwrap();
+            assert_eq!(current["pid"], trace["pid"], "Vite identity changed");
+        }
+    }
     let start = Instant::now();
     match case {
-        "vite-ctrl-c" => assert_ne!(unsafe { GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0) }, 0),
-        "vite-ctrl-break" => assert_ne!(
+        "vite-ctrl-c" | "vite-watch-ctrl-c" => {
+            assert_ne!(unsafe { GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0) }, 0)
+        }
+        "vite-ctrl-break" | "vite-watch-ctrl-break" => assert_ne!(
             unsafe { GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, child.id()) },
             0
         ),
-        "vite-frontend-exit" => fs::write(frontend.join("frontend.exit"), "exit").unwrap(),
+        "vite-frontend-exit" | "vite-watch-frontend-exit" => {
+            fs::write(frontend.join("frontend.exit"), "exit").unwrap()
+        }
         "vite-rust-exit" => fs::write(app.join("rust.exit"), "exit").unwrap(),
         _ => unreachable!(),
     }
     let status = wait_child(&mut child);
-    let expected = if case.starts_with("vite-ctrl-") {
+    let expected = if case.contains("ctrl-") {
         0xc000013a
     } else {
         23

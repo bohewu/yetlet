@@ -646,7 +646,7 @@ fn selected_files(
         }
     }
     let cli = format!(
-        "\n[cli.vite]\nenabled = {vite}\nroot = \"frontend/\"\nauto_start = {vite}\nauto_build = {vite}\n\n[cli.generate.k8s]\nreplicas = 1\n"
+        "\n[cli.rust]\nwatch = false\n\n[cli.vite]\nenabled = {vite}\nroot = \"frontend/\"\nauto_start = {vite}\nauto_build = {vite}\n\n[cli.generate.k8s]\nreplicas = 1\n"
     );
     if with_config {
         for (path, content) in &mut entries {
@@ -676,8 +676,9 @@ fn selected_files(
             *path,
             "development.toml" | "staging.toml" | "production.toml"
         ) {
-            content
-                .push_str("\n# Override declared [cli.vite] or [cli.generate.k8s] values here.\n");
+            content.push_str(
+                "\n# Override declared [cli.rust], [cli.vite] or [cli.generate.k8s] values here.\n",
+            );
         }
     }
     if vite {

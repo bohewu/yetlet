@@ -36,6 +36,14 @@ pub(crate) fn run_pair(rust: &mut Command, frontend: &mut Command) -> io::Result
     foreground::run_pair(rust, frontend)
 }
 
+pub(crate) fn run_watch(
+    rust: &mut Command,
+    watcher: &mut Command,
+    frontend: Option<&mut Command>,
+) -> io::Result<Completion> {
+    foreground::run_watch(rust, watcher, frontend)
+}
+
 pub(crate) fn signal(status: &ExitStatus) -> Option<i32> {
     status.signal()
 }

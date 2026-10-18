@@ -103,6 +103,8 @@ fn discovery_is_exclusive_scoped_and_needs_no_project_or_tools() {
         vec!["new", "--help"],
         vec!["doctor", "-h"],
         vec!["run", "--help"],
+        vec!["watch", "--help"],
+        vec!["watch", "-h"],
         vec!["build", "-h"],
         vec!["generate", "--help"],
         vec!["generate", "docker", "-h"],
@@ -130,6 +132,10 @@ fn discovery_is_exclusive_scoped_and_needs_no_project_or_tools() {
         vec!["generate"],
         vec!["generate", "k8s", "--help", "--output", "secret-value"],
         vec!["run", "--version"],
+        vec!["watch", "--release"],
+        vec!["watch", "secret-value"],
+        vec!["watch", "--manifest-path=x", "--manifest-path=y"],
+        vec!["watch", "--help", "--manifest-path=secret-value"],
         vec!["build", "--release", "-h"],
     ] {
         let output = code(

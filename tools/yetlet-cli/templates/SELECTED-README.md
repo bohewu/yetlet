@@ -33,6 +33,23 @@ Plain SSR leaves Vite disabled and needs no Node runtime. `APP_ENVIRONMENT`
 selects one profile and defaults to Production; `--release` selects only Cargo's
 build profile. APP_CLI overrides must name keys already declared in base.toml.
 
+Rust watch is disabled by default for `yetlet run`. Prepare Watchexec 2.8.0 on
+PATH separately, then use `yetlet watch` for one invocation. It shares `run`,
+keeps Vite selection in settings and leaves settings files unchanged. To make
+watch the default for `run`, override the existing base key in the selected profile:
+
+```toml
+[cli.rust]
+watch = true
+```
+
+Run `yetlet run` (or `APP_CLI__RUST__WATCH=true yetlet run`). The CLI restarts only
+the Rust tree on app-root Rust/Cargo file changes; Vite stays running. Compile
+errors and backend exits wait for the next change. `yetlet build` never watches
+and needs no Watchexec. CLI policy changes require rerunning the CLI. External
+local dependencies are not watched; browser refresh, backend state preservation
+and graceful request draining are not promised.
+
 The app owns ordinary Rust handlers and escaped HTML with strict CSP. No
 Controller, DI container or provider registry is required. Stop foreground
 execution with Ctrl-C. Native Windows runtime qualification remains separate.

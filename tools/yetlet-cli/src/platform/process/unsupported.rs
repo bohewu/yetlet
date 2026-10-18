@@ -17,6 +17,14 @@ pub(crate) fn run_pair(_rust: &mut Command, _frontend: &mut Command) -> io::Resu
     Err(io::ErrorKind::Unsupported.into())
 }
 
+pub(crate) fn run_watch(
+    _rust: &mut Command,
+    _watcher: &mut Command,
+    _frontend: Option<&mut Command>,
+) -> io::Result<Completion> {
+    Err(io::ErrorKind::Unsupported.into())
+}
+
 pub(crate) fn signal(_status: &ExitStatus) -> Option<i32> {
     None
 }

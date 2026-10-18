@@ -83,6 +83,7 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                         .unwrap()
                         .parse()
                         .unwrap();
+                    assert_eq!(base["cli"]["rust"]["watch"].as_bool(), Some(false));
                     for key in ["enabled", "auto_start", "auto_build"] {
                         assert_eq!(base["cli"]["vite"][key].as_bool(), Some(vite));
                     }
@@ -217,6 +218,8 @@ mod selected_cli_settings_tests {
     #[test]
     fn strict_cli_namespace_keeps_types_unknown_fields_and_bounds() {
         for (key, value) in [
+            ("APP_CLI__RUST__WATCH", "1"),
+            ("APP_CLI__RUST__UNKNOWN", "false"),
             ("APP_CLI__VITE__ENABLED", "1"),
             ("APP_CLI__VITE__UNKNOWN", "false"),
             ("APP_CLI__GENERATE__K8S__REPLICAS", "0"),
@@ -229,6 +232,24 @@ mod selected_cli_settings_tests {
             ]);
             assert!(loaded.is_err() || loaded.unwrap().validate(true).is_err(), "{key}");
         }
+    }
+    #[test]
+    fn rust_watch_is_opt_in_and_absent_sections_remain_compatible() {
+        let default: Settings = loader().load_from_env([]).unwrap();
+        assert!(!default.cli.rust.watch);
+        let enabled: Settings = loader().load_from_env([
+            ("APP_CLI__RUST__WATCH".into(), "true".into()),
+        ]).unwrap();
+        assert!(enabled.cli.rust.watch);
+        let mut old = serde_json::to_value(serde_json::json!({
+            "vite": {"enabled": false, "root": "frontend/", "auto_start": false, "auto_build": false},
+            "generate": {"k8s": {"replicas": 1}}
+        })).unwrap();
+        assert!(!serde_json::from_value::<Cli>(old.clone()).unwrap().rust.watch);
+        old["rust"] = serde_json::json!({});
+        assert!(serde_json::from_value::<Cli>(old.clone()).is_err());
+        old["rust"] = serde_json::json!({"watch": "true"});
+        assert!(serde_json::from_value::<Cli>(old).is_err());
     }
 }
 "#,

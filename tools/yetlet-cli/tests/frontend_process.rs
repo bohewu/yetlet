@@ -450,6 +450,116 @@ fn execution_switches_are_independent_and_disabled_frontend_stays_skipped() {
 }
 
 #[test]
+fn watch_forces_rust_watch_after_settings_validation_without_changing_run() {
+    for rust in ["", "[cli.rust]\nwatch=false\n"] {
+        let fixture = Fixture::new();
+        let base_path = fixture.root.path().join("base.toml");
+        let base = format!("{}{rust}", fs::read_to_string(&base_path).unwrap());
+        fs::write(&base_path, &base).unwrap();
+        let watcher = fixture.root.path().join("bin/watchexec");
+        fs::write(
+            &watcher,
+            r#"#!/usr/bin/python3
+import os, time
+root=os.environ['YT_FRONTEND_TEST_ROOT']
+with open(root+'/watcher-started', 'w') as out: out.write(str(os.getpid()))
+while True: time.sleep(.02)
+"#,
+        )
+        .unwrap();
+        fs::set_permissions(&watcher, fs::Permissions::from_mode(0o700)).unwrap();
+        for action in ["run", "watch"] {
+            let mut command = fixture.command(action, "rust-fail");
+            command.env("APP_CLI__VITE__AUTO_START", "false");
+            if !rust.is_empty() {
+                command.env("APP_CLI__RUST__WATCH", "false");
+            }
+            let running = Running::start(&mut command);
+            let watcher_pid = if action == "watch" {
+                fixture.ready("cargo.pid");
+                let deadline = Instant::now() + Duration::from_secs(6);
+                let pid = loop {
+                    if let Some(pid) =
+                        fs::read_to_string(fixture.root.path().join("watcher-started"))
+                            .ok()
+                            .and_then(|value| value.parse::<i32>().ok())
+                            .filter(|pid| *pid > 0)
+                    {
+                        break pid;
+                    }
+                    assert!(Instant::now() < deadline, "watcher PID readiness");
+                    thread::sleep(Duration::from_millis(5));
+                };
+                running.signal(libc::SIGINT);
+                Some(pid)
+            } else {
+                None
+            };
+            let output = running.wait();
+            if action == "run" {
+                assert_eq!(output.status.code(), Some(23));
+            } else {
+                assert_eq!(
+                    output.status.signal(),
+                    Some(libc::SIGINT),
+                    "{}",
+                    String::from_utf8_lossy(&output.stderr)
+                );
+                let pid = watcher_pid.unwrap();
+                assert_eq!(unsafe { libc::kill(pid, 0) }, -1, "owned watcher survived");
+                assert_eq!(
+                    std::io::Error::last_os_error().raw_os_error(),
+                    Some(libc::ESRCH)
+                );
+            }
+            assert_eq!(
+                fixture.root.path().join("watcher-started").exists(),
+                action == "watch"
+            );
+            assert!(!fixture.root.path().join("npm.pid").exists());
+            assert_eq!(fs::read_to_string(&base_path).unwrap(), base);
+            for file in ["cargo.pid", "cargo-leaf.pid"] {
+                let pid = fs::read_to_string(fixture.root.path().join(file))
+                    .unwrap()
+                    .parse::<i32>()
+                    .unwrap();
+                assert_eq!(unsafe { libc::kill(pid, 0) }, -1, "owned {file} survived");
+                assert_eq!(
+                    std::io::Error::last_os_error().raw_os_error(),
+                    Some(libc::ESRCH)
+                );
+                fs::remove_file(fixture.root.path().join(file)).unwrap();
+            }
+        }
+        assert_eq!(fixture.trace().len(), 2);
+        assert!(fixture.trace().iter().all(|row| row["role"] == "cargo"));
+    }
+    // A command override must not hide invalid declared settings or environment values.
+    for (rust, override_value) in [
+        ("[cli.rust]\nwatch='invalid'\n", None),
+        ("[cli.rust]\nunknown=true\n", None),
+        ("[cli.rust]\nwatch=false\n", Some("invalid")),
+    ] {
+        let fixture = Fixture::new();
+        let base_path = fixture.root.path().join("base.toml");
+        let base = format!("{}{rust}", fs::read_to_string(&base_path).unwrap());
+        fs::write(&base_path, &base).unwrap();
+        let mut command = fixture.command("watch", "rust-fail");
+        command.env("APP_CLI__VITE__AUTO_START", "false");
+        if let Some(value) = override_value {
+            command.env("APP_CLI__RUST__WATCH", value);
+        }
+        let output = Running::start(&mut command).wait();
+        assert_eq!(output.status.code(), Some(1));
+        assert!(
+            String::from_utf8_lossy(&output.stderr).contains("invalid public CLI configuration")
+        );
+        assert!(fixture.trace().is_empty());
+        assert_eq!(fs::read_to_string(base_path).unwrap(), base);
+    }
+}
+
+#[test]
 fn configured_frontend_root_with_spaces_and_unicode_is_literal_and_filters_backend_env() {
     let fixture = Fixture::new();
     let selected = "frontend 雪 with spaces";

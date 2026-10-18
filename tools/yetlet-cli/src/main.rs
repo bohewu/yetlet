@@ -17,8 +17,9 @@ fn main() -> ExitCode {
             println!("{}", report.render(json));
             ExitCode::from(report.exit_code())
         }
-        Ok(Cli::Build { manifest, release }) => application(&manifest, false, release),
-        Ok(Cli::Run { manifest }) => application(&manifest, true, false),
+        Ok(Cli::Build { manifest, release }) => application(&manifest, false, release, false),
+        Ok(Cli::Run { manifest }) => application(&manifest, true, false, false),
+        Ok(Cli::Watch { manifest }) => application(&manifest, true, false, true),
         Ok(command @ Cli::GenerateK8s { .. }) => match command.generate_k8s() {
             Ok(()) => {
                 println!(
@@ -88,8 +89,13 @@ fn main() -> ExitCode {
     }
 }
 
-fn application(manifest: &std::path::Path, run: bool, release: bool) -> ExitCode {
-    match app::run(manifest, run, release) {
+fn application(manifest: &std::path::Path, run: bool, release: bool, watch: bool) -> ExitCode {
+    let result = if watch {
+        app::watch(manifest)
+    } else {
+        app::run(manifest, run, release)
+    };
+    match result {
         Ok(completion) => completion.finish(),
         Err(error) => {
             let code = if error.code == 125 {
@@ -99,7 +105,13 @@ fn application(manifest: &std::path::Path, run: bool, release: bool) -> ExitCode
             };
             eprintln!(
                 "{code} {}: {}",
-                if run { "run" } else { "build" },
+                if watch {
+                    "watch"
+                } else if run {
+                    "run"
+                } else {
+                    "build"
+                },
                 error.message
             );
             ExitCode::from(error.code as u8)

@@ -16,7 +16,8 @@ See the [CLI contract](../../docs/CLI-CONTRACT.md) and
 | `yetlet --version` / `-V` | Build-time CLI version; no project, tools or settings required |
 | `yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]` | Publish a new scaffold; no tools, installs, builds or lock generation |
 | `yetlet doctor [--json]` | Bounded environment-only Rust/Cargo identity and compiled filesystem capability; schema 1 JSON |
-| `yetlet run [--manifest-path PATH]` | Frozen Cargo run, optionally supervised with Vite according to settings |
+| `yetlet run [--manifest-path PATH]` | Frozen Cargo run, with independent settings-controlled Rust watch and Vite supervision |
+| `yetlet watch [--manifest-path PATH]` | Same run pipeline with Rust watch enabled for this invocation; Vite still uses settings |
 | `yetlet build [--manifest-path PATH] [--release]` | Optional frontend production build followed by frozen Cargo build |
 | `yetlet generate docker [--manifest-path PATH] --output DIRECTORY` | Qualified-source configuration/inventory only |
 | `yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE` | Configuration for a separately built Linux/amd64 image |
@@ -74,10 +75,13 @@ existing separately prepared standalone Tailwind 4.3.3 path otherwise.
 DI, sessions and other capability modules remain optional.
 
 Every new app has public base.toml and development/staging/production overlays.
-A plain scaffold declares disabled Vite settings without a runtime config
-crate. `new webapp --vite` declares:
+Every scaffold declares `cli.rust.watch = false`. A plain scaffold also
+declares disabled Vite settings without a runtime config crate. `new webapp --vite` declares:
 
 ```toml
+[cli.rust]
+watch = false
+
 [cli.vite]
 enabled = true
 root = "frontend/"
@@ -91,7 +95,7 @@ replicas = 1
 The shared `yetlet-config` loader applies base, exactly one selected overlay,
 and real scoped ENV overrides. APP_ENVIRONMENT selects Development, Staging or
 Production and defaults to Production. Examples include
-APP_CLI__VITE__AUTO_START=false, APP_CLI__VITE__AUTO_BUILD=false,
+APP_CLI__RUST__WATCH=true, APP_CLI__VITE__AUTO_START=false, APP_CLI__VITE__AUTO_BUILD=false,
 APP_CLI__VITE__ROOT=web and APP_CLI__GENERATE__K8S__REPLICAS=3. Values override
 existing declared keys; invalid keys/types and partial settings fail safely.
 CLI behavior is not stored in Cargo metadata.
@@ -99,8 +103,8 @@ CLI behavior is not stored in Cargo metadata.
 CLI public settings default to the selected app root. Explicit absolute
 YETLET_CONFIG_ROOT can relocate the public settings root. Vite root always
 resolves relative to the selected Cargo.toml, including when settings move.
-Legacy apps without CLI declarations retain disabled-Vite/default-generator
-behavior; their source and settings are not rewritten automatically.
+Legacy apps without CLI declarations retain disabled-watch/disabled-Vite/default-generator
+behavior; an absent cli.rust section also defaults to watch disabled; their source and settings are not rewritten automatically.
 
 App runtime settings retain APP_SERVER__HOST/PORT, APP_SERVICE__TOKEN and the
 existing explicit Development-only YETLET_DEV_SECRETS mechanism. No usable token
@@ -131,20 +135,60 @@ frozen Cargo compilation. Frontend failure preserves its status and skips Rust.
 When disabled, it reports that the frontend stage was skipped; this does not
 claim missing/stale assets are ready.
 
-`run` selects only `enabled && auto_start`. When selected, it starts the strict
+`run` and `watch` select Vite through `enabled && auto_start`, independently of Rust watch. When selected, they start the strict
 loopback Vite server on 127.0.0.1:5173, waits for bounded readiness, and supervises
 it together with frozen Cargo run. The generated read-only bridge expects the
 backend on 127.0.0.1:3000; keep the corresponding app settings when using it.
 Build initial frontend dist separately before startup. Rust snapshots and
 validates dist; auto-start does not silently perform a production frontend build.
-Both owned trees are stopped/reaped when either child exits or the CLI is
-cancelled. No Rust watcher/restart or browser launch is added.
+With Rust watch disabled, both owned trees are stopped/reaped when either child
+exits or the CLI is cancelled. Browser launch is not added.
 
 Disable auto_start for the manual two-terminal workflow: set YETLET_VITE_PORT=5173
 for the Rust process and start `npm run dev` separately in the frontend root.
 The bridge remains root-page/read-only, with strict origin/path/CSP/nonce bounds;
 no authentication, cookies, POST/actions, arbitrary proxy or multi-page support.
 Production uses versioned static assets and no Node runtime.
+
+## Rust watch
+
+Rust watch is disabled by default for `run` and independent of Vite. Prepare
+Watchexec on PATH separately (integration targets version 2.8.0); the CLI never
+installs it. Use `yetlet watch` to enable watch for this invocation, even when
+`cli.rust.watch` is false or absent. It shares `run` and validates settings
+strictly before applying the override; settings files are unchanged.
+
+To make watch the default for `yetlet run`, enable the existing base declaration
+through the selected profile:
+
+```toml
+[cli.rust]
+watch = true
+```
+
+Then run `yetlet run`, or use `APP_CLI__RUST__WATCH=true yetlet run` with the
+base key declared. `--settings` still only selects generated runtime settings;
+watch uses public CLI settings even for plain SSR apps. There is no watch flag
+or Cargo metadata configuration. `build` never starts watch and requires no
+Watchexec, even when this setting is true.
+
+The CLI starts frozen/offline Cargo immediately. Watchexec emits JSON file events;
+the CLI stops/reaps the old Rust tree and starts a fresh generation on a relevant
+change. Compile errors and Rust runtime exits are reported, then wait for the
+next change. Vite keeps the same process through Rust restarts. Cancellation,
+Vite exit or watcher death ends the session and cleans up all owned trees.
+
+Watch covers app-root Rust `*.rs` (including build.rs), Cargo.toml and Cargo.lock.
+It excludes the configured frontend root, target, node_modules and dist, plus
+CARGO_TARGET_DIR when under the app root, and does not follow symlinks. Outside-app
+local dependencies are not watched. Special target directories from Cargo config
+need separate exclusion if required; select CARGO_TARGET_DIR for an excluded
+in-root location or put the directory outside the watched root.
+
+CLI settings are loaded once per run; rerun the CLI to change watch/Vite policy.
+The fresh backend reads its runtime settings on each restart. Browser refresh,
+in-process state preservation and graceful request draining are not promised.
+Historical Vite lifecycle evidence does not qualify the added watch mode.
 
 ## Current generator source matrix (YT-101)
 

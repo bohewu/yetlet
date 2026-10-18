@@ -28,10 +28,11 @@ pub const VERSION: &str = concat!(
     env!("CARGO_PKG_VERSION"),
     " (unpublished preview)"
 );
-pub const HELP: &str = "Yetlet CLI preview (unpublished)\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet run [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
+pub const HELP: &str = "Yetlet CLI preview (unpublished)\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
 const NEW_HELP: &str = "Usage: yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]\n\nNAME may appear anywhere among options. --parent defaults to cwd and must exist.\nNAME: 1-64 lowercase ASCII letters/digits/-/_, starting with a letter; reserved names refused.\n--vite selects the complete frontend scaffold and implies --settings. Plain new keeps app-runtime settings opt-in.\n--tailwind selects standalone Tailwind or the official Vite plugin. --service adds bind/health/shutdown.\nCreates one new tree without overwrite, dependency installation, lock generation or process startup.\n";
 const DOCTOR_HELP: &str = "Usage: yetlet doctor [--json]\n\nReports bounded local Rust/Cargo 1.99+ identity and compiled new-filesystem capability.\nEnvironment only; application, framework, settings, frontend and execution readiness are not checked.\n--json emits schema 1. No builds, installs, Node probes or listeners.\n";
-const RUN_HELP: &str = "Usage: yetlet run [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; no ancestor or workspace search.\nRequires a protected standalone app and existing Cargo.lock; runs frozen Cargo.\nPublic settings select optional Vite startup; no implicit installs or Rust watcher.\nOwned processes must retain their process group/Job; escaped daemons are unsupported.\n";
+const RUN_HELP: &str = "Usage: yetlet run [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; no ancestor or workspace search.\nRequires a protected standalone app and existing Cargo.lock; runs frozen Cargo.\nPublic settings select Rust watch and optional Vite startup; no implicit installs.\nOwned processes must retain their process group/Job; escaped daemons are unsupported.\n";
+const WATCH_HELP: &str = "Usage: yetlet watch [--manifest-path PATH]\n\nRuns the same pipeline as yetlet run, forcing Rust watch for this invocation.\nManifest defaults to exactly cwd/Cargo.toml; requires a protected standalone app and Cargo.lock.\nPublic settings are validated first; Vite enabled, auto_start and root settings still apply.\nRequires Watchexec on PATH; no implicit installs or settings-file changes.\nRust restarts retain Vite; cancellation cleans up owned processes.\n";
 const BUILD_HELP: &str = "Usage: yetlet build [--manifest-path PATH] [--release]\n\nManifest defaults to exactly cwd/Cargo.toml. Requires a protected standalone app and existing Cargo.lock.\nSettings select a frontend build before frozen Cargo, or an explicitly skipped frontend stage.\n--release selects the Cargo build profile; it does not change APP_ENVIRONMENT. No implicit installs.\n";
 const GENERATE_HELP: &str = "Usage:\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nWrites configuration only for qualified source/lock representations, without overwrite.\nNo image build/pull, source export, credentials lookup or deployment.\n";
 const DOCKER_HELP: &str = "Usage: yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n\nManifest defaults to cwd/Cargo.toml. Output is a complete new directory under an existing protected parent.\nQualified source/lock inspection only; writes configuration without tools or source export.\n";
@@ -58,6 +59,9 @@ pub enum Cli {
         release: bool,
     },
     Run {
+        manifest: PathBuf,
+    },
+    Watch {
         manifest: PathBuf,
     },
     GenerateDocker {
@@ -100,6 +104,7 @@ pub fn usage(args: &[OsString]) -> &'static str {
         Some("new") => NEW_HELP,
         Some("doctor") => DOCTOR_HELP,
         Some("run") => RUN_HELP,
+        Some("watch") => WATCH_HELP,
         Some("build") => BUILD_HELP,
         Some("generate") => match args.get(1).and_then(|v| v.to_str()) {
             Some("docker") => DOCKER_HELP,
@@ -127,7 +132,7 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
         return Err("dev was renamed; use yetlet run");
     }
     let (start, generator) = match command {
-        "new" | "doctor" | "run" | "build" => (1, None),
+        "new" | "doctor" | "run" | "watch" | "build" => (1, None),
         "generate" => {
             if args.len() == 2 && matches!(args[1].to_str(), Some("--help" | "-h")) {
                 return Ok(Cli::Help(GENERATE_HELP));
@@ -161,7 +166,8 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
                 parent = Some(path_value(args, &mut index, inline)?)
             }
             Some("--manifest-path")
-                if matches!(command, "run" | "build" | "generate") && manifest.is_none() =>
+                if matches!(command, "run" | "watch" | "build" | "generate")
+                    && manifest.is_none() =>
             {
                 manifest = Some(path_value(args, &mut index, inline)?)
             }
@@ -236,6 +242,7 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
         }),
         "doctor" => Ok(Cli::Doctor { json }),
         "run" => Ok(Cli::Run { manifest }),
+        "watch" => Ok(Cli::Watch { manifest }),
         "build" => Ok(Cli::Build { manifest, release }),
         _ => {
             let output = output.ok_or("generator requires --output DIRECTORY")?;
@@ -373,6 +380,23 @@ mod tests {
             })
         );
         assert_eq!(
+            parse(&argv(&["watch"])),
+            Ok(Cli::Watch {
+                manifest: "Cargo.toml".into()
+            })
+        );
+        for args in [
+            vec!["watch", "--manifest-path", "./應 用;$literal/Cargo.toml"],
+            vec!["watch", "--manifest-path=./應 用;$literal/Cargo.toml"],
+        ] {
+            assert_eq!(
+                parse(&argv(&args)),
+                Ok(Cli::Watch {
+                    manifest: "./應 用;$literal/Cargo.toml".into()
+                })
+            );
+        }
+        assert_eq!(
             parse(&argv(&[
                 "build",
                 "--release",
@@ -419,6 +443,14 @@ mod tests {
             vec!["new", "demo", "--parent", " "],
             vec!["new", "demo", "--parent="],
             vec!["run", "--manifest-path="],
+            vec!["watch", "--manifest-path="],
+            vec!["watch", "--manifest-path", " "],
+            vec!["watch", "--release"],
+            vec!["watch", "extra"],
+            vec!["watch", "--manifest-path=x", "--manifest-path=y"],
+            vec!["watch", "--help", "--manifest-path=x"],
+            vec!["watch", "--manifest-path=x", "-h"],
+            vec!["watch", "--", "anything"],
             vec!["build", "--release=false"],
             vec!["doctor", "--json=true"],
             vec!["doctor", "--json", "--json"],
@@ -465,6 +497,16 @@ mod tests {
         );
         let inline = OsString::from_vec(b"--manifest-path=./native-\xff/Cargo.toml".to_vec());
         assert_eq!(parse(&["run".into(), inline]), expected);
+        let path = OsString::from_vec(b"./native-\xff/Cargo.toml".to_vec());
+        let expected = Ok(Cli::Watch {
+            manifest: path.clone().into(),
+        });
+        assert_eq!(
+            parse(&["watch".into(), "--manifest-path".into(), path]),
+            expected
+        );
+        let inline = OsString::from_vec(b"--manifest-path=./native-\xff/Cargo.toml".to_vec());
+        assert_eq!(parse(&["watch".into(), inline]), expected);
     }
 
     #[test]

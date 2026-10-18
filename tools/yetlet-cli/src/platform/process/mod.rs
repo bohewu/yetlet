@@ -1,5 +1,6 @@
 //! Internal compile-time process boundary; no runtime backend selection.
 mod probe;
+pub(crate) mod watch;
 pub(crate) use probe::{ProbeError, probe};
 #[cfg(target_os = "linux")]
 mod linux;
@@ -93,18 +94,46 @@ pub(crate) fn run_with_frontend(app: &App, frontend: &App) -> io::Result<Complet
     imp::run_pair(&mut rust, &mut frontend_command)
 }
 
+pub(crate) fn run_watch(
+    app: &App,
+    frontend: Option<&App>,
+    frontend_root: &str,
+) -> io::Result<Completion> {
+    let mut rust = command(app, true, false)?;
+    let mut watcher = watch::command(app, frontend_root);
+    imp::pin_cwd(app, &mut watcher)?;
+    let mut front = frontend
+        .map(|front| frontend_command(app, front, true))
+        .transpose()?;
+    if let Some(front) = front.as_mut() {
+        front.stdin(std::process::Stdio::null());
+        rust.env("YETLET_VITE_PORT", "5173");
+    }
+    println!("Rust watch enabled by cli.rust.watch; Watchexec supplies file events");
+    #[cfg(windows)]
+    return imp::run_watch(app, &mut rust, &mut watcher, frontend.zip(front.as_mut()));
+    #[cfg(not(windows))]
+    imp::run_watch(&mut rust, &mut watcher, front.as_mut())
+}
+
 pub(crate) fn finish(completion: Completion) -> ! {
     let signal = match completion {
         Completion::Cancelled(signal) => {
             eprintln!("CLI_CANCELLED stage=execution: owned children stopped");
             Some(signal)
         }
-        Completion::Exited(status) | Completion::FrontendExited(status) => {
-            let stage = if matches!(completion, Completion::FrontendExited(_)) {
-                "frontend"
-            } else {
-                "rust"
+        Completion::Exited(status)
+        | Completion::FrontendExited(status)
+        | Completion::WatcherExited(status) => {
+            let stage = match completion {
+                Completion::FrontendExited(_) => "frontend",
+                Completion::WatcherExited(_) => "watcher",
+                _ => "rust",
             };
+            if matches!(completion, Completion::WatcherExited(_)) && status.success() {
+                eprintln!("CLI_CHILD_EXIT stage=watcher: file event source ended unexpectedly");
+                std::process::exit(125);
+            }
             if !status.success() {
                 eprintln!("CLI_CHILD_EXIT stage={stage}: child ended with {status}");
             }
