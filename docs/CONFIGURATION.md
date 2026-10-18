@@ -168,6 +168,14 @@ there is no Windows execution receipt for this workspace yet.
 
 ## Dependency and scope boundary
 
+The separately selected [secret-provider follow-up](SECRET-PROVIDERS.md)
+offers an opt-in asynchronous string lookup interface. Applications load the
+same typed settings, then explicitly map selected secret fields into an
+`SettingsSecrets` snapshot provider, with explicit whole-snapshot replacement
+for later application adoption. The loader's formats, precedence and
+Development-only secret rules remain unchanged. Provider lookup is an explicit
+application operation, separate from loading configuration.
+
 The separately selected [development HTTPS follow-up](DEV-HTTPS-VERIFICATION.md)
 adds public `server.tls` declarations to settings-enabled CLI scaffolds. It reuses
 this loader and the existing secret rules; optional application TLS dependencies

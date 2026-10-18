@@ -1,0 +1,2 @@
+[service]
+public_message = "Staging secret provider example"

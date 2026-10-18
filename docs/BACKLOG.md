@@ -252,6 +252,15 @@ Vite HTTPS/WSS. Its native lifecycle and independent review evidence remain
 separate from the broader YT-102 research acceptance. Existing secret behavior
 and YT-102 Todo status are unchanged.
 
+The separately authorized [opt-in SecretProvider follow-up](SECRET-PROVIDERS.md)
+extends YT-090's application composition with a named asynchronous string-secret
+contract and an explicit adapter over already-loaded settings. It does not
+reopen the completed loader acceptance or activate YT-095 DI research,
+publication or deployment. A subsequent owner-selected
+[rotation and native/cloud experiment](SECRET-ROTATION-VERIFICATION.md) covers
+explicit local snapshot replacement, native Windows tests and disposable Azure
+CLI secret versions; it does not establish production cloud-provider support.
+
 ## Update rules
 
 1. Change status only after checking source changes and task-specific evidence.

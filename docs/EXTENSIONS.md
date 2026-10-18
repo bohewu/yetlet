@@ -110,6 +110,12 @@ error and disposal-contract differences.
 
 ## Designing another module
 
+The separately selected [secret provider](SECRET-PROVIDERS.md) is an opt-in
+native contract: applications explicitly construct `SettingsSecrets` from
+already-loaded fields, pass `Arc<dyn SecretProvider>` to ordinary service
+constructors and optionally retain it in application-owned State. The module
+adds no middleware, ambient service resolution or core dependency.
+
 Use a normal setup function where it suffices. Add narrow traits only for genuine replaceable resource contracts (for example a cache store), not for a central plugin registry. Keep storage-specific dependencies in the module/provider crate. A handler that does not need context, auth or session should remain an ordinary function.
 
 M8c implements only the bounded memory Session provider described above. Cookie authentication, authorization and cache providers remain unimplemented. Session is not authentication; data cache is not HTTP output caching. Key rotation for protected client-side data, shared/distributed storage, login-time fixation rules, authorization, trusted proxy identity and production qualification cannot be inferred from typed registration.

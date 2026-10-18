@@ -1,0 +1,25 @@
+[workspace]
+resolver = "3"
+
+[package]
+name = "yetlet-secrets"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+license = "MIT OR Apache-2.0"
+description = "Experimental opt-in native string secret provider"
+
+[dependencies]
+secrecy = "=0.10.3"
+
+[dev-dependencies]
+secrecy = { version = "=0.10.3", features = ["serde"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.154"
+yetlet-config = { path = "../yetlet-config" }
+yetlet-core = { path = "../yetlet-core" }
+yetlet-server-axum = { path = "../yetlet-server-axum" }
+axum = { version = "=0.8.9", default-features = false, features = ["http1", "tokio"] }
+tokio = { version = "=1.53.2", features = ["macros", "rt-multi-thread", "process", "time"] }
+tower = { version = "=0.5.3", features = ["util"] }
