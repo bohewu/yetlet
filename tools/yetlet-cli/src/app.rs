@@ -50,6 +50,32 @@ fn execute(
         } else {
             settings.vite.auto_build
         };
+    if settings.tls.enabled {
+        let manifest = crate::platform::fs::read_app_file(&app, "Cargo.toml")
+            .map_err(|message| Failure { code: 1, message })?;
+        let manifest = parse_file("Cargo.toml", manifest.as_slice())
+            .map_err(|message| Failure { code: 1, message })?;
+        if manifest
+            .get("features")
+            .and_then(|features| features.get("yetlet-dev-tls"))
+            .and_then(toml::Value::as_array)
+            .is_none()
+        {
+            return Err(Failure {
+                code: 1,
+                message:
+                    "CLI_PROJECT: Development TLS requires the app's yetlet-dev-tls Cargo feature"
+                        .into(),
+            });
+        }
+    }
+    // Build selects the capability but never inspects development key files.
+    if dev {
+        settings
+            .tls
+            .paths(&app, &settings.vite.root)
+            .map_err(|message| Failure { code: 1, message })?;
+    }
     if selected {
         let frontend =
             crate::platform::fs::frontend_directory(&app, Path::new(&settings.vite.root))
@@ -65,9 +91,19 @@ fn execute(
             crate::platform::fs::read_frontend_manifest(&frontend)
                 .map_err(|_| Failure { code: 1, message: "Vite startup requires an existing protected frontend dist; build it separately first".into() })?;
             return if settings.rust.watch {
-                crate::platform::process::run_watch(&app, Some(&frontend), &settings.vite.root)
+                crate::platform::process::run_watch(
+                    &app,
+                    Some(&frontend),
+                    &settings.vite.root,
+                    &settings.tls,
+                )
             } else {
-                crate::platform::process::run_with_frontend(&app, &frontend)
+                crate::platform::process::run_with_frontend(
+                    &app,
+                    &frontend,
+                    &settings.tls,
+                    &settings.vite.root,
+                )
             }
             .map_err(process_failure);
         }
@@ -84,10 +120,11 @@ fn execute(
         println!("Frontend build skipped by public CLI settings");
     }
     if dev && settings.rust.watch {
-        crate::platform::process::run_watch(&app, None, &settings.vite.root)
+        crate::platform::process::run_watch(&app, None, &settings.vite.root, &settings.tls)
             .map_err(process_failure)
     } else {
-        crate::platform::process::run_cargo(&app, dev, release).map_err(process_failure)
+        crate::platform::process::run_cargo(&app, dev, release, &settings.tls)
+            .map_err(process_failure)
     }
 }
 

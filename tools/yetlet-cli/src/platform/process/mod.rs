@@ -27,8 +27,16 @@ pub(crate) fn command(app: &App, dev: bool, release: bool) -> io::Result<Command
     Ok(command)
 }
 
-pub(crate) fn run_cargo(app: &App, dev: bool, release: bool) -> io::Result<Completion> {
+pub(crate) fn run_cargo(
+    app: &App,
+    dev: bool,
+    release: bool,
+    tls: &crate::settings::Tls,
+) -> io::Result<Completion> {
     let mut command = command(app, dev, release)?;
+    if tls.enabled {
+        command.args(["--features", "yetlet-dev-tls"]);
+    }
     #[cfg(windows)]
     return imp::run(app, &mut command);
     #[cfg(not(windows))]
@@ -59,6 +67,9 @@ fn frontend_command(app: &App, frontend: &App, dev: bool) -> io::Result<Command>
         }
     }
     command
+        .env_remove("YETLET_DEV_TLS_CERT")
+        .env_remove("YETLET_DEV_TLS_KEY");
+    command
         .env("YETLET_PROJECT_ROOT", crate::platform::fs::app_root(app))
         .env("npm_config_offline", "true")
         .env("npm_config_audit", "false")
@@ -83,11 +94,16 @@ fn frontend_completion(completion: Completion) -> Completion {
     }
 }
 
-pub(crate) fn run_with_frontend(app: &App, frontend: &App) -> io::Result<Completion> {
+pub(crate) fn run_with_frontend(
+    app: &App,
+    frontend: &App,
+    tls: &crate::settings::Tls,
+    frontend_root: &str,
+) -> io::Result<Completion> {
     let mut frontend_command = frontend_command(app, frontend, true)?;
     frontend_command.stdin(std::process::Stdio::null());
     let mut rust = command(app, true, false)?;
-    rust.env("YETLET_VITE_PORT", "5173");
+    bridge_environment(app, &mut rust, &mut frontend_command, tls, frontend_root)?;
     #[cfg(windows)]
     return imp::run_pair(app, &mut rust, frontend, &mut frontend_command);
     #[cfg(not(windows))]
@@ -98,8 +114,12 @@ pub(crate) fn run_watch(
     app: &App,
     frontend: Option<&App>,
     frontend_root: &str,
+    tls: &crate::settings::Tls,
 ) -> io::Result<Completion> {
     let mut rust = command(app, true, false)?;
+    if tls.enabled && frontend.is_none() {
+        rust.args(["--features", "yetlet-dev-tls"]);
+    }
     let mut watcher = watch::command(app, frontend_root);
     imp::pin_cwd(app, &mut watcher)?;
     let mut front = frontend
@@ -107,13 +127,35 @@ pub(crate) fn run_watch(
         .transpose()?;
     if let Some(front) = front.as_mut() {
         front.stdin(std::process::Stdio::null());
-        rust.env("YETLET_VITE_PORT", "5173");
+        bridge_environment(app, &mut rust, front, tls, frontend_root)?;
     }
     println!("Rust watch enabled by cli.rust.watch; Watchexec supplies file events");
     #[cfg(windows)]
     return imp::run_watch(app, &mut rust, &mut watcher, frontend.zip(front.as_mut()));
     #[cfg(not(windows))]
     imp::run_watch(&mut rust, &mut watcher, front.as_mut())
+}
+
+fn bridge_environment(
+    app: &App,
+    rust: &mut Command,
+    frontend: &mut Command,
+    tls: &crate::settings::Tls,
+    root: &str,
+) -> io::Result<()> {
+    rust.env("YETLET_VITE_PORT", "5173")
+        .env("APP_SERVER__HOST", "127.0.0.1")
+        .env("APP_SERVER__PORT", "3000");
+    if tls.enabled {
+        rust.args(["--features", "yetlet-dev-tls"]);
+        rust.env("APP_SERVER__TLS__ENABLED", "false");
+    }
+    if let Some((certificate, key)) = tls.paths(app, root).map_err(io::Error::other)? {
+        frontend
+            .env("YETLET_DEV_TLS_CERT", certificate)
+            .env("YETLET_DEV_TLS_KEY", key);
+    }
+    Ok(())
 }
 
 pub(crate) fn finish(completion: Completion) -> ! {

@@ -134,12 +134,15 @@ For CLI public settings, step 3 is deliberately not enabled: no `YETLET_DEV_SECR
 | `APP_CLI__VITE__AUTO_START` | `cli.vite.auto_start` |
 | `APP_CLI__VITE__AUTO_BUILD` | `cli.vite.auto_build` |
 | `APP_CLI__GENERATE__K8S__REPLICAS` | `cli.generate.k8s.replicas` |
+| `APP_SERVER__TLS__ENABLED` | `server.tls.enabled` |
+| `APP_SERVER__TLS__CERTIFICATE` | `server.tls.certificate` |
+| `APP_SERVER__TLS__PRIVATE_KEY` | `server.tls.private_key` |
 
 The earlier proposed `YETLET_VITE_AUTO_START`/`YETLET_VITE_AUTO_BUILD` names and `[package.metadata.yetlet.vite]` proposal are superseded, not implemented compatibility promises. Do not silently parse `${VARIABLE}` expressions in TOML or add shell expansion. `APP_ENVIRONMENT` remains the shared file selector; neither `run` nor `--release` secretly changes it.
 
 ### Shared loader integration
 
-Loader deserializes the whole merged root and has no section-projection API. The CLI reuses `Loader::load_from_env::<serde_json::Value>()` with only APP_ENVIRONMENT and related APP_CLI variables, leaves Development secrets disabled, then strictly deserializes the cli table. The shared parser owns merge/key/type/profile semantics. CLI public files receive native protected-path preflight. Selected generated runtime Settings explicitly contains the known strict CLI namespace; global unknown-field validation remains enabled. Legacy internal scaffold APIs retain their exact previous representation for generator qualification.
+Loader deserializes the whole merged root and has no section-projection API. The CLI reuses `Loader::load_from_env::<serde_json::Value>()` with APP_ENVIRONMENT, related APP_CLI variables and the public APP_SERVER__TLS namespace, leaves Development secrets disabled, then strictly deserializes the cli and optional server.tls tables. The shared parser owns merge/key/type/profile semantics. CLI public files receive native protected-path preflight. Selected generated runtime Settings explicitly contains the known strict CLI namespace; global unknown-field validation remains enabled. Legacy internal scaffold APIs retain their exact previous representation for generator qualification.
 
 New project settings files are required inputs once selected. For legacy standalone apps with no CLI namespace, retain disabled-watch/disabled-Vite/default-generator behavior; do not infer tools from filenames/dependencies. Explicit CLI overrides require declared CLI keys. Missing required profile files, partial configuration, malformed sources and invalid values never trigger a silent fallback. No automatic edit of an old application's settings/Rust types occurs.
 
@@ -200,6 +203,27 @@ Vite owns HMR. [Implementation and integration evidence](YT-102-STATEFUL-HMR-IMP
 records the state boundary, tested edits/restores and remaining scope.
 
 With Rust watch disabled, the pair supervisor uses bounded frontend readiness, native signal ownership, stage attribution and cleanup of both owned trees. Current native Linux tests cover failure, cancellation, descendants and PTY restoration; [native Windows GNU evidence](YT-102-WINDOWS-VITE-VERIFICATION.md) covers six selected real Vite/Rust cases for startup, failure, C/BREAK, port collision and disabled auto-start. In that non-watch mode, child failure must stop/reap the other owned tree; cleanup uncertainty is failure. Native Windows console/headless limits remain explicit; compile-only evidence cannot prove lifecycle support. Manual frontend startup and the current two-terminal fallback remain usable when automatic startup is disabled. Windows cross-compilation alone does not satisfy the native qualification gate.
+
+### Development HTTPS
+
+Settings-enabled selected scaffolds, including Vite applications, declare
+`[server.tls]` with `enabled = false`, `certificate = ""` and `private_key = ""`.
+The existing Development profile and scoped environment overrides select TLS.
+Certificate/key paths are protected application-relative files outside frontend
+sources; `.dev/` is ignored in generated projects. The CLI never installs or
+invokes mkcert, generates a key, or changes certificate trust.
+
+`run` and `watch` select the generated optional `yetlet-dev-tls` Cargo feature
+when TLS is enabled. Direct Rust execution serves HTTPS with axum-server/rustls.
+With automatic Vite startup, Vite owns HTTPS/WSS on `127.0.0.1:5173`, while the
+CLI fixes the backend to private HTTP `127.0.0.1:3000`. Existing bridge scope,
+Origin/CSP/path checks and process ownership remain in force. `build` selects
+compilation without reading certificate/key files; frontend build environments
+do not receive development TLS paths. Runtime TLS settings require Development;
+missing or invalid material fails rather than falling back to HTTP.
+
+See [setup and verification](DEV-HTTPS-VERIFICATION.md). Default HTTP, existing
+secrets, Core/browser dependencies and the minimal plain scaffold stay unchanged.
 
 ### Opt-in Rust watch
 

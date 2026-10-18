@@ -168,6 +168,12 @@ there is no Windows execution receipt for this workspace yet.
 
 ## Dependency and scope boundary
 
+The separately selected [development HTTPS follow-up](DEV-HTTPS-VERIFICATION.md)
+adds public `server.tls` declarations to settings-enabled CLI scaffolds. It reuses
+this loader and the existing secret rules; optional application TLS dependencies
+remain outside the configuration crate and Core/browser defaults. This is a
+later development capability, separate from the original YT-090 boundary below.
+
 The adapter pins `toml = 0.9.12` with only std/parse/serde, Serde 1.0.229 and
 dotenvy 0.15.7; libc 0.2.186 is Unix-only for the no-follow/nonblocking file open.
 Secrecy 0.10.3, Axum/Tokio/Tower and Yetlet's native SSR crates are example/test

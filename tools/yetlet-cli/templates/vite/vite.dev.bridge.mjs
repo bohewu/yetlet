@@ -1,8 +1,9 @@
 // App-owned YT-100 development bridge, never imported by production Rust/build.
 import { randomBytes } from 'node:crypto';
 import { get } from 'node:http';
-import { realpathSync } from 'node:fs';
+import { readFileSync, realpathSync } from 'node:fs';
 import { isAbsolute, join, relative, sep } from 'node:path';
+import { createSecureContext } from 'node:tls';
 
 export const productionCsp = "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
 const maxHtmlBytes = 256 * 1024;
@@ -25,9 +26,31 @@ export function devPort(value = '5173') {
   return port;
 }
 
-export function allowedOrigin(headers, port, websocket = false) {
+export function devTls(root, env = process.env) {
+  const certPath = env.YETLET_DEV_TLS_CERT;
+  const keyPath = env.YETLET_DEV_TLS_KEY;
+  if (certPath === undefined && keyPath === undefined) return undefined;
+  try {
+    const frontend = realpathSync(root);
+    for (const path of [certPath, keyPath]) {
+      if (typeof path !== 'string' || !isAbsolute(path)) throw new Error();
+      for (const candidate of [path, realpathSync(path)]) {
+        const location = relative(frontend, candidate);
+        if (!isAbsolute(location) && location !== '..' && !location.startsWith(`..${sep}`)) throw new Error();
+      }
+    }
+    const https = { cert: readFileSync(certPath), key: readFileSync(keyPath) };
+    createSecureContext(https);
+    return https;
+  } catch {
+    // Never surface credential contents, paths or OpenSSL diagnostics in Vite logs.
+    throw new Error('Invalid development TLS credentials');
+  }
+}
+
+export function allowedOrigin(headers, port, websocket = false, https = false) {
   return headers.host === `127.0.0.1:${port}`
-    && (headers.origin === `http://127.0.0.1:${port}` || (!websocket && headers.origin === undefined));
+    && (headers.origin === `${https ? 'https' : 'http'}://127.0.0.1:${port}` || (!websocket && headers.origin === undefined));
 }
 
 export function allowedPath(raw) {
@@ -49,7 +72,7 @@ export function allowedPath(raw) {
     && !/^(?:vite(?:\.dev)?\.(?:config|bridge)|(?:tailwind|postcss)\.config)\./i.test(filename);
 }
 
-export function devDocument(html, port) {
+export function devDocument(html, port, https = false) {
   devPort(String(port));
   if (typeof html !== 'string' || Buffer.byteLength(html) > maxHtmlBytes || !html.startsWith(head)) {
     throw new Error('Unexpected backend HTML');
@@ -61,11 +84,11 @@ export function devDocument(html, port) {
   }
   const nonce = randomBytes(18).toString('base64');
   const body = tail.slice(block.length).replace(mark,
-    `<img id="local-mark" src="http://127.0.0.1:${port}/mark.svg" alt="Local check mark" width="80" height="48">`);
+    `<img id="local-mark" src="${https ? 'https' : 'http'}://127.0.0.1:${port}/mark.svg" alt="Local check mark" width="80" height="48">`);
   return {
     nonce,
     csp: productionCsp.replace("style-src 'self'", `style-src 'self' 'nonce-${nonce}'`)
-      .replace("connect-src 'self'", `connect-src 'self' ws://127.0.0.1:${port}`),
+      .replace("connect-src 'self'", `connect-src 'self' ${https ? 'wss' : 'ws'}://127.0.0.1:${port}`),
     html: head + `<meta property="csp-nonce" nonce="${nonce}"><script type="module" src="/@vite/client"></script><script type="module" src="/app.ts"></script></head><body>` + body,
   };
 }
@@ -80,25 +103,32 @@ function reply(res, status, body, csp = productionCsp, html = false) {
   res.end(body);
 }
 
-export function devBridge(port) {
+export function devBridge(port, https) {
   devPort(String(port));
   return {
     name: 'yetlet-local-dev-bridge',
     apply: 'serve',
     configResolved(config) {
+      const resolvedTls = config.server.https;
+      const expectedTls = https
+        ? resolvedTls && Object.keys(resolvedTls).length === 2
+          && Buffer.isBuffer(resolvedTls.cert) && resolvedTls.cert.equals(https.cert)
+          && Buffer.isBuffer(resolvedTls.key) && resolvedTls.key.equals(https.key)
+        : !resolvedTls;
       // CLI overrides must never silently select a public listener or another port.
       if (config.server.host !== '127.0.0.1' || config.server.port !== port
-        || !config.server.strictPort || config.base !== '/' || config.server.https
+        || !config.server.strictPort || config.base !== '/' || !expectedTls
         || config.server.middlewareMode || config.server.ws?.port !== port
-        || config.server.ws?.host !== '127.0.0.1') {
-        throw new Error('Use the fixed loopback dev profile; select only YETLET_VITE_PORT');
+        || config.server.ws?.host !== '127.0.0.1'
+        || config.server.ws?.protocol !== (https ? 'wss' : 'ws')) {
+        throw new Error('Use the configured loopback development profile');
       }
     },
     configureServer(server) {
       const root = realpathSync(server.config.root);
       const pending = new Set();
       const upgrade = (req, socket) => {
-        if (!allowedOrigin(req.headers, port, true) || !/^\/\?token=[A-Za-z0-9_-]{12}$/.test(req.url ?? '')) {
+        if (!allowedOrigin(req.headers, port, true, Boolean(https)) || !/^\/\?token=[A-Za-z0-9_-]{12}$/.test(req.url ?? '')) {
           socket.destroy();
         }
       };
@@ -108,7 +138,7 @@ export function devBridge(port) {
         for (const request of pending) request.destroy();
       });
       server.middlewares.use((req, res, next) => {
-        if (!allowedOrigin(req.headers, port) || !allowedPath(req.url)) {
+        if (!allowedOrigin(req.headers, port, false, Boolean(https)) || !allowedPath(req.url)) {
           reply(res, 403, 'Development request refused\n');
           return;
         }
@@ -158,7 +188,7 @@ export function devBridge(port) {
             if (finished) return;
             try {
               const html = new TextDecoder('utf-8', { fatal: true }).decode(Buffer.concat(chunks));
-              const transformed = devDocument(html, port);
+              const transformed = devDocument(html, port, Boolean(https));
               finished = true;
               reply(res, 200, req.method === 'HEAD' ? undefined : transformed.html, transformed.csp, true);
             } catch { unavailable(); }

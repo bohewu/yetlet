@@ -5,7 +5,7 @@ import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { EventEmitter } from 'node:events';
-import { allowedOrigin, allowedPath, devBridge, devDocument, devPort, productionCsp } from '../templates/vite/vite.dev.bridge.mjs';
+import { allowedOrigin, allowedPath, devBridge, devDocument, devPort, devTls, productionCsp } from '../templates/vite/vite.dev.bridge.mjs';
 
 const fixture = mkdtempSync(join(tmpdir(), 'yetlet-vite-source-'));
 const root = join(fixture, 'frontend');
@@ -49,6 +49,48 @@ test('HTTP and WebSocket require exact host and explicit same dev origin', () =>
     for (const bad of ['evil.example', 'localhost:' + port, '127.0.0.1', host + '.evil', [host]]) {
       assert(!allowedOrigin({ host: bad }, port));
     }
+  }
+});
+
+test('HTTPS and WSS require the selected HTTPS origin and retain exact host checks', () => {
+  const host = '127.0.0.1:5173';
+  assert(allowedOrigin({ host }, 5173, false, true));
+  assert(!allowedOrigin({ host }, 5173, true, true));
+  assert(allowedOrigin({ host, origin: `https://${host}` }, 5173, true, true));
+  for (const origin of [`http://${host}`, `wss://${host}`, 'null', 'https://localhost:5173', 'https://evil.example']) {
+    assert(!allowedOrigin({ host, origin }, 5173, false, true));
+    assert(!allowedOrigin({ host, origin }, 5173, true, true));
+  }
+  assert(!allowedOrigin({ host: 'localhost:5173', origin: `https://${host}` }, 5173, false, true));
+});
+
+test('development TLS requires two absolute external paths and redacts invalid material', () => {
+  assert.equal(devTls(root, {}), undefined);
+  const external = join(fixture, 'invalid-tls.pem');
+  writeFileSync(external, 'private TLS sentinel');
+  const inRoot = join(root, 'app.js');
+  const alias = join(fixture, 'frontend-alias');
+  symlinkSync(root, alias, 'junction');
+  const rootAlias = join(root, 'tls-alias');
+  symlinkSync(fixture, rootAlias, 'junction');
+  for (const env of [
+    { YETLET_DEV_TLS_CERT: external }, { YETLET_DEV_TLS_KEY: external },
+    { YETLET_DEV_TLS_CERT: '', YETLET_DEV_TLS_KEY: external },
+    { YETLET_DEV_TLS_CERT: 'relative.pem', YETLET_DEV_TLS_KEY: external },
+    { YETLET_DEV_TLS_CERT: join(fixture, 'missing.pem'), YETLET_DEV_TLS_KEY: external },
+    { YETLET_DEV_TLS_CERT: inRoot, YETLET_DEV_TLS_KEY: external },
+    { YETLET_DEV_TLS_CERT: external, YETLET_DEV_TLS_KEY: inRoot },
+    { YETLET_DEV_TLS_CERT: join(alias, 'app.js'), YETLET_DEV_TLS_KEY: external },
+    { YETLET_DEV_TLS_CERT: join(rootAlias, 'invalid-tls.pem'), YETLET_DEV_TLS_KEY: external },
+    { YETLET_DEV_TLS_CERT: external, YETLET_DEV_TLS_KEY: external },
+  ]) {
+    assert.throws(() => devTls(root, env), (error) => {
+      assert.equal(error.message, 'Invalid development TLS credentials');
+      assert.equal(error.cause, undefined);
+      assert(!error.stack.includes('private TLS sentinel'));
+      assert(!error.stack.includes(external));
+      return true;
+    });
   }
 });
 
@@ -207,11 +249,33 @@ test('fresh cryptographic nonce matches HTML and only the two intended dev CSP a
   }
 });
 
+test('HTTPS document uses same-origin HTTPS assets and only WSS in its nonce CSP', () => {
+  const result = devDocument(html, 5173, true);
+  assert(result.html.includes('src="https://127.0.0.1:5173/mark.svg"'));
+  assert(result.html.includes('<p>Rust &lt;safe &amp; useful&gt;</p>'));
+  assert.equal(result.csp.replace(` 'nonce-${result.nonce}'`, '').replace(' wss://127.0.0.1:5173', ''), productionCsp);
+  assert(!result.html.includes('http://'));
+  assert(!result.csp.includes(' ws://'));
+});
+
 test('CLI listener overrides fail closed before starting a server', () => {
   const plugin = devBridge(5173);
-  const config = { base: '/', server: { host: '127.0.0.1', port: 5173, strictPort: true, ws: { host: '127.0.0.1', port: 5173 } } };
+  const config = { base: '/', server: { host: '127.0.0.1', port: 5173, strictPort: true, ws: { host: '127.0.0.1', port: 5173, protocol: 'ws' } } };
   plugin.configResolved(config);
   for (const change of [{ host: '0.0.0.0' }, { port: 5174 }, { strictPort: false }, { https: {} }, { middlewareMode: true }, { ws: { host: 'evil.example', port: 5173 } }]) {
     assert.throws(() => plugin.configResolved({ ...config, server: { ...config.server, ...change } }));
   }
+});
+
+test('HTTPS configuration must retain the prepared credentials and WSS mode', () => {
+  const https = { cert: Buffer.from('test certificate'), key: Buffer.from('test private key') };
+  const plugin = devBridge(5173, https);
+  const config = { base: '/', server: { host: '127.0.0.1', port: 5173, strictPort: true, https,
+    ws: { host: '127.0.0.1', port: 5173, protocol: 'wss' } } };
+  plugin.configResolved(config);
+  for (const change of [
+    { https: undefined }, { https: {} }, { https: { ...https, key: Buffer.from('different') } },
+    { https: { ...https, rejectUnauthorized: false } },
+    { ws: { ...config.server.ws, protocol: 'ws' } },
+  ]) assert.throws(() => plugin.configResolved({ ...config, server: { ...config.server, ...change } }));
 });

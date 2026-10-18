@@ -246,6 +246,12 @@ documentation-only revisions. The full journey audit, measured comparisons and
 DX Extension Contract remain open; YT-102 stays Todo. Public release remains
 blocked, and new generator source representations require separate acceptance.
 
+The separately authorized [development HTTPS slice](DEV-HTTPS-VERIFICATION.md)
+uses existing settings and mkcert-prepared material for optional Rust TLS and
+Vite HTTPS/WSS. Its native lifecycle and independent review evidence remain
+separate from the broader YT-102 research acceptance. Existing secret behavior
+and YT-102 Todo status are unchanged.
+
 ## Update rules
 
 1. Change status only after checking source changes and task-specific evidence.

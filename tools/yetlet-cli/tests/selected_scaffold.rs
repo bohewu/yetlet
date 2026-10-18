@@ -79,6 +79,19 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                         settings || vite
                     );
                     assert_eq!(before.contains_key("src/config.rs"), settings || vite);
+                    assert_eq!(
+                        manifest["dependencies"].get("axum-server").is_some(),
+                        settings || vite
+                    );
+                    if settings || vite {
+                        assert_eq!(
+                            manifest["dependencies"]["axum-server"]["optional"].as_bool(),
+                            Some(true)
+                        );
+                        assert!(manifest["features"]["yetlet-dev-tls"].as_array().is_some());
+                        assert!(String::from_utf8_lossy(&before[".gitignore"]).contains("/.dev/"));
+                    }
+
                     let base: toml::Value = String::from_utf8(before["base.toml"].clone())
                         .unwrap()
                         .parse()
@@ -403,6 +416,14 @@ mod selected_frontend_root_tests {
     fs::write(app.join("src/vite.rs"), adapter).unwrap();
     for args in [
         vec!["generate-lockfile", "--offline"],
+        vec![
+            "check",
+            "--offline",
+            "--locked",
+            "--all-targets",
+            "--features",
+            "yetlet-dev-tls",
+        ],
         vec![
             "test",
             "--offline",

@@ -16,7 +16,7 @@ root=os.environ['YT_FRONTEND_TEST_ROOT']
 role=os.path.basename(sys.argv[0])
 mode=os.environ['YT_FRONTEND_TEST_MODE']
 with open(root+'/trace', 'a') as out:
- out.write(json.dumps({'role':role, 'args':sys.argv[1:], 'cwd':os.getcwd(), 'secret':any(k.startswith('APP_') or k in ['YETLET_DEV_SECRETS','YETLET_CONFIG_ROOT'] for k in os.environ), 'public':os.environ.get('VITE_PUBLIC'), 'projectRoot':os.environ.get('YETLET_PROJECT_ROOT')})+'\n')
+ out.write(json.dumps({'role':role, 'args':sys.argv[1:], 'cwd':os.getcwd(), 'secret':any(k.startswith('APP_') or k in ['YETLET_DEV_SECRETS','YETLET_CONFIG_ROOT'] for k in os.environ), 'public':os.environ.get('VITE_PUBLIC'), 'projectRoot':os.environ.get('YETLET_PROJECT_ROOT'), 'tlsCert':os.environ.get('YETLET_DEV_TLS_CERT'), 'tlsKey':os.environ.get('YETLET_DEV_TLS_KEY'), 'backendTls':os.environ.get('APP_SERVER__TLS__ENABLED'), 'backendHost':os.environ.get('APP_SERVER__HOST'), 'backendPort':os.environ.get('APP_SERVER__PORT')})+'\n')
 if sys.argv[1:]==['run','build']:
  sys.exit(23 if mode=='build-fail' else 0)
 if role=='cargo' and sys.argv[1]=='build': sys.exit(0)
@@ -635,4 +635,52 @@ fn configured_frontend_root_with_spaces_and_unicode_is_literal_and_filters_backe
     );
     assert_eq!(trace[0]["secret"], false);
     assert_eq!(trace[1]["cwd"], fixture.root.path().to_str().unwrap());
+}
+
+#[test]
+fn development_tls_build_selects_feature_without_certificate_reads_and_filters_paths() {
+    let fixture = Fixture::new();
+    let root = fixture.root.path();
+    fs::write(
+        root.join("Cargo.toml"),
+        "[package]\nname='fixture'\nversion='0.1.0'\n[workspace]\n[features]\nyetlet-dev-tls=[]\n",
+    )
+    .unwrap();
+    let mut base = fs::read_to_string(root.join("base.toml")).unwrap();
+    base.push_str("[server.tls]\nenabled=false\ncertificate='.dev/certs/absent.pem'\nprivate_key='.dev/certs/absent-key.pem'\n");
+    fs::write(root.join("base.toml"), base).unwrap();
+    let mut command = fixture.command("build", "build-ok");
+    command
+        .env("APP_ENVIRONMENT", "Development")
+        .env("APP_SERVER__TLS__ENABLED", "true")
+        .env("YETLET_DEV_TLS_CERT", "must-not-reach-frontend")
+        .env("YETLET_DEV_TLS_KEY", "must-not-reach-frontend");
+    let output = Running::start(&mut command).wait();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let trace = fixture.trace();
+    assert_eq!(trace.len(), 2);
+    assert_eq!(trace[0]["tlsCert"], serde_json::Value::Null);
+    assert_eq!(trace[0]["tlsKey"], serde_json::Value::Null);
+    assert!(
+        trace[1]["args"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|v| v == "yetlet-dev-tls")
+    );
+    fs::remove_file(root.join("trace")).unwrap();
+    let mut command = fixture.command("run", "build-ok");
+    command
+        .env("APP_ENVIRONMENT", "Development")
+        .env("APP_SERVER__TLS__ENABLED", "true");
+    let output = Running::start(&mut command).wait();
+    assert!(!output.status.success());
+    assert!(
+        fixture.trace().is_empty(),
+        "missing keys must refuse before any child"
+    );
 }

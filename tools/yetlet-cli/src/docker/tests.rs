@@ -802,6 +802,22 @@ fn selected_fixture(config: bool, assets: bool, plugin: bool) -> crate::cloud_fi
         }
     }
     disk::write(f.manifest(), toml::to_string(&manifest).unwrap()).unwrap();
+    if config {
+        // Cargo records optional dependencies even when their feature is off.
+        let mut lock = parse(&disk::read(f.app.join("Cargo.lock")).unwrap()).unwrap();
+        let packages = lock["package"].as_array_mut().unwrap();
+        let app = packages
+            .iter_mut()
+            .find(|p| p["name"].as_str() == Some("composeapp"))
+            .unwrap();
+        let dependencies = app["dependencies"].as_array_mut().unwrap();
+        dependencies.extend(["axum-server", "rustls"].map(|name| Value::String(name.into())));
+        dependencies.sort_by(|a, b| a.as_str().cmp(&b.as_str()));
+        for (name, version) in [("axum-server", "0.8.0"), ("rustls", "0.23.46")] {
+            packages.push(format!("name='{name}'\nversion='{version}'\nsource='registry+https://github.com/rust-lang/crates.io-index'\nchecksum='{}'\n", "a".repeat(64)).parse().unwrap());
+        }
+        disk::write(f.app.join("Cargo.lock"), toml::to_string(&lock).unwrap()).unwrap();
+    }
     if assets {
         disk::rename(f.app.join("dist"), f.app.join(root).join("dist")).unwrap();
         // Structural graph only: refresh synthetic build timestamps after inputs.

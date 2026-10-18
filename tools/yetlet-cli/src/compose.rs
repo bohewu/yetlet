@@ -74,6 +74,16 @@ pub(crate) fn validate_lock(snapshot: &docker::Snapshot) -> Result<(), String> {
     if snapshot.with_config {
         app_dependencies.extend(["secrecy", "serde", "yetlet-config"]);
     }
+    // Source inspection already requires the exact generated manifest. Cargo
+    // records its optional TLS dependencies even when the feature is disabled.
+    if snapshot
+        .manifest
+        .get("features")
+        .and_then(|features| features.get("yetlet-dev-tls"))
+        .is_some()
+    {
+        app_dependencies.extend(["axum-server", "rustls"]);
+    }
     app_dependencies.sort();
     app_dependencies.dedup();
     for (name, expected) in [

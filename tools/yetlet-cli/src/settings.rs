@@ -9,10 +9,71 @@ use std::{
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct Settings {
+    #[serde(skip)]
+    pub(crate) tls: Tls,
     #[serde(default)]
     pub(crate) rust: Rust,
     pub(crate) vite: Vite,
     pub(crate) generate: Generate,
+}
+
+#[derive(Debug, Default, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct Tls {
+    pub(crate) enabled: bool,
+    pub(crate) certificate: String,
+    pub(crate) private_key: String,
+}
+
+impl Tls {
+    pub(crate) fn paths(
+        &self,
+        app: &App,
+        frontend: &str,
+    ) -> Result<Option<(PathBuf, PathBuf)>, String> {
+        if !self.enabled {
+            return Ok(None);
+        }
+        let certificate = tls_path(app, &self.certificate, frontend)?;
+        let key = tls_path(app, &self.private_key, frontend)?;
+        if certificate == key {
+            return Err(INVALID.into());
+        }
+        Ok(Some((certificate, key)))
+    }
+}
+
+fn tls_path(app: &App, value: &str, frontend: &str) -> Result<PathBuf, String> {
+    if !valid_frontend_root(value)
+        || value.ends_with('/')
+        || Path::new(value).starts_with(frontend.trim_end_matches('/'))
+    {
+        return Err(INVALID.into());
+    }
+    let relative = Path::new(value);
+    if let Some(parent) = relative.parent().filter(|p| !p.as_os_str().is_empty()) {
+        fs::frontend_directory(app, parent).map_err(|_| INVALID.to_owned())?;
+    }
+    let path = fs::app_root(app).join(relative);
+    let metadata = std::fs::symlink_metadata(&path).map_err(|_| INVALID.to_owned())?;
+    if !metadata.is_file() || metadata.file_type().is_symlink() {
+        return Err(INVALID.into());
+    }
+    #[cfg(windows)]
+    {
+        use std::os::windows::fs::MetadataExt;
+        if metadata.file_attributes() & 0x400 != 0 {
+            return Err(INVALID.into());
+        }
+    }
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        if metadata.permissions().mode() & 0o022 != 0 {
+            return Err(INVALID.into());
+        }
+    }
+    Ok(path)
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -45,6 +106,7 @@ pub(crate) struct K8s {
 impl Default for Settings {
     fn default() -> Self {
         Self {
+            tls: Tls::default(),
             rust: Rust::default(),
             vite: Vite {
                 enabled: false,
@@ -82,7 +144,12 @@ pub(crate) fn load_from_env(
             // Match case-insensitively only to recognize malformed related names.
             // The shared loader then enforces canonical spelling and Unicode.
             let upper = key.to_string_lossy().to_ascii_uppercase();
-            if upper == "APP_ENVIRONMENT" || upper == "APP_CLI" || upper.starts_with("APP_CLI_") {
+            if upper == "APP_ENVIRONMENT"
+                || upper == "APP_CLI"
+                || upper.starts_with("APP_CLI_")
+                || upper == "APP_SERVER__TLS"
+                || upper.starts_with("APP_SERVER__TLS_")
+            {
                 filtered.push((key, value));
             }
         }
@@ -127,10 +194,27 @@ pub(crate) fn load_from_env(
     let merged: serde_json::Value = yetlet_config::Loader::new(root, "APP")
         .load_from_env(filtered)
         .map_err(|_| INVALID.to_owned())?;
-    let Some(cli) = merged.get("cli") else {
-        return Ok(Settings::default());
+    let mut settings: Settings = match merged.get("cli") {
+        Some(cli) => serde_json::from_value(cli.clone()).map_err(|_| INVALID.to_owned())?,
+        None => Settings::default(),
     };
-    let settings: Settings = serde_json::from_value(cli.clone()).map_err(|_| INVALID.to_owned())?;
+    if let Some(tls) = merged.get("server").and_then(|server| server.get("tls")) {
+        settings.tls = serde_json::from_value(tls.clone()).map_err(|_| INVALID.to_owned())?;
+    }
+    if settings.tls.enabled && overlay != "development.toml" {
+        return Err(INVALID.into());
+    }
+    if settings.tls.enabled
+        && [&settings.tls.certificate, &settings.tls.private_key]
+            .iter()
+            .any(|path| {
+                !valid_frontend_root(path)
+                    || path.ends_with('/')
+                    || Path::new(path).starts_with(settings.vite.root.trim_end_matches('/'))
+            })
+    {
+        return Err(INVALID.into());
+    }
     if !(1..=100).contains(&settings.generate.k8s.replicas)
         || !valid_frontend_root(&settings.vite.root)
     {
@@ -283,6 +367,72 @@ mod tests {
             assert_eq!(error, INVALID);
         }
     }
+    #[test]
+    fn tls_uses_public_development_settings_without_reading_secret_files() {
+        let (_temp, app) = app();
+        std::fs::write(
+            fs::app_root(&app).join("base.toml"),
+            format!("{BASE}[server.tls]\nenabled=false\ncertificate=''\nprivate_key=''\n"),
+        )
+        .unwrap();
+        std::fs::write(fs::app_root(&app).join("development.toml"), "[server.tls]\nenabled=true\ncertificate='.dev/certs/localhost.pem'\nprivate_key='.dev/certs/localhost-key.pem'\n").unwrap();
+        std::fs::write(fs::app_root(&app).join("production.toml"), "").unwrap();
+        let settings = load_from_env(
+            &app,
+            [
+                ("APP_ENVIRONMENT".into(), "Development".into()),
+                (
+                    "YETLET_DEV_SECRETS".into(),
+                    "/missing-private-selector".into(),
+                ),
+            ],
+        )
+        .unwrap();
+        assert!(settings.tls.enabled);
+        assert!(settings.tls.paths(&app, "frontend/").is_err());
+        assert!(!load_from_env(&app, []).unwrap().tls.enabled);
+        assert!(
+            !load_from_env(
+                &app,
+                [
+                    ("APP_ENVIRONMENT".into(), "Development".into()),
+                    ("APP_SERVER__TLS__ENABLED".into(), "false".into()),
+                ]
+            )
+            .unwrap()
+            .tls
+            .enabled
+        );
+        for (key, value) in [
+            ("APP_SERVER__TLS__ENABLED", "true"),
+            ("APP_SERVER__TLS__UNKNOWN", "private-value"),
+            ("app_server__tls__enabled", "true"),
+        ] {
+            assert_eq!(
+                load_from_env(&app, [(key.into(), value.into())]).unwrap_err(),
+                INVALID
+            );
+        }
+        for path in [
+            "../secret.pem",
+            "/outside.pem",
+            "frontend/key.pem",
+            "frontend/../key.pem",
+        ] {
+            assert_eq!(
+                load_from_env(
+                    &app,
+                    [
+                        ("APP_ENVIRONMENT".into(), "Development".into()),
+                        ("APP_SERVER__TLS__PRIVATE_KEY".into(), path.into()),
+                    ]
+                )
+                .unwrap_err(),
+                INVALID
+            );
+        }
+    }
+
     #[test]
     fn root_is_relative_and_native_unicode_is_preserved() {
         for root in ["frontend/", "ui assets/前端", "web/nested"] {

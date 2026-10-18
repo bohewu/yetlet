@@ -752,5 +752,69 @@ pub(crate) fn selected_files(
             .1
             .push_str(include_str!("../templates/tailwind/SELECTED-README.md"));
     }
+    if with_config {
+        entries[0].1 = entries[0].1.replacen("[dependencies]\n", "[dependencies]\naxum-server = { version = \"=0.8.0\", default-features = false, features = [\"tls-rustls-no-provider\"], optional = true }\nrustls = { version = \"0.23\", default-features = false, features = [\"ring\", \"std\", \"tls12\"], optional = true }\n", 1);
+        entries[0]
+            .1
+            .push_str("\n[features]\nyetlet-dev-tls = [\"dep:axum-server\", \"dep:rustls\"]\n");
+        entries[2].1.push_str("/.dev/\n");
+        for (path, content) in &mut entries {
+            match *path {
+                "base.toml" => {
+                    *content = content.replacen("[service]", "[server.tls]\nenabled = false\ncertificate = \"\"\nprivate_key = \"\"\n\n[service]", 1);
+                }
+                "src/config.rs" => {
+                    *content = content.replacen(
+                        "    port: u16,",
+                        "    port: u16,\n    #[serde(default)]\n    pub tls: Tls,",
+                        1,
+                    );
+                    content.push_str(&include_str!("../templates/config/tls.rs").replace(
+                        "@FRONTEND_ROOT@",
+                        "self.cli.vite.root.trim_end_matches('/')",
+                    ));
+                }
+                "src/main.rs" => {
+                    // Resolve/parse TLS before any listener exists or Settings moves into State.
+                    let address_end = if cloud {
+                        "let address = settings.validate(true)?;"
+                    } else {
+                        "let address = settings.validate(false)?;"
+                    };
+                    *content = content.replace(address_end, &format!("{address_end}\n    let https = settings.server.tls.enabled;\n    let tls = settings.tls().await?;"));
+                    *content = content.replace("println!(\"Listening on http://{}\", listener.local_addr()?);", "println!(\"Listening on {}://{}\", if https { \"https\" } else { \"http\" }, listener.local_addr()?);");
+                    let start = content
+                        .find("axum::serve(")
+                        .ok_or("missing selected server")?;
+                    let end = start
+                        + content[start..]
+                            .find(".await?;")
+                            .ok_or("missing selected serve await")?;
+                    let expression = content[start..end]
+                        .split(".with_graceful_shutdown")
+                        .next()
+                        .unwrap()
+                        .trim_end();
+                    let close = expression
+                        .rfind(')')
+                        .ok_or("missing selected serve close")?;
+                    let shutdown = if cloud {
+                        "shutdown"
+                    } else {
+                        "std::future::pending::<()>()"
+                    };
+                    let expression = format!(
+                        "{}, {shutdown}).await?;",
+                        expression[..close].trim_end().trim_end_matches(',')
+                    )
+                    .replacen("axum::serve(", "config::serve(", 1)
+                    .replacen("listener,", "listener, tls,", 1);
+                    content.replace_range(start..end + ".await?;".len(), &expression);
+                }
+                _ => {}
+            }
+        }
+    }
+
     Ok(entries)
 }
