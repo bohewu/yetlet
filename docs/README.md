@@ -79,6 +79,16 @@ The changed source passed its [own independent reviewer](YT-081-WGPU-API-INDEPEN
 with zero issues and required followups. YT-081 is Done only at the
 selected documented scope.
 
+## Production-oriented reference application
+
+The standalone [Issue Tracker starter](../examples/production-starter/README.md) exercises
+YT-092 with native SSR forms, a command JSON API, SQLite restart persistence,
+existing settings/CLI, health/readiness, correlated JSON logs and graceful shutdown.
+Its [verification record](YT-092-STARTER-VERIFICATION.md) separates native platform
+evidence from browser/hosting qualification. This opt-in reference application is
+independent of the historical twelve-member sample catalog and does not change
+framework defaults or generator source contracts.
+
 ## Library guides
 
 These nine unpublished candidate pages describe the implemented APIs and their practical limits. Use the checkout's Rust 1.99 toolchain; native SSR needs no browser build.
