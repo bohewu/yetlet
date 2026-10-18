@@ -8,6 +8,13 @@ fn main() -> ExitCode {
             print!("{help}");
             ExitCode::SUCCESS
         }
+        Ok(Cli::Key(command)) => match yetlet_cli::key::execute(&command) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(error) => {
+                eprintln!("CLI_KEY: {error}");
+                ExitCode::FAILURE
+            }
+        },
         Ok(Cli::Version) => {
             println!("{VERSION}");
             ExitCode::SUCCESS

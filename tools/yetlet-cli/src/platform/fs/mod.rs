@@ -15,6 +15,7 @@ use windows as imp;
 pub(in crate::platform) use windows::Executable;
 
 use crate::app;
+pub(crate) use imp::key;
 pub(crate) use imp::{
     App, NEW_DIAGNOSTIC, NEW_SUPPORTED, app_root, create_project, open_directory, read_framework,
 };

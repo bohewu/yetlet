@@ -69,3 +69,6 @@ pub(crate) fn read_app_input(
 ) -> Result<(Vec<u8>, std::time::SystemTime), String> {
     Err(UNSUPPORTED_APP.into())
 }
+
+#[path = "key_unsupported.rs"]
+pub(crate) mod key;

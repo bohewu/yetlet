@@ -361,6 +361,66 @@ fn native_cli_build_debug_release_and_lock_cache_errors_are_frozen() {
 }
 
 #[test]
+fn untrusted_cargo_reports_executable_stage_before_spawn_and_trusted_copy_builds() {
+    let root = tempfile::tempdir().unwrap();
+    let app = fixture(root.path());
+    let manifest = app.join("Cargo.toml");
+    fs::write(
+        app.join("Cargo.lock"),
+        "version=4\n[[package]]\nname='yt088c_fixture'\nversion='0.1.0'\n",
+    )
+    .unwrap();
+    let unsafe_tools = app.join("untrusted-tools");
+    fs::create_dir(&unsafe_tools).unwrap();
+    let cargo = unsafe_tools.join("cargo.exe");
+    fs::copy(app.join(".yt088c-private-cargo/cargo.exe"), &cargo).unwrap();
+    let sddl: Vec<_> = "D:P(A;;FA;;;WD)".encode_utf16().chain([0]).collect();
+    let mut descriptor = null_mut();
+    // SAFETY: set only this disposable executable's DACL, preserving its owner.
+    unsafe {
+        assert_ne!(
+            ConvertStringSecurityDescriptorToSecurityDescriptorW(
+                sddl.as_ptr(),
+                SDDL_REVISION_1,
+                &mut descriptor,
+                null_mut()
+            ),
+            0
+        );
+    }
+    let descriptor = Local(descriptor);
+    let path: Vec<_> = cargo.as_os_str().encode_wide().chain([0]).collect();
+    assert_ne!(
+        unsafe {
+            windows_sys::Win32::Security::SetFileSecurityW(
+                path.as_ptr(),
+                DACL_SECURITY_INFORMATION,
+                descriptor.0,
+            )
+        },
+        0
+    );
+    let output = code(
+        cli(&manifest).env("PATH", &unsafe_tools).output().unwrap(),
+        125,
+    );
+    let error = String::from_utf8_lossy(&output.stderr);
+    assert!(error.contains("CLI_PROCESS stage=executable:"), "{error}");
+    assert!(
+        error.contains("kind=Other, native_os_error=None"),
+        "{error}"
+    );
+    assert!(error.contains("no untrusted write access"), "{error}");
+    assert!(!error.contains(cargo.to_string_lossy().as_ref()));
+    assert!(
+        !app.join("target").exists(),
+        "untrusted Cargo must not start"
+    );
+    code(cli(&manifest).output().unwrap(), 0);
+    assert!(app.join("target/debug/yt088c_fixture.exe").is_file());
+}
+
+#[test]
 fn preflight_and_executable_selection_never_launch_app_local_cargo() {
     let root = tempfile::tempdir().unwrap();
     let app = fixture(root.path());

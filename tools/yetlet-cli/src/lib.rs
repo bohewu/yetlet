@@ -7,6 +7,7 @@ pub mod doctor;
 mod framework;
 mod image;
 mod k8s;
+pub mod key;
 mod platform;
 pub mod scaffold;
 mod settings;
@@ -28,7 +29,7 @@ pub const VERSION: &str = concat!(
     env!("CARGO_PKG_VERSION"),
     " (unpublished preview)"
 );
-pub const HELP: &str = "Yetlet CLI preview (unpublished)\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
+pub const HELP: &str = "Yetlet CLI preview (unpublished)\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
 const NEW_HELP: &str = "Usage: yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]\n\nNAME may appear anywhere among options. --parent defaults to cwd and must exist.\nNAME: 1-64 lowercase ASCII letters/digits/-/_, starting with a letter; reserved names refused.\n--vite selects the complete frontend scaffold and implies --settings. Plain new keeps app-runtime settings opt-in.\n--tailwind selects standalone Tailwind or the official Vite plugin. --service adds bind/health/shutdown.\nCreates one new tree without overwrite, dependency installation, lock generation or process startup.\n";
 const DOCTOR_HELP: &str = "Usage: yetlet doctor [--json]\n\nReports bounded local Rust/Cargo 1.99+ identity and compiled new-filesystem capability.\nEnvironment only; application, framework, settings, frontend and execution readiness are not checked.\n--json emits schema 1. No builds, installs, Node probes or listeners.\n";
 const RUN_HELP: &str = "Usage: yetlet run [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; no ancestor or workspace search.\nRequires a protected standalone app and existing Cargo.lock; runs frozen Cargo.\nPublic settings select Rust watch and optional Vite startup; no implicit installs.\nOwned processes must retain their process group/Job; escaped daemons are unsupported.\n";
@@ -43,6 +44,7 @@ const K8S_HELP: &str = "Usage: yetlet generate k8s [--manifest-path PATH] --outp
 pub enum Cli {
     Help(&'static str),
     Version,
+    Key(key::Command),
     Doctor {
         json: bool,
     },
@@ -101,6 +103,7 @@ impl Cli {
 /// Safe usage selected only from recognized command paths, never arbitrary argv.
 pub fn usage(args: &[OsString]) -> &'static str {
     match args.first().and_then(|v| v.to_str()) {
+        Some("key") => key::HELP,
         Some("new") => NEW_HELP,
         Some("doctor") => DOCTOR_HELP,
         Some("run") => RUN_HELP,
@@ -128,6 +131,9 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
         }
     }
     let command = args[0].to_str().ok_or("command must be UTF-8")?;
+    if command == "key" {
+        return key::parse(&args[1..]);
+    }
     if command == "dev" {
         return Err("dev was renamed; use yetlet run");
     }

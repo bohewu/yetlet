@@ -1,4 +1,6 @@
-//! Existing Linux filesystem guarantees, selected only at compile time.
+#[path = "key_linux.rs"]
+pub(crate) mod key;
+// Existing Linux filesystem guarantees, selected only at compile time.
 #[path = "safe_dir.rs"]
 mod safe_dir;
 pub(crate) use safe_dir::create as create_project;

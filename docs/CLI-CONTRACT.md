@@ -35,6 +35,8 @@ yetlet doctor [--json]
 yetlet run [--manifest-path PATH]
 yetlet watch [--manifest-path PATH]
 yetlet build [--manifest-path PATH] [--release]
+yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]
+yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]
 yetlet generate docker [--manifest-path PATH] --output DIRECTORY
 yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE
 yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE
@@ -49,6 +51,7 @@ yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE
 | `--json`, help/version | Machine/report/discovery formatting. |
 | Rust watch, Vite root, automatic startup/build, K8s replicas | Persistent settings, not more CLI options. `--replicas` moves to settings. |
 | `watch` | Common execution shortcut: share `run` and enable Rust watch for this invocation, without changing settings files. |
+| `key status` / `key rotate` | Explicit opt-in local signing administration added by YT-093. Settings select named providers/keys; status is public-only and read-only. Confirmed rotation updates only the selected key in the selected profile, preserving unrelated content and old verification material. |
 
 `dev` is renamed to `run`: it executes the selected project. No second `dev` synonym, `--vite MODE`, `--assets`, `--dev-bridge`, runtime `--vite`, root/auto-start/auto-build flags, or framework-source flag is selected. No old-name aliases or deprecation window are required for this unpublished preview; fixed migration hints are allowed. Existing generated apps/instructions are never rewritten automatically.
 
@@ -66,6 +69,29 @@ The generator example requires a separately qualified source representation.
 Current service/settings/Vite scaffolds use explicit compatible local Cargo
 path overrides and a separately prepared lock; registry-only delivery remains
 outside this acceptance. See the linked compatibility record.
+
+### Explicit key administration — YT-093
+
+The owner included key CLI administration in the first signing slice and required
+automatic settings updates after explicit rotation approval. The
+[signing contract](YT-093-SIGNING-CONTRACT.md) defines multiple named local keys,
+immutable versions, PEM/PFX profiles, trust, retirement/revocation and the exact
+profile-write boundary. This is an explicit operator action, independent of
+`new`, `run`, `watch`, frontend startup and normal application signing.
+
+Provider/key defaults, paths and modes live in the existing top-level `signing`
+settings section. `--provider` selects a configured alias for this invocation;
+`KEY` selects a logical key. `--from` names an explicitly prepared replacement
+PFX. `--yes` is explicit noninteractive approval, never implicit consent. Ordinary
+rotation requires terminal confirmation; all private-key passwords come from the
+configured process environment source. No cloud SDK, arbitrary endpoint,
+`yetlet sign`, general settings editor or provider registry is introduced.
+
+Rotation preserves old public/private material and does not revoke/delete it.
+The app adopts updated settings on its next load; the first version requires a
+restart and does not claim live reload. See the
+[verification record](YT-093-SIGNING-VERIFICATION.md) for platform evidence,
+including the separately retained Windows Cargo-supervision limitation.
 
 ## 3. One settings mechanism
 
@@ -211,6 +237,15 @@ Root, every command, generate namespace and all generator leaves have exclusive 
 Human success/help/version/doctor reports use stdout; safe scoped CLI errors and usage go to stderr. Build/run retain native child diagnostics/streams, which are not JSON or guaranteed secret-redacted. No CLI message echoes raw configuration, environment values, secrets or arbitrary argv. Include origin/stage and stable codes such as `CLI_USAGE`, `CLI_PROJECT`, `CLI_SOURCE_UNSUPPORTED`, `CLI_PUBLISH`, `CLI_SPAWN`, `CLI_CHILD_EXIT`, `CLI_CANCELLED`, `CLI_CLEANUP`. A child exit gets a neutral summary; lock/cache advice requires direct preflight evidence, not any nonzero child.
 
 CLI-owned status remains 0 success/help, 1 preflight/generation/report failure, 2 usage, 125 spawn/supervision/cleanup failure. Native Cargo/application exits and OS cancellation keep their identity after verified cleanup; these may overlap CLI-owned numeric values. No universal POSIX/Windows code mapping, guessed cause, automatic repair/retry or process-name-based kills. Preserve Linux process groups/subreaping/signal re-raise and Windows suspended creation/Job assignment/native console behavior; deliberately escaped daemons remain unsupported.
+
+On Windows, executable selection failures also emit `CLI_PROCESS stage=executable`
+with a fixed error kind, optional numeric OS code and protected-tool guidance.
+Selected paths, arguments, environment values and arbitrary OS error text are not
+included. This diagnostic preserves exit 125 and the existing trusted-owner,
+untrusted-write and no-reparse executable checks.
+The [Windows exit-125 follow-up](WINDOWS-CLI-125-VERIFICATION.md) records the
+selected Runner's Cargo ACL refusal and native MSVC build/run/Ctrl-C cleanup
+with protected task-local tools.
 
 Doctor stays environment-only: Rust/Cargo 1.99+ identity and compiled new-filesystem capability. Report app/framework/settings/assets/generator/console/execution readiness as not checked; no Node probe requirement. Version probes are fixed trusted local Rust/Cargo commands with no shell, null stdin, installer/update/online-resolution disabled. Bound each to 3 seconds/64 KiB combined output, drain both streams, terminate/reap within an additional 2-second cleanup budget; failed/uncertain cleanup cannot pass. Render only validated identity or fixed errors, never raw probe output.
 

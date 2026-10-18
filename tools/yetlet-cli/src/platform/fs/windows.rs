@@ -1,6 +1,8 @@
 //! Local fixed NTFS only. Native relative opens never resolve an unpinned path.
 //! Creating the private stage and acquiring its handle is ONE FILE_CREATE call;
 //! no mkdir/open substitution window exists, even in a writable parent.
+#[path = "key_windows.rs"]
+pub(crate) mod key;
 use std::{
     cell::RefCell,
     ffi::OsStr,

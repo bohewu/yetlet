@@ -748,7 +748,15 @@ fn spawn_owned(app: &App, command: &mut Command) -> io::Result<Child> {
 }
 
 fn spawn_with_output(app: &App, command: &mut Command, capture: bool) -> io::Result<Child> {
-    let program = executable(command.get_program())?;
+    let program = executable(command.get_program()).inspect_err(|error| {
+        // Fixed policy guidance and numeric OS evidence only: never print the
+        // selected path, command arguments, environment or arbitrary error text.
+        eprintln!(
+            "CLI_PROCESS stage=executable: trusted executable selection failed (kind={:?}, native_os_error={:?}); use an absolute, non-reparse PATH entry whose executable has a trusted owner and no untrusted write access",
+            error.kind(),
+            error.raw_os_error()
+        );
+    })?;
     let script = if command.get_program() == "node" {
         Some(Executable::open(std::path::Path::new(
             command

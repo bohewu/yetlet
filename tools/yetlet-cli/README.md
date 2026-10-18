@@ -16,6 +16,8 @@ See the [CLI contract](../../docs/CLI-CONTRACT.md) and
 | `yetlet --version` / `-V` | Build-time CLI version; no project, tools or settings required |
 | `yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]` | Publish a new scaffold; no tools, installs, builds or lock generation |
 | `yetlet doctor [--json]` | Bounded environment-only Rust/Cargo identity and compiled filesystem capability; schema 1 JSON |
+| `yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]` | Read-only selected key/version, certificate pins and dates; no password or generation |
+| `yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]` | Confirmed local rotation and atomic selected-profile settings update; retain old versions |
 | `yetlet run [--manifest-path PATH]` | Frozen Cargo run, with independent settings-controlled Rust watch and Vite supervision |
 | `yetlet watch [--manifest-path PATH]` | Same run pipeline with Rust watch enabled for this invocation; Vite still uses settings |
 | `yetlet build [--manifest-path PATH] [--release]` | Optional frontend production build followed by frozen Cargo build |
@@ -31,6 +33,13 @@ Manifest defaults to exactly cwd/Cargo.toml. `--parent` selects an existing
 creation parent; `--output` selects the complete new generator destination.
 Paths remain literal, including supported native Unicode and spaces.
 
+On Windows, executable selection requires absolute PATH entries without reparse
+traversal, a trusted executable owner and no untrusted write access. A refusal
+prints `CLI_PROCESS stage=executable` with the error kind and optional numeric OS
+code before returning exit 125. Prepare a protected tool installation and select
+its physical directory on PATH; tool permissions are managed separately from the CLI.
+See the [native Windows diagnosis and verification](../../docs/WINDOWS-CLI-125-VERIFICATION.md).
+
 ## Build locally and create an application
 
 ```sh
@@ -45,7 +54,10 @@ Use an existing protected parent: Linux owner-protected directories or trusted
 sticky creation parents; Windows protected local fixed NTFS without reparse
 traversal. Creation never overwrites or merges an existing destination.
 
-The CLI has its own Cargo workspace and lock. New apps have their own standalone
+The CLI has its own Cargo workspace and lock. Its local signing dependency requires
+OpenSSL headers/libraries (the YT-093 reference targets OpenSSL 3.5 LTS); use
+`OPENSSL_DIR` and `OPENSSL_STATIC=1` for an explicitly prepared static prefix.
+No native tools or OpenSSL installation is performed by the CLI. New apps have their own standalone
 workspace and no Cargo.lock. Current Yetlet crate versions are unpublished:
 explicitly replace generated dependencies with compatible local Cargo path
 entries or patches, using the generated README's example. Core/server use
@@ -111,6 +123,48 @@ existing explicit Development-only YETLET_DEV_SECRETS mechanism. No usable token
 is generated; settings-enabled applications require an operator-provided token
 before startup. CLI tool decisions never open that secret file. Backend `.env`
 auto-discovery is disabled. See [configuration](../../docs/CONFIGURATION.md).
+
+## Local signing keys
+
+See the [signing example](../../examples/signing/README.md) for the complete
+public settings schema and disposable setup. Provider and key names are configured
+snake_case aliases. Omitted names require explicit `signing.default_provider`
+and `signing.default_key`; there is no guessed provider or key.
+
+`key status` reads public certificate material only and reports certificate dates
+separately from policy expiry. `key rotate` requires a protected existing
+`<provider.root>/<key>` directory. This public parent may be owner-writable
+0755 on Linux; newly created version directories remain 0700 and private files
+0600. Windows versions use a protected owner-only DACL. Provider roots are
+project-relative even when
+`YETLET_CONFIG_ROOT` selects another settings directory. The configured
+`password_env` names a nonempty separate environment source; passwords never
+appear in CLI arguments, public TOML or diagnostics.
+
+Rotation prints provider, key, old/new versions and the selected settings file.
+Without `--yes`, both stdin and stdout must be terminals and the exact answer
+`yes` approves the displayed plan. Noninteractive input and declines cause no
+changes. `self_signed_test` mode generates a fresh 30-day test certificate;
+`imported` mode requires `--from` with a protected replacement PFX encrypted under
+the configured password. An imported certificate pin is displayed for approval.
+This is replacement, not CA renewal. There is no `yetlet sign` or cloud client.
+
+Rotation validates material, key matching, certificate usability and distinct
+public keys across every configured historical identity before publishing an
+immutable encrypted PEM version. It then atomically updates only the selected
+profile's key version array and active version, retaining unrelated settings and
+comments. Base declarations and other keys/profiles are preserved. Signing ENV
+overrides are refused for rotation because they could mask the saved result;
+status applies them through the normal shared loader. Retired/revoked public
+identities remain available for duplicate detection and explicit trust policy.
+
+A per-settings-directory exclusive lock and byte/identity revalidation reject
+concurrent or stale plans. Failed activation retains the old settings when the
+atomic replacement has not occurred, and retains any published new material for
+inspection; it never deletes private keys. A failure after replacement reports
+uncertain durability, not a rollback or success. The `.yetlet-key.lock` inode is
+retained for safe cross-process locking. These are local filesystem guarantees,
+not distributed policy synchronization or certificate custody qualification.
 
 ## Vite execution
 

@@ -27,6 +27,18 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M18 — Done at bounded YT-098–YT-101 scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; [YT-101 cloud delivery](YT-101-VERIFICATION.md) Done: real Linux Docker/Compose/K3s Pod/Service/asset PASS, Windows MSVC native/source PASS, subsequent Windows GNU 726/726 source and native tests/generator PASS after official MinGW64 GCC/Binutils installation, independent Reviewer `wc_job_fYtD9F8KXkXyzvYQ` PASS; no stable shared asset API, default/core/browser or release change |
 | **M19 — Production-oriented application and developer experience (partial)** | Native Issue Tracker starter, research-only developer workflow and separately opt-in rolling asset qualification | YT-092, YT-102–YT-103 | [YT-092 starter](YT-092-STARTER-VERIFICATION.md): Linux/Windows native HTTP, persistence, CLI lifecycle and independent Reviewer PASS. DX research and rolling qualification remain separate; no production support or release claim |
 
+**YT-093 bounded closeout (2026-10-18):** the
+[signing verification](YT-093-SIGNING-VERIFICATION.md) records the opt-in signing
+crate, local multi-key CLI, confirmed automatic settings updates and independent
+Reviewer PASS. Linux and source-matched Windows native signing/key operations
+pass; actual Linux CLI sample build/run and terminal confirmation pass. The
+separate Azure CLI experiment verifies three remote signatures locally and
+removes active lab resources, with disclosed soft-delete retention. The original
+Windows exit-125 evidence remains retained; the separately reviewed
+[CLI follow-up](WINDOWS-CLI-125-VERIFICATION.md) identifies the Cargo ACL refusal
+and passes build/run/Ctrl-C cleanup with protected task-local tools. No cloud adapter, HTTPS feature or production
+security/release qualification follows from this bounded Done status.
+
 **YT-092 bounded closeout (2026-10-18):** the independent
 [Issue Tracker starter](../examples/production-starter/README.md) exercises
 SSR forms, a command JSON API and explicit SQLite persistence using existing

@@ -17,6 +17,8 @@ path = "src/main.rs"
 [dependencies]
 serde = { version = "=1.0.229", features = ["derive"] }
 yetlet-config = { path = "../../crates/yetlet-config" }
+yetlet-signing = { path = "../../crates/yetlet-signing" }
+toml_edit = "=0.22.20"
 serde_json = "=1.0.149"
 toml = "=0.8.19"
 sha2 = "=0.10.9"

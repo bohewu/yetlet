@@ -9,6 +9,7 @@ Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 - [Extensions](EXTENSIONS.md): explicit opt-in setup and provider boundaries.
 - [API contracts](API-CONTRACTS.md) and [Compatibility](COMPATIBILITY.md): implemented API classification and pre-public stability limits.
 - [CLI contract](CLI-CONTRACT.md): accepted settings-first CLI naming, grammar, execution boundaries and intentional migration; see [current implementation evidence](YT-102-CLI-IMPLEMENTATION.md). The [current CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) remains the executable reference; [YT-102 baseline verification](YT-102-CLI-CONTRACT-VERIFICATION.md) records this documentation slice without completing DX research.
+- [Windows CLI exit-125 follow-up](WINDOWS-CLI-125-VERIFICATION.md): Cargo executable ACL diagnosis, safe stage diagnostics and source-matched native build/run/Ctrl-C cleanup with protected task-local tools.
 - [Doctor follow-up](YT-102-DOCTOR-VERIFICATION.md): authorized Rustup permission repair and source-matched Linux/Windows verification; no change to doctor trust policy.
 - [Windows Vite pair verification](YT-102-WINDOWS-VITE-VERIFICATION.md): source-matched native Rust/Vite lifecycle checks using existing installed tools, with separate execution and review evidence.
 - [Windows browser CSS HMR verification](YT-102-WINDOWS-HMR-VERIFICATION.md): actual generated Rust SSR, rendered CSS updates with retained interaction state, restoration and owned browser/server cleanup.
@@ -88,6 +89,12 @@ Its [verification record](YT-092-STARTER-VERIFICATION.md) separates native platf
 evidence from browser/hosting qualification. This opt-in reference application is
 independent of the historical twelve-member sample catalog and does not change
 framework defaults or generator source contracts.
+
+The standalone [local signing reference](../examples/signing/README.md) exercises
+YT-093's opt-in [provider contract](YT-093-SIGNING-CONTRACT.md), multiple named
+keys/certificates, public-only verification and confirmed key CLI rotation with
+automatic profile settings updates. Its [verification record](YT-093-SIGNING-VERIFICATION.md)
+separates local, native Windows and disposable Azure experiment evidence.
 
 ## Library guides
 
