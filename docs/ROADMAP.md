@@ -25,7 +25,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M16 — Done at bounded YT-090 / YT-097 scope** | Opt-in typed native configuration and optional CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](YT-090-VERIFICATION.md); [CLI integration Linux/Windows GNU/MSVC and independent Reviewer PASS](YT-097-VERIFICATION.md); no default/core/browser or release change |
 | **M17 — Done at bounded YT-091 Tailwind scope** | Opt-in build-time Tailwind CSS 4 application scaffolding | YT-091 | [Guide](../tools/yetlet-cli/README.md#opt-in-tailwind-css-4-yt-091-independently-reviewed), [evidence](YT-091-VERIFICATION.md); actual Linux HTTP/CSS/CSP/signals and native Windows GNU/MSVC Tailwind source-bound builds PASS; independent Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS, no core/browser change or release activation |
 | **M18 — Done at bounded YT-098–YT-101 scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; [YT-101 cloud delivery](YT-101-VERIFICATION.md) Done: real Linux Docker/Compose/K3s Pod/Service/asset PASS, Windows MSVC native/source PASS, subsequent Windows GNU 726/726 source and native tests/generator PASS after official MinGW64 GCC/Binutils installation, independent Reviewer `wc_job_fYtD9F8KXkXyzvYQ` PASS; no stable shared asset API, default/core/browser or release change |
-| **M19 — Production-oriented application and developer experience (partial)** | Native Issue Tracker starter, research-only developer workflow and separately opt-in rolling asset qualification | YT-092, YT-102–YT-103 | [YT-092 starter](YT-092-STARTER-VERIFICATION.md): Linux/Windows native HTTP, persistence, CLI lifecycle and independent Reviewer PASS. DX research and rolling qualification remain separate; no production support or release claim |
+| **M19 — Production-oriented application and developer experience (partial)** | Native Issue Tracker starter, research-only developer workflow and separately opt-in rolling asset qualification; planned browser-only starter | YT-092, YT-102–YT-104 | [YT-092 starter](YT-092-STARTER-VERIFICATION.md): Linux/Windows native HTTP, persistence, CLI lifecycle and independent Reviewer PASS. DX research and rolling qualification remain separate; no production support or release claim. YT-104 remains Todo at registration-only scope. |
 
 **YT-093 bounded closeout (2026-10-18):** the
 [signing verification](YT-093-SIGNING-VERIFICATION.md) records the opt-in signing
@@ -49,6 +49,23 @@ Linux lint/format/docs checks and independent Reviewer `/root/yt092_review` PASS
 with zero issues/followups. YT-092 is Done only at this reference-app scope;
 public hosting/auth/HA, broader browser qualification and generator source
 contract changes remain outside this closeout.
+
+**YT-104, opt-in browser-only application workflow:** complete the delivery path
+around the existing Rust/WASM DOM and local-state capabilities. First define a
+bounded sample against the current supported DOM subset, then integrate CLI
+creation, run/stop and build through the existing settings-first conventions.
+Prefer existing WASM/Vite packaging tools where appropriate. The result must
+run from HTML/JS/WASM/static assets on a local static host, without a Yetlet
+native server or backend-generated shell; ordinary local interactions require
+no API. Remote work remains a separately selected explicit API boundary. Browser
+configuration is public and separate from native settings/secrets. Document
+JavaScript/WASM requirements, build prerequisites, asset paths and navigation
+fallback choices. Require source-matched Linux/Windows CLI lifecycle, actual
+browser mount/state, MIME/CSP and cleanup evidence plus independent review.
+This item is Todo and separate from YT-094's SSR-first Admin reference. Its
+registration does not select a general SPA/router, CLI flag, cloud deployment,
+publication or production support, and does not change SSR/island defaults or
+automatically gate YT-096. Implementation requires a separate owner selection.
 
 ## M18 — Asset contract and Vite integration (Done at bounded scopes)
 
