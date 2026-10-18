@@ -161,3 +161,12 @@ Registry-only source delivery, arbitrary edited apps, further generator formats,
 HA/asset retention and production qualification remain separate. YT-102's full
 journey audit remains Todo; this compatibility extension does not change the
 YT-096/YT-020 release gates. The next independent application item remains YT-092.
+
+## Subsequent native Windows qualification
+
+The [native Windows GNU followup](YT-102-WINDOWS-GENERATOR-VERIFICATION.md)
+verifies the four current service profiles and all 12 generator outputs against
+the current source snapshot. It also records the narrow Windows dependency-path
+comparison correction, native test counts, preserved earlier failures and exact
+source/checkout preservation. This is separate runtime evidence; MSVC compilation
+alone remains insufficient. Registry and production boundaries above remain.

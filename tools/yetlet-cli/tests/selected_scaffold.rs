@@ -141,9 +141,14 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                         );
                         let config = String::from_utf8_lossy(&before["frontend/vite.config.mjs"]);
                         assert!(config.contains("envDir: root"));
+                        assert!(config.contains("plugins: [frontendDotenv, "));
                         assert_eq!(config.contains("tailwindcss()"), tailwind);
                         if tailwind {
-                            assert!(config.contains("plugins: [rustSource, tailwindcss()]"));
+                            assert!(
+                                config.contains(
+                                    "plugins: [frontendDotenv, rustSource, tailwindcss()]"
+                                )
+                            );
                             assert!(config.contains("YETLET_PROJECT_ROOT"));
                             assert!(
                                 String::from_utf8_lossy(&before["frontend/app.css"])
@@ -173,6 +178,116 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
     assert!(!root.path().join("no-tools").exists());
     assert!(!root.path().join("no-cache").exists());
     assert_eq!(fs::read_dir(root.path()).unwrap().count(), 16);
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+#[ignore = "requires an explicit installed Vite 8.3.4 path via YETLET_TEST_VITE_JS; no install or server"]
+fn selected_vite_dotenv_is_checked_before_load_on_each_build_and_serve_resolution() {
+    let vite =
+        Path::new(&std::env::var_os("YETLET_TEST_VITE_JS").expect("set YETLET_TEST_VITE_JS"))
+            .canonicalize()
+            .unwrap();
+    let modules = vite.parent().unwrap().parent().unwrap().parent().unwrap();
+    let root = tempfile::tempdir().unwrap();
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
+    }
+    for tailwind in [false, true] {
+        let name = format!("dotenv-{tailwind}");
+        yetlet_cli::scaffold::create_selected(&name, root.path(), false, false, tailwind, true)
+            .unwrap();
+        let app = root.path().join(name);
+        let frontend = app.join("ui assets").join("frontend");
+        fs::create_dir(frontend.parent().unwrap()).unwrap();
+        fs::rename(app.join("frontend"), &frontend).unwrap();
+        std::os::unix::fs::symlink(modules, frontend.join("node_modules")).unwrap();
+        let output = Command::new("node")
+            .args(["--input-type=module", "-e"])
+            .arg(r#"
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
+const root = process.cwd();
+const { resolveConfig, version } = await import(pathToFileURL(process.argv[1]));
+assert.equal(version, '8.3.4');
+const outside = join(root, '..', '.env');
+fs.writeFileSync(outside, 'VITE_OUTSIDE=outside-marker\n');
+const readFileSync = fs.readFileSync;
+let deniedPath;
+let deniedReads = 0;
+fs.readFileSync = function(path, ...args) {
+  if (deniedPath && (String(path) === deniedPath || String(path) === outside)) {
+    deniedReads++;
+    throw new Error('dotenv read before confinement check');
+  }
+  return readFileSync.call(this, path, ...args);
+};
+try {
+  for (const command of ['build', 'serve']) {
+    const mode = command === 'build' ? 'production' : 'development';
+    const resolve = () => resolveConfig({
+      root, mode, logLevel: 'silent', configLoader: 'native',
+      configFile: join(root, command === 'build' ? 'vite.config.mjs' : 'vite.dev.config.mjs'),
+    }, command);
+    const names = ['.env', '.env.local', `.env.${mode}`, `.env.${mode}.local`];
+    for (const [index, name] of names.entries()) {
+      fs.writeFileSync(join(root, name), `VITE_LAYER=${index}\nVITE_LOCAL_${index}=local-${index}\nVITE_PRIORITY=file\n`);
+    }
+    process.env.VITE_PRIORITY = 'inherited';
+    const resolved = await resolve();
+    assert.equal(resolved.env.VITE_OUTSIDE, undefined);
+    assert.equal(resolved.env.VITE_LAYER, '3');
+    assert.equal(resolved.env.VITE_PRIORITY, 'inherited');
+    for (let index = 0; index < names.length; index++) {
+      assert.equal(resolved.env[`VITE_LOCAL_${index}`], `local-${index}`);
+    }
+    // Resolve again after replacing a previously accepted file, as on config reload.
+    for (const name of names) {
+      const path = join(root, name);
+      const bytes = fs.readFileSync(path);
+      fs.unlinkSync(path);
+      fs.symlinkSync(outside, path);
+      deniedPath = path;
+      await assert.rejects(resolve, /Yetlet frontend dotenv must be a regular, unlinked file/);
+      assert.equal(deniedReads, 0);
+      deniedPath = undefined;
+      fs.unlinkSync(path);
+      fs.writeFileSync(path, bytes);
+    }
+    fs.unlinkSync(join(root, '.env'));
+    fs.symlinkSync(join(root, 'missing-env'), join(root, '.env'));
+    await assert.rejects(resolve, /Yetlet frontend dotenv must be a regular, unlinked file/);
+    fs.unlinkSync(join(root, '.env'));
+    fs.mkdirSync(join(root, '.env'));
+    await assert.rejects(resolve, /Yetlet frontend dotenv must be a regular, unlinked file/);
+    fs.rmdirSync(join(root, '.env'));
+    for (const name of names.slice(1)) fs.unlinkSync(join(root, name));
+  }
+  console.log('PASS: plain/Tailwind shared build/serve config checks regular, external-linked, dangling and nonregular dotenv before reads');
+} finally {
+  fs.readFileSync = readFileSync;
+}
+"#)
+            .arg(modules.join("vite/dist/node/index.js"))
+            .current_dir(&frontend)
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "tailwind={tailwind}: {}{}",
+            String::from_utf8_lossy(&output.stdout),
+            String::from_utf8_lossy(&output.stderr)
+        );
+        println!(
+            "tailwind={tailwind}: {}",
+            String::from_utf8_lossy(&output.stdout)
+        );
+        assert!(!frontend.join("dist").exists());
+    }
+    root.close().unwrap();
 }
 
 #[test]

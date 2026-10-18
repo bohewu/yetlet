@@ -54,6 +54,8 @@ fn execute(
         let frontend =
             crate::platform::fs::frontend_directory(&app, Path::new(&settings.vite.root))
                 .map_err(|message| Failure { code: 1, message })?;
+        crate::platform::fs::validate_frontend_dotenv(&frontend)
+            .map_err(|message| Failure { code: 1, message })?;
         crate::platform::fs::read_app_file(&frontend, "package.json").map_err(|_| Failure {
             code: 1,
             message: "frontend package.json is missing or unsafe; prepare dependencies separately"

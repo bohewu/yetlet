@@ -162,6 +162,43 @@ pub(crate) fn frontend_directory(app: &App, relative: &Path) -> Result<App, Stri
     selected.ok_or_else(|| "frontend root must select a directory".into())
 }
 
+/// Existing selected apps also need refusal before any frontend child can read dotenv.
+pub(crate) fn validate_frontend_dotenv(frontend: &App) -> Result<(), String> {
+    imp::verify_app(frontend)?;
+    let entries = std::fs::read_dir(app_root(frontend))
+        .map_err(|_| "cannot inspect frontend dotenv entries")?;
+    for entry in entries {
+        let entry = entry.map_err(|_| "cannot inspect frontend dotenv entry")?;
+        let name = entry.file_name();
+        let name = name.as_encoded_bytes();
+        #[cfg(windows)]
+        let dotenv = name.eq_ignore_ascii_case(b".env")
+            || name
+                .get(..5)
+                .is_some_and(|prefix| prefix.eq_ignore_ascii_case(b".env."));
+        #[cfg(not(windows))]
+        let dotenv = name == b".env" || name.starts_with(b".env.");
+        if !dotenv {
+            continue;
+        }
+        let metadata = std::fs::symlink_metadata(entry.path())
+            .map_err(|_| "cannot inspect frontend dotenv file")?;
+        let unsafe_file = !metadata.is_file() || metadata.file_type().is_symlink();
+        #[cfg(windows)]
+        let unsafe_file = {
+            use std::os::windows::fs::MetadataExt;
+            unsafe_file
+                || metadata.file_attributes()
+                    & windows_sys::Win32::Storage::FileSystem::FILE_ATTRIBUTE_REPARSE_POINT
+                    != 0
+        };
+        if unsafe_file {
+            return Err("frontend dotenv must be a regular, unlinked, non-reparse file".into());
+        }
+    }
+    imp::verify_app(frontend)
+}
+
 /// CLI frontend startup keeps its input separate from generator qualification.
 pub(crate) fn read_frontend_manifest(frontend: &App) -> Result<Vec<u8>, String> {
     #[cfg(target_os = "linux")]

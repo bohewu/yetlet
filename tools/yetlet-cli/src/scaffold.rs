@@ -710,6 +710,8 @@ pub(crate) fn selected_files(
                         *content = format!("{}{}", include_str!("../templates/vite/selected-tailwind-source.mjs"), content)
                             .replace("plugins: [tailwindcss()]", "plugins: [rustSource, tailwindcss()]");
                     }
+                    *content = format!("{}{}", include_str!("../templates/vite/selected-dotenv.mjs"), content)
+                        .replace("plugins: [", "plugins: [frontendDotenv, ");
                 }
                 "frontend/app.css" if with_tailwind => *content = content.replace("./src/main.rs", "../src/main.rs"),
                 "src/main.rs" => *content = content

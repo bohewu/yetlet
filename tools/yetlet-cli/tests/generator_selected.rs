@@ -66,9 +66,14 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     }
     let framework = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../..")
-        .canonicalize()
-        .unwrap();
+        .parent()
+        .unwrap()
+        .parent()
+        .unwrap()
+        .to_path_buf();
+    // Deployment output requires an owner-protected parent on Windows too.
+    success(cli(root.path(), root.path(), &["new", "output-parent"]));
+    let output_parent = root.path().join("output-parent");
     for (index, options) in [
         vec!["--service"],
         vec!["--service", "--settings"],
@@ -88,15 +93,18 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
         for krate in ["yetlet-core", "yetlet-server-axum", "yetlet-config"] {
             if let Some(dependency) = manifest["dependencies"].get_mut(krate) {
                 // Explicit Cargo-owned preparation retains the selected version.
-                dependency.as_table_mut().unwrap().insert(
-                    "path".into(),
-                    framework
-                        .join("crates")
-                        .join(krate)
-                        .to_str()
-                        .unwrap()
-                        .into(),
-                );
+                let dependency_path = framework.join("crates").join(krate);
+                let dependency_path = dependency_path.to_str().unwrap();
+                // Exercise native and Cargo-style separators across the profiles.
+                let dependency_path = if index % 2 == 0 {
+                    dependency_path.to_owned()
+                } else {
+                    dependency_path.replace('\\', "/")
+                };
+                dependency
+                    .as_table_mut()
+                    .unwrap()
+                    .insert("path".into(), dependency_path.into());
             }
         }
         fs::write(&path, toml::to_string(&manifest).unwrap()).unwrap();
@@ -160,7 +168,7 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
         fs::write(app.join(".ssh/private"), SECRET).unwrap();
         let before = inventory(&app);
         for kind in ["docker", "compose", "k8s"] {
-            let destination = root.path().join(format!("out-{index}-{kind}"));
+            let destination = output_parent.join(format!("out-{index}-{kind}"));
             let mut args = vec!["generate", kind, "--output", destination.to_str().unwrap()];
             if kind != "docker" {
                 args.extend(["--image", IMAGE]);
@@ -212,7 +220,7 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
         assert!(!root.path().join("no-tools").exists());
         if index == 3 {
             fs::write(app.join("src/main.rs"), "fn main() {}\n").unwrap();
-            let destination = root.path().join("edited-refused");
+            let destination = output_parent.join("edited-refused");
             assert!(
                 !cli(
                     &app,

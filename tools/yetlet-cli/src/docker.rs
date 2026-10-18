@@ -201,19 +201,22 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
         // Every other manifest key, version, feature and dependency stays exact.
         for package in ["yetlet-core", "yetlet-server-axum", "yetlet-config"] {
             if expected_manifest["dependencies"].get(package).is_some() {
+                let path = dependencies
+                    .get(package)
+                    .and_then(|d| d.get("path"))
+                    .and_then(Value::as_str)
+                    .ok_or("generated framework path dependency is required")?;
+                if !Path::new(path).is_absolute()
+                    || framework::absolute(Path::new(path))
+                        .map_err(|_| "unsafe framework dependency path")?
+                        != roots[0].join("crates").join(package)
+                {
+                    return Err("framework dependency must match the qualified workspace".into());
+                }
                 expected_manifest["dependencies"][package]
                     .as_table_mut()
                     .unwrap()
-                    .insert(
-                        "path".into(),
-                        Value::String(
-                            roots[0]
-                                .join(format!("crates/{package}"))
-                                .to_str()
-                                .ok_or("framework path must be UTF-8")?
-                                .into(),
-                        ),
-                    );
+                    .insert("path".into(), Value::String(path.into()));
             }
         }
     }

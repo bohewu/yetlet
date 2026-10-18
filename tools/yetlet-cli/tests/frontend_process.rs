@@ -560,6 +560,58 @@ while True: time.sleep(.02)
 }
 
 #[test]
+fn frontend_dotenv_preflight_refuses_unsafe_files_without_children_and_accepts_local_files() {
+    for selected in ["frontend", "frontend 雪 with spaces"] {
+        let fixture = Fixture::new();
+        let frontend = fixture.root.path().join(selected);
+        if selected != "frontend" {
+            fs::rename(fixture.root.path().join("frontend"), &frontend).unwrap();
+        }
+        let outside = fixture.root.path().join(".env");
+        fs::write(&outside, "VITE_PUBLIC=outside-marker\n").unwrap();
+        let dotenv = frontend.join(".env");
+        for action in ["run", "watch", "build"] {
+            std::os::unix::fs::symlink(&outside, &dotenv).unwrap();
+            let output = fixture
+                .command(action, "build-ok")
+                .env("APP_CLI__VITE__ROOT", selected)
+                .output()
+                .unwrap();
+            assert_eq!(output.status.code(), Some(1));
+            assert!(
+                String::from_utf8_lossy(&output.stderr)
+                    .contains("frontend dotenv must be a regular")
+            );
+            assert!(fixture.trace().is_empty());
+            fs::remove_file(&dotenv).unwrap();
+        }
+        fs::create_dir(&dotenv).unwrap();
+        let output = fixture
+            .command("build", "build-ok")
+            .env("APP_CLI__VITE__ROOT", selected)
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(1));
+        assert!(fixture.trace().is_empty());
+        fs::remove_dir(&dotenv).unwrap();
+        fs::write(&dotenv, "VITE_PUBLIC=frontend-local\n").unwrap();
+        let output = fixture
+            .command("build", "build-ok")
+            .env("APP_CLI__VITE__ROOT", selected)
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "{}",
+            String::from_utf8_lossy(&output.stderr)
+        );
+        assert_eq!(fixture.trace().len(), 2);
+        assert!(!fixture.root.path().join("npm.pid").exists());
+        assert!(!fixture.root.path().join("cargo.pid").exists());
+    }
+}
+
+#[test]
 fn configured_frontend_root_with_spaces_and_unicode_is_literal_and_filters_backend_env() {
     let fixture = Fixture::new();
     let selected = "frontend 雪 with spaces";
