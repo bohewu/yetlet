@@ -116,7 +116,7 @@ impl Drop for Console {
     }
 }
 
-fn win(ok: i32) -> io::Result<()> {
+pub(super) fn win(ok: i32) -> io::Result<()> {
     if ok == 0 {
         Err(io::Error::last_os_error())
     } else {
@@ -130,14 +130,16 @@ fn wide(value: &OsStr) -> io::Result<Vec<u16>> {
     }
     Ok(value)
 }
-fn terminated(value: &OsStr) -> io::Result<Vec<u16>> {
+pub(super) fn terminated(value: &OsStr) -> io::Result<Vec<u16>> {
     let mut value = wide(value)?;
     value.push(0);
     Ok(value)
 }
 
 pub(crate) fn pin_cwd(app: &App, command: &mut Command) -> io::Result<()> {
-    if !matches!(command.get_args().next(), Some(arg) if arg == "build" || arg == "run") {
+    if command.get_program() != "node"
+        && !matches!(command.get_args().next(), Some(arg) if arg == "build" || arg == "run")
+    {
         return Err(io::ErrorKind::Unsupported.into());
     }
     app.verify()?;
@@ -145,15 +147,15 @@ pub(crate) fn pin_cwd(app: &App, command: &mut Command) -> io::Result<()> {
     Ok(())
 }
 
-fn executable(program: &OsStr) -> io::Result<Executable> {
+pub(super) fn executable(program: &OsStr) -> io::Result<Executable> {
     // Only absolute PATH entries are eligible. Never ask Windows to search the
     // selected application directory or invoke cmd/bat/PowerShell.
-    if program == "cargo" {
+    if program == "cargo" || program == "rustc" || program == "node" {
         for directory in std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default()) {
             if !directory.is_absolute() {
                 continue;
             }
-            let path = directory.join("cargo.exe");
+            let path = directory.join(format!("{}.exe", program.to_string_lossy()));
             // This probe only skips missing PATH entries. Authorization and all
             // executable reads use the pinned, no-reparse handle open below.
             if path.try_exists()? {
@@ -171,7 +173,7 @@ fn executable(program: &OsStr) -> io::Result<Executable> {
 }
 
 // Windows CRT argv quoting. No shell is involved, including for Unicode/spaces.
-fn argument(output: &mut Vec<u16>, value: &OsStr) -> io::Result<()> {
+pub(super) fn argument(output: &mut Vec<u16>, value: &OsStr) -> io::Result<()> {
     output.push(b'"' as u16);
     let mut slashes = 0;
     for unit in wide(value)? {
@@ -204,7 +206,7 @@ fn ordinal(a: &[u16], b: &[u16]) -> Ordering {
     }
 }
 
-fn environment(command: &Command) -> io::Result<Vec<u16>> {
+pub(super) fn environment(command: &Command) -> io::Result<Vec<u16>> {
     let mut vars: Vec<(Vec<u16>, Vec<u16>)> = std::env::vars_os()
         .map(|(key, value)| Ok((wide(&key)?, wide(&value)?)))
         .collect::<io::Result<_>>()?;
@@ -230,7 +232,7 @@ fn environment(command: &Command) -> io::Result<Vec<u16>> {
     Ok(block)
 }
 
-fn stdio(which: u32) -> io::Result<OwnedHandle> {
+pub(super) fn stdio(which: u32) -> io::Result<OwnedHandle> {
     // SAFETY: obtain a borrowed standard handle without changing it.
     let original = unsafe { GetStdHandle(which) };
     let raw = if original.is_null() || original == INVALID_HANDLE_VALUE {
@@ -279,9 +281,32 @@ fn stdio(which: u32) -> io::Result<OwnedHandle> {
     Ok(unsafe { OwnedHandle::from_raw_handle(raw) })
 }
 
-struct Attributes(Vec<usize>);
+fn null_input() -> io::Result<OwnedHandle> {
+    let attributes = SECURITY_ATTRIBUTES {
+        nLength: size_of::<SECURITY_ATTRIBUTES>() as u32,
+        lpSecurityDescriptor: null_mut(),
+        bInheritHandle: 1,
+    };
+    let raw = unsafe {
+        CreateFileW(
+            terminated(OsStr::new("NUL"))?.as_ptr(),
+            windows_sys::Win32::Foundation::GENERIC_READ,
+            FILE_SHARE_READ | FILE_SHARE_WRITE,
+            &attributes,
+            OPEN_EXISTING,
+            0,
+            null_mut(),
+        )
+    };
+    if raw == INVALID_HANDLE_VALUE {
+        return Err(io::Error::last_os_error());
+    }
+    Ok(unsafe { OwnedHandle::from_raw_handle(raw) })
+}
+
+pub(super) struct Attributes(pub(super) Vec<usize>);
 impl Attributes {
-    fn new(handles: &[HANDLE]) -> io::Result<Self> {
+    pub(super) fn new(handles: &[HANDLE]) -> io::Result<Self> {
         let mut bytes = 0;
         // SAFETY: standard size query; no list is initialized on this call.
         unsafe {
@@ -320,9 +345,9 @@ impl Drop for Attributes {
     }
 }
 
-struct Job(OwnedHandle);
+pub(super) struct Job(pub(super) OwnedHandle);
 impl Job {
-    fn new() -> io::Result<Self> {
+    pub(super) fn new() -> io::Result<Self> {
         // SAFETY: unnamed, non-inheritable job. No unrelated job can be opened.
         let raw = unsafe { CreateJobObjectW(null(), null()) };
         if raw.is_null() {
@@ -343,7 +368,7 @@ impl Job {
         })?;
         Ok(job)
     }
-    fn active(&self) -> io::Result<u32> {
+    pub(super) fn active(&self) -> io::Result<u32> {
         let mut info = JOBOBJECT_BASIC_ACCOUNTING_INFORMATION::default();
         // SAFETY: matching SDK output class/record/size and live job.
         win(unsafe {
@@ -357,7 +382,7 @@ impl Job {
         })?;
         Ok(info.ActiveProcesses)
     }
-    fn cleanup(&self, code: u32) -> io::Result<()> {
+    pub(super) fn cleanup(&self, code: u32) -> io::Result<()> {
         // SAFETY: only the private owned job is terminated, never a PID/group search.
         win(unsafe { TerminateJobObject(self.0.as_raw_handle(), code) })?;
         let deadline = Instant::now() + CLEANUP;
@@ -376,6 +401,9 @@ struct Child {
     thread: OwnedHandle,
     job: Job,
     done: bool,
+    pid: u32,
+    _program: Executable,
+    _script: Option<Executable>,
 }
 impl Child {
     fn cleanup(&mut self, code: u32) -> io::Result<()> {
@@ -406,6 +434,113 @@ impl Drop for Child {
     }
 }
 
+pub(crate) fn npm_command(dev: bool) -> io::Result<Command> {
+    let node = executable(OsStr::new("node"))?;
+    let script = node
+        .path
+        .parent()
+        .ok_or(io::ErrorKind::NotFound)?
+        .join("node_modules/npm/bin/npm-cli.js");
+    let checked = Executable::open(&script)?;
+    checked.verify()?;
+    let mut command = Command::new("node");
+    command
+        .arg(script)
+        .args(["run", if dev { "dev" } else { "build" }]);
+    Ok(command)
+}
+
+pub(crate) fn run_pair(
+    app: &App,
+    rust: &mut Command,
+    frontend: &App,
+    command: &mut Command,
+) -> io::Result<Completion> {
+    // Install before starting either child; headless/raw-console limits remain explicit.
+    let mut console = Console::install()?;
+    let address = std::net::SocketAddr::from(([127, 0, 0, 1], 5173));
+    drop(std::net::TcpListener::bind(address)?);
+    let mut front = spawn_owned(frontend, command)?;
+    let mut back: Option<Child> = None;
+    let result: io::Result<bool> = (|| {
+        let deadline = Instant::now() + Duration::from_secs(10);
+        loop {
+            if CONTROL.load(AtomicOrdering::SeqCst) != 0 || exited(&front)? {
+                return Ok(true);
+            }
+            if std::net::TcpStream::connect_timeout(&address, Duration::from_millis(20)).is_ok() {
+                break;
+            }
+            if Instant::now() >= deadline {
+                return Err(io::ErrorKind::TimedOut.into());
+            }
+            std::thread::sleep(POLL);
+        }
+        back = Some(spawn_owned(app, rust)?);
+        loop {
+            if CONTROL.load(AtomicOrdering::SeqCst) != 0 {
+                return Ok(false);
+            }
+            if exited(&front)? {
+                return Ok(true);
+            }
+            if exited(back.as_ref().unwrap())? {
+                return Ok(false);
+            }
+            std::thread::sleep(POLL);
+        }
+    })();
+    let cancelled = CONTROL.load(AtomicOrdering::SeqCst) != 0;
+    let front_signal = break_signal(&front);
+    let back_signal = back.as_ref().map_or(Ok(()), break_signal);
+    let deadline = Instant::now() + GRACE;
+    while Instant::now() < deadline {
+        std::thread::sleep(POLL);
+    }
+    let front_cleanup = front.cleanup(if cancelled { CONTROL_EXIT } else { 125 });
+    let back_cleanup = back.as_mut().map_or(Ok(()), |child| {
+        child.cleanup(if cancelled { CONTROL_EXIT } else { 125 })
+    });
+    let restore = console.restore();
+    front_cleanup?;
+    back_cleanup?;
+    restore?;
+    front_signal?;
+    back_signal?;
+    let frontend_exited = result?;
+    if cancelled {
+        return Ok(Completion::Exited(ExitStatus::from_raw(CONTROL_EXIT)));
+    }
+    let child = if frontend_exited {
+        &front
+    } else {
+        back.as_ref().ok_or(io::ErrorKind::Other)?
+    };
+    let mut code = 0;
+    win(unsafe { GetExitCodeProcess(child.process.as_raw_handle(), &mut code) })?;
+    let status = ExitStatus::from_raw(code);
+    Ok(if frontend_exited {
+        Completion::FrontendExited(status)
+    } else {
+        Completion::Exited(status)
+    })
+}
+
+fn break_signal(child: &Child) -> io::Result<()> {
+    if child.job.active()? != 0 {
+        win(unsafe { GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, child.pid) })?;
+    }
+    Ok(())
+}
+
+fn exited(child: &Child) -> io::Result<bool> {
+    match unsafe { WaitForSingleObject(child.process.as_raw_handle(), 0) } {
+        WAIT_OBJECT_0 => Ok(true),
+        WAIT_TIMEOUT => Ok(false),
+        _ => Err(io::Error::last_os_error()),
+    }
+}
+
 pub(crate) fn run(app: &App, command: &mut Command) -> io::Result<Completion> {
     let dev = command.get_args().next() == Some(OsStr::new("run"));
     run_owned(app, command, dev)
@@ -413,7 +548,68 @@ pub(crate) fn run(app: &App, command: &mut Command) -> io::Result<Completion> {
 
 fn run_owned(app: &App, command: &mut Command, dev: bool) -> io::Result<Completion> {
     let mut console = if dev { Some(Console::install()?) } else { None };
+    let mut child = spawn_owned(app, command)?;
+    let result = (|| {
+        let cancelled = if dev {
+            loop {
+                if CONTROL.load(AtomicOrdering::SeqCst) != 0 {
+                    break true;
+                }
+                match unsafe { WaitForSingleObject(child.process.as_raw_handle(), 10) } {
+                    WAIT_OBJECT_0 => break false,
+                    WAIT_TIMEOUT => (),
+                    _ => return Err(io::Error::last_os_error()),
+                }
+            }
+        } else {
+            if unsafe { WaitForSingleObject(child.process.as_raw_handle(), INFINITE) }
+                != WAIT_OBJECT_0
+            {
+                return Err(io::Error::last_os_error());
+            }
+            false
+        };
+        if dev && child.job.active()? != 0 {
+            // info.dwProcessId is the group we created, with its process HANDLE
+            // held through the last signal. Never generate CTRL_C_EVENT or use
+            // group zero. New consoles/groups may miss BREAK but stay in our Job.
+            win(unsafe { GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, child.pid) })?;
+            let deadline = Instant::now() + GRACE;
+            while child.job.active()? != 0 && Instant::now() < deadline {
+                std::thread::sleep(POLL);
+            }
+        }
+        if dev {
+            child.cleanup(if cancelled { CONTROL_EXIT } else { 125 })?;
+        }
+        let mut code = 0;
+        win(unsafe { GetExitCodeProcess(child.process.as_raw_handle(), &mut code) })?;
+        Ok(Completion::Exited(ExitStatus::from_raw(code)))
+    })();
+    // Even a successful Cargo exit must not leave owned descendants behind.
+    let cleanup = if child.done {
+        Ok(())
+    } else {
+        child.cleanup(125)
+    };
+    let restore = console.as_mut().map_or(Ok(()), Console::restore);
+    cleanup?;
+    restore?;
+    result
+}
+
+fn spawn_owned(app: &App, command: &mut Command) -> io::Result<Child> {
     let program = executable(command.get_program())?;
+    let script = if command.get_program() == "node" {
+        Some(Executable::open(std::path::Path::new(
+            command
+                .get_args()
+                .next()
+                .ok_or(io::ErrorKind::InvalidInput)?,
+        ))?)
+    } else {
+        None
+    };
     let application = terminated(program.path.as_os_str())?;
     let cwd = terminated(app.cwd.as_os_str())?;
     let mut argv = Vec::new();
@@ -428,7 +624,11 @@ fn run_owned(app: &App, command: &mut Command, dev: bool) -> io::Result<Completi
     }
     let env = environment(command)?;
     let stdio = [
-        stdio(STD_INPUT_HANDLE)?,
+        if command.get_program() == "node" {
+            null_input()?
+        } else {
+            stdio(STD_INPUT_HANDLE)?
+        },
         stdio(STD_OUTPUT_HANDLE)?,
         stdio(STD_ERROR_HANDLE)?,
     ];
@@ -467,18 +667,21 @@ fn run_owned(app: &App, command: &mut Command, dev: bool) -> io::Result<Completi
             &mut info,
         )
     })?;
-    let mut child = Child {
+    let child = Child {
         process: unsafe { OwnedHandle::from_raw_handle(info.hProcess) },
         thread: unsafe { OwnedHandle::from_raw_handle(info.hThread) },
         job,
         done: false,
+        pid: info.dwProcessId,
+        _program: program,
+        _script: script,
     };
-    let result = (|| {
+    (|| {
         // SAFETY: exact suspended process handle; failure never resumes the child.
         if let Err(error) = win(unsafe {
             AssignProcessToJobObject(child.job.0.as_raw_handle(), child.process.as_raw_handle())
         }) {
-            if dev {
+            {
                 eprintln!(
                     "Windows dev cannot establish its private Job (nested Job may be incompatible); suspended child will be reaped"
                 );
@@ -497,57 +700,17 @@ fn run_owned(app: &App, command: &mut Command, dev: bool) -> io::Result<Completi
             return Err(io::Error::other("child Job membership is unverified"));
         }
         app.verify()?;
-        program.verify()?;
+        child._program.verify()?;
+        if let Some(script) = &child._script {
+            script.verify()?;
+        }
         // SAFETY: owned primary thread suspended exactly once by CreateProcessW.
         if unsafe { ResumeThread(child.thread.as_raw_handle()) } != 1 {
             return Err(io::Error::other("cannot resume the owned primary thread"));
         }
-        let cancelled = if dev {
-            loop {
-                if CONTROL.load(AtomicOrdering::SeqCst) != 0 {
-                    break true;
-                }
-                match unsafe { WaitForSingleObject(child.process.as_raw_handle(), 10) } {
-                    WAIT_OBJECT_0 => break false,
-                    WAIT_TIMEOUT => (),
-                    _ => return Err(io::Error::last_os_error()),
-                }
-            }
-        } else {
-            if unsafe { WaitForSingleObject(child.process.as_raw_handle(), INFINITE) }
-                != WAIT_OBJECT_0
-            {
-                return Err(io::Error::last_os_error());
-            }
-            false
-        };
-        if dev && child.job.active()? != 0 {
-            // info.dwProcessId is the group we created, with its process HANDLE
-            // held through the last signal. Never generate CTRL_C_EVENT or use
-            // group zero. New consoles/groups may miss BREAK but stay in our Job.
-            win(unsafe { GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, info.dwProcessId) })?;
-            let deadline = Instant::now() + GRACE;
-            while child.job.active()? != 0 && Instant::now() < deadline {
-                std::thread::sleep(POLL);
-            }
-        }
-        if dev {
-            child.cleanup(if cancelled { CONTROL_EXIT } else { 125 })?;
-        }
-        let mut code = 0;
-        win(unsafe { GetExitCodeProcess(child.process.as_raw_handle(), &mut code) })?;
-        Ok(Completion::Exited(ExitStatus::from_raw(code)))
-    })();
-    // Even a successful Cargo exit must not leave owned descendants behind.
-    let cleanup = if child.done {
         Ok(())
-    } else {
-        child.cleanup(125)
-    };
-    let restore = console.as_mut().map_or(Ok(()), Console::restore);
-    cleanup?;
-    restore?;
-    result
+    })()?;
+    Ok(child)
 }
 
 pub(crate) fn signal(_: &ExitStatus) -> Option<i32> {

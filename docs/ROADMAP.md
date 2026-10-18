@@ -24,10 +24,10 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M15 — Done at bounded Linux OCI/Kubernetes configuration-generator preview scope** | Opt-in CLI emission of Dockerfile, Compose and portable Kubernetes manifests without platform SDK coupling | YT-089 | [Generator plan](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md), source-path-aware image build, app-owned bind/health/SIGTERM, offline generation and per-slice independent verification; no image publication or cluster deployment |
 | **M16 — Done at bounded YT-090 / YT-097 scope** | Opt-in typed native configuration and optional CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](YT-090-VERIFICATION.md); [CLI integration Linux/Windows GNU/MSVC and independent Reviewer PASS](YT-097-VERIFICATION.md); no default/core/browser or release change |
 | **M17 — Done at bounded YT-091 Tailwind scope** | Opt-in build-time Tailwind CSS 4 application scaffolding | YT-091 | [Guide](../tools/yetlet-cli/README.md#opt-in-tailwind-css-4-yt-091-independently-reviewed), [evidence](YT-091-VERIFICATION.md); actual Linux HTTP/CSS/CSP/signals and native Windows GNU/MSVC Tailwind source-bound builds PASS; independent Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS, no core/browser change or release activation |
-| **M18 — In progress; YT-098–YT-100 Done at bounded scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; YT-101 Todo; no stable shared asset API, default/core/browser or release change |
+| **M18 — Done at bounded YT-098–YT-101 scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; [YT-101 cloud delivery](YT-101-VERIFICATION.md) Done: real Linux Docker/Compose/K3s Pod/Service/asset PASS, Windows MSVC native/source PASS, subsequent Windows GNU 726/726 source and native tests/generator PASS after official MinGW64 GCC/Binutils installation, independent Reviewer `wc_job_fYtD9F8KXkXyzvYQ` PASS; no stable shared asset API, default/core/browser or release change |
 | **M19 — Planned Developer Experience and rolling-asset qualification** | Research-only developer workflow improvements and separately opt-in HA/rolling asset-retention qualification | YT-102–YT-103 | Planned evidence-based DX gap/proposal research and future independently reviewed disposable two-version K3s rollout, old-client asset continuity and measured availability; no mandatory Yetlet Core/provider coupling or production support/release claim |
 
-## M18 — Asset contract and Vite integration (in progress)
+## M18 — Asset contract and Vite integration (Done at bounded scopes)
 
 The [Vite feasibility spike](VITE-SPIKE-VERIFICATION.md) and
 [isolated experiment](../experiments/vite-integration/README.md) demonstrate
@@ -51,8 +51,21 @@ evidence gate. YT-100 is now **Done** at its isolated opt-in dev bridge scope:
 real Plain and Tailwind Chrome HMR/CSP/WS plus two actual foreground
 Ctrl-C/restart/cleanup paths PASS, and independent Reviewer
 `wc_job_MprRYhxeijOu6xG5` passed with zero issues/required followups.
-YT-101 remains **Todo**. The accepted VITE-SPIKE source and YT-091 standalone
-Tailwind templates remain unchanged. YT-020 remains Blocked; no CI/CD or
+YT-101 is **Done at bounded opt-in cloud-delivery scope**:
+[implementation and real runtime evidence](YT-101-VERIFICATION.md) cover
+plain/plugin Vite and optional typed config/config-only generators, absolute
+runtime roots, sanitized three-context inventories, runtime-only token wiring
+and 13/13 unchanged legacy outputs. Linux Docker Buildx/non-root runtime,
+Compose and isolated three-node K3s Service/Pod/asset bytes PASS with full
+owned cleanup. Windows MSVC 726/726 source-bound native tests and protected
+generator outputs PASS; supplemental Windows GNU 1.99 native CLI tests,
+Strict Clippy, Build, config-only app and Docker/Compose/K8s generators also
+PASS with 726/726 source hashes after official toolchain installation. The
+original GNU environment failure remains in the historical evidence.
+Independent read-only Reviewer
+`wc_job_fYtD9F8KXkXyzvYQ` returned PASS (0 issues/followups).
+The accepted VITE-SPIKE
+source and YT-091 standalone Tailwind templates remain unchanged. YT-020 remains Blocked; no CI/CD or
 release activation follows.
 The earlier experiment/planning Reviewer `wc_job_SuuEr3YetGlVbs_8` PASS
 remains separate historical evidence for the Vite experiment and plan.
@@ -68,6 +81,13 @@ prioritized DX research report and candidate future backlog slices with
 independent Reviewer PASS. Research does **not** implement a unified dev command,
 make Node/Vite mandatory, authorize process automation, or alter production
 runtime/CSP, release or deployment.
+
+The 2026-10-18 [CLI contract](CLI-CONTRACT.md) now has an explicitly authorized
+[local implementation slice](YT-102-CLI-IMPLEMENTATION.md). The earlier
+[design-only verification](YT-102-CLI-CONTRACT-VERIFICATION.md) remains historical.
+Current Linux tests and Windows cross-compilation do not close native Windows
+qualification, broader DX research, registry release or new generator formats.
+YT-102's real journey audit, measurements and DX Extension Contract remain Todo.
 
 **YT-103, opt-in HA and rolling asset compatibility:** independently of the
 YT-102 developer workflow study, follow YT-101 with an application/deployment

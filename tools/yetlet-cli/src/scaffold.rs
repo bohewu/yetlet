@@ -371,7 +371,7 @@ pub fn create_vite_dev(
     crate::platform::fs::create_project(dir, name, &entries)
 }
 
-fn vite_files(
+pub(crate) fn vite_files(
     name: &str,
     framework: &Path,
     cloud: bool,
@@ -588,5 +588,166 @@ fn vite_files(
             include_str!("../templates/vite/mark.svg").into(),
         ),
     ]);
+    Ok(entries)
+}
+
+/// Release-facing creation: file publication only, with no source checkout lookup.
+/// The declarations remain unpublished until the release qualification gates pass.
+pub fn create_selected(
+    name: &str,
+    dir: &Path,
+    cloud: bool,
+    with_config: bool,
+    with_tailwind: bool,
+    vite: bool,
+) -> Result<(), String> {
+    validate_name(name).map_err(str::to_owned)?;
+    crate::platform::fs::ensure_create_supported()?;
+    let entries = selected_files(name, cloud, with_config, with_tailwind, vite)?;
+    crate::platform::fs::create_project(dir, name, &entries)
+}
+
+fn selected_files(
+    name: &str,
+    cloud: bool,
+    with_config: bool,
+    with_tailwind: bool,
+    vite: bool,
+) -> Result<Vec<(&'static str, String)>, String> {
+    // Vite needs the same typed runtime settings as the CLI. Plain SSR stays opt-in.
+    let with_config = with_config || vite;
+    // These paths only seed the established template assembly; no filesystem lookup.
+    let framework = Path::new("__yetlet_release_template__");
+    let mut entries = if vite {
+        vite_files(name, framework, cloud, true, with_tailwind)?
+    } else if with_tailwind {
+        tailwind_files(name, framework, cloud, with_config)?
+    } else if with_config {
+        config_files(name, framework, cloud)?
+    } else {
+        files(name, framework, cloud)?
+    };
+    let manifest = &mut entries[0].1;
+    for (krate, version) in [
+        ("yetlet-core", "0.1.0"),
+        ("yetlet-server-axum", "0.1.0"),
+        ("yetlet-config", "0.0.0"),
+    ] {
+        let prefix = format!("{krate} = {{ path = ");
+        if let Some(start) = manifest.find(&prefix) {
+            let end = start
+                + manifest[start..]
+                    .find('\n')
+                    .ok_or("invalid built-in dependency")?;
+            manifest.replace_range(
+                start..end,
+                &format!("{krate} = {{ version = \"={version}\" }}"),
+            );
+        }
+    }
+    let cli = format!(
+        "\n[cli.vite]\nenabled = {vite}\nroot = \"frontend/\"\nauto_start = {vite}\nauto_build = {vite}\n\n[cli.generate.k8s]\nreplicas = 1\n"
+    );
+    if with_config {
+        for (path, content) in &mut entries {
+            if *path == "src/config.rs" {
+                *content = content.replace(
+                    "pub struct Settings {",
+                    "pub struct Settings {\n    pub cli: Cli,",
+                );
+                content.push_str(include_str!("../templates/config/cli.rs"));
+                *content = content.replace(
+                    "        if self.service.token",
+                    "        self.cli.validate()?;\n        if self.service.token",
+                );
+            }
+            if *path == "base.toml" {
+                content.push_str(&cli);
+            }
+        }
+    } else {
+        entries.push(("base.toml", cli.clone()));
+        for path in ["development.toml", "staging.toml", "production.toml"] {
+            entries.push((path, "# Public CLI settings inherit base.toml.\n".into()));
+        }
+    }
+    for (path, content) in &mut entries {
+        if matches!(
+            *path,
+            "development.toml" | "staging.toml" | "production.toml"
+        ) {
+            content
+                .push_str("\n# Override declared [cli.vite] or [cli.generate.k8s] values here.\n");
+        }
+    }
+    if vite {
+        for (path, content) in &mut entries {
+            *path = match *path {
+                "package.json" => "frontend/package.json",
+                "package-lock.json" => "frontend/package-lock.json",
+                "vite.config.mjs" => "frontend/vite.config.mjs",
+                "tsconfig.json" => "frontend/tsconfig.json",
+                "app.ts" => "frontend/app.ts",
+                "app.css" => "frontend/app.css",
+                "companion.ts" => "frontend/companion.ts",
+                "shared.ts" => "frontend/shared.ts",
+                "shared.css" => "frontend/shared.css",
+                "lazy.ts" => "frontend/lazy.ts",
+                "lazy.css" => "frontend/lazy.css",
+                "mark.svg" => "frontend/mark.svg",
+                other => other,
+            };
+            match *path {
+                "frontend/package.json" => *content = content.replace(
+                    "\"build\": \"vite build\"", "\"build\": \"vite build\",\n    \"dev\": \"vite --config vite.dev.config.mjs\""
+                ),
+                "frontend/vite.config.mjs" => {
+                    *content = content
+                        .replace("No dotenv discovery", "Frontend-root dotenv only")
+                        .replace("envDir: false", "envDir: root");
+                    if with_tailwind {
+                        *content = format!("{}{}", include_str!("../templates/vite/selected-tailwind-source.mjs"), content)
+                            .replace("plugins: [tailwindcss()]", "plugins: [rustSource, tailwindcss()]");
+                    }
+                }
+                "frontend/app.css" if with_tailwind => *content = content.replace("./src/main.rs", "../src/main.rs"),
+                "src/main.rs" => *content = content
+                    .replace("    let assets = vite::Snapshot::load_from_env()?;\n", "")
+                    .replace("    let address = settings.validate(", "    let assets = vite::Snapshot::load_selected(&settings.cli.vite.root)?;\n    let address = settings.validate("),
+                "src/vite.rs" => {
+                    let start = content.find("    pub(crate) fn load_from_env()").ok_or("missing snapshot loader")?;
+                    let end = content[start..].find("        if snapshot.images()").ok_or("missing snapshot validation")? + start;
+                    content.replace_range(start..end, include_str!("../templates/vite/selected-loader.rs"));
+                    *content = content.replace("let root = Path::new(env!(\"CARGO_MANIFEST_DIR\")).join(\"dist\");", "let root = Path::new(env!(\"CARGO_MANIFEST_DIR\")).join(crate::config::load().expect(\"app settings required\").cli.vite.root).join(\"dist\");");
+                }
+                _ => {}
+            }
+        }
+        entries.extend([
+            ("frontend/.env.example", "# Frontend values are public when imported. Never store backend credentials here.\nVITE_PUBLIC_MESSAGE=Yetlet\n".into()),
+            ("frontend/vite.dev.config.mjs", include_str!("../templates/vite/vite.dev.config.mjs").into()),
+            ("frontend/vite.dev.bridge.mjs", include_str!("../templates/vite/vite.dev.bridge.mjs").into()),
+        ]);
+        entries[2]
+            .1
+            .push_str("/frontend/dist/\n/frontend/node_modules/\n!frontend/.env.example\n");
+    }
+    entries[1].1 = include_str!("../templates/SELECTED-README.md")
+        .replace("@NAME@", name)
+        .replace("@VERSION@", env!("CARGO_PKG_VERSION"));
+    if with_config {
+        entries[1]
+            .1
+            .push_str(include_str!("../templates/config/SELECTED-README.md"));
+    }
+    if vite {
+        entries[1]
+            .1
+            .push_str(include_str!("../templates/vite/SELECTED-README.md"));
+    } else if with_tailwind {
+        entries[1]
+            .1
+            .push_str(include_str!("../templates/tailwind/SELECTED-README.md"));
+    }
     Ok(entries)
 }

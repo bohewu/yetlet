@@ -80,6 +80,137 @@ fn junction(path: &Path, target: &Path) {
     .unwrap();
 }
 
+fn frontend_entries() -> Vec<(&'static str, String)> {
+    vec![
+        ("base.toml", "[cli]\n".into()),
+        ("src/main.rs", "owned source".into()),
+        ("frontend/package.json", "owned frontend".into()),
+        ("frontend/.env.example", "VITE_PUBLIC_VALUE=example".into()),
+    ]
+}
+
+#[test]
+fn frontend_and_src_are_one_no_replace_publication_with_owned_cleanup() {
+    let root = tempfile::tempdir().unwrap();
+    let files = frontend_entries();
+    create_project(root.path(), "app", &files).unwrap();
+    for (path, bytes) in &files {
+        assert_eq!(
+            fs::read(root.path().join("app").join(path)).unwrap(),
+            bytes.as_bytes()
+        );
+    }
+    assert!(create_project(root.path(), "app", &files).is_err());
+    assert!(
+        create(root.path(), "rollback", &files, || Err(io::Error::other(
+            "injected failure"
+        )))
+        .is_err()
+    );
+    let mut duplicate = files.clone();
+    duplicate.push(("frontend/package.json", "replacement".into()));
+    assert!(create_project(root.path(), "partial", &duplicate).is_err());
+    assert_eq!(names(root.path()), ["app"]);
+    assert!(
+        create(root.path(), "race", &files, || {
+            junction(&root.path().join("race"), &root.path().join("app"));
+            Ok(())
+        })
+        .is_err()
+    );
+    assert_eq!(
+        fs::read(root.path().join("race/frontend/package.json")).unwrap(),
+        b"owned frontend"
+    );
+    assert_eq!(names(root.path()), ["app", "race"]);
+    for path in [
+        "frontend/../escape",
+        "frontend/nested/app.ts",
+        "frontend/unlisted",
+        "other/package.json",
+    ] {
+        assert!(create_project(root.path(), "bad", &[(path, "bad".into())]).is_err());
+        assert!(!root.path().join("bad").exists());
+    }
+    for files in [
+        vec![
+            ("src/main.rs", "".into()),
+            ("cargo-overlay/Cargo.toml", "".into()),
+        ],
+        vec![
+            ("frontend/package.json", "".into()),
+            ("cargo-overlay/Cargo.toml", "".into()),
+        ],
+    ] {
+        assert!(create_project(root.path(), "mixed", &files).is_err());
+    }
+}
+
+#[test]
+fn protected_frontend_root_is_project_relative_pinned_and_rejects_junctions() {
+    use crate::platform::fs::{app_root, frontend_directory};
+    let root = tempfile::tempdir().unwrap();
+    create_project(root.path(), "app", &frontend_entries()).unwrap();
+    let path = root.path().join("app");
+    fs::create_dir_all(path.join("ui/client")).unwrap();
+    junction(&path.join("linked"), &path.join("frontend"));
+    junction(&path.join("ui/linked"), &path.join("frontend"));
+    let app = open_directory(&path).unwrap();
+    let frontend = frontend_directory(&app, Path::new("frontend/")).unwrap();
+    assert_eq!(app_root(&frontend), path.join("frontend"));
+    assert_eq!(
+        read_app_file(&frontend, "package.json").unwrap(),
+        b"owned frontend"
+    );
+    assert_eq!(
+        app_root(&frontend_directory(&app, Path::new("ui/client")).unwrap()),
+        path.join("ui/client")
+    );
+    assert!(read_app_file(&app, "frontend/package.json").is_err());
+    assert!(app_directory_entries(&app, "frontend").is_err());
+    for directory in [
+        "",
+        ".",
+        "..",
+        "../frontend",
+        "ui/../frontend",
+        "C:/frontend",
+        "C:frontend",
+        "\\\\server\\share",
+        "linked",
+        "ui/linked",
+        "missing",
+        "ui/client:stream",
+    ] {
+        assert!(
+            frontend_directory(&app, Path::new(directory)).is_err(),
+            "{directory}"
+        );
+    }
+    assert!(fs::rename(path.join("frontend"), path.join("moved")).is_err());
+    frontend.verify().unwrap();
+}
+
+#[test]
+fn explicit_public_settings_root_retains_non_reparse_reads_without_manifest_or_lock() {
+    let root = tempfile::tempdir().unwrap();
+    create_project(root.path(), "settings", &[("base.toml", "[cli]\n".into())]).unwrap();
+    let path = root.path().join("settings");
+    let settings = open_directory(&path).unwrap();
+    assert_eq!(read_app_file(&settings, "base.toml").unwrap(), b"[cli]\n");
+    assert!(open_directory(Path::new("relative")).is_err());
+    assert!(open_directory(&path.join("..")).is_err());
+    assert!(read_app_file(&settings, "private.toml").is_err());
+    junction(&path.join("unsafe.toml"), &path);
+    assert!(read_app_file(&settings, "unsafe.toml").is_err());
+    fs::write(path.join("base.toml"), vec![0; 1024 * 1024 + 1]).unwrap();
+    assert!(
+        read_app_file(&settings, "base.toml")
+            .unwrap_err()
+            .contains("size limit")
+    );
+}
+
 #[test]
 fn unicode_bytes_and_private_stage_publish_on_ntfs() {
     let root = tempfile::tempdir().unwrap();
@@ -465,7 +596,7 @@ fn rollback_retains_foreign_file_with_different_identity() {
     let root = tempfile::tempdir().unwrap();
     let parent = Anchor::open(root.path()).unwrap();
     let sd = private_security().unwrap();
-    let mut stage = Stage::make(&parent, &sd, "src").unwrap();
+    let mut stage = Stage::make(&parent, &sd).unwrap();
     stage
         .populate(&[("README.md", "original".into())], &sd)
         .unwrap();

@@ -25,24 +25,18 @@ fn fixture_framework(root: &Path) -> std::path::PathBuf {
     source
 }
 
-fn scaffold(parent: &Path, framework: &Path, name: &str, cloud: bool) -> std::process::Output {
+// Historical local-source qualification fixtures use the retained internal API.
+fn scaffold(parent: &Path, framework: &Path, name: &str, cloud: bool) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(parent, fs::Permissions::from_mode(0o700)).unwrap();
     }
-    let mut command = Command::new(env!("CARGO_BIN_EXE_yetlet"));
-    command
-        .args(["new", name, "--framework-path"])
-        .arg(framework)
-        .arg("--dir")
-        .arg(parent)
-        .env("PATH", parent.join("no-executables"))
-        .env("CARGO_HOME", parent.join("no-cargo-home"));
     if cloud {
-        command.arg("--cloud");
+        yetlet_cli::scaffold::create_cloud(name, framework, parent)
+    } else {
+        yetlet_cli::scaffold::create(name, framework, parent)
     }
-    command.output().unwrap()
 }
 
 #[test]
@@ -59,11 +53,7 @@ fn both_profiles_use_safe_no_replace_without_subprocess_lock_or_extra_files() {
         .unwrap();
     for (name, cloud) in [("ordinary", false), ("cloudapp", true)] {
         let output = scaffold(&parent, &framework, name, cloud);
-        assert!(
-            output.status.success(),
-            "{}",
-            String::from_utf8_lossy(&output.stderr)
-        );
+        assert!(output.is_ok(), "{output:?}");
         let app = parent.join(name);
         let main = fs::read(app.join("src/main.rs")).unwrap();
         let readme = fs::read_to_string(app.join("README.md")).unwrap();
@@ -119,10 +109,7 @@ fn both_profiles_use_safe_no_replace_without_subprocess_lock_or_extra_files() {
             b"/target/\n.env\n.env.*\n"
         );
 
-        assert_eq!(
-            scaffold(&parent, &framework, name, !cloud).status.code(),
-            Some(1)
-        );
+        assert!(scaffold(&parent, &framework, name, !cloud).is_err());
         assert_eq!(fs::read(app.join("Cargo.toml")).unwrap(), manifest);
         assert_eq!(fs::read(app.join("src/main.rs")).unwrap(), main);
     }
@@ -143,11 +130,7 @@ fn generated_cloud_app_offline_contract() {
         .canonicalize()
         .unwrap();
     let output = scaffold(root.path(), &framework, "cloudapp", true);
-    assert!(
-        output.status.success(),
-        "{}",
-        String::from_utf8_lossy(&output.stderr)
-    );
+    assert!(output.is_ok(), "{output:?}");
     let app = root.path().join("cloudapp");
     let cargo = |args: &[&str]| {
         let output = Command::new("cargo")

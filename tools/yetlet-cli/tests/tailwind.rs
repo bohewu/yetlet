@@ -15,85 +15,41 @@ fn framework() -> std::path::PathBuf {
     }
 }
 
-fn scaffold(parent: &Path, name: &str, cloud: bool, config: bool) -> std::process::Output {
+// Historical local-source qualification fixtures use the retained internal API.
+fn scaffold(parent: &Path, name: &str, cloud: bool, config: bool) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(parent, fs::Permissions::from_mode(0o700)).unwrap();
     }
-    let mut command = Command::new(env!("CARGO_BIN_EXE_yetlet"));
-    command
-        .args(["new", name, "--with-tailwind", "--framework-path"])
-        .arg(framework())
-        .arg("--dir")
-        .arg(parent)
-        .env("PATH", parent.join("no-executables"))
-        .env("CARGO_HOME", parent.join("no-cache"));
-    if cloud {
-        command.arg("--cloud");
-    }
-    if config {
-        command.arg("--with-config");
-    }
-    command.output().unwrap()
+    yetlet_cli::scaffold::create_tailwind(name, &framework(), parent, cloud, config)
 }
 
 #[test]
 fn tailwind_parser_is_explicit_unique_new_only_and_composes() {
     for cloud in [false, true] {
         for config in [false, true] {
-            let mut args = [
-                "new",
-                "styled",
-                "--framework-path",
-                "framework",
-                "--with-tailwind",
-            ]
-            .map(OsString::from)
-            .to_vec();
+            let mut args = ["new", "--tailwind", "styled"].map(OsString::from).to_vec();
             if cloud {
-                args.push("--cloud".into());
+                args.push("--service".into());
             }
             if config {
-                args.push("--with-config".into());
+                args.push("--settings".into());
             }
             assert!(matches!(parse(&args), Ok(Cli::New {
-                cloud: c, with_config: s, with_tailwind: true, ..
+                cloud: c, with_config: s, with_tailwind: true, vite: false, ..
             }) if c == cloud && s == config));
-            args.push("--with-tailwind".into());
+            args.push("--tailwind".into());
             assert!(parse(&args).is_err());
         }
     }
     for args in [
-        vec!["--with-tailwind"],
-        vec![
-            "new",
-            "--with-tailwind",
-            "styled",
-            "--framework-path",
-            "framework",
-        ],
-        vec!["new", "styled", "--framework-path", "--with-tailwind"],
-        vec![
-            "new",
-            "styled",
-            "--framework-path",
-            "framework",
-            "--with-tailwind=true",
-        ],
-        vec![
-            "new",
-            "styled",
-            "--framework-path",
-            "framework",
-            "--with-tailwnd",
-        ],
-        vec!["doctor", "--with-tailwind"],
-        vec!["build", "--manifest-path", "Cargo.toml", "--with-tailwind"],
-        vec!["dev", "--manifest-path", "Cargo.toml", "--with-tailwind"],
-        vec!["generate", "docker", "--with-tailwind"],
-        vec!["generate", "compose", "--with-tailwind"],
-        vec!["generate", "k8s", "--with-tailwind"],
+        vec!["new", "styled", "--tailwind=true"],
+        vec!["new", "styled", "--with-tailwind"],
+        vec!["doctor", "--tailwind"],
+        vec!["run", "--tailwind"],
+        vec!["build", "--tailwind"],
+        vec!["generate", "docker", "--tailwind"],
     ] {
         assert!(parse(&args.iter().map(OsString::from).collect::<Vec<_>>()).is_err());
     }
@@ -106,11 +62,7 @@ fn four_profiles_write_only_sources_without_tools_or_overwrite() {
         for config in [false, true] {
             let name = format!("styled-{cloud}-{config}");
             let result = scaffold(root.path(), &name, cloud, config);
-            assert!(
-                result.status.success(),
-                "{}",
-                String::from_utf8_lossy(&result.stderr)
-            );
+            assert!(result.is_ok(), "{result:?}");
             let app = root.path().join(&name);
             let mut names = fs::read_dir(&app)
                 .unwrap()
@@ -156,10 +108,7 @@ fn four_profiles_write_only_sources_without_tools_or_overwrite() {
                 "@import \"tailwindcss\" source(none);\n@source \"./src\";\n"
             );
             let main = fs::read(app.join("src/main.rs")).unwrap();
-            assert_eq!(
-                scaffold(root.path(), &name, !cloud, !config).status.code(),
-                Some(1)
-            );
+            assert!(scaffold(root.path(), &name, !cloud, !config).is_err());
             assert_eq!(fs::read(app.join("src/main.rs")).unwrap(), main);
         }
     }
@@ -167,75 +116,48 @@ fn four_profiles_write_only_sources_without_tools_or_overwrite() {
 }
 
 #[test]
-fn no_flag_preserves_all_four_established_scaffold_api_bytes() {
+fn selected_cli_keeps_runtime_settings_opt_in_and_adds_public_tool_settings() {
     let root = tempfile::tempdir().unwrap();
     #[cfg(target_os = "linux")]
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     }
-    // The original entry points/templates are unchanged. Compare every emitted
-    // byte with CLI dispatch without the new flag, including typed config files.
     for cloud in [false, true] {
         for config in [false, true] {
-            let api = root.path().join(format!("api-{cloud}-{config}"));
-            let cli = root.path().join(format!("cli-{cloud}-{config}"));
-            fs::create_dir(&api).unwrap();
-            fs::create_dir(&cli).unwrap();
-            #[cfg(target_os = "linux")]
-            {
-                use std::os::unix::fs::PermissionsExt;
-                for parent in [&api, &cli] {
-                    fs::set_permissions(parent, fs::Permissions::from_mode(0o700)).unwrap();
-                }
-            }
-            if config {
-                yetlet_cli::scaffold::create_config("plain", &framework(), &api, cloud).unwrap();
-            } else if cloud {
-                yetlet_cli::scaffold::create_cloud("plain", &framework(), &api).unwrap();
-            } else {
-                yetlet_cli::scaffold::create("plain", &framework(), &api).unwrap();
-            }
+            let name = format!("plain-{cloud}-{config}");
             let mut command = Command::new(env!("CARGO_BIN_EXE_yetlet"));
             command
-                .args(["new", "plain", "--framework-path"])
-                .arg(framework())
-                .arg("--dir")
-                .arg(&cli)
+                .args(["new", &name, "--parent"])
+                .arg(root.path())
                 .env("PATH", root.path().join("no-executables"));
             if cloud {
-                command.arg("--cloud");
+                command.arg("--service");
             }
             if config {
-                command.arg("--with-config");
+                command.arg("--settings");
             }
-            assert!(command.output().unwrap().status.success());
-            let mut paths = vec![std::path::PathBuf::new()];
-            while let Some(path) = paths.pop() {
-                let mut expected = fs::read_dir(api.join("plain").join(&path))
-                    .unwrap()
-                    .map(|e| e.unwrap().file_name())
-                    .collect::<Vec<_>>();
-                let mut actual = fs::read_dir(cli.join("plain").join(&path))
-                    .unwrap()
-                    .map(|e| e.unwrap().file_name())
-                    .collect::<Vec<_>>();
-                expected.sort();
-                actual.sort();
-                assert_eq!(actual, expected);
-                for name in expected {
-                    let relative = path.join(name);
-                    if api.join("plain").join(&relative).is_dir() {
-                        paths.push(relative);
-                    } else {
-                        assert_eq!(
-                            fs::read(api.join("plain").join(&relative)).unwrap(),
-                            fs::read(cli.join("plain").join(&relative)).unwrap(),
-                            "{relative:?}"
-                        );
-                    }
-                }
-            }
+            let output = command.output().unwrap();
+            assert!(
+                output.status.success(),
+                "{}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+            let app = root.path().join(&name);
+            assert_eq!(app.join("src/config.rs").exists(), config);
+            let manifest = fs::read_to_string(app.join("Cargo.toml")).unwrap();
+            assert!(!manifest.contains("path ="));
+            assert_eq!(manifest.contains("yetlet-config"), config);
+            let settings: toml::Value = fs::read_to_string(app.join("base.toml"))
+                .unwrap()
+                .parse()
+                .unwrap();
+            assert_eq!(settings["cli"]["vite"]["enabled"].as_bool(), Some(false));
+            assert_eq!(settings["cli"]["vite"]["auto_start"].as_bool(), Some(false));
+            assert_eq!(settings["cli"]["vite"]["auto_build"].as_bool(), Some(false));
+            assert!(!app.join("package.json").exists());
+            assert!(!app.join("frontend").exists());
+            assert!(!app.join("Cargo.lock").exists());
         }
     }
 }
@@ -295,11 +217,7 @@ fn generated_tailwind_apps_offline_contract() {
         for config in [false, true] {
             let name = format!("styled-{cloud}-{config}");
             let result = scaffold(root.path(), &name, cloud, config);
-            assert!(
-                result.status.success(),
-                "{}",
-                String::from_utf8_lossy(&result.stderr)
-            );
+            assert!(result.is_ok(), "{result:?}");
             let app = root.path().join(&name);
             fs::create_dir(app.join("dist")).unwrap();
             let result = Command::new(&binary)

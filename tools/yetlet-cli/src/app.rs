@@ -10,6 +10,7 @@ pub struct Failure {
 #[derive(Debug)]
 pub enum Completion {
     Exited(ExitStatus),
+    FrontendExited(ExitStatus),
     Cancelled(i32),
 }
 
@@ -23,13 +24,51 @@ impl Completion {
 pub fn run(manifest: &Path, dev: bool, release: bool) -> Result<Completion, Failure> {
     let app =
         crate::platform::fs::open_app(manifest).map_err(|message| Failure { code: 1, message })?;
-    crate::platform::process::run_cargo(&app, dev, release).map_err(|error| Failure {
+    let settings = crate::settings::load(&app).map_err(|message| Failure { code: 1, message })?;
+    let selected = settings.vite.enabled
+        && if dev {
+            settings.vite.auto_start
+        } else {
+            settings.vite.auto_build
+        };
+    if selected {
+        let frontend =
+            crate::platform::fs::frontend_directory(&app, Path::new(&settings.vite.root))
+                .map_err(|message| Failure { code: 1, message })?;
+        crate::platform::fs::read_app_file(&frontend, "package.json").map_err(|_| Failure {
+            code: 1,
+            message: "frontend package.json is missing or unsafe; prepare dependencies separately"
+                .into(),
+        })?;
+        if dev {
+            crate::platform::fs::read_frontend_manifest(&frontend)
+                .map_err(|_| Failure { code: 1, message: "Vite startup requires an existing protected frontend dist; build it separately first".into() })?;
+            return crate::platform::process::run_with_frontend(&app, &frontend)
+                .map_err(process_failure);
+        }
+        println!("Frontend build selected by cli.vite.auto_build");
+        match crate::platform::process::run_frontend_build(&app, &frontend)
+            .map_err(process_failure)?
+        {
+            Completion::Exited(status) | Completion::FrontendExited(status) if status.success() => {
+                println!("Frontend build completed")
+            }
+            completion => return Ok(completion),
+        }
+    } else if !dev {
+        println!("Frontend build skipped by public CLI settings");
+    }
+    crate::platform::process::run_cargo(&app, dev, release).map_err(process_failure)
+}
+
+fn process_failure(error: std::io::Error) -> Failure {
+    Failure {
         code: 125,
         message: format!(
-            "Cargo spawn/supervision/cleanup failed ({:?}); success is not claimed",
+            "owned child spawn/supervision/cleanup failed ({:?}); success is not claimed",
             error.kind()
         ),
-    })
+    }
 }
 
 pub(crate) fn parse_file(name: &str, file: impl std::io::Read) -> Result<toml::Value, String> {

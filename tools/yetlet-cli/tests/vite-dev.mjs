@@ -1,8 +1,27 @@
 // Direct Node product tests; no listener, browser, dependency install or test framework.
 import assert from 'node:assert/strict';
-import { test } from 'node:test';
+import { after, test } from 'node:test';
+import { mkdirSync, mkdtempSync, rmSync, symlinkSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
 import { EventEmitter } from 'node:events';
 import { allowedOrigin, allowedPath, devBridge, devDocument, devPort, productionCsp } from '../templates/vite/vite.dev.bridge.mjs';
+
+const fixture = mkdtempSync(join(tmpdir(), 'yetlet-vite-source-'));
+const root = join(fixture, 'frontend');
+const sourcePaths = [
+  '/app.js', '/shared.js', '/lazy.js', '/companion.js', '/custom.ts', '/other.js',
+  '/src/app.js', '/nested/user-module.ts', '/modules/helpers.mjs', '/modules/types.mts',
+  '/settings/theme.ts', '/components/settings/panel.ts', '/config/client.ts', '/user.settings.ts',
+  '/server/status.ts', '/backend/client.ts', '/env.js', '/config.ts',
+  '/styles/custom.css', '/images/custom.svg', '/space%20name.js', '/%E6%A8%A1%E7%B5%84/%E6%8C%89%E9%88%95.ts',
+];
+for (const path of [...sourcePaths, '/dist/private.ts', '/.hidden/private.js', '/vite.dev.config.mjs']) {
+  const file = join(root, decodeURIComponent(path).slice(1));
+  mkdirSync(dirname(file), { recursive: true });
+  writeFileSync(file, 'export const value = 1;\n');
+}
+after(() => rmSync(fixture, { recursive: true, force: true }));
 
 const prefix = '<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Yetlet</title>';
 const tags = '<link rel="stylesheet" href="/static/assets/shared-abc.css"><link rel="stylesheet" href="/static/assets/app-123.css"><script type="module" src="/static/assets/app-abc.js"></script>';
@@ -33,9 +52,102 @@ test('HTTP and WebSocket require exact host and explicit same dev origin', () =>
   }
 });
 
-test('finite source request allowlist rejects secret/config/raw/traversal paths', () => {
-  for (const path of ['/', '/@vite/client', '/@vite/env', '/app.ts', '/shared.css?t=12345678', '/mark.svg?import', '/app.css?direct']) assert(allowedPath(path), path);
-  for (const path of ['/.env', '/.env.local', '/server.key', '/server.pem', '/server.crt', '/base.toml', '/src/main.rs', '/package.json', '/vite.dev.config.mjs', '/vite.dev.bridge.mjs', '/@fs/etc/passwd', '/%2eenv', '/./app.ts', '/app.ts/../.env', '//app.ts', '/app.ts?raw', '/app.ts?url', '/app.ts?x=1', '/app.ts??import', '/app.ts#x', '/hello/name', 'http://evil.example/', null]) assert(!allowedPath(path), String(path));
+test('frontend source paths admit custom modules and assets without a filename inventory', () => {
+  for (const path of ['/', '/@vite/client', '/@vite/env', '/app.ts', '/shared.css?t=12345678', '/mark.svg?import', '/app.css?direct', ...sourcePaths,
+    '/%61pp.js', '/app%2ejs', '/nested/模組.ts', '/nested/icon.svg?import&t=123', '/styles/custom.css?t=123&direct']) assert(allowedPath(path), path);
+  for (const path of ['/.env', '/.env.local', '/server.key', '/server.pem', '/server.crt', '/base.toml', '/src/main.rs', '/package.json', '/package-lock.json',
+    '/vite.dev.config.mjs', '/vite.dev.bridge.mjs', '/vite.config.mjs', '/tailwind.config.js', '/postcss.config.mjs', '/config/base.toml', '/settings/secrets.toml',
+    '/target/private.ts', '/.hidden/source.ts', '/nested/.env.ts', '/dist/app.js',
+    '/@fs/etc/passwd', '/@fs/etc/passwd.js', '/@id/module.js', '/%40fs/etc/passwd.js', '/%2eenv', '/./app.ts', '/app.ts/../.env', '/%2e%2e/outside.js',
+    '/nested/%2e%2e/app.js', '/nested%2fapp.js', '/nested%5capp.js', '/%252e%252e/outside.js', '/app.js%3fimport', '/app.js%23fragment',
+    '//app.ts', '/app.ts?raw', '/app.ts?url', '/app.ts?x=1', '/app.ts??import', '/app.ts#x', '/hello/name', 'http://evil.example/', '/C:/outside.js',
+    '/nested\\app.js', '/control%00.js', '/control%0a.js', '/bad%ff.js', '/bad%.js', null]) assert(!allowedPath(path), String(path));
+});
+
+test('custom JS/TS, nested CSS/SVG and import/HMR queries reach Vite middleware', () => {
+  let middleware;
+  const httpServer = new EventEmitter();
+  devBridge(5173).configureServer({
+    config: { root }, httpServer,
+    middlewares: { use(callback) { middleware = callback; } },
+  });
+  const headers = { host: '127.0.0.1:5173', origin: 'http://127.0.0.1:5173' };
+  try {
+    for (const path of sourcePaths) {
+      for (const query of ['', '?import', '?direct', '?t=12345678', '?import&t=12345678', '?t=12345678&direct']) {
+        for (const method of ['GET', 'HEAD']) {
+          const response = {
+            headers: {},
+            setHeader(name, value) { this.headers[name] = value; },
+            writeHead() { assert.fail(`${method} ${path}${query} must reach Vite`); },
+            end() { assert.fail(`${method} ${path}${query} must reach Vite`); },
+          };
+          let forwarded = 0;
+          middleware({ headers, url: path + query, method }, response, () => { forwarded += 1; });
+          assert.equal(forwarded, 1, `${method} ${path}${query}`);
+          assert.equal(response.headers['X-Content-Type-Options'], 'nosniff');
+          assert.equal(response.headers['Cache-Control'], 'no-store');
+        }
+      }
+    }
+    for (const url of [
+      '/app.jsx', '/app.tsx', '/data.json', '/app.js/extra', '/app.js.map', '/./app.js', '/lazy.js/../app.js', '//app.js',
+      '/vite.dev.bridge.mjs', '/config/base.toml', '/.env.js', '/node_modules/private.js', '/@fs/etc/secret.js',
+      '/app.js%3fimport', '/app.js#fragment', '/nested%2fapp.js', '/%252e%252e/app.js',
+      '/app.js?raw', '/app.js?url', '/app.js?x=1', '/app.js?', '/app.js??import',
+      '/app.js?import&import', '/app.js?import&direct', '/app.js?t=1&t=2', '/app.js?%69mport', '/app.js?%74=1', '/app.js?t=%31',
+      '/app.js?t=1%0a', '/app.js?t=12345678901234567',
+    ]) {
+      const response = { status: null, writeHead(status) { this.status = status; }, end() {} };
+      middleware({ headers, url, method: 'GET' }, response, () => { assert.fail(`${url} must be refused`); });
+      assert.equal(response.status, 403, url);
+    }
+    for (const [requestHeaders, method, status] of [
+      [{ ...headers, host: 'localhost:5173' }, 'GET', 403],
+      [{ ...headers, origin: 'https://evil.example' }, 'GET', 403],
+      [headers, 'POST', 405],
+      [headers, 'PUT', 405],
+      [headers, 'DELETE', 405],
+    ]) {
+      const response = { status: null, writeHead(code) { this.status = code; }, end() {} };
+      middleware({ headers: requestHeaders, url: '/app.js', method }, response, () => { assert.fail('request must be refused'); });
+      assert.equal(response.status, status);
+    }
+  } finally {
+    httpServer.emit('close');
+    assert.equal(httpServer.listenerCount('upgrade'), 0);
+  }
+});
+
+test('physical source paths stay inside frontend root and cannot alias protected files', () => {
+  const outside = join(fixture, 'backend');
+  mkdirSync(outside);
+  writeFileSync(join(outside, 'private.ts'), 'export const value = 2;');
+  symlinkSync(outside, join(root, 'escape'), 'junction');
+  symlinkSync(join(root, 'dist'), join(root, 'alias'), 'junction');
+  symlinkSync(join(root, '.hidden'), join(root, 'hidden-alias'), 'junction');
+  symlinkSync(join(root, 'src'), join(root, 'local-alias'), 'junction');
+  let middleware;
+  const httpServer = new EventEmitter();
+  devBridge(5173).configureServer({
+    config: { root }, httpServer,
+    middlewares: { use(callback) { middleware = callback; } },
+  });
+  try {
+    for (const url of ['/escape/private.ts', '/alias/private.ts', '/hidden-alias/private.js']) {
+      assert(allowedPath(url), 'public name alone is insufficient');
+      const response = { status: null, writeHead(status) { this.status = status; }, end() {} };
+      middleware({ headers: { host: '127.0.0.1:5173' }, url, method: 'GET' }, response, () => assert.fail(url));
+      assert.equal(response.status, 403, url);
+    }
+    let forwarded = 0;
+    middleware({ headers: { host: '127.0.0.1:5173' }, url: '/local-alias/app.js', method: 'GET' },
+      { setHeader() {}, writeHead() { assert.fail('in-root source alias should pass'); }, end() {} }, () => { forwarded += 1; });
+    assert.equal(forwarded, 1);
+  } finally {
+    httpServer.emit('close');
+    assert.equal(httpServer.listenerCount('upgrade'), 0);
+  }
 });
 
 test('the one pinned Vite client env import reaches Vite middleware; other node_modules stay refused', () => {
@@ -52,7 +164,7 @@ test('the one pinned Vite client env import reaches Vite middleware; other node_
   let middleware;
   const httpServer = new EventEmitter();
   devBridge(5173).configureServer({
-    httpServer,
+    config: { root }, httpServer,
     middlewares: { use(callback) { middleware = callback; } },
   });
   assert.equal(typeof middleware, 'function');

@@ -52,12 +52,13 @@ cookies, token or credentials cross the bridge.
 
 Vite binds only 127.0.0.1, uses strictPort, explicit same-origin CORS/HTTP and WS
 checks, strict app-root filesystem access and sensitive-file denial, with no
-dotenv discovery or public directory. A finite request allowlist additionally
-blocks app settings, Rust sources, configs, locks, arbitrary files and `/@fs/`
-access except Vite's one internal env module. Keep this trusted application tree
+dotenv discovery or public directory. Source requests are physically confined
+to this frontend root; app settings, Rust sources, tooling configs, locks and
+`/@fs/` access remain blocked except Vite's one internal env module. Keep this trusted application tree
 free of secrets in frontend source, `VITE_*`, or imports; source imports are
-public. Adding files/imports or changing root HTML requires reviewing the bounded
-dev profile. `vite.dev.config.mjs` and `vite.dev.bridge.mjs` are dev-only; never
+public. New JS/TS, CSS and SVG files may use normal imports and subdirectories
+without a filename registration step. Root HTML still uses the generated bridge
+contract. `vite.dev.config.mjs` and `vite.dev.bridge.mjs` are dev-only; never
 deploy them or expose this experimental dev server outside the local host.
 
 The two-terminal arrangement is a temporary, explicit architecture choice.

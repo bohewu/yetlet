@@ -1,6 +1,5 @@
 #![cfg(any(target_os = "linux", windows))]
-use std::{collections::BTreeMap, ffi::OsString, fs, path::Path, process::Command};
-#[cfg(target_os = "linux")]
+use std::{collections::BTreeMap, ffi::OsString, fs, path::Path};
 use yetlet_cli::scaffold;
 use yetlet_cli::{Cli, parse};
 
@@ -27,130 +26,26 @@ fn private_root() -> tempfile::TempDir {
 }
 
 #[test]
-fn vite_is_exact_unique_new_only_and_preserves_legacy_parse_results() {
-    for cloud in [false, true] {
-        for config in [false, true] {
-            for tailwind in [false, true] {
-                let mut args = ["new", "web", "--framework-path", "framework"]
-                    .map(OsString::from)
-                    .to_vec();
-                if cloud {
-                    args.push("--cloud".into());
-                }
-                if config {
-                    args.push("--with-config".into());
-                }
-                if tailwind {
-                    args.push("--with-tailwind".into());
-                }
-                assert_eq!(
-                    parse(&args),
-                    Ok(Cli::New {
-                        name: "web".into(),
-                        framework: "framework".into(),
-                        dir: ".".into(),
-                        cloud,
-                        with_config: config,
-                        with_tailwind: tailwind
-                    })
-                );
-                args.extend(["--assets".into(), "vite".into()]);
-                assert_eq!(
-                    parse(&args),
-                    Ok(Cli::NewVite {
-                        name: "web".into(),
-                        framework: "framework".into(),
-                        dir: ".".into(),
-                        cloud,
-                        with_config: config,
-                        with_tailwind: tailwind
-                    })
-                );
-                args.extend(["--assets".into(), "vite".into()]);
-                assert!(parse(&args).is_err());
-            }
-        }
+fn vite_boolean_implies_settings_and_has_no_mode_or_legacy_alias() {
+    for args in [["new", "web", "--vite"], ["new", "--vite", "web"]] {
+        assert!(matches!(
+            parse(&args.map(OsString::from)),
+            Ok(Cli::New {
+                with_config: true,
+                vite: true,
+                ..
+            })
+        ));
     }
     for args in [
-        vec!["--assets", "vite"],
-        vec![
-            "new",
-            "--assets",
-            "vite",
-            "web",
-            "--framework-path",
-            "framework",
-        ],
-        vec!["new", "web", "--framework-path", "framework", "--assets"],
-        vec![
-            "new",
-            "web",
-            "--framework-path",
-            "framework",
-            "--assets",
-            "",
-        ],
-        vec![
-            "new",
-            "web",
-            "--framework-path",
-            "framework",
-            "--assets",
-            "Vite",
-        ],
-        vec![
-            "new",
-            "web",
-            "--framework-path",
-            "framework",
-            "--assets",
-            "webpack",
-        ],
-        vec![
-            "new",
-            "web",
-            "--framework-path",
-            "framework",
-            "--assets",
-            "vite",
-            "extra",
-        ],
-        vec![
-            "new",
-            "web",
-            "--framework-path",
-            "framework",
-            "--assets=vite",
-        ],
-        vec!["new", "web", "--framework-path", "--assets", "vite"],
-        vec![
-            "new",
-            "web",
-            "--framework-path",
-            "framework",
-            "--assets",
-            "--cloud",
-        ],
-        vec!["doctor", "--assets", "vite"],
-        vec!["dev", "--manifest-path", "Cargo.toml", "--assets", "vite"],
-        vec!["build", "--manifest-path", "Cargo.toml", "--assets", "vite"],
-        vec!["generate", "docker", "--assets", "vite"],
-        vec!["generate", "compose", "--assets", "vite"],
-        vec!["generate", "k8s", "--assets", "vite"],
+        vec!["new", "web", "--vite=dev"],
+        vec!["new", "web", "--vite", "--vite"],
+        vec!["new", "web", "--vite", "dev"],
+        vec!["new", "web", "--assets", "vite"],
+        vec!["new", "web", "--with-vite-dev"],
+        vec!["run", "--vite"],
     ] {
-        assert!(
-            parse(&args.iter().map(OsString::from).collect::<Vec<_>>()).is_err(),
-            "{args:?}"
-        );
-    }
-    #[cfg(unix)]
-    {
-        use std::os::unix::ffi::OsStringExt;
-        let mut args = ["new", "web", "--framework-path", "framework", "--assets"]
-            .map(OsString::from)
-            .to_vec();
-        args.push(OsString::from_vec(vec![255]));
-        assert!(parse(&args).is_err());
+        assert!(parse(&args.iter().map(OsString::from).collect::<Vec<_>>()).is_err());
     }
 }
 
@@ -185,29 +80,9 @@ fn eight_vite_profiles_have_exact_finite_sources_locks_and_no_tool_or_overwrite(
         for config in [false, true] {
             for tailwind in [false, true] {
                 let name = format!("web-{cloud}-{config}-{tailwind}");
-                let mut command = Command::new(env!("CARGO_BIN_EXE_yetlet"));
-                command
-                    .args(["new", &name, "--assets", "vite", "--framework-path"])
-                    .arg(framework())
-                    .arg("--dir")
-                    .arg(root.path())
-                    .env("PATH", root.path().join("no-tools"))
-                    .env("CARGO_HOME", root.path().join("no-cache"));
-                if cloud {
-                    command.arg("--cloud");
-                }
-                if config {
-                    command.arg("--with-config");
-                }
-                if tailwind {
-                    command.arg("--with-tailwind");
-                }
-                let output = command.output().unwrap();
-                assert!(
-                    output.status.success(),
-                    "{}",
-                    String::from_utf8_lossy(&output.stderr)
-                );
+                // Preserve the exact legacy local-source fixture; selected CLI layout is tested below.
+                scaffold::create_vite(&name, &framework(), root.path(), cloud, config, tailwind)
+                    .unwrap();
                 let app = root.path().join(&name);
                 let before = inventory(&app);
                 let mut expected = vec![
@@ -245,7 +120,17 @@ fn eight_vite_profiles_have_exact_finite_sources_locks_and_no_tool_or_overwrite(
                     expected
                 );
                 assert!(!root.path().join("no-cache").exists());
-                assert!(!command.output().unwrap().status.success());
+                assert!(
+                    scaffold::create_vite(
+                        &name,
+                        &framework(),
+                        root.path(),
+                        cloud,
+                        config,
+                        tailwind
+                    )
+                    .is_err()
+                );
                 assert_eq!(inventory(&app), before);
                 let package: serde_json::Value =
                     serde_json::from_slice(&before["package.json"]).unwrap();

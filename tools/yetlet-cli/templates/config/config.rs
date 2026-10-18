@@ -49,8 +49,25 @@ fn loader() -> Loader {
     Loader::new(env!("CARGO_MANIFEST_DIR"), "APP")
 }
 
+fn selected_loader(root: Option<std::ffi::OsString>) -> io::Result<Loader> {
+    Ok(match root {
+        Some(root) => {
+            let root = PathBuf::from(root);
+            if !root.is_absolute()
+                || root
+                    .components()
+                    .any(|c| matches!(c, std::path::Component::ParentDir))
+            {
+                return Err(invalid());
+            }
+            Loader::new(root, "APP")
+        }
+        None => loader(),
+    })
+}
+
 pub fn load() -> io::Result<Settings> {
-    let mut loader = loader();
+    let mut loader = selected_loader(std::env::var_os("YETLET_CONFIG_ROOT"))?;
     // Only Development even inspects this explicitly selected, non-APP path.
     // Never discover .env or .env.local, or resolve a path against an unknown cwd.
     if std::env::var_os("APP_ENVIRONMENT").as_deref() == Some(std::ffi::OsStr::new("Development"))
@@ -76,6 +93,25 @@ mod tests {
                 ("APP_SERVICE__TOKEN".into(), token.into()),
             ])
             .unwrap()
+    }
+
+    #[test]
+    fn runtime_root_is_explicit_absolute_and_does_not_enter_typed_overrides() {
+        for path in ["", "relative", "/opt/config/../secret"] {
+            assert!(selected_loader(Some(path.into())).is_err());
+        }
+        let selected = selected_loader(Some(env!("CARGO_MANIFEST_DIR").into())).unwrap();
+        let settings: Settings = selected
+            .load_from_env([
+                ("APP_ENVIRONMENT".into(), "Production".into()),
+                (
+                    "YETLET_CONFIG_ROOT".into(),
+                    env!("CARGO_MANIFEST_DIR").into(),
+                ),
+                ("APP_SERVICE__TOKEN".into(), "000123".into()),
+            ])
+            .unwrap();
+        assert!(settings.validate(true).is_ok());
     }
 
     #[test]

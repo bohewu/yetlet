@@ -16,25 +16,14 @@ fn framework() -> std::path::PathBuf {
     }
 }
 
-fn scaffold(parent: &Path, name: &str, cloud: bool) -> std::process::Output {
+// Historical local-source qualification fixtures use the retained internal API.
+fn scaffold(parent: &Path, name: &str, cloud: bool) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(parent, fs::Permissions::from_mode(0o700)).unwrap();
     }
-    let mut cmd = Command::new(env!("CARGO_BIN_EXE_yetlet"));
-    cmd.args(["new", name, "--framework-path"])
-        .arg(framework())
-        .arg("--dir")
-        .arg(parent)
-        .arg("--with-config")
-        .env("PATH", parent.join("no-executables"))
-        .env("CARGO_HOME", parent.join("no-cache"))
-        .env("APP_SERVICE__TOKEN", "must-not-be-interpolated");
-    if cloud {
-        cmd.arg("--cloud");
-    }
-    cmd.output().unwrap()
+    yetlet_cli::scaffold::create_config(name, &framework(), parent, cloud)
 }
 
 #[test]
@@ -42,11 +31,7 @@ fn both_config_profiles_generate_only_safe_files_without_tools_or_overwrite() {
     let root = tempfile::tempdir().unwrap();
     for (name, cloud) in [("configured", false), ("configured-cloud", true)] {
         let result = scaffold(root.path(), name, cloud);
-        assert!(
-            result.status.success(),
-            "{}",
-            String::from_utf8_lossy(&result.stderr)
-        );
+        assert!(result.is_ok(), "{result:?}");
         let app = root.path().join(name);
         let mut names = fs::read_dir(&app)
             .unwrap()
@@ -84,7 +69,7 @@ fn both_config_profiles_generate_only_safe_files_without_tools_or_overwrite() {
             );
         }
         let manifest = fs::read(app.join("Cargo.toml")).unwrap();
-        assert_eq!(scaffold(root.path(), name, !cloud).status.code(), Some(1));
+        assert!(scaffold(root.path(), name, !cloud).is_err());
         assert_eq!(fs::read(app.join("Cargo.toml")).unwrap(), manifest);
     }
     assert_eq!(fs::read_dir(root.path()).unwrap().count(), 2);
@@ -118,11 +103,7 @@ fn generated_config_apps_offline_contract() {
     let root = tempfile::tempdir().unwrap();
     for (name, cloud) in [("configured", false), ("configured-cloud", true)] {
         let result = scaffold(root.path(), name, cloud);
-        assert!(
-            result.status.success(),
-            "{}",
-            String::from_utf8_lossy(&result.stderr)
-        );
+        assert!(result.is_ok(), "{result:?}");
         let app = root.path().join(name);
         let cargo = |args: &[&str]| {
             let output = Command::new("cargo")
@@ -160,8 +141,7 @@ fn generated_config_apps_offline_contract() {
             "warnings",
         ]);
         if cloud {
-            // A real lock is present: rejection is about the config application's
-            // contract, rather than the missing-lock preflight alone.
+            // YT-101 now accepts exact cloud/config sources and public TOMLs.
             for generator in ["docker", "compose", "k8s"] {
                 let output = root.path().join(generator);
                 let mut cmd = Command::new(env!("CARGO_BIN_EXE_yetlet"));
@@ -173,10 +153,10 @@ fn generated_config_apps_offline_contract() {
                     cmd.args(["--image", "localhost:5000/team/app:v1"]);
                 }
                 let result = cmd.output().unwrap();
-                assert_eq!(result.status.code(), Some(1));
-                assert!(!output.exists());
+                assert_eq!(result.status.code(), Some(0));
+                assert!(output.exists());
                 eprintln!(
-                    "config cloud {generator}: rejected, no output: {}",
+                    "config cloud {generator}: generated optional delivery profile: {}",
                     String::from_utf8_lossy(&result.stderr)
                 );
             }

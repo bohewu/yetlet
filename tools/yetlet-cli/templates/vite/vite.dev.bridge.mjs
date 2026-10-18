@@ -1,6 +1,8 @@
 // App-owned YT-100 development bridge, never imported by production Rust/build.
 import { randomBytes } from 'node:crypto';
 import { get } from 'node:http';
+import { realpathSync } from 'node:fs';
+import { isAbsolute, join, relative, sep } from 'node:path';
 
 export const productionCsp = "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
 const maxHtmlBytes = 256 * 1024;
@@ -8,9 +10,7 @@ const head = '<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><m
 const assets = /^(?:<link rel="stylesheet" href="\/static\/assets\/[A-Za-z0-9_-]+\.css">){1,128}<script type="module" src="\/static\/assets\/[A-Za-z0-9_-]+\.js"><\/script><\/head><body>/;
 const mark = /<img id="local-mark" src="\/static\/assets\/[A-Za-z0-9_-]+\.svg" alt="Local check mark" width="80" height="48">/g;
 const publicPaths = new Set([
-  '/', '/@vite/client', '/@vite/env', '/app.ts', '/app.css',
-  '/shared.ts', '/shared.css', '/lazy.ts', '/lazy.css', '/mark.svg',
-  '/companion.ts', '/favicon.ico',
+  '/', '/@vite/client', '/@vite/env', '/favicon.ico',
   // Vite 8.3.4 normalizes its internal @vite/env import to this exact app-local module.
   // The sole node_modules exception does not grant access to other packages/files.
   '/node_modules/vite/dist/client/env.mjs',
@@ -31,11 +31,22 @@ export function allowedOrigin(headers, port, websocket = false) {
 }
 
 export function allowedPath(raw) {
-  // Check the raw path before URL normalization; no encoded paths, traversal or files by extension.
+  // Decode once before URL normalization; encoded separators and traversal stay refused.
   if (typeof raw !== 'string' || raw.length > 2048) return false;
   const [path, query, extra] = raw.split('?');
-  return publicPaths.has(path) && extra === undefined
-    && (query === undefined || /^(?:import|direct|t=[0-9]{1,16})$/.test(query));
+  if (extra !== undefined || (query !== undefined
+    && !/^(?:(?:import|direct)(?:&t=[0-9]{1,16})?|t=[0-9]{1,16}(?:&(?:import|direct))?)$/.test(query))) return false;
+  if (publicPaths.has(path)) return true;
+  if (!path.startsWith('/') || /%2f|%5c/i.test(path)) return false;
+  let decoded;
+  try { decoded = decodeURIComponent(path); } catch { return false; }
+  if (decoded.startsWith('/@') || /[\\%?#:\u0000-\u001f\u007f]/.test(decoded)) return false;
+  const parts = decoded.slice(1).split('/');
+  if (parts.some((part) => !part || part.startsWith('.')
+    || /^(?:node_modules|dist|target)$/i.test(part))) return false;
+  const filename = parts.at(-1);
+  return /\.(?:m?js|m?ts|css|svg)$/.test(filename)
+    && !/^(?:vite(?:\.dev)?\.(?:config|bridge)|(?:tailwind|postcss)\.config)\./i.test(filename);
 }
 
 export function devDocument(html, port) {
@@ -84,6 +95,7 @@ export function devBridge(port) {
       }
     },
     configureServer(server) {
+      const root = realpathSync(server.config.root);
       const pending = new Set();
       const upgrade = (req, socket) => {
         if (!allowedOrigin(req.headers, port, true) || !/^\/\?token=[A-Za-z0-9_-]{12}$/.test(req.url ?? '')) {
@@ -103,6 +115,19 @@ export function devBridge(port) {
         if (!['GET', 'HEAD'].includes(req.method)) {
           reply(res, 405, 'Read-only development profile\n');
           return;
+        }
+        const path = req.url.split('?')[0];
+        if (!publicPaths.has(path)) {
+          // Vite's imported safeModulePaths can bypass fs.allow. Keep physical sources
+          // inside the frontend root, including symlinks and aliases to protected files.
+          let source;
+          try { source = relative(root, realpathSync(join(root, decodeURIComponent(path).slice(1)))); }
+          catch { reply(res, 403, 'Development request refused\n'); return; }
+          if (isAbsolute(source) || source === '..' || source.startsWith(`..${sep}`)
+            || !allowedPath('/' + source.split(sep).join('/'))) {
+            reply(res, 403, 'Development request refused\n');
+            return;
+          }
         }
         // All other explicitly allowed source requests stay with Vite, never Rust.
         res.setHeader('X-Content-Type-Options', 'nosniff');

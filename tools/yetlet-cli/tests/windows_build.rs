@@ -401,7 +401,7 @@ fn preflight_and_executable_selection_never_launch_app_local_cargo() {
 fn dev_cli(manifest: &Path) -> Command {
     let build = cli(manifest);
     let mut dev = Command::new(build.get_program());
-    dev.args(["dev", "--manifest-path"]).arg(manifest);
+    dev.args(["run", "--manifest-path"]).arg(manifest);
     dev.envs(build.get_envs().map(|(key, value)| (key, value.unwrap())));
     dev
 }
@@ -529,6 +529,12 @@ fn console_fixture(case: &str) {
         fs::read_to_string(root.path().join("console.stdout")).unwrap(),
         fs::read_to_string(root.path().join("console.stderr")).unwrap()
     );
+    if case.starts_with("vite-") {
+        print!(
+            "{}",
+            fs::read_to_string(root.path().join("console.stdout")).unwrap()
+        );
+    }
 }
 
 #[test]
@@ -538,6 +544,28 @@ fn native_cli_dev_real_cargo_exit_lock_and_offline_policy() {
 #[test]
 fn native_cli_dev_console_ctrl_c_break_resistant_tree_and_isolation() {
     for case in ["ctrl-c", "ctrl-break"] {
+        console_fixture(case);
+    }
+}
+
+// Explicit native qualification: uses already installed tools, never installs.
+#[test]
+#[ignore = "requires installed Vite via YETLET_TEST_VITE_JS and a native Windows console"]
+fn native_cli_vite_pair() {
+    let vite =
+        PathBuf::from(std::env::var_os("YETLET_TEST_VITE_JS").expect("set YETLET_TEST_VITE_JS"));
+    assert!(
+        vite.is_absolute() && vite.is_file(),
+        "absolute existing Vite CLI required"
+    );
+    for case in [
+        "vite-ctrl-c",
+        "vite-ctrl-break",
+        "vite-frontend-exit",
+        "vite-rust-exit",
+        "vite-collision",
+        "vite-disabled",
+    ] {
         console_fixture(case);
     }
 }
@@ -733,6 +761,197 @@ fn dev_cancel(app: &Path, case: &str) {
     sentinel.wait().unwrap();
 }
 
+fn dev_vite_pair(app: &Path, case: &str) {
+    use std::io::{Read, Write};
+    let vite = PathBuf::from(std::env::var_os("YETLET_TEST_VITE_JS").unwrap());
+    assert!(vite.is_absolute() && vite.is_file());
+    let frontend = app.join("frontend");
+    fs::create_dir_all(frontend.join("dist/.vite")).unwrap();
+    fs::write(frontend.join("dist/.vite/manifest.json"), "{}").unwrap();
+    let script = format!(
+        "node \"{}\" --host 127.0.0.1 --port 5173",
+        vite.to_str().unwrap().replace('\\', "/")
+    );
+    fs::write(
+        frontend.join("package.json"),
+        serde_json::json!({"private": true, "scripts": {"dev": script}}).to_string(),
+    )
+    .unwrap();
+    fs::write(frontend.join("vite.config.mjs"), r#"
+const fs = process.getBuiltinModule('fs');
+export default { plugins: [{ name: 'native-pair-fixture', configureServer() {
+  fs.writeFileSync('frontend.trace', JSON.stringify({pid: process.pid,
+    secret: Object.keys(process.env).some(k => k.toUpperCase().startsWith('APP_') || ['YETLET_DEV_SECRETS','YETLET_CONFIG_ROOT'].includes(k.toUpperCase())),
+    public: process.env.VITE_PAIR_PUBLIC, projectRoot: process.env.YETLET_PROJECT_ROOT}));
+  setInterval(() => { if (fs.existsSync('frontend.exit')) process.exit(23); }, 10);
+}}] };
+"#).unwrap();
+    let auto_start = case != "vite-disabled";
+    fs::write(app.join("base.toml"), format!("[cli.vite]\nenabled=true\nroot='frontend/'\nauto_start={auto_start}\nauto_build=false\n[cli.generate.k8s]\nreplicas=1\n")).unwrap();
+    fs::write(app.join("production.toml"), "").unwrap();
+    let source = DEV_APP.replace(
+        "fn main() {",
+        "fn main() { assert_eq!(std::env::var(\"APP_PAIR_PRIVATE\").unwrap(), \"synthetic-backend-marker\"); std::fs::write(\"backend.marker\", \"retained\").unwrap();",
+    ).replace(
+        "loop {\n        if EVENT",
+        "loop {\n        if depth == 0 && std::path::Path::new(\"rust.exit\").is_file() { std::process::exit(23); }\n        if EVENT",
+    );
+    fs::write(app.join("src/main.rs"), source).unwrap();
+    fs::write(
+        app.join("Cargo.lock"),
+        "version=4\n[[package]]\nname='yt088c_fixture'\nversion='0.1.0'\n",
+    )
+    .unwrap();
+    let lock = fs::read(app.join("Cargo.lock")).unwrap();
+    let mut command = dev_cli(&app.join("Cargo.toml"));
+    for (key, _) in std::env::vars_os() {
+        let upper = key.to_string_lossy().to_ascii_uppercase();
+        if upper.starts_with("APP_") || upper == "YETLET_CONFIG_ROOT" {
+            command.env_remove(key);
+        }
+    }
+    command
+        .env("APP_ENVIRONMENT", "Production")
+        .env("APP_PAIR_PRIVATE", "synthetic-backend-marker")
+        .env("YETLET_DEV_SECRETS", "synthetic-private-selector")
+        .env("YETLET_CONFIG_ROOT", app)
+        .env("VITE_PAIR_PUBLIC", "synthetic-public-marker")
+        .env(
+            "YT088D_BEHAVIOR",
+            if auto_start { "resist" } else { "exit" },
+        );
+    if matches!(case, "vite-collision" | "vite-disabled") {
+        let listener = std::net::TcpListener::bind((std::net::Ipv4Addr::LOCALHOST, 5173)).unwrap();
+        let output = code(command.output().unwrap(), if auto_start { 125 } else { 23 });
+        assert!(
+            !frontend.join("frontend.trace").exists(),
+            "frontend started despite policy/preflight"
+        );
+        assert_eq!(app.join("backend.marker").exists(), !auto_start);
+        assert_eq!(fs::read(app.join("Cargo.lock")).unwrap(), lock);
+        println!(
+            "{}",
+            serde_json::json!({"case":case,"exit":output.status.code(),"frontend_started":false,"rust_started":!auto_start,"lock_preserved":true,"pids_clean":[]})
+        );
+        drop(listener);
+        return;
+    }
+    let sentinel_root = app.join("sentinel");
+    fs::create_dir(&sentinel_root).unwrap();
+    let mut sentinel = Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "native_dev_console_fixture", "--nocapture"])
+        .env("YT088D_CASE", "sentinel")
+        .env("YT088D_ROOT", &sentinel_root)
+        .creation_flags(CREATE_NEW_PROCESS_GROUP)
+        .spawn()
+        .unwrap();
+    wait_marker(&sentinel_root.join("ready"));
+    if case == "vite-ctrl-break" {
+        command.creation_flags(CREATE_NEW_PROCESS_GROUP);
+    }
+    let mut child = command.spawn().unwrap();
+    wait_marker(&frontend.join("frontend.trace"));
+    let trace: serde_json::Value =
+        serde_json::from_slice(&fs::read(frontend.join("frontend.trace")).unwrap()).unwrap();
+    assert_eq!(trace["secret"], false);
+    assert_eq!(trace["public"], "synthetic-public-marker");
+    assert_eq!(trace["projectRoot"], app.to_str().unwrap());
+    let deadline = Instant::now() + Duration::from_secs(10);
+    loop {
+        let response = (|| -> io::Result<String> {
+            let mut stream = std::net::TcpStream::connect_timeout(
+                &"127.0.0.1:5173".parse().unwrap(),
+                Duration::from_millis(100),
+            )?;
+            stream.set_read_timeout(Some(Duration::from_secs(1)))?;
+            stream.write_all(
+                b"GET /@vite/client HTTP/1.1\r\nHost: 127.0.0.1:5173\r\nConnection: close\r\n\r\n",
+            )?;
+            let mut response = String::new();
+            stream.read_to_string(&mut response)?;
+            Ok(response)
+        })();
+        if response.is_ok_and(|response| {
+            response.starts_with("HTTP/1.1 200") && response.contains("createHotContext")
+        }) {
+            break;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "real Vite /@vite/client did not become ready"
+        );
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let mut pids = vec![trace["pid"].as_u64().unwrap() as u32];
+    for depth in 0..3 {
+        let marker = app.join(format!("pid-{depth}"));
+        wait_marker(&marker);
+        pids.push(fs::read_to_string(marker).unwrap().parse::<u32>().unwrap());
+    }
+    let owned: Vec<_> = pids
+        .iter()
+        .map(|&pid| {
+            let raw = unsafe {
+                OpenProcess(
+                    PROCESS_SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION,
+                    0,
+                    pid,
+                )
+            };
+            assert!(!raw.is_null(), "cannot pin pair process {pid}");
+            unsafe { OwnedHandle::from_raw_handle(raw) }
+        })
+        .collect();
+    assert!(app.join("backend.marker").is_file());
+    let start = Instant::now();
+    match case {
+        "vite-ctrl-c" => assert_ne!(unsafe { GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0) }, 0),
+        "vite-ctrl-break" => assert_ne!(
+            unsafe { GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, child.id()) },
+            0
+        ),
+        "vite-frontend-exit" => fs::write(frontend.join("frontend.exit"), "exit").unwrap(),
+        "vite-rust-exit" => fs::write(app.join("rust.exit"), "exit").unwrap(),
+        _ => unreachable!(),
+    }
+    let status = wait_child(&mut child);
+    let expected = if case.starts_with("vite-ctrl-") {
+        0xc000013a
+    } else {
+        23
+    };
+    assert_eq!(status.code().unwrap() as u32, expected);
+    assert!(
+        start.elapsed() < Duration::from_secs(12),
+        "pair cleanup exceeded bounds"
+    );
+    for process in &owned {
+        assert_eq!(
+            unsafe { WaitForSingleObject(process.as_raw_handle(), 0) },
+            WAIT_OBJECT_0,
+            "owned pair process survived"
+        );
+    }
+    let listener = std::net::TcpListener::bind((std::net::Ipv4Addr::LOCALHOST, 5173))
+        .expect("Vite listener survived");
+    assert!(
+        sentinel.try_wait().unwrap().is_none(),
+        "unrelated group terminated"
+    );
+    assert!(
+        !sentinel_root.join("event").exists(),
+        "unrelated group received forwarded event"
+    );
+    assert_eq!(fs::read(app.join("Cargo.lock")).unwrap(), lock);
+    sentinel.kill().unwrap();
+    sentinel.wait().unwrap();
+    println!(
+        "{}",
+        serde_json::json!({"case":case,"exit":status.code(),"vite_http":true,"frontend_environment_filtered":true,"backend_marker_retained":true,"pids_clean":pids,"port_released":true,"sentinel_isolated":true,"lock_preserved":true})
+    );
+    drop(listener);
+}
+
 #[test]
 fn native_dev_console_fixture() {
     let Ok(case) = std::env::var("YT088D_CASE") else {
@@ -766,6 +985,7 @@ fn native_dev_console_fixture() {
     match case.as_str() {
         "frozen" => dev_frozen(&app),
         "ctrl-c" | "ctrl-break" => dev_cancel(&app, &case),
+        case if case.starts_with("vite-") => dev_vite_pair(&app, case),
         _ => panic!("unknown console fixture"),
     }
     assert_ne!(

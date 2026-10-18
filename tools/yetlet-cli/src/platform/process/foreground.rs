@@ -378,6 +378,125 @@ pub(crate) fn run(command: &mut Command) -> io::Result<Completion> {
     })
 }
 
+// The frontend is a background owned group; Rust alone receives terminal input.
+// A single CLI invocation owns both groups and retains both leaders until cleanup.
+pub(crate) fn run_pair(rust: &mut Command, frontend: &mut Command) -> io::Result<Completion> {
+    let address = std::net::SocketAddr::from(([127, 0, 0, 1], 5173));
+    // Refuse an existing listener before starting either tree. strictPort on the
+    // actual child closes the bind race without accepting a moved Vite port.
+    drop(std::net::TcpListener::bind(address)?);
+    prepare(frontend)?;
+    prepare(rust)?;
+    let terminal = if unsafe { libc::isatty(libc::STDIN_FILENO) } == 1 {
+        let group = unsafe { libc::tcgetpgrp(libc::STDIN_FILENO) };
+        if group < 0 || group != unsafe { libc::getpgrp() } {
+            return Err(io::Error::other("CLI does not own its foreground terminal"));
+        }
+        Some(group)
+    } else {
+        None
+    };
+    let cancelled = CANCEL.load(Ordering::Relaxed);
+    if cancelled != 0 {
+        return Ok(Completion::Cancelled(cancelled));
+    }
+    let child = frontend.spawn()?;
+    let mut front = Owned {
+        pgid: child.id() as libc::pid_t,
+        child,
+        may_signal: true,
+        cleaned: false,
+        terminal: None,
+        notifier: None,
+        notices: None,
+    };
+    let mut backend: Option<Owned> = None;
+    let result: io::Result<bool> = (|| {
+        let deadline = Instant::now() + Duration::from_secs(10);
+        loop {
+            if front.cancellation()? != 0 || front.exited()? {
+                return Ok(true);
+            }
+            if std::net::TcpStream::connect_timeout(&address, Duration::from_millis(20)).is_ok() {
+                break;
+            }
+            if Instant::now() >= deadline {
+                return Err(io::Error::new(
+                    io::ErrorKind::TimedOut,
+                    "frontend readiness failed",
+                ));
+            }
+            thread::sleep(POLL);
+        }
+        let child = rust.spawn()?;
+        backend = Some(Owned {
+            pgid: child.id() as libc::pid_t,
+            child,
+            may_signal: true,
+            cleaned: false,
+            terminal,
+            notifier: None,
+            notices: None,
+        });
+        let back = backend.as_mut().unwrap();
+        if terminal.is_some() {
+            back.start_notifier()?;
+            terminal_group(back.pgid)?;
+            back.signal(libc::SIGCONT)?;
+        }
+        loop {
+            if back.cancellation()? != 0 {
+                return Ok(false);
+            }
+            if front.exited()? {
+                return Ok(true);
+            }
+            if back.exited()? {
+                return Ok(false);
+            }
+            thread::sleep(POLL);
+        }
+    })();
+    // Signal and reap both even if signalling, waiting, readiness or spawn failed.
+    let cleanup: io::Result<(std::process::ExitStatus, Option<std::process::ExitStatus>)> =
+        (|| {
+            let signal = CANCEL.load(Ordering::Relaxed);
+            let signal = if signal == 0 { libc::SIGTERM } else { signal };
+            let front_signal = front.signal(signal);
+            let back_signal = backend.as_ref().map_or(Ok(()), |back| back.signal(signal));
+            let mut forwarded = signal != libc::SIGTERM;
+            let grace = if let Some(back) = backend.as_ref() {
+                back.grace(&mut forwarded)
+            } else {
+                front.grace(&mut forwarded)
+            };
+            // A cancellation first observed during grace must reach both groups.
+            let cancellation = CANCEL.load(Ordering::Relaxed);
+            let front_cancel = if cancellation != 0 {
+                front.signal(cancellation)
+            } else {
+                Ok(())
+            };
+            let front_status = front.kill_reap();
+            let back_status = backend.as_mut().map(Owned::kill_reap).transpose();
+            front_signal?;
+            back_signal?;
+            grace?;
+            front_cancel?;
+            Ok((front_status?, back_status?))
+        })();
+    let (front_status, back_status) = cleanup?;
+    let frontend_exited = result?;
+    let signal = CANCEL.load(Ordering::Relaxed);
+    Ok(if signal != 0 {
+        Completion::Cancelled(signal)
+    } else if frontend_exited {
+        Completion::FrontendExited(front_status)
+    } else {
+        Completion::Exited(back_status.ok_or_else(|| io::Error::other("Rust was not started"))?)
+    })
+}
+
 #[cfg(test)]
 #[path = "foreground_tests.rs"]
 mod tests;

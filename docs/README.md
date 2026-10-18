@@ -8,6 +8,12 @@ Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 - [HTTP pipeline](HTTP-PIPELINE.md): native Axum/Tower handlers, middleware, request state and response semantics.
 - [Extensions](EXTENSIONS.md): explicit opt-in setup and provider boundaries.
 - [API contracts](API-CONTRACTS.md) and [Compatibility](COMPATIBILITY.md): implemented API classification and pre-public stability limits.
+- [CLI contract](CLI-CONTRACT.md): accepted settings-first CLI naming, grammar, execution boundaries and intentional migration; see [current implementation evidence](YT-102-CLI-IMPLEMENTATION.md). The [current CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) remains the executable reference; [YT-102 baseline verification](YT-102-CLI-CONTRACT-VERIFICATION.md) records this documentation slice without completing DX research.
+- [Doctor follow-up](YT-102-DOCTOR-VERIFICATION.md): authorized Rustup permission repair and source-matched Linux/Windows verification; no change to doctor trust policy.
+- [Windows Vite pair verification](YT-102-WINDOWS-VITE-VERIFICATION.md): source-matched native Rust/Vite lifecycle checks using existing installed tools, with separate execution and review evidence.
+- [Windows browser CSS HMR verification](YT-102-WINDOWS-HMR-VERIFICATION.md): actual generated Rust SSR, rendered CSS updates with retained interaction state, restoration and owned browser/server cleanup.
+- [Historical Windows JS/TS update verification](YT-102-WINDOWS-JS-TS-VERIFICATION.md): pre-implementation TypeScript full-document reload, unsupported plain-JS route, retained recovery limitation and fresh-process restoration.
+- [Vite integration evidence](YT-102-STATEFUL-HMR-IMPLEMENTATION.md): configured CLI run/stop/build, frontend source confinement, current Linux follow-up and historical native Windows browser evidence.
 - ADRs [0001](adr/0001-separation-of-concerns.md), [0002](adr/0002-events-and-actions.md), [0003](adr/0003-renderers-and-loading.md), [0004](adr/0004-request-context-and-middleware.md), [0005](adr/0005-opt-in-capability-modules.md), [0006](adr/0006-handler-first-mvc-optional.md) and [0007](adr/0007-bounded-keyed-dom-and-local-graph.md): retained decisions and tradeoffs.
 
 ## M12 — Rust repository toolchain plan

@@ -75,7 +75,6 @@ fn literal_docker_command_is_distinct_strict_and_requires_both_paths() {
         vec!["generate", "k8s"],
         vec!["generate", "docker"],
         vec!["generate", "docker", "--manifest-path", "Cargo.toml"],
-        vec!["generate", "docker", "--output", "out"],
         vec![
             "generate",
             "docker",
@@ -101,13 +100,6 @@ fn literal_docker_command_is_distinct_strict_and_requires_both_paths() {
             "Cargo.toml",
             "--manifest-path",
             "Cargo.toml",
-            "--output",
-            "out",
-        ],
-        vec![
-            "generate",
-            "docker",
-            "--manifest-path=Cargo.toml",
             "--output",
             "out",
         ],
@@ -380,4 +372,377 @@ fn no_follow_app_or_output_symlinks_and_pinned_app_rename_race() {
     });
     assert!(result.is_err());
     assert!(!output.exists());
+}
+
+// Structural fixtures exercise generation only; actual npm/Cargo builds are separate.
+fn delivery_fixture(config: bool, assets: bool, plugin: bool) -> crate::cloud_fixture::Fixture {
+    let f = crate::cloud_fixture::Fixture::new();
+    if config {
+        let dir = f.framework.join("crates/yetlet-config");
+        disk::create_dir_all(dir.join("src")).unwrap();
+        disk::write(
+            dir.join("Cargo.toml"),
+            include_bytes!("../../../../crates/yetlet-config/Cargo.toml"),
+        )
+        .unwrap();
+        disk::write(
+            dir.join("src/lib.rs"),
+            include_bytes!("../../../../crates/yetlet-config/src/lib.rs"),
+        )
+        .unwrap();
+    }
+    let entries = if assets {
+        scaffold::vite_files("composeapp", &f.framework, true, config, plugin).unwrap()
+    } else {
+        scaffold::config_files("composeapp", &f.framework, true).unwrap()
+    };
+    for (path, content) in entries {
+        disk::write(f.app.join(path), content).unwrap();
+    }
+    let manifest = parse(&disk::read(f.manifest()).unwrap()).unwrap();
+    let mut lock = parse(&disk::read(f.app.join("Cargo.lock")).unwrap()).unwrap();
+    let packages = lock["package"].as_array_mut().unwrap();
+    let app = packages
+        .iter_mut()
+        .find(|p| p["name"].as_str() == Some("composeapp"))
+        .unwrap();
+    app["dependencies"] = Value::Array(
+        manifest["dependencies"]
+            .as_table()
+            .unwrap()
+            .keys()
+            .cloned()
+            .map(Value::String)
+            .collect(),
+    );
+    if assets {
+        app["dependencies"].as_array_mut().unwrap().extend([
+            Value::String("tempfile".into()),
+            Value::String("tower".into()),
+        ]);
+        app["dependencies"]
+            .as_array_mut()
+            .unwrap()
+            .sort_by(|a, b| a.as_str().cmp(&b.as_str()));
+    }
+    packages
+        .iter_mut()
+        .find(|p| p["name"].as_str() == Some("serde"))
+        .unwrap()["version"] = Value::String("1.0.229".into());
+    for (name, version, enabled) in [
+        ("serde_json", "1.0.149", assets),
+        ("tempfile", "3.27.0", assets),
+        ("secrecy", "0.10.3", config),
+        ("toml", "0.9.12+spec-1.1.0", config),
+        ("dotenvy", "0.15.7", config),
+        ("libc", "0.2.186", config),
+    ] {
+        if enabled {
+            packages.push(format!("name='{name}'\nversion='{version}'\nsource='registry+https://github.com/rust-lang/crates.io-index'\nchecksum='{}'\n", "a".repeat(64)).parse().unwrap());
+        }
+    }
+    if config {
+        packages.push("name='yetlet-config'\nversion='0.0.0'\ndependencies=['dotenvy','libc','serde','toml']\n".parse().unwrap());
+    }
+    disk::write(f.app.join("Cargo.lock"), toml::to_string(&lock).unwrap()).unwrap();
+    if assets {
+        disk::create_dir_all(f.app.join("dist/.vite")).unwrap();
+        disk::create_dir(f.app.join("dist/assets")).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            for path in ["dist", "dist/.vite", "dist/assets"] {
+                disk::set_permissions(f.app.join(path), disk::Permissions::from_mode(0o700))
+                    .unwrap();
+            }
+        }
+        for file in [
+            "app.js",
+            "shared.js",
+            "lazy.js",
+            "companion.js",
+            "app.css",
+            "shared.css",
+            "lazy.css",
+            "mark.svg",
+        ] {
+            disk::write(f.app.join("dist/assets").join(file), file).unwrap();
+        }
+        disk::write(f.app.join("dist/.vite/manifest.json"), serde_json::json!({
+            "app.ts": {"file":"assets/app.js","src":"app.ts","isEntry":true,"imports":["_shared.js"],"dynamicImports":["lazy.ts"],"css":["assets/app.css"],"assets":["assets/mark.svg"]},
+            "_shared.js": {"file":"assets/shared.js","css":["assets/shared.css"]},
+            "companion.ts": {"file":"assets/companion.js","isEntry":true,"imports":["_shared.js"]},
+            "lazy.ts": {"file":"assets/lazy.js","isDynamicEntry":true,"css":["assets/lazy.css"]}
+        }).to_string()).unwrap();
+    }
+    f
+}
+
+#[test]
+fn delivery_profile_matrix_exact_inventory_env_and_no_secrets_or_developer_paths() {
+    for (config, assets, plugin) in [
+        (false, true, false),
+        (false, true, true),
+        (true, true, false),
+        (true, true, true),
+        (true, false, false),
+    ] {
+        let f = delivery_fixture(config, assets, plugin);
+        let sentinel = "SYNTHETIC_BACKEND_ONLY_NEVER_EXPORT";
+        for name in [".env", ".env.production", "private-key.pem"] {
+            disk::write(f.app.join(name), sentinel).unwrap();
+        }
+        for name in ["node_modules", ".git"] {
+            disk::create_dir(f.app.join(name)).unwrap();
+            disk::write(f.app.join(name).join("private"), sentinel).unwrap();
+        }
+        let pinned = fs::open_app(&f.manifest()).unwrap();
+        let snapshot = inspect(&pinned).unwrap();
+        let files = render(&snapshot).unwrap();
+        assert_eq!(files, render(&snapshot).unwrap());
+        let files: BTreeMap<_, _> = files.into_iter().collect();
+        let inv: serde_json::Value =
+            serde_json::from_str(&files["build-context-inventory.json"]).unwrap();
+        for (path, record) in inv["app-src"].as_object().unwrap() {
+            let bytes = if path == ".dockerignore" {
+                files["app-src.dockerignore"].as_bytes().to_vec()
+            } else {
+                disk::read(f.app.join(path)).unwrap()
+            };
+            assert_eq!(record["sha256"], digest(&bytes));
+            assert_eq!(record["bytes"], bytes.len());
+        }
+        assert_eq!(
+            inv["yetlet-src"].as_object().unwrap().len(),
+            if config { 16 } else { 14 }
+        );
+        assert_eq!(inv["app-src"].get("src/config.rs").is_some(), config);
+        assert_eq!(inv["app-src"].get("base.toml").is_some(), config);
+        assert_eq!(
+            inv["app-src"].get("dist/.vite/manifest.json").is_some(),
+            assets
+        );
+        assert_eq!(
+            files["Dockerfile"].contains("YETLET_ASSET_ROOT=/opt/yetlet/assets"),
+            assets
+        );
+        assert_eq!(
+            files["Dockerfile"].contains("YETLET_CONFIG_ROOT=/opt/yetlet/config"),
+            config
+        );
+        // Private 0600/0700 BuildKit context exports must still work with
+        // the selected non-root container UID, without altering legacy output.
+        let permission_roots = match (assets, config) {
+            (true, true) => Some("/opt/yetlet/assets /opt/yetlet/config"),
+            (true, false) => Some("/opt/yetlet/assets"),
+            (false, true) => Some("/opt/yetlet/config"),
+            (false, false) => None,
+        };
+        if let Some(roots) = permission_roots {
+            assert!(files["Dockerfile"].contains(&format!("RUN chmod -R a+rX {roots}\n")));
+        } else {
+            assert!(!files["Dockerfile"].contains("RUN chmod -R a+rX"));
+        }
+        assert!(!files["Dockerfile"].contains("APP_SERVICE__TOKEN="));
+        let overlay: Value = files["cargo-overlay/Cargo.toml"].parse().unwrap();
+        if config {
+            assert_eq!(
+                overlay["dependencies"]["yetlet-config"]["path"].as_str(),
+                Some("/work/yetlet/crates/yetlet-config")
+            );
+        }
+        for text in files.values() {
+            assert!(!text.contains(sentinel));
+            assert!(!text.contains(f.app.to_str().unwrap()));
+            assert!(!text.contains(f.framework.to_str().unwrap()));
+        }
+        generate(&f.manifest(), &f.parent.join("docker")).unwrap();
+        crate::compose::generate(
+            &f.manifest(),
+            &f.parent.join("compose"),
+            "localhost:5000/yt101:local",
+        )
+        .unwrap();
+        crate::k8s::generate(
+            &f.manifest(),
+            &f.parent.join("k8s"),
+            "localhost:5000/yt101:local",
+            1,
+        )
+        .unwrap();
+        let yaml = disk::read_to_string(f.parent.join("compose/compose.yaml")).unwrap();
+        assert_eq!(
+            yaml.contains("APP_SERVICE__TOKEN: '${APP_SERVICE__TOKEN:?Set APP_SERVICE__TOKEN}'"),
+            config
+        );
+        assert_eq!(
+            yaml.contains("YETLET_ASSET_ROOT: '/opt/yetlet/assets'"),
+            assets
+        );
+        let deploy: serde_json::Value =
+            serde_json::from_slice(&disk::read(f.parent.join("k8s/deployment.yaml")).unwrap())
+                .unwrap();
+        let container = &deploy["spec"]["template"]["spec"]["containers"][0];
+        assert_eq!(container["securityContext"]["readOnlyRootFilesystem"], true);
+        assert_eq!(container["image"], "localhost:5000/yt101:local");
+        let env = container["env"].as_array().unwrap();
+        let token = env.iter().find(|v| v["name"] == "APP_SERVICE__TOKEN");
+        assert_eq!(token.is_some(), config);
+        if let Some(token) = token {
+            assert!(token.get("value").is_none());
+            assert_eq!(
+                token["valueFrom"]["secretKeyRef"],
+                serde_json::json!({"name":"composeapp-runtime","key":"service-token","optional":false})
+            );
+        }
+    }
+}
+
+#[test]
+fn delivery_refuses_attacker_inputs_stale_missing_and_unbounded_artifacts() {
+    for mutation in 0..17 {
+        let f = delivery_fixture(true, true, true);
+        let manifest = f.app.join("dist/.vite/manifest.json");
+        let mut graph: serde_json::Value =
+            serde_json::from_slice(&disk::read(&manifest).unwrap()).unwrap();
+        match mutation {
+            0 => disk::write(
+                f.app.join("base.toml"),
+                include_str!("../../templates/config/base.toml")
+                    .replace("token = \"\"", "token = \"PRIVATE_SENTINEL\""),
+            )
+            .unwrap(),
+            1 => disk::write(
+                f.app.join("production.toml"),
+                "[service]\ntoken='PRIVATE_SENTINEL'\n",
+            )
+            .unwrap(),
+            2 => disk::write(f.app.join("src/config.rs"), "// altered\n").unwrap(),
+            3 => disk::write(f.app.join("vite.config.mjs"), "// unsafe plugin\n").unwrap(),
+            4 => disk::write(f.app.join("dist/assets/app.js.map"), "PRIVATE_SENTINEL").unwrap(),
+            5 => disk::write(f.app.join("dist/.env"), "PRIVATE_SENTINEL").unwrap(),
+            6 => disk::remove_file(f.app.join("dist/assets/lazy.js")).unwrap(),
+            7 => {
+                graph["app.ts"]["file"] = "../private.js".into();
+                disk::write(&manifest, graph.to_string()).unwrap();
+            }
+            8 => {
+                graph["lazy.ts"]["dynamicImports"] = serde_json::json!(["app.ts"]);
+                disk::write(&manifest, graph.to_string()).unwrap();
+            }
+            9 => {
+                graph["app.ts"]["imports"] = serde_json::json!(["absent"]);
+                disk::write(&manifest, graph.to_string()).unwrap();
+            }
+            10 => {
+                graph["app.ts"]["css"] = serde_json::json!(["assets/app.js"]);
+                disk::write(&manifest, graph.to_string()).unwrap();
+            }
+            11 => {
+                graph["app.ts"]["unknown"] = true.into();
+                disk::write(&manifest, graph.to_string()).unwrap();
+            }
+            12 => disk::File::options()
+                .write(true)
+                .open(&manifest)
+                .unwrap()
+                .set_times(disk::FileTimes::new().set_modified(std::time::SystemTime::UNIX_EPOCH))
+                .unwrap(),
+            13 => disk::File::options()
+                .write(true)
+                .open(f.app.join("dist/assets/app.js"))
+                .unwrap()
+                .set_len(1024 * 1024 + 1)
+                .unwrap(),
+            14 => disk::write(f.framework.join("crates/yetlet-config/src/extra.rs"), "").unwrap(),
+            15 => disk::write(
+                f.framework.join("crates/yetlet-config/src/lib.rs"),
+                "// changed config closure\n",
+            )
+            .unwrap(),
+            _ => disk::remove_file(&manifest).unwrap(),
+        }
+        let out = f.parent.join("refused");
+        assert!(
+            generate(&f.manifest(), &out).is_err(),
+            "mutation {mutation}"
+        );
+        assert!(!out.exists());
+    }
+}
+
+#[test]
+fn delivery_revalidates_assets_public_config_and_frontend_inputs_before_publication() {
+    for selected in ["dist/assets/app.js", "base.toml", "package-lock.json"] {
+        let f = delivery_fixture(true, true, false);
+        let out = f.parent.join("changed");
+        assert!(
+            generate_inner(&f.manifest(), &out, || {
+                disk::write(f.app.join(selected), "changed").unwrap();
+            })
+            .is_err()
+        );
+        assert!(!out.exists());
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn delivery_rejects_symlink_assets_config_and_manifest_paths() {
+    use std::os::unix::fs::symlink;
+    for selected in [
+        "dist/assets/app.js",
+        "dist/.vite/manifest.json",
+        "base.toml",
+        "src/config.rs",
+        "dist/assets",
+    ] {
+        let f = delivery_fixture(true, true, false);
+        let path = f.app.join(selected);
+        let saved = f.app.join("saved");
+        disk::rename(&path, &saved).unwrap();
+        symlink(&saved, &path).unwrap();
+        assert!(generate(&f.manifest(), &f.parent.join("refused")).is_err());
+    }
+}
+
+#[test]
+fn legacy_docker_template_outputs_retain_pre_yt101_bytes() {
+    let f = Fixture::new();
+    let app = fs::open_app(&f.manifest()).unwrap();
+    let mut snapshot = inspect(&app).unwrap();
+    snapshot.manifest["package"]["name"] = Value::String("legacy".into());
+    let files: BTreeMap<_, _> = render(&snapshot).unwrap().into_iter().collect();
+    for (path, hash) in [
+        (
+            "Dockerfile",
+            "e345b1e83786ffe9a580cd64db02174967f89216092ff026b12d6cb830187d1e",
+        ),
+        (
+            "README.md",
+            "3a0df474b3c2ccf47707a987ec21490802977f4a372470088bccc0e208f0f4bb",
+        ),
+        (
+            ".dockerignore",
+            "4dbfc2de7ffa88f8b7a5895dba7cb86d7ce2370d311a9dd30ad71194e6174463",
+        ),
+        (
+            "app-src.dockerignore",
+            "303ea146ebcbf3f6caf512b12886effd25c9122b3658c55e64c57dbb3556c52d",
+        ),
+        (
+            "yetlet-src.dockerignore",
+            "01ab32213fc7cf4a5a2e0f8bcc07b47ef3f75f4b39e8a804f3f24c8a3c5bf9ff",
+        ),
+        (
+            "framework-workspace.toml",
+            "573adfb0e4bbedc9647fcf2767a901391a002971603046c00ec7d0bd8944726f",
+        ),
+        (
+            "cargo-overlay/Cargo.toml",
+            "16da14664d33cafc54df39569f50e16df238167ad4a835b7613277ae293b78d1",
+        ),
+    ] {
+        assert_eq!(digest(files[path].as_bytes()), hash, "{path}");
+    }
 }

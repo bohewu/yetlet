@@ -4,6 +4,8 @@ use sha2::{Digest, Sha256};
 use std::{collections::BTreeMap, path::Path};
 use toml::Value;
 
+mod delivery;
+
 type Files = Vec<(&'static str, String)>;
 
 const PACKAGES: &[(&str, &[&str])] = &[
@@ -77,6 +79,10 @@ pub(crate) struct Snapshot {
     main: Vec<u8>,
     minimal_workspace: String,
     framework_files: BTreeMap<String, Vec<u8>>,
+    pub(crate) with_config: bool,
+    pub(crate) with_assets: bool,
+    app_files: BTreeMap<String, Vec<u8>>,
+    inspected_inputs: BTreeMap<String, Vec<u8>>,
 }
 
 fn parse(bytes: &[u8]) -> Result<Value, String> {
@@ -93,8 +99,7 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
             n.as_str(),
             "build.rs" | ".cargo" | "tests" | "examples" | "benches"
         )
-    }) || fs::app_entries(app, true)? != ["main.rs"]
-    {
+    }) {
         return Err("only the generated cloud app layout is supported; no build scripts, Cargo config or extra targets/sources".into());
     }
     let manifest = parse(&fs::read_app_file(app, "Cargo.toml")?)?;
@@ -134,29 +139,78 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
     if roots[0] != roots[1] {
         return Err("framework dependencies must share one workspace".into());
     }
-    let expected = scaffold::files(name, &roots[0], true)?;
+    let with_config = dependencies.get("yetlet-config").is_some();
+    let with_assets = dependencies.get("serde_json").is_some();
+    let mut expected = if with_assets {
+        // package.json is an exact pinned choice, never an arbitrary build command.
+        let package = fs::read_app_file(app, "package.json")?;
+        let plugin = package == include_bytes!("../templates/vite/tailwind-package.json");
+        scaffold::vite_files(name, &roots[0], true, with_config, plugin)?
+    } else if with_config {
+        scaffold::config_files(name, &roots[0], true)?
+    } else {
+        scaffold::files(name, &roots[0], true)?
+    };
     if manifest != parse(expected[0].1.as_bytes())? {
-        return Err("manifest must match the standalone generated native-ssr-v1 profile; edited dependencies, features and layouts are unsupported".into());
+        return Err("manifest must match an exact generated cloud profile; edited dependencies, features and layouts are unsupported".into());
     }
-    let main = fs::read_app_file(app, "src/main.rs")?;
-    let source = std::str::from_utf8(&main).map_err(|_| "cloud source must be UTF-8")?;
-    let template = include_str!("../templates/cloud/main.rs");
-    let parsed = syn::parse_file(source).map_err(|_| "cloud main source is invalid Rust")?;
-    let expected_source =
-        syn::parse_file(template).map_err(|_| "built-in cloud contract is invalid")?;
-    if parsed != expected_source || source.replace("\r\n", "\n") != template.replace("\r\n", "\n") {
-        return Err("cloud main source contract is unverified; only the unedited generated template is supported".into());
+    let mut source_names: Vec<_> = expected
+        .iter()
+        .filter_map(|(p, _)| p.strip_prefix("src/"))
+        .collect();
+    source_names.sort();
+    if fs::app_entries(app, true)? != source_names {
+        return Err("only exact generated cloud sources are supported".into());
+    }
+    let mut app_files = BTreeMap::new();
+    let mut inspected_inputs = BTreeMap::new();
+    let mut newest_input = std::time::SystemTime::UNIX_EPOCH;
+    for (path, text) in expected.drain(..) {
+        if matches!(
+            path,
+            "README.md" | ".gitignore" | ".env.example" | "Cargo.toml"
+        ) {
+            continue;
+        }
+        let (bytes, modified) = fs::read_app_input(app, path)?;
+        if normalize(&bytes)? != normalize(text.as_bytes())? {
+            return Err("cloud source/public config contract is unverified; only exact generated public inputs are supported".into());
+        }
+        newest_input = newest_input.max(modified);
+        if path.starts_with("src/") || path.ends_with(".toml") {
+            app_files.insert(path.into(), bytes.clone());
+        }
+        inspected_inputs.insert(path.into(), bytes);
+    }
+    let main = app_files
+        .remove("src/main.rs")
+        .ok_or("missing generated main")?;
+    if with_assets {
+        app_files.extend(delivery::assets(app, newest_input)?);
     }
     let lock = fs::read_app_file(app, "Cargo.lock")?;
     crate::app::validate_lock(&parse(&lock)?)?;
-    let (minimal_workspace, framework_files) = inspect_framework(&roots[0])?;
+    let (minimal_workspace, mut framework_files) = inspect_framework(&roots[0])?;
+    if with_config {
+        delivery::config_framework(&roots[0], &mut framework_files)?;
+    }
     Ok(Snapshot {
         manifest,
         lock,
         main,
         minimal_workspace,
         framework_files,
+        with_config,
+        with_assets,
+        app_files,
+        inspected_inputs,
     })
+}
+
+fn normalize(bytes: &[u8]) -> Result<String, String> {
+    std::str::from_utf8(bytes)
+        .map(|s| s.replace("\r\n", "\n"))
+        .map_err(|_| "generated source must be UTF-8".into())
 }
 
 fn read_framework(root: &Path, relative: &str) -> Result<Vec<u8>, String> {
@@ -291,15 +345,18 @@ fn export_ignore(names: impl Iterator<Item = String>) -> String {
 }
 
 fn render(snapshot: &Snapshot) -> Result<Files, String> {
+    if snapshot.with_config || snapshot.with_assets {
+        crate::compose::validate_lock(snapshot)?;
+    }
     let mut overlay = snapshot.manifest.clone();
-    for name in ["yetlet-core", "yetlet-server-axum"] {
+    for name in delivery::dependencies(snapshot) {
         overlay["dependencies"][name]["path"] =
             Value::String(format!("/work/yetlet/crates/{name}"));
     }
     let overlay = toml::to_string(&overlay).map_err(|_| "cannot render app overlay")?;
     // Prove reconstruction changes exactly the two permitted paths.
     let mut roundtrip: Value = overlay.parse().map_err(|_| "cannot parse app overlay")?;
-    for name in ["yetlet-core", "yetlet-server-axum"] {
+    for name in delivery::dependencies(snapshot) {
         roundtrip["dependencies"][name]["path"] =
             snapshot.manifest["dependencies"][name]["path"].clone();
     }
@@ -307,11 +364,12 @@ fn render(snapshot: &Snapshot) -> Result<Files, String> {
         return Err("app overlay changed unsupported semantics".into());
     }
     let name = snapshot.manifest["package"]["name"].as_str().unwrap();
-    let dockerfile = include_str!("../templates/docker/Dockerfile").replace("@NAME@", name);
+    let dockerfile = delivery::dockerfile(snapshot, name);
     let mut app = BTreeMap::from([
         ("Cargo.lock".into(), snapshot.lock.clone()),
         ("src/main.rs".into(), snapshot.main.clone()),
     ]);
+    app.extend(snapshot.app_files.clone());
     let mut framework = snapshot.framework_files.clone();
     framework.insert(
         "Cargo.toml".into(),
@@ -336,7 +394,11 @@ fn render(snapshot: &Snapshot) -> Result<Files, String> {
         ("yetlet-src.dockerignore", framework_ignore),
         (
             "README.md",
-            include_str!("../templates/docker/README.md").replace("@NAME@", name),
+            if snapshot.with_config || snapshot.with_assets {
+                include_str!("../templates/docker/DELIVERY.md").replace("@NAME@", name)
+            } else {
+                include_str!("../templates/docker/README.md").replace("@NAME@", name)
+            },
         ),
     ];
     let generated: BTreeMap<String, Vec<u8>> = files

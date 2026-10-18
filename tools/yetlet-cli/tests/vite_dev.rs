@@ -1,5 +1,5 @@
 #![cfg(any(target_os = "linux", windows))]
-use std::{collections::BTreeMap, ffi::OsString, fs, path::Path, process::Command};
+use std::{collections::BTreeMap, ffi::OsString, fs, path::Path};
 use yetlet_cli::{Cli, parse, scaffold};
 
 fn framework() -> std::path::PathBuf {
@@ -48,96 +48,23 @@ fn private_root() -> tempfile::TempDir {
 }
 
 #[test]
-fn dev_option_requires_vite_is_unique_new_only_and_preserves_existing_variants() {
+fn removed_development_switches_refuse_before_creation() {
     let argv = |args: &[&str]| args.iter().map(OsString::from).collect::<Vec<_>>();
-    for cloud in [false, true] {
-        for with_config in [false, true] {
-            for with_tailwind in [false, true] {
-                let mut args = argv(&["new", "web", "--framework-path", "framework"]);
-                for (enabled, flag) in [
-                    (cloud, "--cloud"),
-                    (with_config, "--with-config"),
-                    (with_tailwind, "--with-tailwind"),
-                ] {
-                    if enabled {
-                        args.push(flag.into());
-                    }
-                }
-                assert_eq!(
-                    parse(&args),
-                    Ok(Cli::New {
-                        name: "web".into(),
-                        framework: "framework".into(),
-                        dir: ".".into(),
-                        cloud,
-                        with_config,
-                        with_tailwind
-                    })
-                );
-                args.extend(argv(&["--assets", "vite"]));
-                assert_eq!(
-                    parse(&args),
-                    Ok(Cli::NewVite {
-                        name: "web".into(),
-                        framework: "framework".into(),
-                        dir: ".".into(),
-                        cloud,
-                        with_config,
-                        with_tailwind
-                    })
-                );
-                args.push("--with-vite-dev".into());
-                assert_eq!(
-                    parse(&args),
-                    Ok(Cli::NewViteDev {
-                        name: "web".into(),
-                        framework: "framework".into(),
-                        dir: ".".into(),
-                        cloud,
-                        with_config,
-                        with_tailwind
-                    })
-                );
-                args.push("--with-vite-dev".into());
-                assert!(parse(&args).is_err());
-            }
-        }
-    }
     for args in [
-        vec![
-            "new",
-            "web",
-            "--framework-path",
-            "framework",
-            "--with-vite-dev",
-        ],
-        vec![
-            "new",
-            "web",
-            "--framework-path",
-            "framework",
-            "--with-vite-dev=true",
-            "--assets",
-            "vite",
-        ],
-        vec!["doctor", "--with-vite-dev"],
-        vec!["dev", "--manifest-path", "Cargo.toml", "--with-vite-dev"],
-        vec!["build", "--manifest-path", "Cargo.toml", "--with-vite-dev"],
-        vec!["generate", "docker", "--with-vite-dev"],
+        vec!["new", "web", "--with-vite-dev"],
+        vec!["new", "web", "--assets", "vite"],
+        vec!["new", "web", "--vite", "dev"],
+        vec!["run", "--with-vite-dev"],
     ] {
-        assert!(parse(&argv(&args)).is_err(), "{args:?}");
+        assert!(parse(&argv(&args)).is_err());
     }
     assert!(matches!(
-        parse(&argv(&[
-            "new",
-            "web",
-            "--with-vite-dev",
-            "--framework-path",
-            "framework",
-            "--assets",
-            "vite"
-        ])),
-        Ok(Cli::NewViteDev { .. })
+        parse(&argv(&["new", "web", "--vite"])),
+        Ok(Cli::New {
+            vite: true,
+            with_config: true,
+            ..
+        })
     ));
 }
 
@@ -161,36 +88,8 @@ fn eight_dev_profiles_only_add_two_root_files_and_script_readme_without_tools_or
                 let name = format!("web-{cloud}-{config}-{tailwind}");
                 scaffold::create_vite(&name, &framework(), &legacy, cloud, config, tailwind)
                     .unwrap();
-                let mut command = Command::new(env!("CARGO_BIN_EXE_yetlet"));
-                command
-                    .args([
-                        "new",
-                        &name,
-                        "--assets",
-                        "vite",
-                        "--with-vite-dev",
-                        "--framework-path",
-                    ])
-                    .arg(framework())
-                    .arg("--dir")
-                    .arg(&dev)
-                    .env("PATH", root.path().join("no-tools"))
-                    .env("CARGO_HOME", root.path().join("no-cache"));
-                for (enabled, flag) in [
-                    (cloud, "--cloud"),
-                    (config, "--with-config"),
-                    (tailwind, "--with-tailwind"),
-                ] {
-                    if enabled {
-                        command.arg(flag);
-                    }
-                }
-                let result = command.output().unwrap();
-                assert!(
-                    result.status.success(),
-                    "{}",
-                    String::from_utf8_lossy(&result.stderr)
-                );
+                scaffold::create_vite_dev(&name, &framework(), &dev, cloud, config, tailwind)
+                    .unwrap();
                 let original = inventory(&legacy.join(&name));
                 let generated = inventory(&dev.join(&name));
                 assert_eq!(generated.len(), original.len() + 2);
@@ -215,7 +114,10 @@ fn eight_dev_profiles_only_add_two_root_files_and_script_readme_without_tools_or
                 );
                 assert!(generated.contains_key("vite.dev.config.mjs"));
                 assert!(generated.contains_key("vite.dev.bridge.mjs"));
-                assert!(!command.output().unwrap().status.success());
+                assert!(
+                    scaffold::create_vite_dev(&name, &framework(), &dev, cloud, config, tailwind)
+                        .is_err()
+                );
                 assert_eq!(generated, inventory(&dev.join(&name)));
                 assert!(!root.path().join("no-cache").exists());
             }

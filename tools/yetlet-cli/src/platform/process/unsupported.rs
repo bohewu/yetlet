@@ -13,6 +13,10 @@ pub(crate) fn run(_command: &mut Command) -> io::Result<Completion> {
     Err(io::ErrorKind::Unsupported.into())
 }
 
+pub(crate) fn run_pair(_rust: &mut Command, _frontend: &mut Command) -> io::Result<Completion> {
+    Err(io::ErrorKind::Unsupported.into())
+}
+
 pub(crate) fn signal(_status: &ExitStatus) -> Option<i32> {
     None
 }
