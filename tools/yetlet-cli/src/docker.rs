@@ -81,6 +81,8 @@ pub(crate) struct Snapshot {
     framework_files: BTreeMap<String, Vec<u8>>,
     pub(crate) with_config: bool,
     pub(crate) with_assets: bool,
+    with_public_settings: bool,
+    selected_frontend: Option<String>,
     app_files: BTreeMap<String, Vec<u8>>,
     inspected_inputs: BTreeMap<String, Vec<u8>>,
 }
@@ -141,17 +143,81 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
     }
     let with_config = dependencies.get("yetlet-config").is_some();
     let with_assets = dependencies.get("serde_json").is_some();
-    let mut expected = if with_assets {
-        // package.json is an exact pinned choice, never an arbitrary build command.
-        let package = fs::read_app_file(app, "package.json")?;
-        let plugin = package == include_bytes!("../templates/vite/tailwind-package.json");
+    let selected = if root_entries.iter().any(|p| p == "base.toml") {
+        parse(&fs::read_app_file(app, "base.toml")?)?
+            .get("cli")
+            .is_some()
+    } else {
+        false
+    };
+    let frontend = if selected {
+        // Inspect the application's public files only; never read backend secrets
+        // or redirect generator reads through ambient runtime environment roots.
+        let mut frontend = None;
+        for profile in ["Development", "Staging", "Production"] {
+            let settings =
+                crate::settings::load_from_env(app, [("APP_ENVIRONMENT".into(), profile.into())])?;
+            if profile == "Production" {
+                frontend = Some(settings.vite.root);
+            }
+        }
+        frontend.unwrap()
+    } else {
+        String::new()
+    };
+    let frontend_app = if selected && with_assets {
+        Some(fs::frontend_directory(app, Path::new(&frontend))?)
+    } else {
+        None
+    };
+    let plugin = if with_assets {
+        let package = normalize(&fs::read_app_file(
+            frontend_app.as_ref().unwrap_or(app),
+            "package.json",
+        )?)?;
+        let mut expected = include_str!("../templates/vite/tailwind-package.json").to_owned();
+        if selected {
+            expected = expected.replace(
+                "\"build\": \"vite build\"",
+                "\"build\": \"vite build\",\n    \"dev\": \"vite --config vite.dev.config.mjs\"",
+            );
+        }
+        package == expected
+    } else {
+        false
+    };
+    let mut expected = if selected {
+        scaffold::selected_files(name, true, with_config, plugin, with_assets)?
+    } else if with_assets {
         scaffold::vite_files(name, &roots[0], true, with_config, plugin)?
     } else if with_config {
         scaffold::config_files(name, &roots[0], true)?
     } else {
         scaffold::files(name, &roots[0], true)?
     };
-    if manifest != parse(expected[0].1.as_bytes())? {
+    let mut expected_manifest = parse(expected[0].1.as_bytes())?;
+    if selected {
+        // Only normal explicit path overrides of the pinned declarations qualify.
+        // Every other manifest key, version, feature and dependency stays exact.
+        for package in ["yetlet-core", "yetlet-server-axum", "yetlet-config"] {
+            if expected_manifest["dependencies"].get(package).is_some() {
+                expected_manifest["dependencies"][package]
+                    .as_table_mut()
+                    .unwrap()
+                    .insert(
+                        "path".into(),
+                        Value::String(
+                            roots[0]
+                                .join(format!("crates/{package}"))
+                                .to_str()
+                                .ok_or("framework path must be UTF-8")?
+                                .into(),
+                        ),
+                    );
+            }
+        }
+    }
+    if manifest != expected_manifest {
         return Err("manifest must match an exact generated cloud profile; edited dependencies, features and layouts are unsupported".into());
     }
     let mut source_names: Vec<_> = expected
@@ -172,21 +238,44 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
         ) {
             continue;
         }
-        let (bytes, modified) = fs::read_app_input(app, path)?;
-        if normalize(&bytes)? != normalize(text.as_bytes())? {
+        let input_path = if selected {
+            path.strip_prefix("frontend/")
+                .map(|tail| format!("{}/{tail}", frontend.trim_end_matches('/')))
+                .unwrap_or_else(|| path.into())
+        } else {
+            path.into()
+        };
+        let (input_app, read_path) = match (frontend_app.as_ref(), path.strip_prefix("frontend/")) {
+            (Some(frontend_app), Some(relative)) => (frontend_app, relative),
+            _ => (app, path),
+        };
+        let (bytes, modified) = fs::read_app_input(input_app, read_path)?;
+        let matches = if selected
+            && matches!(
+                path,
+                "base.toml" | "development.toml" | "staging.toml" | "production.toml"
+            ) {
+            public_settings_match(&bytes, text.as_bytes())?
+        } else {
+            normalize(&bytes)? == normalize(text.as_bytes())?
+        };
+        if !matches {
             return Err("cloud source/public config contract is unverified; only exact generated public inputs are supported".into());
         }
         newest_input = newest_input.max(modified);
         if path.starts_with("src/") || path.ends_with(".toml") {
             app_files.insert(path.into(), bytes.clone());
         }
-        inspected_inputs.insert(path.into(), bytes);
+        inspected_inputs.insert(input_path, bytes);
     }
     let main = app_files
         .remove("src/main.rs")
         .ok_or("missing generated main")?;
     if with_assets {
-        app_files.extend(delivery::assets(app, newest_input)?);
+        app_files.extend(delivery::assets(
+            frontend_app.as_ref().unwrap_or(app),
+            newest_input,
+        )?);
     }
     let lock = fs::read_app_file(app, "Cargo.lock")?;
     crate::app::validate_lock(&parse(&lock)?)?;
@@ -202,9 +291,27 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
         framework_files,
         with_config,
         with_assets,
+        with_public_settings: with_config || selected,
+        selected_frontend: selected.then_some(frontend),
         app_files,
         inspected_inputs,
     })
+}
+
+// Runtime public tables retain the established exact generated values. Only the
+// declared CLI namespace may vary, after all profiles passed the strict loader.
+fn public_settings_match(actual: &[u8], expected: &[u8]) -> Result<bool, String> {
+    let mut actual = parse(actual)?;
+    let mut expected = parse(expected)?;
+    actual
+        .as_table_mut()
+        .ok_or("public settings must be a table")?
+        .remove("cli");
+    expected
+        .as_table_mut()
+        .ok_or("public settings must be a table")?
+        .remove("cli");
+    Ok(actual == expected)
 }
 
 fn normalize(bytes: &[u8]) -> Result<String, String> {
@@ -345,7 +452,7 @@ fn export_ignore(names: impl Iterator<Item = String>) -> String {
 }
 
 fn render(snapshot: &Snapshot) -> Result<Files, String> {
-    if snapshot.with_config || snapshot.with_assets {
+    if snapshot.with_public_settings || snapshot.with_assets {
         crate::compose::validate_lock(snapshot)?;
     }
     let mut overlay = snapshot.manifest.clone();
@@ -394,7 +501,9 @@ fn render(snapshot: &Snapshot) -> Result<Files, String> {
         ("yetlet-src.dockerignore", framework_ignore),
         (
             "README.md",
-            if snapshot.with_config || snapshot.with_assets {
+            if snapshot.selected_frontend.is_some() {
+                include_str!("../templates/docker/SELECTED-DELIVERY.md").replace("@NAME@", name)
+            } else if snapshot.with_config || snapshot.with_assets {
                 include_str!("../templates/docker/DELIVERY.md").replace("@NAME@", name)
             } else {
                 include_str!("../templates/docker/README.md").replace("@NAME@", name)
@@ -405,7 +514,7 @@ fn render(snapshot: &Snapshot) -> Result<Files, String> {
         .iter()
         .map(|(p, v)| ((*p).into(), v.as_bytes().to_vec()))
         .collect();
-    let contexts = serde_json::json!({
+    let mut contexts = serde_json::json!({
         "schema_version": 1,
         "target": "linux/amd64",
         "default_context": inventory(&BTreeMap::from([
@@ -416,6 +525,22 @@ fn render(snapshot: &Snapshot) -> Result<Files, String> {
         "app-src": inventory(&app), "yetlet-src": inventory(&framework),
         "generated_files_except_inventory": inventory(&generated),
     });
+    if let Some(frontend) = &snapshot.selected_frontend {
+        let source_paths: BTreeMap<_, _> = app
+            .keys()
+            .filter(|path| path.as_str() != ".dockerignore")
+            .map(|path| {
+                let source = if snapshot.with_assets && path.starts_with("dist/") {
+                    format!("{}/{path}", frontend.trim_end_matches('/'))
+                } else {
+                    path.clone()
+                };
+                (path.clone(), source)
+            })
+            .collect();
+        contexts["app-src-source-paths"] =
+            serde_json::to_value(source_paths).map_err(|_| "cannot render app source mapping")?;
+    }
     files.push((
         "build-context-inventory.json",
         format!(

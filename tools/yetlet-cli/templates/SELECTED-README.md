@@ -53,5 +53,21 @@ and graceful request draining are not promised.
 The app owns ordinary Rust handlers and escaped HTML with strict CSP. No
 Controller, DI container or provider registry is required. Stop foreground
 execution with Ctrl-C. Native Windows runtime qualification remains separate.
-New shared-settings/release/frontend layouts are outside the deployment
-generators' qualified legacy-source representation and are refused.
+
+With `--service`, the unedited selected scaffold supports configuration-only
+Docker, Compose and Kubernetes generation after compatible explicit local Cargo
+path overrides and separate lock preparation. Vite additionally needs an
+explicit build in the configured Production frontend root before generation.
+Watch and automatic frontend execution settings do not start tools here:
+
+```text
+yetlet generate docker --output /work/out/docker
+yetlet generate compose --output /work/out/compose --image localhost:5000/team/app:v1
+yetlet generate k8s --output /work/out/k8s --image localhost:5000/team/app:v1
+```
+
+Select new protected output directories. Follow the generated Docker README's
+explicit physical export and hash checks, including `app-src-source-paths` for
+frontend assets. Generation does not build, export, publish or deploy an image.
+Registry-only dependency delivery and arbitrary edited app layouts require
+separate qualification.

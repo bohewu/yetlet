@@ -4,7 +4,7 @@ Date: 2026-10-18 (Asia/Taipei). Task: YT-102, accepted CLI contract and authoriz
 
 - **Current implementation:** the [CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) describes the revised working-tree CLI. [Implementation evidence](YT-102-CLI-IMPLEMENTATION.md) separates native Linux tests, subsequent selected Windows GNU verification, MSVC compile-only evidence and remaining release/generator limits.
 - **Accepted revised design:** implementation was explicitly authorized after independent design review. The latest user direction makes `new --vite` imply `--settings`; plain new retains the runtime module opt-in. The [design verification record](YT-102-CLI-CONTRACT-VERIFICATION.md) preserves prior revisions.
-- **Remaining qualification:** [selected native Windows GNU lifecycle cases](YT-102-WINDOWS-VITE-VERIFICATION.md) now have direct evidence; additional platform/runtime, new generator source representations and registry release qualification remain open. YT-102 overall stays Todo because its broader DX research is incomplete; public release stays blocked.
+- **Remaining qualification:** [selected native Windows GNU lifecycle cases](YT-102-WINDOWS-VITE-VERIFICATION.md) now have direct evidence; [current generator compatibility](YT-102-GENERATOR-COMPATIBILITY.md) records the separately extended local-source representation. Additional platform/runtime and registry release qualification remain open. YT-102 overall stays Todo because its broader DX research is incomplete; public release stays blocked.
 
 ## 1. Historical starting implementation and authority
 
@@ -62,7 +62,10 @@ yetlet build --release
 yetlet generate k8s --output /work/out/service-k8s --image localhost:5000/team/service:v1
 ```
 
-The generator example requires an already qualified source representation. Neither a new name nor a newly generated settings/layout/registry variant inherits existing generator acceptance.
+The generator example requires a separately qualified source representation.
+Current service/settings/Vite scaffolds use explicit compatible local Cargo
+path overrides and a separately prepared lock; registry-only delivery remains
+outside this acceptance. See the linked compatibility record.
 
 ## 3. One settings mechanism
 
@@ -182,7 +185,22 @@ Watch scope is the selected app root: Rust `*.rs` files (including `build.rs`), 
 
 CLI policy settings are loaded once per run; restart the CLI to change that policy. Each fresh backend process reads its own runtime settings. Rust restart does not promise browser refresh, preservation of in-process state or graceful request draining. Native watch lifecycle evidence is recorded separately from the historical Vite-pair verification; the earlier pair results do not qualify this added mode.
 
-Generators still accept only the recorded YT-101 unedited local-source representation: service alone, service+settings, or service+production Vite with optional settings/plugin Tailwind. Existing dev-bridge, standalone Tailwind, edited/general apps and unknown dependencies/layouts remain refused. The new shared CLI namespace, full Vite scaffold/nested root and registry-backed declarations do **not** inherit acceptance; each requires an explicit future source/lock/export contract before generator support. Runtime token handling, sanitized three-context exports, bounded assets/public-config checks and no-overwrite remain unchanged.
+Generators retain the recorded YT-101 unedited local-source representation and
+extend exact inspection to current `new --service`, optional settings, and Vite
+plain/plugin scaffolds. Vite implies settings. Current pinned dependency
+declarations need explicit compatible absolute local Cargo paths and a separately
+prepared lock; no registry resolver or framework-source option is added. All
+public CLI profiles are strictly validated; runtime public tables remain exact
+and token declarations empty. The Production public Vite root selects the
+verified built graph, independently of valid Development/Staging roots. Docker's
+additive `app-src-source-paths` inventory maps canonical exported files back to
+their actual project-relative inputs. The existing explicit absolute
+YETLET_ASSET_ROOT selects the runtime image graph. Generation never starts watch,
+Vite or a frontend build. Legacy dev bridge, standalone Tailwind, edited/general
+apps and unknown dependencies/layouts remain refused. Runtime token handling,
+sanitized three-context exports, bounded public inputs and no-overwrite remain
+unchanged. Actual evidence and remaining qualification are in the
+[compatibility record](YT-102-GENERATOR-COMPATIBILITY.md).
 
 ## 6. Grammar, diagnostics and process contract
 
@@ -245,4 +263,4 @@ Rows describe the intentional migration. Current evidence and uncovered qualific
 
 The user explicitly authorized this CLI implementation and independent review. This authorization supersedes the former documentation-only next-step proposal. Current source-matched evidence is in [YT-102 implementation](YT-102-CLI-IMPLEMENTATION.md); prior design reviews remain historical evidence.
 
-Selected native Windows GNU startup/cancellation/cleanup has [direct bounded evidence](YT-102-WINDOWS-VITE-VERIFICATION.md). Additional platform/runtime qualification, new generator source/lock/export representations, usable registry templates and release qualification remain open. Rust watch/recompile/restart is an explicit settings-controlled mode with the boundaries above; arbitrary proxy/auth/actions/multi-page bridging and alternative provider registries stay deferred. YT-102's broader journey audit, measured cold/warm/change-feedback comparison and prioritized DX roadmap remain Todo. YT-103 rolling asset retention and M20/YT-020 release remain separate. No commit, publication or deployment is implied.
+Selected native Windows GNU startup/cancellation/cleanup has [direct bounded evidence](YT-102-WINDOWS-VITE-VERIFICATION.md). The current generator local-source extension has its own [compatibility evidence](YT-102-GENERATOR-COMPATIBILITY.md); additional platform/runtime qualification, registry-only source/export representations, usable registry templates and release qualification remain open. Rust watch/recompile/restart is an explicit settings-controlled mode with the boundaries above; arbitrary proxy/auth/actions/multi-page bridging and alternative provider registries stay deferred. YT-102's broader journey audit, measured cold/warm/change-feedback comparison and prioritized DX roadmap remain Todo. YT-103 rolling asset retention and M20/YT-020 release remain separate. No commit, publication or deployment is implied.

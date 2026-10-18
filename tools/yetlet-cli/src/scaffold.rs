@@ -607,7 +607,7 @@ pub fn create_selected(
     crate::platform::fs::create_project(dir, name, &entries)
 }
 
-fn selected_files(
+pub(crate) fn selected_files(
     name: &str,
     cloud: bool,
     with_config: bool,

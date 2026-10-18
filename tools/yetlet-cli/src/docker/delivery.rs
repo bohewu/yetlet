@@ -266,7 +266,7 @@ pub(super) fn dockerfile(snapshot: &Snapshot, name: &str) -> String {
     if snapshot.with_assets {
         runtime.push_str("COPY --from=app-src /dist/ /opt/yetlet/assets/\nENV YETLET_ASSET_ROOT=/opt/yetlet/assets\n");
     }
-    if snapshot.with_config {
+    if snapshot.with_public_settings {
         for file in [
             "base.toml",
             "development.toml",
@@ -277,13 +277,15 @@ pub(super) fn dockerfile(snapshot: &Snapshot, name: &str) -> String {
                 "COPY --from=app-src /{file} /opt/yetlet/config/{file}\n"
             ));
         }
+    }
+    if snapshot.with_config {
         runtime.push_str("ENV YETLET_CONFIG_ROOT=/opt/yetlet/config APP_ENVIRONMENT=Production APP_SERVER__HOST=0.0.0.0 APP_SERVER__PORT=8080\n");
     }
     // Sanitized private exports may use 0600 files and 0700 directories.
     // Only the selected immutable public build assets/configuration become
     // readable by the image's unprivileged runtime identity.
-    if snapshot.with_assets || snapshot.with_config {
-        let public_roots = match (snapshot.with_assets, snapshot.with_config) {
+    if snapshot.with_assets || snapshot.with_public_settings {
+        let public_roots = match (snapshot.with_assets, snapshot.with_public_settings) {
             (true, true) => "/opt/yetlet/assets /opt/yetlet/config",
             (true, false) => "/opt/yetlet/assets",
             (false, true) => "/opt/yetlet/config",

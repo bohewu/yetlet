@@ -18,6 +18,7 @@ Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 - [Rust watch/restart experiment](YT-102-RUST-WATCH-POC.md): separately authorized Linux Watchexec trial of Rust edit, compile-error recovery and owned process cleanup; no native CLI integration.
 - [Windows Rust watch/restart verification](YT-102-WINDOWS-RUST-WATCH-VERIFICATION.md): source-matched WebCodex trial with compilation-error recovery, actual console keyboard Ctrl-C and owned process cleanup.
 - [Integrated Rust watch](YT-102-RUST-WATCH-IMPLEMENTATION.md): settings-controlled `run`, Watchexec file events, persistent Vite and Linux/Windows lifecycle verification.
+- [Current CLI generator compatibility](YT-102-GENERATOR-COMPATIBILITY.md): exact service/settings/frontend scaffolds, Cargo-owned local paths, configured production asset roots and explicit source-export mapping.
 - ADRs [0001](adr/0001-separation-of-concerns.md), [0002](adr/0002-events-and-actions.md), [0003](adr/0003-renderers-and-loading.md), [0004](adr/0004-request-context-and-middleware.md), [0005](adr/0005-opt-in-capability-modules.md), [0006](adr/0006-handler-first-mvc-optional.md) and [0007](adr/0007-bounded-keyed-dom-and-local-graph.md): retained decisions and tradeoffs.
 
 ## M12 — Rust repository toolchain plan

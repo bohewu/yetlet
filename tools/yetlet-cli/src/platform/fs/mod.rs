@@ -46,10 +46,27 @@ fn app_input(name: &str) -> Result<(&str, &str), String> {
     match name {
         "src/main.rs" | "src/config.rs" | "src/vite.rs" => Ok(("src", &name[4..])),
         "dist/.vite/manifest.json" => Ok(("dist/.vite", "manifest.json")),
-        "Cargo.toml" | "Cargo.lock" | "base.toml" | "development.toml" | "staging.toml"
-        | "production.toml" | "package.json" | "package-lock.json" | "vite.config.mjs"
-        | "tsconfig.json" | "app.ts" | "app.css" | "companion.ts" | "shared.ts" | "shared.css"
-        | "lazy.ts" | "lazy.css" | "mark.svg" => Ok(("", name)),
+        "Cargo.toml"
+        | "Cargo.lock"
+        | "base.toml"
+        | "development.toml"
+        | "staging.toml"
+        | "production.toml"
+        | "package.json"
+        | "package-lock.json"
+        | "vite.config.mjs"
+        | "vite.dev.config.mjs"
+        | "vite.dev.bridge.mjs"
+        | ".env.example"
+        | "tsconfig.json"
+        | "app.ts"
+        | "app.css"
+        | "companion.ts"
+        | "shared.ts"
+        | "shared.css"
+        | "lazy.ts"
+        | "lazy.css"
+        | "mark.svg" => Ok(("", name)),
         _ => {
             let file = name
                 .strip_prefix("dist/assets/")

@@ -190,7 +190,27 @@ The fresh backend reads its runtime settings on each restart. Browser refresh,
 in-process state preservation and graceful request draining are not promised.
 Historical Vite lifecycle evidence does not qualify the added watch mode.
 
-## Current generator source matrix (YT-101)
+## Current generator source matrix
+
+Current unedited `new --service` output now supports all three generators after
+explicit compatible local Cargo path overrides and separately prepared locks:
+
+| Current creation choice | Delivery requirement |
+|---|---|
+| `new NAME --service` | Public CLI settings; no runtime settings dependency or token |
+| `new NAME --service --settings` | Public CLI/runtime TOMLs; runtime token supplied separately |
+| `new NAME --service --vite` | Settings implied; complete explicitly built production Vite graph |
+| `new NAME --service --vite --tailwind` | Same graph contract with the pinned official plugin |
+
+Keep the generated pinned versions when adding the qualified framework's local
+path dependencies. Registry-only images still require separate release/source
+qualification. The generator validates all public CLI profiles; its asset input
+uses the Production Vite root, which may differ from Development/Staging.
+Watch, auto_start and auto_build never execute during generation. Docker's
+inventory adds `app-src-source-paths` so a configured `frontend/dist` or custom
+root can be explicitly exported to canonical `dist/`. Follow the generated
+Docker README's physical allowlist/hash instructions. See the
+[compatibility evidence](../../docs/YT-102-GENERATOR-COMPATIBILITY.md).
 
 Generators retain their separately qualified, **unedited legacy local-source**
 representation, consistent app lock and source revalidation. Retained internal
@@ -203,10 +223,10 @@ selections are historical labels, not current CLI options:
 | Service with typed settings | Exact public TOMLs; runtime token supplied separately |
 | Service with production Vite, optional settings/plugin Tailwind | Explicitly prebuilt and validated flat dist |
 
-New shared CLI settings, complete nested frontend output and registry version
-representation **do not inherit generator acceptance**. Standalone Tailwind,
+The retained legacy matrix is separately qualified by
+[YT-101 evidence](../../docs/YT-101-VERIFICATION.md). Standalone Tailwind,
 legacy dev bridge, edited/general apps and unknown dependencies/layouts remain
-refused. See [YT-101 evidence](../../docs/YT-101-VERIFICATION.md).
+refused; adding a marker or CLI namespace alone cannot qualify arbitrary code.
 
 Generators run no npm, Cargo, Docker, kubectl, image pull/build, source export or
 deployment. Runtime tokens are not inspected. Configuration publication is

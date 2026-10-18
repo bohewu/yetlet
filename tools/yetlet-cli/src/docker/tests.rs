@@ -746,3 +746,150 @@ fn legacy_docker_template_outputs_retain_pre_yt101_bytes() {
         assert_eq!(digest(files[path].as_bytes()), hash, "{path}");
     }
 }
+
+fn selected_fixture(config: bool, assets: bool, plugin: bool) -> crate::cloud_fixture::Fixture {
+    let f = if config || assets {
+        delivery_fixture(true, assets, plugin)
+    } else {
+        crate::cloud_fixture::Fixture::new()
+    };
+    let root = "web ui/前端";
+    for (path, mut content) in
+        scaffold::selected_files("composeapp", true, config, plugin, assets).unwrap()
+    {
+        if path == "base.toml" {
+            content = content
+                .replace("root = \"frontend/\"", &format!("root = \"{root}\""))
+                .replace("replicas = 1", "replicas = 3")
+                .replace("watch = false", "watch = true");
+        }
+        if path == "development.toml" {
+            content.push_str("\n[cli.vite]\nroot = 'different-dev-root/'\n");
+        }
+        let path = path
+            .strip_prefix("frontend/")
+            .map(|tail| format!("{root}/{tail}"))
+            .unwrap_or_else(|| path.into());
+        let destination = f.app.join(path);
+        disk::create_dir_all(destination.parent().unwrap()).unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            let mut parent = destination.parent().unwrap();
+            while parent != f.app {
+                disk::set_permissions(parent, disk::Permissions::from_mode(0o700)).unwrap();
+                parent = parent.parent().unwrap();
+            }
+        }
+        disk::write(destination, content).unwrap();
+    }
+    let mut manifest = parse(&disk::read(f.manifest()).unwrap()).unwrap();
+    for name in ["yetlet-core", "yetlet-server-axum", "yetlet-config"] {
+        if manifest["dependencies"].get(name).is_some() {
+            manifest["dependencies"][name]
+                .as_table_mut()
+                .unwrap()
+                .insert(
+                    "path".into(),
+                    Value::String(
+                        f.framework
+                            .join(format!("crates/{name}"))
+                            .to_str()
+                            .unwrap()
+                            .into(),
+                    ),
+                );
+        }
+    }
+    disk::write(f.manifest(), toml::to_string(&manifest).unwrap()).unwrap();
+    if assets {
+        disk::rename(f.app.join("dist"), f.app.join(root).join("dist")).unwrap();
+        // Structural graph only: refresh synthetic build timestamps after inputs.
+        for dir in ["assets", ".vite"] {
+            for entry in disk::read_dir(f.app.join(root).join("dist").join(dir)).unwrap() {
+                let path = entry.unwrap().path();
+                let bytes = disk::read(&path).unwrap();
+                disk::write(path, bytes).unwrap();
+            }
+        }
+    }
+    f
+}
+
+#[test]
+fn current_selected_profiles_keep_pinned_overrides_public_settings_and_asset_mapping() {
+    for (config, assets, plugin) in [
+        (false, false, false),
+        (true, false, false),
+        (true, true, false),
+        (true, true, true),
+    ] {
+        let f = selected_fixture(config, assets, plugin);
+        let app = fs::open_app(&f.manifest()).unwrap();
+        let snapshot = inspect(&app).unwrap();
+        let rendered: BTreeMap<_, _> = render(&snapshot).unwrap().into_iter().collect();
+        let inventory: serde_json::Value =
+            serde_json::from_str(&rendered["build-context-inventory.json"]).unwrap();
+        assert!(inventory["app-src"].get("base.toml").is_some());
+        assert_eq!(snapshot.with_config, config);
+        assert_eq!(inventory["app-src"].get("src/config.rs").is_some(), config);
+        assert_eq!(
+            rendered["Dockerfile"].contains("YETLET_CONFIG_ROOT=/opt/yetlet/config"),
+            config
+        );
+        assert!(rendered["Dockerfile"].contains("/opt/yetlet/config/base.toml"));
+        assert_eq!(inventory["app-src-source-paths"]["base.toml"], "base.toml");
+        assert!(
+            inventory["app-src-source-paths"]
+                .get(".dockerignore")
+                .is_none()
+        );
+        if assets {
+            assert_eq!(
+                inventory["app-src-source-paths"]["dist/assets/app.js"],
+                "web ui/前端/dist/assets/app.js"
+            );
+            assert!(inventory["app-src"].get("dist/assets/app.js").is_some());
+            assert!(
+                inventory["app-src"]
+                    .get("web ui/前端/vite.dev.config.mjs")
+                    .is_none()
+            );
+        }
+    }
+}
+
+#[test]
+fn current_selected_profiles_refuse_edited_sources_dependencies_and_runtime_public_tables() {
+    for change in 0..7 {
+        let f = selected_fixture(true, false, false);
+        match change {
+            0 => disk::write(f.app.join("src/config.rs"), "// edited\n").unwrap(),
+            1 => {
+                let mut manifest = parse(&disk::read(f.manifest()).unwrap()).unwrap();
+                manifest["dependencies"]["yetlet-core"]["version"] = Value::String("*".into());
+                disk::write(f.manifest(), toml::to_string(&manifest).unwrap()).unwrap();
+            }
+            _ => {
+                let mut base = parse(&disk::read(f.app.join("base.toml")).unwrap()).unwrap();
+                match change {
+                    2 => base["service"]["token"] = Value::String("PRIVATE".into()),
+                    3 => base["cli"]["vite"]["root"] = Value::String("../outside".into()),
+                    4 => {
+                        base["cli"]["vite"]
+                            .as_table_mut()
+                            .unwrap()
+                            .insert("unknown".into(), Value::Boolean(true));
+                    }
+                    5 => base["cli"]["generate"]["k8s"]["replicas"] = Value::Integer(101),
+                    _ => base["cli"]["rust"]["watch"] = Value::String("true".into()),
+                }
+                disk::write(f.app.join("base.toml"), toml::to_string(&base).unwrap()).unwrap();
+            }
+        }
+        assert!(
+            inspect(&fs::open_app(&f.manifest()).unwrap()).is_err(),
+            "change {change}"
+        );
+    }
+}
