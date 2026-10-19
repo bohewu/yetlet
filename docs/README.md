@@ -22,6 +22,7 @@ Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 - [Windows Rust watch/restart verification](YT-102-WINDOWS-RUST-WATCH-VERIFICATION.md): source-matched WebCodex trial with compilation-error recovery, actual console keyboard Ctrl-C and owned process cleanup.
 - [Integrated Rust watch](YT-102-RUST-WATCH-IMPLEMENTATION.md): settings-controlled `run`, Watchexec file events, persistent Vite and Linux/Windows lifecycle verification.
 - [Current CLI generator compatibility](YT-102-GENERATOR-COMPATIBILITY.md): exact service/settings/frontend scaffolds, Cargo-owned local paths, configured production asset roots and explicit source-export mapping.
+- [YT-103 rolling deployment and retained assets](YT-103-ROLLING-ASSET-PLAN.md): provider comparison, application/deployment-owned retention, rollback and draining assumptions; [local qualification](YT-103-ROLLING-ASSET-VERIFICATION.md) records actual build/runtime evidence and its limits.
 - ADRs [0001](adr/0001-separation-of-concerns.md), [0002](adr/0002-events-and-actions.md), [0003](adr/0003-renderers-and-loading.md), [0004](adr/0004-request-context-and-middleware.md), [0005](adr/0005-opt-in-capability-modules.md), [0006](adr/0006-handler-first-mvc-optional.md) and [0007](adr/0007-bounded-keyed-dom-and-local-graph.md): retained decisions and tradeoffs.
 
 ## M12 — Rust repository toolchain plan
@@ -91,8 +92,15 @@ The application guide records local evidence and remaining qualification gates.
 The later [Rust/WASM triage slice](YT-094-WASM-TRIAGE.md) adds local multi-draft
 interaction and explicit HTTP saves; [API observations](YT-094-API-OBSERVATIONS.md)
 record the bounded YT-105 follow-up and existing YT-104 packaging gap.
+The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
+completed native/browser checks from the returned operator-attested native
+IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.
+The [Windows desktop handoff](YT-094-WINDOWS-DESKTOP-HANDOFF.md) provides the
+historical mint-game setup and manual verification steps; its passed results and
+final cleanup are reconciled in the follow-up rather than rerun.
 The [opt-in OIDC slice](YT-094-OIDC.md) records existing settings/SecretProvider
 composition and its separate real-provider qualification boundary.
+
 
 The standalone [Issue Tracker starter](../examples/production-starter/README.md) exercises
 YT-092 with native SSR forms, a command JSON API, SQLite restart persistence,

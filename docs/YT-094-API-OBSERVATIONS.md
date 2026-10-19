@@ -22,5 +22,23 @@ reactivity/validation framework follows from this record.
 
 YT-105 records the later authoring comparison after YT-094. Independently, YT-104
 is an unblockable delivery item whose completed dependencies and this packaging
-evidence allow a separately selected slice. YT-094's Windows browser and real
-input/AT gates remain scheduled for final qualification, as requested by the owner.
+evidence allow a separately selected slice. YT-094's subsequent Windows browser
+checks and operator-attested native input/AT results are reconciled in the
+[Windows verification](YT-094-WINDOWS-WASM-VERIFICATION.md); they do not expand
+these API proposals or establish production qualification.
+
+## Third-party frontend components — YT-106
+
+After trying the triage workspace, the owner requested a separate research item
+for existing chart/editor packages. Vite/npm already supplies asset bundling;
+it does not provide a general Rust component adapter. The proposed investigation
+compares small app-owned JS/TS glue, existing wasm-bindgen interop and Web
+Components. A component that requires React may need its own React mount.
+
+The practical contract should give each DOM subtree one owner and specify
+mount/update/dispose, typed data and events, stale callbacks, meaningful SSR
+fallback, CSP/static assets and package cost. Select one chart and one editor
+candidate for a later bounded trial. The research may recommend documentation
+or application glue alone; it does not preselect a universal adapter. YT-106
+remains Todo. Registration adds no implementation or dependencies and does not
+expand YT-094's pending platform/input qualification or its reviewed code.

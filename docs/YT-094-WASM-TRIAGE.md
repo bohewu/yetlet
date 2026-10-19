@@ -127,3 +127,11 @@ redesign. This slice leaves YT-094 In progress. Windows execution of the changed
 slice, Windows browser, real OS keyboard/IME, actual spoken assistive technology,
 external OIDC, production hosting/durability and authenticated frontend HMR remain
 unqualified. The owner's existing Linux demonstration was preserved separately.
+
+The subsequent [Windows Rust/WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md)
+qualifies this candidate's selected Windows native/build/browser workflow. Real
+OS IME, keyboard and spoken assistive technology subsequently passed by operator
+attestation in the [returned native evidence](YT-094-WINDOWS-WASM-VERIFICATION.md#returned-native-windows-evidence--2026-10-19),
+with drain/exit-0 images and cleanup corroboration recorded separately. The
+[desktop handoff](YT-094-WINDOWS-DESKTOP-HANDOFF.md) is historical preparation.
+These follow-ups preserve the boundaries of the original Linux evidence above.

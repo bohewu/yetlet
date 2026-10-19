@@ -111,7 +111,12 @@ Any future immutable policy must verify a content digest against its URL, and
 operators must retain **all** old digest assets needed by old HTML and lazy JS
 through the full cache/rollout lifetime. An in-process snapshot protects current
 requests only until that process exits. Cache expiry cannot repair missing lazy
-chunks after a rollout; retention/rolling deployment remain YT-101 work. This
+chunks after a rollout. [YT-101](YT-101-VERIFICATION.md) qualifies bounded cloud
+delivery of these snapshots. The optional application/deployment-owned
+[YT-103 plan](YT-103-ROLLING-ASSET-PLAN.md) compares retention options, and its
+[local evidence](YT-103-ROLLING-ASSET-VERIFICATION.md) records an independent
+static service retaining two complete build graphs through rollout and rollback.
+That arrangement does not add retention to these templates or core. The snapshot
 caveat also applies to a digest URL produced by the unchanged YT-091 template.
 
 ## Extraction decision and next boundary

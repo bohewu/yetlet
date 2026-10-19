@@ -170,6 +170,12 @@ See the [slice verification](../../docs/YT-094-WASM-TRIAGE.md) and
 native evidence does not qualify this changed slice; Windows browser and real
 OS input/assistive technology remain deferred to final qualification.
 
+The subsequent [Windows Rust/WASM verification](../../docs/YT-094-WINDOWS-WASM-VERIFICATION.md)
+records the candidate's native/browser checks and returned operator-attested
+IME/keyboard/Narrator journeys, with drain/exit-0 images and final cleanup. Those
+results supersede the pending Windows input status above at their bounded scope;
+production authentication/deployment and the other stated limits remain open.
+
 Independent Reviewer `/root/yt094_wasm_review` follow-up PASS, zero remaining
 issues/followups. The first review found a queued-save lifetime defect; the
 pre-execution guard and independent zero-POST regression resolved it.

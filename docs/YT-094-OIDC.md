@@ -4,8 +4,8 @@ Status: implementation, focused native checks, independent code review and the
 bounded Linux real-provider token/access/local-logout workflow pass. Independent
 returned-evidence review PASS has zero issues or required followups. Existing SSR,
 Rust/WASM and returned Windows evidence retain their original source boundaries.
-This slice does not qualify the changed code on Windows or establish production
-authentication/deployment support.
+The owner waived separate Windows OIDC verification; it was not run. The
+reference does not establish production authentication/deployment support.
 
 ## Selected contract
 
@@ -170,3 +170,14 @@ retained run evidence. Only anonymized observations, source hashes, safe local
 application screenshots and the build log are retained. The external test client
 and account were not deleted by the agent; their removal remains an operator
 action. No commit, push or external configuration change was made.
+
+## Verification ownership and owner-selected scope
+
+The maintained `openidconnect` dependency owns its documented protocol,
+cryptographic and platform behavior. This reference verifies the selected
+application wiring: settings, redirects/CSP, session/CSRF, permissions and local
+logout. It does not repeat the dependency's full protocol or per-platform matrix
+and does not expose every upstream feature as a configured application flow.
+The owner explicitly declined additional Windows OIDC verification and removed
+the dedicated client/account. Preserve the accepted Linux proof; do not request
+new credentials to reopen that waived check.
