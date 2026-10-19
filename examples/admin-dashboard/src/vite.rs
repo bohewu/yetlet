@@ -34,7 +34,6 @@ mod assets {
     pub(crate) struct Snapshot {
         files: BTreeMap<String, Asset>,
         styles: Vec<String>,
-        #[cfg(test)]
         script: Option<String>,
         images: Vec<String>,
     }
@@ -58,6 +57,7 @@ mod assets {
             Some("css") => Ok("text/css; charset=utf-8"),
             Some("js") => Ok("text/javascript; charset=utf-8"),
             Some("svg") => Ok("image/svg+xml"),
+            Some("wasm") => Ok("application/wasm"),
             _ => Err("unsupported asset type"),
         }
     }
@@ -261,7 +261,6 @@ mod assets {
                 files,
                 styles,
                 images,
-                #[cfg(test)]
                 script: selected
                     .file
                     .ends_with(".js")
@@ -277,6 +276,9 @@ mod assets {
                 .iter()
                 .map(|path| format!("/static/{path}"))
                 .collect()
+        }
+        pub(crate) fn entry_script_path(&self) -> Option<String> {
+            self.script.as_ref().map(|path| format!("/static/{path}"))
         }
         pub(crate) fn images(&self) -> &[String] {
             &self.images
@@ -508,11 +510,11 @@ mod assets {
                 "a\".css",
                 "a.png",
                 "a.CSS",
-                "a.wasm",
                 "a.html",
             ] {
                 assert!(mime(path).is_err(), "{path:?}");
             }
+            assert_eq!(mime("assets/triage.wasm").unwrap(), "application/wasm");
             let mut g = graph();
             g.get_mut("app").unwrap().styles.push("x.js".into());
             assert!(validate(&g).is_err());
@@ -874,7 +876,12 @@ mod tests {
         assert!(!links.contains("lazy"));
         let manifest: serde_json::Value =
             serde_json::from_slice(&fs::read(root.join(".vite/manifest.json")).unwrap()).unwrap();
-        assert_eq!(manifest.as_object().unwrap().len(), 1);
+        assert!(manifest.as_object().unwrap().len() >= 3);
+        assert!(manifest.as_object().unwrap().values().any(|chunk| {
+            snapshot
+                .asset(chunk["file"].as_str().unwrap())
+                .is_some_and(|asset| asset.mime == "application/wasm")
+        }));
         assert_eq!(snapshot.stylesheet_paths().len(), 1);
         let app = router(snapshot.clone());
         for (key, chunk) in manifest.as_object().unwrap() {

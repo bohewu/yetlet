@@ -22,6 +22,9 @@ yetlet-core = { path = "../../crates/yetlet-core" }
 yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
 yetlet-session = { path = "../../crates/yetlet-session" }
 
+yetlet-board-triage = { path = "../board-triage" }
+yetlet-actions = { path = "../../crates/yetlet-actions" }
+
 [dev-dependencies]
 tempfile = "3"
 tower = { version = "0.5", features = ["util"] }

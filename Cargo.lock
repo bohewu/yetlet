@@ -1647,6 +1647,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "yetlet-board-triage"
+version = "0.1.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
+ "yetlet-actions",
+ "yetlet-core",
+ "yetlet-dom-keyed",
+ "yetlet-reactive",
+]
+
+[[package]]
 name = "yetlet-cart-server"
 version = "0.1.0"
 dependencies = [
@@ -1800,6 +1815,8 @@ dependencies = [
  "tempfile",
  "tokio",
  "tower",
+ "yetlet-actions",
+ "yetlet-board-triage",
  "yetlet-core",
  "yetlet-server-axum",
  "yetlet-session",

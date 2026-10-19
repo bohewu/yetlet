@@ -8,9 +8,10 @@ while the Board library remains a member of the repository workspace. Explicit
 local Cargo paths reuse its routes, typed forms, sessions, authorization, SQLite
 transactions and audit history. There is no second implementation of those rules.
 
-The interface uses Tailwind CSS 4 through the official Vite plugin. A CSS-only
-entry scans the shared Rust views at build time. The selected manifest supplies
-same-origin, versioned CSS; ordinary pages have no browser script. Desktop has a
+The interface uses Tailwind CSS 4 through the official Vite plugin. The entry
+scans shared Rust views for CSS and dynamically loads the Rust/WASM triage module
+only on its selected page. The manifest supplies same-origin, versioned assets;
+ordinary pages have no browser script. Desktop has a
 project sidebar, filter toolbar and record table. Mobile uses horizontal project
 navigation, compact filters and keyboard-focusable scrolling tables. Login,
 validation, conflict and storage-error screens share the theme.
@@ -18,13 +19,15 @@ validation, conflict and storage-error screens share the theme.
 ## Prepare and execute
 
 Run from the repository root with the existing Yetlet CLI on PATH. Provision
-Cargo and Node dependencies separately; the CLI never installs them:
+Cargo and Node dependencies separately; the CLI never installs them. Install
+the `wasm32-unknown-unknown` Rust target and matching `wasm-bindgen-cli` 0.2.129
+before building. Build first to generate binding declarations for TypeScript:
 
 ```sh
 npm ci --prefix examples/admin-dashboard/frontend --ignore-scripts --no-audit --no-fund
 cargo generate-lockfile --offline --manifest-path examples/admin-dashboard/Cargo.toml
-npm run typecheck --prefix examples/admin-dashboard/frontend
 yetlet build --manifest-path examples/admin-dashboard/Cargo.toml
+npm run typecheck --prefix examples/admin-dashboard/frontend
 yetlet run --manifest-path examples/admin-dashboard/Cargo.toml
 ```
 
@@ -52,14 +55,15 @@ APP_DATABASE__PATH=/absolute/private/board.sqlite3 yetlet run --manifest-path ex
 APP_CLI__VITE__AUTO_BUILD=false yetlet build --manifest-path examples/admin-dashboard/Cargo.toml
 ```
 
-`cli.vite.auto_build=true` compiles Tailwind before Rust. With `auto_build=false`,
+`cli.vite.auto_build=true` builds browser Rust/WASM, bindings and Tailwind/Vite
+assets before the native Rust app. With `auto_build=false`,
 prepare a matching frontend build separately. `cli.vite.auto_start=false` is
-intentional: this first slice serves built CSS directly from Rust. The generated
+intentional: this application serves built frontend assets directly from Rust. The generated
 anonymous-root dev bridge cannot forward this application's cookie-backed,
 multiroute workflow, so its unused dev scripts were removed and the application
 rejects `auto_start=true`. Authenticated frontend HMR is a separate decision.
 Disabling `cli.vite.enabled` skips CLI orchestration; the application still needs
-its prepared CSS snapshot.
+its prepared frontend snapshot.
 
 `frontend/` can be renamed by moving it and changing `cli.vite.root`; keep its
 relative Tailwind sources aligned with the Rust views. Public frontend dotenv
@@ -138,3 +142,24 @@ qualification should select native OS IME/assistive-technology and broader host
 coverage before treating this reference as fully qualified. External OIDC,
 production TLS/deployment, authenticated dev-server bridging and production
 storage/HA remain explicit boundaries.
+
+## Rust/WASM triage workspace
+
+Operators can select Triage workspace for the latest 12 project items. Filter,
+reorder and switch between local drafts without HTTP; Save selected sends one
+authenticated, CSRF-protected, version-checked command. Conflicts retain drafts.
+Without WASM, item links still reach the native detail/editor pages. Other pages
+remain script-free. Drafts are tab-local and are discarded on navigation/reload.
+
+The frontend build now also needs the `wasm32-unknown-unknown` Rust target and
+`wasm-bindgen-cli` 0.2.129. `WASM_BINDGEN` can select that executable; the existing
+user-local Yetlet tools directory or PATH is the fallback. The existing settings
+and CLI build/run/stop workflow are unchanged. Generated bindings are ignored.
+See the [slice verification](../../docs/YT-094-WASM-TRIAGE.md) and
+[API observations](../../docs/YT-094-API-OBSERVATIONS.md). The earlier Windows
+native evidence does not qualify this changed slice; Windows browser and real
+OS input/assistive technology remain deferred to final qualification.
+
+Independent Reviewer `/root/yt094_wasm_review` follow-up PASS, zero remaining
+issues/followups. The first review found a queued-save lifetime defect; the
+pre-execution guard and independent zero-POST regression resolved it.

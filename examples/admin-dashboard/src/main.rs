@@ -44,11 +44,12 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
     let listener = tokio::net::TcpListener::bind(address).await?;
     let actual = listener.local_addr()?;
-    let board = Board::open_with_stylesheets(
+    let board = Board::open_with_frontend(
         &settings.database_path(),
         actual,
         identities,
         assets.stylesheet_paths(),
+        assets.entry_script_path(),
     )
     .await?;
     let shutdown = shutdown_signal(board.stop_signal())?;
@@ -76,11 +77,12 @@ mod tests {
         let dir = tempfile::tempdir().unwrap();
         let assets = vite::Snapshot::load_selected("frontend/").unwrap();
         let stylesheet = assets.stylesheet_paths()[0].clone();
-        let board = Board::open_with_stylesheets(
+        let board = Board::open_with_frontend(
             &dir.path().join("board.sqlite3"),
             "127.0.0.1:3014".parse().unwrap(),
             DemoIdentities::generate().unwrap(),
             assets.stylesheet_paths(),
+            assets.entry_script_path(),
         )
         .await
         .unwrap();

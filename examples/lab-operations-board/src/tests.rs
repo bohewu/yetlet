@@ -913,3 +913,179 @@ async fn stream_sends_authorized_snapshot_and_stops_after_logout() {
     );
     board.drain().await.unwrap();
 }
+
+async fn triage_json(
+    board: &Board,
+    client: &Client,
+    project: i64,
+    payload: serde_json::Value,
+) -> (StatusCode, String) {
+    let mut request = Request::builder()
+        .method(Method::POST)
+        .uri(format!("/board/projects/{project}/triage"))
+        .header(header::HOST, HOST)
+        .header(header::ORIGIN, format!("http://{HOST}"))
+        .header(header::CONTENT_TYPE, "application/json");
+    if let Some(cookie) = &client.cookie {
+        request = request.header(header::COOKIE, cookie);
+    }
+    let response = board
+        .router
+        .clone()
+        .oneshot(
+            request
+                .body(Body::from(serde_json::to_vec(&payload).unwrap()))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    let status = response.status();
+    assert_eq!(
+        response.headers()[header::CONTENT_SECURITY_POLICY],
+        DEFAULT_CSP
+    );
+    let body = String::from_utf8(
+        to_bytes(response.into_body(), 65536)
+            .await
+            .unwrap()
+            .to_vec(),
+    )
+    .unwrap();
+    (status, body)
+}
+
+#[tokio::test]
+async fn triage_json_reuses_authorization_csrf_validation_and_atomic_conflicts() {
+    let (_dir, board, ids) = setup().await;
+    let item = board
+        .database
+        .save(alice(), None, 0, fields("Original"))
+        .await
+        .unwrap();
+    let mut client = Client::login(&board, &ids, "alice").await;
+    let mut item = yetlet_board_triage::Item::from(item);
+    item.title = "Saved from Rust".into();
+    let payload = serde_json::json!({"csrf":client.csrf,"item":item});
+    assert_eq!(
+        triage_json(&board, &Client::default(), 1, payload.clone())
+            .await
+            .0,
+        StatusCode::UNAUTHORIZED
+    );
+    let mut forged = payload.clone();
+    forged["csrf"] = "invalid".into();
+    assert_eq!(
+        triage_json(&board, &client, 1, forged).await.0,
+        StatusCode::FORBIDDEN
+    );
+    assert_eq!(
+        triage_json(&board, &client, 2, payload.clone()).await.0,
+        StatusCode::FORBIDDEN
+    );
+    let viewer = Client::login(&board, &ids, "viewer").await;
+    assert_eq!(
+        triage_json(&board, &viewer, 1, payload.clone()).await.0,
+        StatusCode::FORBIDDEN
+    );
+    let mut invalid = payload.clone();
+    invalid["item"]["title"] = "".into();
+    assert_eq!(
+        triage_json(&board, &client, 1, invalid).await.0,
+        StatusCode::UNPROCESSABLE_ENTITY
+    );
+    let mut malformed = payload.clone();
+    malformed["unexpected"] = true.into();
+    assert_eq!(
+        triage_json(&board, &client, 1, malformed).await.0,
+        StatusCode::BAD_REQUEST
+    );
+    assert_eq!(board.database.get(1, item.id).await.unwrap().1.len(), 1);
+    let (status, body) = triage_json(&board, &client, 1, payload.clone()).await;
+    assert_eq!(status, StatusCode::OK);
+    let saved: yetlet_board_triage::Item = serde_json::from_str(&body).unwrap();
+    assert_eq!(saved.version, 2);
+    assert_eq!(saved.title, item.title);
+    let (status, body) = triage_json(&board, &client, 1, payload).await;
+    assert_eq!(status, StatusCode::CONFLICT);
+    assert_eq!(
+        serde_json::from_str::<yetlet_actions::ApiErrorEnvelope>(&body)
+            .unwrap()
+            .error
+            .code,
+        "conflict"
+    );
+    assert_eq!(board.database.get(1, item.id).await.unwrap().1.len(), 2);
+    let reply = client
+        .call(&board.router, Method::GET, "/board/projects/1/triage", None)
+        .await;
+    assert_eq!(reply.status, StatusCode::OK);
+    assert!(!reply.body.contains("<script"));
+    board.drain().await.unwrap();
+}
+
+#[tokio::test]
+async fn triage_only_enables_wasm_on_selected_page_and_escapes_bounded_bootstrap() {
+    let dir = tempfile::tempdir().unwrap();
+    let ids = DemoIdentities::generate().unwrap();
+    let board = Board::open_with_frontend(
+        &dir.path().join("triage.sqlite3"),
+        HOST.parse().unwrap(),
+        ids.clone(),
+        Vec::new(),
+        Some("/static/assets/app-123.js".into()),
+    )
+    .await
+    .unwrap();
+    for n in 0..14 {
+        board
+            .database
+            .save(alice(), None, 0, fields(&format!("<script> & \"{n}\"")))
+            .await
+            .unwrap();
+    }
+    let client = Client::login(&board, &ids, "alice").await;
+    let response = board
+        .router
+        .clone()
+        .oneshot(
+            Request::builder()
+                .uri("/board/projects/1/triage")
+                .header(header::HOST, HOST)
+                .header(header::COOKIE, client.cookie.unwrap())
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    assert_eq!(
+        response.headers()[header::CONTENT_SECURITY_POLICY],
+        triage::CSP
+    );
+    assert!(!triage::CSP.contains("'unsafe-eval'"));
+    assert!(!triage::CSP.contains("'unsafe-inline'"));
+    let html = String::from_utf8(
+        to_bytes(response.into_body(), 512 * 1024)
+            .await
+            .unwrap()
+            .to_vec(),
+    )
+    .unwrap();
+    assert_eq!(html.matches("data-id=").count(), 12);
+    assert_eq!(html.matches("<script").count(), 1);
+    assert!(html.contains("&lt;script&gt;"));
+    assert!(html.contains("type=\"module\" src=\"/static/assets/app-123.js\""));
+    board.drain().await.unwrap();
+    assert!(
+        Board::open_with_frontend(
+            &dir.path().join("must-not-exist.sqlite3"),
+            HOST.parse().unwrap(),
+            ids,
+            Vec::new(),
+            Some("/static/assets/\"bad.js".into())
+        )
+        .await
+        .is_err()
+    );
+    assert!(!dir.path().join("must-not-exist.sqlite3").exists());
+}

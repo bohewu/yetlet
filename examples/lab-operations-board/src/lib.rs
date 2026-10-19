@@ -3,6 +3,7 @@ mod asset_data;
 mod assets;
 mod database;
 mod domain;
+mod triage;
 mod views;
 
 use axum::{
@@ -113,6 +114,7 @@ struct AppState {
     identities: DemoIdentities,
     manifest: assets::Manifest,
     origin: HeaderValue,
+    triage_script: Option<String>,
     streams: Arc<Semaphore>,
     stopping: watch::Receiver<bool>,
 }
@@ -143,6 +145,30 @@ impl Board {
         identities: DemoIdentities,
         stylesheets: Vec<String>,
     ) -> Result<Self, Failure> {
+        Self::open_with_frontend(path, listen, identities, stylesheets, None).await
+    }
+
+    /// App-owned enhancement selection. Other pages remain SSR without scripts.
+    pub async fn open_with_frontend(
+        path: &Path,
+        listen: SocketAddr,
+        identities: DemoIdentities,
+        stylesheets: Vec<String>,
+        triage_script: Option<String>,
+    ) -> Result<Self, Failure> {
+        if triage_script.as_deref().is_some_and(|path| {
+            path.strip_prefix("/static/assets/")
+                .and_then(|name| name.strip_suffix(".js"))
+                .is_none_or(|name| {
+                    name.is_empty()
+                        || name.len() > 160
+                        || !name
+                            .bytes()
+                            .all(|c| c.is_ascii_alphanumeric() || matches!(c, b'-' | b'_'))
+                })
+        }) {
+            return Err(Failure::Invalid);
+        }
         if !listen.ip().is_loopback() || listen.port() == 0 {
             return Err(Failure::Invalid);
         }
@@ -173,6 +199,7 @@ impl Board {
         let (stopping, stop_rx) = watch::channel(false);
         let state = AppState {
             database: database.clone(),
+            triage_script,
             identities,
             manifest,
             origin: HeaderValue::from_str(&format!("http://{listen}"))
@@ -199,7 +226,9 @@ impl Board {
                         .get("/projects/{project}/items/{id}", detail)
                         .post("/projects/{project}/items/{id}", update)
                         .get("/projects/{project}/items/{id}/edit", edit)
-                        .get("/projects/{project}/events", events),
+                        .get("/projects/{project}/events", events)
+                        .get("/projects/{project}/triage", triage::workspace)
+                        .post("/projects/{project}/triage", triage::save),
                 )
             })
             .get("/", || async { Redirect::to("/board") })
@@ -271,9 +300,14 @@ async fn security(
         *response.body_mut() = themed.into_body();
         response.headers_mut().remove(header::CONTENT_LENGTH);
     }
+    let csp = if response.extensions().get::<triage::WasmPage>().is_some() {
+        triage::CSP
+    } else {
+        DEFAULT_CSP
+    };
     response.headers_mut().insert(
         header::CONTENT_SECURITY_POLICY,
-        HeaderValue::from_static(DEFAULT_CSP),
+        HeaderValue::from_static(csp),
     );
     response.headers_mut().insert(
         header::X_CONTENT_TYPE_OPTIONS,

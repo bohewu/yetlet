@@ -25,7 +25,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M16 — Done at bounded YT-090 / YT-097 scope** | Opt-in typed native configuration and optional CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](YT-090-VERIFICATION.md); [CLI integration Linux/Windows GNU/MSVC and independent Reviewer PASS](YT-097-VERIFICATION.md); no default/core/browser or release change |
 | **M17 — Done at bounded YT-091 Tailwind scope** | Opt-in build-time Tailwind CSS 4 application scaffolding | YT-091 | [Guide](../tools/yetlet-cli/README.md#opt-in-tailwind-css-4-yt-091-independently-reviewed), [evidence](YT-091-VERIFICATION.md); actual Linux HTTP/CSS/CSP/signals and native Windows GNU/MSVC Tailwind source-bound builds PASS; independent Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS, no core/browser change or release activation |
 | **M18 — Done at bounded YT-098–YT-101 scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; [YT-101 cloud delivery](YT-101-VERIFICATION.md) Done: real Linux Docker/Compose/K3s Pod/Service/asset PASS, Windows MSVC native/source PASS, subsequent Windows GNU 726/726 source and native tests/generator PASS after official MinGW64 GCC/Binutils installation, independent Reviewer `wc_job_fYtD9F8KXkXyzvYQ` PASS; no stable shared asset API, default/core/browser or release change |
-| **M19 — Production-oriented application and developer experience (partial)** | Native Issue Tracker starter, research-only developer workflow and separately opt-in rolling asset qualification; planned browser-only starter | YT-092, YT-102–YT-104 | [YT-092 starter](YT-092-STARTER-VERIFICATION.md): Linux/Windows native HTTP, persistence, CLI lifecycle and independent Reviewer PASS. DX research and rolling qualification remain separate; no production support or release claim. YT-104 remains Todo at registration-only scope. |
+| **M19 — Production-oriented application and developer experience (partial)** | Native Issue Tracker starter, research-only developer workflow and separately opt-in rolling asset qualification; planned browser-only starter | YT-092, YT-102–YT-105 | [YT-092 starter](YT-092-STARTER-VERIFICATION.md): Linux/Windows native HTTP, persistence, CLI lifecycle and independent Reviewer PASS. DX research and rolling qualification remain separate; no production support or release claim. YT-104 remains Todo at registration-only scope. |
 
 **YT-094 first slice (2026-10-19):** the
 [SSR administration reference](../examples/admin-dashboard/README.md) starts from
@@ -40,6 +40,17 @@ tests, CLI lifecycle and HTTP, with independent Reviewer PASS and zero issues or
 required followups; browser/OS input remain open. YT-094 remains In progress:
 OS-level IME/accessibility qualification, wider native/browser coverage and
 production authentication/deployment gates are not claimed by this first slice.
+
+**YT-094 Rust/WASM slice (2026-10-19):** the
+[triage workspace](YT-094-WASM-TRIAGE.md) exercises per-item drafts, local
+filtering/keyed reorder and explicit authenticated HTTP saves with the existing
+Rust graph/DOM/action APIs. It retains a no-JS native workflow and confines WASM
+CSP to the selected page. Linux checks are separate from the earlier Windows
+native source. [Observed authoring gaps](YT-094-API-OBSERVATIONS.md) seed the
+bounded YT-105 comparison; packaging evidence feeds existing YT-104. No framework
+redesign or additional platform qualification is implied. Independent Reviewer
+`/root/yt094_wasm_review` follow-up PASS follows one corrected queued-save
+lifetime finding; zero remaining material issues or required followups.
 
 **YT-093 bounded closeout (2026-10-18):** the
 [signing verification](YT-093-SIGNING-VERIFICATION.md) records the opt-in signing

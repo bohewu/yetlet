@@ -64,7 +64,7 @@ pub(crate) fn shell(
     if let Some(user) = user {
         let root = format!("/board/projects/{}/items", user.project);
         let mut items_link = link("Work items", &root);
-        if title != "New work item" {
+        if title != "New work item" && title != "Triage workspace" {
             items_link = items_link.attribute(
                 "aria-current",
                 if title == "Work items" {
@@ -83,7 +83,14 @@ pub(crate) fn shell(
             if title == "New work item" {
                 new_link = new_link.attribute("aria-current", "page");
             }
-            navigation = navigation.child(new_link);
+            let mut triage = link(
+                "Triage workspace",
+                &format!("/board/projects/{}/triage", user.project),
+            );
+            if title == "Triage workspace" {
+                triage = triage.attribute("aria-current", "page");
+            }
+            navigation = navigation.child(new_link).child(triage);
         }
         layout = layout.child(navigation);
     }

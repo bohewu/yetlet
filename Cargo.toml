@@ -25,6 +25,7 @@ members = [
     "examples/forms-validation",
     "examples/form-css-proof",
     "examples/lab-operations-board",
+    "examples/board-triage",
     "examples/file-server",
     "examples/sqlite-crud",
     "examples/sse-notifications",

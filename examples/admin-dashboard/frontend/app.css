@@ -1,6 +1,7 @@
 @import "tailwindcss" source(none);
 @source "../src/main.rs";
 @source "../../lab-operations-board/src/views.rs";
+@source "../../lab-operations-board/src/triage.rs";
 
 @theme {
   --color-board-accent: #155e75;
@@ -91,3 +92,35 @@
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+@layer components {
+  .triage-intro { @apply mb-6 flex flex-wrap items-start justify-between gap-3 text-sm text-slate-600; }
+  .triage-intro p { @apply m-0 max-w-2xl; }
+  .triage-intro a { @apply shrink-0 font-medium; }
+  .triage-notice { @apply mb-5 rounded-lg border border-cyan-200 bg-cyan-50 px-4 py-3 text-sm text-cyan-950; }
+  .triage-toolbar { @apply mb-5 flex flex-wrap items-end gap-4; }
+  .triage-toolbar .triage-field { @apply max-w-sm grow; }
+  .triage-toolbar > span { @apply self-center text-sm text-slate-600; }
+  .triage-columns { @apply grid grid-cols-[minmax(240px,0.9fr)_minmax(300px,1.1fr)] items-start gap-6; }
+  .triage-queue, .triage-editor { @apply min-w-0 rounded-xl border border-slate-200 bg-white p-5 shadow-sm; }
+  .triage-queue > h2 { @apply border-b border-slate-200 pb-4 text-base; }
+  .triage-list { @apply m-0 flex list-none flex-col gap-2 p-0; }
+  .triage-list li { @apply grid grid-cols-[1fr_auto] gap-x-3 gap-y-1 rounded-lg border border-transparent px-3 py-3; }
+  .triage-list li[data-selected="true"] { @apply border-cyan-300 bg-cyan-50; }
+  .triage-list [data-title] { @apply col-start-1 row-start-1 min-w-0 self-center text-sm font-semibold; overflow-wrap: anywhere; }
+  .triage-list [data-meta] { @apply col-start-1 row-start-2 text-xs text-slate-600; }
+  .triage-list button { @apply col-start-2 row-span-2 row-start-1 self-center px-3; }
+  .triage-field { @apply mb-4; }
+  .triage-field > label { @apply mb-1.5 block text-sm font-medium text-slate-700; }
+  .triage-toolbar .triage-field { @apply mb-0; }
+  .triage-field-pair { @apply grid grid-cols-2 gap-4; }
+  .triage-eyebrow { @apply mb-1 text-xs font-semibold tracking-widest text-cyan-800; }
+  .triage-editor h2 { @apply mb-5 text-lg; }
+  .triage-editor-actions { @apply mb-4 flex flex-wrap gap-3; }
+  .triage-editor > a { @apply text-sm; }
+  .triage-hint { @apply mb-0 mt-4 text-xs leading-relaxed text-slate-500; }
+  .btn:disabled { @apply cursor-default opacity-50; }
+}
+@media (max-width: 1100px) { .triage-columns { grid-template-columns: minmax(0, 1fr); } }
+/* Hidden is a semantic state, even when a component declares display:flex/grid. */
+[hidden] { display: none !important; }

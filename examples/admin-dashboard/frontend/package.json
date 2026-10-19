@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "build": "vite build"
+    "build": "node build-wasm.mjs && vite build"
   },
   "engines": {
     "node": "^20.19.0 || >=22.12.0"
