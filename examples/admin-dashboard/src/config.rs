@@ -6,7 +6,8 @@ use std::{
     net::SocketAddr,
     path::{Component, Path, PathBuf},
 };
-use yetlet_config::Loader;
+use yetlet_config::{Loader, SecretFormat};
+use yetlet_secrets::SecretString;
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -14,8 +15,40 @@ pub struct Settings {
     pub server: Server,
     pub database: Database,
     pub cli: Cli,
+    pub oidc: Oidc,
     #[serde(skip)]
     root: PathBuf,
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Oidc {
+    pub enabled: bool,
+    pub issuer: String,
+    pub client_id: String,
+    pub client_secret: SecretString,
+    pub subjects: Subjects,
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Subjects {
+    pub alice: String,
+    pub bob: String,
+    pub viewer: String,
+}
+impl Oidc {
+    pub fn subject_map(&self) -> io::Result<std::collections::BTreeMap<String, String>> {
+        let mut map = std::collections::BTreeMap::new();
+        for (name, subject) in [
+            ("alice", &self.subjects.alice),
+            ("bob", &self.subjects.bob),
+            ("viewer", &self.subjects.viewer),
+        ] {
+            if !subject.is_empty() && map.insert(subject.clone(), name.to_owned()).is_some() {
+                return Err(invalid());
+            }
+        }
+        Ok(map)
+    }
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -126,9 +159,18 @@ pub fn load_from_env(vars: Vec<(OsString, OsString)>) -> io::Result<Settings> {
     if !absolute_clean(&root) {
         return Err(invalid());
     }
-    let mut settings: Settings = Loader::new(&root, "APP")
-        .load_from_env(vars)
-        .map_err(|_| invalid())?;
+    let mut loader = Loader::new(&root, "APP");
+    if let Some((_, path)) = vars
+        .iter()
+        .find(|(key, _)| key == "YETLET_DEVELOPMENT_SECRET_FILE")
+    {
+        let path = PathBuf::from(path);
+        if !absolute_clean(&path) {
+            return Err(invalid());
+        }
+        loader = loader.development_secrets(path, SecretFormat::Toml);
+    }
+    let mut settings: Settings = loader.load_from_env(vars).map_err(|_| invalid())?;
     settings.root = root;
     settings.validate()?;
     Ok(settings)
@@ -137,6 +179,74 @@ pub fn load_from_env(vars: Vec<(OsString, OsString)>) -> io::Result<Settings> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use yetlet_secrets::ExposeSecret;
+
+    #[test]
+    fn explicit_development_overlay_and_env_use_existing_loader_precedence() {
+        let dir = tempfile::tempdir().unwrap();
+        let path = dir.path().join("secrets.toml");
+        std::fs::write(
+            &path,
+            "[oidc]\nclient_secret = 'synthetic-private-overlay'\n",
+        )
+        .unwrap();
+        let vars = vec![
+            ("APP_ENVIRONMENT".into(), "Development".into()),
+            (
+                "YETLET_DEVELOPMENT_SECRET_FILE".into(),
+                path.as_os_str().to_owned(),
+            ),
+        ];
+        let settings = load_from_env(vars.clone()).unwrap();
+        assert_eq!(
+            settings.oidc.client_secret.expose_secret(),
+            "synthetic-private-overlay"
+        );
+        let mut overrides = vars;
+        overrides.push((
+            "APP_OIDC__CLIENT_SECRET".into(),
+            "synthetic-environment".into(),
+        ));
+        assert_eq!(
+            load_from_env(overrides)
+                .unwrap()
+                .oidc
+                .client_secret
+                .expose_secret(),
+            "synthetic-environment"
+        );
+        for profile in ["Staging", "Production"] {
+            let settings = load_from_env(vec![
+                ("APP_ENVIRONMENT".into(), profile.into()),
+                (
+                    "YETLET_DEVELOPMENT_SECRET_FILE".into(),
+                    dir.path().join("missing.toml").into_os_string(),
+                ),
+            ])
+            .unwrap();
+            assert!(settings.oidc.client_secret.expose_secret().is_empty());
+            assert!(!settings.oidc.enabled);
+        }
+    }
+
+    #[test]
+    fn duplicate_subjects_fail_closed_and_no_mapping_assigns_no_access() {
+        assert!(
+            load_from_env(vec![])
+                .unwrap()
+                .oidc
+                .subject_map()
+                .unwrap()
+                .is_empty()
+        );
+        let settings = load_from_env(vec![
+            ("APP_OIDC__SUBJECTS__ALICE".into(), "same-subject".into()),
+            ("APP_OIDC__SUBJECTS__VIEWER".into(), "same-subject".into()),
+        ])
+        .unwrap();
+        assert!(settings.oidc.subject_map().is_err());
+    }
+
     #[test]
     fn profiles_env_precedence_and_project_relative_database() {
         for profile in ["Development", "Staging", "Production"] {

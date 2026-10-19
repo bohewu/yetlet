@@ -104,7 +104,7 @@ pub(crate) fn shell(
     Element::new("div")
         .child(link("Skip to content","#main").attribute("class","skip-link"))
         .child(header).child(layout)
-        .child(text("footer","Local noncritical lab demonstration. Synthetic identities; records persist in SQLite. No remote machine control.").attribute("class","board-footer"))
+        .child(text("footer","Local noncritical lab demonstration. Application-owned permissions; records persist in SQLite. No remote machine control.").attribute("class","board-footer"))
         .into()
 }
 pub(crate) fn login(csrf: &str, message: Option<&str>) -> View {
@@ -162,6 +162,26 @@ pub(crate) fn failure(message: &str) -> View {
             .child(text("p", message).attribute("role", "alert"))
             .child(link("Return to the board", "/board").attribute("class", "btn btn-primary")),
     )
+}
+
+#[cfg(feature = "oidc")]
+pub(crate) fn oidc_login(csrf: &str) -> View {
+    shell(None, None, "Sign in", Element::new("section")
+        .child(text("p", "Sign in with the configured identity provider. Access is assigned by this application."))
+        .child(Element::new("form").attribute("method", "post")
+            .attribute("action", "/board/oidc/login").attribute("class", "board-form")
+            .child(hidden("csrf", csrf))
+            .child(text("button", "Continue with identity provider").attribute("type", "submit")
+                .attribute("class", "btn btn-primary"))))
+}
+
+#[cfg(feature = "oidc")]
+pub(crate) fn unassigned_identity(subject: &str) -> View {
+    shell(None, None, "Access not assigned", Element::new("section")
+        .child(text("p", "Sign-in succeeded, but this account has no application access. Ask an administrator to assign access."))
+        .child(text("p", "Account reference:"))
+        .child(text("code", subject).attribute("id", "account-reference"))
+        .child(link("Return to sign in", "/board/login").attribute("class", "btn btn-primary")))
 }
 fn field(label: &str, id: &'static str, control: Element, error: Option<&str>) -> Element {
     let mut control = control;

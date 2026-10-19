@@ -27,6 +27,11 @@ const USERS: [Principal; 3] = [
     },
 ];
 
+#[cfg(feature = "oidc")]
+pub(crate) fn principal(name: &str) -> Option<Principal> {
+    USERS.iter().copied().find(|user| user.name == name)
+}
+
 /// Synthetic local credentials, generated anew for each process. Not an IdP.
 #[derive(Clone)]
 pub struct DemoIdentities([String; 3]);
@@ -72,6 +77,8 @@ impl DemoIdentities {
 #[derive(Clone, Debug, Default)]
 pub(crate) struct LoginSession {
     pub user: Option<Principal>,
+    #[cfg(feature = "oidc")]
+    pub oidc: Option<crate::oidc::Pending>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq, Eq)]

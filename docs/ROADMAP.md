@@ -52,6 +52,19 @@ redesign or additional platform qualification is implied. Independent Reviewer
 `/root/yt094_wasm_review` follow-up PASS follows one corrected queued-save
 lifetime finding; zero remaining material issues or required followups.
 
+**YT-094 opt-in OIDC slice (2026-10-19):** the
+[application-owned integration](YT-094-OIDC.md) uses `openidconnect`, existing
+settings/SecretProvider composition, native forms, PKCE and explicit verified
+subject-to-permission mapping. Focused Linux tests and strict Clippy pass;
+independent code review PASS has zero issues or required code followups.
+After the operator WAF adjustment, real token exchange, unassigned/replay denial,
+explicit Project 1 access, cross-project denial, native persisted edits/history
+and local logout passed with JavaScript disabled. CLI build/run/Ctrl-C and
+cleanup passed at the documented Linux cancellation exit 1; independent
+returned-evidence Reviewer PASS has zero issues or required followups. Private client,
+account and browser evidence stays outside the working tree. Earlier Windows
+acceptance is preserved for its original source and does not qualify this edit.
+
 **YT-093 bounded closeout (2026-10-18):** the
 [signing verification](YT-093-SIGNING-VERIFICATION.md) records the opt-in signing
 crate, local multi-key CLI, confirmed automatic settings updates and independent

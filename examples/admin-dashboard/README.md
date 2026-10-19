@@ -143,6 +143,16 @@ coverage before treating this reference as fully qualified. External OIDC,
 production TLS/deployment, authenticated dev-server bridging and production
 storage/HA remain explicit boundaries.
 
+## Opt-in OIDC
+
+Runtime `oidc.enabled=true` selects the existing Board's optional OIDC client and
+disables terminal-code login. Keep real provider/client settings and credentials
+outside Git. `YETLET_DEVELOPMENT_SECRET_FILE` explicitly selects a private TOML
+overlay only with `APP_ENVIRONMENT=Development`; selected secret values flow
+through the existing SecretProvider. Verified subjects need explicit application
+permission mappings. See the [OIDC contract and validation boundary](../../docs/YT-094-OIDC.md).
+The default `false` preserves the earlier demonstration and qualification.
+
 ## Rust/WASM triage workspace
 
 Operators can select Triage workspace for the latest 12 project items. Filter,

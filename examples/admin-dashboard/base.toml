@@ -5,6 +5,17 @@ port = 3014
 [database]
 path = "data/board.sqlite3"
 
+[oidc]
+enabled = false
+issuer = ""
+client_id = ""
+client_secret = ""
+
+[oidc.subjects]
+alice = ""
+bob = ""
+viewer = ""
+
 [cli.rust]
 watch = false
 

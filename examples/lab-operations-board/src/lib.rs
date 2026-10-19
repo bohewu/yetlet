@@ -3,6 +3,8 @@ mod asset_data;
 mod assets;
 mod database;
 mod domain;
+#[cfg(feature = "oidc")]
+pub mod oidc;
 mod triage;
 mod views;
 
@@ -111,12 +113,19 @@ impl IntoResponse for Failure {
 #[derive(Clone)]
 struct AppState {
     database: Database,
-    identities: DemoIdentities,
+    authentication: Authentication,
     manifest: assets::Manifest,
     origin: HeaderValue,
     triage_script: Option<String>,
     streams: Arc<Semaphore>,
     stopping: watch::Receiver<bool>,
+}
+
+#[derive(Clone)]
+enum Authentication {
+    Demo(DemoIdentities),
+    #[cfg(feature = "oidc")]
+    Oidc(Arc<oidc::Oidc>),
 }
 
 /// Owns the local application and its graceful stream/worker shutdown signal.
@@ -153,6 +162,42 @@ impl Board {
         path: &Path,
         listen: SocketAddr,
         identities: DemoIdentities,
+        stylesheets: Vec<String>,
+        triage_script: Option<String>,
+    ) -> Result<Self, Failure> {
+        Self::open_authenticated(
+            path,
+            listen,
+            Authentication::Demo(identities),
+            stylesheets,
+            triage_script,
+        )
+        .await
+    }
+
+    /// Explicit app-owned OIDC selection. The demo-code login is unavailable.
+    #[cfg(feature = "oidc")]
+    pub async fn open_with_oidc(
+        path: &Path,
+        listen: SocketAddr,
+        oidc: oidc::Oidc,
+        stylesheets: Vec<String>,
+        triage_script: Option<String>,
+    ) -> Result<Self, Failure> {
+        Self::open_authenticated(
+            path,
+            listen,
+            Authentication::Oidc(Arc::new(oidc)),
+            stylesheets,
+            triage_script,
+        )
+        .await
+    }
+
+    async fn open_authenticated(
+        path: &Path,
+        listen: SocketAddr,
+        authentication: Authentication,
         stylesheets: Vec<String>,
         triage_script: Option<String>,
     ) -> Result<Self, Failure> {
@@ -200,7 +245,7 @@ impl Board {
         let state = AppState {
             database: database.clone(),
             triage_script,
-            identities,
+            authentication,
             manifest,
             origin: HeaderValue::from_str(&format!("http://{listen}"))
                 .map_err(|_| Failure::Invalid)?,
@@ -214,22 +259,29 @@ impl Board {
         );
         let app = App::new()
             .group("/board", |group| {
-                sessions.scoped(
-                    group
-                        .get("/", home)
-                        .get("/login", login_page)
-                        .post("/login", login)
-                        .post("/logout", logout)
-                        .get("/projects/{project}/items", listing)
-                        .post("/projects/{project}/items", create)
-                        .get("/projects/{project}/items/new", new_item)
-                        .get("/projects/{project}/items/{id}", detail)
-                        .post("/projects/{project}/items/{id}", update)
-                        .get("/projects/{project}/items/{id}/edit", edit)
-                        .get("/projects/{project}/events", events)
-                        .get("/projects/{project}/triage", triage::workspace)
-                        .post("/projects/{project}/triage", triage::save),
-                )
+                let routes = group
+                    .get("/", home)
+                    .get("/login", login_page)
+                    .post("/login", login)
+                    .post("/logout", logout)
+                    .get("/projects/{project}/items", listing)
+                    .post("/projects/{project}/items", create)
+                    .get("/projects/{project}/items/new", new_item)
+                    .get("/projects/{project}/items/{id}", detail)
+                    .post("/projects/{project}/items/{id}", update)
+                    .get("/projects/{project}/items/{id}/edit", edit)
+                    .get("/projects/{project}/events", events)
+                    .get("/projects/{project}/triage", triage::workspace)
+                    .post("/projects/{project}/triage", triage::save);
+                #[cfg(feature = "oidc")]
+                let routes = if matches!(state.authentication, Authentication::Oidc(_)) {
+                    routes
+                        .post("/oidc/login", oidc::begin)
+                        .get("/oidc/callback", oidc::callback)
+                } else {
+                    routes
+                };
+                sessions.scoped(routes)
             })
             .get("/", || async { Redirect::to("/board") })
             .get("/healthz", || async { StatusCode::OK })
@@ -263,6 +315,9 @@ async fn security(
     request: axum::extract::Request,
     next: Next,
 ) -> Response {
+    let callback = request.uri().path() == "/board/oidc/callback";
+    #[cfg(feature = "oidc")]
+    let oidc_login_page = request.uri().path() == "/board/login";
     // Exact authority prevents browser DNS-rebinding use of the loopback demo.
     let host = state
         .origin
@@ -305,10 +360,16 @@ async fn security(
     } else {
         DEFAULT_CSP
     };
-    response.headers_mut().insert(
-        header::CONTENT_SECURITY_POLICY,
-        HeaderValue::from_static(csp),
-    );
+    let csp = HeaderValue::from_static(csp);
+    #[cfg(feature = "oidc")]
+    let csp = if oidc_login_page && let Authentication::Oidc(oidc) = &state.authentication {
+        HeaderValue::from_str(&oidc.login_csp()).expect("validated authorization origin")
+    } else {
+        csp
+    };
+    response
+        .headers_mut()
+        .insert(header::CONTENT_SECURITY_POLICY, csp);
     response.headers_mut().insert(
         header::X_CONTENT_TYPE_OPTIONS,
         HeaderValue::from_static("nosniff"),
@@ -317,7 +378,11 @@ async fn security(
         header::REFERRER_POLICY,
         // Native form POST must retain its same-origin Origin. no-referrer
         // serializes that header as null, which our exact-origin guard rejects.
-        HeaderValue::from_static("same-origin"),
+        HeaderValue::from_static(if callback {
+            "no-referrer"
+        } else {
+            "same-origin"
+        }),
     );
     response
         .headers_mut()
@@ -383,6 +448,15 @@ async fn login_page(
     State(state): State<AppState>,
     Extension(session): Extension<Session<LoginSession>>,
 ) -> Result<Response, Failure> {
+    #[cfg(feature = "oidc")]
+    if matches!(state.authentication, Authentication::Oidc(_)) {
+        return page(
+            &state,
+            "Sign in | Lab Operations",
+            views::oidc_login(&csrf(&session)?),
+            false,
+        );
+    }
     page(
         &state,
         "Sign in | Lab Operations",
@@ -404,7 +478,15 @@ async fn login(
 ) -> Result<Response, Failure> {
     let Form(form) = form.map_err(|_| Failure::Invalid)?;
     require_csrf(&session, &form.csrf)?;
-    let Some(principal) = state.identities.authenticate(&form.username, &form.code) else {
+    #[cfg(not(feature = "oidc"))]
+    let Authentication::Demo(identities) = &state.authentication;
+    #[cfg(feature = "oidc")]
+    let identities = match &state.authentication {
+        Authentication::Demo(identities) => identities,
+        #[cfg(feature = "oidc")]
+        Authentication::Oidc(_) => return Err(Failure::Forbidden),
+    };
+    let Some(principal) = identities.authenticate(&form.username, &form.code) else {
         return Ok((
             StatusCode::UNAUTHORIZED,
             page(
@@ -419,6 +501,8 @@ async fn login(
     session
         .replace_and_rotate(LoginSession {
             user: Some(principal),
+            #[cfg(feature = "oidc")]
+            oidc: None,
         })
         .map_err(|_| Failure::Unavailable)?;
     Ok(Redirect::to(&format!("/board/projects/{}/items", principal.project)).into_response())

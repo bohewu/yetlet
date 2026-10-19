@@ -1,10 +1,12 @@
 mod config;
+mod oidc;
 mod vite;
 
 use std::io;
 use std::sync::Arc;
 use tokio::sync::watch;
 use yetlet_lab_operations_board::{Board, DemoIdentities};
+use yetlet_secrets::{SecretProvider, SettingsSecrets};
 
 fn application(board: &Board, assets: Arc<vite::Snapshot>) -> axum::Router {
     // Board's global middleware is a fallback service. Keep it intact behind
@@ -37,21 +39,41 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let settings = config::load()?;
     let address = settings.address()?;
     let assets = vite::Snapshot::load_selected(&settings.cli.vite.root)?;
-    let identities = DemoIdentities::generate()?;
-    // Ephemeral synthetic login codes for this loopback-only demonstration.
-    for (name, code) in identities.terminal_codes() {
-        println!("LOCAL_LOGIN {name} {code}");
-    }
+    let oidc = if settings.oidc.enabled {
+        let secrets: Arc<dyn SecretProvider> =
+            Arc::new(SettingsSecrets::new(std::collections::BTreeMap::from([(
+                "oidc-client-secret".into(),
+                settings.oidc.client_secret.clone(),
+            )])));
+        Some(oidc::configure(&settings.oidc, address, secrets).await?)
+    } else {
+        None
+    };
     let listener = tokio::net::TcpListener::bind(address).await?;
     let actual = listener.local_addr()?;
-    let board = Board::open_with_frontend(
-        &settings.database_path(),
-        actual,
-        identities,
-        assets.stylesheet_paths(),
-        assets.entry_script_path(),
-    )
-    .await?;
+    let board = if let Some(oidc) = oidc {
+        Board::open_with_oidc(
+            &settings.database_path(),
+            actual,
+            oidc,
+            assets.stylesheet_paths(),
+            assets.entry_script_path(),
+        )
+        .await?
+    } else {
+        let identities = DemoIdentities::generate()?;
+        for (name, code) in identities.terminal_codes() {
+            println!("LOCAL_LOGIN {name} {code}");
+        }
+        Board::open_with_frontend(
+            &settings.database_path(),
+            actual,
+            identities,
+            assets.stylesheet_paths(),
+            assets.entry_script_path(),
+        )
+        .await?
+    };
     let shutdown = shutdown_signal(board.stop_signal())?;
     let app = application(&board, assets);
     println!("READY http://{actual}/board");

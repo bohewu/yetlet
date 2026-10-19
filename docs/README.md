@@ -91,6 +91,8 @@ The application guide records local evidence and remaining qualification gates.
 The later [Rust/WASM triage slice](YT-094-WASM-TRIAGE.md) adds local multi-draft
 interaction and explicit HTTP saves; [API observations](YT-094-API-OBSERVATIONS.md)
 record the bounded YT-105 follow-up and existing YT-104 packaging gap.
+The [opt-in OIDC slice](YT-094-OIDC.md) records existing settings/SecretProvider
+composition and its separate real-provider qualification boundary.
 
 The standalone [Issue Tracker starter](../examples/production-starter/README.md) exercises
 YT-092 with native SSR forms, a command JSON API, SQLite restart persistence,
