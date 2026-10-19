@@ -91,7 +91,10 @@ cargo xtask check docs
 
 This is the first local YT-094 slice, not production qualification. Synthetic
 identities, loopback HTTP, local SQLite and memory sessions do not qualify OIDC,
-production TLS, shared sessions, HA, backups, remote deployment or Windows/macOS.
+production TLS, shared sessions, HA, backups, remote deployment or general
+Windows/macOS browser support. The subsequent
+[Windows native slice](../../docs/YT-094-WINDOWS-VERIFICATION.md) records source-matched
+MSVC tests, CLI lifecycle and native HTTP separately from browser/OS input.
 Service delivery from this edited application layout is not qualified. See the
 [backlog](../../docs/BACKLOG.md) for remaining gates; YT-094 stays In progress.
 

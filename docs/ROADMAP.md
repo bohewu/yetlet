@@ -34,7 +34,10 @@ Operations Board through explicit application composition. The selected CSS-only
 Vite build covers responsive list/filter/pagination, native forms, detail/history
 and consistent failure states. Local Linux Chrome and CLI evidence is recorded in
 the application guide; independent Reviewer `/root/yt094_slice_review` PASS has
-zero material issues or required followups. YT-094 remains In progress:
+zero material issues or required followups. The later
+[Windows native slice](YT-094-WINDOWS-VERIFICATION.md) passes source-matched MSVC
+tests, CLI lifecycle and HTTP, with independent Reviewer PASS and zero issues or
+required followups; browser/OS input remain open. YT-094 remains In progress:
 OS-level IME/accessibility qualification, wider native/browser coverage and
 production authentication/deployment gates are not claimed by this first slice.
 
