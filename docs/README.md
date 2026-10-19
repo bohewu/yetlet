@@ -87,10 +87,12 @@ selected documented scope.
 
 ## Production-oriented reference application
 
-The [SSR administration reference](../examples/admin-dashboard/README.md) is the
-first YT-094 slice: CLI-created Vite/Tailwind/settings composition over the existing
-persisted Lab Operations Board, with native no-JS forms and responsive screens.
-The application guide records local evidence and remaining qualification gates.
+The [SSR administration reference](../examples/admin-dashboard/README.md) closes
+YT-094 at the selected reference-application scope: CLI-created
+Vite/Tailwind/settings composition over the persisted Lab Operations Board, with
+native no-JS forms and responsive screens. The [closeout matrix](YT-094-CLOSEOUT.md)
+links existing evidence and accepted limitations; this is not production or
+public-release qualification. The application guide retains the first-slice results.
 The later [Rust/WASM triage slice](YT-094-WASM-TRIAGE.md) adds local multi-draft
 interaction and explicit HTTP saves; [API observations](YT-094-API-OBSERVATIONS.md)
 record the bounded YT-105 follow-up and existing YT-104 packaging gap.
@@ -104,7 +106,9 @@ The [opt-in OIDC slice](YT-094-OIDC.md) records existing settings/SecretProvider
 composition and its separate real-provider qualification boundary.
 The [Valkey shared-session slice](YT-094-VALKEY-SESSIONS.md) records explicit
 provider/settings selection and two-container login/logout, restart and outage
-verification, separate from business storage and production HA.
+verification. The later [shared-SQLite slice](YT-094-SHARED-SQLITE.md) adds
+separately reviewed two-app business storage on a single local volume; neither
+slice qualifies production HA.
 
 
 The standalone [Issue Tracker starter](../examples/production-starter/README.md) exercises

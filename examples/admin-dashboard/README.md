@@ -1,4 +1,9 @@
-# SSR administration reference — YT-094 first slice
+# SSR administration reference — YT-094
+
+YT-094 is Done at the selected reference-application scope. The
+[closeout matrix](../../docs/YT-094-CLOSEOUT.md) links the accepted evidence and
+limitations. Dated slice records below retain their original source/platform
+scope; their earlier overall task status is superseded by that closeout.
 
 A responsive, local administration application built from
 `yetlet new admin-dashboard --vite --tailwind --service --settings`, then composed
@@ -93,14 +98,16 @@ cargo clippy --offline --locked -p yetlet-lab-operations-board --all-targets -- 
 cargo xtask check docs
 ```
 
-This is the first local YT-094 slice, not production qualification. Synthetic
-identities, loopback HTTP, local SQLite and memory sessions do not qualify OIDC,
-production TLS, shared sessions, HA, backups, remote deployment or general
-Windows/macOS browser support. The subsequent
+The default synthetic identities, loopback HTTP, local SQLite and memory
+sessions are a local demonstration. Separately selected OIDC, Valkey sessions
+and shared-SQLite evidence is linked in the closeout; production TLS, HA,
+backups, remote deployment and general all-OS support remain unqualified. The
+subsequent
 [Windows native slice](../../docs/YT-094-WINDOWS-VERIFICATION.md) records source-matched
 MSVC tests, CLI lifecycle and native HTTP separately from browser/OS input.
 Service delivery from this edited application layout is not qualified. See the
-[backlog](../../docs/BACKLOG.md) for remaining gates; YT-094 stays In progress.
+[closeout](../../docs/YT-094-CLOSEOUT.md) for accepted limits and the
+[backlog](../../docs/BACKLOG.md) for separate follow-ups.
 
 ## First-slice local evidence — 2026-10-19
 
@@ -137,11 +144,11 @@ Independent Reviewer `/root/yt094_slice_review` passed this first slice with
 zero material issues and required followups. The reviewer inspected the source,
 browser assertions and desktop/mobile/error screenshots, and independently ran
 the existing compiled app and Board test binaries (13/13 and 15/15); no reviewer
-rebuild or workspace mutation occurred. YT-094 remains In progress; next
-qualification should select native OS IME/assistive-technology and broader host
-coverage before treating this reference as fully qualified. External OIDC,
-production TLS/deployment, authenticated dev-server bridging and production
-storage/HA remain explicit boundaries.
+rebuild or workspace mutation occurred. At that first-slice review YT-094 remained
+In progress, with OS IME/assistive-technology, external OIDC and broader host
+coverage still open. Later evidence and owner decisions are reconciled in the
+[closeout](../../docs/YT-094-CLOSEOUT.md); production TLS/deployment,
+authenticated dev-server bridging and production storage/HA remain boundaries.
 
 ## Opt-in OIDC
 

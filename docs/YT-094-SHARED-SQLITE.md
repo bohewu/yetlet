@@ -82,6 +82,7 @@ read-only/unavailable-storage tests remain the broader error-path evidence.
 Shared local storage does not imply cross-host deployment, distributed SSE
 delivery, SQLite backup/restore, shared provider refresh or production HA.
 Migrations/rolling schema compatibility and simultaneous first-run migration
-qualification remain outside the selected test cases. YT-094 remains In progress
-for separately selected application/deployment work; YT-104 remains independently
-unblockable. Owner-waived platform/input matrices remain closed.
+qualification remain outside the selected test cases. The subsequent
+[YT-094 closeout](YT-094-CLOSEOUT.md) accepts these limits and marks the selected
+reference-application scope Done. YT-104 remains independently unblockable.
+Owner-waived platform/input matrices remain closed.

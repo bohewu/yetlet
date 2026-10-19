@@ -50,7 +50,18 @@ claims. YT-095 is a smaller research comparison of native State/FromRef/traits
 against optional Rust DI containers, after real YT-092/YT-093 consumers exist.
 No mandatory IoC container follows from this research.
 
-**YT-094 first slice (2026-10-19):** the
+**YT-094 bounded closeout (2026-10-19):** the
+[completion matrix and accepted limitations](YT-094-CLOSEOUT.md) reconcile the
+existing SSR, Rust/WASM, Windows, real OIDC, Valkey and shared-SQLite evidence.
+YT-094 is Done at the selected reference-application scope. Independent Reviewer
+`/root/yt094_closeout_review_oct19` PASS has zero issues or required followups.
+Passed runtime checks are not repeated.
+The dated slice summaries below preserve their original evidence boundaries;
+their earlier overall In progress status is superseded by this closeout.
+Owner-waived Windows OIDC and routine input/AT matrices remain closed. M19 is
+still partial; production deployment, HA and public release are not qualified.
+
+**YT-094 first slice (2026-10-19, historical):** the
 [SSR administration reference](../examples/admin-dashboard/README.md) starts from
 the existing CLI's Vite/Tailwind/settings scaffold and reuses the persisted Lab
 Operations Board through explicit application composition. The selected CSS-only
@@ -75,7 +86,7 @@ redesign or additional platform qualification is implied. Independent Reviewer
 `/root/yt094_wasm_review` follow-up PASS follows one corrected queued-save
 lifetime finding; zero remaining material issues or required followups.
 
-**YT-094 returned Windows evidence (2026-10-19):** the
+**YT-094 returned Windows evidence (2026-10-19, historical):** the
 [Windows follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) retains the passed
 native/browser matrix and now reconciles operator-passed Bopomofo, draft/focus,
 Narrator, save/reload and physical-stop journeys. Images corroborate drain and
@@ -83,9 +94,9 @@ exit 0; returned observations confirm no server/listener or running input/AT
 tools. All 14 returned evidence files match their supplied hashes, and all 310
 selected source inputs match `a402b6f`. The Windows review's historical fail for
 the then-missing exit code and its configured/observed-model mismatch remain
-explicit. No workload or product fix was repeated. YT-094 remains In progress;
-separate source-side reconciliation Reviewer PASS has zero issues/followups.
-production authentication/deployment and other unqualified scopes require an
+explicit. No workload or product fix was repeated. At that stage YT-094 remained
+In progress; separate source-side reconciliation Reviewer PASS has zero
+issues/followups. Production authentication/deployment and other unqualified scopes require an
 explicitly selected next slice rather than reopening passed native journeys.
 
 **YT-094 opt-in OIDC slice (2026-10-19):** the
@@ -111,7 +122,10 @@ replicas on pinned Valkey 9.1.2 passed shared login/logout, app restart,
 bounded fail-closed pause/outage and recovery. Native tests and strict Clippy
 pass; independent Reviewer PASS has zero issues or required followups. Owned
 containers/volumes/listeners were cleaned up. Valkey has no persistence in this lab;
-SQLite business data remains replica-local. No core/browser dependency, IdP
+SQLite business data remains replica-local in that initial fixture. The later
+[shared-SQLite slice](YT-094-SHARED-SQLITE.md) separately passes two-app business
+reads/updates, conflicts, restart and cleanup on one local volume, with independent
+Reviewer PASS. No core/browser dependency, IdP
 resource, registry, multi-host or production HA claim is added.
 
 **YT-106, optional third-party component interoperability research:** study
