@@ -1,0 +1,25 @@
+[package]
+name = "yetlet-admin-dashboard"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+description = "SSR-first administration reference using the existing Lab Operations Board"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace]
+resolver = "3"
+
+[dependencies]
+axum = "0.8"
+tokio = { version = "1", features = ["macros", "net", "rt-multi-thread", "signal"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.149"
+yetlet-config = { path = "../../crates/yetlet-config" }
+yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
+yetlet-lab-operations-board = { path = "../lab-operations-board" }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }
+tempfile = "=3.27.0"

@@ -84,6 +84,11 @@ selected documented scope.
 
 ## Production-oriented reference application
 
+The [SSR administration reference](../examples/admin-dashboard/README.md) is the
+first YT-094 slice: CLI-created Vite/Tailwind/settings composition over the existing
+persisted Lab Operations Board, with native no-JS forms and responsive screens.
+The application guide records local evidence and remaining qualification gates.
+
 The standalone [Issue Tracker starter](../examples/production-starter/README.md) exercises
 YT-092 with native SSR forms, a command JSON API, SQLite restart persistence,
 existing settings/CLI, health/readiness, correlated JSON logs and graceful shutdown.

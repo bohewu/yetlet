@@ -63,12 +63,27 @@ pub(crate) fn shell(
     );
     if let Some(user) = user {
         let root = format!("/board/projects/{}/items", user.project);
+        let mut items_link = link("Work items", &root);
+        if title != "New work item" {
+            items_link = items_link.attribute(
+                "aria-current",
+                if title == "Work items" {
+                    "page"
+                } else {
+                    "location"
+                },
+            );
+        }
         let mut navigation = Element::new("nav")
             .attribute("aria-label", "Project navigation")
             .attribute("class", "board-nav")
-            .child(link("Work items", &root));
+            .child(items_link);
         if user.write {
-            navigation = navigation.child(link("New work item", &format!("{root}/new")));
+            let mut new_link = link("New work item", &format!("{root}/new"));
+            if title == "New work item" {
+                new_link = new_link.attribute("aria-current", "page");
+            }
+            navigation = navigation.child(new_link);
         }
         layout = layout.child(navigation);
     }
@@ -129,6 +144,17 @@ pub(crate) fn login(csrf: &str, message: Option<&str>) -> View {
                 .attribute("class", "btn btn-primary"),
         );
     shell(None, None, "Sign in", body.child(form))
+}
+pub(crate) fn failure(message: &str) -> View {
+    shell(
+        None,
+        None,
+        "Unable to complete the request",
+        Element::new("section")
+            .attribute("class", "board-error")
+            .child(text("p", message).attribute("role", "alert"))
+            .child(link("Return to the board", "/board").attribute("class", "btn btn-primary")),
+    )
 }
 fn field(label: &str, id: &'static str, control: Element, error: Option<&str>) -> Element {
     let mut control = control;
@@ -383,9 +409,15 @@ pub(crate) fn listing(user: Principal, csrf: &str, query: &ListQuery, values: &L
         body = body.child(
             Element::new("div")
                 .attribute("class", "table-responsive")
+                .attribute("tabindex", "0")
+                .attribute("role", "region")
+                .attribute(
+                    "aria-label",
+                    "Work items table; scroll horizontally for more columns",
+                )
                 .child(
                     Element::new("table")
-                        .attribute("class", "table align-middle")
+                        .attribute("class", "table board-records align-middle")
                         .child(text(
                             "caption",
                             format!(
@@ -474,6 +506,12 @@ pub(crate) fn detail(user: Principal, csrf: &str, value: &WorkItem, history: &[H
         .child(
             Element::new("div")
                 .attribute("class", "table-responsive")
+                .attribute("tabindex", "0")
+                .attribute("role", "region")
+                .attribute(
+                    "aria-label",
+                    "History table; scroll horizontally for more columns",
+                )
                 .child(
                     Element::new("table")
                         .attribute("class", "table")

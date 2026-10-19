@@ -92,24 +92,19 @@ impl Failure {
 }
 impl IntoResponse for Failure {
     fn into_response(self) -> Response {
-        let content = views::shell(
-            None,
-            None,
-            "Unable to complete the request",
-            views::text("section", self.message())
-                .child(views::text("a", "Return to the board").attribute("href", "/board")),
-        );
-        (
+        let mut response = (
             self.status(),
             yetlet_server_axum::Page::with_metadata(
                 DocumentMetadata::with_language(
                     "Lab Operations",
                     LanguageTag::new("en").expect("static language"),
                 ),
-                content,
+                views::failure(self.message()),
             ),
         )
-            .into_response()
+            .into_response();
+        response.extensions_mut().insert(self);
+        response
     }
 }
 #[derive(Clone)]
@@ -135,12 +130,46 @@ impl Board {
         listen: SocketAddr,
         identities: DemoIdentities,
     ) -> Result<Self, Failure> {
+        Self::open_with_stylesheets(path, listen, identities, Vec::new()).await
+    }
+
+    /// Application-only composition for a separately built reference frontend.
+    /// Empty selection retains the original embedded theme. Nonempty selection
+    /// accepts at most eight same-origin Vite CSS filenames; the caller owns the
+    /// matching static route. This changes neither authentication nor storage.
+    pub async fn open_with_stylesheets(
+        path: &Path,
+        listen: SocketAddr,
+        identities: DemoIdentities,
+        stylesheets: Vec<String>,
+    ) -> Result<Self, Failure> {
         if !listen.ip().is_loopback() || listen.port() == 0 {
             return Err(Failure::Invalid);
         }
+        let mut seen = std::collections::BTreeSet::new();
+        if stylesheets.len() > 8
+            || stylesheets.iter().any(|path| {
+                !seen.insert(path)
+                    || path
+                        .strip_prefix("/static/assets/")
+                        .and_then(|name| name.strip_suffix(".css"))
+                        .is_none_or(|name| {
+                            name.is_empty()
+                                || name.len() > 160
+                                || !name
+                                    .bytes()
+                                    .all(|c| c.is_ascii_alphanumeric() || matches!(c, b'-' | b'_'))
+                        })
+            })
+        {
+            return Err(Failure::Invalid);
+        }
         let database = Database::open(path).await?;
-        let manifest = assets::Manifest::parse(include_str!("../assets/manifest.json"))
+        let mut manifest = assets::Manifest::parse(include_str!("../assets/manifest.json"))
             .map_err(|_| Failure::Unavailable)?;
+        if !stylesheets.is_empty() {
+            manifest.stylesheets = stylesheets;
+        }
         let (stopping, stop_rx) = watch::channel(false);
         let state = AppState {
             database: database.clone(),
@@ -229,6 +258,19 @@ async fn security(
     } else {
         next.run(request).await
     };
+    // Failure has no State extractor. Apply the selected application theme here,
+    // retaining its status and session headers without buffering response bodies.
+    if let Some(failure) = response.extensions_mut().remove::<Failure>()
+        && let Ok(themed) = page(
+            &state,
+            "Unable to complete the request | Lab Operations",
+            views::failure(failure.message()),
+            false,
+        )
+    {
+        *response.body_mut() = themed.into_body();
+        response.headers_mut().remove(header::CONTENT_LENGTH);
+    }
     response.headers_mut().insert(
         header::CONTENT_SECURITY_POLICY,
         HeaderValue::from_static(DEFAULT_CSP),

@@ -278,6 +278,63 @@ fn fields(title: &str) -> Fields {
 }
 
 #[tokio::test]
+async fn application_stylesheets_are_validated_before_storage_and_keep_ssr_security() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("themed.sqlite");
+    let ids = DemoIdentities::generate().unwrap();
+    for paths in [
+        vec!["https://example.test/app.css".to_owned()],
+        vec!["/static/assets/../app.css".to_owned()],
+        vec!["/static/assets/app.css?x=1".to_owned()],
+        vec!["/static/assets/app.css\" onload=\"x".to_owned()],
+        vec!["/static/assets/app.css".to_owned(); 2],
+        (0..9)
+            .map(|n| format!("/static/assets/app-{n}.css"))
+            .collect(),
+    ] {
+        assert!(matches!(
+            Board::open_with_stylesheets(&path, HOST.parse().unwrap(), ids.clone(), paths).await,
+            Err(Failure::Invalid)
+        ));
+        assert!(!path.exists());
+    }
+    let board = Board::open_with_stylesheets(
+        &path,
+        HOST.parse().unwrap(),
+        ids.clone(),
+        vec!["/static/assets/app-Test_123.css".to_owned()],
+    )
+    .await
+    .unwrap();
+    let mut client = Client::login(&board, &ids, "alice").await;
+    let page = client
+        .call(&board.router, Method::GET, "/board/projects/1/items", None)
+        .await;
+    assert_eq!(page.status, StatusCode::OK);
+    assert!(
+        page.body
+            .contains("href=\"/static/assets/app-Test_123.css\"")
+    );
+    assert!(!page.body.contains("bootstrap"));
+    assert!(!page.body.contains("<script"));
+    assert_eq!(page.headers[header::CONTENT_SECURITY_POLICY], DEFAULT_CSP);
+    assert_eq!(page.headers[header::CACHE_CONTROL], "no-store");
+    let denied = client
+        .call(&board.router, Method::GET, "/board/projects/2/items", None)
+        .await;
+    assert_eq!(denied.status, StatusCode::FORBIDDEN);
+    assert!(
+        denied
+            .body
+            .contains("href=\"/static/assets/app-Test_123.css\"")
+    );
+    assert!(denied.body.contains("Return to the board"));
+    assert!(denied.body.contains("role=\"alert\""));
+    assert!(!denied.body.contains("<script"));
+    board.drain().await.unwrap();
+}
+
+#[tokio::test]
 async fn native_pages_assets_host_and_private_cache_are_explicit() {
     let (_dir, board, ids) = setup().await;
     let mut guest = Client::default();

@@ -1,0 +1,19 @@
+{
+  "name": "yetlet-vite-app",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "build": "vite build"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  },
+  "devDependencies": {
+    "typescript": "7.0.2",
+    "vite": "8.3.4",
+    "@tailwindcss/vite": "4.3.3",
+    "tailwindcss": "4.3.3"
+  }
+}
