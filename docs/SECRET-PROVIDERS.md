@@ -10,9 +10,14 @@ owner-authorized; publication and production qualification remain separate.
 
 The unpublished, Experimental `yetlet-secrets` nested workspace supplies a
 small native string-secret contract. Applications explicitly select its path
-dependency and construct a provider. Core, browser, configuration loader,
+dependency and construct a provider. Core, browser, the default configuration loader,
 signing, CLI scaffolds and existing applications do not acquire a dependency
 or initialize a provider automatically.
+
+The separately authorized [settings integration](SETTINGS-SECRET-PROVIDER.md)
+can resolve an injected provider into selected protected settings fields through
+the loader's `secret-provider` feature. `SettingsSecrets` retains the reverse,
+already-loaded-settings adapter; neither direction implicitly enables the other.
 
 ## Read contract
 

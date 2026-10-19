@@ -10,10 +10,18 @@ publish = false
 license = "MIT OR Apache-2.0"
 description = "Experimental opt-in native typed application configuration"
 
+[features]
+secret-provider = ["dep:yetlet-secrets"]
+
 [dependencies]
 serde = { version = "=1.0.229", features = ["derive"] }
 toml = { version = "=0.9.12", default-features = false, features = ["std", "parse", "serde"] }
 dotenvy = "=0.15.7"
+yetlet-secrets = { path = "../yetlet-secrets", optional = true }
+
+[[example]]
+name = "secret_provider"
+required-features = ["secret-provider"]
 
 [target.'cfg(unix)'.dependencies]
 libc = "=0.2.186"

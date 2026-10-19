@@ -173,8 +173,11 @@ offers an opt-in asynchronous string lookup interface. Applications load the
 same typed settings, then explicitly map selected secret fields into an
 `SettingsSecrets` snapshot provider, with explicit whole-snapshot replacement
 for later application adoption. The loader's formats, precedence and
-Development-only secret rules remain unchanged. Provider lookup is an explicit
-application operation, separate from loading configuration.
+Development-only secret rules remain unchanged. Ordinary `load` does not call a
+provider. The separately opt-in `secret-provider` feature adds explicit
+`load_with_secrets` and typed `SecretBinding` selectors for startup resolution
+directly into chosen `SecretString` fields. See the
+[integration contract and checks](SETTINGS-SECRET-PROVIDER.md).
 
 The separately selected [development HTTPS follow-up](DEV-HTTPS-VERIFICATION.md)
 adds public `server.tls` declarations to settings-enabled CLI scaffolds. It reuses

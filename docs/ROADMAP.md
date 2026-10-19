@@ -104,6 +104,16 @@ was explicitly waived by the owner; the dedicated client/account are deleted.
 Routine IME/assistive-technology rechecks are not selected; focused Ubuntu checks
 may accompany relevant input/accessibility changes.
 
+**YT-094 opt-in Valkey shared sessions (2026-10-19):** the
+[application slice](YT-094-VALKEY-SESSIONS.md) keeps the existing Memory default
+and reuses the optional async provider through settings. Two actual Compose
+replicas on pinned Valkey 9.1.2 passed shared login/logout, app restart,
+bounded fail-closed pause/outage and recovery. Native tests and strict Clippy
+pass; independent Reviewer PASS has zero issues or required followups. Owned
+containers/volumes/listeners were cleaned up. Valkey has no persistence in this lab;
+SQLite business data remains replica-local. No core/browser dependency, IdP
+resource, registry, multi-host or production HA claim is added.
+
 **YT-106, optional third-party component interoperability research:** study
 small npm/Vite JS/TS and wasm-bindgen boundaries for chart/editor components,
 including Web Components and a separate React mount only when needed. Define

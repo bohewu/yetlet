@@ -10,6 +10,7 @@ publish = false
 
 [features]
 oidc = ["dep:openidconnect"]
+valkey = ["dep:yetlet-session-valkey"]
 
 [dependencies]
 axum.workspace = true
@@ -25,6 +26,7 @@ openidconnect = { version = "=4.0.1", default-features = false, features = ["req
 yetlet-core = { path = "../../crates/yetlet-core" }
 yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
 yetlet-session = { path = "../../crates/yetlet-session" }
+yetlet-session-valkey = { package = "yetlet-session-redis", path = "../../crates/yetlet-session-redis", optional = true }
 
 yetlet-board-triage = { path = "../board-triage" }
 yetlet-actions = { path = "../../crates/yetlet-actions" }

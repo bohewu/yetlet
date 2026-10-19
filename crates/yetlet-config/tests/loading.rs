@@ -81,6 +81,176 @@ fn dev() -> [(&'static str, &'static str); 1] {
     [("APP_ENVIRONMENT", "Development")]
 }
 
+#[cfg(feature = "secret-provider")]
+mod secret_provider {
+    use super::*;
+    use std::{collections::BTreeMap, sync::Mutex};
+    use yetlet_config::SecretBinding;
+    use yetlet_secrets::{SecretError, SecretFuture, SecretProvider, SettingsSecrets};
+
+    struct Recording {
+        calls: Mutex<Vec<String>>,
+        error: Option<SecretError>,
+    }
+    impl SecretProvider for Recording {
+        fn get<'a>(&'a self, name: &'a str) -> SecretFuture<'a> {
+            Box::pin(async move {
+                self.calls.lock().unwrap().push(name.into());
+                match self.error {
+                    Some(error) => Err(error),
+                    None => Ok(None),
+                }
+            })
+        }
+    }
+    fn binding() -> SecretBinding<'static, Settings> {
+        SecretBinding::new("selected-service-token", |s| &mut s.service.token)
+    }
+
+    #[tokio::test]
+    async fn selected_protected_field_uses_provider_after_normal_source_precedence() {
+        let f = Fixture::new();
+        f.write("private file", "[service]\ntoken='synthetic-development'\n");
+        let token = "literal-\"<tag>\n${not-interpolation}";
+        let provider = SettingsSecrets::new(BTreeMap::from([
+            ("selected-service-token".into(), SecretString::from(token)),
+            (
+                "unrelated-secret".into(),
+                SecretString::from("unrelated-value"),
+            ),
+        ]));
+        let s: Settings = f
+            .secret(SecretFormat::Toml)
+            .load_from_env_with_secrets(
+                env(&[
+                    ("APP_ENVIRONMENT", "Development"),
+                    ("APP_SERVICE__TOKEN", "synthetic-env"),
+                    ("APP_SERVICE__NAME", "public-env"),
+                ]),
+                &provider,
+                &[binding()],
+            )
+            .await
+            .unwrap();
+        assert_eq!(s.service.token.expose_secret(), token);
+        assert_eq!(s.service.name, "public-env");
+        assert_eq!(s.server.port, 3100);
+        assert!(!format!("{s:?}").contains(token));
+        assert!(!format!("{:?}", binding()).contains("selected-service-token"));
+    }
+
+    #[tokio::test]
+    async fn lookup_failures_never_fall_back_to_existing_literals_or_expose_names() {
+        let f = Fixture::new();
+        for (cause, expected) in [
+            (None, Error::SecretMissing),
+            (Some(SecretError::Unavailable), Error::SecretUnavailable),
+            (Some(SecretError::AccessDenied), Error::SecretAccessDenied),
+        ] {
+            let provider = Recording {
+                calls: Mutex::new(vec![]),
+                error: cause,
+            };
+            let result: Result<Settings, _> = f
+                .loader()
+                .load_from_env_with_secrets(
+                    env(&[("APP_SERVICE__TOKEN", "synthetic-fallback-must-not-win")]),
+                    &provider,
+                    &[binding()],
+                )
+                .await;
+            let error = result.unwrap_err();
+            assert_eq!(error, expected);
+            assert_eq!(
+                *provider.calls.lock().unwrap(),
+                vec!["selected-service-token"]
+            );
+            let text = format!("{error:?} {error}");
+            assert!(
+                !text.contains("selected-service-token") && !text.contains("synthetic-fallback")
+            );
+        }
+    }
+
+    #[tokio::test]
+    async fn empty_selection_and_invalid_base_make_no_provider_calls() {
+        let f = Fixture::new();
+        let provider = Recording {
+            calls: Mutex::new(vec![]),
+            error: Some(SecretError::AccessDenied),
+        };
+        let s: Settings = f
+            .loader()
+            .load_from_env_with_secrets(env(&[]), &provider, &[])
+            .await
+            .unwrap();
+        assert_eq!(s.service.name, "production");
+        let ordinary: Settings = f.loader().load_from_env(env(&[])).unwrap();
+        assert_eq!(ordinary.service.name, "production");
+        f.write("base.toml", "not valid TOML");
+        let result: Result<Settings, _> = f
+            .loader()
+            .load_from_env_with_secrets(env(&[]), &provider, &[binding()])
+            .await;
+        assert_eq!(result.unwrap_err(), Error::Toml);
+        assert!(provider.calls.lock().unwrap().is_empty());
+    }
+
+    #[tokio::test]
+    async fn protected_values_keep_empty_semantics_and_existing_size_bound() {
+        let f = Fixture::new();
+        for size in [0, MAX_FILE_BYTES, MAX_FILE_BYTES + 1] {
+            let provider = SettingsSecrets::new(BTreeMap::from([(
+                "selected-service-token".into(),
+                SecretString::from("x".repeat(size)),
+            )]));
+            let result: Result<Settings, _> = f
+                .loader()
+                .load_from_env_with_secrets(env(&[]), &provider, &[binding()])
+                .await;
+            if size <= MAX_FILE_BYTES {
+                assert_eq!(result.unwrap().service.token.expose_secret().len(), size);
+            } else {
+                assert_eq!(result.unwrap_err(), Error::Input);
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn failed_multi_field_resolution_does_not_publish_or_mutate_prior_settings() {
+        #[derive(Debug, Deserialize)]
+        #[serde(deny_unknown_fields)]
+        struct Pair {
+            first: SecretString,
+            second: SecretString,
+        }
+        let f = Fixture::new();
+        for profile in ["development.toml", "staging.toml", "production.toml"] {
+            f.write(profile, "");
+        }
+        let loader = f.loader().defaults("first=''\nsecond=''\n");
+        let prior: Pair = loader
+            .load_from_env(env(&[("APP_FIRST", "synthetic-old")]))
+            .unwrap();
+        let provider = SettingsSecrets::new(BTreeMap::from([(
+            "first".into(),
+            SecretString::from("synthetic-new"),
+        )]));
+        let result: Result<Pair, _> = loader
+            .load_from_env_with_secrets(
+                env(&[]),
+                &provider,
+                &[
+                    SecretBinding::new("first", |s: &mut Pair| &mut s.first),
+                    SecretBinding::new("missing", |s: &mut Pair| &mut s.second),
+                ],
+            )
+            .await;
+        assert_eq!(result.unwrap_err(), Error::SecretMissing);
+        assert_eq!(prior.first.expose_secret(), "synthetic-old");
+    }
+}
+
 #[test]
 fn profiles_and_safe_default() {
     let f = Fixture::new();

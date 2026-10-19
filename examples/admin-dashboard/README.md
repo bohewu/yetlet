@@ -153,6 +153,21 @@ through the existing SecretProvider. Verified subjects need explicit application
 permission mappings. See the [OIDC contract and validation boundary](../../docs/YT-094-OIDC.md).
 The default `false` preserves the earlier demonstration and qualification.
 
+## Shared sessions (opt-in)
+
+Build with Cargo feature `valkey`, then select `session.backend="valkey"` through
+the existing settings. The default remains `memory`; a build without that
+capability rejects selecting the remote backend. The application aliases and
+reuses the existing provider, with Valkey as the selected shared-session server.
+See the [contract and two-app results](../../docs/YT-094-VALKEY-SESSIONS.md) and
+[local Compose fixture](../../qualification/yt094-valkey/README.md). Set
+`session.valkey.ttl_seconds` to choose an absolute lifetime from 1 second to
+30 days; the default is 1800 seconds (30 minutes), matching the local demo.
+Reads do not extend it. This shares sessions,
+not the replica-local SQLite business databases or production HA.
+The separately selected [shared-SQLite slice](../../docs/YT-094-SHARED-SQLITE.md)
+adds an optional Compose volume override for two app instances on one host.
+
 ## Rust/WASM triage workspace
 
 Operators can select Triage workspace for the latest 12 project items. Filter,

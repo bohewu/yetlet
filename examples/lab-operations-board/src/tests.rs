@@ -9,6 +9,127 @@ use tower::ServiceExt;
 const HOST: &str = "127.0.0.1:3012";
 
 #[tokio::test]
+async fn independent_boards_share_sqlite_records_conflicts_busy_errors_and_restart() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("shared.sqlite");
+    let ids = DemoIdentities::generate().unwrap();
+    let a = Board::open(&path, HOST.parse().unwrap(), ids.clone())
+        .await
+        .unwrap();
+    let b = Board::open(&path, HOST.parse().unwrap(), ids.clone())
+        .await
+        .unwrap();
+    let mut ca = Client::login(&a, &ids, "alice").await;
+    let mut cb = Client::login(&b, &ids, "alice").await;
+    let created = ca
+        .call(
+            &a.router,
+            Method::POST,
+            "/board/projects/1/items",
+            Some(ca.form("Created through A", "open", 0, "")),
+        )
+        .await;
+    assert_eq!(created.status, StatusCode::SEE_OTHER);
+    let detail = created.headers[header::LOCATION]
+        .to_str()
+        .unwrap()
+        .to_owned();
+    assert!(
+        cb.call(&b.router, Method::GET, &detail, None)
+            .await
+            .body
+            .contains("Created through A")
+    );
+    assert_eq!(
+        cb.call(
+            &b.router,
+            Method::POST,
+            &detail,
+            Some(cb.form("Updated through B", "active", 1, ""))
+        )
+        .await
+        .status,
+        StatusCode::SEE_OTHER
+    );
+    assert!(
+        ca.call(&a.router, Method::GET, &detail, None)
+            .await
+            .body
+            .contains("Updated through B")
+    );
+    let stale = ca
+        .call(
+            &a.router,
+            Method::POST,
+            &detail,
+            Some(ca.form("Stale draft", "open", 1, "")),
+        )
+        .await;
+    assert_eq!(stale.status, StatusCode::CONFLICT);
+    assert!(stale.body.contains("Stale draft"));
+    let fa = ca.form("Concurrent A", "active", 2, "");
+    let fb = cb.form("Concurrent B", "active", 2, "");
+    let (ra, rb) = tokio::join!(
+        ca.call(&a.router, Method::POST, &detail, Some(fa)),
+        cb.call(&b.router, Method::POST, &detail, Some(fb)),
+    );
+    let mut statuses = [ra.status.as_u16(), rb.status.as_u16()];
+    statuses.sort();
+    assert_eq!(statuses, [303, 409]);
+    let (item, history) = b.database.get(1, 1).await.unwrap();
+    assert_eq!(item.version, 3);
+    assert_eq!(history.len(), 3);
+
+    // Hold a real external writer only to check the application's existing
+    // busy/error mapping. This does not qualify SQLite capacity or durability.
+    let blocker = rusqlite::Connection::open(&path).unwrap();
+    blocker.execute_batch("BEGIN IMMEDIATE;").unwrap();
+    let busy = cb
+        .call(
+            &b.router,
+            Method::POST,
+            &detail,
+            Some(cb.form("Not committed", "active", 3, "")),
+        )
+        .await;
+    assert_eq!(busy.status, StatusCode::SERVICE_UNAVAILABLE);
+    assert!(busy.body.contains("Storage is busy"));
+    blocker.execute_batch("ROLLBACK;").unwrap();
+    drop(blocker);
+    assert_eq!(b.database.get(1, 1).await.unwrap().0.version, 3);
+    assert_eq!(
+        cb.call(
+            &b.router,
+            Method::POST,
+            &detail,
+            Some(cb.form("Recovered through B", "active", 3, ""))
+        )
+        .await
+        .status,
+        StatusCode::SEE_OTHER
+    );
+
+    a.drain().await.unwrap();
+    drop(a);
+    let restarted = Board::open(&path, HOST.parse().unwrap(), ids.clone())
+        .await
+        .unwrap();
+    let mut renewed = Client::login(&restarted, &ids, "alice").await;
+    assert!(
+        renewed
+            .call(&restarted.router, Method::GET, &detail, None)
+            .await
+            .body
+            .contains("Recovered through B")
+    );
+    let (item, history) = restarted.database.get(1, 1).await.unwrap();
+    assert_eq!(item.version, 4);
+    assert_eq!(history.len(), 4);
+    restarted.drain().await.unwrap();
+    b.drain().await.unwrap();
+}
+
+#[tokio::test]
 async fn readonly_and_unavailable_storage_fail_closed_and_recover() {
     let (_dir, board, ids) = setup().await;
     let mut client = Client::login(&board, &ids, "alice").await;

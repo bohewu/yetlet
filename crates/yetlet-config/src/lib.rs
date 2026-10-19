@@ -11,6 +11,11 @@
 #[cfg(target_arch = "wasm32")]
 compile_error!("yetlet-config is native application configuration, not browser state");
 
+#[cfg(feature = "secret-provider")]
+mod secrets;
+#[cfg(feature = "secret-provider")]
+pub use secrets::SecretBinding;
+
 use serde::de::DeserializeOwned;
 use std::{
     collections::BTreeSet,
@@ -65,6 +70,12 @@ pub enum Error {
     EnvironmentKey,
     Type,
     Settings,
+    #[cfg(feature = "secret-provider")]
+    SecretMissing,
+    #[cfg(feature = "secret-provider")]
+    SecretUnavailable,
+    #[cfg(feature = "secret-provider")]
+    SecretAccessDenied,
 }
 
 impl fmt::Display for Error {
@@ -78,6 +89,12 @@ impl fmt::Display for Error {
             Self::EnvironmentKey => "unknown, malformed or duplicate configuration key",
             Self::Type => "configuration value has an incompatible type",
             Self::Settings => "configuration does not match application settings",
+            #[cfg(feature = "secret-provider")]
+            Self::SecretMissing => "required configuration secret is missing",
+            #[cfg(feature = "secret-provider")]
+            Self::SecretUnavailable => "configuration secret provider is unavailable",
+            #[cfg(feature = "secret-provider")]
+            Self::SecretAccessDenied => "configuration secret access was denied",
         })
     }
 }

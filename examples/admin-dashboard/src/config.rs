@@ -16,8 +16,22 @@ pub struct Settings {
     pub database: Database,
     pub cli: Cli,
     pub oidc: Oidc,
+    pub session: Session,
     #[serde(skip)]
     root: PathBuf,
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Session {
+    pub backend: String,
+    pub valkey: Valkey,
+}
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Valkey {
+    pub endpoint: SecretString,
+    pub namespace: String,
+    pub ttl_seconds: u64,
 }
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -99,6 +113,42 @@ fn absolute_clean(path: &Path) -> bool {
     path.is_absolute() && !path.components().any(|c| matches!(c, Component::ParentDir))
 }
 impl Settings {
+    pub fn session_backend(&self) -> io::Result<yetlet_lab_operations_board::SessionBackend> {
+        use yetlet_lab_operations_board::SessionBackend;
+        match self.session.backend.as_str() {
+            "memory" => Ok(SessionBackend::Memory),
+            "valkey" => {
+                #[cfg(feature = "valkey")]
+                {
+                    use yetlet_secrets::ExposeSecret;
+                    let selected = &self.session.valkey;
+                    let endpoint = selected.endpoint.expose_secret();
+                    if !endpoint.starts_with("redis://")
+                        || endpoint.chars().any(char::is_control)
+                        || selected.namespace.is_empty()
+                        || selected.namespace.len() > 64
+                        || !selected
+                            .namespace
+                            .bytes()
+                            .all(|c| c.is_ascii_alphanumeric() || matches!(c, b'_' | b'-'))
+                        || !(1..=30 * 24 * 60 * 60).contains(&selected.ttl_seconds)
+                    {
+                        return Err(invalid());
+                    }
+                    Ok(SessionBackend::Valkey {
+                        endpoint: endpoint.to_owned(),
+                        namespace: selected.namespace.clone(),
+                        ttl: std::time::Duration::from_secs(selected.ttl_seconds),
+                    })
+                }
+                #[cfg(not(feature = "valkey"))]
+                {
+                    Err(invalid())
+                }
+            }
+            _ => Err(invalid()),
+        }
+    }
     pub fn address(&self) -> io::Result<SocketAddr> {
         if self.server.host != "127.0.0.1" || self.server.port == 0 {
             return Err(invalid());
@@ -110,6 +160,13 @@ impl Settings {
     }
     fn validate(&self) -> io::Result<()> {
         self.address()?;
+        self.session_backend()?;
+        // Unselected provider values are not opened or logged.
+        let _ = (
+            &self.session.valkey.endpoint,
+            &self.session.valkey.namespace,
+            self.session.valkey.ttl_seconds,
+        );
         let path = &self.database.path;
         if path.as_os_str().is_empty()
             || path == Path::new(":memory:")
@@ -182,12 +239,63 @@ mod tests {
     use yetlet_secrets::ExposeSecret;
 
     #[test]
+    fn session_selection_is_explicit_and_requires_the_compiled_capability() {
+        let settings = load_from_env(vec![]).unwrap();
+        assert_eq!(settings.session.backend, "memory");
+        assert_eq!(settings.session.valkey.ttl_seconds, 1800);
+        assert!(load_from_env(vec![("APP_SESSION__BACKEND".into(), "unknown".into())]).is_err());
+        let selected = vec![
+            ("APP_SESSION__BACKEND".into(), "valkey".into()),
+            (
+                "APP_SESSION__VALKEY__ENDPOINT".into(),
+                "redis://127.0.0.1:6379/".into(),
+            ),
+        ];
+        #[cfg(feature = "valkey")]
+        {
+            let loaded = load_from_env(selected.clone()).unwrap();
+            assert!(matches!(
+                loaded.session_backend().unwrap(),
+                yetlet_lab_operations_board::SessionBackend::Valkey { ttl, .. }
+                    if ttl == std::time::Duration::from_secs(1800)
+            ));
+            for seconds in [1, 60, 61, 3600, 30 * 24 * 60 * 60] {
+                let mut vars = selected.clone();
+                vars.push((
+                    "APP_SESSION__VALKEY__TTL_SECONDS".into(),
+                    seconds.to_string().into(),
+                ));
+                let loaded = load_from_env(vars).unwrap();
+                assert!(matches!(
+                    loaded.session_backend().unwrap(),
+                    yetlet_lab_operations_board::SessionBackend::Valkey { ttl, .. }
+                        if ttl == std::time::Duration::from_secs(seconds)
+                ));
+            }
+            for (key, value) in [
+                ("APP_SESSION__VALKEY__ENDPOINT", "http://invalid.example/"),
+                ("APP_SESSION__VALKEY__NAMESPACE", "bad/name"),
+                ("APP_SESSION__VALKEY__TTL_SECONDS", "0"),
+                ("APP_SESSION__VALKEY__TTL_SECONDS", "2592001"),
+                ("APP_SESSION__VALKEY__TTL_SECONDS", "18446744073709551615"),
+            ] {
+                let mut vars: Vec<(OsString, OsString)> =
+                    selected.iter().filter(|(k, _)| k != key).cloned().collect();
+                vars.push((key.into(), value.into()));
+                assert!(load_from_env(vars).is_err());
+            }
+        }
+        #[cfg(not(feature = "valkey"))]
+        assert!(load_from_env(selected).is_err());
+    }
+
+    #[test]
     fn explicit_development_overlay_and_env_use_existing_loader_precedence() {
         let dir = tempfile::tempdir().unwrap();
         let path = dir.path().join("secrets.toml");
         std::fs::write(
             &path,
-            "[oidc]\nclient_secret = 'synthetic-private-overlay'\n",
+            "[oidc]\nclient_secret = 'synthetic-private-overlay'\n[session.valkey]\nttl_seconds = 3600\n",
         )
         .unwrap();
         let vars = vec![
@@ -198,6 +306,7 @@ mod tests {
             ),
         ];
         let settings = load_from_env(vars.clone()).unwrap();
+        assert_eq!(settings.session.valkey.ttl_seconds, 3600);
         assert_eq!(
             settings.oidc.client_secret.expose_secret(),
             "synthetic-private-overlay"
@@ -207,12 +316,11 @@ mod tests {
             "APP_OIDC__CLIENT_SECRET".into(),
             "synthetic-environment".into(),
         ));
+        overrides.push(("APP_SESSION__VALKEY__TTL_SECONDS".into(), "7200".into()));
+        let overridden = load_from_env(overrides).unwrap();
+        assert_eq!(overridden.session.valkey.ttl_seconds, 7200);
         assert_eq!(
-            load_from_env(overrides)
-                .unwrap()
-                .oidc
-                .client_secret
-                .expose_secret(),
+            overridden.oidc.client_secret.expose_secret(),
             "synthetic-environment"
         );
         for profile in ["Staging", "Production"] {

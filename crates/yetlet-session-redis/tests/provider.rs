@@ -150,12 +150,18 @@ fn explicit_configuration_bounds_and_secure_name() {
     let c = RedisSessionConfig::new("app", "sid", Duration::from_secs(60), 2, 1024).unwrap();
     assert!(c.cookie_name() == "__Host-sid");
     assert!(c.insecure_for_local_http().cookie_name() == "sid");
+    for millis in [1, 60_001, 1_800_000, 2_592_000_000] {
+        assert!(
+            RedisSessionConfig::new("app", "sid", Duration::from_millis(millis), 1, 10).is_ok()
+        );
+    }
+    assert!(RedisSessionConfig::new("app", "sid", Duration::MAX, 1, 10).is_err());
     for (namespace, scope, ttl, capacity, payload) in [
         ("", "sid", 1000, 1, 10),
         ("app:*", "sid", 1000, 1, 10),
         ("app", "bad;", 1000, 1, 10),
         ("app", "sid", 0, 1, 10),
-        ("app", "sid", 60001, 1, 10),
+        ("app", "sid", 2_592_000_001, 1, 10),
         ("app", "sid", 1000, 0, 10),
         ("app", "sid", 1000, 5, 10),
         ("app", "sid", 1000, 1, 4097),
@@ -170,6 +176,85 @@ fn explicit_configuration_bounds_and_secure_name() {
             )
             .is_err()
         );
+    }
+}
+
+#[tokio::test]
+#[ignore = "requires the disposable Redis fixture"]
+async fn configured_long_lifetime_reaches_store_and_cookie_without_sliding_expiry() {
+    for ttl_ms in [1_800_000, 2_592_000_000] {
+        let config = config(ttl_ms, 2);
+        let a = Manager::<Cart>::connect(&endpoint(), config.clone())
+            .await
+            .unwrap();
+        let b = Manager::<Cart>::connect(&endpoint(), config).await.unwrap();
+        let response = request(app(a.clone()), "/create", "POST", &HeaderMap::new()).await;
+        assert_eq!(response.status(), StatusCode::CREATED);
+        assert!(
+            response.headers()[header::SET_COOKIE]
+                .to_str()
+                .unwrap()
+                .contains(&format!("Max-Age={};", ttl_ms / 1000))
+        );
+        let h = headers(&response);
+        let id = h[header::COOKIE]
+            .to_str()
+            .unwrap()
+            .split_once('=')
+            .unwrap()
+            .1;
+        let mut observer = connection().await;
+        // Each test namespace is isolated; discover its one active session by the
+        // opaque identity rather than exposing provider configuration fields.
+        let keys: Vec<String> = redis::cmd("KEYS")
+            .arg(format!("yetlet:redis:v1:*:session:{id}"))
+            .query_async(&mut observer)
+            .await
+            .unwrap();
+        assert_eq!(keys.len(), 1);
+        let key = &keys[0];
+        let remaining: i64 = redis::cmd("PTTL")
+            .arg(key)
+            .query_async(&mut observer)
+            .await
+            .unwrap();
+        assert!(((ttl_ms as i64 - 10_000)..=ttl_ms as i64).contains(&remaining));
+        let expires: String = redis::cmd("HGET")
+            .arg(key)
+            .arg("expires")
+            .query_async(&mut observer)
+            .await
+            .unwrap();
+        let s = b.open(&h).unwrap();
+        assert_eq!(s.read().await.unwrap().count, 1);
+        s.try_update(|cart| {
+            cart.count += 1;
+            Ok::<_, ()>(())
+        })
+        .await
+        .unwrap();
+        let after: String = redis::cmd("HGET")
+            .arg(key)
+            .arg("expires")
+            .query_async(&mut observer)
+            .await
+            .unwrap();
+        assert_eq!(after, expires);
+        let rotated = request(app(b.clone()), "/rotate", "POST", &h).await;
+        assert_eq!(rotated.status(), StatusCode::NO_CONTENT);
+        assert!(
+            rotated.headers()[header::SET_COOKIE]
+                .to_str()
+                .unwrap()
+                .contains(&format!("Max-Age={};", ttl_ms / 1000))
+        );
+        assert!(a.open(&h).unwrap().read().await.is_err());
+        let newh = headers(&rotated);
+        assert_eq!(a.open(&newh).unwrap().read().await.unwrap().count, 2);
+        b.open(&newh).unwrap().destroy().await.unwrap();
+        assert!(a.open(&newh).unwrap().read().await.is_err());
+        a.shutdown().await.unwrap();
+        b.shutdown().await.unwrap();
     }
 }
 

@@ -1,11 +1,12 @@
 //! Opt-in, application-owned OIDC. No provider roles or email grant access.
+use crate::sessions::Session;
 use crate::{
     AppState, Authentication, CsrfForm, Failure,
     domain::{LoginSession, Principal, principal},
     require_csrf,
 };
 use axum::{
-    Extension, Form,
+    Form,
     extract::{
         Query, State,
         rejection::{FormRejection, QueryRejection},
@@ -23,10 +24,9 @@ use openidconnect::{
 use serde::Deserialize;
 use std::{
     collections::BTreeMap,
-    time::{Duration, Instant},
+    time::{Duration, SystemTime},
 };
 use subtle::ConstantTimeEq;
-use yetlet_session::Session;
 
 type Client = CoreClient<
     EndpointSet,
@@ -142,7 +142,7 @@ impl Oidc {
                 state: state.secret().clone(),
                 nonce,
                 verifier: verifier.secret().clone(),
-                deadline: Instant::now() + Duration::from_secs(300),
+                deadline: SystemTime::now() + Duration::from_secs(300),
             },
         )
     }
@@ -231,11 +231,13 @@ fn subject_map(values: BTreeMap<String, String>) -> Result<BTreeMap<String, Prin
 }
 
 #[derive(Clone)]
+#[cfg_attr(feature = "valkey", derive(serde::Serialize, serde::Deserialize))]
+#[cfg_attr(feature = "valkey", serde(deny_unknown_fields))]
 pub(crate) struct Pending {
     state: String,
     nonce: Nonce,
     verifier: String,
-    deadline: Instant,
+    deadline: SystemTime,
 }
 impl std::fmt::Debug for Pending {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -244,17 +246,18 @@ impl std::fmt::Debug for Pending {
 }
 impl Pending {
     fn accepts(&self, state: &str) -> bool {
-        self.deadline > Instant::now() && bool::from(self.state.as_bytes().ct_eq(state.as_bytes()))
+        self.deadline > SystemTime::now()
+            && bool::from(self.state.as_bytes().ct_eq(state.as_bytes()))
     }
 }
 
 pub(crate) async fn begin(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     form: Result<Form<CsrfForm>, FormRejection>,
 ) -> Result<Response, Failure> {
     let Form(form) = form.map_err(|_| Failure::Invalid)?;
-    require_csrf(&session, &form.csrf)?;
+    require_csrf(&session, &form.csrf).await?;
     let Authentication::Oidc(oidc) = &state.authentication else {
         return Err(Failure::Forbidden);
     };
@@ -264,7 +267,7 @@ pub(crate) async fn begin(
             user: None,
             oidc: Some(pending),
         })
-        .map_err(|_| Failure::Unavailable)?;
+        .await?;
     Ok(Redirect::to(&url).into_response())
 }
 
@@ -277,7 +280,7 @@ pub(crate) struct Callback {
 }
 pub(crate) async fn callback(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     query: Result<Query<Callback>, QueryRejection>,
 ) -> Result<Response, Failure> {
     let Authentication::Oidc(oidc) = &state.authentication else {
@@ -286,10 +289,7 @@ pub(crate) async fn callback(
     let Query(query) = query.map_err(|_| Failure::Invalid)?;
     // Atomic take prevents duplicate or concurrent callback consumption. Invalid
     // callbacks retire the transaction too. Network failure requires a new login.
-    let pending = session
-        .try_update(|value| Ok::<_, Infallible>(value.oidc.take()))
-        .map_err(|_| Failure::Unauthorized)?
-        .ok_or(Failure::Unauthorized)?;
+    let pending = session.take_oidc().await?.ok_or(Failure::Unauthorized)?;
     if !pending.accepts(query.state.as_deref().unwrap_or_default())
         || query.error.is_some()
         || query
@@ -321,10 +321,9 @@ pub(crate) async fn callback(
             user: Some(principal),
             oidc: None,
         })
-        .map_err(|_| Failure::Unauthorized)?;
+        .await?;
     Ok(Redirect::to(&format!("/board/projects/{}/items", principal.project)).into_response())
 }
-use std::convert::Infallible;
 
 #[cfg(test)]
 mod tests;

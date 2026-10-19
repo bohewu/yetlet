@@ -5,6 +5,14 @@ port = 3014
 [database]
 path = "data/board.sqlite3"
 
+[session]
+backend = "memory"
+
+[session.valkey]
+endpoint = ""
+namespace = "admin_dashboard"
+ttl_seconds = 1800
+
 [oidc]
 enabled = false
 issuer = ""

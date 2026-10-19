@@ -1,0 +1,10 @@
+# Optional Linux single-host storage selection. Mount the whole directory so
+# both connections share the database and its WAL/SHM companion files.
+services:
+  app-a:
+    volumes: [shared-data:/data]
+  app-b:
+    volumes: [shared-data:/data]
+
+volumes:
+  shared-data: {}

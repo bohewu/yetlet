@@ -3,6 +3,8 @@ mod asset_data;
 mod assets;
 mod database;
 mod domain;
+mod sessions;
+pub use sessions::SessionBackend;
 #[cfg(feature = "oidc")]
 pub mod oidc;
 mod triage;
@@ -12,7 +14,7 @@ use axum::{
     Form, Router,
     body::Body,
     extract::{
-        DefaultBodyLimit, Extension, Path as RoutePath, Query, State,
+        DefaultBodyLimit, Path as RoutePath, Query, State,
         rejection::{FormRejection, QueryRejection},
     },
     http::{HeaderMap, HeaderValue, StatusCode, header},
@@ -24,13 +26,13 @@ pub use domain::DemoIdentities;
 use domain::{Fields, ListQuery, LoginSession, Principal};
 use futures_util::stream;
 use serde::Deserialize;
+use sessions::{Manager as SessionManager, Session};
 use std::{convert::Infallible, net::SocketAddr, path::Path, sync::Arc, time::Duration};
 use tokio::sync::{Semaphore, watch};
 use yetlet_core::View;
 use yetlet_server_axum::{
     App, DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document_with_metadata,
 };
-use yetlet_session::{Session, SessionConfig, SessionManager};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Failure {
@@ -133,6 +135,7 @@ pub struct Board {
     pub router: Router,
     database: Database,
     stopping: watch::Sender<bool>,
+    sessions: SessionManager,
 }
 impl Board {
     /// Build only for a concrete loopback listener. No public-network demo mode.
@@ -171,6 +174,7 @@ impl Board {
             Authentication::Demo(identities),
             stylesheets,
             triage_script,
+            SessionBackend::Memory,
         )
         .await
     }
@@ -190,6 +194,46 @@ impl Board {
             Authentication::Oidc(Arc::new(oidc)),
             stylesheets,
             triage_script,
+            SessionBackend::Memory,
+        )
+        .await
+    }
+
+    /// Optional shared session selection over the existing providers.
+    pub async fn open_with_frontend_and_sessions(
+        path: &Path,
+        listen: SocketAddr,
+        identities: DemoIdentities,
+        stylesheets: Vec<String>,
+        triage_script: Option<String>,
+        sessions: SessionBackend,
+    ) -> Result<Self, Failure> {
+        Self::open_authenticated(
+            path,
+            listen,
+            Authentication::Demo(identities),
+            stylesheets,
+            triage_script,
+            sessions,
+        )
+        .await
+    }
+    #[cfg(feature = "oidc")]
+    pub async fn open_with_oidc_and_sessions(
+        path: &Path,
+        listen: SocketAddr,
+        oidc: oidc::Oidc,
+        stylesheets: Vec<String>,
+        triage_script: Option<String>,
+        sessions: SessionBackend,
+    ) -> Result<Self, Failure> {
+        Self::open_authenticated(
+            path,
+            listen,
+            Authentication::Oidc(Arc::new(oidc)),
+            stylesheets,
+            triage_script,
+            sessions,
         )
         .await
     }
@@ -200,6 +244,7 @@ impl Board {
         authentication: Authentication,
         stylesheets: Vec<String>,
         triage_script: Option<String>,
+        selected_sessions: SessionBackend,
     ) -> Result<Self, Failure> {
         if triage_script.as_deref().is_some_and(|path| {
             path.strip_prefix("/static/assets/")
@@ -252,11 +297,7 @@ impl Board {
             streams: Arc::new(Semaphore::new(16)),
             stopping: stop_rx,
         };
-        let sessions = SessionManager::<LoginSession>::new(
-            SessionConfig::new("yetlet_lab", Duration::from_secs(1800), 1024)
-                .map_err(|_| Failure::Invalid)?
-                .insecure_for_local_http(),
-        );
+        let sessions = SessionManager::connect(selected_sessions).await?;
         let app = App::new()
             .group("/board", |group| {
                 let routes = group
@@ -297,6 +338,7 @@ impl Board {
             router,
             database,
             stopping,
+            sessions,
         })
     }
     pub fn stop(&self) {
@@ -307,7 +349,8 @@ impl Board {
     }
     pub async fn drain(&self) -> Result<(), Failure> {
         self.stop();
-        self.database.drain().await
+        self.database.drain().await?;
+        self.sessions.shutdown().await
     }
 }
 async fn security(
@@ -408,59 +451,47 @@ fn page(state: &AppState, title: &str, view: View, live: bool) -> Result<Respons
     html = html.replacen("</head>", &format!("{tags}</head>"), 1);
     Ok(axum::response::Html(html).into_response())
 }
-fn user(
-    session: &Session<LoginSession>,
-    project: Option<i64>,
-    write: bool,
-) -> Result<Principal, Failure> {
-    let user = session
-        .read()
-        .map_err(|_| Failure::Unauthorized)?
-        .user
-        .ok_or(Failure::Unauthorized)?;
+async fn user(session: &Session, project: Option<i64>, write: bool) -> Result<Principal, Failure> {
+    let user = session.read().await?.user.ok_or(Failure::Unauthorized)?;
     if project.is_some_and(|project| project != user.project) || (write && !user.write) {
         return Err(Failure::Forbidden);
     }
     Ok(user)
 }
-fn csrf(session: &Session<LoginSession>) -> Result<String, Failure> {
-    session.csrf_token().map_err(|_| Failure::Unauthorized)
+async fn csrf(session: &Session) -> Result<String, Failure> {
+    session.csrf_token().await
 }
-fn require_csrf(session: &Session<LoginSession>, value: &str) -> Result<(), Failure> {
-    if session
-        .verify_csrf(value)
-        .map_err(|_| Failure::Unauthorized)?
-    {
+async fn require_csrf(session: &Session, value: &str) -> Result<(), Failure> {
+    if session.verify_csrf(value).await? {
         Ok(())
     } else {
         Err(Failure::Forbidden)
     }
 }
-async fn home(Extension(session): Extension<Session<LoginSession>>) -> Response {
-    match user(&session, None, false) {
+async fn home(session: Session) -> Response {
+    match user(&session, None, false).await {
         Ok(user) => {
             Redirect::to(&format!("/board/projects/{}/items", user.project)).into_response()
         }
-        Err(_) => Redirect::to("/board/login").into_response(),
+        Err(Failure::Unauthorized) => Redirect::to("/board/login").into_response(),
+        Err(error) => error.into_response(),
     }
 }
-async fn login_page(
-    State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
-) -> Result<Response, Failure> {
+async fn login_page(State(state): State<AppState>, session: Session) -> Result<Response, Failure> {
+    session.ensure_anonymous().await?;
     #[cfg(feature = "oidc")]
     if matches!(state.authentication, Authentication::Oidc(_)) {
         return page(
             &state,
             "Sign in | Lab Operations",
-            views::oidc_login(&csrf(&session)?),
+            views::oidc_login(&csrf(&session).await?),
             false,
         );
     }
     page(
         &state,
         "Sign in | Lab Operations",
-        views::login(&csrf(&session)?, None),
+        views::login(&csrf(&session).await?, None),
         false,
     )
 }
@@ -473,11 +504,11 @@ struct LoginForm {
 }
 async fn login(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     form: Result<Form<LoginForm>, FormRejection>,
 ) -> Result<Response, Failure> {
     let Form(form) = form.map_err(|_| Failure::Invalid)?;
-    require_csrf(&session, &form.csrf)?;
+    require_csrf(&session, &form.csrf).await?;
     #[cfg(not(feature = "oidc"))]
     let Authentication::Demo(identities) = &state.authentication;
     #[cfg(feature = "oidc")]
@@ -492,7 +523,10 @@ async fn login(
             page(
                 &state,
                 "Sign in | Lab Operations",
-                views::login(&csrf(&session)?, Some("The identity or code is not valid.")),
+                views::login(
+                    &csrf(&session).await?,
+                    Some("The identity or code is not valid."),
+                ),
                 false,
             )?,
         )
@@ -504,7 +538,7 @@ async fn login(
             #[cfg(feature = "oidc")]
             oidc: None,
         })
-        .map_err(|_| Failure::Unavailable)?;
+        .await?;
     Ok(Redirect::to(&format!("/board/projects/{}/items", principal.project)).into_response())
 }
 #[derive(Deserialize)]
@@ -513,70 +547,77 @@ struct CsrfForm {
     csrf: String,
 }
 async fn logout(
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     form: Result<Form<CsrfForm>, FormRejection>,
 ) -> Result<Response, Failure> {
     let Form(form) = form.map_err(|_| Failure::Invalid)?;
-    require_csrf(&session, &form.csrf)?;
-    session.destroy().map_err(|_| Failure::Unauthorized)?;
+    require_csrf(&session, &form.csrf).await?;
+    session.destroy().await?;
     Ok(Redirect::to("/board/login").into_response())
 }
 async fn listing(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     RoutePath(project): RoutePath<i64>,
     query: Result<Query<ListQuery>, QueryRejection>,
 ) -> Result<Response, Failure> {
-    let user = user(&session, Some(project), false)?;
+    let user = user(&session, Some(project), false).await?;
     let query = query.map_err(|_| Failure::Invalid)?.0.normalize()?;
     let values = state.database.list(project, query.clone()).await?;
     page(
         &state,
         "Work items | Lab Operations",
-        views::listing(user, &csrf(&session)?, &query, &values),
+        views::listing(user, &csrf(&session).await?, &query, &values),
         query.live,
     )
 }
 async fn new_item(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     RoutePath(project): RoutePath<i64>,
 ) -> Result<Response, Failure> {
-    let user = user(&session, Some(project), true)?;
+    let user = user(&session, Some(project), true).await?;
     page(
         &state,
         "New work item | Lab Operations",
-        views::edit(user, &csrf(&session)?, None, 0, &Fields::default(), None),
+        views::edit(
+            user,
+            &csrf(&session).await?,
+            None,
+            0,
+            &Fields::default(),
+            None,
+        ),
         false,
     )
 }
 async fn detail(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     RoutePath((project, id)): RoutePath<(i64, i64)>,
 ) -> Result<Response, Failure> {
-    let user = user(&session, Some(project), false)?;
+    let user = user(&session, Some(project), false).await?;
     let (value, history) = state.database.get(project, id).await?;
     page(
         &state,
         "Work item | Lab Operations",
-        views::detail(user, &csrf(&session)?, &value, &history),
+        views::detail(user, &csrf(&session).await?, &value, &history),
         false,
     )
 }
 async fn edit(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     RoutePath((project, id)): RoutePath<(i64, i64)>,
 ) -> Result<Response, Failure> {
-    let user = user(&session, Some(project), true)?;
+    let user = user(&session, Some(project), true).await?;
     let (value, _) = state.database.get(project, id).await?;
     page(
         &state,
         "Edit work item | Lab Operations",
         views::edit(
             user,
-            &csrf(&session)?,
+            &csrf(&session).await?,
             Some(id),
             value.version,
             &value.fields,
@@ -609,19 +650,19 @@ impl EditForm {
 }
 async fn save(
     state: AppState,
-    session: Session<LoginSession>,
+    session: Session,
     project: i64,
     id: Option<i64>,
     form: Result<Form<EditForm>, FormRejection>,
 ) -> Result<Response, Failure> {
-    let principal = user(&session, Some(project), true)?;
+    let principal = user(&session, Some(project), true).await?;
     let Form(form) = match form {
         Ok(form) => form,
         Err(error) => {
             return Ok((error.status(), "Invalid or oversized form submission").into_response());
         }
     };
-    require_csrf(&session, &form.csrf)?;
+    require_csrf(&session, &form.csrf).await?;
     let fields = form.fields();
     if !fields.errors(project).is_empty() {
         return Ok((
@@ -631,7 +672,7 @@ async fn save(
                 "Correct fields | Lab Operations",
                 views::edit(
                     principal,
-                    &csrf(&session)?,
+                    &csrf(&session).await?,
                     id,
                     form.expected_version,
                     &fields,
@@ -643,7 +684,7 @@ async fn save(
             .into_response());
     }
     // Recheck current session after parsing, before starting the bounded SQL operation.
-    user(&session, Some(project), true)?;
+    user(&session, Some(project), true).await?;
     match state
         .database
         .save(principal, id, form.expected_version, fields.clone())
@@ -659,7 +700,7 @@ async fn save(
                 "Draft not saved | Lab Operations",
                 views::edit(
                     principal,
-                    &csrf(&session)?,
+                    &csrf(&session).await?,
                     id,
                     form.expected_version,
                     &fields,
@@ -674,7 +715,7 @@ async fn save(
 }
 async fn create(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     RoutePath(project): RoutePath<i64>,
     form: Result<Form<EditForm>, FormRejection>,
 ) -> Result<Response, Failure> {
@@ -682,7 +723,7 @@ async fn create(
 }
 async fn update(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     RoutePath((project, id)): RoutePath<(i64, i64)>,
     form: Result<Form<EditForm>, FormRejection>,
 ) -> Result<Response, Failure> {
@@ -712,11 +753,11 @@ async fn asset(RoutePath(name): RoutePath<String>) -> Response {
 }
 async fn events(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     RoutePath(project): RoutePath<i64>,
     headers: HeaderMap,
 ) -> Result<Response, Failure> {
-    let principal = user(&session, Some(project), false)?;
+    let principal = user(&session, Some(project), false).await?;
     let ids: Vec<_> = headers.get_all("last-event-id").iter().collect();
     if ids.len() > 1
         || ids.first().is_some_and(|id| {
@@ -737,7 +778,7 @@ async fn events(
         .map_err(|_| Failure::Busy)?;
     struct Cursor {
         state: AppState,
-        session: Session<LoginSession>,
+        session: Session,
         principal: Principal,
         first: bool,
         deadline: tokio::time::Instant,
@@ -764,7 +805,9 @@ async fn events(
             tokio::select! {_ = tokio::time::sleep(Duration::from_secs(1))=>{},_ = cursor.state.stopping.changed()=>return None,}
         }
         cursor.first = false;
-        if user(&cursor.session, Some(cursor.principal.project), false).ok()
+        if user(&cursor.session, Some(cursor.principal.project), false)
+            .await
+            .ok()
             != Some(cursor.principal)
         {
             return None;

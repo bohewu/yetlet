@@ -38,6 +38,7 @@ fn shutdown_signal(stopping: watch::Sender<bool>) -> io::Result<impl Future<Outp
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let settings = config::load()?;
     let address = settings.address()?;
+    let sessions = settings.session_backend()?;
     let assets = vite::Snapshot::load_selected(&settings.cli.vite.root)?;
     let oidc = if settings.oidc.enabled {
         let secrets: Arc<dyn SecretProvider> =
@@ -52,12 +53,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let listener = tokio::net::TcpListener::bind(address).await?;
     let actual = listener.local_addr()?;
     let board = if let Some(oidc) = oidc {
-        Board::open_with_oidc(
+        Board::open_with_oidc_and_sessions(
             &settings.database_path(),
             actual,
             oidc,
             assets.stylesheet_paths(),
             assets.entry_script_path(),
+            sessions,
         )
         .await?
     } else {
@@ -65,12 +67,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         for (name, code) in identities.terminal_codes() {
             println!("LOCAL_LOGIN {name} {code}");
         }
-        Board::open_with_frontend(
+        Board::open_with_frontend_and_sessions(
             &settings.database_path(),
             actual,
             identities,
             assets.stylesheet_paths(),
             assets.entry_script_path(),
+            sessions,
         )
         .await?
     };

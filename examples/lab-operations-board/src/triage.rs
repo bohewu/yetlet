@@ -68,10 +68,10 @@ fn select(label: &str, name: &'static str, options: &[(&str, &str)]) -> Element 
 }
 pub(super) async fn workspace(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     RoutePath(project): RoutePath<i64>,
 ) -> Result<Response, Failure> {
-    let principal = user(&session, Some(project), true)?;
+    let principal = user(&session, Some(project), true).await?;
     let items = state
         .database
         .list(project, ListQuery::default().normalize()?)
@@ -87,7 +87,7 @@ pub(super) async fn workspace(
         items,
     };
     let json = serde_json::to_string(&snapshot).map_err(|_| Failure::Unavailable)?;
-    let csrf = csrf(&session)?;
+    let csrf = csrf(&session).await?;
     let mut rows = Element::new("ul")
         .attribute("id", "triage-list")
         .attribute("class", "triage-list");
@@ -191,14 +191,14 @@ fn error(failure: Failure) -> Response {
 }
 pub(super) async fn save(
     State(state): State<AppState>,
-    Extension(session): Extension<Session<LoginSession>>,
+    session: Session,
     RoutePath(project): RoutePath<i64>,
     payload: Result<Json<Save>, JsonRejection>,
 ) -> Response {
     let result = async {
-        let principal = user(&session, Some(project), true)?;
+        let principal = user(&session, Some(project), true).await?;
         let Json(payload) = payload.map_err(|_| Failure::Invalid)?;
-        require_csrf(&session, &payload.csrf)?;
+        require_csrf(&session, &payload.csrf).await?;
         let item = payload.item;
         if item.id <= 0 || item.version <= 0 {
             return Err(Failure::Invalid);
@@ -213,7 +213,7 @@ pub(super) async fn save(
         if !fields.errors(project).is_empty() {
             return Err(Failure::Transition);
         }
-        user(&session, Some(project), true)?;
+        user(&session, Some(project), true).await?;
         state
             .database
             .save(principal, Some(item.id), item.version, fields)

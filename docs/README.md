@@ -12,6 +12,8 @@ Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 - [Windows CLI exit-125 follow-up](WINDOWS-CLI-125-VERIFICATION.md): Cargo executable ACL diagnosis, safe stage diagnostics and source-matched native build/run/Ctrl-C cleanup with protected task-local tools.
 - [Development HTTPS](DEV-HTTPS-VERIFICATION.md): existing settings, externally prepared mkcert certificates, optional Rust TLS, Vite HTTPS/WSS and native run/stop/build evidence.
 - [Opt-in secret providers](SECRET-PROVIDERS.md): asynchronous named string lookup, explicit settings snapshots and constructor/State injection with replaceable providers.
+- [Settings from SecretProvider](SETTINGS-SECRET-PROVIDER.md): opt-in startup resolution into selected protected fields, narrow module settings and fail-closed errors.
+- [Shared SQLite reference](YT-094-SHARED-SQLITE.md): two Compose app replicas accessing one local business-data directory, application conflicts and restart/error behavior.
 - [Doctor follow-up](YT-102-DOCTOR-VERIFICATION.md): authorized Rustup permission repair and source-matched Linux/Windows verification; no change to doctor trust policy.
 - [Windows Vite pair verification](YT-102-WINDOWS-VITE-VERIFICATION.md): source-matched native Rust/Vite lifecycle checks using existing installed tools, with separate execution and review evidence.
 - [Windows browser CSS HMR verification](YT-102-WINDOWS-HMR-VERIFICATION.md): actual generated Rust SSR, rendered CSS updates with retained interaction state, restoration and owned browser/server cleanup.
@@ -100,6 +102,9 @@ historical mint-game setup and manual verification steps; its passed results and
 final cleanup are reconciled in the follow-up rather than rerun.
 The [opt-in OIDC slice](YT-094-OIDC.md) records existing settings/SecretProvider
 composition and its separate real-provider qualification boundary.
+The [Valkey shared-session slice](YT-094-VALKEY-SESSIONS.md) records explicit
+provider/settings selection and two-container login/logout, restart and outage
+verification, separate from business storage and production HA.
 
 
 The standalone [Issue Tracker starter](../examples/production-starter/README.md) exercises

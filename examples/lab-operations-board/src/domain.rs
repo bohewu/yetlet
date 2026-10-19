@@ -27,9 +27,23 @@ const USERS: [Principal; 3] = [
     },
 ];
 
-#[cfg(feature = "oidc")]
+#[cfg(any(feature = "oidc", feature = "valkey"))]
 pub(crate) fn principal(name: &str) -> Option<Principal> {
     USERS.iter().copied().find(|user| user.name == name)
+}
+
+#[cfg(feature = "valkey")]
+impl Serialize for Principal {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        serializer.serialize_str(self.name)
+    }
+}
+#[cfg(feature = "valkey")]
+impl<'de> Deserialize<'de> for Principal {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let name = String::deserialize(deserializer)?;
+        principal(&name).ok_or_else(|| serde::de::Error::custom("unknown local identity"))
+    }
 }
 
 /// Synthetic local credentials, generated anew for each process. Not an IdP.
@@ -75,9 +89,12 @@ impl DemoIdentities {
 }
 
 #[derive(Clone, Debug, Default)]
+#[cfg_attr(feature = "valkey", derive(Serialize, Deserialize))]
+#[cfg_attr(feature = "valkey", serde(deny_unknown_fields))]
 pub(crate) struct LoginSession {
     pub user: Option<Principal>,
     #[cfg(feature = "oidc")]
+    #[cfg_attr(feature = "valkey", serde(default))]
     pub oidc: Option<crate::oidc::Pending>,
 }
 

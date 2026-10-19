@@ -31,6 +31,21 @@ fn fixture() -> Oidc {
     }
 }
 
+#[cfg(feature = "valkey")]
+#[test]
+fn pending_oidc_state_round_trips_without_serializing_permissions() {
+    let (_, pending) = fixture().start();
+    let state = LoginSession {
+        user: Some(principal("viewer").unwrap()),
+        oidc: Some(pending.clone()),
+    };
+    let encoded = serde_json::to_string(&state).unwrap();
+    assert!(!encoded.contains("write") && !encoded.contains("project"));
+    let decoded: LoginSession = serde_json::from_str(&encoded).unwrap();
+    assert_eq!(decoded.user, state.user);
+    assert!(decoded.oidc.unwrap().accepts(&pending.state));
+}
+
 #[test]
 fn each_attempt_has_fresh_state_nonce_and_s256_without_secrets_in_debug() {
     let oidc = fixture();
@@ -55,7 +70,7 @@ fn each_attempt_has_fresh_state_nonce_and_s256_without_secrets_in_debug() {
     assert!(!pending.accepts("wrong"));
     assert_eq!(format!("{pending:?}"), "Pending { .. }");
     let expired = Pending {
-        deadline: Instant::now() - Duration::from_secs(1),
+        deadline: SystemTime::now() - Duration::from_secs(1),
         ..pending
     };
     assert!(!expired.accepts(&a["state"]));

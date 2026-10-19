@@ -105,7 +105,8 @@ impl RedisSessionConfig {
             || !cookie_scope
                 .bytes()
                 .all(|c| c.is_ascii_alphanumeric() || c == b'_')
-            || !(1..=60000).contains(&ttl.as_millis())
+            || ttl.as_millis() == 0
+            || ttl > Duration::from_secs(30 * 24 * 60 * 60)
             || !(1..=4).contains(&max_in_flight)
             || !(1..=4096).contains(&payload_limit)
         {
