@@ -142,11 +142,21 @@ backend service, HMR, production hosting or release is selected.
 **YT-105 form-binding comparison (2026-10-19, research only):** the first
 [Admin/Todo study](YT-105-FORM-BINDING-RESEARCH.md) measures control/value/event
 glue and recommends documenting native action-time drafts versus graph-owned
-drafts over existing `web-sys` and listener ownership. No public helper or
-runtime change is selected. The broader YT-105 state-read/initial-render and
-HTTP-feedback comparison remains Todo. Independent Reviewer
+drafts over existing `web-sys` and listener ownership. No public form-binding helper or
+runtime change is selected. The broader YT-105 HTTP-feedback comparison remains
+Todo. Independent Reviewer
 `/root/yt105_form_binding_research_review_oct19` PASS has zero issues or required
 followups for this research slice.
+
+**YT-105 state-read/initial-render comparison (2026-10-19, research only):**
+the [second Admin/Todo study](YT-105-STATE-READ-INITIAL-RENDER-RESEARCH.md)
+identifies duplicated committed-state mirrors and proposes a weak
+`GraphHandle::snapshot()` matching existing owner clone/error semantics. Initial
+rendering remains explicit application setup rather than constructor side
+effects. Neither proposal is implemented or approved for implementation;
+HTTP-feedback research remains open and YT-105 stays Todo. Independent Reviewer
+`/root/yt105_state_read_review_oct19` PASS has zero issues or required followups
+for this research slice.
 
 **YT-106, optional third-party component interoperability research:** study
 small npm/Vite JS/TS and wasm-bindgen boundaries for chart/editor components,

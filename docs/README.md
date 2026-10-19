@@ -104,7 +104,10 @@ interaction and explicit HTTP saves; [API observations](YT-094-API-OBSERVATIONS.
 record the YT-105 follow-up. The first
 [form-value/event comparison](YT-105-FORM-BINDING-RESEARCH.md) recommends existing
 native-draft and graph-draft patterns before adding a public helper, with
-independent Reviewer PASS; the broader state-read/HTTP comparison remains open. Packaging is covered by YT-104 above.
+independent Reviewer PASS. The separate
+[state-read/initial-render study](YT-105-STATE-READ-INITIAL-RENDER-RESEARCH.md)
+proposes a weak-handle snapshot and explicit application rendering for later
+selection, with independent Reviewer PASS; HTTP feedback remains open. Packaging is covered by YT-104 above.
 The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
 completed native/browser checks from the returned operator-attested native
 IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.
