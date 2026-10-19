@@ -139,6 +139,15 @@ Reviewer `/root/yt104_template_closeout_review_oct19` both PASS with zero issues
 or required followups. Native SSR remains the default; no router,
 backend service, HMR, production hosting or release is selected.
 
+**YT-105 form-binding comparison (2026-10-19, research only):** the first
+[Admin/Todo study](YT-105-FORM-BINDING-RESEARCH.md) measures control/value/event
+glue and recommends documenting native action-time drafts versus graph-owned
+drafts over existing `web-sys` and listener ownership. No public helper or
+runtime change is selected. The broader YT-105 state-read/initial-render and
+HTTP-feedback comparison remains Todo. Independent Reviewer
+`/root/yt105_form_binding_research_review_oct19` PASS has zero issues or required
+followups for this research slice.
+
 **YT-106, optional third-party component interoperability research:** study
 small npm/Vite JS/TS and wasm-bindgen boundaries for chart/editor components,
 including Web Components and a separate React mount only when needed. Define

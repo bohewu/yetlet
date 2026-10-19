@@ -101,7 +101,10 @@ links existing evidence and accepted limitations; this is not production or
 public-release qualification. The application guide retains the first-slice results.
 The later [Rust/WASM triage slice](YT-094-WASM-TRIAGE.md) adds local multi-draft
 interaction and explicit HTTP saves; [API observations](YT-094-API-OBSERVATIONS.md)
-record the bounded YT-105 follow-up and existing YT-104 packaging gap.
+record the YT-105 follow-up. The first
+[form-value/event comparison](YT-105-FORM-BINDING-RESEARCH.md) recommends existing
+native-draft and graph-draft patterns before adding a public helper, with
+independent Reviewer PASS; the broader state-read/HTTP comparison remains open. Packaging is covered by YT-104 above.
 The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
 completed native/browser checks from the returned operator-attested native
 IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.
