@@ -107,7 +107,12 @@ native-draft and graph-draft patterns before adding a public helper, with
 independent Reviewer PASS. The separate
 [state-read/initial-render study](YT-105-STATE-READ-INITIAL-RENDER-RESEARCH.md)
 proposes a weak-handle snapshot and explicit application rendering for later
-selection, with independent Reviewer PASS; HTTP feedback remains open. Packaging is covered by YT-104 above.
+selection, with independent Reviewer PASS. The
+[HTTP-feedback comparison](YT-105-HTTP-FEEDBACK-RESEARCH.md) retains existing
+body-token CSRF and recommends application-owned field feedback before a shared
+error API, with independent Reviewer PASS and zero issues/required followups.
+YT-105 is Done at research-only scope; none of these proposals is runtime
+implementation. Packaging is covered by YT-104 above.
 The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
 completed native/browser checks from the returned operator-attested native
 IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.

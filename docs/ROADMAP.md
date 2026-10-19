@@ -143,8 +143,8 @@ backend service, HMR, production hosting or release is selected.
 [Admin/Todo study](YT-105-FORM-BINDING-RESEARCH.md) measures control/value/event
 glue and recommends documenting native action-time drafts versus graph-owned
 drafts over existing `web-sys` and listener ownership. No public form-binding helper or
-runtime change is selected. The broader YT-105 HTTP-feedback comparison remains
-Todo. Independent Reviewer
+runtime change is selected. HTTP feedback is compared in the third study below.
+Independent Reviewer
 `/root/yt105_form_binding_research_review_oct19` PASS has zero issues or required
 followups for this research slice.
 
@@ -154,9 +154,20 @@ identifies duplicated committed-state mirrors and proposes a weak
 `GraphHandle::snapshot()` matching existing owner clone/error semantics. Initial
 rendering remains explicit application setup rather than constructor side
 effects. Neither proposal is implemented or approved for implementation;
-HTTP-feedback research remains open and YT-105 stays Todo. Independent Reviewer
+the subsequent HTTP-feedback comparison is recorded below. Independent Reviewer
 `/root/yt105_state_read_review_oct19` PASS has zero issues or required followups
 for this research slice.
+
+**YT-105 HTTP-feedback comparison (2026-10-19, research only):** the
+[third Admin/Todo study](YT-105-HTTP-FEEDBACK-RESEARCH.md) finds the existing
+body-token CSRF sufficient for these callers and traces field-detail loss in
+both the Admin handler and common executor. It recommends a private Admin HTTP
+adapter/payload trial and Todo code mapping before changing public error types;
+custom ActionExecutor implementations still have the same fixed ActionError.
+All research topics are covered. Independent Reviewer
+`/root/yt105_http_feedback_review_oct19` PASS has zero issues or required
+followups and explicitly approves YT-105 Done at research-only scope.
+No API or application change is implemented or authorized.
 
 **YT-106, optional third-party component interoperability research:** study
 small npm/Vite JS/TS and wasm-bindgen boundaries for chart/editor components,
