@@ -209,8 +209,16 @@ fn selected_vite_dotenv_is_checked_before_load_on_each_build_and_serve_resolutio
     }
     for tailwind in [false, true] {
         let name = format!("dotenv-{tailwind}");
-        yetlet_cli::scaffold::create_selected(&name, root.path(), false, false, tailwind, true)
-            .unwrap();
+        yetlet_cli::scaffold::create_selected(
+            &name,
+            root.path(),
+            yetlet_cli::scaffold::Template::Native,
+            false,
+            false,
+            tailwind,
+            true,
+        )
+        .unwrap();
         let app = root.path().join(name);
         let frontend = app.join("ui assets").join("frontend");
         fs::create_dir(frontend.parent().unwrap()).unwrap();
@@ -312,8 +320,16 @@ fn selected_vite_runtime_settings_and_custom_root_compile_with_explicit_cargo_ov
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     }
-    yetlet_cli::scaffold::create_selected("selected-runtime", root.path(), true, false, true, true)
-        .unwrap();
+    yetlet_cli::scaffold::create_selected(
+        "selected-runtime",
+        root.path(),
+        yetlet_cli::scaffold::Template::Native,
+        true,
+        false,
+        true,
+        true,
+    )
+    .unwrap();
     let app = root.path().join("selected-runtime");
     let framework = Path::new(env!("CARGO_MANIFEST_DIR"))
         .parent()

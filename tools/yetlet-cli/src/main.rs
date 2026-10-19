@@ -72,12 +72,20 @@ fn main() -> ExitCode {
         Ok(Cli::New {
             name,
             dir,
+            template,
             cloud,
             with_config,
             with_tailwind,
             vite,
-        }) => match scaffold::create_selected(&name, &dir, cloud, with_config, with_tailwind, vite)
-        {
+        }) => match scaffold::create_selected(
+            &name,
+            &dir,
+            template,
+            cloud,
+            with_config,
+            with_tailwind,
+            vite,
+        ) {
             Ok(()) => {
                 println!(
                     "Created {name}. Follow its README for explicit dependency and lockfile preparation."

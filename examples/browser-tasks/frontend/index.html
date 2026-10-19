@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
+  <title>Yetlet Tasks</title>
+  <link rel="icon" type="image/svg+xml" href="./mark.svg">
+  <script type="module" src="./app.ts"></script>
+</head>
+<body>
+  <header class="brand"><a href="#main" class="skip">Skip to tasks</a><div class="brand-name"><span class="mark" aria-hidden="true">Y</span>Yetlet Tasks</div><span id="workspace-label">Local workspace</span></header>
+  <main id="main">
+    <h1>Make room for what matters.</h1>
+    <p class="subtitle">A small list. A clear next step.</p>
+    <noscript><p>JavaScript and WebAssembly are required for this browser-only application.</p></noscript>
+    <p id="runtime-status" role="status">Loading browser runtime…</p>
+    <fieldset id="workspace" disabled>
+      <form id="add-form">
+        <label for="new-task">New task</label>
+        <div class="input-row"><input id="new-task" name="title" maxlength="120" autocomplete="off" placeholder="What needs to get done?" required><button class="primary" type="submit">Add task</button></div>
+      </form>
+      <form id="edit-form" hidden>
+        <label for="edit-title">Edit task</label>
+        <div class="input-row"><input id="edit-title" name="title" maxlength="120" required><button class="primary" type="submit">Save changes</button><button id="cancel-edit" type="button">Cancel</button></div>
+      </form>
+      <div class="toolbar"><div class="filters" role="group" aria-label="Filter tasks"><button id="filter-all" type="button" aria-pressed="true">All</button><button id="filter-active" type="button" aria-pressed="false">Active</button><button id="filter-completed" type="button" aria-pressed="false">Completed</button></div><p id="count" aria-live="polite"></p></div>
+      <ul id="tasks" aria-label="Tasks"></ul>
+      <p id="empty" hidden>No tasks in this view.</p>
+      <p id="feedback" role="status" aria-live="polite"></p>
+    </fieldset>
+    <footer>Changes stay in this tab. Reload to start fresh.</footer>
+  </main>
+</body>
+</html>

@@ -47,6 +47,7 @@ fn app_input(name: &str) -> Result<(&str, &str), String> {
     match name {
         "src/main.rs" | "src/config.rs" | "src/vite.rs" => Ok(("src", &name[4..])),
         "dist/.vite/manifest.json" => Ok(("dist/.vite", "manifest.json")),
+        "dist/index.html" => Ok(("dist", "index.html")),
         "Cargo.toml"
         | "Cargo.lock"
         | "base.toml"
@@ -101,9 +102,12 @@ fn generated_subdirectories(files: &[(&str, String)]) -> Result<Vec<&'static str
     let mut children = Vec::new();
     for (path, _) in files {
         let directory = match *path {
-            "src/main.rs" | "src/config.rs" | "src/tailwind.rs" | "src/vite.rs" => Some("src"),
+            "src/main.rs" | "src/lib.rs" | "src/model.rs" | "src/config.rs" | "src/tailwind.rs"
+            | "src/vite.rs" => Some("src"),
             "cargo-overlay/Cargo.toml" => Some("cargo-overlay"),
             "frontend/package.json"
+            | "frontend/index.html"
+            | "frontend/build-wasm.mjs"
             | "frontend/package-lock.json"
             | "frontend/vite.config.mjs"
             | "frontend/vite.dev.config.mjs"
@@ -206,4 +210,11 @@ pub(crate) fn read_frontend_manifest(frontend: &App) -> Result<Vec<u8>, String> 
     return linux::read_frontend_manifest(frontend);
     #[cfg(not(target_os = "linux"))]
     read_app_file(frontend, "dist/.vite/manifest.json")
+}
+
+pub(crate) fn read_frontend_index(frontend: &App) -> Result<Vec<u8>, String> {
+    #[cfg(target_os = "linux")]
+    return linux::read_frontend_index(frontend);
+    #[cfg(not(target_os = "linux"))]
+    read_app_file(frontend, "dist/index.html")
 }

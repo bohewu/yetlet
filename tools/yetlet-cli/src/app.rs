@@ -9,6 +9,7 @@ pub struct Failure {
 
 #[derive(Debug)]
 pub enum Completion {
+    Skipped,
     Exited(ExitStatus),
     FrontendExited(ExitStatus),
     WatcherExited(ExitStatus),
@@ -43,6 +44,46 @@ fn execute(
         crate::settings::load(&app).map_err(|message| Failure { code: 1, message })?;
     if force_watch {
         settings.rust.watch = true;
+    }
+    if settings.target == crate::settings::Target::Browser {
+        if settings.rust.watch {
+            return Err(Failure {
+                code: 1,
+                message: "browser target uses built static assets; Rust watch is not selected"
+                    .into(),
+            });
+        }
+        let selected = if dev {
+            settings.vite.auto_start
+        } else {
+            settings.vite.auto_build
+        };
+        if !selected {
+            println!(
+                "Browser {} skipped by public cli.vite settings",
+                if dev { "run" } else { "build" }
+            );
+            return Ok(Completion::Skipped);
+        }
+        let frontend =
+            crate::platform::fs::frontend_directory(&app, Path::new(&settings.vite.root))
+                .map_err(|message| Failure { code: 1, message })?;
+        crate::platform::fs::validate_frontend_dotenv(&frontend)
+            .map_err(|message| Failure { code: 1, message })?;
+        crate::platform::fs::read_app_file(&frontend, "package.json")
+            .map_err(|message| Failure { code: 1, message })?;
+        if dev {
+            crate::platform::fs::read_frontend_manifest(&frontend)
+                .and_then(|_| crate::platform::fs::read_frontend_index(&frontend))
+                .map_err(|_| Failure {
+                    code: 1,
+                    message:
+                        "browser run requires protected built static assets; run yetlet build first"
+                            .into(),
+                })?;
+        }
+        return crate::platform::process::run_frontend(&app, &frontend, dev)
+            .map_err(process_failure);
     }
     let selected = settings.vite.enabled
         && if dev {

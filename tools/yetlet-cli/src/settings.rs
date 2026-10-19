@@ -9,12 +9,22 @@ use std::{
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub(crate) struct Settings {
+    #[serde(default)]
+    pub(crate) target: Target,
     #[serde(skip)]
     pub(crate) tls: Tls,
     #[serde(default)]
     pub(crate) rust: Rust,
     pub(crate) vite: Vite,
     pub(crate) generate: Generate,
+}
+
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "lowercase")]
+pub(crate) enum Target {
+    #[default]
+    Native,
+    Browser,
 }
 
 #[derive(Debug, Default, Deserialize)]
@@ -106,6 +116,7 @@ pub(crate) struct K8s {
 impl Default for Settings {
     fn default() -> Self {
         Self {
+            target: Target::Native,
             tls: Tls::default(),
             rust: Rust::default(),
             vite: Vite {
@@ -220,6 +231,11 @@ pub(crate) fn load_from_env(
     {
         return Err(INVALID.into());
     }
+    if settings.target == Target::Browser
+        && (!settings.vite.enabled || settings.rust.watch || settings.tls.enabled)
+    {
+        return Err("CLI_PROJECT settings: browser target requires Vite enabled, Rust watch disabled and no native TLS".into());
+    }
     Ok(settings)
 }
 
@@ -253,6 +269,33 @@ mod tests {
         let app = fs::open_directory(&temp.path().join("settings")).unwrap();
         (temp, app)
     }
+    #[test]
+    fn browser_target_uses_shared_profile_overrides_and_rejects_native_capabilities() {
+        let (_temp, app) = app();
+        let base = format!("[cli]\ntarget='native'\n{BASE}");
+        std::fs::write(fs::app_root(&app).join("base.toml"), &base).unwrap();
+        std::fs::write(
+            fs::app_root(&app).join("production.toml"),
+            "[cli]\ntarget='browser'\n",
+        )
+        .unwrap();
+        assert_eq!(load_from_env(&app, []).unwrap().target, Target::Browser);
+        let override_target = [("APP_CLI__TARGET".into(), "native".into())];
+        assert_eq!(
+            load_from_env(&app, override_target).unwrap().target,
+            Target::Native
+        );
+        for overlay in [
+            "[cli]\ntarget='unknown'\n",
+            "[cli]\ntarget=true\n",
+            "[cli]\ntarget='browser'\n[cli.rust]\nwatch=true\n",
+            "[cli]\ntarget='browser'\n[cli.vite]\nenabled=false\n",
+        ] {
+            std::fs::write(fs::app_root(&app).join("production.toml"), overlay).unwrap();
+            assert!(load_from_env(&app, []).is_err(), "{overlay}");
+        }
+    }
+
     #[test]
     fn same_loader_profile_and_scoped_environment_precedence() {
         let (_temp, app) = app();

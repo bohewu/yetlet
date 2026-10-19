@@ -1,0 +1,14 @@
+[cli]
+target = "browser"
+
+[cli.rust]
+watch = false
+
+[cli.vite]
+enabled = true
+root = "frontend/"
+auto_start = true
+auto_build = true
+
+[cli.generate.k8s]
+replicas = 1

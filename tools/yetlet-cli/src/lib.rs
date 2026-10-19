@@ -1,6 +1,7 @@
 //! Unpublished local CLI: literal arguments, diagnostics, SSR scaffolding and frozen Cargo.
 
 pub mod app;
+mod browser;
 pub mod compose;
 pub mod docker;
 pub mod doctor;
@@ -29,12 +30,12 @@ pub const VERSION: &str = concat!(
     env!("CARGO_PKG_VERSION"),
     " (unpublished preview)"
 );
-pub const HELP: &str = "Yetlet CLI preview (unpublished)\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
-const NEW_HELP: &str = "Usage: yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]\n\nNAME may appear anywhere among options. --parent defaults to cwd and must exist.\nNAME: 1-64 lowercase ASCII letters/digits/-/_, starting with a letter; reserved names refused.\n--vite selects the complete frontend scaffold and implies --settings. Plain new keeps app-runtime settings opt-in.\n--tailwind selects standalone Tailwind or the official Vite plugin. --service adds bind/health/shutdown.\nCreates one new tree without overwrite, dependency installation, lock generation or process startup.\n";
+pub const HELP: &str = "Yetlet CLI preview (unpublished)\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
+const NEW_HELP: &str = "Usage: yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n\nNAME may appear anywhere among options. --parent defaults to cwd and must exist.\nNAME: 1-64 lowercase ASCII letters/digits/-/_, starting with a letter; reserved names refused.\n--vite selects the complete frontend scaffold and implies --settings. Plain new keeps app-runtime settings opt-in.\n--tailwind selects standalone Tailwind or the official Vite plugin. --service adds bind/health/shutdown.\n--template native|browser selects a built-in starter (default native), independent of runtime settings.\nThe browser template persists cli.target=browser and includes Vite/public settings.\nBrowser creation refuses --service. Plain creation defaults to native.\nCreates one new tree without overwrite, dependency installation, lock generation or process startup.\n";
 const DOCTOR_HELP: &str = "Usage: yetlet doctor [--json]\n\nReports bounded local Rust/Cargo 1.99+ identity and compiled new-filesystem capability.\nEnvironment only; application, framework, settings, frontend and execution readiness are not checked.\n--json emits schema 1. No builds, installs, Node probes or listeners.\n";
-const RUN_HELP: &str = "Usage: yetlet run [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; no ancestor or workspace search.\nRequires a protected standalone app and existing Cargo.lock; runs frozen Cargo.\nPublic settings select Rust watch and optional Vite startup; no implicit installs.\nOwned processes must retain their process group/Job; escaped daemons are unsupported.\n";
+const RUN_HELP: &str = "Usage: yetlet run [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; no ancestor or workspace search.\nRequires a protected standalone app and existing Cargo.lock; runs frozen Cargo.\nPublic settings select native Rust watch/Vite or cli.target=browser static preview.\nBrowser run starts only the prepared frontend, honoring cli.vite.auto_start. No implicit installs.\nOwned processes must retain their process group/Job; escaped daemons are unsupported.\n";
 const WATCH_HELP: &str = "Usage: yetlet watch [--manifest-path PATH]\n\nRuns the same pipeline as yetlet run, forcing Rust watch for this invocation.\nManifest defaults to exactly cwd/Cargo.toml; requires a protected standalone app and Cargo.lock.\nPublic settings are validated first; Vite enabled, auto_start and root settings still apply.\nRequires Watchexec on PATH; no implicit installs or settings-file changes.\nRust restarts retain Vite; cancellation cleans up owned processes.\n";
-const BUILD_HELP: &str = "Usage: yetlet build [--manifest-path PATH] [--release]\n\nManifest defaults to exactly cwd/Cargo.toml. Requires a protected standalone app and existing Cargo.lock.\nSettings select a frontend build before frozen Cargo, or an explicitly skipped frontend stage.\n--release selects the Cargo build profile; it does not change APP_ENVIRONMENT. No implicit installs.\n";
+const BUILD_HELP: &str = "Usage: yetlet build [--manifest-path PATH] [--release]\n\nManifest defaults to exactly cwd/Cargo.toml. Requires a protected standalone app and existing Cargo.lock.\nSettings select native frontend-then-Cargo, or cli.target=browser frontend-only build.\nBrowser build honors cli.vite.auto_build; skipped stages exit 0 without children.\n--release selects the Cargo build profile; it does not change APP_ENVIRONMENT. No implicit installs.\n";
 const GENERATE_HELP: &str = "Usage:\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nWrites configuration only for qualified source/lock representations, without overwrite.\nNo image build/pull, source export, credentials lookup or deployment.\n";
 const DOCKER_HELP: &str = "Usage: yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n\nManifest defaults to cwd/Cargo.toml. Output is a complete new directory under an existing protected parent.\nQualified source/lock inspection only; writes configuration without tools or source export.\n";
 const COMPOSE_HELP: &str = "Usage: yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nManifest defaults to cwd/Cargo.toml. Uses an explicit separately built Linux/amd64 image.\nIMAGE requires an explicit tag or sha256 digest. No build, pull or deployment.\n";
@@ -51,6 +52,7 @@ pub enum Cli {
     New {
         name: String,
         dir: PathBuf,
+        template: scaffold::Template,
         cloud: bool,
         with_config: bool,
         with_tailwind: bool,
@@ -159,6 +161,7 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
     }
     let mut name = None;
     let mut parent = None;
+    let mut template = None;
     let mut manifest = None;
     let mut output = None;
     let mut image = None;
@@ -170,6 +173,13 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
         match option {
             Some("--parent") if command == "new" && parent.is_none() => {
                 parent = Some(path_value(args, &mut index, inline)?)
+            }
+            Some("--template") if command == "new" && template.is_none() => {
+                template = Some(match argument_value(args, &mut index, inline)?.to_str() {
+                    Some("native") => scaffold::Template::Native,
+                    Some("browser") => scaffold::Template::Browser,
+                    _ => return Err("--template requires native or browser"),
+                });
             }
             Some("--manifest-path")
                 if matches!(command, "run" | "watch" | "build" | "generate")
@@ -237,10 +247,15 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
         index += 1;
     }
     let manifest = manifest.unwrap_or_else(|| PathBuf::from("Cargo.toml"));
+    let template = template.unwrap_or_default();
+    if template == scaffold::Template::Browser && cloud {
+        return Err("browser template does not select the native --service profile");
+    }
     match command {
         "new" => Ok(Cli::New {
             name: name.ok_or("new requires NAME")?,
             dir: parent.unwrap_or_else(|| PathBuf::from(".")),
+            template,
             cloud,
             with_config: with_config || vite,
             with_tailwind,
@@ -350,6 +365,7 @@ mod tests {
                 Ok(Cli::New {
                     name: "demo".into(),
                     dir: "/tmp/應 用;$literal".into(),
+                    template: scaffold::Template::Native,
                     cloud: true,
                     with_config: true,
                     with_tailwind: true,
@@ -362,6 +378,7 @@ mod tests {
             Ok(Cli::New {
                 name: "demo".into(),
                 dir: ".".into(),
+                template: scaffold::Template::Native,
                 cloud: false,
                 with_config: true,
                 with_tailwind: false,
@@ -373,6 +390,7 @@ mod tests {
             Ok(Cli::New {
                 name: "demo".into(),
                 dir: ".".into(),
+                template: scaffold::Template::Native,
                 cloud: false,
                 with_config: false,
                 with_tailwind: false,
@@ -435,6 +453,45 @@ mod tests {
                 image: "localhost/app:v1".into()
             })
         );
+    }
+
+    #[test]
+    fn template_selection_is_a_literal_creation_option() {
+        for args in [
+            vec!["new", "tasks", "--template", "browser", "--tailwind"],
+            vec!["new", "--template=browser", "--tailwind", "tasks"],
+        ] {
+            assert_eq!(
+                parse(&argv(&args)),
+                Ok(Cli::New {
+                    name: "tasks".into(),
+                    dir: ".".into(),
+                    template: scaffold::Template::Browser,
+                    cloud: false,
+                    with_config: false,
+                    with_tailwind: true,
+                    vite: false,
+                })
+            );
+        }
+        assert_eq!(
+            parse(&argv(&["new", "tasks", "--template=native"])),
+            parse(&argv(&["new", "tasks"]))
+        );
+        assert!(NEW_HELP.contains("--template native|browser"));
+        assert!(!NEW_HELP.contains("APP_CLI__TARGET"));
+        for args in [
+            vec!["new", "tasks", "--template"],
+            vec!["new", "tasks", "--template="],
+            vec!["new", "tasks", "--template", "unknown"],
+            vec!["new", "tasks", "--template", "Browser"],
+            vec!["new", "tasks", "--template=browser", "--template=native"],
+            vec!["new", "tasks", "--service", "--template=browser"],
+            vec!["run", "--template=browser"],
+            vec!["build", "--template=browser"],
+        ] {
+            assert!(parse(&argv(&args)).is_err(), "{args:?}");
+        }
     }
 
     #[test]

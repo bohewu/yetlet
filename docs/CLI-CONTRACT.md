@@ -30,7 +30,7 @@ Implemented working-tree command syntax:
 ```text
 yetlet --help | -h
 yetlet --version | -V
-yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]
+yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]
 yetlet doctor [--json]
 yetlet run [--manifest-path PATH]
 yetlet watch [--manifest-path PATH]
@@ -45,6 +45,7 @@ yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE
 | Surface | Selected responsibility |
 |---|---|
 | `new` options | One-time choices about files/code to generate. `--vite` and `--tailwind` are simple switches. `--service` retains the bind/health/shutdown scaffold; `--settings` retains app-runtime typed-settings scaffolding. These do not start processes. |
+| `new --template native\|browser` | Select a finite built-in starter before settings exist; persist its execution target. Omission keeps the native default. |
 | `--parent` / `--manifest-path` | Choose creation destination/project; useful before a new project has settings or when executing from elsewhere. |
 | `--release` | Common per-build Cargo profile selection; independent of application environment. |
 | `--output` / `--image` | Explicit generator destination and per-artifact image identity; keep existing bounded validation. |
@@ -180,6 +181,24 @@ The former Vite scaffold was flat with separate opt-ins and disabled dotenv disc
 A release-facing `new` emits the CLI release's qualified crate/version declarations without querying a registry or selecting a developer checkout. Actual usable registry-backed templates require YT-096/YT-020 qualification; no released version is asserted. Local crate overrides remain Cargo path/patch declarations with compatible versions and a separately refreshed app lock. These are dependency settings, not CLI/Vite execution configuration. The executable no longer accepts `--framework-path`; no source-directory guessing, hidden source environment variable or custom resolver is added.
 
 ## 5. Execution follows the selected settings
+
+### Opt-in browser-only target — YT-104
+
+The [browser starter contract](YT-104-BROWSER-STARTER.md) adds public
+`cli.target = "browser"`; absent target keeps `native`. Existing commands and
+the shared Loader are reused. `yetlet new tasks --template browser
+--tailwind` selects the finite browser starter and persists that execution target.
+`--template native|browser` is a creation-only choice, defaulting to `native`;
+`new` does not use `APP_CLI__TARGET` or parent settings to select a template.
+Unknown, missing or duplicate template values and browser with `--service` are
+usage errors before publication. Vite/public CLI settings are included. During
+execution `APP_CLI__TARGET` retains normal declared-key/profile precedence.
+
+Browser `build` supervises only the npm/WASM/Vite production build and browser
+`run` previews prepared static output, without a native server or dev bridge.
+Both honor their existing automatic-stage booleans: disabled stages visibly
+skip with exit 0 and no child. Rust watch and native TLS are not selected for
+this contract. The existing native command behavior below remains unchanged.
 
 | Command | Result/effects and success boundary |
 |---|---|

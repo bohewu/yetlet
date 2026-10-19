@@ -174,10 +174,23 @@ pub(crate) fn read_app_file(app: &App, name: &str) -> Result<Vec<u8>, String> {
 }
 
 pub(super) fn read_frontend_manifest(app: &App) -> Result<Vec<u8>, String> {
+    read_frontend_output(app, true)
+}
+
+pub(super) fn read_frontend_index(app: &App) -> Result<Vec<u8>, String> {
+    read_frontend_output(app, false)
+}
+
+fn read_frontend_output(app: &App, manifest: bool) -> Result<Vec<u8>, String> {
     use std::io::Read;
     verify_app(app)?;
     let mut selected = None;
-    for relative in ["dist", "dist/.vite"] {
+    let directories: &[&str] = if manifest {
+        &["dist", "dist/.vite"]
+    } else {
+        &["dist"]
+    };
+    for relative in directories {
         let anchor =
             Anchor::open(&app.cwd.join(relative)).map_err(|_| "unsafe frontend dist directory")?;
         let metadata = anchor
@@ -193,10 +206,18 @@ pub(super) fn read_frontend_manifest(app: &App) -> Result<Vec<u8>, String> {
     }
     let anchor = selected.expect("fixed frontend directory selection");
     let mut bytes = Vec::new();
-    read(&anchor, "manifest.json", app.private_cwd)?
-        .take(1024 * 1024 + 1)
-        .read_to_end(&mut bytes)
-        .map_err(|_| "cannot read frontend manifest")?;
+    read(
+        &anchor,
+        if manifest {
+            "manifest.json"
+        } else {
+            "index.html"
+        },
+        app.private_cwd,
+    )?
+    .take(1024 * 1024 + 1)
+    .read_to_end(&mut bytes)
+    .map_err(|_| "cannot read frontend manifest")?;
     if bytes.len() > 1024 * 1024 {
         return Err("frontend manifest exceeds size limit".into());
     }

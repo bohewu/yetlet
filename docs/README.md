@@ -87,6 +87,12 @@ selected documented scope.
 
 ## Production-oriented reference application
 
+The separate [browser-only task starter](YT-104-BROWSER-STARTER.md) exercises
+YT-104 with settings-selected CLI creation/build/run/stop and static Rust/WASM
+output. It requires JavaScript/WASM and serves without a native Yetlet backend;
+SSR/island defaults remain unchanged. Its qualification record distinguishes
+Linux browser/static-host evidence from native Windows checks.
+
 The [SSR administration reference](../examples/admin-dashboard/README.md) closes
 YT-094 at the selected reference-application scope: CLI-created
 Vite/Tailwind/settings composition over the persisted Lab Operations Board, with

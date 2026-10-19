@@ -14,13 +14,13 @@ See the [CLI contract](../../docs/CLI-CONTRACT.md) and
 |---|---|
 | `yetlet --help` / `-h` | Root help; every complete command path also has exclusive scoped help |
 | `yetlet --version` / `-V` | Build-time CLI version; no project, tools or settings required |
-| `yetlet new NAME [--parent DIRECTORY] [--vite] [--tailwind] [--service] [--settings]` | Publish a new scaffold; no tools, installs, builds or lock generation |
+| `yetlet new NAME [--parent DIRECTORY] [--template native\|browser] [--vite] [--tailwind] [--service] [--settings]` | Publish a new scaffold; no tools, installs, builds or lock generation |
 | `yetlet doctor [--json]` | Bounded environment-only Rust/Cargo identity and compiled filesystem capability; schema 1 JSON |
 | `yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]` | Read-only selected key/version, certificate pins and dates; no password or generation |
 | `yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]` | Confirmed local rotation and atomic selected-profile settings update; retain old versions |
-| `yetlet run [--manifest-path PATH]` | Frozen Cargo run, with independent settings-controlled Rust watch and Vite supervision |
+| `yetlet run [--manifest-path PATH]` | Native frozen Cargo/watch/Vite, or settings-selected browser-only static preview |
 | `yetlet watch [--manifest-path PATH]` | Same run pipeline with Rust watch enabled for this invocation; Vite still uses settings |
-| `yetlet build [--manifest-path PATH] [--release]` | Optional frontend production build followed by frozen Cargo build |
+| `yetlet build [--manifest-path PATH] [--release]` | Native frontend-then-Cargo, or settings-selected browser-only production build |
 | `yetlet generate docker [--manifest-path PATH] --output DIRECTORY` | Qualified-source configuration/inventory only |
 | `yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE` | Configuration for a separately built Linux/amd64 image |
 | `yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE` | Deployment/Service configuration; replicas use settings, default 1, range 1–100 |
@@ -77,6 +77,16 @@ It does not install it globally. Missing cached dependencies fail offline.
 Frozen execution is not a sandbox for package scripts, build scripts or app code.
 
 ## Creation choices and settings
+
+YT-104 adds an explicitly selected [browser-only Rust/WASM task starter](../../docs/YT-104-BROWSER-STARTER.md):
+`yetlet new tasks --template browser --tailwind`. This persists
+`cli.target = "browser"` and includes Vite/public settings, with no native
+server or app-runtime settings/secret crate. Existing `build`/`run` then manage
+only the frontend; their automatic-stage booleans still apply.
+`--template native|browser` selects creation only and defaults to `native`. `new` ignores
+`APP_CLI__TARGET`; execution retains that normal settings override. The same
+creation command works in POSIX shells and PowerShell. Plain creation keeps
+the native behavior below.
 
 Plain `new` remains HTML-first SSR with no mandatory JS/WASM or app settings
 module. `--settings` adds typed runtime configuration. **`--vite` implies

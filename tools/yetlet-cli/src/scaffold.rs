@@ -593,9 +593,18 @@ pub(crate) fn vite_files(
 
 /// Release-facing creation: file publication only, with no source checkout lookup.
 /// The declarations remain unpublished until the release qualification gates pass.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub enum Template {
+    #[default]
+    Native,
+    Browser,
+}
+
+/// Publish the explicitly selected built-in template, independent of runtime settings.
 pub fn create_selected(
     name: &str,
     dir: &Path,
+    template: Template,
     cloud: bool,
     with_config: bool,
     with_tailwind: bool,
@@ -603,7 +612,14 @@ pub fn create_selected(
 ) -> Result<(), String> {
     validate_name(name).map_err(str::to_owned)?;
     crate::platform::fs::ensure_create_supported()?;
-    let entries = selected_files(name, cloud, with_config, with_tailwind, vite)?;
+    let entries = if template == Template::Browser {
+        if cloud {
+            return Err("browser target does not select the native --service profile".into());
+        }
+        crate::browser::files(name, with_tailwind)?
+    } else {
+        selected_files(name, cloud, with_config, with_tailwind, vite)?
+    };
     crate::platform::fs::create_project(dir, name, &entries)
 }
 

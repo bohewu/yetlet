@@ -213,6 +213,99 @@ fn frontend_build_precedes_rust_and_filters_backend_environment() {
     );
     assert_eq!(trace[1]["secret"], true);
 }
+
+fn browser_fixture() -> Fixture {
+    let fixture = Fixture::new();
+    let base = fixture.root.path().join("base.toml");
+    fs::write(
+        &base,
+        format!(
+            "[cli]\ntarget='browser'\n{}",
+            fs::read_to_string(&base).unwrap()
+        ),
+    )
+    .unwrap();
+    fs::write(
+        fixture.root.path().join("frontend/dist/index.html"),
+        "<!doctype html><title>Tasks</title>",
+    )
+    .unwrap();
+    fixture
+}
+
+#[test]
+fn browser_build_has_no_native_child_preserves_failure_and_honors_skip() {
+    for (mode, expected) in [("build-ok", 0), ("build-fail", 23)] {
+        let fixture = browser_fixture();
+        let output = Running::start(&mut fixture.command("build", mode)).wait();
+        assert_eq!(output.status.code(), Some(expected));
+        let trace = fixture.trace();
+        assert_eq!(trace.len(), 1);
+        assert_eq!(trace[0]["role"], "npm");
+        assert_eq!(trace[0]["secret"], false);
+    }
+    for (action, flag) in [
+        ("build", "APP_CLI__VITE__AUTO_BUILD"),
+        ("run", "APP_CLI__VITE__AUTO_START"),
+    ] {
+        let fixture = browser_fixture();
+        let output = fixture
+            .command(action, "build-ok")
+            .env(flag, "false")
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        assert!(fixture.trace().is_empty());
+    }
+}
+
+#[test]
+fn browser_run_owns_only_frontend_and_reaps_it_on_cancellation() {
+    let _port = PORT.lock().unwrap();
+    let fixture = browser_fixture();
+    let running = Running::start(&mut fixture.command("run", "build-ok"));
+    fixture.ready("npm-leaf.pid");
+    assert_eq!(fixture.trace().len(), 1);
+    assert!(!fixture.root.path().join("cargo.pid").exists());
+    running.signal(libc::SIGINT);
+    let output = running.wait();
+    assert_eq!(output.status.signal(), Some(libc::SIGINT));
+    for name in ["npm.pid", "npm-leaf.pid"] {
+        let pid = fs::read_to_string(fixture.root.path().join(name))
+            .unwrap()
+            .parse::<i32>()
+            .unwrap();
+        assert_eq!(unsafe { libc::kill(pid, 0) }, -1, "owned child survived");
+    }
+}
+
+#[test]
+fn browser_run_requires_static_output_and_respects_frontend_root() {
+    let fixture = browser_fixture();
+    fs::remove_file(fixture.root.path().join("frontend/dist/index.html")).unwrap();
+    let output = fixture.command("run", "build-ok").output().unwrap();
+    assert_eq!(output.status.code(), Some(1));
+    assert!(fixture.trace().is_empty());
+    let base = fixture.root.path().join("base.toml");
+    fs::write(
+        &base,
+        fs::read_to_string(&base)
+            .unwrap()
+            .replace("frontend/", "web/"),
+    )
+    .unwrap();
+    fs::rename(
+        fixture.root.path().join("frontend"),
+        fixture.root.path().join("web"),
+    )
+    .unwrap();
+    let output = fixture.command("build", "build-ok").output().unwrap();
+    assert!(output.status.success());
+    assert_eq!(
+        fixture.trace()[0]["cwd"],
+        fixture.root.path().join("web").to_str().unwrap()
+    );
+}
 #[test]
 fn frontend_build_failure_preserves_exit_without_starting_rust_or_guessing_cause() {
     let fixture = Fixture::new();

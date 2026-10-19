@@ -61,7 +61,10 @@ fn frontend_command(app: &App, frontend: &App, dev: bool) -> io::Result<Command>
     for (key, _) in std::env::vars_os() {
         let upper = key.to_string_lossy().to_ascii_uppercase();
         if upper.starts_with("APP_")
-            || matches!(upper.as_str(), "YETLET_DEV_SECRETS" | "YETLET_CONFIG_ROOT")
+            || matches!(
+                upper.as_str(),
+                "YETLET_DEV_SECRETS" | "YETLET_DEVELOPMENT_SECRET_FILE" | "YETLET_CONFIG_ROOT"
+            )
         {
             command.env_remove(key);
         }
@@ -79,7 +82,12 @@ fn frontend_command(app: &App, frontend: &App, dev: bool) -> io::Result<Command>
 }
 
 pub(crate) fn run_frontend_build(app: &App, frontend: &App) -> io::Result<Completion> {
-    let mut command = frontend_command(app, frontend, false)?;
+    run_frontend(app, frontend, false)
+}
+
+/// Browser applications reuse single-child process ownership on both platforms.
+pub(crate) fn run_frontend(app: &App, frontend: &App, dev: bool) -> io::Result<Completion> {
+    let mut command = frontend_command(app, frontend, dev)?;
     #[cfg(windows)]
     let completion = imp::run(frontend, &mut command)?;
     #[cfg(not(windows))]
@@ -160,6 +168,7 @@ fn bridge_environment(
 
 pub(crate) fn finish(completion: Completion) -> ! {
     let signal = match completion {
+        Completion::Skipped => std::process::exit(0),
         Completion::Cancelled(signal) => {
             eprintln!("CLI_CANCELLED stage=execution: owned children stopped");
             Some(signal)

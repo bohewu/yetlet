@@ -128,6 +128,17 @@ reads/updates, conflicts, restart and cleanup on one local volume, with independ
 Reviewer PASS. No core/browser dependency, IdP
 resource, registry, multi-host or production HA claim is added.
 
+**YT-104 browser-only starter (2026-10-19, bounded Done):** the
+[minimal contract and evidence](YT-104-BROWSER-STARTER.md) reuse existing CLI
+commands, `new --template browser` and public execution settings for a Rust/WASM
+task list.
+Linux native/Chrome desktop/mobile and a separate dist-only static host pass.
+Source-matched Windows GNU CLI creation/build/run/console Ctrl-C and cleanup
+pass. Original Reviewer `/root/yt104_browser_review_oct19` and template-amendment
+Reviewer `/root/yt104_template_closeout_review_oct19` both PASS with zero issues
+or required followups. Native SSR remains the default; no router,
+backend service, HMR, production hosting or release is selected.
+
 **YT-106, optional third-party component interoperability research:** study
 small npm/Vite JS/TS and wasm-bindgen boundaries for chart/editor components,
 including Web Components and a separate React mount only when needed. Define

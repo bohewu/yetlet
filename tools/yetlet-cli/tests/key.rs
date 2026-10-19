@@ -41,6 +41,7 @@ impl Fixture {
         yetlet_cli::scaffold::create_selected(
             "key_fixture",
             temp.path(),
+            yetlet_cli::scaffold::Template::Native,
             false,
             false,
             false,
