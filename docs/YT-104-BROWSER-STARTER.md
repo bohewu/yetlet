@@ -210,13 +210,34 @@ replays stopped. These are occupied-port test-environment results, not passing
 current-suite claims. The earlier complete library/process PASS and actual
 Linux/Windows run/stop/browser/static-host receipts remain qualified to their
 recorded source. Execution, process adapters, browser runtime and packaging are
-unchanged by this amendment; the requested preview remains running.
+unchanged by this amendment; the requested preview was still running at that
+checkpoint.
 
 Final amendment Reviewer `/root/yt104_template_closeout_review_oct19` PASS has
 zero issues or required followups. It verified all 47 final review-target hashes,
 inspected the creation/settings/publication paths and accepted the focused
 Linux/Windows evidence, seven identical runtime inputs and explicit occupied-port
 replay boundaries. Review was read-only with no repeated tests or services.
+
+### Post-preview shutdown verification — 2026-10-19
+
+At the maintainer's explicit request, the trial preview was stopped through its
+original CLI terminal with Ctrl-C. The CLI reported owned children stopped
+(tool-observed cancellation exit 1); its CLI/npm/Vite processes were absent and
+port 5173 was free before testing. On committed source
+`74c5f69aea36563d3922a72e952b8cbcb3d1db29`, the previously affected suites were
+run sequentially with the existing task-local OpenSSL SDK:
+
+```sh
+cargo test --offline --locked --manifest-path tools/yetlet-cli/Cargo.toml --lib --test frontend_process
+```
+
+Library **83/83** and frontend/process **15/15** pass, with native Cargo exit 0.
+This includes watch/restart, cancellation/signals, child failure, occupied-port
+refusal and terminal Ctrl-C cleanup. Afterward the preview processes remained
+absent and port 5173 was free. No product or test source changed. The earlier
+occupied-port failures remain recorded above; this later replay closes that
+verification gap. Native logs and shutdown/preflight receipts remain outside Git.
 
 ## Closeout boundary
 
