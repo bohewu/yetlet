@@ -2,6 +2,24 @@
 
 Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then choose a [runnable sample](SAMPLES.md). Yetlet is an experimental, unpublished `0.1.0` prototype in a Private repository. Current task status belongs to [Backlog](BACKLOG.md), milestone gates to [Roadmap](ROADMAP.md), and release decisions to [Release readiness](RELEASE-READINESS.md).
 
+## Current release-candidate qualification
+
+[YT-096 candidate selection and package preflight](YT-096-CANDIDATE-QUALIFICATION.md) records the owner-approved `ce56e08` source, original nine experimental `0.1.0` libraries, Rust 1.99 and selected support targets. Nine source packages and a clean packaged-input native consumer pass on Ubuntu 26.04.1. The [selected dependency/API delta](YT-096-SUPPLY-CHAIN-DELTA.md) records 23 SBOMs and license/source checks, nine passing RustSec package-lock scans, API/threat reconciliation and an unsigned checksum bundle with explicit coverage limits. The selected Ubuntu 24.04 baseline and remaining platform/build-bound inventory/rebuild/formal review/trust gates are explicit. YT-096 is In progress and YT-020 remains Blocked. Historical accepted evidence is preserved; no publication or production support is activated.
+
+The [partial platform followup](YT-096-PLATFORM-QUALIFICATION.md) adds Ubuntu
+24.04.5 container userspace tests/doctests, five packaged wasm builds and a
+source-reconciled Firefox workflow. It retains the shared-kernel/Chrome evidence
+limits and the historical Windows cache failures. The resumed standalone
+archive lane passes all nine packages on Windows MSVC: 83 native tests and
+four doctests. The [two-host archive rebuild](YT-096-TWO-HOST-REBUILD.md) now
+matches all nine Windows archives byte-for-byte to the Linux originals.
+Independent builder control and later release gates remain open. The earlier
+[SSH failures](YT-096-AZURE-CLEAN-BUILDER.md) are preserved. The
+[Azure Run Command continuation](YT-096-AZURE-RUN-COMMAND.md) now passes on an
+actual Ubuntu 24.04.5 guest with an empty cache: nine identical archives,
+83 native tests/four doctests and five wasm libraries. All temporary resources
+are deleted; aggregate Cargo observations retain explicit SBOM/dev-only limits.
+
 ## Architecture and contracts
 
 - [Architecture](ARCHITECTURE.md) and [MVP contract](MVP.md): responsibilities, trust boundaries and original acceptance criteria.

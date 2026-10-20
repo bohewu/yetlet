@@ -13,6 +13,30 @@
 
 This document separates bounded repository evidence from a support or security commitment. See [M9 final evidence](M9J-VERIFICATION.md), [API contract classification](API-CONTRACTS.md) and the [post-M9 CI/security review](CI-SECURITY-REVIEW.md).
 
+## Current candidate selection and local preflights (2026-10-20)
+
+The owner selected immutable `ce56e0814e5423782440acd2c959ca777d572cd4`, the original nine experimental `0.1.0` libraries and Rust 1.99/1.99.0. [YT-096 candidate qualification](YT-096-CANDIDATE-QUALIFICATION.md) records the approved native/browser targets, exact new archive digests and remaining gates. Nine-package Cargo verification, archive/license/normalized-manifest checks and four clean packaged-input consumer tests pass on the actual Ubuntu 26.04.1 GNU host. The [selected dependency/API delta](YT-096-SUPPLY-CHAIN-DELTA.md) now records 23 target-specific SBOMs with documented dev-feature over-inclusion, 23 passing license/source checks, nine passing fresh-database RustSec scans, source/API/threat reconciliation and a verified unsigned checksum bundle. These initial local preflights alone do not establish the selected platform/browser matrix, exact compiled-artifact inventory, independent rebuild, final release/security review or formal trust/registry evidence. YT-096 is In progress; YT-020 stays Blocked. No old signature or historical PASS is reassigned to these new artifacts. The dated preparation checkpoints below remain historical evidence.
+
+The [partial platform continuation](YT-096-PLATFORM-QUALIFICATION.md) now records
+83 native tests/four doctests in Ubuntu 24.04.5 container userspace, five packaged
+wasm builds and a fresh source-reconciled Firefox workflow on Ubuntu 26.04.1.
+Its shared host-kernel limitation and historical Chrome boundary remain
+explicit. The resumed Windows MSVC standalone archive lane now passes all
+nine package commands, 83 native tests and four doctests, with matched
+inputs/tools and unchanged locks. Historical cache failures are retained.
+These platform results do not complete final platform acceptance or subsequent
+release gates. The separately executed [two-host archive rebuild](YT-096-TWO-HOST-REBUILD.md)
+now matches all nine Windows source archives exactly to the Linux originals,
+with normal Cargo verification. Shared control/staged dependencies do not
+satisfy independent builder evidence. Build-bound inventory and formal
+trust/release/security/approval gates remain open. The
+[earlier Azure SSH attempts](YT-096-AZURE-CLEAN-BUILDER.md) remain historical
+failures. The [Run Command/private Blob continuation](YT-096-AZURE-RUN-COMMAND.md)
+now passes actual Ubuntu 24.04.5 native execution, empty-cache nine-archive
+rebuilding, 83 native tests/four doctests and five wasm libraries. Actual Cargo
+observations retain known dev-only SBOM differences and inventory limits.
+All temporary resources are deleted; formal independent trust is not established.
+
 ## Current documentation and package boundary (2026-10-12)
 
 YT-068 completes the developer entry, exactly nine package guides, evidence-preserving navigation and [T08 Private preparation reconciliation](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) at bounded documentation scope. The five research items YT-029/YT-021/YT-024/YT-022/YT-023 are Done with their linked [actual evidence and decisions](README.md#completed-research-prototypes), without supported-core promotion. T07's nine package-list checks passed; they establish README inclusion only. The independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate.
