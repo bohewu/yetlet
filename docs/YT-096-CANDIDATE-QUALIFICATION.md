@@ -324,3 +324,14 @@ waivers, API/MSRV classifications and the original failed final verdict.
 Four release conditions remain open: formal integrity/trust, actual registry
 proof, public activation/reporting controls and concrete final release approval.
 No runtime rerun, signing or publication is authorized by this decision.
+
+## Subsequent formal trust research
+
+The reviewed support/inventory decision was committed as `0bd7596`.
+[Minimum formal trust/provenance research](YT-096-FORMAL-TRUST-PROPOSAL.md)
+now proposes conditional GitHub OIDC/public Sigstore signing with the existing
+Cosign pin, exact identity/roots, provenance plus a complete evidence manifest
+and independent verification. Public metadata disclosure and a future
+workflow/source candidate require explicit decisions. This is research only;
+ce56e08 remains the selected source, formal trust is not qualified, and all
+four remaining release conditions and original Not verified limits stay open.

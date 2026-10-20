@@ -145,3 +145,14 @@ authorize signing, publication, tags, visibility changes or deployment, does
 not weaken existing supply-chain policy, and does not mark YT-096 Done or
 unblock YT-020. Independent review of this update is a bounded documentation
 review, not a replacement final release verdict.
+
+## Subsequent formal trust proposal
+
+After commit `0bd7596`, the owner requested
+[minimum trust/provenance research](YT-096-FORMAL-TRUST-PROPOSAL.md) and
+independent documentation review, excluding signing/publication. The proposal
+identifies conditional public Sigstore/GitHub OIDC identities, exact evidence
+bindings and future operations. It does not select a service policy, disclose
+signing metadata, authenticate a past builder or replace the original failed
+release verdict. Formal trust and the other three remaining conditions are
+still open; no new candidate, workflow or activation is approved here.

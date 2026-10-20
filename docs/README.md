@@ -43,6 +43,11 @@ disposition; formal integrity/trust, actual registry proof, public activation
 controls and concrete maintainer release approval remain open.
 No runtime rerun, signing or publication occurred.
 
+The [minimum formal trust/provenance proposal](YT-096-FORMAL-TRUST-PROPOSAL.md)
+lists required identities, evidence and future operations after commit
+`0bd7596`. GitHub OIDC/public Sigstore is conditional on disclosure and exact
+workflow/source approvals; no policy selection, signing or activation occurs.
+
 ## Architecture and contracts
 
 - [Architecture](ARCHITECTURE.md) and [MVP contract](MVP.md): responsibilities, trust boundaries and original acceptance criteria.
