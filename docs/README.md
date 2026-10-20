@@ -167,6 +167,13 @@ keys/certificates, public-only verification and confirmed key CLI rotation with
 automatic profile settings updates. Its [verification record](YT-093-SIGNING-VERIFICATION.md)
 separates local, native Windows and disposable Azure experiment evidence.
 
+The [YT-095 composition comparison](YT-095-COMPOSITION-RESEARCH.md) inspects
+Starter, signing, Admin and existing secret/settings consumers. It recommends
+constructors and native State/FromRef, with explicit generic, trait-object and
+finite-enum boundaries; no new container, provider contract or implementation
+is selected. Independent Reviewer PASS has zero issues or required followups;
+YT-095 is Done at research-only scope.
+
 ## Library guides
 
 The [YT-102 developer workflow audit](YT-102-DX-AUDIT.md) reconciles current

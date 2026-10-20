@@ -232,6 +232,16 @@ CLI build/run/stop and recorded bundle cost. Independent Reviewer
 followups; this bounded trial is complete. No core/CLI/settings API, rich-text
 layer or wider platform matrix is selected.
 
+**YT-095 dependency composition (2026-10-20, research only):** the
+[current-consumer comparison](YT-095-COMPOSITION-RESEARCH.md) retains native
+constructors and Axum State/FromRef after inspecting Starter, signing, Admin
+and existing settings/secret examples. It compares shaku/dill without installing
+them, records static authoring costs and unmeasured build costs, and preserves
+generic signing, finite session selection and explicit resource lifetimes.
+No framework/container API, ADR change or application refactor is selected.
+Independent Reviewer `/root/yt095_composition_research_review_oct20` PASS has
+zero issues or required followups; YT-095 is Done at research-only scope.
+
 **YT-093 bounded closeout (2026-10-18):** the
 [signing verification](YT-093-SIGNING-VERIFICATION.md) records the opt-in signing
 crate, local multi-key CLI, confirmed automatic settings updates and independent
