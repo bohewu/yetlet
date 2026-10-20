@@ -153,8 +153,8 @@ the [second Admin/Todo study](YT-105-STATE-READ-INITIAL-RENDER-RESEARCH.md)
 identifies duplicated committed-state mirrors and proposes a weak
 `GraphHandle::snapshot()` matching existing owner clone/error semantics. Initial
 rendering remains explicit application setup rather than constructor side
-effects. Neither proposal is implemented or approved for implementation;
-the subsequent HTTP-feedback comparison is recorded below. Independent Reviewer
+effects. That research did not authorize implementation; the subsequent
+separately selected snapshot slice is recorded below. Independent Reviewer
 `/root/yt105_state_read_review_oct19` PASS has zero issues or required followups
 for this research slice.
 
@@ -167,7 +167,25 @@ custom ActionExecutor implementations still have the same fixed ActionError.
 All research topics are covered. Independent Reviewer
 `/root/yt105_http_feedback_review_oct19` PASS has zero issues or required
 followups and explicitly approves YT-105 Done at research-only scope.
-No API or application change is implemented or authorized.
+No HTTP-feedback application/API implementation is selected by that study.
+
+**YT-105 weak-handle snapshot (2026-10-19, separately authorized):** the
+[implementation slice](YT-105-GRAPH-SNAPSHOT.md) adds `GraphHandle::snapshot()`
+using the owner's existing read/error/borrow semantics. Focused native tests
+and strict Clippy plus Wasm/rustdoc/docs checks pass. Independent Reviewer
+`/root/yt105_graph_snapshot_impl_review_oct19` PASS has zero issues or required
+followups; this separately selected minimal implementation is complete.
+That original slice left consumer mirrors and initial-render/HTTP/form behavior
+unchanged.
+
+**YT-105 Admin/Todo adoption (2026-10-20, separately selected):** the same
+[snapshot record](YT-105-GRAPH-SNAPSHOT.md#admin--todo-adoption--2026-10-20)
+now documents both consumers reading through weak handles without separate
+state mirrors. Wasm/native/strict Clippy and actual Chrome checks pass, including
+Admin CLI build/run/SIGINT drain and Todo's existing lifecycle smoke. Consumer
+Reviewer `/root/yt105_consumer_snapshot_review_oct20` PASS has zero issues or
+required followups; this bounded adoption is complete. No profiling/speedup
+claim or initial-render/HTTP/form change is selected.
 
 **YT-106, optional third-party component interoperability research:** study
 small npm/Vite JS/TS and wasm-bindgen boundaries for chart/editor components,

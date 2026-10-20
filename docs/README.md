@@ -111,8 +111,14 @@ selection, with independent Reviewer PASS. The
 [HTTP-feedback comparison](YT-105-HTTP-FEEDBACK-RESEARCH.md) retains existing
 body-token CSRF and recommends application-owned field feedback before a shared
 error API, with independent Reviewer PASS and zero issues/required followups.
-YT-105 is Done at research-only scope; none of these proposals is runtime
-implementation. Packaging is covered by YT-104 above.
+YT-105 is Done at research-only scope. The separately authorized
+[weak-handle snapshot slice](YT-105-GRAPH-SNAPSHOT.md) implements only that read
+method with owner semantics; native tests, Wasm/rustdoc checks and independent
+Reviewer PASS are recorded there. Its 2026-10-20 follow-up removes Admin/Todo
+state mirrors and records native/Wasm/Chrome adoption checks and independent
+consumer Reviewer PASS. Initial rendering, browser Tasks and other proposals remain
+separate.
+Packaging is covered by YT-104 above.
 The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
 completed native/browser checks from the returned operator-attested native
 IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.

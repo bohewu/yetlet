@@ -261,17 +261,14 @@ pub fn mount_triage() -> Result<(), JsValue> {
         rows: KeyedChildren::from_existing(root.clone(), entries)?,
         project,
     };
-    let committed = Rc::new(RefCell::new(state.clone()));
-    let current = committed.clone();
     let graph = LocalGraph::new(
-        state.clone(),
+        state,
         |state: &mut Workspace, message| {
             *state = state.reduce(message)?;
             Ok(())
         },
         move |state: &Workspace| {
             dom.render(state).map_err(|_| "DOM update failed")?;
-            *current.borrow_mut() = state.clone();
             Ok(())
         },
     );
@@ -343,7 +340,7 @@ pub fn mount_triage() -> Result<(), JsValue> {
     let save_handle = handle.clone();
     let lifetime = active.clone();
     bindings.push(DomEventListener::new(element(&document, "triage-save")?.as_ref(), "click", move |_| {
-        let state = committed.borrow().clone();
+        let Ok(state) = save_handle.snapshot() else { return; };
         if state.pending.is_some() { return; }
         let Some(draft) = state.selected().filter(|draft| draft.dirty()) else { return; };
         let command = Save { csrf: csrf.clone(), item: draft.value.clone() };

@@ -6,6 +6,12 @@ This is the second selected YT-105 research slice, not implementation or an
 accepted public API. Independent Reviewer `/root/yt105_state_read_review_oct19`
 PASS has zero issues or required followups.
 
+Subsequent separately authorized work implements the weak snapshot method in
+the [snapshot slice](YT-105-GRAPH-SNAPSHOT.md). The proposals and source-line
+observations below retain their original `6e782bf` research context; the slice
+records implementation/validation and the subsequent separately selected
+Admin/Todo adoption.
+
 ## Recommendation
 
 Propose one small addition for a separately authorized implementation:

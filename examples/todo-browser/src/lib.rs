@@ -33,13 +33,12 @@ mod runtime {
     #[derive(Clone)]
     struct LocalGraphExecutor {
         handle: TodoGraphHandle,
-        committed: Rc<RefCell<TodoSnapshot>>,
     }
 
     impl ActionExecutor<TodoCommand> for LocalGraphExecutor {
         async fn execute(&self, command: TodoCommand) -> Result<TodoSnapshot, ActionError> {
             self.handle.dispatch(command).map_err(graph_action_error)?;
-            Ok(self.committed.borrow().clone())
+            self.handle.snapshot().map_err(graph_action_error)
         }
     }
 
@@ -227,13 +226,11 @@ mod runtime {
         let list_host = get_element(&document, "todo-list-host")?;
         let list = Rc::new(RefCell::new(bind_todo_list(&list_host, &initial.items)?));
         list_host.set_attribute("data-yetlet-local-runtime", "keyed-graph")?;
-        let committed = Rc::new(RefCell::new(initial.clone()));
         let graph = LocalGraph::new(
             initial,
             |state, command| apply_todo_command(state, command).map(|_| ()),
             {
                 let list = Rc::clone(&list);
-                let committed = Rc::clone(&committed);
                 move |snapshot: &TodoSnapshot| {
                     let result = list.borrow_mut().reconcile(
                         &snapshot.items,
@@ -245,14 +242,12 @@ mod runtime {
                         web_sys::console::error_1(&error);
                         return Err(ActionError::Internal);
                     }
-                    *committed.borrow_mut() = snapshot.clone();
                     Ok(())
                 }
             },
         );
         let local_executor = Rc::new(LocalGraphExecutor {
             handle: graph.handle(),
-            committed,
         });
 
         let status = get_element(&document, "todo-status")?;
