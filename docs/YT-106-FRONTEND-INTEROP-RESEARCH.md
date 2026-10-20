@@ -6,6 +6,10 @@ no package installation, widget implementation, adapter crate or runtime change.
 Independent Reviewer `/root/yt106_frontend_interop_research_review_oct20` PASS
 has zero issues or required followups and approves research-only closure.
 
+Subsequent, separately authorized implementation:
+[Admin Chart.js slice](YT-106-CHART-VERIFICATION.md). The dated observations and
+proposals below describe the research checkout, not that later implementation.
+
 ## Recommendation
 
 Start with an application-owned TS adapter around an existing package, mounting

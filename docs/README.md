@@ -124,6 +124,10 @@ recommends app-owned TS/wasm-bindgen boundaries, Chart.js as the first proposed
 trial and CodeMirror only after CSP feasibility. It compares Web Components
 and React roots, records package cost limits and leaves implementation separate;
 independent Reviewer PASS closes YT-106 at research-only scope.
+The separately selected [Admin Chart.js trial](YT-106-CHART-VERIFICATION.md)
+implements loaded draft-status bars with a permanent native summary and the
+existing Vite/WASM/CLI. Independent implementation Reviewer PASS completes that
+bounded trial; CodeMirror remains conditional on CSP feasibility.
 The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
 completed native/browser checks from the returned operator-attested native
 IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.

@@ -3,7 +3,7 @@ use super::*;
 use axum::{Json, extract::rejection::JsonRejection};
 use domain::WorkItem;
 use yetlet_actions::{ApiErrorBody, ApiErrorEnvelope};
-use yetlet_board_triage::{Bootstrap, Item, MAX_ITEMS, Save};
+use yetlet_board_triage::{Bootstrap, Item, MAX_ITEMS, STATUS_LABELS, Save, status_counts};
 use yetlet_core::Element;
 
 #[derive(Clone)]
@@ -66,6 +66,31 @@ fn select(label: &str, name: &'static str, options: &[(&str, &str)]) -> Element 
         .child(views::text("label", label).attribute("for", id))
         .child(input)
 }
+fn status_summary(items: &[Item]) -> Element {
+    let counts = status_counts(items);
+    let totals = Element::new("dl")
+        .attribute("class", "triage-status-totals")
+        .children(STATUS_LABELS.iter().enumerate().map(|(index, label)| {
+            Element::new("div")
+                .attribute("class", format!("triage-stat triage-stat-{index}"))
+                .child(views::text("dt", *label))
+                .child(
+                    views::text("dd", counts[index].to_string())
+                        .attribute("id", format!("triage-status-{index}")),
+                )
+                .into()
+        }));
+    Element::new("section")
+        .attribute("class", "triage-overview")
+        .attribute("aria-labelledby", "triage-status-heading")
+        .child(views::text("h2", "Loaded item status").attribute("id", "triage-status-heading"))
+        .child(views::text("p", "All loaded items, including unsaved status changes. Filtering does not change these totals.")
+            .attribute("class", "triage-summary-note"))
+        .child(Element::new("div").attribute("class", "triage-overview-body")
+            .child(totals)
+            .child(Element::new("div").attribute("id", "triage-status-chart")
+                .attribute("class", "triage-chart").attribute("aria-hidden", "true").attribute("hidden", "")))
+}
 pub(super) async fn workspace(
     State(state): State<AppState>,
     session: Session,
@@ -119,6 +144,7 @@ pub(super) async fn workspace(
         .child(Element::new("div").attribute("class", "triage-intro")
             .child(views::text("p", "A focused workspace for the 12 most recently updated items. Filter, reorder and keep several drafts; save one item at a time."))
             .child(views::text("a", "View all work items →").attribute("href", format!("/board/projects/{project}/items"))))
+        .child(status_summary(&snapshot.items))
         .child(views::hidden("triage-bootstrap", json).attribute("id", "triage-bootstrap"))
         .child(views::hidden("triage-csrf", &csrf).attribute("id", "triage-csrf"))
         .child(views::text("p", "Interactive workspace is loading. You can always open an item above to view or edit it using native pages.")

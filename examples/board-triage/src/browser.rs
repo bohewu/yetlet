@@ -1,4 +1,4 @@
-use super::{Bootstrap, Draft, Item, Msg, Save, Workspace};
+use super::{Bootstrap, Draft, Item, Msg, Save, Workspace, status_counts};
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
@@ -14,6 +14,22 @@ use yetlet_dom_keyed::{DomEventListener, KeyedChildren, KeyedEntry};
 use yetlet_reactive::{GraphHandle, LocalGraph};
 
 type Handle = GraphHandle<Workspace, Msg, &'static str>;
+
+#[wasm_bindgen]
+extern "C" {
+    type StatusChart;
+    #[wasm_bindgen(method, catch, js_name = update)]
+    fn update_chart(this: &StatusChart, counts: &[u32]) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = destroy)]
+    fn destroy_chart(this: &StatusChart) -> Result<(), JsValue>;
+}
+
+struct ChartOwner(StatusChart);
+impl Drop for ChartOwner {
+    fn drop(&mut self) {
+        let _ = self.0.destroy_chart();
+    }
+}
 struct Runtime {
     active: Rc<Cell<bool>>,
     _graph: LocalGraph<Workspace, Msg, &'static str>,
@@ -137,9 +153,21 @@ struct Dom {
     document: Document,
     rows: KeyedChildren<()>,
     project: i64,
+    chart: Option<ChartOwner>,
 }
 impl Dom {
     fn render(&mut self, state: &Workspace) -> Result<(), JsValue> {
+        let counts = status_counts(state.drafts.iter().map(|draft| &draft.value));
+        for (index, count) in counts.iter().enumerate() {
+            element(&self.document, &format!("triage-status-{index}"))?
+                .set_text_content(Some(&count.to_string()));
+        }
+        if let Some(chart) = &self.chart
+            && chart.0.update_chart(&counts).is_err()
+        {
+            // A foreign widget failure must not fault the native draft runtime.
+            self.chart.take();
+        }
         let visible = state.visible();
         let selected = state.selected;
         self.rows.reconcile(
@@ -225,8 +253,10 @@ fn failure(error: ActionError) -> String {
     }
 }
 #[wasm_bindgen]
-pub fn mount_triage() -> Result<(), JsValue> {
+pub fn mount_triage(chart: JsValue) -> Result<(), JsValue> {
     dispose_triage();
+    let chart =
+        (!chart.is_null() && !chart.is_undefined()).then(|| ChartOwner(chart.unchecked_into()));
     let document = web_sys::window()
         .and_then(|w| w.document())
         .ok_or_else(|| js("Document unavailable"))?;
@@ -260,6 +290,7 @@ pub fn mount_triage() -> Result<(), JsValue> {
         document: document.clone(),
         rows: KeyedChildren::from_existing(root.clone(), entries)?,
         project,
+        chart,
     };
     let graph = LocalGraph::new(
         state,

@@ -1193,6 +1193,11 @@ async fn triage_only_enables_wasm_on_selected_page_and_escapes_bounded_bootstrap
     )
     .unwrap();
     assert_eq!(html.matches("data-id=").count(), 12);
+    assert!(html.contains("Loaded item status"));
+    assert!(html.contains("id=\"triage-status-0\">12</dd>"));
+    for index in 1..4 {
+        assert!(html.contains(&format!("id=\"triage-status-{index}\">0</dd>")));
+    }
     assert_eq!(html.matches("<script").count(), 1);
     assert!(html.contains("&lt;script&gt;"));
     assert!(html.contains("type=\"module\" src=\"/static/assets/app-123.js\""));

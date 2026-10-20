@@ -201,6 +201,16 @@ CSP change, implementation or deployment is selected. The
 [original integration question](YT-094-API-OBSERVATIONS.md#third-party-frontend-components--yt-106)
 is retained separately.
 
+**YT-106 Chart.js trial (2026-10-20, separately authorized):** the
+[Admin slice](YT-106-CHART-VERIFICATION.md) adds loaded-item status bars driven
+by Rust drafts, a permanent native summary, private TS update/destroy ownership
+and existing CLI/Vite/WASM delivery. Native/WASM, strict Clippy, TypeScript and
+actual Chrome update/fallback/lifetime/CSP checks pass, with owned CLI cleanup
+and raw/gzip bundle costs recorded. Independent Reviewer
+`/root/yt106_chart_impl_review_oct20` PASS has zero issues or required followups;
+this bounded trial is complete. The conditional editor, core APIs and
+production/platform qualification remain separate.
+
 **YT-093 bounded closeout (2026-10-18):** the
 [signing verification](YT-093-SIGNING-VERIFICATION.md) records the opt-in signing
 crate, local multi-key CLI, confirmed automatic settings updates and independent

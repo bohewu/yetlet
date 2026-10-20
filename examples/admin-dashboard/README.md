@@ -83,6 +83,14 @@ directory.
 
 ## Workflow and checks
 
+The triage page also offers a read-only Chart.js status summary through its
+existing Vite/Rust/WASM enhancement. Native Open/Active/Blocked/Closed counts
+remain visible with JS off or if the chart fails. Totals cover all currently
+loaded items (at most 12), including unsaved status changes; filtering does not
+change their scope. Only an explicit Save writes to the server. See the
+[YT-106 slice record](../../docs/YT-106-CHART-VERIFICATION.md) for ownership,
+fallback, browser/CLI checks and measured package cost.
+
 Sign in → filter/sort/paginate work items → detail → edit → history. Native POST
 forms remain usable with JavaScript disabled. Validation and version conflicts
 preserve drafts; permissions and CSRF checks run on the server. Closing keeps the

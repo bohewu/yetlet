@@ -6,6 +6,24 @@ use yetlet_actions::Command;
 mod browser;
 
 pub const MAX_ITEMS: usize = 12;
+pub const STATUS_LABELS: [&str; 4] = ["Open", "Active", "Blocked", "Closed"];
+
+/// Count known statuses across the loaded items, including local draft edits.
+/// Invalid draft statuses stay available for server validation, not a new bucket.
+pub fn status_counts<'a>(items: impl IntoIterator<Item = &'a Item>) -> [u32; 4] {
+    let mut counts = [0; 4];
+    for item in items {
+        let index = match item.status.as_str() {
+            "open" => 0,
+            "active" => 1,
+            "blocked" => 2,
+            "closed" => 3,
+            _ => continue,
+        };
+        counts[index] += 1;
+    }
+    counts
+}
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -226,6 +244,38 @@ mod tests {
             items: vec![item(1), item(2)],
         })
         .unwrap()
+    }
+    #[test]
+    fn counts_cover_all_loaded_drafts_and_follow_reset() {
+        let state = state()
+            .reduce(Msg::Edit {
+                field: "status",
+                value: "blocked".into(),
+            })
+            .unwrap()
+            .reduce(Msg::Filter("no matching title".into()))
+            .unwrap();
+        assert!(state.visible().is_empty());
+        assert_eq!(
+            status_counts(state.drafts.iter().map(|d| &d.value)),
+            [1, 0, 1, 0]
+        );
+        let state = state.reduce(Msg::Reset).unwrap();
+        assert_eq!(
+            status_counts(state.drafts.iter().map(|d| &d.value)),
+            [2, 0, 0, 0]
+        );
+        assert_eq!(status_counts([].iter()), [0; 4]);
+        let mut items = [item(1), item(2), item(3), item(4)];
+        for (item, status) in items
+            .iter_mut()
+            .zip(["open", "active", "blocked", "closed"])
+        {
+            item.status = status.into();
+        }
+        assert_eq!(status_counts(&items), [1; 4]);
+        items[0].status = "invalid draft".into();
+        assert_eq!(status_counts(&items), [0, 1, 1, 1]);
     }
     #[test]
     fn drafts_survive_switch_filter_and_reorder() {
