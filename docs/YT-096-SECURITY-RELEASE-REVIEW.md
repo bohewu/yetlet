@@ -3,8 +3,12 @@
 Date: 2026-10-20. **Review complete; release gate FAIL; release-ready NO.**
 The independent reviewer accepts the bounded candidate technical/security
 evidence with its recorded limits and identifies no new material defect in the
-inspected source delta and adjacent boundaries. Five existing release-evidence
-and approval gates remain unmet. YT-096 stays In progress; YT-020 stays Blocked.
+inspected source delta and adjacent boundaries. At that review checkpoint,
+five existing release-evidence and approval gates were unmet. The subsequent
+[owner disposition](#subsequent-owner-support-and-inventory-disposition)
+resolves only support/inventory acceptance; four release conditions remain
+open. The original verdict is unchanged. YT-096 stays In progress;
+YT-020 stays Blocked.
 
 ## Authority and immutable review target
 
@@ -87,17 +91,17 @@ compiler-event coverage remain unverified. Firefox is source-reconciled on
 Ubuntu 26.04.1; historical Chrome has no original candidate-wide manifest.
 Windows OIDC and repeated IME/assistive-technology waivers remain intact.
 
-## Five unmet release gates
+## Five unmet release gates at the review checkpoint
 
 | Gate | Reviewer disposition and requirement | Next authority/evidence |
 | --- | --- | --- |
 | Formal integrity and trust | P1 evidence gap: unsigned 36-entry source/SBOM bundle and separate hosted provenance do not authenticate a combined release statement. Approved source/tag, builder/signing identity, verifier/roots, certificate/chain and transparency/inclusion evidence are absent | Separately approve and authorize the release trust/identity/source/tag policy and independently verified bound evidence set under [supply-chain policy](RELEASE-SUPPLY-CHAIN.md#independent-rebuild-provenance-and-approvals) |
-| Support and inventory acceptance | P2 evidence gap: historical Chrome's missing original candidate source binding and conservative/dev-only/compiled-system inventory omissions have no final maintainer disposition | Explicitly accept the exact recorded limits or retain the affected claims as unsupported/unverified; no invented receipt or automatic rerun |
+| Support and inventory acceptance | P2 evidence gap at the review checkpoint: historical Chrome's missing original candidate source binding and conservative/dev-only/compiled-system inventory omissions had no final maintainer disposition | Subsequently resolved as a maintainer disposition only by the [owner's bounded acceptance](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20); missing evidence stays Not verified |
 | Actual registry qualification | P2 evidence gap: local directory-source consumer simulation does not establish account/name rights, uploaded/downloaded bytes or real registry consumption | Keep blocked until separately authorized registry activation supplies those proofs under the existing release policy |
 | Public activation controls | P2 evidence gap: retained records do not establish the required reachable private reporting fallback or applicable public reporting/scanning controls | Before separately authorized public activation, verify the route/fallback and applicable controls; retain Private state until then |
 | Concrete maintainer release approval | P2 evidence gap: candidate selection and reviews do not approve a concrete tag, evidence digests, residual risks or rollback target | After applicable gates pass, record the maintainer's exact source/tag/artifact/evidence/support/risk/rollback decision |
 
-These are mandatory deferred release conditions, not new product
+At that checkpoint these were mandatory deferred release conditions, not new product
 vulnerabilities or authorization to execute activation work. The review request
 is complete with this rejection of release readiness. No additional repair,
 rerun, policy weakening or signing/publication was admitted in response to the
@@ -108,16 +112,36 @@ their historical records; no current entitlement or setting is invented.
 ## Preservation and next decision
 
 All 743 prior evidence files, 63 selected source inputs and five canonical
-private scan files remain unchanged. The current checkout stays on
-`feat/yt090-configuration`, HEAD `c0726d2`; the new report/status updates remain
-uncommitted. No runtime resource or new external operation was started. Signing,
+private scan files were unchanged at review closeout. That checkpoint used
+`feat/yt090-configuration`, HEAD `c0726d2`, with the new report/status updates
+uncommitted; they were subsequently committed as `2118495` under separate
+owner authorization. No runtime resource or new external operation was started. Signing,
 key access, tags, publication, visibility changes and deployment were not
 performed. The final documentation and preservation checks are recorded in
 [FINAL-STATE.json](../artifacts/yt096-security-release-review-20261020/FINAL-STATE.json).
 
-The next decision that needs no signing or publication is the maintainer's
-explicit disposition of the support/inventory limits in
+At the review checkpoint, the next decision needing no signing or publication
+was the maintainer's explicit disposition of the support/inventory limits in
 [the reconciliation](YT-096-FINAL-RECONCILIATION.md#residual-decisions-and-release-boundary).
 Acceptance cannot create missing source evidence or erase Not verified claims.
 Formal integrity/registry/public-activation execution remains separately
 authorized work; final release approval follows the applicable completed gates.
+
+## Subsequent owner support and inventory disposition
+
+On 2026-10-20, after commit `2118495`, the owner explicitly accepted the
+[recommended scope and known inventory differences](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20)
+and required missing evidence to remain Not verified. This resolves the
+support/inventory finding's missing maintainer disposition only. Historical
+Chrome exact-candidate binding and complete compiled/binary/system inventory
+are still Not verified; native/wasm/Firefox evidence keeps its original scope.
+Neither raw reviewer result nor historical evidence is rewritten.
+
+The original final review remains FAIL / release-ready NO. Four conditions
+still need their own authority and evidence: formal integrity/trust, actual
+registry qualification, public activation/reporting controls and concrete
+final maintainer release approval. This documentation acceptance does not
+authorize signing, publication, tags, visibility changes or deployment, does
+not weaken existing supply-chain policy, and does not mark YT-096 Done or
+unblock YT-020. Independent review of this update is a bounded documentation
+review, not a replacement final release verdict.

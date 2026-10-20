@@ -52,17 +52,28 @@ unsigned bundle; actual GNU/wasm Cargo observations have only known dev-only
 differences. Existing native/wasm/Firefox and historical Chrome results are
 retained without runtime reruns. Historical Chrome has no original independent
 candidate-wide manifest, and complete compiled/per-library/system inventory is
-Not verified. Explicit support/inventory-limit acceptance and all remaining
-formal trust/registry/final security/release/maintainer gates remain open.
+Not verified. At that reconciliation checkpoint, support/inventory-limit
+acceptance and remaining formal trust/registry/final review/maintainer gates
+were open; the subsequent decisions below retain those evidence boundaries.
 
 The subsequent [independent final candidate review](YT-096-SECURITY-RELEASE-REVIEW.md)
 is complete with overall FAIL and release-ready NO. It accepts bounded
 technical/security evidence and identifies no new material source defect in the
-inspected delta. Formal integrity/trust, final support/inventory acceptance,
-actual registry proof, public activation controls and concrete maintainer
-release approval remain mandatory. These are existing deferred release gates;
+inspected delta. At that review checkpoint, formal integrity/trust, final
+support/inventory acceptance, actual registry proof, public activation controls
+and concrete maintainer release approval were unmet. These are existing release gates;
 the review authorized no repairs, reruns, signing or publication. YT-096 stays
 In progress and YT-020 stays Blocked.
+
+After the review report was committed as `2118495`, the owner explicitly
+accepted the [bounded support scope and known inventory differences](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20).
+Missing evidence remains Not verified, including exact-candidate Chrome
+qualification and complete compiled/binary/system inventory. This resolves
+only the missing support/inventory disposition. The original final verdict
+stays FAIL / release-ready NO; formal integrity/trust, actual registry proof,
+public activation/reporting controls and concrete final maintainer approval
+remain open. No policy, API classification, required CI or release authority
+changes, and no runtime rerun, signing or publication occurs.
 
 ## Current documentation and package boundary (2026-10-12)
 

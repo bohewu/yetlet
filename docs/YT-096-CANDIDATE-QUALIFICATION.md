@@ -249,11 +249,11 @@ release/security PASS is claimed here.
 | Remaining gate | Required evidence |
 |---|---|
 | Candidate MSRV/platform execution | Rust 1.99.0 native GNU/MSVC and five wasm libraries PASS; preserve source/API reconciliation and final supported-matrix review |
-| Selected native/browser targets | [Final evidence reconciliation](YT-096-FINAL-RECONCILIATION.md) retains actual Ubuntu 24.04/Windows MSVC native and five wasm-build PASS, source-reconciled Firefox and historical Chrome consumer PASS. Historical Chrome support-scope acceptance remains explicit; no retroactive candidate receipt is claimed |
-| Build-bound inventory | [Final inventory crosswalk](YT-096-FINAL-RECONCILIATION.md) joins nine archives/locks to 23 SBOMs and 140 retained Cargo events. Known dev/conservative differences and per-library/output/native-system omissions remain; complete compiled inventory and final limit/trust acceptance are not established |
+| Selected native/browser targets | [Owner-accepted scope](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20): actual Ubuntu 24.04/Windows MSVC native and five wasm-build PASS, source-reconciled Firefox and historical Chrome consumer reuse only. Exact-candidate Chrome qualification remains Not verified; no retroactive receipt is claimed |
+| Build-bound inventory | [Owner-accepted source-inventory scope and differences](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20) retain nine archives/locks, 23 SBOMs and 140 aggregate Cargo events. Known dev/conservative differences are accepted; complete per-library/output/native-system inventory and new Windows compiler-event coverage remain Not verified. Formal trust remains open |
 | Independent rebuild | [Two-host archive comparison](YT-096-TWO-HOST-REBUILD.md) PASS; [separately operated GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) matches all nine archives with exact source/tool/lock inputs. Final authenticated builder/source/tag/trust-policy acceptance remains required |
 | Trust and registry | Current exact artifact provenance/signatures, formal trust requirements and separately authorized real registry rights/download/consumer checks |
-| Independent release/security review | [Final candidate review](YT-096-SECURITY-RELEASE-REVIEW.md) is complete: bounded technical/security evidence accepted with limits, no new material source defect identified; overall release gate FAIL because five existing evidence/approval conditions remain unmet |
+| Independent release/security review | [Final candidate review](YT-096-SECURITY-RELEASE-REVIEW.md) is complete: bounded technical/security evidence accepted with limits, no new material source defect identified; original overall verdict FAIL. Subsequent owner support/inventory acceptance resolves one disposition; four release conditions remain open |
 | Maintainer decision | Explicit final release approval and separate external activation authorization |
 
 The [partial platform followup](YT-096-PLATFORM-QUALIFICATION.md) records
@@ -261,8 +261,8 @@ Ubuntu userspace/wasm and Firefox results, the resumed Windows MSVC PASS for
 all nine standalone archived packages, retained cache-resolution failures and
 exact preservation/cleanup. The [Windows archive rebuild](YT-096-TWO-HOST-REBUILD.md)
 now produces nine byte-identical archives with normal Cargo verification.
-Resolve final platform evidence scope and continue build-bound inventory and
-independently controlled builder evidence before the later trust/approval gates.
+The subsequent reconciliation and owner decision below address the bounded
+platform/inventory disposition; formal builder trust and release approval remain open.
 The earlier [Azure SSH attempts](YT-096-AZURE-CLEAN-BUILDER.md) stopped before
 transfer/build and remain preserved. The [Run Command/private Blob continuation](YT-096-AZURE-RUN-COMMAND.md)
 now passes actual Ubuntu 24.04.5 execution, an empty-cache nine-archive rebuild,
@@ -294,9 +294,10 @@ bundle, reconciles actual Cargo observations and matches 133 browser Git source
 entries/eight retained assets. Known conservative and test/dev-only inventory
 differences have no unexplained package/version gap. Historical Chrome lacks
 an original candidate-wide receipt; complete compiled/per-library/system
-inventory remains Not verified. These limits require explicit final support
-and inventory acceptance, followed by the remaining formal trust/registry and
-independent final security/release/maintainer gates. This comparison is complete
+inventory remains Not verified. At this comparison checkpoint, the limits
+required explicit final support/inventory acceptance; the subsequent owner
+decision below supplies that disposition without changing evidence status.
+Formal trust/registry and final release/maintainer gates remain. This comparison is complete
 at its stated scope and does not mark YT-096 Done or activate YT-020.
 
 ## Final candidate security/release disposition
@@ -304,9 +305,22 @@ at its stated scope and does not mark YT-096 Done or activate YT-020.
 The [independent final review](YT-096-SECURITY-RELEASE-REVIEW.md) subsequently
 completed source/security-delta and retained-evidence inspection without reruns.
 Its exact overall verdict is FAIL, release-ready NO: bounded technical/security
-evidence is accepted, while formal integrity/trust, support/inventory acceptance,
-actual registry proof, public activation controls and concrete maintainer
-release approval remain open. No new material source defect was identified
+evidence was accepted, while five conditions were open at that checkpoint:
+formal integrity/trust, support/inventory acceptance, actual registry proof,
+public activation controls and concrete maintainer release approval.
+No new material source defect was identified
 within the inspected delta/adjacent boundaries. This is a completed review with
 unmet release conditions, not candidate release approval. YT-096 remains
 In progress and YT-020 remains Blocked; signing/publication were not performed.
+
+## Subsequent owner support and inventory acceptance
+
+After committing the review report as `2118495`, the owner accepted the
+[bounded experimental source-package scope and known inventory differences](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20)
+on 2026-10-20. Exact-candidate Chrome qualification and complete
+compiled/per-library/system inventory remain Not verified. This records the
+missing maintainer disposition only; it preserves original PASS/FAIL evidence,
+waivers, API/MSRV classifications and the original failed final verdict.
+Four release conditions remain open: formal integrity/trust, actual registry
+proof, public activation/reporting controls and concrete final release approval.
+No runtime rerun, signing or publication is authorized by this decision.

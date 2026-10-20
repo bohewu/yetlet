@@ -24,18 +24,23 @@ The [GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) reuses th
 existing manual workflow at the exact same candidate. All nine returned archives
 match complete primary bytes with matched source/lock/tool inputs and verified
 unsigned bindings. This adds separately operated execution evidence; formal
-trust, final inventory/platform acceptance and release approval remain open.
+trust and release approval remain open. The owner subsequently accepted only
+the bounded inventory/platform disposition described below.
 
 The [final inventory/platform evidence reconciliation](YT-096-FINAL-RECONCILIATION.md)
 joins nine archives to 23 target SBOMs and retained Cargo observations, with
 133 browser-source/eight asset identities checked and no runtime reruns.
-Historical Chrome source-binding and complete compiled/system inventory limits
-remain explicit final acceptance decisions; no formal release gate is waived.
+The [owner's support/inventory decision](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20)
+accepts the experimental nine-source-package scope and known differences.
+Exact-candidate Chrome qualification and complete compiled/system inventory
+remain Not verified; no formal release gate is waived.
 
 The [final candidate security/release review](YT-096-SECURITY-RELEASE-REVIEW.md)
 is complete. Bounded technical/security evidence is accepted with limits and no
 new material source defect was identified; the overall release gate is FAIL,
-release-ready NO, with five existing evidence/approval conditions still open.
+release-ready NO. Subsequent owner support/inventory acceptance resolves one
+disposition; formal integrity/trust, actual registry proof, public activation
+controls and concrete maintainer release approval remain open.
 No runtime rerun, signing or publication occurred.
 
 ## Architecture and contracts
