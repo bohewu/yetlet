@@ -32,6 +32,12 @@ joins nine archives to 23 target SBOMs and retained Cargo observations, with
 Historical Chrome source-binding and complete compiled/system inventory limits
 remain explicit final acceptance decisions; no formal release gate is waived.
 
+The [final candidate security/release review](YT-096-SECURITY-RELEASE-REVIEW.md)
+is complete. Bounded technical/security evidence is accepted with limits and no
+new material source defect was identified; the overall release gate is FAIL,
+release-ready NO, with five existing evidence/approval conditions still open.
+No runtime rerun, signing or publication occurred.
+
 ## Architecture and contracts
 
 - [Architecture](ARCHITECTURE.md) and [MVP contract](MVP.md): responsibilities, trust boundaries and original acceptance criteria.

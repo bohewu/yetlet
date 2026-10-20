@@ -140,12 +140,17 @@ owner's waivers. Optional WebKit/mobile/macOS/Windows GNU/device/performance,
 application HA/durability/OIDC/certificate-custody and GPU capabilities receive
 no new qualification. Required/scheduled CI and compatibility/API classifications
 remain unchanged. No runtime or external resource was started by this slice.
-New reconciliation documents remain uncommitted pending the owner's next step.
+The reconciliation was subsequently committed as `c0726d2` before the final
+candidate review; that documentation commit preserves the selected source and
+all earlier evidence identities.
 
-The next work that needs no signing or publication is an independent final
-candidate security/release review and a concrete maintainer decision on the
-recorded support/inventory limits. That review cannot substitute for the
-remaining formal trust/registry execution or final release authorization.
+The subsequent [final candidate security/release review](YT-096-SECURITY-RELEASE-REVIEW.md)
+is now complete: technical/security evidence accepted with limits, overall
+release gate FAIL and release-ready NO because existing evidence/approval
+conditions remain unmet. The next decision that needs no signing/publication
+is the maintainer's disposition of the recorded support/inventory limits.
+That decision cannot substitute for the remaining formal trust/registry
+execution or final release authorization.
 
 ## Independent ordinary slice review
 

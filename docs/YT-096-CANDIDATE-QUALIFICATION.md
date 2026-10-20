@@ -253,7 +253,7 @@ release/security PASS is claimed here.
 | Build-bound inventory | [Final inventory crosswalk](YT-096-FINAL-RECONCILIATION.md) joins nine archives/locks to 23 SBOMs and 140 retained Cargo events. Known dev/conservative differences and per-library/output/native-system omissions remain; complete compiled inventory and final limit/trust acceptance are not established |
 | Independent rebuild | [Two-host archive comparison](YT-096-TWO-HOST-REBUILD.md) PASS; [separately operated GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) matches all nine archives with exact source/tool/lock inputs. Final authenticated builder/source/tag/trust-policy acceptance remains required |
 | Trust and registry | Current exact artifact provenance/signatures, formal trust requirements and separately authorized real registry rights/download/consumer checks |
-| Independent release/security review | Review the complete candidate evidence and residual risks; this local slice does not satisfy that gate |
+| Independent release/security review | [Final candidate review](YT-096-SECURITY-RELEASE-REVIEW.md) is complete: bounded technical/security evidence accepted with limits, no new material source defect identified; overall release gate FAIL because five existing evidence/approval conditions remain unmet |
 | Maintainer decision | Explicit final release approval and separate external activation authorization |
 
 The [partial platform followup](YT-096-PLATFORM-QUALIFICATION.md) records
@@ -298,3 +298,15 @@ inventory remains Not verified. These limits require explicit final support
 and inventory acceptance, followed by the remaining formal trust/registry and
 independent final security/release/maintainer gates. This comparison is complete
 at its stated scope and does not mark YT-096 Done or activate YT-020.
+
+## Final candidate security/release disposition
+
+The [independent final review](YT-096-SECURITY-RELEASE-REVIEW.md) subsequently
+completed source/security-delta and retained-evidence inspection without reruns.
+Its exact overall verdict is FAIL, release-ready NO: bounded technical/security
+evidence is accepted, while formal integrity/trust, support/inventory acceptance,
+actual registry proof, public activation controls and concrete maintainer
+release approval remain open. No new material source defect was identified
+within the inspected delta/adjacent boundaries. This is a completed review with
+unmet release conditions, not candidate release approval. YT-096 remains
+In progress and YT-020 remains Blocked; signing/publication were not performed.
