@@ -188,6 +188,57 @@ is generated; settings-enabled applications require an operator-provided token
 before startup. CLI tool decisions never open that secret file. Backend `.env`
 auto-discovery is disabled. See [configuration](../../docs/CONFIGURATION.md).
 
+### Settings selection decision table
+
+For `run`, `watch` and `build`, resolve these choices in order using the
+existing [CLI settings projection](src/settings.rs) and
+[shared Loader](../../crates/yetlet-config/src/lib.rs):
+
+| Decision | Existing rule | Practical effect |
+|---|---|---|
+| Application | Explicit `--manifest-path PATH`, otherwise exactly cwd/Cargo.toml; select a protected standalone Cargo.toml with an existing Cargo.lock | Its parent is the app root; no ancestor/workspace search |
+| Public settings directory | Absolute `YETLET_CONFIG_ROOT` when supplied, otherwise the selected app root | Moves public TOML lookup only; source, lock and `cli.vite.root` stay relative to the selected app |
+| Settings profile | `APP_ENVIRONMENT` accepts exactly `Development`, `Staging` or `Production`; absent means Production | Selects exactly the matching profile TOML alongside base.toml; `--release` does not select a settings profile |
+| Public values | base.toml, then selected profile, then scoped OS overrides such as `APP_CLI__VITE__AUTO_START` | Higher layers replace declared keys with the same value kind; ENV is not a way to create undeclared settings |
+| Execution target | Merged `cli.target`, default native when absent; browser must have Vite enabled, Rust watch disabled and native TLS disabled | `--template browser` selects creation; later execution reads settings, including declared `APP_CLI__TARGET` overrides |
+| Invocation choice | After settings validation, `watch` forces Rust watch for this invocation; native `build --release` selects Cargo's release profile | Neither writes settings; invalid settings cannot be repaired or skipped by these command choices |
+
+The CLI also admits public `APP_SERVER__TLS__*` overrides for Development TLS;
+other backend overrides and Development secret files do not enter tool-policy
+loading. Invalid profiles, unknown related keys, wrong types and unsafe selected
+paths fail before child startup.
+
+With no recognized base/profile files, legacy defaults are available only when
+there is no explicit settings-root or public-value override: native target,
+Rust watch off, Vite off and one generated replica. The profile selector must
+still be valid. Once files exist, both base.toml and the selected profile are
+required. If their validated merged data has no cli section, those defaults
+still apply; a present but incomplete cli section is not filled arbitrarily.
+An omitted cli.target or cli.rust retains its specific backward-compatible
+default. Settings are read for each command invocation; this is not live
+tool-policy reload inside an already running watch process.
+
+### Execution decision table
+
+After successful [application preflight and settings selection](src/app.rs):
+
+| Target / command | Settings decision | Result |
+|---|---|---|
+| Native `run` | `cli.rust.watch`; Vite only when enabled and auto_start | Frozen Cargo run, optionally supervised by Watchexec and/or alongside Vite |
+| Native `watch` | Force Rust watch; retain Vite enabled/auto_start/root settings | Watch/rebuild/restart Rust; an owned Vite process stays running across Rust restarts |
+| Native `build` | Vite only when enabled and auto_build; Rust watch is not used | Selected frontend build must succeed before frozen Cargo build; when the gate is false, build Cargo only |
+| Browser `run` | auto_start | Preview existing static dist, without a native app server; false skips startup with exit 0 and no child |
+| Browser `build` | auto_build | Run the frontend-owned WASM/Vite build, without a native app build; false skips it with exit 0 and no child |
+| Browser `watch` | Unsupported by this browser contract | Refuse before child startup; explicitly build and preview instead |
+
+For example, in a generated native Vite app, a Development overlay setting
+auto_start=false makes `run` start Rust only. A declared
+`APP_CLI__VITE__AUTO_START=true` override enables Vite for that invocation.
+Neither changes auto_build: `build` still uses that independent setting.
+Use `APP_ENVIRONMENT=Development` explicitly to select that overlay. CLI public
+selection does not establish that app runtime secrets or frontend dist are ready;
+follow the [first-use preparation order](#first-use-prerequisites).
+
 ## Local signing keys
 
 See the [signing example](../../examples/signing/README.md) for the complete

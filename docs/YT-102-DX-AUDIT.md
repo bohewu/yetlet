@@ -263,3 +263,23 @@ required followups; the original rendering failure remains recorded here.
 The next separately
 selectable DX candidate is documenting effective project/settings selection;
 this slice does not select a new report command or error schema.
+
+## Selected settings-decision documentation slice (2026-10-20)
+
+After the first-use guide commit `6e46455`, the owner selected a practical
+decision table using the existing settings mechanism. The CLI guide now records
+[selection order and execution decisions](../tools/yetlet-cli/README.md#settings-selection-decision-table):
+manifest/app root, public settings root, finite profile, declared-key merge and
+ENV precedence, native/browser target, command-only watch/release choices,
+legacy defaults and independent Vite startup/build gates.
+
+The table follows current `settings.rs`, `app.rs`, manifest preflight and the
+shared Loader. It distinguishes public Development TLS from backend secret
+loading, and relocating TOMLs from relocating the app or frontend. No new
+configuration source, schema, command, report or runtime behavior is introduced.
+Existing accepted native/browser/Windows evidence is retained without reruns.
+`cargo xtask check docs`, Markdown table rendering and `git diff --check` pass.
+Both new tables retain three cells in every row. Independent Reviewer
+`/root/yt102_settings_decisions_review_oct20` PASS has zero issues or required
+followups. The separate safe configuration-error categories remain a possible
+later candidate; this slice does not authorize their implementation.

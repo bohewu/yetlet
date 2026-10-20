@@ -302,6 +302,11 @@ OpenSSL, initial-assets and doctor-scope boundaries. It changes no tool or
 runtime behavior. Docs/whitespace checks and the focused Markdown table-rendering
 check pass; independent Reviewer `/root/yt102_first_use_guide_review_oct20`
 followup PASS has zero issues or required followups after the recorded table fix.
+The following documentation slice records existing settings-selection order
+and native/browser execution decisions in the CLI guide. It preserves the
+shared Loader and public/secret boundary. Docs, rendered-table and whitespace
+checks pass; independent Reviewer `/root/yt102_settings_decisions_review_oct20`
+PASS has zero issues or required followups.
 
 **YT-103, opt-in HA and rolling asset compatibility:** independently of the
 YT-102 developer workflow study, follow YT-101 with an application/deployment
