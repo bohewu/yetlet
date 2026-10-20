@@ -2,7 +2,7 @@
 use crate::app::Completion;
 use std::{
     fs::File,
-    io,
+    io::{self, Read},
     os::{
         fd::{AsRawFd, FromRawFd},
         unix::process::CommandExt,
@@ -244,6 +244,35 @@ impl Owned {
         Ok(())
     }
 
+    fn only_pinned_children(&self) -> io::Result<bool> {
+        // Called only after WNOWAIT observes leader exit and orphan adoption.
+        // The CLI is single-threaded and does not reap here: its direct children
+        // cannot disappear during this read, even if they exit. Do not use this
+        // as a general snapshot of an actively reaped/multithreaded process tree.
+        let mut tasks = std::fs::read_dir("/proc/self/task")?;
+        let task = tasks.next().ok_or_else(|| io::Error::other("no task"))??;
+        if tasks.next().is_some() {
+            return Ok(false);
+        }
+        let mut children = String::new();
+        File::open(task.path().join("children"))?
+            .take(64)
+            .read_to_string(&mut children)?;
+        if children.len() == 64 {
+            return Ok(false);
+        }
+        let mut actual = children
+            .split_whitespace()
+            .map(str::parse::<libc::pid_t>)
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|_| io::Error::other("invalid child identity"))?;
+        let mut expected = vec![self.pgid];
+        expected.extend(self.notifier);
+        actual.sort_unstable();
+        expected.sort_unstable();
+        Ok(actual == expected)
+    }
+
     fn grace(&self, forwarded: &mut bool) -> io::Result<()> {
         let deadline = Instant::now() + GRACE;
         while Instant::now() < deadline {
@@ -364,6 +393,7 @@ pub(crate) fn run(command: &mut Command) -> io::Result<Completion> {
     };
     let result: io::Result<()> = (|| {
         let mut forwarded = false;
+        let mut natural_exit = false;
         if terminal.is_some() {
             owned.start_notifier()?;
             terminal_group(owned.pgid)?;
@@ -378,13 +408,21 @@ pub(crate) fn run(command: &mut Command) -> io::Result<Completion> {
                 break;
             }
             if owned.exited()? {
+                natural_exit = true;
                 break;
             }
             thread::sleep(POLL);
         }
         // Natural Cargo exit also tears down any remaining application descendants.
         owned.signal(libc::SIGTERM)?;
-        owned.grace(&mut forwarded)?;
+        // Missing procfs, other children or cancellation retain the full grace.
+        // Keep the leader pinned until kill_reap's last group signal in all cases.
+        if !natural_exit
+            || !owned.only_pinned_children().unwrap_or(false)
+            || owned.cancellation()? != 0
+        {
+            owned.grace(&mut forwarded)?;
+        }
         Ok(())
     })();
     let status = owned.kill_reap()?;

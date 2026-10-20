@@ -272,7 +272,30 @@ The 2026-10-18 [CLI contract](CLI-CONTRACT.md) now has an explicitly authorized
 [design-only verification](YT-102-CLI-CONTRACT-VERIFICATION.md) remains historical.
 Current Linux tests and Windows cross-compilation do not close native Windows
 qualification, broader DX research, registry release or new generator formats.
-YT-102's real journey audit, measurements and DX Extension Contract remain Todo.
+The subsequent 2026-10-20 [DX audit](YT-102-DX-AUDIT.md) reconciles those research
+deliverables: current journey map, retained platform evidence, bounded Ubuntu
+empty-target/warm/change-feedback observations, prioritized proposals and DX
+extension boundary. Fixed cleanup latency is the first bounded code candidate;
+no improvement is implemented. Independent Reviewer
+`/root/yt102_dx_audit_review_oct20` PASS has zero issues or required followups;
+YT-102 is Done at research-only scope.
+
+**YT-102 Linux completion latency (2026-10-20, separately authorized):** the
+[bounded implementation](YT-102-COMPLETION-LATENCY.md) skips natural-exit grace
+only after an exited leader and exact retained-child/single-thread observation.
+Other children, unavailable inspection and cancellation retain existing waits;
+the leader stays pinned through all group signals and full cleanup still runs.
+Focused foreground/CLI tests and warm-build/PTY observations pass. Independent
+Reviewer `/root/yt102_completion_latency_review_oct20` PASS has zero issues or
+required followups; the bounded slice is complete. No public CLI/settings or
+Windows change. The subsequently requested native Windows MSVC followup in the
+same record verifies build/run, real console C/BREAK, native statuses and
+descendant cleanup; all six default cases have passing evidence across the
+initial invocation and a focused rerun after one environment-only correction.
+The same record adds a native Windows warm-build baseline: CLI median 267 ms
+versus direct Cargo 225 ms across three alternating pairs. Retain this bounded
+baseline for unrelated changes and revisit relevant Windows process/toolchain
+changes or reported regressions; no mandatory recurring benchmark is added.
 
 **YT-103, opt-in HA and rolling asset compatibility:** independently of the
 YT-102 developer workflow study, follow YT-101 with an application/deployment

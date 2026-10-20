@@ -92,6 +92,73 @@ fn frozen_cli_build_run_and_lock_cache_failures_use_native_cargo() {
 }
 
 #[test]
+fn natural_cli_exit_keeps_grace_for_adopted_children_and_reaps_them() {
+    let root = tempfile::tempdir().unwrap();
+    fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
+    let manifest = root.path().join("Cargo.toml");
+    fs::write(
+        &manifest,
+        "[package]\nname='grace_fixture'\nversion='0.1.0'\nedition='2024'\n[workspace]\n",
+    )
+    .unwrap();
+    fs::write(
+        root.path().join("Cargo.lock"),
+        "version=4\n[[package]]\nname='grace_fixture'\nversion='0.1.0'\n",
+    )
+    .unwrap();
+    fs::create_dir(root.path().join("src")).unwrap();
+    fs::write(
+        root.path().join("src/main.rs"),
+        r#"
+use std::{fs, path::PathBuf, process::Command, thread, time::{Duration, Instant}};
+fn main() {
+    let root = PathBuf::from(std::env::var_os("GRACE_ROOT").unwrap());
+    let script = if std::env::var("GRACE_MODE").unwrap() == "graceful" {
+        "trap 'sleep 0.1; printf done > \"$1/graceful\"; exit 0' TERM; echo $$ > \"$1/leaf.pid\"; while :; do sleep 0.02; done"
+    } else {
+        "trap '' TERM; echo $$ > \"$1/leaf.pid\"; while :; do sleep 0.02; done"
+    };
+    let _child = Command::new("/bin/sh").args(["-c", script, "sh"]).arg(&root).spawn().unwrap();
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while fs::read_to_string(root.join("leaf.pid")).ok()
+        .and_then(|value| value.trim().parse::<u32>().ok()).is_none() {
+        assert!(Instant::now() < deadline);
+        thread::sleep(Duration::from_millis(5));
+    }
+    std::process::exit(17);
+}
+"#,
+    )
+    .unwrap();
+    code(cli("build", &manifest).output().unwrap(), 0);
+    for mode in ["graceful", "resistant"] {
+        code(
+            cli("run", &manifest)
+                .env("GRACE_ROOT", root.path())
+                .env("GRACE_MODE", mode)
+                .output()
+                .unwrap(),
+            17,
+        );
+        let pid = fs::read_to_string(root.path().join("leaf.pid"))
+            .unwrap()
+            .trim()
+            .parse::<i32>()
+            .unwrap();
+        assert_eq!(unsafe { libc::kill(pid, 0) }, -1);
+        assert_eq!(
+            std::io::Error::last_os_error().raw_os_error(),
+            Some(libc::ESRCH)
+        );
+        assert_eq!(root.path().join("graceful").exists(), mode == "graceful");
+        fs::remove_file(root.path().join("leaf.pid")).unwrap();
+        if mode == "graceful" {
+            fs::remove_file(root.path().join("graceful")).unwrap();
+        }
+    }
+}
+
+#[test]
 fn discovery_is_exclusive_scoped_and_needs_no_project_or_tools() {
     let root = tempfile::tempdir().unwrap();
     for arguments in [

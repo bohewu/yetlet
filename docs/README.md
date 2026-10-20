@@ -169,6 +169,17 @@ separates local, native Windows and disposable Azure experiment evidence.
 
 ## Library guides
 
+The [YT-102 developer workflow audit](YT-102-DX-AUDIT.md) reconciles current
+CLI/settings/tool responsibilities and retained platform evidence. Bounded
+Ubuntu measurements identify fixed process-completion waiting and onboarding
+costs; the report proposes minimal improvements and a DX extension boundary
+without changing implementation. Independent Reviewer PASS has zero issues or
+required followups; YT-102 is Done at research-only scope.
+The subsequent [Linux completion-latency slice](YT-102-COMPLETION-LATENCY.md)
+implements one separately selected improvement with targeted process/CLI tests
+and bounded warm-build/PTY observations. Independent implementation Reviewer
+PASS has zero issues or required followups.
+
 These nine unpublished candidate pages describe the implemented APIs and their practical limits. Use the checkout's Rust 1.99 toolchain; native SSR needs no browser build.
 
 | Area | Package guide |
