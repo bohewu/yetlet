@@ -330,3 +330,14 @@ observation does not prove per-library feature equivalence, output-file
 digests, Rust sysroot/native-linker inventory or formal builder trust.
 Existing source inventory bytes, coverage differences, checksums and owner
 waivers remain intact; final inventory/trust/release approvals remain open.
+
+## Final documentary inventory crosswalk
+
+The [final reconciliation](YT-096-FINAL-RECONCILIATION.md) subsequently links
+all nine original source archives/package locks to these 23 unchanged SBOMs,
+the retained unsigned bundle and actual Cargo observations. It adds no SBOM
+generation or license/audit/build rerun. Conservative Serde derive extras,
+known native test/dev-only packages, per-library/output/system omissions and
+the separate unsigned hosted provenance remain explicit. No authenticated
+combined release statement or complete compiled inventory is claimed; final
+inventory/trust/security/release/maintainer acceptance remains open.

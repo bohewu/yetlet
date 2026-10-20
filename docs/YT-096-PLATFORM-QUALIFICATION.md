@@ -297,3 +297,13 @@ observation does not prove per-library feature equivalence, output-file
 digests, Rust sysroot/native-linker inventory or formal builder trust.
 Existing source inventory bytes, coverage differences, checksums and owner
 waivers remain intact; final inventory/trust/release approvals remain open.
+
+## Final documentary reconciliation
+
+The [final evidence table](YT-096-FINAL-RECONCILIATION.md) subsequently joins
+these retained native/wasm/browser results to the unchanged candidate and
+current inventory evidence, without rerunning tests. It preserves historical
+Chrome's missing candidate-wide source manifest and exact Firefox/native host
+boundaries. The separately operated hosted rebuild is recorded there; final
+support/inventory-limit acceptance and formal trust/release approvals remain
+open. Earlier results and this report's original review identities are intact.

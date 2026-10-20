@@ -26,6 +26,12 @@ match complete primary bytes with matched source/lock/tool inputs and verified
 unsigned bindings. This adds separately operated execution evidence; formal
 trust, final inventory/platform acceptance and release approval remain open.
 
+The [final inventory/platform evidence reconciliation](YT-096-FINAL-RECONCILIATION.md)
+joins nine archives to 23 target SBOMs and retained Cargo observations, with
+133 browser-source/eight asset identities checked and no runtime reruns.
+Historical Chrome source-binding and complete compiled/system inventory limits
+remain explicit final acceptance decisions; no formal release gate is waived.
+
 ## Architecture and contracts
 
 - [Architecture](ARCHITECTURE.md) and [MVP contract](MVP.md): responsibilities, trust boundaries and original acceptance criteria.

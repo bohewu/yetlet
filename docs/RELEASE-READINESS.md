@@ -46,6 +46,15 @@ builder/provenance/trust-policy acceptance and final security/release approval
 remain open. No signing or publication occurred; API classifications remain
 unchanged and YT-020 remains Blocked.
 
+The [final documentary reconciliation](YT-096-FINAL-RECONCILIATION.md) now
+joins nine source archives/package locks to 23 SBOMs and the retained 36-entry
+unsigned bundle; actual GNU/wasm Cargo observations have only known dev-only
+differences. Existing native/wasm/Firefox and historical Chrome results are
+retained without runtime reruns. Historical Chrome has no original independent
+candidate-wide manifest, and complete compiled/per-library/system inventory is
+Not verified. Explicit support/inventory-limit acceptance and all remaining
+formal trust/registry/final security/release/maintainer gates remain open.
+
 ## Current documentation and package boundary (2026-10-12)
 
 YT-068 completes the developer entry, exactly nine package guides, evidence-preserving navigation and [T08 Private preparation reconciliation](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) at bounded documentation scope. The five research items YT-029/YT-021/YT-024/YT-022/YT-023 are Done with their linked [actual evidence and decisions](README.md#completed-research-prototypes), without supported-core promotion. T07's nine package-list checks passed; they establish README inclusion only. The independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate.

@@ -249,8 +249,8 @@ release/security PASS is claimed here.
 | Remaining gate | Required evidence |
 |---|---|
 | Candidate MSRV/platform execution | Rust 1.99.0 native GNU/MSVC and five wasm libraries PASS; preserve source/API reconciliation and final supported-matrix review |
-| Selected native/browser targets | Actual Ubuntu 24.04 guest, Windows MSVC and selected wasm execution PASS; fresh Firefox and historical Chrome scope require final matrix reconciliation |
-| Build-bound inventory | Carry completed source-package SBOM/license/audit and threat delta into actual artifact/build review, including recorded dev-feature over-inclusion and non-Cargo omissions |
+| Selected native/browser targets | [Final evidence reconciliation](YT-096-FINAL-RECONCILIATION.md) retains actual Ubuntu 24.04/Windows MSVC native and five wasm-build PASS, source-reconciled Firefox and historical Chrome consumer PASS. Historical Chrome support-scope acceptance remains explicit; no retroactive candidate receipt is claimed |
+| Build-bound inventory | [Final inventory crosswalk](YT-096-FINAL-RECONCILIATION.md) joins nine archives/locks to 23 SBOMs and 140 retained Cargo events. Known dev/conservative differences and per-library/output/native-system omissions remain; complete compiled inventory and final limit/trust acceptance are not established |
 | Independent rebuild | [Two-host archive comparison](YT-096-TWO-HOST-REBUILD.md) PASS; [separately operated GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) matches all nine archives with exact source/tool/lock inputs. Final authenticated builder/source/tag/trust-policy acceptance remains required |
 | Trust and registry | Current exact artifact provenance/signatures, formal trust requirements and separately authorized real registry rights/download/consumer checks |
 | Independent release/security review | Review the complete candidate evidence and residual risks; this local slice does not satisfy that gate |
@@ -284,3 +284,17 @@ GitHub-hosted Ubuntu 24.04.5 job is terminal and its private artifact/logs were
 saved locally. This supplies separately operated execution evidence, not formal
 authenticated provenance or final release authorization. Historical results and
 API classifications remain unchanged.
+
+## Final inventory and platform evidence reconciliation
+
+The owner selected documentary closeout using existing passing evidence, with
+no runtime reruns. [Final reconciliation](YT-096-FINAL-RECONCILIATION.md)
+binds all nine archives to 23 target SBOMs, preserves the 36-entry unsigned
+bundle, reconciles actual Cargo observations and matches 133 browser Git source
+entries/eight retained assets. Known conservative and test/dev-only inventory
+differences have no unexplained package/version gap. Historical Chrome lacks
+an original candidate-wide receipt; complete compiled/per-library/system
+inventory remains Not verified. These limits require explicit final support
+and inventory acceptance, followed by the remaining formal trust/registry and
+independent final security/release/maintainer gates. This comparison is complete
+at its stated scope and does not mark YT-096 Done or activate YT-020.
