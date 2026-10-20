@@ -20,6 +20,12 @@ actual Ubuntu 24.04.5 guest with an empty cache: nine identical archives,
 83 native tests/four doctests and five wasm libraries. All temporary resources
 are deleted; aggregate Cargo observations retain explicit SBOM/dev-only limits.
 
+The [GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) reuses the
+existing manual workflow at the exact same candidate. All nine returned archives
+match complete primary bytes with matched source/lock/tool inputs and verified
+unsigned bindings. This adds separately operated execution evidence; formal
+trust, final inventory/platform acceptance and release approval remain open.
+
 ## Architecture and contracts
 
 - [Architecture](ARCHITECTURE.md) and [MVP contract](MVP.md): responsibilities, trust boundaries and original acceptance criteria.

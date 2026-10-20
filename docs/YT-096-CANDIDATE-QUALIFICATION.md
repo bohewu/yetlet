@@ -251,7 +251,7 @@ release/security PASS is claimed here.
 | Candidate MSRV/platform execution | Rust 1.99.0 native GNU/MSVC and five wasm libraries PASS; preserve source/API reconciliation and final supported-matrix review |
 | Selected native/browser targets | Actual Ubuntu 24.04 guest, Windows MSVC and selected wasm execution PASS; fresh Firefox and historical Chrome scope require final matrix reconciliation |
 | Build-bound inventory | Carry completed source-package SBOM/license/audit and threat delta into actual artifact/build review, including recorded dev-feature over-inclusion and non-Cargo omissions |
-| Independent rebuild | [Two-host archive comparison](YT-096-TWO-HOST-REBUILD.md) PASS for all nine packages; independently controlled builder evidence still required by release policy |
+| Independent rebuild | [Two-host archive comparison](YT-096-TWO-HOST-REBUILD.md) PASS; [separately operated GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) matches all nine archives with exact source/tool/lock inputs. Final authenticated builder/source/tag/trust-policy acceptance remains required |
 | Trust and registry | Current exact artifact provenance/signatures, formal trust requirements and separately authorized real registry rights/download/consumer checks |
 | Independent release/security review | Review the complete candidate evidence and residual risks; this local slice does not satisfy that gate |
 | Maintainer decision | Explicit final release approval and separate external activation authorization |
@@ -272,3 +272,15 @@ are recorded; they do not complete all feature/binary/system inventory or
 independent builder trust. Preserve accepted application/platform evidence
 and owner waivers.
 YT-096 stays **In progress** and YT-020 stays **Blocked**.
+
+## Subsequently authorized GitHub-hosted rebuild
+
+The owner later authorized necessary push and dispatch of the existing private
+workflow, comparison and independent review, while prohibiting signing and
+publication. [Run 39418279958](YT-096-GITHUB-HOSTED-REBUILD.md) now passes at
+the same immutable candidate: nine byte-identical archives, matched 63 source
+inputs, lock/epoch/tools and unsigned checksum/provenance bindings. The native
+GitHub-hosted Ubuntu 24.04.5 job is terminal and its private artifact/logs were
+saved locally. This supplies separately operated execution evidence, not formal
+authenticated provenance or final release authorization. Historical results and
+API classifications remain unchanged.
