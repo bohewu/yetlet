@@ -7,10 +7,37 @@ use yetlet_board_triage::{Bootstrap, Item, MAX_ITEMS, STATUS_LABELS, Save, statu
 use yetlet_core::Element;
 
 #[derive(Clone)]
-pub(super) struct WasmPage;
+pub(super) struct WasmPage {
+    style_nonce: Option<String>,
+}
 // WASM compilation is allowed only on this explicitly enhanced page. No inline
 // scripts, unsafe-eval, remote origin, or persistent server circuit is enabled.
 pub(super) const CSP: &str = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; img-src 'self'; connect-src 'self'; font-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'; frame-ancestors 'none'";
+
+impl WasmPage {
+    fn new() -> Self {
+        let mut bytes = [0u8; 16];
+        let style_nonce = getrandom::fill(&mut bytes)
+            .ok()
+            .map(|()| bytes.iter().map(|byte| format!("{byte:02x}")).collect());
+        Self { style_nonce }
+    }
+    pub(super) fn csp(&self) -> HeaderValue {
+        match &self.style_nonce {
+            Some(nonce) => HeaderValue::from_str(&CSP.replace(
+                "style-src 'self'",
+                &format!("style-src 'self' 'nonce-{nonce}'; style-src-attr 'none'"),
+            ))
+            .expect("generated hexadecimal style nonce"),
+            None => HeaderValue::from_static(CSP),
+        }
+    }
+    fn head(&self) -> String {
+        self.style_nonce.as_ref().map_or_else(String::new, |nonce| {
+            format!("<meta property=\"csp-nonce\" nonce=\"{nonce}\">")
+        })
+    }
+}
 
 impl From<WorkItem> for Item {
     fn from(item: WorkItem) -> Self {
@@ -50,7 +77,11 @@ fn control(label: &str, name: &'static str, kind: &'static str) -> Element {
     }
     Element::new("div")
         .attribute("class", "triage-field")
-        .child(views::text("label", label).attribute("for", id))
+        .child(
+            views::text("label", label)
+                .attribute("for", id)
+                .attribute("id", format!("triage-{name}-label")),
+        )
         .child(input)
 }
 fn select(label: &str, name: &'static str, options: &[(&str, &str)]) -> Element {
@@ -162,6 +193,8 @@ pub(super) async fn workspace(
                 .child(views::text("h2", "Selected item").attribute("id", "triage-heading"))
                 .child(control("Title", "title", "input"))
                 .child(control("Description", "description", "textarea"))
+                .child(Element::new("div").attribute("id", "triage-description-editor").attribute("class", "triage-description-editor").attribute("hidden", ""))
+                .child(views::text("p", "Plain text, up to 4,000 characters. Undo history resets on item switch or Reset.").attribute("id", "triage-description-hint").attribute("class", "triage-hint"))
                 .child(Element::new("div").attribute("class", "triage-field-pair")
                     .child(select("Status", "status", &[("open", "Open"), ("active", "Active"), ("blocked", "Blocked"), ("closed", "Closed")]))
                     .child(select("Priority", "priority", &[("low", "Low"), ("normal", "Normal"), ("high", "High")])))
@@ -174,6 +207,7 @@ pub(super) async fn workspace(
     let view = views::shell(Some(principal), Some(&csrf), "Triage workspace", body);
     let mut response = page(&state, "Triage workspace | Lab Operations", view, false)?;
     if let Some(script) = &state.triage_script {
+        let policy = WasmPage::new();
         // Re-render from the same escaped view contract; the module path was
         // validated before opening storage. The bootstrap contains no markup.
         let bytes = axum::body::to_bytes(response.into_body(), 512 * 1024)
@@ -182,11 +216,14 @@ pub(super) async fn workspace(
         let html = String::from_utf8(bytes.to_vec()).map_err(|_| Failure::Unavailable)?;
         response = axum::response::Html(html.replacen(
             "</head>",
-            &format!("<script type=\"module\" src=\"{script}\"></script></head>"),
+            &format!(
+                "{}<script type=\"module\" src=\"{script}\"></script></head>",
+                policy.head()
+            ),
             1,
         ))
         .into_response();
-        response.extensions_mut().insert(WasmPage);
+        response.extensions_mut().insert(policy);
     }
     Ok(response)
 }
@@ -250,5 +287,16 @@ pub(super) async fn save(
     match result {
         Ok(item) => Json(item).into_response(),
         Err(failure) => error(failure),
+    }
+}
+
+#[cfg(test)]
+mod policy_tests {
+    use super::*;
+    #[test]
+    fn unavailable_nonce_keeps_native_policy_and_no_carrier() {
+        let policy = WasmPage { style_nonce: None };
+        assert_eq!(policy.csp(), CSP);
+        assert!(policy.head().is_empty());
     }
 }

@@ -22,6 +22,31 @@ extern "C" {
     fn update_chart(this: &StatusChart, counts: &[u32]) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = destroy)]
     fn destroy_chart(this: &StatusChart) -> Result<(), JsValue>;
+    type DescriptionEditor;
+    #[wasm_bindgen(method, catch, js_name = connect)]
+    fn connect_editor(this: &DescriptionEditor, callback: &JsValue) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = update)]
+    fn update_editor(
+        this: &DescriptionEditor,
+        id: f64,
+        text: &str,
+        read_only: bool,
+        reset: u32,
+    ) -> Result<(), JsValue>;
+    #[wasm_bindgen(method, catch, js_name = destroy)]
+    fn destroy_editor(this: &DescriptionEditor) -> Result<(), JsValue>;
+}
+
+type EditCallback = wasm_bindgen::closure::Closure<dyn FnMut(f64, String)>;
+struct DescriptionOwner {
+    handle: DescriptionEditor,
+    callback: RefCell<Option<EditCallback>>,
+}
+impl Drop for DescriptionOwner {
+    fn drop(&mut self) {
+        // JS invalidates its entry point before the callback field is released.
+        let _ = self.handle.destroy_editor();
+    }
 }
 
 struct ChartOwner(StatusChart);
@@ -154,6 +179,7 @@ struct Dom {
     rows: KeyedChildren<()>,
     project: i64,
     chart: Option<ChartOwner>,
+    description: Option<Rc<DescriptionOwner>>,
 }
 impl Dom {
     fn render(&mut self, state: &Workspace) -> Result<(), JsValue> {
@@ -226,6 +252,20 @@ impl Dom {
                 pending,
             )?;
         }
+        if let Some(description) = &self.description
+            && description
+                .handle
+                .update_editor(
+                    draft.value.id as f64,
+                    &draft.value.description,
+                    pending,
+                    state.description_reset,
+                )
+                .is_err()
+        {
+            // The native control already has the current draft if enhancement fails.
+            self.description.take();
+        }
         for (id, disabled) in [
             ("triage-save", state.pending.is_some() || !draft.dirty()),
             ("triage-reset", pending || !draft.dirty()),
@@ -253,10 +293,16 @@ fn failure(error: ActionError) -> String {
     }
 }
 #[wasm_bindgen]
-pub fn mount_triage(chart: JsValue) -> Result<(), JsValue> {
+pub fn mount_triage(chart: JsValue, description: JsValue) -> Result<(), JsValue> {
     dispose_triage();
     let chart =
         (!chart.is_null() && !chart.is_undefined()).then(|| ChartOwner(chart.unchecked_into()));
+    let description = (!description.is_null() && !description.is_undefined()).then(|| {
+        Rc::new(DescriptionOwner {
+            handle: description.unchecked_into(),
+            callback: RefCell::new(None),
+        })
+    });
     let document = web_sys::window()
         .and_then(|w| w.document())
         .ok_or_else(|| js("Document unavailable"))?;
@@ -291,6 +337,7 @@ pub fn mount_triage(chart: JsValue) -> Result<(), JsValue> {
         rows: KeyedChildren::from_existing(root.clone(), entries)?,
         project,
         chart,
+        description: description.clone(),
     };
     let graph = LocalGraph::new(
         state,
@@ -305,6 +352,28 @@ pub fn mount_triage(chart: JsValue) -> Result<(), JsValue> {
     );
     let handle = graph.handle();
     let active = Rc::new(Cell::new(true));
+    if let Some(description) = &description {
+        let handle = handle.clone();
+        let active = active.clone();
+        let callback = EditCallback::new(move |id: f64, text: String| {
+            if active.get()
+                && id.is_finite()
+                && id.fract() == 0.0
+                && id > 0.0
+                && id <= 9_007_199_254_740_991.0
+            {
+                dispatch(
+                    &handle,
+                    Msg::EditDescription {
+                        id: id as i64,
+                        value: text,
+                    },
+                );
+            }
+        });
+        description.handle.connect_editor(callback.as_ref())?;
+        *description.callback.borrow_mut() = Some(callback);
+    }
     let mut bindings = Vec::new();
     let select_handle = handle.clone();
     bindings.push(DomEventListener::new(

@@ -135,5 +135,13 @@
   .btn:disabled { @apply cursor-default opacity-50; }
 }
 @media (max-width: 1100px) { .triage-columns { grid-template-columns: minmax(0, 1fr); } }
+/* CodeMirror injects unlayered base styles; app overrides must share that layer. */
+.triage-description-editor { @apply mb-4 min-w-0 overflow-hidden rounded-md border border-slate-300 bg-white; }
+.triage-description-editor:focus-within { @apply border-sky-700 ring-2 ring-sky-700/20; }
+.triage-description-editor .cm-editor { outline: none; }
+.triage-description-editor .cm-scroller { max-height: 18rem; overflow: auto; font: inherit; }
+.triage-description-editor .cm-content { min-height: 10rem; padding: 0.5rem 0; }
+.triage-description-editor .cm-line { padding: 0 0.75rem; }
+#triage-description-hint { margin-top: 0; margin-bottom: 1rem; }
 /* Hidden is a semantic state, even when a component declares display:flex/grid. */
 [hidden] { display: none !important; }

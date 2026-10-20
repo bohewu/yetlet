@@ -398,12 +398,11 @@ async fn security(
         *response.body_mut() = themed.into_body();
         response.headers_mut().remove(header::CONTENT_LENGTH);
     }
-    let csp = if response.extensions().get::<triage::WasmPage>().is_some() {
-        triage::CSP
+    let csp = if let Some(policy) = response.extensions().get::<triage::WasmPage>() {
+        policy.csp()
     } else {
-        DEFAULT_CSP
+        HeaderValue::from_static(DEFAULT_CSP)
     };
-    let csp = HeaderValue::from_static(csp);
     #[cfg(feature = "oidc")]
     let csp = if oidc_login_page && let Authentication::Oidc(oidc) = &state.authentication {
         HeaderValue::from_str(&oidc.login_csp()).expect("validated authorization origin")

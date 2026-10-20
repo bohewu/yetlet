@@ -222,6 +222,16 @@ Reviewer `/root/yt106_codemirror_csp_research_review_oct20` PASS has zero issues
 required followups and completes this research; real editor behavior and bundle
 cost remain future evidence.
 
+**YT-106 Description editor (2026-10-20, separately authorized):** the
+[plain-text trial](YT-106-CODEMIRROR-VERIFICATION.md) implements a private TS editor
+handle/owned Rust callback, selected-item and pending/bound checks, page-local
+style nonce and native fallback. Native/WASM, strict Clippy, TypeScript and
+actual Chrome typing/history/Save/CSP/fallback/lifetime checks pass with existing
+CLI build/run/stop and recorded bundle cost. Independent Reviewer
+`/root/yt106_codemirror_impl_review_oct20` PASS has zero issues or required
+followups; this bounded trial is complete. No core/CLI/settings API, rich-text
+layer or wider platform matrix is selected.
+
 **YT-093 bounded closeout (2026-10-18):** the
 [signing verification](YT-093-SIGNING-VERIFICATION.md) records the opt-in signing
 crate, local multi-key CLI, confirmed automatic settings updates and independent

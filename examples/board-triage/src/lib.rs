@@ -98,6 +98,7 @@ pub struct Workspace {
     pub selected: Option<i64>,
     pub query: String,
     pub pending: Option<i64>,
+    pub description_reset: u32,
     pub message: String,
 }
 #[derive(Clone, Debug)]
@@ -106,6 +107,7 @@ pub enum Msg {
     Filter(String),
     Reverse,
     Edit { field: &'static str, value: String },
+    EditDescription { id: i64, value: String },
     Reset,
     Begin,
     Saved(Item),
@@ -126,6 +128,7 @@ impl Workspace {
                 .collect(),
             query: String::new(),
             pending: None,
+            description_reset: 0,
             message: "Rust workspace ready. Changes stay here until you save an item.".into(),
         })
     }
@@ -175,6 +178,18 @@ impl Workspace {
                     _ => return Err("Unknown field"),
                 }
             }
+            Msg::EditDescription { id, value } => {
+                if self.selected != Some(id) || self.pending == Some(id) {
+                    return Ok(next);
+                }
+                if value.chars().count() > 4000 {
+                    return Err("Description exceeds 4,000 characters");
+                }
+                return self.reduce(Msg::Edit {
+                    field: "description",
+                    value,
+                });
+            }
             Msg::Reset => {
                 if next.selected == next.pending {
                     return Ok(next);
@@ -185,6 +200,7 @@ impl Workspace {
                     .find(|d| Some(d.value.id) == next.selected)
                 {
                     draft.value = draft.saved.clone();
+                    next.description_reset = next.description_reset.wrapping_add(1);
                     next.message =
                         "Selected draft reset to its loaded version. Other drafts are unchanged."
                             .into();
@@ -226,6 +242,51 @@ impl Workspace {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn editor_updates_are_selected_bounded_and_blocked_while_saving() {
+        let state = state();
+        let edit = |id, value: &str| Msg::EditDescription {
+            id,
+            value: value.into(),
+        };
+        assert_eq!(
+            state
+                .reduce(edit(2, "old item callback"))
+                .unwrap()
+                .dirty_count(),
+            0
+        );
+        let text = "😀".repeat(4000);
+        let state = state.reduce(edit(1, &text)).unwrap();
+        assert_eq!(state.selected().unwrap().value.description, text);
+        assert!(state.reduce(edit(1, &"x".repeat(4001))).is_err());
+        let pending = state.reduce(Msg::Begin).unwrap();
+        assert_eq!(
+            pending
+                .reduce(edit(1, "late edit"))
+                .unwrap()
+                .selected()
+                .unwrap()
+                .value
+                .description,
+            text
+        );
+        let reset = state.reduce(Msg::Reset).unwrap();
+        assert!(reset.selected().unwrap().value.description.is_empty());
+        assert_eq!(reset.description_reset, 1);
+        let status_only = reset
+            .reduce(Msg::Edit {
+                field: "status",
+                value: "blocked".into(),
+            })
+            .unwrap();
+        let reset_again = status_only.reduce(Msg::Reset).unwrap();
+        assert_eq!(
+            reset_again.selected().unwrap().value.description,
+            reset.selected().unwrap().value.description
+        );
+        assert_eq!(reset_again.description_reset, 2);
+    }
     fn item(id: i64) -> Item {
         Item {
             id,

@@ -91,6 +91,14 @@ change their scope. Only an explicit Save writes to the server. See the
 [YT-106 slice record](../../docs/YT-106-CHART-VERIFICATION.md) for ownership,
 fallback, browser/CLI checks and measured package cost.
 
+Description is enhanced with an app-owned CodeMirror plain-text editor on that
+same page. Rust retains drafts and explicit Save; typing/undo/redo stays local,
+with a 4,000-character limit and fresh undo history on item switch or Reset.
+Only this HTML response receives a fresh style nonce. The native textarea stays
+usable if the package/nonce/styles are unavailable, and JS-off item links still
+reach the native editor. See the [editor record](../../docs/YT-106-CODEMIRROR-VERIFICATION.md)
+for policy, lifecycle and bounded verification.
+
 Sign in → filter/sort/paginate work items → detail → edit → history. Native POST
 forms remain usable with JavaScript disabled. Validation and version conflicts
 preserve drafts; permissions and CSRF checks run on the server. Closing keeps the

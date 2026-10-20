@@ -1172,16 +1172,32 @@ async fn triage_only_enables_wasm_on_selected_page_and_escapes_bounded_bootstrap
             Request::builder()
                 .uri("/board/projects/1/triage")
                 .header(header::HOST, HOST)
-                .header(header::COOKIE, client.cookie.unwrap())
+                .header(header::COOKIE, client.cookie.clone().unwrap())
                 .body(Body::empty())
                 .unwrap(),
         )
         .await
         .unwrap();
     assert_eq!(response.status(), StatusCode::OK);
+    let csp = response.headers()[header::CONTENT_SECURITY_POLICY]
+        .to_str()
+        .unwrap()
+        .to_owned();
+    let nonce = csp
+        .split("'nonce-")
+        .nth(1)
+        .unwrap()
+        .split('\'')
+        .next()
+        .unwrap();
+    assert_eq!(nonce.len(), 32);
+    assert!(nonce.bytes().all(|b| b.is_ascii_hexdigit()));
     assert_eq!(
-        response.headers()[header::CONTENT_SECURITY_POLICY],
-        triage::CSP
+        csp,
+        triage::CSP.replace(
+            "style-src 'self'",
+            &format!("style-src 'self' 'nonce-{nonce}'; style-src-attr 'none'")
+        )
     );
     assert!(!triage::CSP.contains("'unsafe-eval'"));
     assert!(!triage::CSP.contains("'unsafe-inline'"));
@@ -1201,6 +1217,21 @@ async fn triage_only_enables_wasm_on_selected_page_and_escapes_bounded_bootstrap
     assert_eq!(html.matches("<script").count(), 1);
     assert!(html.contains("&lt;script&gt;"));
     assert!(html.contains("type=\"module\" src=\"/static/assets/app-123.js\""));
+    assert!(html.contains(&format!("<meta property=\"csp-nonce\" nonce=\"{nonce}\">")));
+    let second = board
+        .router
+        .clone()
+        .oneshot(
+            Request::builder()
+                .uri("/board/projects/1/triage")
+                .header(header::HOST, HOST)
+                .header(header::COOKIE, client.cookie.unwrap())
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_ne!(second.headers()[header::CONTENT_SECURITY_POLICY], csp);
     board.drain().await.unwrap();
     assert!(
         Board::open_with_frontend(

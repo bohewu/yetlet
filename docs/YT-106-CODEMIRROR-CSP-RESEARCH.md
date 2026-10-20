@@ -9,6 +9,10 @@ is not implied by the generic browser experiment below. Independent Reviewer
 `/root/yt106_codemirror_csp_research_review_oct20` PASS has zero issues or required
 followups; this research is complete at the stated scope.
 
+Subsequent, separately authorized [Admin editor slice](YT-106-CODEMIRROR-VERIFICATION.md)
+implements the selected trial. The dated research observations and unimplemented
+status below refer to this study's base checkout.
+
 ## Recommendation
 
 **A small nonce-based trial is feasible on the inspected source and observed
