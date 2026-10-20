@@ -283,3 +283,19 @@ Both new tables retain three cells in every row. Independent Reviewer
 `/root/yt102_settings_decisions_review_oct20` PASS has zero issues or required
 followups. The separate safe configuration-error categories remain a possible
 later candidate; this slice does not authorize their implementation.
+
+## Selected safe-error classification research (2026-10-20)
+
+After decision-table commit `e691dca`, the owner requested
+[research into safe settings-error classification](YT-102-SETTINGS-ERROR-RESEARCH.md),
+without implementation. The existing Loader already supplies input-free safe
+errors; the CLI collapses most of them and its local checks to one message.
+The recommendation is an optional private source/profile/values mapping using
+existing variants/guards and unchanged String/caller boundaries. Generic
+fallback, current specific refusals, source ordering, exit/channel semantics
+and secret isolation remain explicit. The report compares leaving the generic
+message, forwarding the existing safe Display, and the three-group option,
+with a bounded future test plan. No code, schema or diagnostic behavior changes.
+Docs, rendered-table and whitespace checks pass; independent Reviewer
+`/root/yt102_settings_error_research_review_oct20` PASS has zero issues or
+required followups.

@@ -307,6 +307,12 @@ and native/browser execution decisions in the CLI guide. It preserves the
 shared Loader and public/secret boundary. Docs, rendered-table and whitespace
 checks pass; independent Reviewer `/root/yt102_settings_decisions_review_oct20`
 PASS has zero issues or required followups.
+The following [safe settings-error research](YT-102-SETTINGS-ERROR-RESEARCH.md)
+recommends an optional private three-group mapping over existing Loader errors
+and CLI guards. It introduces no implementation or new shared contract;
+research checks pass. Independent Reviewer
+`/root/yt102_settings_error_research_review_oct20` PASS has zero issues or
+required followups; implementation remains an owner decision.
 
 **YT-103, opt-in HA and rolling asset compatibility:** independently of the
 YT-102 developer workflow study, follow YT-101 with an application/deployment
