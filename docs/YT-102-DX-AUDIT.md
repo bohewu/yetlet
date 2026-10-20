@@ -235,3 +235,31 @@ implements the first bounded latency candidate with focused correctness and
 timing evidence. It preserves this dated research and its original measurements;
 independent implementation Reviewer PASS completes that bounded slice with zero
 issues or required followups.
+
+## Selected first-use documentation slice (2026-10-20)
+
+After committing the reviewed research, completion-latency implementation and
+Windows verification at `ec31c63`, the owner selected the next compact
+documentation candidate. The CLI guide now places a
+[first-use prerequisite table](../tools/yetlet-cli/README.md#first-use-prerequisites)
+before its first build command: native/Vite/browser tools, the CLI's own
+OpenSSL requirement, separately prepared dependencies/locks/assets, optional
+watch/HTTPS tools, settings-enabled startup secrets and the limited doctor
+scope. The Windows notes distinguish native MSVC single-Cargo evidence from
+the still compile-only MSVC Vite-pair scope.
+
+The guide was checked against the current CLI dependency manifest, generated
+template READMEs/package engines, browser WASM build script and existing
+native records. This changes documentation only; accepted process/browser/
+Windows tests and performance measurements are reused, not rerun. No command,
+settings schema, dependency, installer or diagnostic behavior changes.
+`cargo xtask check docs` and `git diff --check` pass with exit 0. The first
+review found that raw pipes in the Node version expression truncated the
+rendered Vite row. Replacing them with plain-language alternatives fixes that
+row; the existing Markdown table parser confirms all six rows, including the
+header, have three complete cells. Independent Reviewer
+`/root/yt102_first_use_guide_review_oct20` followup PASS has zero issues or
+required followups; the original rendering failure remains recorded here.
+The next separately
+selectable DX candidate is documenting effective project/settings selection;
+this slice does not select a new report command or error schema.

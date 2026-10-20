@@ -296,6 +296,12 @@ The same record adds a native Windows warm-build baseline: CLI median 267 ms
 versus direct Cargo 225 ms across three alternating pairs. Retain this bounded
 baseline for unrelated changes and revisit relevant Windows process/toolchain
 changes or reported regressions; no mandatory recurring benchmark is added.
+The subsequent documentation slice adds the CLI guide's compact native/Vite/
+browser first-use prerequisite table and preparation order, with explicit
+OpenSSL, initial-assets and doctor-scope boundaries. It changes no tool or
+runtime behavior. Docs/whitespace checks and the focused Markdown table-rendering
+check pass; independent Reviewer `/root/yt102_first_use_guide_review_oct20`
+followup PASS has zero issues or required followups after the recorded table fix.
 
 **YT-103, opt-in HA and rolling asset compatibility:** independently of the
 YT-102 developer workflow study, follow YT-101 with an application/deployment

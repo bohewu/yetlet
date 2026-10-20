@@ -49,9 +49,57 @@ code before returning exit 125. Prepare a protected tool installation and select
 its physical directory on PATH; tool permissions are managed separately from the CLI.
 See the [native Windows diagnosis and verification](../../docs/WINDOWS-CLI-125-VERIFICATION.md).
 
+## First-use prerequisites
+
+Prepare tools and dependency caches explicitly before running the examples.
+Building the CLI from source requires OpenSSL headers/libraries through its
+native signing dependency, even if you only plan to create a browser app.
+Plain generated native/browser apps do not acquire that CLI dependency.
+Building the CLI and building an app are separate steps.
+
+| Selection | Tools and inputs to prepare | Initial workflow |
+|---|---|---|
+| Build this CLI from the checkout | Rust/Cargo 1.99+, a native C/link toolchain, OpenSSL development files (reference: 3.5 LTS) and cached locked dependencies | [Build the CLI](#build-locally-and-create-an-application), then inspect help/doctor |
+| Native `new NAME` | Native Rust toolchain, compatible local Yetlet dependency paths and a separately prepared app Cargo.lock | `yetlet build`, then `yetlet run`; no Node or frontend tool is required |
+| Native `new NAME --vite`, optionally `--tailwind` | Native prerequisites plus Node `^20.19.0` or `>=22.12.0`, npm and the generated frontend dependencies | [Vite preparation](templates/vite/SELECTED-README.md), initial `yetlet build` with auto_build enabled, then `yetlet run` |
+| `new NAME --template browser`, optionally `--tailwind` | Rust/Cargo 1.99+, `wasm32-unknown-unknown`, wasm-bindgen-cli 0.2.129, the same Node/npm prerequisites and the generated dependencies | [Browser preparation](templates/browser/README.md), `yetlet build`, then `yetlet run` to preview the existing dist |
+| Native `new NAME --tailwind` without Vite | Native prerequisites plus the separately provisioned standalone Tailwind 4.3.3 CLI | [Build `dist/tailwind.css` explicitly](templates/tailwind/SELECTED-README.md) before running Rust |
+
+The Vite Tailwind selection uses the official npm plugin, without a standalone
+CSS compiler. Native Rust watch additionally needs separately prepared
+[Watchexec](#rust-watch); development HTTPS needs separately prepared
+[mkcert and certificates](templates/config/SELECTED-README.md#development-https).
+Settings-enabled native apps, including `--vite`, need their own service token
+before startup; use the existing [settings/Development-secret mechanism](templates/config/SELECTED-README.md),
+keeping credentials out of public TOMLs and frontend files.
+
+Use this order: prepare tools/cache, build the CLI, create the selected app,
+configure its local Cargo dependencies and generate its lock, prepare any
+selected frontend dependencies/assets, then build/run. `new` does not install
+tools, generate Cargo.lock or produce dist; selected frontend templates include
+their pinned package lock. `run` does not create the initial dist;
+with frontend auto_build disabled, prepare it separately before startup.
+Offline commands require an already populated cache. CLI execution never
+installs dependencies or repairs locks automatically.
+
+`yetlet doctor --json` checks the local Rust/Cargo environment and compiled
+filesystem capability only. A passing result does not check OpenSSL development
+files for a CLI rebuild, app dependencies/settings/secrets, Node/npm, WASM tools,
+frontend dist or whether `run` will work. Use the selected setup instructions
+and actual build/run for those checks. On Windows, also prepare protected
+physical tool paths and an attached processed-input console for native run;
+see [native tool preparation](../../docs/WINDOWS-CLI-125-VERIFICATION.md#reuse-the-prepared-runner-tools).
+
 ## Build locally and create an application
 
+The following POSIX-shell example starts at the repository root after the
+prerequisites above are ready. For an existing custom static OpenSSL prefix,
+select it in this shell before the build:
+
 ```sh
+# Only when using your separately prepared static OpenSSL installation:
+# export OPENSSL_DIR=/path/to/prepared/openssl
+# export OPENSSL_STATIC=1
 cargo build --offline --locked --manifest-path tools/yetlet-cli/Cargo.toml
 tools/yetlet-cli/target/debug/yetlet --help
 tools/yetlet-cli/target/debug/yetlet doctor --json
@@ -63,10 +111,7 @@ Use an existing protected parent: Linux owner-protected directories or trusted
 sticky creation parents; Windows protected local fixed NTFS without reparse
 traversal. Creation never overwrites or merges an existing destination.
 
-The CLI has its own Cargo workspace and lock. Its local signing dependency requires
-OpenSSL headers/libraries (the YT-093 reference targets OpenSSL 3.5 LTS); use
-`OPENSSL_DIR` and `OPENSSL_STATIC=1` for an explicitly prepared static prefix.
-No native tools or OpenSSL installation is performed by the CLI. New apps have their own standalone
+The CLI has its own Cargo workspace and lock. New apps have their own standalone
 workspace and no Cargo.lock. Current Yetlet crate versions are unpublished:
 explicitly replace generated dependencies with compatible local Cargo path
 entries or patches, using the generated README's example. Core/server use
@@ -347,7 +392,10 @@ $Yetlet = Join-Path (Get-Location) "tools\yetlet-cli\target\debug\yetlet.exe"
 
 Choose an existing owner-protected local fixed NTFS parent. Do not disable ACL,
 reparse or executable checks. The [native Windows GNU pair record](../../docs/YT-102-WINDOWS-VITE-VERIFICATION.md)
-covers six selected real Rust/Vite lifecycle cases; MSVC evidence remains compile-only.
+covers six selected real Rust/Vite lifecycle cases; MSVC pair evidence remains
+compile-only. Separately, [native MSVC single-Cargo evidence](../../docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20)
+covers build/run, native console cancellation and descendant cleanup, with a
+bounded warm-build baseline in the same record.
 
 ## Diagnostics and platform evidence
 
@@ -366,7 +414,9 @@ Linux. No installation/update, shell, app settings or Node probes occur.
 Linux has current native process/PTY/cleanup tests. Current Windows GNU
 [doctor and CLI evidence](../../docs/YT-102-DOCTOR-VERIFICATION.md) and
 [Rust/Vite pair evidence](../../docs/YT-102-WINDOWS-VITE-VERIFICATION.md) supplement
-the separate MSVC compile-only checks. Windows run still requires an attached console
+the separate MSVC compile-only pair checks and
+[native single-Cargo followup](../../docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20).
+Windows run still requires an attached console
 with processed Ctrl-C input and protected app/tool paths; npm uses vetted native
 node.exe plus its same-install npm CLI script, without a .cmd shell fallback.
 Escaped daemons and unsupported OS/filesystem/console contexts remain unsupported.
