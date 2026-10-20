@@ -313,6 +313,13 @@ and CLI guards. It introduces no implementation or new shared contract;
 research checks pass. Independent Reviewer
 `/root/yt102_settings_error_research_review_oct20` PASS has zero issues or
 required followups; implementation remains an owner decision.
+After research commit `b07e630`, the owner selected its
+[minimal CLI implementation](YT-102-SETTINGS-ERROR-RESEARCH.md#selected-cli-implementation-2026-10-20):
+private fixed source/profile/values hints, existing Loader and unchanged
+exit/channel/source boundaries. Focused native tests and docs/lint checks pass;
+independent Reviewer `/root/yt102_settings_error_impl_review_oct20` PASS has
+zero issues or required followups. Historical Windows, browser and
+performance evidence is retained without rerunning unrelated matrices.
 
 **YT-103, opt-in HA and rolling asset compatibility:** independently of the
 YT-102 developer workflow study, follow YT-101 with an application/deployment

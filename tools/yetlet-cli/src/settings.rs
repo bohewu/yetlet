@@ -133,6 +133,21 @@ impl Default for Settings {
 }
 
 const INVALID: &str = "CLI_PROJECT settings: invalid public CLI configuration; check base/profile declarations and APP_CLI overrides";
+const SOURCE: &str = "CLI_PROJECT settings source: check the public settings directory and required base/profile files for safe ownership and readability";
+const PROFILE: &str = "CLI_PROJECT settings profile: select exactly Development, Staging or Production; the default is Production";
+const VALUES: &str = "CLI_PROJECT settings values: check public TOML syntax, base-declared keys/types, ranges and target/TLS requirements";
+
+fn loader_hint(error: yetlet_config::Error) -> &'static str {
+    use yetlet_config::Error;
+    match error {
+        Error::File => SOURCE,
+        Error::Environment => PROFILE,
+        Error::Input | Error::Toml | Error::EnvironmentKey | Error::Type | Error::Settings => {
+            VALUES
+        }
+        _ => INVALID,
+    }
+}
 
 pub(crate) fn load(app: &App) -> Result<Settings, String> {
     load_from_env(app, std::env::vars_os())
@@ -148,7 +163,7 @@ pub(crate) fn load_from_env(
         if key == "YETLET_CONFIG_ROOT" {
             let root = PathBuf::from(value);
             if !root.is_absolute() || root.components().any(|c| matches!(c, Component::ParentDir)) {
-                return Err(INVALID.into());
+                return Err(SOURCE.into());
             }
             selected_root = Some(root);
         } else {
@@ -168,8 +183,8 @@ pub(crate) fn load_from_env(
     let root = selected_root
         .as_deref()
         .unwrap_or_else(|| fs::app_root(app));
-    let protected = fs::open_directory(root).map_err(|_| INVALID.to_owned())?;
-    let entries = fs::app_directory_entries(&protected, "").map_err(|_| INVALID.to_owned())?;
+    let protected = fs::open_directory(root).map_err(|_| SOURCE.to_owned())?;
+    let entries = fs::app_directory_entries(&protected, "").map_err(|_| SOURCE.to_owned())?;
     let has_files = [
         "base.toml",
         "development.toml",
@@ -189,31 +204,31 @@ pub(crate) fn load_from_env(
         Some("Production") => "production.toml",
         Some("Staging") => "staging.toml",
         Some("Development") => "development.toml",
-        _ => return Err(INVALID.into()),
+        _ => return Err(PROFILE.into()),
     };
     if !has_files {
         if selected_root.is_some() || has_override {
-            return Err(INVALID.into());
+            return Err(SOURCE.into());
         }
         return Ok(Settings::default());
     }
     for name in ["base.toml", overlay] {
-        fs::read_app_file(&protected, name).map_err(|_| INVALID.to_owned())?;
+        fs::read_app_file(&protected, name).map_err(|_| SOURCE.to_owned())?;
     }
     // No Development secret source is enabled, and no backend APP overrides enter
     // this projection. Parser/merge/type/ENV behavior belongs to yetlet-config.
     let merged: serde_json::Value = yetlet_config::Loader::new(root, "APP")
         .load_from_env(filtered)
-        .map_err(|_| INVALID.to_owned())?;
+        .map_err(|error| loader_hint(error).to_owned())?;
     let mut settings: Settings = match merged.get("cli") {
-        Some(cli) => serde_json::from_value(cli.clone()).map_err(|_| INVALID.to_owned())?,
+        Some(cli) => serde_json::from_value(cli.clone()).map_err(|_| VALUES.to_owned())?,
         None => Settings::default(),
     };
     if let Some(tls) = merged.get("server").and_then(|server| server.get("tls")) {
-        settings.tls = serde_json::from_value(tls.clone()).map_err(|_| INVALID.to_owned())?;
+        settings.tls = serde_json::from_value(tls.clone()).map_err(|_| VALUES.to_owned())?;
     }
     if settings.tls.enabled && overlay != "development.toml" {
-        return Err(INVALID.into());
+        return Err(VALUES.into());
     }
     if settings.tls.enabled
         && [&settings.tls.certificate, &settings.tls.private_key]
@@ -224,12 +239,12 @@ pub(crate) fn load_from_env(
                     || Path::new(path).starts_with(settings.vite.root.trim_end_matches('/'))
             })
     {
-        return Err(INVALID.into());
+        return Err(VALUES.into());
     }
     if !(1..=100).contains(&settings.generate.k8s.replicas)
         || !valid_frontend_root(&settings.vite.root)
     {
-        return Err(INVALID.into());
+        return Err(VALUES.into());
     }
     if settings.target == Target::Browser
         && (!settings.vite.enabled || settings.rust.watch || settings.tls.enabled)
@@ -272,7 +287,7 @@ mod tests {
     #[test]
     fn browser_target_uses_shared_profile_overrides_and_rejects_native_capabilities() {
         let (_temp, app) = app();
-        let base = format!("[cli]\ntarget='native'\n{BASE}");
+        let base = format!("[cli]\ntarget='native'\n{BASE}[cli.rust]\nwatch=false\n");
         std::fs::write(fs::app_root(&app).join("base.toml"), &base).unwrap();
         std::fs::write(
             fs::app_root(&app).join("production.toml"),
@@ -285,14 +300,19 @@ mod tests {
             load_from_env(&app, override_target).unwrap().target,
             Target::Native
         );
+        for overlay in ["[cli]\ntarget='unknown'\n", "[cli]\ntarget=true\n"] {
+            std::fs::write(fs::app_root(&app).join("production.toml"), overlay).unwrap();
+            assert_eq!(load_from_env(&app, []).unwrap_err(), VALUES);
+        }
         for overlay in [
-            "[cli]\ntarget='unknown'\n",
-            "[cli]\ntarget=true\n",
             "[cli]\ntarget='browser'\n[cli.rust]\nwatch=true\n",
             "[cli]\ntarget='browser'\n[cli.vite]\nenabled=false\n",
         ] {
             std::fs::write(fs::app_root(&app).join("production.toml"), overlay).unwrap();
-            assert!(load_from_env(&app, []).is_err(), "{overlay}");
+            assert_eq!(
+                load_from_env(&app, []).unwrap_err(),
+                "CLI_PROJECT settings: browser target requires Vite enabled, Rust watch disabled and no native TLS"
+            );
         }
     }
 
@@ -372,7 +392,7 @@ mod tests {
                 format!("{BASE}{rust}"),
             )
             .unwrap();
-            assert_eq!(load_from_env(&app, []).unwrap_err(), INVALID);
+            assert_eq!(load_from_env(&app, []).unwrap_err(), VALUES);
         }
         std::fs::write(
             fs::app_root(&app).join("base.toml"),
@@ -386,7 +406,7 @@ mod tests {
         ] {
             assert_eq!(
                 load_from_env(&app, [(key.into(), value.into())]).unwrap_err(),
-                INVALID
+                VALUES
             );
         }
     }
@@ -394,10 +414,24 @@ mod tests {
     fn legacy_defaults_and_partial_or_invalid_configuration_refusals() {
         let (_temp, app) = app();
         assert!(!load_from_env(&app, []).unwrap().vite.enabled);
-        assert!(load_from_env(&app, [("APP_ENVIRONMENT".into(), "invalid".into())]).is_err());
-        assert!(load_from_env(&app, [("APP_CLI__VITE__ENABLED".into(), "true".into())]).is_err());
+        assert_eq!(
+            load_from_env(&app, [("APP_ENVIRONMENT".into(), "invalid".into())]).unwrap_err(),
+            PROFILE
+        );
+        assert_eq!(
+            load_from_env(&app, [("APP_CLI__VITE__ENABLED".into(), "true".into())]).unwrap_err(),
+            SOURCE
+        );
+        assert_eq!(
+            load_from_env(
+                &app,
+                [("YETLET_CONFIG_ROOT".into(), fs::app_root(&app).into())]
+            )
+            .unwrap_err(),
+            SOURCE
+        );
         std::fs::write(fs::app_root(&app).join("base.toml"), BASE).unwrap();
-        assert!(load_from_env(&app, []).is_err());
+        assert_eq!(load_from_env(&app, []).unwrap_err(), SOURCE);
         std::fs::write(fs::app_root(&app).join("production.toml"), "").unwrap();
         for (key, value) in [
             ("APP_CLI__VITE__AUTO_BUILD", "yes"),
@@ -407,7 +441,7 @@ mod tests {
             ("app_cli__vite__enabled", "true"),
         ] {
             let error = load_from_env(&app, [(key.into(), value.into())]).unwrap_err();
-            assert_eq!(error, INVALID);
+            assert_eq!(error, VALUES);
         }
     }
     #[test]
@@ -432,7 +466,7 @@ mod tests {
         )
         .unwrap();
         assert!(settings.tls.enabled);
-        assert!(settings.tls.paths(&app, "frontend/").is_err());
+        assert_eq!(settings.tls.paths(&app, "frontend/").unwrap_err(), INVALID);
         assert!(!load_from_env(&app, []).unwrap().tls.enabled);
         assert!(
             !load_from_env(
@@ -453,7 +487,7 @@ mod tests {
         ] {
             assert_eq!(
                 load_from_env(&app, [(key.into(), value.into())]).unwrap_err(),
-                INVALID
+                VALUES
             );
         }
         for path in [
@@ -471,9 +505,41 @@ mod tests {
                     ]
                 )
                 .unwrap_err(),
-                INVALID
+                VALUES
             );
         }
+    }
+
+    #[test]
+    fn source_checks_still_precede_profile_selection_and_keep_generic_fallback() {
+        let (_temp, app) = app();
+        let missing = fs::app_root(&app).join("synthetic-missing-root");
+        for root in [PathBuf::from("synthetic-relative-root"), missing] {
+            assert_eq!(
+                load_from_env(
+                    &app,
+                    [
+                        ("YETLET_CONFIG_ROOT".into(), root.into_os_string()),
+                        ("APP_ENVIRONMENT".into(), "synthetic-profile".into()),
+                    ],
+                )
+                .unwrap_err(),
+                SOURCE
+            );
+        }
+        #[cfg(unix)]
+        {
+            use std::os::unix::ffi::OsStringExt;
+            assert_eq!(
+                load_from_env(
+                    &app,
+                    [("APP_ENVIRONMENT".into(), OsString::from_vec(vec![0xff]))],
+                )
+                .unwrap_err(),
+                PROFILE
+            );
+        }
+        assert_eq!(loader_hint(yetlet_config::Error::Prefix), INVALID);
     }
 
     #[test]

@@ -644,11 +644,76 @@ while True: time.sleep(.02)
         }
         let output = Running::start(&mut command).wait();
         assert_eq!(output.status.code(), Some(1));
-        assert!(
-            String::from_utf8_lossy(&output.stderr).contains("invalid public CLI configuration")
-        );
+        assert!(String::from_utf8_lossy(&output.stderr).contains("CLI_PROJECT settings values:"));
         assert!(fixture.trace().is_empty());
         assert_eq!(fs::read_to_string(base_path).unwrap(), base);
+    }
+}
+
+#[test]
+fn settings_hints_keep_exit_stderr_redaction_and_preflight_without_children() {
+    for action in ["run", "watch", "build"] {
+        for case in ["root", "missing", "profile", "toml", "key", "type"] {
+            let fixture = Fixture::new();
+            let mut command = fixture.command(action, "build-ok");
+            let (group, hint) = match case {
+                "root" | "missing" => (
+                    "source",
+                    "check the public settings directory and required base/profile files for safe ownership and readability",
+                ),
+                "profile" => (
+                    "profile",
+                    "select exactly Development, Staging or Production; the default is Production",
+                ),
+                _ => (
+                    "values",
+                    "check public TOML syntax, base-declared keys/types, ranges and target/TLS requirements",
+                ),
+            };
+            match case {
+                "root" => {
+                    command.env("YETLET_CONFIG_ROOT", "../SYNTHETIC_SETTINGS_PATH");
+                }
+                "missing" => {
+                    fs::remove_file(fixture.root.path().join("production.toml")).unwrap();
+                }
+                "profile" => {
+                    command.env("APP_ENVIRONMENT", "production");
+                }
+                "toml" => {
+                    fs::write(
+                        fixture.root.path().join("base.toml"),
+                        "SYNTHETIC_SETTINGS_TOML = [",
+                    )
+                    .unwrap();
+                }
+                "key" => {
+                    command.env(
+                        "APP_CLI__SYNTHETIC_SETTINGS_KEY",
+                        "SYNTHETIC_SETTINGS_VALUE",
+                    );
+                }
+                "type" => {
+                    command.env("APP_CLI__VITE__AUTO_BUILD", "SYNTHETIC_SETTINGS_VALUE");
+                }
+                _ => unreachable!(),
+            }
+            let base = fs::read(fixture.root.path().join("base.toml")).unwrap();
+            let output = command.output().unwrap();
+            assert_eq!(output.status.code(), Some(1), "{action}/{case}");
+            assert!(output.stdout.is_empty());
+            assert_eq!(
+                String::from_utf8(output.stderr).unwrap(),
+                format!("CLI_PROJECT {action}: CLI_PROJECT settings {group}: {hint}\n"),
+                "{action}/{case}"
+            );
+            assert!(fixture.trace().is_empty());
+            assert!(!fixture.root.path().join("target").exists());
+            assert_eq!(
+                fs::read(fixture.root.path().join("base.toml")).unwrap(),
+                base
+            );
+        }
     }
 }
 

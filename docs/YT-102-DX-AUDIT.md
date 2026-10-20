@@ -299,3 +299,18 @@ with a bounded future test plan. No code, schema or diagnostic behavior changes.
 Docs, rendered-table and whitespace checks pass; independent Reviewer
 `/root/yt102_settings_error_research_review_oct20` PASS has zero issues or
 required followups.
+
+## Selected settings-error hint implementation (2026-10-20)
+
+After research commit `b07e630`, the owner separately selected the
+[private three-hint implementation](YT-102-SETTINGS-ERROR-RESEARCH.md#selected-cli-implementation-2026-10-20).
+Existing CLI settings guards and Loader errors now select fixed source,
+profile or values guidance. No shared Loader/API, validation order, source
+selection, secret access, exit code or caller-wrapper changes are made.
+Generic fallback, the existing browser refusal and later TLS-file messages
+remain. Focused settings tests, 18 binary rejection cases, generator no-output
+refusal and existing command/watch regressions pass, along with strict Clippy,
+formatting and docs checks. The evidence retains the corrected initial test
+fixture failure and the accepted Windows/browser/performance boundaries.
+Independent Reviewer `/root/yt102_settings_error_impl_review_oct20` PASS has
+zero issues or required followups; this bounded slice is complete.

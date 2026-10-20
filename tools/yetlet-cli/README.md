@@ -456,6 +456,22 @@ identity after verified cleanup. Safe scoped CLI errors use stable codes and
 stderr; child-failure summaries identify their stage without guessing lock/cache
 causes. Child stdout/stderr remains native and is not guaranteed secret-redacted.
 
+Public CLI settings failures use three fixed human troubleshooting hints:
+
+| Hint | Check |
+|---|---|
+| `source` | Public settings directory and required base/profile files, including safe ownership/readability |
+| `profile` | Exactly Development, Staging or Production; absent selection defaults to Production |
+| `values` | Public TOML syntax, base-declared keys/types, ranges and target/TLS requirements |
+
+These are coarse hints, not new machine codes or exact filesystem diagnoses.
+They never echo supplied values, unknown keys, configured paths or underlying
+parser/IO/Serde errors. The existing Loader, validation order, exit 1/stderr and
+caller wrappers remain intact, including generator rejection before output.
+Unexpected Loader errors retain the generic hint; existing browser-capability
+refusals and later TLS-file checks retain their messages. See the
+[research and bounded implementation evidence](../../docs/YT-102-SETTINGS-ERROR-RESEARCH.md#selected-cli-implementation-2026-10-20).
+
 Doctor reports schema 1 environment checks only, never application, asset,
 frontend, console, generator or release readiness. Fixed local Rust/Cargo probes
 have 3-second/64-KiB combined-output bounds plus 2-second cleanup. Unsafe or

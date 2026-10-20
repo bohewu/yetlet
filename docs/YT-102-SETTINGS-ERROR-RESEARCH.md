@@ -120,3 +120,57 @@ accepted; no new runtime qualification is claimed. Source and existing test
 inspection support this proposal. `cargo xtask check docs`, table-rendering and
 `git diff --check` pass; independent review confirms research-only closure.
 Whether to implement the three groups is the remaining owner decision.
+
+## Selected CLI implementation (2026-10-20)
+
+The research above describes its original `e691dca` snapshot. After independent
+review, research commit `b07e630` records that decision input. The owner then
+authorized the recommended minimum: three private literal hints and one mapping
+helper in [settings.rs](../tools/yetlet-cli/src/settings.rs). Only the previously
+generic `load_from_env` failures change. The shared Loader, String boundary,
+filesystem protections, validation order and consumers remain unchanged.
+The [CLI guide](../tools/yetlet-cli/README.md#diagnostics-and-platform-evidence)
+describes the actual groups; they are human guidance, not machine codes.
+
+Every changed error branch selects literal text, discarding its input/error.
+Source hints do not identify a failed file or distinguish missing from unsafe
+access. Generic fallback, the specific browser-capability refusal and later
+TLS-file error text remain. Settings failures still use exit 1 and existing
+stderr wrappers; usage, process-management and native child statuses are not
+remapped. CLI tool policy still ignores backend overrides and Development
+secret selectors; no new files, tools, retries or source probes are added.
+
+Verification on Ubuntu uses the existing CLI settings, frontend-process,
+Kubernetes and command fixtures. Cargo commands below use the CLI's existing
+prepared static OpenSSL installation; no dependency or tool installation was
+performed. All Cargo commands select `--offline --locked` and
+`--manifest-path tools/yetlet-cli/Cargo.toml`. Tests use `--test-threads=1`
+after the test-argument separator, alongside `--exact` where shown:
+
+| Command selection | Result / observation |
+|---|---|
+| `cargo test --lib settings::tests` | 8 pass: precedence/defaults, public/secret isolation, typed/projection/range/TLS failures, source-before-profile order, non-Unicode selector and generic fallback; exact browser and later TLS-file messages retained |
+| `cargo test --test frontend_process settings_hints_keep_exit_stderr_redaction_and_preflight_without_children -- --exact` | 1 pass, covering 18 actual CLI invocations: run/watch/build across invalid root, missing selected file, wrong-case profile, malformed TOML, unknown key and invalid type; exact fixed stderr, exit 1, empty stdout, unchanged base bytes and no child trace/target |
+| `cargo test --test frontend_process watch_forces_rust_watch_after_settings_validation_without_changing_run -- --exact` | 1 pass: existing run/watch behavior and child cleanup, rejection before forced-watch startup |
+| `cargo test --test k8s settings_rejection_keeps_generator_exit_wrapper_and_no_output_tree -- --exact` | 1 pass: out-of-range replicas retain exit 1 and generator stderr wrapper without creating the destination |
+| `cargo test --test commands` | 4 pass: discovery/usage, doctor, real frozen Cargo build/run/native exit, lock/cache refusal and adopted-child cleanup |
+
+The first settings test run had one fixture-only failure: its strengthened
+browser-specific assertion encountered the existing earlier rejection of an
+undeclared Rust watch key. Declaring watch=false in that fixture's base makes
+the intended specific refusal reachable; the single focused rerun passed all
+8 settings tests. No production change was needed for that failure.
+
+Synthetic key/value/path/TOML markers and temporary absolute paths cannot enter
+the exact-output assertions. These tests prove the bounded CLI presentation
+and rejection behavior; they do not promise redaction of application/child
+output or exact filesystem diagnosis. Existing Windows/browser/performance
+evidence is retained, not rerun for this message-only slice.
+
+`cargo clippy` for the CLI library/binary and changed integration targets with
+`-D warnings`, `cargo fmt --check`, `cargo xtask check docs`, rendered-table
+structure and `git diff --check` pass. Independent Reviewer
+`/root/yt102_settings_error_impl_review_oct20` PASS has zero issues or required
+followups after inspecting the diff, Loader and consumer boundaries. Native
+test results are parent-provided session evidence, not independently rerun by
+the reviewer. This bounded implementation is complete.
