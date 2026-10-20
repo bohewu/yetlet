@@ -187,14 +187,19 @@ Reviewer `/root/yt105_consumer_snapshot_review_oct20` PASS has zero issues or
 required followups; this bounded adoption is complete. No profiling/speedup
 claim or initial-render/HTTP/form change is selected.
 
-**YT-106, optional third-party component interoperability research:** study
-small npm/Vite JS/TS and wasm-bindgen boundaries for chart/editor components,
-including Web Components and a separate React mount only when needed. Define
-DOM ownership, mount/update/dispose and typed data/event flow before proposing
-one bounded trial. Existing CSS/JS bundling does not establish a generic widget
-adapter. This Todo registration selects research planning only; it adds no
-implementation, dependency or mandatory frontend framework. See the
-[recorded integration question](YT-094-API-OBSERVATIONS.md#third-party-frontend-components--yt-106).
+**YT-106 interoperability comparison (2026-10-20, research only):** the
+[package study](YT-106-FRONTEND-INTEROP-RESEARCH.md) recommends app-owned TS
+instances and existing wasm-bindgen for Rust-owned state, comparing direct JS,
+Web Components and React-only roots. It proposes Chart.js loaded-item bars first
+and a conditional CodeMirror description editor after CSP feasibility; nonce
+support alone does not prove style-attribute compatibility. Current renderer
+ownership/asset limits, read-only package metadata, cost uncertainty and focused
+future checks are recorded. Independent Reviewer
+`/root/yt106_frontend_interop_research_review_oct20` PASS has zero issues or
+required followups; YT-106 is Done at research-only scope. No package, adapter,
+CSP change, implementation or deployment is selected. The
+[original integration question](YT-094-API-OBSERVATIONS.md#third-party-frontend-components--yt-106)
+is retained separately.
 
 **YT-093 bounded closeout (2026-10-18):** the
 [signing verification](YT-093-SIGNING-VERIFICATION.md) records the opt-in signing

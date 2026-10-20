@@ -119,6 +119,11 @@ state mirrors and records native/Wasm/Chrome adoption checks and independent
 consumer Reviewer PASS. Initial rendering, browser Tasks and other proposals remain
 separate.
 Packaging is covered by YT-104 above.
+The separate [YT-106 package interoperability study](YT-106-FRONTEND-INTEROP-RESEARCH.md)
+recommends app-owned TS/wasm-bindgen boundaries, Chart.js as the first proposed
+trial and CodeMirror only after CSP feasibility. It compares Web Components
+and React roots, records package cost limits and leaves implementation separate;
+independent Reviewer PASS closes YT-106 at research-only scope.
 The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
 completed native/browser checks from the returned operator-attested native
 IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.
