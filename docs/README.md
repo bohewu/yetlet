@@ -128,6 +128,11 @@ The separately selected [Admin Chart.js trial](YT-106-CHART-VERIFICATION.md)
 implements loaded draft-status bars with a permanent native summary and the
 existing Vite/WASM/CLI. Independent implementation Reviewer PASS completes that
 bounded trial; CodeMirror remains conditional on CSP feasibility.
+The [CodeMirror CSP follow-up](YT-106-CODEMIRROR-CSP-RESEARCH.md) now finds a
+response-local style nonce feasible at source/mechanism scope, preserving
+attribute restrictions and native fallback. Independent research Reviewer PASS
+has zero issues or required followups; no editor or application-policy change
+is implemented.
 The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
 completed native/browser checks from the returned operator-attested native
 IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.

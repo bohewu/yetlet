@@ -211,6 +211,17 @@ and raw/gzip bundle costs recorded. Independent Reviewer
 this bounded trial is complete. The conditional editor, core APIs and
 production/platform qualification remain separate.
 
+**YT-106 CodeMirror CSP study (2026-10-20, research only):** the
+[focused study](YT-106-CODEMIRROR-CSP-RESEARCH.md) inspects published view/style-mod
+paths and compares the current policy with a proposed page-local style nonce
+using isolated Chrome mechanisms. Matching-nonce styles and CSSOM values apply,
+while unapproved style blocks and inline attributes remain blocked. This supports
+a minimal future plain-text trial without unsafe-inline or a core nonce service;
+no CodeMirror code ran in Yetlet and no app policy/package changed. Independent
+Reviewer `/root/yt106_codemirror_csp_research_review_oct20` PASS has zero issues or
+required followups and completes this research; real editor behavior and bundle
+cost remain future evidence.
+
 **YT-093 bounded closeout (2026-10-18):** the
 [signing verification](YT-093-SIGNING-VERIFICATION.md) records the opt-in signing
 crate, local multi-key CLI, confirmed automatic settings updates and independent

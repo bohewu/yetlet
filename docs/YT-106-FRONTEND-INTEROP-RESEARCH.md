@@ -9,6 +9,10 @@ has zero issues or required followups and approves research-only closure.
 Subsequent, separately authorized implementation:
 [Admin Chart.js slice](YT-106-CHART-VERIFICATION.md). The dated observations and
 proposals below describe the research checkout, not that later implementation.
+The separately selected [CodeMirror CSP study](YT-106-CODEMIRROR-CSP-RESEARCH.md)
+inspects published packages and isolated Chrome style mechanisms. It recommends
+a response-local style nonce for a later trial; actual editor qualification
+remains separate.
 
 ## Recommendation
 
