@@ -206,6 +206,18 @@ pub fn browser_page(items: &[Todo]) -> View {
                         .child(View::text("No remote action sent")),
                 )
                 .child(
+                    Element::new("button")
+                        .attribute("id", "remote-review")
+                        .attribute("type", "button")
+                        .child(View::text("Review server list")),
+                )
+                .child(
+                    Element::new("button")
+                        .attribute("id", "remote-resume")
+                        .attribute("type", "button")
+                        .child(View::text("Start another create")),
+                )
+                .child(
                     Element::new("div")
                         .attribute("id", "remote-list-host")
                         .child(

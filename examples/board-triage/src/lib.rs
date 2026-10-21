@@ -1,7 +1,7 @@
 //! App-owned triage contract. No database, session, secret or server capability.
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use yetlet_actions::Command;
+use yetlet_actions::{ActionError, Command};
 
 #[cfg(target_arch = "wasm32")]
 mod browser;
@@ -115,15 +115,76 @@ pub fn validation_fields(status: u16, body: &str) -> Option<FieldErrors> {
         .then_some(payload.error.fields)
 }
 
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum SaveFeedback {
+    Loaded,
+    Saved,
+    Rejected,
+    Access,
+    Conflict,
+    Unconfirmed,
+}
+impl SaveFeedback {
+    pub fn from_error(error: &ActionError) -> Self {
+        match error {
+            ActionError::Remote {
+                status: 401 | 403, ..
+            } => Self::Access,
+            ActionError::Remote { status: 409, .. } => Self::Conflict,
+            ActionError::Remote { status: 422, .. } => Self::Rejected,
+            _ => Self::Unconfirmed,
+        }
+    }
+    pub fn needs_fresh_page(self) -> bool {
+        matches!(self, Self::Access | Self::Conflict | Self::Unconfirmed)
+    }
+    pub fn guidance(self) -> &'static str {
+        match self {
+            Self::Access => {
+                "Permission or session changed. Copy your draft, sign in in another tab, then open a fresh workspace and review your access before reapplying edits."
+            }
+            Self::Conflict => {
+                "Conflict: the stored record changed. Copy your draft and compare the latest record in another tab, then reapply your edits in a fresh workspace."
+            }
+            Self::Unconfirmed => {
+                "Save could not be confirmed; it may have reached the server. Copy your draft and check the latest record in another tab before reapplying edits in a fresh workspace."
+            }
+            Self::Rejected => {
+                "Draft rejected. Check the highlighted fields and status transition. Your draft is still here."
+            }
+            _ => "",
+        }
+    }
+}
+
 #[derive(Clone, Debug)]
 pub struct Draft {
     pub saved: Item,
     pub value: Item,
     pub errors: FieldErrors,
+    pub feedback: SaveFeedback,
 }
 impl Draft {
     pub fn dirty(&self) -> bool {
         self.value != self.saved
+    }
+    pub fn can_save(&self) -> bool {
+        self.dirty() && !self.feedback.needs_fresh_page()
+    }
+    pub fn save_status(&self, pending: bool) -> &'static str {
+        if pending {
+            return "Saving";
+        }
+        match self.feedback {
+            SaveFeedback::Access => "Access needs review",
+            SaveFeedback::Conflict => "Conflict needs review",
+            SaveFeedback::Unconfirmed => "Save unconfirmed",
+            SaveFeedback::Rejected => "Needs corrections",
+            _ if !self.errors.is_empty() => "Needs corrections",
+            _ if self.dirty() => "Unsaved changes",
+            SaveFeedback::Saved => "Saved",
+            _ => "Loaded version",
+        }
     }
 }
 
@@ -146,7 +207,7 @@ pub enum Msg {
     Reset,
     Begin,
     Saved(Item),
-    Failed(String),
+    Failed { id: i64, feedback: SaveFeedback },
     ValidationFailed { id: i64, fields: FieldErrors },
 }
 impl Workspace {
@@ -161,6 +222,7 @@ impl Workspace {
                     saved: value.clone(),
                     value,
                     errors: FieldErrors::new(),
+                    feedback: SaveFeedback::Loaded,
                 })
                 .collect(),
             query: String::new(),
@@ -215,6 +277,9 @@ impl Workspace {
                     _ => return Err("Unknown field"),
                 }
                 draft.errors.remove(field);
+                if draft.feedback == SaveFeedback::Rejected {
+                    draft.feedback = SaveFeedback::Loaded;
+                }
             }
             Msg::EditDescription { id, value } => {
                 if self.selected != Some(id) || self.pending == Some(id) {
@@ -237,8 +302,12 @@ impl Workspace {
                     .iter_mut()
                     .find(|d| Some(d.value.id) == next.selected)
                 {
+                    if draft.feedback.needs_fresh_page() {
+                        return Ok(next);
+                    }
                     draft.value = draft.saved.clone();
                     draft.errors.clear();
+                    draft.feedback = SaveFeedback::Loaded;
                     next.description_reset = next.description_reset.wrapping_add(1);
                     next.message =
                         "Selected draft reset to its loaded version. Other drafts are unchanged."
@@ -246,7 +315,7 @@ impl Workspace {
                 }
             }
             Msg::Begin => {
-                if next.pending.is_some() || !next.selected().is_some_and(Draft::dirty) {
+                if next.pending.is_some() || !next.selected().is_some_and(Draft::can_save) {
                     return Err("Nothing to save");
                 }
                 next.pending = next.selected;
@@ -274,12 +343,27 @@ impl Workspace {
                 draft.saved = item.clone();
                 draft.value = item;
                 draft.errors.clear();
+                draft.feedback = SaveFeedback::Saved;
                 next.pending = None;
-                next.message = "Item saved. Other drafts are still local.".into();
+                next.message = format!(
+                    "Item #{} saved. Other drafts are still local.",
+                    draft.value.id
+                );
             }
-            Msg::Failed(message) => {
+            Msg::Failed { id, feedback } => {
+                if next.pending != Some(id)
+                    || matches!(feedback, SaveFeedback::Loaded | SaveFeedback::Saved)
+                {
+                    return Err("Unexpected save failure");
+                }
+                let draft = next
+                    .drafts
+                    .iter_mut()
+                    .find(|d| d.value.id == id)
+                    .ok_or("Missing draft")?;
+                draft.feedback = feedback;
                 next.pending = None;
-                next.message = message;
+                next.message = format!("Item #{id}: {}", feedback.guidance());
             }
             Msg::ValidationFailed { id, fields } => {
                 if next.pending != Some(id) || !valid_fields(&fields) {
@@ -291,6 +375,7 @@ impl Workspace {
                     .find(|d| d.value.id == id)
                     .ok_or("Missing draft")?;
                 draft.errors = fields;
+                draft.feedback = SaveFeedback::Rejected;
                 next.pending = None;
                 next.message = if next.selected == Some(id) {
                     "Check the highlighted fields. Your draft is still here.".into()
@@ -565,7 +650,10 @@ mod tests {
             .unwrap()
             .reduce(Msg::Begin)
             .unwrap()
-            .reduce(Msg::Failed("Conflict".into()))
+            .reduce(Msg::Failed {
+                id: 1,
+                feedback: SaveFeedback::Conflict,
+            })
             .unwrap();
         assert_eq!(state.selected().unwrap().value.title, "Keep me");
         assert_eq!(state.selected().unwrap().saved.version, 1);
@@ -576,6 +664,134 @@ mod tests {
                 items: vec![item(1), item(1)]
             })
             .is_err()
+        );
+    }
+
+    #[test]
+    fn save_status_tracks_edit_pending_success_and_correction() {
+        let state = state();
+        assert_eq!(
+            state.selected().unwrap().save_status(false),
+            "Loaded version"
+        );
+        let edited = state
+            .reduce(Msg::Edit {
+                field: "title",
+                value: "New title".into(),
+            })
+            .unwrap();
+        assert_eq!(
+            edited.selected().unwrap().save_status(false),
+            "Unsaved changes"
+        );
+        let saving = edited.reduce(Msg::Begin).unwrap();
+        assert!(saving.reduce(Msg::Begin).is_err());
+        assert_eq!(saving.selected().unwrap().save_status(true), "Saving");
+        let mut item = saving.selected().unwrap().value.clone();
+        item.version += 1;
+        let saved = saving.reduce(Msg::Saved(item)).unwrap();
+        assert_eq!(saved.selected().unwrap().save_status(false), "Saved");
+        assert!(!saved.selected().unwrap().can_save());
+        let rejected = edited
+            .reduce(Msg::Begin)
+            .unwrap()
+            .reduce(Msg::Failed {
+                id: 1,
+                feedback: SaveFeedback::Rejected,
+            })
+            .unwrap();
+        assert_eq!(
+            rejected.selected().unwrap().save_status(false),
+            "Needs corrections"
+        );
+        let corrected = rejected
+            .reduce(Msg::Edit {
+                field: "title",
+                value: "Corrected".into(),
+            })
+            .unwrap();
+        assert_eq!(
+            corrected.selected().unwrap().save_status(false),
+            "Unsaved changes"
+        );
+        assert!(corrected.reduce(Msg::Begin).is_ok());
+        let reset = corrected.reduce(Msg::Reset).unwrap();
+        assert_eq!(
+            reset.selected().unwrap().save_status(false),
+            "Loaded version"
+        );
+    }
+
+    #[test]
+    fn recovery_is_bound_to_failed_draft_and_blocks_replay_without_losing_edits() {
+        for feedback in [
+            SaveFeedback::Access,
+            SaveFeedback::Conflict,
+            SaveFeedback::Unconfirmed,
+        ] {
+            let saving = state()
+                .reduce(Msg::Edit {
+                    field: "title",
+                    value: "Keep my work".into(),
+                })
+                .unwrap()
+                .reduce(Msg::Begin)
+                .unwrap();
+            assert!(saving.reduce(Msg::Failed { id: 2, feedback }).is_err());
+            let other = saving
+                .reduce(Msg::Select(2))
+                .unwrap()
+                .reduce(Msg::Edit {
+                    field: "title",
+                    value: "Other draft".into(),
+                })
+                .unwrap();
+            let failed = other.reduce(Msg::Failed { id: 1, feedback }).unwrap();
+            assert_eq!(failed.selected().unwrap().feedback, SaveFeedback::Loaded);
+            assert!(failed.selected().unwrap().can_save());
+            let original = failed.reduce(Msg::Select(1)).unwrap();
+            assert_eq!(original.selected().unwrap().value.title, "Keep my work");
+            assert_eq!(original.selected().unwrap().feedback, feedback);
+            assert!(original.message.contains("Item #1"));
+            assert!(original.reduce(Msg::Begin).is_err());
+            let reset = original.reduce(Msg::Reset).unwrap();
+            assert_eq!(reset.selected().unwrap().value.title, "Keep my work");
+            let edited = reset
+                .reduce(Msg::Edit {
+                    field: "description",
+                    value: "More work".into(),
+                })
+                .unwrap();
+            assert!(edited.reduce(Msg::Begin).is_err());
+            assert_eq!(edited.selected().unwrap().saved.version, 1);
+            assert_eq!(edited.drafts[1].value.title, "Other draft");
+            assert!(edited.reduce(Msg::Failed { id: 1, feedback }).is_err());
+        }
+    }
+
+    #[test]
+    fn structured_failures_select_fixed_recovery_without_raw_remote_text() {
+        for (status, expected) in [
+            (401, SaveFeedback::Access),
+            (403, SaveFeedback::Access),
+            (409, SaveFeedback::Conflict),
+            (422, SaveFeedback::Rejected),
+            (503, SaveFeedback::Unconfirmed),
+        ] {
+            let feedback = SaveFeedback::from_error(&ActionError::Remote {
+                status,
+                code: "untrusted-response-content".into(),
+            });
+            assert_eq!(feedback, expected);
+            assert!(!feedback.guidance().contains("untrusted-response-content"));
+        }
+        assert_eq!(
+            SaveFeedback::from_error(&ActionError::Network),
+            SaveFeedback::Unconfirmed
+        );
+        assert_eq!(
+            SaveFeedback::from_error(&ActionError::InvalidResponse),
+            SaveFeedback::Unconfirmed
         );
     }
 }

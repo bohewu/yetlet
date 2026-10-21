@@ -1,5 +1,6 @@
 use super::{
-    Bootstrap, Draft, FieldErrors, Item, Msg, Save, Workspace, status_counts, validation_fields,
+    Bootstrap, Draft, FieldErrors, Item, Msg, Save, SaveFeedback, Workspace, status_counts,
+    validation_fields,
 };
 use std::{
     cell::{Cell, RefCell},
@@ -236,6 +237,29 @@ impl Dom {
         };
         editor.remove_attribute("hidden")?;
         let pending = state.pending == state.selected;
+        editor.set_attribute("aria-busy", if pending { "true" } else { "false" })?;
+        element(&self.document, "triage-save-state")?
+            .set_text_content(Some(draft.save_status(pending)));
+        let recovery = element(&self.document, "triage-recovery")?;
+        if draft.feedback.needs_fresh_page() {
+            recovery.remove_attribute("hidden")?;
+            element(&self.document, "triage-recovery-message")?
+                .set_text_content(Some(draft.feedback.guidance()));
+            element(&self.document, "triage-draft-copy")?
+                .dyn_into::<HtmlTextAreaElement>()?
+                .set_value(
+                    &serde_json::to_string_pretty(&draft.value)
+                        .map_err(|_| js("Draft unavailable"))?,
+                );
+        } else {
+            recovery.set_attribute("hidden", "")?;
+        }
+        let sign_in = element(&self.document, "triage-sign-in")?;
+        if draft.feedback == SaveFeedback::Access {
+            sign_in.remove_attribute("hidden")?;
+        } else {
+            sign_in.set_attribute("hidden", "")?;
+        }
         element(&self.document, "triage-heading")?.set_text_content(Some(&format!(
             "Item #{} · version {}{}",
             draft.value.id,
@@ -292,8 +316,11 @@ impl Dom {
             self.description.take();
         }
         for (id, disabled) in [
-            ("triage-save", state.pending.is_some() || !draft.dirty()),
-            ("triage-reset", pending || !draft.dirty()),
+            ("triage-save", state.pending.is_some() || !draft.can_save()),
+            (
+                "triage-reset",
+                pending || !draft.dirty() || draft.feedback.needs_fresh_page(),
+            ),
         ] {
             element(&self.document, id)?
                 .dyn_into::<HtmlButtonElement>()?
@@ -309,15 +336,6 @@ impl Dom {
 fn dispatch(handle: &Handle, message: Msg) {
     let _ = handle.dispatch(message);
 }
-fn failure(error: ActionError) -> String {
-    match error {
-        ActionError::Remote { status: 409, .. } => "Conflict: your draft is still here. Open the latest record before retrying; this workspace has not overwritten it.".into(),
-        ActionError::Remote { status: 401 | 403, .. } => "Permission or session changed. Your draft was not saved; sign in again using another tab.".into(),
-        ActionError::Remote { status: 422, .. } => "Draft rejected. Check title, field lengths and status transition. Your draft is still here.".into(),
-        _ => "Save could not be confirmed. Keep your draft and check the latest record before retrying.".into(),
-    }
-}
-
 enum SaveFailure {
     Global(ActionError),
     Validation(FieldErrors),
@@ -511,36 +529,98 @@ pub fn mount_triage(chart: JsValue, description: JsValue) -> Result<(), JsValue>
             move |_| dispatch(&handle, msg.clone()),
         )?);
     }
+    bindings.push(DomEventListener::new(
+        element(&document, "triage-select-draft")?.as_ref(),
+        "click",
+        {
+            let document = document.clone();
+            move |_| {
+                if let Ok(element) = element(&document, "triage-draft-copy")
+                    && let Ok(input) = element.dyn_into::<HtmlTextAreaElement>()
+                {
+                    let _ = input.focus();
+                    input.select();
+                }
+            }
+        },
+    )?);
     let executor = HttpExecutor::new(&format!("/board/projects/{project}/triage"))
         .map_err(|_| js("Invalid action endpoint"))?;
     let save_handle = handle.clone();
     let lifetime = active.clone();
-    bindings.push(DomEventListener::new(element(&document, "triage-save")?.as_ref(), "click", move |_| {
-        let Ok(state) = save_handle.snapshot() else { return; };
-        if state.pending.is_some() { return; }
-        let Some(draft) = state.selected().filter(|draft| draft.dirty()) else { return; };
-        let command = Save { csrf: csrf.clone(), item: draft.value.clone() };
-        let submitted_id = command.item.id;
-        if save_handle.dispatch(Msg::Begin).is_err() { return; }
-        let executor = executor.clone(); let handle = save_handle.clone(); let active = lifetime.clone();
-        spawn_local(async move {
-            // The owner may be disposed before this queued future first runs.
-            if !active.get() {
+    bindings.push(DomEventListener::new(
+        element(&document, "triage-save")?.as_ref(),
+        "click",
+        move |_| {
+            let Ok(state) = save_handle.snapshot() else {
+                return;
+            };
+            if state.pending.is_some() {
                 return;
             }
-            let result = save(&executor, command).await;
-            if !active.get() { return; }
-            match result {
-                Ok(item) => { if handle.dispatch(Msg::Saved(item)).is_err() { dispatch(&handle, Msg::Failed("Unexpected save response. Keep your draft and check the latest record.".into())); } }
-                Err(SaveFailure::Global(error)) => dispatch(&handle, Msg::Failed(failure(error))),
-                Err(SaveFailure::Validation(fields)) => {
-                    if handle.dispatch(Msg::ValidationFailed { id: submitted_id, fields }).is_err() {
-                        dispatch(&handle, Msg::Failed("Unexpected validation response. Keep your draft and check the latest record.".into()));
+            let Some(draft) = state.selected().filter(|draft| draft.can_save()) else {
+                return;
+            };
+            let command = Save {
+                csrf: csrf.clone(),
+                item: draft.value.clone(),
+            };
+            let submitted_id = command.item.id;
+            if save_handle.dispatch(Msg::Begin).is_err() {
+                return;
+            }
+            let executor = executor.clone();
+            let handle = save_handle.clone();
+            let active = lifetime.clone();
+            spawn_local(async move {
+                // The owner may be disposed before this queued future first runs.
+                if !active.get() {
+                    return;
+                }
+                let result = save(&executor, command).await;
+                if !active.get() {
+                    return;
+                }
+                match result {
+                    Ok(item) => {
+                        if handle.dispatch(Msg::Saved(item)).is_err() {
+                            dispatch(
+                                &handle,
+                                Msg::Failed {
+                                    id: submitted_id,
+                                    feedback: SaveFeedback::Unconfirmed,
+                                },
+                            );
+                        }
+                    }
+                    Err(SaveFailure::Global(error)) => dispatch(
+                        &handle,
+                        Msg::Failed {
+                            id: submitted_id,
+                            feedback: SaveFeedback::from_error(&error),
+                        },
+                    ),
+                    Err(SaveFailure::Validation(fields)) => {
+                        if handle
+                            .dispatch(Msg::ValidationFailed {
+                                id: submitted_id,
+                                fields,
+                            })
+                            .is_err()
+                        {
+                            dispatch(
+                                &handle,
+                                Msg::Failed {
+                                    id: submitted_id,
+                                    feedback: SaveFeedback::Unconfirmed,
+                                },
+                            );
+                        }
                     }
                 }
-            }
-        });
-    })?);
+            });
+        },
+    )?);
     // Commit once after all bindings exist; LocalGraph::new does not render.
     handle
         .dispatch(Msg::Filter(String::new()))

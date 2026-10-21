@@ -210,6 +210,7 @@ pub(super) async fn workspace(
             .child(Element::new("section").attribute("id", "triage-editor").attribute("hidden", "").attribute("class", "triage-editor").attribute("aria-label", "Selected item draft")
                 .child(views::text("p", "LOCAL DRAFT").attribute("class", "triage-eyebrow"))
                 .child(views::text("h2", "Selected item").attribute("id", "triage-heading"))
+                .child(views::text("p", "Loaded version").attribute("id", "triage-save-state").attribute("class", "triage-hint").attribute("aria-live", "polite"))
                 .child(control("Title", "title", "input"))
                 .child(control("Description", "description", "textarea"))
                 .child(Element::new("div").attribute("class", "triage-field-pair")
@@ -219,7 +220,16 @@ pub(super) async fn workspace(
                 .child(Element::new("div").attribute("class", "triage-editor-actions")
                     .child(button("triage-save", "Save selected").attribute("class", "btn btn-primary"))
                     .child(button("triage-reset", "Reset draft")))
-                .child(views::text("a", "Open latest record / native editor →").attribute("id", "triage-latest").attribute("href", format!("/board/projects/{project}/items")))
+                .child(views::text("a", "Review latest record / native editor (new tab) →").attribute("id", "triage-latest").attribute("href", format!("/board/projects/{project}/items")).attribute("target", "_blank").attribute("rel", "noopener noreferrer"))
+                .child(Element::new("section").attribute("id", "triage-recovery").attribute("class", "triage-recovery").attribute("hidden", "").attribute("aria-label", "Save recovery")
+                    .child(views::text("h3", "Keep your draft and review"))
+                    .child(Element::new("p").attribute("id", "triage-recovery-message"))
+                    .child(views::text("label", "Draft values for copying").attribute("for", "triage-draft-copy"))
+                    .child(Element::new("textarea").attribute("id", "triage-draft-copy").attribute("readonly", "").attribute("rows", "9"))
+                    .child(button("triage-select-draft", "Select draft text"))
+                    .child(Element::new("div").attribute("class", "triage-editor-actions")
+                        .child(views::text("a", "Sign in (new tab)").attribute("id", "triage-sign-in").attribute("href", "/board/login").attribute("target", "_blank").attribute("rel", "noopener noreferrer"))
+                        .child(views::text("a", "Open fresh workspace (new tab)").attribute("href", format!("/board/projects/{project}/triage")).attribute("target", "_blank").attribute("rel", "noopener noreferrer"))))
                 .child(views::text("p", "Drafts stay in this tab. Reloading or leaving discards unsaved changes.").attribute("class", "triage-hint"))));
     let view = views::shell(Some(principal), Some(&csrf), "Triage workspace", body);
     let mut response = page(&state, "Triage workspace | Lab Operations", view, false)?;
