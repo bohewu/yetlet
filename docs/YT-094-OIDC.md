@@ -45,6 +45,39 @@ session and CSRF token again. Project/write checks, audit history and
 CSRF-protected local logout remain authoritative; local logout does not end the
 IdP's SSO session.
 
+## Dependency audit applicability — 2026-10-21
+
+The first [PR #10 CI run](https://github.com/bohewu/yetlet/actions/runs/39532401659)
+failed its full-lockfile RustSec gate. The root workspace, standalone Admin and
+xtask lockfiles now select rustls-webpki 0.103.16 and webpki-roots 1.0.10, fixing
+[RUSTSEC-2026-0382](https://rustsec.org/advisories/RUSTSEC-2026-0382.html) and
+[RUSTSEC-2026-0381](https://rustsec.org/advisories/RUSTSEC-2026-0381.html).
+HTTPS certificate verification remains enabled; no trust bypass is introduced.
+The adjacent xtask lockfile also advances rustls from 0.23.45 to 0.23.46,
+removing its RUSTSEC-2026-0346 through RUSTSEC-2026-0349 findings.
+
+The optional openidconnect 4.0.1 dependency also includes rsa 0.9.10, reported by
+[RUSTSEC-2023-0071](https://rustsec.org/advisories/RUSTSEC-2023-0071.html). That
+advisory concerns private-key disclosure through observable timing and currently
+has no patched version. The application is an OIDC client: Oidc::finish calls
+ID Token claims verification with the client's verifier. The pinned dependency's
+RSA verification path constructs RsaPublicKey from the issuer's public n/e and
+calls verify. This consumer does not construct RSA private keys, sign tokens or
+decrypt RSA ciphertext. Client-secret authentication is not an RSA private-key
+operation. The separate local signing provider uses ES256, not this RSA path.
+
+The single-ID exception in [.cargo/audit.toml](../.cargo/audit.toml) records this
+bounded applicability decision. It does not patch rsa, certify arbitrary uses of
+openidconnect, disable auditing of other advisories or change the historical
+YT-096 package-audit results. Reassess the exception before changing the OIDC/RSA
+dependency or consumer, especially before introducing private-key operations.
+
+Local follow-up passes the 25 Board tests with oidc enabled, 17 Admin tests,
+documentation validation, and root/Admin RustSec audits with only that
+single-ID exception. The supplemental xtask audit reports no vulnerabilities
+and retains the pre-existing xml-rs 0.8.19 yanked-version warning; it is not
+silenced. These results do not rerun or expand the YT-096 candidate gates.
+
 ## Existing settings and secret-provider composition
 
 Real provider/client settings, subjects, test credentials, authorization/callback
