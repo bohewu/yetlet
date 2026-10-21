@@ -42,3 +42,15 @@ candidate for a later bounded trial. The research may recommend documentation
 or application glue alone; it does not preselect a universal adapter. YT-106
 remains Todo. Registration adds no implementation or dependencies and does not
 expand YT-094's pending platform/input qualification or its reviewed code.
+
+## YT-107 form/save follow-up (2026-10-21)
+
+The separately selected [YT-107 guide](YT-107-FORM-FEEDBACK.md#application-authoring-guide)
+connects these observations to actual Admin/Todo code: application-owned field
+feedback, per-draft save results, deliberate recovery, and native/editor/reset
+comparison. One rich-error Admin adapter and one code-only Todo mapping do not
+yet demonstrate repeated rich-error transport policy. Keep the current private
+seams and existing owner/lifetime primitives. The shared DOM View's unsupported
+hidden attribute is a concrete, bounded future candidate; it is recorded for
+later selection without a new framework or automatic renderer expansion.
+The original dated observations and their source scope above remain historical.

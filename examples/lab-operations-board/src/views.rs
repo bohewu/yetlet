@@ -257,10 +257,14 @@ pub(crate) fn edit(
                 .attribute("class", "alert alert-warning mt-3"),
         );
         if let Some(id) = id {
-            body = body.child(link(
-                "Open the latest stored version before reapplying this draft",
-                &format!("{root}/{id}"),
-            ));
+            body = body.child(
+                link(
+                    "Open the latest stored version before reapplying this draft (new tab)",
+                    &format!("{root}/{id}"),
+                )
+                .attribute("target", "_blank")
+                .attribute("rel", "noopener noreferrer"),
+            );
         }
     }
     let operator = if user.project == 1 { "alice" } else { "bob" };
@@ -274,7 +278,8 @@ pub(crate) fn edit(
         .child(text("p","Closing preserves the record and its history. Reopen a closed item before moving it to Active or Blocked.").attribute("class","text-body-secondary"))
         .child(Element::new("div").attribute("class","board-actions")
             .child(text("button",if id.is_some() { "Save changes" } else { "Create work item" }).attribute("type","submit").attribute("class","btn btn-primary"))
-            .child(text("button","Reset draft").attribute("type","reset").attribute("class","btn btn-outline-secondary")));
+            .child(text("button","Restore page values").attribute("type","reset").attribute("class","btn btn-outline-secondary")))
+        .child(text("p","Restore page values uses the values shown when this page loaded. Copy your edits before leaving this page.").attribute("class","text-body-secondary"));
     shell(
         Some(user),
         Some(csrf),

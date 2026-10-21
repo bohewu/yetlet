@@ -48,9 +48,12 @@ lists required identities, evidence and future operations after commit
 `0bd7596`. GitHub OIDC/public Sigstore is conditional on disclosure and exact
 workflow/source approvals; no policy selection, signing or activation occurs.
 
-[YT-107 form/save feedback](YT-107-FORM-FEEDBACK.md) implements the selected
-Admin/Todo follow-up in three slices. The first carries existing server
-validation to safe field messages while preserving draft and authority boundaries.
+[YT-107 form/save feedback](YT-107-FORM-FEEDBACK.md) is Done at the bounded
+Admin/Todo scope, with independent review of all three slices: server validation to field messages,
+explicit save state/recovery, and editor/native/Todo consistency. Its
+[application authoring guide](YT-107-FORM-FEEDBACK.md#application-authoring-guide)
+shows existing patterns, intentional Reset/HTTP differences and the actual
+costs that remain app-owned.
 
 ## Architecture and contracts
 
