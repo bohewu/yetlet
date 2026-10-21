@@ -66,7 +66,7 @@ fn exact_post(c: &mut Client, start: usize, title: &str) -> Result<()> {
     Ok(())
 }
 fn remote(c: &mut Client, title: &str, status: &str) -> Result<()> {
-    c.evaluate(&format!("(()=>{{document.getElementById('remote-title').value={};document.getElementById('create-remote').click();return true;}})()",json!(title)))?;
+    c.evaluate(&format!("(()=>{{document.getElementById('remote-title').value={};document.getElementById('remote-title').dispatchEvent(new Event('input',{{bubbles:true}}));document.getElementById('create-remote').click();return true;}})()",json!(title)))?;
     c.until(
         &format!(
             "document.getElementById('remote-status').textContent === {}",
@@ -180,7 +180,11 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
             }
             if !firefox {
                 let before = count(c)?;
-                remote(c, "Remote E2E task", "Saved on server (revision 1)")?;
+                remote(
+                    c,
+                    "Remote E2E task",
+                    "Saved on server (revision 1). Edit the title to create another task.",
+                )?;
                 c.equal(
                     "document.querySelectorAll('#remote-list-host li').length",
                     json!(3),
@@ -208,7 +212,7 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
                 c.navigate(&format!("{}/app", server.base))?;
                 ready(c)?;
                 let before = count(c)?;
-                remote(c, "  ", "Remote error: invalid_title")?;
+                remote(c, "  ", "Check the task title. Your text is still here.")?;
                 exact_post(c, before, "  ")?;
                 require(
                     c.chrome()?
@@ -226,18 +230,22 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
             }
             lifecycle(c, &server.base, firefox)?;
             if firefox {
-                c.evaluate("(document.getElementById('remote-title').value='Firefox saved task')")?;
+                c.evaluate("(()=>{const input=document.getElementById('remote-title');input.value='Firefox saved task';input.dispatchEvent(new Event('input',{bubbles:true}));return true;})()")?;
                 c.click("#create-remote")?;
-                c.until("document.getElementById('remote-status').textContent==='Saved on server (revision 1)'","Firefox typed POST")?;
+                c.until("document.getElementById('remote-status').textContent==='Saved on server (revision 1). Edit the title to create another task.'","Firefox typed POST")?;
                 snapshot(&server.base, 1, Some("Firefox saved task"))?;
-                c.evaluate("(document.getElementById('remote-title').value='  ')")?;
+                c.evaluate("(()=>{const input=document.getElementById('remote-title');input.value='  ';input.dispatchEvent(new Event('input',{bubbles:true}));return true;})()")?;
                 c.click("#create-remote")?;
-                c.until("document.getElementById('remote-status').textContent==='Remote error: invalid_title'","Firefox typed 422")?;
+                c.until("document.getElementById('remote-status').textContent==='Check the task title. Your text is still here.'","Firefox typed 422")?;
                 snapshot(&server.base, 1, None)?;
                 search(c, &server.base, true)?;
             } else {
                 let before = count(c)?;
-                remote(c, "Lifecycle remote task", "Saved on server (revision 2)")?;
+                remote(
+                    c,
+                    "Lifecycle remote task",
+                    "Saved on server (revision 2). Edit the title to create another task.",
+                )?;
                 exact_post(c, before, "Lifecycle remote task")?;
                 snapshot(&server.base, 2, Some("Lifecycle remote task"))?;
                 require(
@@ -256,7 +264,9 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
 }
 fn lifecycle(c: &mut Client, base: &str, firefox: bool) -> Result<()> {
     let queued = if firefox { 0 } else { count(c)? };
-    c.check(r#"(()=>{window.__yetlet_lifecycle_row=document.querySelector('#todo-list-host [data-id="1"]');window.__yetlet_queued_local_status=document.getElementById('todo-status').textContent;window.__yetlet_queued_remote_status=document.getElementById('remote-status').textContent;const runtime=window.__yetletTodoRuntime;if(!runtime||typeof runtime.dispose!=='function'||typeof runtime.mount!=='function')return false;document.getElementById('remote-title').value='Queued action must not run';document.getElementById('toggle-first').click();document.getElementById('create-remote').click();runtime.dispose();window.__yetlet_lifecycle='disposed';return true;})()"#)?;
+    // YT-107 claims pending synchronously; dispose still retires the queued HTTP
+    // work, while the already-rendered pending status remains unchanged.
+    c.check(r#"(()=>{window.__yetlet_lifecycle_row=document.querySelector('#todo-list-host [data-id="1"]');window.__yetlet_queued_local_status=document.getElementById('todo-status').textContent;const runtime=window.__yetletTodoRuntime;if(!runtime||typeof runtime.dispose!=='function'||typeof runtime.mount!=='function')return false;document.getElementById('remote-title').value='Queued action must not run';document.getElementById('remote-title').dispatchEvent(new Event('input',{bubbles:true}));document.getElementById('toggle-first').click();document.getElementById('create-remote').click();window.__yetlet_queued_remote_status=document.getElementById('remote-status').textContent;runtime.dispose();window.__yetlet_lifecycle='disposed';return window.__yetlet_queued_remote_status==='Saving to server...';})()"#)?;
     pause(400)?;
     c.equal(
         "window.__yetlet_lifecycle_row.getAttribute('data-completed')",
@@ -283,15 +293,7 @@ fn lifecycle(c: &mut Client, base: &str, firefox: bool) -> Result<()> {
         json!("false"),
     )?;
     text(c, "todo-status", "First task: active")?;
-    text(
-        c,
-        "remote-status",
-        if firefox {
-            "No remote action sent"
-        } else {
-            "Remote error: invalid_title"
-        },
-    )?;
+    text(c, "remote-status", "Saving to server...")?;
     if firefox {
         no_api(c, 0)?;
     } else {
@@ -330,7 +332,7 @@ fn lifecycle(c: &mut Client, base: &str, firefox: bool) -> Result<()> {
         "second remount action",
     )?;
     let pending = if firefox { 0 } else { count(c)? };
-    c.check("(()=>{window.__yetlet_original_fetch=window.fetch.bind(window);window.__yetlet_fetch_gate={started:false,ready:false};window.fetch=(...args)=>{window.__yetlet_fetch_gate.started=true;return window.__yetlet_original_fetch(...args).then(response=>new Promise(resolve=>{window.__yetlet_fetch_gate.ready=true;window.__yetlet_fetch_gate.release=()=>resolve(response);}));};window.__yetlet_retired_remote_status=document.getElementById('remote-status');window.__yetlet_retired_remote_host=document.getElementById('remote-list-host');window.__yetlet_retired_remote_host_before=window.__yetlet_retired_remote_host.textContent;document.getElementById('remote-title').value='  ';document.getElementById('create-remote').click();return true;})()")?;
+    c.check("(()=>{window.__yetlet_original_fetch=window.fetch.bind(window);window.__yetlet_fetch_gate={started:false,ready:false};window.fetch=(...args)=>{window.__yetlet_fetch_gate.started=true;return window.__yetlet_original_fetch(...args).then(response=>new Promise(resolve=>{window.__yetlet_fetch_gate.ready=true;window.__yetlet_fetch_gate.release=()=>resolve(response);}));};window.__yetlet_retired_remote_status=document.getElementById('remote-status');window.__yetlet_retired_remote_host=document.getElementById('remote-list-host');window.__yetlet_retired_remote_host_before=window.__yetlet_retired_remote_host.textContent;document.getElementById('remote-title').value='  ';document.getElementById('remote-title').dispatchEvent(new Event('input',{bubbles:true}));document.getElementById('create-remote').click();return true;})()")?;
     c.until("Boolean(window.__yetlet_fetch_gate?.ready && typeof window.__yetlet_fetch_gate.release==='function')","retired HTTP response gate")?;
     c.equal(
         "window.__yetlet_retired_remote_status.textContent",

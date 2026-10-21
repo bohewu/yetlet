@@ -400,3 +400,26 @@ workloads. Cleanup is supported by the receipts and script teardown. Manual
 recovery, transient drafts, native HTTP failure semantics, selection limits and
 the stated platform/performance/release exclusions remain accepted boundaries.
 The final slice is uncommitted. This review grants no delivery/release authority.
+
+## PR #10 CI continuation — 2026-10-21
+
+The owner subsequently authorized delivery: the final slice is committed as
+de4eb2e, with portable historical-path cleanup in 3888852. The first hosted CI
+failure and its dependency-audit correction are recorded in the
+[OIDC audit applicability note](YT-094-OIDC.md#dependency-audit-applicability--2026-10-21).
+After that correction, [run 39533949072](https://github.com/bohewu/yetlet/actions/runs/39533949072)
+passed MSRV, RustSec, native tests/smokes and WASM/build steps, then timed out
+in browser-chrome while waiting for the pre-YT-107 success text.
+
+The existing Todo/Search smoke now expects the exact current success and field
+feedback, dispatches input events when editing values, and captures synchronous
+pending state before disposal. It retains exact HTTP payload/count, actual 422,
+server revision, keyed identity, remount and late-response retirement checks.
+No application, public API, timeout or workflow gate changes are made.
+
+Local cargo xtask smoke browser-chrome and browser-firefox with --profile release
+both pass. Their receipts are target/m12/yt085/browser-chrome-zSCaBD and
+target/m12/yt085/browser-firefox-f0kIOU. Browser sessions/profiles and server trees
+were reaped with closed listeners/streams. The four smoke_browser_harness tests,
+xtask strict Clippy, formatting and whitespace checks also pass. The original
+hosted failure and its downloaded diagnostics remain preserved separately.
