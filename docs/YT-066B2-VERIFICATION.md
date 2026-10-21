@@ -53,7 +53,7 @@ Production TLS/ACL, Redis persistence/restart/restore, HA/Cluster, external host
 
 ## Independent implementation review and closeout
 
-The workspace profile was verified healthy/current/eligible/trusted. The saved repository reviewer configuration selected `gpt-6-astra`, proven tier `strong`; the shared resolver selected `high` for ordinary adaptive ad-hoc review with multi-file, concurrency/ordering, data-integrity and bounded-tradeoff signals. Canonical role: `/home/bohe/.codex/agents-pipeline/agents/reviewer.md`.
+The workspace profile was verified healthy/current/eligible/trusted. The saved repository reviewer configuration selected `gpt-6-astra`, proven tier `strong`; the shared resolver selected `high` for ordinary adaptive ad-hoc review with multi-file, concurrency/ordering, data-integrity and bounded-tradeoff signals. Canonical role: `${CODEX_HOME}/agents-pipeline/agents/reviewer.md`.
 
 A separate local `codex exec` process ran with the exact reviewer contract and a read-only sandbox. This was a role-directed process, not WebCodex, `codex exec review`, current-session self-review, native managed-role identity or formal assurance. Thread `01a128d5-37d1-7f40-a7c7-84fc0c923771` reached terminal exit **0**; process `957808` was gone. Local runtime metadata matched expected/observed `gpt-6-astra`, requested/observed `high` and read-only sandbox; the shared resolver accepted the observed effort.
 

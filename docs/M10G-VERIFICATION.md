@@ -299,7 +299,7 @@ responsibility/persistence document and adjacent authoritative contracts and
 retained evidence. Fresh workspace profile status was healthy/current/eligible;
 the saved repository reviewer model was `gpt-6-astra`, tier strong. The shared
 resolver selected ordinary adaptive `review` / `ad-hoc-review`, effort `high`.
-The exact role contract was `/home/bohe/.codex/agents-pipeline/agents/reviewer.md`.
+The exact role contract was `${CODEX_HOME}/agents-pipeline/agents/reviewer.md`.
 
 A separate ordinary local `codex exec` process used that contract and read-only
 sandbox, not WebCodex, `codex exec review`, self-review or native managed-role

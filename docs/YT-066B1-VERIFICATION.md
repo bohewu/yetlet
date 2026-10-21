@@ -106,7 +106,7 @@ The independent reviewer accepted this bounded prototype and its evidence. This 
 | Item | Retained evidence |
 |---|---|
 | Dispatch | Local ordinary `codex exec`, role-directed process; no WebCodex |
-| Role contract | `/home/bohe/.codex/agents-pipeline/agents/reviewer.md`; saved workspace reviewer configuration |
+| Role contract | `${CODEX_HOME}/agents-pipeline/agents/reviewer.md`; saved workspace reviewer configuration |
 | Workspace preflight | `health=ok`, `catalog_state=current`, `profile_eligibility=eligible`, `project_trust=trusted`, `configuration_compatibility=current` |
 | Resolver | Adaptive, task intent `review`, context `ad-hoc-review`, proven `strong` tier; `multi_file`, `data_integrity`, `concurrency_or_ordering`, `bounded_tradeoff` signals; no conflict or degradation |
 | Thread | `01a12884-69a7-7e20-beb5-9710e561c4d9` |
