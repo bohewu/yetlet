@@ -49,36 +49,43 @@ Open `http://127.0.0.1:3003/` or `/hello/World`. See [Hello World](examples/hell
 
 ## Optional local Yetlet CLI preview
 
-The separate [unpublished CLI](tools/yetlet-cli/README.md) provides Linux and Windows `doctor`, `new`, `build` and foreground `dev` commands for native handler-first SSR applications. It is not installed globally or published to crates.io, and does not replace internal `cargo xtask`.
+The separate [unpublished CLI](tools/yetlet-cli/README.md) creates native SSR applications and executes `run`/`build`. Persistent CLI/Vite behavior uses the existing settings mechanism. `new --vite` implies the optional runtime settings module; plain new keeps it opt-in.
 
 ```bash
 cargo build --offline --locked --manifest-path tools/yetlet-cli/Cargo.toml
-tools/yetlet-cli/target/debug/yetlet doctor --framework-path . --json
+tools/yetlet-cli/target/debug/yetlet --help
+tools/yetlet-cli/target/debug/yetlet doctor --json
 mkdir -p -m 700 "$HOME/yetlet-apps"
-tools/yetlet-cli/target/debug/yetlet new sampleapp --framework-path . --dir "$HOME/yetlet-apps"
+tools/yetlet-cli/target/debug/yetlet new sampleapp --parent "$HOME/yetlet-apps"
+# Follow the generated README: unpublished crates need explicit Cargo-owned local overrides.
 cargo generate-lockfile --offline --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
 tools/yetlet-cli/target/debug/yetlet build --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
-tools/yetlet-cli/target/debug/yetlet dev --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
+tools/yetlet-cli/target/debug/yetlet run --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
 ```
 
-On **Windows GNU/MSVC**, the same CLI commands are available using `yetlet.exe` from a locally built CLI. See the [Windows PowerShell quick start](tools/yetlet-cli/README.md#windows-powershell-native-gnumsvc) for the explicit Cargo.lock step and protected NTFS/ACL/Cargo requirements. Windows `dev` needs a real console for Ctrl-C/Break and runs Cargo and its descendants in an owned Job Object. This preview remains unpublished.
-
-New applications use explicit local Yetlet source paths; the CLI never creates the application's lockfile, resolves dependencies online or installs tools. The separate offline lock step requires cached dependencies. `build/dev` use Cargo `--frozen`, and `dev` has no HMR/watch mode. Linux process/PTY and Windows NTFS/ACL/Job Object/console behavior have separate bounded acceptance receipts. Other operating systems and unsupported console/filesystem configurations fail closed. This is not production or release qualification; see [YT-087](docs/YT-087C-VERIFICATION.md) and [YT-088](docs/YT-088-CROSS-PLATFORM-CLI-PLAN.md).
+Creation runs no tools or installation and generates no app lock. The optional Vite settings independently select frontend auto-start/build; Rust execution remains frozen without a Rust watcher. Linux has current native process/PTY/cleanup evidence. This revision has Windows cross-compilation evidence only; historical [YT-088 native receipts](docs/YT-088E-VERIFICATION.md) do not qualify the new two-process integration. Windows run requires a protected local NTFS app/tools and an attached processed-input console. See [CLI implementation evidence](docs/YT-102-CLI-IMPLEMENTATION.md). Global installation, publication and production qualification remain separate.
 
 ## Optional Linux container and Kubernetes configuration
 
-The unpublished CLI can explicitly scaffold a [cloud-profile SSR app](docs/YT-089A-VERIFICATION.md) with local-process liveness/readiness, configurable bind address, and graceful SIGTERM/Ctrl-C handling. The separate [configuration-only generators](tools/yetlet-cli/README.md) emit Dockerfile, Compose and generic Linux/amd64 Kubernetes Deployment/Service files from a validated cloud-profile app with an explicit Cargo.lock:
+The unpublished CLI can scaffold a [service SSR app](docs/YT-089A-VERIFICATION.md) with local-process liveness/readiness, configurable bind address, and graceful SIGTERM/Ctrl-C handling. The separate [configuration-only generators](tools/yetlet-cli/README.md) emit Dockerfile, Compose and generic Linux/amd64 Kubernetes Deployment/Service files from a qualified legacy service app with an explicit Cargo.lock. Newly generated shared-settings/registry layouts require separate generator acceptance and are currently refused:
 
 ```sh
 YETLET=tools/yetlet-cli/target/debug/yetlet
-"$YETLET" new cloudapp --cloud --framework-path . --dir "$HOME/yetlet-apps"
-cargo generate-lockfile --offline --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml"
+# Select an existing qualified legacy local-source app with its prepared lock.
 "$YETLET" generate docker --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml" --output "$HOME/yetlet-apps/docker-output"
 "$YETLET" generate compose --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml" --output "$HOME/yetlet-apps/compose-output" --image localhost:5000/team/cloudapp:v1
 "$YETLET" generate k8s --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml" --output "$HOME/yetlet-apps/k8s-output" --image localhost:5000/team/cloudapp:v1
 ```
 
 Generation **does not** run Docker or Kubernetes, fetch dependencies, export private source, publish images, or deploy a cluster. Docker builds require separate audited `app-src` and `yetlet-src` named BuildKit contexts; deployment images/credentials, ports and namespaces remain operator responsibilities. Linux OCI/K3s output and Windows GNU/MSVC generator parity have [separate source-bound evidence](docs/YT-089E-VERIFICATION.md). M15 is an unpublished preview, not production or YT-020 release qualification.
+
+## Optional typed application configuration
+
+The separate unpublished [configuration guide](docs/CONFIGURATION.md) shows typed
+Serde settings, explicit Development/Staging/Production layers, development-only
+secret files and native Axum State. The isolated workspace leaves default/core/
+browser dependencies unchanged. Current CLI templates opt into this same mechanism. [YT-090 verification](docs/YT-090-VERIFICATION.md)
+records focused Linux checks and independent Reviewer PASS at the unpublished scope.
 
 ## Add browser behavior when needed
 

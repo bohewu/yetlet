@@ -1,14 +1,17 @@
 //! Unpublished local CLI: literal arguments, diagnostics, SSR scaffolding and frozen Cargo.
 
 pub mod app;
+mod browser;
 pub mod compose;
 pub mod docker;
 pub mod doctor;
 mod framework;
 mod image;
 mod k8s;
+pub mod key;
 mod platform;
 pub mod scaffold;
+mod settings;
 
 #[cfg(test)]
 #[path = "../tests/fixtures/compose_app.rs"]
@@ -17,28 +20,52 @@ mod cloud_fixture;
 #[path = "../tests/fixtures/docker_framework.rs"]
 mod docker_fixture;
 
-use std::{ffi::OsString, path::PathBuf};
+use std::{
+    ffi::{OsStr, OsString},
+    path::PathBuf,
+};
 
-pub const HELP: &str = "Yetlet CLI preview (unpublished, Linux/Windows; YT-088)\n\nUsage:\n  yetlet [--help]\n  yetlet doctor [--framework-path PATH] [--json]\n  yetlet new NAME --framework-path PATH [--dir DIRECTORY] [--cloud]\n  yetlet build --manifest-path PATH [--release]\n  yetlet dev --manifest-path PATH\n  yetlet generate docker --manifest-path APP/Cargo.toml --output DIRECTORY\n  yetlet generate compose --manifest-path APP/Cargo.toml --output DIRECTORY --image REGISTRY/REPOSITORY:TAG\n  yetlet generate k8s --manifest-path APP/Cargo.toml --output DIRECTORY --image REGISTRY/REPOSITORY:TAG [--replicas COUNT]\n\nnew --cloud opts into app-owned bind/health/graceful shutdown; see its README.\nnew creates DIRECTORY/NAME; DIRECTORY defaults to the current directory and must\nalready exist. Linux uses protected, symlink-safe paths; Windows requires protected local fixed NTFS paths without reparse traversal. No '..' or overwrite.\nNAME: 1-64 lowercase ASCII letters, digits, '-' or '_', starting with a letter;\nRust keywords and reserved device/Cargo names are rejected. Paths may contain\nspaces and Unicode. No shell expansion is performed.\n\nRequires Rust/Cargo 1.99 or newer. doctor only runs local --version probes;\nnew and generate docker/compose/k8s run no subprocess. Kubernetes writes deployment.yaml, service.yaml and README.md for a separately built Linux/amd64 image; --replicas is ASCII decimal 1-100 (default 1). Its package name must be unchanged DNS label syntax (1-63 letters/digits/hyphens, letter prefix, letter/digit suffix); underscores are refused. No cluster action is performed. Compose references an explicit separately built Linux/amd64 image; it never builds or pulls an image. Docker generation writes configuration only; prepare two separate sanitized named source contexts as instructed in its README. Neither command installs, builds or downloads anything.\nA new app has no Cargo.lock: explicitly generate its own lock offline using the\nlocal cache, then cargo check --frozen (see the generated README).\nbuild/dev require a standalone [package] + [workspace] Cargo.toml and its own\nexisting Cargo.lock. App cwd/manifest/lock must be protected against untrusted writes by native\npermissions/ACLs; Windows build/dev require an owner-protected cargo.exe.\nLinux and Windows are supported within local OS/console limits; other OSes fail closed.\nThey run one foreground cargo build/run --frozen, without network fallback.\ndev has no watcher/browser; Ctrl-C cleans its owned process group/Job.\nWindows dev requires an attached console with processed Ctrl-C input. Applications\nmust retain the inherited process group; daemonization is unsupported.\nExit: 0 success/help, 1 preflight, 2 usage, 125 spawn/cleanup failure; otherwise\nthe native Cargo exit or signal is preserved, including cancellation.\nPublication and global installation remain outside this preview.\n";
+pub const VERSION: &str = concat!(
+    "yetlet ",
+    env!("CARGO_PKG_VERSION"),
+    " (unpublished preview)"
+);
+pub const HELP: &str = "Yetlet CLI preview (unpublished)\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
+const NEW_HELP: &str = "Usage: yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n\nNAME may appear anywhere among options. --parent defaults to cwd and must exist.\nNAME: 1-64 lowercase ASCII letters/digits/-/_, starting with a letter; reserved names refused.\n--vite selects the complete frontend scaffold and implies --settings. Plain new keeps app-runtime settings opt-in.\n--tailwind selects standalone Tailwind or the official Vite plugin. --service adds bind/health/shutdown.\n--template native|browser selects a built-in starter (default native), independent of runtime settings.\nThe browser template persists cli.target=browser and includes Vite/public settings.\nBrowser creation refuses --service. Plain creation defaults to native.\nCreates one new tree without overwrite, dependency installation, lock generation or process startup.\n";
+const DOCTOR_HELP: &str = "Usage: yetlet doctor [--json]\n\nReports bounded local Rust/Cargo 1.99+ identity and compiled new-filesystem capability.\nEnvironment only; application, framework, settings, frontend and execution readiness are not checked.\n--json emits schema 1. No builds, installs, Node probes or listeners.\n";
+const RUN_HELP: &str = "Usage: yetlet run [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; no ancestor or workspace search.\nRequires a protected standalone app and existing Cargo.lock; runs frozen Cargo.\nPublic settings select native Rust watch/Vite or cli.target=browser static preview.\nBrowser run starts only the prepared frontend, honoring cli.vite.auto_start. No implicit installs.\nOwned processes must retain their process group/Job; escaped daemons are unsupported.\n";
+const WATCH_HELP: &str = "Usage: yetlet watch [--manifest-path PATH]\n\nRuns the same pipeline as yetlet run, forcing Rust watch for this invocation.\nManifest defaults to exactly cwd/Cargo.toml; requires a protected standalone app and Cargo.lock.\nPublic settings are validated first; Vite enabled, auto_start and root settings still apply.\nRequires Watchexec on PATH; no implicit installs or settings-file changes.\nRust restarts retain Vite; cancellation cleans up owned processes.\n";
+const BUILD_HELP: &str = "Usage: yetlet build [--manifest-path PATH] [--release]\n\nManifest defaults to exactly cwd/Cargo.toml. Requires a protected standalone app and existing Cargo.lock.\nSettings select native frontend-then-Cargo, or cli.target=browser frontend-only build.\nBrowser build honors cli.vite.auto_build; skipped stages exit 0 without children.\n--release selects the Cargo build profile; it does not change APP_ENVIRONMENT. No implicit installs.\n";
+const GENERATE_HELP: &str = "Usage:\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nWrites configuration only for qualified source/lock representations, without overwrite.\nNo image build/pull, source export, credentials lookup or deployment.\n";
+const DOCKER_HELP: &str = "Usage: yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n\nManifest defaults to cwd/Cargo.toml. Output is a complete new directory under an existing protected parent.\nQualified source/lock inspection only; writes configuration without tools or source export.\n";
+const COMPOSE_HELP: &str = "Usage: yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nManifest defaults to cwd/Cargo.toml. Uses an explicit separately built Linux/amd64 image.\nIMAGE requires an explicit tag or sha256 digest. No build, pull or deployment.\n";
+const K8S_HELP: &str = "Usage: yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nManifest defaults to cwd/Cargo.toml. Replicas come from cli.generate.k8s.replicas (default 1, integer 1-100).\nPackage names must retain narrower DNS-label syntax; underscores are refused.\nWrites configuration for an explicit separately built Linux/amd64 image; no cluster action.\n";
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Cli {
-    Help,
+    Help(&'static str),
+    Version,
+    Key(key::Command),
     Doctor {
-        framework: Option<PathBuf>,
         json: bool,
     },
     New {
         name: String,
-        framework: PathBuf,
         dir: PathBuf,
+        template: scaffold::Template,
         cloud: bool,
+        with_config: bool,
+        with_tailwind: bool,
+        vite: bool,
     },
     Build {
         manifest: PathBuf,
         release: bool,
     },
-    Dev {
+    Run {
+        manifest: PathBuf,
+    },
+    Watch {
         manifest: PathBuf,
     },
     GenerateDocker {
@@ -54,7 +81,6 @@ pub enum Cli {
         manifest: PathBuf,
         output: PathBuf,
         image: String,
-        replicas: u32,
     },
 }
 
@@ -66,175 +92,239 @@ impl Cli {
                 manifest,
                 output,
                 image,
-                replicas,
-            } => k8s::generate(manifest, output, image, *replicas),
+            } => {
+                let app = platform::fs::open_app(manifest)?;
+                let settings = settings::load(&app)?;
+                k8s::generate(manifest, output, image, settings.generate.k8s.replicas)
+            }
             _ => Err("expected generate k8s command".into()),
         }
     }
 }
 
-pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
-    if args.is_empty() || args == ["--help"] || args == ["-h"] {
-        return Ok(Cli::Help);
-    }
-    let command = args[0].to_str().ok_or("command must be UTF-8")?;
-    if command == "generate" {
-        let generator = args.get(1).and_then(|v| v.to_str());
-        if !matches!(generator, Some("docker" | "compose" | "k8s")) {
-            return Err("generate requires the docker, compose or k8s command");
-        }
-        let mut manifest = None;
-        let mut output = None;
-        let mut image = None;
-        let mut replicas = None;
-        let mut index = 2;
-        while index < args.len() {
-            match args[index].to_str() {
-                Some("--manifest-path") if manifest.is_none() => {
-                    index += 1;
-                    manifest = Some(value(args, index)?);
-                }
-                Some("--output") if output.is_none() => {
-                    index += 1;
-                    output = Some(value(args, index)?);
-                }
-                Some("--image")
-                    if matches!(generator, Some("compose" | "k8s")) && image.is_none() =>
-                {
-                    index += 1;
-                    let literal = args
-                        .get(index)
-                        .and_then(|v| v.to_str())
-                        .ok_or("--image requires a literal ASCII image reference")?;
-                    image::validate(literal)?;
-                    image = Some(literal.to_owned());
-                }
-                Some("--replicas") if generator == Some("k8s") && replicas.is_none() => {
-                    index += 1;
-                    replicas = Some(k8s::parse_replicas(
-                        args.get(index)
-                            .and_then(|v| v.to_str())
-                            .ok_or("--replicas requires an ASCII decimal integer 1-100")?,
-                    )?);
-                }
-                _ => return Err("unknown, duplicate or misplaced generate option"),
-            }
-            index += 1;
-        }
-        if generator == Some("k8s") {
-            let manifest = manifest.ok_or("generate k8s requires --manifest-path PATH")?;
-            let output = output.ok_or("generate k8s requires --output DIRECTORY")?;
-            if [manifest.as_os_str(), output.as_os_str()]
-                .iter()
-                .any(|v| v.to_str().is_some_and(|s| s.trim().is_empty()))
-            {
-                return Err("generate k8s requires nonblank paths");
-            }
-            return Ok(Cli::GenerateK8s {
-                manifest,
-                output,
-                image: image.ok_or(
-                    "generate k8s requires --image REGISTRY/REPOSITORY:TAG or @sha256:DIGEST",
-                )?,
-                replicas: replicas.unwrap_or(1),
-            });
-        }
-        if generator == Some("compose") {
-            let manifest = manifest.ok_or("generate compose requires --manifest-path PATH")?;
-            let output = output.ok_or("generate compose requires --output DIRECTORY")?;
-            // Compose rejects blank paths without changing historical commands.
-            if [manifest.as_os_str(), output.as_os_str()]
-                .iter()
-                .any(|v| v.to_str().is_some_and(|s| s.trim().is_empty()))
-            {
-                return Err("generate compose requires nonblank paths");
-            }
-            return Ok(Cli::GenerateCompose {
-                manifest,
-                output,
-                image: image.ok_or(
-                    "generate compose requires --image REGISTRY/REPOSITORY:TAG or @sha256:DIGEST",
-                )?,
-            });
-        }
-        return Ok(Cli::GenerateDocker {
-            manifest: manifest.ok_or("generate docker requires --manifest-path PATH")?,
-            output: output.ok_or("generate docker requires --output DIRECTORY")?,
-        });
-    }
-    if matches!(command, "build" | "dev") {
-        let mut manifest = None;
-        let mut release = false;
-        let mut index = 1;
-        while index < args.len() {
-            match args[index].to_str() {
-                Some("--manifest-path") if manifest.is_none() => {
-                    index += 1;
-                    manifest = Some(value(args, index)?);
-                }
-                Some("--release") if command == "build" && !release => release = true,
-                _ => return Err("unknown, duplicate or misplaced option"),
-            }
-            index += 1;
-        }
-        let manifest = manifest.ok_or("build/dev require --manifest-path PATH")?;
-        return Ok(if command == "build" {
-            Cli::Build { manifest, release }
-        } else {
-            Cli::Dev { manifest }
-        });
-    }
-    let mut framework = None;
-    let mut dir = None;
-    let mut json = false;
-    let mut cloud = false;
-    let mut index = 1;
-    let name = if command == "new" {
-        let name = args
-            .get(index)
-            .and_then(|v| v.to_str())
-            .ok_or("new requires NAME")?;
-        scaffold::validate_name(name)?;
-        index += 1;
-        Some(name.to_owned())
-    } else if command == "doctor" {
-        None
-    } else {
-        return Err("unknown command (see --help)");
-    };
-    while index < args.len() {
-        match args[index].to_str() {
-            Some("--framework-path") if framework.is_none() => {
-                index += 1;
-                framework = Some(value(args, index)?);
-            }
-            Some("--dir") if command == "new" && dir.is_none() => {
-                index += 1;
-                dir = Some(value(args, index)?);
-            }
-            Some("--json") if command == "doctor" && !json => json = true,
-            Some("--cloud") if command == "new" && !cloud => cloud = true,
-            _ => return Err("unknown, duplicate or misplaced option"),
-        }
-        index += 1;
-    }
-    match name {
-        Some(name) => Ok(Cli::New {
-            name,
-            framework: framework.ok_or("new requires --framework-path PATH")?,
-            dir: dir.unwrap_or_else(|| PathBuf::from(".")),
-            cloud,
-        }),
-        None => Ok(Cli::Doctor { framework, json }),
+/// Safe usage selected only from recognized command paths, never arbitrary argv.
+pub fn usage(args: &[OsString]) -> &'static str {
+    match args.first().and_then(|v| v.to_str()) {
+        Some("key") => key::HELP,
+        Some("new") => NEW_HELP,
+        Some("doctor") => DOCTOR_HELP,
+        Some("run") => RUN_HELP,
+        Some("watch") => WATCH_HELP,
+        Some("build") => BUILD_HELP,
+        Some("generate") => match args.get(1).and_then(|v| v.to_str()) {
+            Some("docker") => DOCKER_HELP,
+            Some("compose") => COMPOSE_HELP,
+            Some("k8s") => K8S_HELP,
+            _ => GENERATE_HELP,
+        },
+        _ => HELP,
     }
 }
 
-fn value(args: &[OsString], index: usize) -> Result<PathBuf, &'static str> {
-    let value = args.get(index).ok_or("option requires a path")?;
-    if value.is_empty() || value.to_string_lossy().starts_with('-') {
-        return Err("option requires a nonempty path (use ./ for a leading '-')");
+pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
+    if args.is_empty() {
+        return Ok(Cli::Help(HELP));
     }
-    Ok(value.into())
+    if args.len() == 1 {
+        match args[0].to_str() {
+            Some("--help" | "-h") => return Ok(Cli::Help(HELP)),
+            Some("--version" | "-V") => return Ok(Cli::Version),
+            _ => (),
+        }
+    }
+    let command = args[0].to_str().ok_or("command must be UTF-8")?;
+    if command == "key" {
+        return key::parse(&args[1..]);
+    }
+    if command == "dev" {
+        return Err("dev was renamed; use yetlet run");
+    }
+    let (start, generator) = match command {
+        "new" | "doctor" | "run" | "watch" | "build" => (1, None),
+        "generate" => {
+            if args.len() == 2 && matches!(args[1].to_str(), Some("--help" | "-h")) {
+                return Ok(Cli::Help(GENERATE_HELP));
+            }
+            let generator = args
+                .get(1)
+                .and_then(|v| v.to_str())
+                .ok_or("generate requires docker, compose or k8s")?;
+            if !matches!(generator, "docker" | "compose" | "k8s") {
+                return Err("generate requires docker, compose or k8s");
+            }
+            (2, Some(generator))
+        }
+        _ => return Err("unknown command; see --help"),
+    };
+    if args.len() == start + 1 && matches!(args[start].to_str(), Some("--help" | "-h")) {
+        return Ok(Cli::Help(usage(args)));
+    }
+    let mut name = None;
+    let mut parent = None;
+    let mut template = None;
+    let mut manifest = None;
+    let mut output = None;
+    let mut image = None;
+    let (mut json, mut cloud, mut with_config, mut with_tailwind, mut vite, mut release) =
+        (false, false, false, false, false, false);
+    let mut index = start;
+    while index < args.len() {
+        let (option, inline) = split_option(&args[index]);
+        match option {
+            Some("--parent") if command == "new" && parent.is_none() => {
+                parent = Some(path_value(args, &mut index, inline)?)
+            }
+            Some("--template") if command == "new" && template.is_none() => {
+                template = Some(match argument_value(args, &mut index, inline)?.to_str() {
+                    Some("native") => scaffold::Template::Native,
+                    Some("browser") => scaffold::Template::Browser,
+                    _ => return Err("--template requires native or browser"),
+                });
+            }
+            Some("--manifest-path")
+                if matches!(command, "run" | "watch" | "build" | "generate")
+                    && manifest.is_none() =>
+            {
+                manifest = Some(path_value(args, &mut index, inline)?)
+            }
+            Some("--output") if generator.is_some() && output.is_none() => {
+                output = Some(path_value(args, &mut index, inline)?)
+            }
+            Some("--image") if matches!(generator, Some("compose" | "k8s")) && image.is_none() => {
+                let value = argument_value(args, &mut index, inline)?
+                    .to_str()
+                    .ok_or("--image requires a literal ASCII image reference")?;
+                image::validate(value)?;
+                image = Some(value.to_owned());
+            }
+            Some("--json") if command == "doctor" && !json && inline.is_none() => json = true,
+            Some("--service") if command == "new" && !cloud && inline.is_none() => cloud = true,
+            Some("--settings") if command == "new" && !with_config && inline.is_none() => {
+                with_config = true
+            }
+            Some("--tailwind") if command == "new" && !with_tailwind && inline.is_none() => {
+                with_tailwind = true
+            }
+            Some("--vite") if command == "new" && !vite && inline.is_none() => vite = true,
+            Some("--release") if command == "build" && !release && inline.is_none() => {
+                release = true
+            }
+            Some("--cloud") => return Err("--cloud was removed; use new --service"),
+            Some("--with-config") => return Err("--with-config was removed; use new --settings"),
+            Some("--with-tailwind") => {
+                return Err("--with-tailwind was removed; use new --tailwind");
+            }
+            Some("--dir") => return Err("--dir was removed; use new --parent DIRECTORY"),
+            Some("--assets" | "--with-vite-dev" | "--dev-bridge") => {
+                return Err(
+                    "old Vite options were removed; use new --vite and public cli.vite settings",
+                );
+            }
+            Some("--framework-path") => {
+                return Err(
+                    "--framework-path was removed; configure dependency versions or local overrides in Cargo.toml",
+                );
+            }
+            Some("--replicas") => {
+                return Err(
+                    "--replicas was removed; set cli.generate.k8s.replicas in public settings",
+                );
+            }
+            _ if command == "new"
+                && name.is_none()
+                && !args[index].as_encoded_bytes().starts_with(b"-") =>
+            {
+                let value = args[index].to_str().ok_or("NAME must be UTF-8")?;
+                scaffold::validate_name(value)?;
+                name = Some(value.to_owned());
+            }
+            _ => {
+                return Err(
+                    "unknown, duplicate or misplaced argument; help/version must be exclusive",
+                );
+            }
+        }
+        index += 1;
+    }
+    let manifest = manifest.unwrap_or_else(|| PathBuf::from("Cargo.toml"));
+    let template = template.unwrap_or_default();
+    if template == scaffold::Template::Browser && cloud {
+        return Err("browser template does not select the native --service profile");
+    }
+    match command {
+        "new" => Ok(Cli::New {
+            name: name.ok_or("new requires NAME")?,
+            dir: parent.unwrap_or_else(|| PathBuf::from(".")),
+            template,
+            cloud,
+            with_config: with_config || vite,
+            with_tailwind,
+            vite,
+        }),
+        "doctor" => Ok(Cli::Doctor { json }),
+        "run" => Ok(Cli::Run { manifest }),
+        "watch" => Ok(Cli::Watch { manifest }),
+        "build" => Ok(Cli::Build { manifest, release }),
+        _ => {
+            let output = output.ok_or("generator requires --output DIRECTORY")?;
+            match generator {
+                Some("docker") => Ok(Cli::GenerateDocker { manifest, output }),
+                Some("compose") => Ok(Cli::GenerateCompose {
+                    manifest,
+                    output,
+                    image: image.ok_or("generate compose requires --image IMAGE")?,
+                }),
+                _ => Ok(Cli::GenerateK8s {
+                    manifest,
+                    output,
+                    image: image.ok_or("generate k8s requires --image IMAGE")?,
+                }),
+            }
+        }
+    }
+}
+
+fn split_option(value: &OsStr) -> (Option<&str>, Option<&OsStr>) {
+    let bytes = value.as_encoded_bytes();
+    if let Some(index) = bytes.iter().position(|&v| v == b'=') {
+        // ASCII '=' is a self-synchronizing boundary in OsStr's encoding. The suffix
+        // remains borrowed from the same native string, including non-UTF-8 paths.
+        let suffix = unsafe { OsStr::from_encoded_bytes_unchecked(&bytes[index + 1..]) };
+        (std::str::from_utf8(&bytes[..index]).ok(), Some(suffix))
+    } else {
+        (value.to_str(), None)
+    }
+}
+
+fn argument_value<'a>(
+    args: &'a [OsString],
+    index: &mut usize,
+    inline: Option<&'a OsStr>,
+) -> Result<&'a OsStr, &'static str> {
+    let value = match inline {
+        Some(value) => value,
+        None => {
+            *index += 1;
+            args.get(*index)
+                .ok_or("option requires a value")?
+                .as_os_str()
+        }
+    };
+    if value.is_empty()
+        || value.to_str().is_some_and(|v| v.trim().is_empty())
+        || value.as_encoded_bytes().starts_with(b"-")
+    {
+        return Err("option requires a nonblank literal value (use ./ for a leading '-')");
+    }
+    Ok(value)
+}
+
+fn path_value(
+    args: &[OsString],
+    index: &mut usize,
+    inline: Option<&OsStr>,
+) -> Result<PathBuf, &'static str> {
+    Ok(argument_value(args, index, inline)?.into())
 }
 #[cfg(test)]
 mod tests {
@@ -246,173 +336,286 @@ mod tests {
     }
 
     #[test]
-    fn commands_and_options_are_literal_and_fail_closed() {
-        assert_eq!(parse(&argv(&[])), Ok(Cli::Help));
-        assert_eq!(parse(&argv(&["--help"])), Ok(Cli::Help));
-        assert_eq!(
-            parse(&argv(&[
-                "doctor",
-                "--framework-path",
-                "/tmp/framework",
-                "--json"
-            ])),
-            Ok(Cli::Doctor {
-                framework: Some("/tmp/framework".into()),
-                json: true
-            })
-        );
-        assert_eq!(
-            parse(&argv(&[
+    fn command_grammar_normalizes_creation_and_literal_values() {
+        assert_eq!(parse(&argv(&[])), Ok(Cli::Help(HELP)));
+        assert_eq!(parse(&argv(&["-V"])), Ok(Cli::Version));
+        for args in [
+            vec![
                 "new",
-                "sample_app",
-                "--framework-path",
-                "/tmp/framework",
-                "--dir",
-                "/tmp/out"
-            ])),
-            Ok(Cli::New {
-                name: "sample_app".into(),
-                framework: "/tmp/framework".into(),
-                dir: "/tmp/out".into(),
-                cloud: false,
-            })
-        );
-        for invalid in [
-            vec!["build"],
-            vec!["dev"],
-            vec!["new", "app"],
-            vec!["new", "app", "--framework-path"],
-            vec!["new", "app", "--framework-path", "/tmp/framework", "--json"],
-            vec!["doctor", "--json", "--json"],
-            vec!["doctor", "--dir", "/tmp/out"],
-            vec!["doctor", "--framework-path", ""],
-            vec!["doctor", "--framework-path", "-unsafe"],
-            vec!["new", "../escape", "--framework-path", "/tmp/framework"],
+                "--parent=/tmp/應 用;$literal",
+                "--vite",
+                "demo",
+                "--tailwind",
+                "--service",
+                "--settings",
+            ],
+            vec![
+                "new",
+                "demo",
+                "--parent",
+                "/tmp/應 用;$literal",
+                "--settings",
+                "--service",
+                "--tailwind",
+                "--vite",
+            ],
         ] {
-            assert!(
-                parse(&argv(&invalid)).is_err(),
-                "unexpectedly accepted {invalid:?}"
+            assert_eq!(
+                parse(&argv(&args)),
+                Ok(Cli::New {
+                    name: "demo".into(),
+                    dir: "/tmp/應 用;$literal".into(),
+                    template: scaffold::Template::Native,
+                    cloud: true,
+                    with_config: true,
+                    with_tailwind: true,
+                    vite: true
+                })
             );
         }
-    }
-
-    #[test]
-    fn build_dev_require_explicit_literal_manifest_and_exact_options() {
+        assert_eq!(
+            parse(&argv(&["new", "demo", "--vite"])),
+            Ok(Cli::New {
+                name: "demo".into(),
+                dir: ".".into(),
+                template: scaffold::Template::Native,
+                cloud: false,
+                with_config: true,
+                with_tailwind: false,
+                vite: true
+            })
+        );
+        assert_eq!(
+            parse(&argv(&["new", "demo"])),
+            Ok(Cli::New {
+                name: "demo".into(),
+                dir: ".".into(),
+                template: scaffold::Template::Native,
+                cloud: false,
+                with_config: false,
+                with_tailwind: false,
+                vite: false
+            })
+        );
+        assert_eq!(
+            parse(&argv(&["run"])),
+            Ok(Cli::Run {
+                manifest: "Cargo.toml".into()
+            })
+        );
+        assert_eq!(
+            parse(&argv(&["watch"])),
+            Ok(Cli::Watch {
+                manifest: "Cargo.toml".into()
+            })
+        );
+        for args in [
+            vec!["watch", "--manifest-path", "./應 用;$literal/Cargo.toml"],
+            vec!["watch", "--manifest-path=./應 用;$literal/Cargo.toml"],
+        ] {
+            assert_eq!(
+                parse(&argv(&args)),
+                Ok(Cli::Watch {
+                    manifest: "./應 用;$literal/Cargo.toml".into()
+                })
+            );
+        }
         assert_eq!(
             parse(&argv(&[
                 "build",
                 "--release",
-                "--manifest-path",
-                "/tmp/應 用;$(literal)/Cargo.toml"
+                "--manifest-path=./應 用/Cargo.toml"
             ])),
             Ok(Cli::Build {
-                manifest: "/tmp/應 用;$(literal)/Cargo.toml".into(),
+                manifest: "./應 用/Cargo.toml".into(),
                 release: true
             })
         );
         assert_eq!(
-            parse(&argv(&["build", "--manifest-path", "./Cargo.toml"])),
-            Ok(Cli::Build {
-                manifest: "./Cargo.toml".into(),
-                release: false
+            parse(&argv(&["generate", "docker", "--output=out"])),
+            Ok(Cli::GenerateDocker {
+                manifest: "Cargo.toml".into(),
+                output: "out".into()
             })
         );
         assert_eq!(
-            parse(&argv(&["dev", "--manifest-path", "./Cargo.toml"])),
-            Ok(Cli::Dev {
-                manifest: "./Cargo.toml".into()
+            parse(&argv(&[
+                "generate",
+                "k8s",
+                "--image",
+                "localhost/app:v1",
+                "--output",
+                "out"
+            ])),
+            Ok(Cli::GenerateK8s {
+                manifest: "Cargo.toml".into(),
+                output: "out".into(),
+                image: "localhost/app:v1".into()
             })
         );
-        for invalid in [
-            vec!["build", "--release"],
-            vec!["dev", "--manifest-path"],
-            vec!["dev", "--manifest-path", ""],
-            vec!["dev", "--manifest-path", "--release"],
-            vec!["dev", "--manifest-path", "Cargo.toml", "--release"],
-            vec![
-                "build",
-                "--manifest-path",
-                "Cargo.toml",
-                "--release",
-                "--release",
-            ],
-            vec![
-                "build",
-                "--manifest-path",
-                "Cargo.toml",
-                "--manifest-path",
-                "Cargo.toml",
-            ],
-            vec!["build", "--manifest-path", "Cargo.toml", "--locked"],
-            vec!["dev", "--manifest-path", "Cargo.toml", "--", "app-argument"],
-            vec!["dev", "--manifest-path=Cargo.toml"],
-            vec!["build", "Cargo.toml"],
-            vec!["dev", "--help"],
-            vec!["build", "--offline"],
+    }
+
+    #[test]
+    fn template_selection_is_a_literal_creation_option() {
+        for args in [
+            vec!["new", "tasks", "--template", "browser", "--tailwind"],
+            vec!["new", "--template=browser", "--tailwind", "tasks"],
         ] {
-            assert!(parse(&argv(&invalid)).is_err(), "{invalid:?}");
+            assert_eq!(
+                parse(&argv(&args)),
+                Ok(Cli::New {
+                    name: "tasks".into(),
+                    dir: ".".into(),
+                    template: scaffold::Template::Browser,
+                    cloud: false,
+                    with_config: false,
+                    with_tailwind: true,
+                    vite: false,
+                })
+            );
+        }
+        assert_eq!(
+            parse(&argv(&["new", "tasks", "--template=native"])),
+            parse(&argv(&["new", "tasks"]))
+        );
+        assert!(NEW_HELP.contains("--template native|browser"));
+        assert!(!NEW_HELP.contains("APP_CLI__TARGET"));
+        for args in [
+            vec!["new", "tasks", "--template"],
+            vec!["new", "tasks", "--template="],
+            vec!["new", "tasks", "--template", "unknown"],
+            vec!["new", "tasks", "--template", "Browser"],
+            vec!["new", "tasks", "--template=browser", "--template=native"],
+            vec!["new", "tasks", "--service", "--template=browser"],
+            vec!["run", "--template=browser"],
+            vec!["build", "--template=browser"],
+        ] {
+            assert!(parse(&argv(&args)).is_err(), "{args:?}");
         }
     }
 
     #[test]
-    fn cloud_is_an_explicit_unique_new_option_after_name() {
-        for options in [
+    fn invalid_grammar_and_removed_spellings_fail_before_effects() {
+        for args in [
+            vec!["new"],
+            vec!["new", "demo", "other"],
+            vec!["new", "demo", "--vite", "build"],
+            vec!["new", "demo", "--vite=true"],
+            vec!["new", "demo", "--vite", "--vite"],
+            vec!["new", "demo", "--settings", "--settings"],
+            vec!["new", "demo", "--parent", " "],
+            vec!["new", "demo", "--parent="],
+            vec!["run", "--manifest-path="],
+            vec!["watch", "--manifest-path="],
+            vec!["watch", "--manifest-path", " "],
+            vec!["watch", "--release"],
+            vec!["watch", "extra"],
+            vec!["watch", "--manifest-path=x", "--manifest-path=y"],
+            vec!["watch", "--help", "--manifest-path=x"],
+            vec!["watch", "--manifest-path=x", "-h"],
+            vec!["watch", "--", "anything"],
+            vec!["build", "--release=false"],
+            vec!["doctor", "--json=true"],
+            vec!["doctor", "--json", "--json"],
+            vec!["run", "--manifest-path", "Cargo.toml", "--manifest-path=x"],
+            vec!["generate", "--output", "out", "docker"],
+            vec!["generate", "docker", "--image=x:y", "--output=out"],
             vec![
-                "new",
-                "demo",
-                "--cloud",
-                "--framework-path",
-                "/tmp/framework",
+                "generate",
+                "k8s",
+                "--output=out",
+                "--image=x:y",
+                "--replicas=2",
             ],
-            vec![
-                "new",
-                "demo",
-                "--framework-path",
-                "/tmp/framework",
-                "--cloud",
-            ],
+            vec!["dev"],
+            vec!["new", "demo", "--framework-path=x"],
+            vec!["doctor", "--framework-path=x"],
+            vec!["new", "demo", "--cloud"],
+            vec!["new", "demo", "--with-config"],
+            vec!["new", "demo", "--with-tailwind"],
+            vec!["new", "demo", "--dir=x"],
+            vec!["new", "demo", "--assets=vite"],
+            vec!["new", "demo", "--with-vite-dev"],
+            vec!["run", "--vite"],
+            vec!["--help", "run"],
+            vec!["new", "demo", "--help"],
+            vec!["generate", "docker", "--help", "--output=out"],
+            vec!["run", "--", "anything"],
         ] {
-            assert_eq!(
-                parse(&argv(&options)),
-                Ok(Cli::New {
-                    name: "demo".into(),
-                    framework: "/tmp/framework".into(),
-                    dir: ".".into(),
-                    cloud: true,
-                })
-            );
+            assert!(parse(&argv(&args)).is_err(), "{args:?}");
         }
-        for invalid in [
-            vec!["--cloud"],
-            vec!["--cloud", "new", "demo"],
-            vec![
-                "new",
-                "--cloud",
-                "demo",
-                "--framework-path",
-                "/tmp/framework",
-            ],
-            vec![
-                "new",
-                "demo",
-                "--cloud",
-                "--cloud",
-                "--framework-path",
-                "/tmp/framework",
-            ],
-            vec!["new", "demo", "--framework-path", "--cloud"],
-            vec![
-                "new",
-                "demo",
-                "--cloud=true",
-                "--framework-path",
-                "/tmp/framework",
-            ],
-            vec!["doctor", "--cloud"],
-            vec!["build", "--manifest-path", "Cargo.toml", "--cloud"],
-            vec!["dev", "--manifest-path", "Cargo.toml", "--cloud"],
-        ] {
-            assert!(parse(&argv(&invalid)).is_err(), "{invalid:?}");
+    }
+
+    #[cfg(unix)]
+    #[test]
+    fn native_non_utf8_paths_survive_both_option_forms() {
+        use std::os::unix::ffi::OsStringExt;
+        let path = OsString::from_vec(b"./native-\xff/Cargo.toml".to_vec());
+        let expected = Ok(Cli::Run {
+            manifest: path.clone().into(),
+        });
+        assert_eq!(
+            parse(&["run".into(), "--manifest-path".into(), path]),
+            expected
+        );
+        let inline = OsString::from_vec(b"--manifest-path=./native-\xff/Cargo.toml".to_vec());
+        assert_eq!(parse(&["run".into(), inline]), expected);
+        let path = OsString::from_vec(b"./native-\xff/Cargo.toml".to_vec());
+        let expected = Ok(Cli::Watch {
+            manifest: path.clone().into(),
+        });
+        assert_eq!(
+            parse(&["watch".into(), "--manifest-path".into(), path]),
+            expected
+        );
+        let inline = OsString::from_vec(b"--manifest-path=./native-\xff/Cargo.toml".to_vec());
+        assert_eq!(parse(&["watch".into(), inline]), expected);
+    }
+
+    #[test]
+    fn config_manifest_dependencies_and_root_files_are_explicit() {
+        for cloud in [false, true] {
+            let framework = Path::new("/tmp/framework space \"quoted");
+            let files = scaffold::config_files("demo", framework, cloud).unwrap();
+            assert_eq!(
+                files.iter().map(|(p, _)| *p).collect::<Vec<_>>(),
+                [
+                    "Cargo.toml",
+                    "README.md",
+                    ".gitignore",
+                    "src/main.rs",
+                    "src/config.rs",
+                    "base.toml",
+                    "development.toml",
+                    "staging.toml",
+                    "production.toml",
+                    ".env.example",
+                ]
+            );
+            let manifest: toml::Value = files[0].1.parse().unwrap();
+            assert_eq!(
+                manifest["dependencies"]["yetlet-config"]["path"].as_str(),
+                framework.join("crates/yetlet-config").to_str()
+            );
+            assert_eq!(
+                manifest["dependencies"]["serde"]["features"][0].as_str(),
+                Some("derive")
+            );
+            assert_eq!(
+                manifest["dependencies"]["secrecy"]["features"][0].as_str(),
+                Some("serde")
+            );
+            assert_eq!(manifest["package"]["publish"].as_bool(), Some(false));
+            assert_eq!(manifest["package"].get("metadata").is_some(), cloud);
+            assert_eq!(manifest["dependencies"].as_table().unwrap().len(), 7);
+            for (_, contents) in &files[5..9] {
+                contents.parse::<toml::Value>().unwrap();
+            }
+            assert!(!files.iter().any(|(p, _)| *p == "Cargo.lock"));
+            assert!(files[1].1.contains("generate docker"));
+            assert!(files[2].1.ends_with("!.env.example\n"));
+            syn::parse_file(&files[3].1).unwrap();
+            syn::parse_file(&files[4].1).unwrap();
         }
     }
 

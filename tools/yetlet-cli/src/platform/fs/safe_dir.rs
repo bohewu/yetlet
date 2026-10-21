@@ -153,18 +153,17 @@ impl Anchor {
 struct OwnedFile {
     name: CString,
     file: File,
-    in_src: bool,
+    child: Option<usize>,
 }
 struct Temp {
     name: CString,
     dir: File,
-    src: Option<File>,
-    child: &'static str,
+    children: Vec<(&'static str, File)>,
     files: Vec<OwnedFile>,
 }
 
 impl Temp {
-    fn make(parent: &Anchor, child: &'static str) -> io::Result<Self> {
+    fn make(parent: &Anchor) -> io::Result<Self> {
         for _ in 0..8 {
             let mut random = [0_u8; 16];
             // SAFETY: valid writable buffer; flags=0 obtains kernel randomness.
@@ -189,8 +188,7 @@ impl Temp {
                     return Ok(Self {
                         name,
                         dir,
-                        src: None,
-                        child,
+                        children: Vec::new(),
                         files: Vec::new(),
                     });
                 }
@@ -212,23 +210,28 @@ impl Temp {
     }
 
     fn write(&mut self, path: &str, data: &str) -> io::Result<()> {
-        let in_src = path.contains('/');
-        if in_src && self.src.is_none() {
-            let name = cstr(self.child.as_ref())?;
-            mkdir(&self.dir, &name)?;
-            self.src = Some(directory(&self.dir, &name)?);
-        }
-        let parent = if in_src {
-            self.src.as_ref().unwrap()
+        let (child, name) = if let Some((child, name)) = path.split_once('/') {
+            let index =
+                if let Some(index) = self.children.iter().position(|(name, _)| *name == child) {
+                    index
+                } else {
+                    let child = match child {
+                        "src" => "src",
+                        "frontend" => "frontend",
+                        "cargo-overlay" => "cargo-overlay",
+                        _ => return Err(io::Error::other("unsupported generated child")),
+                    };
+                    let name = cstr(child.as_ref())?;
+                    mkdir(&self.dir, &name)?;
+                    self.children.push((child, directory(&self.dir, &name)?));
+                    self.children.len() - 1
+                };
+            (Some(index), name)
         } else {
-            &self.dir
+            (None, path)
         };
-        let name = CString::new(if in_src {
-            path.split_once('/').unwrap().1
-        } else {
-            path
-        })
-        .unwrap();
+        let parent = child.map_or(&self.dir, |index| &self.children[index].1);
+        let name = CString::new(name).unwrap();
         let file = open_at(
             parent,
             &name,
@@ -236,25 +239,23 @@ impl Temp {
             0o600,
         )?;
         // Retain the FD before write, so partial writes also have an owned identity.
-        self.files.push(OwnedFile { name, file, in_src });
+        self.files.push(OwnedFile { name, file, child });
         let file = &mut self.files.last_mut().unwrap().file;
         file.write_all(data.as_bytes())?;
         file.sync_all()
     }
 
     fn verify_contents(&self) -> io::Result<()> {
-        if let Some(src) = &self.src {
-            let actual = directory(&self.dir, &cstr(self.child.as_ref())?)?;
-            if !same(&actual.metadata()?, &src.metadata()?) {
-                return Err(io::Error::other("temporary src identity changed"));
+        for (name, child) in &self.children {
+            let actual = directory(&self.dir, &cstr(name.as_ref())?)?;
+            if !same(&actual.metadata()?, &child.metadata()?) {
+                return Err(io::Error::other("temporary child identity changed"));
             }
         }
         for entry in &self.files {
-            let parent = if entry.in_src {
-                self.src.as_ref().unwrap()
-            } else {
-                &self.dir
-            };
+            let parent = entry
+                .child
+                .map_or(&self.dir, |index| &self.children[index].1);
             let actual = open_at(parent, &entry.name, libc::O_PATH, 0)?;
             if !same(&actual.metadata()?, &entry.file.metadata()?) {
                 return Err(io::Error::other("temporary file identity changed"));
@@ -269,19 +270,17 @@ impl Temp {
         self.verify(parent)?;
         self.verify_contents()?;
         for entry in &self.files {
-            let parent = if entry.in_src {
-                self.src.as_ref().unwrap()
-            } else {
-                &self.dir
-            };
+            let parent = entry
+                .child
+                .map_or(&self.dir, |index| &self.children[index].1);
             let actual = open_at(parent, &entry.name, libc::O_PATH, 0)?;
             if !same(&actual.metadata()?, &entry.file.metadata()?) {
                 return Err(io::Error::other("cleanup identity uncertain"));
             }
             unlink(parent, &entry.name, false)?;
         }
-        if self.src.is_some() {
-            unlink(&self.dir, &cstr(self.child.as_ref())?, true)?;
+        for (name, _) in &self.children {
+            unlink(&self.dir, &cstr(name.as_ref())?, true)?;
         }
         self.verify(parent)?;
         unlink(parent.fd(), &self.name, true)
@@ -307,7 +306,7 @@ fn create_inner(
     files: &[(&str, String)],
     mut hook: impl FnMut(Step, &Path) -> io::Result<()>,
 ) -> Result<(), String> {
-    let child = super::super::generated_subdirectory(files)?;
+    super::super::generated_subdirectories(files)?;
     if name.is_empty() || matches!(name, "." | "..") || name.contains(['/', '\\', '\0']) {
         return Err("invalid destination component".into());
     }
@@ -324,7 +323,7 @@ fn create_inner(
         Err(e) if e.raw_os_error() == Some(libc::ENOENT) => (),
         Err(_) => return Err("destination cannot be safely inspected".into()),
     }
-    let mut temp = Temp::make(&parent, child).map_err(|e| {
+    let mut temp = Temp::make(&parent).map_err(|e| {
         format!(
             "cannot establish owned temporary directory (OS code {:?}); inspect parent",
             e.raw_os_error()
@@ -418,6 +417,124 @@ mod tests {
         let root = tempfile::tempdir().expect("create temporary test directory");
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
         root
+    }
+
+    fn frontend_files() -> Vec<(&'static str, String)> {
+        vec![
+            ("Cargo.toml", "owned manifest".into()),
+            ("src/main.rs", "owned source".into()),
+            ("frontend/package.json", "owned frontend".into()),
+            ("frontend/.env.example", "VITE_PUBLIC_VALUE=example".into()),
+        ]
+    }
+
+    #[test]
+    fn frontend_and_src_publish_together_without_replacement_or_partial_trees() {
+        let root = private_root();
+        let entries = frontend_files();
+        create(root.path(), "app", &entries).unwrap();
+        for (path, bytes) in &entries {
+            assert_eq!(
+                fs::read(root.path().join("app").join(path)).unwrap(),
+                bytes.as_bytes()
+            );
+        }
+        assert!(create(root.path(), "app", &entries).is_err());
+        for failure in [
+            Step::FileWritten(1),
+            Step::FileWritten(2),
+            Step::FileWritten(3),
+            Step::BeforePublish,
+        ] {
+            assert!(
+                create_inner(root.path(), "rollback", &entries, |step, _| {
+                    if step == failure {
+                        Err(io::Error::other("injected failure"))
+                    } else {
+                        Ok(())
+                    }
+                })
+                .unwrap_err()
+                .contains("cleaned")
+            );
+            assert_eq!(fs::read_dir(root.path()).unwrap().count(), 1);
+        }
+        assert!(
+            create_inner(root.path(), "race", &entries, |step, _| {
+                if step == Step::ParentChecked {
+                    symlink("private-target", root.path().join("race"))?;
+                }
+                Ok(())
+            })
+            .unwrap_err()
+            .contains("destination appeared")
+        );
+        assert_eq!(
+            fs::read_link(root.path().join("race")).unwrap(),
+            Path::new("private-target")
+        );
+        assert_eq!(fs::read_dir(root.path()).unwrap().count(), 2);
+        for path in [
+            "frontend/../escape",
+            "frontend/nested/app.ts",
+            "frontend/unlisted",
+            "other/package.json",
+        ] {
+            assert!(create(root.path(), "bad", &[(path, "bad".into())]).is_err());
+            assert!(!root.path().join("bad").exists());
+        }
+        for files in [
+            vec![
+                ("src/main.rs", "".into()),
+                ("cargo-overlay/Cargo.toml", "".into()),
+            ],
+            vec![
+                ("frontend/package.json", "".into()),
+                ("cargo-overlay/Cargo.toml", "".into()),
+            ],
+        ] {
+            assert!(create(root.path(), "mixed", &files).is_err());
+        }
+    }
+
+    #[test]
+    fn substituted_frontend_child_is_retained_without_following_links() {
+        let root = private_root();
+        let target = root.path().join("foreign");
+        fs::create_dir(&target).unwrap();
+        fs::write(target.join("package.json"), "private").unwrap();
+        let error = create_inner(root.path(), "app", &frontend_files(), |step, temp| {
+            if step == Step::BeforePublish {
+                fs::rename(temp.join("frontend"), temp.join("saved-frontend"))?;
+                symlink(&target, temp.join("frontend"))?;
+            }
+            Ok(())
+        })
+        .unwrap_err();
+        assert!(error.contains("cleanup identity uncertain"));
+        assert!(!root.path().join("app").exists());
+        assert_eq!(fs::read(target.join("package.json")).unwrap(), b"private");
+        let temp = fs::read_dir(root.path())
+            .unwrap()
+            .map(|entry| entry.unwrap().path())
+            .find(|path| {
+                path.file_name()
+                    .unwrap()
+                    .to_string_lossy()
+                    .starts_with(".yetlet-new-")
+            })
+            .unwrap();
+        assert!(
+            fs::symlink_metadata(temp.join("frontend"))
+                .unwrap()
+                .file_type()
+                .is_symlink()
+        );
+        assert_eq!(
+            fs::read(temp.join("saved-frontend/package.json")).unwrap(),
+            b"owned frontend"
+        );
+        assert_eq!(fs::read(temp.join("src/main.rs")).unwrap(), b"owned source");
     }
 
     #[test]

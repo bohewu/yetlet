@@ -176,38 +176,44 @@ fn private_cargo(app: &Path) {
     );
     let parent = directory(&private);
     assert_owner_only(&parent, owner);
-    let destination = private.join("cargo.exe");
-    let path: Vec<_> = destination.as_os_str().encode_wide().chain([0]).collect();
-    // SAFETY: create-new file with explicit owner/DACL and non-inherited handle.
-    let raw = unsafe {
-        CreateFileW(
-            path.as_ptr(),
-            GENERIC_WRITE | READ_CONTROL,
-            FILE_SHARE_READ,
-            &attributes,
-            CREATE_NEW,
-            FILE_ATTRIBUTE_NORMAL,
-            null_mut(),
-        )
-    };
-    assert_ne!(
-        raw,
-        INVALID_HANDLE_VALUE,
-        "private Cargo file creation failed: {}",
-        io::Error::last_os_error()
-    );
-    // SAFETY: successful CreateFileW transfers the owned handle.
-    let mut destination = unsafe { fs::File::from_raw_handle(raw) };
-    assert_owner_only(&destination, owner);
     let cargo = std::env::split_paths(&std::env::var_os("PATH").unwrap_or_default())
         .filter(|directory| directory.is_absolute())
         .map(|directory| directory.join("cargo.exe"))
         .find(|candidate| candidate.is_file())
         .expect("native cargo proxy should be in absolute PATH");
-    let mut source = fs::File::open(cargo).unwrap();
-    let bytes = io::copy(&mut source, &mut destination).unwrap();
-    assert_eq!(bytes, source.metadata().unwrap().len());
-    assert_owner_only(&destination, owner);
+    let mut tools = vec![("cargo.exe", cargo)];
+    if let Some(watcher) = std::env::var_os("YETLET_TEST_WATCHEXEC") {
+        tools.push(("watchexec.exe", PathBuf::from(watcher)));
+    }
+    for (name, source_path) in tools {
+        let destination = private.join(name);
+        let path: Vec<_> = destination.as_os_str().encode_wide().chain([0]).collect();
+        // SAFETY: create-new file with explicit owner/DACL and non-inherited handle.
+        let raw = unsafe {
+            CreateFileW(
+                path.as_ptr(),
+                GENERIC_WRITE | READ_CONTROL,
+                FILE_SHARE_READ,
+                &attributes,
+                CREATE_NEW,
+                FILE_ATTRIBUTE_NORMAL,
+                null_mut(),
+            )
+        };
+        assert_ne!(
+            raw,
+            INVALID_HANDLE_VALUE,
+            "private Cargo file creation failed: {}",
+            io::Error::last_os_error()
+        );
+        // SAFETY: successful CreateFileW transfers the owned handle.
+        let mut destination = unsafe { fs::File::from_raw_handle(raw) };
+        assert_owner_only(&destination, owner);
+        let mut source = fs::File::open(source_path).unwrap();
+        let bytes = io::copy(&mut source, &mut destination).unwrap();
+        assert_eq!(bytes, source.metadata().unwrap().len());
+        assert_owner_only(&destination, owner);
+    }
     // All writer handles close before executable validation and CreateProcess.
 }
 
@@ -355,6 +361,66 @@ fn native_cli_build_debug_release_and_lock_cache_errors_are_frozen() {
 }
 
 #[test]
+fn untrusted_cargo_reports_executable_stage_before_spawn_and_trusted_copy_builds() {
+    let root = tempfile::tempdir().unwrap();
+    let app = fixture(root.path());
+    let manifest = app.join("Cargo.toml");
+    fs::write(
+        app.join("Cargo.lock"),
+        "version=4\n[[package]]\nname='yt088c_fixture'\nversion='0.1.0'\n",
+    )
+    .unwrap();
+    let unsafe_tools = app.join("untrusted-tools");
+    fs::create_dir(&unsafe_tools).unwrap();
+    let cargo = unsafe_tools.join("cargo.exe");
+    fs::copy(app.join(".yt088c-private-cargo/cargo.exe"), &cargo).unwrap();
+    let sddl: Vec<_> = "D:P(A;;FA;;;WD)".encode_utf16().chain([0]).collect();
+    let mut descriptor = null_mut();
+    // SAFETY: set only this disposable executable's DACL, preserving its owner.
+    unsafe {
+        assert_ne!(
+            ConvertStringSecurityDescriptorToSecurityDescriptorW(
+                sddl.as_ptr(),
+                SDDL_REVISION_1,
+                &mut descriptor,
+                null_mut()
+            ),
+            0
+        );
+    }
+    let descriptor = Local(descriptor);
+    let path: Vec<_> = cargo.as_os_str().encode_wide().chain([0]).collect();
+    assert_ne!(
+        unsafe {
+            windows_sys::Win32::Security::SetFileSecurityW(
+                path.as_ptr(),
+                DACL_SECURITY_INFORMATION,
+                descriptor.0,
+            )
+        },
+        0
+    );
+    let output = code(
+        cli(&manifest).env("PATH", &unsafe_tools).output().unwrap(),
+        125,
+    );
+    let error = String::from_utf8_lossy(&output.stderr);
+    assert!(error.contains("CLI_PROCESS stage=executable:"), "{error}");
+    assert!(
+        error.contains("kind=Other, native_os_error=None"),
+        "{error}"
+    );
+    assert!(error.contains("no untrusted write access"), "{error}");
+    assert!(!error.contains(cargo.to_string_lossy().as_ref()));
+    assert!(
+        !app.join("target").exists(),
+        "untrusted Cargo must not start"
+    );
+    code(cli(&manifest).output().unwrap(), 0);
+    assert!(app.join("target/debug/yt088c_fixture.exe").is_file());
+}
+
+#[test]
 fn preflight_and_executable_selection_never_launch_app_local_cargo() {
     let root = tempfile::tempdir().unwrap();
     let app = fixture(root.path());
@@ -401,7 +467,7 @@ fn preflight_and_executable_selection_never_launch_app_local_cargo() {
 fn dev_cli(manifest: &Path) -> Command {
     let build = cli(manifest);
     let mut dev = Command::new(build.get_program());
-    dev.args(["dev", "--manifest-path"]).arg(manifest);
+    dev.args(["run", "--manifest-path"]).arg(manifest);
     dev.envs(build.get_envs().map(|(key, value)| (key, value.unwrap())));
     dev
 }
@@ -529,6 +595,12 @@ fn console_fixture(case: &str) {
         fs::read_to_string(root.path().join("console.stdout")).unwrap(),
         fs::read_to_string(root.path().join("console.stderr")).unwrap()
     );
+    if case.starts_with("vite-") {
+        print!(
+            "{}",
+            fs::read_to_string(root.path().join("console.stdout")).unwrap()
+        );
+    }
 }
 
 #[test]
@@ -538,6 +610,47 @@ fn native_cli_dev_real_cargo_exit_lock_and_offline_policy() {
 #[test]
 fn native_cli_dev_console_ctrl_c_break_resistant_tree_and_isolation() {
     for case in ["ctrl-c", "ctrl-break"] {
+        console_fixture(case);
+    }
+}
+
+// Explicit native qualification: uses already installed tools, never installs.
+#[test]
+#[ignore = "requires installed Vite via YETLET_TEST_VITE_JS and a native Windows console"]
+fn native_cli_vite_pair() {
+    let vite =
+        PathBuf::from(std::env::var_os("YETLET_TEST_VITE_JS").expect("set YETLET_TEST_VITE_JS"));
+    assert!(
+        vite.is_absolute() && vite.is_file(),
+        "absolute existing Vite CLI required"
+    );
+    for case in [
+        "vite-ctrl-c",
+        "vite-ctrl-break",
+        "vite-frontend-exit",
+        "vite-rust-exit",
+        "vite-collision",
+        "vite-disabled",
+    ] {
+        console_fixture(case);
+    }
+}
+
+#[test]
+#[ignore = "requires YETLET_TEST_VITE_JS, YETLET_TEST_WATCHEXEC and a native Windows console"]
+fn native_cli_rust_watch() {
+    for key in ["YETLET_TEST_VITE_JS", "YETLET_TEST_WATCHEXEC"] {
+        let path = PathBuf::from(std::env::var_os(key).expect(key));
+        assert!(
+            path.is_absolute() && path.is_file(),
+            "absolute installed tool required: {key}"
+        );
+    }
+    for case in [
+        "vite-watch-ctrl-c",
+        "vite-watch-ctrl-break",
+        "vite-watch-frontend-exit",
+    ] {
         console_fixture(case);
     }
 }
@@ -733,6 +846,284 @@ fn dev_cancel(app: &Path, case: &str) {
     sentinel.wait().unwrap();
 }
 
+fn dev_vite_pair(app: &Path, case: &str) {
+    use std::io::{Read, Write};
+    let vite = PathBuf::from(std::env::var_os("YETLET_TEST_VITE_JS").unwrap());
+    assert!(vite.is_absolute() && vite.is_file());
+    let frontend = app.join("frontend");
+    fs::create_dir_all(frontend.join("dist/.vite")).unwrap();
+    fs::write(frontend.join("dist/.vite/manifest.json"), "{}").unwrap();
+    let script = format!(
+        "node \"{}\" --host 127.0.0.1 --port 5173",
+        vite.to_str().unwrap().replace('\\', "/")
+    );
+    fs::write(
+        frontend.join("package.json"),
+        serde_json::json!({"private": true, "scripts": {"dev": script}}).to_string(),
+    )
+    .unwrap();
+    fs::write(frontend.join("vite.config.mjs"), r#"
+const fs = process.getBuiltinModule('fs');
+export default { plugins: [{ name: 'native-pair-fixture', configureServer() {
+  fs.writeFileSync('frontend.trace', JSON.stringify({pid: process.pid,
+    secret: Object.keys(process.env).some(k => k.toUpperCase().startsWith('APP_') || ['YETLET_DEV_SECRETS','YETLET_CONFIG_ROOT'].includes(k.toUpperCase())),
+    public: process.env.VITE_PAIR_PUBLIC, projectRoot: process.env.YETLET_PROJECT_ROOT}));
+  setInterval(() => { if (fs.existsSync('frontend.exit')) process.exit(23); }, 10);
+}}] };
+"#).unwrap();
+    let auto_start = case != "vite-disabled";
+    fs::write(app.join("base.toml"), format!("[cli.vite]\nenabled=true\nroot='frontend/'\nauto_start={auto_start}\nauto_build=false\n[cli.generate.k8s]\nreplicas=1\n")).unwrap();
+    if case.starts_with("vite-watch-") {
+        use std::io::Write;
+        writeln!(
+            fs::OpenOptions::new()
+                .append(true)
+                .open(app.join("base.toml"))
+                .unwrap(),
+            "[cli.rust]\nwatch=true"
+        )
+        .unwrap();
+    }
+    fs::write(app.join("production.toml"), "").unwrap();
+    let source = DEV_APP.replace(
+        "fn main() {",
+        "fn main() { assert_eq!(std::env::var(\"APP_PAIR_PRIVATE\").unwrap(), \"synthetic-backend-marker\"); std::fs::write(\"backend.marker\", \"retained\").unwrap();",
+    ).replace(
+        "loop {\n        if EVENT",
+        "loop {\n        if depth == 0 && std::path::Path::new(\"rust.exit\").is_file() { std::process::exit(23); }\n        if EVENT",
+    );
+    fs::write(app.join("src/main.rs"), &source).unwrap();
+    fs::write(
+        app.join("Cargo.lock"),
+        "version=4\n[[package]]\nname='yt088c_fixture'\nversion='0.1.0'\n",
+    )
+    .unwrap();
+    let lock = fs::read(app.join("Cargo.lock")).unwrap();
+    let mut command = dev_cli(&app.join("Cargo.toml"));
+    for (key, _) in std::env::vars_os() {
+        let upper = key.to_string_lossy().to_ascii_uppercase();
+        if upper.starts_with("APP_") || upper == "YETLET_CONFIG_ROOT" {
+            command.env_remove(key);
+        }
+    }
+    command
+        .env("APP_ENVIRONMENT", "Production")
+        .env("APP_PAIR_PRIVATE", "synthetic-backend-marker")
+        .env("YETLET_DEV_SECRETS", "synthetic-private-selector")
+        .env("YETLET_CONFIG_ROOT", app)
+        .env("VITE_PAIR_PUBLIC", "synthetic-public-marker")
+        .env(
+            "YT088D_BEHAVIOR",
+            if auto_start { "resist" } else { "exit" },
+        );
+    if matches!(case, "vite-collision" | "vite-disabled") {
+        let listener = std::net::TcpListener::bind((std::net::Ipv4Addr::LOCALHOST, 5173)).unwrap();
+        let output = code(command.output().unwrap(), if auto_start { 125 } else { 23 });
+        assert!(
+            !frontend.join("frontend.trace").exists(),
+            "frontend started despite policy/preflight"
+        );
+        assert_eq!(app.join("backend.marker").exists(), !auto_start);
+        assert_eq!(fs::read(app.join("Cargo.lock")).unwrap(), lock);
+        println!(
+            "{}",
+            serde_json::json!({"case":case,"exit":output.status.code(),"frontend_started":false,"rust_started":!auto_start,"lock_preserved":true,"pids_clean":[]})
+        );
+        drop(listener);
+        return;
+    }
+    let sentinel_root = app.join("sentinel");
+    fs::create_dir(&sentinel_root).unwrap();
+    let mut sentinel = Command::new(std::env::current_exe().unwrap())
+        .args(["--exact", "native_dev_console_fixture", "--nocapture"])
+        .env("YT088D_CASE", "sentinel")
+        .env("YT088D_ROOT", &sentinel_root)
+        .creation_flags(CREATE_NEW_PROCESS_GROUP)
+        .spawn()
+        .unwrap();
+    wait_marker(&sentinel_root.join("ready"));
+    if matches!(case, "vite-ctrl-break" | "vite-watch-ctrl-break") {
+        command.creation_flags(CREATE_NEW_PROCESS_GROUP);
+    }
+    if case.starts_with("vite-watch-") {
+        command.stderr(fs::File::create(app.join("watch.stderr")).unwrap());
+    }
+    let mut child = command.spawn().unwrap();
+    wait_marker(&frontend.join("frontend.trace"));
+    let trace: serde_json::Value =
+        serde_json::from_slice(&fs::read(frontend.join("frontend.trace")).unwrap()).unwrap();
+    assert_eq!(trace["secret"], false);
+    assert_eq!(trace["public"], "synthetic-public-marker");
+    assert_eq!(trace["projectRoot"], app.to_str().unwrap());
+    let deadline = Instant::now() + Duration::from_secs(10);
+    loop {
+        let response = (|| -> io::Result<String> {
+            let mut stream = std::net::TcpStream::connect_timeout(
+                &"127.0.0.1:5173".parse().unwrap(),
+                Duration::from_millis(100),
+            )?;
+            stream.set_read_timeout(Some(Duration::from_secs(1)))?;
+            stream.write_all(
+                b"GET /@vite/client HTTP/1.1\r\nHost: 127.0.0.1:5173\r\nConnection: close\r\n\r\n",
+            )?;
+            let mut response = String::new();
+            stream.read_to_string(&mut response)?;
+            Ok(response)
+        })();
+        if response.is_ok_and(|response| {
+            response.starts_with("HTTP/1.1 200") && response.contains("createHotContext")
+        }) {
+            break;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "real Vite /@vite/client did not become ready"
+        );
+        std::thread::sleep(Duration::from_millis(10));
+    }
+    let mut pids = vec![trace["pid"].as_u64().unwrap() as u32];
+    for depth in 0..3 {
+        let marker = app.join(format!("pid-{depth}"));
+        wait_marker(&marker);
+        pids.push(fs::read_to_string(marker).unwrap().parse::<u32>().unwrap());
+    }
+    let mut owned: Vec<_> = pids
+        .iter()
+        .map(|&pid| {
+            let raw = unsafe {
+                OpenProcess(
+                    PROCESS_SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION,
+                    0,
+                    pid,
+                )
+            };
+            assert!(!raw.is_null(), "cannot pin pair process {pid}");
+            unsafe { OwnedHandle::from_raw_handle(raw) }
+        })
+        .collect();
+    assert!(app.join("backend.marker").is_file());
+    if case.starts_with("vite-watch-") {
+        // Exercise the actual watcher and a real compile failure. Generation
+        // marker files are outside watched roots, so assertions cannot restart it.
+        for (revision, valid) in [("edited", true), ("broken", false), ("recovered", true)] {
+            for depth in 0..3 {
+                let marker = app.join(format!("pid-{depth}"));
+                if marker.exists() {
+                    fs::remove_file(marker).unwrap();
+                }
+            }
+            let changed = if valid {
+                format!("{source}\n// {revision}\n")
+            } else {
+                "fn main() { deliberate invalid Rust }".into()
+            };
+            fs::write(app.join("src/main.rs"), changed).unwrap();
+            let deadline = Instant::now() + Duration::from_secs(20);
+            for process in owned.iter().skip(1) {
+                while unsafe { WaitForSingleObject(process.as_raw_handle(), 0) } != WAIT_OBJECT_0 {
+                    assert!(
+                        Instant::now() < deadline,
+                        "previous Rust generation survived"
+                    );
+                    std::thread::sleep(Duration::from_millis(10));
+                }
+            }
+            if valid {
+                for depth in 0..3 {
+                    let marker = app.join(format!("pid-{depth}"));
+                    wait_marker(&marker);
+                    let pid = fs::read_to_string(marker).unwrap().parse::<u32>().unwrap();
+                    let raw = unsafe {
+                        OpenProcess(
+                            PROCESS_SYNCHRONIZE | PROCESS_QUERY_LIMITED_INFORMATION,
+                            0,
+                            pid,
+                        )
+                    };
+                    assert!(!raw.is_null(), "replacement Rust process missing");
+                    owned.push(unsafe { OwnedHandle::from_raw_handle(raw) });
+                    pids.push(pid);
+                }
+            } else {
+                // Cargo's error must complete before restoring source. The CLI
+                // logs its native exit while the same session keeps watching.
+                let log = app.join("watch.stderr");
+                let deadline = Instant::now() + Duration::from_secs(20);
+                while !fs::read_to_string(&log)
+                    .unwrap()
+                    .contains("waiting for source changes")
+                {
+                    assert!(Instant::now() < deadline, "compile failure not observed");
+                    std::thread::sleep(Duration::from_millis(10));
+                }
+                assert!(!app.join("pid-0").exists());
+            }
+            assert!(child.try_wait().unwrap().is_none(), "watch session exited");
+            assert_ne!(
+                unsafe { WaitForSingleObject(owned[0].as_raw_handle(), 0) },
+                WAIT_OBJECT_0,
+                "Vite restarted/exited"
+            );
+            assert!(std::net::TcpStream::connect((std::net::Ipv4Addr::LOCALHOST, 5173)).is_ok());
+            let current: serde_json::Value =
+                serde_json::from_slice(&fs::read(frontend.join("frontend.trace")).unwrap())
+                    .unwrap();
+            assert_eq!(current["pid"], trace["pid"], "Vite identity changed");
+        }
+    }
+    let start = Instant::now();
+    match case {
+        "vite-ctrl-c" | "vite-watch-ctrl-c" => {
+            assert_ne!(unsafe { GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0) }, 0)
+        }
+        "vite-ctrl-break" | "vite-watch-ctrl-break" => assert_ne!(
+            unsafe { GenerateConsoleCtrlEvent(CTRL_BREAK_EVENT, child.id()) },
+            0
+        ),
+        "vite-frontend-exit" | "vite-watch-frontend-exit" => {
+            fs::write(frontend.join("frontend.exit"), "exit").unwrap()
+        }
+        "vite-rust-exit" => fs::write(app.join("rust.exit"), "exit").unwrap(),
+        _ => unreachable!(),
+    }
+    let status = wait_child(&mut child);
+    let expected = if case.contains("ctrl-") {
+        0xc000013a
+    } else {
+        23
+    };
+    assert_eq!(status.code().unwrap() as u32, expected);
+    assert!(
+        start.elapsed() < Duration::from_secs(12),
+        "pair cleanup exceeded bounds"
+    );
+    for process in &owned {
+        assert_eq!(
+            unsafe { WaitForSingleObject(process.as_raw_handle(), 0) },
+            WAIT_OBJECT_0,
+            "owned pair process survived"
+        );
+    }
+    let listener = std::net::TcpListener::bind((std::net::Ipv4Addr::LOCALHOST, 5173))
+        .expect("Vite listener survived");
+    assert!(
+        sentinel.try_wait().unwrap().is_none(),
+        "unrelated group terminated"
+    );
+    assert!(
+        !sentinel_root.join("event").exists(),
+        "unrelated group received forwarded event"
+    );
+    assert_eq!(fs::read(app.join("Cargo.lock")).unwrap(), lock);
+    sentinel.kill().unwrap();
+    sentinel.wait().unwrap();
+    println!(
+        "{}",
+        serde_json::json!({"case":case,"exit":status.code(),"vite_http":true,"frontend_environment_filtered":true,"backend_marker_retained":true,"pids_clean":pids,"port_released":true,"sentinel_isolated":true,"lock_preserved":true})
+    );
+    drop(listener);
+}
+
 #[test]
 fn native_dev_console_fixture() {
     let Ok(case) = std::env::var("YT088D_CASE") else {
@@ -766,6 +1157,7 @@ fn native_dev_console_fixture() {
     match case.as_str() {
         "frozen" => dev_frozen(&app),
         "ctrl-c" | "ctrl-break" => dev_cancel(&app, &case),
+        case if case.starts_with("vite-") => dev_vite_pair(&app, case),
         _ => panic!("unknown console fixture"),
     }
     assert_ne!(

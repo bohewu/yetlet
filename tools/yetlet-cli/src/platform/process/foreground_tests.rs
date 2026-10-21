@@ -43,6 +43,45 @@ fn owned_fixture() {
         return;
     };
     let root = std::path::PathBuf::from(std::env::var_os("YT087B_ROOT").unwrap());
+    if mode == "watch-supervise" {
+        let mut rust = Command::new("sh");
+        rust.current_dir(&root).args([
+            "-c",
+            r#"
+n=1
+if test -f generation; then n=$(($(cat generation) + 1)); fi
+echo $$ >> rust.pids
+echo "$n" > generation
+if test "$n" = 1; then exit 23; fi
+sleep 60 &
+echo $! >> rust.pids
+wait
+"#,
+        ]);
+        let mut watcher = Command::new("sh");
+        watcher.current_dir(&root).args(["-c", r#"
+echo $$ > watcher.pid
+while :; do
+  if test -f watcher-exit; then exit 31; fi
+  if test -f change; then
+    rm change
+    printf '%s\n' '{"tags":[{"kind":"path","absolute":"/test/src/main.rs","filetype":"file"}],"metadata":{}}'
+  fi
+  sleep 0.02
+done
+"#]);
+        let mut front = fixture("watch-frontend", &root);
+        let result = run_watch(&mut rust, &mut watcher, Some(&mut front)).unwrap();
+        fs::write(root.join("watch-cleaned"), "done").unwrap();
+        result.finish();
+    }
+    if mode == "watch-frontend" {
+        let _listener = std::net::TcpListener::bind(("127.0.0.1", 5173)).unwrap();
+        fs::write(root.join("frontend.pid"), std::process::id().to_string()).unwrap();
+        loop {
+            thread::sleep(POLL);
+        }
+    }
     if mode == "tty-supervise-resistant" {
         let original = unsafe { libc::tcgetpgrp(libc::STDIN_FILENO) };
         assert_eq!(original, unsafe { libc::getpgrp() });
@@ -120,6 +159,79 @@ fn owned_fixture() {
             }
         }
         _ => panic!("unknown fixture mode"),
+    }
+}
+
+fn generation(root: &Path, expected: u32) {
+    let deadline = Instant::now() + Duration::from_secs(5);
+    loop {
+        if fs::read_to_string(root.join("generation"))
+            .ok()
+            .and_then(|value| value.trim().parse::<u32>().ok())
+            == Some(expected)
+        {
+            return;
+        }
+        assert!(
+            Instant::now() < deadline,
+            "Rust generation {expected} did not start"
+        );
+        thread::sleep(POLL);
+    }
+}
+
+fn watch_absent(root: &Path) {
+    for file in ["rust.pids", "frontend.pid", "watcher.pid"] {
+        for pid in fs::read_to_string(root.join(file))
+            .unwrap()
+            .split_whitespace()
+        {
+            let pid = pid.parse::<i32>().unwrap();
+            assert_eq!(
+                unsafe { libc::kill(pid, 0) },
+                -1,
+                "owned PID {pid} survived"
+            );
+            assert_eq!(io::Error::last_os_error().raw_os_error(), Some(libc::ESRCH));
+        }
+    }
+    assert!(root.join("watch-cleaned").exists());
+}
+
+#[test]
+fn watch_recovers_restarts_rust_and_cleans_all_groups() {
+    use std::os::unix::process::ExitStatusExt;
+    // Keep fixed-port sessions sequential inside this single subprocess test.
+    for watcher_exit in [false, true] {
+        let root = tempfile::tempdir().unwrap();
+        let mut supervisor = Probe::start("watch-supervise", root.path());
+        ready(&root.path().join("frontend.pid"));
+        ready(&root.path().join("watcher.pid"));
+        generation(root.path(), 1);
+        // The first compiler fixture exits 23; the session remains usable.
+        thread::sleep(Duration::from_millis(650));
+        assert!(supervisor.0.try_wait().unwrap().is_none());
+        let front = fs::read_to_string(root.path().join("frontend.pid")).unwrap();
+        for next in [2, 3] {
+            fs::write(root.path().join("change"), "change").unwrap();
+            generation(root.path(), next);
+            assert_eq!(
+                fs::read_to_string(root.path().join("frontend.pid")).unwrap(),
+                front
+            );
+            assert_eq!(unsafe { libc::kill(front.trim().parse().unwrap(), 0) }, 0);
+        }
+        if watcher_exit {
+            fs::write(root.path().join("watcher-exit"), "exit").unwrap();
+            assert_eq!(supervisor.wait().code(), Some(31));
+        } else {
+            assert_eq!(
+                unsafe { libc::kill(supervisor.0.id() as i32, libc::SIGINT) },
+                0
+            );
+            assert_eq!(supervisor.wait().signal(), Some(libc::SIGINT));
+        }
+        watch_absent(root.path());
     }
 }
 

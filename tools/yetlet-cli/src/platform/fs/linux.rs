@@ -1,4 +1,6 @@
-//! Existing Linux filesystem guarantees, selected only at compile time.
+#[path = "key_linux.rs"]
+pub(crate) mod key;
+// Existing Linux filesystem guarantees, selected only at compile time.
 #[path = "safe_dir.rs"]
 mod safe_dir;
 pub(crate) use safe_dir::create as create_project;
@@ -56,31 +58,8 @@ impl AppFiles {
             .parent()
             .ok_or("manifest has no parent")?
             .to_owned();
-        let parent = Anchor::open(&cwd)
-            .map_err(|_| "app cwd is missing or unsafe (symlinks are forbidden)")?;
-        let directory = parent
-            .working_directory()
-            .map_err(|_| "cannot pin app cwd")?;
-        if !trusted(&directory.metadata().map_err(|_| "cannot inspect app cwd")?) {
-            return Err(
-                "app cwd must be owned by the current user and not group/world-writable".into(),
-            );
-        }
-        // Cargo's explicit offline lock step honors the user's umask. A 0664
-        // lock inside an owned 0700 app is inaccessible to other principals.
-        let private_cwd = directory
-            .metadata()
-            .map_err(|_| "cannot inspect app cwd")?
-            .mode()
-            & 0o077
-            == 0;
         Ok(Self {
-            app: App {
-                directory,
-                cwd,
-                parent,
-                private_cwd,
-            },
+            app: open_directory(&cwd)?,
         })
     }
 
@@ -97,16 +76,55 @@ impl AppFiles {
     }
 }
 
-fn selected_directory(app: &App, child: bool) -> Result<Anchor, String> {
+pub(crate) fn app_root(app: &App) -> &Path {
+    &app.cwd
+}
+
+pub(super) fn verify_app(app: &App) -> Result<(), String> {
+    app.parent
+        .verify()
+        .map_err(|_| "app cwd identity changed".into())
+}
+
+pub(crate) fn open_directory(path: &Path) -> Result<App, String> {
+    if !path.is_absolute() {
+        return Err("protected directory path must be absolute".into());
+    }
+    let cwd = framework::absolute(path)
+        .map_err(|_| "directory path must be nonempty and contain no '..'")?;
+    let parent =
+        Anchor::open(&cwd).map_err(|_| "app cwd is missing or unsafe (symlinks are forbidden)")?;
+    let directory = parent
+        .working_directory()
+        .map_err(|_| "cannot pin app cwd")?;
+    if !trusted(&directory.metadata().map_err(|_| "cannot inspect app cwd")?) {
+        return Err(
+            "app cwd must be owned by the current user and not group/world-writable".into(),
+        );
+    }
+    // Cargo's explicit offline lock step honors the user's umask. A 0664
+    // lock inside an owned 0700 app is inaccessible to other principals.
+    let private_cwd = directory
+        .metadata()
+        .map_err(|_| "cannot inspect app cwd")?
+        .mode()
+        & 0o077
+        == 0;
+    Ok(App {
+        directory,
+        cwd,
+        parent,
+        private_cwd,
+    })
+}
+
+fn selected_directory(app: &App, relative: &str) -> Result<Anchor, String> {
     app.parent
         .verify()
         .map_err(|_| "app cwd identity changed")?;
-    let anchor = Anchor::open(&if child {
-        app.cwd.join("src")
-    } else {
-        app.cwd.clone()
-    })
-    .map_err(|_| "app directory is unavailable or unsafe")?;
+    super::app_directory(relative)?;
+    let anchor = Anchor::open(&app.cwd.join(relative))
+        .map_err(|_| "app directory is unavailable or unsafe")?;
     let dir = anchor
         .working_directory()
         .map_err(|_| "cannot inspect app directory")?;
@@ -117,8 +135,12 @@ fn selected_directory(app: &App, child: bool) -> Result<Anchor, String> {
 }
 
 pub(crate) fn app_entries(app: &App, child: bool) -> Result<Vec<String>, String> {
+    app_directory_entries(app, if child { "src" } else { "" })
+}
+
+pub(crate) fn app_directory_entries(app: &App, relative: &str) -> Result<Vec<String>, String> {
     use std::os::fd::AsRawFd;
-    let anchor = selected_directory(app, child)?;
+    let anchor = selected_directory(app, relative)?;
     let dir = anchor
         .working_directory()
         .map_err(|_| "cannot pin app directory")?;
@@ -126,6 +148,9 @@ pub(crate) fn app_entries(app: &App, child: bool) -> Result<Vec<String>, String>
         .map_err(|_| "cannot enumerate pinned app directory")?;
     let mut names = Vec::new();
     for entry in entries {
+        if names.len() >= 256 {
+            return Err("app directory exceeds entry limit".into());
+        }
         names.push(
             entry
                 .map_err(|_| "cannot enumerate app")?
@@ -145,13 +170,71 @@ pub(crate) fn app_entries(app: &App, child: bool) -> Result<Vec<String>, String>
 }
 
 pub(crate) fn read_app_file(app: &App, name: &str) -> Result<Vec<u8>, String> {
+    read_app_input(app, name).map(|(bytes, _)| bytes)
+}
+
+pub(super) fn read_frontend_manifest(app: &App) -> Result<Vec<u8>, String> {
+    read_frontend_output(app, true)
+}
+
+pub(super) fn read_frontend_index(app: &App) -> Result<Vec<u8>, String> {
+    read_frontend_output(app, false)
+}
+
+fn read_frontend_output(app: &App, manifest: bool) -> Result<Vec<u8>, String> {
     use std::io::Read;
-    let (child, name) = match name {
-        "src/main.rs" => (true, "main.rs"),
-        "Cargo.toml" | "Cargo.lock" => (false, name),
-        _ => return Err("unsupported app input".into()),
+    verify_app(app)?;
+    let mut selected = None;
+    let directories: &[&str] = if manifest {
+        &["dist", "dist/.vite"]
+    } else {
+        &["dist"]
     };
-    let anchor = selected_directory(app, child)?;
+    for relative in directories {
+        let anchor =
+            Anchor::open(&app.cwd.join(relative)).map_err(|_| "unsafe frontend dist directory")?;
+        let metadata = anchor
+            .working_directory()
+            .and_then(|file| file.metadata())
+            .map_err(|_| "cannot inspect frontend dist directory")?;
+        if metadata.uid() != unsafe { libc::geteuid() }
+            || !app.private_cwd && metadata.mode() & 0o022 != 0
+        {
+            return Err("frontend dist directory must be owned and protected".into());
+        }
+        selected = Some(anchor);
+    }
+    let anchor = selected.expect("fixed frontend directory selection");
+    let mut bytes = Vec::new();
+    read(
+        &anchor,
+        if manifest {
+            "manifest.json"
+        } else {
+            "index.html"
+        },
+        app.private_cwd,
+    )?
+    .take(1024 * 1024 + 1)
+    .read_to_end(&mut bytes)
+    .map_err(|_| "cannot read frontend manifest")?;
+    if bytes.len() > 1024 * 1024 {
+        return Err("frontend manifest exceeds size limit".into());
+    }
+    anchor
+        .verify()
+        .map_err(|_| "frontend dist identity changed")?;
+    verify_app(app)?;
+    Ok(bytes)
+}
+
+pub(crate) fn read_app_input(
+    app: &App,
+    name: &str,
+) -> Result<(Vec<u8>, std::time::SystemTime), String> {
+    use std::io::Read;
+    let (directory, name) = super::app_input(name)?;
+    let anchor = selected_directory(app, directory)?;
     let mut file = read(&anchor, name, app.private_cwd)?;
     let mut bytes = Vec::new();
     file.by_ref()
@@ -167,7 +250,11 @@ pub(crate) fn read_app_file(app: &App, name: &str) -> Result<Vec<u8>, String> {
     app.parent
         .verify()
         .map_err(|_| "app cwd identity changed")?;
-    Ok(bytes)
+    let modified = file
+        .metadata()
+        .and_then(|m| m.modified())
+        .map_err(|_| "cannot inspect app input time")?;
+    Ok((bytes, modified))
 }
 
 pub(crate) fn read_framework(path: &Path) -> std::io::Result<Vec<u8>> {
@@ -210,6 +297,102 @@ mod tests {
             fs::set_permissions(root.path().join(name), fs::Permissions::from_mode(0o600)).unwrap();
         }
         root
+    }
+
+    #[test]
+    fn frontend_root_selection_is_app_relative_protected_and_separate_from_generator_inputs() {
+        use crate::platform::fs::{app_root, frontend_directory, read_app_file};
+        use std::path::Path;
+        let root = fixture();
+        for directory in ["frontend", "ui", "ui/client"] {
+            fs::create_dir(root.path().join(directory)).unwrap();
+            fs::set_permissions(
+                root.path().join(directory),
+                fs::Permissions::from_mode(0o700),
+            )
+            .unwrap();
+        }
+        fs::write(
+            root.path().join("frontend/package.json"),
+            "frontend package",
+        )
+        .unwrap();
+        let app = open_app(&root.path().join("Cargo.toml")).unwrap();
+        let frontend = frontend_directory(&app, Path::new("frontend/")).unwrap();
+        assert_eq!(app_root(&frontend), root.path().join("frontend"));
+        assert_eq!(
+            read_app_file(&frontend, "package.json").unwrap(),
+            b"frontend package"
+        );
+        assert_eq!(
+            app_root(&frontend_directory(&app, Path::new("ui/client")).unwrap()),
+            root.path().join("ui/client")
+        );
+        assert!(read_app_file(&app, "frontend/package.json").is_err());
+        assert!(crate::platform::fs::app_directory_entries(&app, "frontend").is_err());
+        for directory in [
+            "",
+            ".",
+            "..",
+            "../frontend",
+            "ui/../frontend",
+            "/tmp",
+            "C:/frontend",
+            "ui\\client",
+            "missing",
+        ] {
+            assert!(
+                frontend_directory(&app, Path::new(directory)).is_err(),
+                "{directory}"
+            );
+        }
+        symlink("frontend", root.path().join("linked")).unwrap();
+        assert!(frontend_directory(&app, Path::new("linked")).is_err());
+        symlink("../ui", root.path().join("frontend/linked")).unwrap();
+        assert!(frontend_directory(&app, Path::new("frontend/linked/client")).is_err());
+        fs::set_permissions(root.path().join("ui"), fs::Permissions::from_mode(0o777)).unwrap();
+        assert!(frontend_directory(&app, Path::new("ui/client")).is_err());
+        fs::rename(
+            root.path().join("frontend"),
+            root.path().join("old-frontend"),
+        )
+        .unwrap();
+        fs::create_dir(root.path().join("frontend")).unwrap();
+        assert!(read_app_file(&frontend, "package.json").is_err());
+        use std::os::unix::fs::MetadataExt;
+        assert_eq!(
+            frontend.directory.metadata().unwrap().ino(),
+            fs::metadata(root.path().join("old-frontend"))
+                .unwrap()
+                .ino()
+        );
+    }
+
+    #[test]
+    fn explicit_public_settings_directory_needs_no_manifest_or_lock_and_retains_safe_reads() {
+        use crate::platform::fs::{open_directory, read_app_file};
+        let root = tempfile::tempdir().unwrap();
+        fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
+        fs::write(root.path().join("base.toml"), "[cli]\n").unwrap();
+        let settings = open_directory(root.path()).unwrap();
+        assert_eq!(read_app_file(&settings, "base.toml").unwrap(), b"[cli]\n");
+        assert!(open_directory(std::path::Path::new("relative")).is_err());
+        assert!(open_directory(&root.path().join("..")).is_err());
+        fs::rename(
+            root.path().join("base.toml"),
+            root.path().join("private.toml"),
+        )
+        .unwrap();
+        symlink("private.toml", root.path().join("base.toml")).unwrap();
+        assert!(read_app_file(&settings, "base.toml").is_err());
+        assert!(read_app_file(&settings, "private.toml").is_err());
+        fs::remove_file(root.path().join("base.toml")).unwrap();
+        fs::write(root.path().join("base.toml"), vec![0; 1024 * 1024 + 1]).unwrap();
+        assert!(
+            read_app_file(&settings, "base.toml")
+                .unwrap_err()
+                .contains("size limit")
+        );
     }
 
     #[test]

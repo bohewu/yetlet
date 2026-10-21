@@ -52,7 +52,7 @@ local deadline, ttl = tonumber(ARGV[6]), tonumber(ARGV[7])
 local operation_ttl, tombstone_ttl, cap = tonumber(ARGV[8]), tonumber(ARGV[9]), tonumber(ARGV[11])
 local expected = tonumber(ARGV[3])
 if not deadline or not ttl or not operation_ttl or not tombstone_ttl or not cap
-    or not limit or not expected or ttl < 1 or ttl > 60000 or operation_ttl < 2000
+    or not limit or not expected or ttl < 1 or ttl > 2592000000 or operation_ttl < 2000
     or operation_ttl > 60000 or tombstone_ttl < 1 or tombstone_ttl > 60000
     or limit < 1 or limit > 4096 or cap < 1 or cap > 128
     or expected < 0 or expected > 1000000 or #ARGV[4] > limit then return {'invalid', '0'} end

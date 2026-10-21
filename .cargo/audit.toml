@@ -1,0 +1,7 @@
+[advisories]
+# rsa is transitive through the opt-in openidconnect 4.0.1 client. This consumer
+# only verifies ID Token signatures with public keys; it never performs RSA
+# private-key signing or decryption affected by the Marvin timing attack.
+# This is an applicability exception, not an upstream fix. Reassess before any
+# RSA private-key use or OIDC dependency/consumer change. See docs/YT-094-OIDC.md.
+ignore = ["RUSTSEC-2023-0071"]

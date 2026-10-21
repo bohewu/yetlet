@@ -25,6 +25,7 @@ members = [
     "examples/forms-validation",
     "examples/form-css-proof",
     "examples/lab-operations-board",
+    "examples/board-triage",
     "examples/file-server",
     "examples/sqlite-crud",
     "examples/sse-notifications",
@@ -36,7 +37,7 @@ members = [
     "examples/todo-server",
 ]
 resolver = "3"
-exclude = ["examples/webgpu-scene-island"]
+exclude = ["examples/webgpu-scene-island", "crates/yetlet-session-redis"]
 
 [workspace.package]
 version = "0.1.0"

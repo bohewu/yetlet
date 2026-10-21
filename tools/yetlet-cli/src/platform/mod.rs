@@ -14,7 +14,8 @@ mod tests {
         let _: CreateProject = fs::create_project;
         let _: fn(&Path) -> Result<fs::App, String> = fs::open_app;
         let _: fn(&Path) -> io::Result<Vec<u8>> = fs::read_framework;
-        let _: fn(&fs::App, bool, bool) -> io::Result<Completion> = process::run_cargo;
+        let _: fn(&fs::App, bool, bool, &crate::settings::Tls) -> io::Result<Completion> =
+            process::run_cargo;
         let _: fn(Completion) -> ! = process::finish;
     }
 

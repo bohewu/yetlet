@@ -12,6 +12,15 @@ pub(crate) const NEW_DIAGNOSTIC: &str =
 const UNSUPPORTED_APP: &str = "build/dev are unsupported on this platform: native cwd/process ownership Not verified; no child started";
 
 pub(crate) struct App;
+pub(crate) fn app_root(_app: &App) -> &Path {
+    unreachable!("protected app directories are unsupported on this platform")
+}
+pub(crate) fn open_directory(_path: &Path) -> Result<App, String> {
+    Err(UNSUPPORTED_APP.into())
+}
+pub(super) fn verify_app(_app: &App) -> Result<(), String> {
+    Err(UNSUPPORTED_APP.into())
+}
 pub(crate) fn app_entries(_app: &App, _child: bool) -> Result<Vec<String>, String> {
     Err(UNSUPPORTED_APP.into())
 }
@@ -50,3 +59,16 @@ pub(crate) fn read_framework(path: &Path) -> io::Result<Vec<u8>> {
     }
     fs::read(path)
 }
+
+pub(crate) fn app_directory_entries(_app: &App, _relative: &str) -> Result<Vec<String>, String> {
+    Err(UNSUPPORTED_APP.into())
+}
+pub(crate) fn read_app_input(
+    _app: &App,
+    _name: &str,
+) -> Result<(Vec<u8>, std::time::SystemTime), String> {
+    Err(UNSUPPORTED_APP.into())
+}
+
+#[path = "key_unsupported.rs"]
+pub(crate) mod key;

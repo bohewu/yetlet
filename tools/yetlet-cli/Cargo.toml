@@ -15,16 +15,20 @@ name = "yetlet"
 path = "src/main.rs"
 
 [dependencies]
+serde = { version = "=1.0.229", features = ["derive"] }
+yetlet-config = { path = "../../crates/yetlet-config" }
+yetlet-signing = { path = "../../crates/yetlet-signing" }
+toml_edit = "=0.22.20"
 serde_json = "=1.0.149"
 toml = "=0.8.19"
 sha2 = "=0.10.9"
 syn = { version = "=3.0.7", features = ["full", "extra-traits"] }
 
 [target.'cfg(target_os = "linux")'.dependencies]
-libc = "=0.2.183"
+libc = "=0.2.186"
 
 [target.'cfg(windows)'.dependencies]
-windows-sys = { version = "=0.61.2", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_Globalization", "Win32_Security_Authorization", "Win32_Security_Cryptography", "Win32_Storage_FileSystem", "Win32_System_Console", "Win32_System_IO", "Win32_System_Ioctl", "Win32_System_JobObjects", "Win32_System_SystemServices", "Win32_System_Threading", "Win32_System_WindowsProgramming"] }
+windows-sys = { version = "=0.61.2", features = ["Wdk_Foundation", "Wdk_Storage_FileSystem", "Win32_Foundation", "Win32_Globalization", "Win32_Security_Authorization", "Win32_Security_Cryptography", "Win32_Storage_FileSystem", "Win32_System_Console", "Win32_System_IO", "Win32_System_Ioctl", "Win32_System_JobObjects", "Win32_System_Pipes", "Win32_System_SystemServices", "Win32_System_Threading", "Win32_System_WindowsProgramming"] }
 
 [dev-dependencies]
 tempfile = "=3.27.0"

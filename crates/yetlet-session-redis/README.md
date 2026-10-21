@@ -1,8 +1,16 @@
-# Experimental Redis Session provider — YT-066b2
+# Experimental Valkey / Redis-protocol Session provider — YT-066b2
 
 **Status: focused integration tests and independent implementation review passed at bounded YT-066b2 scope. Do not treat this crate as production-qualified.** See [provider implementation verification](../../docs/YT-066B2-VERIFICATION.md) and the later [three-application qualification](../../docs/YT-066B3-VERIFICATION.md). It is unpublished and has its own workspace/lockfile, outside the default framework build and dependency graphs. The existing synchronous Memory provider is unchanged.
 
 This is a separate, explicitly selected async Session implementation, not an authentication system. It uses the reviewed single-primary Lua semantics and [selected pure-SSR Cookie contract](../../docs/YT-066B-COOKIE-ORDERING.md). No JavaScript, plugin registry, DI container, implicit Memory fallback or synchronous Redis facade is added.
+
+The later [YT-094 Valkey reference](../../docs/YT-094-VALKEY-SESSIONS.md) selects
+Valkey 9.1.2 for actual two-app shared-session verification. It reuses this
+implementation and existing protocol/key schema. Its later TTL correction
+accepts up to 30 days, matching the Memory provider's upper bound; the other
+experimental bounds remain unchanged. The historical crate/API names remain compatible; the
+reference's feature and backend setting use `valkey`. This evidence does not
+upgrade the provider to a production or HA guarantee.
 
 ## API and application responsibilities
 
@@ -26,7 +34,7 @@ A late prepared Set may overwrite a newer cookie and require login again. The au
 
 ## Deliberate bounds and unqualified scope
 
-Configuration accepts a 1–64 character isolated namespace, a 1–20 character cookie scope, 1–60000 ms absolute Session lifetime, 1–4 in-flight calls plus the same number of waiters, and 1–4096 bytes encoded payload. Reuse the same namespace/config for workers sharing one application; choose a new namespace when intentionally invalidating all prior state.
+Configuration accepts a 1–64 character isolated namespace, a 1–20 character cookie scope, 1 ms–30 days absolute Session lifetime, 1–4 in-flight calls plus the same number of waiters, and 1–4096 bytes encoded payload. Sub-millisecond lifetime precision is truncated. The caller chooses the lifetime; the Admin reference defaults to 30 minutes through settings. Reads and CAS updates do not renew expiry, while rotation starts a new configured lifetime. Reuse the same namespace/config for workers sharing one application; choose a new namespace when intentionally invalidating all prior state.
 
 The fixed experimental bounds are: 400 ms shared caller deadline across request-lock/queue/Redis phases, 80 ms operation queue wait, 200 ms connect timeout, one reconnect retry with 10–20 ms backoff, immutable one-second server dispatch window, five-second operation-result retention, 64 result records per namespace, 400 ms tombstones and two-second shutdown drain. A synchronous callback cannot be interrupted; if it exhausts the caller deadline, the next phase refuses dispatch. Caller timeout does not cancel a dispatched Redis write; owned work retains its permits until a reply/disconnect or shutdown.
 
@@ -41,4 +49,4 @@ CARGO_TARGET_DIR="$PWD/target/yt066b2-build" cargo +1.99.0 test --manifest-path 
 CARGO_TARGET_DIR="$PWD/target/yt066b2-build" cargo clippy --manifest-path crates/yetlet-session-redis/Cargo.toml --locked --all-targets -- -D warnings
 ```
 
-The five Redis tests are ignored unless explicitly selected; a sixth configuration test needs no service. Use only the existing disposable [Redis fixture](../../qualification/yt066b/compose.yaml), random loopback listener and exact-project cleanup. They deliberately pause writes and corrupt synthetic records. Do not run against a shared store. The CAS test uses `block_in_place` for its synchronous callback barrier. All five provider tests passed after that test-only correction; the separate cancellation/drain test retains its earlier PASS. The verification record preserves both prior stalled attempts and the explicitly authorized correction.
+Remote-service tests are ignored unless explicitly selected; the configuration test needs no service. Use only a disposable [Redis fixture](../../qualification/yt066b/compose.yaml) or the [Valkey fixture](../../qualification/yt094-valkey/README.md), random loopback listener and exact-project cleanup. They deliberately pause writes and corrupt synthetic records. Do not run against a shared store. The CAS test uses `block_in_place` for its synchronous callback barrier. Historical provider tests passed after that test-only correction; the separate cancellation/drain test retains its earlier PASS. The verification record preserves both prior stalled attempts and the explicitly authorized correction. The added TTL integration checks a 30-minute store TTL/cookie, non-sliding reads/updates and cross-manager rotation/logout.

@@ -1,0 +1,18 @@
+# Explicit local reference identities. No private material or password belongs here.
+[signing]
+default_provider = "local_dev"
+default_key = "documents"
+
+[signing.providers.local_dev]
+kind = "local"
+root = "keys/local_dev"
+mode = "self_signed_test"
+password_env = "YETLET_SIGNING_PASSWORD"
+
+[signing.providers.local_dev.keys.documents]
+active_version = ""
+versions = []
+
+[signing.providers.local_dev.keys.invoices]
+active_version = ""
+versions = []

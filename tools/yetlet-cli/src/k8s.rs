@@ -3,18 +3,6 @@ use crate::{compose, docker, image};
 use serde_json::{Value, json};
 use std::path::Path;
 
-pub(crate) fn parse_replicas(value: &str) -> Result<u32, &'static str> {
-    let invalid = "--replicas requires an ASCII decimal integer 1-100";
-    if value.is_empty() || !value.bytes().all(|b| b.is_ascii_digit()) {
-        return Err(invalid);
-    }
-    let replicas = value.parse().map_err(|_| invalid)?;
-    if !(1..=100).contains(&replicas) {
-        return Err(invalid);
-    }
-    Ok(replicas)
-}
-
 fn validate_name(name: &str) -> Result<(), &'static str> {
     // Identity mapping avoids underscore/hyphen and truncation collisions.
     // The letter prefix also satisfies the portable Service DNS label rule.
@@ -51,7 +39,7 @@ fn generate_inner(
 ) -> Result<(), String> {
     image::validate(image).map_err(str::to_owned)?;
     if !(1..=100).contains(&replicas) {
-        return Err("--replicas requires an ASCII decimal integer 1-100".into());
+        return Err("cli.generate.k8s.replicas must be an integer 1-100".into());
     }
     docker::generate_checked(
         manifest,
@@ -60,16 +48,32 @@ fn generate_inner(
             compose::validate_lock(snapshot)?;
             let name = snapshot.manifest["package"]["name"].as_str().unwrap();
             validate_name(name).map_err(str::to_owned)?;
+            let mut deploy = deployment(name, image, replicas);
+            let env = deploy["spec"]["template"]["spec"]["containers"][0]["env"]
+                .as_array_mut()
+                .unwrap();
+            if snapshot.with_assets {
+                env.push(json!({"name": "YETLET_ASSET_ROOT", "value": "/opt/yetlet/assets"}));
+            }
+            if snapshot.with_config {
+                for (name, value) in [
+                    ("YETLET_CONFIG_ROOT", "/opt/yetlet/config"),
+                    ("APP_ENVIRONMENT", "Production"),
+                    ("APP_SERVER__HOST", "0.0.0.0"),
+                    ("APP_SERVER__PORT", "8080"),
+                ] {
+                    env.push(json!({"name": name, "value": value}));
+                }
+                env.push(json!({"name": "APP_SERVICE__TOKEN", "valueFrom": {"secretKeyRef": {"name": format!("{name}-runtime"), "key": "service-token", "optional": false}}}));
+            }
+            let mut readme = include_str!("../templates/k8s/README.md").to_owned();
+            if snapshot.with_config || snapshot.with_assets {
+                readme.push_str(include_str!("../templates/docker/PROFILE-RUNTIME.md"));
+            }
             Ok(vec![
-                (
-                    "deployment.yaml",
-                    document(deployment(name, image, replicas))?,
-                ),
+                ("deployment.yaml", document(deploy)?),
                 ("service.yaml", document(service(name))?),
-                (
-                    "README.md",
-                    include_str!("../templates/k8s/README.md").into(),
-                ),
+                ("README.md", readme),
             ])
         },
         after_inspection,

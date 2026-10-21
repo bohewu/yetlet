@@ -192,6 +192,7 @@ pub fn browser_page(items: &[Todo]) -> View {
                         .attribute("placeholder", "New server task")
                         .attribute("autocomplete", "off"),
                 )
+                .child(Element::new("p").attribute("id", "remote-title-error"))
                 .child(
                     Element::new("button")
                         .attribute("id", "create-remote")
@@ -203,6 +204,18 @@ pub fn browser_page(items: &[Todo]) -> View {
                         .attribute("id", "remote-status")
                         .attribute("aria-live", "polite")
                         .child(View::text("No remote action sent")),
+                )
+                .child(
+                    Element::new("button")
+                        .attribute("id", "remote-review")
+                        .attribute("type", "button")
+                        .child(View::text("Review server list")),
+                )
+                .child(
+                    Element::new("button")
+                        .attribute("id", "remote-resume")
+                        .attribute("type", "button")
+                        .child(View::text("Start another create")),
                 )
                 .child(
                     Element::new("div")

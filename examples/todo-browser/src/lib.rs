@@ -4,15 +4,28 @@
 //! or semantic JSON HTTP commands. No raw DOM event, persistent circuit, or
 //! server repository is included in this crate.
 
+#[cfg(any(target_arch = "wasm32", test))]
+mod remote;
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn complete_browser_page_obeys_dom_policy() {
+        let page = yetlet_todo_ui::browser_page(&yetlet_todo_ui::TodoSnapshot::initial().items);
+        assert_eq!(yetlet_dom::validate(&page), Ok(()));
+    }
+}
+
 #[cfg(target_arch = "wasm32")]
 mod runtime {
+    use super::remote::{Phase, RemoteForm, decode_snapshot};
     use std::{
         cell::{Cell, RefCell},
         rc::Rc,
     };
 
     use wasm_bindgen::{JsCast, JsValue, prelude::wasm_bindgen};
-    use wasm_bindgen_futures::spawn_local;
+    use wasm_bindgen_futures::{JsFuture, spawn_local};
     use web_sys::{Document, Element, HtmlInputElement, Node};
     use yetlet_actions::{ActionError, ActionExecutor, HttpExecutor};
     use yetlet_core::binding::BindingKey;
@@ -33,13 +46,12 @@ mod runtime {
     #[derive(Clone)]
     struct LocalGraphExecutor {
         handle: TodoGraphHandle,
-        committed: Rc<RefCell<TodoSnapshot>>,
     }
 
     impl ActionExecutor<TodoCommand> for LocalGraphExecutor {
         async fn execute(&self, command: TodoCommand) -> Result<TodoSnapshot, ActionError> {
             self.handle.dispatch(command).map_err(graph_action_error)?;
-            Ok(self.committed.borrow().clone())
+            self.handle.snapshot().map_err(graph_action_error)
         }
     }
 
@@ -207,6 +219,78 @@ mod runtime {
         });
     }
 
+    #[derive(Clone)]
+    struct RemoteControls {
+        input: HtmlInputElement,
+        create: Element,
+        review: Element,
+        resume: Element,
+        status: Element,
+        list: Element,
+        error: Element,
+        section: Element,
+    }
+    impl RemoteControls {
+        fn render(&self, form: &RemoteForm) -> Result<(), JsValue> {
+            if form.can_create(&self.input.value()) {
+                self.create.remove_attribute("disabled")?;
+            } else {
+                self.create.set_attribute("disabled", "")?;
+            }
+            for (button, visible) in [
+                (
+                    &self.review,
+                    matches!(
+                        form.phase,
+                        Phase::Unconfirmed | Phase::Reviewing | Phase::Reviewed
+                    ),
+                ),
+                (&self.resume, form.phase == Phase::Reviewed),
+            ] {
+                if visible {
+                    button.remove_attribute("hidden")?;
+                } else {
+                    button.set_attribute("hidden", "")?;
+                }
+            }
+            if form.phase == Phase::Reviewing {
+                self.review.set_attribute("disabled", "")?;
+            } else {
+                self.review.remove_attribute("disabled")?;
+            }
+            self.section.set_attribute(
+                "aria-busy",
+                if matches!(form.phase, Phase::Saving | Phase::Reviewing) {
+                    "true"
+                } else {
+                    "false"
+                },
+            )?;
+            Ok(())
+        }
+    }
+
+    async fn read_server() -> Result<TodoSnapshot, ActionError> {
+        let response = JsFuture::from(
+            web_sys::window()
+                .ok_or(ActionError::Network)?
+                .fetch_with_str("/api/todos"),
+        )
+        .await
+        .map_err(|_| ActionError::Network)?
+        .dyn_into::<web_sys::Response>()
+        .map_err(|_| ActionError::InvalidResponse)?;
+        if !response.ok() {
+            return Err(ActionError::InvalidResponse);
+        }
+        let text = JsFuture::from(response.text().map_err(|_| ActionError::Network)?)
+            .await
+            .map_err(|_| ActionError::Network)?
+            .as_string()
+            .ok_or(ActionError::InvalidResponse)?;
+        decode_snapshot(&text)
+    }
+
     /// Mount the full client route, with a local graph executor and HTTP executor.
     #[wasm_bindgen]
     pub fn mount() -> Result<(), JsValue> {
@@ -227,13 +311,11 @@ mod runtime {
         let list_host = get_element(&document, "todo-list-host")?;
         let list = Rc::new(RefCell::new(bind_todo_list(&list_host, &initial.items)?));
         list_host.set_attribute("data-yetlet-local-runtime", "keyed-graph")?;
-        let committed = Rc::new(RefCell::new(initial.clone()));
         let graph = LocalGraph::new(
             initial,
             |state, command| apply_todo_command(state, command).map(|_| ()),
             {
                 let list = Rc::clone(&list);
-                let committed = Rc::clone(&committed);
                 move |snapshot: &TodoSnapshot| {
                     let result = list.borrow_mut().reconcile(
                         &snapshot.items,
@@ -245,14 +327,12 @@ mod runtime {
                         web_sys::console::error_1(&error);
                         return Err(ActionError::Internal);
                     }
-                    *committed.borrow_mut() = snapshot.clone();
                     Ok(())
                 }
             },
         );
         let local_executor = Rc::new(LocalGraphExecutor {
             handle: graph.handle(),
-            committed,
         });
 
         let status = get_element(&document, "todo-status")?;
@@ -289,51 +369,167 @@ mod runtime {
             }
         })?;
 
-        // Remote events never move across the network. A local click creates a
-        // TodoCommand and opts into an HTTP executor using ordinary fetch/JSON.
-        let remote_input: HtmlInputElement = get_element(&document, "remote-title")?.dyn_into()?;
-        let remote_button = get_element(&document, "create-remote")?;
-        let remote_host = get_element(&document, "remote-list-host")?;
-        let remote_status = get_element(&document, "remote-status")?;
+        // Claim one request synchronously, before its future is queued.
+        let remote = Rc::new(RefCell::new(RemoteForm::default()));
+        let ui = RemoteControls {
+            input: get_element(&document, "remote-title")?.dyn_into()?,
+            create: get_element(&document, "create-remote")?,
+            review: get_element(&document, "remote-review")?,
+            resume: get_element(&document, "remote-resume")?,
+            list: get_element(&document, "remote-list-host")?,
+            status: get_element(&document, "remote-status")?,
+            error: get_element(&document, "remote-title-error")?,
+            section: get_element(&document, "remote-actions")?,
+        };
+        title_feedback(&ui.input, &ui.error, None)?;
+        ui.render(&remote.borrow())?;
+        let clear_title_binding = DomEventListener::new(ui.input.as_ref(), "input", {
+            let ui = ui.clone();
+            let remote = remote.clone();
+            move |_| {
+                if ui.input.has_attribute("aria-invalid") {
+                    let _ = title_feedback(&ui.input, &ui.error, None);
+                }
+                if remote.borrow().phase == Phase::Ready {
+                    ui.status.set_text_content(Some(
+                        if remote.borrow().can_create(&ui.input.value()) {
+                            "Title edited. Create on server when ready."
+                        } else {
+                            "This title was just created. Edit it to create another task."
+                        },
+                    ));
+                }
+                let _ = ui.render(&remote.borrow());
+            }
+        })?;
         let http = Rc::new(
             HttpExecutor::new("/api/todos").map_err(|error| JsValue::from_str(error.code()))?,
         );
-        let remote_binding = DomEventListener::new(remote_button.as_ref(), "click", {
+        let remote_binding = DomEventListener::new(ui.create.as_ref(), "click", {
+            let ui = ui.clone();
+            let remote = remote.clone();
             let lifetime = lifetime.clone();
-            move |_event| {
-                let title = remote_input.value();
-                let executor = Rc::clone(&http);
-                let host = remote_host.clone();
+            move |_| {
+                if !lifetime.is_active() {
+                    return;
+                }
+                let title = ui.input.value();
+                if !remote.borrow_mut().begin(&title) {
+                    return;
+                }
+                let _ = title_feedback(&ui.input, &ui.error, None);
+                ui.status.set_text_content(Some("Saving to server..."));
+                let _ = ui.render(&remote.borrow());
+                let executor = http.clone();
+                let remote = remote.clone();
+                let ui = ui.clone();
                 let lifetime = lifetime.clone();
-                let status = remote_status.clone();
                 spawn_local(async move {
                     if !lifetime.is_active() {
                         return;
                     }
-                    status.set_text_content(Some("Saving to server..."));
-                    let result = executor.execute(TodoCommand::Create { title }).await;
+                    let result = executor
+                        .execute(TodoCommand::Create {
+                            title: title.clone(),
+                        })
+                        .await;
                     if !lifetime.is_active() {
                         return;
                     }
                     match result {
                         Ok(snapshot) => {
-                            if let Err(error) = mount_view(&host, &todo_list(&snapshot.items)) {
-                                web_sys::console::error_1(&error);
-                                status.set_text_content(Some("Render error"));
-                                return;
+                            remote.borrow_mut().saved(title.clone());
+                            if mount_view(&ui.list, &todo_list(&snapshot.items)).is_err() {
+                                ui.status.set_text_content(Some("The task was saved, but the list could not be displayed. Keep your title and review the server list."));
+                                remote.borrow_mut().unconfirmed();
+                            } else {
+                                ui.status.set_text_content(Some(&format!(
+                                    "Saved on server (revision {}). {}",
+                                    snapshot.revision,
+                                    if ui.input.value() == title {
+                                        "Edit the title to create another task."
+                                    } else {
+                                        "Your edited title is ready for another create."
+                                    }
+                                )));
                             }
-                            status.set_text_content(Some(&format!(
-                                "Saved on server (revision {})",
-                                snapshot.revision
-                            )));
                         }
-                        Err(error) => {
-                            // Display only structured error codes, never raw HTML.
-                            status
-                                .set_text_content(Some(&format!("Remote error: {}", error.code())));
+                        Err(ActionError::Remote { status: 422, code })
+                            if code == "invalid_title" =>
+                        {
+                            remote.borrow_mut().rejected();
+                            if ui.input.value() == title {
+                                let _ = title_feedback(
+                                    &ui.input,
+                                    &ui.error,
+                                    Some("Enter 1 to 100 characters without control characters."),
+                                );
+                                ui.status.set_text_content(Some(
+                                    "Check the task title. Your text is still here.",
+                                ));
+                            } else {
+                                ui.status.set_text_content(Some("The submitted title was rejected. Review your edited title before trying again."));
+                            }
+                        }
+                        Err(ActionError::Remote {
+                            status: 400..=499, ..
+                        }) => {
+                            remote.borrow_mut().rejected();
+                            ui.status.set_text_content(Some("Request rejected. Your text is still here. Review the title or server limits before trying again."));
+                        }
+                        Err(_) => {
+                            remote.borrow_mut().unconfirmed();
+                            ui.status.set_text_content(Some("Create could not be confirmed; it may have reached the server. Your text is still here. Review the server list before starting another create."));
                         }
                     }
+                    let _ = ui.render(&remote.borrow());
                 });
+            }
+        })?;
+        let review_binding = DomEventListener::new(ui.review.as_ref(), "click", {
+            let ui = ui.clone();
+            let remote = remote.clone();
+            let lifetime = lifetime.clone();
+            move |_| {
+                if !lifetime.is_active() || !remote.borrow_mut().begin_review() {
+                    return;
+                }
+                ui.status
+                    .set_text_content(Some("Reading the server list... Your title stays here."));
+                let _ = ui.render(&remote.borrow());
+                let ui = ui.clone();
+                let remote = remote.clone();
+                let lifetime = lifetime.clone();
+                spawn_local(async move {
+                    if !lifetime.is_active() {
+                        return;
+                    }
+                    let result = read_server().await;
+                    if !lifetime.is_active() {
+                        return;
+                    }
+                    let displayed = result.ok().filter(|snapshot| {
+                        mount_view(&ui.list, &todo_list(&snapshot.items)).is_ok()
+                    });
+                    remote.borrow_mut().reviewed(displayed.is_some());
+                    ui.status.set_text_content(Some(if displayed.is_some() {
+                        "Server list loaded. Compare it with your title. Choose Start another create only when you intend an additional task."
+                    } else { "Could not load the server list. Your title is still here. Review the server list again when available." }));
+                    let _ = ui.render(&remote.borrow());
+                });
+            }
+        })?;
+        let resume_binding = DomEventListener::new(ui.resume.as_ref(), "click", {
+            let ui = ui.clone();
+            let remote = remote.clone();
+            let lifetime = lifetime.clone();
+            move |_| {
+                if lifetime.is_active() && remote.borrow_mut().resume() {
+                    ui.status.set_text_content(Some(
+                        "Ready for an explicit new create. Review the title before submitting.",
+                    ));
+                    let _ = ui.render(&remote.borrow());
+                }
             }
         })?;
 
@@ -341,10 +537,34 @@ mod runtime {
             *runtime.borrow_mut() = Some(BrowserRuntime {
                 lifetime,
                 _graph: graph,
-                _bindings: vec![local_binding, remote_binding],
+                _bindings: vec![
+                    local_binding,
+                    remote_binding,
+                    clear_title_binding,
+                    review_binding,
+                    resume_binding,
+                ],
             });
         });
         document_element.set_attribute("data-yetlet-ready", "true")?;
+        Ok(())
+    }
+
+    fn title_feedback(
+        input: &HtmlInputElement,
+        error: &Element,
+        message: Option<&str>,
+    ) -> Result<(), JsValue> {
+        error.set_text_content(message);
+        if message.is_some() {
+            input.set_attribute("aria-invalid", "true")?;
+            input.set_attribute("aria-describedby", "remote-title-error")?;
+            error.remove_attribute("hidden")?;
+        } else {
+            input.remove_attribute("aria-invalid")?;
+            input.remove_attribute("aria-describedby")?;
+            error.set_attribute("hidden", "")?;
+        }
         Ok(())
     }
 

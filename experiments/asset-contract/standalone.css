@@ -1,0 +1,3 @@
+@import "../vite-integration/node_modules/tailwindcss/theme.css" layer(theme);
+@import "../vite-integration/node_modules/tailwindcss/utilities.css" layer(utilities) source(none);
+@source "./src/main.rs";

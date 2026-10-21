@@ -144,7 +144,7 @@ not broader qualification. Its terminal evidence is retained under
 The second reviewer inspected the actual final b3 fixture/diff, adjacent
 authoritative documents, retained execution evidence and focused cleanup repair.
 It reached terminal exit 0 as local ordinary `codex exec`, role-directed by
-`/home/bohe/.codex/agents-pipeline/agents/reviewer.md`, with read-only sandbox.
+`${CODEX_HOME}/agents-pipeline/agents/reviewer.md`, with read-only sandbox.
 This was not WebCodex, `codex exec review`, native managed-role dispatch or
 current-session self-review.
 

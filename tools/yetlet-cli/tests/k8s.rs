@@ -41,6 +41,37 @@ fn files(output: &Path) -> Vec<(String, Vec<u8>)> {
 }
 
 #[test]
+fn settings_rejection_keeps_generator_exit_wrapper_and_no_output_tree() {
+    let f = fixture::Fixture::new();
+    fs::write(f.app.join("base.toml"), "[cli.vite]\nenabled=false\nroot='frontend/'\nauto_start=false\nauto_build=false\n[cli.generate.k8s]\nreplicas=1\n").unwrap();
+    fs::write(f.app.join("production.toml"), "").unwrap();
+    let output = f.parent.join("SYNTHETIC_SETTINGS_DESTINATION");
+    let mut command = Command::new(env!("CARGO_BIN_EXE_yetlet"));
+    for (key, _) in std::env::vars_os() {
+        if key.to_string_lossy().starts_with("APP_") || key == "YETLET_CONFIG_ROOT" {
+            command.env_remove(key);
+        }
+    }
+    let result = command
+        .args(["generate", "k8s", "--manifest-path"])
+        .arg(f.manifest())
+        .arg("--output")
+        .arg(&output)
+        .args(["--image", IMAGE])
+        .env("APP_CLI__GENERATE__K8S__REPLICAS", "101")
+        .env("PATH", f.root.path().join("no-tools"))
+        .output()
+        .unwrap();
+    assert_eq!(result.status.code(), Some(1));
+    assert!(result.stdout.is_empty());
+    assert_eq!(
+        String::from_utf8(result.stderr).unwrap(),
+        "CLI_SOURCE_UNSUPPORTED generate k8s: CLI_PROJECT settings values: check public TOML syntax, base-declared keys/types, ranges and target/TLS requirements\n"
+    );
+    assert!(!output.exists());
+}
+
+#[test]
 fn binary_k8s_is_deterministic_tool_free_and_preserves_source_secrets_and_destinations() {
     let f = fixture::Fixture::new();
     let before =
@@ -249,12 +280,28 @@ fn real_generated_cloud_app_with_explicit_offline_cargo_lock_is_supported() {
     let before =
         ["Cargo.toml", "Cargo.lock", "src/main.rs"].map(|p| fs::read(app.join(p)).unwrap());
     let output = root.path().join("real-source 設定");
-    let result = generate(
-        &app.join("Cargo.toml"),
-        &output,
-        root.path(),
-        &["--replicas", "3"],
-    );
+    // Persistent replicas use the same public base/profile mechanism. This
+    // separate settings root keeps the qualified legacy source bytes unchanged.
+    let settings_root = root.path().join("public-settings");
+    fs::create_dir(&settings_root).unwrap();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        fs::set_permissions(&settings_root, fs::Permissions::from_mode(0o700)).unwrap();
+    }
+    fs::write(settings_root.join("base.toml"), "[cli.vite]\nenabled=false\nroot='frontend/'\nauto_start=false\nauto_build=false\n[cli.generate.k8s]\nreplicas=3\n").unwrap();
+    fs::write(settings_root.join("production.toml"), "").unwrap();
+    let result = Command::new(env!("CARGO_BIN_EXE_yetlet"))
+        .args(["generate", "k8s", "--manifest-path"])
+        .arg(app.join("Cargo.toml"))
+        .arg("--output")
+        .arg(&output)
+        .args(["--image", IMAGE])
+        .env("YETLET_CONFIG_ROOT", &settings_root)
+        .env("APP_ENVIRONMENT", "Production")
+        .env("PATH", root.path().join("no-tools"))
+        .output()
+        .unwrap();
     assert_eq!(
         result.status.code(),
         Some(0),

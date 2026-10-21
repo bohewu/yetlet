@@ -1,0 +1,66 @@
+x-app: &app
+  image: "${YT094_APP_IMAGE:?select the prepared local app image}"
+  # Deliberately Linux-only: preserve the reference's exact loopback Host/Origin
+  # checks rather than introducing a public listener or trusted-proxy contract.
+  network_mode: host
+  environment: &settings
+    APP_ENVIRONMENT: Production
+    YETLET_CONFIG_ROOT: /app/config
+    YETLET_ASSET_ROOT: /app/assets
+    APP_DATABASE__PATH: /data/board.sqlite3
+    APP_SESSION__BACKEND: valkey
+    APP_SESSION__VALKEY__ENDPOINT: "redis://127.0.0.1:${YT094_VALKEY_PORT:?select an unused loopback port}/"
+    APP_SESSION__VALKEY__NAMESPACE: "${YT094_NAMESPACE:?select an isolated namespace}"
+    APP_SESSION__VALKEY__TTL_SECONDS: "${YT094_SESSION_TTL_SECONDS:-1800}"
+    APP_OIDC__ENABLED: "false"
+  depends_on:
+    valkey:
+      condition: service_healthy
+  read_only: true
+  tmpfs:
+    - /tmp:rw,noexec,nosuid,nodev,size=16m,mode=1777
+  cap_drop: [ALL]
+  security_opt: [no-new-privileges:true]
+  pids_limit: 128
+  mem_limit: 256m
+  stop_signal: SIGTERM
+  stop_grace_period: 8s
+  restart: "no"
+
+services:
+  app-a:
+    <<: *app
+    environment:
+      <<: *settings
+      APP_SERVER__PORT: "${YT094_APP_A_PORT:?select an unused loopback port}"
+    volumes: [app-a-data:/data]
+  app-b:
+    <<: *app
+    environment:
+      <<: *settings
+      APP_SERVER__PORT: "${YT094_APP_B_PORT:?select another unused loopback port}"
+    volumes: [app-b-data:/data]
+  valkey:
+    image: valkey/valkey@sha256:418652cfb58ef879d4978c33553735d7147016032d5aefaa14c828e611eb9dfd
+    user: "10001:10001"
+    command: [valkey-server, --bind, 0.0.0.0, --protected-mode, "no", --save, "", --appendonly, "no", --maxmemory, 64mb, --maxmemory-policy, noeviction]
+    ports:
+      - "127.0.0.1:${YT094_VALKEY_PORT:?select an unused loopback port}:6379"
+    read_only: true
+    tmpfs:
+      - /data:uid=10001,gid=10001,mode=0700
+      - /tmp:uid=10001,gid=10001,mode=1777
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    mem_limit: 128m
+    pids_limit: 64
+    healthcheck:
+      test: [CMD, valkey-cli, ping]
+      interval: 1s
+      timeout: 1s
+      retries: 10
+    restart: "no"
+
+volumes:
+  app-a-data: {}
+  app-b-data: {}

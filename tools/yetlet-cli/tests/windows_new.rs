@@ -1,39 +1,15 @@
 #![cfg(windows)]
-use std::{fs, path::Path, process::Command};
-
-fn framework(path: &Path) {
-    fs::create_dir_all(path).unwrap();
-    fs::write(
-        path.join("Cargo.toml"),
-        "[workspace]\n[workspace.package]\nrust-version='1.99'\n",
-    )
-    .unwrap();
-    for name in ["yetlet-core", "yetlet-server-axum"] {
-        let dir = path.join("crates").join(name);
-        fs::create_dir_all(dir.join("src")).unwrap();
-        fs::write(
-            dir.join("Cargo.toml"),
-            format!("[package]\nname='{name}'\n"),
-        )
-        .unwrap();
-        fs::write(dir.join("src/lib.rs"), "// local fixture\n").unwrap();
-    }
-}
+use std::{fs, process::Command};
 
 #[test]
 fn new_uses_shared_standalone_templates_without_cargo_or_network() {
     let root = tempfile::tempdir().unwrap();
-    let source = root.path().join("framework 雪 😀");
     let parent = root.path().join("apps with spaces");
     let empty_path = root.path().join("no-executables");
-    framework(&source);
     fs::create_dir(&parent).unwrap();
     fs::create_dir(&empty_path).unwrap();
-    let before = fs::read(source.join("Cargo.toml")).unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_yetlet"))
-        .args(["new", "demo", "--framework-path"])
-        .arg(&source)
-        .arg("--dir")
+        .args(["new", "demo", "--parent"])
         .arg(&parent)
         .env("PATH", &empty_path)
         .env("CARGO_HOME", root.path().join("must-not-exist"))
@@ -54,12 +30,12 @@ fn new_uses_shared_standalone_templates_without_cargo_or_network() {
     assert_eq!(manifest["package"]["publish"].as_bool(), Some(false));
     assert_eq!(manifest["workspace"]["resolver"].as_str(), Some("3"));
     assert_eq!(
-        manifest["dependencies"]["yetlet-core"]["path"].as_str(),
-        source.join("crates/yetlet-core").to_str()
+        manifest["dependencies"]["yetlet-core"]["version"].as_str(),
+        Some("=0.1.0")
     );
     assert_eq!(
-        manifest["dependencies"]["yetlet-server-axum"]["path"].as_str(),
-        source.join("crates/yetlet-server-axum").to_str()
+        manifest["dependencies"]["yetlet-server-axum"]["version"].as_str(),
+        Some("=0.1.0")
     );
     assert_eq!(
         fs::read(app.join("src/main.rs")).unwrap(),
@@ -67,25 +43,24 @@ fn new_uses_shared_standalone_templates_without_cargo_or_network() {
     );
     assert_eq!(
         fs::read_to_string(app.join("README.md")).unwrap(),
-        include_str!("../templates/README.md").replace("@NAME@", "demo")
+        include_str!("../templates/SELECTED-README.md")
+            .replace("@NAME@", "demo")
+            .replace("@VERSION@", env!("CARGO_PKG_VERSION"))
     );
     assert!(!app.join("Cargo.lock").exists());
     assert!(!app.join("target").exists());
     assert!(!root.path().join("must-not-exist").exists());
-    assert_eq!(fs::read(source.join("Cargo.toml")).unwrap(), before);
+    assert!(app.join("base.toml").is_file());
+    assert!(!app.join("src/config.rs").exists());
 }
 
 #[test]
 fn single_letter_name_publishes_complete_project_without_stage_residue() {
     let root = tempfile::tempdir().unwrap();
-    let source = root.path().join("framework");
     let parent = root.path().join("projects");
-    framework(&source);
     fs::create_dir(&parent).unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_yetlet"))
-        .args(["new", "a", "--framework-path"])
-        .arg(&source)
-        .arg("--dir")
+        .args(["new", "a", "--parent"])
         .arg(&parent)
         .env("RUSTUP_AUTO_INSTALL", "0")
         .env("CARGO_NET_OFFLINE", "true")
@@ -108,7 +83,9 @@ fn single_letter_name_publishes_complete_project_without_stage_residue() {
     assert_eq!(manifest["package"]["name"].as_str(), Some("a"));
     assert_eq!(
         fs::read_to_string(app.join("README.md")).unwrap(),
-        include_str!("../templates/README.md").replace("@NAME@", "a")
+        include_str!("../templates/SELECTED-README.md")
+            .replace("@NAME@", "a")
+            .replace("@VERSION@", env!("CARGO_PKG_VERSION"))
     );
     assert!(app.join(".gitignore").is_file());
     assert!(!app.join("Cargo.lock").exists());
@@ -124,13 +101,9 @@ fn single_letter_name_publishes_complete_project_without_stage_residue() {
 }
 
 #[test]
-fn doctor_reports_windows_new_availability_and_selected_framework() {
-    let root = tempfile::tempdir().unwrap();
-    let source = root.path().join("framework 雪");
-    framework(&source);
+fn doctor_reports_windows_new_availability_and_framework_not_checked() {
     let output = Command::new(env!("CARGO_BIN_EXE_yetlet"))
-        .args(["doctor", "--json", "--framework-path"])
-        .arg(source)
+        .args(["doctor", "--json"])
         .env("RUSTUP_AUTO_INSTALL", "0")
         .env("RUSTUP_SKIP_UPDATE_CHECK", "1")
         .env("CARGO_NET_OFFLINE", "true")
@@ -143,6 +116,13 @@ fn doctor_reports_windows_new_availability_and_selected_framework() {
             .iter()
             .find(|d| d["capability"] == capability)
             .unwrap();
-        assert_eq!(diagnostic["status"], "pass");
+        assert_eq!(
+            diagnostic["status"],
+            if capability == "new-platform" {
+                "pass"
+            } else {
+                "not-checked"
+            }
+        );
     }
 }

@@ -1,0 +1,56 @@
+@import "tailwindcss";
+@source "../src/lib.rs";
+:root { font-family: Inter, ui-sans-serif, system-ui, sans-serif; color: #0f172a; background: #f3f6fb; font-synthesis: none; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+.brand { max-width: 1080px; margin: 0 auto; padding: 30px 24px; display: flex; align-items: center; justify-content: space-between; gap: 24px; color: #53617c; font-size: 14px; }
+.brand-name { display: flex; align-items: center; gap: 16px; color: #10182f; font-size: 22px; font-weight: 700; }
+.mark { color: #4338ca; font-weight: 800; font-size: 34px; line-height: 1; }
+main { max-width: 960px; margin: 32px auto 56px; padding: 44px 48px 32px; background: white; border: 1px solid #d7deeb; border-radius: 8px; }
+h1 { margin: 0; font-size: clamp(28px, 3.3vw, 44px); letter-spacing: -.04em; font-weight: 750; line-height: 1.15; }
+.subtitle { margin: 12px 0 36px; color: #53617c; font-size: 23px; }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+label { display: block; font-size: 16px; font-weight: 650; margin-bottom: 10px; }
+.input-row { display: flex; gap: 12px; align-items: stretch; }
+input:not([type=checkbox]) { font: inherit; padding: 14px 16px; border: 1px solid #c9d2e2; border-radius: 6px; min-width: 0; flex: 1; color: #0f172a; background: white; }
+input::placeholder { color: #64748b; }
+button { font: inherit; font-size: 14px; font-weight: 600; border: 1px solid #d7deeb; border-radius: 6px; padding: 10px 18px; color: #475569; background: #f8fafc; cursor: pointer; min-height: 42px; }
+button:hover { background: #eef2ff; border-color: #a5b4fc; }
+button.primary, .filters button[aria-pressed=true] { color: white; background: #4338ca; border-color: #4338ca; }
+button.primary { padding-inline: 24px; white-space: nowrap; }
+button.primary:hover, .filters button[aria-pressed=true]:hover { background: #3730a3; }
+button:disabled { cursor: wait; }
+:focus-visible { outline: 3px solid #818cf8; outline-offset: 3px; }
+.toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin: 30px 0 22px; }
+.filters { display: flex; gap: 8px; }
+#count { color: #53617c; font-size: 14px; margin: 0; white-space: nowrap; }
+#tasks { margin: 0; padding: 0; list-style: none; border: 1px solid #d7deeb; border-radius: 6px; overflow: hidden; }
+#tasks:empty { display: none; }
+.task-row { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 22px 24px; border-top: 1px solid #e2e8f0; min-height: 82px; }
+.task-row:first-child { border-top: 0; }
+.task-label { display: flex; align-items: center; gap: 22px; margin: 0; min-width: 0; font-size: 16px; font-weight: 550; overflow-wrap: anywhere; }
+input[type=checkbox] { width: 22px; height: 22px; flex-shrink: 0; accent-color: #4338ca; cursor: pointer; }
+.completed .task-title { color: #64748b; text-decoration: line-through; }
+.task-row button { flex-shrink: 0; }
+#edit-form { margin-top: 24px; padding: 20px; background: #f8fafc; border: 1px solid #d7deeb; border-radius: 6px; }
+#feedback { min-height: 20px; color: #475569; font-size: 14px; }
+#empty { padding: 32px; color: #53617c; border: 1px dashed #c9d2e2; text-align: center; }
+footer { margin-top: 26px; padding-top: 24px; border-top: 1px solid #e2e8f0; text-align: center; color: #53617c; font-size: 14px; }
+.skip { position: absolute; top: -100px; background: white; padding: 12px; }
+.skip:focus { top: 8px; }
+[hidden] { display: none !important; }
+@media (max-width: 640px) {
+  .brand { padding: 22px 20px; font-size: 12px; gap: 12px; }
+  .brand-name { gap: 10px; font-size: 18px; }
+  main { margin: 8px 12px 24px; padding: 28px 20px 24px; }
+  .subtitle { font-size: 18px; margin-bottom: 28px; }
+  .input-row { flex-wrap: wrap; }
+  .input-row input { flex-basis: 100%; }
+  .input-row .primary { flex: 1; }
+  .toolbar { align-items: flex-start; flex-direction: column; gap: 14px; margin-top: 24px; }
+  .filters { width: 100%; }
+  .filters button { flex: 1; padding-inline: 10px; }
+  .task-row { gap: 12px; padding: 18px 14px; }
+  .task-label { gap: 12px; font-size: 14px; }
+  .task-row button { padding-inline: 12px; }
+}

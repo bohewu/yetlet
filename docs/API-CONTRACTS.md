@@ -93,6 +93,19 @@ cost of their correct sync/async semantics. There is no common
 `YetletError` promise, universal scheduler, default GPU graph, or public
 SemVer compatibility claim.
 
+### Subsequently selected secret providers (2026-10-18)
+
+`yetlet-secrets::{SecretProvider, SecretFuture, SecretError, SettingsSecrets}`
+and its `SecretString`/`ExposeSecret` reexports are **Experimental, unpublished,
+native-only**, in an isolated nested workspace. The one async lookup contract
+supports explicit constructor/State injection; the local adapter owns selected
+already-loaded settings values and accepts explicit whole-snapshot `replace`
+for later adoption through the same shared handle. No source revision/freshness
+check is promised; applications serialize the full load/validate/replace sequence
+when offering reload. This does not change configuration precedence,
+Core/browser defaults, signing semantics or the original release inventory.
+See the [contract and verification](SECRET-PROVIDERS.md).
+
 ## Internal/support-only
 
 | Public surface | Reason |

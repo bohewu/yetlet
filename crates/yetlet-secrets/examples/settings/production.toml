@@ -1,0 +1,2 @@
+[service]
+public_message = "Production secret provider example"

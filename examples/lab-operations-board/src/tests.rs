@@ -9,6 +9,127 @@ use tower::ServiceExt;
 const HOST: &str = "127.0.0.1:3012";
 
 #[tokio::test]
+async fn independent_boards_share_sqlite_records_conflicts_busy_errors_and_restart() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("shared.sqlite");
+    let ids = DemoIdentities::generate().unwrap();
+    let a = Board::open(&path, HOST.parse().unwrap(), ids.clone())
+        .await
+        .unwrap();
+    let b = Board::open(&path, HOST.parse().unwrap(), ids.clone())
+        .await
+        .unwrap();
+    let mut ca = Client::login(&a, &ids, "alice").await;
+    let mut cb = Client::login(&b, &ids, "alice").await;
+    let created = ca
+        .call(
+            &a.router,
+            Method::POST,
+            "/board/projects/1/items",
+            Some(ca.form("Created through A", "open", 0, "")),
+        )
+        .await;
+    assert_eq!(created.status, StatusCode::SEE_OTHER);
+    let detail = created.headers[header::LOCATION]
+        .to_str()
+        .unwrap()
+        .to_owned();
+    assert!(
+        cb.call(&b.router, Method::GET, &detail, None)
+            .await
+            .body
+            .contains("Created through A")
+    );
+    assert_eq!(
+        cb.call(
+            &b.router,
+            Method::POST,
+            &detail,
+            Some(cb.form("Updated through B", "active", 1, ""))
+        )
+        .await
+        .status,
+        StatusCode::SEE_OTHER
+    );
+    assert!(
+        ca.call(&a.router, Method::GET, &detail, None)
+            .await
+            .body
+            .contains("Updated through B")
+    );
+    let stale = ca
+        .call(
+            &a.router,
+            Method::POST,
+            &detail,
+            Some(ca.form("Stale draft", "open", 1, "")),
+        )
+        .await;
+    assert_eq!(stale.status, StatusCode::CONFLICT);
+    assert!(stale.body.contains("Stale draft"));
+    let fa = ca.form("Concurrent A", "active", 2, "");
+    let fb = cb.form("Concurrent B", "active", 2, "");
+    let (ra, rb) = tokio::join!(
+        ca.call(&a.router, Method::POST, &detail, Some(fa)),
+        cb.call(&b.router, Method::POST, &detail, Some(fb)),
+    );
+    let mut statuses = [ra.status.as_u16(), rb.status.as_u16()];
+    statuses.sort();
+    assert_eq!(statuses, [303, 409]);
+    let (item, history) = b.database.get(1, 1).await.unwrap();
+    assert_eq!(item.version, 3);
+    assert_eq!(history.len(), 3);
+
+    // Hold a real external writer only to check the application's existing
+    // busy/error mapping. This does not qualify SQLite capacity or durability.
+    let blocker = rusqlite::Connection::open(&path).unwrap();
+    blocker.execute_batch("BEGIN IMMEDIATE;").unwrap();
+    let busy = cb
+        .call(
+            &b.router,
+            Method::POST,
+            &detail,
+            Some(cb.form("Not committed", "active", 3, "")),
+        )
+        .await;
+    assert_eq!(busy.status, StatusCode::SERVICE_UNAVAILABLE);
+    assert!(busy.body.contains("Storage is busy"));
+    blocker.execute_batch("ROLLBACK;").unwrap();
+    drop(blocker);
+    assert_eq!(b.database.get(1, 1).await.unwrap().0.version, 3);
+    assert_eq!(
+        cb.call(
+            &b.router,
+            Method::POST,
+            &detail,
+            Some(cb.form("Recovered through B", "active", 3, ""))
+        )
+        .await
+        .status,
+        StatusCode::SEE_OTHER
+    );
+
+    a.drain().await.unwrap();
+    drop(a);
+    let restarted = Board::open(&path, HOST.parse().unwrap(), ids.clone())
+        .await
+        .unwrap();
+    let mut renewed = Client::login(&restarted, &ids, "alice").await;
+    assert!(
+        renewed
+            .call(&restarted.router, Method::GET, &detail, None)
+            .await
+            .body
+            .contains("Recovered through B")
+    );
+    let (item, history) = restarted.database.get(1, 1).await.unwrap();
+    assert_eq!(item.version, 4);
+    assert_eq!(history.len(), 4);
+    restarted.drain().await.unwrap();
+    b.drain().await.unwrap();
+}
+
+#[tokio::test]
 async fn readonly_and_unavailable_storage_fail_closed_and_recover() {
     let (_dir, board, ids) = setup().await;
     let mut client = Client::login(&board, &ids, "alice").await;
@@ -275,6 +396,63 @@ fn fields(title: &str) -> Fields {
         title: title.into(),
         ..Fields::default()
     }
+}
+
+#[tokio::test]
+async fn application_stylesheets_are_validated_before_storage_and_keep_ssr_security() {
+    let dir = tempfile::tempdir().unwrap();
+    let path = dir.path().join("themed.sqlite");
+    let ids = DemoIdentities::generate().unwrap();
+    for paths in [
+        vec!["https://example.test/app.css".to_owned()],
+        vec!["/static/assets/../app.css".to_owned()],
+        vec!["/static/assets/app.css?x=1".to_owned()],
+        vec!["/static/assets/app.css\" onload=\"x".to_owned()],
+        vec!["/static/assets/app.css".to_owned(); 2],
+        (0..9)
+            .map(|n| format!("/static/assets/app-{n}.css"))
+            .collect(),
+    ] {
+        assert!(matches!(
+            Board::open_with_stylesheets(&path, HOST.parse().unwrap(), ids.clone(), paths).await,
+            Err(Failure::Invalid)
+        ));
+        assert!(!path.exists());
+    }
+    let board = Board::open_with_stylesheets(
+        &path,
+        HOST.parse().unwrap(),
+        ids.clone(),
+        vec!["/static/assets/app-Test_123.css".to_owned()],
+    )
+    .await
+    .unwrap();
+    let mut client = Client::login(&board, &ids, "alice").await;
+    let page = client
+        .call(&board.router, Method::GET, "/board/projects/1/items", None)
+        .await;
+    assert_eq!(page.status, StatusCode::OK);
+    assert!(
+        page.body
+            .contains("href=\"/static/assets/app-Test_123.css\"")
+    );
+    assert!(!page.body.contains("bootstrap"));
+    assert!(!page.body.contains("<script"));
+    assert_eq!(page.headers[header::CONTENT_SECURITY_POLICY], DEFAULT_CSP);
+    assert_eq!(page.headers[header::CACHE_CONTROL], "no-store");
+    let denied = client
+        .call(&board.router, Method::GET, "/board/projects/2/items", None)
+        .await;
+    assert_eq!(denied.status, StatusCode::FORBIDDEN);
+    assert!(
+        denied
+            .body
+            .contains("href=\"/static/assets/app-Test_123.css\"")
+    );
+    assert!(denied.body.contains("Return to the board"));
+    assert!(denied.body.contains("role=\"alert\""));
+    assert!(!denied.body.contains("<script"));
+    board.drain().await.unwrap();
 }
 
 #[tokio::test]
@@ -855,4 +1033,299 @@ async fn stream_sends_authorized_snapshot_and_stops_after_logout() {
             .is_none()
     );
     board.drain().await.unwrap();
+}
+
+async fn triage_json(
+    board: &Board,
+    client: &Client,
+    project: i64,
+    payload: serde_json::Value,
+) -> (StatusCode, String) {
+    let mut request = Request::builder()
+        .method(Method::POST)
+        .uri(format!("/board/projects/{project}/triage"))
+        .header(header::HOST, HOST)
+        .header(header::ORIGIN, format!("http://{HOST}"))
+        .header(header::CONTENT_TYPE, "application/json");
+    if let Some(cookie) = &client.cookie {
+        request = request.header(header::COOKIE, cookie);
+    }
+    let response = board
+        .router
+        .clone()
+        .oneshot(
+            request
+                .body(Body::from(serde_json::to_vec(&payload).unwrap()))
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    let status = response.status();
+    assert_eq!(
+        response.headers()[header::CONTENT_SECURITY_POLICY],
+        DEFAULT_CSP
+    );
+    let body = String::from_utf8(
+        to_bytes(response.into_body(), 65536)
+            .await
+            .unwrap()
+            .to_vec(),
+    )
+    .unwrap();
+    (status, body)
+}
+
+#[tokio::test]
+async fn triage_json_reuses_authorization_csrf_validation_and_atomic_conflicts() {
+    let (_dir, board, ids) = setup().await;
+    let item = board
+        .database
+        .save(alice(), None, 0, fields("Original"))
+        .await
+        .unwrap();
+    let mut client = Client::login(&board, &ids, "alice").await;
+    let mut item = yetlet_board_triage::Item::from(item);
+    item.title = "Saved from Rust".into();
+    let payload = serde_json::json!({"csrf":client.csrf,"item":item});
+    assert_eq!(
+        triage_json(&board, &Client::default(), 1, payload.clone())
+            .await
+            .0,
+        StatusCode::UNAUTHORIZED
+    );
+    let mut forged = payload.clone();
+    forged["csrf"] = "invalid".into();
+    assert_eq!(
+        triage_json(&board, &client, 1, forged).await.0,
+        StatusCode::FORBIDDEN
+    );
+    assert_eq!(
+        triage_json(&board, &client, 2, payload.clone()).await.0,
+        StatusCode::FORBIDDEN
+    );
+    let viewer = Client::login(&board, &ids, "viewer").await;
+    assert_eq!(
+        triage_json(&board, &viewer, 1, payload.clone()).await.0,
+        StatusCode::FORBIDDEN
+    );
+    let mut invalid = payload.clone();
+    invalid["item"]["title"] = "".into();
+    assert_eq!(
+        triage_json(&board, &client, 1, invalid).await.0,
+        StatusCode::UNPROCESSABLE_ENTITY
+    );
+    let mut malformed = payload.clone();
+    malformed["unexpected"] = true.into();
+    assert_eq!(
+        triage_json(&board, &client, 1, malformed).await.0,
+        StatusCode::BAD_REQUEST
+    );
+    assert_eq!(board.database.get(1, item.id).await.unwrap().1.len(), 1);
+    let (status, body) = triage_json(&board, &client, 1, payload.clone()).await;
+    assert_eq!(status, StatusCode::OK);
+    let saved: yetlet_board_triage::Item = serde_json::from_str(&body).unwrap();
+    assert_eq!(saved.version, 2);
+    assert_eq!(saved.title, item.title);
+    let (status, body) = triage_json(&board, &client, 1, payload).await;
+    assert_eq!(status, StatusCode::CONFLICT);
+    assert_eq!(
+        serde_json::from_str::<yetlet_actions::ApiErrorEnvelope>(&body)
+            .unwrap()
+            .error
+            .code,
+        "conflict"
+    );
+    assert_eq!(board.database.get(1, item.id).await.unwrap().1.len(), 2);
+    let reply = client
+        .call(&board.router, Method::GET, "/board/projects/1/triage", None)
+        .await;
+    assert_eq!(reply.status, StatusCode::OK);
+    assert!(!reply.body.contains("<script"));
+    board.drain().await.unwrap();
+}
+
+#[tokio::test]
+async fn triage_field_details_reuse_all_rules_after_authority_and_do_not_write() {
+    let (_dir, board, ids) = setup().await;
+    let original = board
+        .database
+        .save(alice(), None, 0, fields("Original"))
+        .await
+        .unwrap();
+    let client = Client::login(&board, &ids, "alice").await;
+    let viewer = Client::login(&board, &ids, "viewer").await;
+    let mut item = yetlet_board_triage::Item::from(original);
+    item.title = "\u{1}".into();
+    item.description = "<script>rejected-input</script>".repeat(160);
+    item.status = "invalid-status".into();
+    item.priority = "invalid-priority".into();
+    item.assignee = "bob".into();
+    let payload = serde_json::json!({"csrf":client.csrf,"item":item});
+    let (status, body) = triage_json(&board, &client, 1, payload.clone()).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    let field_errors = yetlet_board_triage::validation_fields(status.as_u16(), &body).unwrap();
+    assert_eq!(field_errors.len(), 5);
+    assert_eq!(
+        field_errors["title"],
+        "Enter 1 to 160 characters without control characters."
+    );
+    assert_eq!(
+        field_errors["description"],
+        "Use at most 4,000 characters and ordinary line breaks."
+    );
+    assert_eq!(field_errors["status"], "Select a valid status.");
+    assert_eq!(field_errors["priority"], "Select a valid priority.");
+    assert_eq!(
+        field_errors["assignee"],
+        "Select an operator belonging to this project."
+    );
+    assert!(!body.contains("rejected-input"));
+    assert!(!body.contains(&client.csrf));
+    let mut forged = payload.clone();
+    forged["csrf"] = "invalid".into();
+    for (actor, project, input, expected) in [
+        (
+            &Client::default(),
+            1,
+            payload.clone(),
+            StatusCode::UNAUTHORIZED,
+        ),
+        (&viewer, 1, payload.clone(), StatusCode::FORBIDDEN),
+        (&client, 2, payload.clone(), StatusCode::FORBIDDEN),
+        (&client, 1, forged, StatusCode::FORBIDDEN),
+    ] {
+        let (status, body) = triage_json(&board, actor, project, input).await;
+        assert_eq!(status, expected);
+        assert!(
+            serde_json::from_str::<serde_json::Value>(&body).unwrap()["error"]
+                .get("fields")
+                .is_none()
+        );
+    }
+    let (stored, history) = board.database.get(1, item.id).await.unwrap();
+    assert_eq!(stored.fields.title, "Original");
+    assert_eq!(stored.version, 1);
+    assert_eq!(history.len(), 1);
+    let mut closed = fields("Closed");
+    closed.status = "closed".into();
+    let closed = board.database.save(alice(), None, 0, closed).await.unwrap();
+    let mut transition = yetlet_board_triage::Item::from(closed);
+    transition.status = "active".into();
+    let (status, body) = triage_json(
+        &board,
+        &client,
+        1,
+        serde_json::json!({"csrf":client.csrf,"item":transition}),
+    )
+    .await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(yetlet_board_triage::validation_fields(status.as_u16(), &body).is_none());
+    assert_eq!(
+        board.database.get(1, transition.id).await.unwrap().1.len(),
+        1
+    );
+    board.drain().await.unwrap();
+}
+
+#[tokio::test]
+async fn triage_only_enables_wasm_on_selected_page_and_escapes_bounded_bootstrap() {
+    let dir = tempfile::tempdir().unwrap();
+    let ids = DemoIdentities::generate().unwrap();
+    let board = Board::open_with_frontend(
+        &dir.path().join("triage.sqlite3"),
+        HOST.parse().unwrap(),
+        ids.clone(),
+        Vec::new(),
+        Some("/static/assets/app-123.js".into()),
+    )
+    .await
+    .unwrap();
+    for n in 0..14 {
+        board
+            .database
+            .save(alice(), None, 0, fields(&format!("<script> & \"{n}\"")))
+            .await
+            .unwrap();
+    }
+    let client = Client::login(&board, &ids, "alice").await;
+    let response = board
+        .router
+        .clone()
+        .oneshot(
+            Request::builder()
+                .uri("/board/projects/1/triage")
+                .header(header::HOST, HOST)
+                .header(header::COOKIE, client.cookie.clone().unwrap())
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_eq!(response.status(), StatusCode::OK);
+    let csp = response.headers()[header::CONTENT_SECURITY_POLICY]
+        .to_str()
+        .unwrap()
+        .to_owned();
+    let nonce = csp
+        .split("'nonce-")
+        .nth(1)
+        .unwrap()
+        .split('\'')
+        .next()
+        .unwrap();
+    assert_eq!(nonce.len(), 32);
+    assert!(nonce.bytes().all(|b| b.is_ascii_hexdigit()));
+    assert_eq!(
+        csp,
+        triage::CSP.replace(
+            "style-src 'self'",
+            &format!("style-src 'self' 'nonce-{nonce}'; style-src-attr 'none'")
+        )
+    );
+    assert!(!triage::CSP.contains("'unsafe-eval'"));
+    assert!(!triage::CSP.contains("'unsafe-inline'"));
+    let html = String::from_utf8(
+        to_bytes(response.into_body(), 512 * 1024)
+            .await
+            .unwrap()
+            .to_vec(),
+    )
+    .unwrap();
+    assert_eq!(html.matches("data-id=").count(), 12);
+    assert!(html.contains("Loaded item status"));
+    assert!(html.contains("id=\"triage-status-0\">12</dd>"));
+    for index in 1..4 {
+        assert!(html.contains(&format!("id=\"triage-status-{index}\">0</dd>")));
+    }
+    assert_eq!(html.matches("<script").count(), 1);
+    assert!(html.contains("&lt;script&gt;"));
+    assert!(html.contains("type=\"module\" src=\"/static/assets/app-123.js\""));
+    assert!(html.contains(&format!("<meta property=\"csp-nonce\" nonce=\"{nonce}\">")));
+    let second = board
+        .router
+        .clone()
+        .oneshot(
+            Request::builder()
+                .uri("/board/projects/1/triage")
+                .header(header::HOST, HOST)
+                .header(header::COOKIE, client.cookie.unwrap())
+                .body(Body::empty())
+                .unwrap(),
+        )
+        .await
+        .unwrap();
+    assert_ne!(second.headers()[header::CONTENT_SECURITY_POLICY], csp);
+    board.drain().await.unwrap();
+    assert!(
+        Board::open_with_frontend(
+            &dir.path().join("must-not-exist.sqlite3"),
+            HOST.parse().unwrap(),
+            ids,
+            Vec::new(),
+            Some("/static/assets/\"bad.js".into())
+        )
+        .await
+        .is_err()
+    );
+    assert!(!dir.path().join("must-not-exist.sqlite3").exists());
 }

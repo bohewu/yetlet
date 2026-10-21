@@ -104,7 +104,7 @@ pub struct LocalGraph<State, Message, Error> {
     inner: Rc<RefCell<Inner<State, Message, Error>>>,
 }
 
-/// Weak dispatch capability. It cannot keep a graph alive.
+/// Weak read/dispatch capability. It cannot keep a graph alive.
 pub struct GraphHandle<State, Message, Error> {
     inner: Weak<RefCell<Inner<State, Message, Error>>>,
 }
@@ -193,23 +193,10 @@ where
         }
     }
 
+    /// Clone the published state, with the same semantics as
+    /// [`GraphHandle::snapshot`].
     pub fn snapshot(&self) -> Result<State, ReactiveError<Error>> {
-        let state = {
-            let inner = self.inner.borrow();
-            if inner.disposed {
-                return Err(ReactiveError::Disposed);
-            }
-            if inner.faulted {
-                return Err(ReactiveError::Faulted);
-            }
-            Rc::clone(
-                inner
-                    .state
-                    .as_ref()
-                    .expect("active reactive graph owns committed state"),
-            )
-        };
-        Ok((*state).clone())
+        snapshot(&self.inner)
     }
 
     pub fn subscribe(
@@ -281,6 +268,28 @@ where
     Message: 'static,
     Error: 'static,
 {
+    /// Clone the graph's published state without flushing queued messages or
+    /// invoking its reducer, commit callback or observers.
+    ///
+    /// Before the first dispatch this reads the initial state. During a reducer
+    /// or commit callback it reads the previous published state; an observer
+    /// reads the newly published state, before any queued later pass executes.
+    /// Reads do not guarantee that a re-entrant dispatch has completed.
+    ///
+    /// Returns [`ReactiveError::Disposed`] after disposal or owner drop, and
+    /// [`ReactiveError::Faulted`] for a live faulted graph. Disposal takes
+    /// precedence. The graph borrow ends before calling `State::clone`, so
+    /// user-defined clone code may re-enter it. This is a read when the state
+    /// reference is acquired, not a freshness guarantee after cloning or await.
+    /// The returned value follows `State`'s clone semantics, which may share
+    /// interior-mutable data. User-defined clone code controls its own side
+    /// effects; the handle remains weak and this method adds no graph ownership
+    /// to the returned value.
+    pub fn snapshot(&self) -> Result<State, ReactiveError<Error>> {
+        let inner = self.inner.upgrade().ok_or(ReactiveError::Disposed)?;
+        snapshot(&inner)
+    }
+
     pub fn dispatch(&self, message: Message) -> Result<FlushStats, ReactiveError<Error>> {
         self.batch([message])
     }
@@ -321,6 +330,27 @@ where
         inner.borrow_mut().flushing = false;
         outcome
     }
+}
+
+fn snapshot<State: Clone, Message, Error>(
+    shared: &RefCell<Inner<State, Message, Error>>,
+) -> Result<State, ReactiveError<Error>> {
+    let state = {
+        let inner = shared.borrow();
+        if inner.disposed {
+            return Err(ReactiveError::Disposed);
+        }
+        if inner.faulted {
+            return Err(ReactiveError::Faulted);
+        }
+        Rc::clone(
+            inner
+                .state
+                .as_ref()
+                .expect("active reactive graph owns committed state"),
+        )
+    };
+    Ok((*state).clone())
 }
 
 fn flush<State, Message, Error>(
@@ -517,6 +547,158 @@ mod tests {
     use super::{FlushStats, GraphHandle, LocalGraph, ReactiveError, Subscription};
 
     #[test]
+    fn handle_snapshots_match_owner_without_running_callbacks() {
+        let reductions = Rc::new(Cell::new(0));
+        let reduced = Rc::clone(&reductions);
+        let commits = Rc::new(Cell::new(0));
+        let committed = Rc::clone(&commits);
+        let notifications = Rc::new(Cell::new(0));
+        let notified = Rc::clone(&notifications);
+        let graph = LocalGraph::new(
+            vec![1],
+            move |state, message| {
+                reduced.set(reduced.get() + 1);
+                state.push(message);
+                Ok::<_, &'static str>(())
+            },
+            move |_state| {
+                committed.set(committed.get() + 1);
+                Ok(())
+            },
+        );
+        let handle = graph.handle();
+        let _subscription = graph
+            .subscribe(move |_state| notified.set(notified.get() + 1))
+            .unwrap();
+        let initial = handle.snapshot().unwrap();
+        assert_eq!(initial, vec![1]);
+        assert_eq!(graph.snapshot(), Ok(initial.clone()));
+        assert_eq!(
+            (reductions.get(), commits.get(), notifications.get()),
+            (0, 0, 0)
+        );
+
+        handle.batch([2, 3]).unwrap();
+        assert_eq!(handle.snapshot(), Ok(vec![1, 2, 3]));
+        assert_eq!(graph.snapshot(), handle.snapshot());
+        assert_eq!(
+            (reductions.get(), commits.get(), notifications.get()),
+            (2, 1, 1)
+        );
+        drop(graph);
+        assert_eq!(initial, vec![1]);
+        assert_eq!(handle.snapshot(), Err(ReactiveError::Disposed));
+    }
+
+    #[test]
+    fn handle_snapshot_reads_published_state_in_each_flush_phase() {
+        type Handle = GraphHandle<i32, i32, &'static str>;
+        let slot: Rc<RefCell<Option<Handle>>> = Rc::new(RefCell::new(None));
+        let reads = Rc::new(RefCell::new(Vec::new()));
+        let reducer_slot = Rc::clone(&slot);
+        let reducer_reads = Rc::clone(&reads);
+        let commit_slot = Rc::clone(&slot);
+        let commit_reads = Rc::clone(&reads);
+        let graph = LocalGraph::new(
+            0_i32,
+            move |state, message| {
+                *state += message;
+                let handle = reducer_slot.borrow().as_ref().unwrap().clone();
+                reducer_reads
+                    .borrow_mut()
+                    .push(("reducer", handle.snapshot().unwrap()));
+                Ok::<_, &'static str>(())
+            },
+            move |_state| {
+                let handle = commit_slot.borrow().as_ref().unwrap().clone();
+                commit_reads
+                    .borrow_mut()
+                    .push(("commit", handle.snapshot().unwrap()));
+                Ok(())
+            },
+        );
+        let handle = graph.handle();
+        *slot.borrow_mut() = Some(handle.clone());
+        let observer_handle = handle.clone();
+        let observer_reads = Rc::clone(&reads);
+        let _subscription = graph
+            .subscribe(move |state| {
+                observer_reads
+                    .borrow_mut()
+                    .push(("observer", observer_handle.snapshot().unwrap()));
+                if *state == 1 {
+                    assert_eq!(observer_handle.dispatch(2), Ok(FlushStats::default()));
+                    observer_reads
+                        .borrow_mut()
+                        .push(("queued", observer_handle.snapshot().unwrap()));
+                }
+            })
+            .unwrap();
+
+        let stats = handle.dispatch(1).unwrap();
+        assert_eq!((stats.messages, stats.passes, stats.commits), (2, 2, 2));
+        assert_eq!(handle.snapshot(), Ok(3));
+        assert_eq!(graph.snapshot(), Ok(3));
+        assert_eq!(
+            *reads.borrow(),
+            vec![
+                ("reducer", 0),
+                ("commit", 0),
+                ("observer", 1),
+                ("queued", 1),
+                ("reducer", 1),
+                ("commit", 1),
+                ("observer", 3),
+            ]
+        );
+    }
+
+    #[test]
+    fn snapshots_release_the_graph_borrow_before_cloning_state() {
+        type CloneHook = Rc<RefCell<Option<Box<dyn Fn()>>>>;
+        struct State {
+            value: i32,
+            on_clone: CloneHook,
+        }
+        impl Clone for State {
+            fn clone(&self) -> Self {
+                let callback = self.on_clone.borrow_mut().take();
+                if let Some(callback) = callback {
+                    callback();
+                }
+                Self {
+                    value: self.value,
+                    on_clone: Rc::clone(&self.on_clone),
+                }
+            }
+        }
+        let hook: CloneHook = Rc::new(RefCell::new(None));
+        let graph = LocalGraph::new(
+            State {
+                value: 7,
+                on_clone: Rc::clone(&hook),
+            },
+            |_state, _message: ()| Ok::<_, &'static str>(()),
+            |_state| Ok(()),
+        );
+        for read_through_handle in [false, true] {
+            let handle = graph.handle();
+            *hook.borrow_mut() = Some(Box::new(move || {
+                // An empty batch takes a mutable graph borrow without running
+                // callbacks. This panics if snapshot still holds its borrow.
+                assert_eq!(handle.batch([]), Ok(FlushStats::default()));
+            }));
+            let state = if read_through_handle {
+                graph.handle().snapshot().unwrap()
+            } else {
+                graph.snapshot().unwrap()
+            };
+            assert_eq!(state.value, 7);
+            assert!(hook.borrow().is_none());
+        }
+    }
+
+    #[test]
     fn batch_coalesces_messages_into_one_commit_and_notification() {
         let commits = Rc::new(Cell::new(0));
         let observations = Rc::new(RefCell::new(Vec::new()));
@@ -619,14 +801,16 @@ mod tests {
             Err(ReactiveError::Reducer("negative"))
         );
         assert_eq!(graph.snapshot(), Ok(5));
+        assert_eq!(graph.handle().snapshot(), Ok(5));
         assert_eq!(commits.get(), 0);
         graph.handle().dispatch(2).unwrap();
         assert_eq!(graph.snapshot(), Ok(7));
+        assert_eq!(graph.handle().snapshot(), Ok(7));
     }
 
     #[test]
     fn commit_failure_faults_graph_without_committing_state() {
-        let graph = LocalGraph::new(
+        let mut graph = LocalGraph::new(
             0_i32,
             |state, message| {
                 *state += message;
@@ -640,7 +824,12 @@ mod tests {
             Err(ReactiveError::Commit("render"))
         );
         assert_eq!(graph.snapshot(), Err(ReactiveError::Faulted));
+        let handle = graph.handle();
+        assert_eq!(handle.snapshot(), Err(ReactiveError::Faulted));
         assert_eq!(graph.handle().dispatch(2), Err(ReactiveError::Faulted));
+        assert!(graph.dispose());
+        assert_eq!(graph.snapshot(), Err(ReactiveError::Disposed));
+        assert_eq!(handle.snapshot(), Err(ReactiveError::Disposed));
     }
 
     type CleanupHandle = GraphHandle<i32, CleanupMessage, &'static str>;
@@ -742,6 +931,8 @@ mod tests {
             Err(ReactiveError::ReentrantLimit { limit: 3 })
         );
         assert_eq!(handle.dispatch(1), Err(ReactiveError::Faulted));
+        assert_eq!(graph.snapshot(), Err(ReactiveError::Faulted));
+        assert_eq!(handle.snapshot(), Err(ReactiveError::Faulted));
     }
 
     #[test]
@@ -917,6 +1108,7 @@ mod tests {
 
         assert_eq!(dropped.get(), 4);
         assert_eq!(handle.dispatch(()), Err(ReactiveError::Disposed));
+        assert!(matches!(handle.snapshot(), Err(ReactiveError::Disposed)));
         drop(subscription);
         assert_eq!(dropped.get(), 4);
     }
@@ -940,6 +1132,8 @@ mod tests {
         assert!(graph.dispose());
         assert!(!graph.dispose());
         assert_eq!(handle.dispatch(1), Err(ReactiveError::Disposed));
+        assert_eq!(graph.snapshot(), Err(ReactiveError::Disposed));
+        assert_eq!(handle.snapshot(), Err(ReactiveError::Disposed));
         assert_eq!(notifications.get(), 0);
     }
 }

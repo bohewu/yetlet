@@ -5,7 +5,7 @@ use std::ffi::OsString;
 const IMAGE: &str = "localhost:5000/team/app:v1";
 
 #[test]
-fn strict_k8s_parser_requires_literal_unique_options_and_bounded_replicas() {
+fn k8s_parser_keeps_literal_targets_and_moves_replicas_to_settings() {
     let args = |parts: &[&str]| parts.iter().map(OsString::from).collect::<Vec<_>>();
     let base = [
         "generate",
@@ -23,46 +23,15 @@ fn strict_k8s_parser_requires_literal_unique_options_and_bounded_replicas() {
             manifest: "應 用/Cargo.toml".into(),
             output: "設定 ;$(literal)".into(),
             image: IMAGE.into(),
-            replicas: 1,
         })
     );
-    for (literal, count) in [("1", 1), ("2", 2), ("100", 100), ("002", 2)] {
-        let mut input = base.to_vec();
-        input.extend(["--replicas", literal]);
-        assert!(
-            matches!(parse(&args(&input)), Ok(Cli::GenerateK8s {replicas, ..}) if replicas == count)
-        );
-        input.extend(["--replicas", "1"]);
-        assert!(parse(&args(&input)).is_err());
-    }
-    for bad in [
-        "",
-        "0",
-        "101",
-        "-1",
-        "+1",
-        "1.0",
-        "1e2",
-        " 1",
-        "1 ",
-        "1\n",
-        "１",
-        "4294967296",
-        "--image",
-    ] {
-        let mut input = base.to_vec();
-        input.extend(["--replicas", bad]);
-        assert!(parse(&args(&input)).is_err(), "{bad:?}");
-    }
     for tail in [
-        vec!["--replicas"],
+        vec!["--replicas", "1"],
+        vec!["--replicas=2"],
         vec!["--output", "x"],
-        vec!["--manifest-path", "x"],
         vec!["--image", IMAGE],
-        vec!["--namespace", "x"],
         vec!["--apply"],
         vec!["--help"],
-        vec!["--replicas=2"],
         vec!["--"],
         vec!["extra"],
     ] {
@@ -70,17 +39,9 @@ fn strict_k8s_parser_requires_literal_unique_options_and_bounded_replicas() {
         input.extend(tail);
         assert!(parse(&args(&input)).is_err(), "{input:?}");
     }
-    for position in [2, 4, 6] {
-        let mut missing = base.to_vec();
-        missing.drain(position..position + 2);
-        assert!(parse(&args(&missing)).is_err());
-        assert!(parse(&args(&base[..position + 1])).is_err());
-        for blank in ["", " ", "\t", "--output"] {
-            let mut input = base;
-            input[position + 1] = blank;
-            assert!(parse(&args(&input)).is_err());
-        }
-    }
+    assert!(
+        matches!(parse(&args(&["generate", "k8s", "--output=out", "--image=localhost:5000/team/app:v1"])), Ok(Cli::GenerateK8s {manifest, ..}) if manifest == std::path::Path::new("Cargo.toml"))
+    );
     for bad in [
         "app:v1",
         "ghcr.io/app:latest",
@@ -92,45 +53,7 @@ fn strict_k8s_parser_requires_literal_unique_options_and_bounded_replicas() {
         input[7] = bad;
         assert!(parse(&args(&input)).is_err());
     }
-    for generator in ["docker", "compose"] {
-        let mut input = base.to_vec();
-        input[1] = generator;
-        if generator == "docker" {
-            input.truncate(6);
-        }
-        input.extend(["--replicas", "2"]);
-        assert!(parse(&args(&input)).is_err());
-    }
-    let reordered = args(&[
-        "generate",
-        "k8s",
-        "--replicas",
-        "3",
-        "--image",
-        IMAGE,
-        "--output",
-        "out",
-        "--manifest-path",
-        "app/Cargo.toml",
-    ]);
-    assert!(matches!(
-        parse(&reordered),
-        Ok(Cli::GenerateK8s { replicas: 3, .. })
-    ));
-    let mut nonunicode = args(&base);
-    #[cfg(unix)]
-    {
-        use std::os::unix::ffi::OsStringExt;
-        nonunicode[7] = OsString::from_vec(vec![0xff]);
-    }
-    #[cfg(windows)]
-    {
-        use std::os::windows::ffi::OsStringExt;
-        nonunicode[7] = OsString::from_wide(&[0xd800]);
-    }
-    #[cfg(any(unix, windows))]
-    assert!(parse(&nonunicode).is_err());
-    assert!(Cli::Help.generate_k8s().is_err());
+    assert!(Cli::Help(crate::HELP).generate_k8s().is_err());
 }
 
 #[test]

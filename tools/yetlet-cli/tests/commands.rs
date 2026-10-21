@@ -23,7 +23,7 @@ fn code(output: Output, expected: i32) -> Output {
 }
 
 #[test]
-fn frozen_cli_build_dev_and_lock_cache_failures_use_native_cargo() {
+fn frozen_cli_build_run_and_lock_cache_failures_use_native_cargo() {
     let root = tempfile::Builder::new()
         .prefix("yt087b 空 間;$literal-")
         .tempdir()
@@ -42,7 +42,7 @@ fn frozen_cli_build_dev_and_lock_cache_failures_use_native_cargo() {
     )
     .unwrap();
     code(cli("build", &manifest).output().unwrap(), 1);
-    code(cli("dev", &manifest).output().unwrap(), 1);
+    code(cli("run", &manifest).output().unwrap(), 1);
     assert!(!lock.exists());
     // Explicit fixture lock, independent of all repository/CLI lockfiles.
     fs::write(
@@ -53,14 +53,14 @@ fn frozen_cli_build_dev_and_lock_cache_failures_use_native_cargo() {
     fs::set_permissions(&lock, fs::Permissions::from_mode(0o600)).unwrap();
     let initial_lock = fs::read(&lock).unwrap();
     code(cli("build", &manifest).output().unwrap(), 0);
-    code(cli("dev", &manifest).output().unwrap(), 23);
+    code(cli("run", &manifest).output().unwrap(), 23);
     assert_eq!(fs::read(&lock).unwrap(), initial_lock);
     fs::write(
         &manifest,
         format!("{manifest_text}\n[dependencies]\nserde_json='=1.0.149'\n"),
     )
     .unwrap();
-    for command in ["build", "dev"] {
+    for command in ["build", "run"] {
         let output = code(cli(command, &manifest).output().unwrap(), 101);
         assert!(String::from_utf8_lossy(&output.stderr).contains("lock"));
         assert_eq!(fs::read(&lock).unwrap(), initial_lock);
@@ -78,7 +78,7 @@ fn frozen_cli_build_dev_and_lock_cache_failures_use_native_cargo() {
     );
     let cached_lock = fs::read(&lock).unwrap();
     let cache = tempfile::tempdir().unwrap();
-    for command in ["build", "dev"] {
+    for command in ["build", "run"] {
         let output = code(
             cli(command, &manifest)
                 .env("CARGO_HOME", cache.path())
@@ -89,4 +89,187 @@ fn frozen_cli_build_dev_and_lock_cache_failures_use_native_cargo() {
         assert!(String::from_utf8_lossy(&output.stderr).contains("offline"));
         assert_eq!(fs::read(&lock).unwrap(), cached_lock);
     }
+}
+
+#[test]
+fn natural_cli_exit_keeps_grace_for_adopted_children_and_reaps_them() {
+    let root = tempfile::tempdir().unwrap();
+    fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
+    let manifest = root.path().join("Cargo.toml");
+    fs::write(
+        &manifest,
+        "[package]\nname='grace_fixture'\nversion='0.1.0'\nedition='2024'\n[workspace]\n",
+    )
+    .unwrap();
+    fs::write(
+        root.path().join("Cargo.lock"),
+        "version=4\n[[package]]\nname='grace_fixture'\nversion='0.1.0'\n",
+    )
+    .unwrap();
+    fs::create_dir(root.path().join("src")).unwrap();
+    fs::write(
+        root.path().join("src/main.rs"),
+        r#"
+use std::{fs, path::PathBuf, process::Command, thread, time::{Duration, Instant}};
+fn main() {
+    let root = PathBuf::from(std::env::var_os("GRACE_ROOT").unwrap());
+    let script = if std::env::var("GRACE_MODE").unwrap() == "graceful" {
+        "trap 'sleep 0.1; printf done > \"$1/graceful\"; exit 0' TERM; echo $$ > \"$1/leaf.pid\"; while :; do sleep 0.02; done"
+    } else {
+        "trap '' TERM; echo $$ > \"$1/leaf.pid\"; while :; do sleep 0.02; done"
+    };
+    let _child = Command::new("/bin/sh").args(["-c", script, "sh"]).arg(&root).spawn().unwrap();
+    let deadline = Instant::now() + Duration::from_secs(5);
+    while fs::read_to_string(root.join("leaf.pid")).ok()
+        .and_then(|value| value.trim().parse::<u32>().ok()).is_none() {
+        assert!(Instant::now() < deadline);
+        thread::sleep(Duration::from_millis(5));
+    }
+    std::process::exit(17);
+}
+"#,
+    )
+    .unwrap();
+    code(cli("build", &manifest).output().unwrap(), 0);
+    for mode in ["graceful", "resistant"] {
+        code(
+            cli("run", &manifest)
+                .env("GRACE_ROOT", root.path())
+                .env("GRACE_MODE", mode)
+                .output()
+                .unwrap(),
+            17,
+        );
+        let pid = fs::read_to_string(root.path().join("leaf.pid"))
+            .unwrap()
+            .trim()
+            .parse::<i32>()
+            .unwrap();
+        assert_eq!(unsafe { libc::kill(pid, 0) }, -1);
+        assert_eq!(
+            std::io::Error::last_os_error().raw_os_error(),
+            Some(libc::ESRCH)
+        );
+        assert_eq!(root.path().join("graceful").exists(), mode == "graceful");
+        fs::remove_file(root.path().join("leaf.pid")).unwrap();
+        if mode == "graceful" {
+            fs::remove_file(root.path().join("graceful")).unwrap();
+        }
+    }
+}
+
+#[test]
+fn discovery_is_exclusive_scoped_and_needs_no_project_or_tools() {
+    let root = tempfile::tempdir().unwrap();
+    for arguments in [
+        vec![],
+        vec!["--help"],
+        vec!["-h"],
+        vec!["--version"],
+        vec!["-V"],
+        vec!["new", "--help"],
+        vec!["doctor", "-h"],
+        vec!["run", "--help"],
+        vec!["watch", "--help"],
+        vec!["watch", "-h"],
+        vec!["build", "-h"],
+        vec!["generate", "--help"],
+        vec!["generate", "docker", "-h"],
+        vec!["generate", "compose", "--help"],
+        vec!["generate", "k8s", "-h"],
+    ] {
+        let output = code(
+            Command::new(env!("CARGO_BIN_EXE_yetlet"))
+                .args(&arguments)
+                .current_dir(root.path())
+                .env("PATH", "")
+                .env("YETLET_CONFIG_ROOT", "missing")
+                .output()
+                .unwrap(),
+            0,
+        );
+        assert!(!output.stdout.is_empty(), "{arguments:?}");
+        assert!(output.stderr.is_empty(), "{arguments:?}");
+    }
+    assert_eq!(fs::read_dir(root.path()).unwrap().count(), 0);
+    for arguments in [
+        vec!["--version", "secret-value"],
+        vec!["new", "demo", "--help"],
+        vec!["doctor", "--help", "--json"],
+        vec!["generate"],
+        vec!["generate", "k8s", "--help", "--output", "secret-value"],
+        vec!["run", "--version"],
+        vec!["watch", "--release"],
+        vec!["watch", "secret-value"],
+        vec!["watch", "--manifest-path=x", "--manifest-path=y"],
+        vec!["watch", "--help", "--manifest-path=secret-value"],
+        vec!["build", "--release", "-h"],
+    ] {
+        let output = code(
+            Command::new(env!("CARGO_BIN_EXE_yetlet"))
+                .args(&arguments)
+                .current_dir(root.path())
+                .output()
+                .unwrap(),
+            2,
+        );
+        assert!(output.stdout.is_empty());
+        let stderr = String::from_utf8(output.stderr).unwrap();
+        assert!(stderr.contains("CLI_USAGE"));
+        assert!(!stderr.contains("secret-value"));
+        assert!(stderr.contains("Usage:"));
+    }
+}
+
+#[test]
+fn doctor_json_is_one_environment_report_even_when_tools_are_unavailable() {
+    let root = tempfile::tempdir().unwrap();
+    let output = code(
+        Command::new(env!("CARGO_BIN_EXE_yetlet"))
+            .args(["doctor", "--json"])
+            .current_dir(root.path())
+            .env("PATH", "")
+            .env("YETLET_CONFIG_ROOT", "missing")
+            .output()
+            .unwrap(),
+        1,
+    );
+    assert!(output.stderr.is_empty());
+    assert!(output.stdout.ends_with(b"\n"));
+    assert_eq!(output.stdout.iter().filter(|&&v| v == b'\n').count(), 1);
+    let value: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    assert_eq!(value["schema_version"], 1);
+    assert_eq!(value["scope"], "environment");
+    assert_eq!(value["completed"], true);
+    assert_eq!(value["ok"], false);
+    let diagnostics = value["diagnostics"].as_array().unwrap();
+    for code in [
+        "DOCTOR_RUSTC_VERSION",
+        "DOCTOR_CARGO_VERSION",
+        "DOCTOR_NEW_PLATFORM",
+        "DOCTOR_FRAMEWORK",
+        "DOCTOR_APP_READINESS",
+        "DOCTOR_ASSETS",
+        "DOCTOR_BUILD_DEV",
+        "DOCTOR_CONSOLE",
+        "DOCTOR_GENERATOR",
+    ] {
+        assert!(diagnostics.iter().any(|d| d["code"] == code), "{code}");
+    }
+    for d in diagnostics {
+        for field in ["code", "origin", "capability", "status", "message"] {
+            assert!(d[field].is_string());
+        }
+        if ![
+            "DOCTOR_RUSTC_VERSION",
+            "DOCTOR_CARGO_VERSION",
+            "DOCTOR_NEW_PLATFORM",
+        ]
+        .iter()
+        .any(|code| d["code"] == *code)
+        {
+            assert_eq!(d["status"], "not-checked");
+        }
+    }
+    assert_eq!(fs::read_dir(root.path()).unwrap().count(), 0);
 }

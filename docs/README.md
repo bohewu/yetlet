@@ -2,12 +2,82 @@
 
 Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then choose a [runnable sample](SAMPLES.md). Yetlet is an experimental, unpublished `0.1.0` prototype in a Private repository. Current task status belongs to [Backlog](BACKLOG.md), milestone gates to [Roadmap](ROADMAP.md), and release decisions to [Release readiness](RELEASE-READINESS.md).
 
+## Current release-candidate qualification
+
+[YT-096 candidate selection and package preflight](YT-096-CANDIDATE-QUALIFICATION.md) records the owner-approved `ce56e08` source, original nine experimental `0.1.0` libraries, Rust 1.99 and selected support targets. Nine source packages and a clean packaged-input native consumer pass on Ubuntu 26.04.1. The [selected dependency/API delta](YT-096-SUPPLY-CHAIN-DELTA.md) records 23 SBOMs and license/source checks, nine passing RustSec package-lock scans, API/threat reconciliation and an unsigned checksum bundle with explicit coverage limits. The selected Ubuntu 24.04 baseline and remaining platform/build-bound inventory/rebuild/formal review/trust gates are explicit. YT-096 is In progress and YT-020 remains Blocked. Historical accepted evidence is preserved; no publication or production support is activated.
+
+The [partial platform followup](YT-096-PLATFORM-QUALIFICATION.md) adds Ubuntu
+24.04.5 container userspace tests/doctests, five packaged wasm builds and a
+source-reconciled Firefox workflow. It retains the shared-kernel/Chrome evidence
+limits and the historical Windows cache failures. The resumed standalone
+archive lane passes all nine packages on Windows MSVC: 83 native tests and
+four doctests. The [two-host archive rebuild](YT-096-TWO-HOST-REBUILD.md) now
+matches all nine Windows archives byte-for-byte to the Linux originals.
+Independent builder control and later release gates remain open. The earlier
+[SSH failures](YT-096-AZURE-CLEAN-BUILDER.md) are preserved. The
+[Azure Run Command continuation](YT-096-AZURE-RUN-COMMAND.md) now passes on an
+actual Ubuntu 24.04.5 guest with an empty cache: nine identical archives,
+83 native tests/four doctests and five wasm libraries. All temporary resources
+are deleted; aggregate Cargo observations retain explicit SBOM/dev-only limits.
+
+The [GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) reuses the
+existing manual workflow at the exact same candidate. All nine returned archives
+match complete primary bytes with matched source/lock/tool inputs and verified
+unsigned bindings. This adds separately operated execution evidence; formal
+trust and release approval remain open. The owner subsequently accepted only
+the bounded inventory/platform disposition described below.
+
+The [final inventory/platform evidence reconciliation](YT-096-FINAL-RECONCILIATION.md)
+joins nine archives to 23 target SBOMs and retained Cargo observations, with
+133 browser-source/eight asset identities checked and no runtime reruns.
+The [owner's support/inventory decision](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20)
+accepts the experimental nine-source-package scope and known differences.
+Exact-candidate Chrome qualification and complete compiled/system inventory
+remain Not verified; no formal release gate is waived.
+
+The [final candidate security/release review](YT-096-SECURITY-RELEASE-REVIEW.md)
+is complete. Bounded technical/security evidence is accepted with limits and no
+new material source defect was identified; the overall release gate is FAIL,
+release-ready NO. Subsequent owner support/inventory acceptance resolves one
+disposition; formal integrity/trust, actual registry proof, public activation
+controls and concrete maintainer release approval remain open.
+No runtime rerun, signing or publication occurred.
+
+The [minimum formal trust/provenance proposal](YT-096-FORMAL-TRUST-PROPOSAL.md)
+lists required identities, evidence and future operations after commit
+`0bd7596`. GitHub OIDC/public Sigstore is conditional on disclosure and exact
+workflow/source approvals; no policy selection, signing or activation occurs.
+
+[YT-107 form/save feedback](YT-107-FORM-FEEDBACK.md) is Done at the bounded
+Admin/Todo scope, with independent review of all three slices: server validation to field messages,
+explicit save state/recovery, and editor/native/Todo consistency. Its
+[application authoring guide](YT-107-FORM-FEEDBACK.md#application-authoring-guide)
+shows existing patterns, intentional Reset/HTTP differences and the actual
+costs that remain app-owned.
+
 ## Architecture and contracts
 
 - [Architecture](ARCHITECTURE.md) and [MVP contract](MVP.md): responsibilities, trust boundaries and original acceptance criteria.
 - [HTTP pipeline](HTTP-PIPELINE.md): native Axum/Tower handlers, middleware, request state and response semantics.
 - [Extensions](EXTENSIONS.md): explicit opt-in setup and provider boundaries.
 - [API contracts](API-CONTRACTS.md) and [Compatibility](COMPATIBILITY.md): implemented API classification and pre-public stability limits.
+- [CLI contract](CLI-CONTRACT.md): accepted settings-first CLI naming, grammar, execution boundaries and intentional migration; see [current implementation evidence](YT-102-CLI-IMPLEMENTATION.md). The [current CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) remains the executable reference; [YT-102 baseline verification](YT-102-CLI-CONTRACT-VERIFICATION.md) records this documentation slice without completing DX research.
+- [Windows CLI exit-125 follow-up](WINDOWS-CLI-125-VERIFICATION.md): Cargo executable ACL diagnosis, safe stage diagnostics and source-matched native build/run/Ctrl-C cleanup with protected task-local tools.
+- [Development HTTPS](DEV-HTTPS-VERIFICATION.md): existing settings, externally prepared mkcert certificates, optional Rust TLS, Vite HTTPS/WSS and native run/stop/build evidence.
+- [Opt-in secret providers](SECRET-PROVIDERS.md): asynchronous named string lookup, explicit settings snapshots and constructor/State injection with replaceable providers.
+- [Settings from SecretProvider](SETTINGS-SECRET-PROVIDER.md): opt-in startup resolution into selected protected fields, narrow module settings and fail-closed errors.
+- [Shared SQLite reference](YT-094-SHARED-SQLITE.md): two Compose app replicas accessing one local business-data directory, application conflicts and restart/error behavior.
+- [Doctor follow-up](YT-102-DOCTOR-VERIFICATION.md): authorized Rustup permission repair and source-matched Linux/Windows verification; no change to doctor trust policy.
+- [Windows Vite pair verification](YT-102-WINDOWS-VITE-VERIFICATION.md): source-matched native Rust/Vite lifecycle checks using existing installed tools, with separate execution and review evidence.
+- [Windows browser CSS HMR verification](YT-102-WINDOWS-HMR-VERIFICATION.md): actual generated Rust SSR, rendered CSS updates with retained interaction state, restoration and owned browser/server cleanup.
+- [Historical Windows JS/TS update verification](YT-102-WINDOWS-JS-TS-VERIFICATION.md): pre-implementation TypeScript full-document reload, unsupported plain-JS route, retained recovery limitation and fresh-process restoration.
+- [Vite integration evidence](YT-102-STATEFUL-HMR-IMPLEMENTATION.md): configured CLI run/stop/build, frontend source confinement, current Linux follow-up and historical native Windows browser evidence.
+- [Rust hot-reload research](YT-102-RUST-HOT-RELOAD-RESEARCH.md): existing watch/rebuild/restart tools versus in-process replacement, current CLI integration seams and a bounded future evaluation; no implementation.
+- [Rust watch/restart experiment](YT-102-RUST-WATCH-POC.md): separately authorized Linux Watchexec trial of Rust edit, compile-error recovery and owned process cleanup; no native CLI integration.
+- [Windows Rust watch/restart verification](YT-102-WINDOWS-RUST-WATCH-VERIFICATION.md): source-matched WebCodex trial with compilation-error recovery, actual console keyboard Ctrl-C and owned process cleanup.
+- [Integrated Rust watch](YT-102-RUST-WATCH-IMPLEMENTATION.md): settings-controlled `run`, Watchexec file events, persistent Vite and Linux/Windows lifecycle verification.
+- [Current CLI generator compatibility](YT-102-GENERATOR-COMPATIBILITY.md): exact service/settings/frontend scaffolds, Cargo-owned local paths, configured production asset roots and explicit source-export mapping.
+- [YT-103 rolling deployment and retained assets](YT-103-ROLLING-ASSET-PLAN.md): provider comparison, application/deployment-owned retention, rollback and draining assumptions; [local qualification](YT-103-ROLLING-ASSET-VERIFICATION.md) records actual build/runtime evidence and its limits.
 - ADRs [0001](adr/0001-separation-of-concerns.md), [0002](adr/0002-events-and-actions.md), [0003](adr/0003-renderers-and-loading.md), [0004](adr/0004-request-context-and-middleware.md), [0005](adr/0005-opt-in-capability-modules.md), [0006](adr/0006-handler-first-mvc-optional.md) and [0007](adr/0007-bounded-keyed-dom-and-local-graph.md): retained decisions and tradeoffs.
 
 ## M12 — Rust repository toolchain plan
@@ -68,7 +138,107 @@ The changed source passed its [own independent reviewer](YT-081-WGPU-API-INDEPEN
 with zero issues and required followups. YT-081 is Done only at the
 selected documented scope.
 
+## Production-oriented reference application
+
+The separate [browser-only task starter](YT-104-BROWSER-STARTER.md) exercises
+YT-104 with settings-selected CLI creation/build/run/stop and static Rust/WASM
+output. It requires JavaScript/WASM and serves without a native Yetlet backend;
+SSR/island defaults remain unchanged. Its qualification record distinguishes
+Linux browser/static-host evidence from native Windows checks.
+
+The [SSR administration reference](../examples/admin-dashboard/README.md) closes
+YT-094 at the selected reference-application scope: CLI-created
+Vite/Tailwind/settings composition over the persisted Lab Operations Board, with
+native no-JS forms and responsive screens. The [closeout matrix](YT-094-CLOSEOUT.md)
+links existing evidence and accepted limitations; this is not production or
+public-release qualification. The application guide retains the first-slice results.
+The later [Rust/WASM triage slice](YT-094-WASM-TRIAGE.md) adds local multi-draft
+interaction and explicit HTTP saves; [API observations](YT-094-API-OBSERVATIONS.md)
+record the YT-105 follow-up. The first
+[form-value/event comparison](YT-105-FORM-BINDING-RESEARCH.md) recommends existing
+native-draft and graph-draft patterns before adding a public helper, with
+independent Reviewer PASS. The separate
+[state-read/initial-render study](YT-105-STATE-READ-INITIAL-RENDER-RESEARCH.md)
+proposes a weak-handle snapshot and explicit application rendering for later
+selection, with independent Reviewer PASS. The
+[HTTP-feedback comparison](YT-105-HTTP-FEEDBACK-RESEARCH.md) retains existing
+body-token CSRF and recommends application-owned field feedback before a shared
+error API, with independent Reviewer PASS and zero issues/required followups.
+YT-105 is Done at research-only scope. The separately authorized
+[weak-handle snapshot slice](YT-105-GRAPH-SNAPSHOT.md) implements only that read
+method with owner semantics; native tests, Wasm/rustdoc checks and independent
+Reviewer PASS are recorded there. Its 2026-10-20 follow-up removes Admin/Todo
+state mirrors and records native/Wasm/Chrome adoption checks and independent
+consumer Reviewer PASS. Initial rendering, browser Tasks and other proposals remain
+separate.
+Packaging is covered by YT-104 above.
+The separate [YT-106 package interoperability study](YT-106-FRONTEND-INTEROP-RESEARCH.md)
+recommends app-owned TS/wasm-bindgen boundaries, Chart.js as the first proposed
+trial and CodeMirror only after CSP feasibility. It compares Web Components
+and React roots, records package cost limits and leaves implementation separate;
+independent Reviewer PASS closes YT-106 at research-only scope.
+The separately selected [Admin Chart.js trial](YT-106-CHART-VERIFICATION.md)
+implements loaded draft-status bars with a permanent native summary and the
+existing Vite/WASM/CLI. Independent implementation Reviewer PASS completes that
+bounded trial; CodeMirror remains conditional on CSP feasibility.
+The [CodeMirror CSP follow-up](YT-106-CODEMIRROR-CSP-RESEARCH.md) now finds a
+response-local style nonce feasible at source/mechanism scope, preserving
+attribute restrictions and native fallback. Independent research Reviewer PASS
+has zero issues or required followups; no editor or application-policy change
+is implemented.
+The subsequent [Admin Description editor](YT-106-CODEMIRROR-VERIFICATION.md)
+implements the selected nonce/TS/Rust trial with native fallback, bounded local
+editing and existing CLI delivery. Targeted native/WASM/Chrome checks and
+independent implementation Reviewer PASS complete this bounded trial, with zero
+issues or required followups.
+The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
+completed native/browser checks from the returned operator-attested native
+IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.
+The [Windows desktop handoff](YT-094-WINDOWS-DESKTOP-HANDOFF.md) provides the
+historical mint-game setup and manual verification steps; its passed results and
+final cleanup are reconciled in the follow-up rather than rerun.
+The [opt-in OIDC slice](YT-094-OIDC.md) records existing settings/SecretProvider
+composition and its separate real-provider qualification boundary.
+The [Valkey shared-session slice](YT-094-VALKEY-SESSIONS.md) records explicit
+provider/settings selection and two-container login/logout, restart and outage
+verification. The later [shared-SQLite slice](YT-094-SHARED-SQLITE.md) adds
+separately reviewed two-app business storage on a single local volume; neither
+slice qualifies production HA.
+
+
+The standalone [Issue Tracker starter](../examples/production-starter/README.md) exercises
+YT-092 with native SSR forms, a command JSON API, SQLite restart persistence,
+existing settings/CLI, health/readiness, correlated JSON logs and graceful shutdown.
+Its [verification record](YT-092-STARTER-VERIFICATION.md) separates native platform
+evidence from browser/hosting qualification. This opt-in reference application is
+independent of the historical twelve-member sample catalog and does not change
+framework defaults or generator source contracts.
+
+The standalone [local signing reference](../examples/signing/README.md) exercises
+YT-093's opt-in [provider contract](YT-093-SIGNING-CONTRACT.md), multiple named
+keys/certificates, public-only verification and confirmed key CLI rotation with
+automatic profile settings updates. Its [verification record](YT-093-SIGNING-VERIFICATION.md)
+separates local, native Windows and disposable Azure experiment evidence.
+
+The [YT-095 composition comparison](YT-095-COMPOSITION-RESEARCH.md) inspects
+Starter, signing, Admin and existing secret/settings consumers. It recommends
+constructors and native State/FromRef, with explicit generic, trait-object and
+finite-enum boundaries; no new container, provider contract or implementation
+is selected. Independent Reviewer PASS has zero issues or required followups;
+YT-095 is Done at research-only scope.
+
 ## Library guides
+
+The [YT-102 developer workflow audit](YT-102-DX-AUDIT.md) reconciles current
+CLI/settings/tool responsibilities and retained platform evidence. Bounded
+Ubuntu measurements identify fixed process-completion waiting and onboarding
+costs; the report proposes minimal improvements and a DX extension boundary
+without changing implementation. Independent Reviewer PASS has zero issues or
+required followups; YT-102 is Done at research-only scope.
+The subsequent [Linux completion-latency slice](YT-102-COMPLETION-LATENCY.md)
+implements one separately selected improvement with targeted process/CLI tests
+and bounded warm-build/PTY observations. Independent implementation Reviewer
+PASS has zero issues or required followups.
 
 These nine unpublished candidate pages describe the implemented APIs and their practical limits. Use the checkout's Rust 1.99 toolchain; native SSR needs no browser build.
 
@@ -398,6 +568,9 @@ Yetlet is dual-licensed under your choice of [MIT](../LICENSE-MIT) or [Apache Li
 M10 release-supply-chain design/preflight is independently reviewed. Four local Firefox release/keyboard suites, real local Session/SQLite operations and the YT-066a three-instance Docker/Memory proof passed with owned resource cleanup. The scheduled/manual qualification workflow was merged and hosted run `38043565238` passed Linux, Windows MSVC, macOS ARM64 and Linux Firefox lanes; separate local Windows GNU and offline Docker evidence also passed. YT-065 is complete at that bounded automated scope. Real IME, spoken screen-reader output, WebKit/mobile and zoom remain explicitly Not verified optional coverage. YT-066a demonstrates stateless multi-instance serving and current Memory Session limitations only; its final independent review passed, while the separately opt-in Redis provider and [three-application fixture](YT-066B3-VERIFICATION.md) now have passing bounded single-host/no-persistence execution, cleanup and independent b3 review; YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope. Production TLS/ACL policy, backups, business RPO/RTO and operational ownership are application responsibilities; broader deployment durability/recovery remains unverified. No result establishes a supported-device range, accessibility conformance, production deployment or publication approval.
 
 #### Documentation
+
+- [Opt-in typed application configuration](CONFIGURATION.md)
+- [YT-090 configuration scope and verification](YT-090-VERIFICATION.md)
 
 - [Architecture and module boundaries](ARCHITECTURE.md)
 - [Full MVP specification](MVP.md)

@@ -2,7 +2,7 @@
 use crate::app::Completion;
 use std::{
     fs::File,
-    io,
+    io::{self, Read},
     os::{
         fd::{AsRawFd, FromRawFd},
         unix::process::CommandExt,
@@ -38,7 +38,7 @@ extern "C" fn notify(signal: libc::c_int) {
 }
 
 fn prepare(command: &mut Command) -> io::Result<()> {
-    // SAFETY: process-local adoption, before the sole Cargo spawn. The executable
+    // SAFETY: process-local adoption, before owned child spawns. The executable
     // never spawns unrelated children; adopted children are reaped only by owned PGID.
     unsafe {
         if libc::prctl(libc::PR_SET_CHILD_SUBREAPER, 1, 0, 0, 0) < 0 {
@@ -90,6 +90,25 @@ struct Owned {
 }
 
 impl Owned {
+    fn spawn(command: &mut Command, terminal: Option<libc::pid_t>) -> io::Result<Self> {
+        let child = command.spawn()?;
+        let mut owned = Self {
+            pgid: child.id() as libc::pid_t,
+            child,
+            may_signal: true,
+            cleaned: false,
+            terminal,
+            notifier: None,
+            notices: None,
+        };
+        if terminal.is_some() {
+            owned.start_notifier()?;
+            terminal_group(owned.pgid)?;
+            owned.signal(libc::SIGCONT)?;
+        }
+        Ok(owned)
+    }
+
     fn start_notifier(&mut self) -> io::Result<()> {
         let mut fds = [-1; 2];
         if unsafe { libc::pipe2(fds.as_mut_ptr(), libc::O_CLOEXEC | libc::O_NONBLOCK) } < 0 {
@@ -225,6 +244,35 @@ impl Owned {
         Ok(())
     }
 
+    fn only_pinned_children(&self) -> io::Result<bool> {
+        // Called only after WNOWAIT observes leader exit and orphan adoption.
+        // The CLI is single-threaded and does not reap here: its direct children
+        // cannot disappear during this read, even if they exit. Do not use this
+        // as a general snapshot of an actively reaped/multithreaded process tree.
+        let mut tasks = std::fs::read_dir("/proc/self/task")?;
+        let task = tasks.next().ok_or_else(|| io::Error::other("no task"))??;
+        if tasks.next().is_some() {
+            return Ok(false);
+        }
+        let mut children = String::new();
+        File::open(task.path().join("children"))?
+            .take(64)
+            .read_to_string(&mut children)?;
+        if children.len() == 64 {
+            return Ok(false);
+        }
+        let mut actual = children
+            .split_whitespace()
+            .map(str::parse::<libc::pid_t>)
+            .collect::<Result<Vec<_>, _>>()
+            .map_err(|_| io::Error::other("invalid child identity"))?;
+        let mut expected = vec![self.pgid];
+        expected.extend(self.notifier);
+        actual.sort_unstable();
+        expected.sort_unstable();
+        Ok(actual == expected)
+    }
+
     fn grace(&self, forwarded: &mut bool) -> io::Result<()> {
         let deadline = Instant::now() + GRACE;
         while Instant::now() < deadline {
@@ -345,6 +393,7 @@ pub(crate) fn run(command: &mut Command) -> io::Result<Completion> {
     };
     let result: io::Result<()> = (|| {
         let mut forwarded = false;
+        let mut natural_exit = false;
         if terminal.is_some() {
             owned.start_notifier()?;
             terminal_group(owned.pgid)?;
@@ -359,13 +408,21 @@ pub(crate) fn run(command: &mut Command) -> io::Result<Completion> {
                 break;
             }
             if owned.exited()? {
+                natural_exit = true;
                 break;
             }
             thread::sleep(POLL);
         }
         // Natural Cargo exit also tears down any remaining application descendants.
         owned.signal(libc::SIGTERM)?;
-        owned.grace(&mut forwarded)?;
+        // Missing procfs, other children or cancellation retain the full grace.
+        // Keep the leader pinned until kill_reap's last group signal in all cases.
+        if !natural_exit
+            || !owned.only_pinned_children().unwrap_or(false)
+            || owned.cancellation()? != 0
+        {
+            owned.grace(&mut forwarded)?;
+        }
         Ok(())
     })();
     let status = owned.kill_reap()?;
@@ -375,6 +432,282 @@ pub(crate) fn run(command: &mut Command) -> io::Result<Completion> {
         Completion::Cancelled(signal)
     } else {
         Completion::Exited(status)
+    })
+}
+
+// The frontend is a background owned group; Rust alone receives terminal input.
+// A single CLI invocation owns both groups and retains both leaders until cleanup.
+pub(crate) fn run_pair(rust: &mut Command, frontend: &mut Command) -> io::Result<Completion> {
+    let address = std::net::SocketAddr::from(([127, 0, 0, 1], 5173));
+    // Refuse an existing listener before starting either tree. strictPort on the
+    // actual child closes the bind race without accepting a moved Vite port.
+    drop(std::net::TcpListener::bind(address)?);
+    prepare(frontend)?;
+    prepare(rust)?;
+    let terminal = if unsafe { libc::isatty(libc::STDIN_FILENO) } == 1 {
+        let group = unsafe { libc::tcgetpgrp(libc::STDIN_FILENO) };
+        if group < 0 || group != unsafe { libc::getpgrp() } {
+            return Err(io::Error::other("CLI does not own its foreground terminal"));
+        }
+        Some(group)
+    } else {
+        None
+    };
+    let cancelled = CANCEL.load(Ordering::Relaxed);
+    if cancelled != 0 {
+        return Ok(Completion::Cancelled(cancelled));
+    }
+    let child = frontend.spawn()?;
+    let mut front = Owned {
+        pgid: child.id() as libc::pid_t,
+        child,
+        may_signal: true,
+        cleaned: false,
+        terminal: None,
+        notifier: None,
+        notices: None,
+    };
+    let mut backend: Option<Owned> = None;
+    let result: io::Result<bool> = (|| {
+        let deadline = Instant::now() + Duration::from_secs(10);
+        loop {
+            if front.cancellation()? != 0 || front.exited()? {
+                return Ok(true);
+            }
+            if std::net::TcpStream::connect_timeout(&address, Duration::from_millis(20)).is_ok() {
+                break;
+            }
+            if Instant::now() >= deadline {
+                return Err(io::Error::new(
+                    io::ErrorKind::TimedOut,
+                    "frontend readiness failed",
+                ));
+            }
+            thread::sleep(POLL);
+        }
+        let child = rust.spawn()?;
+        backend = Some(Owned {
+            pgid: child.id() as libc::pid_t,
+            child,
+            may_signal: true,
+            cleaned: false,
+            terminal,
+            notifier: None,
+            notices: None,
+        });
+        let back = backend.as_mut().unwrap();
+        if terminal.is_some() {
+            back.start_notifier()?;
+            terminal_group(back.pgid)?;
+            back.signal(libc::SIGCONT)?;
+        }
+        loop {
+            if back.cancellation()? != 0 {
+                return Ok(false);
+            }
+            if front.exited()? {
+                return Ok(true);
+            }
+            if back.exited()? {
+                return Ok(false);
+            }
+            thread::sleep(POLL);
+        }
+    })();
+    // Signal and reap both even if signalling, waiting, readiness or spawn failed.
+    let cleanup: io::Result<(std::process::ExitStatus, Option<std::process::ExitStatus>)> =
+        (|| {
+            let signal = CANCEL.load(Ordering::Relaxed);
+            let signal = if signal == 0 { libc::SIGTERM } else { signal };
+            let front_signal = front.signal(signal);
+            let back_signal = backend.as_ref().map_or(Ok(()), |back| back.signal(signal));
+            let mut forwarded = signal != libc::SIGTERM;
+            let grace = if let Some(back) = backend.as_ref() {
+                back.grace(&mut forwarded)
+            } else {
+                front.grace(&mut forwarded)
+            };
+            // A cancellation first observed during grace must reach both groups.
+            let cancellation = CANCEL.load(Ordering::Relaxed);
+            let front_cancel = if cancellation != 0 {
+                front.signal(cancellation)
+            } else {
+                Ok(())
+            };
+            let front_status = front.kill_reap();
+            let back_status = backend.as_mut().map(Owned::kill_reap).transpose();
+            front_signal?;
+            back_signal?;
+            grace?;
+            front_cancel?;
+            Ok((front_status?, back_status?))
+        })();
+    let (front_status, back_status) = cleanup?;
+    let frontend_exited = result?;
+    let signal = CANCEL.load(Ordering::Relaxed);
+    Ok(if signal != 0 {
+        Completion::Cancelled(signal)
+    } else if frontend_exited {
+        Completion::FrontendExited(front_status)
+    } else {
+        Completion::Exited(back_status.ok_or_else(|| io::Error::other("Rust was not started"))?)
+    })
+}
+
+// Watchexec emits events only. Each Rust generation, the watcher and the
+// persistent frontend remain separate groups owned by this supervisor.
+pub(crate) fn run_watch(
+    rust: &mut Command,
+    watcher: &mut Command,
+    frontend: Option<&mut Command>,
+) -> io::Result<Completion> {
+    let address = std::net::SocketAddr::from(([127, 0, 0, 1], 5173));
+    if frontend.is_some() {
+        drop(std::net::TcpListener::bind(address)?);
+    }
+    prepare(rust)?;
+    prepare(watcher)?;
+    let terminal = if unsafe { libc::isatty(libc::STDIN_FILENO) } == 1 {
+        let group = unsafe { libc::tcgetpgrp(libc::STDIN_FILENO) };
+        if group < 0 || group != unsafe { libc::getpgrp() } {
+            return Err(io::Error::other("CLI does not own its foreground terminal"));
+        }
+        Some(group)
+    } else {
+        None
+    };
+    let signal = CANCEL.load(Ordering::Relaxed);
+    if signal != 0 {
+        return Ok(Completion::Cancelled(signal));
+    }
+    watcher
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::piped());
+    let mut watch = Owned::spawn(watcher, None).map_err(|error| {
+        if error.kind() == io::ErrorKind::NotFound {
+            io::Error::new(
+                error.kind(),
+                "Rust watch requires Watchexec on PATH; prepare it separately or disable cli.rust.watch",
+            )
+        } else {
+            error
+        }
+    })?;
+    let mut events = crate::platform::process::watch::Events::new(
+        watch.child.stdout.take().expect("piped watcher stdout"),
+    );
+    let mut front: Option<Owned> = None;
+    let mut backend: Option<Owned> = None;
+    let result: io::Result<bool> = (|| {
+        if let Some(frontend) = frontend {
+            prepare(frontend)?;
+            frontend.stdin(std::process::Stdio::null());
+            front = Some(Owned::spawn(frontend, None)?);
+            let deadline = Instant::now() + Duration::from_secs(10);
+            loop {
+                if watch.cancellation()? != 0 || watch.exited()? {
+                    return Ok(false);
+                }
+                if front.as_ref().unwrap().exited()? {
+                    return Ok(true);
+                }
+                // Initial Rust startup already builds the latest source state.
+                let _ = events.changed()?;
+                if std::net::TcpStream::connect_timeout(&address, Duration::from_millis(20)).is_ok()
+                {
+                    break;
+                }
+                if Instant::now() >= deadline {
+                    return Err(io::Error::new(
+                        io::ErrorKind::TimedOut,
+                        "frontend readiness failed",
+                    ));
+                }
+                thread::sleep(POLL);
+            }
+        }
+        let mut restart = true;
+        loop {
+            let signal = if let Some(back) = &backend {
+                back.cancellation()?
+            } else {
+                watch.cancellation()?
+            };
+            if signal != 0 || watch.exited()? {
+                return Ok(false);
+            }
+            if let Some(front) = &front
+                && front.exited()?
+            {
+                return Ok(true);
+            }
+            restart |= events.changed()?;
+            if let Some(back) = backend.as_mut()
+                && (restart || back.exited()?)
+            {
+                back.signal(libc::SIGTERM)?;
+                back.grace(&mut false)?;
+                let status = back.kill_reap()?;
+                if !restart {
+                    eprintln!(
+                        "CLI_WATCH_EXIT stage=rust: child ended with {status}; waiting for changes"
+                    );
+                }
+                backend = None;
+                // Events during teardown collapse into the next generation.
+                restart |= events.changed()?;
+                continue;
+            }
+            if restart {
+                backend = Some(Owned::spawn(rust, terminal)?);
+                restart = false;
+            }
+            thread::sleep(POLL);
+        }
+    })();
+    // Attempt every cleanup even when another group or the event stream failed.
+    let signal = CANCEL.load(Ordering::Relaxed);
+    let signal = if signal == 0 { libc::SIGTERM } else { signal };
+    let watch_signal = watch.signal(signal);
+    let front_signal = front.as_ref().map_or(Ok(()), |front| front.signal(signal));
+    let back_signal = backend.as_ref().map_or(Ok(()), |back| back.signal(signal));
+    let grace = backend
+        .as_ref()
+        .unwrap_or(&watch)
+        .grace(&mut (signal != libc::SIGTERM));
+    let cancellation = CANCEL.load(Ordering::Relaxed);
+    let watch_cancel = if cancellation != 0 {
+        watch.signal(cancellation)
+    } else {
+        Ok(())
+    };
+    let front_cancel = front.as_ref().map_or(Ok(()), |front| {
+        if cancellation != 0 {
+            front.signal(cancellation)
+        } else {
+            Ok(())
+        }
+    });
+    let watch_status = watch.kill_reap();
+    let front_status = front.as_mut().map(Owned::kill_reap).transpose();
+    let back_status = backend.as_mut().map(Owned::kill_reap).transpose();
+    watch_signal?;
+    front_signal?;
+    back_signal?;
+    grace?;
+    watch_cancel?;
+    front_cancel?;
+    let watch_status = watch_status?;
+    let front_status = front_status?;
+    back_status?;
+    let signal = CANCEL.load(Ordering::Relaxed);
+    if signal != 0 {
+        return Ok(Completion::Cancelled(signal));
+    }
+    Ok(if result? {
+        Completion::FrontendExited(front_status.expect("frontend exited"))
+    } else {
+        Completion::WatcherExited(watch_status)
     })
 }
 

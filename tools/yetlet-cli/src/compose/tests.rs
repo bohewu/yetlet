@@ -40,7 +40,7 @@ fn literal_compose_arguments_are_required_unique_and_command_specific() {
         invalid.extend(tail);
         assert!(parse(&args(&invalid)).is_err(), "{invalid:?}");
     }
-    for position in [2, 4, 6] {
+    for position in [4, 6] {
         let mut missing = base.to_vec();
         missing.drain(position..position + 2);
         assert!(parse(&args(&missing)).is_err());

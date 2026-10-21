@@ -267,7 +267,7 @@ production controls, HA, supported devices, accessibility, SLA or publication.
 ## Independent responsibility-scope review — 2026-10-11
 
 The saved repository reviewer contract at
-`/home/bohe/.codex/agents-pipeline/agents/reviewer.md` was supplied to an ordinary
+`${CODEX_HOME}/agents-pipeline/agents/reviewer.md` was supplied to an ordinary
 local `codex exec` process with a read-only sandbox, not `codex exec review`,
 WebCodex, current-session self-review or native managed-role dispatch. Fresh
 workspace profile checks reported `health=ok`, `catalog_state=current` and

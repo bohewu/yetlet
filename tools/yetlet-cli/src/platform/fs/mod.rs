@@ -15,9 +15,12 @@ use windows as imp;
 pub(in crate::platform) use windows::Executable;
 
 use crate::app;
-pub(crate) use imp::{App, NEW_DIAGNOSTIC, NEW_SUPPORTED, create_project, read_framework};
-pub(crate) use imp::{app_entries, read_app_file};
-use std::path::Path;
+pub(crate) use imp::key;
+pub(crate) use imp::{
+    App, NEW_DIAGNOSTIC, NEW_SUPPORTED, app_root, create_project, open_directory, read_framework,
+};
+pub(crate) use imp::{app_directory_entries, app_entries, read_app_file, read_app_input};
+use std::path::{Component, Path};
 
 const UNSUPPORTED_CREATE: &str = "new is unsupported on this platform: no verified no-replace/reparse implementation; nothing written";
 
@@ -39,14 +42,86 @@ pub(crate) fn open_app(manifest: &Path) -> Result<App, String> {
     files.finish()
 }
 
-// The two built-in generators each need exactly one fixed child directory.
-// Keep arbitrary relative paths out of the native write/rollback adapters.
-fn generated_subdirectory(files: &[(&str, String)]) -> Result<&'static str, String> {
-    let mut child = None;
+// Only exact generated inputs and the flat built Vite asset directory are readable.
+fn app_input(name: &str) -> Result<(&str, &str), String> {
+    match name {
+        "src/main.rs" | "src/config.rs" | "src/vite.rs" => Ok(("src", &name[4..])),
+        "dist/.vite/manifest.json" => Ok(("dist/.vite", "manifest.json")),
+        "dist/index.html" => Ok(("dist", "index.html")),
+        "Cargo.toml"
+        | "Cargo.lock"
+        | "base.toml"
+        | "development.toml"
+        | "staging.toml"
+        | "production.toml"
+        | "package.json"
+        | "package-lock.json"
+        | "vite.config.mjs"
+        | "vite.dev.config.mjs"
+        | "vite.dev.bridge.mjs"
+        | ".env.example"
+        | "tsconfig.json"
+        | "app.ts"
+        | "app.css"
+        | "companion.ts"
+        | "shared.ts"
+        | "shared.css"
+        | "lazy.ts"
+        | "lazy.css"
+        | "mark.svg" => Ok(("", name)),
+        _ => {
+            let file = name
+                .strip_prefix("dist/assets/")
+                .ok_or("unsupported app input")?;
+            if file.is_empty()
+                || file.len() > 200
+                || file.starts_with('.')
+                || !file
+                    .bytes()
+                    .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'.' | b'-' | b'_'))
+                || !["js", "css", "svg"].contains(&file.rsplit('.').next().unwrap_or(""))
+            {
+                return Err("unsupported built asset path".into());
+            }
+            Ok(("dist/assets", file))
+        }
+    }
+}
+
+fn app_directory(name: &str) -> Result<(), String> {
+    if ["", "src", "dist", "dist/.vite", "dist/assets"].contains(&name) {
+        Ok(())
+    } else {
+        Err("unsupported app directory".into())
+    }
+}
+
+// Only the scaffold's two fixed children or the generator's cargo overlay are
+// writable. This does not expand the separate generator input/read allowlist.
+fn generated_subdirectories(files: &[(&str, String)]) -> Result<Vec<&'static str>, String> {
+    let mut children = Vec::new();
     for (path, _) in files {
         let directory = match *path {
-            "src/main.rs" => Some("src"),
+            "src/main.rs" | "src/lib.rs" | "src/model.rs" | "src/config.rs" | "src/tailwind.rs"
+            | "src/vite.rs" => Some("src"),
             "cargo-overlay/Cargo.toml" => Some("cargo-overlay"),
+            "frontend/package.json"
+            | "frontend/index.html"
+            | "frontend/build-wasm.mjs"
+            | "frontend/package-lock.json"
+            | "frontend/vite.config.mjs"
+            | "frontend/vite.dev.config.mjs"
+            | "frontend/vite.dev.bridge.mjs"
+            | "frontend/tsconfig.json"
+            | "frontend/app.ts"
+            | "frontend/app.css"
+            | "frontend/companion.ts"
+            | "frontend/shared.ts"
+            | "frontend/shared.css"
+            | "frontend/lazy.ts"
+            | "frontend/lazy.css"
+            | "frontend/mark.svg"
+            | "frontend/.env.example" => Some("frontend"),
             name if !name.is_empty()
                 && !matches!(name, "." | "..")
                 && !name.contains(['/', '\\', '\0']) =>
@@ -55,12 +130,91 @@ fn generated_subdirectory(files: &[(&str, String)]) -> Result<&'static str, Stri
             }
             _ => return Err("unsupported generated file path".into()),
         };
-        if let Some(directory) = directory {
-            if child.is_some_and(|existing| existing != directory) {
-                return Err("mixed generated subdirectories are unsupported".into());
-            }
-            child = Some(directory);
+        if let Some(directory) = directory
+            && !children.contains(&directory)
+        {
+            children.push(directory);
         }
     }
-    Ok(child.unwrap_or("src"))
+    if children.contains(&"cargo-overlay") && children.len() != 1 {
+        return Err("mixed generator and scaffold subdirectories are unsupported".into());
+    }
+    Ok(children)
+}
+
+// Frontend roots are independent of generator inputs and always app-relative.
+pub(crate) fn frontend_directory(app: &App, relative: &Path) -> Result<App, String> {
+    let text = relative.to_str().ok_or("frontend root must be Unicode")?;
+    if text.is_empty()
+        || text.contains([':', '\\', '\0'])
+        || relative
+            .components()
+            .any(|part| !matches!(part, Component::Normal(_)))
+    {
+        return Err(
+            "frontend root must be a nonempty project-relative path without traversal".into(),
+        );
+    }
+    imp::verify_app(app)?;
+    let mut path = app_root(app).to_owned();
+    let mut selected = None;
+    // Each selected descendant must be protected too, not just its last child.
+    for component in relative.components() {
+        path.push(component.as_os_str());
+        selected = Some(open_directory(&path)?);
+    }
+    imp::verify_app(app)?;
+    selected.ok_or_else(|| "frontend root must select a directory".into())
+}
+
+/// Existing selected apps also need refusal before any frontend child can read dotenv.
+pub(crate) fn validate_frontend_dotenv(frontend: &App) -> Result<(), String> {
+    imp::verify_app(frontend)?;
+    let entries = std::fs::read_dir(app_root(frontend))
+        .map_err(|_| "cannot inspect frontend dotenv entries")?;
+    for entry in entries {
+        let entry = entry.map_err(|_| "cannot inspect frontend dotenv entry")?;
+        let name = entry.file_name();
+        let name = name.as_encoded_bytes();
+        #[cfg(windows)]
+        let dotenv = name.eq_ignore_ascii_case(b".env")
+            || name
+                .get(..5)
+                .is_some_and(|prefix| prefix.eq_ignore_ascii_case(b".env."));
+        #[cfg(not(windows))]
+        let dotenv = name == b".env" || name.starts_with(b".env.");
+        if !dotenv {
+            continue;
+        }
+        let metadata = std::fs::symlink_metadata(entry.path())
+            .map_err(|_| "cannot inspect frontend dotenv file")?;
+        let unsafe_file = !metadata.is_file() || metadata.file_type().is_symlink();
+        #[cfg(windows)]
+        let unsafe_file = {
+            use std::os::windows::fs::MetadataExt;
+            unsafe_file
+                || metadata.file_attributes()
+                    & windows_sys::Win32::Storage::FileSystem::FILE_ATTRIBUTE_REPARSE_POINT
+                    != 0
+        };
+        if unsafe_file {
+            return Err("frontend dotenv must be a regular, unlinked, non-reparse file".into());
+        }
+    }
+    imp::verify_app(frontend)
+}
+
+/// CLI frontend startup keeps its input separate from generator qualification.
+pub(crate) fn read_frontend_manifest(frontend: &App) -> Result<Vec<u8>, String> {
+    #[cfg(target_os = "linux")]
+    return linux::read_frontend_manifest(frontend);
+    #[cfg(not(target_os = "linux"))]
+    read_app_file(frontend, "dist/.vite/manifest.json")
+}
+
+pub(crate) fn read_frontend_index(frontend: &App) -> Result<Vec<u8>, String> {
+    #[cfg(target_os = "linux")]
+    return linux::read_frontend_index(frontend);
+    #[cfg(not(target_os = "linux"))]
+    read_app_file(frontend, "dist/index.html")
 }

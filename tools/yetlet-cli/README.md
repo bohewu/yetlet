@@ -1,177 +1,491 @@
 # Yetlet CLI — Unpublished Linux/Windows Developer Preview
 
-The `yetlet` CLI is an **experimental, local-source-only** companion. It is not published to a registry, globally installed, or production-qualified. [YT-087](../../docs/YT-087C-VERIFICATION.md) records historical Linux acceptance; [YT-088](../../docs/YT-088-CROSS-PLATFORM-CLI-PLAN.md) records the later native Windows parity implementation and its bounded validation. YT-020 release gates remain blocked.
+The CLI creates applications and executes selected tasks. Persistent behavior uses
+Yetlet's existing public base/profile settings and scoped environment overrides.
+This experimental preview is unpublished. Its emitted version declarations are
+not usable from a registry before YT-096/YT-020 qualification. Local evaluation
+uses explicit Cargo dependency overrides; no framework source flag is needed.
+See the [CLI contract](../../docs/CLI-CONTRACT.md) and
+[implementation evidence](../../docs/YT-102-CLI-IMPLEMENTATION.md).
+The subsequent [DX audit](../../docs/YT-102-DX-AUDIT.md) compares actual setup,
+build/run/watch, diagnostics, testing and deployment-preview journeys and records
+bounded costs and proposed improvements. Independent Reviewer PASS completes
+YT-102 at research-only scope, with zero issues or required followups. CLI
+behavior and wider qualification remain unchanged.
+The separately selected [Linux completion-latency slice](../../docs/YT-102-COMPLETION-LATENCY.md)
+avoids the natural-exit grace only after a conservative single-thread/pinned-child
+check; cancellation and descendant cleanup retain their existing behavior.
+Independent implementation Reviewer PASS has zero issues or required followups.
 
-## Build locally
+## Current command and capability inventory
 
-From the Yetlet checkout, using its already installed Rust/Cargo 1.99 toolchain and cached dependencies:
+| Command | Implemented behavior |
+|---|---|
+| `yetlet --help` / `-h` | Root help; every complete command path also has exclusive scoped help |
+| `yetlet --version` / `-V` | Build-time CLI version; no project, tools or settings required |
+| `yetlet new NAME [--parent DIRECTORY] [--template native\|browser] [--vite] [--tailwind] [--service] [--settings]` | Publish a new scaffold; no tools, installs, builds or lock generation |
+| `yetlet doctor [--json]` | Bounded environment-only Rust/Cargo identity and compiled filesystem capability; schema 1 JSON |
+| `yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]` | Read-only selected key/version, certificate pins and dates; no password or generation |
+| `yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]` | Confirmed local rotation and atomic selected-profile settings update; retain old versions |
+| `yetlet run [--manifest-path PATH]` | Native frozen Cargo/watch/Vite, or settings-selected browser-only static preview |
+| `yetlet watch [--manifest-path PATH]` | Same run pipeline with Rust watch enabled for this invocation; Vite still uses settings |
+| `yetlet build [--manifest-path PATH] [--release]` | Native frontend-then-Cargo, or settings-selected browser-only production build |
+| `yetlet generate docker [--manifest-path PATH] --output DIRECTORY` | Qualified-source configuration/inventory only |
+| `yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE` | Configuration for a separately built Linux/amd64 image |
+| `yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE` | Deployment/Service configuration; replicas use settings, default 1, range 1–100 |
+
+Value options accept separate or equals forms; NAME may appear anywhere among
+new's options. Booleans are presence-only. Unknown, duplicate, empty, misplaced
+or removed options fail before effects. Help/version are exclusive. There is no
+argument forwarding, shell expansion, ancestor project search or implicit install.
+Manifest defaults to exactly cwd/Cargo.toml. `--parent` selects an existing
+creation parent; `--output` selects the complete new generator destination.
+Paths remain literal, including supported native Unicode and spaces.
+
+On Windows, executable selection requires absolute PATH entries without reparse
+traversal, a trusted executable owner and no untrusted write access. A refusal
+prints `CLI_PROCESS stage=executable` with the error kind and optional numeric OS
+code before returning exit 125. Prepare a protected tool installation and select
+its physical directory on PATH; tool permissions are managed separately from the CLI.
+See the [native Windows diagnosis and verification](../../docs/WINDOWS-CLI-125-VERIFICATION.md).
+
+## First-use prerequisites
+
+Prepare tools and dependency caches explicitly before running the examples.
+Building the CLI from source requires OpenSSL headers/libraries through its
+native signing dependency, even if you only plan to create a browser app.
+Plain generated native/browser apps do not acquire that CLI dependency.
+Building the CLI and building an app are separate steps.
+
+| Selection | Tools and inputs to prepare | Initial workflow |
+|---|---|---|
+| Build this CLI from the checkout | Rust/Cargo 1.99+, a native C/link toolchain, OpenSSL development files (reference: 3.5 LTS) and cached locked dependencies | [Build the CLI](#build-locally-and-create-an-application), then inspect help/doctor |
+| Native `new NAME` | Native Rust toolchain, compatible local Yetlet dependency paths and a separately prepared app Cargo.lock | `yetlet build`, then `yetlet run`; no Node or frontend tool is required |
+| Native `new NAME --vite`, optionally `--tailwind` | Native prerequisites plus Node `^20.19.0` or `>=22.12.0`, npm and the generated frontend dependencies | [Vite preparation](templates/vite/SELECTED-README.md), initial `yetlet build` with auto_build enabled, then `yetlet run` |
+| `new NAME --template browser`, optionally `--tailwind` | Rust/Cargo 1.99+, `wasm32-unknown-unknown`, wasm-bindgen-cli 0.2.129, the same Node/npm prerequisites and the generated dependencies | [Browser preparation](templates/browser/README.md), `yetlet build`, then `yetlet run` to preview the existing dist |
+| Native `new NAME --tailwind` without Vite | Native prerequisites plus the separately provisioned standalone Tailwind 4.3.3 CLI | [Build `dist/tailwind.css` explicitly](templates/tailwind/SELECTED-README.md) before running Rust |
+
+The Vite Tailwind selection uses the official npm plugin, without a standalone
+CSS compiler. Native Rust watch additionally needs separately prepared
+[Watchexec](#rust-watch); development HTTPS needs separately prepared
+[mkcert and certificates](templates/config/SELECTED-README.md#development-https).
+Settings-enabled native apps, including `--vite`, need their own service token
+before startup; use the existing [settings/Development-secret mechanism](templates/config/SELECTED-README.md),
+keeping credentials out of public TOMLs and frontend files.
+
+Use this order: prepare tools/cache, build the CLI, create the selected app,
+configure its local Cargo dependencies and generate its lock, prepare any
+selected frontend dependencies/assets, then build/run. `new` does not install
+tools, generate Cargo.lock or produce dist; selected frontend templates include
+their pinned package lock. `run` does not create the initial dist;
+with frontend auto_build disabled, prepare it separately before startup.
+Offline commands require an already populated cache. CLI execution never
+installs dependencies or repairs locks automatically.
+
+`yetlet doctor --json` checks the local Rust/Cargo environment and compiled
+filesystem capability only. A passing result does not check OpenSSL development
+files for a CLI rebuild, app dependencies/settings/secrets, Node/npm, WASM tools,
+frontend dist or whether `run` will work. Use the selected setup instructions
+and actual build/run for those checks. On Windows, also prepare protected
+physical tool paths and an attached processed-input console for native run;
+see [native tool preparation](../../docs/WINDOWS-CLI-125-VERIFICATION.md#reuse-the-prepared-runner-tools).
+
+## Build locally and create an application
+
+The following POSIX-shell example starts at the repository root after the
+prerequisites above are ready. For an existing custom static OpenSSL prefix,
+select it in this shell before the build:
 
 ```sh
+# Only when using your separately prepared static OpenSSL installation:
+# export OPENSSL_DIR=/path/to/prepared/openssl
+# export OPENSSL_STATIC=1
 cargo build --offline --locked --manifest-path tools/yetlet-cli/Cargo.toml
-tools/yetlet-cli/target/debug/yetlet doctor --framework-path . --json
-```
-
-The CLI is in its own unpublished Cargo workspace and has its own Cargo.lock. Its build does not join or change the framework or `cargo xtask` dependency graph.
-
-## Linux — scaffold and run native SSR
-
-Create or select a **protected existing parent directory** (owned by you, non-group/world-writable; `new` also permits trusted sticky parents on Linux). This sample uses a private parent and preserves the current application's local framework dependency paths:
-
-```sh
+tools/yetlet-cli/target/debug/yetlet --help
+tools/yetlet-cli/target/debug/yetlet doctor --json
 mkdir -p -m 700 "$HOME/yetlet-apps"
-tools/yetlet-cli/target/debug/yetlet new sampleapp --framework-path . --dir "$HOME/yetlet-apps"
-cargo generate-lockfile --offline --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
-tools/yetlet-cli/target/debug/yetlet build --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
-tools/yetlet-cli/target/debug/yetlet dev --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
+tools/yetlet-cli/target/debug/yetlet new sampleapp --parent "$HOME/yetlet-apps"
 ```
 
-Open `http://127.0.0.1:3000/` and stop with Ctrl-C. The generated application is native, handler-first SSR: no mandatory JS/WASM, Controllers, DI, Session, HTTP event circuit or watcher. `YETLET_PORT` selects another loopback port. `new` never creates an application lockfile or builds/downloads dependencies; **you** run the explicit offline `cargo generate-lockfile` step. If dependencies are absent from the local cache, it fails rather than falling back to the network. Keep the application's own Cargo.lock for future frozen commands.
+Use an existing protected parent: Linux owner-protected directories or trusted
+sticky creation parents; Windows protected local fixed NTFS without reparse
+traversal. Creation never overwrites or merges an existing destination.
 
-### Opt-in native SSR cloud profile (YT-089a)
-
-Append `--cloud` to `new NAME --framework-path PATH [--dir DIRECTORY]` to select
-the separate app-owned cloud template. It still defaults to `127.0.0.1:3000`.
-Only explicit `YETLET_HOST=0.0.0.0` permits external listening; the other accepted
-host literal is `127.0.0.1`. `YETLET_PORT` accepts decimal ports 1 through 65535.
-Empty, non-Unicode or invalid settings fail startup without echoing their values.
-The default template and its generated README are unchanged.
-
-The cloud app alone enables Tokio's signal feature and supplies empty-body
-`GET /health/live` (200) and `/health/ready` (200, or 503 after shutdown starts).
-These report local-process state, not external DB/Redis health. Unix SIGTERM or
-portable Ctrl-C makes readiness unavailable and initiates Axum graceful drain.
-After the listener closes, probes may be refused rather than receiving 503.
-Long requests/streams have no automatic drain deadline; the application's later
-deployment `terminationGracePeriodSeconds` budget and traffic withdrawal policy
-must account for them. Run production drain checks against the app binary;
-the CLI `dev` supervisor retains its separate bounded cleanup behavior.
-
-The cloud manifest declares `[package.metadata.yetlet] cloud-profile =
-"native-ssr-v1"` for future generators; this declaration is not source attestation.
-The Docker generator below verifies the parsed source as well as this marker.
-See the generated cloud README and [accepted YT-089a evidence](../../docs/YT-089A-VERIFICATION.md)
-for its bounded Linux runtime and native Windows compile/build/unit gates.
-
-### Opt-in Docker configuration (YT-089b; independently accepted)
-
-```text
-yetlet generate docker --manifest-path APP/Cargo.toml --output NEW_DIRECTORY
-```
-
-The output targets Linux OCI/amd64 on Linux or Windows. It requires an existing
-app Cargo.lock and the exact generated standalone `--cloud` manifest and parsed
-main source contract. Edited/manual apps, extra sources/dependencies/features,
-build scripts, unknown framework path packages and unsupported workspace
-inheritance fail closed. Output uses the native safe no-replace adapter; its
-parent must exist and be protected. Paths support spaces/Unicode within the
-platform contract. No Cargo, Docker, network, source copying or source edits
-occur during generation. The public three-argument scaffold API is retained.
-
-The eight generated files are Dockerfile, a deny-by-default root `.dockerignore`,
-`cargo-overlay/Cargo.toml`, `framework-workspace.toml`, two named-context ignore
-templates, a nonsecret SHA-256 inventory and README. Follow that README to
-manually prepare and verify two **physically separate sanitized** `app-src` and
-`yetlet-src` exports. The output directory is the only default context. Never
-send the live app or dirty checkout as a context or assume the output ignore
-file sanitizes named sources. No automatic exporter is provided.
-
-The app overlay changes exactly two path values and preserves other supported
-manifest semantics. The framework workspace template retains the exact supported
-inherited metadata/dependencies and only core/HTML/server-axum members. Docker
-uses a Rust 1.99.0 Bookworm GNU builder and Debian Bookworm slim non-root runtime,
-explicit `YETLET_HOST=0.0.0.0`, `YETLET_PORT=8080`, exec entrypoint and SIGTERM.
-No unprovided healthcheck executable is assumed. The separate operator build
-runs `cargo metadata --locked` and `cargo build --locked --release`; registry
-crates/base images/frontend can require network. Tags are versioned, mutable,
-and require a later verified digest-pin decision. See [accepted YT-089b
-evidence](../../docs/YT-089B-VERIFICATION.md). The separately reviewed Kubernetes configuration generator is documented below.
-
-### Opt-in Compose configuration (YT-089c independently accepted)
-
-```text
-yetlet generate compose --manifest-path APP/Cargo.toml --output NEW_DIRECTORY --image localhost:5000/team/app:v1
-```
-
-Generation creates exactly `compose.yaml` and `README.md` in a fresh directory
-under an existing protected parent. It reuses the Docker generator's unchanged
-cloud-app/source/framework inspection, revalidation and native no-replace writer.
-An explicit Cargo.lock v4 must match the supported app/framework root packages,
-direct dependency identities and complete referenced lock nodes; stale/missing
-locks fail closed. Static checks do not replace the operator's locked image build.
-No Cargo, Docker, Compose, shell, network, registry or kubectl is invoked.
-
-The shared internal image validator requires lowercase ASCII registry/repository
-and an explicit non-`latest` tag (ASCII case allowed in tags) or `@sha256:` with
-64 lowercase hex digits. A registry must be a dotted DNS/IPv4 host or `localhost`,
-optionally with a decimal port 1-65535 without leading zeros. Short/unqualified
-names, IPv6, tag-plus-digest, blanks, controls, Unicode, YAML/shell interpolation
-and escapes are refused. Missing/duplicate/unknown/invalid args use usage exit 2;
-unsafe inputs/output or stale sources use exit 1.
-
-Compose references a separately operator-built Linux/amd64 image, with
-`pull_policy: never`, container `0.0.0.0:8080`, host-only `127.0.0.1:8080`,
-SIGTERM and a 30-second stop grace period. The app has no automatic drain deadline;
-adjust this example budget for measured long requests. No build, volumes,
-privileges, credentials or healthcheck tool is assumed. The generated README
-describes explicit operator config/up/down actions and local digest availability.
-The generator neither reads `.env` nor embeds personal paths or secret values.
-
-[YT-089c verification](../../docs/YT-089C-VERIFICATION.md) records independent Reviewer PASS after native GNU/MSVC byte parity and isolated Linux Docker Compose HTTP/SIGTERM/cleanup; generator invocation itself never builds or deploys.
-
-## Opt-in Kubernetes configuration (YT-089d independently accepted)
+The CLI has its own Cargo workspace and lock. New apps have their own standalone
+workspace and no Cargo.lock. Current Yetlet crate versions are unpublished:
+explicitly replace generated dependencies with compatible local Cargo path
+entries or patches, using the generated README's example. Core/server use
+0.1.0 and config uses 0.0.0. Then prepare the app's lock separately:
 
 ```sh
-yetlet generate k8s --manifest-path APP/Cargo.toml --output NEW_DIRECTORY --image localhost:5000/team/app:v1 --replicas 1
+cd "$HOME/yetlet-apps/sampleapp"
+cargo generate-lockfile --offline
+cargo check --frozen
+yetlet build
+yetlet run
 ```
 
-Linux and Windows generate Linux/amd64 Deployment and internal ClusterIP Service
-configuration only: `deployment.yaml`, `service.yaml` and `README.md`. The files
-use JSON syntax within YAML 1.2, with exact typed scalar/image preservation.
-Only the accepted unedited cloud profile and an explicit consistent Cargo.lock
-are supported; inspection, source revalidation and native no-replace publication
-are shared with the accepted generators. No tool, daemon or cluster is invoked.
+The example assumes the locally built CLI is explicitly available as `yetlet`.
+It does not install it globally. Missing cached dependencies fail offline.
+`--release` changes only the Cargo compilation profile, not APP_ENVIRONMENT.
+Frozen execution is not a sandbox for package scripts, build scripts or app code.
 
-`--replicas` is optional, unsigned ASCII decimal 1-100, default 1. Package names
-must be unchanged DNS labels of 1-63 lowercase letters/digits/hyphens, with a
-letter prefix and letter/digit suffix; underscores and translation are refused.
-The generated README covers the separate sanitized BuildKit image build,
-operator image import/publication, explicitly selected context/namespace dry-run
-and apply commands, local-only probes, example resource limits and the
-30-second grace budget without a hard application drain promise.
+## Creation choices and settings
 
-[YT-089d accepted evidence](../../docs/YT-089D-VERIFICATION.md) records independent Reviewer `wc_job_1SJSI37ZToF_od0U` PASS after Linux manifest schema checks, exact Windows GNU/MSVC native output parity and parent-operated, isolated Multipass K3s Pod/Service/HTTP/health and full namespace/image cleanup. The generator itself never invokes Kubernetes or deploys anything.
+YT-104 adds an explicitly selected [browser-only Rust/WASM task starter](../../docs/YT-104-BROWSER-STARTER.md):
+`yetlet new tasks --template browser --tailwind`. This persists
+`cli.target = "browser"` and includes Vite/public settings, with no native
+server or app-runtime settings/secret crate. Existing `build`/`run` then manage
+only the frontend; their automatic-stage booleans still apply.
+`--template native|browser` selects creation only and defaults to `native`. `new` ignores
+`APP_CLI__TARGET`; execution retains that normal settings override. The same
+creation command works in POSIX shells and PowerShell. Plain creation keeps
+the native behavior below.
+
+Plain `new` remains HTML-first SSR with no mandatory JS/WASM or app settings
+module. `--settings` adds typed runtime configuration. **`--vite` implies
+`--settings`**, and generates the complete frontend production/development
+integration. `--tailwind` selects the official Vite plugin with Vite, or the
+existing separately prepared standalone Tailwind 4.3.3 path otherwise.
+`--service` adds app-owned health/readiness and graceful shutdown. Controllers,
+DI, sessions and other capability modules remain optional.
+
+Every new app has public base.toml and development/staging/production overlays.
+Every scaffold declares `cli.rust.watch = false`. A plain scaffold also
+declares disabled Vite settings without a runtime config crate. `new webapp --vite` declares:
+
+```toml
+[cli.rust]
+watch = false
+
+[cli.vite]
+enabled = true
+root = "frontend/"
+auto_start = true
+auto_build = true
+
+[cli.generate.k8s]
+replicas = 1
+```
+
+The shared `yetlet-config` loader applies base, exactly one selected overlay,
+and real scoped ENV overrides. APP_ENVIRONMENT selects Development, Staging or
+Production and defaults to Production. Examples include
+APP_CLI__RUST__WATCH=true, APP_CLI__VITE__AUTO_START=false, APP_CLI__VITE__AUTO_BUILD=false,
+APP_CLI__VITE__ROOT=web and APP_CLI__GENERATE__K8S__REPLICAS=3. Values override
+existing declared keys; invalid keys/types and partial settings fail safely.
+CLI behavior is not stored in Cargo metadata.
+
+CLI public settings default to the selected app root. Explicit absolute
+YETLET_CONFIG_ROOT can relocate the public settings root. Vite root always
+resolves relative to the selected Cargo.toml, including when settings move.
+Legacy apps without CLI declarations retain disabled-watch/disabled-Vite/default-generator
+behavior; an absent cli.rust section also defaults to watch disabled; their source and settings are not rewritten automatically.
+
+App runtime settings retain APP_SERVER__HOST/PORT, APP_SERVICE__TOKEN and the
+existing explicit Development-only YETLET_DEV_SECRETS mechanism. No usable token
+is generated; settings-enabled applications require an operator-provided token
+before startup. CLI tool decisions never open that secret file. Backend `.env`
+auto-discovery is disabled. See [configuration](../../docs/CONFIGURATION.md).
+
+### Settings selection decision table
+
+For `run`, `watch` and `build`, resolve these choices in order using the
+existing [CLI settings projection](src/settings.rs) and
+[shared Loader](../../crates/yetlet-config/src/lib.rs):
+
+| Decision | Existing rule | Practical effect |
+|---|---|---|
+| Application | Explicit `--manifest-path PATH`, otherwise exactly cwd/Cargo.toml; select a protected standalone Cargo.toml with an existing Cargo.lock | Its parent is the app root; no ancestor/workspace search |
+| Public settings directory | Absolute `YETLET_CONFIG_ROOT` when supplied, otherwise the selected app root | Moves public TOML lookup only; source, lock and `cli.vite.root` stay relative to the selected app |
+| Settings profile | `APP_ENVIRONMENT` accepts exactly `Development`, `Staging` or `Production`; absent means Production | Selects exactly the matching profile TOML alongside base.toml; `--release` does not select a settings profile |
+| Public values | base.toml, then selected profile, then scoped OS overrides such as `APP_CLI__VITE__AUTO_START` | Higher layers replace declared keys with the same value kind; ENV is not a way to create undeclared settings |
+| Execution target | Merged `cli.target`, default native when absent; browser must have Vite enabled, Rust watch disabled and native TLS disabled | `--template browser` selects creation; later execution reads settings, including declared `APP_CLI__TARGET` overrides |
+| Invocation choice | After settings validation, `watch` forces Rust watch for this invocation; native `build --release` selects Cargo's release profile | Neither writes settings; invalid settings cannot be repaired or skipped by these command choices |
+
+The CLI also admits public `APP_SERVER__TLS__*` overrides for Development TLS;
+other backend overrides and Development secret files do not enter tool-policy
+loading. Invalid profiles, unknown related keys, wrong types and unsafe selected
+paths fail before child startup.
+
+With no recognized base/profile files, legacy defaults are available only when
+there is no explicit settings-root or public-value override: native target,
+Rust watch off, Vite off and one generated replica. The profile selector must
+still be valid. Once files exist, both base.toml and the selected profile are
+required. If their validated merged data has no cli section, those defaults
+still apply; a present but incomplete cli section is not filled arbitrarily.
+An omitted cli.target or cli.rust retains its specific backward-compatible
+default. Settings are read for each command invocation; this is not live
+tool-policy reload inside an already running watch process.
+
+### Execution decision table
+
+After successful [application preflight and settings selection](src/app.rs):
+
+| Target / command | Settings decision | Result |
+|---|---|---|
+| Native `run` | `cli.rust.watch`; Vite only when enabled and auto_start | Frozen Cargo run, optionally supervised by Watchexec and/or alongside Vite |
+| Native `watch` | Force Rust watch; retain Vite enabled/auto_start/root settings | Watch/rebuild/restart Rust; an owned Vite process stays running across Rust restarts |
+| Native `build` | Vite only when enabled and auto_build; Rust watch is not used | Selected frontend build must succeed before frozen Cargo build; when the gate is false, build Cargo only |
+| Browser `run` | auto_start | Preview existing static dist, without a native app server; false skips startup with exit 0 and no child |
+| Browser `build` | auto_build | Run the frontend-owned WASM/Vite build, without a native app build; false skips it with exit 0 and no child |
+| Browser `watch` | Unsupported by this browser contract | Refuse before child startup; explicitly build and preview instead |
+
+For example, in a generated native Vite app, a Development overlay setting
+auto_start=false makes `run` start Rust only. A declared
+`APP_CLI__VITE__AUTO_START=true` override enables Vite for that invocation.
+Neither changes auto_build: `build` still uses that independent setting.
+Use `APP_ENVIRONMENT=Development` explicitly to select that overlay. CLI public
+selection does not establish that app runtime secrets or frontend dist are ready;
+follow the [first-use preparation order](#first-use-prerequisites).
+
+## Local signing keys
+
+See the [signing example](../../examples/signing/README.md) for the complete
+public settings schema and disposable setup. Provider and key names are configured
+snake_case aliases. Omitted names require explicit `signing.default_provider`
+and `signing.default_key`; there is no guessed provider or key.
+
+`key status` reads public certificate material only and reports certificate dates
+separately from policy expiry. `key rotate` requires a protected existing
+`<provider.root>/<key>` directory. This public parent may be owner-writable
+0755 on Linux; newly created version directories remain 0700 and private files
+0600. Windows versions use a protected owner-only DACL. Provider roots are
+project-relative even when
+`YETLET_CONFIG_ROOT` selects another settings directory. The configured
+`password_env` names a nonempty separate environment source; passwords never
+appear in CLI arguments, public TOML or diagnostics.
+
+Rotation prints provider, key, old/new versions and the selected settings file.
+Without `--yes`, both stdin and stdout must be terminals and the exact answer
+`yes` approves the displayed plan. Noninteractive input and declines cause no
+changes. `self_signed_test` mode generates a fresh 30-day test certificate;
+`imported` mode requires `--from` with a protected replacement PFX encrypted under
+the configured password. An imported certificate pin is displayed for approval.
+This is replacement, not CA renewal. There is no `yetlet sign` or cloud client.
+
+Rotation validates material, key matching, certificate usability and distinct
+public keys across every configured historical identity before publishing an
+immutable encrypted PEM version. It then atomically updates only the selected
+profile's key version array and active version, retaining unrelated settings and
+comments. Base declarations and other keys/profiles are preserved. Signing ENV
+overrides are refused for rotation because they could mask the saved result;
+status applies them through the normal shared loader. Retired/revoked public
+identities remain available for duplicate detection and explicit trust policy.
+
+A per-settings-directory exclusive lock and byte/identity revalidation reject
+concurrent or stale plans. Failed activation retains the old settings when the
+atomic replacement has not occurred, and retains any published new material for
+inspection; it never deletes private keys. A failure after replacement reports
+uncertain durability, not a rollback or success. The `.yetlet-key.lock` inode is
+retained for safe cross-process locking. These are local filesystem guarantees,
+not distributed policy synchronization or certificate custody qualification.
+
+## Vite execution
+
+Frontend files live under frontend/ by default: package.json, pinned package
+lock, production/dev Vite configs, source assets and a public .env.example.
+Change `cli.vite.root` after moving that directory to a protected app-relative
+location. Traversal, unsafe paths, symlinks and reparse escapes are refused.
+Frontend `.env*` discovery is confined to this root; VITE_* values imported into
+the browser are public. Backend APP_* variables and secret/config selectors are
+removed from the frontend child environment. The CLI supplies its selected app
+root as YETLET_PROJECT_ROOT for Tailwind Rust-source discovery. Direct npm at a
+custom nested root needs this explicit absolute context; the default frontend/
+location has a relative source fallback.
+
+Prepare Node, npm and dependencies separately, for example an explicit
+`npm ci --offline` in frontend/ when the cache is already complete. CLI actions
+never invoke install/ci or refresh either package lock.
+
+`build` selects only `enabled && auto_build`. When selected, it runs
+`npm run build` in the configured frontend root and waits for success before
+frozen Cargo compilation. Frontend failure preserves its status and skips Rust.
+When disabled, it reports that the frontend stage was skipped; this does not
+claim missing/stale assets are ready.
+
+`run` and `watch` select Vite through `enabled && auto_start`, independently of Rust watch. When selected, they start the strict
+loopback Vite server on 127.0.0.1:5173, waits for bounded readiness, and supervises
+it together with frozen Cargo run. The generated read-only bridge expects the
+backend on 127.0.0.1:3000; keep the corresponding app settings when using it.
+Build initial frontend dist separately before startup. Rust snapshots and
+validates dist; auto-start does not silently perform a production frontend build.
+With Rust watch disabled, both owned trees are stopped/reaped when either child
+exits or the CLI is cancelled. Browser launch is not added.
+
+Disable auto_start for the manual two-terminal workflow: set YETLET_VITE_PORT=5173
+for the Rust process and start `npm run dev` separately in the frontend root.
+The bridge remains root-page/read-only, with strict origin/path/CSP/nonce bounds;
+no authentication, cookies, POST/actions, arbitrary proxy or multi-page support.
+Production uses versioned static assets and no Node runtime.
+
+## Rust watch
+
+Rust watch is disabled by default for `run` and independent of Vite. Prepare
+Watchexec on PATH separately (integration targets version 2.8.0); the CLI never
+installs it. Use `yetlet watch` to enable watch for this invocation, even when
+`cli.rust.watch` is false or absent. It shares `run` and validates settings
+strictly before applying the override; settings files are unchanged.
+
+To make watch the default for `yetlet run`, enable the existing base declaration
+through the selected profile:
+
+```toml
+[cli.rust]
+watch = true
+```
+
+Then run `yetlet run`, or use `APP_CLI__RUST__WATCH=true yetlet run` with the
+base key declared. `--settings` still only selects generated runtime settings;
+watch uses public CLI settings even for plain SSR apps. There is no watch flag
+or Cargo metadata configuration. `build` never starts watch and requires no
+Watchexec, even when this setting is true.
+
+The CLI starts frozen/offline Cargo immediately. Watchexec emits JSON file events;
+the CLI stops/reaps the old Rust tree and starts a fresh generation on a relevant
+change. Compile errors and Rust runtime exits are reported, then wait for the
+next change. Vite keeps the same process through Rust restarts. Cancellation,
+Vite exit or watcher death ends the session and cleans up all owned trees.
+
+Watch covers app-root Rust `*.rs` (including build.rs), Cargo.toml and Cargo.lock.
+It excludes the configured frontend root, target, node_modules and dist, plus
+CARGO_TARGET_DIR when under the app root, and does not follow symlinks. Outside-app
+local dependencies are not watched. Special target directories from Cargo config
+need separate exclusion if required; select CARGO_TARGET_DIR for an excluded
+in-root location or put the directory outside the watched root.
+
+CLI settings are loaded once per run; rerun the CLI to change watch/Vite policy.
+The fresh backend reads its runtime settings on each restart. Browser refresh,
+in-process state preservation and graceful request draining are not promised.
+Historical Vite lifecycle evidence does not qualify the added watch mode.
+
+## Current generator source matrix
+
+Current unedited `new --service` output now supports all three generators after
+explicit compatible local Cargo path overrides and separately prepared locks:
+
+| Current creation choice | Delivery requirement |
+|---|---|
+| `new NAME --service` | Public CLI settings; no runtime settings dependency or token |
+| `new NAME --service --settings` | Public CLI/runtime TOMLs; runtime token supplied separately |
+| `new NAME --service --vite` | Settings implied; complete explicitly built production Vite graph |
+| `new NAME --service --vite --tailwind` | Same graph contract with the pinned official plugin |
+
+Keep the generated pinned versions when adding the qualified framework's local
+path dependencies. Registry-only images still require separate release/source
+qualification. The generator validates all public CLI profiles; its asset input
+uses the Production Vite root, which may differ from Development/Staging.
+Watch, auto_start and auto_build never execute during generation. Docker's
+inventory adds `app-src-source-paths` so a configured `frontend/dist` or custom
+root can be explicitly exported to canonical `dist/`. Follow the generated
+Docker README's physical allowlist/hash instructions. See the
+[compatibility evidence](../../docs/YT-102-GENERATOR-COMPATIBILITY.md).
+
+Generators retain their separately qualified, **unedited legacy local-source**
+representation, consistent app lock and source revalidation. Retained internal
+legacy scaffold functions support its acceptance fixtures. These source
+selections are historical labels, not current CLI options:
+
+| Qualified legacy source | Delivery requirement |
+|---|---|
+| Native service SSR | Established source/lock closure |
+| Service with typed settings | Exact public TOMLs; runtime token supplied separately |
+| Service with production Vite, optional settings/plugin Tailwind | Explicitly prebuilt and validated flat dist |
+
+The retained legacy matrix is separately qualified by
+[YT-101 evidence](../../docs/YT-101-VERIFICATION.md). Standalone Tailwind,
+legacy dev bridge, edited/general apps and unknown dependencies/layouts remain
+refused; adding a marker or CLI namespace alone cannot qualify arbitrary code.
+
+Generators run no npm, Cargo, Docker, kubectl, image pull/build, source export or
+deployment. Runtime tokens are not inspected. Configuration publication is
+protected and never replaces an existing output. Docker image preparation still
+requires three separate contexts: generated config, sanitized app-src and
+sanitized yetlet-src; live checkout/app trees are not build contexts. Public
+config/assets have the recorded bounded validation, not authenticated provenance.
+Compose uses separately built local images; K8s creates no runtime Secret.
+Image references require a validated explicit registry/repository and non-latest
+tag or sha256 digest. K8s package names retain unchanged DNS-label restrictions.
+
+Replicas use the same public settings loader. A qualified legacy app can select
+an explicit separate public YETLET_CONFIG_ROOT with declared cli settings;
+adding new namespace/layout fields to legacy app sources does not bypass exact
+source inspection. Existing token interpolation/Secret references, Linux/amd64
+security defaults and operator-owned drain/retention limits remain unchanged.
+
+## Opt-in Tailwind CSS 4 (YT-091 independently reviewed)
+
+Use `new NAME --tailwind`; add `--vite` for the official Vite plugin. Without
+Vite, prepare the pinned standalone tool and CSS build explicitly using the
+[generated Tailwind instructions](templates/tailwind/SELECTED-README.md).
+[YT-091 evidence](../../docs/YT-091-VERIFICATION.md) retains the historical
+source-bound native/browser acceptance; it does not qualify the new settings
+representation.
 
 ## Windows PowerShell (native GNU/MSVC)
 
-Build the isolated CLI using the selected Rust 1.99 Windows toolchain. On Windows, choose an **existing, protected directory on a local fixed NTFS volume** and a trusted, owner-protected `cargo.exe` on PATH before `build` or `dev`. The CLI deliberately refuses unsafe ACLs, junction/reparse traversal and untrusted executables.
+The CLI owns configured startup, stop/cleanup and build orchestration. Vite owns
+module compilation, dependency tracking and HMR. Frontend JS/TS files may use
+custom names and subdirectories without registration; physical root confinement
+still refuses private/tooling files and outside links. The default entry remains
+`app.ts`. [Integration evidence](../../docs/YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
+separates the earlier Windows browser checks from the current Linux follow-up.
 
 ```powershell
 cargo build --offline --locked --manifest-path .\tools\yetlet-cli\Cargo.toml
 $Yetlet = Join-Path (Get-Location) "tools\yetlet-cli\target\debug\yetlet.exe"
-$Parent = Join-Path $env:TEMP "yetlet-apps"
-New-Item -ItemType Directory -Force -Path $Parent | Out-Null
-& $Yetlet doctor --framework-path . --json
-& $Yetlet new sampleapp --framework-path . --dir $Parent
-$Manifest = Join-Path $Parent "sampleapp\Cargo.toml"
-cargo generate-lockfile --offline --manifest-path $Manifest
-& $Yetlet build --manifest-path $Manifest
-& $Yetlet dev --manifest-path $Manifest
+& $Yetlet --help
+& $Yetlet new sampleapp --parent C:\ProtectedApps
+# Prepare compatible local Cargo overrides and the app lock as its README describes.
+& $Yetlet build --manifest-path C:\ProtectedApps\sampleapp\Cargo.toml
+& $Yetlet run --manifest-path C:\ProtectedApps\sampleapp\Cargo.toml
 ```
 
-If the chosen parent inherited unsafe ACLs, or Cargo's rustup proxy is writable by other principals, the CLI fails closed. Provision a protected NTFS parent or an owner-protected copy of `cargo.exe` and select it through the current session's PATH; do not disable security checks. `dev` requires an attached, processed-input Windows console and uses its own Job Object for Cargo and application descendants. For GNU, some MinGW linkers cannot emit executable files into all Unicode output directories; select a compatible, task-owned ASCII `CARGO_TARGET_DIR` if needed.
+Choose an existing owner-protected local fixed NTFS parent. Do not disable ACL,
+reparse or executable checks. The [native Windows GNU pair record](../../docs/YT-102-WINDOWS-VITE-VERIFICATION.md)
+covers six selected real Rust/Vite lifecycle cases; MSVC pair evidence remains
+compile-only. Separately, [native MSVC single-Cargo evidence](../../docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20)
+covers build/run, native console cancellation and descendant cleanup, with a
+bounded warm-build baseline in the same record.
 
-## Commands and boundaries
+## Diagnostics and platform evidence
 
-| Command | Behavior |
+CLI-owned statuses are 0 success/help, 1 preflight/report, 2 usage and 125
+spawn/supervision/cleanup failure. Native child exits and cancellation retain
+identity after verified cleanup. Safe scoped CLI errors use stable codes and
+stderr; child-failure summaries identify their stage without guessing lock/cache
+causes. Child stdout/stderr remains native and is not guaranteed secret-redacted.
+
+Public CLI settings failures use three fixed human troubleshooting hints:
+
+| Hint | Check |
 |---|---|
-| `doctor [--framework-path PATH] [--json]` | Sanitized local Rust/Cargo and optional selected framework-source diagnostics; no installation or app launch |
-| `new NAME --framework-path PATH [--dir DIRECTORY] [--cloud]` | Linux safe directory-FD/no-replace or Windows local NTFS handle/reparse/ACL-safe no-overwrite scaffold; cloud app profile is explicit opt-in |
-| `build --manifest-path PATH [--release]` | Explicit external standalone app, existing lockfile, native `cargo build --frozen`; no implicit resolution |
-| `generate docker --manifest-path PATH --output DIRECTORY` | New protected directory containing Linux/amd64 configuration only; operator prepares and verifies separate named source contexts |
-| `generate compose --manifest-path PATH --output DIRECTORY --image IMAGE` | Candidate: two deterministic files referencing an explicit operator-built Linux/amd64 image, localhost port only; no build/pull/launch |
-| `generate k8s --manifest-path PATH --output DIRECTORY --image IMAGE [--replicas COUNT]` | Candidate: three deterministic configuration files for an operator-built Linux/amd64 image; no cluster discovery, credentials or deployment |
-| `dev --manifest-path PATH` | Foreground native `cargo run --frozen` with owned Cargo/app process-group teardown and terminal Ctrl-C handling; **not** HMR/watch mode |
+| `source` | Public settings directory and required base/profile files, including safe ownership/readability |
+| `profile` | Exactly Development, Staging or Production; absent selection defaults to Production |
+| `values` | Public TOML syntax, base-declared keys/types, ranges and target/TLS requirements |
 
-The supported preview OS targets are Linux and Windows x86-64 (GNU/MSVC), each with independently checked native filesystem and process contracts. Other platforms and incompatible/unsafe filesystem or console contexts fail closed. Windows uses a protected local fixed NTFS volume, owner-protected app/Cargo executable and a real console for `dev`; Linux preserves symlink-safe directory FDs and process groups. `dev` does not contain intentionally daemonized/session-escaped children. Path safety, error classification, cleanup and terminal handling are covered by the targeted tests, but this is not an isolation sandbox or deployment agent.
+These are coarse hints, not new machine codes or exact filesystem diagnoses.
+They never echo supplied values, unknown keys, configured paths or underlying
+parser/IO/Serde errors. The existing Loader, validation order, exit 1/stderr and
+caller wrappers remain intact, including generator rejection before output.
+Unexpected Loader errors retain the generic hint; existing browser-capability
+refusals and later TLS-file checks retain their messages. See the
+[research and bounded implementation evidence](../../docs/YT-102-SETTINGS-ERROR-RESEARCH.md#selected-cli-implementation-2026-10-20).
 
-No registry publication, release signature, global installation, hosted operation or release activation is authorized. Prior YT-087a/b tests and actual loopback/PTY receipts are source-bound and separate from YT-020 release readiness.
+Doctor reports schema 1 environment checks only, never application, asset,
+frontend, console, generator or release readiness. Fixed local Rust/Cargo probes
+have 3-second/64-KiB combined-output bounds plus 2-second cleanup. Unsafe or
+unavailable executables fail; group-writable toolchain paths are refused on
+Linux. No installation/update, shell, app settings or Node probes occur.
+
+Linux has current native process/PTY/cleanup tests. Current Windows GNU
+[doctor and CLI evidence](../../docs/YT-102-DOCTOR-VERIFICATION.md) and
+[Rust/Vite pair evidence](../../docs/YT-102-WINDOWS-VITE-VERIFICATION.md) supplement
+the separate MSVC compile-only pair checks and
+[native single-Cargo followup](../../docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20).
+Windows run still requires an attached console
+with processed Ctrl-C input and protected app/tool paths; npm uses vetted native
+node.exe plus its same-install npm CLI script, without a .cmd shell fallback.
+Escaped daemons and unsupported OS/filesystem/console contexts remain unsupported.
+Public release, production qualification, global installation and deployment
+remain outside this preview.

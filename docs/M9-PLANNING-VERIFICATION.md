@@ -51,7 +51,7 @@ Independent role-directed reviewer Job `wc_job_fr93PI1YLOtR3KjE` completed at te
 - `python3 scripts/test_check_samples.py`: **PASS**, 4/4 focused catalog tests.
 - Custom read-only consistency checks: all nine canonical names in original display order plus three supplements, YT-049–YT-059 in Roadmap/Backlog, SQL-first without built-in ORM, exact eight-file change scope and unmodified runnable `examples/samples.toml`: **PASS**.
 - `git diff --check` and whitespace/newline checks for new documents: **PASS**.
-- Git baseline: original one worktree `/home/bohe/repos/yetlet`, branch `master`, HEAD `742e0d4909cc9b132d81b78e12bbb66d5bf60f57`, empty index. **No** M9 code, Cargo/ORM change, commit or push.
+- Git baseline: original single worktree at the repository root (`.`), branch `master`, HEAD `742e0d4909cc9b132d81b78e12bbb66d5bf60f57`, empty index. **No** M9 code, Cargo/ORM change, commit or push.
 
 The first ad hoc consistency harness attempt contained an incorrectly normalized string assertion; it was corrected in the command and the actual scope/structural checks passed. No product or documentation gate failed. Post-review edits are limited to recording this evidence and marking the planning gate Done; documentation validation is rerun after those changes.
 

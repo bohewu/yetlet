@@ -1,0 +1,30 @@
+[package]
+name = "yetlet-production-starter"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace]
+resolver = "3"
+
+[dependencies]
+axum = "0.8"
+tokio = { version = "1", features = ["macros", "net", "rt-multi-thread", "signal", "sync"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+rusqlite = { version = "0.40.2", default-features = false, features = ["bundled"] }
+secrecy = { version = "0.10", features = ["serde"] }
+subtle = "2.6"
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["json"] }
+yetlet-config = { path = "../../crates/yetlet-config" }
+yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
+yetlet-request-id = { path = "../../crates/yetlet-request-id" }
+yetlet-session = { path = "../../crates/yetlet-session" }
+
+[dev-dependencies]
+tempfile = "3"
+tower = { version = "0.5", features = ["util"] }

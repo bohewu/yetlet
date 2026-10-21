@@ -1,0 +1,25 @@
+[server]
+host = "127.0.0.1"
+port = 3010
+
+[database]
+path = "data/issues.sqlite3"
+
+[service]
+name = "Issue tracker"
+api_token = ""
+
+[logging]
+level = "info"
+
+[cli.rust]
+watch = false
+
+[cli.vite]
+enabled = false
+root = "frontend/"
+auto_start = false
+auto_build = false
+
+[cli.generate.k8s]
+replicas = 1

@@ -1,20 +1,32 @@
 use std::process::ExitCode;
-use yetlet_cli::{Cli, HELP, app, compose, docker, doctor, parse, scaffold};
+use yetlet_cli::{Cli, VERSION, app, compose, docker, doctor, parse, scaffold, usage};
 
 fn main() -> ExitCode {
     let args = std::env::args_os().skip(1).collect::<Vec<_>>();
     match parse(&args) {
-        Ok(Cli::Help) => {
-            print!("{HELP}");
+        Ok(Cli::Help(help)) => {
+            print!("{help}");
             ExitCode::SUCCESS
         }
-        Ok(Cli::Doctor { framework, json }) => {
-            let report = doctor::check(framework.as_deref());
-            println!("{}", report.render(json));
-            ExitCode::from(u8::from(!report.ok()))
+        Ok(Cli::Key(command)) => match yetlet_cli::key::execute(&command) {
+            Ok(()) => ExitCode::SUCCESS,
+            Err(error) => {
+                eprintln!("CLI_KEY: {error}");
+                ExitCode::FAILURE
+            }
+        },
+        Ok(Cli::Version) => {
+            println!("{VERSION}");
+            ExitCode::SUCCESS
         }
-        Ok(Cli::Build { manifest, release }) => application(&manifest, false, release),
-        Ok(Cli::Dev { manifest }) => application(&manifest, true, false),
+        Ok(Cli::Doctor { json }) => {
+            let report = doctor::check();
+            println!("{}", report.render(json));
+            ExitCode::from(report.exit_code())
+        }
+        Ok(Cli::Build { manifest, release }) => application(&manifest, false, release, false),
+        Ok(Cli::Run { manifest }) => application(&manifest, true, false, false),
+        Ok(Cli::Watch { manifest }) => application(&manifest, true, false, true),
         Ok(command @ Cli::GenerateK8s { .. }) => match command.generate_k8s() {
             Ok(()) => {
                 println!(
@@ -23,7 +35,7 @@ fn main() -> ExitCode {
                 ExitCode::SUCCESS
             }
             Err(error) => {
-                eprintln!("generate k8s failed: {error}");
+                eprintln!("CLI_SOURCE_UNSUPPORTED generate k8s: {error}");
                 ExitCode::FAILURE
             }
         },
@@ -39,7 +51,7 @@ fn main() -> ExitCode {
                 ExitCode::SUCCESS
             }
             Err(error) => {
-                eprintln!("generate compose failed: {error}");
+                eprintln!("CLI_SOURCE_UNSUPPORTED generate compose: {error}");
                 ExitCode::FAILURE
             }
         },
@@ -47,51 +59,74 @@ fn main() -> ExitCode {
             match docker::generate(&manifest, &output) {
                 Ok(()) => {
                     println!(
-                        "Created Docker configuration. Read its README before preparing the two sanitized source exports."
+                        "Created Docker configuration. Read its README before preparing the sanitized source exports."
                     );
                     ExitCode::SUCCESS
                 }
                 Err(error) => {
-                    eprintln!("generate docker failed: {error}");
+                    eprintln!("CLI_SOURCE_UNSUPPORTED generate docker: {error}");
                     ExitCode::FAILURE
                 }
             }
         }
         Ok(Cli::New {
             name,
-            framework,
             dir,
+            template,
             cloud,
-        }) => match if cloud {
-            scaffold::create_cloud(&name, &framework, &dir)
-        } else {
-            scaffold::create(&name, &framework, &dir)
-        } {
+            with_config,
+            with_tailwind,
+            vite,
+        }) => match scaffold::create_selected(
+            &name,
+            &dir,
+            template,
+            cloud,
+            with_config,
+            with_tailwind,
+            vite,
+        ) {
             Ok(()) => {
                 println!(
-                    "Created {name}. Follow its README for the explicit offline lockfile step."
+                    "Created {name}. Follow its README for explicit dependency and lockfile preparation."
                 );
                 ExitCode::SUCCESS
             }
             Err(error) => {
-                eprintln!("new failed: {error}");
+                eprintln!("CLI_PUBLISH new: {error}");
                 ExitCode::FAILURE
             }
         },
         Err(error) => {
-            eprintln!("{error}\n\n{HELP}");
+            eprintln!("CLI_USAGE parser: {error}\n\n{}", usage(&args));
             ExitCode::from(2)
         }
     }
 }
 
-fn application(manifest: &std::path::Path, dev: bool, release: bool) -> ExitCode {
-    match app::run(manifest, dev, release) {
+fn application(manifest: &std::path::Path, run: bool, release: bool, watch: bool) -> ExitCode {
+    let result = if watch {
+        app::watch(manifest)
+    } else {
+        app::run(manifest, run, release)
+    };
+    match result {
         Ok(completion) => completion.finish(),
         Err(error) => {
+            let code = if error.code == 125 {
+                "CLI_SPAWN"
+            } else {
+                "CLI_PROJECT"
+            };
             eprintln!(
-                "{} failed: {}",
-                if dev { "dev" } else { "build" },
+                "{code} {}: {}",
+                if watch {
+                    "watch"
+                } else if run {
+                    "run"
+                } else {
+                    "build"
+                },
                 error.message
             );
             ExitCode::from(error.code as u8)
