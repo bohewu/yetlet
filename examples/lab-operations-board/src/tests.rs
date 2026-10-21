@@ -1145,6 +1145,89 @@ async fn triage_json_reuses_authorization_csrf_validation_and_atomic_conflicts()
 }
 
 #[tokio::test]
+async fn triage_field_details_reuse_all_rules_after_authority_and_do_not_write() {
+    let (_dir, board, ids) = setup().await;
+    let original = board
+        .database
+        .save(alice(), None, 0, fields("Original"))
+        .await
+        .unwrap();
+    let client = Client::login(&board, &ids, "alice").await;
+    let viewer = Client::login(&board, &ids, "viewer").await;
+    let mut item = yetlet_board_triage::Item::from(original);
+    item.title = "\u{1}".into();
+    item.description = "<script>rejected-input</script>".repeat(160);
+    item.status = "invalid-status".into();
+    item.priority = "invalid-priority".into();
+    item.assignee = "bob".into();
+    let payload = serde_json::json!({"csrf":client.csrf,"item":item});
+    let (status, body) = triage_json(&board, &client, 1, payload.clone()).await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    let field_errors = yetlet_board_triage::validation_fields(status.as_u16(), &body).unwrap();
+    assert_eq!(field_errors.len(), 5);
+    assert_eq!(
+        field_errors["title"],
+        "Enter 1 to 160 characters without control characters."
+    );
+    assert_eq!(
+        field_errors["description"],
+        "Use at most 4,000 characters and ordinary line breaks."
+    );
+    assert_eq!(field_errors["status"], "Select a valid status.");
+    assert_eq!(field_errors["priority"], "Select a valid priority.");
+    assert_eq!(
+        field_errors["assignee"],
+        "Select an operator belonging to this project."
+    );
+    assert!(!body.contains("rejected-input"));
+    assert!(!body.contains(&client.csrf));
+    let mut forged = payload.clone();
+    forged["csrf"] = "invalid".into();
+    for (actor, project, input, expected) in [
+        (
+            &Client::default(),
+            1,
+            payload.clone(),
+            StatusCode::UNAUTHORIZED,
+        ),
+        (&viewer, 1, payload.clone(), StatusCode::FORBIDDEN),
+        (&client, 2, payload.clone(), StatusCode::FORBIDDEN),
+        (&client, 1, forged, StatusCode::FORBIDDEN),
+    ] {
+        let (status, body) = triage_json(&board, actor, project, input).await;
+        assert_eq!(status, expected);
+        assert!(
+            serde_json::from_str::<serde_json::Value>(&body).unwrap()["error"]
+                .get("fields")
+                .is_none()
+        );
+    }
+    let (stored, history) = board.database.get(1, item.id).await.unwrap();
+    assert_eq!(stored.fields.title, "Original");
+    assert_eq!(stored.version, 1);
+    assert_eq!(history.len(), 1);
+    let mut closed = fields("Closed");
+    closed.status = "closed".into();
+    let closed = board.database.save(alice(), None, 0, closed).await.unwrap();
+    let mut transition = yetlet_board_triage::Item::from(closed);
+    transition.status = "active".into();
+    let (status, body) = triage_json(
+        &board,
+        &client,
+        1,
+        serde_json::json!({"csrf":client.csrf,"item":transition}),
+    )
+    .await;
+    assert_eq!(status, StatusCode::UNPROCESSABLE_ENTITY);
+    assert!(yetlet_board_triage::validation_fields(status.as_u16(), &body).is_none());
+    assert_eq!(
+        board.database.get(1, transition.id).await.unwrap().1.len(),
+        1
+    );
+    board.drain().await.unwrap();
+}
+
+#[tokio::test]
 async fn triage_only_enables_wasm_on_selected_page_and_escapes_bounded_bootstrap() {
     let dir = tempfile::tempdir().unwrap();
     let ids = DemoIdentities::generate().unwrap();

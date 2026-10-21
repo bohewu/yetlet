@@ -4,6 +4,15 @@
 //! or semantic JSON HTTP commands. No raw DOM event, persistent circuit, or
 //! server repository is included in this crate.
 
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn complete_browser_page_obeys_dom_policy() {
+        let page = yetlet_todo_ui::browser_page(&yetlet_todo_ui::TodoSnapshot::initial().items);
+        assert_eq!(yetlet_dom::validate(&page), Ok(()));
+    }
+}
+
 #[cfg(target_arch = "wasm32")]
 mod runtime {
     use std::{
@@ -290,6 +299,19 @@ mod runtime {
         let remote_button = get_element(&document, "create-remote")?;
         let remote_host = get_element(&document, "remote-list-host")?;
         let remote_status = get_element(&document, "remote-status")?;
+        let title_error = get_element(&document, "remote-title-error")?;
+        title_feedback(&remote_input, &title_error, None)?;
+        let clear_title_binding = DomEventListener::new(remote_input.as_ref(), "input", {
+            let input = remote_input.clone();
+            let error = title_error.clone();
+            let status = remote_status.clone();
+            move |_| {
+                if input.has_attribute("aria-invalid") {
+                    let _ = title_feedback(&input, &error, None);
+                    status.set_text_content(Some("Title edited. Create on server to try again."));
+                }
+            }
+        })?;
         let http = Rc::new(
             HttpExecutor::new("/api/todos").map_err(|error| JsValue::from_str(error.code()))?,
         );
@@ -301,17 +323,26 @@ mod runtime {
                 let host = remote_host.clone();
                 let lifetime = lifetime.clone();
                 let status = remote_status.clone();
+                let input = remote_input.clone();
+                let error_field = title_error.clone();
                 spawn_local(async move {
                     if !lifetime.is_active() {
                         return;
                     }
                     status.set_text_content(Some("Saving to server..."));
-                    let result = executor.execute(TodoCommand::Create { title }).await;
+                    let result = executor
+                        .execute(TodoCommand::Create {
+                            title: title.clone(),
+                        })
+                        .await;
                     if !lifetime.is_active() {
                         return;
                     }
                     match result {
                         Ok(snapshot) => {
+                            if input.value() == title {
+                                let _ = title_feedback(&input, &error_field, None);
+                            }
                             if let Err(error) = mount_view(&host, &todo_list(&snapshot.items)) {
                                 web_sys::console::error_1(&error);
                                 status.set_text_content(Some("Render error"));
@@ -323,6 +354,24 @@ mod runtime {
                             )));
                         }
                         Err(error) => {
+                            if matches!(&error, ActionError::Remote { status: 422, code } if code == "invalid_title")
+                            {
+                                if input.value() == title {
+                                    let _ = title_feedback(
+                                        &input,
+                                        &error_field,
+                                        Some(
+                                            "Enter 1 to 100 characters without control characters.",
+                                        ),
+                                    );
+                                    status.set_text_content(Some(
+                                        "Check the task title. Your text is still here.",
+                                    ));
+                                } else {
+                                    status.set_text_content(Some("The submitted title was rejected. Review your edited title before trying again."));
+                                }
+                                return;
+                            }
                             // Display only structured error codes, never raw HTML.
                             status
                                 .set_text_content(Some(&format!("Remote error: {}", error.code())));
@@ -336,10 +385,28 @@ mod runtime {
             *runtime.borrow_mut() = Some(BrowserRuntime {
                 lifetime,
                 _graph: graph,
-                _bindings: vec![local_binding, remote_binding],
+                _bindings: vec![local_binding, remote_binding, clear_title_binding],
             });
         });
         document_element.set_attribute("data-yetlet-ready", "true")?;
+        Ok(())
+    }
+
+    fn title_feedback(
+        input: &HtmlInputElement,
+        error: &Element,
+        message: Option<&str>,
+    ) -> Result<(), JsValue> {
+        error.set_text_content(message);
+        if message.is_some() {
+            input.set_attribute("aria-invalid", "true")?;
+            input.set_attribute("aria-describedby", "remote-title-error")?;
+            error.remove_attribute("hidden")?;
+        } else {
+            input.remove_attribute("aria-invalid")?;
+            input.remove_attribute("aria-describedby")?;
+            error.set_attribute("hidden", "")?;
+        }
         Ok(())
     }
 

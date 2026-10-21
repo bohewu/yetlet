@@ -3,7 +3,10 @@ use super::*;
 use axum::{Json, extract::rejection::JsonRejection};
 use domain::WorkItem;
 use yetlet_actions::{ApiErrorBody, ApiErrorEnvelope};
-use yetlet_board_triage::{Bootstrap, Item, MAX_ITEMS, STATUS_LABELS, Save, status_counts};
+use yetlet_board_triage::{
+    Bootstrap, Item, MAX_ITEMS, STATUS_LABELS, Save, ValidationBody, ValidationEnvelope,
+    status_counts,
+};
 use yetlet_core::Element;
 
 #[derive(Clone)]
@@ -73,16 +76,31 @@ fn control(label: &str, name: &'static str, kind: &'static str) -> Element {
             .attribute("maxlength", if name == "title" { "160" } else { "100" });
     }
     if kind == "textarea" {
-        input = input.attribute("maxlength", "4000").attribute("rows", "5");
+        input = input
+            .attribute("maxlength", "4000")
+            .attribute("rows", "5")
+            .attribute("aria-describedby", "triage-description-hint");
     }
-    Element::new("div")
+    let mut field = Element::new("div")
         .attribute("class", "triage-field")
         .child(
             views::text("label", label)
                 .attribute("for", id)
                 .attribute("id", format!("triage-{name}-label")),
         )
-        .child(input)
+        .child(input);
+    if name == "description" {
+        field = field
+            .child(Element::new("div").attribute("id", "triage-description-editor").attribute("class", "triage-description-editor").attribute("hidden", ""))
+            .child(views::text("p", "Plain text, up to 4,000 characters. Undo history resets on item switch or Reset.").attribute("id", "triage-description-hint").attribute("class", "triage-hint"));
+    }
+    field.child(field_error(name))
+}
+fn field_error(name: &str) -> Element {
+    Element::new("p")
+        .attribute("id", format!("triage-{name}-error"))
+        .attribute("class", "text-danger triage-field-error")
+        .attribute("hidden", "")
 }
 fn select(label: &str, name: &'static str, options: &[(&str, &str)]) -> Element {
     let id = format!("triage-{name}");
@@ -96,6 +114,7 @@ fn select(label: &str, name: &'static str, options: &[(&str, &str)]) -> Element 
         .attribute("class", "triage-field")
         .child(views::text("label", label).attribute("for", id))
         .child(input)
+        .child(field_error(name))
 }
 fn status_summary(items: &[Item]) -> Element {
     let counts = status_counts(items);
@@ -193,8 +212,6 @@ pub(super) async fn workspace(
                 .child(views::text("h2", "Selected item").attribute("id", "triage-heading"))
                 .child(control("Title", "title", "input"))
                 .child(control("Description", "description", "textarea"))
-                .child(Element::new("div").attribute("id", "triage-description-editor").attribute("class", "triage-description-editor").attribute("hidden", ""))
-                .child(views::text("p", "Plain text, up to 4,000 characters. Undo history resets on item switch or Reset.").attribute("id", "triage-description-hint").attribute("class", "triage-hint"))
                 .child(Element::new("div").attribute("class", "triage-field-pair")
                     .child(select("Status", "status", &[("open", "Open"), ("active", "Active"), ("blocked", "Blocked"), ("closed", "Closed")]))
                     .child(select("Priority", "priority", &[("low", "Low"), ("normal", "Normal"), ("high", "High")])))
@@ -273,19 +290,33 @@ pub(super) async fn save(
             priority: item.priority,
             assignee: item.assignee,
         };
-        if !fields.errors(project).is_empty() {
-            return Err(Failure::Transition);
+        let errors = fields.errors(project);
+        if !errors.is_empty() {
+            return Ok((
+                StatusCode::UNPROCESSABLE_ENTITY,
+                Json(ValidationEnvelope {
+                    error: ValidationBody {
+                        code: "validation".into(),
+                        message: "Check the highlighted fields. Your draft was not saved.".into(),
+                        fields: errors
+                            .into_iter()
+                            .map(|(name, message)| (name.into(), message.into()))
+                            .collect(),
+                    },
+                }),
+            )
+                .into_response());
         }
         user(&session, Some(project), true).await?;
         state
             .database
             .save(principal, Some(item.id), item.version, fields)
             .await
-            .map(Item::from)
+            .map(|item| Json(Item::from(item)).into_response())
     }
     .await;
     match result {
-        Ok(item) => Json(item).into_response(),
+        Ok(response) => response,
         Err(failure) => error(failure),
     }
 }

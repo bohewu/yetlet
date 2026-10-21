@@ -4,7 +4,7 @@ import { defaultKeymap, history, historyKeymap } from '@codemirror/commands';
 
 export interface DescriptionEditor {
   connect(onEdit: (id: number, text: string) => void): void;
-  update(id: number, text: string, readOnly: boolean, reset: number): void;
+  update(id: number, text: string, readOnly: boolean, reset: number, invalid: boolean): void;
   destroy(): void;
 }
 
@@ -66,7 +66,7 @@ export function createDescriptionEditor(host: HTMLElement, nonce: string): Descr
     connect(callback) {
       if (active) onEdit = callback;
     },
-    update(id, text, locked, reset) {
+    update(id, text, locked, reset, invalid) {
       if (!active) return;
       if (!Number.isSafeInteger(id) || id <= 0 || typeof text !== 'string' || length(text) > 4000 || typeof locked !== 'boolean'
           || !Number.isInteger(reset) || reset < 0 || reset > 0xffffffff) {
@@ -86,6 +86,9 @@ export function createDescriptionEditor(host: HTMLElement, nonce: string): Descr
         }
         host.hidden = false;
         fallback.hidden = true;
+        editor.contentDOM.setAttribute('aria-invalid', String(invalid));
+        editor.contentDOM.setAttribute('aria-describedby', hint.id + (invalid ? ' triage-description-error' : ''));
+        host.dataset.invalid = String(invalid);
       } finally { syncing = false; }
     },
     destroy() {
@@ -96,6 +99,7 @@ export function createDescriptionEditor(host: HTMLElement, nonce: string): Descr
       try { editor.destroy(); }
       finally {
         editor.dom.remove(); host.hidden = true; fallback.hidden = false;
+        delete host.dataset.invalid;
         hint.textContent = hintText;
       }
     },

@@ -138,6 +138,8 @@
 /* CodeMirror injects unlayered base styles; app overrides must share that layer. */
 .triage-description-editor { @apply mb-4 min-w-0 overflow-hidden rounded-md border border-slate-300 bg-white; }
 .triage-description-editor:focus-within { @apply border-sky-700 ring-2 ring-sky-700/20; }
+.triage-description-editor[data-invalid="true"] { @apply border-red-700; }
+.triage-field-error { @apply mt-2 mb-0; overflow-wrap: anywhere; }
 .triage-description-editor .cm-editor { outline: none; }
 .triage-description-editor .cm-scroller { max-height: 18rem; overflow: auto; font: inherit; }
 .triage-description-editor .cm-content { min-height: 10rem; padding: 0.5rem 0; }

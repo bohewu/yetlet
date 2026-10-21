@@ -192,6 +192,7 @@ pub fn browser_page(items: &[Todo]) -> View {
                         .attribute("placeholder", "New server task")
                         .attribute("autocomplete", "off"),
                 )
+                .child(Element::new("p").attribute("id", "remote-title-error"))
                 .child(
                     Element::new("button")
                         .attribute("id", "create-remote")

@@ -1,14 +1,16 @@
-use super::{Bootstrap, Draft, Item, Msg, Save, Workspace, status_counts};
+use super::{
+    Bootstrap, Draft, FieldErrors, Item, Msg, Save, Workspace, status_counts, validation_fields,
+};
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,
 };
 use wasm_bindgen::{JsCast, JsValue, prelude::wasm_bindgen};
-use wasm_bindgen_futures::spawn_local;
+use wasm_bindgen_futures::{JsFuture, spawn_local};
 use web_sys::{
     Document, Element, HtmlButtonElement, HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement,
 };
-use yetlet_actions::{ActionError, ActionExecutor, HttpExecutor};
+use yetlet_actions::{ActionError, ApiErrorEnvelope, HttpExecutor};
 use yetlet_core::binding::BindingKey;
 use yetlet_dom_keyed::{DomEventListener, KeyedChildren, KeyedEntry};
 use yetlet_reactive::{GraphHandle, LocalGraph};
@@ -32,6 +34,7 @@ extern "C" {
         text: &str,
         read_only: bool,
         reset: u32,
+        invalid: bool,
     ) -> Result<(), JsValue>;
     #[wasm_bindgen(method, catch, js_name = destroy)]
     fn destroy_editor(this: &DescriptionEditor) -> Result<(), JsValue>;
@@ -246,11 +249,32 @@ impl Dom {
             ("priority", &draft.value.priority),
             ("assignee", &draft.value.assignee),
         ] {
-            set_control(
-                &element(&self.document, &format!("triage-{name}"))?,
-                text,
-                pending,
-            )?;
+            let control = element(&self.document, &format!("triage-{name}"))?;
+            set_control(&control, text, pending)?;
+            let error = element(&self.document, &format!("triage-{name}-error"))?;
+            let message = draft.errors.get(name);
+            error.set_text_content(message.map(String::as_str));
+            let hint = if name == "description" {
+                "triage-description-hint"
+            } else {
+                ""
+            };
+            if message.is_some() {
+                control.set_attribute("aria-invalid", "true")?;
+                control.set_attribute(
+                    "aria-describedby",
+                    format!("{hint} triage-{name}-error").trim(),
+                )?;
+                error.remove_attribute("hidden")?;
+            } else {
+                control.remove_attribute("aria-invalid")?;
+                if hint.is_empty() {
+                    control.remove_attribute("aria-describedby")?;
+                } else {
+                    control.set_attribute("aria-describedby", hint)?;
+                }
+                error.set_attribute("hidden", "")?;
+            }
         }
         if let Some(description) = &self.description
             && description
@@ -260,6 +284,7 @@ impl Dom {
                     &draft.value.description,
                     pending,
                     state.description_reset,
+                    draft.errors.contains_key("description"),
                 )
                 .is_err()
         {
@@ -291,6 +316,57 @@ fn failure(error: ActionError) -> String {
         ActionError::Remote { status: 422, .. } => "Draft rejected. Check title, field lengths and status transition. Your draft is still here.".into(),
         _ => "Save could not be confirmed. Keep your draft and check the latest record before retrying.".into(),
     }
+}
+
+enum SaveFailure {
+    Global(ActionError),
+    Validation(FieldErrors),
+}
+impl From<ActionError> for SaveFailure {
+    fn from(value: ActionError) -> Self {
+        Self::Global(value)
+    }
+}
+// One app-owned rich-error path; the common executor's status/code API stays unchanged.
+async fn save(executor: &HttpExecutor, command: Save) -> Result<Item, SaveFailure> {
+    use web_sys::{Request, RequestInit, Response};
+    let body = serde_json::to_string(&command).map_err(|_| ActionError::InvalidResponse)?;
+    let init = RequestInit::new();
+    init.set_method("POST");
+    init.set_body(&JsValue::from_str(&body));
+    let request = Request::new_with_str_and_init(executor.endpoint(), &init)
+        .map_err(|_| ActionError::InvalidEndpoint)?;
+    for (name, value) in [
+        ("Content-Type", "application/json"),
+        ("Accept", "application/json"),
+    ] {
+        request
+            .headers()
+            .set(name, value)
+            .map_err(|_| ActionError::Network)?;
+    }
+    let window = web_sys::window().ok_or(ActionError::Network)?;
+    let response: Response = JsFuture::from(window.fetch_with_request(&request))
+        .await
+        .map_err(|_| ActionError::Network)?
+        .dyn_into()
+        .map_err(|_| ActionError::InvalidResponse)?;
+    let status = response.status();
+    let text = JsFuture::from(response.text().map_err(|_| ActionError::Network)?)
+        .await
+        .map_err(|_| ActionError::Network)?
+        .as_string()
+        .ok_or(ActionError::InvalidResponse)?;
+    if !(200..300).contains(&status) {
+        if let Some(fields) = validation_fields(status, &text) {
+            return Err(SaveFailure::Validation(fields));
+        }
+        let code = serde_json::from_str::<ApiErrorEnvelope>(&text)
+            .map(|reply| reply.error.code)
+            .unwrap_or_else(|_| "remote_error".into());
+        return Err(ActionError::Remote { status, code }.into());
+    }
+    serde_json::from_str(&text).map_err(|_| ActionError::InvalidResponse.into())
 }
 #[wasm_bindgen]
 pub fn mount_triage(chart: JsValue, description: JsValue) -> Result<(), JsValue> {
@@ -444,6 +520,7 @@ pub fn mount_triage(chart: JsValue, description: JsValue) -> Result<(), JsValue>
         if state.pending.is_some() { return; }
         let Some(draft) = state.selected().filter(|draft| draft.dirty()) else { return; };
         let command = Save { csrf: csrf.clone(), item: draft.value.clone() };
+        let submitted_id = command.item.id;
         if save_handle.dispatch(Msg::Begin).is_err() { return; }
         let executor = executor.clone(); let handle = save_handle.clone(); let active = lifetime.clone();
         spawn_local(async move {
@@ -451,11 +528,16 @@ pub fn mount_triage(chart: JsValue, description: JsValue) -> Result<(), JsValue>
             if !active.get() {
                 return;
             }
-            let result: Result<Item, _> = executor.execute(command).await;
+            let result = save(&executor, command).await;
             if !active.get() { return; }
             match result {
                 Ok(item) => { if handle.dispatch(Msg::Saved(item)).is_err() { dispatch(&handle, Msg::Failed("Unexpected save response. Keep your draft and check the latest record.".into())); } }
-                Err(error) => dispatch(&handle, Msg::Failed(failure(error))),
+                Err(SaveFailure::Global(error)) => dispatch(&handle, Msg::Failed(failure(error))),
+                Err(SaveFailure::Validation(fields)) => {
+                    if handle.dispatch(Msg::ValidationFailed { id: submitted_id, fields }).is_err() {
+                        dispatch(&handle, Msg::Failed("Unexpected validation response. Keep your draft and check the latest record.".into()));
+                    }
+                }
             }
         });
     })?);
