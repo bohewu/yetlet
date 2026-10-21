@@ -75,8 +75,18 @@ dependency or consumer, especially before introducing private-key operations.
 Local follow-up passes the 25 Board tests with oidc enabled, 17 Admin tests,
 documentation validation, and root/Admin RustSec audits with only that
 single-ID exception. The supplemental xtask audit reports no vulnerabilities
-and retains the pre-existing xml-rs 0.8.19 yanked-version warning; it is not
-silenced. These results do not rerun or expand the YT-096 candidate gates.
+and, at d963494, retained the pre-existing xml-rs 0.8.19 yanked-version warning
+without silencing it. These results do not rerun or expand the YT-096 candidate
+gates.
+
+The owner subsequently selected removal of that warning. The xtask manifest and
+lockfile now pin [xml-rs 0.8.29](https://docs.rs/crate/xml-rs/0.8.29), a non-yanked
+0.8 patch with the same MIT license and no additional dependencies. The existing
+SVG/CSS safety and exact-output tests pass within the full xtask test suite
+(141 passed, two pre-existing ignored). The xtask RustSec audit with --deny
+warnings exits 0 with zero vulnerabilities and zero warnings. Historical
+YT-084/YT-085 cached-dependency limitations remain unchanged as source-bound
+records; this update does not modify application/library dependencies or assets.
 
 ## Existing settings and secret-provider composition
 
