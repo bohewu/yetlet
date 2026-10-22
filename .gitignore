@@ -31,6 +31,9 @@ yarn-error.log*
 /.tmp/
 /tmp/
 
+# Local verification evidence and generated handoffs; reviewed source records live in docs/
+/artifacts/
+
 # Test and coverage output
 __pycache__/
 *.pyc
