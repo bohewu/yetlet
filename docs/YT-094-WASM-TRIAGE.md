@@ -97,8 +97,10 @@ controlled system Chrome. No replacement browser infrastructure was added.
 Native tests also reject unauthorized, viewer, cross-project, forged-CSRF,
 unknown-field and invalid-field saves without writes, and prove one history row
 per accepted version. SSR tests bound the list, escape script-shaped text and
-reject unsafe module paths before storage is opened. The local result summary is
-[retained here](../artifacts/yt094-wasm-20261019/result.json). Detailed run-local
+reject unsafe module paths before storage is opened. The original result summary
+is preserved in [the historical source commit](https://github.com/bohewu/yetlet/blob/096f8db1e2c5b0f0fd1e664e776503cc21a74727/artifacts/yt094-wasm-20261019/result.json).
+Current `artifacts/` outputs are intentionally Git-ignored, while this accepted
+summary remains available in repository history. Detailed run-local
 commands, screenshots and logs are under the task's temporary work directory;
 startup codes were retained only in process memory, never in the report.
 
