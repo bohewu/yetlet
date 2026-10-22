@@ -58,6 +58,8 @@ costs that remain app-owned.
 ## Architecture and contracts
 
 - [Architecture](ARCHITECTURE.md) and [MVP contract](MVP.md): responsibilities, trust boundaries and original acceptance criteria.
+- [DOM capability and authoring review](YT-109-DOM-CAPABILITY-REVIEW.md): current renderer/consumer inventory, property and ownership boundaries, and staged proposals; research only, not runtime implementation.
+- [Bounded DOM capability implementation](YT-110-DOM-CAPABILITIES.md): finite View vocabulary, duplicate/void consistency, native control defaults/reset, same-origin navigation and actual verification; no general binding runtime.
 - [HTTP pipeline](HTTP-PIPELINE.md): native Axum/Tower handlers, middleware, request state and response semantics.
 - [Extensions](EXTENSIONS.md): explicit opt-in setup and provider boundaries.
 - [API contracts](API-CONTRACTS.md) and [Compatibility](COMPATIBILITY.md): implemented API classification and pre-public stability limits.

@@ -381,7 +381,6 @@ mod runtime {
             error: get_element(&document, "remote-title-error")?,
             section: get_element(&document, "remote-actions")?,
         };
-        title_feedback(&ui.input, &ui.error, None)?;
         ui.render(&remote.borrow())?;
         let clear_title_binding = DomEventListener::new(ui.input.as_ref(), "input", {
             let ui = ui.clone();

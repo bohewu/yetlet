@@ -19,7 +19,11 @@ Open `http://127.0.0.1:3000/search`. The external loader builds/loads assets exp
 
 ## Supported subset and lifetime
 
-The allowlisted tags are `main`, `section`, `div`, `article`, `header`, `h1`, `h2`, `p`, `span`, `ul`, `li`, `button`, `strong`, `input` and `label`. Attributes are limited to `id`, `class`, `type`, `data-id`, `data-completed`, `aria-live`, `aria-pressed`, `for`, `placeholder`, `maxlength` and `autocomplete`. Unsupported tags/attributes return `DomPolicyError` before mutation. Text uses DOM text nodes rather than `innerHTML`; URL, inline style and inline event attributes are excluded.
+The finite [YT-110 vocabulary and contract](../../docs/YT-110-DOM-CAPABILITIES.md#dom-vocabulary) supports 38 tags and 42 named attributes: ordinary semantic structure, explicit ARIA/data names, native form controls and bounded navigation. Unsupported names, duplicates, supported void-element children and invalid selected control structures fail before mutation. No arbitrary attribute-prefix expansion, inline style, inline handler or resource URL is admitted. Text uses nodes rather than `innerHTML`.
+
+Initial input/textarea/select/checkbox defaults are declarative; live values, chosen events, reset and submission remain browser/application-owned. Textarea text has LF normalization and preserves an initial newline across SSR and DOM. See the shared [native controls example](../../examples/todo-ui/src/controls.rs), available at `/app` and the no-JS `/controls` route in Todo.
+
+`href` accepts a root-relative path or fragment; form `action` accepts a root-relative path. Static `validate` checks the narrow spelling. WASM mount additionally uses the browser URL parser and effective document base, rejects non-HTTP(S), cross-origin or credential-bearing destinations, and stores absolute URLs before touching the target. Therefore mount can reject a View that passed static validation. Later base changes do not retarget accepted attributes. The broader SSR URL policy remains separate; see [navigation limits](../../docs/YT-110-DOM-CAPABILITIES.md#navigation-and-submission-boundary).
 
 The caller owns the target and event listener lifetime. Keep listeners outside the replaced subtree or explicitly release/rebind them. Subtree replacement does not preserve child identity, focus or selection as a general contract, and unexpected DOM API failures are not transactional rollback. Choose the separate opt-in keyed crate for proven identity-sensitive collections. There is no general VDOM, hydration, resumability or GPU acceleration.
 

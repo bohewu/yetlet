@@ -16,6 +16,8 @@ Open `http://127.0.0.1:3003/hello/World`. Use `yetlet-server-axum::Page` when yo
 
 ## Policy and errors
 
+[YT-110](../../docs/YT-110-DOM-CAPABILITIES.md) adds duplicate-name and selected control-child errors to the pre-public `RenderError` contract. Supply each attribute once, do not nest forms inside a View, and use text children for textarea/option. The serializer normalizes textarea CRLF/CR to LF and preserves an initial newline after HTML parsing; callers must remove any former manually prepended newline sentinel. Live values, selectedness and reset are browser/application behavior, not a serializer binding runtime.
+
 `RenderError` distinguishes invalid tag/attribute names, forbidden attributes, unsafe URL schemes and children on void elements. Names follow the lowercase identifier policy; `script`, `style`, `iframe`, `object` and `embed` tags are rejected. Attributes beginning with `on`, plus `style` and `srcdoc`, are forbidden. Selected URL attributes reject script/data schemes conservatively, including whitespace/control obfuscation. There is no raw HTML escape hatch.
 
 The serializer borrows a View for the call and returns an owned String; no mount or disposal lifetime exists. It buffers the complete fragment rather than streaming. Escaping is not a complete URL-policy engine or an accessibility checker: callers still choose semantic markup and application URL policy. The HTML and DOM subsets differ, so successful HTML serialization does not prove browser mount compatibility.

@@ -7,7 +7,7 @@ mod pipeline;
 
 use axum::{
     Json, Router,
-    extract::{DefaultBodyLimit, Extension},
+    extract::{DefaultBodyLimit, Extension, Query},
     http::{HeaderValue, StatusCode, header},
     response::{Html, IntoResponse, Response},
     routing::get,
@@ -116,11 +116,36 @@ async fn search_route() -> Response {
     response
 }
 
+/// Read-only form preview. Browser and native SSR consume the same shared View.
+async fn controls_route(Query(values): Query<std::collections::HashMap<String, String>>) -> Page {
+    use yetlet_todo_ui::controls::{NativeDraft, native_controls};
+    let mut draft = NativeDraft::default();
+    if values.contains_key("title") {
+        draft.title = values
+            .get("title")
+            .map(|s| s.chars().take(120).collect())
+            .unwrap_or_default();
+        draft.notes = values
+            .get("notes")
+            .map(|s| s.chars().take(500).collect())
+            .unwrap_or_default();
+        draft.priority = if values.get("priority").is_some_and(|s| s == "important") {
+            "important"
+        } else {
+            "normal"
+        }
+        .into();
+        draft.completed = values.get("completed").is_some_and(|s| s == "yes");
+    }
+    Page::new("Yetlet | Native draft controls", native_controls(&draft))
+}
+
 pub fn app() -> Router {
     let app = App::new()
         .get("/", root)
         .get("/app", browser_shell)
         .get("/search", search_route)
+        .get("/controls", controls_route)
         .get("/healthz", || async { "ok" })
         .group("/api", |api| {
             api.get("/ping", api_ping)
@@ -147,6 +172,30 @@ mod tests {
         http::{Request, StatusCode, header},
     };
     use tower::ServiceExt;
+
+    #[tokio::test]
+    async fn controls_preview_is_safe_read_only_ssr_with_native_defaults() {
+        let response = app()
+            .oneshot(
+                Request::builder()
+                    .uri("/controls?title=%3Cscript%3E&notes=%0Aline&priority=important")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        let body = axum::body::to_bytes(response.into_body(), usize::MAX)
+            .await
+            .unwrap();
+        let html = std::str::from_utf8(&body).unwrap();
+        assert!(html.contains("value=\"&lt;script&gt;\""));
+        assert!(html.contains("value=\"important\" selected=\"\""));
+        assert!(html.contains("\n\nline</textarea>"));
+        assert!(!html.contains("checked="));
+        assert!(!html.contains("<script"));
+        assert!(html.contains("method=\"get\" action=\"/controls\""));
+    }
 
     #[tokio::test]
     async fn get_root_is_static_ssr_without_script() {

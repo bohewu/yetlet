@@ -218,7 +218,7 @@ pub(super) async fn workspace(
                     .child(select("Priority", "priority", &[("low", "Low"), ("normal", "Normal"), ("high", "High")])))
                 .child(select("Assignee", "assignee", &[("", "Unassigned"), (operator, operator)]))
                 .child(Element::new("div").attribute("class", "triage-editor-actions")
-                    .child(button("triage-save", "Save selected").attribute("class", "btn btn-primary"))
+                    .child(button("triage-save", "Save selected"))
                     .child(button("triage-reset", "Reset draft")))
                 .child(views::text("a", "Review latest record / native editor (new tab) →").attribute("id", "triage-latest").attribute("href", format!("/board/projects/{project}/items")).attribute("target", "_blank").attribute("rel", "noopener noreferrer"))
                 .child(Element::new("section").attribute("id", "triage-recovery").attribute("class", "triage-recovery").attribute("hidden", "").attribute("aria-label", "Save recovery")

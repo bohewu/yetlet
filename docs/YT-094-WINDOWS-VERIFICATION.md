@@ -70,11 +70,13 @@ retaining stdout and removed with their private logs and SQLite fixtures.
   handle wait verified completion. Neither assertion failure demonstrated an
   application source defect; the original observations remain recorded.
 
-The [local result](../artifacts/yt094-windows-20261019/result.json) records native
-outcomes, source/CLI identities, cleanup and SHA-256 inventories. Full sanitized
-logs remain in the named Runner Project under
-`artifacts/yt094-windows-20261019/evidence/`. The local JSON is a structured capture
-of WebCodex output; its log hashes identify the original Runner bytes.
+The [historical JSON result](https://github.com/bohewu/yetlet/blob/096f8db1e2c5b0f0fd1e664e776503cc21a74727/artifacts/yt094-windows-20261019/result.json)
+records native outcomes, source/CLI identities, cleanup and SHA-256 inventories.
+Current `artifacts/` outputs are intentionally Git-ignored; the original result
+remains available in repository history. Full sanitized logs remain in the named
+Runner Project under `artifacts/yt094-windows-20261019/evidence/`.
+The JSON is a structured capture of WebCodex output; its log hashes identify
+the original Runner bytes.
 Final checks found zero task processes, private login logs or runtime databases,
 and all 820 source files remained unchanged. The existing Linux demo was left
 running for the owner.
