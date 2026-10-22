@@ -271,7 +271,7 @@ pub(crate) fn edit(
     let form = Element::new("form").attribute("method","post").attribute("action",action).attribute("novalidate","").attribute("class","board-form mt-4")
         .child(hidden("csrf",csrf)).child(hidden("expected_version",expected.to_string()))
         .child(field("Title","title",Element::new("input").attribute("type","text").attribute("name","title").attribute("id","title").attribute("value",&value.title).attribute("maxlength","160").attribute("required","").attribute("class","form-control"),err("title")))
-        .child(field("Description (plain text)","description",Element::new("textarea").attribute("name","description").attribute("id","description").attribute("rows","6").attribute("maxlength","4000").attribute("class","form-control").child(View::text(format!("\n{}",value.description))),err("description")))
+        .child(field("Description (plain text)","description",Element::new("textarea").attribute("name","description").attribute("id","description").attribute("rows","6").attribute("maxlength","4000").attribute("class","form-control").child(View::text(&value.description)),err("description")))
         .child(field("Status","status",select("status",&value.status,&[("open","Open"),("active","Active"),("blocked","Blocked"),("closed","Closed")]),err("status")))
         .child(field("Priority","priority",select("priority",&value.priority,&[("low","Low"),("normal","Normal"),("high","High")]),err("priority")))
         .child(field("Assignee","assignee",select("assignee",&value.assignee,&[("","Unassigned"),(operator,operator)]),err("assignee")))

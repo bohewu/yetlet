@@ -2,6 +2,8 @@
 //!
 //! Both native HTML SSR and browser DOM rendering consume these same Views.
 
+pub mod controls;
+
 use serde::{Deserialize, Serialize};
 use yetlet_actions::{ActionError, Command};
 use yetlet_core::{Element, View};
@@ -192,7 +194,11 @@ pub fn browser_page(items: &[Todo]) -> View {
                         .attribute("placeholder", "New server task")
                         .attribute("autocomplete", "off"),
                 )
-                .child(Element::new("p").attribute("id", "remote-title-error"))
+                .child(
+                    Element::new("p")
+                        .attribute("id", "remote-title-error")
+                        .attribute("hidden", ""),
+                )
                 .child(
                     Element::new("button")
                         .attribute("id", "create-remote")
@@ -232,6 +238,7 @@ pub fn browser_page(items: &[Todo]) -> View {
                 .attribute("aria-live", "polite")
                 .child(View::text("First task: active")),
         )
+        .child(controls::native_controls(&controls::NativeDraft::default()))
         .into()
 }
 
@@ -411,6 +418,21 @@ mod tests {
     };
     use yetlet_actions::ActionError;
     use yetlet_html::render_to_string;
+
+    #[test]
+    fn browser_page_declares_initial_title_feedback_hidden() {
+        let html = render_to_string(&browser_page(&initial_todos())).unwrap();
+        assert!(html.contains("<p id=\"remote-title-error\" hidden=\"\"></p>"));
+        let title = html
+            .split("<input id=\"remote-title\"")
+            .nth(1)
+            .unwrap()
+            .split('>')
+            .next()
+            .unwrap();
+        assert!(!title.contains("aria-invalid"));
+        assert!(!title.contains("aria-describedby"));
+    }
 
     #[test]
     fn todo_titles_are_text_not_markup() {

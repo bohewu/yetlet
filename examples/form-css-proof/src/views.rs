@@ -60,14 +60,14 @@ pub(crate) fn form(draft: &Draft, errors: &Errors, enhanced: bool, assets_ready:
         "required",
         true,
     );
-    // HTML removes one leading newline inside textarea; this sentinel preserves a user's leading newline.
+    // The HTML renderer preserves the textarea's initial newline; no caller sentinel is needed.
     let notes = Element::new("textarea")
         .attribute("id", "notes")
         .attribute("name", "notes")
         .attribute("rows", "4")
         .attribute("maxlength", "4000")
         .attribute("class", "form-control")
-        .child(View::text(format!("\n{}", draft.notes)));
+        .child(View::text(&draft.notes));
     let mut priority = Element::new("select")
         .attribute("id", "priority")
         .attribute("name", "priority")

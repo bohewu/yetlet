@@ -136,6 +136,7 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
             let c = browser.client()?;
             c.navigate(&format!("{}/app", server.base))?;
             ready(c)?;
+            c.check("(()=>{const error=document.getElementById('remote-title-error');return error.getAttribute('hidden')==='' && error.getClientRects().length===0;})()")?;
             c.equal(
                 "document.querySelector('#todo-list-host ul.todo-list').outerHTML",
                 json!(ssr),
@@ -214,6 +215,9 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
                 let before = count(c)?;
                 remote(c, "  ", "Check the task title. Your text is still here.")?;
                 exact_post(c, before, "  ")?;
+                c.check("(()=>{const error=document.getElementById('remote-title-error');return !error.hasAttribute('hidden') && error.textContent.length>0 && error.getClientRects().length>0 && document.getElementById('remote-title').getAttribute('aria-invalid')==='true';})()")?;
+                c.evaluate("(()=>{const input=document.getElementById('remote-title');input.value='Corrected title';input.dispatchEvent(new Event('input',{bubbles:true}));return true;})()")?;
+                c.check("(()=>{const error=document.getElementById('remote-title-error');return error.getAttribute('hidden')==='' && error.textContent==='' && error.getClientRects().length===0 && !document.getElementById('remote-title').hasAttribute('aria-invalid');})()")?;
                 require(
                     c.chrome()?
                         .failed_responses
@@ -253,6 +257,8 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
                     "no persistent event circuit",
                 )?;
             }
+            native_controls(c, &server.base)?;
+            snapshot(&server.base, if firefox { 1 } else { 2 }, None)?;
             Ok(())
         })();
         let cleanup = browser.stop();
@@ -262,6 +268,66 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
     server.stop(false)?;
     result
 }
+// One actual shared-View journey: initial properties, edits outside the keyed
+// list, browser reset, constrained links and a native, read-only GET submission.
+fn native_controls(c: &mut Client, base: &str) -> Result<()> {
+    c.navigate(&format!("{base}/app"))?;
+    ready(c)?;
+    let initial = json!([
+        "Draft task",
+        "Draft task",
+        "\nKeep this draft local.\nPreview without creating a task.",
+        "\nKeep this draft local.\nPreview without creating a task.",
+        "normal",
+        true,
+        true,
+        true,
+        true,
+        true
+    ]);
+    let values = "(()=>{const title=document.getElementById('native-title'),notes=document.getElementById('native-notes'),select=document.getElementById('native-priority'),check=document.getElementById('native-completed');return [title.value,title.defaultValue,notes.value,notes.defaultValue,select.value,select.options[0].defaultSelected,check.checked,check.defaultChecked,document.getElementById('native-mode').readOnly,document.getElementById('native-disabled').disabled];})()";
+    c.equal(values, initial.clone())?;
+    c.check("document.getElementById('native-notes').getAttribute('aria-describedby')==='native-hint' && document.getElementById('native-form').getAttribute('action')===new URL('/controls',location.href).href && document.getElementById('native-ssr-link').getAttribute('href')===new URL('/controls',location.href).href")?;
+    c.evaluate("(()=>{window.__yt110Title=document.getElementById('native-title');__yt110Title.value='Edited draft';document.getElementById('native-notes').value='Two\\nlines';document.getElementById('native-priority').value='important';document.getElementById('native-completed').checked=false;return true;})()")?;
+    c.click("#toggle-first")?;
+    c.until(
+        "document.getElementById('todo-status').textContent==='First task: completed'",
+        "unrelated local update",
+    )?;
+    c.check("document.getElementById('native-title')===window.__yt110Title && __yt110Title.value==='Edited draft' && document.getElementById('native-notes').value==='Two\\nlines'")?;
+    c.check("(()=>{const data=new FormData(document.getElementById('native-form'));return data.get('title')==='Edited draft' && data.get('priority')==='important' && !data.has('completed') && !data.has('ignored') && data.get('mode')==='Preview only';})()")?;
+    no_api(c, 0)?;
+    c.click("#native-reset")?;
+    c.equal(values, initial.clone())?;
+    c.click("#native-anchor-link")?;
+    c.until(
+        "location.hash==='#native-controls'",
+        "same-origin fragment navigation",
+    )?;
+    c.evaluate("(()=>{document.getElementById('native-title').value='Edited draft';document.getElementById('native-notes').value='Two\\nlines';document.getElementById('native-priority').value='important';document.getElementById('native-completed').checked=false;return true;})()")?;
+    c.click("#native-submit")?;
+    c.until("location.pathname==='/controls' && document.readyState==='complete' && document.getElementById('native-title')?.value==='Edited draft'", "native GET preview")?;
+    c.check("(()=>{const query=new URLSearchParams(location.search);return query.get('title')==='Edited draft' && query.get('priority')==='important' && !query.has('completed') && !query.has('ignored') && document.querySelectorAll('script').length===0 && document.getElementById('native-notes').value==='Two\\nlines' && document.getElementById('native-completed').checked===false;})()")?;
+    c.evaluate(
+        "(()=>{document.getElementById('native-title').value='Later edit';return true;})()",
+    )?;
+    c.click("#native-reset")?;
+    c.equal(
+        "document.getElementById('native-title').value",
+        json!("Edited draft"),
+    )?;
+    c.navigate(&format!("{base}/app"))?;
+    ready(c)?;
+    c.click("#native-ssr-link")?;
+    c.until(
+        "location.pathname==='/controls' && document.readyState==='complete'",
+        "root-relative link",
+    )?;
+    c.equal(values, initial)?;
+    c.check("document.querySelectorAll('script').length===0")?;
+    Ok(())
+}
+
 fn lifecycle(c: &mut Client, base: &str, firefox: bool) -> Result<()> {
     let queued = if firefox { 0 } else { count(c)? };
     // YT-107 claims pending synchronously; dispose still retires the queued HTTP

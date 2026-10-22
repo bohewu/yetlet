@@ -14,6 +14,8 @@ pub enum RenderError {
     ForbiddenAttribute(String),
     UnsafeUrl(String),
     VoidElementHasChildren(String),
+    DuplicateAttribute(String),
+    InvalidChildren(String),
 }
 
 impl fmt::Display for RenderError {
@@ -32,6 +34,8 @@ impl fmt::Display for RenderError {
             Self::VoidElementHasChildren(tag) => {
                 write!(f, "void HTML element cannot have children: {tag}")
             }
+            Self::DuplicateAttribute(name) => write!(f, "duplicate HTML attribute: {name}"),
+            Self::InvalidChildren(tag) => write!(f, "unsupported HTML children for: {tag}"),
         }
     }
 }
@@ -56,11 +60,11 @@ pub fn escape_text(input: &str) -> String {
 /// Serialize one view without allowing markup injection through its text/attrs.
 pub fn render_to_string(view: &View) -> Result<String, RenderError> {
     let mut output = String::new();
-    render_into(view, &mut output)?;
+    render_into(view, &mut output, false)?;
     Ok(output)
 }
 
-fn render_into(view: &View, output: &mut String) -> Result<(), RenderError> {
+fn render_into(view: &View, output: &mut String, inside_form: bool) -> Result<(), RenderError> {
     match view {
         View::Text(value) => output.push_str(&escape_text(value)),
         View::Element(element) => {
@@ -69,9 +73,26 @@ fn render_into(view: &View, output: &mut String) -> Result<(), RenderError> {
                 return Err(RenderError::InvalidTag(tag.to_owned()));
             }
 
+            if (tag == "form" && inside_form)
+                || (matches!(tag, "textarea" | "option")
+                    && element
+                        .child_views()
+                        .iter()
+                        .any(|v| !matches!(v, View::Text(_))))
+                || (tag == "select"
+                    && element.child_views().iter().any(|v| {
+                        !matches!(v, View::Element(e) if matches!(e.tag(), "option" | "optgroup"))
+                            && !matches!(v, View::Text(s) if s.trim().is_empty())
+                    }))
+            {
+                return Err(RenderError::InvalidChildren(tag.into()));
+            }
             write!(output, "<{tag}").expect("writing to String is infallible");
-            for attribute in element.attributes() {
+            for (index, attribute) in element.attributes().iter().enumerate() {
                 let name = attribute.name;
+                if element.attributes()[..index].iter().any(|a| a.name == name) {
+                    return Err(RenderError::DuplicateAttribute(name.into()));
+                }
                 if !valid_identifier(name) {
                     return Err(RenderError::InvalidAttribute(name.to_owned()));
                 }
@@ -93,8 +114,25 @@ fn render_into(view: &View, output: &mut String) -> Result<(), RenderError> {
                 }
                 return Ok(());
             }
-            for child in element.child_views() {
-                render_into(child, output)?;
+            if tag == "textarea" {
+                let text: String = element
+                    .child_views()
+                    .iter()
+                    .filter_map(|v| match v {
+                        View::Text(s) => Some(s.as_str()),
+                        _ => None,
+                    })
+                    .collect();
+                let normalized = text.replace("\r\n", "\n").replace('\r', "\n");
+                // HTML parsing discards one LF immediately after the start tag.
+                if normalized.starts_with('\n') {
+                    output.push('\n');
+                }
+                output.push_str(&escape_text(&normalized));
+            } else {
+                for child in element.child_views() {
+                    render_into(child, output, inside_form || tag == "form")?;
+                }
             }
             write!(output, "</{tag}>").expect("writing to String is infallible");
         }
@@ -135,6 +173,48 @@ mod tests {
     use yetlet_core::{Element, View};
 
     #[test]
+    fn rejects_duplicate_names_and_invalid_control_children() {
+        let view = Element::new("div")
+            .attribute("id", "first")
+            .attribute("id", "last")
+            .into();
+        assert_eq!(
+            render_to_string(&view),
+            Err(RenderError::DuplicateAttribute("id".into()))
+        );
+        for view in [
+            Element::new("textarea").child(Element::new("p")).into(),
+            Element::new("option").child(Element::new("span")).into(),
+            Element::new("select").child(Element::new("div")).into(),
+            Element::new("form")
+                .child(Element::new("section").child(Element::new("form")))
+                .into(),
+        ] {
+            assert!(matches!(
+                render_to_string(&view),
+                Err(RenderError::InvalidChildren(_))
+            ));
+        }
+    }
+
+    #[test]
+    fn textarea_defaults_preserve_initial_newline_and_escape_text() {
+        let view = Element::new("textarea")
+            .child(View::text("\r"))
+            .child(View::text("\n<draft>\rnext"))
+            .into();
+        assert_eq!(
+            render_to_string(&view).unwrap(),
+            "<textarea>\n\n&lt;draft&gt;\nnext</textarea>"
+        );
+        let view = Element::new("textarea").child(View::text("normal")).into();
+        assert_eq!(
+            render_to_string(&view).unwrap(),
+            "<textarea>normal</textarea>"
+        );
+    }
+
+    #[test]
     fn escapes_dynamic_text_and_attributes() {
         let tree: View = Element::new("p")
             .attribute("title", "\" onclick='evil()' &")
@@ -144,6 +224,28 @@ mod tests {
         assert_eq!(
             html,
             "<p title=\"&quot; onclick=&#39;evil()&#39; &amp;\">&lt;img src=x onerror=1&gt; &amp; &#39; &quot;</p>"
+        );
+    }
+
+    #[test]
+    fn serializes_hidden_presence_and_values_without_boolean_coercion() {
+        assert_eq!(
+            render_to_string(&Element::new("p").into()).unwrap(),
+            "<p></p>"
+        );
+        for value in ["", "hidden", "false", "until-found"] {
+            let view = Element::new("p").attribute("hidden", value).into();
+            assert_eq!(
+                render_to_string(&view).unwrap(),
+                format!("<p hidden=\"{value}\"></p>"),
+            );
+        }
+        let view = Element::new("p")
+            .attribute("hidden", "\" onclick=\"evil()&")
+            .into();
+        assert_eq!(
+            render_to_string(&view).unwrap(),
+            "<p hidden=\"&quot; onclick=&quot;evil()&amp;\"></p>",
         );
     }
 
