@@ -84,6 +84,55 @@ mod tests {
     use super::{Element, View};
 
     #[test]
+    fn yt152_child_conversion_order_clone_and_unwind() {
+        use std::cell::Cell;
+
+        struct Converted<'a>(&'a Cell<usize>);
+        impl From<Converted<'_>> for View {
+            fn from(value: Converted<'_>) -> Self {
+                value.0.set(value.0.get() + 1);
+                View::text("first")
+            }
+        }
+        let conversions = Cell::new(0);
+        let tree = Element::new("div")
+            .child(Converted(&conversions))
+            .children([View::text("second"), View::text("third")])
+            .child(View::text("fourth"))
+            .child(View::text("fifth"));
+        assert_eq!(conversions.get(), 1);
+        assert_eq!(
+            tree.child_views(),
+            ["first", "second", "third", "fourth", "fifth"].map(View::text)
+        );
+        let cloned = tree.clone().child(View::text("sixth"));
+        assert_eq!(tree.child_views().len(), 5);
+        assert_eq!(cloned.child_views().last(), Some(&View::text("sixth")));
+        let bulk_first = Element::new("div")
+            .children([View::text("bulk")])
+            .child(View::text("after"));
+        assert_eq!(bulk_first.child_views(), ["bulk", "after"].map(View::text));
+
+        struct Panicking<'a>(&'a Cell<usize>);
+        impl Drop for Panicking<'_> {
+            fn drop(&mut self) {
+                self.0.set(self.0.get() + 1);
+            }
+        }
+        impl From<Panicking<'_>> for View {
+            fn from(_: Panicking<'_>) -> Self {
+                panic!("intentional conversion unwind")
+            }
+        }
+        let drops = Cell::new(0);
+        let result = std::panic::catch_unwind(std::panic::AssertUnwindSafe(|| {
+            Element::new("div").child(Panicking(&drops))
+        }));
+        assert!(result.is_err());
+        assert_eq!(drops.get(), 1);
+    }
+
+    #[test]
     fn view_tree_is_renderer_neutral() {
         let tree: View = Element::new("ul")
             .attribute("class", "todos")

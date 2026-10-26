@@ -106,10 +106,11 @@ pub trait PublicKeySource: Send + Sync {
     fn public_key(&self, key: &KeyRef) -> impl Future<Output = Result<ResolvedPublicKey>> + Send;
 }
 
-/// Contains public material only; no password or signing capability.
+/// An in-memory public-key source for certificate-backed or certificate-free material.
+/// Contains no password or signing capability; trust is configured separately by [`Policy`].
 #[derive(Clone)]
-pub struct PublicCertificates(BTreeMap<KeyRef, PublicMaterial>);
-impl PublicCertificates {
+pub struct PublicKeySet(BTreeMap<KeyRef, PublicMaterial>);
+impl PublicKeySet {
     pub fn new(entries: Vec<(KeyRef, PublicMaterial)>) -> Result<Self> {
         let mut map = BTreeMap::new();
         for (key, material) in entries {
@@ -121,7 +122,7 @@ impl PublicCertificates {
         Ok(Self(map))
     }
 }
-impl PublicKeySource for PublicCertificates {
+impl PublicKeySource for PublicKeySet {
     async fn public_key(&self, key: &KeyRef) -> Result<ResolvedPublicKey> {
         Ok(ResolvedPublicKey {
             key_ref: key.clone(),

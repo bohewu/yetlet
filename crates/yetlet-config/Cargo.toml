@@ -3,10 +3,11 @@ resolver = "3"
 
 [package]
 name = "yetlet-config"
-version = "0.0.0"
+version = "0.1.0"
 edition = "2024"
 rust-version = "1.99"
-publish = false
+readme = "README.md"
+repository = "https://github.com/bohewu/yetlet"
 license = "MIT OR Apache-2.0"
 description = "Experimental opt-in native typed application configuration"
 
@@ -17,7 +18,7 @@ secret-provider = ["dep:yetlet-secrets"]
 serde = { version = "=1.0.229", features = ["derive"] }
 toml = { version = "=0.9.12", default-features = false, features = ["std", "parse", "serde"] }
 dotenvy = "=0.15.7"
-yetlet-secrets = { path = "../yetlet-secrets", optional = true }
+yetlet-secrets = { version = "0.1.0", path = "../yetlet-secrets", optional = true }
 
 [[example]]
 name = "secret_provider"
@@ -31,5 +32,5 @@ secrecy = { version = "=0.10.3", features = ["serde"] }
 axum = { version = "=0.8.9", default-features = false, features = ["http1", "tokio"] }
 tokio = { version = "=1.53.2", features = ["macros", "rt-multi-thread", "net"] }
 tower = { version = "=0.5.3", features = ["util"] }
-yetlet-core = { path = "../yetlet-core" }
-yetlet-server-axum = { path = "../yetlet-server-axum" }
+yetlet-core = { version = "0.1.0", path = "../yetlet-core" }
+yetlet-server-axum = { version = "0.1.0", path = "../yetlet-server-axum" }

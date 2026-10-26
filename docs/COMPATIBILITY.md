@@ -6,6 +6,12 @@
 
 The maintainer authorized [Private release preparation](YT-020-PRIVATE-RELEASE-PREP.md), not publication or a visibility change. Existing API classifications remain unchanged.
 
+**Current package preparation (2026-10-26):** [YT-201](YT-201-PACKAGE-PREPARATION.md)
+aligns sixteen library manifests to experimental 0.1.0 with compatible registry
+dependency requirements and unchanged independent workspaces/default features.
+They remain unpublished. This extends preparation, not the immutable ce56e08
+candidate, support classifications, final source C or release authorization.
+
 ## Release train
 
 Yetlet-owned crates use one workspace version and one coordinated release train. Runnable examples, benchmark fixtures, generated WASM glue and Python harnesses are validation assets, not independently versioned public packages.
@@ -18,10 +24,10 @@ For the selected `0.1.x` train, patches preserve documented API behavior and MSR
 
 The optional Redis Session provider and the owner-approved
 `yetlet-wgpu` candidate use **isolated nested Cargo workspaces/locks**,
-`publish = false`, and pre-public Experimental contracts. They are not
+publication-prepared metadata, and pre-public Experimental contracts. They are not
 among the original nine coordinated YT-020 release candidates; their
-`0.1.0` (GPU) or separate provider version is not evidence that they
-have entered the root release train. The default HTML/DOM/server
+shared prepared `0.1.0` version is not evidence that they
+have entered an approved immutable release. The default HTML/DOM/server
 dependency paths and root lock remain independent. See the
 [YT-081 source/API audit](YT-081-API-CONTRACT-AUDIT.md) before assuming
 cross-provider interchangeability or a GPU stability guarantee.

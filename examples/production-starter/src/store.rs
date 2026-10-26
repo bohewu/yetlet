@@ -9,17 +9,20 @@ use std::{
     time::Duration,
 };
 
+use crate::observability::{Active, Metrics};
 use rusqlite::{
     Connection, ErrorCode, OpenFlags, OptionalExtension, Row, TransactionBehavior, params,
 };
 use serde::{Deserialize, Serialize};
-use tokio::sync::Semaphore;
+use tokio::sync::{Notify, OwnedSemaphorePermit, Semaphore};
 
 #[cfg(unix)]
 use std::os::unix::fs::OpenOptionsExt;
 
 const MIGRATION: &str = include_str!("../migrations/0001_init.sql");
-const SCHEMA_VERSION: i64 = 1;
+const STATUS_INDEX: &str = include_str!("../migrations/0002_status_index.sql");
+const SCHEMA_VERSION: i64 = 2;
+const SQL_CAPACITY: usize = 4;
 
 #[derive(Debug, Clone, Copy, Deserialize, Serialize, PartialEq, Eq)]
 #[serde(rename_all = "snake_case")]
@@ -88,6 +91,23 @@ impl From<rusqlite::Error> for StoreError {
 pub struct Store {
     path: Arc<PathBuf>,
     gate: Arc<Semaphore>,
+    completed: Arc<Notify>,
+    metrics: Option<Arc<Metrics>>,
+}
+
+// Owned by the closure, including time queued on Tokio's blocking pool. Release
+// capacity only after the connection closes, also on errors and unwinding.
+struct Completion {
+    permit: Option<OwnedSemaphorePermit>,
+    completed: Arc<Notify>,
+    active: Option<Active>,
+}
+impl Drop for Completion {
+    fn drop(&mut self) {
+        drop(self.active.take());
+        drop(self.permit.take());
+        self.completed.notify_waiters();
+    }
 }
 
 impl Store {
@@ -119,8 +139,21 @@ impl Store {
         verify_schema(&connection)?;
         Ok(Self {
             path: Arc::new(path),
-            gate: Arc::new(Semaphore::new(4)),
+            gate: Arc::new(Semaphore::new(SQL_CAPACITY)),
+            completed: Arc::new(Notify::new()),
+            metrics: None,
         })
+    }
+
+    /// Attach app-owned collection before cloning the store into consumers.
+    /// Existing clones retain their original collection choice.
+    pub fn with_metrics(mut self, metrics: Arc<Metrics>) -> Self {
+        self.metrics = Some(metrics);
+        self
+    }
+
+    pub(crate) fn metrics(&self) -> Option<&Arc<Metrics>> {
+        self.metrics.as_ref()
     }
 
     async fn run<T, F>(&self, operation: F) -> Result<T, StoreError>
@@ -128,20 +161,78 @@ impl Store {
         T: Send + 'static,
         F: FnOnce(&mut Connection) -> Result<T, StoreError> + Send + 'static,
     {
-        let permit = self
-            .gate
-            .clone()
-            .acquire_owned()
-            .await
-            .map_err(|_| StoreError::Unavailable)?;
+        let permit = self.gate.clone().try_acquire_owned();
+        if let Some(metrics) = &self.metrics {
+            let outcome = match &permit {
+                Ok(_) => "acquired",
+                Err(tokio::sync::TryAcquireError::Closed) => "closed",
+                Err(tokio::sync::TryAcquireError::NoPermits) => "saturated",
+            };
+            metrics.sql_admission.with_label_values(&[outcome]).inc();
+            // No queue exists: do not mistake syscall time for permit waiting.
+            metrics.sql_wait.observe(0.0);
+        }
+        let permit = permit.map_err(|_| StoreError::Unavailable)?;
+        let completion = Completion {
+            permit: Some(permit),
+            completed: self.completed.clone(),
+            active: self.metrics.as_ref().map(|m| Active::new(&m.sql_active)),
+        };
         let path = self.path.clone();
+        let metrics = self.metrics.clone();
+        let span = tracing::Span::current();
+        let dispatcher = tracing::dispatcher::get_default(Clone::clone);
         tokio::task::spawn_blocking(move || {
-            let _permit = permit;
-            let mut connection = open_connection(&path)?;
-            operation(&mut connection)
+            tracing::dispatcher::with_default(&dispatcher, || {
+                span.in_scope(|| {
+                    let _completion = completion;
+                    let result = (|| {
+                        let mut connection = open_connection(&path)?;
+                        operation(&mut connection)
+                    })();
+                    let outcome = match &result {
+                        Ok(_) => "ok",
+                        Err(StoreError::NotFound) => "not_found",
+                        Err(StoreError::Conflict) => "conflict",
+                        Err(StoreError::Unavailable) => "unavailable",
+                        Err(StoreError::InvalidSchema) => "invalid_schema",
+                        Err(StoreError::Internal) => "internal",
+                    };
+                    if let Some(metrics) = metrics {
+                        metrics.sql_operations.with_label_values(&[outcome]).inc();
+                    }
+                    // Operation return is not an audit/durability acknowledgment.
+                    tracing::info!(event = "sql_finished", outcome);
+                    result
+                })
+            })
         })
         .await
         .map_err(|_| StoreError::Unavailable)?
+    }
+
+    /// Reject new work across all clones. Already admitted work may still commit.
+    pub fn close(&self) {
+        self.gate.close();
+    }
+
+    pub fn is_closed(&self) -> bool {
+        self.gate.is_closed()
+    }
+
+    /// Close admission and wait for real blocking completion, not HTTP waiters.
+    /// The application owns the outer shutdown grace deadline.
+    pub async fn drain(&self) {
+        self.close();
+        loop {
+            let notified = self.completed.notified();
+            tokio::pin!(notified);
+            notified.as_mut().enable();
+            if self.gate.available_permits() == SQL_CAPACITY {
+                return;
+            }
+            notified.await;
+        }
     }
 
     pub async fn ready(&self) -> Result<(), StoreError> {
@@ -170,6 +261,19 @@ impl Store {
     pub async fn get(&self, id: i64) -> Result<Issue, StoreError> {
         self.run(move |connection| select_issue(connection, id)?.ok_or(StoreError::NotFound))
             .await
+    }
+
+    /// V2 status view: apply the filter before the existing 100-row limit.
+    pub async fn list_by_status(&self, status: IssueStatus) -> Result<Vec<Issue>, StoreError> {
+        self.run(move |connection| {
+            let mut statement = connection.prepare(
+                "SELECT id, title, body, status, version FROM issues WHERE status=?1 ORDER BY id DESC LIMIT 100",
+            )?;
+            let rows = statement.query_map([status.as_str()], issue_from_row)?;
+            rows.collect::<rusqlite::Result<Vec<_>>>()
+                .map_err(Into::into)
+        })
+        .await
     }
 
     pub async fn create(&self, title: String, body: String) -> Result<Issue, StoreError> {
@@ -240,10 +344,15 @@ fn migrate(connection: &mut Connection) -> Result<(), StoreError> {
                 return Err(StoreError::InvalidSchema);
             }
             transaction.execute_batch(MIGRATION)?;
-            transaction.pragma_update(None, "user_version", SCHEMA_VERSION)?;
         }
+        1 => verify_issue_table(&transaction)?,
         SCHEMA_VERSION => verify_schema(&transaction)?,
         _ => return Err(StoreError::InvalidSchema),
+    }
+    if version < SCHEMA_VERSION {
+        transaction.execute_batch(STATUS_INDEX)?;
+        transaction.pragma_update(None, "user_version", SCHEMA_VERSION)?;
+        verify_schema(&transaction)?;
     }
     transaction.commit()?;
     let mode: String = connection.query_row("PRAGMA journal_mode=WAL", [], |row| row.get(0))?;
@@ -255,6 +364,23 @@ fn migrate(connection: &mut Connection) -> Result<(), StoreError> {
 
 fn verify_schema(connection: &Connection) -> Result<(), StoreError> {
     let version: i64 = connection.pragma_query_value(None, "user_version", |row| row.get(0))?;
+    verify_issue_table(connection)?;
+    let index: Option<String> = connection
+        .query_row(
+            "SELECT sql FROM sqlite_schema WHERE type='index' AND name='issues_status_id'",
+            [],
+            |row| row.get(0),
+        )
+        .optional()?;
+    if version != SCHEMA_VERSION
+        || index.as_deref() != Some(STATUS_INDEX.trim().trim_end_matches(';'))
+    {
+        return Err(StoreError::InvalidSchema);
+    }
+    Ok(())
+}
+
+fn verify_issue_table(connection: &Connection) -> Result<(), StoreError> {
     let schema: Option<String> = connection
         .query_row(
             "SELECT sql FROM sqlite_schema WHERE type='table' AND name='issues'",
@@ -262,10 +388,10 @@ fn verify_schema(connection: &Connection) -> Result<(), StoreError> {
             |row| row.get(0),
         )
         .optional()?;
-    // This application owns one fixed migration, including its CHECK constraints.
+    // The historical table and its CHECK constraints remain unchanged in v2.
     // Comparing the DDL also rejects lookalike tables with missing constraints.
     let expected = MIGRATION.trim().trim_end_matches(';');
-    if version != SCHEMA_VERSION || schema.as_deref() != Some(expected) {
+    if schema.as_deref() != Some(expected) {
         return Err(StoreError::InvalidSchema);
     }
     Ok(())
@@ -302,6 +428,220 @@ fn select_issue(connection: &Connection, id: i64) -> Result<Option<Issue>, Store
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[tokio::test]
+    async fn v1_upgrade_preserves_all_fields_and_sequence_and_filters_before_limit() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("v1.sqlite3");
+        let connection = Connection::open(&path).unwrap();
+        connection.execute_batch(MIGRATION).unwrap();
+        connection.pragma_update(None, "user_version", 1).unwrap();
+        connection
+            .execute(
+                "INSERT INTO issues(id,title,body,status,version) VALUES (42,?1,?2,'closed',7)",
+                params!["old ' <title>", "Unicode 中文 & body"],
+            )
+            .unwrap();
+        let before = select_issue(&connection, 42).unwrap().unwrap();
+        drop(connection);
+        let store = Store::open(&path).unwrap();
+        assert_eq!(store.get(42).await.unwrap(), before);
+        let connection = open_connection(&path).unwrap();
+        assert_eq!(
+            connection
+                .pragma_query_value(None, "user_version", |r| r.get::<_, i64>(0))
+                .unwrap(),
+            2
+        );
+        assert_eq!(
+            connection
+                .query_row(
+                    "SELECT seq FROM sqlite_sequence WHERE name='issues'",
+                    [],
+                    |r| r.get::<_, i64>(0)
+                )
+                .unwrap(),
+            42
+        );
+        for _ in 0..105 {
+            connection
+                .execute("INSERT INTO issues(title,body) VALUES ('new','')", [])
+                .unwrap();
+        }
+        assert_eq!(
+            store.list_by_status(IssueStatus::Closed).await.unwrap(),
+            vec![before.clone()]
+        );
+        let open = store.list_by_status(IssueStatus::Open).await.unwrap();
+        assert_eq!(open.len(), 100);
+        assert_eq!(open[0].id, 147);
+        assert_eq!(open[99].id, 48);
+        let updated = store
+            .set_status(42, IssueStatus::InProgress, 7)
+            .await
+            .unwrap();
+        assert_eq!(updated.version, 8);
+        assert_eq!(updated.title, before.title);
+        assert_eq!(updated.body, before.body);
+        drop(connection);
+        drop(store);
+        Store::open(&path).unwrap().ready().await.unwrap();
+    }
+
+    #[test]
+    fn failed_upgrade_rolls_back_and_damaged_v2_index_is_refused() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("v1.sqlite3");
+        let connection = Connection::open(&path).unwrap();
+        connection.execute_batch(MIGRATION).unwrap();
+        connection.execute_batch("PRAGMA user_version=1; INSERT INTO issues(title,body) VALUES ('retain','body'); CREATE INDEX issues_status_id ON issues(title);").unwrap();
+        assert!(Store::open(&path).is_err());
+        assert_eq!(
+            connection
+                .pragma_query_value(None, "user_version", |r| r.get::<_, i64>(0))
+                .unwrap(),
+            1
+        );
+        assert_eq!(
+            select_issue(&connection, 1).unwrap().unwrap().title,
+            "retain"
+        );
+        connection
+            .execute_batch("DROP INDEX issues_status_id")
+            .unwrap();
+        drop(connection);
+        Store::open(&path).unwrap();
+        let connection = open_connection(&path).unwrap();
+        connection
+            .execute_batch(
+                "DROP INDEX issues_status_id; CREATE INDEX issues_status_id ON issues(title);",
+            )
+            .unwrap();
+        assert!(matches!(Store::open(&path), Err(StoreError::InvalidSchema)));
+        assert_eq!(select_issue(&connection, 1).unwrap().unwrap().body, "body");
+    }
+
+    #[tokio::test]
+    async fn admission_has_no_queue_and_cancellation_keeps_blocking_capacity() {
+        let directory = tempfile::tempdir().unwrap();
+        let metrics = Arc::new(Metrics::new().unwrap());
+        let store = Store::open(directory.path().join("issues.sqlite3"))
+            .unwrap()
+            .with_metrics(metrics.clone());
+        let mut callers = Vec::new();
+        let mut releases = Vec::new();
+        for _ in 0..SQL_CAPACITY {
+            let (started, received) = tokio::sync::oneshot::channel();
+            let (release, wait) = std::sync::mpsc::channel();
+            releases.push(release);
+            let store = store.clone();
+            callers.push(tokio::spawn(async move {
+                store
+                    .run(move |_| {
+                        let _ = started.send(());
+                        wait.recv_timeout(Duration::from_secs(10)).unwrap();
+                        Ok(())
+                    })
+                    .await
+            }));
+            received.await.unwrap();
+        }
+        // All four closures are started, so these cannot wait or start work.
+        for _ in 0..1000 {
+            assert_eq!(store.list().await, Err(StoreError::Unavailable));
+        }
+        assert_eq!(store.ready().await, Err(StoreError::Unavailable));
+        for caller in callers {
+            caller.abort();
+            assert!(caller.await.unwrap_err().is_cancelled());
+        }
+        assert_eq!(store.gate.available_permits(), 0);
+        assert_eq!(metrics.sql_active.get(), 4);
+        assert_eq!(
+            metrics
+                .sql_admission
+                .with_label_values(&["saturated"])
+                .get(),
+            1001
+        );
+        assert_eq!(metrics.sql_wait.get_sample_count(), 1005);
+        assert_eq!(metrics.sql_wait.get_sample_sum(), 0.0);
+        for release in releases {
+            release.send(()).unwrap();
+        }
+        tokio::time::timeout(Duration::from_secs(5), async {
+            while store.gate.available_permits() != SQL_CAPACITY {
+                tokio::task::yield_now().await;
+            }
+        })
+        .await
+        .unwrap();
+        assert_eq!(metrics.sql_active.get(), 0);
+        assert_eq!(metrics.sql_operations.with_label_values(&["ok"]).get(), 4);
+        store.ready().await.unwrap();
+        assert!(store.list().await.unwrap().is_empty());
+        store.close();
+        assert_eq!(store.ready().await, Err(StoreError::Unavailable));
+        assert_eq!(
+            metrics.sql_admission.with_label_values(&["closed"]).get(),
+            1
+        );
+    }
+
+    #[tokio::test]
+    async fn timeout_write_commits_later_and_shutdown_waits_for_it() {
+        let directory = tempfile::tempdir().unwrap();
+        let path = directory.path().join("issues.sqlite3");
+        let store = Store::open(&path).unwrap();
+        // A future dropped before first poll has dispatched nothing.
+        drop(store.create("never dispatched".into(), String::new()));
+        assert!(store.list().await.unwrap().is_empty());
+        let (started, received) = tokio::sync::oneshot::channel();
+        let (release, wait) = std::sync::mpsc::channel();
+        let worker_store = store.clone();
+        let caller = tokio::spawn(async move {
+            worker_store
+                .run(move |connection| {
+                    let _ = started.send(());
+                    wait.recv_timeout(Duration::from_secs(10)).unwrap();
+                    connection.execute(
+                        "INSERT INTO issues(title, body) VALUES ('late write', '')",
+                        [],
+                    )?;
+                    Ok(())
+                })
+                .await
+        });
+        received.await.unwrap();
+        // Timeout drops this caller, but cannot abort the started SQL closure.
+        let mut caller = caller;
+        assert!(
+            tokio::time::timeout(Duration::from_millis(10), &mut caller)
+                .await
+                .is_err()
+        );
+        caller.abort();
+        assert!(caller.await.unwrap_err().is_cancelled());
+        store.close();
+        assert_eq!(store.list().await, Err(StoreError::Unavailable));
+        assert_eq!(store.ready().await, Err(StoreError::Unavailable));
+        let drain = store.drain();
+        tokio::pin!(drain);
+        assert!(
+            tokio::time::timeout(Duration::from_millis(10), &mut drain)
+                .await
+                .is_err()
+        );
+        release.send(()).unwrap();
+        tokio::time::timeout(Duration::from_secs(5), &mut drain)
+            .await
+            .unwrap();
+        assert_eq!(store.gate.available_permits(), SQL_CAPACITY);
+        let reopened = Store::open(&path).unwrap();
+        let issues = reopened.list().await.unwrap();
+        assert_eq!(issues.len(), 1);
+        assert_eq!(issues[0].title, "late write");
+    }
 
     #[tokio::test]
     async fn migration_reopen_and_bound_parameters_preserve_data() {

@@ -1,16 +1,59 @@
-# YT-090 follow-up — settings from an injected SecretProvider
+# Settings from an injected SecretProvider
 
-Date: 2026-10-19. Scope: owner-authorized opt-in settings integration, followed
-by separate YT-094 shared-SQLite work only after this slice passes review.
-Implementation and focused checks pass; independent Reviewer PASS with zero
-issues and required followups.
+Resolve an explicitly injected SecretProvider into selected protected startup
+settings fields. Ordinary settings loading remains independent and unchanged.
 
-## Contract
+**Experimental, unpublished.** Use this source checkout and the documented target scope.
+
+
+## Prerequisites
+
+Use the pinned Rust/Cargo toolchain and the isolated config workspace. Explicitly
+enable `secret-provider`; construct the provider before resolving settings to
+avoid circular bootstrap. The runnable example uses bundled settings and a local
+synthetic provider. The wiring fragment assumes application-owned `Settings`,
+`DeliveryClient`, a Loader and a provider; see the complete source for real types.
+
+## Minimal integration
+
+Run the existing complete listener-free example from the repository root:
+
+```sh
+cargo run --locked --manifest-path crates/yetlet-config/Cargo.toml \
+  --features secret-provider --example secret_provider
+```
+
+To embed it, enable the feature and call `load_with_secrets` or the explicit
+snapshot variant with typed `SecretBinding` selectors, then validate before
+constructing consumers. The existing wiring fragment and exact failure contract
+are retained below.
+
+
+
+## Expected result
+
+The complete example prints `Example request status: 200 OK` and exits without
+a listener or external lookup. Only explicitly bound fields use the provider as
+the sole final source; unbound fields retain ordinary source precedence. No
+partially resolved settings are returned after failure.
+
+## Configuration and errors
+
+### Contract
 
 The existing `yetlet-config` loader adds the optional `secret-provider` feature.
-Its ordinary `load`/`load_from_env` methods, file/environment precedence and
+Its ordinary `load`/`load_with_env` methods,
+file/environment precedence and
 Development-only secret-file rules are unchanged. Default builds have no normal
 dependency on `yetlet-secrets`. Core/browser and application defaults are unchanged.
+
+Use **settings loader** for `yetlet_config::Loader` and **secret provider** for
+`yetlet_secrets::SecretProvider`. These are separate optional capabilities; no
+SettingsProvider trait is introduced. Explicit snapshots use
+`load_with_env_and_secrets`. The owner-selected pre-public migration removed
+former Rust aliases while preserving precedence and provider semantics. See the
+[naming guide](NAMING.md); the [earlier checkpoint](NAMING-COMPATIBILITY.md)
+retains its accepted historical compatibility evidence.
 
 Enable the feature and inject an already-constructed read-only provider:
 
@@ -50,7 +93,7 @@ distinct closed loader errors without names, values or backend diagnostic chains
 A failure returns no partially resolved settings; separately held prior settings
 are not mutated. Separate lookups are not an atomic external-vault snapshot.
 
-## Module and security boundaries
+### Module and security boundaries
 
 The application owns assembly. Give each module its needed typed settings or
 specific secret, rather than the entire root settings/provider. The
@@ -76,7 +119,23 @@ administrative writes/rotation assigned separately. Ordinary source loading may
 still parse literal secrets as before; this feature makes no process-wide
 zeroization guarantee.
 
-## Validation and review
+## API reference
+
+Use [binding implementation](../crates/yetlet-config/src/secrets.rs),
+[Loader source/rustdoc](../crates/yetlet-config/src/lib.rs),
+[SecretProvider guide](SECRET-PROVIDERS.md) and the [current API reference](API-REFERENCE.md).
+
+<details>
+<summary>Historical delivery context and evidence</summary>
+
+### YT-090 follow-up — settings from an injected SecretProvider
+
+Date: 2026-10-19. Scope: owner-authorized opt-in settings integration, followed
+by separate YT-094 shared-SQLite work only after this slice passes review.
+Implementation and focused checks pass; independent Reviewer PASS with zero
+issues and required followups.
+
+### Validation and review
 
 Focused checks passed with exit 0:
 
@@ -114,3 +173,5 @@ source/document targets and focused evidence. Only synthetic values and
 listener-free requests were used; no listener, background service, cloud
 resource or browser was started. Existing accepted OIDC, Valkey, Windows and
 cloud evidence remains at its recorded scope. No commit or push was performed.
+
+</details>

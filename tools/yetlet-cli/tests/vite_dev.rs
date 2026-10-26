@@ -62,7 +62,7 @@ fn removed_development_switches_refuse_before_creation() {
         parse(&argv(&["new", "web", "--vite"])),
         Ok(Cli::New {
             vite: true,
-            with_config: true,
+            runtime_settings: true,
             ..
         })
     ));
@@ -82,13 +82,13 @@ fn eight_dev_profiles_only_add_two_root_files_and_script_readme_without_tools_or
             fs::set_permissions(path, fs::Permissions::from_mode(0o700)).unwrap();
         }
     }
-    for cloud in [false, true] {
+    for service in [false, true] {
         for config in [false, true] {
             for tailwind in [false, true] {
-                let name = format!("web-{cloud}-{config}-{tailwind}");
-                scaffold::create_vite(&name, &framework(), &legacy, cloud, config, tailwind)
+                let name = format!("web-{service}-{config}-{tailwind}");
+                scaffold::create_vite(&name, &framework(), &legacy, service, config, tailwind)
                     .unwrap();
-                scaffold::create_vite_dev(&name, &framework(), &dev, cloud, config, tailwind)
+                scaffold::create_vite_dev(&name, &framework(), &dev, service, config, tailwind)
                     .unwrap();
                 let original = inventory(&legacy.join(&name));
                 let generated = inventory(&dev.join(&name));
@@ -115,7 +115,7 @@ fn eight_dev_profiles_only_add_two_root_files_and_script_readme_without_tools_or
                 assert!(generated.contains_key("vite.dev.config.mjs"));
                 assert!(generated.contains_key("vite.dev.bridge.mjs"));
                 assert!(
-                    scaffold::create_vite_dev(&name, &framework(), &dev, cloud, config, tailwind)
+                    scaffold::create_vite_dev(&name, &framework(), &dev, service, config, tailwind)
                         .is_err()
                 );
                 assert_eq!(generated, inventory(&dev.join(&name)));

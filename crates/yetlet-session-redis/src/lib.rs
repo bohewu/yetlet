@@ -5,6 +5,11 @@
 //! No JavaScript, Memory dependency/fallback, implicit callback retry or DI layer.
 mod store;
 
+/// Unsupported research-build linkage; absent from ordinary consumer builds.
+#[cfg(yetlet_session_admission_probe)]
+#[doc(hidden)]
+pub mod admission_trace;
+
 use axum::{
     extract::{Request, State},
     http::{HeaderMap, HeaderValue, StatusCode, header},
@@ -205,8 +210,9 @@ fn private_headers(response: &mut Response) {
 
 impl<T: Serialize + DeserializeOwned + Clone + Send + Sync + 'static> RedisSessionManager<T> {
     /// Endpoint is application-owned and never included in errors or Debug.
-    /// Only redis:// single-primary operation is supported in this private stage;
-    /// TLS/ACL/HA and persistence recovery are not qualified.
+    /// Single-primary redis:// remains the default private mode. Optional `tls`
+    /// admits checked rediss:// using native Rustls trust; insecure fragments reject.
+    /// Deployment, ACL and persistence/recovery guarantees require separate evidence.
     pub async fn connect(
         endpoint: &str,
         config: RedisSessionConfig,

@@ -11,7 +11,9 @@ use axum::{
 use secrecy::SecretString;
 use serde_json::{Value, json};
 use tower::ServiceExt;
+use tracing::instrument::WithSubscriber;
 use yetlet_production_starter::{
+    observability::Metrics,
     store::{IssueStatus, Store},
     web::app,
 };
@@ -346,6 +348,94 @@ async fn api_create_read_update_and_stale_conflict_preserve_data() {
 }
 
 #[tokio::test]
+async fn v2_status_view_preserves_v1_wire_and_auth_boundaries() {
+    let (_directory, store, _ready, router) = fixture();
+    let (_, _, body) = api(
+        &router,
+        "POST",
+        "/api/issues",
+        json!({"title":"v1 create", "body":"unchanged"}),
+    )
+    .await;
+    let original: Value = serde_json::from_str(&body).unwrap();
+    store.create("second".into(), String::new()).await.unwrap();
+    let (status, headers, body) = api(
+        &router,
+        "PATCH",
+        "/api/issues/1",
+        json!({"status":"closed", "expected_version":1}),
+    )
+    .await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(headers["cache-control"], "no-store");
+    let closed: Value = serde_json::from_str(&body).unwrap();
+    assert_eq!(closed["title"], original["title"]);
+    assert_eq!(closed["body"], original["body"]);
+    let (status, headers, body) =
+        api(&router, "GET", "/api/v2/issues?status=closed", Value::Null).await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(
+        serde_json::from_str::<Value>(&body).unwrap(),
+        json!([closed])
+    );
+    assert!(headers.contains_key("content-security-policy"));
+    assert!(headers.get("set-cookie").is_none());
+    assert_eq!(
+        serde_json::from_str::<Vec<Value>>(
+            &api(&router, "GET", "/api/issues", Value::Null).await.2
+        )
+        .unwrap()
+        .len(),
+        2
+    );
+    for query in [
+        "",
+        "?status=secret-marker",
+        "?status=open&extra=secret-marker",
+    ] {
+        let (status, _, body) = api(
+            &router,
+            "GET",
+            &format!("/api/v2/issues{query}"),
+            Value::Null,
+        )
+        .await;
+        assert_eq!(status, StatusCode::BAD_REQUEST);
+        assert!(!body.contains("secret-marker"));
+    }
+    assert_eq!(
+        call(&router, "GET", "/api/v2/issues?status=open", &[], "")
+            .await
+            .0,
+        StatusCode::UNAUTHORIZED
+    );
+    assert_eq!(
+        call(
+            &router,
+            "GET",
+            "/api/v2/issues?status=open",
+            &[("authorization", &bearer()), ("origin", "http://localhost")],
+            ""
+        )
+        .await
+        .0,
+        StatusCode::FORBIDDEN
+    );
+    assert_eq!(
+        api(
+            &router,
+            "PATCH",
+            "/api/issues/1",
+            json!({"status":"open", "expected_version":1})
+        )
+        .await
+        .0,
+        StatusCode::CONFLICT
+    );
+    assert_eq!(store.get(1).await.unwrap().status, IssueStatus::Closed);
+}
+
+#[tokio::test]
 async fn bounded_validation_extractor_and_database_errors_do_not_leak_inputs() {
     let (directory, store, _ready, router) = fixture();
     let marker = "secret-input-marker";
@@ -459,7 +549,10 @@ async fn tracing_observes_generated_request_id_without_urls_headers_or_bodies() 
         .json()
         .with_writer(move || writer.clone())
         .finish();
-    tracing::subscriber::set_global_default(subscriber).unwrap();
+    // Keep two registered dispatchers so concurrent uninstrumented callsites
+    // cannot cache single-dispatcher Interest::never for this scoped capture.
+    let _other_dispatcher = tracing::Dispatch::new(tracing::subscriber::NoSubscriber::default());
+    let dispatcher = tracing::Dispatch::new(subscriber);
     let (status, headers, _) = call(
         &router,
         "GET",
@@ -468,13 +561,54 @@ async fn tracing_observes_generated_request_id_without_urls_headers_or_bodies() 
             ("authorization", &bearer()),
             ("x-yetlet-request-id", "999999"),
             ("x-private", "secret-header-marker"),
+            ("cookie", "yetlet-starter=secret-session-marker"),
+            ("traceparent", "secret-trace-marker"),
         ],
         "secret-body-marker",
     )
+    .with_subscriber(dispatcher.clone())
     .await;
     assert_eq!(status, StatusCode::NOT_FOUND);
     assert_ne!(headers["x-yetlet-request-id"], "999999");
+    let (ssr, api_result) = async {
+        tokio::join!(
+            call(&router, "GET", "/", &[], ""),
+            api(&router, "GET", "/api/issues", json!(null))
+        )
+    }
+    .with_subscriber(dispatcher)
+    .await;
+    assert_eq!(ssr.0, StatusCode::OK);
+    assert_eq!(api_result.0, StatusCode::OK);
     let logs = String::from_utf8(capture.0.lock().unwrap().clone()).unwrap();
+    let events: Vec<Value> = logs
+        .lines()
+        .map(|line| serde_json::from_str(line).unwrap())
+        .collect();
+    for response in [&ssr, &api_result] {
+        let id: u64 = response.1["x-yetlet-request-id"]
+            .to_str()
+            .unwrap()
+            .parse()
+            .unwrap();
+        assert_eq!(
+            events
+                .iter()
+                .filter(|event| event["fields"]["event"] == "sql_finished"
+                    && event["span"]["request_id"] == id)
+                .count(),
+            1,
+            "captured events: {logs}"
+        );
+        assert_eq!(
+            events
+                .iter()
+                .filter(|event| event["fields"]["event"] == "http_request"
+                    && event["span"]["request_id"] == id)
+                .count(),
+            1
+        );
+    }
     assert!(logs.contains("http_request"));
     assert!(logs.contains("\"request_id\":1"));
     assert!(logs.contains("\"status\":404"));
@@ -485,8 +619,247 @@ async fn tracing_observes_generated_request_id_without_urls_headers_or_bodies() 
         "secret-query-marker",
         "secret-header-marker",
         "secret-body-marker",
+        "secret-session-marker",
+        "secret-trace-marker",
         "999999",
     ] {
         assert!(!logs.contains(marker));
     }
+}
+
+// A request body that signals when the handler actually awaits its next frame.
+// This makes saturation/cancellation tests independent of scheduler delays.
+struct PendingBody(Option<tokio::sync::oneshot::Sender<()>>);
+impl axum::body::HttpBody for PendingBody {
+    type Data = axum::body::Bytes;
+    type Error = std::convert::Infallible;
+    fn poll_frame(
+        mut self: std::pin::Pin<&mut Self>,
+        _: &mut std::task::Context<'_>,
+    ) -> std::task::Poll<Option<Result<http_body::Frame<Self::Data>, Self::Error>>> {
+        if let Some(started) = self.0.take() {
+            let _ = started.send(());
+        }
+        std::task::Poll::Pending
+    }
+}
+
+#[tokio::test]
+async fn http_admission_deadline_health_exceptions_and_recovery() {
+    use std::time::Duration;
+    use yetlet_production_starter::web::{Admission, app_with_admission};
+    let (_directory, store, ready, _) = fixture();
+    let metrics = Arc::new(Metrics::new().unwrap());
+    let store = store.with_metrics(metrics);
+    let router = app_with_admission(
+        store.clone(),
+        SecretString::from(TOKEN),
+        ready,
+        Admission {
+            max_requests: 1,
+            request_timeout: Duration::from_secs(1),
+        },
+    )
+    .unwrap();
+    let (started, received) = tokio::sync::oneshot::channel();
+    let pending = Request::builder()
+        .method("POST")
+        .uri("/api/issues")
+        .header("authorization", bearer())
+        .header("content-type", "application/json")
+        .body(Body::new(PendingBody(Some(started))))
+        .unwrap();
+    let request = tokio::spawn(router.clone().oneshot(pending));
+    received.await.unwrap();
+    let (status, headers, body) = api(&router, "GET", "/api/issues", json!(null)).await;
+    assert_eq!(status, StatusCode::SERVICE_UNAVAILABLE);
+    assert_eq!(
+        serde_json::from_str::<Value>(&body).unwrap()["error"],
+        "Issue storage is unavailable"
+    );
+    assert_eq!(headers["cache-control"], "no-store");
+    assert!(headers.contains_key("content-security-policy"));
+    assert!(headers.contains_key("x-yetlet-request-id"));
+    assert_eq!(
+        call(&router, "GET", "/", &[], "").await.0,
+        StatusCode::SERVICE_UNAVAILABLE
+    );
+    assert_eq!(
+        call(&router, "GET", "/health/live", &[], "").await.0,
+        StatusCode::OK
+    );
+    assert_eq!(
+        call(&router, "GET", "/health/ready", &[], "").await.0,
+        StatusCode::OK
+    );
+    let (status, _, collected) = call(&router, "GET", "/metrics", &[], "").await;
+    assert_eq!(status, StatusCode::OK);
+    assert!(collected.contains("starter_http_requests_active 1\n"));
+    assert!(collected.contains("starter_http_admission_rejections_total{reason=\"capacity\"} 2"));
+    let response = request.await.unwrap().unwrap();
+    assert_eq!(response.status(), StatusCode::GATEWAY_TIMEOUT);
+    assert_eq!(response.headers()["cache-control"], "no-store");
+    assert!(response.headers().contains_key("content-security-policy"));
+    let body = to_bytes(response.into_body(), 1024).await.unwrap();
+    assert!(
+        std::str::from_utf8(&body)
+            .unwrap()
+            .contains("may still complete")
+    );
+    let (_, _, collected) = call(&router, "GET", "/metrics", &[], "").await;
+    assert!(collected.contains("starter_http_requests_active 0\n"));
+    assert!(collected.contains("starter_http_admission_rejections_total{reason=\"deadline\"} 1"));
+    assert!(store.list().await.unwrap().is_empty()); // upload never dispatched SQL
+    assert_eq!(
+        api(&router, "GET", "/api/issues", json!(null)).await.0,
+        StatusCode::OK
+    );
+    store.drain().await;
+    assert_eq!(
+        api(&router, "GET", "/api/issues", json!(null)).await.0,
+        StatusCode::SERVICE_UNAVAILABLE
+    );
+    assert_eq!(
+        call(&router, "GET", "/health/ready", &[], "").await.0,
+        StatusCode::SERVICE_UNAVAILABLE
+    );
+    assert_eq!(
+        call(&router, "GET", "/health/live", &[], "").await.0,
+        StatusCode::OK
+    );
+}
+
+#[tokio::test]
+async fn declared_normal_load_four_simultaneous_operations_has_no_rejections() {
+    let (_directory, store, _ready, router) = fixture();
+    for _ in 0..20 {
+        let calls = (0..4)
+            .map(|_| {
+                let router = router.clone();
+                tokio::spawn(async move {
+                    api(&router, "POST", "/api/issues", json!({"title":"normal"}))
+                        .await
+                        .0
+                })
+            })
+            .collect::<Vec<_>>();
+        for call in calls {
+            assert_eq!(call.await.unwrap(), StatusCode::CREATED);
+        }
+    }
+    assert_eq!(store.list().await.unwrap().len(), 80);
+}
+
+#[tokio::test]
+async fn http_write_timeout_is_indeterminate_and_can_commit_after_response() {
+    use std::time::Duration;
+    use yetlet_production_starter::web::{Admission, app_with_admission};
+    let (directory, store, ready, _) = fixture();
+    let metrics = Arc::new(Metrics::new().unwrap());
+    let store = store.with_metrics(metrics.clone());
+    let connection = rusqlite::Connection::open(directory.path().join("issues.sqlite3")).unwrap();
+    connection.execute_batch("BEGIN IMMEDIATE").unwrap();
+    let router = app_with_admission(
+        store.clone(),
+        SecretString::from(TOKEN),
+        ready,
+        Admission {
+            max_requests: 32,
+            request_timeout: Duration::from_millis(100),
+        },
+    )
+    .unwrap();
+    let (status, _, body) = api(
+        &router,
+        "POST",
+        "/api/issues",
+        json!({"title":"late HTTP write"}),
+    )
+    .await;
+    assert_eq!(status, StatusCode::GATEWAY_TIMEOUT);
+    assert!(body.contains("may still complete"));
+    let collected = String::from_utf8(metrics.encode().unwrap()).unwrap();
+    assert!(collected.contains("starter_http_requests_active 0\n"));
+    assert!(collected.contains("starter_sql_operations_active 1\n"));
+    assert!(!collected.contains("starter_sql_operations_total{outcome=\"ok\"}"));
+    connection.execute_batch("ROLLBACK").unwrap();
+    store.drain().await;
+    let collected = String::from_utf8(metrics.encode().unwrap()).unwrap();
+    assert!(collected.contains("starter_sql_operations_active 0\n"));
+    assert!(collected.contains("starter_sql_operations_total{outcome=\"ok\"} 1"));
+    let reopened = Store::open(directory.path().join("issues.sqlite3")).unwrap();
+    let issues = reopened.list().await.unwrap();
+    assert_eq!(issues.len(), 1);
+    assert_eq!(issues[0].title, "late HTTP write");
+}
+
+#[tokio::test]
+async fn optional_metrics_are_isolated_bounded_and_report_storage_failure() {
+    let (directory, store, ready, disabled) = fixture();
+    assert_eq!(
+        call(&disabled, "GET", "/metrics", &[], "").await.0,
+        StatusCode::NOT_FOUND
+    );
+    let metrics = Arc::new(Metrics::new().unwrap());
+    let separate = Metrics::new().unwrap();
+    let store = store.with_metrics(metrics);
+    let router = app(store, SecretString::from(TOKEN), ready).unwrap();
+    assert_eq!(
+        call(&router, "GET", "/health/ready", &[], "").await.0,
+        StatusCode::OK
+    );
+    for id in 1..=20 {
+        let path = format!("/private-path-{id}?user_id=private-user-marker");
+        call(
+            &router,
+            "PRIVATE_METHOD",
+            &path,
+            &[
+                ("authorization", &bearer()),
+                ("cookie", "private-session-marker"),
+                ("x-yetlet-request-id", "private-id-marker"),
+            ],
+            "private-body-marker",
+        )
+        .await;
+    }
+    let connection = rusqlite::Connection::open(directory.path().join("issues.sqlite3")).unwrap();
+    connection.execute_batch("DROP TABLE issues").unwrap();
+    assert_eq!(
+        call(&router, "GET", "/health/ready", &[], "").await.0,
+        StatusCode::SERVICE_UNAVAILABLE
+    );
+    let (status, headers, collected) = call(&router, "GET", "/metrics", &[], "").await;
+    assert_eq!(status, StatusCode::OK);
+    assert_eq!(
+        headers["content-type"],
+        "text/plain; version=0.0.4; charset=utf-8"
+    );
+    assert_eq!(headers["cache-control"], "no-store");
+    assert!(collected.contains("starter_http_requests_total{method=\"OTHER\",status=\"404\"} 20"));
+    assert!(collected.contains("starter_http_request_duration_seconds_count{method=\"OTHER\"} 20"));
+    assert!(collected.contains("starter_readiness_last_probe 0\n"));
+    assert!(collected.contains("starter_readiness_checks_total{outcome=\"ready\"} 1"));
+    assert!(collected.contains("starter_readiness_checks_total{outcome=\"not_ready\"} 1"));
+    assert!(collected.contains("starter_sql_operations_total{outcome=\"invalid_schema\"} 1"));
+    assert!(collected.contains("starter_sql_admission_wait_seconds_sum 0\n"));
+    for marker in [
+        TOKEN,
+        "private-",
+        "PRIVATE_METHOD",
+        "user_id",
+        "request_id",
+        "url",
+        "path=",
+    ] {
+        assert!(
+            !collected.contains(marker),
+            "unexpected telemetry: {marker}"
+        );
+    }
+    // Scrapes exclude themselves and never call SQL or change readiness.
+    assert_eq!(collected, call(&router, "GET", "/metrics", &[], "").await.2);
+    let independent = String::from_utf8(separate.encode().unwrap()).unwrap();
+    assert!(!independent.contains("starter_http_requests_total{"));
+    assert!(independent.contains("starter_readiness_last_probe -1\n"));
 }

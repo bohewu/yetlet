@@ -9,7 +9,7 @@ use std::{
 
 pub(super) fn dependencies(snapshot: &Snapshot) -> Vec<&'static str> {
     let mut names = vec!["yetlet-core", "yetlet-server-axum"];
-    if snapshot.with_config {
+    if snapshot.runtime_settings {
         names.push("yetlet-config");
     }
     names
@@ -19,13 +19,17 @@ pub(super) fn config_framework(
     root: &Path,
     files: &mut BTreeMap<String, Vec<u8>>,
 ) -> Result<(), String> {
-    let directory = "crates/yetlet-config";
-    if super::directory_names(&root.join(directory).join("src"))? != ["lib.rs"]
-        || super::directory_names(&root.join(directory))?
-            .iter()
-            .any(|n| matches!(n.as_str(), "build.rs" | ".cargo"))
-    {
-        return Err("unsupported config crate layout".into());
+    for (directory, sources) in [
+        ("crates/yetlet-config", &["lib.rs", "secrets.rs"][..]),
+        ("crates/yetlet-secrets", &["lib.rs"][..]),
+    ] {
+        if super::directory_names(&root.join(directory).join("src"))? != sources
+            || super::directory_names(&root.join(directory))?
+                .iter()
+                .any(|n| matches!(n.as_str(), "build.rs" | ".cargo"))
+        {
+            return Err("unsupported config/secrets crate layout".into());
+        }
     }
     for (path, expected) in [
         (
@@ -35,6 +39,25 @@ pub(super) fn config_framework(
         (
             "crates/yetlet-config/src/lib.rs",
             include_bytes!("../../../../crates/yetlet-config/src/lib.rs").as_slice(),
+        ),
+        (
+            "crates/yetlet-config/src/secrets.rs",
+            include_bytes!("../../../../crates/yetlet-config/src/secrets.rs").as_slice(),
+        ),
+        // Cargo requires this explicitly declared target even when the
+        // optional provider feature and example are not being compiled.
+        (
+            "crates/yetlet-config/examples/secret_provider.rs",
+            include_bytes!("../../../../crates/yetlet-config/examples/secret_provider.rs")
+                .as_slice(),
+        ),
+        (
+            "crates/yetlet-secrets/Cargo.toml",
+            include_bytes!("../../../../crates/yetlet-secrets/Cargo.toml").as_slice(),
+        ),
+        (
+            "crates/yetlet-secrets/src/lib.rs",
+            include_bytes!("../../../../crates/yetlet-secrets/src/lib.rs").as_slice(),
         ),
     ] {
         let bytes = read_framework(root, path)?;
@@ -250,7 +273,7 @@ pub(super) fn dockerfile(snapshot: &Snapshot, name: &str) -> String {
     let mut text = include_str!("../../templates/docker/Dockerfile").replace("@NAME@", name);
     for source in ["config", "vite"] {
         if if source == "config" {
-            snapshot.with_config
+            snapshot.runtime_settings
         } else {
             snapshot.with_assets
         } {
@@ -278,7 +301,7 @@ pub(super) fn dockerfile(snapshot: &Snapshot, name: &str) -> String {
             ));
         }
     }
-    if snapshot.with_config {
+    if snapshot.runtime_settings {
         runtime.push_str("ENV YETLET_CONFIG_ROOT=/opt/yetlet/config APP_ENVIRONMENT=Production APP_SERVER__HOST=0.0.0.0 APP_SERVER__PORT=8080\n");
     }
     // Sanitized private exports may use 0600 files and 0700 directories.

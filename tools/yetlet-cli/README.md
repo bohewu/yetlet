@@ -25,10 +25,11 @@ Independent implementation Reviewer PASS has zero issues or required followups.
 | `yetlet --version` / `-V` | Build-time CLI version; no project, tools or settings required |
 | `yetlet new NAME [--parent DIRECTORY] [--template native\|browser] [--vite] [--tailwind] [--service] [--settings]` | Publish a new scaffold; no tools, installs, builds or lock generation |
 | `yetlet doctor [--json]` | Bounded environment-only Rust/Cargo identity and compiled filesystem capability; schema 1 JSON |
+| `yetlet inspect [--manifest-path PATH] [--json]` | Read-only public-settings plan for build/run/watch; separate project-execution-plan schema 1; no readiness checks |
 | `yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]` | Read-only selected key/version, certificate pins and dates; no password or generation |
 | `yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]` | Confirmed local rotation and atomic selected-profile settings update; retain old versions |
 | `yetlet run [--manifest-path PATH]` | Native frozen Cargo/watch/Vite, or settings-selected browser-only static preview |
-| `yetlet watch [--manifest-path PATH]` | Same run pipeline with Rust watch enabled for this invocation; Vite still uses settings |
+| `yetlet watch [--manifest-path PATH]` | Native Rust watch, or explicitly selected browser WASM rebuild/full reload; Vite still uses settings |
 | `yetlet build [--manifest-path PATH] [--release]` | Native frontend-then-Cargo, or settings-selected browser-only production build |
 | `yetlet generate docker [--manifest-path PATH] --output DIRECTORY` | Qualified-source configuration/inventory only |
 | `yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE` | Configuration for a separately built Linux/amd64 image |
@@ -50,6 +51,9 @@ its physical directory on PATH; tool permissions are managed separately from the
 See the [native Windows diagnosis and verification](../../docs/WINDOWS-CLI-125-VERIFICATION.md).
 
 ## First-use prerequisites
+
+For one guided plain-native path, follow [Build your first Yetlet app](../../docs/FIRST-APP.md).
+This reference retains the broader target, settings and execution choices.
 
 Prepare tools and dependency caches explicitly before running the examples.
 Building the CLI from source requires OpenSSL headers/libraries through its
@@ -201,7 +205,7 @@ existing [CLI settings projection](src/settings.rs) and
 | Settings profile | `APP_ENVIRONMENT` accepts exactly `Development`, `Staging` or `Production`; absent means Production | Selects exactly the matching profile TOML alongside base.toml; `--release` does not select a settings profile |
 | Public values | base.toml, then selected profile, then scoped OS overrides such as `APP_CLI__VITE__AUTO_START` | Higher layers replace declared keys with the same value kind; ENV is not a way to create undeclared settings |
 | Execution target | Merged `cli.target`, default native when absent; browser must have Vite enabled, Rust watch disabled and native TLS disabled | `--template browser` selects creation; later execution reads settings, including declared `APP_CLI__TARGET` overrides |
-| Invocation choice | After settings validation, `watch` forces Rust watch for this invocation; native `build --release` selects Cargo's release profile | Neither writes settings; invalid settings cannot be repaired or skipped by these command choices |
+| Invocation choice | After settings validation, native `watch` forces Rust watch; browser `watch` requires both auto_start and auto_build; native `build --release` selects Cargo's release profile | Neither writes settings; invalid settings cannot be repaired or skipped by these command choices |
 
 The CLI also admits public `APP_SERVER__TLS__*` overrides for Development TLS;
 other backend overrides and Development secret files do not enter tool-policy
@@ -229,7 +233,7 @@ After successful [application preflight and settings selection](src/app.rs):
 | Native `build` | Vite only when enabled and auto_build; Rust watch is not used | Selected frontend build must succeed before frozen Cargo build; when the gate is false, build Cargo only |
 | Browser `run` | auto_start | Preview existing static dist, without a native app server; false skips startup with exit 0 and no child |
 | Browser `build` | auto_build | Run the frontend-owned WASM/Vite build, without a native app build; false skips it with exit 0 and no child |
-| Browser `watch` | Unsupported by this browser contract | Refuse before child startup; explicitly build and preview instead |
+| Browser `watch` | Both auto_start and auto_build | Vite dev with serialized frozen WASM builds, immutable publication and full-page reload; either false skips without children; no native watcher or Rust state restoration |
 
 For example, in a generated native Vite app, a Development overlay setting
 auto_start=false makes `run` start Rust only. A declared
@@ -361,15 +365,29 @@ Historical Vite lifecycle evidence does not qualify the added watch mode.
 
 ## Current generator source matrix
 
-Current unedited `new --service` output now supports all three generators after
+Generators accept the following exact current `new --service` source shapes after
 explicit compatible local Cargo path overrides and separately prepared locks:
 
-| Current creation choice | Delivery requirement |
+| Current creation choice | Source shape and current acceptance |
 |---|---|
-| `new NAME --service` | Public CLI settings; no runtime settings dependency or token |
-| `new NAME --service --settings` | Public CLI/runtime TOMLs; runtime token supplied separately |
-| `new NAME --service --vite` | Settings implied; complete explicitly built production Vite graph |
-| `new NAME --service --vite --tailwind` | Same graph contract with the pinned official plugin |
+| `new NAME --service` | Public CLI settings; no runtime settings dependency or token; accepted by all three generators |
+| `new NAME --service --settings` | Public CLI/runtime TOMLs and the exact Config/Secrets source closure; accepted by all three generators |
+| `new NAME --service --vite` | Settings implied; accepted with the validated Production Vite asset graph |
+| `new NAME --service --vite --tailwind` | Accepted with the pinned official plugin and validated Production Vite asset graph |
+
+The separate [2026-10-22 source-closure repair](../../docs/YT-102-GENERATOR-SOURCE-CLOSURE.md)
+adds only six exact reviewed Config/Secrets source files, including Config's
+explicitly declared example. Settings profiles declare 20 framework-context
+files; plain service retains 14. These public source files are distinct from
+application credentials. The optional secret provider remains disabled and absent
+from the selected normal dependency graph. Source/layout comparisons and protected
+reads still reject modified, extra or symlinked selected source inputs.
+
+Focused evidence covers all four profiles and 12 outputs, exact inventories,
+negative-source cases and an actual sanitized Vite-source offline Cargo build.
+Its Vite assets are a structural fixture. The earlier failed five-file attempt
+and original config-layout refusal remain recorded; neither metadata success nor
+historical qualification is relabeled as a fresh OCI/platform/deployment PASS.
 
 Keep the generated pinned versions when adding the qualified framework's local
 path dependencies. Registry-only images still require separate release/source
@@ -384,7 +402,10 @@ Docker README's physical allowlist/hash instructions. See the
 Generators retain their separately qualified, **unedited legacy local-source**
 representation, consistent app lock and source revalidation. Retained internal
 legacy scaffold functions support its acceptance fixtures. These source
-selections are historical labels, not current CLI options:
+selections are historical labels, not current CLI options. The rows below
+retain source-bound historical qualification. The matching legacy delivery
+fixture passes with the repaired exact source closure; historical platform and
+runtime/deployment evidence does not transfer automatically to this checkout.
 
 | Qualified legacy source | Delivery requirement |
 |---|---|
@@ -448,6 +469,44 @@ compile-only. Separately, [native MSVC single-Cargo evidence](../../docs/YT-102-
 covers build/run, native console cancellation and descendant cleanup, with a
 bounded warm-build baseline in the same record.
 
+## Read-only project inspection (YT-111)
+
+Use `yetlet inspect`, or select an explicit project with
+`yetlet inspect --manifest-path /work/app/Cargo.toml --json`. The default is
+exactly cwd/Cargo.toml, with the same protected standalone manifest and existing
+Cargo.lock requirements as build/run/watch. No ancestor search occurs.
+
+Inspection uses the existing public base/profile Loader, YETLET_CONFIG_ROOT,
+APP_ENVIRONMENT (default Production) and scoped APP_CLI overrides. It explains
+native/browser target, configured Rust watch, Vite enabled/relative root and
+auto_build/auto_start, then the intended Rust/watch/Vite stages for each command
+and fixed reasons for selection or skipping. Native watch forces Rust watch
+after validation; build never watches. Browser build selects frontend build,
+run selects static preview, and browser watch requires both auto_start and
+auto_build for frontend-owned WASM rebuild/full reload.
+
+Human roots are escaped for terminal safety. JSON is one ASCII-escaped object
+with `schema_version: 1`, `scope: "project-execution-plan"`, `environment`,
+`target`, `rust_watch`, `vite`, `commands` and `limitations`. Each command has
+`supported` and `rust`, `rust_watch`, `vite` stages with `selected`/`reason`.
+This schema is separate from the unchanged environment-only doctor schema 1.
+See the [selected contract](../../docs/CLI-CONTRACT.md#read-only-project-inspection--yt-111).
+
+Exit 0 means settings-derived intentions were explained; unsupported/skipped
+stages do not make inspection fail. No tools, frontend directories/assets,
+TLS files, secrets, runtime startup or readiness are verified. Inspection starts
+no children, writes no output/settings, makes no network requests, reads no
+Development secret files and calls no SecretProvider. It never dumps settings,
+ENV, tokens or resolved absolute roots. Invalid selection/settings uses exit 1,
+empty stdout and safe stderr, including existing source/profile/values hints;
+`--json` does not alter error formatting. Usage failures use exit 2.
+
+The [inspection record](../../docs/YT-111-IMPLEMENTATION.md) retains its
+source-bound acceptance evidence. The separate
+[browser-loop record](../../docs/YT-112-IMPLEMENTATION.md) records completed Linux
+edit/error/recovery and lifecycle acceptance. New Windows browser-watch execution
+remains Not verified; the separate earlier Windows CLI evidence does not cover it.
+
 ## Diagnostics and platform evidence
 
 CLI-owned statuses are 0 success/help, 1 preflight/report, 2 usage and 125
@@ -489,3 +548,26 @@ node.exe plus its same-install npm CLI script, without a .cmd shell fallback.
 Escaped daemons and unsupported OS/filesystem/console contexts remain unsupported.
 Public release, production qualification, global installation and deployment
 remain outside this preview.
+
+## Browser Rust development loop — YT-112
+
+Use `yetlet watch` for the browser starter's selected edit/rebuild/reload loop.
+Both `cli.vite.auto_start` and `auto_build` must be true; either false skips the
+whole loop. Keep the native `cli.rust.watch` setting false. No Watchexec/native
+backend is needed here: Vite watches app `src/`, Cargo manifest/lock and build.rs.
+The initial and subsequent optimized WASM builds are frozen/offline and require
+separately prepared wasm-bindgen-cli 0.2.129. Edits are serialized/coalesced;
+compiler failures wait for source correction without replacing the last good
+JS/WASM pair. Before any successful generation HTTP returns 503.
+
+Successful Rust generation triggers full reload and resets tab-local state.
+Vite retains CSS HMR and TS/JS update ownership; no Rust state restoration or
+live remount is promised. Strict loopback/port, source confinement, dotenv and
+backend-environment filtering remain enforced. A fresh document nonce permits
+Vite CSS styles without weakening production CSP. Ctrl-C stops the owned tree
+and removes private generations. Browser `run` stays static preview; `build`
+packages production `dist/`, with no watch artifacts. External path dependencies
+are not automatically watched. The [selected amendment](../../docs/YT-112-IMPLEMENTATION.md)
+records completed Linux browser/lifecycle acceptance and retains the original
+failed attempts. New Windows browser-watch execution remains Not verified;
+historical YT-104 qualification describes the earlier static starter scope.

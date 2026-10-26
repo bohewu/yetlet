@@ -1,25 +1,47 @@
 # Opt-in secret providers
 
-Date: 2026-10-18. Scope: separately authorized YT-090 follow-up.
-Status: the initial read contract passed focused local verification and
-[independent review](SECRET-PROVIDER-REVIEW.md), with zero blocking issues or
-required followups. The separately authorized
-[rotation/Windows/Azure follow-up](SECRET-ROTATION-VERIFICATION.md) extends that
-slice; its current results and review are recorded separately. Local commit is
-owner-authorized; publication and production qualification remain separate.
+Inject read-only native secret lookup into application constructors or typed
+state. Lookup is asynchronous; loading settings and rotating credentials remain
+separate, explicitly selected operations.
 
-The unpublished, Experimental `yetlet-secrets` nested workspace supplies a
-small native string-secret contract. Applications explicitly select its path
-dependency and construct a provider. Core, browser, the default configuration loader,
-signing, CLI scaffolds and existing applications do not acquire a dependency
-or initialize a provider automatically.
+**Experimental, unpublished.** Use this source checkout and the documented target scope.
 
-The separately authorized [settings integration](SETTINGS-SECRET-PROVIDER.md)
-can resolve an injected provider into selected protected settings fields through
-the loader's `secret-provider` feature. `SettingsSecrets` retains the reverse,
-already-loaded-settings adapter; neither direction implicitly enables the other.
 
-## Read contract
+## Prerequisites
+
+Use the pinned Rust/Cargo toolchain and the isolated `yetlet-secrets` workspace.
+Select a provider explicitly. The existing state example also selects the config
+loader and bundled example settings. From the repository root, pass only the
+synthetic token below; no cloud account, real credential or listener is needed.
+
+## Minimal integration
+
+Run the existing listener-free composition example:
+
+```sh
+(
+  export YTSECRETS_SERVICE__TOKEN=example
+  cargo run --locked --manifest-path crates/yetlet-secrets/Cargo.toml --example state
+)
+```
+
+For your own application, load/validate its settings, select only required fields
+into `SettingsSecrets`, and inject `Arc<dyn SecretProvider>` into the consumer.
+The detailed existing snippets below assume that already-loaded `settings` value.
+
+
+
+## Expected result
+
+The example prints `Example request status: 200 OK`, consumes its in-process
+response and exits without a listener or secret dump. `get` returns owned
+protected values; absent names, unavailable service and denied access remain
+different outcomes. Consumers holding a copied secret keep that value; freshness
+of later lookups follows the selected provider.
+
+## Configuration and errors
+
+### Read contract
 
 `SecretProvider: Send + Sync` exposes one asynchronous operation:
 
@@ -46,7 +68,7 @@ their plaintext requires an explicit `ExposeSecret` operation. Applications
 remain responsible for excluding plaintext from logs, responses and browser
 state. The contract does not assign a business use to a name or value.
 
-## Reuse existing settings
+### Reuse existing settings
 
 Keep the application's existing typed schema and
 [loader](CONFIGURATION.md). For example, deserialize `service.token` as a
@@ -83,7 +105,7 @@ credentials out of committed settings. A user-private secret-file path is
 explicit, not discovered automatically. OS keychain and encrypted-vault adapters
 are not supplied by the local provider.
 
-## Constructor injection
+### Constructor injection
 
 A normal service accepts the shared handle through its constructor. Handlers
 can receive the service or provider through native Axum State and the existing
@@ -111,7 +133,7 @@ new App/RequestContext field is required. This follows the explicit composition
 in [ADR 0005](adr/0005-opt-in-capability-modules.md) and
 [ADR 0006](adr/0006-handler-first-mvc-optional.md).
 
-## Refresh and rotation
+### Refresh and rotation
 
 `get` reads; it does not generate or rotate a secret. A future provider may
 choose caching and current-version resolution internally. The consumer decides
@@ -127,7 +149,7 @@ that already copied a password keeps that password until the application
 reconfigures or rebuilds the client, even if a different provider later returns
 a new value. No transparent consumer reload is implied.
 
-### Minimal local reload contract
+#### Minimal local reload contract
 
 No source revision or local generation counter is added. `replace` publishes
 the complete supplied map, removing omitted names; it does not establish that
@@ -170,7 +192,7 @@ capabilities. Explicit local snapshot replacement and a bounded Azure CLI
 rotation experiment are documented in the separate follow-up; no secret-write
 CLI command, cache, watcher, retry policy or provider registry is introduced.
 
-### Administration and Azure
+#### Administration and Azure
 
 Applications can create a new Azure Key Vault Secret version through the
 [Set Secret API](https://learn.microsoft.com/en-us/rest/api/keyvault/secrets/set-secret/set-secret?view=rest-keyvault-secrets-2025-07-01)
@@ -203,7 +225,41 @@ For local development, keep mkcert CA preparation in explicit developer tooling;
 the business app should not require its powerful
 [CA private key](https://github.com/FiloSottile/mkcert#installation).
 
-## Verification
+## API reference
+
+Use the [crate guide/source](../crates/yetlet-secrets/README.md),
+[state example](../crates/yetlet-secrets/examples/state.rs),
+[settings injection guide](SETTINGS-SECRET-PROVIDER.md) and
+the [current API reference](API-REFERENCE.md).
+
+<details>
+<summary>Historical delivery context and evidence</summary>
+
+Date: 2026-10-18. Scope: separately authorized YT-090 follow-up.
+Status: the initial read contract passed focused local verification and
+[independent review](SECRET-PROVIDER-REVIEW.md), with zero blocking issues or
+required followups. The separately authorized
+[rotation/Windows/Azure follow-up](SECRET-ROTATION-VERIFICATION.md) extends that
+slice; its current results and review are recorded separately. Local commit is
+owner-authorized; publication and production qualification remain separate.
+
+The unpublished, Experimental `yetlet-secrets` nested workspace supplies a
+small native string-secret contract. Applications explicitly select its path
+dependency and construct a provider. Core, browser, the default configuration loader,
+signing, CLI scaffolds and existing applications do not acquire a dependency
+or initialize a provider automatically.
+
+The separately authorized [settings integration](SETTINGS-SECRET-PROVIDER.md)
+can resolve an injected provider into selected protected settings fields through
+the loader's `secret-provider` feature. `SettingsSecrets` retains the reverse,
+already-loaded-settings adapter; neither direction implicitly enables the other.
+
+`yetlet_config::Loader` is the settings loader. `SecretProvider` is the distinct
+async secret-lookup trait; there is no SettingsProvider interface. The
+[naming guide](NAMING.md) records canonical loader entry points and the separate
+external settings boundary; secret provider behavior is unchanged.
+
+### Verification
 
 The initial read-contract commands completed with exit 0:
 
@@ -243,3 +299,5 @@ backlog item changes state; YT-094 remains a separate next core discussion.
 The initial read-contract slice did not include Windows/cloud execution. The
 owner subsequently selected those checks in the linked follow-up. Neither slice
 claims browser secret handling or authorizes a commit/push.
+
+</details>

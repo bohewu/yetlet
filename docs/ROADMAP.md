@@ -25,8 +25,10 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M16 — Done at bounded YT-090 / YT-097 scope** | Opt-in typed native configuration and optional CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](YT-090-VERIFICATION.md); [CLI integration Linux/Windows GNU/MSVC and independent Reviewer PASS](YT-097-VERIFICATION.md); no default/core/browser or release change |
 | **M17 — Done at bounded YT-091 Tailwind scope** | Opt-in build-time Tailwind CSS 4 application scaffolding | YT-091 | [Guide](../tools/yetlet-cli/README.md#opt-in-tailwind-css-4-yt-091-independently-reviewed), [evidence](YT-091-VERIFICATION.md); actual Linux HTTP/CSS/CSP/signals and native Windows GNU/MSVC Tailwind source-bound builds PASS; independent Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS, no core/browser change or release activation |
 | **M18 — Done at bounded YT-098–YT-101 scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; [YT-101 cloud delivery](YT-101-VERIFICATION.md) Done: real Linux Docker/Compose/K3s Pod/Service/asset PASS, Windows MSVC native/source PASS, subsequent Windows GNU 726/726 source and native tests/generator PASS after official MinGW64 GCC/Binutils installation, independent Reviewer `wc_job_fYtD9F8KXkXyzvYQ` PASS; no stable shared asset API, default/core/browser or release change |
-| **M19 — Production-oriented application and developer experience (partial)** | Production Starter, signing, Admin Dashboard, DI/DX research, browser-only starter and optional HA/rolling deployment asset compatibility | YT-092–YT-095, YT-102–YT-110 | Real native/browser/reference-app proof, independently reviewed DX research, a separately qualified browser-only static workflow, and independently validated multi-version asset-retention/rolling-availability evidence; no automatic production support or release claim |
-| **M20 — Release-candidate qualification in progress** | Candidate API/security/supply-chain validation before explicit public-release decision | YT-096, YT-020 | [Selected `ce56e08` candidate](YT-096-CANDIDATE-QUALIFICATION.md): original nine experimental 0.1.0 libraries and Rust 1.99; local source-package/clean-consumer preflight passes on Ubuntu 26.04.1. [Selected dependency/API preflight](YT-096-SUPPLY-CHAIN-DELTA.md) adds 23 scoped SBOM/license checks, nine passing RustSec scans and explicit coverage limits. [Partial platform execution](YT-096-PLATFORM-QUALIFICATION.md) adds Ubuntu 24.04.5 container userspace native/doctest PASS, five wasm builds and fresh Linux Firefox PASS; resumed Windows MSVC standalone-package execution passes 83 native tests/four doctests, with historical cache failures and shared-kernel/Chrome scope retained. [Two-host archive rebuild](YT-096-TWO-HOST-REBUILD.md) matches all nine Windows archives byte-for-byte to Linux with normal Cargo verification. [Azure Run Command continuation](YT-096-AZURE-RUN-COMMAND.md) passes actual Ubuntu 24.04.5 guest execution, empty-cache nine-archive rebuild, 83 native tests/four doctests and five wasm libraries; earlier SSH failures preserved and resources deleted. [GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) passes at the exact candidate with nine byte-identical archives and matched source/lock/tools, adding separately operated execution evidence. [Final documentary reconciliation](YT-096-FINAL-RECONCILIATION.md) joins nine archives to 23 SBOMs and retained compiler/platform/browser evidence without runtime reruns. The [owner accepted the bounded support scope and known inventory differences](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20), keeping exact-candidate Chrome and complete compiled/per-library/system inventory Not verified; [Final independent candidate review](YT-096-SECURITY-RELEASE-REVIEW.md) completed with technical/security evidence accepted but overall release gate FAIL, release-ready NO. Only support/inventory disposition is resolved; [minimum formal trust research](YT-096-FORMAL-TRUST-PROPOSAL.md) proposes conditional GitHub OIDC/public Sigstore and exact source/evidence bindings without implementation or policy selection. Formal integrity/trust, registry proof, public activation controls and concrete final maintainer approval remain open; YT-020 stays Blocked, no auto-merge/release |
+| **M19 — Production-oriented application and developer experience (partial)** | Production Starter, signing, Admin Dashboard, DI/DX research, browser-only starter and optional HA/rolling deployment asset compatibility | YT-092–YT-095, YT-102–YT-112 | Real native/browser/reference-app proof, independently reviewed DX research, a separately qualified browser-only static workflow, and independently validated multi-version asset-retention/rolling-availability evidence; no automatic production support or release claim |
+| **M20 — Release-candidate qualification in progress** | Candidate API/security/supply-chain validation before explicit public-release decision | YT-096, YT-020 | [Selected `ce56e08` candidate](YT-096-CANDIDATE-QUALIFICATION.md): original nine experimental 0.1.0 libraries and Rust 1.99; local source-package/clean-consumer preflight passes on Ubuntu 26.04.1. [Selected dependency/API preflight](YT-096-SUPPLY-CHAIN-DELTA.md) adds 23 scoped SBOM/license checks, nine passing RustSec scans and explicit coverage limits. [Partial platform execution](YT-096-PLATFORM-QUALIFICATION.md) adds Ubuntu 24.04.5 container userspace native/doctest PASS, five wasm builds and fresh Linux Firefox PASS; resumed Windows MSVC standalone-package execution passes 83 native tests/four doctests, with historical cache failures and shared-kernel/Chrome scope retained. [Two-host archive rebuild](YT-096-TWO-HOST-REBUILD.md) matches all nine Windows archives byte-for-byte to Linux with normal Cargo verification. [Azure Run Command continuation](YT-096-AZURE-RUN-COMMAND.md) passes actual Ubuntu 24.04.5 guest execution, empty-cache nine-archive rebuild, 83 native tests/four doctests and five wasm libraries; earlier SSH failures preserved and resources deleted. [GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) passes at the exact candidate with nine byte-identical archives and matched source/lock/tools, adding separately operated execution evidence. [Final documentary reconciliation](YT-096-FINAL-RECONCILIATION.md) joins nine archives to 23 SBOMs and retained compiler/platform/browser evidence without runtime reruns. The [owner accepted the bounded support scope and known inventory differences](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20), keeping exact-candidate Chrome and complete compiled/per-library/system inventory Not verified; [Final independent candidate review](YT-096-SECURITY-RELEASE-REVIEW.md) completed with technical/security evidence accepted but overall release gate FAIL, release-ready NO. Only support/inventory disposition is resolved; [minimum formal trust research](YT-096-FORMAL-TRUST-PROPOSAL.md) proposes conditional GitHub OIDC/public Sigstore and exact source/evidence bindings without implementation or policy selection. The [metadata decision brief](YT-096-TRUST-DISCLOSURE-DECISIONS.md) records public exposure/impacts and pending owner choices while retaining the original candidate and evidence without reruns or signing. Formal integrity/trust, registry proof, public activation controls and concrete final maintainer approval remain open; YT-020 stays Blocked, no auto-merge/release |
+| **M21 — Opt-in server capability roadmap (registered)** | Separate optional Authentication/Authorization, Session integration, rate limiting and conditional provider studies without bloating core | YT-113–YT-123 | [Staged capability plan](YT-113-123-OPT-IN-CAPABILITIES.md): YT-113 research and YT-114 native foundation Done after separate independent Reviewer PASS; YT-115 Done at Memory bridge scope and YT-116/119/120 Done at independently reviewed study scopes; [YT-117 rate limiting](YT-117-RATE-LIMIT.md) Done at per-process scope after independent Reviewer PASS; YT-118/121/122 research Done after independent Reviewer PASS and [YT-123 research](YT-123-TRACING-CORRELATION-STUDY.md) Done after independent Reviewer PASS; design gates and independent review before implementation; no M20 release-gate dependency or production claim |
+| **M22 — Production Readiness Phase 2 (bounded local scope complete)** | Sequential app-owned admission, opt-in observability, bounded capacity/recovery and upgrade compatibility | YT-127–YT-131 | [Contracts, baseline gaps and final matrix](PRODUCTION-READINESS-PHASE2.md): YT-127 Done at bounded A1 scope after independent Reviewer PASS; YT-128 Done after [local verification and independent Reviewer PASS](YT-128-OBSERVABILITY.md); YT-129 [local load/recovery evidence](YT-129-LOAD-SOAK-RECOVERY.md) Done after independent Reviewer PASS; YT-130 [local restore/runbook evidence](YT-130-BACKUP-RESTORE.md) Done after independent Reviewer PASS; YT-131 [v1-to-v2 implementation and local evidence](YT-131-MIXED-VERSION-COMPATIBILITY.md) Done after independent Reviewer PASS and controller acceptance; A1 → A2 → B1 → B2 → C1 with source-bound evidence and cleanup. Keep Implemented, Verified and Deployment-qualified separate; no generic infrastructure, M20 candidate expansion or production/release claim |
 
 YT-107 is Done at the [owner-selected application form/save-feedback scope](YT-107-FORM-FEEDBACK.md).
 Server field feedback, deliberate save-state/recovery and the final
@@ -57,6 +59,22 @@ proof with cleanup. Independent Reviewer role-directed Job wc_job_v5BMe9GdWQmvY0
 PASS has zero issues or required followups. The earlier executor dispatch rejection
 and current-session implementation remain explicit. No forms runtime, keyed/reactive
 ownership rewrite or release-candidate requalification is implied.
+
+YT-111 is **Done** at the selected
+[read-only project inspection scope](YT-111-IMPLEMENTATION.md), using the existing
+public Loader and a separate `inspect` schema while preserving environment-only
+doctor. Independent Reviewer follow-up `wc_job_42fZ6Oced30fFBOS` PASS closes the
+initial DEL-escaping P2; targeted regression and required checks pass.
+YT-112 is **Done at the selected Linux scope** under the owner-selected
+[browser development-loop amendment](YT-112-IMPLEMENTATION.md): explicit watch,
+serialized frozen WASM generations, full reload and Vite-owned TS/CSS updates.
+The retained original Reviewer FAIL identified module-routing and runtime-proof
+gaps. The precise JS `?import` correction now passes all ten focused Linux
+browser/lifecycle groups, including HMR, recovery, queued edits, active-build
+cancellation and production build/static preview with cleanup. Independent
+follow-up Reviewer `wc_job_8jX83hMPaed3M1xI` PASS has zero issues or required
+followups. Prior failures remain preserved; new Windows browser-watch execution
+and release qualification are not implied.
 
 ## M19–M20 — Product readiness and release qualification (planned)
 
@@ -423,6 +441,82 @@ neither automatically becomes a YT-096 release prerequisite unless the owner
 selects the capability for a supported candidate. M18 and M19 are not strictly
 sequential global barriers.
 
+## M21 — Opt-in HTTP/server capabilities (registered)
+
+The [YT-113–YT-123 batch plan](YT-113-123-OPT-IN-CAPABILITIES.md) is an
+owner-approved **roadmap only**, separate from the exact-candidate M20 release
+qualification. [ADR 0005](adr/0005-opt-in-capability-modules.md) already defines
+optional module composition: no default Session/Auth/Cookie/Cache/Trace provider,
+no fixed request-context identity field and no provider registry or DI container.
+
+**Primary sequence:** YT-113 reviews the Authentication/Authorization contract
+using existing Auth Notes, Admin OIDC and the Session provider; YT-114 introduces
+a narrow, server-only `yetlet-auth` principal/extractor/policy seam after contract
+selection; YT-115 separately integrates protected Session/Cookie identity;
+YT-116 evaluates conditional OIDC reuse; YT-117 selects then validates an
+opt-in scoped single-process rate limiter. Each needs its own owner-selected
+implementation or research gate and independent review.
+
+**Conditional studies:** the owner-selected [YT-118 Audit study](YT-118-AUDIT-STUDY.md) is Done after independent Reviewer PASS with application-owned history/security-event policy and no new API selected; YT-119 Bearer, YT-120 cookie
+primitives, [YT-121 data cache](YT-121-CACHE-STUDY.md) (research Done after independent Reviewer PASS), [YT-122 private-safe HTTP output cache](YT-122-OUTPUT-CACHE-STUDY.md) (research Done after independent Reviewer PASS) and [YT-123
+tracing/correlation](YT-123-TRACING-CORRELATION-STUDY.md) (research Done after independent Reviewer PASS). These are not authorization to create six more crates;
+existing native Rust/Axum/Tower providers or app-level composition should win
+when sufficient. A second real consumer and measured duplicated glue are
+important selection inputs. No WAF control-plane application, PostgreSQL schema,
+NGINX, agent, secrets export, deployment or production security certification
+is pulled into Yetlet by this roadmap.
+
+M21 has **YT-113 Done at research scope, YT-114 Done at native foundation scope, YT-115 Done at Memory bridge scope, YT-116/119/120 Done at research scopes, YT-117 Done at per-process scope, YT-118 Done at research scope, YT-121 Done at research scope, YT-122 Done at research scope and YT-123 Done at research scope; all eleven original entries are Done at their individually selected scopes**.
+The separately selected [YT-117 contract](YT-117-RATE-LIMIT.md) fixes endpoint/group
+composition, reusable settings versus shared in-memory accounting and default-off
+startup installation before minimal implementation. The selected implementation
+passed 17 focused tests, one doctest, strict Clippy/rustdoc/fmt/docs and independent
+Reviewer `/root/yt117_rate_limit_independent_review_20261022` with zero issues or
+required followups. The initial five baseline normal dependency graphs were byte-identical. The
+separately selected [Settings-example follow-up](YT-117-RATE-LIMIT.md#settings-loader-follow-up--2026-10-22)
+uses the existing opt-in loader; its shared-lock libc pin and fresh focused
+evidence are recorded separately from that original acceptance.
+No benchmark, hot reload or distributed quota is selected.
+The [YT-114 foundation](YT-114-IMPLEMENTATION.md) passed 15 integration tests, one compiled
+example, focused native/graph/WASM-target checks and independent Reviewer
+`/root/yt114_foundation_review_20261022` PASS with zero issues/required followups;
+the separately authorized [YT-115 Memory bridge](YT-115-SESSION-AUTH.md) is now
+Done after independent Reviewer PASS. YT-116/119/120 research passed independent
+Reviewer `/root/auth_studies_review_20261022` with zero issues and required
+followups for each item. The [Auth group Standard security scan](YT-115-SESSION-AUTH.md#auth-group-security-scan--2026-10-22)
+completed with all six Auth-crate files reviewed and zero reportable findings;
+this is scoped offline review, not whole-repository or production qualification.
+No OIDC/Bearer adapter is selected.
+The [authentication contract study](YT-113-AUTHENTICATION-CONTRACT.md) passed independent
+Reviewer `/root/yt113_contract_review_20261022` with zero issues/required followups;
+YT-114 and YT-115 were separately authorized. Accepted
+YT-066, YT-094, YT-111/112 and YT-096/020 statuses remain unchanged.
+
+The owner separately selected [YT-124 multi-instance Auth/Valkey Session research](YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md).
+It is Done at research scope after independent Reviewer PASS and does not change the
+original eleven-item registration counts above. Valkey is already the Admin
+reference's shared-session server; YT-066b3 retains its historical Redis scope.
+The study defines async Auth integration, cross-instance lifecycle, current
+permissions and failure/commit semantics while reusing YT-094 and YT-103 evidence.
+Implementation remains subject to a later owner decision; no runtime or
+deployment execution is selected.
+
+After YT-124 PASS, the owner selected [YT-125 minimal Valkey/Auth integration](YT-125-VALKEY-AUTH-INTEGRATION.md).
+It is Done after independent Reviewer PASS at the standalone application-owned
+resolver scope, with fresh shared local policy and actual two-process Valkey
+qualification. The focused HTTP test, two unit tests and strict lint/format
+checks pass, four baseline normal graphs remain unchanged and owned cleanup
+is verified. Business-data mutation,
+Admin migration, generic helper promotion and production/HA claims are outside
+this slice. The record preserves actual scope, commands and independent review.
+
+The owner then selected [YT-126 opt-in Admin adoption](YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md).
+This application-owned resolver/extractor and fresh shared-policy integration is
+Done after focused new two-Admin-process evidence and independent Reviewer
+PASS with zero issues/followups. Defaults, browser graphs, OIDC verification and existing
+Session-provider APIs remain separate. The existing pre-SQL race is disclosed;
+strict cross-store business-commit ordering remains an unselected later gate.
+
 ## M18 — Asset contract and Vite integration (Done at bounded scopes)
 
 The [Vite feasibility spike](VITE-SPIKE-VERIFICATION.md) and
@@ -773,6 +867,52 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 
 **Goal:** turn prototype evidence into explicit support, governance and production-security decisions without expanding Yetlet core or implying release approval.
 
+**Current-source planning / YT-199 (2026-10-26):** [Delivery scope and evidence
+gaps](YT-199-CURRENT-DELIVERY-READINESS.md), Done at documentation-planning scope
+after independent Reviewer PASS with zero issues/required followups, compares
+`64a6d1c` with the unchanged `ce56e08` candidate. Four source/four evidence bindings
+and HEAD/status/staged-zero state matched through review; docs checks passed.
+Separate the original nine candidates, seven later unpublished opt-in packages,
+application-owned references and experimental tools. Map changed production/test
+source, retained proof and missing packaging/feature/browser/security/publication
+claims without replaying accepted qualification. Recommend owner selection of a
+later delivery scope before any missing checks; this selects no replacement
+candidate, stable API, new product work, deployment or Commit/Push. YT-096 remains
+In progress with D1–D6 Pending and YT-020 Blocked; adopter hardware/SLO/HA and
+operational ownership remain deployment choices, not framework completion gates.
+
+**Sixteen-package co-release review / YT-200 (2026-10-26):**
+[Feasibility and missing verification plan](YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md),
+Done at planning-review scope after independent Reviewer PASS, zero issues and
+required followups, recommends coordinated experimental preparation of all
+sixteen implemented libraries with per-package platform and
+feature limits. Register YT-201 metadata/packaged consumers, YT-202 native/MSRV/
+opt-in gaps, YT-203 Wasm/DOM/optional GPU gaps, YT-204 inventory/security gaps and
+YT-205 technical/reader evidence consolidation as Todo. Reconcile inputs and
+reuse accepted proof before any focused new check. Preserve YT-199 as its earlier
+reviewed recommendation; no manifest change, product test/build/scan, candidate
+selection, resource allocation, Commit/Push, signing or publication occurs in
+this planning slice. Four target/five evidence/sixteen manifest bindings matched
+through review; YT-199 is preserved and documentation checks passed. The old
+ce56e08 candidate, D1–D6 Pending and YT-020 Blocked
+remain unchanged; eventual sixteen-subject trust/registry activation is separate.
+
+**YT-201 package preparation (2026-10-26):** [Metadata and local packaged-consumer
+preflight](YT-201-PACKAGE-PREPARATION.md), Done at metadata/local-preflight scope
+after independent Reviewer PASS, zero issues/required followups, follows
+authorized continuation after guarded planning commit f955251. Prepare
+sixteen experimental 0.1.0 packages, normal/dev registry requirements, seven
+license pairs and bounded package guides; retain workspaces/defaults and all
+33 library source files. Ten locks update local versions only. Sixteen normal
+Cargo package checks and two isolated native default/integrated-feature consumers
+PASS; source-cache and VCS-field inspection failures remain retained. This is
+dirty-source/hash-bound local preflight, not final source C, public registry,
+Windows/browser/GPU or release qualification. YT-202–205 remain Todo, D1–D6
+Pending and YT-020 Blocked; new changes have no Commit/Push authorization.
+All 45 source/55 evidence bindings matched through review; documentation checks
+passed and staged files remain zero. Package/readme/archive inputs are unchanged
+by completion metadata.
+
 - [x] **YT-060 / M10a:** Dual `MIT OR Apache-2.0` license, package metadata, security policy and maintainer-directed/no-external-PR contribution policy; independent reviewer PASS.
 - [x] **YT-061 / M10b:** Collaborator-only PRs, protected `master`, required checks, SHA-pinned GitHub-owned Actions and Dependabot configured; unsupported private-state security services recorded; repeat reviewer PASS.
 - [x] **YT-062 / M10c:** Minimal title/language document metadata, provisional compatibility policy, legacy generic compile fixtures, complete stable/MSRV validation and repeat reviewer PASS.
@@ -809,3 +949,687 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 ## Decision rule
 
 For every proposed feature, identify its owner: kernel, renderer, transport, server adapter, or optional tooling. If ownership is unclear or responsibilities overlap, document the decision or run a bounded spike before adding core abstractions.
+
+## M22 — Production Readiness Phase 2
+
+[Registration and operational boundaries](PRODUCTION-READINESS-PHASE2.md) track
+YT-127 (A1 admission), YT-128 (A2 observability), YT-129 (B1 load/soak/recovery),
+YT-130 (B2 backup/restore) and YT-131 (C1 mixed-version compatibility).
+[YT-127 implementation/local verification](YT-127-ADMISSION-OVERLOAD.md) is
+Done at bounded A1 scope after independent Reviewer PASS, zero issues and
+required followups; YT-128 is Done after [local verification and independent Reviewer PASS](YT-128-OBSERVABILITY.md); YT-129 is [Done after independent Reviewer PASS at local load/recovery scope](YT-129-LOAD-SOAK-RECOVERY.md); YT-130 is [Done after independent Reviewer PASS at local restore scope](YT-130-BACKUP-RESTORE.md); YT-131 is [Done after independent Reviewer PASS and controller acceptance at local C1 scope](YT-131-MIXED-VERSION-COMPATIBILITY.md).
+Implementation, verification and deployment qualification remain separate.
+Fully validate and independently review each item before its successor;
+unresolved material P0–P2 findings prevent acceptance. The [final five-capability matrix](PRODUCTION-READINESS-PHASE2.md#final-production-readiness-matrix) consolidates accepted scopes; the controller owns aggregate documentation checks and final consolidation review. The separate release-owner decision remains YT-096 D1–D6; [M23 profile planning](#m23--production-deployment-profile-contracts) records accepted deployment-contract planning without expanding accepted M22 proof. Neither authorizes signing or release.
+
+Reuse accepted YT-103 asset evidence, YT-123 research and bounded YT-066/YT-094
+recovery records only within their original scope. The generator source closure
+is already repaired separately. This stage stays application-owned, opt-in and
+local/isolated; no new generic framework or validation infrastructure, external
+deployment or public activation is selected. M20 candidate `ce56e08`, YT-096
+In progress with D1–D6 Pending, and YT-020 Blocked remain unchanged.
+
+## M23 — Production deployment profile contracts
+
+[YT-132 contract planning](PRODUCTION-DEPLOYMENT-PROFILES.md) remains Done at its
+historical documentation-only scope after independent Reviewer PASS, zero
+issues and required followups. Its one-process/one-host and N-replica categories
+retain the same-host/cross-host distinction and all source-bound evidence limits.
+[YT-133](YT-133-STARTER-SINGLE-INSTANCE-CONTRACT.md) retains historical base-contract
+and private operator selection Reviewer PASS. The later user-approved
+framework/responsibility correction and reference implementation have a separate
+**independent Reviewer PASS**, zero issues and required followups; earlier PASS
+retains its original scope.
+
+M23 now describes optional framework capabilities, reusable app/reference
+integrations, developer documentation and bounded source/fixture verification.
+YT-133 is **Done** at the scope of a minimal private single-instance development
+reference using Linux/systemd/native release, SSH/loopback Nginx and local
+SQLite. This is one possible stack, not required Yetlet infrastructure or current
+host production adoption. The minimal reference and isolated integration checks
+with cleanup are complete; independent Reviewer
+`/root/yt133_optional_reference_review_20261023` returned PASS with zero issues
+and required followups, all eight input hashes matched. Numeric
+host/probe/transport/stop parameters are reference
+validation choices, not framework defaults, measured capacity or promises.
+
+Consumer developers choose actual hosts, addresses/accounts/keys, production
+service users and secret sources, operators/on-call/data-loss authority,
+production SLO/RPO/RTO/retention/alerts, IdP/infra deployment and production
+qualification. These are nonblocking consumer guidance, not framework/reference
+Done criteria. Security, CSRF/Auth/secret isolation, honest resource/evidence
+limits, unknown-write outcomes and stop/drain-before-migration correctness remain
+required. A production Profile is a consumer evidence record, not a Loader
+environment, configuration key, CLI flag or runtime feature.
+
+[Backlog M23](BACKLOG.md#m23--production-deployment-profile-contracts-planning)
+now includes activated [YT-141 performance validation](YT-141-PERFORMANCE-VALIDATION.md),
+Done at bounded optional local reference scope after contract PASS, bounded new workload,
+owned cleanup and final independent Reviewer PASS, zero issues and required followups. The user has now
+activated [YT-140 OIDC proxy/replica integration](YT-140-OIDC-PROXY-REPLICAS.md),
+Done at bounded optional local integration scope after initial contract review,
+minimum implementation, three new focused tests, cleanup and final independent
+Reviewer PASS, zero issues and required followups. The user has now
+activated [YT-139 multi-instance authority/recovery](YT-139-MULTI-INSTANCE-AUTHORITY-RECOVERY.md),
+Done at bounded optional local reference scope after independent contract
+review, new stale-Session restoration/re-login proof, cleanup and final
+independent Reviewer PASS, zero issues and required followups. The user has now
+activated [YT-138 authorization-to-commit ordering research](YT-138-AUTHORIZATION-COMMIT-ORDERING.md),
+Done at source-bound research scope after independent Reviewer PASS, zero issues
+and required followups. YT-137 is now
+separately activated for [write-outcome/idempotency research](YT-137-WRITE-OUTCOME-IDEMPOTENCY.md),
+Done at source-bound research scope after independent Reviewer PASS, zero issues
+and required followups. The user has now
+activated [YT-136 bounded telemetry collection](YT-136-TELEMETRY-COLLECTION.md),
+Done after new integration proof, cleanup and independent Reviewer PASS, zero
+issues and required followups. The user has activated
+[YT-135 current-schema recovery](YT-135-CURRENT-SCHEMA-RECOVERY.md), now Done
+after bounded release/schema-2 proof, cleanup and independent Reviewer PASS,
+zero issues and required followups. YT-134 is
+**Done at bounded optional reference scope** under the separately authorized [release/storage workload
+contract](YT-134-RELEASE-STORAGE-CAPACITY.md), reusing the accepted release binary
+for isolated schema-2/ext4 measurements: 23,549 requests, passing paced
+1/2/4-worker points, retained Step 8 503/readiness FAIL, exact acknowledged-write
+reconciliation and cleanup complete; independent Reviewer
+`/root/yt134_release_storage_independent_review_20261023` PASS, zero issues and
+required followups, all six hashes matched. It offers
+an optional reproducible capacity reference and workload guidance; it does not qualify consumer hardware/SLO or replace B1 limits with
+universal req/s. YT-135 offers optional current-schema Starter backup/restore/
+upgrade procedures and disposable local proof, preserving rows/index/sequence,
+unknown-outcome and forward-fix rules without production DR commitments.
+YT-136 offers opt-in telemetry collection/logging guidance using YT-128, without
+mandatory collectors, on-call or retention/alert operation. YT-137 documents
+selected consumers' uncertain-write/retry and existing application idempotency
+contracts; YT-138 now researches application authorization-to-commit ordering
+and the existing pre-SQL race limit. Each is Done at its independently reviewed application-owned decision;
+any implementation requires separate authorization. YT-139 offers optional
+multi-instance authority/recovery integration using a concrete local consumer
+and topology fixture, reusing accepted Valkey bridges without mandating a
+database/HA/customer topology. YT-140 offers optional maintained-client OIDC
+proxy/replica guidance/reference, reusing source-bound IdP evidence without
+requiring customer's real IdP/TLS/domain deployment or repeating old proof.
+
+Dependencies retain repository acceptance order, with multi-instance authority
+prerequisites conditional on the selected fixture; none demands consumer
+production adoption. Reference evidence binds the exact app/binary/schema/data
+and fixture limits; Starter YT-129–YT-131 PASS does not qualify Admin or another
+consumer. Independent review remains necessary before each activated item is
+Done. No broader roadmap redesign, validation infrastructure, production
+activation, signing or release is selected.
+
+YT-134's bounded local release/storage reference is Done after independent
+review. The separately authorized [ephemeral Azure supplement](YT-134-AZURE-REFERENCE.md)
+completed its workload, reconciliation, ordinary reboot/readback and full
+resource deletion, with separate independent Reviewer PASS, zero issues and
+required followups. Failed cloud points and probe/clock limits remain retained;
+local PASS keeps its own scope. YT-135 current-schema recovery guidance/reference
+is now Done at bounded optional reference scope after complete three-row snapshot
+restore, explicit two-acknowledgment loss accounting, missing-index refusal and
+four-row postrestore forward-restart readback; owned cleanup is complete and
+independent Reviewer PASS, zero issues and required followups, with six hashes
+matched. YT-136 is now Done after bounded enabled/stopped/disabled collection,
+last-good preservation, correlated log projection and oversize rejection; owned
+cleanup is complete with independent Reviewer PASS, zero issues and required
+followups; seven hashes matched. YT-137 is Done at source-bound
+write-outcome/idempotency research scope after independent Reviewer PASS, zero
+issues and required followups; six hashes matched. YT-138 is Done at
+source-bound authorization-to-commit ordering research scope after independent
+Reviewer PASS, zero issues and required followups; six hashes matched. Its
+accepted decision retains the YT-126 pre-SQL race for actual
+Admin/Board native/triage saves; future shared-authority ordering must distinguish
+revocation scope, in-flight work, commit/acknowledgment and recovery boundaries.
+YT-139 is Done at bounded optional local authority/recovery reference scope; independent
+contract review PASS, zero issues/required followups. New exact recovery test,
+full business/policy reconciliation, four Admin drains and owned cleanup are
+complete; final independent Reviewer PASS, zero issues/required followups; seven
+hashes matched. YT-140 is Done at bounded optional local OIDC proxy/replica
+integration, reusing accepted IdP and authority evidence; initial independent
+contract Reviewer PASS, zero issues/required followups; minimum origin integration,
+three new focused tests, static checks and owned cleanup complete. Final
+independent Reviewer PASS, zero issues/required followups; twelve hashes matched.
+New live proof is single-process Board listeners
+with no successful token exchange or cross-process Admin OIDC claim. [YT-141](YT-141-PERFORMANCE-VALIDATION.md) is Done after independent contract
+PASS and the minimal k6 reference/new controlled-arrival proof: 14,006 measured
+valid-200 responses plus 501 warmup, no drops/errors, p50/p95 1/2 ms and p99
+2–4 ms. All six phase bounds passed; no saturation maximum is established.
+Twenty rows/schema/index/sequence reconciled, native stop and cleanup complete;
+final independent Reviewer `/root/yt141_performance_final_review_20261023` returned
+PASS, zero issues/required followups; eight hashes matched. The accepted YT-137
+decision preserves Starter/Board no-automatic-retry behavior and manual unknown
+outcome reconciliation limits, plus modular-shop's existing SQLite order
+deduplication within its Session/cart/handler scope. Any future durable replay
+ledger requires application-owned identity, authorization, atomic business
+effects, retention and restore semantics; no implementation is selected here. Accepted YT-128/133
+evidence was reused; only the new collection/failure/staleness integration was
+verified. Sink/alert/retention choices remain
+optional consumer guidance, without a mandatory collector or runtime change.
+The user has now separately activated [YT-142 saturation and recovery](YT-142-SATURATION-RECOVERY.md),
+Done at bounded optional observation scope after initial contract PASS, new
+load/recovery/cleanup and final independent Reviewer PASS, zero issues and
+required followups; eight hashes matched. The first 1,000/s load point failed with five
+SQL-admission 503 responses among 10,001 requests (~0.05%); app inner-load CPU
+49.49%, no client drops/throttling. The 250/s recovery completed 7,501 valid HTTP 200 responsess;
+all 30 bins healthy, first 0–1 s healthy and ten-bin confirmation at 10.000 s. Stop
+before 2,000/s and higher was deliberate; no CPU/sustained maximum or new matched passing
+bracket is established. Full 20-row/schema/index/sequence equality and owned
+cleanup are complete. Preserve YT-141 baseline acceptance and
+all historical failures; distinguish application saturation from generator or
+resource caps. No unchanged passing proof, product tuning or cloud execution
+is selected.
+The user separately requested future performance validation, registered as
+[YT-141](YT-141-PERFORMANCE-VALIDATION.md), now explicitly activated. Tool selection
+compares community HTTP benchmark/load tools with a minimal
+application-specific driver for a new controlled-arrival read-only API question. Preserve reproducible
+workloads, offered-versus-achieved load, all/successful latency, rejection/error
+and resource populations, exact writes and cleanup. The new bounded local workload has independent contract PASS, minimum
+reproducible proof, cleanup and final independent Reviewer PASS, zero issues/required followups;
+no consumer SLO/CI gate or repeat of accepted YT-134 proof follows.
+YT-133's bounded reference is accepted after
+independent review and completed focused proof/cleanup. Existing local PASS/FAIL, M21/M22
+scopes, YT-103 asset proof, immutable M20 candidate `ce56e08`/original nine,
+YT-096 In progress with D1–D6 Pending and YT-020 Blocked remain unchanged.
+
+The user has separately activated [YT-143 native Axum/Yetlet workload comparison](YT-143-AXUM-WORKLOAD-COMPARISON.md), **Done at bounded comparison scope after independent final Reviewer PASS, zero issues and required followups**. Independently review the contract before adding a minimal standalone public synthetic app and fixed paired plaintext/JSON/dynamic-SSR measurements. Match responses, dependency/runtime/resource inputs and error/latency populations; label SSR as the Yetlet render pipeline versus independent escaped direct rendering. Retain failures and cleanup; final independent Reviewer PASS is required before Done. This is a bounded TechEmpower-inspired local comparison, without capacity, full-suite certification or product optimization claims. PostgreSQL is the next separate user-requested contract after this comparison; no database or cloud work begins here. Existing YT-141/142 and release gates retain their scopes.
+
+YT-143 now has the standalone sample, focused test/format/release-build PASS and retained bounded results. An original raw-output tmpfs deviation caused client memory pressure; one independently accepted canonical ext4 correction ran only the never-started second repetition, without replaying phases 1–12 or changing product inputs/resources. Its 300,006 exact measured 200s include one dropped native-Axum SSR 4,000/s arrival, making that pair noncomparable; five corrected pairs are comparable, without two valid repetitions or a stable-overhead/capacity claim. Original failures, unavailable phase-12 exit and arithmetic erratum remain explicit. All owned processes/units/listener/tools are cleaned, retained raw evidence preserved; final independent Reviewer `/root/yt143_axum_final_review_20261023` PASS, zero issues and required followups, with nine hashes matched.
+
+
+YT-144 separately activates the [optional PostgreSQL workload comparison](YT-144-POSTGRES-WORKLOAD-COMPARISON.md), **Done at bounded comparison scope after independent final Reviewer PASS, zero issues and required followups**. Independently review the contract before acquiring a pinned official PostgreSQL image or adding sample-local optional SQLx support. The same deterministic single-row SELECT, pool and JSON handler serve native Axum and Yetlet; two fixed rates and order-balanced repetitions carry explicit database/application/client, timeout, storage and cleanup bounds. Retain all failures and separate pool/provider/HTTP/client outcomes, all/valid latency and achieved/offered populations. Preserve the old sample main/script, default/Core/browser graphs, root lock and accepted earlier proof without replay. At the initial contract checkpoint no database startup, build or workload had run; minimum new proof and independent final Reviewer PASS are required before Done. This is neither PostgreSQL-versus-SQLite performance nor ORM/Core adoption, production qualification or database-capacity certification.
+
+
+YT-144 stage 2 implemented the optional SQLx/PostgreSQL binary and deterministic
+fixture without changing the old main/workload, shared dependency versions,
+root/Core/browser sources or accepted proofs. Corrected contract review, pinned
+acquisitions, the new locked release build and one focused PostgreSQL 18.6 test
+PASS. Resource observation then failed on host backend proc-FD permissions; one
+bounded same-PGDATA Docker-local fallback returned no required process records
+and stopped. All eight app/warmup/measured phases remain unstarted, so there
+are no performance/comparable-pair results. Failures and original deadline/cache
+history are retained, post-focused logical rows match, and owned cleanup
+completed inside the original runtime budget. Final independent Reviewer
+`/root/yt144_postgres_final_review_20261023` returned FAIL with one P2: the
+requested workload comparison has no measured evidence. YT-144 remains
+In progress; no further retry or Done claim follows from this result.
+
+The separately human-authorized YT-144 continuation fixed only the owned process
+observer and case-insensitive live-probe header lookup, retained the earlier
+failures and failed preload, and ran the eight never-started fixed groups once.
+All 100,007 measured responses were exact valid 200s with zero errors/drops/
+interruptions; four pairs meet the declared comparison criteria, without stable
+overhead or capacity claims. Full logical/schema reconciliation and owned
+cleanup pass inside the renewed unchanged deadline. Accepted old proofs were
+reused; the necessarily reconstructed executable is byte-identical. YT-144
+is Done at this bounded comparison scope after independent final Reviewer
+`/root/yt144_postgres_final_review_20261023` PASS, zero issues and required
+followups. The original failed verdict and YT-096/YT-020 release gates remain
+unchanged.
+
+
+YT-145 separately activates [small/medium/large SSR cost baselines](YT-145-SSR-PERFORMANCE-BASELINES.md), **Done at fixed local SSR baseline scope after independent final Reviewer `/root/yt145_ssr_final_review_20261023` PASS, zero issues and required followups**. Independent contract Reviewer PASS preceded the five-file standalone opt-in fixture, two serial focused tests and normal/counted locked release builds. Fixed construction/body/document/combined measurements completed: 1,200 measured timing rows plus 240 warmups, 36 balanced allocation operations across 12 fresh counted processes, all six exact HTML hashes matched, all native workload exits 0. Raw timing variability and observed gap candidates are retained without performance fixes. Exact escaped output, separate ordinary timing and logical allocation/live/peak counts, whole-process RSS context, finite resources, retained raw failures and owned cleanup bound the evidence. Reuse accepted verification; final independent Reviewer PASS is required before Done. Record discovered gaps as future candidates without tuning or unrelated fixes. No HTTP capacity, browser/database/provider workload, Core/API/default-graph change, consumer SLO, new commit or push is selected. YT-096/YT-020 release gates retain their existing scope.
+
+
+YT-146 separately activates [SSR serializer allocation/copy attribution](YT-146-SSR-SERIALIZER-ATTRIBUTION.md), **Done at bounded attribution-study/proposal scope after independent final Reviewer `/root/yt146_ssr_attribution_final_review_20261023` PASS, zero issues and required followups; nine reviewed hashes matched**, dependent on accepted YT-145. Independent contract Reviewer PASS preceded the five-file default-off extension, four new focused tests, two locked offline builds and bounded new measurements. All six new-copy hashes match; six allocation operations reconcile creation/release/global logical heap increments to YT-145; 80 ordinary component timings and 20 warmups remain retained. Escaping contributes 6,150 of 7,176 document allocation calls, while buffer realloc request-byte concentration is separately reported without physical-copy, ownership or CPU-share claims. A private escape-into helper is the one proposed future candidate; no optimization implementation or API/security/default-graph change is selected. Raw identities, native exits, failure history, finite bounds and owned cleanup remain explicit. No old accepted proof was replayed. Independent final Reviewer PASS is required before Done; YT-096/YT-020 release gates and no-commit/push scope remain unchanged.
+
+
+YT-147 separately activates [private escape-into implementation and matched SSR comparison](YT-147-PRIVATE-ESCAPE-INTO.md), **Done at bounded implementation/comparison scope after independent final Reviewer PASS, zero issues and required followups**, dependent on Done YT-146. Independent contract Reviewer PASS must precede implementation, tests, builds and measurements. Preserve public `escape_text`, exact escaping/output, validation order/errors and security; leave textarea normalization, URL policy, document composition, Core/browser/default graphs and dependencies unchanged. Reuse the existing source-derived temporary-String shadow as the control for one fixed large-page reference/current body/document comparison, separate ordinary timing from global allocation counts, and check all three sizes plus changed security behavior through new focused entry points. Retain failures, variation, source/control limitations and owned cleanup; no numerical performance threshold or old-proof replay. Independent final Reviewer PASS is required before Done. No new commit, push, production claim or release-gate change is selected. Independent contract review passed before the accepted implementation and comparison.
+
+YT-147 implementation and the fixed comparison are now complete, with status **Done after independent final Reviewer `/root/yt147_escape_into_final_review_20261023` PASS, zero issues and required followups; nine reviewed hashes matched**. Three new filtered tests and two offline locked builds passed; all twelve reference/current hashes match the six accepted values, and all reference relative global count snapshots reconcile to accepted YT-146 evidence. The fixed 160 measured timings, 40 warmups and 12 balanced count operations remain retained. Current removes 6,149 allocation calls per body/document operation; held output bytes and document peak remain unchanged. Lower current medians in both repetitions remain descriptive local observations, with variation and source-derived-control/compiler caveats. No old accepted verification was replayed, owned foreground resources are cleaned, and no second optimization or release claim follows. No follow-on optimization is activated; further work requires separate selection.
+
+
+YT-148 separately activates [URL-check allocation attribution](YT-148-URL-CHECK-ATTRIBUTION.md), **Done at bounded attribution/proposal scope after independent final Reviewer /root/yt148_url_attribution_final_review_20261023 PASS, zero issues and required followups; eight reviewed hashes matched**, dependent on Done YT-147. Independent contract Reviewer /root/yt148_url_contract_review_20261023 PASS, zero issues/required followups, preceded the four-file default-off sample extension. Two new filtered tests and both offline locked builds passed; the fixed two ordinary repetitions retain 40 measured timings/10 warmups, while one counted process retains three balanced operations. All native exits are 0 and URL event/request fields reconcile exactly to accepted YT-146 raw buckets without replay. URL normalization accounts for 1,024 allocations/2,048 reallocations per corpus operation; standalone elapsed medians 404.745/271.423 microseconds remain descriptive with visible drift, not CPU share or speedup. Product/security/API/locks/default graphs and seven historical bindings remain unchanged; the one source-check harness failure and blank-line-only correction are retained. One minimum future private prefix-streaming proposal is documented without implementation. Parent docs/whitespace checks passed; only completion metadata is updated after PASS. No optimization implementation, commit, push, production claim or YT-096/YT-020 gate change is selected.
+
+
+YT-149 separately activates [private streaming URL-prefix matching](YT-149-PRIVATE-URL-PREFIX.md), **Done at bounded implementation/comparison scope after independent final Reviewer /root/yt149_url_prefix_final_review_20261024 PASS, zero issues and required followups; nine reviewed hashes matched**, dependent on Done YT-148. Independent contract Reviewer /root/yt149_url_prefix_contract_review_20261024 PASS, zero issues and required followups, preceded the private function-body-only change. Identical ASCII filtering/full Unicode lowercase feeds an equivalent three-prefix stream; URL list, validation/error/output/API semantics and unrelated product sources remain unchanged. Three new focused tests, both offline locked release builds and six all-size literal/hash outputs passed. The fixed 80 ordinary observations/20 warmups and six counted operations are retained; all native measurement exits are 0 and all nine reference pairs reconcile 12 fields to accepted YT-148 raw data without replay. The current copied URL probe observes zero logical allocation/request/live/peak deltas; standalone timing drift and source-derived/compiler limits remain explicit, with no whole-render CPU-share, stable/production-speed or RSS claim. All 1,021 protected tracked files and eight reused bindings match; the pre-edit binding failure, counted-only manual correction, normal test embedded-source delta and missing original findmnt raw text are disclosed. Parent documentation/whitespace checks passed; the disclosed evidence limits are nonblocking. Only completion metadata is updated after PASS, without further code or measurement changes. No public API, dependency/default graph change, broader URL policy, commit, push or release-gate change is selected.
+
+
+YT-150 separately activates [full SSR comparison including YT-149](YT-150-FULL-SSR-COMPARISON.md), **Done at bounded full-SSR measurement scope after independent final Reviewer /root/yt150_full_ssr_final_review_20261024 PASS, zero issues/required followups; eight reviewed hashes matched**, dependent on Done YT-149. Independent contract Reviewer /root/yt150_full_ssr_contract_review_20261024 PASS, zero issues/required followups, preceded the opt-in sample module and actual pinned-source builds. One new focused test, four release builds and twelve literal/hash outputs passed. Separate construction, real document render and combined input teardown retain 240 measured observations/60 warmups and 18 balanced allocation operations; all ten workload exits are 0. Reference construct/document reconcile all fields to existing raw data without replay. Document paired medians fall 31.94/31.36 percent and combined 21.29/21.78 percent, with unchanged construction variation disclosed; actual document alloc/realloc calls become 3/21 from 1,027/2,069 while held/peak stay unchanged. These are one-page descriptive observations, not stable/production/HTTP/RSS claims. Preparation failures, source/archive/binary/context limits and cleanup are retained. No product/API/dependency/default graph change or other optimization occurred. Parent documentation/whitespace checks passed; only completion metadata changes after PASS, without code or measurement changes; new changes have no commit/push authorization and release gates stay unchanged.
+
+
+YT-151 separately activates [View/metadata construction attribution](YT-151-VIEW-CONSTRUCTION-ATTRIBUTION.md), **Done at bounded attribution/proposal scope**, dependent on Done YT-150. A fixed opt-in sample extension calls unchanged actual Core/metadata APIs, tags creation call sites and reconciles global heap observations against accepted construction data. Separate ordinary format and prepared-assembly probes preserve their distinct limits; no additive CPU-share or optimization claim follows. Independent contract Reviewer /root/yt151_construction_contract_review_20261024 PASS preceded implementation. Two new filtered tests, both release builds, six literal/hash outputs and the fixed new population pass; all nine counted pairs reconcile to YT-150. Children Vec requests dominate logical bytes, fixture formatting dominates calls and metadata is negligible here. One private first-child capacity proposal retains multi-child reallocation/move risks; final independent Reviewer /root/yt151_view_attribution_final_review_20261024 PASS has zero issues/required followups, with all nine reviewed hashes matching before the permitted status/reference closeout. Preserve API/security/default graphs and all product inputs, retain failures/provenance/bounds/cleanup, and propose one minimum future candidate without implementing it. No commit, push or release-gate change is selected.
+
+YT-152 separately activates [private first-child capacity comparison](YT-152-FIRST-CHILD-CAPACITY.md), **Done at bounded comparison/rejected-candidate scope**, dependent on Done YT-151. The privately implemented first-insertion candidate preserves conversion order, representation, API, bulk insertion and security/output. Compare actual pinned libraries on single-child, multi-child and complete-page construction/combined SSR; retain memory, elapsed and additional reallocation costs with historical/raw/source/output bindings. Independent contract Reviewer /root/yt152_first_child_contract_review_20261024 PASS preceded implementation. New focused checks, four builds, twenty outputs and fixed ordinary/count populations pass; historical groups reconcile. The measured logical-memory reduction comes with slower paired medians and additional reallocations, so default Core adoption is rejected and exact baseline production code restored while retaining immutable candidate evidence/new test. The final-checkout rebuild boundary and preparation errors are disclosed; final independent Reviewer /root/yt152_first_child_final_review_20261024 PASS has zero issues/required followups, with all nine reviewed hashes matched before the permitted status/reference closeout. No universal speedup, further optimization, new dependency, commit, push or release-gate expansion is selected.
+
+YT-153 separately activates [document buffer growth and body temporary attribution](YT-153-DOCUMENT-BUFFER-ATTRIBUTION.md), **Done at bounded attribution/proposal scope**, dependent on Done YT-150–152. Preserve all product/API/security/default inputs. Finite sample-only observations of actual renderer calls and source-derived adapter composition distinguish body growth, envelope appends and temporary lifetimes, with historical reconciliation and separate nonadditive ordinary append probes. Independent contract Reviewer /root/yt153_document_buffer_contract_review_20261024 PASS preceded implementation. New focused tests/builds/outputs and fixed populations pass; all nine historical pairs and event/boundary observations reconcile. The last suffix doubles returned capacity, while earlier body/envelope overlap determines peak. One future private tail-capacity proposal targets spare capacity without claiming CPU/peak benefit; no optimization is implemented. Normal-only source-edit provenance and lifetime/timing limits remain disclosed; final independent Reviewer /root/yt153_document_buffer_final_review_20261024 PASS has zero issues/required followups, with all nine reviewed file hashes and data/history/executable bindings matched before the permitted status/reference closeout. Retain failures/limits/provenance/cleanup; no commit, push or release-gate expansion.
+
+YT-154 separately activates [private document tail-capacity comparison](YT-154-DOCUMENT-CAPACITY-COMPARISON.md), **Done at bounded implementation/comparison scope**, dependent on Done YT-153. Preserve actual body rendering and release before closing, public API/output/security, dependency/default graphs and all other product behavior. Compare pinned real libraries across three page sizes plus large combined SSR, with finite document-only trace, historical reconciliation, retained failures and explicit memory/elapsed tradeoffs. Independent contract Reviewer /root/yt154_document_capacity_contract_review_20261024 PASS preceded implementation. One new filtered test, four release builds, twelve outputs and all fixed populations pass; historical groups and document traces reconcile. Candidate halves retained output capacity with one fewer realloc and fourteen-byte higher peak; large timings improve, small/medium regress with preserved variation. Retain this minimum candidate as a capacity improvement, with no universal timing promise. The contract EOF whitespace failure/correction is retained; final independent Reviewer /root/yt154_document_capacity_final_review_20261024 PASS has zero issues/required followups, with all nine reviewed file hashes and data/history/executable bindings matched before the permitted status/reference closeout; no guaranteed speedup/peak reduction, further optimization, new commit/push or release-gate expansion.
+
+YT-155 separately activates [small/medium latency attribution and stability](YT-155-SMALL-MEDIUM-LATENCY-STABILITY.md), **Done at bounded research scope**, dependent on Done YT-154. Independent contract Reviewer /root/yt155_latency_stability_contract_review_20261024 PASS preceded sample code. Six fixed processes retain 5,184 times, twelve completed warmups, all blocks/context/extrema and accepted inputs; one new filtered test, format and two ordinary builds pass. Warmed actual API increases 1.58–1.74 percent small / 2.53–3.83 percent medium, while same-process reserved tail proxies are lower. Initial/context variability is visible; unique full-API or historical timing cause remains unresolved. Retain the accepted capacity policy, unchanged products/API/output/security and original negative results; no optimization or accepted-proof replay. Final independent Reviewer /root/yt155_latency_stability_final_review_20261024 PASS has zero issues/required followups; all eight reviewed hashes and data/history/source/executable bindings matched before permitted status-only closeout; no commit, push or release-gate expansion.
+
+YT-156 separately activates [full HTTP SSR before/current comparison](YT-156-HTTP-SSR-COMPARISON.md), **Done at bounded comparison scope**, dependent on Done YT-155. Independent contract Reviewer /root/yt156_http_ssr_contract_review_20261024 PASS0 preceded code; fresh exact fixture and accepted product/lock/tool/proofs reused. New test/format/two builds and24 measured phases pass;150019 valid200, no errors/drops/interruptions, all twelve pairs comparable. At1000/s large p50/CPU improve while p95 increases5–6 percent; medium p95 increases about19 percent in both orders. Preserve mixed outcomes, all raw/resources/boundaries and two bounded observation/preparation corrections without load replay; owned cleanup complete. HTTP-tail cause remains open, no new optimization or universal/capacity claim. Independent final Reviewer /root/yt156_http_ssr_final_review_20261024 PASS has zero issues/required followups; all reviewed file/data/history/source/executable/cleanup bindings matched before permitted status-only closeout; no commit/push or release-gate expansion.
+
+YT-157 separately activates [medium high-rate HTTP p95 attribution](YT-157-MEDIUM-HTTP-TAIL-ATTRIBUTION.md), **Done at bounded attribution scope**, dependent on Done YT-156. Corrected independent contract Reviewer /root/yt157_medium_tail_contract_review_20261024 PASS0 preceded code; original denominator FAIL preserved. Retained40005 native responses and four new instrumented phases/40003 valid measured requests establish waiting-boundary dominance but heterogeneous sampled pipeline/construction behavior. All1284 IDs correlate, measured pairs comparable, new test/format/two builds pass and owned cleanup completes. Diagnostic p95 increase remains positive; no unique code/allocator/scheduling/transport cause or optimization target established. Retain sparse deterministic tail cohorts, observer/context limits, all failures and one arithmetic-only artifact correction without workload replay. Final independent Reviewer /root/yt157_medium_tail_final_review_20261024 PASS has zero issues/required followups; all reviewed file/data/history/source/executable/cleanup bindings matched before permitted status-only closeout; bounded research Done leaves unique cause unresolved; no optimization, commit/push or release-gate expansion.
+
+YT-158 separately activates [render-history and construction CPU context](YT-158-RENDER-HISTORY-CONTEXT.md), **Done at bounded attribution scope**, dependent on Done YT-157. Independent contract/adaptation Reviewer PASS0 preceded the four fixed synchronous processes;16384 measured/16384 warmups/512 empty brackets/64 groups complete. Current construction CPU is slightly lower in both source pairs; small CPU-visible history sensitivity does not establish a unique allocator/scheduler/HTTP cause or optimization target. Actual body/CSP/new focused test, format and corrected builds pass; original failed assertion and bounded preparation corrections remain, with no old proof/load replay. Four owned units/PIDs/cgroups closed, unchanged products/API/output/security. Independent final Reviewer /root/yt158_render_context_final_review_20261024 PASS, zero issues/required followups; reviewed file/data/history/source/executable/cleanup bindings match before permitted status-only closeout; original HTTP-tail cause remains unresolved; preserve uncommitted YT-157 work, no commit/push or release-gate expansion.
+
+YT-159 separately activates [actual HTTP worker construction CPU attribution](YT-159-HTTP-WORKER-THREAD-CPU.md), **Done at bounded attribution scope**, dependent on Done YT-158. Independent contract Reviewer PASS0 preceded two builds/new test/format and four once-only new-feature phases:40002 measured/1003 warmup valid200,zero errors/drops/interruptions,1284 unique correlated samples/2568 valid same-thread clocks. Construction CPU median increases27.83/36.80 percent like wall, while empty clock work also scales; CPU-visible context is supported without unique frequency/allocator/compiler or original HTTP-tail causality. Preserve all populations/tails, sparse worker cohorts, observer limits and a report-format-only correction; no old-proof/load replay or optimization. Five owned units/13 workload PIDs/cgroups/listener closed. Independent final Reviewer /root/yt159_http_worker_cpu_final_review_20261024 PASS, zero issues/required followups; reviewed file/data/history/source/executable/cleanup bindings match before permitted status-only closeout; original HTTP-tail cause remains unresolved; unchanged products/API/output/security, no commit/push or release-gate expansion.
+
+YT-160 separately activates [reported frequency and worker activity context](YT-160-FREQUENCY-WORKER-DUTY.md), **Done at bounded research scope**, dependent on Done YT-159. Independent contract Reviewer PASS0 preceded finite read-only external observation using exact accepted binaries/caller and qualifications. Four once-only phases:40004 measured/1003 warmup valid200,1176 context records/769 measured-window readings,1284 valid CPU probes; no response/errors/drops or context comparability failure. Lower reported frequency accompanies higher construction/empty CPU in both pairs; worker running share similar, so no unique frequency/idle mechanism or historicalHTTP attribution. Preserve cache/fallback, coarse counter-accounting and observer limits, raw tails/preparation failures, no live/old-proof replay. Five units/13 workload PIDs/cgroups/listener closed; pre/post readable policy matches. Independent final Reviewer /root/yt160_frequency_duty_final_review_20261024 PASS, zero issues/required followups; reviewed file/data/history/source/executable/cleanup bindings match before permitted status-only closeout; historical HTTP-tail causality remains unresolved; no product/sample/host setting change, optimization, commit/push or release-gate expansion.
+
+YT-161 separately activates [controlled benchmark execution profile and admission](YT-161-BENCHMARK-EXECUTION-PROFILE.md), **Done at profile/admission scope**, dependent on Done YT-160. Independent contract Reviewer PASS0 precedes one no-network read-only metadata container: native process exits0 in2.165369s, resource limits verified, exact container/PID removed, image retained and readable host policy unchanged. Resource isolation does not supply physical frequency authority; controlled-frequency Not admitted stops without SSR load. Controlled execution remains Pending actual suitable target/controls/observation. Preserve initial metadata and post-removal wrapper failures, one parser correction without replay and aggregate126.935921123s versus120s bound miss. Independent final Reviewer /root/yt161_benchmark_profile_final_review_20261024 PASS, zero issues/required followups; preserve accepted evidence and products, no host tuning/cloud provisioning/optimization/commit/push or release expansion.
+
+YT-162 follows with [actual target inventory and independent-platform comparison](YT-162-ISOLATED-PLATFORM-COMPARISON.md), **Done at bounded platform-reference scope** after Independent final Reviewer /root/yt162_azure_results_final_review_20261024 PASS, zero issues/required followups. Independent continuation review PASS precedes successful Blob GET/1KiB roundtrip and four unchanged once-only populations:39977measuredvalid200/1003warmups/27drops,zero HTTP errors/interruptions,1283correlated CPU samples. Pair one comparable (HTTPp95ratio0.815245,constructionCPUmedianratio0.986885); pair two fails scheduling because reference2drops27 and is excluded from qualified ratios. All raw failures/older windows retained; all16owned resources/credentials removed within448.907s/3600s bound. No historical/frequency causal claim, product/host tuning, optimization, commit/push or release expansion.
+
+YT-163 records the [retained dropped-arrival attribution](YT-163-DROPPED-ARRIVAL-ATTRIBUTION.md), Done at bounded research scope and dependent on YT-162. Independent contract Reviewer PASS0 precedes offline analysis of four existing measured populations: all27drops occur within27.752147ms, native HTTP/runFn overlap64at every drop;66affected requests spend98.869percent of summed HTTP in waiting. Two sampled server pipelines remain0.391–0.397ms against58–98ms HTTP; Independent final Reviewer /root/yt163_drop_results_final_review_20261024 PASS, zero issues/required followups. The transient full-VU mechanism is supported, unique generator/VM/SSH/pre-middleware cause unresolved; pair two remains unqualified. Future private direct-versus-SSH measurement is proposed only. No workload/old-proof replay, product change, consumer hardware/SLO gate, commit or push.
+
+YT-164 records the [private direct-HTTP/SSH path comparison](YT-164-PRIVATE-HTTP-SSH-COMPARISON.md), Done at bounded comparison scope and dependent on YT-163. Contract/mapping Reviewers PASS0 precede one storage-first two-VM allocation: same current executable, opt-in sample private endpoints and unchanged workload/oracle/fixed load acrossSSH/direct/direct/SSH;40004measured/1004warmupvalid200,zero errors/drops. DirectHTTPp95lower49.73/53.43percent in two comparable pairs;2066finite observer records separate similar k6CPU from observed SSH forwarding cost while preserving guest/sparse-clock limits. All16owned resources/credentials removed within515.125s; nativeexit0. Independent final Reviewer /root/yt164_transport_results_final_review_20261024 PASS, zero issues/required followups; historical27dropcause unresolved, original failed pair unchanged. No old-proof replay, Core optimization, consumer hardware/SLO gate, new-change commit or push.
+
+YT-165 records the [private HTTP capacity/saturation/recovery](YT-165-PRIVATE-HTTP-CAPACITY-RECOVERY.md), Done at bounded profile-study scope and dependent on YT-164. Contract/mapping Reviewers PASS0 precede one bounded direct run using exact accepted app/k6/workload/oracle:2k/4k clean;8k retains20450drops/59550valid200,5929.6in-windowvalidRPS,p95 63.445ms and sustained near2CPU app activity while the16CPU client uses39percent quota. Higher12k/16k points remain unstarted. Both same-PID1k recovery points have0errors/drops,p95below1ms;139553measured/251warmupvalid200total. All16owned resources/credentials removed within539.694s; raw failures and observer/drain limits preserved. Independent final Reviewer /root/yt165_capacity_results_final_review_20261024 PASS, zero issues/required followups; no Core optimization, old-proof replay, consumer SLO gate or new-change commit/push.
+
+YT-166 records [5k/6k/7k private capacity refinement](YT-166-PRIVATE-HTTP-CAPACITY-REFINEMENT.md), Done at bounded refinement scope and dependent on YT-165. Contract/mapping Reviewers PASS before one new allocation: exact accepted artifacts/oracle and the same app/generator/256VU profile, fresh app per rate.5k/6k clean;7k retains9585drops/60416valid200,6015.7in-windowvalidRPS,p95 63.278ms and near2CPU app activity versus35percent of16CPU client quota.170418measured/753warmupvalid200 have0HTTP errors/mismatches. All16owned resources/credentials removed within457.122s; raw failure/observer evidence retained. New-host6k–7k bracket is finite, no old-point/recovery replay or fictitious cross-allocation precision. Independent final Reviewer /root/yt166_refinement_results_final_review_20261024 PASS, zero issues/required followups; no Core change, consumer SLO gate or new-change commit/push.
+
+YT-167 records [sustained private HTTP capacity at6k](YT-167-PRIVATE-HTTP-SUSTAINED-CAPACITY.md), Done at bounded research scope and dependent on YT-166. Contract/mapping Reviewers PASS before one new300s exposure using exact accepted app/k6/workload/oracle and unchanged app/256VU profile, with declared larger diagnostic capture bounds. Failed offered load retains1765706valid200/34302drops,5884.83in-windowvalidRPS,p95 63.333ms; all ten30s windows show pressure, app near2CPU,0HTTP errors/mismatches and0OOM. Full11.06GBlogicalraw retained,251warmupvalid200; all16owned resources/credentials removed within1055.576s. Different allocation from the old short pass prevents duration-only causation or universal clean-capacity claims. Independent final Reviewer /root/yt167_sustained_results_final_review_20261024 PASS, zero issues/required followups; Done at bounded research scope with failed load preserved; no old-proof replay, Core optimization, consumer SLO gate or new-change commit/push.
+
+YT-168 records [sustained private HTTP capacity at5k](YT-168-PRIVATE-HTTP-SUSTAINED-5000.md), Done at bounded profile-observation scope and dependent on YT-167. Contract/mapping Reviewers PASS before one new5000/s300s exposure using exact accepted app/k6/workload/oracle/resource/capture bounds.1500001measured/250warmupvalid200,0drops/errors/mismatches;4999.983in-windowvalidRPS,p95 0.894ms, all ten30s windows clean. App uses66.55percent of2CPU quota, no app/client throttle or OOM; full9.38GBlogicalraw retained. All16owned resources/credentials removed within938.037s. Prior failed6k and short5k results remain unchanged; different allocations prevent a precise same-target5k–6k bracket or universal capacity claim. Independent final Reviewer /root/yt168_sustained5000_results_final_review_20261024 PASS, zero issues/required followups; Done at bounded profile-observation scope; no old-proof replay, Core optimization, consumer SLO gate or new-change commit/push.
+
+YT-169 records [thirty-minute sustained private HTTP capacity at5k](YT-169-PRIVATE-HTTP-SUSTAINED-1800.md), Done at bounded profile-observation scope and dependent on YT-168; independent final Reviewer /root/yt169_sustained1800_results_final_review_20261025 PASS, zero issues/required followups. Contract/mapping PASS precede one new allocation using exact accepted app/workload/full oracle/256VUs.9000001measured/251warmupvalid200,0drops/errors/mismatches,4999.996667in-windowvalidRPS,p95 0.954ms/p99 1.593ms; all60windows zero drops/errors and localized150–180s p99 13.669ms retained. App uses72.36percent of2CPU quota; app/client cgroup throttle/OOM deltas zero. Full55.58GBlogicalraw retained as1.78GBgzip,551bounded sparse records and one finite client-observer read gap disclosed. All16resources/credentials removed within2561.164s; no old-proof replay, Core optimization, consumer SLO/universal capacity claim or new-change commit/push.
+
+YT-170 records [Auth/Session/PostgreSQL functional workload validation](YT-170-AUTH-SESSION-POSTGRES-WORKLOAD.md), Done at bounded local functional-reference scope and dependent on YT-169/YT-125/YT-144; independent final Reviewer /root/yt170_auth_session_postgres_results_final_review_20261025 PASS, zero issues/required followups. Contract/corrected mapping PASS precede one opt-in app plus dedicated Valkey/PostgreSQL. New tenant/permission/CSRF/revocation/SQL-authority outage/recovery proof passes; JSON2000/SSR2001valid200 at100in-windowRPS each,p95 2.116/2.112ms,zero measured drops/errors. All rows/schema equal and containers/newPGimage/private material/units removed within53.010s. Original compile and mapping FAIL remain, default graphs/old qualification unchanged. Synthetic login/read-only/finite reference only; no Core/Admin migration, realIdP/capacity claim or new-change commit/push.
+
+YT-171 records [Auth/Session/PostgreSQL staged load and recovery](YT-171-AUTH-CAPACITY-RECOVERY.md), Done at bounded staged-research scope, dependent on YT-170; final independent Reviewer /root/yt171_auth_capacity_results_final_review_20261025 PASS, zero issues/required followups. Contract/mapping PASS precede the sole optional-observation allocation. JSON250/s is clean;500/s retains one Session-busy503/10001 and skips1000/2000. SSR250/500/1000 are clean;2000/s retains nineteen Session-busy503/40002. Zero drops/SQL errors; same-PID100/s10s recoveries have all ten bins clean each. Exact-owned cleanup completes within152.972s; accepted YT-170/input bindings remain unchanged. Fixed4pool/4activeSession calls with bounded waiting, no universal capacity/CPU ceiling or automatic tuning. No old-proof replay/commit/push.
+
+YT-172 records [Session admission bursts and queue attribution](YT-172-SESSION-ADMISSION-BURSTS.md), Done at bounded provider-research scope, dependent on YT-171; final independent Reviewer /root/yt172_session_admission_results_final_review_20261025 PASS, zero issues/required followups. Contract/corrected mapping PASS precede one cfg(test)-only648read probe. Fixed4active/8total slots yield552valid/96busy;12/16barrier waves reject4/8each and nominal1ms-spaced controls are clean;8serial recovery reads pass. Acquisition/reply observations support burst sensitivity, not exact historical HTTP causation or a req/s ceiling. Actual resource absence is verified; initial mapping/startup and already-unloaded-unit cleanup FAIL remain. No runtime/API/limit/security change, accepted-proof replay or new-change commit/push.
+
+YT-173 records [full HTTP and Session provider timeline attribution](YT-173-HTTP-SESSION-TIMELINE.md), Done at bounded correlation-research scope, dependent on YT-172; final independent Reviewer /root/yt173_http_session_results_final_review_20261025 PASS, zero issues/required followups. Contract/corrected mapping PASS precede the sole new12550request study;12538valid/12busy and37638complete same-process clock records. Every new busy has exactly8guaranteed/candidate owners,4active and4pending; first11startupcluster andone laterreply-path episode. Observer-command overlap is advisory, not uniquehistoricalcausation. Both16request HTTPbursts and8serialrecoveries per mode validate; exact-owned cleanup18.200s. AllinitialCLI/mapping failures and oldevidence remain. Compiler-cfg-only linkage adds no normalAPI/defaultgraph/limit/security change; no oldproofreplay/tuning/new-change commit/push.
+
+YT-174 records the [host-side passive sampling comparison](YT-174-HOST-PASSIVE-SAMPLING.md), Done at bounded comparison scope and dependent on YT-173; final independent Reviewer /root/yt174_host_passive_results_final_review_20261025 PASS, zero issues/required followups. Contract/corrected mapping PASS precede the sole new condition: zero Docker exec or Docker/SQL control overlap with traffic, recorded 26-sample cost 3.182→0.365s (88.54% lower). 12550 requests/12541 valid/nine busy and 37641 complete records; all new busy prove four active/four pending, with changed burst/observe distribution rather than causal improvement. Exact-owned cleanup 18.746s PASS, all initial failures/raw results/old proofs retained. Same binary/limits/security, no old validation replay, tuning or new-change Commit/Push.
+
+YT-175 documents the [Session burst/overload policy contract](YT-175-SESSION-BURST-OVERLOAD-POLICY.md), Done at document-only contract scope, dependent on YT-174/YT-117/YT-127. Retain four active/eight total and existing queue/deadline/worker/security bounds; compare fail-fast admission, application HTTP admission/waiting, separate opt-in rate quotas and bounded safe-read retry. Keep 503 capacity failures distinct from 429 quotas and identity/authorization failures; uncertain writes require reconciliation. Recommend existing provider protection plus separately selected early application admission, without activating implementation, tuning, Settings changes or prior-proof replay. Final independent Reviewer /root/yt175_session_burst_overload_contract_review_20261025 PASS, zero issues/required followups; new documents remain uncommitted/unpushed.
+
+YT-176 selects [opt-in fail-fast outer HTTP admission](YT-176-HTTP-ADMISSION.md), Done at bounded local integration scope and dependent on YT-175. Contract first, then a private example feature/startup cap and shared native Axum gate outside Session/Auth, held through response construction/finalization. Zero added queue/retry, private 503, unchanged four-active/eight-total Session and deadline/security/worker ownership. New in-process focused cases plus feature-off compile/source checks; no old proof replay, live services or performance qualification. Contract Reviewer PASS; six new composition tests (one old oracle filtered), feature-off compile, format and docs checks PASS. Final independent Reviewer /root/yt176_http_admission_final_review_20261025 PASS, zero issues/required followups; new changes remain uncommitted/unpushed.
+
+YT-177 records the [isolated HTTP admission=4 workload](YT-177-HTTP-ADMISSION-WORKLOAD.md), Done at bounded policy-behavior scope, dependent on YT-176/YT-174; final independent Reviewer /root/yt177_admission_workload_final_review_20261025 PASS, zero issues/required followups. Contract/mapping PASS precede one new12550request cohort:12452valid/98checked HTTP-only503,37454complete records, zero Session busy/queue timeout/SQL errors/drops; source/cap/oracle/counters support conditional pre-Session attribution without gate timestamps. Both eight-read recoveries and exact-owned cleanup18.752s PASS. More rejections than historicalnine remain failed requests, with no causal capacity/SLO uplift. No source/Session/queue/retry change, old proof replay or new-change Commit/Push.
+
+YT-178 records the [isolated HTTP admission=8 comparison](YT-178-HTTP-ADMISSION-EIGHT.md), Done at bounded comparison scope and dependent on YT-177; final independent Reviewer /root/yt178_admission_eight_final_review_20261025 PASS, zero issues/required followups. Contract/mapping PASS, same binary/caller/sampler reused without build/replay.12549selected/12475valid/74HTTP-only503,37499complete records,0Session busy/queue timeout/SQL errors/drops. Numerically24fewer failures/23more successes than retained cap4 withone fewer boundary attempt, while burst p95/failed client tails worsen; no randomized/default-cap/capacity/SLO claim. Both recoveries and exact-owned cleanup18.919s PASS; source/Session4active8total/zero added queue/new retry unchanged, failures intact, no new-change Commit/Push.
+
+YT-179 records the [isolated HTTP admission=16 comparison](YT-179-HTTP-ADMISSION-SIXTEEN.md), Done at bounded comparison scope and dependent on YT-178. Contract/mapping PASS, same binary/caller reused without build/replay;12552selected/12540valid/12checked503 (7HTTP-only,5providerBusy),37637complete records,0QueueTimeout/SQLerrors/drops. Numerically62fewer failures/65more successes than cap8 withthree extra boundary attempts and observed downstream pressure; latency/arrival/population uncertainty prevents default-cap/capacity/SLO claims. Both recoveries and exact-owned cleanup18.853s PASS; Session4active8total/zero added queue/new retry unchanged, all failures intact. Final independent Reviewer /root/yt179_admission_sixteen_final_review_20261025 PASS, zero issues/required followups;4docs/352evidence/105mapping/94retained hashes stable. No new-change Commit/Push.
+
+YT-180 records the [example HTTP admission capacity selection guide](../examples/axum-workload-comparison/README.md#http-admission-capacity-selection), Done at documentation-only scope and dependent on YT-177/YT-178/YT-179. Document application-owned opt-in startup choices4/8/16, shared per-process scope, fixed Session4/8 and separate rate quotas; reuse accepted counts, all/valid/failed timing and boundary/recovery/cleanup evidence without tests/builds/load/analysis replay. Suitable priorities preserve total-failure versus provider-pressure and latency tradeoffs; no universal default, runtime/API/Settings/limit change or further experiment. Independent Reviewer /root/yt180_http_admission_capacity_guide_review_20261025 PASS, zero issues/required followups;4document/12evidence/19retained hashes stable, new docs/whitespace PASS. No Commit/Push.
+
+
+### Post-benchmark application follow-ups — YT-181–YT-184
+
+The maintainer requests the [follow-up evaluation and schedule](YT-181-184-APPLICATION-FOLLOWUPS.md)
+after closing the benchmark phase through YT-180. At registration all new items were **Todo**; the later YT-181 contract stage is
+tracked below. YT-181 selects a contract-first opt-in commit-time authorization reference for
+one real Admin write/revoke scope; YT-182 selects optional native tracing/worker
+propagation composition; YT-183 selects a useful non-authoritative cache consumer
+before conditional implementation; YT-184 selects a bounded secure private Azure
+cross-host authority/persistent-restart reference. Audit remains application-owned
+and public output cache remains consumer-gated/deferred, not missing mandatory
+framework packages. No implementation, tests, cloud allocation, benchmark replay,
+universal default, mandatory infrastructure or HA claim is activated by this
+planning update. Independent Reviewer acceptance is required before each new
+item is Done. YT-096/YT-020 release gates and no Commit/Push remain unchanged.
+
+
+YT-181 now activates only its [minimal sensitive-write contract](YT-181-SENSITIVE-WRITE-CONTRACT.md),
+In progress: selected SQL-owned local-account/project write revoke, private
+old-generation ticket and the shared IMMEDIATE item/history/revoke transaction
+order. Preserve native middleware/domain composition without generic AOP,
+Session/file-policy limitations, bounded workers, unknown outcomes and no blind
+retry. Optional v2 reference/legacy exclusion and restore refusal remain future
+implementation obligations, not executed proof. Independent contract Reviewer
+/root/yt181_sensitive_write_contract_review_20261025 PASS, zero issues/followups;
+5document/13evidence/17source hashes stable and new docs/whitespace PASS. YT-181
+cannot be Done before later implementation/new focused evidence/
+independent review. YT-182–184 remain Todo; no benchmark replay, runtime/cloud
+change or new-change Commit/Push.
+
+
+The separately authorized [YT-181 opt-in implementation](YT-181-SENSITIVE-WRITE-IMPLEMENTATION.md)
+is Done at bounded application-reference scope after independent Reviewer
+/root/yt181_commit_write_auth_implementation_review_20261025 PASS, zero issues/
+followups;19files/41evidence/12retained hashes stable, strict Clippy/fmt/docs PASS. Default-off app
+feature plus Admin Settings selects a fresh v2 reference, private Store-bound
+generation tickets and same-transaction item/history enforcement; trusted SQL
+revoke/re-enable advances generations. Existing v2 open conservatively denies
+before trusted re-enable; no auto-migration or restored allow. Six new Board
+cases and one new Admin setting case in two feature conditions pass, with old
+tests filtered and benchmark/provider proof retained without replay. Session/
+file-policy race, worker/security bounds and no generic AOP remain. No new-change
+Commit/Push or YT-182–184 activation.
+
+
+YT-182 activates the [opt-in request tracing/worker contract](YT-182-TRACING-WORKER-CONTRACT.md),
+In progress. Select Board/Admin as one consumer and preserve Starter evidence;
+explicit feature/Settings, native middleware and server-generated RequestIds,
+allowlisted safe root/worker spans with scoped Dispatch, distinct Response-return/
+future-drop/worker completion and application-owned namespace-filtered JSON
+output. No generic AOP/crate/exporter, body instrumentation or old-proof replay.
+Contract Reviewer precedes minimal integration; final independent Reviewer and
+new focused proof precede Done. YT-181 Done and YT-183/184 Todo remain; no new-
+change Commit/Push or release expansion.
+
+
+YT-182 contract Reviewer `/root/yt182_safe_tracing_contract_review_20261025`
+returns PASS, zero issues/followups. The [application integration/new proof](YT-182-TRACING-WORKER-IMPLEMENTATION.md)
+is In progress pending independent implementation acceptance: five new Board
+cases and the new Admin setting case in two feature conditions have seven
+successful executions, with old cases filtered; original compile/future-drop
+failures and smallest corrections remain recorded. Native scoped Dispatch is
+retained for HTTP future destruction as well as blocking workers. Strict Clippy
+and default normal dependency isolation pass; no new generic AOP/crate, old
+proof replay, cloud allocation or new-change Commit/Push.
+
+
+YT-182 is now Done at that bounded application-reference scope: independent
+implementation Reviewer `/root/yt182_safe_tracing_implementation_review_20261025`
+PASS, zero issues/required followups, all 21 implementation/81 evidence/15 retained
+hashes and Git baseline stable. Scope remains default-off Board/Admin native
+middleware, safe scoped request/worker correlation and distinct lifecycle facts;
+no durable audit, body/remote propagation, performance qualification or framework
+tracing extraction. Seven successful new test executions and original failures
+are retained without old-proof replay. Only acceptance/status documentation is
+updated after review; runtime/test/dependency bytes stay reviewed. YT-183/184
+remain Todo, release gates unchanged; no new-change Commit/Push.
+
+
+YT-183 now selects the [Shop catalog/cart display contract](YT-183-CATALOG-CACHE-CONTRACT.md),
+In progress before minimum integration: default-off application Moka cache,
+two-second source-age bound, bounded retained projection/fill wait and local
+commit-generation invalidation safe against late old fills. Cart mutations,
+Session/CSRF, order ownership/idempotency and transactional price/stock remain
+authoritative; Board/SSE and Starter are unchanged. New focused reuse evidence
+is selected without prior benchmark/test replay. Independent acceptance precedes
+Done; YT-184 remains Todo, no new-change Commit/Push.
+
+
+YT-183 is now Done at its [bounded application-reference scope](YT-183-CATALOG-CACHE-IMPLEMENTATION.md):
+independent Reviewer `/root/yt183_catalog_cache_independent_review_20261025` PASS,
+zero issues/required followups; 20 file/41 evidence/16 retained bindings and Git
+baseline stable. Nine new test executions, strict Clippy/fmt/docs/default-graph
+checks PASS; old cases filtered, initial missing-offline-dependency result kept.
+Shop display reuse leaves Session/CSRF/checkout SQL authoritative; source-age/
+local generation/cancellation/oversize/failure limits stay explicit. No latency,
+throughput, distributed coherence, framework cache or production qualification.
+Only acceptance/status docs change after review; runtime/test/dependencies stay
+reviewed. YT-184 stays Todo/unactivated, release gates unchanged, new changes
+uncommitted/unpushed.
+
+
+YT-184 now selects the [Azure cross-host/persistent-restart contract](YT-184-AZURE-AUTH-SESSION-RESTART.md),
+In progress before opt-in transport and minimum new proof. Two fixed task VMs,
+native verified SQL/Valkey TLS, canonical private HTTPS/Secure Session cookies,
+one authority disk and explicit new-epoch re-login after authority-host restart;
+current SQL/Session authority and release gates unchanged. Ninety minutes total,
+twenty reserved for cleanup, US$5 ceiling and one allocation; initial SKU CLI
+timeout retained, same-SKU REST admission passed. No old load/provider replay or
+HA/default claim. Independent mapping before allocation and final results/cleanup
+acceptance before Done; no new-change Commit/Push.
+
+
+YT-184's first resource generation passes Blob/ARM/provisioning but **fails**
+authority bootstrap before live Auth/Session/TLS/restart. Preallocation Reviewer
+PASS0 remains historical mapping acceptance, not successful execution. The
+executed failed bootstrap is retained; one canonical two-Path-expression fix
+passes four local checks without cloud/passing-proof replay. Cleanup PASS after
+440.35seconds: exact group absent, zero tagged resources, private runtime removed.
+YT-184 remains In progress with all live acceptance unexecuted; one-allocation
+bound requires explicit continuation before another resource generation. No
+release-gate change, Done promotion, new-change Commit or Push.
+
+
+YT-184's explicitly authorized additional generation reaches both apps READY,
+eight combined SQL backends and wrong SQL/Valkey TLS-name startup refusal. Its
+journey exits1 at the initial observer: inet-to-text includes a netmask while
+expected peers are bare IPs; raw rows are unavailable because persistence came
+after assertion. The failed source is retained; canonical host(inet) and
+save-before-assert correction preserve exact connection/TLS/peer requirements.
+One new native timeout privacy check passes; no old proof is replayed. Generation2
+cleanup PASS after493.61seconds, zero owned resources/private credentials.
+Both allocation permissions are spent, no third allocation authorized. Full
+Auth/restart remains unexecuted, YT-184 In progress; no new Commit/Push.
+
+
+YT-184 generation3 is explicitly authorized after the second correction review:
+same two VMs/new90minute maximum including20minute cleanup, US$5 cumulative
+ceiling, unchanged product/binary and retained first two failures. Reuse old
+passing unit/build/negative-TLS evidence; no fourth allocation authorized.
+Remaining Auth/restart proof and final independent acceptance are pending.
+
+
+YT-184 generation3 retains exactly8encrypted SQL connections/four per private
+peer and passed HTTPS wrong-name refusal, then exits1 at the first auth form;
+raw HTTP status/body are unavailable. Source/direct ACL simulation establish
+missing TIME permission for Store::prepare; canonical +time-only deployment
+correction and safe numeric-status failure capture are prepared but not runtime-
+validated. Local CLI probes failed to establish app-user identity and are retained
+as invalid diagnostics; repeated identity failure stops further harness attempts.
+Cleanup PASS469.97seconds, exact group absent/zero resources/private credentials;
+all three permissions spent, no fourth allocation authorized, no Commit/Push.
+Full Auth/restart acceptance remains pending and YT-184 In progress.
+
+
+YT-184 explicitly resumes only local named-app/Session confirmation. Default
+off/password AUTH eliminates the previous diagnostic-identity ambiguity;
+original TIME/provider create refuse, +time-only grant enables real provider
+secure cookie/create/read/CSRF/rotate/revoke across managers while namespace/
+admin denial stays. One new exact ignored regression PASS/6oldcases filtered,
+initial compile preparation failure retained, local container/private files
+removed within1.034seconds. Native TCP/router oneshot only, no SQL/TLS/cloud
+restart proof. Local named-app/Session independent Reviewer /root/yt184_local_named_acl_session_review_20261025
+PASS0 (17source/20evidence stable); no fourth Azure allocation or new Commit/Push,
+full item remains In progress pending actual Azure Auth/restart proof.
+
+
+YT-184 generation4 is explicitly authorized after local named-app/Session PASS:
+same two VMs/new90min including20mincleanup/US$5 cumulative, unchanged product/
+binary/topology, reviewed +time and fresh protected inputs. Reuse successful
+old negatives and unit/build proof; execute only fresh transport/input admission
+and remaining Auth/outage/persistent restart. No fifth allocation authorized;
+actual results/final review pending, no new Commit/Push.
+
+
+YT-184 generation4 passes actual cross-host Auth/fullJSONSSR/tenant/current-policy/
+logout/app-restart, then fails first expected200 after Valkey restart/fixed2s;
+actual recovery status unavailable, both offline503 retained. Cleanup PASS467.05s,
+all four generations deleted. One new local AOF restart case PASS/7oldcases
+filtered records both503 after2s then complete200 at107.495/110.289ms additional
+read-only observation; no provider limit/retry/API changes, local resources/private
+files removed3.882s. Canonical bounded5s/100ms read-only readiness/status capture
+and reuse of passed Auth proof prepared; review/cloud remainder pending.
+YT-184 In progress, no fifth allocation or new Commit/Push authorization.
+
+
+Independent fourth-results/local-recovery Reviewer
+/root/yt184_fourth_auth_recovery_observation_review_20261025 PASS0, zero required
+followups, all17source/28evidence stable. It accepts the actual Auth subset,
+retention/cleanup/local recovery and minimum remaining-only contract, not full
+Azure authority/VM restart or another allocation. YT-184 remains In progress;
+all owned resources are deleted, no fifth allocation or new Commit/Push.
+
+
+YT-184 generation5 is explicitly authorized for remaining authority service
+recovery/persistent VM restart only, same2VM/new90min incl20mincleanup/US$5
+cumulative. Accepted canonical sources/binary reused with fresh protected inputs;
+prior Auth and negative proof reused, no sixth allocation or new Commit/Push.
+Actual outcome/final independent acceptance pending, full item In progress.
+
+
+YT-184 generation5 completes remaining-only authority/VM proof with nativeexit0:
+both offline503/recovery, retained transient503s before full200, sameVM/disk
+restart, unchanged full SQL receipt/current restrictive policy, persisted unexpired
+oldSession refusal under fresh epoch, policy-respecting login/durable JSONSSR/
+logout. G4Auth reused, no oldcase replay. CleanupPASS512.50s/all5groups gone;
+final independent acceptance pending before Done. No sixth allocation/Commit/Push.
+
+
+YT-184 **Done at bounded opt-in cross-host Auth/Session and orderly persistent-
+restart reference scope**, after independent final Reviewer
+/root/yt184_cross_host_final_results_review_20261025 PASS0, zero required followups.
+All17source/83evidence and8original runtime/config/lock bindings stable. Accept
+composed G4Auth/G5authority recovery/VM/SQLpolicy/unexpiredSession-epoch proof;
+all5owned groups/credentials deleted, failed attempts/503 retained. Only status/
+reference bookkeeping follows. No production/HA/arbitraryrestore/release upgrade;
+YT-096/D1-D6 and YT-020 unchanged, new changes uncommitted/unpushed.
+
+
+YT-185 selects [application opt-in startup options](YT-185-OPT-IN-OPTIONS.md)
+after the maintainer's consistency request: contract first, minimum Board/Admin
+and Shop typed options integration, default-off feature/startup separation,
+optional Settings loader and unchanged security/provider/release boundaries.
+Done at application-integration scope after independent Reviewer
+/root/yt185_opt_in_options_independent_review_20261026 PASS0; four new tests/10
+successful executions, strict Clippy/format/default graphs/docs PASS; all19source/
+45evidence/13preserved YT-184 bindings stable, shared navigation prior hashes
+reconciled. Original failures retained, five Rust constructors migrated with no
+aliases, no accepted workload/provider proof replay, Commit or Push.
+
+
+YT-186 selects [current API/reference and documentation publication scope](YT-186-DOCUMENTATION-SCOPE.md):
+classify reader sources and maintainer evidence first, then add a concise current
+API map and correct concrete stale usage. Repo documents plus rustdoc remain
+canonical; no Wiki copy, new sample/runtime, evidence rewrite or release expansion.
+Done at documentation-preparation scope after independent Reviewer
+/root/yt186_api_docs_scope_independent_review_20261026 PASS0, zero required followups;
+ten Markdown delivery paths, bounded docs/links/structure/whitespace/DAG PASS,
+492protected source/guide/history inputs unchanged. No old qualification replay,
+rustdoc build, full corpus privacy certification, site/publication, Commit or Push.
+Original release/trust/support decisions remain unchanged.
+
+
+YT-187 selects a [product-oriented README and developer entry](YT-187-README-DX.md)
+after the maintainer's DX/readability direction: one first-run path, current
+capability value and task-based guide links, with planned work tracked here and
+in Backlog rather than root milestone/qualification narration. Keep a dated root
+snapshot and all YT-186 outcomes; no new sample/runtime or publication.
+Done at bounded product/DX documentation scope after independent Reviewer
+/root/yt187_product_readme_dx_review_20261026 follow-up PASS0; initial one-P2 FAIL
+and browser-prerequisite fix retained. Root196to108lines, existing sample code and
+current task links, browser target/pinnedCLI/PATH setup; document gates PASS,
+six non-shared YT-186/492earlier inputs preserved. No measured novice study,
+new runtime/sample, old validation replay, publication, Commit or Push.
+
+
+YT-188 selects [consistent primary integration guides](YT-188-GUIDE-TEMPLATE.md)
+after the product README delivery: ten existing framework guides use one five-part
+reader template with prerequisites, minimum wiring, expected result, settings/errors
+and API reference. Retain source/security/ownership semantics, old anchors and
+historical proof; inventories/policies/application/CLI reference keep their roles.
+Done at selected documentation-only guide scope after independent Reviewer
+/root/yt188_integration_guides_independent_review_20261026 PASS0, zero followups;
+ten guides/sixteen Markdown paths,29original snippets/all old heading text retained,
+bounded docs/links/structure/whitespace/DAG PASS and489protected inputs unchanged.
+No new runtime/sample, old qualification replay, publication, Commit or Push.
+
+
+YT-189 selects [a first standalone application walkthrough](YT-189-FIRST-APP-GUIDE.md)
+after YT-188 delivery: connect existing native Linux/POSIX prerequisites, CLI
+creation, explicit unpublished local dependencies, independent app lock/cache,
+frozen build/run and expected routes with common failure guidance. One reader
+guide plus narrow navigation, no new sample/runtime/template or source behavior.
+Done at source-backed documentation scope after independent Reviewer
+/root/yt189_first_app_guide_independent_review_20261026 PASS0, zero followups;
+eight Markdown paths, bounded docs/links/structure/whitespace/DAG PASS and
+499protected source/guide/history inputs unchanged. No generated fixture,
+tutorial command/runtime/old qualification replay, publication, Commit or Push.
+
+
+YT-190 selects [common-error troubleshooting guidance](YT-190-TROUBLESHOOTING-GUIDE.md)
+after the first-app walkthrough: symptom → possible cause → correction → exact
+existing guide. Cover first use, CLI/settings/browser and selected opt-in HTTP
+failures; retain source, security and ownership semantics. One reference catalog
+plus narrow links, no new runtime/sample/diagnostic tool or old validation replay.
+Done at documentation/source-inspection scope after independent Reviewer
+/root/yt190_troubleshooting_guide_independent_review_20261026 PASS0, zero followups;
+27 rows/six groups/eight Markdown paths, bounded docs/links/structure/whitespace/
+DAG PASS and1,101 non-target tracked hashes unchanged. No runtime/tests,
+error reproduction or old qualification replay; new changes remain
+uncommitted/unpushed/unpublished and release gates unchanged.
+
+
+YT-191 selects [the three remaining DX documentation gaps](YT-191-DX-GUIDES.md):
+correct two stale current CLI status statements; continue the first app with
+existing View/function/list/conditional composition; and concentrate opt-in
+package/features, startup/options and consumer settings/defaults. Twelve Markdown
+paths, existing contracts and historical proof retained, no new API/runtime/sample
+or old qualification replay. Done at source-backed documentation scope after
+independent Reviewer /root/yt191_dx_guides_independent_review_20261026 PASS0,
+zero issues/followups; docs/links/structure/whitespace/DAG PASS and1,100 non-target
+tracked hashes unchanged. All original CLI fences retained; no new runtime/tests,
+authoring-fragment execution, old verification replay or Commit/Push/publication.
+
+
+## M24 — Application-owned 3D physics lab: contract and feasibility
+
+YT-192 selects [documentation-only minimum research](YT-192-3D-PHYSICS-LAB-STUDY.md)
+for a separate opt-in 3D physics example: private wgpu pipeline, Rapier CPU
+physics, first desktop-browser candidate, bounded cube/sphere scene, fixed-step
+clock and explicit GPU failure/lifetime recovery. Existing flat renderer APIs,
+default graphs, source-bound historical proof and release scope stay unchanged.
+Numeric limits are selected starting bounds, not measured capacity/performance.
+Done at documentation/source-level feasibility scope after independent Reviewer
+/root/yt192_physics_lab_contract_independent_review_20261026 PASS0, zero followups;
+four Markdown paths, docs/links/structure/whitespace/DAG PASS and1,109 non-target
+tracked hashes unchanged. Exact joint compile, new physics/browser/GPU behavior
+and resource/performance proof remain Not run. No implementation/sample,
+dependency/lock change, runtime/old qualification replay or Commit/Push/publication.
+A later isolated prototype needs separate authority; no new implementation item
+is automatically activated.
+
+
+YT-193 activates the [minimum isolated physics-lab prototype](YT-193-3D-PHYSICS-LAB-PROTOTYPE.md)
+after the reviewed YT-192 contract and separate commit authorization. New native
+SSR, application-owned optional CPU physics/private 3D pipeline, source-hashed
+assets and scoped controls/lifetime follow the bounded scene/clock/failure rules.
+Existing renderer API/graphs/old proof unchanged; new consumer verification only.
+Done at the isolated prototype scope after independent whole-item Reviewer PASS0:
+new CPU/SSR/Wasm/native/default-graph and actual3D/browser/lifecycle evidence,
+reviewed Firefox154/privateWayland/default NVIDIA Vulkan target; all failures
+and invalid Intel/blank-capture observations retained. This is not a general
+hardware/support, performance, second-active-canvas or production qualification.
+New changes remain unstaged/uncommitted/unpushed; no publication/deployment.
+
+
+YT-194 applies the [owner-selected action contract](YT-194-PHYSICS-LAB-CONTROLS.md):
+firstRun owns explicit optional initialization; primary Run/Pause/Reset, Advanced
+Step and failure-only Retry replace technical Activate/Dispose buttons. Keep
+HTML-first fallback, fixed-step/resource limits and GPU lifetime/generation
+safety. Done after focused new action observations, one SSR test, corrected
+monotonic-time bridge and independent Reviewer PASS0; all failed receipts stay
+failed, actual defaultIntel/Vulkan metadata and telemetry limits are accepted at
+this application scope only. No old qualification replay, Commit/Push or public
+support expansion.
+
+
+YT-195 selects [browser startup and failure guidance](YT-195-BROWSER-STARTUP-GUIDANCE.md):
+normal-browser capability/secure-origin conditions, static/noJS help, bounded
+actionable errors, the general pre-Wasm HTML/CSS loading-shell contract and local
+reduced-motion feedback. Preserve YT-194
+actions, opt-in and lifetime/safety. Done after new SSR1pass/4filtered, native/
+asset/docs checks and9focused browser guidance/loading checks; independent
+Reviewer PASS0 with bounded evidence and unchanged protected sources. No old
+qualification replay or Commit/Push. Owner feedback
+for more scenarios and FPS remains candidate work. The clarified general loading
+shell was registered as YT-196 Todo for bounded shared-helper/template adoption;
+no implementation or support/performance claim follows automatically.
+
+
+YT-196 starts the [shared pre-Wasm shell adoption](YT-196-WASM-STARTUP-SHELL.md)
+under the reviewed contract: optional canonical JS/CSS, customized initial HTML,
+opaque UI tickets and scoped full-page/browser-template plus SSR-region use.
+Actual async resources remain loader-owned. Done after helper4/emission1/
+lifecycle2 checks, consumer builds/typecheck,8new browser cases and docs PASS.
+Initial P2 cached-page retirement was repaired; independent re-review PASS0 with
+26source/47evidence and1,110protected hash bindings unchanged. Failures retained;
+no old qualification replay, native default/Core API change or new-change
+Commit/Push.
+
+
+YT-197 starts [Lab scenarios and estimated render FPS](YT-197-PHYSICS-LAB-SCENARIOS-FPS.md):
+keep falling objects,add bounded stack impact/domino chain and a submission-rate
+HUD independent of physics60Hz. Staged selection applies with Reset; native SSR
+and existing opt-in/lifetime/budgets remain. Done after newRust4/JS3,builds/docs
+and7new browser observations; first keyboard-selection fixture failure retained.
+Independent Reviewer PASS0,13source/23evidence and1,126protected hash bindings
+unchanged. No slope/editor/Core API, old qualification replay, benchmark or
+new-change Commit/Push.
+
+
+YT-198 starts [slope shape/friction comparison](YT-198-PHYSICS-LAB-SLOPE.md):
+one fixed ramp,four box/ball/material lanes,active-world legend and existing
+staged Reset/FPS. Keep application-owned opt-in and64dynamic/fivestatic/pose
+budgets; preserve uncommitted YT-197. Done after newRust3,native/Wasm/assets/docs
+and actual slope browser flow PASS. Independent Reviewer PASS0 with9incremental
+source/24evidence and1,131protected current file bindings. No editor/Core/renderer
+API,old qualification replay,benchmark or Commit/Push.

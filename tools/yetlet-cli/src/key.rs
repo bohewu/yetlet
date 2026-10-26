@@ -205,7 +205,7 @@ impl Loaded {
             .map_err(|_| "selected settings profile is unsafe, read-only or unwritable")?;
         let merged: serde_json::Value = yetlet_config::Loader::new(&settings_root, "APP")
             .defaults(String::from_utf8(base.bytes.clone()).map_err(|_| INVALID)?)
-            .load_from_env(filtered)
+            .load_with_env(filtered)
             .map_err(|_| INVALID)?;
         base.ensure().map_err(|_| INVALID)?;
         profile.ensure().map_err(|_| INVALID)?;

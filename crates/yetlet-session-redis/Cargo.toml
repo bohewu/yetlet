@@ -1,17 +1,23 @@
 [package]
 name = "yetlet-session-redis"
-version = "0.0.0"
+version = "0.1.0"
 edition = "2024"
 rust-version = "1.99"
-publish = false
+readme = "README.md"
+repository = "https://github.com/bohewu/yetlet"
 license = "MIT OR Apache-2.0"
 description = "Experimental explicitly selected async Redis sessions for Yetlet"
 
-# Remain outside the default workspace while single-primary qualification is open.
+# Keep remote-provider dependencies in an independently selected workspace.
 [workspace]
 resolver = "3"
 
+[features]
+default = []
+tls = ["redis/tokio-rustls-comp", "dep:rustls"]
+
 [dependencies]
+rustls = { version = "0.23", default-features = false, features = ["std", "ring", "tls12"], optional = true }
 axum = "=0.8.9"
 tokio = { version = "=1.53.2", features = ["macros", "rt-multi-thread", "sync", "time", "net"] }
 redis = { version = "=1.7.1", default-features = false, features = ["tokio-comp", "connection-manager", "script"] }
@@ -20,8 +26,11 @@ serde_json = "=1.0.151"
 getrandom = "0.2"
 sha2 = "0.10"
 subtle = "2.6"
-yetlet-server-axum = { path = "../yetlet-server-axum" }
+yetlet-server-axum = { version = "0.1.0", path = "../yetlet-server-axum" }
 
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }
 reqwest = { version = "=0.12.28", default-features = false, features = ["cookies"] }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(yetlet_session_admission_probe)'] }

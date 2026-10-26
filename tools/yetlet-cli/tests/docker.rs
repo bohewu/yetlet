@@ -25,10 +25,10 @@ fn binary_generates_only_selected_configuration_with_no_tools_cargo_cache_or_sec
     }
     let framework = root.path().join("framework space 框");
     fixture::create(&framework);
-    yetlet_cli::scaffold::create_cloud("cloudapp", &framework, root.path()).unwrap();
+    yetlet_cli::scaffold::create_service("cloudapp", &framework, root.path()).unwrap();
     // Use a separate CLI-created owner-protected output parent; the selected
     // cloud app must not receive a generated deployment directory.
-    yetlet_cli::scaffold::create_cloud("output_parent", &framework, root.path()).unwrap();
+    yetlet_cli::scaffold::create_service("output_parent", &framework, root.path()).unwrap();
     let output_parent = root.path().join("output_parent");
     let app = root.path().join("cloudapp");
     fs::write(

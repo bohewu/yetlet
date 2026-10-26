@@ -7,20 +7,22 @@ use std::{
     time::{Duration, Instant},
 };
 
+use crate::observability::{Active, Metrics};
 use axum::{
     Form, Json, Router,
     extract::{
-        DefaultBodyLimit, Extension, Path, Request, State,
-        rejection::{FormRejection, JsonRejection, PathRejection},
+        DefaultBodyLimit, Extension, Path, Query, Request, State,
+        rejection::{FormRejection, JsonRejection, PathRejection, QueryRejection},
     },
     http::{HeaderValue, StatusCode, header},
-    middleware::{Next, from_fn, from_fn_with_state},
+    middleware::{Next, from_fn_with_state},
     response::{IntoResponse, Redirect, Response},
     routing::get,
 };
 use secrecy::{ExposeSecret, SecretString};
 use serde::{Deserialize, Serialize};
 use subtle::ConstantTimeEq;
+use tracing::Instrument;
 use yetlet_core::{Element, View};
 use yetlet_request_id::{RequestId, RequestIds};
 use yetlet_server_axum::{App, DocumentMetadata, LanguageTag, Page, middleware::with_global};
@@ -29,6 +31,29 @@ use yetlet_session::{Session, SessionConfig, SessionManager};
 use crate::store::{Issue, IssueStatus, Store, StoreError};
 
 const BODY_LIMIT: usize = 16 * 1024;
+
+/// Application policy; existing `app` consumers receive these bounded defaults.
+#[derive(Clone, Copy)]
+pub struct Admission {
+    pub max_requests: usize,
+    pub request_timeout: Duration,
+}
+impl Default for Admission {
+    fn default() -> Self {
+        Self {
+            max_requests: 32,
+            request_timeout: Duration::from_secs(5),
+        }
+    }
+}
+
+#[derive(Clone)]
+struct RequestAdmission {
+    gate: Arc<tokio::sync::Semaphore>,
+    store: Store,
+    timeout: Duration,
+}
+
 #[derive(Clone)]
 struct WebState {
     store: Store,
@@ -43,6 +68,27 @@ pub fn app(
     api_token: SecretString,
     readiness: Arc<AtomicBool>,
 ) -> Result<Router, &'static str> {
+    app_with_admission(store, api_token, readiness, Admission::default())
+}
+
+pub fn app_with_admission(
+    store: Store,
+    api_token: SecretString,
+    readiness: Arc<AtomicBool>,
+    admission: Admission,
+) -> Result<Router, &'static str> {
+    if admission.max_requests == 0
+        || admission.max_requests > 1024
+        || admission.request_timeout.is_zero()
+        || admission.request_timeout > Duration::from_secs(60)
+    {
+        return Err("Request admission configuration is invalid");
+    }
+    let requests = RequestAdmission {
+        gate: Arc::new(tokio::sync::Semaphore::new(admission.max_requests)),
+        store: store.clone(),
+        timeout: admission.request_timeout,
+    };
     let token = api_token.expose_secret();
     if token.len() != 64 || !token.bytes().all(|b| b.is_ascii_hexdigit()) {
         return Err("API token must contain 64 hexadecimal characters");
@@ -67,6 +113,7 @@ pub fn app(
         )
         .into_router();
     let api = Router::new()
+        .route("/v2/issues", get(api_list_by_status))
         .route("/issues", get(api_list).post(api_create))
         .route("/issues/{id}", get(api_get).patch(api_status))
         .fallback(|| async { api_error(StatusCode::NOT_FOUND, "Route not found") })
@@ -74,21 +121,102 @@ pub fn app(
             api_error(StatusCode::METHOD_NOT_ALLOWED, "Method not allowed")
         })
         .layer(from_fn_with_state(state.clone(), authorize_api));
-    let router = browser
+    let metrics = state.store.metrics().cloned();
+    let mut router = browser
         .nest("/api", api)
-        .route("/health/live", get(|| async { "live" }))
-        .route("/health/ready", get(ready))
         .fallback(|| async { (StatusCode::NOT_FOUND, "Route not found") })
         .method_not_allowed_fallback(|| async {
             (StatusCode::METHOD_NOT_ALLOWED, "Method not allowed")
         })
         .layer(DefaultBodyLimit::max(BODY_LIMIT))
-        .with_state(state);
-    let router = with_global(router, from_fn(observe));
+        .layer(from_fn_with_state(requests, admit))
+        // Only existing health routes bypass HTTP admission. Readiness still
+        // uses bounded SQL admission; liveness performs no SQL.
+        .route("/health/live", get(|| async { "live" }))
+        .route("/health/ready", get(ready));
+    if let Some(metrics) = metrics.clone() {
+        // Collection must remain reachable during application/SQL saturation.
+        // This route is loopback-only under the same listener contract as health.
+        router = router.route(
+            "/metrics",
+            get(move || {
+                let metrics = metrics.clone();
+                async move {
+                    match metrics.encode() {
+                        Ok(bytes) => (
+                            [(
+                                header::CONTENT_TYPE,
+                                "text/plain; version=0.0.4; charset=utf-8",
+                            )],
+                            bytes,
+                        )
+                            .into_response(),
+                        Err(_) => (StatusCode::INTERNAL_SERVER_ERROR, "Metrics unavailable")
+                            .into_response(),
+                    }
+                }
+            }),
+        );
+    }
+    let router = router.with_state(state);
+    let router = with_global(router, from_fn_with_state(metrics, observe));
     Ok(RequestIds::new().global(App::from_router(router)))
 }
 
-async fn observe(request: Request, next: Next) -> Response {
+async fn admit(
+    State(admission): State<RequestAdmission>,
+    request: Request,
+    next: Next,
+) -> Response {
+    let api = request.uri().path() == "/api" || request.uri().path().starts_with("/api/");
+    let error = |status, message| {
+        if api {
+            api_error(status, message)
+        } else {
+            text_error(status, message)
+        }
+    };
+    let reject = |reason| {
+        if let Some(metrics) = admission.store.metrics() {
+            metrics.http_rejections.with_label_values(&[reason]).inc();
+        }
+        tracing::info!(event = "http_admission_rejected", reason);
+    };
+    let Ok(_permit) = admission.gate.try_acquire() else {
+        reject("capacity");
+        return error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "Issue storage is unavailable",
+        );
+    };
+    if admission.store.is_closed() {
+        reject("shutdown");
+        return error(
+            StatusCode::SERVICE_UNAVAILABLE,
+            "Issue storage is unavailable",
+        );
+    }
+    match tokio::time::timeout(admission.timeout, next.run(request)).await {
+        Ok(response) => response,
+        Err(_) => {
+            reject("deadline");
+            error(
+                StatusCode::GATEWAY_TIMEOUT,
+                "Request deadline exceeded; a submitted write may still complete. Check state before retrying",
+            )
+        }
+    }
+}
+
+async fn observe(
+    State(metrics): State<Option<Arc<Metrics>>>,
+    request: Request,
+    next: Next,
+) -> Response {
+    let collect = metrics
+        .as_ref()
+        .filter(|_| request.uri().path() != "/metrics");
+    let _active = collect.map(|m| Active::new(&m.http_active));
     let request_id = request.extensions().get::<RequestId>().map_or(0, |id| id.0);
     let method = match request.method().as_str() {
         "GET" => "GET",
@@ -101,14 +229,30 @@ async fn observe(request: Request, next: Next) -> Response {
         _ => "OTHER",
     };
     let started = Instant::now();
-    let mut response = next.run(request).await;
-    tracing::info!(
-        event = "http_request",
-        request_id,
-        method,
-        status = response.status().as_u16(),
-        duration_ms = started.elapsed().as_millis() as u64
-    );
+    let span = tracing::info_span!("http_request", request_id, method);
+    let mut response = async {
+        let response = next.run(request).await;
+        tracing::info!(
+            event = "http_request",
+            request_id,
+            method,
+            status = response.status().as_u16(),
+            duration_ms = started.elapsed().as_millis() as u64
+        );
+        response
+    }
+    .instrument(span)
+    .await;
+    if let Some(metrics) = collect {
+        metrics
+            .http_requests
+            .with_label_values(&[method, response.status().as_str()])
+            .inc();
+        metrics
+            .http_duration
+            .with_label_values(&[method])
+            .observe(started.elapsed().as_secs_f64());
+    }
     let headers = response.headers_mut();
     headers.insert(header::CACHE_CONTROL, HeaderValue::from_static("no-store"));
     headers.insert(
@@ -143,7 +287,21 @@ async fn authorize_api(State(state): State<WebState>, request: Request, next: Ne
 }
 
 async fn ready(State(state): State<WebState>) -> Response {
-    if state.readiness.load(Ordering::Acquire) && state.store.ready().await.is_ok() {
+    let ready = state.readiness.load(Ordering::Acquire)
+        && tokio::time::timeout(Duration::from_secs(1), state.store.ready())
+            .await
+            .is_ok_and(|result| result.is_ok())
+        && !state.store.is_closed()
+        && state.readiness.load(Ordering::Acquire);
+    if let Some(metrics) = state.store.metrics() {
+        metrics.readiness.set(i64::from(ready));
+        metrics
+            .readiness_checks
+            .with_label_values(&[if ready { "ready" } else { "not_ready" }])
+            .inc();
+    }
+    tracing::info!(event = "readiness_checked", ready);
+    if ready {
         (StatusCode::OK, "ready").into_response()
     } else {
         (StatusCode::SERVICE_UNAVAILABLE, "not ready").into_response()
@@ -517,6 +675,28 @@ fn json_failure(error: JsonRejection) -> Response {
 }
 async fn api_list(State(state): State<WebState>) -> Response {
     match state.store.list().await {
+        Ok(issues) => Json(issues).into_response(),
+        Err(error) => {
+            let (status, message) = store_failure(error);
+            api_error(status, message)
+        }
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct StatusQuery {
+    status: IssueStatus,
+}
+
+async fn api_list_by_status(
+    State(state): State<WebState>,
+    query: Result<Query<StatusQuery>, QueryRejection>,
+) -> Response {
+    let Ok(Query(query)) = query else {
+        return api_error(StatusCode::BAD_REQUEST, "Invalid status query");
+    };
+    match state.store.list_by_status(query.status).await {
         Ok(issues) => Json(issues).into_response(),
         Err(error) => {
             let (status, message) = store_failure(error);

@@ -27,7 +27,7 @@ pub fn run(manifest: &Path, dev: bool, release: bool) -> Result<Completion, Fail
     execute(manifest, dev, release, false)
 }
 
-/// Run the selected app with Rust watch enabled for this invocation only.
+/// Watch the selected target: native Rust restarts or browser WASM rebuild/full reload.
 pub fn watch(manifest: &Path) -> Result<Completion, Failure> {
     execute(manifest, true, false, true)
 }
@@ -42,18 +42,13 @@ fn execute(
         crate::platform::fs::open_app(manifest).map_err(|message| Failure { code: 1, message })?;
     let mut settings =
         crate::settings::load(&app).map_err(|message| Failure { code: 1, message })?;
-    if force_watch {
+    if force_watch && settings.target != crate::settings::Target::Browser {
         settings.rust.watch = true;
     }
     if settings.target == crate::settings::Target::Browser {
-        if settings.rust.watch {
-            return Err(Failure {
-                code: 1,
-                message: "browser target uses built static assets; Rust watch is not selected"
-                    .into(),
-            });
-        }
-        let selected = if dev {
+        let selected = if force_watch {
+            settings.vite.auto_start && settings.vite.auto_build
+        } else if dev {
             settings.vite.auto_start
         } else {
             settings.vite.auto_build
@@ -61,7 +56,13 @@ fn execute(
         if !selected {
             println!(
                 "Browser {} skipped by public cli.vite settings",
-                if dev { "run" } else { "build" }
+                if force_watch {
+                    "watch"
+                } else if dev {
+                    "run"
+                } else {
+                    "build"
+                }
             );
             return Ok(Completion::Skipped);
         }
@@ -72,7 +73,7 @@ fn execute(
             .map_err(|message| Failure { code: 1, message })?;
         crate::platform::fs::read_app_file(&frontend, "package.json")
             .map_err(|message| Failure { code: 1, message })?;
-        if dev {
+        if dev && !force_watch {
             crate::platform::fs::read_frontend_manifest(&frontend)
                 .and_then(|_| crate::platform::fs::read_frontend_index(&frontend))
                 .map_err(|_| Failure {
@@ -82,7 +83,7 @@ fn execute(
                             .into(),
                 })?;
         }
-        return crate::platform::process::run_frontend(&app, &frontend, dev)
+        return crate::platform::process::run_browser_frontend(&app, &frontend, dev, force_watch)
             .map_err(process_failure);
     }
     let selected = settings.vite.enabled

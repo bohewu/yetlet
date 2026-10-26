@@ -16,6 +16,9 @@ use tokio::{
     time::{Instant, timeout, timeout_at},
 };
 
+#[cfg(test)]
+mod admission_probe;
+
 const SCRIPT: &str = include_str!("session.lua");
 pub const CALL_TIMEOUT: Duration = Duration::from_millis(400);
 pub const WAIT_TIMEOUT: Duration = Duration::from_millis(80);
@@ -71,6 +74,8 @@ struct Inner {
     admission: Arc<Semaphore>,
     peak: AtomicUsize,
     running: AtomicUsize,
+    #[cfg(test)]
+    probe: admission_probe::Probe,
 }
 #[derive(Clone)]
 pub struct Store {
@@ -105,8 +110,7 @@ fn mutation(value: redis::Value) -> Result<Mutation, Error> {
 
 impl Store {
     pub async fn connect(url: &str, config: RedisSessionConfig) -> Result<Self, Error> {
-        // TLS/ACL and off-host deployments remain a separate qualification gate.
-        if !url.starts_with("redis://") {
+        if !endpoint_supported(url) {
             return Err(Error::Configuration);
         }
         let concurrency = config.max_in_flight;
@@ -140,12 +144,22 @@ impl Store {
                 admission: Arc::new(Semaphore::new(concurrency * 2)),
                 peak: AtomicUsize::new(0),
                 running: AtomicUsize::new(0),
+                #[cfg(test)]
+                probe: admission_probe::Probe::default(),
             }),
         })
     }
 
     async fn call(&self, query: Query, end: Instant) -> Result<redis::Value, Error> {
+        #[cfg(test)]
+        let mut probe = self.inner.probe.start();
+        #[cfg(yetlet_session_admission_probe)]
+        let mut trace = crate::admission_trace::Call::new();
         if Instant::now() >= end {
+            #[cfg(test)]
+            probe.failed(&Error::DispatchDeadline);
+            #[cfg(yetlet_session_admission_probe)]
+            trace.failed(&Error::DispatchDeadline);
             return Err(Error::DispatchDeadline);
         }
         let admission = self
@@ -154,20 +168,52 @@ impl Store {
             .clone()
             .try_acquire_owned()
             .map_err(|e| {
-                if matches!(e, tokio::sync::TryAcquireError::Closed) {
+                let error = if matches!(e, tokio::sync::TryAcquireError::Closed) {
                     Error::Closed
                 } else {
                     Error::Busy
-                }
+                };
+                #[cfg(test)]
+                probe.failed(&error);
+                #[cfg(yetlet_session_admission_probe)]
+                trace.failed(&error);
+                error
             })?;
+        #[cfg(test)]
+        probe.admitted(self.inner.active.available_permits());
+        #[cfg(yetlet_session_admission_probe)]
+        trace.admitted(
+            self.inner.active.available_permits(),
+            self.inner.admission.available_permits(),
+        );
         let active = timeout_at(
             end.min(Instant::now() + WAIT_TIMEOUT),
             self.inner.active.clone().acquire_owned(),
         )
         .await
-        .map_err(|_| Error::QueueTimeout)?
-        .map_err(|_| Error::Closed)?;
+        .map_err(|_| {
+            #[cfg(test)]
+            probe.failed(&Error::QueueTimeout);
+            #[cfg(yetlet_session_admission_probe)]
+            trace.failed(&Error::QueueTimeout);
+            Error::QueueTimeout
+        })?
+        .map_err(|_| {
+            #[cfg(test)]
+            probe.failed(&Error::Closed);
+            #[cfg(yetlet_session_admission_probe)]
+            trace.failed(&Error::Closed);
+            Error::Closed
+        })?;
+        #[cfg(test)]
+        probe.acquired();
+        #[cfg(yetlet_session_admission_probe)]
+        trace.acquired();
         if Instant::now() >= end {
+            #[cfg(test)]
+            probe.failed(&Error::DispatchDeadline);
+            #[cfg(yetlet_session_admission_probe)]
+            trace.failed(&Error::DispatchDeadline);
             return Err(Error::DispatchDeadline);
         }
         let (send, recv) = oneshot::channel();
@@ -176,7 +222,11 @@ impl Store {
             let mut manager = tasks.manager.clone().ok_or(Error::Closed)?;
             tasks.handles.retain(|h| !h.is_finished());
             let inner = self.inner.clone();
+            #[cfg(yetlet_session_admission_probe)]
+            let trace_worker = trace.worker();
             tasks.handles.push(tokio::spawn(async move {
+                #[cfg(yetlet_session_admission_probe)]
+                let mut trace_worker = crate::admission_trace::Worker::enter(trace_worker);
                 struct Running(Arc<Inner>);
                 impl Drop for Running {
                     fn drop(&mut self) {
@@ -203,13 +253,21 @@ impl Store {
                         invocation.invoke_async(&mut manager).await
                     }
                 };
+                #[cfg(yetlet_session_admission_probe)]
+                trace_worker.reply();
                 let _ = send.send(result.map_err(|_| Error::Unavailable));
             }));
         }
-        timeout_at(end, recv)
+        let result = timeout_at(end, recv)
             .await
-            .map_err(|_| Error::Unavailable)?
-            .map_err(|_| Error::Unavailable)?
+            .map_err(|_| Error::Unavailable)
+            .and_then(|reply| reply.map_err(|_| Error::Unavailable))
+            .and_then(std::convert::identity);
+        #[cfg(test)]
+        probe.finished(&result);
+        #[cfg(yetlet_session_admission_probe)]
+        trace.finished(&result);
+        result
     }
 
     pub fn record_key(&self, id: &str) -> Result<String, Error> {
@@ -493,5 +551,34 @@ mod tests {
         ));
         wait_blocked(&observer, 0).await;
         observer.shutdown().await.unwrap();
+    }
+}
+
+fn endpoint_supported(url: &str) -> bool {
+    url.starts_with("redis://")
+        || (cfg!(feature = "tls") && url.starts_with("rediss://") && !url.contains('#'))
+}
+
+#[cfg(test)]
+mod tls_selection_tests {
+    use super::*;
+    #[cfg(feature = "tls")]
+    #[test]
+    fn yt184_tls_backend_is_constructible_without_other_consumers() {
+        let _ = rustls::ClientConfig::builder()
+            .with_root_certificates(rustls::RootCertStore::empty())
+            .with_no_client_auth();
+    }
+    #[test]
+    fn yt184_tls_endpoint_selection_and_no_insecure_fragment() {
+        assert!(endpoint_supported("redis://127.0.0.1:6379/"));
+        assert_eq!(
+            endpoint_supported("rediss://valkey.yt184.test:6379/"),
+            cfg!(feature = "tls")
+        );
+        assert!(!endpoint_supported(
+            "rediss://valkey.yt184.test:6379/#insecure"
+        ));
+        assert!(!endpoint_supported("http://valkey.yt184.test:6379/"));
     }
 }

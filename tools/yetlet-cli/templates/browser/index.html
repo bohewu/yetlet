@@ -6,15 +6,21 @@
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'">
   <title>Yetlet Tasks</title>
   <link rel="icon" type="image/svg+xml" href="./mark.svg">
+  <link rel="stylesheet" href="./wasm-startup.css">
+  <link rel="stylesheet" href="./app.css">
   <script type="module" src="./app.ts"></script>
 </head>
 <body>
   <header class="brand"><a href="#main" class="skip">Skip to tasks</a><div class="brand-name"><span class="mark" aria-hidden="true">Y</span>Yetlet Tasks</div><span id="workspace-label">Local workspace</span></header>
-  <main id="main">
+  <main id="main" data-wasm-startup data-startup-state="loading" aria-busy="true">
     <h1>Make room for what matters.</h1>
     <p class="subtitle">A small list. A clear next step.</p>
     <noscript><p>JavaScript and WebAssembly are required for this browser-only application.</p></noscript>
-    <p id="runtime-status" role="status">Loading browser runtime…</p>
+    <section class="wasm-startup-panel" aria-label="Application startup">
+      <span id="startup-indicator" class="wasm-startup-indicator" aria-hidden="true"></span>
+      <p id="runtime-status" role="status">Loading browser runtime…</p>
+      <p>If loading does not finish, check JavaScript, WebAssembly and the site files, then <a href="">reload this page</a>. Reload discards this tab’s changes.</p>
+    </section>
     <fieldset id="workspace" disabled>
       <form id="add-form">
         <label for="new-task">New task</label>

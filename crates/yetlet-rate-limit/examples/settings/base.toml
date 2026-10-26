@@ -1,0 +1,6 @@
+enabled = false
+
+[policy]
+interval_ms = 2000
+burst = 5
+max_keys = 64

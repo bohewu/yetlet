@@ -29,11 +29,11 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     }
-    for cloud in [false, true] {
+    for service in [false, true] {
         for settings in [false, true] {
             for vite in [false, true] {
                 for tailwind in [false, true] {
-                    let name = format!("app-{cloud}-{settings}-{vite}-{tailwind}");
+                    let name = format!("app-{service}-{settings}-{vite}-{tailwind}");
                     let mut command = Command::new(env!("CARGO_BIN_EXE_yetlet"));
                     command
                         .args(["new", "--parent"])
@@ -43,7 +43,7 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                         .env("CARGO_HOME", root.path().join("no-cache"))
                         .env("APP_SERVICE__TOKEN", "private-sentinel-do-not-copy");
                     for (enabled, flag) in [
-                        (cloud, "--service"),
+                        (service, "--service"),
                         (settings, "--settings"),
                         (vite, "--vite"),
                         (tailwind, "--tailwind"),
@@ -175,7 +175,7 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                                 "vite::Snapshot::load_selected(&settings.cli.vite.root)?"
                             )
                         );
-                        assert!(!main.contains("Snapshot::load_from_env"));
+                        assert!(!main.contains("Snapshot::load_with_env"));
                         assert!(!app.join("frontend/dist").exists());
                     } else {
                         assert!(!app.join("frontend").exists());
@@ -370,7 +370,7 @@ mod selected_cli_settings_tests {
             ("APP_CLI__GENERATE__K8S__REPLICAS", "101"),
             ("APP_CLI__VITE__ROOT", "../outside"),
         ] {
-            let loaded = loader().load_from_env::<Settings>([
+            let loaded = loader().load_with_env::<Settings>([
                 ("APP_SERVICE__TOKEN".into(), "synthetic-token".into()),
                 (key.into(), value.into()),
             ]);
@@ -379,9 +379,9 @@ mod selected_cli_settings_tests {
     }
     #[test]
     fn rust_watch_is_opt_in_and_absent_sections_remain_compatible() {
-        let default: Settings = loader().load_from_env([]).unwrap();
+        let default: Settings = loader().load_with_env([]).unwrap();
         assert!(!default.cli.rust.watch);
-        let enabled: Settings = loader().load_from_env([
+        let enabled: Settings = loader().load_with_env([
             ("APP_CLI__RUST__WATCH".into(), "true".into()),
         ]).unwrap();
         assert!(enabled.cli.rust.watch);

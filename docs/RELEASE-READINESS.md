@@ -1,5 +1,33 @@
 # Yetlet Prototype Release Readiness
 
+**YT-201 package preparation (2026-10-26):** [Sixteen-package metadata and local
+consumer preflight](YT-201-PACKAGE-PREPARATION.md) aligns publication metadata,
+versioned local dependencies and license/guide inputs without runtime/feature
+changes. Sixteen normal Cargo package checks and two isolated native consumer
+runs pass; independent Reviewer PASS with zero issues/required followups accepts
+metadata/local preflight only. These are hash-bound uncommitted
+preflight inputs on Ubuntu 26.04.1, not final candidate C, actual registry or
+public activation evidence. Historical ce56e08 records and YT-096/D1–D6/YT-020
+gates remain unchanged.
+
+**Sixteen-package planning (2026-10-26):** [YT-200 co-release review and follow-up
+items](YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md) considers all sixteen implemented
+libraries together, with distinct feature/platform limits and missing validation
+registered as YT-201–205 Todo. Independent Reviewer PASS, zero issues/required
+followups, accepts planning only; it does not change manifests, select a
+replacement source or authorize qualification,
+signing/registry/public activation. The original ce56e08 candidate and all
+YT-096/D1–D6/YT-020 gates remain intact.
+
+**Current-source planning (2026-10-26):** [YT-199 delivery scope and evidence
+gaps](YT-199-CURRENT-DELIVERY-READINESS.md) compares source snapshot `64a6d1c`
+with the unchanged nine-package `ce56e08` candidate. Sixteen current API entries
+do not select sixteen releases or transfer historical qualification. This is
+documentation planning accepted after independent Reviewer PASS with zero
+issues/required followups, not a new source/support selection. YT-096/D1–D6 and
+YT-020 decisions remain unchanged. The dated
+checkpoints below retain their original evidence and verdicts.
+
 **Date:** 2026-10-10
 **Decision:** **M0–M9 are demonstrable and independently reviewed at prototype scope; public package publication and production deployment remain blocked.**
 

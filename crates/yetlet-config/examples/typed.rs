@@ -112,7 +112,7 @@ mod tests {
 
     fn settings(token: &str) -> Settings {
         loader()
-            .load_from_env([
+            .load_with_env([
                 ("YTCONFIG_ENVIRONMENT".into(), "Production".into()),
                 ("YTCONFIG_SERVICE__TOKEN".into(), token.into()),
             ])

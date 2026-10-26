@@ -9,6 +9,9 @@ path = "data/issues.sqlite3"
 name = "Issue tracker"
 api_token = ""
 
+[metrics]
+enabled = false
+
 [logging]
 level = "info"
 

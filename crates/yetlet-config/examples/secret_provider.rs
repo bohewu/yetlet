@@ -86,7 +86,7 @@ async fn settings(provider: &dyn SecretProvider) -> Result<Settings, yetlet_conf
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("examples/settings"),
         "YTCONFIG",
     )
-    .load_from_env_with_secrets(
+    .load_with_env_and_secrets(
         [("YTCONFIG_ENVIRONMENT".into(), "Production".into())],
         provider,
         &[SecretBinding::new("delivery-token", |s: &mut Settings| {

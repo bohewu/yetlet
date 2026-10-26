@@ -317,4 +317,9 @@ mod browser {
         });
         Ok(())
     }
+    /// Retire app-owned listeners/graph; late bootstrap must not mount afterward.
+    #[wasm_bindgen]
+    pub fn dispose_tasks() {
+        RUNTIME.with(|slot| slot.borrow_mut().take());
+    }
 }

@@ -1,6 +1,11 @@
 # Start the Lab Operations Board
 
-This guide applies to the existing Yetlet checkout containing `examples/lab-operations-board`. The M11 implementation is still uncommitted unless a later delivery explicitly says otherwise; cloning or pulling the old remote revision alone will not include it. This is an unpublished, local synthetic-identity demonstration, not a production service.
+This guide applies to a Yetlet checkout containing `examples/lab-operations-board`.
+The Board implementation is committed; available source still depends on the
+revision checked out, and no registry release is assumed. This is an unpublished,
+local synthetic-identity demonstration. The [current Board README](../examples/lab-operations-board/README.md)
+owns opt-in options and safety limits; the [API reference](API-REFERENCE.md)
+distinguishes application APIs from framework packages.
 
 ## Local startup
 
@@ -43,7 +48,9 @@ YETLET_BOARD_LISTEN=127.0.0.1:3012 \
 cargo run --release --locked -p yetlet-lab-operations-board
 ```
 
-PowerShell equivalent configuration (Windows execution of this Board has not been qualified by the current Linux run):
+PowerShell equivalent configuration. Retained [Windows native execution](YT-094-WINDOWS-VERIFICATION.md)
+includes Board tests and Admin HTTP/restart/drain at its recorded source; it is
+not new qualification of every later feature or this checkout:
 
 ```powershell
 New-Item -ItemType Directory -Force .local-board | Out-Null

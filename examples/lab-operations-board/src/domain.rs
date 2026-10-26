@@ -92,6 +92,7 @@ impl DemoIdentities {
 #[cfg_attr(feature = "valkey", derive(Serialize, Deserialize))]
 #[cfg_attr(feature = "valkey", serde(deny_unknown_fields))]
 pub(crate) struct LoginSession {
+    #[cfg_attr(feature = "valkey", serde(deserialize_with = "explicit_user"))]
     pub user: Option<Principal>,
     #[cfg(feature = "oidc")]
     #[cfg_attr(feature = "valkey", serde(default))]
@@ -229,4 +230,11 @@ pub(crate) struct Listing {
     pub items: Vec<WorkItem>,
     pub matching: i64,
     pub snapshot: Snapshot,
+}
+
+#[cfg(feature = "valkey")]
+fn explicit_user<'de, D: serde::Deserializer<'de>>(
+    deserializer: D,
+) -> Result<Option<Principal>, D::Error> {
+    Option::<Principal>::deserialize(deserializer)
 }

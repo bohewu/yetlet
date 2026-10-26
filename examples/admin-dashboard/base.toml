@@ -13,8 +13,13 @@ endpoint = ""
 namespace = "admin_dashboard"
 ttl_seconds = 1800
 
+[auth]
+enabled = false
+policy_file = ""
+
 [oidc]
 enabled = false
+application_origin = ""
 issuer = ""
 client_id = ""
 client_secret = ""
@@ -35,3 +40,11 @@ auto_build = true
 
 [cli.generate.k8s]
 replicas = 1
+
+# Explicitly selected app-owned schema-v2 reference; requires commit-write-auth.
+[write_authorization]
+enabled = false
+
+# Application-owned safe request/worker diagnostics; requires request-tracing.
+[request_tracing]
+enabled = false

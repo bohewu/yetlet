@@ -57,6 +57,7 @@ fn browser_creation_is_explicit_finite_and_preserves_native_default() {
             "src/model.rs",
             "frontend/index.html",
             "frontend/build-wasm.mjs",
+            "frontend/serve.mjs",
             "frontend/package-lock.json",
         ] {
             assert!(app.join(file).is_file());

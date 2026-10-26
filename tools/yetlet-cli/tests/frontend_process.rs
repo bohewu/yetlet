@@ -16,7 +16,7 @@ root=os.environ['YT_FRONTEND_TEST_ROOT']
 role=os.path.basename(sys.argv[0])
 mode=os.environ['YT_FRONTEND_TEST_MODE']
 with open(root+'/trace', 'a') as out:
- out.write(json.dumps({'role':role, 'args':sys.argv[1:], 'cwd':os.getcwd(), 'secret':any(k.startswith('APP_') or k in ['YETLET_DEV_SECRETS','YETLET_CONFIG_ROOT'] for k in os.environ), 'public':os.environ.get('VITE_PUBLIC'), 'projectRoot':os.environ.get('YETLET_PROJECT_ROOT'), 'tlsCert':os.environ.get('YETLET_DEV_TLS_CERT'), 'tlsKey':os.environ.get('YETLET_DEV_TLS_KEY'), 'backendTls':os.environ.get('APP_SERVER__TLS__ENABLED'), 'backendHost':os.environ.get('APP_SERVER__HOST'), 'backendPort':os.environ.get('APP_SERVER__PORT')})+'\n')
+ out.write(json.dumps({'role':role, 'args':sys.argv[1:], 'cwd':os.getcwd(), 'secret':any(k.startswith('APP_') or k in ['YETLET_DEV_SECRETS','YETLET_CONFIG_ROOT'] for k in os.environ), 'public':os.environ.get('VITE_PUBLIC'), 'projectRoot':os.environ.get('YETLET_PROJECT_ROOT'), 'tlsCert':os.environ.get('YETLET_DEV_TLS_CERT'), 'tlsKey':os.environ.get('YETLET_DEV_TLS_KEY'), 'backendTls':os.environ.get('APP_SERVER__TLS__ENABLED'), 'backendHost':os.environ.get('APP_SERVER__HOST'), 'backendPort':os.environ.get('APP_SERVER__PORT'), 'browserWatch':os.environ.get('YETLET_BROWSER_WATCH')})+'\n')
 if sys.argv[1:]==['run','build']:
  sys.exit(23 if mode=='build-fail' else 0)
 if role=='cargo' and sys.argv[1]=='build': sys.exit(0)
@@ -247,6 +247,8 @@ fn browser_build_has_no_native_child_preserves_failure_and_honors_skip() {
     for (action, flag) in [
         ("build", "APP_CLI__VITE__AUTO_BUILD"),
         ("run", "APP_CLI__VITE__AUTO_START"),
+        ("watch", "APP_CLI__VITE__AUTO_START"),
+        ("watch", "APP_CLI__VITE__AUTO_BUILD"),
     ] {
         let fixture = browser_fixture();
         let output = fixture
@@ -262,23 +264,40 @@ fn browser_build_has_no_native_child_preserves_failure_and_honors_skip() {
 #[test]
 fn browser_run_owns_only_frontend_and_reaps_it_on_cancellation() {
     let _port = PORT.lock().unwrap();
-    let fixture = browser_fixture();
-    let running = Running::start(&mut fixture.command("run", "build-ok"));
-    fixture.ready("npm-leaf.pid");
-    assert_eq!(fixture.trace().len(), 1);
-    assert!(!fixture.root.path().join("cargo.pid").exists());
-    running.signal(libc::SIGINT);
-    let output = running.wait();
-    assert_eq!(output.status.signal(), Some(libc::SIGINT));
-    for name in ["npm.pid", "npm-leaf.pid"] {
-        let pid = fs::read_to_string(fixture.root.path().join(name))
-            .unwrap()
-            .parse::<i32>()
-            .unwrap();
-        assert_eq!(unsafe { libc::kill(pid, 0) }, -1, "owned child survived");
+    for action in ["run", "watch"] {
+        let fixture = browser_fixture();
+        if action == "watch" {
+            fs::remove_dir_all(fixture.root.path().join("frontend/dist")).unwrap();
+        }
+        let running = Running::start(
+            fixture
+                .command(action, "build-ok")
+                .env("YETLET_BROWSER_WATCH", "untrusted"),
+        );
+        fixture.ready("npm-leaf.pid");
+        assert_eq!(fixture.trace().len(), 1);
+        assert_eq!(
+            fixture.trace()[0]["browserWatch"],
+            if action == "watch" {
+                serde_json::json!("1")
+            } else {
+                serde_json::Value::Null
+            }
+        );
+        assert_eq!(fixture.trace()[0]["secret"], false);
+        assert!(!fixture.root.path().join("cargo.pid").exists());
+        running.signal(libc::SIGINT);
+        let output = running.wait();
+        assert_eq!(output.status.signal(), Some(libc::SIGINT));
+        for name in ["npm.pid", "npm-leaf.pid"] {
+            let pid = fs::read_to_string(fixture.root.path().join(name))
+                .unwrap()
+                .parse::<i32>()
+                .unwrap();
+            assert_eq!(unsafe { libc::kill(pid, 0) }, -1, "owned child survived");
+        }
     }
 }
-
 #[test]
 fn browser_run_requires_static_output_and_respects_frontend_root() {
     let fixture = browser_fixture();

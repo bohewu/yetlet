@@ -79,7 +79,7 @@ pub(crate) struct Snapshot {
     main: Vec<u8>,
     minimal_workspace: String,
     framework_files: BTreeMap<String, Vec<u8>>,
-    pub(crate) with_config: bool,
+    pub(crate) runtime_settings: bool,
     pub(crate) with_assets: bool,
     with_public_settings: bool,
     selected_frontend: Option<String>,
@@ -141,7 +141,7 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
     if roots[0] != roots[1] {
         return Err("framework dependencies must share one workspace".into());
     }
-    let with_config = dependencies.get("yetlet-config").is_some();
+    let runtime_settings = dependencies.get("yetlet-config").is_some();
     let with_assets = dependencies.get("serde_json").is_some();
     let selected = if root_entries.iter().any(|p| p == "base.toml") {
         parse(&fs::read_app_file(app, "base.toml")?)?
@@ -156,7 +156,7 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
         let mut frontend = None;
         for profile in ["Development", "Staging", "Production"] {
             let settings =
-                crate::settings::load_from_env(app, [("APP_ENVIRONMENT".into(), profile.into())])?;
+                crate::settings::load_with_env(app, [("APP_ENVIRONMENT".into(), profile.into())])?;
             if profile == "Production" {
                 frontend = Some(settings.vite.root);
             }
@@ -187,10 +187,10 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
         false
     };
     let mut expected = if selected {
-        scaffold::selected_files(name, true, with_config, plugin, with_assets)?
+        scaffold::selected_files(name, true, runtime_settings, plugin, with_assets)?
     } else if with_assets {
-        scaffold::vite_files(name, &roots[0], true, with_config, plugin)?
-    } else if with_config {
+        scaffold::vite_files(name, &roots[0], true, runtime_settings, plugin)?
+    } else if runtime_settings {
         scaffold::config_files(name, &roots[0], true)?
     } else {
         scaffold::files(name, &roots[0], true)?
@@ -283,7 +283,7 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
     let lock = fs::read_app_file(app, "Cargo.lock")?;
     crate::app::validate_lock(&parse(&lock)?)?;
     let (minimal_workspace, mut framework_files) = inspect_framework(&roots[0])?;
-    if with_config {
+    if runtime_settings {
         delivery::config_framework(&roots[0], &mut framework_files)?;
     }
     Ok(Snapshot {
@@ -292,9 +292,9 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
         main,
         minimal_workspace,
         framework_files,
-        with_config,
+        runtime_settings,
         with_assets,
-        with_public_settings: with_config || selected,
+        with_public_settings: runtime_settings || selected,
         selected_frontend: selected.then_some(frontend),
         app_files,
         inspected_inputs,
@@ -506,7 +506,7 @@ fn render(snapshot: &Snapshot) -> Result<Files, String> {
             "README.md",
             if snapshot.selected_frontend.is_some() {
                 include_str!("../templates/docker/SELECTED-DELIVERY.md").replace("@NAME@", name)
-            } else if snapshot.with_config || snapshot.with_assets {
+            } else if snapshot.runtime_settings || snapshot.with_assets {
                 include_str!("../templates/docker/DELIVERY.md").replace("@NAME@", name)
             } else {
                 include_str!("../templates/docker/README.md").replace("@NAME@", name)

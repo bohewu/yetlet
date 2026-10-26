@@ -166,7 +166,7 @@ mod tests {
 
     async fn lookup(loader: Loader, environment: &[(&str, &str)]) -> SecretString {
         let settings: Settings = loader
-            .load_from_env(
+            .load_with_env(
                 environment
                     .iter()
                     .map(|(k, v)| (OsString::from(k), OsString::from(v))),
@@ -235,7 +235,7 @@ mod tests {
                 OsString::from("Development"),
             )]
         };
-        let first: Settings = selected_loader.load_from_env(environment()).unwrap();
+        let first: Settings = selected_loader.load_with_env(environment()).unwrap();
         let secrets = Arc::new(SettingsSecrets::new(BTreeMap::from([(
             "delivery-token".into(),
             first.service.token,
@@ -268,7 +268,7 @@ mod tests {
             "000$development-synthetic"
         );
         reload(&secrets, &reload_gate, || {
-            selected_loader.load_from_env(environment())
+            selected_loader.load_with_env(environment())
         })
         .unwrap();
         assert_eq!(
@@ -307,7 +307,7 @@ mod tests {
                 let events = &events;
                 move || {
                     reload(secrets, reload_gate, || {
-                        let settings: Settings = selected_loader.load_from_env(environment())?;
+                        let settings: Settings = selected_loader.load_with_env(environment())?;
                         assert_eq!(
                             settings.service.token.expose_secret(),
                             "000$development-synthetic"
@@ -340,7 +340,7 @@ mod tests {
                         "000$development-synthetic"
                     );
                     events.send("B observed A publication").unwrap();
-                    let settings: Settings = selected_loader.load_from_env(environment())?;
+                    let settings: Settings = selected_loader.load_with_env(environment())?;
                     assert_eq!(
                         settings.service.token.expose_secret(),
                         "001$latest-synthetic"
@@ -395,7 +395,7 @@ mod tests {
         let service = DeliveryService::new(secrets.clone());
         let reload_gate = Mutex::new(());
         let load = || {
-            selected_loader.load_from_env([("YTSECRETS_ENVIRONMENT".into(), "Development".into())])
+            selected_loader.load_with_env([("YTSECRETS_ENVIRONMENT".into(), "Development".into())])
         };
         reload(&secrets, &reload_gate, load).unwrap();
         let retained = service
@@ -461,7 +461,7 @@ mod tests {
     #[tokio::test]
     async fn selected_settings_reach_service_and_state_without_secret_in_ssr_or_debug() {
         let settings: Settings = loader()
-            .load_from_env([
+            .load_with_env([
                 ("YTSECRETS_ENVIRONMENT".into(), "Production".into()),
                 (
                     "YTSECRETS_SERVICE__TOKEN".into(),

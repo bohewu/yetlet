@@ -53,7 +53,11 @@ async fn page(State(state): State<AppState>) -> Result<Page, Failure> {
             .attribute("lang", "en")
             .child(Element::new("h1").child(View::text("Modular Shop Catalog")))
             .child(Element::new("p").child(View::text(
-                "Catalog, identity, cart and orders are ordinary separately installed Rust modules.",
+                if state.database.catalog_cache_enabled() {
+                    "Displayed price and stock may be up to two seconds old. Cart actions and checkout check current data."
+                } else {
+                    "Catalog, identity, cart and orders are ordinary separately installed Rust modules."
+                },
             )))
             .child(list)
             .child(navigation),

@@ -71,7 +71,8 @@ fn frontend_command(app: &App, frontend: &App, dev: bool) -> io::Result<Command>
     }
     command
         .env_remove("YETLET_DEV_TLS_CERT")
-        .env_remove("YETLET_DEV_TLS_KEY");
+        .env_remove("YETLET_DEV_TLS_KEY")
+        .env_remove("YETLET_BROWSER_WATCH");
     command
         .env("YETLET_PROJECT_ROOT", crate::platform::fs::app_root(app))
         .env("npm_config_offline", "true")
@@ -88,6 +89,24 @@ pub(crate) fn run_frontend_build(app: &App, frontend: &App) -> io::Result<Comple
 /// Browser applications reuse single-child process ownership on both platforms.
 pub(crate) fn run_frontend(app: &App, frontend: &App, dev: bool) -> io::Result<Completion> {
     let mut command = frontend_command(app, frontend, dev)?;
+    #[cfg(windows)]
+    let completion = imp::run(frontend, &mut command)?;
+    #[cfg(not(windows))]
+    let completion = imp::run(&mut command)?;
+    Ok(frontend_completion(completion))
+}
+
+/// Browser watch uses the same single owned frontend tree, including compilers.
+pub(crate) fn run_browser_frontend(
+    app: &App,
+    frontend: &App,
+    dev: bool,
+    watch: bool,
+) -> io::Result<Completion> {
+    let mut command = frontend_command(app, frontend, dev)?;
+    if watch {
+        command.env("YETLET_BROWSER_WATCH", "1");
+    }
     #[cfg(windows)]
     let completion = imp::run(frontend, &mut command)?;
     #[cfg(not(windows))]

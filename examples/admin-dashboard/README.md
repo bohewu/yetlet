@@ -185,6 +185,38 @@ through the existing SecretProvider. Verified subjects need explicit application
 permission mappings. See the [OIDC contract and validation boundary](../../docs/YT-094-OIDC.md).
 The default `false` preserves the earlier demonstration and qualification.
 
+The separately activated [YT-140 proxy/replica integration](../../docs/YT-140-OIDC-PROXY-REPLICAS.md)
+first reviews the canonical origin/callback, trusted proxy and cross-instance
+transaction/freshness contract, then selects the smallest new integration and
+proof. Initial independent contract Reviewer PASS, zero issues/required
+followups; minimum implementation and focused proof/cleanup are complete, final
+independent Reviewer PASS, zero issues and required followups; Done at bounded
+optional local integration scope. Existing direct
+loopback and real-provider evidence retain their original scope.
+
+`oidc.application_origin` is an optional, empty-by-default value loaded by the
+existing Settings provider. `APP_OIDC__APPLICATION_ORIGIN` or a declared
+profile/private overlay can select, for example, `http://127.0.0.1:31000`; both
+backends must use that same origin and exact registered callback
+`http://127.0.0.1:31000/board/oidc/callback`. The backend listener remains separate.
+Only canonical loopback HTTP with a nonzero explicit port other than 80 is
+accepted; paths/trailing slash, credentials, query/fragment, other hosts and
+HTTPS are rejected. Empty or absent retains the direct listener; disabled OIDC
+keeps its unused configuration inert.
+
+The local static proxy preserves the canonical Host/Origin and strips forwarding
+headers. Backends do not infer origin from those headers; supplied callback
+Origin must be unique and exact, while absent Origin remains valid for normal
+top-level redirects. Keep backend access within the trusted local topology and
+follow the reference's shared namespace/DTO/cookie, current SQL/policy and
+coordinated restart/re-login rules. This option is not a public HTTPS deployment
+configuration or peer authentication.
+
+The new live proof used two independent Board listeners/managers in one test
+process and rejected missing-code callbacks after cross-instance transaction
+consumption. Existing successful real-provider evidence is reused; this is not
+a new successful token exchange or cross-process Admin OIDC qualification.
+
 ## Shared sessions (opt-in)
 
 Build with Cargo feature `valkey`, then select `session.backend="valkey"` through
@@ -226,3 +258,204 @@ production authentication/deployment and the other stated limits remain open.
 Independent Reviewer `/root/yt094_wasm_review` follow-up PASS, zero remaining
 issues/followups. The first review found a queued-save lifetime defect; the
 pre-execution guard and independent zero-POST regression resolved it.
+
+### Optional Auth adoption (YT-126)
+
+Build with `--features auth-valkey` and select all of
+`APP_SESSION__BACKEND=valkey`, the existing Valkey endpoint/namespace settings,
+`APP_AUTH__ENABLED=true`, and `APP_AUTH__POLICY_FILE=/absolute/path/policy.json`.
+Auth is off by default. Selecting it without the compiled capability, Valkey,
+or an absolute policy path fails startup. This local authority is Linux-only;
+other platforms are not qualified and selection fails startup.
+
+The trusted operator owns the policy file and its parent directory. Replace the
+regular JSON file atomically on the same host; do not edit it in place. Example:
+
+```json
+{"accounts":{"alice":{"enabled":true,"read":true,"write":true},"bob":{"enabled":true,"read":true,"write":true},"viewer":{"enabled":true,"read":true,"write":false}}}
+```
+
+Only these account keys and boolean fields are accepted. A missing/null account
+or disabled account denies with 403. Read/write flags only restrict the compiled
+account bounds: Alice remains project 1, Bob project 2, and Viewer cannot write.
+Each protected resolution and subsequent authorization reads fresh policy without
+caching, including pre-SQL checks and every SSE iteration. The file is limited to
+4096 bytes and each read to 250 ms; missing, malformed, oversized or unavailable
+files fail closed with 503. Opened handles must be regular files; Linux opens use
+`O_NONBLOCK | O_NOFOLLOW`. Trusted parent directories and local filesystems are
+required; the deadline bounds the request wait, not arbitrary filesystem work.
+
+The resolver uses the existing typed Valkey Session DTO and `yetlet-auth`.
+Handlers consume `Authenticated` through a private adapter and independently
+recheck Session, account and project permission. Identity uses the application
+namespace `urn:yetlet:admin:local-accounts`, scheme `admin-session`, the verified
+local account name, and static `project-1`/`project-2` tenant. This is the local
+binding established by the existing verified login, not an external OIDC identity.
+OIDC subject mapping remains a startup snapshot; policy changes revoke local
+account/read/write access without changing that mapping. Generic Auth principals
+are never serialized into Session or hydration state.
+
+Login creation, verified demo/OIDC login and CSRF logout are explicit lifecycle
+routes outside required Auth. Disabled users can still log out, including during
+a policy-file outage. Health and static assets remain public. Protected missing,
+expired, rotated or revoked Sessions and explicit anonymous records redirect to
+`/board/login` with 303. Invalid cookies remain 400, denied policy 403,
+misconfiguration 500 and unavailable authority 503. JSON triage keeps its existing
+safe error envelope when authorization fails inside its handler; resolver failures
+before the handler use the native error response. Unknown mutations never report
+success or emit a success cookie and are not automatically retried.
+
+The final fresh principal is passed to the existing database save operation.
+There remains a race between the last authorization decision, queued SQL work
+and commit: a previously admitted write can commit after revocation. There is no
+cross-store fencing or strict write-after-revocation guarantee. See
+[YT-126 adoption record](../../docs/YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md) for review
+status and the exact bounded evidence; this is not production/HA qualification.
+
+The separately activated [YT-138 ordering research](../../docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md)
+examines the native/triage save and independent Session/policy authorities,
+distinguishing authorization snapshots, revocation acknowledgment and business
+commit. Its accepted decision retains the existing pre-SQL race for this
+application; independent Reviewer PASS, zero issues and required followups;
+Done at research scope. This documentation-only work adds no
+fencing, transactional authorization, runtime middleware or stronger guarantee.
+
+The separately activated [YT-139 authority/recovery reference](../../docs/YT-139-MULTI-INSTANCE-AUTHORITY-RECOVERY.md)
+selects a local two-Admin fixture sharing one SQLite business authority, current
+trusted policy and optional single-primary Valkey Sessions. Independent
+contract Reviewer PASS, zero issues/required followups; implementation of the
+bounded stale-Session restoration/re-login proof and cleanup are complete; final
+independent Reviewer PASS, zero issues and required followups; Done at bounded
+optional local reference scope. It does not qualify cross-host shared
+filesystems, production HA or stronger write-after-revocation ordering.
+
+Recovery uses the existing Settings-provider value
+`APP_SESSION__VALKEY__NAMESPACE`: choose one never-reused recovery namespace for
+both stopped/restarted instances, outside the restored Session data. Keep the
+current SQLite database and restrictive policy; follow the reference's
+stop/drain and refusal rules before reopening service. There is no runtime
+epoch allocator or automatic protection against rolling configuration back to
+an unsafe old namespace.
+
+The new focused Linux test also requires Python 3 with standard-library SQLite
+and an explicitly caller-owned disposable Valkey. It restores one retired
+Session record and pauses that whole instance; the caller owns service cleanup:
+
+```sh
+YT139_VALKEY_URL=redis://127.0.0.1:PORT/ cargo test --offline --locked --manifest-path examples/admin-dashboard/Cargo.toml --features auth-valkey --test auth_valkey -- --ignored --exact two_admin_processes_recover_with_new_session_epoch --nocapture
+```
+
+The focused actual-process integration test requires an operator-owned disposable
+Valkey at `YT126_VALKEY_URL=redis://127.0.0.1:PORT/` and existing built frontend
+assets. It pauses that entire disposable instance, starts two actual Admin child
+processes, captures generated demo credentials only in memory, uses isolated
+configuration/policy/SQLite data and drains/reaps its children:
+
+```sh
+cargo test --manifest-path examples/admin-dashboard/Cargo.toml --features auth-valkey \
+  --offline --locked --test auth_valkey -- --ignored --exact two_admin_processes_use_fresh_auth_policy --nocapture
+```
+
+The test does not start or stop Valkey. Its bounded pause/recovery coverage does
+not qualify persistent storage recovery, failover, external IdP callbacks,
+browser behavior, cross-host deployment or atomic revocation of business writes.
+
+
+## Opt-in commit-time write authorization — YT-181
+
+The application feature `commit-write-auth` supplies the
+[YT-181 SQL-owned reference](../../docs/YT-181-SENSITIVE-WRITE-IMPLEMENTATION.md).
+It is default-off and adds no Core/Auth API or generic AOP. The existing Session,
+CSRF, current file policy, item version, worker limits and response security
+remain in effect. Its extra SQL authority covers only Alice/project-one item
+writes, with item and history checked/committed together. It does not turn
+Session logout or policy-file replacement into atomic SQL revocation.
+
+Use a **new, nonexistent, task-private SQLite path** for the v2 reference; do
+not point the selection at a real/v1 database or pre-create an empty file.
+The first explicitly selected fresh file seeds Alice/project-one once. Opening
+an existing v2 Store conservatively commits a deny and advances any enabled
+generation before returning; opening another instance also invalidates old
+allowed tickets. Denied rows are never reseeded. This intentionally requires
+trusted current-authority confirmation and explicit re-enable after reopen;
+it is not transparent restart availability or automatic restore qualification.
+Stop/exclude all legacy writers; old binaries refuse v2 only at open.
+
+Board consumers use `Board::open_with_options` (or
+`open_with_oidc_and_options`) with `BoardOptions { write_authorization: true,
+..BoardOptions::default() }`, supplying any selected frontend/Session fields.
+[YT-185](../../docs/YT-185-OPT-IN-OPTIONS.md) records the intentional pre-public
+constructor migration; Cargo features and existing external settings are unchanged.
+Trusted application code can call
+`board.set_project_write_permission("alice", 1, false).await?` to revoke, or
+pass `true` to establish a fresh generation after current permission/recovery
+confirmation. No HTTP control endpoint or automatic grant loop is installed.
+Every request still needs ordinary identity, resource policy and CSRF allow;
+SQL enable cannot grant another account/project or broaden those checks.
+
+Admin additionally selects its existing Settings loader value
+`write_authorization.enabled = true` (environment override
+`APP_WRITE_AUTHORIZATION__ENABLED=true`) with the compiled `commit-write-auth`
+feature and an explicitly new `database.path`. Base/default is false; absent
+feature plus enabled selection fails settings validation. No hot reload or new
+Settings-provider service is introduced. Do not interpret the parser/setting
+as permission to enable v1 or to restore a backup over a live file.
+
+One private Store-bound ticket is used per save attempt. SQL revoke advances its
+generation, and re-enable advances again; stale tickets reject even after
+re-enable. A writer already holding the IMMEDIATE transaction may finish before
+revoke commits; a late save response does not change commit order. Busy, timeout
+or disconnect never establishes rollback/revoke success or a safe blind retry.
+The reference adds no retry, new queue, remote transaction or HA guarantee.
+
+
+## Opt-in request and SQL-worker tracing — YT-182
+
+[The application reference](../../docs/YT-182-TRACING-WORKER-IMPLEMENTATION.md)
+uses native middleware and Rust `tracing`, with no generic AOP or tracing crate.
+The `request-tracing` Cargo feature is default-off; compiling it does not
+activate tracing. Embedded consumers use `Board::open_with_options` or
+`open_with_oidc_and_options` with `BoardOptions.request_tracing = true`.
+`write_authorization` is an independent options field; true requires its own
+feature and fresh-v2 constraints. Default options disable both capabilities.
+Board never initializes a global subscriber or reads ambient settings. Its
+standalone binary retains defaults; the embedding host or Admin selects options.
+
+Only server-generated, positive, provider-local request IDs and a finite HTTP
+method enter root spans; worker records carry a fixed operation and `ok`/`error`.
+No raw URI, query, credential, cookie, business body, SQL parameter or identity
+is projected. The root has no ambient parent; scoped Dispatch and its selected
+safe span are retained across blocking work and HTTP future destruction.
+Unknown ambient spans/control calls are not forwarded. IDs reset with provider
+recreation and are not distributed trace or durable audit identities.
+
+`http_response_constructed`, `http_future_dropped` and `sql_worker_completed`
+mean different things. Future drop does not cancel started SQL work, release
+its permit early, imply rollback or authorize a retry. A constructed Response
+is not completed body delivery; worker success is not a generic commit proof.
+The existing four-worker limit, waits, Session/CSRF, SQL authority and drain
+semantics remain. Outer Host/Origin refusals and Admin's separate Vite static
+router are outside this trace scope; streams/body chunks are not instrumented.
+
+Select both the feature and existing Settings value to enable the Admin host:
+
+```sh
+APP_REQUEST_TRACING__ENABLED=true cargo run --locked \
+  --manifest-path examples/admin-dashboard/Cargo.toml --features request-tracing
+```
+
+The Settings field is `request_tracing.enabled`, false in `base.toml`; the sole
+environment override is `APP_REQUEST_TRACING__ENABLED`. Enabled without the
+compiled feature fails configuration validation. Disabled does not install the
+new request-ID layers, spans, worker capture or subscriber. No runtime reload
+or RUST_LOG/EnvFilter selection is added. Existing Auth/Session feature/settings
+can compose independently; this example does not enable them by implication.
+
+The host initializes JSON output to synchronous stderr once, before serving.
+Only the fixed `REQUEST_TRACING_TARGET` namespace at INFO and higher is admitted;
+other dependency diagnostics stay OFF. Subscriber conflict is a redacted startup
+failure. Ordinary writer errors do not rewrite business results; slow output
+can delay requests/workers. The embedding host owns access/retention/output
+capacity. No collector, exporter, output queue, performance guarantee or durable
+audit delivery is installed. Existing terminal-only synthetic login-code output
+is a separate local-demo channel; never collect it as tracing evidence.

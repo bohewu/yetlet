@@ -10,8 +10,8 @@ pub(crate) fn files(name: &str, tailwind: bool) -> Result<Vec<(&'static str, Str
     })
     .map_err(|_| "invalid built-in frontend package")?;
     package["scripts"]["build"] = "node build-wasm.mjs && vite build".into();
-    // Run serves the prepared static output. No native server or dev bridge.
-    package["scripts"]["dev"] = "vite preview".into();
+    // Run previews prepared output; explicit browser watch selects Vite development.
+    package["scripts"]["dev"] = "node serve.mjs".into();
     let vite = include_str!("../templates/browser/vite.config.mjs");
     let vite = if tailwind {
         vite.replace(
@@ -34,7 +34,10 @@ pub(crate) fn files(name: &str, tailwind: bool) -> Result<Vec<(&'static str, Str
         ("src/model.rs", include_str!("../templates/browser/model.rs").into()),
         ("frontend/index.html", include_str!("../templates/browser/index.html").into()),
         ("frontend/app.ts", include_str!("../templates/browser/app.ts").into()),
+        ("frontend/wasm-startup.mjs", include_str!("../../../assets/wasm-startup.mjs").into()),
+        ("frontend/wasm-startup.css", include_str!("../../../assets/wasm-startup.css").into()),
         ("frontend/app.css", format!("{}{}", if tailwind { "@import \"tailwindcss\";\n@source \"../src/lib.rs\";\n" } else { "" }, include_str!("../templates/browser/app.css"))),
+        ("frontend/serve.mjs", include_str!("../templates/browser/serve.mjs").into()),
         ("frontend/build-wasm.mjs", include_str!("../templates/browser/build-wasm.mjs").into()),
         ("frontend/vite.config.mjs", vite),
         ("frontend/tsconfig.json", include_str!("../templates/vite/tsconfig.json").into()),
@@ -43,4 +46,43 @@ pub(crate) fn files(name: &str, tailwind: bool) -> Result<Vec<(&'static str, Str
         ("frontend/package-lock.json", if tailwind { include_str!("../templates/vite/tailwind-package-lock.json") } else { include_str!("../templates/vite/plain-package-lock.json") }.into()),
         ("frontend/.env.example", "# Only public VITE_* values belong here. Never put credentials in browser configuration.\nVITE_WORKSPACE_LABEL=Local workspace\n".into()),
     ])
+}
+
+#[cfg(test)]
+mod startup_tests {
+    #[test]
+    fn browser_startup_assets_and_pre_wasm_links_are_emitted() {
+        let files = super::files("startup-contract", false).unwrap();
+        let get = |name| {
+            files
+                .iter()
+                .find(|(path, _)| *path == name)
+                .unwrap()
+                .1
+                .as_str()
+        };
+        assert_eq!(
+            get("frontend/wasm-startup.mjs"),
+            include_str!("../../../assets/wasm-startup.mjs")
+        );
+        assert_eq!(
+            get("frontend/wasm-startup.css"),
+            include_str!("../../../assets/wasm-startup.css")
+        );
+        let html = get("frontend/index.html");
+        assert!(
+            html.find("href=\"./wasm-startup.css\"").unwrap()
+                < html.find("src=\"./app.ts\"").unwrap()
+        );
+        assert!(
+            html.contains("data-startup-state=\"loading\"") && html.contains("reload this page")
+        );
+        let entry = get("frontend/app.ts");
+        assert!(!entry.contains("import init,"));
+        assert!(entry.contains("await import('./generated/tasks.js')"));
+        assert!(
+            get("frontend/serve.mjs")
+                .contains("code.replace(\"await import('./generated/tasks.js')\"")
+        );
+    }
 }

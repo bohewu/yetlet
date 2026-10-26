@@ -446,6 +446,131 @@ async fn connection() -> redis::aio::MultiplexedConnection {
         .await
         .unwrap()
 }
+
+#[tokio::test]
+#[ignore = "requires isolated named-user Valkey with default disabled and TIME initially denied"]
+async fn yt184_named_acl_time_grant_unblocks_session_lifecycle() {
+    let app_url = std::env::var("YT184_LOCAL_APP_URL").expect("select named app fixture");
+    let control_url =
+        std::env::var("YT184_LOCAL_CONTROL_URL").expect("select isolated control fixture");
+    let namespace = std::env::var("YT184_LOCAL_NAMESPACE").expect("select isolated namespace");
+    let client = redis::Client::open(app_url.clone())
+        .unwrap_or_else(|_| panic!("valid private app endpoint"));
+    let mut app_connection = client
+        .get_multiplexed_async_connection()
+        .await
+        .unwrap_or_else(|_| panic!("named app authentication"));
+    let mut control = redis::Client::open(control_url)
+        .unwrap_or_else(|_| panic!("valid private control endpoint"))
+        .get_multiplexed_async_connection()
+        .await
+        .unwrap_or_else(|_| panic!("named control authentication"));
+    let anonymous_info = client
+        .get_connection_info()
+        .clone()
+        .set_redis_settings(redis::RedisConnectionInfo::default());
+    let mut anonymous = redis::Client::open(anonymous_info)
+        .unwrap_or_else(|_| panic!("valid anonymous endpoint"))
+        .get_multiplexed_async_connection()
+        .await;
+    if let Ok(connection) = &mut anonymous {
+        let ping: redis::RedisResult<String> = redis::cmd("PING").query_async(connection).await;
+        assert!(ping.is_err(), "default user must not provide a fallback");
+    }
+    let clients: String = redis::cmd("CLIENT")
+        .arg("LIST")
+        .query_async(&mut control)
+        .await
+        .expect("control client metadata");
+    assert!(clients.lines().any(|line| {
+        line.split_ascii_whitespace()
+            .any(|field| field == "user=yt184_app")
+    }));
+    let denied: redis::RedisResult<Vec<String>> =
+        redis::cmd("TIME").query_async(&mut app_connection).await;
+    assert!(denied.is_err_and(|error| error.code() == Some("NOPERM")));
+
+    let c = RedisSessionConfig::new(namespace, "yt184_acl", Duration::from_secs(900), 4, 256)
+        .expect("bounded reference config");
+    let a = Manager::<Cart>::connect(&app_url, c.clone())
+        .await
+        .expect("app manager authentication");
+    let denied = request(app(a.clone()), "/create", "POST", &HeaderMap::new()).await;
+    assert_eq!(denied.status(), StatusCode::SERVICE_UNAVAILABLE);
+    assert!(!denied.headers().contains_key(header::SET_COOKIE));
+
+    let granted: String = redis::cmd("ACL")
+        .arg("SETUSER")
+        .arg("yt184_app")
+        .arg("+time")
+        .query_async(&mut control)
+        .await
+        .expect("trusted operator grants only TIME");
+    assert_eq!(granted, "OK");
+    let clock: Vec<String> = redis::cmd("TIME")
+        .query_async(&mut app_connection)
+        .await
+        .expect("app TIME after grant");
+    assert!(clock.len() == 2 && clock.iter().all(|cell| cell.parse::<u64>().is_ok()));
+    let outside: redis::RedisResult<Option<String>> = redis::cmd("GET")
+        .arg("outside-yt184-namespace")
+        .query_async(&mut app_connection)
+        .await;
+    assert!(outside.is_err_and(|error| error.code() == Some("NOPERM")));
+    let admin: redis::RedisResult<Vec<String>> = redis::cmd("CONFIG")
+        .arg("GET")
+        .arg("maxmemory")
+        .query_async(&mut app_connection)
+        .await;
+    assert!(admin.is_err_and(|error| error.code() == Some("NOPERM")));
+
+    let response = request(app(a.clone()), "/create", "POST", &HeaderMap::new()).await;
+    assert_eq!(response.status(), StatusCode::CREATED);
+    let cookie = response.headers()[header::SET_COOKIE].to_str().unwrap();
+    assert!(cookie.starts_with("__Host-yt184_acl="));
+    assert!(cookie.contains("; Secure") && cookie.contains("; HttpOnly"));
+    assert!(cookie.contains("; SameSite=Lax") && !cookie.contains("Domain="));
+    let original = headers(&response);
+    let b = Manager::<Cart>::connect(&app_url, c)
+        .await
+        .expect("second app manager authentication");
+    let session = b.open(&original).unwrap();
+    assert_eq!(session.read().await.unwrap().count, 1);
+    let csrf = session.csrf_token().await.unwrap();
+    assert!(session.verify_csrf(&csrf).await.unwrap());
+    assert!(!session.verify_csrf("incorrect").await.unwrap());
+    let rotated = request(app(a.clone()), "/rotate", "POST", &original).await;
+    assert_eq!(rotated.status(), StatusCode::NO_CONTENT);
+    let current = headers(&rotated);
+    assert!(current[header::COOKIE] != original[header::COOKIE]);
+    assert_eq!(
+        request(app(b.clone()), "/read", "GET", &original)
+            .await
+            .status(),
+        StatusCode::UNAUTHORIZED
+    );
+    assert_eq!(
+        request(app(b.clone()), "/read", "GET", &current)
+            .await
+            .status(),
+        StatusCode::OK
+    );
+    assert_eq!(
+        request(app(b.clone()), "/destroy", "POST", &current)
+            .await
+            .status(),
+        StatusCode::NO_CONTENT
+    );
+    assert_eq!(
+        request(app(a.clone()), "/read", "GET", &current)
+            .await
+            .status(),
+        StatusCode::UNAUTHORIZED
+    );
+    a.shutdown().await.unwrap();
+    b.shutdown().await.unwrap();
+}
+
 #[tokio::test]
 #[ignore = "requires the disposable Redis fixture"]
 async fn expiry_corruption_payload_and_unknown_outcome_fail_closed() {
@@ -540,4 +665,84 @@ async fn expiry_corruption_payload_and_unknown_outcome_fail_closed() {
     ));
     corrupt.shutdown().await.unwrap();
     drop(observer);
+}
+
+#[tokio::test(flavor = "multi_thread", worker_threads = 2)]
+#[ignore = "requires an owned persistent named-user Valkey container"]
+async fn yt184_service_restart_records_refusal_and_read_only_recovery() {
+    let endpoint = std::env::var("YT184_LOCAL_APP_URL").expect("select private app endpoint");
+    let namespace = std::env::var("YT184_LOCAL_NAMESPACE").expect("select private namespace");
+    let container = std::env::var("YT184_RECOVERY_CONTAINER").expect("select owned fixture");
+    assert!(container.starts_with("yt184-recovery-"));
+    let c = RedisSessionConfig::new(
+        namespace,
+        "yt184_recovery",
+        Duration::from_secs(900),
+        4,
+        256,
+    )
+    .unwrap();
+    let a = Manager::<Cart>::connect(&endpoint, c.clone())
+        .await
+        .unwrap();
+    let b = Manager::<Cart>::connect(&endpoint, c).await.unwrap();
+    let credential = issued(&a).await;
+    let stopped = std::process::Command::new("docker")
+        .args(["stop", "--time", "5", &container])
+        .output()
+        .expect("stop owned fixture");
+    assert!(stopped.status.success());
+    for manager in [&a, &b] {
+        let response = request(app(manager.clone()), "/read", "GET", &credential).await;
+        assert_eq!(response.status(), StatusCode::SERVICE_UNAVAILABLE);
+        assert!(!response.headers().contains_key(header::SET_COOKIE));
+    }
+    tokio::time::sleep(Duration::from_millis(250)).await;
+    let started = std::process::Command::new("docker")
+        .args(["start", &container])
+        .output()
+        .expect("restart same owned fixture");
+    assert!(started.status.success());
+    tokio::time::sleep(Duration::from_secs(2)).await;
+    let begin = tokio::time::Instant::now();
+    let end = begin + Duration::from_secs(5);
+    let mut ready = [false; 2];
+    let mut observations = Vec::new();
+    while !ready.iter().all(|value| *value) {
+        for (index, manager) in [&a, &b].into_iter().enumerate() {
+            if ready[index] {
+                continue;
+            }
+            let response = request(app(manager.clone()), "/read", "GET", &credential).await;
+            let status = response.status();
+            observations.push(serde_json::json!({
+                "manager": index,
+                "elapsed_us_after_two_second_settle": begin.elapsed().as_micros(),
+                "status": status.as_u16(),
+            }));
+            assert!(!response.headers().contains_key(header::SET_COOKIE));
+            assert!(matches!(
+                status,
+                StatusCode::OK | StatusCode::SERVICE_UNAVAILABLE
+            ));
+            if status == StatusCode::OK {
+                let body = to_bytes(response.into_body(), 1024).await.unwrap();
+                assert!(body.as_ref() == b"1");
+                ready[index] = true;
+            }
+        }
+        assert!(
+            tokio::time::Instant::now() < end,
+            "bounded read-only recovery deadline"
+        );
+        if !ready.iter().all(|value| *value) {
+            tokio::time::sleep(Duration::from_millis(100)).await;
+        }
+    }
+    println!(
+        "{}",
+        serde_json::json!({"yt184_read_only_recovery": observations})
+    );
+    a.shutdown().await.unwrap();
+    b.shutdown().await.unwrap();
 }

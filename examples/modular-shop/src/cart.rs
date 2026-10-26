@@ -80,6 +80,7 @@ fn page_view(
     revision: u64,
     csrf: &str,
     orders_enabled: bool,
+    catalog_cached: bool,
 ) -> View {
     let by_id: BTreeMap<_, _> = products
         .iter()
@@ -178,7 +179,7 @@ fn page_view(
             .into()
     };
 
-    Element::new("main")
+    let mut page = Element::new("main")
         .attribute("lang", "en")
         .child(Element::new("h1").child(View::text(format!("{}'s modular cart", user.display()))))
         .child(
@@ -191,11 +192,24 @@ fn page_view(
         .child(available)
         .child(Element::new("h2").child(View::text("Cart")))
         .child(cart)
-        .child(Element::new("p").child(View::text(format!("Total: {}", money(total)))))
+        .child(Element::new("p").child(View::text(format!(
+            "{}: {}",
+            if catalog_cached {
+                "Estimated total"
+            } else {
+                "Total"
+            },
+            money(total)
+        ))))
         .child(checkout_view)
         .child(clear)
-        .child(logout_form(csrf))
-        .into()
+        .child(logout_form(csrf));
+    if catalog_cached {
+        page = page.child(Element::new("p").child(View::text(
+            "Displayed price and stock may be up to two seconds old. Checkout checks current price and stock."
+        )));
+    }
+    page.into()
 }
 
 async fn page(
@@ -219,6 +233,7 @@ async fn page(
             snapshot.cart.revision,
             &csrf,
             state.modules.orders,
+            state.database.catalog_cache_enabled(),
         ),
     ))
 }

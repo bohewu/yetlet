@@ -387,3 +387,45 @@ fn schema_mismatch_and_public_listener_fail_closed() {
     assert!(listen_address("0.0.0.0:3008").is_err());
     assert!(listen_address("127.0.0.1:3008").is_ok());
 }
+
+#[cfg(feature = "catalog-cache")]
+mod catalog_cache_tests;
+
+#[tokio::test]
+async fn opt_in_options_select_cache_or_refuse_before_storage() {
+    assert!(!DatabaseOptions::default().catalog_cache);
+    let dir = TempDir::new().unwrap();
+    let off =
+        Database::open_with_options(dir.path().join("off.sqlite"), DatabaseOptions::default())
+            .unwrap();
+    assert!(!off.catalog_cache_enabled());
+    assert!(!off.catalog().await.unwrap().is_empty());
+    let path = dir.path().join("on.sqlite");
+    let selected = Database::open_with_options(
+        &path,
+        DatabaseOptions {
+            catalog_cache: true,
+        },
+    );
+    #[cfg(feature = "catalog-cache")]
+    {
+        let db = selected.unwrap();
+        assert!(db.catalog_cache_enabled());
+        assert_eq!(db.catalog().await.unwrap(), off.catalog().await.unwrap());
+        assert_eq!(db.test_cache().test_source_loads(), 1);
+    }
+    #[cfg(not(feature = "catalog-cache"))]
+    {
+        match selected {
+            Err(crate::database::DatabaseError::Io(error)) => {
+                assert_eq!(error.kind(), std::io::ErrorKind::InvalidInput);
+                assert_eq!(
+                    error.to_string(),
+                    "shop catalog-cache configuration invalid"
+                );
+            }
+            _ => panic!("unsupported cache selection must fail closed"),
+        }
+        assert!(!path.exists());
+    }
+}

@@ -8,7 +8,11 @@ use openssl::{
     pkey::{PKey, Private},
     x509::{X509, extension::KeyUsage},
 };
-use yetlet_signing::*;
+use yetlet_signing::{
+    BackendSignature, Envelope, Error, GeneratedMaterial, KeyRef, KeyState, LocalProvider,
+    LocalSigner, Policy, PublicKeySet, PublicKeySource, PublicMaterial, ResolvedPublicKey, Result,
+    Sha256Digest, SigningBackend, SigningService, TrustedKey, Verifier, generate_self_signed,
+};
 
 const PASSWORD: &str = "disposable synthetic password";
 fn key(version: &str) -> KeyRef {
@@ -33,9 +37,9 @@ fn signer(id: KeyRef, m: &GeneratedMaterial) -> LocalSigner {
 fn trusted(id: KeyRef, m: &GeneratedMaterial, state: KeyState) -> TrustedKey {
     TrustedKey::certificate(id, &m.certificate_pem, m.certificate_pin, state).unwrap()
 }
-fn service(m: &GeneratedMaterial) -> SigningService<LocalProvider, PublicCertificates> {
+fn service(m: &GeneratedMaterial) -> SigningService<LocalProvider, PublicKeySet> {
     let local = signer(key("v1"), m);
-    let public = PublicCertificates::new(vec![(key("v1"), local.public_material())]).unwrap();
+    let public = PublicKeySet::new(vec![(key("v1"), local.public_material())]).unwrap();
     SigningService::new(
         LocalProvider::new(vec![local]).unwrap(),
         public,
@@ -59,11 +63,14 @@ fn exact_bytes_tamper_fixed_width_and_public_only_verification() {
     let bytes = b"exact\r\nbytes\0\xff";
     let envelope = block_on(service.sign(&key("v1"), bytes)).unwrap();
     assert_eq!(envelope.signature.len(), 64);
-    let public = PublicCertificates::new(vec![(
+    let public = PublicKeySet::new(vec![(
         key("v1"),
         PublicMaterial::from_certificate_pem(&m.certificate_pem).unwrap(),
     )])
     .unwrap();
+    let resolved = block_on(public.clone().public_key(&key("v1"))).unwrap();
+    assert_eq!(resolved.key_ref, key("v1"));
+    assert_eq!(resolved.material.certificate_pin(), Some(m.certificate_pin));
     let verifier = Verifier::new(
         public,
         Policy::new(vec![trusted(key("v1"), &m, KeyState::Retired)]).unwrap(),
@@ -134,7 +141,7 @@ fn pem_pfx_same_key_and_two_independent_providers() {
             .unwrap()
     );
     for local in [pem, pfx] {
-        let public = PublicCertificates::new(vec![(key("v1"), local.public_material())]).unwrap();
+        let public = PublicKeySet::new(vec![(key("v1"), local.public_material())]).unwrap();
         let service = SigningService::new(
             local,
             public,
@@ -301,7 +308,7 @@ fn rotation_retirement_revocation_and_multiple_logical_keys() {
         signer(key("v2"), &two),
         signer(id_other.clone(), &other),
     ];
-    let public = PublicCertificates::new(vec![
+    let public = PublicKeySet::new(vec![
         (key("v1"), signers[0].public_material()),
         (key("v2"), signers[1].public_material()),
         (id_other.clone(), signers[2].public_material()),
@@ -399,7 +406,7 @@ fn public_source_cannot_create_trust_or_substitute_identity() {
         Err(Error::UnknownKey)
     );
     let other = material();
-    let substituted = PublicCertificates::new(vec![(
+    let substituted = PublicKeySet::new(vec![(
         key("v1"),
         PublicMaterial::from_certificate_pem(&other.certificate_pem).unwrap(),
     )])
@@ -453,7 +460,7 @@ fn backend_wrong_version_double_hash_and_failure_are_not_retried() {
         (2, Error::BackendUnavailable),
     ] {
         let local = signer(key("v1"), &m);
-        let public = PublicCertificates::new(vec![(key("v1"), local.public_material())]).unwrap();
+        let public = PublicKeySet::new(vec![(key("v1"), local.public_material())]).unwrap();
         let s = SigningService::new(
             BadBackend { local, mode },
             public,
@@ -471,7 +478,11 @@ fn certificate_free_provider_public_material_supported() {
         PublicMaterial::from_public_key_der(&local.public_material().public_key_der().unwrap())
             .unwrap();
     assert_eq!(public.certificate_pin(), None);
-    let source = PublicCertificates::new(vec![(key("v1"), public.clone())]).unwrap();
+    let source = PublicKeySet::new(vec![(key("v1"), public.clone())]).unwrap();
+    let resolved = block_on(source.clone().public_key(&key("v1"))).unwrap();
+    assert_eq!(resolved.key_ref, key("v1"));
+    assert_eq!(resolved.material.certificate_pin(), None);
+    assert!(resolved.material.same_public_key(&public));
     let policy = Policy::new(vec![
         TrustedKey::public_key(key("v1"), public, KeyState::Active).unwrap(),
     ])

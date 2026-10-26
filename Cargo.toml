@@ -9,6 +9,8 @@ members = [
     "crates/yetlet-server-axum",
     "crates/yetlet-request-id",
     "crates/yetlet-session",
+    "crates/yetlet-auth",
+    "crates/yetlet-rate-limit",
     "examples/todo-ui",
     "examples/todo-browser",
     "examples/search-island",
@@ -37,7 +39,12 @@ members = [
     "examples/todo-server",
 ]
 resolver = "3"
-exclude = ["examples/webgpu-scene-island", "crates/yetlet-session-redis"]
+exclude = [
+    "examples/webgpu-scene-island",
+    "crates/yetlet-session-redis",
+    "crates/yetlet-config",
+    "crates/yetlet-secrets",
+]
 
 [workspace.package]
 version = "0.1.0"

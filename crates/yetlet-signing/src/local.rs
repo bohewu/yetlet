@@ -35,7 +35,8 @@ fn unavailable(_: openssl::error::ErrorStack) -> Error {
     Error::BackendUnavailable
 }
 
-/// Public data only. Certificate dates are checked at operation time so revoked
+/// Public-key data with an optional certificate and leaf pin.
+/// Certificate dates, when present, are checked at operation time so revoked
 /// or expired history can still participate in duplicate-key detection.
 #[derive(Clone)]
 pub struct PublicMaterial {

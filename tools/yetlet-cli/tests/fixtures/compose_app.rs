@@ -18,8 +18,8 @@ impl Fixture {
         }
         let framework = root.path().join("framework space 框");
         crate::docker_fixture::create(&framework);
-        crate::scaffold::create_cloud("composeapp", &framework, root.path()).unwrap();
-        crate::scaffold::create_cloud("output_parent", &framework, root.path()).unwrap();
+        crate::scaffold::create_service("composeapp", &framework, root.path()).unwrap();
+        crate::scaffold::create_service("output_parent", &framework, root.path()).unwrap();
         let app = root.path().join("composeapp");
         fs::write(app.join("Cargo.lock"), lock()).unwrap();
         let parent = root.path().join("output_parent");

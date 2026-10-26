@@ -5,6 +5,8 @@
 
 mod cart;
 mod catalog;
+#[cfg(feature = "catalog-cache")]
+mod catalog_cache;
 mod database;
 mod identity;
 mod orders;
@@ -24,7 +26,7 @@ use yetlet_core::{Element, View};
 use yetlet_server_axum::App;
 use yetlet_session::{Session, SessionConfig, SessionConfigError, SessionError, SessionManager};
 
-pub use database::Database;
+pub use database::{Database, DatabaseOptions};
 pub use identity::DemoIdentities;
 
 const MAX_FORM_BODY: usize = 4 * 1024;
