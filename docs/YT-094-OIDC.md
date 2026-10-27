@@ -88,6 +88,50 @@ warnings exits 0 with zero vulnerabilities and zero warnings. Historical
 YT-084/YT-085 cached-dependency limitations remain unchanged as source-bound
 records; this update does not modify application/library dependencies or assets.
 
+## Application-owned EC dependency prototype — 2026-10-27
+
+[PR #12's original CI run](https://github.com/bohewu/yetlet/actions/runs/40344831480)
+passed MSRV and the Stable checks before RustSec, then failed on
+[RUSTSEC-2026-0387](https://rustsec.org/advisories/RUSTSEC-2026-0387.html).
+Chrome steps were skipped, not failed. Those execution results remain historical.
+The official release check still found `openidconnect` 4.0.1; the fixing release
+announced in [upstream issue 251](https://github.com/ramosbugs/openidconnect-rs/issues/251)
+was not yet published.
+
+The root and standalone Admin workspaces now select one application-owned
+[runtime-source snapshot](../vendor/openidconnect/UPSTREAM.md) of official 4.0.1.
+Only its P-256/P-384 normal dependency constraints change to the 0.14 series;
+both lockfiles select elliptic-curve 0.14.3 and crypto-bigint 0.7.10, with no
+remaining 0.5.5 instance. RSA/HMAC/token hashing retains the original SHA-2 0.10
+dependency alongside the newer EC stack. No protocol or runtime verification
+adapter change was needed. The original MIT license, source/archive identity,
+test-only omissions and removal condition are recorded with the snapshot.
+
+Board's `oidc` feature, Admin's startup setting, `Oidc::discover`, credentials,
+issuer/JWKS trust, Session/CSRF/PKCE/nonce checks and subject mapping retain their
+existing contracts. The snapshot is excluded from workspace membership and
+publication. No mandatory Core capability or advisory ignore is added; the
+existing RSA-only audit configuration remains byte-identical.
+
+Focused Rust 1.99 tests against the changed dependency graph pass: nine Board
+OIDC tests, including three new public-vector EC tests, and one Admin provider
+refusal test. The EC tests exercise valid ES256/ES384 signatures, changed
+messages/signatures, malformed lengths, algorithm/curve mismatch and invalid
+public points through the actual public verifier API. They are signature-primitive
+vectors, not a new successful IdP exchange. Root/Admin audits pass with no reported
+vulnerabilities under the unchanged RSA decision; the existing Tokio unsound
+warning remains visible. Default Board and browser normal/build graphs exclude
+the unselected OIDC/EC dependency chain. Focused Board Clippy and the repository
+documentation check also pass.
+
+This is local dependency-remediation evidence, not a whole-verifier constant-time
+guarantee or new provider/browser/cloud qualification. Existing source-bound
+evidence is retained; no full suite, real IdP, benchmark or remote CI rerun was
+performed. The newly local upstream source emits pre-existing lifetime-elision
+warnings; no lint suppression is added. Independent candidate review passed on
+2026-10-27 with zero issues and zero required followups.
+No Commit, Push or Merge is authorized for this prototype.
+
 ## Existing settings and secret-provider composition
 
 Real provider/client settings, subjects, test credentials, authorization/callback

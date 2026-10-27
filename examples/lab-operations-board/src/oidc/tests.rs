@@ -863,3 +863,143 @@ async fn invalid_callbacks_are_retired_without_http_or_session_authentication() 
         board.drain().await.unwrap();
     }
 }
+
+// Public verification vectors adapted from openidconnect 4.0.1 (MIT),
+// src/jwt/tests.rs and src/core/jwk/tests.rs. See vendor/openidconnect/LICENSE.
+// The upstream primitive vector treats this signing input as opaque bytes;
+// this does not claim that its RS256 header is a valid ES256/ES384 ID Token.
+const EC_SIGNING_INPUT: &str = concat!(
+    "eyJhbGciOiJSUzI1NiIsImtpZCI6ImJpbGJvLmJhZ2dpbnNAaG9iYml0b24uZX",
+    "hhbXBsZSJ9.",
+    "SXTigJlzIGEgZGFuZ2Vyb3VzIGJ1c2luZXNzLCBGcm9kbywgZ29pbmcgb3V0IH",
+    "lvdXIgZG9vci4gWW91IHN0ZXAgb250byB0aGUgcm9hZCwgYW5kIGlmIHlvdSBk",
+    "b24ndCBrZWVwIHlvdXIgZmVldCwgdGhlcmXigJlzIG5vIGtub3dpbmcgd2hlcm",
+    "UgeW91IG1pZ2h0IGJlIHN3ZXB0IG9mZiB0by4",
+);
+
+fn ec_verification_vectors() -> [(
+    openidconnect::core::CoreJsonWebKey,
+    openidconnect::core::CoreJwsSigningAlgorithm,
+    Vec<u8>,
+); 2] {
+    use openidconnect::core::CoreJwsSigningAlgorithm;
+    [
+        (
+            serde_json::from_str(
+                r#"{
+        "kty": "EC",
+        "kid": "bilbo.baggins@hobbiton.example",
+        "use": "sig",
+        "crv": "P-256",
+        "x": "t6PHivOTggpaX9lkMkis2p8kMhy-CktJAFTz6atReZw",
+        "y": "ODobXupKlD0DeM1yRd7bX4XFNBO1HOgCT1UCu0KY3lc"
+    }"#,
+            )
+            .unwrap(),
+            CoreJwsSigningAlgorithm::EcdsaP256Sha256,
+            vec![
+                0x12, 0x72, 0x82, 0xb4, 0x01, 0xe1, 0xce, 0x1a, 0xb1, 0x57, 0x61, 0x93, 0xaf, 0x55,
+                0x44, 0xba, 0xbb, 0x1e, 0xda, 0x44, 0x3b, 0xa0, 0x7a, 0x45, 0xa1, 0x5a, 0x8c, 0xeb,
+                0xab, 0x18, 0x1a, 0x59, 0x9a, 0x84, 0x34, 0x46, 0x4a, 0x57, 0xeb, 0x54, 0x0b, 0x06,
+                0x0b, 0x37, 0x4b, 0xbf, 0xae, 0x8e, 0x4b, 0x64, 0x1f, 0xd7, 0x3b, 0x7a, 0x38, 0xf1,
+                0xd7, 0xfb, 0x96, 0x40, 0x90, 0xc8, 0x33, 0x94,
+            ],
+        ),
+        (
+            serde_json::from_str(
+                r#"{
+        "kty": "EC",
+        "kid": "bilbo.baggins@hobbiton.example",
+        "use": "sig",
+        "crv" : "P-384",
+        "x": "9ywsUbxX59kJXFRiWHcx97wRKNiF8Hc9F5wI08n8h2ek_qAl0veEc36k1Qz6KLiL",
+        "y": "6PWlqjRbaV7V8ohDscM243IneuLZmxDGLiGNA1w69fQhEDsvZtKLUQ5KiHLgR3op"
+    }"#,
+            )
+            .unwrap(),
+            CoreJwsSigningAlgorithm::EcdsaP384Sha384,
+            vec![
+                0x07, 0xff, 0x68, 0x0c, 0x06, 0x9b, 0x31, 0xab, 0x19, 0xd9, 0x8b, 0x7f, 0x72, 0x70,
+                0x12, 0xdb, 0x5a, 0x30, 0x68, 0xdd, 0x2e, 0x59, 0x22, 0x27, 0x40, 0x13, 0xf1, 0x4e,
+                0xaa, 0xa2, 0x33, 0x73, 0x77, 0x5e, 0x39, 0x24, 0xb0, 0x14, 0x4c, 0x1a, 0xa8, 0x2e,
+                0x24, 0xb5, 0x79, 0x5a, 0x84, 0x8c, 0x72, 0xfa, 0xa0, 0x5f, 0x01, 0xd3, 0x4d, 0x0b,
+                0x5b, 0x1c, 0x6b, 0xa1, 0xd1, 0x47, 0xf8, 0x83, 0xa2, 0xc4, 0xaf, 0xb5, 0xed, 0x3b,
+                0x54, 0xf6, 0x28, 0x2b, 0x6d, 0x41, 0x1d, 0xbb, 0x77, 0x96, 0x1b, 0xbd, 0x56, 0x5d,
+                0x39, 0x1a, 0xf3, 0x0a, 0x6d, 0x0d, 0xb2, 0x6d, 0x73, 0x91, 0x5f, 0xa2,
+            ],
+        ),
+    ]
+}
+
+#[test]
+fn ec_dependency_accepts_known_public_signatures() {
+    use openidconnect::JsonWebKey;
+    for (key, algorithm, signature) in ec_verification_vectors() {
+        key.verify_signature(&algorithm, EC_SIGNING_INPUT.as_bytes(), &signature)
+            .unwrap();
+    }
+}
+
+#[test]
+fn ec_dependency_rejects_changed_messages_signatures_and_lengths() {
+    use openidconnect::{JsonWebKey, SignatureVerificationError};
+    for (key, algorithm, signature) in ec_verification_vectors() {
+        let mut message = EC_SIGNING_INPUT.as_bytes().to_vec();
+        message[0] ^= 1;
+        assert!(matches!(
+            key.verify_signature(&algorithm, &message, &signature),
+            Err(SignatureVerificationError::CryptoError(_))
+        ));
+        let mut changed = signature.clone();
+        changed[0] ^= 1;
+        assert!(matches!(
+            key.verify_signature(&algorithm, EC_SIGNING_INPUT.as_bytes(), &changed),
+            Err(SignatureVerificationError::CryptoError(_))
+        ));
+        assert!(matches!(
+            key.verify_signature(
+                &algorithm,
+                EC_SIGNING_INPUT.as_bytes(),
+                &signature[..signature.len() - 1]
+            ),
+            Err(SignatureVerificationError::CryptoError(_))
+        ));
+        let mut extended = signature;
+        extended.push(0);
+        assert!(matches!(
+            key.verify_signature(&algorithm, EC_SIGNING_INPUT.as_bytes(), &extended),
+            Err(SignatureVerificationError::CryptoError(_))
+        ));
+    }
+}
+
+#[test]
+fn ec_dependency_rejects_curve_mismatch_and_invalid_public_points() {
+    use openidconnect::{
+        JsonWebKey, SignatureVerificationError,
+        core::{CoreJsonWebKey, CoreJwsSigningAlgorithm},
+    };
+    for (key, algorithm, signature) in ec_verification_vectors() {
+        let (wrong_algorithm, coordinate_len) = match algorithm {
+            CoreJwsSigningAlgorithm::EcdsaP256Sha256 => {
+                (CoreJwsSigningAlgorithm::EcdsaP384Sha384, 43)
+            }
+            CoreJwsSigningAlgorithm::EcdsaP384Sha384 => {
+                (CoreJwsSigningAlgorithm::EcdsaP256Sha256, 64)
+            }
+            _ => unreachable!(),
+        };
+        assert!(matches!(
+            key.verify_signature(&wrong_algorithm, EC_SIGNING_INPUT.as_bytes(), &signature),
+            Err(SignatureVerificationError::InvalidKey(_))
+        ));
+        let mut bad_point = serde_json::to_value(key).unwrap();
+        bad_point["x"] = "A".repeat(coordinate_len).into();
+        bad_point["y"] = "A".repeat(coordinate_len).into();
+        let bad_key: CoreJsonWebKey = serde_json::from_value(bad_point).unwrap();
+        assert!(matches!(
+            bad_key.verify_signature(&algorithm, EC_SIGNING_INPUT.as_bytes(), &signature),
+            Err(SignatureVerificationError::InvalidKey(_))
+        ));
+    }
+}

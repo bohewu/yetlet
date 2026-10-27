@@ -44,6 +44,7 @@ exclude = [
     "crates/yetlet-session-redis",
     "crates/yetlet-config",
     "crates/yetlet-secrets",
+    "vendor/openidconnect",
 ]
 
 [workspace.package]
@@ -56,3 +57,7 @@ repository = "https://github.com/bohewu/yetlet"
 [workspace.dependencies]
 axum = "0.8"
 tokio = { version = "1", features = ["macros", "net", "rt-multi-thread"] }
+
+[patch.crates-io]
+# Temporary application OIDC dependency patch; see vendor/openidconnect/UPSTREAM.md.
+openidconnect = { path = "vendor/openidconnect" }

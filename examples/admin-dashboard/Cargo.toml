@@ -36,3 +36,7 @@ tempfile = "=3.27.0"
 [target.'cfg(target_os = "linux")'.dev-dependencies]
 reqwest = { version = "0.12", default-features = false, features = ["json"] }
 libc = "0.2"
+
+[patch.crates-io]
+# Admin is an independent workspace and must select the same application patch.
+openidconnect = { path = "../../vendor/openidconnect" }
