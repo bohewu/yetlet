@@ -3,6 +3,15 @@ name: Yetlet private source-package rebuild
 # Manual preparation only. This workflow does not sign or publish artifacts.
 on:
   workflow_dispatch:
+    inputs:
+      cohort:
+        description: Source-package set (preparation only)
+        type: choice
+        required: true
+        default: original-nine
+        options:
+          - original-nine
+          - sixteen
 
 permissions:
   contents: read
@@ -19,6 +28,7 @@ jobs:
     env:
       RUSTUP_TOOLCHAIN: 1.99.0
       CARGO_BUILD_JOBS: '4'
+      REBUILD_COHORT: ${{ inputs.cohort || 'original-nine' }}
     steps:
       - name: Checkout immutable workflow source
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -27,13 +37,36 @@ jobs:
           persist-credentials: false
       - name: Install pinned compiler
         run: rustup toolchain install 1.99.0 --profile minimal
-      - name: Build nine source packages from fresh inputs
+      - name: Prepare selected static OpenSSL recipe
+        if: inputs.cohort == 'sixteen'
+        run: |
+          set -euo pipefail
+          rebuild_openssl_archive="$RUNNER_TEMP/openssl-3.5.9.tar.gz"
+          rebuild_openssl_source="$RUNNER_TEMP/yetlet-openssl-source"
+          rebuild_openssl_prefix="$RUNNER_TEMP/yetlet-openssl"
+          curl --fail --location --proto '=https' --tlsv1.2 --max-time 120 \
+            --output "$rebuild_openssl_archive" \
+            https://github.com/openssl/openssl/releases/download/openssl-3.5.9/openssl-3.5.9.tar.gz
+          printf '%s  %s\n' 603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a \
+            "$rebuild_openssl_archive" | sha256sum --check
+          mkdir "$rebuild_openssl_source"
+          tar -xzf "$rebuild_openssl_archive" --strip-components=1 -C "$rebuild_openssl_source"
+          (
+            cd "$rebuild_openssl_source"
+            ./Configure --prefix="$rebuild_openssl_prefix" --libdir=lib no-shared
+            make -j4
+            make install_sw
+          )
+          "$rebuild_openssl_prefix/bin/openssl" version
+          printf 'OPENSSL_DIR=%s\nOPENSSL_STATIC=1\n' "$rebuild_openssl_prefix" >> "$GITHUB_ENV"
+          rm -rf "$rebuild_openssl_source" "$rebuild_openssl_archive"
+      - name: Build selected source packages from fresh inputs
         env:
           BUILD_WORKFLOW_REF: ${{ github.workflow_ref }}
           BUILD_WORKFLOW_SHA: ${{ github.workflow_sha }}
         run: |
           set -euo pipefail
-          CARGO_TARGET_DIR="$RUNNER_TEMP/yt086-xtask-bootstrap" cargo run --locked --manifest-path xtask/Cargo.toml -- release private-rebuild
+          CARGO_TARGET_DIR="$RUNNER_TEMP/yt086-xtask-bootstrap" cargo run --locked --manifest-path xtask/Cargo.toml -- release private-rebuild --cohort "$REBUILD_COHORT"
       - name: Retain private package and build evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

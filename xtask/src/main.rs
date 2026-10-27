@@ -41,8 +41,11 @@ fn main() -> std::process::ExitCode {
                 &args,
             ));
         }
-        Cli::PrivateRebuild => {
-            return command_result(yetlet_xtask::release::private::run(&repository_root()));
+        Cli::PrivateRebuild { cohort } => {
+            return command_result(yetlet_xtask::release::private::run(
+                &repository_root(),
+                cohort,
+            ));
         }
         Cli::Checksums {
             operation,

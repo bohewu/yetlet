@@ -314,3 +314,17 @@ remains enforced without conflict/degradation. The reviewer again concludes
 item_can_be_done:false: exact-source CI/sixteen-package rebuild, current-lock MSVC
 evidence and final reader-source disposition remain open. No accepted workload,
 earlier review verdict, source candidate or formal decision is replaced.
+
+## Later rebuild preparation
+
+After the ten checkpoint documents are committed as012ecb3 without Push, the
+owner authorizes the [minimal sixteen-package rebuild extension](YT-205-SIXTEEN-PACKAGE-REBUILD.md).
+The working overlay preserves original-nine mode and adds an explicit sixteen
+cohort across the existing independent workspaces, with separate bootstrap and
+normal verification records. Five focused tests, compile/lint/format and static
+workflow checks pass; independent extension Reviewer PASS0 accepts local
+preparation. This prepares the
+missing mechanism but does not execute the hosted rebuild, select a successor
+source or resolve the remaining CI/MSVC/reader-source conditions. The selected
+a2d6474 candidate and all historical results above remain unchanged; YT-205
+stays In progress and D1–D6 Pending. New work is not committed or pushed.
