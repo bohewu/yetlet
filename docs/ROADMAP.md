@@ -913,6 +913,20 @@ All 45 source/55 evidence bindings matched through review; documentation checks
 passed and staged files remain zero. Package/readme/archive inputs are unchanged
 by completion metadata.
 
+**YT-202 native evidence (2026-10-26):** [GNU results and Windows prerequisite
+gap](YT-202-NATIVE-FEATURE-GAPS.md), Blocked on configured MSVC Rust/VC Tools/
+Windows SDK. Reviewed YT-201 source8fd8751 and delivery integration74f53fe share
+the complete tree. Four default normal/build graphs and two new Ubuntu24 userland
+native consumers with Rust/Cargo1.99/OpenSSL3.5.9 PASS; no browser compilation,
+provider service or old test replay. Owned test containers/images removed. The
+current native Windows Runner exposes GNU tools only; no installation or target
+substitution is made. Independent partial-evidence Reviewer PASS, zero issues/
+required followups, verifies four source/32 evidence bindings and native cleanup;
+documentation checks PASS. No whole-item Done is claimed. Both strict Push
+preflights stopped before any Push; alternate
+delivery history and Windows setup/defer decisions await the owner. Source/API,
+YT-096/D1–D6 and YT-020 gates remain unchanged; new documents are uncommitted.
+
 - [x] **YT-060 / M10a:** Dual `MIT OR Apache-2.0` license, package metadata, security policy and maintainer-directed/no-external-PR contribution policy; independent reviewer PASS.
 - [x] **YT-061 / M10b:** Collaborator-only PRs, protected `master`, required checks, SHA-pinned GitHub-owned Actions and Dependabot configured; unsupported private-state security services recorded; repeat reviewer PASS.
 - [x] **YT-062 / M10c:** Minimal title/language document metadata, provisional compatibility policy, legacy generic compile fixtures, complete stable/MSRV validation and repeat reviewer PASS.
@@ -1633,3 +1647,11 @@ budgets; preserve uncommitted YT-197. Done after newRust3,native/Wasm/assets/doc
 and actual slope browser flow PASS. Independent Reviewer PASS0 with9incremental
 source/24evidence and1,131protected current file bindings. No editor/Core/renderer
 API,old qualification replay,benchmark or Commit/Push.
+
+**YT-202 remaining-cell inventory (2026-10-27):** [Current continuation](YT-202-NATIVE-FEATURE-GAPS.md#current-native-coverage--2026-10-27) retains all accepted GNU/package evidence and the original source binding; no library path changed at delivered4e5ef64. The reconnected Windows Runner now has Rust1.99MSVC, VC Tools and SDK ready. Only fourteen-package native default and Auth/session plus Config/secret-provider consumers remain. Both are Not run: prior official artifact transfer was policy-rejected, and detailed diagnostics require an unavailable admin scope. No exact configuration remedy has been established and no bypass or old test replay occurs. YT-202 remains Blocked pending an admitted route, those executions and final independent review; no new Commit/Push/Merge. Earlier missing-toolchain and Git delivery failures stay historical.
+
+**YT-202 authorized source-route update (2026-10-27):** The owner explicitly selects Git clone for the remaining Windows checks. [The new task-owned clone](YT-202-NATIVE-FEATURE-GAPS.md#owner-authorized-git-source-continuation--2026-10-27) is admitted and fixed at74f53fe/tree2faa, matching accepted YT-201 source; no rejected artifact is relocated or transferred. Windows prerequisites are ready; preparation uses the existing Cargo bootstrap/directory-source convention and a newly bound equivalent fourteen-package consumer. The earlier artifact/admin diagnostic blockers are historical. YT-202 is In progress, with both MSVC executions and final independent review pending; accepted GNU/package/provider/browser evidence is retained without replay. No new Commit/Push/Merge or final release selection.
+
+**YT-202 MSVC execution (2026-10-27):** [Two new native consumers](YT-202-NATIVE-FEATURE-GAPS.md#new-msvc-results-and-preserved-preparation-failure--2026-10-27) PASS on prepared Rust1.99MSVC/VC14.44/SDK26100: fourteen default package dependencies, then Auth/session and Config/secret-provider with missing-Memory-layer refusal and CPU-only wgpu. Inputs/lock remain unchanged; all40 package-file hashes reconcile to committed CRLF checkout and100 external lock identities are retained, without a Linux archive-byte-identity claim. The fresh fixture dependency-preparation failure and environment-observation correction remain recorded; no passing native run or old suite was replayed. Six task-owned Windows directories are removed and evidence retained. YT-202 awaits final independent review before Done; no Commit/Push/Merge or release activation.
+
+**YT-202 final native acceptance (2026-10-27):** [Final independent Reviewer PASS](YT-202-NATIVE-FEATURE-GAPS.md#final-independent-acceptance--2026-10-27), zero issues/required followups, closes YT-202 at selected native/MSRV/feature scope. Both fourteen-package MSVC consumers pass with exact source/feature/lock/tool/result/cleanup bindings;4documentation/30new/32retained evidence hashes and24ZIP members match. Original request records Rust1.99MSVC selection; generic non-Git source freshness and directory-source/CRLF limits remain explicit. Prior failures/reviews and accepted GNU evidence stay intact without replay. Four task documents remain uncommitted; no Commit/Push/Merge or release activation. YT-203 is next; YT-204/205, YT-096/D1–D6 and YT-020 gates remain separate.
