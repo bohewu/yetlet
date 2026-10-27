@@ -1,5 +1,17 @@
 # Yetlet Prototype Release Readiness
 
+**YT-205 selected-source consolidation (2026-10-27):** After guarded28-path
+commita2d6474 without Push, the owner selects that immutable source for all16
+experimental0.1.0 libraries. [The evidence packet](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md)
+binds16 clean C archives,10 new changed-lock package checks/six exact compilation
+reuses, one new integration consumer, eight first-time rustdoc commands and14
+affected inventory cells, all new commands PASS after preserved preparation
+failures.28 inventories and prior source/platform/browser/audit results remain
+source-bound without replay. Exact-source hosted CI/rebuild, affected native
+dependency evidence and C-versus-draft reader guidance remain open; YT-205 stays
+In progress and delivery review is pending. New documentation is uncommitted;
+no Push/Merge, signing or publication, and D1–D6 remain Pending.
+
 **YT-202 native continuation (2026-10-26):** [New GNU evidence and Windows
 prerequisite gap](YT-202-NATIVE-FEATURE-GAPS.md) records four source-bound default
 graphs and two Ubuntu24 userland/OpenSSL3.5.9 native consumer PASS results.
@@ -226,3 +238,7 @@ Yetlet keeps native HTTP, renderer, browser and optional provider dependencies s
 **YT-204 authorized policy followup (2026-10-27):** The owner approves only Zlib/BSL-1.0/ISC additions to the license allowlist, notice preservation and the five failed checks. [All five reruns PASS](YT-204-PACKAGE-SECURITY-COVERAGE.md#authorized-license-policy-followup--2026-10-27), zero license/source errors,39 retained input and10 notice hashes unchanged; six unused-allowance warnings remain. All other policy fields, manifests/locks/runtime and prior failures/scan/advisory evidence stay intact.42/42 selected coverage combines prior passes and these five outcomes; no other successful check is replayed. Policy-wide versus per-component distribution scope is documented without relicensing Yetlet. YT-204 remains In progress pending final independent review; no ignore, upgrade or Commit/Push/Merge.
 
 **YT-204 final policy acceptance (2026-10-27):** [Independent Reviewer PASS](YT-204-PACKAGE-SECURITY-COVERAGE.md#final-policy-acceptance--2026-10-27), zero issues/required followups, closes the authorized license blocker and marks YT-204 Done at selected inventory/security scope. Six candidates/five followup evidence bindings,39 inputs/10 notices/138 source-and-alias bindings and prior canonical/supplemental records verify; all five affected checks pass under the sole three-ID allowlist delta. Other policy, dependency/runtime and historical warning/failure identities remain intact. Restored package trees and owned Cargo home are removed, raw evidence preserved. Six paths stay uncommitted/staged0; no other passed-check replay, Commit/Push/Merge or release activation. YT-205 is next but unopened; formal release gates remain separate.
+
+**YT-205 independent checkpoint acceptance (2026-10-27):** [Read-only Reviewer PASS](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#independent-checkpoint-acceptance--2026-10-27), zero issues/packet repair requirements, verifies10document/185evidence/1179protected bindings,16clean C archives and their retained/new proof distinctions. The reviewer explicitly keeps item_can_be_done:false for current-source CI/rebuild, affected native dependency evidence and reader-source disposition; YT-205 remains In progress. Owned caches/extracted packages are removed; archives, failure logs, SBOMs and rustdoc remain. No product replay or new-change Commit/Push/Merge, and D1-D6 remain Pending.
+
+**YT-205 current-lock GNU delta (2026-10-27):** [One additional Ubuntu24/OpenSSL3.5.9 integration run](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#once-only-current-lock-ubuntu24-continuation) PASS at C/Tokio1.53.3 with unchanged source/lock and observed Rust1.99/glibc2.39. It closes only this selected native dependency gap; no old suite is replayed. Owned image/container/vendor/build inputs are removed and all raw evidence retained. The earlier checkpoint PASS remains intact; separate independent GNU delta review PASS0 verifies10docs/12additional records, original185records unchanged, and explicitly keeps item_can_be_done:false. Current-source hosted CI/sixteen-package rebuild, MSVC dependency evidence and reader-source disposition keep YT-205 In progress; no Commit/Push/Merge or formal decision.

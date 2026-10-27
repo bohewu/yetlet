@@ -1,9 +1,10 @@
 # Current API reference
 
-Date: 2026-10-26. Scope: the current checkout, including the existing opt-in
+Date: 2026-10-27. Scope: the current checkout, including the existing opt-in
 application options. All packages remain unpublished and experimental. This
-entry map does not expand the original nine release candidates, promise SemVer
-stability or requalify the current source for every platform.
+entry map does not promise SemVer stability or requalify the current source for
+every platform. All sixteen implemented libraries are included in the selected
+experimental 0.1.0 candidate; package selection does not install a capability.
 
 Use repository guides for behavior and integration, and source/rustdoc from the
 same revision for signatures and feature/target availability. The
@@ -13,20 +14,20 @@ the [historical M9 classification](API-CONTRACTS.md) retains its original scope.
 The [capability map](CAPABILITIES.md) distinguishes framework packages,
 application integrations and research decisions.
 
-[YT-201 package preparation](YT-201-PACKAGE-PREPARATION.md) supplies compatible
-0.1.0 metadata, licenses and package guides for all sixteen. They remain
-unpublished; preparation does not select the final candidate or expand the
-original ce56e08 release/support evidence.
+The packages have compatible 0.1.0 metadata, licenses and package guides. They
+remain unpublished; the selected candidate is undergoing technical evidence
+reconciliation. Support remains specific to each package, target and feature.
+Historical nine-package evidence keeps its original source and support limits.
 
 For first authoring, follow [Views/components](VIEW-COMPONENTS.md). For package
 features, startup wiring and consumer settings/defaults in one place, use the
 [opt-in quick reference](OPT-IN-QUICK-REFERENCE.md); the tables below remain the
 API-carrier map, with full contracts in their linked guides.
 
-## Original nine library candidates
+## HTML, HTTP and browser packages
 
-These packages form the original candidate set. A package's presence here is
-not registry availability; start from the existing checkout. Renderer validation
+These packages provide the main HTML, HTTP and browser building blocks. Their
+presence here is not registry availability; start from the existing checkout. Renderer validation
 and native Axum/Tower semantics remain separate responsibilities.
 
 | Package and current guide | Main entry points | Selection, ownership and failure boundary |
@@ -41,11 +42,13 @@ and native Axum/Tower semantics remain separate responsibilities.
 | [yetlet-request-id](../crates/yetlet-request-id/README.md) | `RequestIds`, `RequestId`, `HEADER`, `InvalidStart` | Explicit scoped/global installation. Clones share a bounded numeric counter; independent providers/restarts do not. Generated IDs replace untrusted inbound values; overflow refuses with 503, not distributed trace identity |
 | [yetlet-session](../crates/yetlet-session/README.md) | `SessionConfig`, `SessionManager`, `Session`, typed Session errors | Explicit bounded Memory store, synchronous operations, cookie/CSRF and rotation/revocation. Process-local state disappears on restart; anonymous Session is not authentication or durable business storage |
 
-## Later optional packages
+## Additional opt-in packages
 
-These implemented packages are available for explicit source-checkout use and
-remain outside that original release set. A separate workspace/lock is a build
-boundary, not an interchangeable provider or platform-support guarantee.
+These seven packages are also included in the selected sixteen-package
+candidate and are available for explicit source-checkout use. A separate
+workspace/lock is a build boundary, not an interchangeable provider or
+platform-support guarantee. Their default installation and support do not
+follow from coordinated versioning.
 
 | Package and current guide/source | Main entry points | Selection, ownership and failure boundary |
 |---|---|---|

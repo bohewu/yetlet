@@ -46,7 +46,13 @@ Invalid configuration returns `SessionConfigError`; TTL is 1 second–30 days an
 
 Session is not authentication or durable storage. Restart loses Memory state; multiple independent processes do not share it. Logout/cookie response reordering requires application-aware handling, and CSRF tokens must be checked on unsafe actions. Avoid serializing identities, tokens or server capabilities into browser state.
 
-The [separate experimental Redis provider](../yetlet-session-redis/README.md) is outside the nine candidates and remains nonpublishable; its selected single-host/single-primary/no-persistence qualification does not broaden Memory guarantees. See [provider operations](../../docs/PROVIDER-OPERATIONS.md) and [M8c evidence](../../docs/M8C-VERIFICATION.md).
+The [separate experimental Redis-protocol provider](../yetlet-session-redis/README.md)
+has publication-prepared metadata and is included in the selected sixteen-package
+candidate, but remains unpublished. Its async, single-primary semantics and
+separately recorded Valkey evidence do not broaden Memory guarantees or imply
+generic HA/failover/restore support. See [provider operations](../../docs/PROVIDER-OPERATIONS.md)
+and the provider guide for its current limits; [M8c evidence](../../docs/M8C-VERIFICATION.md)
+retains the earlier Memory scope.
 
 ## API reference
 

@@ -14,7 +14,18 @@ candidate, support classifications, final source C or release authorization.
 
 ## Release train
 
-Yetlet-owned crates use one workspace version and one coordinated release train. Runnable examples, benchmark fixtures, generated WASM glue and Python harnesses are validation assets, not independently versioned public packages.
+Yetlet-owned libraries share one coordinated release version and release train.
+Their manifests may inherit the root version or declare it in an isolated
+workspace; coordinated versioning does not merge their dependency graphs.
+Runnable examples, benchmark fixtures, generated WASM glue and Python harnesses
+are validation assets, not independently versioned public packages.
+
+**Current candidate selection (2026-10-27):** The owner selected the sixteen
+experimental 0.1.0 libraries at immutable `a2d6474` for
+[technical evidence consolidation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md).
+The original nine-package ce56e08 records retain their identities. Selection
+does not complete current-source CI/rebuild gates, expand platform support or
+authorize signing, registry publication or activation; D1–D6 remain Pending.
 
 The current `0.y` version remains experimental under SemVer. The classifications in [API Contracts](API-CONTRACTS.md) impose repository discipline but do not yet promise downstream compatibility.
 

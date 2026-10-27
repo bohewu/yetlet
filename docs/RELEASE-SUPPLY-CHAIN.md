@@ -1,5 +1,15 @@
 # Release Supply-Chain Design
 
+**Selected sixteen-package technical candidate (2026-10-27):** The owner selects
+immutable `a2d6474`/tree`1c3eab` for experimental0.1.0
+[YT-205 reconciliation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md). Sixteen local
+C archive digests, retained versus new package/inventory results and an unsigned
+sixteen-subject proposal are bound explicitly. This does not rewrite the original
+nine-subject proposal or old provenance, complete current-C CI/rebuild/platform
+gaps, or approve the later reader draft as C contents. D1–D6 remain Pending;
+signing, registry proof and activation remain YT-096/YT-020 operations under
+separate authority. No new policy, ignore, Push or publication is introduced.
+
 **Task:** YT-064 / M10e
 **Original M10e status:** Design and local preflight accepted; independent reviewer `wc_job_CeUNYnHsO1yI_kBz` PASS. Actual experiments are recorded in M10e verification. Release activation, signing and independent rebuild are not performed; YT-020 remains Blocked.
 

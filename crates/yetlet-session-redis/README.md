@@ -4,6 +4,10 @@
 
 This is a separate, explicitly selected async Session implementation, not an authentication system. It uses the reviewed single-primary Lua semantics and [selected pure-SSR Cookie contract](../../docs/YT-066B-COOKIE-ORDERING.md). No JavaScript, plugin registry, DI container, implicit Memory fallback or synchronous Redis facade is added.
 
+This package is included in the selected sixteen-package experimental 0.1.0
+candidate. It remains unpublished; candidate selection and publication-prepared
+metadata do not establish registry availability or expand the support scope.
+
 The later [YT-094 Valkey reference](../../docs/YT-094-VALKEY-SESSIONS.md) selects
 Valkey 9.1.2 for actual two-app shared-session verification. It reuses this
 implementation and existing protocol/key schema. Its later TTL correction
@@ -38,7 +42,7 @@ Configuration accepts a 1–64 character isolated namespace, a 1–20 character 
 
 The fixed experimental bounds are: 400 ms shared caller deadline across request-lock/queue/Redis phases, 80 ms operation queue wait, 200 ms connect timeout, one reconnect retry with 10–20 ms backoff, immutable one-second server dispatch window, five-second operation-result retention, 64 result records per namespace, 400 ms tombstones and two-second shutdown drain. A synchronous callback cannot be interrupted; if it exhausts the caller deadline, the next phase refuses dispatch. Caller timeout does not cancel a dispatched Redis write; owned work retains its permits until a reply/disconnect or shutdown.
 
-Lua script isolation is not rollback on runtime/OOM failure. Later [YT-066b3 qualification](../../docs/YT-066B3-VERIFICATION.md) passed actual three-application execution, owned cleanup and independent review at single-host/single-primary/no-persistence scope. YT-066 is Done at the selected single-host Docker/Redis-provider scope; YT-020 remains Blocked and this isolated provider remains outside the original nine-package immutable candidate. YT-201 separately prepares 0.1.0 publication metadata; no registry upload or new candidate is selected. Session capacity beyond the selected bounds, persistence/restart/restore, production TLS/ACL/secrets, HA/Cluster and SLO/RPO/RTO remain unqualified. Never restore an older namespace and assume revoked credentials remain invalid.
+Lua script isolation is not rollback on runtime/OOM failure. Later [YT-066b3 qualification](../../docs/YT-066B3-VERIFICATION.md) passed actual three-application execution, owned cleanup and independent review at single-host/single-primary/no-persistence scope. YT-066 is Done at that recorded scope; this isolated provider remains outside the historical nine-package immutable candidate. The later TLS/ACL and cross-host/persistent-restart evidence below has its own bounded inputs; neither record qualifies arbitrary restore, HA/Cluster or application SLO/RPO/RTO. YT-020 remains Blocked and no registry upload is authorized. Never restore an older namespace and assume revoked credentials remain invalid.
 
 ## Local checks
 
