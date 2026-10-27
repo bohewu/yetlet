@@ -52,13 +52,19 @@ visibility alone does not promote them to recommended or supported Yetlet APIs.
 Generated output for optional or browser APIs must use the relevant feature and
 target; one native default build cannot represent every configuration.
 
-The [YT-205 manuscript inventory](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#reader-sources-and-candidate-documentation-boundary)
-enumerates46 exact reader-source files and separately binds the selected native
-and WASM rustdoc outputs. This is an uncommitted reader draft over the selected
-candidate, not a ready-to-publish site. Historical annotations and links to
-unselected source/maintainer records require an explicit reader edition and
-destination mapping before export. No image asset is selected and selection
-still does not recursively include linked reports or change repository visibility.
+The [YT-205 current-C reconciliation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#reader-inventory-and-decision-reconciliation)
+binds46 exact reader manuscripts at technical candidate118f3d0 to the previously
+selected draft and retains native/WASM rustdoc input limits. Both Session README
+corrections are now in C's actual archives. This is a versioned source selection,
+not a sanitized ready-to-publish site. Historical annotations and unselected-target
+links still need an explicit reader edition/destination mapping before export.
+No image asset is selected and selection is not recursive.
+
+The [YT-206 public-source inventory](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md) separately
+lists repository/history/Actions exposure and selected GitHub private-reporting
+activation checks; a separate mailbox/domain is optional.
+Source-preview preparation does not publish a reader site or resolve formal
+signing/registry decisions. Repository visibility remains Private.
 
 ## Retained evidence and maintainer material
 

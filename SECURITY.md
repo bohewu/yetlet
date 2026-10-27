@@ -11,8 +11,10 @@ The maintainer selected [Private preparation](docs/YT-020-PRIVATE-RELEASE-PREP.m
 Do **not** open a public GitHub Issue for a suspected vulnerability.
 
 - While the repository is private, use an existing private collaborator channel to contact the maintainer.
-- When the repository becomes public, use GitHub Private Vulnerability Reporting when that feature is enabled.
-- Before public activation, the maintainer must verify a reachable private fallback and document it alongside the GitHub reporting route. No unverified contact address is advertised here; while Private, use the existing private collaborator channel.
+- For the public source preview, use GitHub Private Vulnerability Reporting through the repository's Security → Advisories → Report a vulnerability entry when enabled. This is the selected reporting channel.
+- As part of separately authorized public activation, enable the private reporting feature, verify that its form is available, and confirm that maintainer notifications are configured before announcing the preview. Do not advertise an unverified reporting route as available.
+- A separate email address, custom domain or email-forwarding service is optional and is not a prerequisite for the source preview.
+- If the private form is unavailable, a public Issue may request a private reporting route only. Do not include vulnerability details, exploit steps, secrets or personal data in that Issue.
 
 Include a clear impact statement, affected commit/version, reproduction steps, prerequisites, and any suggested mitigation. Avoid sending secrets, personal data, destructive payloads, or public exploit details.
 

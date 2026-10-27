@@ -29,4 +29,4 @@ Do not report a suspected vulnerability through a public Issue. Follow [SECURITY
 
 ## Developer entry points
 
-Start with the [native SSR quickstart](README.md#start-with-native-ssr), [documentation index](docs/README.md) and [sample guide](docs/SAMPLES.md). The repository remains Private and unpublished at experimental `0.1.0` scope; retained verification is not release approval. Follow [repository instructions](AGENTS.md) for bounded changes and applicable checks.
+Start with the [native SSR quickstart](README.md#start-with-native-ssr), [documentation index](docs/README.md) and [sample guide](docs/SAMPLES.md). The source checkout is experimental and packages remain unpublished at `0.1.0` scope; retained verification is not release approval. Follow [repository instructions](AGENTS.md) for bounded changes and applicable checks.

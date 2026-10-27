@@ -1704,3 +1704,19 @@ is preserved without alternate transfer or a local-receipt claim. Final independ
 Reviewer PASS0 accepts the actual local/remote evidence and closes YT-205 at
 selected technical/reader scope. Seven document paths stay
 uncommitted/staged0; no Merge/signing/publication and D1–D6 Pending.
+
+**YT-206 public-source preview preparation (2026-10-27):** After authorized
+strict/builtin closeout commit778423e without Push, the
+[disclosure inventory](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md) distinguishes technical
+C qualification from whole-repository visibility. Current1,191files,114remote
+reachable commits,38existing runs,16artifacts,12PR bodies and15synthetic screenshots
+are inventoried without replaying accepted product qualification. Existing history
+and evidence are recommended for an Experimental preview only after owner
+acceptance of the concrete disclosure categories. GitHub Private Vulnerability
+Reporting is selected; a separate mailbox/domain is optional. Form availability
+and maintainer notifications must be verified during authorized public activation
+before announcement. YT-206 remains In progress for disclosure/activation choices.
+Actual collaborator-only
+PR creation and both required checks are observed/preserved. No Commit/Push/Merge,
+visibility/history/log deletion, signing or publication; YT-096/D1–D6 and YT-020
+remain separate.
