@@ -33,7 +33,7 @@ fn scaffold(parent: &Path, framework: &Path, name: &str, cloud: bool) -> Result<
         fs::set_permissions(parent, fs::Permissions::from_mode(0o700)).unwrap();
     }
     if cloud {
-        yetlet_cli::scaffold::create_cloud(name, framework, parent)
+        yetlet_cli::scaffold::create_service(name, framework, parent)
     } else {
         yetlet_cli::scaffold::create(name, framework, parent)
     }

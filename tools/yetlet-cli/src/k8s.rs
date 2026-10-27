@@ -55,7 +55,7 @@ fn generate_inner(
             if snapshot.with_assets {
                 env.push(json!({"name": "YETLET_ASSET_ROOT", "value": "/opt/yetlet/assets"}));
             }
-            if snapshot.with_config {
+            if snapshot.runtime_settings {
                 for (name, value) in [
                     ("YETLET_CONFIG_ROOT", "/opt/yetlet/config"),
                     ("APP_ENVIRONMENT", "Production"),
@@ -67,7 +67,7 @@ fn generate_inner(
                 env.push(json!({"name": "APP_SERVICE__TOKEN", "valueFrom": {"secretKeyRef": {"name": format!("{name}-runtime"), "key": "service-token", "optional": false}}}));
             }
             let mut readme = include_str!("../templates/k8s/README.md").to_owned();
-            if snapshot.with_config || snapshot.with_assets {
+            if snapshot.runtime_settings || snapshot.with_assets {
                 readme.push_str(include_str!("../templates/docker/PROFILE-RUNTIME.md"));
             }
             Ok(vec![

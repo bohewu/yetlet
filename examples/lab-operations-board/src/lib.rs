@@ -1,7 +1,13 @@
 //! Application-owned SSR-first lab records. No core API, GPU or production IdP.
 mod asset_data;
 mod assets;
+#[cfg(feature = "auth-valkey")]
+mod auth;
 mod database;
+#[cfg(feature = "request-tracing")]
+mod request_tracing;
+#[cfg(feature = "request-tracing")]
+pub use request_tracing::TARGET as REQUEST_TRACING_TARGET;
 mod domain;
 mod sessions;
 pub use sessions::SessionBackend;
@@ -26,7 +32,7 @@ pub use domain::DemoIdentities;
 use domain::{Fields, ListQuery, LoginSession, Principal};
 use futures_util::stream;
 use serde::Deserialize;
-use sessions::{Manager as SessionManager, Session};
+use sessions::{Manager as SessionManager, ProtectedSession, Session};
 use std::{convert::Infallible, net::SocketAddr, path::Path, sync::Arc, time::Duration};
 use tokio::sync::{Semaphore, watch};
 use yetlet_core::View;
@@ -37,6 +43,8 @@ use yetlet_server_axum::{
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Failure {
     Invalid,
+    Configuration,
+    LoginRequired,
     Unauthorized,
     Forbidden,
     NotFound,
@@ -66,6 +74,8 @@ impl From<rusqlite::Error> for Failure {
 impl Failure {
     fn status(self) -> StatusCode {
         match self {
+            Self::Configuration => StatusCode::INTERNAL_SERVER_ERROR,
+            Self::LoginRequired => StatusCode::SEE_OTHER,
             Self::Invalid => StatusCode::BAD_REQUEST,
             Self::Unauthorized => StatusCode::UNAUTHORIZED,
             Self::Forbidden => StatusCode::FORBIDDEN,
@@ -79,6 +89,8 @@ impl Failure {
     }
     fn message(self) -> &'static str {
         match self {
+            Self::Configuration => "Authentication configuration error.",
+            Self::LoginRequired => "Sign in again to continue.",
             Self::Invalid => "Invalid request.",
             Self::Unauthorized => "Sign in again to continue.",
             Self::Forbidden => "You do not have permission for this project or action.",
@@ -97,6 +109,9 @@ impl Failure {
 }
 impl IntoResponse for Failure {
     fn into_response(self) -> Response {
+        if self == Self::LoginRequired {
+            return Redirect::to("/board/login").into_response();
+        }
         let mut response = (
             self.status(),
             yetlet_server_axum::Page::with_metadata(
@@ -114,6 +129,8 @@ impl IntoResponse for Failure {
 }
 #[derive(Clone)]
 struct AppState {
+    #[cfg(feature = "auth-valkey")]
+    policy: Option<auth::PolicyFile>,
     database: Database,
     authentication: Authentication,
     manifest: assets::Manifest,
@@ -137,6 +154,18 @@ pub struct Board {
     stopping: watch::Sender<bool>,
     sessions: SessionManager,
 }
+/// Application-owned instance selection, independent of the settings source.
+/// Compiled capabilities remain off unless explicitly selected here.
+#[derive(Default)]
+pub struct BoardOptions {
+    pub stylesheets: Vec<String>,
+    pub triage_script: Option<String>,
+    pub sessions: SessionBackend,
+    /// Selects YT-181's fresh-v2 SQL authority; requires `commit-write-auth`.
+    pub write_authorization: bool,
+    /// Selects request/worker diagnostics; the host still owns the subscriber.
+    pub request_tracing: bool,
+}
 impl Board {
     /// Build only for a concrete loopback listener. No public-network demo mode.
     pub async fn open(
@@ -144,7 +173,7 @@ impl Board {
         listen: SocketAddr,
         identities: DemoIdentities,
     ) -> Result<Self, Failure> {
-        Self::open_with_stylesheets(path, listen, identities, Vec::new()).await
+        Self::open_with_options(path, listen, identities, BoardOptions::default()).await
     }
 
     /// Application-only composition for a separately built reference frontend.
@@ -168,13 +197,15 @@ impl Board {
         stylesheets: Vec<String>,
         triage_script: Option<String>,
     ) -> Result<Self, Failure> {
-        Self::open_authenticated(
+        Self::open_with_options(
             path,
             listen,
-            Authentication::Demo(identities),
-            stylesheets,
-            triage_script,
-            SessionBackend::Memory,
+            identities,
+            BoardOptions {
+                stylesheets,
+                triage_script,
+                ..BoardOptions::default()
+            },
         )
         .await
     }
@@ -188,13 +219,15 @@ impl Board {
         stylesheets: Vec<String>,
         triage_script: Option<String>,
     ) -> Result<Self, Failure> {
-        Self::open_authenticated(
+        Self::open_with_oidc_and_options(
             path,
             listen,
-            Authentication::Oidc(Arc::new(oidc)),
-            stylesheets,
-            triage_script,
-            SessionBackend::Memory,
+            oidc,
+            BoardOptions {
+                stylesheets,
+                triage_script,
+                ..BoardOptions::default()
+            },
         )
         .await
     }
@@ -208,13 +241,16 @@ impl Board {
         triage_script: Option<String>,
         sessions: SessionBackend,
     ) -> Result<Self, Failure> {
-        Self::open_authenticated(
+        Self::open_with_options(
             path,
             listen,
-            Authentication::Demo(identities),
-            stylesheets,
-            triage_script,
-            sessions,
+            identities,
+            BoardOptions {
+                stylesheets,
+                triage_script,
+                sessions,
+                ..BoardOptions::default()
+            },
         )
         .await
     }
@@ -227,25 +263,83 @@ impl Board {
         triage_script: Option<String>,
         sessions: SessionBackend,
     ) -> Result<Self, Failure> {
-        Self::open_authenticated(
+        Self::open_with_oidc_and_options(
             path,
             listen,
-            Authentication::Oidc(Arc::new(oidc)),
-            stylesheets,
-            triage_script,
-            sessions,
+            oidc,
+            BoardOptions {
+                stylesheets,
+                triage_script,
+                sessions,
+                ..BoardOptions::default()
+            },
         )
         .await
+    }
+
+    /// Select application capabilities explicitly; never loads ambient settings.
+    /// Uncompiled selections fail before touching the database or providers.
+    pub async fn open_with_options(
+        path: &Path,
+        listen: SocketAddr,
+        identities: DemoIdentities,
+        options: BoardOptions,
+    ) -> Result<Self, Failure> {
+        Self::open_authenticated(path, listen, Authentication::Demo(identities), options).await
+    }
+
+    /// OIDC identity with the same independent application options as demo login.
+    #[cfg(feature = "oidc")]
+    pub async fn open_with_oidc_and_options(
+        path: &Path,
+        listen: SocketAddr,
+        oidc: oidc::Oidc,
+        options: BoardOptions,
+    ) -> Result<Self, Failure> {
+        Self::open_authenticated(path, listen, Authentication::Oidc(Arc::new(oidc)), options).await
+    }
+    /// Trusted application control, never installed as a public HTTP endpoint.
+    /// This SQL allow is still intersected with normal identity/policy/CSRF checks.
+    #[cfg(feature = "commit-write-auth")]
+    pub async fn set_project_write_permission(
+        &self,
+        account: &str,
+        project: i64,
+        enabled: bool,
+    ) -> Result<(), Failure> {
+        if account != "alice" || project != 1 {
+            return Err(Failure::Forbidden);
+        }
+        self.database
+            .set_write_enabled(
+                Principal {
+                    name: "alice",
+                    project,
+                    write: true,
+                },
+                enabled,
+            )
+            .await
     }
 
     async fn open_authenticated(
         path: &Path,
         listen: SocketAddr,
         authentication: Authentication,
-        stylesheets: Vec<String>,
-        triage_script: Option<String>,
-        selected_sessions: SessionBackend,
+        options: BoardOptions,
     ) -> Result<Self, Failure> {
+        let BoardOptions {
+            stylesheets,
+            triage_script,
+            sessions: selected_sessions,
+            write_authorization,
+            request_tracing,
+        } = options;
+        if (write_authorization && !cfg!(feature = "commit-write-auth"))
+            || (request_tracing && !cfg!(feature = "request-tracing"))
+        {
+            return Err(Failure::Configuration);
+        }
         if triage_script.as_deref().is_some_and(|path| {
             path.strip_prefix("/static/assets/")
                 .and_then(|name| name.strip_suffix(".js"))
@@ -280,40 +374,102 @@ impl Board {
         {
             return Err(Failure::Invalid);
         }
-        let database = Database::open(path).await?;
+        #[cfg(feature = "auth-valkey")]
+        let policy = match &selected_sessions {
+            SessionBackend::AuthValkey { policy_file, .. } => {
+                Some(auth::PolicyFile::new(policy_file.clone())?)
+            }
+            _ => None,
+        };
+        let database = if write_authorization {
+            #[cfg(feature = "commit-write-auth")]
+            {
+                Database::open_with_write_authorization(path).await?
+            }
+            #[cfg(not(feature = "commit-write-auth"))]
+            {
+                return Err(Failure::Configuration);
+            }
+        } else {
+            Database::open(path).await?
+        };
+        #[cfg(feature = "request-tracing")]
+        let database = if request_tracing {
+            database.with_request_tracing()
+        } else {
+            database
+        };
         let mut manifest = assets::Manifest::parse(include_str!("../assets/manifest.json"))
             .map_err(|_| Failure::Unavailable)?;
         if !stylesheets.is_empty() {
             manifest.stylesheets = stylesheets;
         }
         let (stopping, stop_rx) = watch::channel(false);
+        let origin = match &authentication {
+            #[cfg(feature = "oidc")]
+            Authentication::Oidc(oidc) => oidc.application_origin()?,
+            _ => format!("http://{listen}"),
+        };
         let state = AppState {
+            #[cfg(feature = "auth-valkey")]
+            policy,
             database: database.clone(),
             triage_script,
             authentication,
             manifest,
-            origin: HeaderValue::from_str(&format!("http://{listen}"))
-                .map_err(|_| Failure::Invalid)?,
+            origin: HeaderValue::from_str(&origin).map_err(|_| Failure::Invalid)?,
             streams: Arc::new(Semaphore::new(16)),
             stopping: stop_rx,
         };
         let sessions = SessionManager::connect(selected_sessions).await?;
         let app = App::new()
             .group("/board", |group| {
+                #[cfg(feature = "auth-valkey")]
+                let authentication = state
+                    .policy
+                    .as_ref()
+                    .map(|policy| auth::authentication(policy.clone()));
+                let protected = |methods: axum::routing::MethodRouter<AppState>| {
+                    #[cfg(feature = "auth-valkey")]
+                    if let Some(authentication) = &authentication {
+                        // MethodRouter leaves its native 405 fallback outside Auth.
+                        return methods.route_layer(from_fn_with_state(
+                            authentication.clone(),
+                            yetlet_auth::authenticate,
+                        ));
+                    }
+                    methods
+                };
                 let routes = group
-                    .get("/", home)
+                    .route("/", protected(axum::routing::get(home)))
+                    .route(
+                        "/projects/{project}/items",
+                        protected(axum::routing::get(listing).post(create)),
+                    )
+                    .route(
+                        "/projects/{project}/items/new",
+                        protected(axum::routing::get(new_item)),
+                    )
+                    .route(
+                        "/projects/{project}/items/{id}",
+                        protected(axum::routing::get(detail).post(update)),
+                    )
+                    .route(
+                        "/projects/{project}/items/{id}/edit",
+                        protected(axum::routing::get(edit)),
+                    )
+                    .route(
+                        "/projects/{project}/events",
+                        protected(axum::routing::get(events)),
+                    )
+                    .route(
+                        "/projects/{project}/triage",
+                        protected(axum::routing::get(triage::workspace).post(triage::save)),
+                    );
+                let routes = routes
                     .get("/login", login_page)
                     .post("/login", login)
-                    .post("/logout", logout)
-                    .get("/projects/{project}/items", listing)
-                    .post("/projects/{project}/items", create)
-                    .get("/projects/{project}/items/new", new_item)
-                    .get("/projects/{project}/items/{id}", detail)
-                    .post("/projects/{project}/items/{id}", update)
-                    .get("/projects/{project}/items/{id}/edit", edit)
-                    .get("/projects/{project}/events", events)
-                    .get("/projects/{project}/triage", triage::workspace)
-                    .post("/projects/{project}/triage", triage::save);
+                    .post("/logout", logout);
                 #[cfg(feature = "oidc")]
                 let routes = if matches!(state.authentication, Authentication::Oidc(_)) {
                     routes
@@ -332,6 +488,12 @@ impl Board {
             .with_state(state.clone())
             .into_router()
             .layer(DefaultBodyLimit::max(64 * 1024));
+        #[cfg(feature = "request-tracing")]
+        let app = if request_tracing {
+            request_tracing::install(app)
+        } else {
+            app
+        };
         let router =
             yetlet_server_axum::middleware::with_global(app, from_fn_with_state(state, security));
         Ok(Self {
@@ -380,7 +542,11 @@ async fn security(
         *request.method(),
         axum::http::Method::GET | axum::http::Method::HEAD | axum::http::Method::OPTIONS
     );
-    let mut response = if !valid_host || (!safe_method && !valid_origin) {
+    let check_origin = !safe_method;
+    #[cfg(feature = "oidc")]
+    let check_origin =
+        check_origin || (callback && matches!(&state.authentication, Authentication::Oidc(_)));
+    let mut response = if !valid_host || (check_origin && !valid_origin) {
         Failure::Forbidden.into_response()
     } else {
         next.run(request).await
@@ -450,15 +616,30 @@ fn page(state: &AppState, title: &str, view: View, live: bool) -> Result<Respons
     html = html.replacen("</head>", &format!("{tags}</head>"), 1);
     Ok(axum::response::Html(html).into_response())
 }
-async fn user(session: &Session, project: Option<i64>, write: bool) -> Result<Principal, Failure> {
+async fn user(
+    session: &ProtectedSession,
+    project: Option<i64>,
+    write: bool,
+) -> Result<Principal, Failure> {
+    #[cfg(feature = "auth-valkey")]
+    if let Some((policy, identity)) = &session.auth {
+        let record = session.read().await.map_err(auth::protected_failure)?;
+        let rules = policy.read().await?;
+        let user = record.user.ok_or(Failure::LoginRequired)?;
+        auth::check_identity(identity.principal(), user)?;
+        return rules.authorize(user, project, write);
+    }
     let user = session.read().await?.user.ok_or(Failure::Unauthorized)?;
     if project.is_some_and(|project| project != user.project) || (write && !user.write) {
         return Err(Failure::Forbidden);
     }
     Ok(user)
 }
-async fn csrf(session: &Session) -> Result<String, Failure> {
-    session.csrf_token().await
+async fn csrf(session: &ProtectedSession) -> Result<String, Failure> {
+    session
+        .csrf_token()
+        .await
+        .map_err(|error| session.failure(error))
 }
 async fn require_csrf(session: &Session, value: &str) -> Result<(), Failure> {
     if session.verify_csrf(value).await? {
@@ -467,7 +648,7 @@ async fn require_csrf(session: &Session, value: &str) -> Result<(), Failure> {
         Err(Failure::Forbidden)
     }
 }
-async fn home(session: Session) -> Response {
+async fn home(session: ProtectedSession) -> Response {
     match user(&session, None, false).await {
         Ok(user) => {
             Redirect::to(&format!("/board/projects/{}/items", user.project)).into_response()
@@ -483,14 +664,14 @@ async fn login_page(State(state): State<AppState>, session: Session) -> Result<R
         return page(
             &state,
             "Sign in | Lab Operations",
-            views::oidc_login(&csrf(&session).await?),
+            views::oidc_login(&session.csrf_token().await?),
             false,
         );
     }
     page(
         &state,
         "Sign in | Lab Operations",
-        views::login(&csrf(&session).await?, None),
+        views::login(&session.csrf_token().await?, None),
         false,
     )
 }
@@ -523,7 +704,7 @@ async fn login(
                 &state,
                 "Sign in | Lab Operations",
                 views::login(
-                    &csrf(&session).await?,
+                    &session.csrf_token().await?,
                     Some("The identity or code is not valid."),
                 ),
                 false,
@@ -556,7 +737,7 @@ async fn logout(
 }
 async fn listing(
     State(state): State<AppState>,
-    session: Session,
+    session: ProtectedSession,
     RoutePath(project): RoutePath<i64>,
     query: Result<Query<ListQuery>, QueryRejection>,
 ) -> Result<Response, Failure> {
@@ -572,7 +753,7 @@ async fn listing(
 }
 async fn new_item(
     State(state): State<AppState>,
-    session: Session,
+    session: ProtectedSession,
     RoutePath(project): RoutePath<i64>,
 ) -> Result<Response, Failure> {
     let user = user(&session, Some(project), true).await?;
@@ -592,7 +773,7 @@ async fn new_item(
 }
 async fn detail(
     State(state): State<AppState>,
-    session: Session,
+    session: ProtectedSession,
     RoutePath((project, id)): RoutePath<(i64, i64)>,
 ) -> Result<Response, Failure> {
     let user = user(&session, Some(project), false).await?;
@@ -606,7 +787,7 @@ async fn detail(
 }
 async fn edit(
     State(state): State<AppState>,
-    session: Session,
+    session: ProtectedSession,
     RoutePath((project, id)): RoutePath<(i64, i64)>,
 ) -> Result<Response, Failure> {
     let user = user(&session, Some(project), true).await?;
@@ -649,7 +830,7 @@ impl EditForm {
 }
 async fn save(
     state: AppState,
-    session: Session,
+    session: ProtectedSession,
     project: i64,
     id: Option<i64>,
     form: Result<Form<EditForm>, FormRejection>,
@@ -661,7 +842,9 @@ async fn save(
             return Ok((error.status(), "Invalid or oversized form submission").into_response());
         }
     };
-    require_csrf(&session, &form.csrf).await?;
+    require_csrf(&session, &form.csrf)
+        .await
+        .map_err(|error| session.failure(error))?;
     let fields = form.fields();
     if !fields.errors(project).is_empty() {
         return Ok((
@@ -683,7 +866,7 @@ async fn save(
             .into_response());
     }
     // Recheck current session after parsing, before starting the bounded SQL operation.
-    user(&session, Some(project), true).await?;
+    let principal = user(&session, Some(project), true).await?;
     match state
         .database
         .save(principal, id, form.expected_version, fields.clone())
@@ -714,7 +897,7 @@ async fn save(
 }
 async fn create(
     State(state): State<AppState>,
-    session: Session,
+    session: ProtectedSession,
     RoutePath(project): RoutePath<i64>,
     form: Result<Form<EditForm>, FormRejection>,
 ) -> Result<Response, Failure> {
@@ -722,7 +905,7 @@ async fn create(
 }
 async fn update(
     State(state): State<AppState>,
-    session: Session,
+    session: ProtectedSession,
     RoutePath((project, id)): RoutePath<(i64, i64)>,
     form: Result<Form<EditForm>, FormRejection>,
 ) -> Result<Response, Failure> {
@@ -752,7 +935,7 @@ async fn asset(RoutePath(name): RoutePath<String>) -> Response {
 }
 async fn events(
     State(state): State<AppState>,
-    session: Session,
+    session: ProtectedSession,
     RoutePath(project): RoutePath<i64>,
     headers: HeaderMap,
 ) -> Result<Response, Failure> {
@@ -777,7 +960,7 @@ async fn events(
         .map_err(|_| Failure::Busy)?;
     struct Cursor {
         state: AppState,
-        session: Session,
+        session: ProtectedSession,
         principal: Principal,
         first: bool,
         deadline: tokio::time::Instant,

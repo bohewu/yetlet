@@ -121,7 +121,7 @@ mod development_tls_tests {
     #[tokio::test]
     async fn disabled_tls_does_not_open_development_certificate_files() {
         let mut settings: Settings = loader()
-            .load_from_env([("APP_SERVICE__TOKEN".into(), "synthetic-token".into())])
+            .load_with_env([("APP_SERVICE__TOKEN".into(), "synthetic-token".into())])
             .unwrap();
         settings.server.tls.certificate = ".dev/missing-certificate.pem".into();
         settings.server.tls.private_key = ".dev/missing-private-key.pem".into();
@@ -131,7 +131,7 @@ mod development_tls_tests {
     #[cfg(feature = "yetlet-dev-tls")]
     #[test]
     fn tls_paths_reject_traversal_frontend_and_missing_files_with_safe_errors() {
-        let settings: Settings = loader().load_from_env([]).unwrap();
+        let settings: Settings = loader().load_with_env([]).unwrap();
         for path in ["../private.pem", "/private.pem", "frontend/private.pem", ".dev/missing-private.pem"] {
             let error = settings.tls_path(path).unwrap_err();
             assert_eq!(error.to_string(), "application configuration invalid");

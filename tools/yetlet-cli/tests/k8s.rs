@@ -194,7 +194,7 @@ fn missing_stale_unsupported_lock_profile_source_and_output_are_refused() {
             4 => fs::write(f.app.join("src/main.rs"), "fn main() {}\n").unwrap(),
             5 => fs::write(f.app.join("src/lib.rs"), "// arbitrary extra source\n").unwrap(),
             6 => {
-                scaffold::create_cloud("unsafe_name", &f.framework, f.root.path()).unwrap();
+                scaffold::create_service("unsafe_name", &f.framework, f.root.path()).unwrap();
                 let lock = fs::read_to_string(f.app.join("Cargo.lock"))
                     .unwrap()
                     .replace("composeapp", "unsafe_name");
@@ -262,7 +262,7 @@ fn real_generated_cloud_app_with_explicit_offline_cargo_lock_is_supported() {
         .join("../..")
         .canonicalize()
         .unwrap();
-    scaffold::create_cloud("k8sproof", &framework, root.path()).unwrap();
+    scaffold::create_service("k8sproof", &framework, root.path()).unwrap();
     let app = root.path().join("k8sproof");
     // Explicit test-fixture preparation; the generator must never run Cargo.
     let lock = Command::new("cargo")

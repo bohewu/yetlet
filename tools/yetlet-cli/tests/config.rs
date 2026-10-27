@@ -17,20 +17,20 @@ fn framework() -> std::path::PathBuf {
 }
 
 // Historical local-source qualification fixtures use the retained internal API.
-fn scaffold(parent: &Path, name: &str, cloud: bool) -> Result<(), String> {
+fn scaffold(parent: &Path, name: &str, service: bool) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(parent, fs::Permissions::from_mode(0o700)).unwrap();
     }
-    yetlet_cli::scaffold::create_config(name, &framework(), parent, cloud)
+    yetlet_cli::scaffold::create_config(name, &framework(), parent, service)
 }
 
 #[test]
 fn both_config_profiles_generate_only_safe_files_without_tools_or_overwrite() {
     let root = tempfile::tempdir().unwrap();
-    for (name, cloud) in [("configured", false), ("configured-cloud", true)] {
-        let result = scaffold(root.path(), name, cloud);
+    for (name, service) in [("configured", false), ("configured-cloud", true)] {
+        let result = scaffold(root.path(), name, service);
         assert!(result.is_ok(), "{result:?}");
         let app = root.path().join(name);
         let mut names = fs::read_dir(&app)
@@ -69,7 +69,7 @@ fn both_config_profiles_generate_only_safe_files_without_tools_or_overwrite() {
             );
         }
         let manifest = fs::read(app.join("Cargo.toml")).unwrap();
-        assert!(scaffold(root.path(), name, !cloud).is_err());
+        assert!(scaffold(root.path(), name, !service).is_err());
         assert_eq!(fs::read(app.join("Cargo.toml")).unwrap(), manifest);
     }
     assert_eq!(fs::read_dir(root.path()).unwrap().count(), 2);
@@ -101,8 +101,8 @@ fn config_profile_preserves_symlink_and_unsafe_parent_refusal() {
 #[ignore = "explicit real cached-dependency generated-app lock/check/test; HTTP requires YETLET_TEST_NATIVE_HTTP=1"]
 fn generated_config_apps_offline_contract() {
     let root = tempfile::tempdir().unwrap();
-    for (name, cloud) in [("configured", false), ("configured-cloud", true)] {
-        let result = scaffold(root.path(), name, cloud);
+    for (name, service) in [("configured", false), ("configured-cloud", true)] {
+        let result = scaffold(root.path(), name, service);
         assert!(result.is_ok(), "{result:?}");
         let app = root.path().join(name);
         let cargo = |args: &[&str]| {
@@ -140,8 +140,8 @@ fn generated_config_apps_offline_contract() {
             "-D",
             "warnings",
         ]);
-        if cloud {
-            // YT-101 now accepts exact cloud/config sources and public TOMLs.
+        if service {
+            // YT-101 now accepts exact service/config sources and public TOMLs.
             for generator in ["docker", "compose", "k8s"] {
                 let output = root.path().join(generator);
                 let mut cmd = Command::new(env!("CARGO_BIN_EXE_yetlet"));
@@ -169,7 +169,7 @@ fn generated_config_apps_offline_contract() {
             if std::env::var_os("YETLET_TEST_NATIVE_HTTP").as_deref()
                 == Some(std::ffi::OsStr::new("1"))
             {
-                native::check(&binary, &app, cloud);
+                native::check(&binary, &app, service);
             } else {
                 eprintln!("Native HTTP/signals: NOT VERIFIED (host socket permission required)");
             }
@@ -271,7 +271,7 @@ mod native {
         eprintln!("Actual generated main: six bounded redacted startup failures; children reaped");
     }
 
-    pub(super) fn check(binary: &Path, app: &Path, cloud: bool) {
+    pub(super) fn check(binary: &Path, app: &Path, service: bool) {
         let reservation = TcpListener::bind("127.0.0.1:0").unwrap();
         let address = reservation.local_addr().unwrap();
         drop(reservation);
@@ -328,7 +328,7 @@ mod native {
                     && !response.contains("000456")
                     && !response.contains("<script")
             );
-            if cloud {
+            if service {
                 for path in ["/health/live", "/health/ready"] {
                     assert!(request(address, path).unwrap().starts_with("HTTP/1.1 200"));
                 }
@@ -345,7 +345,7 @@ mod native {
             }
             assert!(TcpStream::connect_timeout(&address, Duration::from_millis(100)).is_err());
             eprintln!(
-                "config cloud={cloud} {profile}: real SSR/CSP/escaping, startup rejection, cleanup PASS"
+                "config cloud={service} {profile}: real SSR/CSP/escaping, startup rejection, cleanup PASS"
             );
         }
         // Parent tempfile owns the entire generated application and dev fixture.

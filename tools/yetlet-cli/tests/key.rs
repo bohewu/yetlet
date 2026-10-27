@@ -5,7 +5,7 @@ use std::{
     process::{Command, Output},
 };
 use yetlet_signing::{
-    KeyRef, KeyState, LocalProvider, LocalSigner, Policy, PublicCertificates, PublicMaterial,
+    KeyRef, KeyState, LocalProvider, LocalSigner, Policy, PublicKeySet, PublicMaterial,
     SigningService, TrustedKey, generate_self_signed,
 };
 const PASSWORD: &str = "synthetic-key-test-password";
@@ -92,7 +92,7 @@ impl Fixture {
     }
     fn selected(&self, profile: &str) -> serde_json::Value {
         yetlet_config::Loader::new(&self.root, "APP")
-            .load_from_env([("APP_ENVIRONMENT".into(), profile.into())])
+            .load_with_env([("APP_ENVIRONMENT".into(), profile.into())])
             .unwrap()
     }
 }
@@ -164,7 +164,7 @@ fn rotation_isolated_keys_profiles_comments_and_old_verification() {
     let signer = LocalSigner::from_pem(r.clone(), &old_private, PASSWORD, &old_cert).unwrap();
     let mut service = SigningService::new(
         LocalProvider::new(vec![signer]).unwrap(),
-        PublicCertificates::new(vec![(r.clone(), public.clone())]).unwrap(),
+        PublicKeySet::new(vec![(r.clone(), public.clone())]).unwrap(),
         Policy::new(vec![
             TrustedKey::certificate(
                 r.clone(),

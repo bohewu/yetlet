@@ -6,9 +6,37 @@
 
 The maintainer authorized [Private release preparation](YT-020-PRIVATE-RELEASE-PREP.md), not publication or a visibility change. Existing API classifications remain unchanged.
 
+**Current package preparation (2026-10-26):** [YT-201](YT-201-PACKAGE-PREPARATION.md)
+aligns sixteen library manifests to experimental 0.1.0 with compatible registry
+dependency requirements and unchanged independent workspaces/default features.
+They remain unpublished. This extends preparation, not the immutable ce56e08
+candidate, support classifications, final source C or release authorization.
+
 ## Release train
 
-Yetlet-owned crates use one workspace version and one coordinated release train. Runnable examples, benchmark fixtures, generated WASM glue and Python harnesses are validation assets, not independently versioned public packages.
+Yetlet-owned libraries share one coordinated release version and release train.
+Their manifests may inherit the root version or declare it in an isolated
+workspace; coordinated versioning does not merge their dependency graphs.
+Runnable examples, benchmark fixtures, generated WASM glue and Python harnesses
+are validation assets, not independently versioned public packages.
+
+**Current candidate selection (2026-10-27):** The owner selects immutable
+`118f3d0f496b487ef20fe243f4e73179f9eadc43`, tree
+`07faa3e90c0fca5d27a4e55262c75acf851d884a`, after the guarded rebuild-extension
+commit. The [verification order](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
+preserves the sixteen experimental 0.1.0 libraries and selected platform/feature
+limits. Earlier input-bound results remain historical. New-C required CI, sixteen-package
+hosted/local byte comparison and affected MSVC consumers now PASS;
+[final independent acceptance](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)
+is PASS with zero issues/required followups, closing selected YT-205 technical
+scope. Platform limits remain unchanged and D1–D6 remain Pending.
+
+**Earlier candidate selection (2026-10-27):** The owner selected the sixteen
+experimental 0.1.0 libraries at immutable `a2d6474` for
+[technical evidence consolidation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md).
+The original nine-package ce56e08 records retain their identities. Selection
+does not complete current-source CI/rebuild gates, expand platform support or
+authorize signing, registry publication or activation; D1–D6 remain Pending.
 
 The current `0.y` version remains experimental under SemVer. The classifications in [API Contracts](API-CONTRACTS.md) impose repository discipline but do not yet promise downstream compatibility.
 
@@ -18,10 +46,10 @@ For the selected `0.1.x` train, patches preserve documented API behavior and MSR
 
 The optional Redis Session provider and the owner-approved
 `yetlet-wgpu` candidate use **isolated nested Cargo workspaces/locks**,
-`publish = false`, and pre-public Experimental contracts. They are not
+publication-prepared metadata, and pre-public Experimental contracts. They are not
 among the original nine coordinated YT-020 release candidates; their
-`0.1.0` (GPU) or separate provider version is not evidence that they
-have entered the root release train. The default HTML/DOM/server
+shared prepared `0.1.0` version is not evidence that they
+have entered an approved immutable release. The default HTML/DOM/server
 dependency paths and root lock remain independent. See the
 [YT-081 source/API audit](YT-081-API-CONTRACT-AUDIT.md) before assuming
 cross-provider interchangeability or a GPU stability guarantee.

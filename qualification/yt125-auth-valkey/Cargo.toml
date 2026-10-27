@@ -1,0 +1,25 @@
+[package]
+name = "yt125-auth-valkey"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+license = "MIT OR Apache-2.0"
+description = "Test-only application-owned Auth/Valkey composition"
+
+[workspace]
+resolver = "3"
+
+[dependencies]
+axum = "=0.8.9"
+tokio = { version = "=1.53.3", features = ["macros", "rt-multi-thread", "net", "fs", "io-util", "signal", "time"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+libc = "=0.2.190"
+yetlet-auth = { path = "../../crates/yetlet-auth", default-features = false }
+yetlet-session-valkey = { package = "yetlet-session-redis", path = "../../crates/yetlet-session-redis" }
+
+[dev-dependencies]
+reqwest = { version = "=0.12.28", default-features = false }
+redis = { version = "=1.7.1", default-features = false, features = ["tokio-comp"] }
+tempfile = "=3.27.0"

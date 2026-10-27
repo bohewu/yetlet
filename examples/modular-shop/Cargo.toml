@@ -8,7 +8,11 @@ license.workspace = true
 repository.workspace = true
 publish = false
 
+[features]
+catalog-cache = ["dep:moka", "tokio/time"]
+
 [dependencies]
+moka = { version = "=0.12.16", default-features = false, features = ["future"], optional = true }
 axum.workspace = true
 tokio = { workspace = true, features = ["signal", "sync"] }
 serde = { version = "1", features = ["derive"] }

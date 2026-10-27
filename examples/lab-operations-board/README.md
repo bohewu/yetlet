@@ -65,3 +65,80 @@ The historical import collision and failed login attempts remain documented. The
 The owner-amended `qualify_local.py --profile full` selects 120-second warmup, three 600-second rounds and 1,800-second soak at 0.5 requests/second/client. Five staggered cycle positions preserve each client's four-read/one-write pattern and produce 20 reads/five writes per nominal slot. Default `bounded` behavior remains unchanged. The synchronized full attempt failed write p95; its data is retained separately from the newly authorized mixed-load run. All numeric thresholds, SQLite FULL durability and hard caps are unchanged. The single newly authorized full execution passed all three rounds and the complete 30-minute soak; no replacement or automatic rerun is authorized.
 
 The actual spoken journey covers page/navigation/form labels, validation discovery, detail/history, conflict draft, table caption/headers/links and live update/pause/reconnect/refresh. It does not prove automatic alert focus, general accessibility conformance or other screen readers. Windows Edge, additional browser/mobile platforms, cross-version deployment rollback, real identity and production rollout remain unverified. Final load and independent-review outcomes are recorded in qualification; no core/default browser dependency or GPU change is included.
+
+
+## Opt-in commit-time write authorization — YT-181
+
+The application feature `commit-write-auth` supplies the
+[YT-181 SQL-owned reference](../../docs/YT-181-SENSITIVE-WRITE-IMPLEMENTATION.md).
+It is default-off and adds no Core/Auth API or generic AOP. The existing Session,
+CSRF, current file policy, item version, worker limits and response security
+remain in effect. Its extra SQL authority covers only Alice/project-one item
+writes, with item and history checked/committed together. It does not turn
+Session logout or policy-file replacement into atomic SQL revocation.
+
+Use a **new, nonexistent, task-private SQLite path** for the v2 reference; do
+not point the selection at a real/v1 database or pre-create an empty file.
+The first explicitly selected fresh file seeds Alice/project-one once. Opening
+an existing v2 Store conservatively commits a deny and advances any enabled
+generation before returning; opening another instance also invalidates old
+allowed tickets. Denied rows are never reseeded. This intentionally requires
+trusted current-authority confirmation and explicit re-enable after reopen;
+it is not transparent restart availability or automatic restore qualification.
+Stop/exclude all legacy writers; old binaries refuse v2 only at open.
+
+Board consumers use `Board::open_with_options` (or
+`open_with_oidc_and_options`) with `BoardOptions { write_authorization: true,
+..BoardOptions::default() }`, supplying any selected frontend/Session fields.
+[YT-185](../../docs/YT-185-OPT-IN-OPTIONS.md) records the intentional pre-public
+constructor migration; Cargo features and existing external settings are unchanged.
+Trusted application code can call
+`board.set_project_write_permission("alice", 1, false).await?` to revoke, or
+pass `true` to establish a fresh generation after current permission/recovery
+confirmation. No HTTP control endpoint or automatic grant loop is installed.
+Every request still needs ordinary identity, resource policy and CSRF allow;
+SQL enable cannot grant another account/project or broaden those checks.
+
+Admin additionally selects its existing Settings loader value
+`write_authorization.enabled = true` (environment override
+`APP_WRITE_AUTHORIZATION__ENABLED=true`) with the compiled `commit-write-auth`
+feature and an explicitly new `database.path`. Base/default is false; absent
+feature plus enabled selection fails settings validation. No hot reload or new
+Settings-provider service is introduced. Do not interpret the parser/setting
+as permission to enable v1 or to restore a backup over a live file.
+
+One private Store-bound ticket is used per save attempt. SQL revoke advances its
+generation, and re-enable advances again; stale tickets reject even after
+re-enable. A writer already holding the IMMEDIATE transaction may finish before
+revoke commits; a late save response does not change commit order. Busy, timeout
+or disconnect never establishes rollback/revoke success or a safe blind retry.
+The reference adds no retry, new queue, remote transaction or HA guarantee.
+
+
+## Opt-in request and SQL-worker tracing — YT-182
+
+[The application reference](../../docs/YT-182-TRACING-WORKER-IMPLEMENTATION.md)
+uses native middleware and Rust `tracing`, with no generic AOP or tracing crate.
+The `request-tracing` Cargo feature is default-off; compiling it does not
+activate tracing. Embedded consumers use `Board::open_with_options` or
+`open_with_oidc_and_options` with `BoardOptions.request_tracing = true`.
+`write_authorization` is an independent options field; true requires its own
+feature and fresh-v2 constraints. Default options disable both capabilities.
+Board never initializes a global subscriber or reads ambient settings. Its
+standalone binary retains defaults; the embedding host or Admin selects options.
+
+Only server-generated, positive, provider-local request IDs and a finite HTTP
+method enter root spans; worker records carry a fixed operation and `ok`/`error`.
+No raw URI, query, credential, cookie, business body, SQL parameter or identity
+is projected. The root has no ambient parent; scoped Dispatch and its selected
+safe span are retained across blocking work and HTTP future destruction.
+Unknown ambient spans/control calls are not forwarded. IDs reset with provider
+recreation and are not distributed trace or durable audit identities.
+
+`http_response_constructed`, `http_future_dropped` and `sql_worker_completed`
+mean different things. Future drop does not cancel started SQL work, release
+its permit early, imply rollback or authorize a retry. A constructed Response
+is not completed body delivery; worker success is not a generic commit proof.
+The existing four-worker limit, waits, Session/CSRF, SQL authority and drain
+semantics remain. Outer Host/Origin refusals and Admin's separate Vite static
+router are outside this trace scope; streams/body chunks are not instrumented.

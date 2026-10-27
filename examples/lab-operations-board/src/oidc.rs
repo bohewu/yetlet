@@ -46,6 +46,16 @@ pub struct Oidc {
 }
 
 impl Oidc {
+    pub(super) fn application_origin(&self) -> Result<String, Failure> {
+        Ok(self
+            .client
+            .redirect_uri()
+            .ok_or(Failure::Invalid)?
+            .url()
+            .origin()
+            .ascii_serialization())
+    }
+
     pub(super) fn login_csp(&self) -> String {
         let origin = self.client.auth_uri().url().origin().ascii_serialization();
         crate::DEFAULT_CSP.replace(

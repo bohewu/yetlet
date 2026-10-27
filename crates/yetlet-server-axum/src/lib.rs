@@ -67,8 +67,12 @@ pub fn render_document_with_metadata(
     html.push_str("\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>");
     html.push_str(&escape_text(metadata.title()));
     html.push_str("</title></head><body>");
-    html.push_str(&render_to_string(view)?);
-    html.push_str("</body></html>");
+    let body = render_to_string(view)?;
+    let suffix = "</body></html>";
+    html.reserve_exact(body.len() + suffix.len());
+    html.push_str(&body);
+    drop(body);
+    html.push_str(suffix);
     Ok(html)
 }
 

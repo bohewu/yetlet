@@ -16,29 +16,29 @@ fn framework() -> std::path::PathBuf {
 }
 
 // Historical local-source qualification fixtures use the retained internal API.
-fn scaffold(parent: &Path, name: &str, cloud: bool, config: bool) -> Result<(), String> {
+fn scaffold(parent: &Path, name: &str, service: bool, config: bool) -> Result<(), String> {
     #[cfg(target_os = "linux")]
     {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(parent, fs::Permissions::from_mode(0o700)).unwrap();
     }
-    yetlet_cli::scaffold::create_tailwind(name, &framework(), parent, cloud, config)
+    yetlet_cli::scaffold::create_tailwind(name, &framework(), parent, service, config)
 }
 
 #[test]
 fn tailwind_parser_is_explicit_unique_new_only_and_composes() {
-    for cloud in [false, true] {
+    for service in [false, true] {
         for config in [false, true] {
             let mut args = ["new", "--tailwind", "styled"].map(OsString::from).to_vec();
-            if cloud {
+            if service {
                 args.push("--service".into());
             }
             if config {
                 args.push("--settings".into());
             }
             assert!(matches!(parse(&args), Ok(Cli::New {
-                cloud: c, with_config: s, with_tailwind: true, vite: false, ..
-            }) if c == cloud && s == config));
+                service: c, runtime_settings: s, tailwind: true, vite: false, ..
+            }) if c == service && s == config));
             args.push("--tailwind".into());
             assert!(parse(&args).is_err());
         }
@@ -58,10 +58,10 @@ fn tailwind_parser_is_explicit_unique_new_only_and_composes() {
 #[test]
 fn four_profiles_write_only_sources_without_tools_or_overwrite() {
     let root = tempfile::tempdir().unwrap();
-    for cloud in [false, true] {
+    for service in [false, true] {
         for config in [false, true] {
-            let name = format!("styled-{cloud}-{config}");
-            let result = scaffold(root.path(), &name, cloud, config);
+            let name = format!("styled-{service}-{config}");
+            let result = scaffold(root.path(), &name, service, config);
             assert!(result.is_ok(), "{result:?}");
             let app = root.path().join(&name);
             let mut names = fs::read_dir(&app)
@@ -108,7 +108,7 @@ fn four_profiles_write_only_sources_without_tools_or_overwrite() {
                 "@import \"tailwindcss\" source(none);\n@source \"./src\";\n"
             );
             let main = fs::read(app.join("src/main.rs")).unwrap();
-            assert!(scaffold(root.path(), &name, !cloud, !config).is_err());
+            assert!(scaffold(root.path(), &name, !service, !config).is_err());
             assert_eq!(fs::read(app.join("src/main.rs")).unwrap(), main);
         }
     }
@@ -123,15 +123,15 @@ fn selected_cli_keeps_runtime_settings_opt_in_and_adds_public_tool_settings() {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     }
-    for cloud in [false, true] {
+    for service in [false, true] {
         for config in [false, true] {
-            let name = format!("plain-{cloud}-{config}");
+            let name = format!("plain-{service}-{config}");
             let mut command = Command::new(env!("CARGO_BIN_EXE_yetlet"));
             command
                 .args(["new", &name, "--parent"])
                 .arg(root.path())
                 .env("PATH", root.path().join("no-executables"));
-            if cloud {
+            if service {
                 command.arg("--service");
             }
             if config {
@@ -213,10 +213,10 @@ fn generated_tailwind_apps_offline_contract() {
     let digest = "e0e260ce048014e9268f6237ff18f8ccf02cef521cbd0ae04e82c2cdf7aa3955";
     assert_eq!(format!("{:x}", Sha256::digest(&bytes)), digest);
     let root = tempfile::tempdir().unwrap();
-    for cloud in [false, true] {
+    for service in [false, true] {
         for config in [false, true] {
-            let name = format!("styled-{cloud}-{config}");
-            let result = scaffold(root.path(), &name, cloud, config);
+            let name = format!("styled-{service}-{config}");
+            let result = scaffold(root.path(), &name, service, config);
             assert!(result.is_ok(), "{result:?}");
             let app = root.path().join(&name);
             fs::create_dir(app.join("dist")).unwrap();
@@ -290,7 +290,7 @@ fn generated_tailwind_apps_offline_contract() {
                     .path()
                     .join("target/debug")
                     .join(format!("{name}{}", std::env::consts::EXE_SUFFIX));
-                native::check(&executable, &app, cloud, config);
+                native::check(&executable, &app, service, config);
             }
             // Run real main with missing CSS. It must fail before any socket or
             // configuration load, independently of the runtime working directory.
@@ -364,7 +364,7 @@ mod native {
         Ok(result)
     }
 
-    pub(super) fn check(executable: &Path, app: &Path, cloud: bool, with_config: bool) {
+    pub(super) fn check(executable: &Path, app: &Path, service: bool, runtime_settings: bool) {
         let reserve = TcpListener::bind("127.0.0.1:0").unwrap();
         let address = reserve.local_addr().unwrap();
         drop(reserve);
@@ -375,7 +375,7 @@ mod native {
             .current_dir(app.parent().unwrap())
             .stdout(Stdio::piped())
             .stderr(Stdio::piped());
-        if with_config {
+        if runtime_settings {
             command
                 .env("APP_SERVER__PORT", address.port().to_string())
                 .env("APP_SERVICE__TOKEN", "000123-synthetic-private");
@@ -422,7 +422,7 @@ mod native {
                 .starts_with("HTTP/1.1 404")
         );
 
-        if cloud {
+        if service {
             for route in ["/health/live", "/health/ready"] {
                 assert!(
                     response(address, route)
@@ -430,7 +430,7 @@ mod native {
                         .starts_with("HTTP/1.1 200")
                 );
             }
-            let signal = if with_config {
+            let signal = if runtime_settings {
                 libc::SIGINT
             } else {
                 libc::SIGTERM
@@ -451,7 +451,7 @@ mod native {
         }
         assert!(TcpStream::connect_timeout(&address, Duration::from_millis(120)).is_err());
         eprintln!(
-            "Actual Tailwind HTTP/CSS/CSP/escaping and cleanup PASS: cloud={cloud}, config={with_config}"
+            "Actual Tailwind HTTP/CSS/CSP/escaping and cleanup PASS: cloud={service}, config={runtime_settings}"
         );
     }
 }

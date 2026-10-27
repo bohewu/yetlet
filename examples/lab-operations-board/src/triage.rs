@@ -143,7 +143,7 @@ fn status_summary(items: &[Item]) -> Element {
 }
 pub(super) async fn workspace(
     State(state): State<AppState>,
-    session: Session,
+    session: ProtectedSession,
     RoutePath(project): RoutePath<i64>,
 ) -> Result<Response, Failure> {
     let principal = user(&session, Some(project), true).await?;
@@ -255,6 +255,9 @@ pub(super) async fn workspace(
     Ok(response)
 }
 fn error(failure: Failure) -> Response {
+    if failure == Failure::LoginRequired {
+        return failure.into_response();
+    }
     let code = match failure {
         Failure::Conflict => "conflict",
         Failure::Forbidden => "forbidden",
@@ -281,14 +284,16 @@ fn error(failure: Failure) -> Response {
 }
 pub(super) async fn save(
     State(state): State<AppState>,
-    session: Session,
+    session: ProtectedSession,
     RoutePath(project): RoutePath<i64>,
     payload: Result<Json<Save>, JsonRejection>,
 ) -> Response {
     let result = async {
-        let principal = user(&session, Some(project), true).await?;
+        user(&session, Some(project), true).await?;
         let Json(payload) = payload.map_err(|_| Failure::Invalid)?;
-        require_csrf(&session, &payload.csrf).await?;
+        require_csrf(&session, &payload.csrf)
+            .await
+            .map_err(|error| session.failure(error))?;
         let item = payload.item;
         if item.id <= 0 || item.version <= 0 {
             return Err(Failure::Invalid);
@@ -317,7 +322,7 @@ pub(super) async fn save(
             )
                 .into_response());
         }
-        user(&session, Some(project), true).await?;
+        let principal = user(&session, Some(project), true).await?;
         state
             .database
             .save(principal, Some(item.id), item.version, fields)

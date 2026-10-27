@@ -705,7 +705,7 @@ use yetlet_core::View;
 use yetlet_server_axum::{DEFAULT_CSP, render_document};
 
 impl Snapshot {
-    pub(crate) fn load_from_env() -> io::Result<Arc<Self>> {
+    pub(crate) fn load_with_env() -> io::Result<Arc<Self>> {
         let selected = std::env::var_os("YETLET_ASSET_ROOT").ok_or_else(|| {
             io::Error::other("Set absolute YETLET_ASSET_ROOT after explicitly building dist")
         })?;

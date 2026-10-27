@@ -1,13 +1,55 @@
 # Opt-in typed native application configuration
 
-**YT-090 / M16:** Done at the experimental, unpublished, Linux-tested scope after
-independent Reviewer PASS. This is an explicitly selected application dependency, outside
-the original nine public candidates. Its runtime APIs do not change core, default SSR or browser dependencies.
-The separate YT-097 CLI opt-in is implemented pending independent review;
-existing no-config templates and deployment generator acceptance stay unchanged. See the
-[scope and verification record](YT-090-VERIFICATION.md).
+Load application-owned typed settings explicitly at native startup. The optional
+loader preserves finite source precedence and keeps secrets out of browser state.
 
-## Choose an application-owned settings type
+**Experimental, unpublished.** Use this source checkout and the documented target scope.
+
+
+## Prerequisites
+
+Use the pinned Rust/Cargo toolchain and the isolated config workspace from this
+checkout. The example needs its manifest-relative base/profile files and a
+nonempty synthetic token. Run from the repository root. The three profile
+commands below are alternatives; `--offline` assumes a populated Cargo cache.
+Omit `--offline` only if allowing Cargo to fetch locked dependencies.
+
+## Minimal integration
+
+### Run without starting a listener
+
+From the repository root, use synthetic placeholders with each finite profile:
+
+```sh
+YTCONFIG_ENVIRONMENT=Development YTCONFIG_SERVICE__TOKEN=000123-placeholder \
+  cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --example typed -- --check
+YTCONFIG_ENVIRONMENT=Staging YTCONFIG_SERVICE__TOKEN=000123-placeholder \
+  cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --example typed -- --check
+YTCONFIG_ENVIRONMENT=Production YTCONFIG_SERVICE__TOKEN=000123-placeholder \
+  cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --example typed -- --check
+```
+
+Each exits before binding and prints only the fixed summary
+`Configuration valid; listener not started.` Remove `--check` only when you
+intend to run the foreground example on the configured loopback address.
+PowerShell callers can set the same process-local environment keys with `$env:`;
+there is no Windows execution receipt for this workspace yet.
+
+## Expected result
+
+The selected profile command prints only `Configuration valid; listener not started.`
+and exits before binding. Ordinary sources are loaded and validated; no provider
+is called unless the explicit `secret-provider` path is selected. Removing
+`--check` starts the existing foreground example on its configured loopback address.
+
+## Configuration and errors
+
+### Choose an application-owned settings type
+
+The configuration/settings **loader** is `yetlet_config::Loader`; it is an opt-in
+startup loader, not a `SettingsProvider` service or trait. `SecretProvider` names
+the separate optional secret-lookup interface. The [naming guide](NAMING.md)
+records canonical Rust names and deliberate external settings boundaries.
 
 The isolated [yetlet-config workspace](../crates/yetlet-config/Cargo.toml) loads
 ordinary Serde settings once at startup. It adds no DI container, framework-wide
@@ -40,7 +82,17 @@ Secrets must never be serialized into SSR, hydration, browser/WASM, JSON,
 telemetry or diagnostics. `ExposeSecret` access is an explicit application
 responsibility; this configuration example implements no authentication.
 
-## Sources and deterministic precedence
+`Loader::load()` snapshots the process environment. For explicit supplied
+overrides, `load_with_env(snapshot)` still reads base/profile TOML and then applies
+the supplied environment snapshot; it does not load from environment alone.
+With the optional `secret-provider` feature, the explicit variant is
+`load_with_env_and_secrets`. Former Rust entry points were removed by the
+owner-selected pre-public migration; use the canonical names above.
+`Error::Key` covers malformed, unknown, reserved or duplicate keys where the
+loader validates source keys. Duplicate TOML syntax remains `Error::Toml`, and
+application-schema deserialization failures remain `Error::Settings`.
+
+### Sources and deterministic precedence
 
 Low to high, the loader uses exactly:
 
@@ -88,7 +140,7 @@ Unrelated OS variables are ignored; unrelated dotenv keys fail. The top-level
 `environment` key is reserved and rejected in TOML. Keys must be at most 256
 bytes and OS values at most 64 KiB.
 
-## Development secrets and ownership
+### Development secrets and ownership
 
 Development secrets are disabled unless the caller explicitly selects a path.
 An ignored `.env.local` is a local convenience, **not an encrypted vault**. There
@@ -147,26 +199,7 @@ fields; the application must decide which values are sensitive. No claim is
 made that all temporary strings, parser allocations or environment snapshots
 are zeroized. No actual private secret is needed for these examples/tests.
 
-## Run without starting a listener
-
-From the repository root, use synthetic placeholders with each finite profile:
-
-```sh
-YTCONFIG_ENVIRONMENT=Development YTCONFIG_SERVICE__TOKEN=000123-placeholder \
-  cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --example typed -- --check
-YTCONFIG_ENVIRONMENT=Staging YTCONFIG_SERVICE__TOKEN=000123-placeholder \
-  cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --example typed -- --check
-YTCONFIG_ENVIRONMENT=Production YTCONFIG_SERVICE__TOKEN=000123-placeholder \
-  cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --example typed -- --check
-```
-
-Each exits before binding and prints only the fixed summary
-`Configuration valid; listener not started.` Remove `--check` only when you
-intend to run the foreground example on the configured loopback address.
-PowerShell callers can set the same process-local environment keys with `$env:`;
-there is no Windows execution receipt for this workspace yet.
-
-## Dependency and scope boundary
+### Dependency and scope boundary
 
 The separately selected [secret-provider follow-up](SECRET-PROVIDERS.md)
 offers an opt-in asynchronous string lookup interface. Applications load the
@@ -194,6 +227,12 @@ coercion. The smaller direct TOML adapter preserves strict Serde scalar types
 and implements only bounded loading, known-key merging and typed overrides;
 it does not implement a format parser or general provider system.
 
+<details>
+<summary>Original YT-090/097 delivery checkpoint — historical, not current CLI usage</summary>
+
+Current CLI vocabulary is `--settings`; see the current CLI guide linked above.
+The following earlier checkpoint retains its original option spelling and status.
+
 External vaults, encrypted secret storage, certificates, hot reload, Tailwind
 (YT-091), DI, signing, production starters/admin, formal release and CI/CD are
 deferred. The separate [YT-097 CLI opt-in](YT-097-VERIFICATION.md) now generates
@@ -203,3 +242,27 @@ review and Windows execution; the earlier YT-090 review does not cover it.
 Existing no-config CLI output and Docker/Compose/Kubernetes acceptance are unchanged. YT-020 stays Blocked. The separate
 independent read-only Reviewer passed the bounded YT-090 implementation; that
 acceptance does not activate publication, production qualification or any later task.
+
+</details>
+
+## API reference
+
+Use [Loader source/rustdoc](../crates/yetlet-config/src/lib.rs),
+[typed example source](../crates/yetlet-config/examples/typed.rs),
+[Settings from SecretProvider](SETTINGS-SECRET-PROVIDER.md) and
+the [current API reference](API-REFERENCE.md). External settings keys and source
+precedence remain the current contracts; later evidence does not turn an old
+source-bound platform receipt into a new run.
+
+<details>
+<summary>Historical delivery context and evidence</summary>
+
+**YT-090 / M16:** Done at the experimental, unpublished, Linux-tested scope after
+independent Reviewer PASS. This is an explicitly selected application dependency, outside
+the original nine public candidates. Its runtime APIs do not change core, default SSR or browser dependencies.
+The separate YT-097 CLI opt-in is Done at its recorded scope; current CLI
+settings/template and generator limits are maintained in the
+[CLI guide](../tools/yetlet-cli/README.md#current-generator-source-matrix). See the
+[scope and verification record](YT-090-VERIFICATION.md).
+
+</details>

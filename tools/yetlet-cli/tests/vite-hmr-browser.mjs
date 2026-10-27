@@ -8,6 +8,245 @@ import { join, resolve } from 'node:path';
 import { once } from 'node:events';
 import { chromium } from '../../../experiments/vite-integration/node_modules/playwright-core/index.mjs';
 
+// One bounded Linux headless product sequence for YT-112, using the existing
+// starter, CLI, Vite and Playwright dependency. Requires a disposable prepared app.
+async function browserWatch() {
+  const options = new Map();
+  for (let i = 3; i < process.argv.length; i += 2) {
+    const key = process.argv[i], value = process.argv[i + 1];
+    assert(['--app', '--cli', '--out'].includes(key) && value && !options.has(key));
+    options.set(key, value);
+  }
+  for (const key of ['--app', '--cli', '--out']) assert(options.has(key), key);
+  const app = resolve(options.get('--app')), cli = resolve(options.get('--cli'));
+  const frontend = join(app, 'frontend'), out = resolve(options.get('--out'));
+  const origin = 'http://127.0.0.1:5173';
+  const result = { task: 'YT-112', status: 'running', checks: {}, cleanup: {} };
+  const sources = new Map(), records = [], errors = [], violations = [];
+  const buildGate = join(app, 'build.rs'), activeGate = join(app, 'yt112-build-active');
+  assert(!existsSync(buildGate) && !existsSync(activeGate), 'Disposable starter must not contain test gates');
+  const delayedBuild = 'fn main() { println!("cargo:rerun-if-changed=src/model.rs"); std::fs::write("yt112-build-active", "active").unwrap(); std::thread::sleep(std::time::Duration::from_secs(3)); let _ = std::fs::remove_file("yt112-build-active"); }\n';
+
+  let context, page, log = '';
+  await mkdir(out);
+  const profile = join(out, 'chrome-profile');
+  const pause = (ms) => new Promise((done) => setTimeout(done, ms));
+  async function until(check, timeout = 30000) {
+    const end = Date.now() + timeout;
+    while (Date.now() < end) { if (await check()) return; await pause(100); }
+    throw new Error('Timed out waiting for selected browser condition');
+  }
+  async function status(expected, timeout = 30000) {
+    await until(async () => { try { return (await fetch(origin, { signal: AbortSignal.timeout(700) })).status === expected; } catch { return false; } }, timeout);
+  }
+  async function portClosed() {
+    await until(async () => { try { await fetch(origin, { signal: AbortSignal.timeout(700) }); return false; } catch { return true; } });
+  }
+  async function descendants(pid) {
+    const ids = [];
+    try {
+      for (const id of (await readFile(`/proc/${pid}/task/${pid}/children`, 'utf8')).trim().split(/\s+/).filter(Boolean).map(Number)) {
+        ids.push(id, ...await descendants(id));
+      }
+    } catch {}
+    return ids;
+  }
+  function start(action) {
+    const child = spawn(cli, [action, '--manifest-path', join(app, 'Cargo.toml')], {
+      cwd: app, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],
+      env: { ...process.env, APP_ENVIRONMENT: 'Production', APP_BACKEND_SENTINEL: 'yt112-private-selector', YETLET_DEV_SECRETS: 'yt112-private-file' },
+    });
+    child.on('error', (error) => { log += String(error); });
+    child.stdout.on('data', (data) => { log += data.toString(); });
+    child.stderr.on('data', (data) => { log += data.toString(); });
+    const record = { action, child, stopped: false }; records.push(record);
+    return record;
+  }
+  async function waitExit(record, signal) {
+    const owned = await descendants(record.child.pid);
+    if (signal) record.child.kill(signal);
+    await until(() => record.child.exitCode !== null || record.child.signalCode !== null, signal ? 12000 : 180000);
+    record.stopped = true;
+    for (const pid of owned) {
+      assert.throws(() => process.kill(pid, 0), (error) => error.code === 'ESRCH', `Owned pid ${pid} survived`);
+    }
+    result.cleanup[record.action] = { exitCode: record.child.exitCode, signalCode: record.child.signalCode, ownedPidsAbsent: owned };
+    return record.child.exitCode;
+  }
+  async function ready() { await page.waitForFunction(() => !document.querySelector('#workspace')?.disabled, null, { timeout: 30000 }); }
+  async function addOnce(title) {
+    const before = await page.locator('#tasks > li').count();
+    await page.locator('#new-task').fill(title);
+    await page.locator('#add-form button').click();
+    assert.equal(await page.locator('#tasks > li').count(), before + 1);
+    assert.equal(await page.locator('.task-title').filter({ hasText: title }).count(), 1);
+  }
+  try {
+    assert(existsSync(cli) && existsSync(join(app, 'Cargo.lock')) && existsSync(join(frontend, 'node_modules/vite/bin/vite.js')));
+    for (const name of ['src/model.rs', 'frontend/app.css', 'frontend/app.ts']) sources.set(name, await readFile(join(app, name), 'utf8'));
+    const original = sources.get('src/model.rs');
+    assert(original.includes('Plan the next small slice'));
+    // A failing initial generation serves an honest unavailable state, without a restart storm.
+    await writeFile(join(app, 'src/model.rs'), original + '\ncompile_error!("YT112 intentional initial error");\n');
+    const watch = start('watch');
+    await status(503);
+    await until(() => log.includes('failed; runtime unavailable'), 180000);
+    const attempts = (log.match(/ started/g) ?? []).length;
+    await pause(400);
+    assert.equal((log.match(/ started/g) ?? []).length, attempts);
+    await writeFile(join(app, 'src/model.rs'), original);
+    await status(200, 180000);
+    result.checks.initialFailureAndRecovery = 'pass';
+    context = await chromium.launchPersistentContext(profile, { executablePath: '/usr/bin/google-chrome', headless: true, viewport: { width: 1100, height: 850 } });
+    await context.addInitScript(() => {
+      window.__yt112Csp = [];
+      document.addEventListener('securitypolicyviolation', (event) => window.__yt112Csp.push(event.violatedDirective));
+    });
+    await context.route('**/*', async (route) => {
+      assert.equal(new URL(route.request().url()).origin, origin);
+      await route.continue();
+    });
+    page = await context.newPage();
+    page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
+    page.on('pageerror', (error) => errors.push(error.message));
+    page.on('framenavigated', (frame) => { if (frame === page.mainFrame()) page.evaluate(() => window.__yt112Csp ?? []).then((items) => violations.push(...items)).catch(() => {}); });
+    const response = await page.goto(origin, { waitUntil: 'networkidle' });
+    await ready();
+    const csp = response.headers()['content-security-policy'];
+    assert(csp.includes("style-src 'self' 'nonce-") && csp.includes('ws://127.0.0.1:5173'));
+    assert(!csp.includes('unsafe-inline') && !csp.includes("'unsafe-eval'"));
+    // Vite may reload during initial module discovery; do not read an obsolete navigation body.
+    const firstDocument = await (await fetch(origin)).text();
+    const other = await (await fetch(origin)).text();
+    const firstNonce = /nonce="([^"]+)"/.exec(firstDocument)?.[1];
+    const otherNonce = /nonce="([^"]+)"/.exec(other)?.[1];
+    assert(firstNonce && otherNonce); assert.notEqual(firstNonce, otherNonce);
+    await addOnce('YT112 initial single action');
+    await page.evaluate(() => { window.__yt112Marker = 'css-keeps-document'; });
+    await writeFile(join(app, 'frontend/app.css'), sources.get('frontend/app.css') + '\n#workspace-label { border-left: 9px solid rgb(1, 2, 3); }\n');
+    await page.waitForFunction(() => getComputedStyle(document.querySelector('#workspace-label')).borderLeftWidth === '9px');
+    assert.equal(await page.evaluate(() => window.__yt112Marker), 'css-keeps-document');
+    assert(await page.evaluate(() => [...document.querySelectorAll('style')].some((style) => style.nonce && style.nonce === document.querySelector('meta[property=csp-nonce]')?.nonce)));
+    await addOnce('YT112 after CSS');
+    result.checks.cssHmrAndSingleListeners = 'pass';
+    await writeFile(join(app, 'frontend/app.ts'), sources.get('frontend/app.ts') + '\ndocument.documentElement.dataset.yt112Ts = "changed";\n');
+    await page.waitForFunction(() => document.documentElement.dataset.yt112Ts === 'changed');
+    await ready();
+    await addOnce('YT112 after TS');
+    result.checks.viteTsReloadAndSingleListeners = 'pass';
+    const changed = original.replace('Plan the next small slice', 'YT112 Rust generation');
+    await writeFile(join(app, 'src/model.rs'), changed);
+    await page.waitForFunction(() => document.querySelector('#tasks')?.textContent.includes('YT112 Rust generation'), null, { timeout: 180000 });
+    await ready();
+    await addOnce('YT112 after Rust');
+    result.checks.rustRebuildFullReload = 'pass';
+    const entry = await (await fetch(origin + '/app.ts')).text();
+    const asset = /\/__yetlet_wasm\/[0-9]+\/tasks.js/.exec(entry)?.[0]; assert(asset);
+    const goodJs = await (await fetch(origin + asset)).arrayBuffer();
+    const moduleResponse = await fetch(origin + asset + '?import');
+    assert.equal(moduleResponse.status, 200);
+    assert.equal(moduleResponse.headers.get('content-type'), 'text/javascript');
+    assert.deepEqual(await moduleResponse.arrayBuffer(), goodJs);
+    const moduleHead = await fetch(origin + asset + '?import', { method: 'HEAD' });
+    assert.equal(moduleHead.status, 200); assert.equal(await moduleHead.text(), '');
+    assert.equal((await fetch(origin + asset + '?import', { method: 'POST' })).status, 405);
+    assert.equal((await fetch(origin + asset + '?import', { headers: { Origin: 'https://other.example' } })).status, 403);
+    for (const path of [asset + '?raw', asset + '?import=1', asset + '?import&raw', asset + '?import&import', asset.replace('tasks.js', 'tasksXjs'), asset.replace('tasks.js', 'tasks_bg.wasm?import')]) {
+      assert.equal((await fetch(origin + path)).status, 403, path);
+    }
+    result.checks.exactModuleQueryAndAssetBoundaries = 'pass';
+    const wasmResponse = await fetch(origin + asset.replace('tasks.js', 'tasks_bg.wasm'));
+    assert.equal(wasmResponse.headers.get('content-type'), 'application/wasm');
+    const goodWasm = await wasmResponse.arrayBuffer();
+    const offset = log.length;
+    await writeFile(join(app, 'src/model.rs'), changed + '\ncompile_error!("YT112 later error");\n');
+    await until(() => log.slice(offset).includes('keeping last good generation'), 180000);
+    assert.deepEqual(await (await fetch(origin + asset)).arrayBuffer(), goodJs);
+    assert.deepEqual(await (await fetch(origin + asset.replace('tasks.js', 'tasks_bg.wasm'))).arrayBuffer(), goodWasm);
+    await addOnce('YT112 last good works');
+    await writeFile(join(app, 'src/model.rs'), original.replace('Plan the next small slice', 'YT112 recovered'));
+    await page.waitForFunction(() => document.querySelector('#tasks')?.textContent.includes('YT112 recovered'), null, { timeout: 180000 });
+    await ready(); await addOnce('YT112 recovered once');
+    result.checks.compileFailureAtomicPairAndRecovery = 'pass';
+    // A disposable real Cargo build script creates a deterministic in-build edit window.
+    const queuedOffset = log.length;
+    await writeFile(buildGate, delayedBuild);
+    await until(() => existsSync(activeGate), 180000);
+    await writeFile(join(app, 'src/model.rs'), original.replace('Plan the next small slice', 'YT112 queued first'));
+    await writeFile(join(app, 'src/model.rs'), original.replace('Plan the next small slice', 'YT112 queued final'));
+    await until(() => {
+      const phases = [...log.slice(queuedOffset).matchAll(/YT_BROWSER_BUILD ([0-9]+) (started|published|failed)/g)];
+      return phases.filter((item) => item[2] === 'published').length >= 2 && phases.at(-1)?.[2] === 'published';
+    }, 180000);
+    await page.waitForFunction(() => document.querySelector('#tasks')?.textContent.includes('YT112 queued final'), null, { timeout: 180000 });
+    await ready(); await addOnce('YT112 after queued edits');
+    let building = false;
+    for (const phase of log.slice(queuedOffset).matchAll(/YT_BROWSER_BUILD [0-9]+ (started|published|failed)/g)) {
+      if (phase[1] === 'started') { assert.equal(building, false); building = true; }
+      else { assert.equal(building, true); building = false; }
+    }
+    assert.equal(building, false);
+    result.checks.queuedEditsSerializedLatestGeneration = 'pass';
+
+    for (const path of ['/base.toml', '/Cargo.toml', '/Cargo.lock', '/.env', '/vite.config.mjs', '/serve.mjs', '/build-wasm.mjs', '/src/model.rs', '/@fs/etc/passwd', '/app.ts?raw']) {
+      assert.equal((await fetch(origin + path)).status, 403, path);
+    }
+    violations.push(...await page.evaluate(() => window.__yt112Csp));
+    assert.deepEqual(violations, []); assert.deepEqual(errors, []);
+    assert(!log.includes('yt112-private-selector') && !log.includes('yt112-private-file'));
+    await page.screenshot({ path: join(out, 'watch.png') });
+    await writeFile(buildGate, delayedBuild + '// cancellation fixture\n');
+    await until(() => existsSync(activeGate), 180000);
+    await waitExit(watch, 'SIGINT');
+    assert.equal(watch.child.signalCode, 'SIGINT');
+    await portClosed();
+    assert(log.includes('YT_BROWSER_STOP closed Vite and removed owned generations'));
+    result.checks.watchCtrlCAndCleanup = 'pass';
+    result.checks.cancelDuringActiveCargoBuild = 'pass';
+    await rm(buildGate, { force: true });
+    await rm(activeGate, { force: true });
+    // Exercise the existing production build and static preview, after restoring sources.
+    for (const [name, source] of sources) await writeFile(join(app, name), source);
+    assert.equal(await waitExit(start('build')), 0);
+    const html = await readFile(join(frontend, 'dist/index.html'), 'utf8');
+    assert(!/YETLET_REQUEST_NONCE|__yetlet_wasm|@vite\/client|csp-nonce/.test(html));
+    const preview = start('run'); await status(200);
+    await page.goto(origin, { waitUntil: 'networkidle' }); await ready();
+    await addOnce('YT112 static preview');
+    await waitExit(preview, 'SIGINT'); await portClosed();
+    result.checks.productionBuildAndStaticRun = 'pass';
+    result.status = 'pass';
+  } catch (error) {
+    result.status = 'fail'; result.error = error.stack ?? String(error); process.exitCode = 1;
+    result.consoleErrors = errors;
+    if (page) {
+      try {
+        result.pageFailure = { url: page.url(), text: (await page.locator('body').innerText()).slice(0,2000), csp: await page.evaluate(() => window.__yt112Csp ?? []) };
+        await page.screenshot({ path: join(out, 'failure.png') });
+      } catch (captureError) { result.captureError = String(captureError); }
+    }
+  } finally {
+    for (const record of records.filter((item) => !item.stopped)) {
+      try { await waitExit(record, 'SIGINT'); } catch (error) { result.cleanup.processError = String(error); result.status = 'fail'; process.exitCode = 1; }
+    }
+    if (context) await context.close();
+    await rm(profile, { recursive: true, force: true });
+    result.cleanup.browserProfileRemoved = !existsSync(profile);
+    await rm(buildGate, { force: true });
+    await rm(activeGate, { force: true });
+    result.cleanup.ownedBuildGatesRemoved = !existsSync(buildGate) && !existsSync(activeGate);
+
+    for (const [name, source] of sources) await writeFile(join(app, name), source);
+    result.cleanup.sourcesRestored = true;
+    await writeFile(join(out, 'result.json'), JSON.stringify(result, null, 2) + '\n');
+    await writeFile(join(out, 'cli.log'), log);
+    console.log(JSON.stringify(result, null, 2));
+  }
+}
+
+if (process.argv[2] === '--browser-watch') {
+  await browserWatch();
+} else {
 const args = new Map();
 const flags = new Set(['--cloud', '--config', '--module-hmr']);
 for (let i = 2; i < process.argv.length; i++) {
@@ -350,4 +589,6 @@ try {
     await writeFile(join(outputDir, 'vite.log'), logs.vite ?? '');
   }
   console.log(JSON.stringify(result, null, 2));
+}
+
 }

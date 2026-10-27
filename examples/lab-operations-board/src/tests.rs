@@ -1329,3 +1329,167 @@ async fn triage_only_enables_wasm_on_selected_page_and_escapes_bounded_bootstrap
     );
     assert!(!dir.path().join("must-not-exist.sqlite3").exists());
 }
+
+#[cfg(feature = "commit-write-auth")]
+#[tokio::test]
+async fn commit_write_http_native_and_triage_share_sql_deny_boundary() {
+    let dir = tempfile::tempdir().unwrap();
+    let ids = DemoIdentities::generate().unwrap();
+    let board = Board::open_with_options(
+        &dir.path().join("http.sqlite"),
+        HOST.parse().unwrap(),
+        ids.clone(),
+        BoardOptions {
+            write_authorization: true,
+            ..BoardOptions::default()
+        },
+    )
+    .await
+    .unwrap();
+    let mut client = Client::login(&board, &ids, "alice").await;
+    let created = client
+        .call(
+            &board.router,
+            Method::POST,
+            "/board/projects/1/items",
+            Some(client.form("Created", "open", 0, "")),
+        )
+        .await;
+    assert_eq!(created.status, StatusCode::SEE_OTHER);
+    let item = board.database.get(1, 1).await.unwrap().0;
+    let mut payload_item = yetlet_board_triage::Item::from(item);
+    payload_item.title = "Triage update".into();
+    assert_eq!(
+        triage_json(
+            &board,
+            &client,
+            1,
+            serde_json::json!({"csrf":client.csrf,"item":payload_item})
+        )
+        .await
+        .0,
+        StatusCode::OK
+    );
+    board
+        .set_project_write_permission("alice", 1, false)
+        .await
+        .unwrap();
+    let denied = client
+        .call(
+            &board.router,
+            Method::POST,
+            "/board/projects/1/items/1",
+            Some(client.form("Denied native", "open", 2, "")),
+        )
+        .await;
+    assert_eq!(denied.status, StatusCode::FORBIDDEN);
+    assert_eq!(denied.headers[header::CACHE_CONTROL], "no-store");
+    assert_eq!(denied.headers[header::CONTENT_SECURITY_POLICY], DEFAULT_CSP);
+    assert!(!denied.headers.contains_key(header::SET_COOKIE));
+    assert!(!denied.body.contains("generation"));
+    assert!(!denied.body.contains("write_authority"));
+    payload_item.version = 2;
+    payload_item.title = "Denied triage".into();
+    assert_eq!(
+        triage_json(
+            &board,
+            &client,
+            1,
+            serde_json::json!({"csrf":client.csrf,"item":payload_item})
+        )
+        .await
+        .0,
+        StatusCode::FORBIDDEN
+    );
+    assert_eq!(board.database.get(1, 1).await.unwrap().0.version, 2);
+    assert_eq!(board.database.get(1, 1).await.unwrap().1.len(), 2);
+    assert!(matches!(
+        board.set_project_write_permission("viewer", 1, true).await,
+        Err(Failure::Forbidden)
+    ));
+    board
+        .set_project_write_permission("alice", 1, true)
+        .await
+        .unwrap();
+    assert_eq!(
+        client
+            .call(
+                &board.router,
+                Method::POST,
+                "/board/projects/1/items/1",
+                Some(client.form("Allowed again", "open", 2, ""))
+            )
+            .await
+            .status,
+        StatusCode::SEE_OTHER
+    );
+    board.drain().await.unwrap();
+}
+
+#[cfg(feature = "request-tracing")]
+mod request_trace_tests;
+
+#[tokio::test]
+async fn opt_in_options_select_independent_capabilities_before_storage() {
+    let defaults = BoardOptions::default();
+    assert!(!defaults.write_authorization && !defaults.request_tracing);
+    assert!(defaults.stylesheets.is_empty() && defaults.triage_script.is_none());
+    assert!(matches!(defaults.sessions, SessionBackend::Memory));
+    let dir = tempfile::tempdir().unwrap();
+    for (write_authorization, request_tracing) in
+        [(false, false), (true, false), (false, true), (true, true)]
+    {
+        let path = dir
+            .path()
+            .join(format!("{write_authorization}-{request_tracing}.sqlite"));
+        let result = Board::open_with_options(
+            &path,
+            HOST.parse().unwrap(),
+            DemoIdentities::generate().unwrap(),
+            BoardOptions {
+                write_authorization,
+                request_tracing,
+                ..BoardOptions::default()
+            },
+        )
+        .await;
+        let available = (!write_authorization || cfg!(feature = "commit-write-auth"))
+            && (!request_tracing || cfg!(feature = "request-tracing"));
+        if !available {
+            assert!(matches!(result, Err(Failure::Configuration)));
+            assert!(!path.exists(), "unsupported selection touched storage");
+            continue;
+        }
+        let board = result.unwrap();
+        let response = board
+            .router
+            .clone()
+            .oneshot(
+                Request::builder()
+                    .uri("/board/login")
+                    .header(header::HOST, HOST)
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(response.status(), StatusCode::OK);
+        assert_eq!(
+            response.headers().contains_key("x-yetlet-request-id"),
+            request_tracing
+        );
+        assert!(
+            response
+                .headers()
+                .contains_key(header::CONTENT_SECURITY_POLICY)
+        );
+        assert!(response.headers().contains_key(header::SET_COOKIE));
+        assert_eq!(response.headers()[header::CACHE_CONTROL], "no-store");
+        let version: i64 = rusqlite::Connection::open(&path)
+            .unwrap()
+            .pragma_query_value(None, "user_version", |r| r.get(0))
+            .unwrap();
+        assert_eq!(version, if write_authorization { 2 } else { 1 });
+        board.drain().await.unwrap();
+    }
+}

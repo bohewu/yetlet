@@ -1,5 +1,5 @@
 use std::process::ExitCode;
-use yetlet_cli::{Cli, VERSION, app, compose, docker, doctor, parse, scaffold, usage};
+use yetlet_cli::{Cli, VERSION, app, compose, docker, doctor, inspect, parse, scaffold, usage};
 
 fn main() -> ExitCode {
     let args = std::env::args_os().skip(1).collect::<Vec<_>>();
@@ -24,6 +24,16 @@ fn main() -> ExitCode {
             println!("{}", report.render(json));
             ExitCode::from(report.exit_code())
         }
+        Ok(Cli::Inspect { manifest, json }) => match inspect::explain(&manifest, json) {
+            Ok(report) => {
+                println!("{report}");
+                ExitCode::SUCCESS
+            }
+            Err(error) => {
+                eprintln!("CLI_PROJECT inspect: {error}");
+                ExitCode::FAILURE
+            }
+        },
         Ok(Cli::Build { manifest, release }) => application(&manifest, false, release, false),
         Ok(Cli::Run { manifest }) => application(&manifest, true, false, false),
         Ok(Cli::Watch { manifest }) => application(&manifest, true, false, true),
@@ -73,17 +83,17 @@ fn main() -> ExitCode {
             name,
             dir,
             template,
-            cloud,
-            with_config,
-            with_tailwind,
+            service,
+            runtime_settings,
+            tailwind,
             vite,
         }) => match scaffold::create_selected(
             &name,
             &dir,
             template,
-            cloud,
-            with_config,
-            with_tailwind,
+            service,
+            runtime_settings,
+            tailwind,
             vite,
         ) {
             Ok(()) => {

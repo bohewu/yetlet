@@ -4,6 +4,9 @@
 
 `yetlet-core` describes UI as owned Rust values shared by the native HTML and browser DOM renderers. It has no dependencies, browser runtime, server transport or implicit state scheduler.
 
+For a first-app continuation covering typed data, reusable functions, lists and
+conditions, follow [Write Views and reusable components](../../docs/VIEW-COMPONENTS.md).
+
 ## Build a View
 
 `View` is either `Text(String)` or `Element`. Construct elements with a static tag, inert attributes and child Views. This fragment is copied verbatim from the crate's existing `view_tree_is_renderer_neutral` test:

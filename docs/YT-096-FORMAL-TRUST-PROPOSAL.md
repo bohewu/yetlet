@@ -222,3 +222,13 @@ inputs and nine policy/builder/accepted-scope files retain their hashes.
 Only the separately authorized acceptance commit was made. The research
 documents remain uncommitted/unpushed; no runtime qualification was repeated,
 no resource started and no signing, OIDC request or publication occurred.
+
+## Owner decision brief — 2026-10-23
+
+The owner requested a [public metadata and decision brief](YT-096-TRUST-DISCLOSURE-DECISIONS.md)
+using the unchanged ce56e08 candidate and existing evidence, with no validation
+reruns, signing or publication. It separates exposure classes and D1–D6 pending
+owner decisions from later execution authority. Independent review of this
+follow-up passed with zero issues and required followups. The original research review above and final candidate
+FAIL / release-ready NO remain intact; no proposed policy or new candidate is
+selected by this navigation addendum.

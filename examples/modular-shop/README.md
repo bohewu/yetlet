@@ -46,3 +46,57 @@ cargo xtask check docs
 ```
 
 See [M9i verification](../../docs/M9I-VERIFICATION.md) for retained integration, rollback, reviewer and dependency-isolation evidence.
+
+
+## Optional catalog display cache — YT-183
+
+[The selected contract](../../docs/YT-183-CATALOG-CACHE-CONTRACT.md) applies only
+to the existing public product projection used by catalog and cart displays.
+Default `Database::open` and normal startup remain uncached. Enable both the
+application feature and its single native startup environment selection:
+
+```sh
+YETLET_SHOP_CATALOG_CACHE_ENABLED=true cargo run --locked \
+  -p yetlet-modular-shop --features catalog-cache
+```
+
+Embedded callers use `Database::open_with_options(path,
+DatabaseOptions { catalog_cache: true })`, then pass the Database to the existing
+`app` constructor. `DatabaseOptions::default()` leaves caching off even when
+compiled. Unsupported true selections fail before opening/creating storage.
+[YT-185](../../docs/YT-185-OPT-IN-OPTIONS.md) records the intentional pre-public
+constructor migration. Options do not read ambient settings; the binary maps
+its existing native environment value into them. There
+is no new Settings-provider service, framework middleware/trait or Core/WASM
+cache feature. Missing/`false` selection stays off; only exact `true`/`false`
+is accepted, and true without compiled feature fails redacted startup validation.
+Selection is startup-only. See [new evidence](../../docs/YT-183-CATALOG-CACHE-IMPLEMENTATION.md).
+
+Native Moka coalesces fallible fills. The application admits at most 64 products
+and an estimated 64 KiB payload per retained projection, with native best-effort
+capacity one; these are not hard process-memory bounds. Oversized successful
+results are returned uncached, not truncated. One actual cache-fill SQL worker
+is admitted at a time; an enabled lookup waits up to a cooperative 500 ms and
+returns existing storage-unavailable behavior on timeout/load failure, without
+an application retry or stale-on-error fallback. A started blocking worker keeps
+its fill/SQL permits after caller timeout/drop. Existing four SQL workers and
+two-second SQLite busy timeout are unchanged.
+
+Displayed data has a two-second maximum age since source-load start at selection,
+including source wait, plus native insertion TTL. Hits do not extend the age.
+Enabled pages label price/stock advisory and cart total estimated. Add-to-cart
+still reads current product SQL; checkout still rereads current price/stock and
+commits inventory/order/lines in its original transaction. Session, CSRF, order
+ownership, durable idempotency and private `no-store` response policy are uncached.
+This is data reuse; fresh pages/forms are still rendered for every request.
+
+Checkout publishes a new local generation inside the successful blocking worker,
+including if its caller disappears. Reads begun before publication may finish
+with their prior bounded-age projection; later reads use a new key, so a late
+old fill cannot repopulate the active generation. Rollbacks do not advance it.
+Generation saturation refuses cached reads until cold reopen without changing
+checkout authority. Separate Database opens/processes and out-of-band SQL edits
+have independent caches and only the two-second freshness bound, not immediate
+cross-instance invalidation. New tenant/private catalog rules need a separate
+scope/visibility contract; this public projection is not a reusable authorization
+cache. No speedup, throughput, production or distributed coherence claim.

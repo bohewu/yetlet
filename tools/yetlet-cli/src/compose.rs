@@ -25,12 +25,12 @@ fn generate_inner(
             if snapshot.with_assets {
                 env.push_str("      YETLET_ASSET_ROOT: '/opt/yetlet/assets'\n");
             }
-            if snapshot.with_config {
+            if snapshot.runtime_settings {
                 env.push_str("      YETLET_CONFIG_ROOT: '/opt/yetlet/config'\n      APP_ENVIRONMENT: 'Production'\n      APP_SERVER__HOST: '0.0.0.0'\n      APP_SERVER__PORT: '8080'\n      APP_SERVICE__TOKEN: '${APP_SERVICE__TOKEN:?Set APP_SERVICE__TOKEN}'\n");
             }
             yaml = yaml.replace("    ports:", &format!("{env}    ports:"));
             let mut readme = include_str!("../templates/compose/README.md").to_owned();
-            if snapshot.with_config || snapshot.with_assets {
+            if snapshot.runtime_settings || snapshot.with_assets {
                 readme.push_str(include_str!("../templates/docker/PROFILE-RUNTIME.md"));
             }
             Ok(vec![("compose.yaml", yaml), ("README.md", readme)])
@@ -71,7 +71,7 @@ pub(crate) fn validate_lock(snapshot: &docker::Snapshot) -> Result<(), String> {
     if snapshot.with_assets {
         app_dependencies.extend(["serde", "serde_json", "tempfile", "tower"]);
     }
-    if snapshot.with_config {
+    if snapshot.runtime_settings {
         app_dependencies.extend(["secrecy", "serde", "yetlet-config"]);
     }
     // Source inspection already requires the exact generated manifest. Cargo
@@ -118,7 +118,7 @@ pub(crate) fn validate_lock(snapshot: &docker::Snapshot) -> Result<(), String> {
             return Err(invalid());
         }
     }
-    if snapshot.with_config {
+    if snapshot.runtime_settings {
         let package = one("yetlet-config")?;
         if package.get("version").and_then(Value::as_str) != Some("0.0.0")
             || package.get("source").is_some()
@@ -136,12 +136,12 @@ pub(crate) fn validate_lock(snapshot: &docker::Snapshot) -> Result<(), String> {
         (
             "serde",
             "1.0.229",
-            snapshot.with_assets || snapshot.with_config,
+            snapshot.with_assets || snapshot.runtime_settings,
         ),
         ("serde_json", "1.0.149", snapshot.with_assets),
-        ("secrecy", "0.10.3", snapshot.with_config),
-        ("toml", "0.9.12+spec-1.1.0", snapshot.with_config),
-        ("dotenvy", "0.15.7", snapshot.with_config),
+        ("secrecy", "0.10.3", snapshot.runtime_settings),
+        ("toml", "0.9.12+spec-1.1.0", snapshot.runtime_settings),
+        ("dotenvy", "0.15.7", snapshot.runtime_settings),
     ] {
         if enabled && one(name)?.get("version").and_then(Value::as_str) != Some(version) {
             return Err(invalid());
@@ -191,7 +191,7 @@ pub(crate) fn validate_lock(snapshot: &docker::Snapshot) -> Result<(), String> {
         {
             return Err(invalid());
         }
-        if (snapshot.with_assets || snapshot.with_config)
+        if (snapshot.with_assets || snapshot.runtime_settings)
             && package.get("source").is_none()
             && ![
                 snapshot.manifest["package"]["name"].as_str().unwrap(),
@@ -200,7 +200,7 @@ pub(crate) fn validate_lock(snapshot: &docker::Snapshot) -> Result<(), String> {
                 "yetlet-server-axum",
             ]
             .contains(&name)
-            && !(snapshot.with_config && name == "yetlet-config")
+            && !(snapshot.runtime_settings && name == "yetlet-config")
         {
             return Err(invalid());
         }

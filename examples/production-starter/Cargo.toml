@@ -11,12 +11,13 @@ resolver = "3"
 
 [dependencies]
 axum = "0.8"
-tokio = { version = "1", features = ["macros", "net", "rt-multi-thread", "signal", "sync"] }
+tokio = { version = "1", features = ["macros", "net", "rt-multi-thread", "signal", "sync", "time"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 rusqlite = { version = "0.40.2", default-features = false, features = ["bundled"] }
 secrecy = { version = "0.10", features = ["serde"] }
 subtle = "2.6"
+prometheus = { version = "0.14", default-features = false }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["json"] }
 yetlet-config = { path = "../../crates/yetlet-config" }
@@ -26,5 +27,6 @@ yetlet-request-id = { path = "../../crates/yetlet-request-id" }
 yetlet-session = { path = "../../crates/yetlet-session" }
 
 [dev-dependencies]
+http-body = "1"
 tempfile = "3"
 tower = { version = "0.5", features = ["util"] }

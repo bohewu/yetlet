@@ -12,7 +12,7 @@
   "private": true,
   "scripts": {
     "build": "node build-wasm.mjs && vite build",
-    "dev": "vite preview",
+    "dev": "node serve.mjs",
     "typecheck": "tsc --noEmit"
   },
   "type": "module",

@@ -14,7 +14,7 @@ pub mod samples;
 pub mod smoke;
 pub mod tooling;
 
-pub const HELP: &str = "Yetlet repository xtask (unpublished)\n\nUsage: cargo xtask [--help | doctor [--capability foundation] [--json] | build <builder> [options] | check <docs|samples> | smoke <suite> [options]]\n\nBuilders: browser, keyed-bindings, multi-island-dashboard, render-bench [--release];\nscene-island (offline release); form-css-proof, board-assets [--check | --fetch].\nNative smoke (no options): hello-world, rest-api, cart, middleware-lab, forms-validation,\nfile-server, sqlite-crud, sse-notifications, auth-notes, modular-shop.\nBrowser smoke [--profile debug|release]: browser-chrome, browser-firefox,\nkeyed-bindings-chrome, keyed-bindings-firefox, multi-island-dashboard-chrome,\nmulti-island-dashboard-firefox, forms-accessibility-firefox.\nFixed-build browser smoke (no options): form-css-proof-chrome, board-chrome,\nboard-firefox, scene-chrome, scene-firefox, scene-lifecycle-firefox,\nscene-picking-firefox, scene-candidate-firefox, scene-support-firefox.\nBoard requires release native binary. Scene requires debug nested native binary\nand current Rust scene-island assets. Scene selected Firefox uses temporary\ndom.webgpu.enabled=true; Support requests no WebGPU preference. Lifecycle/picking/\ncandidate/support require YT075_FIREFOX_HEADFUL_X11=1. Missing capability is nonzero.\nMeasurements: baseline, render-strategies, sample-dx, scene-dynamic.\nQualification: board [--profile bounded|full|full-sync|sync-12m|staggered-12m],\nlocal-operations, multi-instance [--report PATH], redis-three-app.\nRelease: checksums <create|verify> <directory>; private-rebuild (manual CI only).\nNo installs or implicit downloads. Doctor is read-only. The alias is root-only.\nExit: 0 success, 1 validation, 2 usage, 124 timeout, 125 infrastructure, 130 cancellation.\n";
+pub const HELP: &str = "Yetlet repository xtask (unpublished)\n\nUsage: cargo xtask [--help | doctor [--capability foundation] [--json] | build <builder> [options] | check <docs|samples> | smoke <suite> [options]]\n\nBuilders: browser, keyed-bindings, multi-island-dashboard, render-bench [--release];\nscene-island (offline release); form-css-proof, board-assets [--check | --fetch].\nNative smoke (no options): hello-world, rest-api, cart, middleware-lab, forms-validation,\nfile-server, sqlite-crud, sse-notifications, auth-notes, modular-shop.\nBrowser smoke [--profile debug|release]: browser-chrome, browser-firefox,\nkeyed-bindings-chrome, keyed-bindings-firefox, multi-island-dashboard-chrome,\nmulti-island-dashboard-firefox, forms-accessibility-firefox.\nFixed-build browser smoke (no options): form-css-proof-chrome, board-chrome,\nboard-firefox, scene-chrome, scene-firefox, scene-lifecycle-firefox,\nscene-picking-firefox, scene-candidate-firefox, scene-support-firefox.\nBoard requires release native binary. Scene requires debug nested native binary\nand current Rust scene-island assets. Scene selected Firefox uses temporary\ndom.webgpu.enabled=true; Support requests no WebGPU preference. Lifecycle/picking/\ncandidate/support require YT075_FIREFOX_HEADFUL_X11=1. Missing capability is nonzero.\nMeasurements: baseline, render-strategies, sample-dx, scene-dynamic.\nQualification: board [--profile bounded|full|full-sync|sync-12m|staggered-12m],\nlocal-operations, multi-instance [--report PATH], redis-three-app.\nRelease: checksums <create|verify> <directory>; private-rebuild [--cohort original-nine|sixteen] (manual CI only).\nNo installs or implicit downloads. Doctor is read-only. The alias is root-only.\nExit: 0 success, 1 validation, 2 usage, 124 timeout, 125 infrastructure, 130 cancellation.\n";
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Cli {
@@ -27,7 +27,9 @@ pub enum Cli {
         suite: String,
         args: Vec<OsString>,
     },
-    PrivateRebuild,
+    PrivateRebuild {
+        cohort: release::private::Cohort,
+    },
     Checksums {
         operation: String,
         directory: PathBuf,
@@ -82,8 +84,10 @@ pub fn parse(args: impl IntoIterator<Item = OsString>) -> Result<Cli, &'static s
         });
     }
     if args.first().is_some_and(|s| s == "release") {
-        if args[1..] == ["private-rebuild"] {
-            return Ok(Cli::PrivateRebuild);
+        if args.get(1).is_some_and(|s| s == "private-rebuild") {
+            return Ok(Cli::PrivateRebuild {
+                cohort: release::private::Cohort::parse(&args[2..])?,
+            });
         }
         if args.len() != 4 || args[1] != "checksums" || (args[2] != "create" && args[2] != "verify")
         {

@@ -1,0 +1,22 @@
+[package]
+name = "yetlet-rate-limit"
+description = "Explicit per-process Tower admission budgets for Yetlet"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+readme = "README.md"
+
+[dependencies]
+axum.workspace = true
+tower = "0.5"
+governor = { version = "=0.10.4", default-features = false, features = ["std"] }
+
+[dev-dependencies]
+yetlet-config = { version = "0.1.0", path = "../yetlet-config" }
+serde = { version = "=1.0.229", features = ["derive"] }
+tokio = { workspace = true, features = ["sync", "time", "signal"] }
+tower = { version = "0.5", features = ["util"] }
+http-body = "1"
+reqwest = { version = "=0.12.28", default-features = false }

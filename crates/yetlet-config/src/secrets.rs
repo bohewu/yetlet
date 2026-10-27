@@ -43,7 +43,7 @@ impl Loader {
         provider: &dyn SecretProvider,
         bindings: &[SecretBinding<'_, T>],
     ) -> Result<T, Error> {
-        self.load_from_env_with_secrets(std::env::vars_os(), provider, bindings)
+        self.load_with_env_and_secrets(std::env::vars_os(), provider, bindings)
             .await
     }
 
@@ -55,13 +55,13 @@ impl Loader {
     /// to the app and must run before listener/client construction. A failed
     /// load returns no partially resolved settings. Separate provider lookups
     /// are not an atomic vault snapshot. No refresh/rotation is implied.
-    pub async fn load_from_env_with_secrets<T: DeserializeOwned>(
+    pub async fn load_with_env_and_secrets<T: DeserializeOwned>(
         &self,
         environment: impl IntoIterator<Item = (OsString, OsString)>,
         provider: &dyn SecretProvider,
         bindings: &[SecretBinding<'_, T>],
     ) -> Result<T, Error> {
-        let mut settings = self.load_from_env(environment)?;
+        let mut settings = self.load_with_env(environment)?;
         for binding in bindings {
             let value = provider
                 .get(binding.name)

@@ -67,7 +67,9 @@ pub enum Error {
     Input,
     File,
     Toml,
-    EnvironmentKey,
+    /// Unknown, malformed, reserved or duplicate configuration key.
+    /// TOML syntax errors, including duplicate definitions, use [`Self::Toml`].
+    Key,
     Type,
     Settings,
     #[cfg(feature = "secret-provider")]
@@ -86,7 +88,7 @@ impl fmt::Display for Error {
             Self::Input => "configuration input exceeds limits or is invalid Unicode",
             Self::File => "configuration file cannot be read safely",
             Self::Toml => "invalid configuration TOML",
-            Self::EnvironmentKey => "unknown, malformed or duplicate configuration key",
+            Self::Key => "unknown, malformed or duplicate configuration key",
             Self::Type => "configuration value has an incompatible type",
             Self::Settings => "configuration does not match application settings",
             #[cfg(feature = "secret-provider")]
@@ -151,13 +153,14 @@ impl Loader {
 
     /// Snapshot real OS variables without mutating the process environment.
     pub fn load<T: DeserializeOwned>(&self) -> Result<T, Error> {
-        self.load_from_env(std::env::vars_os())
+        self.load_with_env(std::env::vars_os())
     }
 
-    /// Load from an explicit environment snapshot, useful for deterministic
-    /// tests/embedding. Unrelated variables are ignored; related keys must use
+    /// Load base/profile TOML and any selected development secret file, then
+    /// apply an explicit environment snapshot, useful for deterministic tests
+    /// and embedding. Unrelated variables are ignored; related keys must use
     /// canonical uppercase ASCII and `__` for nesting. Duplicate keys fail.
-    pub fn load_from_env<T: DeserializeOwned>(
+    pub fn load_with_env<T: DeserializeOwned>(
         &self,
         environment: impl IntoIterator<Item = (OsString, OsString)>,
     ) -> Result<T, Error> {
@@ -185,7 +188,7 @@ impl Loader {
                 return Err(Error::Input);
             }
             if !seen.insert(key.clone()) {
-                return Err(Error::EnvironmentKey);
+                return Err(Error::Key);
             }
             if key == selector {
                 profile = Environment::parse(&value)?;
@@ -211,13 +214,13 @@ impl Loader {
                 SecretFormat::Dotenv => {
                     // dotenvy otherwise expands from ambient process variables.
                     if text.contains('$') {
-                        return Err(Error::EnvironmentKey);
+                        return Err(Error::Key);
                     }
                     let mut seen = BTreeSet::new();
                     for entry in dotenvy::from_read_iter(text.as_bytes()) {
-                        let (key, value) = entry.map_err(|_| Error::EnvironmentKey)?;
+                        let (key, value) = entry.map_err(|_| Error::Key)?;
                         if !seen.insert(key.clone()) || key == selector {
-                            return Err(Error::EnvironmentKey);
+                            return Err(Error::Key);
                         }
                         override_value(&mut settings, &marker, &key, value)?;
                     }
@@ -252,7 +255,7 @@ fn validate_keys(value: &Value) -> Result<(), Error> {
     if let Value::Table(table) = value {
         for (key, value) in table {
             if !valid_key(key) {
-                return Err(Error::EnvironmentKey);
+                return Err(Error::Key);
             }
             validate_keys(value)?;
         }
@@ -266,7 +269,7 @@ fn parse_toml(text: &str) -> Result<Value, Error> {
     }
     let table: toml::Table = toml::from_str(text).map_err(|_| Error::Toml)?;
     if table.contains_key("environment") {
-        return Err(Error::EnvironmentKey);
+        return Err(Error::Key);
     }
     Ok(Value::Table(table))
 }
@@ -275,7 +278,7 @@ fn merge(base: &mut Value, overlay: Value) -> Result<(), Error> {
     match (base, overlay) {
         (Value::Table(base), Value::Table(overlay)) => {
             for (key, value) in overlay {
-                merge(base.get_mut(&key).ok_or(Error::EnvironmentKey)?, value)?;
+                merge(base.get_mut(&key).ok_or(Error::Key)?, value)?;
             }
         }
         (base, overlay) if std::mem::discriminant(base) == std::mem::discriminant(&overlay) => {
@@ -287,20 +290,20 @@ fn merge(base: &mut Value, overlay: Value) -> Result<(), Error> {
 }
 
 fn override_value(root: &mut Value, marker: &str, key: &str, value: String) -> Result<(), Error> {
-    let suffix = key.strip_prefix(marker).ok_or(Error::EnvironmentKey)?;
+    let suffix = key.strip_prefix(marker).ok_or(Error::Key)?;
     if suffix.len() > 256 || suffix != suffix.to_ascii_uppercase() {
-        return Err(Error::EnvironmentKey);
+        return Err(Error::Key);
     }
     let mut target = root;
     for segment in suffix.split("__") {
         let key = segment.to_ascii_lowercase();
         if !valid_key(&key) {
-            return Err(Error::EnvironmentKey);
+            return Err(Error::Key);
         }
         target = target
             .as_table_mut()
             .and_then(|table| table.get_mut(&key))
-            .ok_or(Error::EnvironmentKey)?;
+            .ok_or(Error::Key)?;
     }
     *target = match target {
         Value::String(_) => Value::String(value),

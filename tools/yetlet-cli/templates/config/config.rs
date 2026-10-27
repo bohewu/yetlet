@@ -29,12 +29,12 @@ fn invalid() -> io::Error {
 }
 
 impl Settings {
-    pub fn validate(&self, cloud: bool) -> io::Result<SocketAddr> {
+    pub fn validate(&self, service: bool) -> io::Result<SocketAddr> {
         if self.service.token.expose_secret().trim().is_empty()
             || self.service.public_message.is_empty()
             || self.service.public_message.len() > 80
             || self.server.port == 0
-            || !(self.server.host == "127.0.0.1" || cloud && self.server.host == "0.0.0.0")
+            || !(self.server.host == "127.0.0.1" || service && self.server.host == "0.0.0.0")
         {
             return Err(invalid());
         }
@@ -88,7 +88,7 @@ mod tests {
 
     fn settings(profile: &str, token: &str) -> Settings {
         loader()
-            .load_from_env([
+            .load_with_env([
                 ("APP_ENVIRONMENT".into(), profile.into()),
                 ("APP_SERVICE__TOKEN".into(), token.into()),
             ])
@@ -102,7 +102,7 @@ mod tests {
         }
         let selected = selected_loader(Some(env!("CARGO_MANIFEST_DIR").into())).unwrap();
         let settings: Settings = selected
-            .load_from_env([
+            .load_with_env([
                 ("APP_ENVIRONMENT".into(), "Production".into()),
                 (
                     "YETLET_CONFIG_ROOT".into(),
@@ -146,11 +146,11 @@ mod tests {
             SecretFormat::Dotenv,
         );
         let empty: Settings = selected
-            .load_from_env([("APP_ENVIRONMENT".into(), "Development".into())])
+            .load_with_env([("APP_ENVIRONMENT".into(), "Development".into())])
             .unwrap();
         assert!(empty.validate(true).is_err());
         let overridden: Settings = selected
-            .load_from_env([
+            .load_with_env([
                 ("APP_ENVIRONMENT".into(), "Development".into()),
                 ("APP_SERVICE__TOKEN".into(), "000123".into()),
             ])
@@ -167,7 +167,7 @@ mod tests {
             ("APP_SERVER__PORT", "private-value"),
             ("APP_SERVER__PORT", "65536"),
         ] {
-            let result = loader().load_from_env::<Settings>([(key.into(), value.into())]);
+            let result = loader().load_with_env::<Settings>([(key.into(), value.into())]);
             assert!(result.is_err());
             let error = result.err().unwrap();
             assert!(!format!("{error:?}: {error}").contains("private-value"));
@@ -179,7 +179,7 @@ mod tests {
                     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("missing-private-file"),
                     SecretFormat::Dotenv,
                 )
-                .load_from_env([
+                .load_with_env([
                     ("APP_ENVIRONMENT".into(), profile.into()),
                     ("APP_SERVICE__TOKEN".into(), "000123".into()),
                 ])

@@ -20,7 +20,12 @@ pub async fn configure(
     Oidc::discover(
         &settings.issuer,
         &settings.client_id,
-        &format!("http://{address}/board/oidc/callback"),
+        &format!(
+            "{}/board/oidc/callback",
+            settings
+                .application_origin(address)
+                .map_err(|_| Failure::Invalid)?
+        ),
         settings.subject_map().map_err(|_| Failure::Invalid)?,
         ClientSecret::new(secret.expose_secret().to_owned()),
     )
@@ -39,7 +44,7 @@ mod tests {
     }
     #[tokio::test]
     async fn injected_provider_failure_has_no_backend_or_credential_details() {
-        let settings = crate::config::load_from_env(vec![]).unwrap();
+        let settings = crate::config::load_with_env(vec![]).unwrap();
         assert!(matches!(
             configure(
                 &settings.oidc,

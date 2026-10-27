@@ -1,8 +1,8 @@
 //! Disposable signing workflow; the key CLI manages separate persistent identities.
 use std::process::ExitCode;
 use yetlet_signing::{
-    Error, KeyRef, KeyState, LocalProvider, LocalSigner, Policy, PublicCertificates,
-    SigningService, TrustedKey, Verifier, generate_self_signed,
+    Error, KeyRef, KeyState, LocalProvider, LocalSigner, Policy, PublicKeySet, SigningService,
+    TrustedKey, Verifier, generate_self_signed,
 };
 
 #[tokio::main(flavor = "current_thread")]
@@ -53,7 +53,7 @@ async fn demonstrate(password: &str) -> Result<(), Error> {
         password,
         &invoices.certificate_pem,
     )?;
-    let public = PublicCertificates::new(vec![
+    let public = PublicKeySet::new(vec![
         (first_ref.clone(), first_signer.public_material()),
         (second_ref.clone(), second_signer.public_material()),
         (invoice_ref.clone(), invoice_signer.public_material()),

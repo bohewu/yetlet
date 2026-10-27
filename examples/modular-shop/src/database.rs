@@ -115,11 +115,48 @@ pub struct Database {
 struct Inner {
     path: PathBuf,
     gate: Arc<Semaphore>,
+    #[cfg(feature = "catalog-cache")]
+    catalog_cache: Option<Arc<crate::catalog_cache::CatalogCache>>,
+}
+
+/// Application-owned startup selection; no settings loader is required.
+#[derive(Debug, Clone, Copy, Default)]
+pub struct DatabaseOptions {
+    /// Selects the display cache only; requires the `catalog-cache` feature.
+    pub catalog_cache: bool,
 }
 
 impl Database {
     pub fn open(path: impl Into<PathBuf>) -> Result<Self, DatabaseError> {
-        let path = path.into();
+        Self::open_with_options(path, DatabaseOptions::default())
+    }
+
+    /// Select capabilities explicitly, independently of the settings source.
+    pub fn open_with_options(
+        path: impl Into<PathBuf>,
+        options: DatabaseOptions,
+    ) -> Result<Self, DatabaseError> {
+        if options.catalog_cache && !cfg!(feature = "catalog-cache") {
+            return Err(DatabaseError::Io(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "shop catalog-cache configuration invalid",
+            )));
+        }
+        Self::open_selected(
+            path.into(),
+            #[cfg(feature = "catalog-cache")]
+            options
+                .catalog_cache
+                .then(|| Arc::new(crate::catalog_cache::CatalogCache::new())),
+        )
+    }
+
+    fn open_selected(
+        path: PathBuf,
+        #[cfg(feature = "catalog-cache")] catalog_cache: Option<
+            Arc<crate::catalog_cache::CatalogCache>,
+        >,
+    ) -> Result<Self, DatabaseError> {
         if path.as_os_str().is_empty() || path.is_dir() {
             return Err(DatabaseError::Io(io::Error::new(
                 io::ErrorKind::InvalidInput,
@@ -137,6 +174,8 @@ impl Database {
             inner: Arc::new(Inner {
                 path,
                 gate: Arc::new(Semaphore::new(MAX_DB_OPERATIONS)),
+                #[cfg(feature = "catalog-cache")]
+                catalog_cache,
             }),
         })
     }
@@ -167,8 +206,42 @@ impl Database {
         .map_err(|_| DatabaseError::WorkerUnavailable)?
     }
 
+    pub(crate) fn catalog_cache_enabled(&self) -> bool {
+        #[cfg(feature = "catalog-cache")]
+        {
+            self.inner.catalog_cache.is_some()
+        }
+        #[cfg(not(feature = "catalog-cache"))]
+        {
+            false
+        }
+    }
+
     pub(crate) async fn catalog(&self) -> Result<Vec<Product>, DatabaseError> {
-        self.run(|connection| {
+        #[cfg(feature = "catalog-cache")]
+        if let Some(cache) = &self.inner.catalog_cache {
+            return cache.read(self).await;
+        }
+        self.catalog_source(
+            #[cfg(feature = "catalog-cache")]
+            None,
+        )
+        .await
+    }
+
+    pub(crate) async fn catalog_source(
+        &self,
+        #[cfg(feature = "catalog-cache")] fill_permit: Option<tokio::sync::OwnedSemaphorePermit>,
+    ) -> Result<Vec<Product>, DatabaseError> {
+        #[cfg(all(test, feature = "catalog-cache"))]
+        let cache = self.inner.catalog_cache.clone();
+        self.run(move |connection| {
+            #[cfg(feature = "catalog-cache")]
+            let _fill_permit = fill_permit;
+            #[cfg(all(test, feature = "catalog-cache"))]
+            if let Some(cache) = cache {
+                cache.before_test_source()?;
+            }
             let mut statement = connection
                 .prepare("SELECT id, name, price_cents, stock FROM products ORDER BY id")?;
             statement
@@ -199,6 +272,8 @@ impl Database {
         lines: BTreeMap<String, u8>,
         checkout_key: String,
     ) -> Result<Order, DatabaseError> {
+        #[cfg(feature = "catalog-cache")]
+        let catalog_cache = self.inner.catalog_cache.clone();
         self.run(move |connection| {
             if lines.is_empty() {
                 return Err(DatabaseError::EmptyCart);
@@ -215,6 +290,8 @@ impl Database {
             {
                 let order = load_order(&transaction, existing, owner)?;
                 transaction.commit()?;
+                #[cfg(feature = "catalog-cache")]
+                if let Some(cache) = &catalog_cache { cache.committed(); }
                 return Ok(order);
             }
 
@@ -273,6 +350,8 @@ impl Database {
             }
             let order = load_order(&transaction, order_id, owner)?;
             transaction.commit()?;
+            #[cfg(feature = "catalog-cache")]
+            if let Some(cache) = &catalog_cache { cache.committed(); }
             Ok(order)
         })
         .await
@@ -463,4 +542,14 @@ fn load_order(connection: &Connection, id: i64, owner: UserId) -> Result<Order, 
         created_at: header.2,
         lines,
     })
+}
+
+#[cfg(all(test, feature = "catalog-cache"))]
+impl Database {
+    pub(crate) fn test_cache(&self) -> &Arc<crate::catalog_cache::CatalogCache> {
+        self.inner.catalog_cache.as_ref().unwrap()
+    }
+    pub(crate) fn test_sql_gate(&self) -> Arc<Semaphore> {
+        self.inner.gate.clone()
+    }
 }

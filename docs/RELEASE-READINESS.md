@@ -1,5 +1,74 @@
 # Yetlet Prototype Release Readiness
 
+**Latest YT-205 execution:** Candidate118f3d0 has required CI PASS, sixteen
+byte-identical hosted/local package archives and both affected MSVC consumers
+PASS. [Current evidence and limits](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)
+have final independent Reviewer PASS0 at selected technical/reader scope. The
+earlier dated checkpoints below retain their
+point-in-time identities; no Merge/signing/publication and D1–D6 remain Pending.
+
+**YT-205 new candidate and remaining order (2026-10-27):** Strict/builtin Guard
+and the native hook pass with zero findings for the ten-path rebuild-extension
+commit `118f3d0f496b487ef20fe243f4e73179f9eadc43`; its tree matches `tree_oid`.
+The owner selects that exact commit as new technical C. The
+[remaining plan](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
+orders separately authorized source delivery, required PR CI, explicit sixteen
+cohort hosted/local archive comparison, affected fourteen-package MSVC scope
+and final evidence reconciliation/independent review. Old a2d6474 archives/results
+retain their identities; no old passing suite is replayed here. These post-commit
+selection notes remain uncommitted, with no Push/Merge/dispatch or new platform
+validation. YT-205 remains In progress, YT-020 Blocked and D1–D6 Pending.
+
+**YT-205 selected-source consolidation (2026-10-27):** After guarded28-path
+commita2d6474 without Push, the owner selects that immutable source for all16
+experimental0.1.0 libraries. [The evidence packet](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md)
+binds16 clean C archives,10 new changed-lock package checks/six exact compilation
+reuses, one new integration consumer, eight first-time rustdoc commands and14
+affected inventory cells, all new commands PASS after preserved preparation
+failures.28 inventories and prior source/platform/browser/audit results remain
+source-bound without replay. Exact-source hosted CI/rebuild, affected native
+dependency evidence and C-versus-draft reader guidance remain open; YT-205 stays
+In progress and delivery review is pending. New documentation is uncommitted;
+no Push/Merge, signing or publication, and D1–D6 remain Pending.
+
+**YT-202 native continuation (2026-10-26):** [New GNU evidence and Windows
+prerequisite gap](YT-202-NATIVE-FEATURE-GAPS.md) records four source-bound default
+graphs and two Ubuntu24 userland/OpenSSL3.5.9 native consumer PASS results.
+Selected Windows MSVC remains Not verified because the configured host lacks
+its toolchain/VC Tools/SDK; YT-202 is Blocked. Independent Reviewer PASS with zero
+issues/required followups accepts the bounded GNU evidence/documentation only.
+Commit8fd8751 and same-tree integration74f53fe are local; strict full-history
+Push guards stopped both routes before any Push. New history/setup decisions
+are pending, with no change to formal candidate/trust/registry gates.
+
+**YT-201 package preparation (2026-10-26):** [Sixteen-package metadata and local
+consumer preflight](YT-201-PACKAGE-PREPARATION.md) aligns publication metadata,
+versioned local dependencies and license/guide inputs without runtime/feature
+changes. Sixteen normal Cargo package checks and two isolated native consumer
+runs pass; independent Reviewer PASS with zero issues/required followups accepts
+metadata/local preflight only. These are hash-bound uncommitted
+preflight inputs on Ubuntu 26.04.1, not final candidate C, actual registry or
+public activation evidence. Historical ce56e08 records and YT-096/D1–D6/YT-020
+gates remain unchanged.
+
+**Sixteen-package planning (2026-10-26):** [YT-200 co-release review and follow-up
+items](YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md) considers all sixteen implemented
+libraries together, with distinct feature/platform limits and missing validation
+registered as YT-201–205 Todo. Independent Reviewer PASS, zero issues/required
+followups, accepts planning only; it does not change manifests, select a
+replacement source or authorize qualification,
+signing/registry/public activation. The original ce56e08 candidate and all
+YT-096/D1–D6/YT-020 gates remain intact.
+
+**Current-source planning (2026-10-26):** [YT-199 delivery scope and evidence
+gaps](YT-199-CURRENT-DELIVERY-READINESS.md) compares source snapshot `64a6d1c`
+with the unchanged nine-package `ce56e08` candidate. Sixteen current API entries
+do not select sixteen releases or transfer historical qualification. This is
+documentation planning accepted after independent Reviewer PASS with zero
+issues/required followups, not a new source/support selection. YT-096/D1–D6 and
+YT-020 decisions remain unchanged. The dated
+checkpoints below retain their original evidence and verdicts.
+
 **Date:** 2026-10-10
 **Decision:** **M0–M9 are demonstrable and independently reviewed at prototype scope; public package publication and production deployment remain blocked.**
 
@@ -168,3 +237,45 @@ Application deployment owners apply the [M10d Threat Model](THREAT-MODEL.md) to 
 Yetlet keeps native HTTP, renderer, browser and optional provider dependencies separable. Auth, Session, database, files, SSE, tracing, CORS, rate limiting and deployment capabilities remain explicit opt-ins. The SQLite examples do not introduce an ORM, `DbContext`, repository framework or default data provider.
 
 **Backlog status:** M0–M9 and YT-060–YT-065 are Done at their bounded prototype/policy/design/automated-qualification scopes. YT-065's real-device/IME/assistive-technology/WebKit/mobile/zoom cells remain explicit optional unknowns; YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability/recovery remains Not verified. Application TLS/ACL policy, backup protection, RPO/RTO and operational staffing are not framework completion prerequisites. Revised YT-067 is Done at internal pre-patch source-scan and independently reviewed local Low finding correction scope. The earlier scan of an older snapshot remains incomplete, and no post-fix repository-wide rescan or production certification is claimed. YT-068 and the five authorized research studies are Done at their bounded documentation/prototype scopes: at the pre-M11 checkpoint, 67 of 68 backlog items were Done and YT-020 alone remained Blocked. M11 now files additional work without changing those historical completion results; current counts belong to Backlog/Kanban. The independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate. No historical signature, local commit, review, license, checksum or green CI automatically authorizes current-artifact assurance, production or publication.
+
+**YT-202 readiness correction (2026-10-27):** [Remaining native cells](YT-202-NATIVE-FEATURE-GAPS.md#current-native-coverage--2026-10-27) confirms the reconnected Windows MSVC toolchain/VC Tools/SDK are now ready. Accepted GNU/package results remain unchanged and are not replayed; fourteen-package default and selected-feature MSVC consumer executions are still Not run. The earlier artifact source-read policy rejection has not been resolved; an admin-only diagnostic is unavailable to the current connection, and no exact policy change is proposed. YT-202 stays Blocked until admitted source delivery, both executions and final independent review. PR #12 now contains4e5ef64 with green RustSec/MSRV/native/browser CI and remains unmerged; that hosted Linux result does not replace these Windows cells or select a new final release candidate. This continuation performs no Commit/Push/Merge.
+
+**YT-202 authorized source-route update (2026-10-27):** The owner explicitly selects Git clone for the remaining Windows checks. [The new task-owned clone](YT-202-NATIVE-FEATURE-GAPS.md#owner-authorized-git-source-continuation--2026-10-27) is admitted and fixed at74f53fe/tree2faa, matching accepted YT-201 source; no rejected artifact is relocated or transferred. Windows prerequisites are ready; preparation uses the existing Cargo bootstrap/directory-source convention and a newly bound equivalent fourteen-package consumer. The earlier artifact/admin diagnostic blockers are historical. YT-202 is In progress, with both MSVC executions and final independent review pending; accepted GNU/package/provider/browser evidence is retained without replay. No new Commit/Push/Merge or final release selection.
+
+**YT-202 MSVC execution (2026-10-27):** [Two new native consumers](YT-202-NATIVE-FEATURE-GAPS.md#new-msvc-results-and-preserved-preparation-failure--2026-10-27) PASS on prepared Rust1.99MSVC/VC14.44/SDK26100: fourteen default package dependencies, then Auth/session and Config/secret-provider with missing-Memory-layer refusal and CPU-only wgpu. Inputs/lock remain unchanged; all40 package-file hashes reconcile to committed CRLF checkout and100 external lock identities are retained, without a Linux archive-byte-identity claim. The fresh fixture dependency-preparation failure and environment-observation correction remain recorded; no passing native run or old suite was replayed. Six task-owned Windows directories are removed and evidence retained. YT-202 awaits final independent review before Done; no Commit/Push/Merge or release activation.
+
+**YT-202 final native acceptance (2026-10-27):** [Final independent Reviewer PASS](YT-202-NATIVE-FEATURE-GAPS.md#final-independent-acceptance--2026-10-27), zero issues/required followups, closes YT-202 at selected native/MSRV/feature scope. Both fourteen-package MSVC consumers pass with exact source/feature/lock/tool/result/cleanup bindings;4documentation/30new/32retained evidence hashes and24ZIP members match. Original request records Rust1.99MSVC selection; generic non-Git source freshness and directory-source/CRLF limits remain explicit. Prior failures/reviews and accepted GNU evidence stay intact without replay. Four task documents remain uncommitted; no Commit/Push/Merge or release activation. YT-203 is next; YT-204/205, YT-096/D1–D6 and YT-020 gates remain separate.
+
+**YT-203 source-bound browser continuation (2026-10-27):** [WASM/DOM/optional GPU inventory](YT-203-WASM-DOM-GPU-EVIDENCE.md) reuses accepted CI4e5ef64 original-five/MSRV/Chrome evidence, unchanged DOM contracts and YT-081 actual crate GPU inputs; Lab and Tasks remain separate application evidence. Only missing normalized six-package WASM default/browser compile and current-package Firefox154 DOM cells execute: both Cargo checks and23new controls/navigation/CSP/atomic-refusal observations PASS. Source/lock/assets,34-node default isolation and owned cleanup are retained; directory-source/old-GPU-lock/compile-only and unavailable historical tmp limits remain explicit. Final independent Reviewer is pending before YT-203 Done. No new runtime/sample, old suite replay, new-change Commit/Push/Merge or release activation.
+
+**YT-203 final browser acceptance (2026-10-27):** [Independent Reviewer PASS](YT-203-WASM-DOM-GPU-EVIDENCE.md#final-independent-acceptance--2026-10-27), zero issues/required followups, closes the selected packaged WASM/DOM/optional GPU evidence gaps. All4 candidate docs,37 evidence/fixture files,17 protected inputs and6 packaged-source comparisons verify; original GPU result/review and28 retained inputs reconcile to the six disclosed changed wrappers. New default Wasm build, browser-feature compile and23 Firefox observations pass with owned cleanup; accepted Chrome/GPU/BFCache proof is reused without replay or scope expansion. Completion metadata alone follows acceptance. Four YT-203 documents remain uncommitted; no Push/Merge, runtime feature or release activation. YT-204 remains Todo and is next; YT-205, YT-096/D1–D6 and YT-020 gates remain separate.
+
+**YT-204 inventory/security continuation (2026-10-27):** After strict/builtin guarded YT-203 commitf31eed7 without Push, [current selected coverage](YT-204-PACKAGE-SECURITY-COVERAGE.md) records42 cells:6 exact-input inventories retained without replay and36 new library SBOM closures matching metadata.31 new license/source cells pass;5 fail unchanged policy for Zlib/BSL-1.0/ISC.16 current-db package-lock audits report0 vulnerabilities/exit0 while10 retain Tokio informational warning; no ignore/upgrade. Scoped Standard source scan63212d73 completes120 regular files/18 aliases with0 reportable findings, preserving old Low/remediation/Auth identities and application/system limits. Delivery review is pending; YT-204 stays In progress for an authorized narrow license decision and successful affected checks. No runtime/lock/policy change, old qualification replay or new-change Commit/Push/Merge; YT-205 is unopened and formal release gates remain separate.
+
+**YT-204 bounded delivery acceptance (2026-10-27):** [Independent Reviewer PASS](YT-204-PACKAGE-SECURITY-COVERAGE.md#independent-delivery-acceptance--2026-10-27), zero issues/required followups, verifies4docs/5canonical/6supplemental/138source bindings, sixteen archives, six retained cells and all36 new closures. It accepts truthful inventory/gap reporting and explicitly keeps YT-204 In progress for the five failed license-policy checks; no policy amendment or release approval is implied. Four owned extraction/cache/database directories are removed after review, raw inert evidence and sealed bindings retained. Four task documents remain uncommitted, staged0; no Push/Merge or old qualification replay. YT-205 and formal release gates remain unchanged.
+
+**YT-204 authorized policy followup (2026-10-27):** The owner approves only Zlib/BSL-1.0/ISC additions to the license allowlist, notice preservation and the five failed checks. [All five reruns PASS](YT-204-PACKAGE-SECURITY-COVERAGE.md#authorized-license-policy-followup--2026-10-27), zero license/source errors,39 retained input and10 notice hashes unchanged; six unused-allowance warnings remain. All other policy fields, manifests/locks/runtime and prior failures/scan/advisory evidence stay intact.42/42 selected coverage combines prior passes and these five outcomes; no other successful check is replayed. Policy-wide versus per-component distribution scope is documented without relicensing Yetlet. YT-204 remains In progress pending final independent review; no ignore, upgrade or Commit/Push/Merge.
+
+**YT-204 final policy acceptance (2026-10-27):** [Independent Reviewer PASS](YT-204-PACKAGE-SECURITY-COVERAGE.md#final-policy-acceptance--2026-10-27), zero issues/required followups, closes the authorized license blocker and marks YT-204 Done at selected inventory/security scope. Six candidates/five followup evidence bindings,39 inputs/10 notices/138 source-and-alias bindings and prior canonical/supplemental records verify; all five affected checks pass under the sole three-ID allowlist delta. Other policy, dependency/runtime and historical warning/failure identities remain intact. Restored package trees and owned Cargo home are removed, raw evidence preserved. Six paths stay uncommitted/staged0; no other passed-check replay, Commit/Push/Merge or release activation. YT-205 is next but unopened; formal release gates remain separate.
+
+**YT-205 independent checkpoint acceptance (2026-10-27):** [Read-only Reviewer PASS](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#independent-checkpoint-acceptance--2026-10-27), zero issues/packet repair requirements, verifies10document/185evidence/1179protected bindings,16clean C archives and their retained/new proof distinctions. The reviewer explicitly keeps item_can_be_done:false for current-source CI/rebuild, affected native dependency evidence and reader-source disposition; YT-205 remains In progress. Owned caches/extracted packages are removed; archives, failure logs, SBOMs and rustdoc remain. No product replay or new-change Commit/Push/Merge, and D1-D6 remain Pending.
+
+**YT-205 current-lock GNU delta (2026-10-27):** [One additional Ubuntu24/OpenSSL3.5.9 integration run](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#once-only-current-lock-ubuntu24-continuation) PASS at C/Tokio1.53.3 with unchanged source/lock and observed Rust1.99/glibc2.39. It closes only this selected native dependency gap; no old suite is replayed. Owned image/container/vendor/build inputs are removed and all raw evidence retained. The earlier checkpoint PASS remains intact; separate independent GNU delta review PASS0 verifies10docs/12additional records, original185records unchanged, and explicitly keeps item_can_be_done:false. Current-source hosted CI/sixteen-package rebuild, MSVC dependency evidence and reader-source disposition keep YT-205 In progress; no Commit/Push/Merge or formal decision.
+
+**YT-205 rebuild preparation (2026-10-27):** After strict/builtin guarded ten-document commit012ecb3 without Push, [the bounded builder extension](YT-205-SIXTEEN-PACKAGE-REBUILD.md) preserves original-nine mode and adds explicit sixteen selection, six manifest/lock roots, separate bootstrap/normal verification and conditional pinned OpenSSL3.5.9 preparation. Five focused tests, native compile/lint/format and static manual-workflow checks PASS; expected fixture compile rejection retained and old product proofs not replayed. Independent review is pending. No hosted workflow/OpenSSL setup execution, successor candidate, new-change Commit/Push/Merge or D1-D6 decision; whole YT-205 remains In progress.
+
+**YT-205 rebuild extension acceptance (2026-10-27):** [Independent Reviewer PASS](YT-205-SIXTEEN-PACKAGE-REBUILD.md#independent-acceptance-and-remaining-gate), zero issues/required followups, verifies10candidate/28evidence/1181protected hashes and18 unchanged symlink targets. Five focused controls and compile/lint/format/workflow/docs checks pass; fixtures are removed and intentional rejection logs retained. Acceptance is local preparation only: actual hosted CI/rebuild, MSVC and final reader/source conditions remain open, so wholeYT205_can_be_done:false. New code/docs remain uncommitted/staged0; no Push/Merge/dispatch, candidate change or D1-D6 disposition.
+
+**YT-205 current-C technical execution (2026-10-27):** Authorized strict/builtin
+Push updates PR12 to118f3d0 after5commits/56file operations/0findings and native
+hook PASS. [New execution evidence](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)
+records both required CI jobs PASS with a C-equivalent synthetic merge tree,
+explicit sixteen hosted/local rebuilds with all33 phases PASS each and all16
+archives byte-identical, and two affected current-lock MSVC consumer PASS.
+Forty-six reader sources now match the accepted draft at C; prior input-bound
+proof is retained without manual replay. Owned scratch is removed. Windows
+original text evidence remains readable at its source; a denied local ZIP transfer
+is preserved without alternate transfer or a local-receipt claim. Final independent
+Reviewer PASS0 accepts the actual local/remote evidence and closes YT-205 at
+selected technical/reader scope. Seven document paths stay
+uncommitted/staged0; no Merge/signing/publication and D1–D6 Pending.

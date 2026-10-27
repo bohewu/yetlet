@@ -84,13 +84,13 @@ pub fn validate_name(name: &str) -> Result<(), &'static str> {
     Ok(())
 }
 
-// Preserve the accepted YT-087/YT-088 public scaffold API and its default profile.
+// Keep the default scaffold profile independent of the opt-in service profile.
 pub fn create(name: &str, framework: &Path, dir: &Path) -> Result<(), String> {
     create_with_profile(name, framework, dir, false)
 }
 
-// The cloud profile is an explicit opt-in. No existing callers need a new argument.
-pub fn create_cloud(name: &str, framework: &Path, dir: &Path) -> Result<(), String> {
+/// Create the opt-in native service profile with bind, health and shutdown hooks.
+pub fn create_service(name: &str, framework: &Path, dir: &Path) -> Result<(), String> {
     create_with_profile(name, framework, dir, true)
 }
 
@@ -98,19 +98,19 @@ fn create_with_profile(
     name: &str,
     framework: &Path,
     dir: &Path,
-    cloud: bool,
+    service: bool,
 ) -> Result<(), String> {
     validate_name(name).map_err(str::to_owned)?;
     crate::platform::fs::ensure_create_supported()?;
     let framework = crate::framework::validate(framework).map_err(str::to_owned)?;
-    let entries = files(name, &framework, cloud)?;
+    let entries = files(name, &framework, service)?;
     crate::platform::fs::create_project(dir, name, &entries)
 }
 
 pub(crate) fn files(
     name: &str,
     framework: &Path,
-    cloud: bool,
+    service: bool,
 ) -> Result<Vec<(&'static str, String)>, String> {
     let quoted = |path: &Path| -> Result<String, String> {
         Ok(toml::Value::String(
@@ -122,11 +122,11 @@ pub(crate) fn files(
     };
     let core = quoted(&framework.join("crates/yetlet-core"))?;
     let server = quoted(&framework.join("crates/yetlet-server-axum"))?;
-    let signal = if cloud { ", \"signal\"" } else { "" };
+    let signal = if service { ", \"signal\"" } else { "" };
     let manifest = format!(
         "[package]\nname = \"{name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\nrust-version = \"1.99\"\ndescription = \"Native Yetlet SSR application preview\"\nlicense = \"MIT OR Apache-2.0\"\npublish = false\n\n[workspace]\nresolver = \"3\"\n\n[dependencies]\naxum = \"0.8\"\ntokio = {{ version = \"1\", features = [\"macros\", \"net\", \"rt-multi-thread\"{signal}] }}\nyetlet-core = {{ path = {core} }}\nyetlet-server-axum = {{ path = {server} }}\n"
     );
-    let (manifest, readme, main) = if cloud {
+    let (manifest, readme, main) = if service {
         (
             format!("{manifest}\n[package.metadata.yetlet]\ncloud-profile = \"native-ssr-v1\"\n"),
             include_str!("../templates/cloud/README.md"),
@@ -148,27 +148,32 @@ pub(crate) fn files(
 }
 
 /// Explicit application-owned configuration; existing scaffold APIs stay unchanged.
-pub fn create_config(name: &str, framework: &Path, dir: &Path, cloud: bool) -> Result<(), String> {
+pub fn create_config(
+    name: &str,
+    framework: &Path,
+    dir: &Path,
+    service: bool,
+) -> Result<(), String> {
     validate_name(name).map_err(str::to_owned)?;
     crate::platform::fs::ensure_create_supported()?;
     let framework = crate::framework::validate(framework).map_err(str::to_owned)?;
     crate::framework::validate_config(&framework).map_err(str::to_owned)?;
-    let entries = config_files(name, &framework, cloud)?;
+    let entries = config_files(name, &framework, service)?;
     crate::platform::fs::create_project(dir, name, &entries)
 }
 
 pub(crate) fn config_files(
     name: &str,
     framework: &Path,
-    cloud: bool,
+    service: bool,
 ) -> Result<Vec<(&'static str, String)>, String> {
-    let mut entries = files(name, framework, cloud)?;
+    let mut entries = files(name, framework, service)?;
     let path = framework.join("crates/yetlet-config");
     let path = toml::Value::String(path.to_str().ok_or("framework path must be UTF-8")?.into());
     let dependencies = format!(
         "yetlet-config = {{ path = {path} }}\nserde = {{ version = \"=1.0.229\", features = [\"derive\"] }}\nsecrecy = {{ version = \"=0.10.3\", features = [\"serde\"] }}\n"
     );
-    // Insert inside [dependencies], before the existing cloud metadata table.
+    // Insert inside [dependencies], before the existing service metadata table.
     entries[0].1 = entries[0].1.replacen(
         "[dependencies]\n",
         &format!("[dependencies]\n{dependencies}"),
@@ -176,7 +181,7 @@ pub(crate) fn config_files(
     );
     entries[1].1 = include_str!("../templates/config/README.md").replace("@NAME@", name);
     entries[2].1.push_str("!.env.example\n");
-    entries[3].1 = if cloud {
+    entries[3].1 = if service {
         include_str!("../templates/config/cloud.rs").into()
     } else {
         include_str!("../templates/config/main.rs").into()
@@ -197,29 +202,29 @@ pub fn create_tailwind(
     name: &str,
     framework: &Path,
     dir: &Path,
-    cloud: bool,
-    with_config: bool,
+    service: bool,
+    runtime_settings: bool,
 ) -> Result<(), String> {
     validate_name(name).map_err(str::to_owned)?;
     crate::platform::fs::ensure_create_supported()?;
     let framework = crate::framework::validate(framework).map_err(str::to_owned)?;
-    if with_config {
+    if runtime_settings {
         crate::framework::validate_config(&framework).map_err(str::to_owned)?;
     }
-    let entries = tailwind_files(name, &framework, cloud, with_config)?;
+    let entries = tailwind_files(name, &framework, service, runtime_settings)?;
     crate::platform::fs::create_project(dir, name, &entries)
 }
 
 pub(crate) fn tailwind_files(
     name: &str,
     framework: &Path,
-    cloud: bool,
-    with_config: bool,
+    service: bool,
+    runtime_settings: bool,
 ) -> Result<Vec<(&'static str, String)>, String> {
-    let mut entries = if with_config {
-        config_files(name, framework, cloud)?
+    let mut entries = if runtime_settings {
+        config_files(name, framework, service)?
     } else {
-        files(name, framework, cloud)?
+        files(name, framework, service)?
     };
     entries[0].1 = entries[0].1.replacen(
         "[dependencies]\n",
@@ -233,13 +238,13 @@ pub(crate) fn tailwind_files(
     // no-Tailwind templates and public scaffold entry points stay byte-identical.
     let main = &mut entries[3].1;
     let start = main.find("async fn home(").ok_or("missing built-in home")?;
-    let end = if cloud {
+    let end = if service {
         main.find("async fn live()")
     } else {
         main.find("#[tokio::main]")
     }
     .ok_or("missing built-in entry point")?;
-    let (arguments, message) = if with_config {
+    let (arguments, message) = if runtime_settings {
         (
             "    State(settings): State<Arc<config::Settings>>,\n",
             "&settings.service.public_message",
@@ -262,8 +267,8 @@ pub(crate) fn tailwind_files(
             "async fn main() -> Result<(), Box<dyn std::error::Error>> {",
             "async fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let stylesheet = tailwind::Stylesheet::load()?;",
         );
-    if cloud {
-        let original = if with_config {
+    if service {
+        let original = if runtime_settings {
             "router(settings, readiness)"
         } else {
             "router(readiness)"
@@ -311,17 +316,17 @@ pub fn create_vite(
     name: &str,
     framework: &Path,
     dir: &Path,
-    cloud: bool,
-    with_config: bool,
-    with_tailwind: bool,
+    service: bool,
+    runtime_settings: bool,
+    tailwind: bool,
 ) -> Result<(), String> {
     validate_name(name).map_err(str::to_owned)?;
     crate::platform::fs::ensure_create_supported()?;
     let framework = crate::framework::validate(framework).map_err(str::to_owned)?;
-    if with_config {
+    if runtime_settings {
         crate::framework::validate_config(&framework).map_err(str::to_owned)?;
     }
-    let entries = vite_files(name, &framework, cloud, with_config, with_tailwind)?;
+    let entries = vite_files(name, &framework, service, runtime_settings, tailwind)?;
     crate::platform::fs::create_project(dir, name, &entries)
 }
 
@@ -330,17 +335,17 @@ pub fn create_vite_dev(
     name: &str,
     framework: &Path,
     dir: &Path,
-    cloud: bool,
-    with_config: bool,
-    with_tailwind: bool,
+    service: bool,
+    runtime_settings: bool,
+    tailwind: bool,
 ) -> Result<(), String> {
     validate_name(name).map_err(str::to_owned)?;
     crate::platform::fs::ensure_create_supported()?;
     let framework = crate::framework::validate(framework).map_err(str::to_owned)?;
-    if with_config {
+    if runtime_settings {
         crate::framework::validate_config(&framework).map_err(str::to_owned)?;
     }
-    let mut entries = vite_files(name, &framework, cloud, with_config, with_tailwind)?;
+    let mut entries = vite_files(name, &framework, service, runtime_settings, tailwind)?;
     for (path, content) in &mut entries {
         match *path {
             "README.md" => {
@@ -374,17 +379,17 @@ pub fn create_vite_dev(
 pub(crate) fn vite_files(
     name: &str,
     framework: &Path,
-    cloud: bool,
-    with_config: bool,
-    with_tailwind: bool,
+    service: bool,
+    runtime_settings: bool,
+    tailwind: bool,
 ) -> Result<Vec<(&'static str, String)>, String> {
     // Never pass through the standalone Tailwind generator: Vite owns CSS here.
-    let mut entries = if with_config {
-        config_files(name, framework, cloud)?
+    let mut entries = if runtime_settings {
+        config_files(name, framework, service)?
     } else {
-        files(name, framework, cloud)?
+        files(name, framework, service)?
     };
-    let serde = if with_config {
+    let serde = if runtime_settings {
         ""
     } else {
         "serde = { version = \"=1.0.229\", features = [\"derive\"] }\n"
@@ -400,7 +405,7 @@ pub(crate) fn vite_files(
     let main = &mut entries[3].1;
     let start = main.find("async fn home(").ok_or("missing built-in home")?;
     let end = main
-        .find(if cloud {
+        .find(if service {
             "async fn live()"
         } else {
             "#[tokio::main]"
@@ -409,7 +414,7 @@ pub(crate) fn vite_files(
     let handlers = include_str!("../templates/vite/handlers.rs")
         .replace(
             "@SETTINGS_FIELD@",
-            if with_config {
+            if runtime_settings {
                 "    settings: config::Settings,\n"
             } else {
                 ""
@@ -417,7 +422,7 @@ pub(crate) fn vite_files(
         )
         .replace(
             "@MESSAGE@",
-            if with_config {
+            if runtime_settings {
                 "&state.settings.service.public_message"
             } else {
                 "\"Hello <Yetlet> & Rust!\""
@@ -425,7 +430,7 @@ pub(crate) fn vite_files(
         )
         .replace(
             "@PROOF_ID@",
-            if with_tailwind {
+            if tailwind {
                 "tailwind-proof"
             } else {
                 "plain-proof"
@@ -442,9 +447,9 @@ pub(crate) fn vite_files(
         .replace(".with_state(Arc::new(settings))", ".with_state(state)")
         .replace(
             "async fn main() -> Result<(), Box<dyn std::error::Error>> {",
-            "async fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let assets = vite::Snapshot::load_from_env()?;",
+            "async fn main() -> Result<(), Box<dyn std::error::Error>> {\n    let assets = vite::Snapshot::load_with_env()?;",
         );
-    if !with_config {
+    if !runtime_settings {
         *main = main.replace(
             "        .into_router()",
             "        .with_state(state)\n        .into_router()",
@@ -452,13 +457,13 @@ pub(crate) fn vite_files(
     }
     let state = format!(
         "    let state = std::sync::Arc::new(AppState {{\n        assets: assets.clone(),\n{}    }});\n",
-        if with_config {
+        if runtime_settings {
             "        settings,\n"
         } else {
             ""
         },
     );
-    if cloud {
+    if service {
         *main = main
             .replace(
                 "fn router(settings: config::Settings, readiness: Arc<AtomicBool>)",
@@ -521,13 +526,13 @@ pub(crate) fn vite_files(
     let config = include_str!("../templates/vite/vite.config.mjs")
         .replace(
             "@PLUGIN_IMPORT@",
-            if with_tailwind {
+            if tailwind {
                 "import tailwindcss from '@tailwindcss/vite';\n"
             } else {
                 ""
             },
         )
-        .replace("@PLUGIN@", if with_tailwind { "tailwindcss()" } else { "" });
+        .replace("@PLUGIN@", if tailwind { "tailwindcss()" } else { "" });
     entries.extend([
         (
             "src/vite.rs",
@@ -540,7 +545,7 @@ pub(crate) fn vite_files(
         ),
         (
             "package.json",
-            if with_tailwind {
+            if tailwind {
                 include_str!("../templates/vite/tailwind-package.json")
             } else {
                 include_str!("../templates/vite/plain-package.json")
@@ -549,7 +554,7 @@ pub(crate) fn vite_files(
         ),
         (
             "package-lock.json",
-            if with_tailwind {
+            if tailwind {
                 include_str!("../templates/vite/tailwind-package-lock.json")
             } else {
                 include_str!("../templates/vite/plain-package-lock.json")
@@ -559,7 +564,7 @@ pub(crate) fn vite_files(
         ("app.ts", include_str!("../templates/vite/app.ts").into()),
         (
             "app.css",
-            if with_tailwind {
+            if tailwind {
                 include_str!("../templates/vite/tailwind.css")
             } else {
                 include_str!("../templates/vite/plain.css")
@@ -605,43 +610,43 @@ pub fn create_selected(
     name: &str,
     dir: &Path,
     template: Template,
-    cloud: bool,
-    with_config: bool,
-    with_tailwind: bool,
+    service: bool,
+    runtime_settings: bool,
+    tailwind: bool,
     vite: bool,
 ) -> Result<(), String> {
     validate_name(name).map_err(str::to_owned)?;
     crate::platform::fs::ensure_create_supported()?;
     let entries = if template == Template::Browser {
-        if cloud {
+        if service {
             return Err("browser target does not select the native --service profile".into());
         }
-        crate::browser::files(name, with_tailwind)?
+        crate::browser::files(name, tailwind)?
     } else {
-        selected_files(name, cloud, with_config, with_tailwind, vite)?
+        selected_files(name, service, runtime_settings, tailwind, vite)?
     };
     crate::platform::fs::create_project(dir, name, &entries)
 }
 
 pub(crate) fn selected_files(
     name: &str,
-    cloud: bool,
-    with_config: bool,
-    with_tailwind: bool,
+    service: bool,
+    runtime_settings: bool,
+    tailwind: bool,
     vite: bool,
 ) -> Result<Vec<(&'static str, String)>, String> {
     // Vite needs the same typed runtime settings as the CLI. Plain SSR stays opt-in.
-    let with_config = with_config || vite;
+    let runtime_settings = runtime_settings || vite;
     // These paths only seed the established template assembly; no filesystem lookup.
     let framework = Path::new("__yetlet_release_template__");
     let mut entries = if vite {
-        vite_files(name, framework, cloud, true, with_tailwind)?
-    } else if with_tailwind {
-        tailwind_files(name, framework, cloud, with_config)?
-    } else if with_config {
-        config_files(name, framework, cloud)?
+        vite_files(name, framework, service, true, tailwind)?
+    } else if tailwind {
+        tailwind_files(name, framework, service, runtime_settings)?
+    } else if runtime_settings {
+        config_files(name, framework, service)?
     } else {
-        files(name, framework, cloud)?
+        files(name, framework, service)?
     };
     let manifest = &mut entries[0].1;
     for (krate, version) in [
@@ -664,7 +669,7 @@ pub(crate) fn selected_files(
     let cli = format!(
         "\n[cli.rust]\nwatch = false\n\n[cli.vite]\nenabled = {vite}\nroot = \"frontend/\"\nauto_start = {vite}\nauto_build = {vite}\n\n[cli.generate.k8s]\nreplicas = 1\n"
     );
-    if with_config {
+    if runtime_settings {
         for (path, content) in &mut entries {
             if *path == "src/config.rs" {
                 *content = content.replace(
@@ -722,19 +727,19 @@ pub(crate) fn selected_files(
                     *content = content
                         .replace("No dotenv discovery", "Frontend-root dotenv only")
                         .replace("envDir: false", "envDir: root");
-                    if with_tailwind {
+                    if tailwind {
                         *content = format!("{}{}", include_str!("../templates/vite/selected-tailwind-source.mjs"), content)
                             .replace("plugins: [tailwindcss()]", "plugins: [rustSource, tailwindcss()]");
                     }
                     *content = format!("{}{}", include_str!("../templates/vite/selected-dotenv.mjs"), content)
                         .replace("plugins: [", "plugins: [frontendDotenv, ");
                 }
-                "frontend/app.css" if with_tailwind => *content = content.replace("./src/main.rs", "../src/main.rs"),
+                "frontend/app.css" if tailwind => *content = content.replace("./src/main.rs", "../src/main.rs"),
                 "src/main.rs" => *content = content
-                    .replace("    let assets = vite::Snapshot::load_from_env()?;\n", "")
+                    .replace("    let assets = vite::Snapshot::load_with_env()?;\n", "")
                     .replace("    let address = settings.validate(", "    let assets = vite::Snapshot::load_selected(&settings.cli.vite.root)?;\n    let address = settings.validate("),
                 "src/vite.rs" => {
-                    let start = content.find("    pub(crate) fn load_from_env()").ok_or("missing snapshot loader")?;
+                    let start = content.find("    pub(crate) fn load_with_env()").ok_or("missing snapshot loader")?;
                     let end = content[start..].find("        if snapshot.images()").ok_or("missing snapshot validation")? + start;
                     content.replace_range(start..end, include_str!("../templates/vite/selected-loader.rs"));
                     *content = content.replace("let root = Path::new(env!(\"CARGO_MANIFEST_DIR\")).join(\"dist\");", "let root = Path::new(env!(\"CARGO_MANIFEST_DIR\")).join(crate::config::load().expect(\"app settings required\").cli.vite.root).join(\"dist\");");
@@ -754,7 +759,7 @@ pub(crate) fn selected_files(
     entries[1].1 = include_str!("../templates/SELECTED-README.md")
         .replace("@NAME@", name)
         .replace("@VERSION@", env!("CARGO_PKG_VERSION"));
-    if with_config {
+    if runtime_settings {
         entries[1]
             .1
             .push_str(include_str!("../templates/config/SELECTED-README.md"));
@@ -763,12 +768,12 @@ pub(crate) fn selected_files(
         entries[1]
             .1
             .push_str(include_str!("../templates/vite/SELECTED-README.md"));
-    } else if with_tailwind {
+    } else if tailwind {
         entries[1]
             .1
             .push_str(include_str!("../templates/tailwind/SELECTED-README.md"));
     }
-    if with_config {
+    if runtime_settings {
         entries[0].1 = entries[0].1.replacen("[dependencies]\n", "[dependencies]\naxum-server = { version = \"=0.8.0\", default-features = false, features = [\"tls-rustls-no-provider\"], optional = true }\nrustls = { version = \"0.23\", default-features = false, features = [\"ring\", \"std\", \"tls12\"], optional = true }\n", 1);
         entries[0]
             .1
@@ -792,7 +797,7 @@ pub(crate) fn selected_files(
                 }
                 "src/main.rs" => {
                     // Resolve/parse TLS before any listener exists or Settings moves into State.
-                    let address_end = if cloud {
+                    let address_end = if service {
                         "let address = settings.validate(true)?;"
                     } else {
                         "let address = settings.validate(false)?;"
@@ -814,7 +819,7 @@ pub(crate) fn selected_files(
                     let close = expression
                         .rfind(')')
                         .ok_or("missing selected serve close")?;
-                    let shutdown = if cloud {
+                    let shutdown = if service {
                         "shutdown"
                     } else {
                         "std::future::pending::<()>()"

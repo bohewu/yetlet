@@ -9,10 +9,15 @@ repository.workspace = true
 publish = false
 
 [features]
+request-tracing = ["dep:tracing", "dep:yetlet-request-id"]
+commit-write-auth = []
 oidc = ["dep:openidconnect"]
 valkey = ["dep:yetlet-session-valkey"]
+auth-valkey = ["valkey", "dep:yetlet-auth", "dep:libc", "tokio/fs", "tokio/io-util"]
 
 [dependencies]
+tracing = { version = "0.1", default-features = false, features = ["std"], optional = true }
+yetlet-request-id = { path = "../../crates/yetlet-request-id", optional = true }
 axum.workspace = true
 tokio = { workspace = true, features = ["signal", "sync", "time"] }
 serde = { version = "1", features = ["derive"] }
@@ -25,6 +30,8 @@ subtle = "2"
 openidconnect = { version = "=4.0.1", default-features = false, features = ["reqwest", "rustls-tls"], optional = true }
 yetlet-core = { path = "../../crates/yetlet-core" }
 yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
+yetlet-auth = { path = "../../crates/yetlet-auth", optional = true }
+libc = { version = "0.2", optional = true }
 yetlet-session = { path = "../../crates/yetlet-session" }
 yetlet-session-valkey = { package = "yetlet-session-redis", path = "../../crates/yetlet-session-redis", optional = true }
 
@@ -32,5 +39,6 @@ yetlet-board-triage = { path = "../board-triage" }
 yetlet-actions = { path = "../../crates/yetlet-actions" }
 
 [dev-dependencies]
+tracing-subscriber = { version = "0.3", default-features = false, features = ["fmt", "json", "registry"] }
 tempfile = "3"
 tower = { version = "0.5", features = ["util"] }

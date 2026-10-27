@@ -1,4 +1,5 @@
 #![cfg(any(target_os = "linux", windows))]
+use sha2::{Digest, Sha256};
 use std::{
     fs,
     path::Path,
@@ -189,6 +190,30 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
                 )
                 .unwrap();
                 let mapping = contexts["app-src-source-paths"].as_object().unwrap();
+                assert_eq!(
+                    contexts["yetlet-src"].as_object().unwrap().len(),
+                    if index > 0 { 20 } else { 14 }
+                );
+                for source in [
+                    "crates/yetlet-config/Cargo.toml",
+                    "crates/yetlet-config/src/lib.rs",
+                    "crates/yetlet-config/src/secrets.rs",
+                    "crates/yetlet-config/examples/secret_provider.rs",
+                    "crates/yetlet-secrets/Cargo.toml",
+                    "crates/yetlet-secrets/src/lib.rs",
+                ] {
+                    let record = contexts["yetlet-src"].get(source);
+                    assert_eq!(record.is_some(), index > 0, "{source}");
+                    if let Some(record) = record {
+                        let bytes = fs::read(framework.join(source)).unwrap();
+                        assert_eq!(record["bytes"], bytes.len(), "{source}");
+                        assert_eq!(
+                            record["sha256"],
+                            format!("{:x}", Sha256::digest(bytes)),
+                            "{source}"
+                        );
+                    }
+                }
                 if index >= 2 {
                     assert_eq!(
                         mapping["dist/.vite/manifest.json"],
@@ -209,6 +234,105 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
                         .unwrap()
                         .contains("app-src-source-paths")
                 );
+                if index == 2 {
+                    // Reconstruct only inventoried bytes in physically separate
+                    // contexts; Vite assets above remain a structural fixture.
+                    let exported_framework = root.path().join("framework-export");
+                    let exported_app = root.path().join("app-export");
+                    for (context, exported) in [
+                        ("yetlet-src", &exported_framework),
+                        ("app-src", &exported_app),
+                    ] {
+                        for (relative, record) in contexts[context].as_object().unwrap() {
+                            let bytes = if relative == ".dockerignore" {
+                                fs::read(destination.join(format!("{context}.dockerignore")))
+                                    .unwrap()
+                            } else if context == "yetlet-src" && relative == "Cargo.toml" {
+                                fs::read(destination.join("framework-workspace.toml")).unwrap()
+                            } else if context == "yetlet-src" {
+                                fs::read(framework.join(relative)).unwrap()
+                            } else {
+                                fs::read(app.join(mapping[relative].as_str().unwrap())).unwrap()
+                            };
+                            assert_eq!(record["bytes"], bytes.len(), "{relative}");
+                            assert_eq!(
+                                record["sha256"],
+                                format!("{:x}", Sha256::digest(&bytes)),
+                                "{relative}"
+                            );
+                            let path = exported.join(relative);
+                            fs::create_dir_all(path.parent().unwrap()).unwrap();
+                            fs::write(path, bytes).unwrap();
+                        }
+                        assert_eq!(
+                            inventory(exported).len(),
+                            contexts[context].as_object().unwrap().len()
+                        );
+                    }
+                    // Model the Docker overlay's fixed /work/yetlet mount at
+                    // this temporary native location, changing paths only.
+                    let mut exported_overlay = overlay.clone();
+                    for name in ["yetlet-core", "yetlet-server-axum", "yetlet-config"] {
+                        exported_overlay["dependencies"][name]["path"] = exported_framework
+                            .join("crates")
+                            .join(name)
+                            .to_str()
+                            .unwrap()
+                            .into();
+                    }
+                    fs::write(
+                        exported_app.join("Cargo.toml"),
+                        toml::to_string(&exported_overlay).unwrap(),
+                    )
+                    .unwrap();
+                    let exported_lock = fs::read(exported_app.join("Cargo.lock")).unwrap();
+                    for args in [
+                        vec!["metadata", "--offline", "--locked", "--format-version", "1"],
+                        vec!["check", "--offline", "--locked", "--bin", &name],
+                    ] {
+                        let result = Command::new(env!("CARGO"))
+                            .args(&args)
+                            .current_dir(&exported_app)
+                            .env("CARGO_TARGET_DIR", root.path().join("export-target"))
+                            .env("CARGO_NET_OFFLINE", "true")
+                            .env("RUSTUP_AUTO_INSTALL", "0")
+                            .output()
+                            .unwrap();
+                        eprintln!(
+                            "sanitized export Cargo argv={args:?} cwd={} exit={:?}",
+                            exported_app.display(),
+                            result.status.code()
+                        );
+                        if result.status.success() && args[0] == "metadata" {
+                            let metadata: serde_json::Value =
+                                serde_json::from_slice(&result.stdout).unwrap();
+                            let nodes = metadata["resolve"]["nodes"].as_array().unwrap();
+                            assert!(!nodes.iter().any(|node| {
+                                node["id"].as_str().unwrap().contains("yetlet-secrets")
+                            }));
+                            let config = nodes
+                                .iter()
+                                .find(|node| node["id"].as_str().unwrap().contains("yetlet-config"))
+                                .unwrap();
+                            assert!(
+                                !config["features"]
+                                    .as_array()
+                                    .unwrap()
+                                    .iter()
+                                    .any(|feature| feature == "secret-provider")
+                            );
+                        }
+                        success(result);
+                    }
+                    assert_eq!(
+                        fs::read(exported_app.join("Cargo.lock")).unwrap(),
+                        exported_lock
+                    );
+                    eprintln!(
+                        "sanitized Vite export passed: {} framework files; source hashes checked; optional provider inactive",
+                        contexts["yetlet-src"].as_object().unwrap().len()
+                    );
+                }
             }
         }
         assert_eq!(

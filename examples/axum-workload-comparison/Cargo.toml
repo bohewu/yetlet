@@ -1,0 +1,53 @@
+[package]
+name = "yetlet-axum-workload-comparison"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace]
+resolver = "3"
+
+[features]
+default = []
+ssr-stage-probe = []
+ssr-thread-cpu-probe = ["ssr-stage-probe"]
+ssr-context-study = []
+postgres = ["dep:sqlx"]
+auth-session-postgres = ["postgres", "dep:yetlet-auth", "dep:yetlet-session-valkey"]
+auth-cross-host = ["auth-session-postgres", "sqlx/tls-rustls-ring-native-roots", "yetlet-session-valkey/tls"]
+auth-workload-observation = ["auth-session-postgres"]
+auth-workload-admission = ["auth-session-postgres"]
+
+[[bin]]
+name = "auth-postgres"
+path = "src/bin/auth_postgres.rs"
+required-features = ["auth-session-postgres"]
+
+[[bin]]
+name = "postgres"
+path = "src/bin/postgres.rs"
+required-features = ["postgres"]
+
+[[bin]]
+name = "ssr"
+path = "src/bin/ssr.rs"
+
+[dependencies]
+axum = "=0.8.9"
+tokio = { version = "=1.53.3", features = ["net", "rt-multi-thread", "signal", "macros"] }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
+
+sqlx = { version = "=0.8.6", default-features = false, features = ["runtime-tokio", "postgres"], optional = true }
+yetlet-auth = { path = "../../crates/yetlet-auth", default-features = false, optional = true }
+yetlet-session-valkey = { package = "yetlet-session-redis", path = "../../crates/yetlet-session-redis", optional = true }
+
+[dev-dependencies]
+tower = { version = "=0.5.3", features = ["util"] }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(yetlet_session_admission_probe)'] }

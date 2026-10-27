@@ -21,6 +21,14 @@ pub enum SessionBackend {
         namespace: String,
         ttl: Duration,
     },
+    /// Admin-owned opt-in Auth composition; uses the same Valkey Session wire format.
+    #[cfg(feature = "auth-valkey")]
+    AuthValkey {
+        endpoint: String,
+        namespace: String,
+        ttl: Duration,
+        policy_file: std::path::PathBuf,
+    },
 }
 
 #[derive(Clone)]
@@ -31,7 +39,23 @@ pub(crate) enum Manager {
 }
 impl Manager {
     pub async fn connect(backend: SessionBackend) -> Result<Self, Failure> {
+        #[cfg(feature = "auth-valkey")]
+        let backend = match backend {
+            SessionBackend::AuthValkey {
+                endpoint,
+                namespace,
+                ttl,
+                ..
+            } => SessionBackend::Valkey {
+                endpoint,
+                namespace,
+                ttl,
+            },
+            backend => backend,
+        };
         match backend {
+            #[cfg(feature = "auth-valkey")]
+            SessionBackend::AuthValkey { .. } => unreachable!("normalized above"),
             SessionBackend::Memory => Ok(Self::Memory(SessionManager::new(
                 SessionConfig::new("yetlet_lab", Duration::from_secs(1800), 1024)
                     .map_err(|_| Failure::Invalid)?
@@ -172,12 +196,13 @@ impl Session {
 }
 
 #[cfg(feature = "valkey")]
-fn remote_error(error: RedisSessionError) -> Failure {
+pub(crate) fn remote_error(error: RedisSessionError) -> Failure {
     match error {
         RedisSessionError::Missing
         | RedisSessionError::Expired
         | RedisSessionError::Rotated
         | RedisSessionError::Revoked => Failure::Unauthorized,
+        RedisSessionError::Configuration => Failure::Configuration,
         RedisSessionError::Conflict { .. } => Failure::Conflict,
         RedisSessionError::InvalidCookie => Failure::Invalid,
         _ => Failure::Unavailable,
@@ -194,6 +219,7 @@ mod tests {
         assert_eq!(user.project, 1);
         assert!(!user.write);
         for value in [
+            r#"{}"#,
             r#"{"user":"administrator"}"#,
             r#"{"user":{"name":"viewer","write":true,"project":2}}"#,
             r#"{"user":"alice","extra":"unrecognized"}"#,
@@ -216,5 +242,52 @@ mod tests {
             Failure::Unavailable
         );
         assert_eq!(remote_error(RedisSessionError::Codec), Failure::Unavailable);
+    }
+}
+
+/// Required Auth extraction only when explicitly selected by this application.
+#[derive(Clone)]
+pub(crate) struct ProtectedSession {
+    session: Session,
+    #[cfg(feature = "auth-valkey")]
+    pub(crate) auth: Option<(crate::auth::PolicyFile, yetlet_auth::Authenticated)>,
+}
+impl ProtectedSession {
+    pub(crate) fn failure(&self, error: Failure) -> Failure {
+        #[cfg(feature = "auth-valkey")]
+        if self.auth.is_some() {
+            return crate::auth::protected_failure(error);
+        }
+        error
+    }
+}
+impl std::ops::Deref for ProtectedSession {
+    type Target = Session;
+    fn deref(&self) -> &Session {
+        &self.session
+    }
+}
+impl FromRequestParts<crate::AppState> for ProtectedSession {
+    type Rejection = axum::response::Response;
+    async fn from_request_parts(
+        parts: &mut Parts,
+        state: &crate::AppState,
+    ) -> Result<Self, Self::Rejection> {
+        use axum::response::IntoResponse;
+        #[cfg(feature = "auth-valkey")]
+        let auth = if let Some(policy) = &state.policy {
+            let identity = yetlet_auth::Authenticated::from_request_parts(parts, state).await?;
+            Some((policy.clone(), identity))
+        } else {
+            None
+        };
+        let session = Session::from_request_parts(parts, state)
+            .await
+            .map_err(IntoResponse::into_response)?;
+        Ok(Self {
+            session,
+            #[cfg(feature = "auth-valkey")]
+            auth,
+        })
     }
 }

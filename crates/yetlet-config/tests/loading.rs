@@ -75,7 +75,7 @@ fn env(entries: &[(&str, &str)]) -> Vec<(OsString, OsString)> {
     entries.iter().map(|(k, v)| (k.into(), v.into())).collect()
 }
 fn load(loader: Loader, entries: &[(&str, &str)]) -> Result<Settings, Error> {
-    loader.load_from_env(env(entries))
+    loader.load_with_env(env(entries))
 }
 fn dev() -> [(&'static str, &'static str); 1] {
     [("APP_ENVIRONMENT", "Development")]
@@ -121,7 +121,7 @@ mod secret_provider {
         ]));
         let s: Settings = f
             .secret(SecretFormat::Toml)
-            .load_from_env_with_secrets(
+            .load_with_env_and_secrets(
                 env(&[
                     ("APP_ENVIRONMENT", "Development"),
                     ("APP_SERVICE__TOKEN", "synthetic-env"),
@@ -153,7 +153,7 @@ mod secret_provider {
             };
             let result: Result<Settings, _> = f
                 .loader()
-                .load_from_env_with_secrets(
+                .load_with_env_and_secrets(
                     env(&[("APP_SERVICE__TOKEN", "synthetic-fallback-must-not-win")]),
                     &provider,
                     &[binding()],
@@ -181,16 +181,16 @@ mod secret_provider {
         };
         let s: Settings = f
             .loader()
-            .load_from_env_with_secrets(env(&[]), &provider, &[])
+            .load_with_env_and_secrets(env(&[]), &provider, &[])
             .await
             .unwrap();
         assert_eq!(s.service.name, "production");
-        let ordinary: Settings = f.loader().load_from_env(env(&[])).unwrap();
+        let ordinary: Settings = f.loader().load_with_env(env(&[])).unwrap();
         assert_eq!(ordinary.service.name, "production");
         f.write("base.toml", "not valid TOML");
         let result: Result<Settings, _> = f
             .loader()
-            .load_from_env_with_secrets(env(&[]), &provider, &[binding()])
+            .load_with_env_and_secrets(env(&[]), &provider, &[binding()])
             .await;
         assert_eq!(result.unwrap_err(), Error::Toml);
         assert!(provider.calls.lock().unwrap().is_empty());
@@ -206,7 +206,7 @@ mod secret_provider {
             )]));
             let result: Result<Settings, _> = f
                 .loader()
-                .load_from_env_with_secrets(env(&[]), &provider, &[binding()])
+                .load_with_env_and_secrets(env(&[]), &provider, &[binding()])
                 .await;
             if size <= MAX_FILE_BYTES {
                 assert_eq!(result.unwrap().service.token.expose_secret().len(), size);
@@ -230,14 +230,14 @@ mod secret_provider {
         }
         let loader = f.loader().defaults("first=''\nsecond=''\n");
         let prior: Pair = loader
-            .load_from_env(env(&[("APP_FIRST", "synthetic-old")]))
+            .load_with_env(env(&[("APP_FIRST", "synthetic-old")]))
             .unwrap();
         let provider = SettingsSecrets::new(BTreeMap::from([(
             "first".into(),
             SecretString::from("synthetic-new"),
         )]));
         let result: Result<Pair, _> = loader
-            .load_from_env_with_secrets(
+            .load_with_env_and_secrets(
                 env(&[]),
                 &provider,
                 &[
@@ -350,7 +350,7 @@ fn invalid_related_keys_and_collisions_fail() {
     ] {
         assert_eq!(
             load(f.loader(), &[(key, "123")]).unwrap_err(),
-            Error::EnvironmentKey,
+            Error::Key,
             "{key}"
         );
     }
@@ -360,7 +360,7 @@ fn invalid_related_keys_and_collisions_fail() {
             &[("APP_SERVICE__NAME", "a"), ("APP_SERVICE__NAME", "b")]
         )
         .unwrap_err(),
-        Error::EnvironmentKey
+        Error::Key
     );
     assert_eq!(
         load(
@@ -371,12 +371,12 @@ fn invalid_related_keys_and_collisions_fail() {
             ]
         )
         .unwrap_err(),
-        Error::EnvironmentKey
+        Error::Key
     );
     f.write("private file", "APP_SERVICE__NAME=a\nAPP_SERVICE__NAME=b\n");
     assert_eq!(
         load(f.secret(SecretFormat::Dotenv), &dev()).unwrap_err(),
-        Error::EnvironmentKey
+        Error::Key
     );
     assert!(load(f.loader(), &[("OTHER_UNKNOWN", "ignored")]).is_ok());
 }
@@ -397,7 +397,55 @@ fn typed_mismatches_fail_without_coercing_toml_or_overrides() {
     f.write("production.toml", "[server]\nport = '3300'\n");
     assert_eq!(load(f.loader(), &[]).unwrap_err(), Error::Type);
     f.write("production.toml", "[service]\nunknown = 'value'\n");
-    assert_eq!(load(f.loader(), &[]).unwrap_err(), Error::EnvironmentKey);
+    assert_eq!(load(f.loader(), &[]).unwrap_err(), Error::Key);
+}
+
+#[test]
+fn toml_overlay_key_errors_are_source_neutral_and_redacted() {
+    use std::error::Error as _;
+    let f = Fixture::new();
+    for text in [
+        "[service]\nunknown = 'synthetic-private'\n",
+        "[service]\nBAD = 'synthetic-private'\n",
+        "environment = 'synthetic-private'\n",
+    ] {
+        for source in ["production.toml", "private file"] {
+            f.write(source, text);
+            let error = if source == "production.toml" {
+                load(f.loader(), &[])
+            } else {
+                load(f.secret(SecretFormat::Toml), &dev())
+            }
+            .unwrap_err();
+            assert_eq!(error, Error::Key);
+            assert_eq!(
+                error.to_string(),
+                "unknown, malformed or duplicate configuration key"
+            );
+            assert!(error.source().is_none());
+            let diagnostic = format!("{error:?}: {error}");
+            assert!(!diagnostic.contains("synthetic-private"));
+            assert!(!diagnostic.contains(source));
+            assert!(!diagnostic.contains(&f.0.to_string_lossy().to_string()));
+        }
+    }
+}
+
+#[test]
+fn duplicate_toml_definitions_remain_syntax_errors() {
+    let f = Fixture::new();
+    let text = "[service]\nname = 'first'\nname = 'second'\n";
+    assert_eq!(
+        load(f.loader().defaults(text), &[]).unwrap_err(),
+        Error::Toml
+    );
+    f.write("production.toml", text);
+    assert_eq!(load(f.loader(), &[]).unwrap_err(), Error::Toml);
+    f.write("private file", text);
+    assert_eq!(
+        load(f.secret(SecretFormat::Toml), &dev()).unwrap_err(),
+        Error::Toml
+    );
 }
 
 #[test]
@@ -450,12 +498,14 @@ fn dotenv_never_expands_or_runs_shell_and_rejects_malformed_input() {
         "APP_SERVICE__TOKEN=$(whoami)",
         "APP_SERVICE__TOKEN='unclosed",
         "APP_ENVIRONMENT=Production",
+        "APP_UNKNOWN=synthetic-private",
+        "APP_service__name=synthetic-private",
         "UNRELATED=private",
     ] {
         f.write("private file", text);
         assert_eq!(
             load(f.secret(SecretFormat::Dotenv), &dev()).unwrap_err(),
-            Error::EnvironmentKey
+            Error::Key
         );
     }
 }
@@ -516,7 +566,7 @@ fn invalid_prefixes_base_keys_and_reserved_selector_fail() {
     for base in ["environment = 'Development'", "BAD = 'x'", "a__b = 'x'"] {
         assert_eq!(
             load(f.loader().defaults(base), &[]).unwrap_err(),
-            Error::EnvironmentKey
+            Error::Key
         );
     }
 }
@@ -537,7 +587,7 @@ fn oversized_and_nonunicode_environment_values_fail_safely() {
         use std::os::unix::ffi::OsStringExt;
         let entries = [("APP_SERVICE__TOKEN".into(), OsString::from_vec(vec![255]))];
         assert_eq!(
-            f.loader().load_from_env::<Settings>(entries).unwrap_err(),
+            f.loader().load_with_env::<Settings>(entries).unwrap_err(),
             Error::Input
         );
     }

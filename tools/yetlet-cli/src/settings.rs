@@ -142,21 +142,27 @@ fn loader_hint(error: yetlet_config::Error) -> &'static str {
     match error {
         Error::File => SOURCE,
         Error::Environment => PROFILE,
-        Error::Input | Error::Toml | Error::EnvironmentKey | Error::Type | Error::Settings => {
-            VALUES
-        }
+        Error::Input | Error::Toml | Error::Key | Error::Type | Error::Settings => VALUES,
         _ => INVALID,
     }
 }
 
 pub(crate) fn load(app: &App) -> Result<Settings, String> {
-    load_from_env(app, std::env::vars_os())
+    load_with_env(app, std::env::vars_os())
 }
 
-pub(crate) fn load_from_env(
+pub(crate) fn load_with_env(
     app: &App,
     environment: impl IntoIterator<Item = (OsString, OsString)>,
 ) -> Result<Settings, String> {
+    load_selected(app, environment).map(|(settings, _)| settings)
+}
+
+// Return the already validated profile selection for read-only plan reporting.
+pub(crate) fn load_selected(
+    app: &App,
+    environment: impl IntoIterator<Item = (OsString, OsString)>,
+) -> Result<(Settings, &'static str), String> {
     let mut selected_root = None;
     let mut filtered = Vec::new();
     for (key, value) in environment {
@@ -206,11 +212,16 @@ pub(crate) fn load_from_env(
         Some("Development") => "development.toml",
         _ => return Err(PROFILE.into()),
     };
+    let environment = match overlay {
+        "development.toml" => "Development",
+        "staging.toml" => "Staging",
+        _ => "Production",
+    };
     if !has_files {
         if selected_root.is_some() || has_override {
             return Err(SOURCE.into());
         }
-        return Ok(Settings::default());
+        return Ok((Settings::default(), environment));
     }
     for name in ["base.toml", overlay] {
         fs::read_app_file(&protected, name).map_err(|_| SOURCE.to_owned())?;
@@ -218,7 +229,7 @@ pub(crate) fn load_from_env(
     // No Development secret source is enabled, and no backend APP overrides enter
     // this projection. Parser/merge/type/ENV behavior belongs to yetlet-config.
     let merged: serde_json::Value = yetlet_config::Loader::new(root, "APP")
-        .load_from_env(filtered)
+        .load_with_env(filtered)
         .map_err(|error| loader_hint(error).to_owned())?;
     let mut settings: Settings = match merged.get("cli") {
         Some(cli) => serde_json::from_value(cli.clone()).map_err(|_| VALUES.to_owned())?,
@@ -251,7 +262,7 @@ pub(crate) fn load_from_env(
     {
         return Err("CLI_PROJECT settings: browser target requires Vite enabled, Rust watch disabled and no native TLS".into());
     }
-    Ok(settings)
+    Ok((settings, environment))
 }
 
 pub(crate) fn valid_frontend_root(root: &str) -> bool {
@@ -294,15 +305,15 @@ mod tests {
             "[cli]\ntarget='browser'\n",
         )
         .unwrap();
-        assert_eq!(load_from_env(&app, []).unwrap().target, Target::Browser);
+        assert_eq!(load_with_env(&app, []).unwrap().target, Target::Browser);
         let override_target = [("APP_CLI__TARGET".into(), "native".into())];
         assert_eq!(
-            load_from_env(&app, override_target).unwrap().target,
+            load_with_env(&app, override_target).unwrap().target,
             Target::Native
         );
         for overlay in ["[cli]\ntarget='unknown'\n", "[cli]\ntarget=true\n"] {
             std::fs::write(fs::app_root(&app).join("production.toml"), overlay).unwrap();
-            assert_eq!(load_from_env(&app, []).unwrap_err(), VALUES);
+            assert_eq!(load_with_env(&app, []).unwrap_err(), VALUES);
         }
         for overlay in [
             "[cli]\ntarget='browser'\n[cli.rust]\nwatch=true\n",
@@ -310,7 +321,7 @@ mod tests {
         ] {
             std::fs::write(fs::app_root(&app).join("production.toml"), overlay).unwrap();
             assert_eq!(
-                load_from_env(&app, []).unwrap_err(),
+                load_with_env(&app, []).unwrap_err(),
                 "CLI_PROJECT settings: browser target requires Vite enabled, Rust watch disabled and no native TLS"
             );
         }
@@ -325,7 +336,7 @@ mod tests {
             "[cli.vite]\nauto_start=false\n",
         )
         .unwrap();
-        let settings = load_from_env(
+        let settings = load_with_env(
             &app,
             [
                 ("APP_CLI__VITE__AUTO_BUILD".into(), "true".into()),
@@ -343,10 +354,10 @@ mod tests {
     #[test]
     fn rust_watch_defaults_to_false_and_uses_shared_profile_environment_precedence() {
         let (_temp, app) = app();
-        assert!(!load_from_env(&app, []).unwrap().rust.watch);
+        assert!(!load_with_env(&app, []).unwrap().rust.watch);
         std::fs::write(fs::app_root(&app).join("base.toml"), BASE).unwrap();
         std::fs::write(fs::app_root(&app).join("production.toml"), "").unwrap();
-        assert!(!load_from_env(&app, []).unwrap().rust.watch);
+        assert!(!load_with_env(&app, []).unwrap().rust.watch);
 
         std::fs::write(
             fs::app_root(&app).join("base.toml"),
@@ -358,14 +369,14 @@ mod tests {
             "[cli.rust]\nwatch=true\n",
         )
         .unwrap();
-        assert!(!load_from_env(&app, []).unwrap().rust.watch);
+        assert!(!load_with_env(&app, []).unwrap().rust.watch);
         let development = [("APP_ENVIRONMENT".into(), "Development".into())];
-        assert!(load_from_env(&app, development).unwrap().rust.watch);
+        assert!(load_with_env(&app, development).unwrap().rust.watch);
         for (profile, value, expected) in [
             ("Production", "true", true),
             ("Development", "false", false),
         ] {
-            let settings = load_from_env(
+            let settings = load_with_env(
                 &app,
                 [
                     ("APP_ENVIRONMENT".into(), profile.into()),
@@ -392,7 +403,7 @@ mod tests {
                 format!("{BASE}{rust}"),
             )
             .unwrap();
-            assert_eq!(load_from_env(&app, []).unwrap_err(), VALUES);
+            assert_eq!(load_with_env(&app, []).unwrap_err(), VALUES);
         }
         std::fs::write(
             fs::app_root(&app).join("base.toml"),
@@ -405,7 +416,7 @@ mod tests {
             ("APP_CLI__RUST__UNKNOWN", "false"),
         ] {
             assert_eq!(
-                load_from_env(&app, [(key.into(), value.into())]).unwrap_err(),
+                load_with_env(&app, [(key.into(), value.into())]).unwrap_err(),
                 VALUES
             );
         }
@@ -413,17 +424,17 @@ mod tests {
     #[test]
     fn legacy_defaults_and_partial_or_invalid_configuration_refusals() {
         let (_temp, app) = app();
-        assert!(!load_from_env(&app, []).unwrap().vite.enabled);
+        assert!(!load_with_env(&app, []).unwrap().vite.enabled);
         assert_eq!(
-            load_from_env(&app, [("APP_ENVIRONMENT".into(), "invalid".into())]).unwrap_err(),
+            load_with_env(&app, [("APP_ENVIRONMENT".into(), "invalid".into())]).unwrap_err(),
             PROFILE
         );
         assert_eq!(
-            load_from_env(&app, [("APP_CLI__VITE__ENABLED".into(), "true".into())]).unwrap_err(),
+            load_with_env(&app, [("APP_CLI__VITE__ENABLED".into(), "true".into())]).unwrap_err(),
             SOURCE
         );
         assert_eq!(
-            load_from_env(
+            load_with_env(
                 &app,
                 [("YETLET_CONFIG_ROOT".into(), fs::app_root(&app).into())]
             )
@@ -431,7 +442,7 @@ mod tests {
             SOURCE
         );
         std::fs::write(fs::app_root(&app).join("base.toml"), BASE).unwrap();
-        assert_eq!(load_from_env(&app, []).unwrap_err(), SOURCE);
+        assert_eq!(load_with_env(&app, []).unwrap_err(), SOURCE);
         std::fs::write(fs::app_root(&app).join("production.toml"), "").unwrap();
         for (key, value) in [
             ("APP_CLI__VITE__AUTO_BUILD", "yes"),
@@ -440,7 +451,7 @@ mod tests {
             ("APP_CLI__VITE__UNKNOWN", "true"),
             ("app_cli__vite__enabled", "true"),
         ] {
-            let error = load_from_env(&app, [(key.into(), value.into())]).unwrap_err();
+            let error = load_with_env(&app, [(key.into(), value.into())]).unwrap_err();
             assert_eq!(error, VALUES);
         }
     }
@@ -454,7 +465,7 @@ mod tests {
         .unwrap();
         std::fs::write(fs::app_root(&app).join("development.toml"), "[server.tls]\nenabled=true\ncertificate='.dev/certs/localhost.pem'\nprivate_key='.dev/certs/localhost-key.pem'\n").unwrap();
         std::fs::write(fs::app_root(&app).join("production.toml"), "").unwrap();
-        let settings = load_from_env(
+        let settings = load_with_env(
             &app,
             [
                 ("APP_ENVIRONMENT".into(), "Development".into()),
@@ -467,9 +478,9 @@ mod tests {
         .unwrap();
         assert!(settings.tls.enabled);
         assert_eq!(settings.tls.paths(&app, "frontend/").unwrap_err(), INVALID);
-        assert!(!load_from_env(&app, []).unwrap().tls.enabled);
+        assert!(!load_with_env(&app, []).unwrap().tls.enabled);
         assert!(
-            !load_from_env(
+            !load_with_env(
                 &app,
                 [
                     ("APP_ENVIRONMENT".into(), "Development".into()),
@@ -486,7 +497,7 @@ mod tests {
             ("app_server__tls__enabled", "true"),
         ] {
             assert_eq!(
-                load_from_env(&app, [(key.into(), value.into())]).unwrap_err(),
+                load_with_env(&app, [(key.into(), value.into())]).unwrap_err(),
                 VALUES
             );
         }
@@ -497,7 +508,7 @@ mod tests {
             "frontend/../key.pem",
         ] {
             assert_eq!(
-                load_from_env(
+                load_with_env(
                     &app,
                     [
                         ("APP_ENVIRONMENT".into(), "Development".into()),
@@ -516,7 +527,7 @@ mod tests {
         let missing = fs::app_root(&app).join("synthetic-missing-root");
         for root in [PathBuf::from("synthetic-relative-root"), missing] {
             assert_eq!(
-                load_from_env(
+                load_with_env(
                     &app,
                     [
                         ("YETLET_CONFIG_ROOT".into(), root.into_os_string()),
@@ -531,7 +542,7 @@ mod tests {
         {
             use std::os::unix::ffi::OsStringExt;
             assert_eq!(
-                load_from_env(
+                load_with_env(
                     &app,
                     [("APP_ENVIRONMENT".into(), OsString::from_vec(vec![0xff]))],
                 )

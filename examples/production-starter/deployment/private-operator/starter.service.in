@@ -1,0 +1,32 @@
+# Optional user-unit reference, not a dedicated production-account installation.
+# Substitute absolute paths without spaces or systemd specifiers in owned copies.
+[Unit]
+Description=Optional Yetlet private Starter reference
+
+[Service]
+Type=exec
+WorkingDirectory=@CONFIG_ROOT@
+UMask=0077
+Environment=APP_ENVIRONMENT=Production
+Environment=YETLET_CONFIG_ROOT=@CONFIG_ROOT@
+Environment=APP_SERVER__PORT=@APP_PORT@
+Environment=APP_DATABASE__PATH=@DATABASE@
+Environment=TOKIO_WORKER_THREADS=2
+# This 0600 file contains ONLY APP_SERVICE__API_TOKEN=<64 lowercase hex digits>.
+EnvironmentFile=@SECRET_ENV@
+ExecStartPre=/usr/bin/python3 @REFERENCE@/preflight.py restart @DATABASE@ @RECEIPT@
+ExecStart=@BINARY@
+ExecStartPost=/usr/bin/python3 @REFERENCE@/preflight.py ready @APP_PORT@
+TimeoutStartSec=65s
+Restart=no
+KillSignal=SIGTERM
+KillMode=control-group
+TimeoutStopSec=20s
+CPUQuota=200%
+MemoryMax=2G
+TasksMax=128
+LimitNOFILE=512
+Nice=10
+NoNewPrivileges=yes
+StandardOutput=append:@RUNTIME@/starter.log
+StandardError=append:@RUNTIME@/starter.log

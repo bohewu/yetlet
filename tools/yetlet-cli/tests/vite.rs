@@ -31,7 +31,7 @@ fn vite_boolean_implies_settings_and_has_no_mode_or_legacy_alias() {
         assert!(matches!(
             parse(&args.map(OsString::from)),
             Ok(Cli::New {
-                with_config: true,
+                runtime_settings: true,
                 vite: true,
                 ..
             })
@@ -76,12 +76,12 @@ fn inventory(app: &Path) -> BTreeMap<String, Vec<u8>> {
 #[test]
 fn eight_vite_profiles_have_exact_finite_sources_locks_and_no_tool_or_overwrite() {
     let root = private_root();
-    for cloud in [false, true] {
+    for service in [false, true] {
         for config in [false, true] {
             for tailwind in [false, true] {
-                let name = format!("web-{cloud}-{config}-{tailwind}");
+                let name = format!("web-{service}-{config}-{tailwind}");
                 // Preserve the exact legacy local-source fixture; selected CLI layout is tested below.
-                scaffold::create_vite(&name, &framework(), root.path(), cloud, config, tailwind)
+                scaffold::create_vite(&name, &framework(), root.path(), service, config, tailwind)
                     .unwrap();
                 let app = root.path().join(&name);
                 let before = inventory(&app);
@@ -125,7 +125,7 @@ fn eight_vite_profiles_have_exact_finite_sources_locks_and_no_tool_or_overwrite(
                         &name,
                         &framework(),
                         root.path(),
-                        cloud,
+                        service,
                         config,
                         tailwind
                     )
@@ -179,7 +179,7 @@ fn eight_vite_profiles_have_exact_finite_sources_locks_and_no_tool_or_overwrite(
                 }
                 let main = std::str::from_utf8(&before["src/main.rs"]).unwrap();
                 assert!(
-                    main.find("Snapshot::load_from_env").unwrap()
+                    main.find("Snapshot::load_with_env").unwrap()
                         < main.find("TcpListener::bind").unwrap()
                 );
                 assert!(!main.contains("@MESSAGE@"));

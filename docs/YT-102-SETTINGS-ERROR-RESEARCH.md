@@ -7,6 +7,10 @@ no implementation. Independent Reviewer
 `/root/yt102_settings_error_research_review_oct20` PASS has zero issues or
 required followups.
 
+This source-bound research retains the original method/variant names in its
+analysis and evidence below. Current canonical names are `load_with_env` and
+`Error::Key`; see the [pre-public naming migration](NAMING.md).
+
 ## Recommendation
 
 Keep the shared Loader unchanged. If implementation is selected later, expose

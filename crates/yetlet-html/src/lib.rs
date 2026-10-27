@@ -44,6 +44,11 @@ impl Error for RenderError {}
 
 pub fn escape_text(input: &str) -> String {
     let mut output = String::with_capacity(input.len());
+    escape_into(input, &mut output);
+    output
+}
+
+fn escape_into(input: &str, output: &mut String) {
     for character in input.chars() {
         match character {
             '&' => output.push_str("&amp;"),
@@ -54,7 +59,6 @@ pub fn escape_text(input: &str) -> String {
             _ => output.push(character),
         }
     }
-    output
 }
 
 /// Serialize one view without allowing markup injection through its text/attrs.
@@ -66,7 +70,7 @@ pub fn render_to_string(view: &View) -> Result<String, RenderError> {
 
 fn render_into(view: &View, output: &mut String, inside_form: bool) -> Result<(), RenderError> {
     match view {
-        View::Text(value) => output.push_str(&escape_text(value)),
+        View::Text(value) => escape_into(value, output),
         View::Element(element) => {
             let tag = element.tag();
             if !valid_identifier(tag) || FORBIDDEN_TAGS.contains(&tag) {
@@ -103,8 +107,9 @@ fn render_into(view: &View, output: &mut String, inside_form: bool) -> Result<()
                     return Err(RenderError::UnsafeUrl(name.to_owned()));
                 }
 
-                write!(output, " {name}=\"{}\"", escape_text(&attribute.value))
-                    .expect("writing to String is infallible");
+                write!(output, " {name}=\"").expect("writing to String is infallible");
+                escape_into(&attribute.value, output);
+                output.push('"');
             }
             output.push('>');
 
@@ -154,23 +159,44 @@ fn valid_identifier(identifier: &str) -> bool {
 }
 
 fn unsafe_scheme(value: &str) -> bool {
-    // Whitespace/control characters can be ignored by URL parsers; strip them
-    // before checking common script-capable schemes. This is intentionally
-    // conservative for MVP and is not a full URL policy engine.
-    let normalized: String = value
+    let mut normalized = value
         .chars()
         .filter(|character| !character.is_ascii_whitespace() && !character.is_ascii_control())
-        .flat_map(char::to_lowercase)
-        .collect();
-    normalized.starts_with("javascript:")
-        || normalized.starts_with("vbscript:")
-        || normalized.starts_with("data:")
+        .flat_map(char::to_lowercase);
+    let expected = match normalized.next() {
+        Some('j') => "avascript:",
+        Some('v') => "bscript:",
+        Some('d') => "ata:",
+        _ => return false,
+    };
+    expected
+        .chars()
+        .all(|character| normalized.next() == Some(character))
 }
 
 #[cfg(test)]
 mod tests {
     use super::{RenderError, render_to_string};
     use yetlet_core::{Element, View};
+
+    #[test]
+    fn yt147_private_append_and_public_wrapper_match_literals() {
+        for (input, expected) in [
+            ("", ""),
+            ("plain", "plain"),
+            ("café 水🦀", "café 水🦀"),
+            ("&<>\"'", "&amp;&lt;&gt;&quot;&#39;"),
+            ("é<&🦀'\">", "é&lt;&amp;🦀&#39;&quot;&gt;"),
+        ] {
+            let mut output = String::from("prefix:<&>");
+            super::escape_into(input, &mut output);
+            assert_eq!(output, format!("prefix:<&>{expected}"));
+            let mut empty = String::new();
+            super::escape_into(input, &mut empty);
+            assert_eq!(empty, expected);
+            assert_eq!(super::escape_text(input), expected);
+        }
+    }
 
     #[test]
     fn rejects_duplicate_names_and_invalid_control_children() {

@@ -19,10 +19,10 @@ impl Fixture {
         }
         let framework = root.path().join("框 架");
         fixture::create(&framework);
-        scaffold::create_cloud("demo_app", &framework, root.path()).unwrap();
+        scaffold::create_service("demo_app", &framework, root.path()).unwrap();
         // A separate CLI-created app is an owner-protected output parent on
         // Windows; never disable the Docker generator ACL gate for a fixture.
-        scaffold::create_cloud("output_parent", &framework, root.path()).unwrap();
+        scaffold::create_service("output_parent", &framework, root.path()).unwrap();
         let output_parent = root.path().join("output_parent");
         let app = root.path().join("demo_app");
         disk::write(
@@ -378,18 +378,37 @@ fn no_follow_app_or_output_symlinks_and_pinned_app_rename_race() {
 fn delivery_fixture(config: bool, assets: bool, plugin: bool) -> crate::cloud_fixture::Fixture {
     let f = crate::cloud_fixture::Fixture::new();
     if config {
-        let dir = f.framework.join("crates/yetlet-config");
-        disk::create_dir_all(dir.join("src")).unwrap();
-        disk::write(
-            dir.join("Cargo.toml"),
-            include_bytes!("../../../../crates/yetlet-config/Cargo.toml"),
-        )
-        .unwrap();
-        disk::write(
-            dir.join("src/lib.rs"),
-            include_bytes!("../../../../crates/yetlet-config/src/lib.rs"),
-        )
-        .unwrap();
+        for (path, bytes) in [
+            (
+                "crates/yetlet-config/Cargo.toml",
+                include_bytes!("../../../../crates/yetlet-config/Cargo.toml").as_slice(),
+            ),
+            (
+                "crates/yetlet-config/src/lib.rs",
+                include_bytes!("../../../../crates/yetlet-config/src/lib.rs").as_slice(),
+            ),
+            (
+                "crates/yetlet-config/src/secrets.rs",
+                include_bytes!("../../../../crates/yetlet-config/src/secrets.rs").as_slice(),
+            ),
+            (
+                "crates/yetlet-config/examples/secret_provider.rs",
+                include_bytes!("../../../../crates/yetlet-config/examples/secret_provider.rs")
+                    .as_slice(),
+            ),
+            (
+                "crates/yetlet-secrets/Cargo.toml",
+                include_bytes!("../../../../crates/yetlet-secrets/Cargo.toml").as_slice(),
+            ),
+            (
+                "crates/yetlet-secrets/src/lib.rs",
+                include_bytes!("../../../../crates/yetlet-secrets/src/lib.rs").as_slice(),
+            ),
+        ] {
+            let path = f.framework.join(path);
+            disk::create_dir_all(path.parent().unwrap()).unwrap();
+            disk::write(path, bytes).unwrap();
+        }
     }
     let entries = if assets {
         scaffold::vite_files("composeapp", &f.framework, true, config, plugin).unwrap()
@@ -514,8 +533,17 @@ fn delivery_profile_matrix_exact_inventory_env_and_no_secrets_or_developer_paths
         }
         assert_eq!(
             inv["yetlet-src"].as_object().unwrap().len(),
-            if config { 16 } else { 14 }
+            if config { 20 } else { 14 }
         );
+        for (path, record) in inv["yetlet-src"].as_object().unwrap() {
+            let bytes = match path.as_str() {
+                "Cargo.toml" => files["framework-workspace.toml"].as_bytes().to_vec(),
+                ".dockerignore" => files["yetlet-src.dockerignore"].as_bytes().to_vec(),
+                _ => disk::read(f.framework.join(path)).unwrap(),
+            };
+            assert_eq!(record["sha256"], digest(&bytes), "{path}");
+            assert_eq!(record["bytes"], bytes.len(), "{path}");
+        }
         assert_eq!(inv["app-src"].get("src/config.rs").is_some(), config);
         assert_eq!(inv["app-src"].get("base.toml").is_some(), config);
         assert_eq!(
@@ -595,6 +623,70 @@ fn delivery_profile_matrix_exact_inventory_env_and_no_secrets_or_developer_paths
                 serde_json::json!({"name":"composeapp-runtime","key":"service-token","optional":false})
             );
         }
+    }
+}
+
+#[test]
+fn delivery_config_secrets_closure_refuses_missing_tampered_and_extra_sources() {
+    for selected in [
+        "crates/yetlet-config/Cargo.toml",
+        "crates/yetlet-config/src/lib.rs",
+        "crates/yetlet-config/src/secrets.rs",
+        "crates/yetlet-config/examples/secret_provider.rs",
+        "crates/yetlet-secrets/Cargo.toml",
+        "crates/yetlet-secrets/src/lib.rs",
+    ] {
+        for missing in [false, true] {
+            let f = delivery_fixture(true, false, false);
+            let path = f.framework.join(selected);
+            if missing {
+                disk::remove_file(path).unwrap();
+            } else {
+                disk::write(path, "// unapproved closure bytes\n").unwrap();
+            }
+            let out = f.parent.join("refused");
+            assert!(
+                generate(&f.manifest(), &out).is_err(),
+                "{selected}, missing={missing}"
+            );
+            assert!(!out.exists());
+        }
+    }
+    for package in ["yetlet-config", "yetlet-secrets"] {
+        for selected in ["src/extra.rs", "build.rs", ".cargo/config.toml"] {
+            let f = delivery_fixture(true, false, false);
+            let path = f.framework.join("crates").join(package).join(selected);
+            disk::create_dir_all(path.parent().unwrap()).unwrap();
+            disk::write(path, "").unwrap();
+            let out = f.parent.join("refused");
+            assert!(
+                generate(&f.manifest(), &out).is_err(),
+                "{package}/{selected}"
+            );
+            assert!(!out.exists());
+        }
+    }
+}
+
+#[cfg(unix)]
+#[test]
+fn delivery_config_secrets_closure_refuses_symlink_sources() {
+    for selected in [
+        "crates/yetlet-config/Cargo.toml",
+        "crates/yetlet-config/src/lib.rs",
+        "crates/yetlet-config/src/secrets.rs",
+        "crates/yetlet-config/examples/secret_provider.rs",
+        "crates/yetlet-secrets/Cargo.toml",
+        "crates/yetlet-secrets/src/lib.rs",
+    ] {
+        let f = delivery_fixture(true, false, false);
+        let path = f.framework.join(selected);
+        let saved = f.framework.join("saved");
+        disk::rename(&path, &saved).unwrap();
+        std::os::unix::fs::symlink(saved, path).unwrap();
+        let out = f.parent.join("refused");
+        assert!(generate(&f.manifest(), &out).is_err(), "{selected}");
+        assert!(!out.exists());
     }
 }
 
@@ -847,7 +939,7 @@ fn current_selected_profiles_keep_pinned_overrides_public_settings_and_asset_map
         let inventory: serde_json::Value =
             serde_json::from_str(&rendered["build-context-inventory.json"]).unwrap();
         assert!(inventory["app-src"].get("base.toml").is_some());
-        assert_eq!(snapshot.with_config, config);
+        assert_eq!(snapshot.runtime_settings, config);
         assert_eq!(inventory["app-src"].get("src/config.rs").is_some(), config);
         assert_eq!(
             rendered["Dockerfile"].contains("YETLET_CONFIG_ROOT=/opt/yetlet/config"),

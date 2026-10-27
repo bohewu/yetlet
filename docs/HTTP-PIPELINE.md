@@ -1,38 +1,22 @@
 # HTTP Middleware Pipeline and RequestContext
 
-**Scope:** User-approved middleware handoff, focused P0 extension to the existing M0–M4 implementation.
-**Decision authority:** [ADR 0004](adr/0004-request-context-and-middleware.md).
-**Status:** P0 integrated and locally verified on 2026-10-08. P1 providers/benchmarks and independent review were not claimed at that checkpoint. Subsequent bounded YT-029 deadline/overhead evidence is linked below.
+Compose native global, group and route middleware while keeping request-owned
+parts/body separate from typed application state. Axum/Tower owns HTTP transport.
 
-## Gap assessment and integration
+**Experimental, unpublished.** Use this source checkout and the documented target scope.
 
-| Handoff requirement | Previous implementation | Integration |
-|---|---|---|
-| HTTP transport/routing | Axum and Tower already present | Reused; no HTTP parser or routing engine replacement |
-| Request-side context | Raw Request and State extractors only | Owning `RequestContext<S>` in the existing server adapter |
-| Typed request state | Available via Axum/http but no Yetlet contract | Original request Extensions, distinct from typed application state |
-| Global pre-routing middleware | No explicit API; Router::layer would run too late | `with_global` wraps the complete application Router |
-| Group/route scope | Available in Axum but undocumented/untested here | `nest`, Router::route_layer, MethodRouter::layer, ServiceBuilder |
-| API/SSR consistency | Shared server, mostly handler-local guards | One global pipeline; API group scope and header-only route guard |
-| Error and stream semantics | IntoResponse, HtmlPageError, bounded API JSON | Preserved and tested across the middleware boundary |
-| Browser separation | Browser and server crates already separate | No browser or shared View changes; no context serialization |
 
-## Public API and ownership
+## Prerequisites
 
-`RequestContext<S = ()>` implements Axum `FromRequest<S>` when S is Clone + Send + Sync. It is a body-owning extractor: place it last in handlers, or immediately before native `Next` in middleware. When middleware uses application state, construct it with `from_fn_with_state`.
+Use the pinned Rust/Cargo toolchain and the existing server adapter in a native
+Axum/Tower application. The example is Router wiring, not a standalone server:
+serve the returned Router through native Axum as shown in the [server guide](../crates/yetlet-server-axum/README.md).
+A body-owning RequestContext must be the last body-consuming extractor; use
+`from_fn_with_state` when middleware needs application state.
 
-Request-side operations:
+## Minimal integration
 
-- `method`, `uri`, `uri_mut`, `path`, `original_uri`, `headers`, `headers_mut`.
-- `query::<T>()` and `path_params::<T>().await` decode on demand through Axum and preserve its rejection types. No duplicated parameter cache.
-- `matched_path() -> Option<&str>`: None before application matching or on an unmatched fallback; Some in matched group/route/handler scope. `original_uri` retains the external URI through nested-prefix stripping.
-- `extensions`/`extensions_mut` use the original request-local http::Extensions. Inserted types follow its Clone + Send + Sync + 'static rules. Mutable sharing across layers is an explicit application choice, never a global request dictionary.
-- `state() -> &S` exposes application-level shared state, separately from Extensions. Use Arc-backed handles rather than cloning a large application object per extraction.
-- `body`, `body_mut`, `into_body`, `into_request` preserve one owned streaming body. The context is not Clone or Serialize and performs no read/collect on construction.
-
-Responses remain ordinary Axum responses; RequestContext contains no response builder, DI container, identity/session engine or renderer.
-
-## Minimal composition example
+### Minimal composition example
 
 ```rust
 use axum::{Router, response::Response, routing::get};
@@ -72,7 +56,31 @@ fn app() -> Router {
 
 This is the **original native** Axum Router integration; M6a also implements a thin handler-first `App<S>`/group facade **over the same Router**, not a second router, MVC Controller runtime or middleware engine. Native `State`/`Request` handlers, `MethodRouter`, group-scoped `route_layer` and pre-routing `with_global` remain compatible. Use `App::into_router()` before adding the outer global layer. See [M6a verification](M6A-VERIFICATION.md) and [ADR 0006](adr/0006-handler-first-mvc-optional.md).
 
-## Scope and execution order
+## Expected result
+
+For the assembled Router, `GET /api/example` returns `explicit-request-value`
+with `x-global: visited` and `x-group: api`. Global middleware runs before
+application matching; response middleware sees the returned Response before a
+streamed body finishes. The example does not open a listener by itself.
+
+## Configuration and errors
+
+### Public API and ownership
+
+`RequestContext<S = ()>` implements Axum `FromRequest<S>` when S is Clone + Send + Sync. It is a body-owning extractor: place it last in handlers, or immediately before native `Next` in middleware. When middleware uses application state, construct it with `from_fn_with_state`.
+
+Request-side operations:
+
+- `method`, `uri`, `uri_mut`, `path`, `original_uri`, `headers`, `headers_mut`.
+- `query::<T>()` and `path_params::<T>().await` decode on demand through Axum and preserve its rejection types. No duplicated parameter cache.
+- `matched_path() -> Option<&str>`: None before application matching or on an unmatched fallback; Some in matched group/route/handler scope. `original_uri` retains the external URI through nested-prefix stripping.
+- `extensions`/`extensions_mut` use the original request-local http::Extensions. Inserted types follow its Clone + Send + Sync + 'static rules. Mutable sharing across layers is an explicit application choice, never a global request dictionary.
+- `state() -> &S` exposes application-level shared state, separately from Extensions. Use Arc-backed handles rather than cloning a large application object per extraction.
+- `body`, `body_mut`, `into_body`, `into_request` preserve one owned streaming body. The context is not Clone or Serialize and performs no read/collect on construction.
+
+Responses remain ordinary Axum responses; RequestContext contains no response builder, DI container, identity/session engine or renderer.
+
+### Scope and execution order
 
 For the documented APIs, a matched request enters:
 
@@ -98,7 +106,7 @@ Axum MethodRouter::route_layer (different from Router::route_layer) skips its me
 
 `with_global` uses an outer fallback-only Router to preserve `Router` and `axum::serve` compatibility. Add all application routes before calling it; adding a route to the returned outer wrapper bypasses its fallback/global service. The global layer sees no *application* match metadata. Capture values needed for after-processing before moving the request to Next; response Extensions do not automatically inherit request Extensions.
 
-## Built-in context versus optional RequestId
+### Built-in context versus optional RequestId
 
 `RequestContext<S>` has three fields: original HTTP `parts`, the streaming `body`, and typed application `state`. The core does **not** automatically create `RequestId`, trace/span metadata, sessions, cookie jars, principals or cache handles. Existing request fields come from the incoming HTTP request; matched-route metadata becomes available only after routing; query/path parameters are decoded on demand.
 
@@ -106,7 +114,7 @@ The Todo example **explicitly installs** `RequestIds::new().global(app)` from th
 
 The example counter resets for a new application instance and is not globally unique across server nodes. Applications needing trace correlation should opt into a provider with an intentional ID and trusted propagation policy. See [ADR 0005](adr/0005-opt-in-capability-modules.md).
 
-## Existing demo integration
+### Existing demo integration
 
 M6 moved numeric correlation into `crates/yetlet-request-id`; the Todo app installs it explicitly at finalization. The example's `pipeline::with_api_scope` remains an ordinary `App::configure` setup function applying the API marker/header only to matching API paths.
 
@@ -114,13 +122,40 @@ The header-only `action_headers` middleware remains before handler body extracti
 
 The SSR root now uses Option<Extension<RequestId>> and returns Page, selecting only the numeric ID for its data attribute rather than receiving or serializing the whole RequestContext. Existing tests still prove raw cookies/private headers are not copied. SearchStateV1 and browser source remain untouched. M4 authentication/origin limitations still apply; correlation is not a production identity system.
 
-## Why this remains a small integration
+### Why this remains a small integration
 
 Two production modules are added to the existing server adapter. They reuse http request parts, Body/Extensions, Axum extractors/Next, and Tower Layer/Service. There is no custom dynamic middleware registry, new crate family, duplicate response model, general dependency injection, persistent session, or browser event channel.
 
 This is **not zero overhead**: S is cloned during extraction, native middleware has its own future/service costs, and with_global adds a fallback-only router envelope. RequestId/scope middleware are demo behavior with their own small per-request work. Native latency, allocation counts and throughput were not benchmarked at this P0 checkpoint. The browser build comparison below is separate from those unmeasured native costs.
 
-## Validation and evidence
+## API reference
+
+Use [server source/rustdoc](../crates/yetlet-server-axum/src/lib.rs),
+[composition](EXTENSIONS.md) and the [current API reference](API-REFERENCE.md).
+Current middleware contracts above preserve native routing, errors and streaming.
+The old P0/P1 delivery assessment below is a dated checkpoint, not a current Todo list.
+
+<details>
+<summary>Historical delivery context and evidence</summary>
+
+**Scope:** User-approved middleware handoff, focused P0 extension to the existing M0–M4 implementation.
+**Decision authority:** [ADR 0004](adr/0004-request-context-and-middleware.md).
+**Status:** P0 integrated and locally verified on 2026-10-08. P1 providers/benchmarks and independent review were not claimed at that checkpoint. Subsequent bounded YT-029 deadline/overhead evidence is linked below.
+
+### Gap assessment and integration
+
+| Handoff requirement | Previous implementation | Integration |
+|---|---|---|
+| HTTP transport/routing | Axum and Tower already present | Reused; no HTTP parser or routing engine replacement |
+| Request-side context | Raw Request and State extractors only | Owning `RequestContext<S>` in the existing server adapter |
+| Typed request state | Available via Axum/http but no Yetlet contract | Original request Extensions, distinct from typed application state |
+| Global pre-routing middleware | No explicit API; Router::layer would run too late | `with_global` wraps the complete application Router |
+| Group/route scope | Available in Axum but undocumented/untested here | `nest`, Router::route_layer, MethodRouter::layer, ServiceBuilder |
+| API/SSR consistency | Shared server, mostly handler-local guards | One global pipeline; API group scope and header-only route guard |
+| Error and stream semantics | IntoResponse, HtmlPageError, bounded API JSON | Preserved and tested across the middleware boundary |
+| Browser separation | Browser and server crates already separate | No browser or shared View changes; no context serialization |
+
+### Validation and evidence
 
 The counts and byte comparisons below record the original P0 checkpoint. Complete M6 integration and its migrated Todo results are recorded separately in [M6 verification](M6-VERIFICATION.md); the original evidence is retained, not relabeled as a new run.
 
@@ -164,10 +199,12 @@ git diff --check
 
 The two new server adapter modules contain **142 lines including comments/blank lines** (context.rs: 114; middleware.rs: 28), excluding demo/test/documentation changes. This is a source-size observation, not a latency/throughput benchmark. Existing debug WASM sizes are not production compressed transfer measurements. No independent reviewer or formal assurance claim is implied.
 
-## Deferred P1 and remaining compatibility limits
+### Deferred P1 and remaining compatibility limits
 
 - Reusable tracing/authentication/CORS/session/rate-limit providers remain separate opt-in components, not P0 defaults.
 - Native infallible Tower layers are supported and an existing tower-http layer is tested. Fallible services must use an explicit error-to-response adapter. The thin App facade is implemented in M6; arbitrary fallible-service convenience APIs remain deferred.
 - [YT-029 deadline/overhead research](YT-029-HTTP-DEADLINE-RESEARCH.md) now records an opt-in application-owned native Tower timeout, cancellation/body limits and matched in-process release measurements. This completes the bounded research item, not a supported core API or production benchmark. General provider policy and additional streaming/backpressure qualification remain deferred.
 - Request-local extensions do not prevent a developer from deliberately inserting the same Arc into every request; the framework only avoids doing so implicitly.
 - M5 and M6 record local measurements, not a production performance/security certification. Public release and remaining operational-provider gates remain separate.
+
+</details>

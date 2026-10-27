@@ -1,5 +1,26 @@
 # Release Supply-Chain Design
 
+**Current technical candidate (2026-10-27):** After the guarded ten-path rebuild
+extension commit, the owner selects `118f3d0f496b487ef20fe243f4e73179f9eadc43`,
+tree `07faa3e90c0fca5d27a4e55262c75acf851d884a`. The
+[remaining verification order](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
+records the later authorized Push, required CI, sixteen-package hosted/local
+byte-identical rebuild and affected MSVC PASS. Final independent Reviewer PASS,
+zero issues/required followups, closes YT-205 technical scope. These notes remain
+external metadata, not C payload. No Merge/signing or
+publication occurs; D1–D6 remain Pending and YT-020 Blocked.
+Earlier source, archive, signature and review identities remain intact.
+
+**Earlier sixteen-package technical candidate (2026-10-27):** The owner selects
+immutable `a2d6474`/tree`1c3eab` for experimental0.1.0
+[YT-205 reconciliation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md). Sixteen local
+C archive digests, retained versus new package/inventory results and an unsigned
+sixteen-subject proposal are bound explicitly. This does not rewrite the original
+nine-subject proposal or old provenance, complete current-C CI/rebuild/platform
+gaps, or approve the later reader draft as C contents. D1–D6 remain Pending;
+signing, registry proof and activation remain YT-096/YT-020 operations under
+separate authority. No new policy, ignore, Push or publication is introduced.
+
 **Task:** YT-064 / M10e
 **Original M10e status:** Design and local preflight accepted; independent reviewer `wc_job_CeUNYnHsO1yI_kBz` PASS. Actual experiments are recorded in M10e verification. Release activation, signing and independent rebuild are not performed; YT-020 remains Blocked.
 
@@ -45,7 +66,9 @@ The 19 packages with `publish = false` are `yetlet-auth-notes`, `yetlet-cart-ser
 
 ## License and source gate
 
-`deny.toml` targets cargo-deny **0.20.2**. It allows only MIT, Apache-2.0, BSD-3-Clause and Unicode-3.0, checks development/build dependencies, and sets private-package ignore to false. All other licenses remain denied unless the checker can satisfy an alternative expression with an allowed license. Observed LLVM-exception, BSL, LGPL and Unlicense alternatives do not require approving those additional licenses when MIT or Apache-2.0 satisfies the expression. Combined BSD/Unicode obligations remain required; retain notices in distributed artifacts.
+`deny.toml` targets cargo-deny **0.20.2**. It allows MIT, Apache-2.0, BSD-3-Clause and Unicode-3.0, plus the owner's explicit [YT-204 approval of Zlib, BSL-1.0 and ISC](YT-204-PACKAGE-SECURITY-COVERAGE.md#authorized-license-policy-followup--2026-10-27). It checks development/build dependencies and sets private-package ignore to false. All other licenses remain denied unless the checker can satisfy an alternative expression with an allowed license. At the original preflight, observed LLVM-exception, BSL, LGPL and Unlicense alternatives did not require additional approval when MIT or Apache-2.0 satisfied the expression. Current AND expressions still require every obligation; retain applicable notices in distributed artifacts.
+
+This is a policy-wide SPDX allowlist for the dependency graph checked by this configuration, including future dependencies with these license IDs; it is not a package/version-specific exception. It does not relicense Yetlet or third-party code, authorize publication, or waive copyright, license-text or modified-source notices. `BSL-1.0` means Boost Software License 1.0. Package-specific terms and eventual source/binary/browser-bundle contents still govern distribution obligations; see the [YT-204 scope summary](YT-204-PACKAGE-SECURITY-COVERAGE.md#license-scope-and-distribution-obligations).
 
 Unknown registries and Git sources are denied; only the crates.io registry is accepted. Workspace paths belong to the reviewed source snapshot, not a registry trust exemption. Do not suppress failures, add blanket exceptions or change package licenses to obtain a pass. A future dependency change requires renewed license/source review. Vulnerability audit remains the separate existing RustSec gate.
 

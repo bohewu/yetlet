@@ -1,18 +1,41 @@
 # Yetlet
 
-Yetlet is a small, HTML-first Rust universal UI framework. Write shared Rust Views for native server-rendered pages and opt-in browser WASM/DOM updates; use ordinary Axum handlers for HTTP and typed actions for explicit remote work.
+**Rust UI, HTML first.**
 
-**Experimental `0.1.0`, unpublished, Private.** M0–M9 implementation, selected M10 qualification and M11-P/M11-G product/GPU work are complete at their recorded prototype scopes. [M11 closeout](docs/YT-081-M11-CLOSEOUT.md) reconciles those limits; APIs are pre-public and may change. Public release (`YT-020`) remains **Blocked**; this repository is not production-qualified.
+Build server-rendered pages and HTTP APIs with ordinary Axum handlers. Share
+Rust Views with optional browser WASM when a screen needs local interaction.
+Yetlet is for Rust teams that want to keep UI composition, server behavior and
+explicit browser enhancements in one language.
+
+## Why Yetlet
+
+- **Start with HTML.** Serve useful pages and native forms without JavaScript
+  or a persistent server-side UI connection.
+- **Keep native Rust HTTP.** Use Axum extractors, Tower middleware and typed state
+  alongside a small `App`/`Page` facade.
+- **Share Views across targets.** Reuse Rust UI values for SSR and opt-in browser
+  DOM updates; keep local interactions and remote actions explicit.
+- **Choose capabilities as needed.** Add Session, authentication, rate limiting,
+  configuration or request correlation through explicit dependencies and setup.
+- **Use bounded output policies.** HTML escaping and strict page CSP are built
+  into the server rendering path; application authorization stays explicit.
 
 ## Start with native SSR
 
-From this checkout, install the Rust/Cargo 1.99.0 toolchain pinned in `rust-toolchain.toml`. Native SSR needs no JavaScript, WASM target or browser build tools.
+**Source preview:** Yetlet is experimental and unpublished. Use this repository
+checkout with the pinned Rust/Cargo 1.99.0 toolchain; APIs may change. Native SSR
+needs no Node.js or WASM toolchain. See [compatibility](docs/COMPATIBILITY.md)
+for the current usage and support boundary.
 
-```bash
+From the repository root:
+
+```sh
 cargo run --locked -p yetlet-server-axum --example minimal
 ```
 
-Open `http://127.0.0.1:3000/` for a script-free HTML page and `/api/status` for JSON. The complete [minimal example](crates/yetlet-server-axum/examples/minimal.rs) is:
+Open `http://127.0.0.1:3000/` for HTML and
+`http://127.0.0.1:3000/api/status` for JSON. Stop the server with Ctrl+C.
+The complete [running example](crates/yetlet-server-axum/examples/minimal.rs) is:
 
 ```rust
 use yetlet_core::View;
@@ -37,137 +60,54 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
-`App` is a thin facade that returns a native `axum::Router`. `.page` accepts a no-argument async View handler; parameterized or fallible handlers use `.get`, native Axum extractors and `Page` or `Result<Page, E>`. `Page` provides escaped HTML, strict CSP and generic rendering-error responses. See [HTTP usage](docs/HTTP-PIPELINE.md) and [compatibility/API boundaries](docs/COMPATIBILITY.md).
+`App::into_router()` returns a native Axum Router. For parameters or fallible
+handlers, use ordinary extractors and `Page` or `Result<Page, E>`; see the
+[server guide](crates/yetlet-server-axum/README.md).
 
-For a small application with named-route input and a sample-local guide:
+## Choose your next step
 
-```bash
-cargo run --locked -p yetlet-hello-world
-```
+| I want to… | Start here |
+|---|---|
+| Create my own standalone app | [Build your first Yetlet app](docs/FIRST-APP.md) |
+| Write Views and reusable components | [View/component guide](docs/VIEW-COMPONENTS.md) |
+| Build an SSR page or JSON API | [Hello World](examples/hello-world/README.md) · [REST API](examples/rest-api/README.md) |
+| Add browser interaction | [Todo and Search Island](examples/todo-server/README.md) · [browser DOM guide](crates/yetlet-dom/README.md) |
+| Handle forms and Session state | [Forms](examples/forms-validation/README.md) · [Session cart](examples/cart-server/README.md) |
+| Resolve identity and protect routes | [Authentication guide](crates/yetlet-auth/README.md) · [Admin reference](examples/admin-dashboard/README.md) |
+| Set endpoint or group rate limits | [Rate-limit guide](crates/yetlet-rate-limit/README.md) |
+| Load typed settings and secrets | [Configuration](docs/CONFIGURATION.md) · [Secret providers](docs/SECRET-PROVIDERS.md) |
+| Explore a modular SQL-backed application | [Modular Shop](examples/modular-shop/README.md) · [Issue Tracker starter](examples/production-starter/README.md) |
 
-Open `http://127.0.0.1:3003/` or `/hello/World`. See [Hello World](examples/hello-world/README.md).
+The [sample catalog](docs/SAMPLES.md) lists existing applications, routes and
+limits. Application guides distinguish synthetic login from a real identity
+provider and authoritative state from optional display caching.
 
-## Optional local Yetlet CLI preview
-
-The separate [unpublished CLI](tools/yetlet-cli/README.md) creates native SSR applications and executes `run`/`build`. Persistent CLI/Vite behavior uses the existing settings mechanism. `new --vite` implies the optional runtime settings module; plain new keeps it opt-in.
-
-```bash
-cargo build --offline --locked --manifest-path tools/yetlet-cli/Cargo.toml
-tools/yetlet-cli/target/debug/yetlet --help
-tools/yetlet-cli/target/debug/yetlet doctor --json
-mkdir -p -m 700 "$HOME/yetlet-apps"
-tools/yetlet-cli/target/debug/yetlet new sampleapp --parent "$HOME/yetlet-apps"
-# Follow the generated README: unpublished crates need explicit Cargo-owned local overrides.
-cargo generate-lockfile --offline --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
-tools/yetlet-cli/target/debug/yetlet build --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
-tools/yetlet-cli/target/debug/yetlet run --manifest-path "$HOME/yetlet-apps/sampleapp/Cargo.toml"
-```
-
-Creation runs no tools or installation and generates no app lock. The optional Vite settings independently select frontend auto-start/build; Rust execution remains frozen without a Rust watcher. Linux has current native process/PTY/cleanup evidence. This revision has Windows cross-compilation evidence only; historical [YT-088 native receipts](docs/YT-088E-VERIFICATION.md) do not qualify the new two-process integration. Windows run requires a protected local NTFS app/tools and an attached processed-input console. See [CLI implementation evidence](docs/YT-102-CLI-IMPLEMENTATION.md). Global installation, publication and production qualification remain separate.
-
-## Optional Linux container and Kubernetes configuration
-
-The unpublished CLI can scaffold a [service SSR app](docs/YT-089A-VERIFICATION.md) with local-process liveness/readiness, configurable bind address, and graceful SIGTERM/Ctrl-C handling. The separate [configuration-only generators](tools/yetlet-cli/README.md) emit Dockerfile, Compose and generic Linux/amd64 Kubernetes Deployment/Service files from a qualified legacy service app with an explicit Cargo.lock. Newly generated shared-settings/registry layouts require separate generator acceptance and are currently refused:
+Browser examples additionally need the WASM target and a wasm-bindgen CLI matching
+`Cargo.lock` (0.2.129). Prepare them once in a POSIX shell, then follow the Todo guide:
 
 ```sh
-YETLET=tools/yetlet-cli/target/debug/yetlet
-# Select an existing qualified legacy local-source app with its prepared lock.
-"$YETLET" generate docker --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml" --output "$HOME/yetlet-apps/docker-output"
-"$YETLET" generate compose --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml" --output "$HOME/yetlet-apps/compose-output" --image localhost:5000/team/cloudapp:v1
-"$YETLET" generate k8s --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml" --output "$HOME/yetlet-apps/k8s-output" --image localhost:5000/team/cloudapp:v1
-```
-
-Generation **does not** run Docker or Kubernetes, fetch dependencies, export private source, publish images, or deploy a cluster. Docker builds require separate audited `app-src` and `yetlet-src` named BuildKit contexts; deployment images/credentials, ports and namespaces remain operator responsibilities. Linux OCI/K3s output and Windows GNU/MSVC generator parity have [separate source-bound evidence](docs/YT-089E-VERIFICATION.md). M15 is an unpublished preview, not production or YT-020 release qualification.
-
-## Optional typed application configuration
-
-The separate unpublished [configuration guide](docs/CONFIGURATION.md) shows typed
-Serde settings, explicit Development/Staging/Production layers, development-only
-secret files and native Axum State. The isolated workspace leaves default/core/
-browser dependencies unchanged. Current CLI templates opt into this same mechanism. [YT-090 verification](docs/YT-090-VERIFICATION.md)
-records focused Linux checks and independent Reviewer PASS at the unpublished scope.
-
-## Add browser behavior when needed
-
-The Todo application shares its Rust View between SSR and the browser. `/app` owns local keyed updates and a separate typed HTTP Create action; `/search` renders complete HTML before lazily loading its local Search Island.
-
-Browser builds additionally require `wasm32-unknown-unknown` and wasm-bindgen CLI 0.2.129. The unpublished Rust `cargo xtask` provides build, check, smoke, measure, qualification and release-preparation commands. Original Python files remain frozen reference oracles. YT-085 is accepted after its separate Reviewer PASS; [YT-086 verification](docs/YT-086-VERIFICATION.md) records the migration candidate and remaining acceptance boundaries. No Python interpreter is required by the migrated command implementations.
-
-```bash
 rustup target add wasm32-unknown-unknown
 cargo install wasm-bindgen-cli --version 0.2.129 --locked \
   --root "$HOME/.local/share/yetlet-tools"
-cargo xtask build browser
-cargo run --locked -p yetlet-todo-server
+export PATH="$HOME/.local/share/yetlet-tools/bin:$PATH"
 ```
 
-Open `http://127.0.0.1:3000/`, `/app` and `/search`. Stop the minimal server first because both use port 3000. Assets are built ahead of time into ignored `dist/` with a content-hash manifest; requests never compile WASM. `/app` returns 503 if browser assets are absent. Use `cargo xtask build browser --release` for optimized assets; debug and release measurements are separate.
+## Documentation
 
-## Choose an application example
+- [Current API reference](docs/API-REFERENCE.md): packages, features, ownership,
+  errors and local rustdoc.
+- [Troubleshooting](docs/TROUBLESHOOTING.md): symptoms, likely causes and linked fixes.
+- [Opt-in quick reference](docs/OPT-IN-QUICK-REFERENCE.md): features, startup wiring,
+  application settings and defaults.
+- [HTTP pipeline](docs/HTTP-PIPELINE.md) and [opt-in composition](docs/EXTENSIONS.md).
+- [CLI guide](tools/yetlet-cli/README.md): scaffolding, build/run/watch and selected
+  configuration generators.
+- [Documentation index](docs/README.md): further guides and retained history.
 
-The [sample guide](docs/SAMPLES.md) lists twelve runnable applications with commands, routes, dependencies, security limits and retained evidence. Start with native Hello World or REST; explore Session cart, middleware, forms, files, SQLite, SSE, islands, synthetic authentication and the Modular Shop as needed. Each [sample README](examples/README.md) owns its setup details. SQL and storage remain application choices; Yetlet has no built-in ORM or mandatory database layer.
+## Project and license
 
-## Nine library candidates
+Planned work belongs in [Roadmap](docs/ROADMAP.md); tracked tasks belong in
+[Backlog](docs/BACKLOG.md). Reporting and participation follow
+[Contributing](CONTRIBUTING.md) and the [security policy](SECURITY.md).
 
-These are the original nine unpublished `0.1.0` candidates. Use them from the checkout; no registry installation or stable API is claimed. Each package guide below describes its implemented usage, dependencies, ownership and limits.
-
-| Crate | Responsibility |
-|---|---|
-| [`yetlet-core`](crates/yetlet-core/README.md) | Renderer-neutral View/component model and validated identity, key and binding-slot vocabulary |
-| [`yetlet-html`](crates/yetlet-html/README.md) | Escaped HTML serialization with safe element/attribute policy |
-| [`yetlet-dom`](crates/yetlet-dom/README.md) | Direct browser DOM mount over a restricted HTML subset |
-| [`yetlet-dom-keyed`](crates/yetlet-dom-keyed/README.md) | Optional keyed child identity and disposable listener/entry ownership |
-| [`yetlet-reactive`](crates/yetlet-reactive/README.md) | Optional synchronous local message/reducer/commit graph with explicit lifetime |
-| [`yetlet-actions`](crates/yetlet-actions/README.md) | Typed command and local/HTTP executor boundaries |
-| [`yetlet-server-axum`](crates/yetlet-server-axum/README.md) | App/Page facade, request context and native Axum/Tower composition |
-| [`yetlet-request-id`](crates/yetlet-request-id/README.md) | Opt-in process-local numeric request correlation |
-| [`yetlet-session`](crates/yetlet-session/README.md) | Opt-in process-local server-side Session, expiry, CSRF and cookie lifecycle |
-
-The separate experimental Redis provider is outside these nine candidates and remains nonpublishable. Its retained qualification is limited to the selected single-host/single-primary/no-persistence scope.
-
-## Experimental opt-in scene renderer
-
-[`yetlet-wgpu`](crates/yetlet-wgpu/README.md) is a separate first-party
-**Experimental, unpublished, opt-in** flat-scene renderer. CPU defaults have no
-GPU dependency or initialization; only explicit wasm32 `browser` activation
-adds WebGPU. It does not accelerate ordinary DOM/CSS or alter the nine release
-candidates. The [support boundary](crates/yetlet-wgpu/SUPPORT.md) separates the
-qualified Firefox/X11/Intel opt-in configuration from unverified platforms.
-There is no performance, FPS, stable-API or production guarantee. Future 3D
-is motivation, not a shipped 3D API. See the [real consumer](examples/webgpu-scene-island/README.md).
-
-## Design boundaries
-
-- Default SSR works without JS/WASM or a persistent server-side event circuit.
-- Browser events stay local. Remote operations cross explicit typed HTTP/action boundaries; the server validates inputs, authentication and authorization.
-- Views, renderers, HTTP routing, loaders and transport remain separable. HTTP uses Axum/Tower rather than a custom parser/server stack.
-- Escaping, semantic HTML, accessibility and strict CSP are correctness requirements. Browser state must contain no server secrets or capabilities. WASM pages may allow `'wasm-unsafe-eval'`, without `'unsafe-eval'` or `'unsafe-inline'`.
-- Optional capabilities use explicit Rust setup functions and scoped middleware. The minimal app needs no Session or request-ID provider.
-- Keyed DOM/local reactivity are opt-in per owned surface. Only the Todo local list adopts them; remote Todo and Search results retain bounded subtree replacement.
-
-Generic hydration, resumability, general VDOM/template macros and dependency-tracked signals/forms remain unselected. The five original research tracks retain their bounded application-owned [decisions and measurements](docs/README.md#completed-research-prototypes), not supported core APIs. Separately approved M11 work now provides the Experimental opt-in scene candidate above; the old native Vulkan study does not establish its browser support or accelerate DOM/CSS. See [architecture decisions](docs/README.md#architecture-and-contracts).
-
-## Developer documentation and checks
-
-Use the [documentation index](docs/README.md) for API guidance, architecture, qualification and historical evidence. [Roadmap](docs/ROADMAP.md) and [Backlog](docs/BACKLOG.md) own milestone and task status. Documentation and sample navigation checks are:
-
-```bash
-cargo xtask check docs
-cargo xtask check samples
-```
-
-For implementation validation, use the changed-path checks required by [repository instructions](AGENTS.md) and the relevant sample/verification record. Historical compiler, browser, CSP, benchmark and CI results retain their original dates and source identities; navigation changes do not rerun or transfer those results. [Retained history](docs/README.md#historical-evidence-and-maintainer-notes) includes the former detailed command and milestone notes.
-
-## Qualification and release limits
-
-The original nine candidates remain experimental `0.1.0`, unpublished and Private. [Release readiness](docs/RELEASE-READINESS.md) and [Private preparation](docs/YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) explain the Rust 1.99 minimum, best-effort maintenance and remaining approval gates. YT-068 is Done at documentation scope; the independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate. YT-020 remains **Blocked** for formal activation.
-
-Historical [Private signing](docs/YT-020-PRIVATE-SIGNING-VERIFICATION.md) authenticates the earlier `8e557e760407a3d4b3f5a8b8f833748946be1387` evidence set. It does not attest this later committed source tree, evolved root manifest/lock, nine package guides or Experimental GPU candidate. A future release needs a separately approved immutable candidate and current-source package, rebuild, provenance, SBOM/license and signing evidence; a local commit alone cannot activate release.
-
-[Retained qualification](docs/QUALIFICATION-MATRIX.md) keeps its original native/browser/CI identities. YT-030/YT-065/YT-066/YT-067 remain Done at their stated bounded scopes. Real IME, spoken assistive technology, WebKit/mobile and zoom remain optional unverified coverage; no supported-device, conformance, production or SLA claim follows. The Redis provider remains nonpublishable and qualified only at selected single-host/single-primary/no-persistence scope. Application TLS/ACL, backups, business RPO/RTO and operational ownership remain application responsibilities. [Detailed history](docs/README.md#historical-evidence-and-maintainer-notes) preserves earlier commands, PASS results and limitations.
-
-## Governance and license
-
-Yetlet is a maintainer-directed project. External pull requests are not accepted; repository settings restrict pull-request creation to collaborators so maintainers can still use PRs and required CI internally. Reproducible bugs, compatibility reports, documentation feedback, and focused design proposals are welcome through Issues. Security reports must follow [SECURITY.md](SECURITY.md) and must not be posted publicly. See [CONTRIBUTING.md](CONTRIBUTING.md) for the complete policy.
-
-Yetlet is dual-licensed under your choice of [MIT](LICENSE-MIT) or [Apache License 2.0](LICENSE-APACHE). Workspace packages carry the SPDX expression `MIT OR Apache-2.0`; example and application packages remain `publish = false`. The license permits forks and independent modifications but does not require the upstream project to accept external code contributions.
+Licensed under either [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE).

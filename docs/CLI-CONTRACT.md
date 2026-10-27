@@ -32,6 +32,7 @@ yetlet --help | -h
 yetlet --version | -V
 yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]
 yetlet doctor [--json]
+yetlet inspect [--manifest-path PATH] [--json]
 yetlet run [--manifest-path PATH]
 yetlet watch [--manifest-path PATH]
 yetlet build [--manifest-path PATH] [--release]
@@ -70,6 +71,44 @@ The generator example requires a separately qualified source representation.
 Current service/settings/Vite scaffolds use explicit compatible local Cargo
 path overrides and a separately prepared lock; registry-only delivery remains
 outside this acceptance. See the linked compatibility record.
+
+### Read-only project inspection — YT-111
+
+Selected contract (2026-10-22): `yetlet inspect [--manifest-path PATH] [--json]`.
+A separate command keeps the environment-only doctor schema 1 and its byte
+shape unchanged. Extending doctor would mix project selection/settings failures
+with environment probes; inspection needs neither those probes nor a second
+settings mechanism. The existing protected standalone manifest/lock selection
+and public Loader are reused, with exactly cwd/Cargo.toml as the default.
+
+Inspection explains settings-derived intentions for existing `build`, `run` and
+`watch`. It reports the finite selected environment (Production by default),
+native/browser target, configured Rust watch, Vite enabled/relative root and
+auto_build/auto_start, plus each command's supported status and selected Rust,
+Rust-watch and Vite stages with fixed reasons. Native build never watches;
+native watch forces watch only after settings validation. Browser build/run
+select frontend build/static preview; browser watch selects the YT-112 loop
+only when both auto_start and auto_build are true. Its Rust-watch stage means
+serialized WASM generation owned by the frontend, with no native Cargo run.
+
+JSON is one newline-terminated object with its own `schema_version: 1` and
+`scope: "project-execution-plan"`, `environment`, `target`, `rust_watch`,
+`vite` (`enabled`, `root`, `auto_build`, `auto_start`), `commands` (`build`,
+`run`, `watch`, each with `supported`, `rust`, `rust_watch`, `vite`), and a
+fixed `limitations` string. Each stage has `selected` and `reason`. Root is
+the validated relative setting, never a resolved absolute path. JSON uses
+ASCII escapes; human root text uses Rust character escapes to prevent terminal
+control injection. Human output carries the same choices and limitations.
+
+Exit 0 means the plan was explained, including unsupported/skipped stages;
+it does not mean tools, assets, TLS files, secrets, runtime startup or readiness
+were verified. Inspection never starts children, writes output/settings,
+contacts the network, reads Development secrets or calls SecretProvider. It
+does not inspect frontend directories, package scripts or assets. Errors use
+exit 1, empty stdout and `CLI_PROJECT inspect:` on stderr with the existing
+safe manifest/source/profile/values messages and ordering. `--json` does not
+change failures into a new error schema. Grammar errors retain exit 2 and
+exclusive scoped help, with no supplied values echoed.
 
 ### Explicit key administration — YT-093
 
@@ -143,7 +182,7 @@ The earlier proposed `YETLET_VITE_AUTO_START`/`YETLET_VITE_AUTO_BUILD` names and
 
 ### Shared loader integration
 
-Loader deserializes the whole merged root and has no section-projection API. The CLI reuses `Loader::load_from_env::<serde_json::Value>()` with APP_ENVIRONMENT, related APP_CLI variables and the public APP_SERVER__TLS namespace, leaves Development secrets disabled, then strictly deserializes the cli and optional server.tls tables. The shared parser owns merge/key/type/profile semantics. CLI public files receive native protected-path preflight. Selected generated runtime Settings explicitly contains the known strict CLI namespace; global unknown-field validation remains enabled. Legacy internal scaffold APIs retain their exact previous representation for generator qualification.
+Loader deserializes the whole merged root and has no section-projection API. The CLI reuses `Loader::load_with_env::<serde_json::Value>()` with APP_ENVIRONMENT, related APP_CLI variables and the public APP_SERVER__TLS namespace, leaves Development secrets disabled, then strictly deserializes the cli and optional server.tls tables. The shared parser owns merge/key/type/profile semantics. CLI public files receive native protected-path preflight. Selected generated runtime Settings explicitly contains the known strict CLI namespace; global unknown-field validation remains enabled. Legacy internal scaffold APIs retain their exact previous representation for generator qualification. The [naming guide](NAMING.md) records intentional pre-public Rust support API migrations separately from unchanged argv and external settings keys.
 
 New project settings files are required inputs once selected. For legacy standalone apps with no CLI namespace, retain disabled-watch/disabled-Vite/default-generator behavior; do not infer tools from filenames/dependencies. Explicit CLI overrides require declared CLI keys. Missing required profile files, partial configuration, malformed sources and invalid values never trigger a silent fallback. No automatic edit of an old application's settings/Rust types occurs.
 
@@ -197,8 +236,39 @@ execution `APP_CLI__TARGET` retains normal declared-key/profile precedence.
 Browser `build` supervises only the npm/WASM/Vite production build and browser
 `run` previews prepared static output, without a native server or dev bridge.
 Both honor their existing automatic-stage booleans: disabled stages visibly
-skip with exit 0 and no child. Rust watch and native TLS are not selected for
-this contract. The existing native command behavior below remains unchanged.
+skip with exit 0 and no child. The native `cli.rust.watch` setting and native
+TLS remain disabled for browser targets.
+
+### Explicit browser development loop — YT-112
+
+`yetlet watch` now selects the browser-only Vite development loop when both
+`cli.vite.auto_start` and `auto_build` are true. Either false visibly skips the
+whole loop with exit 0 and no children. Unlike browser `run`, no prebuilt dist
+is required. The existing protected app/lock/settings/frontend/dotenv checks
+precede child startup. A CLI-owned environment selector chooses development
+inside the browser npm dev script; inherited selectors cannot change `run`.
+
+Vite 8.3.4 watches app `src/`, `Cargo.toml`, `Cargo.lock` and `build.rs`;
+external dependency roots are not discovered. An initial optimized frozen/offline
+Rust/WASM build and exact wasm-bindgen 0.2.129 produce a private complete pair.
+Edits debounce and serialize/coalesce builds; failures wait for edits. Successful
+publication invalidates modules and fully reloads the page, resetting Rust state.
+Vite owns TS/JS/CSS updates; the task entry never self-accepts a live Rust remount.
+Failed generation leaves the last good immutable JS/WASM pair available; before
+any success HTTP returns an explicit 503. Correction publishes on the next edit.
+
+Only the strict 127.0.0.1:5173 origin and its WebSocket are admitted. Frontend
+sources are confined, including symlink resolution; Cargo/TOML, dotenv, config,
+secret paths, raw queries and arbitrary filesystem modules stay denied. A random
+request-local style nonce supports Vite CSS HMR without unsafe-inline or general
+unsafe-eval. Production CSP and deployable dist remain separate. The existing
+frontend supervisor owns Vite and all compiler descendants; cancellation aborts
+the active build, closes the listener and removes owned temporary generations.
+No installs, native backend, state restoration or production HMR are introduced.
+
+[Implementation/evidence](YT-112-IMPLEMENTATION.md) remains In progress pending
+independent review and real-browser/lifecycle proof. The native command behavior
+below remains unchanged.
 
 | Command | Result/effects and success boundary |
 |---|---|

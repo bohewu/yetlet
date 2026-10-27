@@ -1,6 +1,7 @@
 # Experimental Support Boundary
 
-`yetlet-wgpu` is **Experimental, opt-in and unpublished** (`publish = false`).
+`yetlet-wgpu` is **Experimental, opt-in and unpublished**, with publication
+metadata prepared under [YT-201](../../docs/YT-201-PACKAGE-PREPARATION.md).
 There is no performance, speedup, FPS, stable API, production-readiness or broad
 browser guarantee. The measured YT-077 comparison did not demonstrate a useful
 WebGPU speedup; experimental promotion was separately approved for an optional

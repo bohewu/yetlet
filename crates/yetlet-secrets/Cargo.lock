@@ -441,9 +441,9 @@ checksum = "0bf256ce5efdfa370213c1dabab5935a12e49f2c58d15e9eac2870d3b4f27263"
 
 [[package]]
 name = "tokio"
-version = "1.53.2"
+version = "1.53.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e95f91fcc7a621e8b030f6aa23c71fe9838ae2fb4d8118b75602a328f5144044"
+checksum = "ce3335fa71841cda333a58d7615b03901380ecf09d59b3296d21f8bbac0dde4e"
 dependencies = [
  "bytes",
  "libc",
@@ -594,7 +594,7 @@ checksum = "23b97319f7b8343df12cc98938e5c3eb436064524c8d2b4e30a1d3a36eecdf81"
 
 [[package]]
 name = "yetlet-config"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "dotenvy",
  "libc",
@@ -615,7 +615,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-secrets"
-version = "0.0.0"
+version = "0.1.0"
 dependencies = [
  "axum",
  "secrecy",

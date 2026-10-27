@@ -7,6 +7,7 @@ pub mod docker;
 pub mod doctor;
 mod framework;
 mod image;
+pub mod inspect;
 mod k8s;
 pub mod key;
 mod platform;
@@ -30,11 +31,12 @@ pub const VERSION: &str = concat!(
     env!("CARGO_PKG_VERSION"),
     " (unpublished preview)"
 );
-pub const HELP: &str = "Yetlet CLI preview (unpublished)\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
+pub const HELP: &str = "Yetlet CLI preview (unpublished)\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet inspect [--manifest-path PATH] [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
 const NEW_HELP: &str = "Usage: yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n\nNAME may appear anywhere among options. --parent defaults to cwd and must exist.\nNAME: 1-64 lowercase ASCII letters/digits/-/_, starting with a letter; reserved names refused.\n--vite selects the complete frontend scaffold and implies --settings. Plain new keeps app-runtime settings opt-in.\n--tailwind selects standalone Tailwind or the official Vite plugin. --service adds bind/health/shutdown.\n--template native|browser selects a built-in starter (default native), independent of runtime settings.\nThe browser template persists cli.target=browser and includes Vite/public settings.\nBrowser creation refuses --service. Plain creation defaults to native.\nCreates one new tree without overwrite, dependency installation, lock generation or process startup.\n";
 const DOCTOR_HELP: &str = "Usage: yetlet doctor [--json]\n\nReports bounded local Rust/Cargo 1.99+ identity and compiled new-filesystem capability.\nEnvironment only; application, framework, settings, frontend and execution readiness are not checked.\n--json emits schema 1. No builds, installs, Node probes or listeners.\n";
+const INSPECT_HELP: &str = "Usage: yetlet inspect [--manifest-path PATH] [--json]\n\nExplains public-settings execution plans for build/run/watch without running tools.\nManifest defaults to exactly cwd/Cargo.toml; requires a protected standalone app and Cargo.lock.\n--json emits project-execution-plan schema 1, separate from environment-only doctor.\nNative watch plans select Rust rebuild/restart; browser watch plans select WASM rebuild/full-page reload\nonly when cli.vite.auto_start and cli.vite.auto_build are both true.\nNo writes, secret sources, frontend inspection or readiness verification.\n";
 const RUN_HELP: &str = "Usage: yetlet run [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; no ancestor or workspace search.\nRequires a protected standalone app and existing Cargo.lock; runs frozen Cargo.\nPublic settings select native Rust watch/Vite or cli.target=browser static preview.\nBrowser run starts only the prepared frontend, honoring cli.vite.auto_start. No implicit installs.\nOwned processes must retain their process group/Job; escaped daemons are unsupported.\n";
-const WATCH_HELP: &str = "Usage: yetlet watch [--manifest-path PATH]\n\nRuns the same pipeline as yetlet run, forcing Rust watch for this invocation.\nManifest defaults to exactly cwd/Cargo.toml; requires a protected standalone app and Cargo.lock.\nPublic settings are validated first; Vite enabled, auto_start and root settings still apply.\nRequires Watchexec on PATH; no implicit installs or settings-file changes.\nRust restarts retain Vite; cancellation cleans up owned processes.\n";
+const WATCH_HELP: &str = "Usage: yetlet watch [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; requires a protected standalone app and Cargo.lock.\nPublic settings are validated before selecting the target-specific pipeline.\nNative: forces cli.rust.watch for this invocation and requires Watchexec on PATH.\nRust rebuild/restart retains Vite; Vite enabled, auto_start and root settings still apply.\nBrowser: requires both cli.vite.auto_start and cli.vite.auto_build; otherwise skips without children.\nThe frontend owns serialized WASM rebuild/full-page reload; no native watcher or Rust state restoration.\nVite owns TS/CSS HMR. No implicit installs or settings-file changes; cancellation cleans up owned processes.\n";
 const BUILD_HELP: &str = "Usage: yetlet build [--manifest-path PATH] [--release]\n\nManifest defaults to exactly cwd/Cargo.toml. Requires a protected standalone app and existing Cargo.lock.\nSettings select native frontend-then-Cargo, or cli.target=browser frontend-only build.\nBrowser build honors cli.vite.auto_build; skipped stages exit 0 without children.\n--release selects the Cargo build profile; it does not change APP_ENVIRONMENT. No implicit installs.\n";
 const GENERATE_HELP: &str = "Usage:\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nWrites configuration only for qualified source/lock representations, without overwrite.\nNo image build/pull, source export, credentials lookup or deployment.\n";
 const DOCKER_HELP: &str = "Usage: yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n\nManifest defaults to cwd/Cargo.toml. Output is a complete new directory under an existing protected parent.\nQualified source/lock inspection only; writes configuration without tools or source export.\n";
@@ -49,13 +51,17 @@ pub enum Cli {
     Doctor {
         json: bool,
     },
+    Inspect {
+        manifest: PathBuf,
+        json: bool,
+    },
     New {
         name: String,
         dir: PathBuf,
         template: scaffold::Template,
-        cloud: bool,
-        with_config: bool,
-        with_tailwind: bool,
+        service: bool,
+        runtime_settings: bool,
+        tailwind: bool,
         vite: bool,
     },
     Build {
@@ -108,6 +114,7 @@ pub fn usage(args: &[OsString]) -> &'static str {
         Some("key") => key::HELP,
         Some("new") => NEW_HELP,
         Some("doctor") => DOCTOR_HELP,
+        Some("inspect") => INSPECT_HELP,
         Some("run") => RUN_HELP,
         Some("watch") => WATCH_HELP,
         Some("build") => BUILD_HELP,
@@ -140,7 +147,7 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
         return Err("dev was renamed; use yetlet run");
     }
     let (start, generator) = match command {
-        "new" | "doctor" | "run" | "watch" | "build" => (1, None),
+        "new" | "doctor" | "inspect" | "run" | "watch" | "build" => (1, None),
         "generate" => {
             if args.len() == 2 && matches!(args[1].to_str(), Some("--help" | "-h")) {
                 return Ok(Cli::Help(GENERATE_HELP));
@@ -165,7 +172,7 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
     let mut manifest = None;
     let mut output = None;
     let mut image = None;
-    let (mut json, mut cloud, mut with_config, mut with_tailwind, mut vite, mut release) =
+    let (mut json, mut service, mut runtime_settings, mut tailwind, mut vite, mut release) =
         (false, false, false, false, false, false);
     let mut index = start;
     while index < args.len() {
@@ -182,7 +189,7 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
                 });
             }
             Some("--manifest-path")
-                if matches!(command, "run" | "watch" | "build" | "generate")
+                if matches!(command, "inspect" | "run" | "watch" | "build" | "generate")
                     && manifest.is_none() =>
             {
                 manifest = Some(path_value(args, &mut index, inline)?)
@@ -197,13 +204,17 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
                 image::validate(value)?;
                 image = Some(value.to_owned());
             }
-            Some("--json") if command == "doctor" && !json && inline.is_none() => json = true,
-            Some("--service") if command == "new" && !cloud && inline.is_none() => cloud = true,
-            Some("--settings") if command == "new" && !with_config && inline.is_none() => {
-                with_config = true
+            Some("--json")
+                if matches!(command, "doctor" | "inspect") && !json && inline.is_none() =>
+            {
+                json = true
             }
-            Some("--tailwind") if command == "new" && !with_tailwind && inline.is_none() => {
-                with_tailwind = true
+            Some("--service") if command == "new" && !service && inline.is_none() => service = true,
+            Some("--settings") if command == "new" && !runtime_settings && inline.is_none() => {
+                runtime_settings = true
+            }
+            Some("--tailwind") if command == "new" && !tailwind && inline.is_none() => {
+                tailwind = true
             }
             Some("--vite") if command == "new" && !vite && inline.is_none() => vite = true,
             Some("--release") if command == "build" && !release && inline.is_none() => {
@@ -248,7 +259,7 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
     }
     let manifest = manifest.unwrap_or_else(|| PathBuf::from("Cargo.toml"));
     let template = template.unwrap_or_default();
-    if template == scaffold::Template::Browser && cloud {
+    if template == scaffold::Template::Browser && service {
         return Err("browser template does not select the native --service profile");
     }
     match command {
@@ -256,12 +267,13 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
             name: name.ok_or("new requires NAME")?,
             dir: parent.unwrap_or_else(|| PathBuf::from(".")),
             template,
-            cloud,
-            with_config: with_config || vite,
-            with_tailwind,
+            service,
+            runtime_settings: runtime_settings || vite,
+            tailwind,
             vite,
         }),
         "doctor" => Ok(Cli::Doctor { json }),
+        "inspect" => Ok(Cli::Inspect { manifest, json }),
         "run" => Ok(Cli::Run { manifest }),
         "watch" => Ok(Cli::Watch { manifest }),
         "build" => Ok(Cli::Build { manifest, release }),
@@ -366,9 +378,9 @@ mod tests {
                     name: "demo".into(),
                     dir: "/tmp/應 用;$literal".into(),
                     template: scaffold::Template::Native,
-                    cloud: true,
-                    with_config: true,
-                    with_tailwind: true,
+                    service: true,
+                    runtime_settings: true,
+                    tailwind: true,
                     vite: true
                 })
             );
@@ -379,9 +391,9 @@ mod tests {
                 name: "demo".into(),
                 dir: ".".into(),
                 template: scaffold::Template::Native,
-                cloud: false,
-                with_config: true,
-                with_tailwind: false,
+                service: false,
+                runtime_settings: true,
+                tailwind: false,
                 vite: true
             })
         );
@@ -391,9 +403,9 @@ mod tests {
                 name: "demo".into(),
                 dir: ".".into(),
                 template: scaffold::Template::Native,
-                cloud: false,
-                with_config: false,
-                with_tailwind: false,
+                service: false,
+                runtime_settings: false,
+                tailwind: false,
                 vite: false
             })
         );
@@ -467,9 +479,9 @@ mod tests {
                     name: "tasks".into(),
                     dir: ".".into(),
                     template: scaffold::Template::Browser,
-                    cloud: false,
-                    with_config: false,
-                    with_tailwind: true,
+                    service: false,
+                    runtime_settings: false,
+                    tailwind: true,
                     vite: false,
                 })
             );
@@ -546,6 +558,20 @@ mod tests {
         }
     }
 
+    #[test]
+    fn removed_creation_flags_keep_canonical_migration_diagnostics() {
+        for (old, canonical) in [
+            ("--cloud", "--service"),
+            ("--with-config", "--settings"),
+            ("--with-tailwind", "--tailwind"),
+        ] {
+            assert_eq!(
+                parse(&argv(&["new", "demo", old])).unwrap_err(),
+                format!("{old} was removed; use new {canonical}")
+            );
+        }
+    }
+
     #[cfg(unix)]
     #[test]
     fn native_non_utf8_paths_survive_both_option_forms() {
@@ -574,9 +600,9 @@ mod tests {
 
     #[test]
     fn config_manifest_dependencies_and_root_files_are_explicit() {
-        for cloud in [false, true] {
+        for service in [false, true] {
             let framework = Path::new("/tmp/framework space \"quoted");
-            let files = scaffold::config_files("demo", framework, cloud).unwrap();
+            let files = scaffold::config_files("demo", framework, service).unwrap();
             assert_eq!(
                 files.iter().map(|(p, _)| *p).collect::<Vec<_>>(),
                 [
@@ -606,7 +632,7 @@ mod tests {
                 Some("serde")
             );
             assert_eq!(manifest["package"]["publish"].as_bool(), Some(false));
-            assert_eq!(manifest["package"].get("metadata").is_some(), cloud);
+            assert_eq!(manifest["package"].get("metadata").is_some(), service);
             assert_eq!(manifest["dependencies"].as_table().unwrap().len(), 7);
             for (_, contents) in &files[5..9] {
                 contents.parse::<toml::Value>().unwrap();
@@ -621,8 +647,8 @@ mod tests {
 
     #[test]
     fn cloud_only_selects_its_templates_signal_feature_and_contract_marker() {
-        for cloud in [false, true] {
-            let files = scaffold::files("demo", Path::new("/tmp/framework"), cloud).unwrap();
+        for service in [false, true] {
+            let files = scaffold::files("demo", Path::new("/tmp/framework"), service).unwrap();
             assert_eq!(
                 files.iter().map(|(name, _)| *name).collect::<Vec<_>>(),
                 ["Cargo.toml", "README.md", ".gitignore", "src/main.rs"]
@@ -631,8 +657,11 @@ mod tests {
             let features = manifest["dependencies"]["tokio"]["features"]
                 .as_array()
                 .unwrap();
-            assert_eq!(features.iter().any(|v| v.as_str() == Some("signal")), cloud);
-            if cloud {
+            assert_eq!(
+                features.iter().any(|v| v.as_str() == Some("signal")),
+                service
+            );
+            if service {
                 assert_eq!(
                     manifest["package"]["metadata"]["yetlet"]["cloud-profile"].as_str(),
                     Some("native-ssr-v1")

@@ -16,6 +16,8 @@ pub struct Settings {
     pub database: Database,
     pub service: Service,
     pub logging: Logging,
+    #[serde(default)]
+    pub metrics: Metrics,
     pub cli: Cli,
     #[serde(skip)]
     root: PathBuf,
@@ -42,6 +44,12 @@ pub struct Service {
 pub struct Logging {
     pub level: LogLevel,
 }
+#[derive(Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct Metrics {
+    pub enabled: bool,
+}
+
 #[derive(Clone, Copy, Deserialize)]
 #[serde(rename_all = "lowercase")]
 pub enum LogLevel {
@@ -147,11 +155,11 @@ impl Settings {
 }
 
 pub fn load() -> Result<Settings, ConfigError> {
-    load_from_env(std::env::vars_os().collect())
+    load_with_env(std::env::vars_os().collect())
 }
 
 /// Explicit environment input keeps precedence tests isolated from process globals.
-pub fn load_from_env(vars: Vec<(OsString, OsString)>) -> Result<Settings, ConfigError> {
+pub fn load_with_env(vars: Vec<(OsString, OsString)>) -> Result<Settings, ConfigError> {
     let value = |name: &str| vars.iter().find(|(k, _)| k == name).map(|(_, v)| v);
     let root = value("YETLET_CONFIG_ROOT")
         .map(PathBuf::from)
@@ -169,7 +177,7 @@ pub fn load_from_env(vars: Vec<(OsString, OsString)>) -> Result<Settings, Config
         }
         loader = loader.development_secrets(path, SecretFormat::Dotenv);
     }
-    let mut settings: Settings = loader.load_from_env(vars).map_err(|_| ConfigError)?;
+    let mut settings: Settings = loader.load_with_env(vars).map_err(|_| ConfigError)?;
     settings.root = root;
     settings.validate()?;
     Ok(settings)
@@ -188,22 +196,40 @@ mod tests {
     fn profiles_are_finite_typed_and_os_overrides_profile() {
         for profile in ["Development", "Staging", "Production"] {
             let mut env = vars(profile);
-            let s = load_from_env(env.clone()).unwrap();
+            let s = load_with_env(env.clone()).unwrap();
             assert_eq!(s.service.name, format!("Issue tracker ({profile})"));
             assert_eq!(
                 s.database_path(),
                 Path::new(env!("CARGO_MANIFEST_DIR")).join("data/issues.sqlite3")
             );
             env.push(("APP_SERVICE__NAME".into(), "OS selected".into()));
-            assert_eq!(load_from_env(env).unwrap().service.name, "OS selected");
+            assert_eq!(load_with_env(env).unwrap().service.name, "OS selected");
         }
-        let s = load_from_env(vec![(
+        let s = load_with_env(vec![(
             "APP_SERVICE__API_TOKEN".into(),
             "a".repeat(64).into(),
         )])
         .unwrap();
         assert_eq!(s.service.name, "Issue tracker (Production)");
     }
+    #[test]
+    fn metrics_default_off_and_typed_override() {
+        assert!(!load_with_env(vars("Production")).unwrap().metrics.enabled);
+        let mut env = vars("Production");
+        env.push(("APP_METRICS__ENABLED".into(), "true".into()));
+        assert!(load_with_env(env.clone()).unwrap().metrics.enabled);
+        env.last_mut().unwrap().1 = "not-a-bool".into();
+        assert!(load_with_env(env).is_err());
+        // A deployment's older settings files need no new table.
+        let directory = tempfile::tempdir().unwrap();
+        let base = include_str!("../base.toml").replace("[metrics]\nenabled = false\n\n", "");
+        std::fs::write(directory.path().join("base.toml"), base).unwrap();
+        std::fs::write(directory.path().join("production.toml"), "").unwrap();
+        let mut env = vars("Production");
+        env.push(("YETLET_CONFIG_ROOT".into(), directory.path().into()));
+        assert!(!load_with_env(env).unwrap().metrics.enabled);
+    }
+
     #[test]
     fn dev_secret_is_explicit_and_below_os_and_unused_elsewhere() {
         let dir = tempfile::tempdir().unwrap();
@@ -220,20 +246,20 @@ mod tests {
             ("APP_ENVIRONMENT".into(), "Development".into()),
             ("YETLET_DEV_SECRETS".into(), secret.clone().into_os_string()),
         ];
-        let s = load_from_env(env.clone()).unwrap();
+        let s = load_with_env(env.clone()).unwrap();
         assert_eq!(s.service.name, "From secret");
         assert_eq!(s.service.api_token.expose_secret(), "b".repeat(64));
         env.push(("APP_SERVICE__NAME".into(), "From OS".into()));
-        assert_eq!(load_from_env(env).unwrap().service.name, "From OS");
+        assert_eq!(load_with_env(env).unwrap().service.name, "From OS");
         for profile in ["Staging", "Production"] {
             let mut env = vars(profile);
             env.push((
                 "YETLET_DEV_SECRETS".into(),
                 dir.path().join("missing.env").into_os_string(),
             ));
-            assert!(load_from_env(env).is_ok());
+            assert!(load_with_env(env).is_ok());
         }
-        assert!(load_from_env(vec![("APP_ENVIRONMENT".into(), "Development".into())]).is_err());
+        assert!(load_with_env(vec![("APP_ENVIRONMENT".into(), "Development".into())]).is_err());
     }
     #[cfg(windows)]
     #[test]
@@ -241,7 +267,7 @@ mod tests {
         for path in [r"C:issues.sqlite3", r"\issues.sqlite3"] {
             let mut env = vars("Development");
             env.push(("APP_DATABASE__PATH".into(), path.into()));
-            assert!(load_from_env(env).is_err());
+            assert!(load_with_env(env).is_err());
         }
         assert!(database_path_valid(Path::new(r"C:\data\issues.sqlite3")));
         assert!(database_path_valid(Path::new(r"data\issues.sqlite3")));
@@ -262,7 +288,7 @@ mod tests {
             let mut env = vars("Development");
             env.retain(|(k, _)| k != key);
             env.push((key.into(), value.into()));
-            let e = load_from_env(env).err().unwrap();
+            let e = load_with_env(env).err().unwrap();
             assert_eq!(e.to_string(), "application configuration invalid");
             assert!(!format!("{e:?}").contains("PRIVATE_VALUE"));
         }

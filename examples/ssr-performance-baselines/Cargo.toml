@@ -1,0 +1,30 @@
+[package]
+name = "yetlet-ssr-performance-baselines"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+license = "MIT OR Apache-2.0"
+publish = false
+
+[workspace]
+resolver = "3"
+
+[features]
+default = []
+allocation-counts = []
+serializer-attribution = ["allocation-counts"]
+component-probes = []
+escape-comparison = []
+url-probes = []
+url-comparison = ["url-probes"]
+page-comparison = []
+construction-study = []
+child-capacity = []
+buffer-study = []
+document-capacity = ["buffer-study"]
+latency-study = []
+
+[dependencies]
+yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-html = { path = "../../crates/yetlet-html" }
+yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }

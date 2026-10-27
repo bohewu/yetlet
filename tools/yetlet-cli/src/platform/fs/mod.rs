@@ -108,6 +108,7 @@ fn generated_subdirectories(files: &[(&str, String)]) -> Result<Vec<&'static str
             "frontend/package.json"
             | "frontend/index.html"
             | "frontend/build-wasm.mjs"
+            | "frontend/serve.mjs"
             | "frontend/package-lock.json"
             | "frontend/vite.config.mjs"
             | "frontend/vite.dev.config.mjs"
