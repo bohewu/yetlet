@@ -1,5 +1,24 @@
 # Yetlet Prototype Release Readiness
 
+**Latest YT-205 execution:** Candidate118f3d0 has required CI PASS, sixteen
+byte-identical hosted/local package archives and both affected MSVC consumers
+PASS. [Current evidence and limits](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)
+have final independent Reviewer PASS0 at selected technical/reader scope. The
+earlier dated checkpoints below retain their
+point-in-time identities; no Merge/signing/publication and D1–D6 remain Pending.
+
+**YT-205 new candidate and remaining order (2026-10-27):** Strict/builtin Guard
+and the native hook pass with zero findings for the ten-path rebuild-extension
+commit `118f3d0f496b487ef20fe243f4e73179f9eadc43`; its tree matches `tree_oid`.
+The owner selects that exact commit as new technical C. The
+[remaining plan](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
+orders separately authorized source delivery, required PR CI, explicit sixteen
+cohort hosted/local archive comparison, affected fourteen-package MSVC scope
+and final evidence reconciliation/independent review. Old a2d6474 archives/results
+retain their identities; no old passing suite is replayed here. These post-commit
+selection notes remain uncommitted, with no Push/Merge/dispatch or new platform
+validation. YT-205 remains In progress, YT-020 Blocked and D1–D6 Pending.
+
 **YT-205 selected-source consolidation (2026-10-27):** After guarded28-path
 commita2d6474 without Push, the owner selects that immutable source for all16
 experimental0.1.0 libraries. [The evidence packet](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md)
@@ -246,3 +265,17 @@ Yetlet keeps native HTTP, renderer, browser and optional provider dependencies s
 **YT-205 rebuild preparation (2026-10-27):** After strict/builtin guarded ten-document commit012ecb3 without Push, [the bounded builder extension](YT-205-SIXTEEN-PACKAGE-REBUILD.md) preserves original-nine mode and adds explicit sixteen selection, six manifest/lock roots, separate bootstrap/normal verification and conditional pinned OpenSSL3.5.9 preparation. Five focused tests, native compile/lint/format and static manual-workflow checks PASS; expected fixture compile rejection retained and old product proofs not replayed. Independent review is pending. No hosted workflow/OpenSSL setup execution, successor candidate, new-change Commit/Push/Merge or D1-D6 decision; whole YT-205 remains In progress.
 
 **YT-205 rebuild extension acceptance (2026-10-27):** [Independent Reviewer PASS](YT-205-SIXTEEN-PACKAGE-REBUILD.md#independent-acceptance-and-remaining-gate), zero issues/required followups, verifies10candidate/28evidence/1181protected hashes and18 unchanged symlink targets. Five focused controls and compile/lint/format/workflow/docs checks pass; fixtures are removed and intentional rejection logs retained. Acceptance is local preparation only: actual hosted CI/rebuild, MSVC and final reader/source conditions remain open, so wholeYT205_can_be_done:false. New code/docs remain uncommitted/staged0; no Push/Merge/dispatch, candidate change or D1-D6 disposition.
+
+**YT-205 current-C technical execution (2026-10-27):** Authorized strict/builtin
+Push updates PR12 to118f3d0 after5commits/56file operations/0findings and native
+hook PASS. [New execution evidence](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)
+records both required CI jobs PASS with a C-equivalent synthetic merge tree,
+explicit sixteen hosted/local rebuilds with all33 phases PASS each and all16
+archives byte-identical, and two affected current-lock MSVC consumer PASS.
+Forty-six reader sources now match the accepted draft at C; prior input-bound
+proof is retained without manual replay. Owned scratch is removed. Windows
+original text evidence remains readable at its source; a denied local ZIP transfer
+is preserved without alternate transfer or a local-receipt claim. Final independent
+Reviewer PASS0 accepts the actual local/remote evidence and closes YT-205 at
+selected technical/reader scope. Seven document paths stay
+uncommitted/staged0; no Merge/signing/publication and D1–D6 Pending.

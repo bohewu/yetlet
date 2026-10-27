@@ -1,6 +1,17 @@
 # Release Supply-Chain Design
 
-**Selected sixteen-package technical candidate (2026-10-27):** The owner selects
+**Current technical candidate (2026-10-27):** After the guarded ten-path rebuild
+extension commit, the owner selects `118f3d0f496b487ef20fe243f4e73179f9eadc43`,
+tree `07faa3e90c0fca5d27a4e55262c75acf851d884a`. The
+[remaining verification order](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
+records the later authorized Push, required CI, sixteen-package hosted/local
+byte-identical rebuild and affected MSVC PASS. Final independent Reviewer PASS,
+zero issues/required followups, closes YT-205 technical scope. These notes remain
+external metadata, not C payload. No Merge/signing or
+publication occurs; D1–D6 remain Pending and YT-020 Blocked.
+Earlier source, archive, signature and review identities remain intact.
+
+**Earlier sixteen-package technical candidate (2026-10-27):** The owner selects
 immutable `a2d6474`/tree`1c3eab` for experimental0.1.0
 [YT-205 reconciliation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md). Sixteen local
 C archive digests, retained versus new package/inventory results and an unsigned

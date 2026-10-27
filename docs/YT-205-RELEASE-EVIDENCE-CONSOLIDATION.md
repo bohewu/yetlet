@@ -1,11 +1,21 @@
 # YT-205 — Sixteen-package source and evidence consolidation
 
-Date: 2026-10-27 (Asia/Taipei). Status: **In progress.** Local reconciliation
-and the missing checks below have independent delivery Reviewer PASS, zero issues
-and zero packet repair requirements.
-Current-candidate CI/rebuild, platform dependency deltas and reader-source
-disposition remain open. Reviewer acceptance of this checkpoint alone cannot
-mark the whole item Done or approve a release.
+**Current technical candidate (2026-10-27):** The owner subsequently selects
+`118f3d0f496b487ef20fe243f4e73179f9eadc43`, tree
+`07faa3e90c0fca5d27a4e55262c75acf851d884a`, after the guarded rebuild-extension
+commit. The [authorized execution](#authorized-current-c-execution--2026-10-27)
+now closes the technical conditions after final independent Reviewer PASS. Earlier
+a2d6474 package/results/reviews keep their original identities and are not
+reassigned to new-C archive or hosted executions.
+
+The earlier checkpoint sections below, before the new-candidate section, retain
+a2d6474 as their C. They describe that checkpoint, not new-C archive generation.
+
+Date: 2026-10-27 (Asia/Taipei). Status: **Done at selected sixteen-package
+technical/reader consolidation scope after final independent Reviewer PASS,
+zero issues and required followups.** Earlier checkpoint verdicts retain their
+original sources/scopes. D1–D6 remain Pending, YT-096 In progress and YT-020
+Blocked; technical completion is not signing, publication or release approval.
 
 ## Authority and immutable source
 
@@ -328,3 +338,265 @@ missing mechanism but does not execute the hosted rebuild, select a successor
 source or resolve the remaining CI/MSVC/reader-source conditions. The selected
 a2d6474 candidate and all historical results above remain unchanged; YT-205
 stays In progress and D1–D6 Pending. New work is not committed or pushed.
+
+## New candidate and remaining verification order — 2026-10-27
+
+The owner authorizes Commit of exactly the ten accepted rebuild-extension paths,
+without Push, and explicitly selects that resulting commit as the new technical
+candidate C. Commit `118f3d0f496b487ef20fe243f4e73179f9eadc43`, tree
+`07faa3e90c0fca5d27a4e55262c75acf851d884a`, passes explicit strict/builtin Guard
+and the native hook, zero findings, with the committed tree matching `tree_oid`.
+The checkout is clean immediately after Commit. This later selection supersedes
+a2d6474 only for future candidate verification; preserve all old archives,
+source identities and accepted/failed results. No tag, Push, Merge, dispatch,
+signing or publication is performed or authorized by this planning step.
+
+These post-commit selection/order notes are external metadata about immutable C,
+not a change to C or a reason to advance it automatically. Technical selection
+does not approve the formal D1 source/workflow/trust composite. D1–D6 stay Pending,
+YT-020 stays Blocked and YT-205 stays In progress.
+
+### Reuse boundary before any new execution
+
+A read-only comparison against the sixteen a2d6474 archives finds only the two
+already reviewed package README corrections in Memory/Redis Session. All package
+runtime/test/example/original-manifest/license payloads and all six selected
+source locks remain identical. The new rebuild/workflow code is outside those
+library payloads. Retain the existing API/native/Ubuntu24, WASM/DOM/GPU, source
+scan, Tokio/advisory, inventory and rustdoc results at their recorded scopes;
+inspect actual input differences before choosing any missing check. No old
+functional suite, benchmark, provider or browser qualification runs here.
+
+The older archives retain a2d6474 identities. They cannot stand in for new-C
+source archives. In particular, older checkout-generated archives have Cargo
+VCS metadata; the hosted recipe packages a plain Git archive and binds source
+externally. Compare hosted outputs only with a matching local Git-archive recipe,
+not with those old checkout packages. Sixteen new-C archives have not been built.
+
+### 1. Deliver the selected source, only after separate Push authority
+
+At the planning observation, PR12 is open/unmerged, its head is4e5ef64 and its
+base is master71b5f08. Current C is five local commits beyond that observed head.
+Do not assume these remote facts remain current: immediately before an authorized
+Push, read the actual remote head, run strict/builtin Guard on the exact outgoing
+range, and use the unmodified native hook. No force Push, history rewrite,
+protection change or silent legacy-baseline adoption. Deliver C to the existing
+branch/PR; do not include uncommitted planning notes or silently select a new tip.
+
+### 2. Observe required PR CI for the delivered source
+
+Retain `Rust 1.99 MSRV` and `Stable native, samples, and Chrome` and existing
+protection. Record PR head C, run/attempt, actual checkout SHA/tree and all
+required outcomes. PR CI may check a synthetic merge commit: establish tree/input
+equivalence to C before attributing that execution to it; a different tree is a
+disclosed gap, not C PASS. This does not authorize an actual PR Merge.
+
+The old green4e5ef64 run remains historical. Do not rerun accepted older suites
+manually or replace required CI with a local or manual-rebuild result. If a new
+C job fails, retain its failure and retry only the affected job/input under the
+applicable authorization; do not replay successful jobs or weaken checks.
+
+### 3. Dispatch the sixteen cohort on a branch pinned to C
+
+Read-only GitHub observation confirms that the default master already contains
+the manual private-rebuild workflow, although its current UI definition is the
+original nine mode. GitHub's [workflow_dispatch rules](https://docs.github.com/en/actions/reference/workflows-and-actions/events-that-trigger-workflows#workflow_dispatch)
+permit branch/tag dispatch after workflow availability on the default branch.
+An actual C dispatch still needs separate authority and verified eligibility;
+no Merge is a planned prerequisite and no dispatch has been attempted here.
+
+Use the explicit branch ref resolving to C and input `cohort=sixteen`, rather
+than the old default-nine UI settings. Re-read the branch immediately before
+dispatch; confirm the resulting run's head/workflow/source SHA are C and the
+recorded cohort/subject set is sixteen. A moved ref, input rejection or identity
+mismatch stops this lane with its failure preserved; it does not permit changing
+master, policy or C to make the run pass.
+
+Retain actual Rust/Cargo1.99.0, GNU target, OpenSSL3.5.9 pin/version, fresh
+Cargo home/target, source epoch, six source-lock hashes, selected input digest,
+default-package feature selection, all33 native step outcomes, separate bootstrap
+staging and normal verification, exact sixteen final names/digests, cleanup and
+unsigned provenance/checksum bindings. Download the seven-day artifact promptly.
+Unsigned private preparation does not establish trusted provenance or approve
+any public metadata disclosure.
+
+### 4. Match the local source-archive recipe and compare all sixteen outputs
+
+Use the same immutable C Git archive outside the working checkout, exact license
+materialization, toolchain/target/features/source epoch and owned fresh Cargo
+state. Execute the recorded packaging phases through existing commands; do not
+forge GitHub environment/runner identity or introduce a dirty-tree test mode.
+Keep the local record explicitly local. This is the missing C rebuild comparison,
+not a replay of accepted product behavior.
+
+Compare every final archive name, size and SHA-256 plus source/input/lock/tool
+and recipe bindings. Do not compare entire run-specific logs/provenance as though
+their timestamps, paths or run IDs must be byte-identical. Preserve mismatches
+and investigate their actual cause before any bounded repair. No promotion or
+trusted-builder claim follows from local checksums alone.
+
+### 5. Close only the affected native MSVC cells at the same C
+
+Use the previously admitted YT-202 WebCodex Git-clone route once C is available
+remotely. Reobserve the prepared MSVC toolchain/VC Tools/SDK and record C's
+source tree, actual executed file hashes and current Tokio1.53.3 lock. Do not
+reuse a stale runner clone or retry/relocate the previously denied ZIP transfer.
+
+Select the same fourteen native packages and Auth/session plus
+Config/secret-provider cases. Signing and Redis Windows support are not selected;
+wgpu remains CPU-only. Compare default/selected-feature input bindings first,
+retain justified prior cases, and execute only uncovered current-lock consumer
+cases with the expected marker/refusal controls. Target-filtered Linux metadata
+does not qualify MSVC execution. Preserve Windows CRLF/directory-source limits;
+Git-source equivalence is not automatically byte identity to Linux archives.
+Retain outcomes and remove only task-owned source/build/cache directories.
+
+This source preparation can be independent of the hosted comparison after
+delivery; the recommended reporting sequence above keeps one coherent C packet.
+Dependencies do not authorize parallel agents or any execution in this turn.
+
+### 6. Reconcile final evidence and obtain independent acceptance
+
+Bind the newly generated archives and actual CI/hosted/MSVC results to C.
+Reconcile package-guide payloads, retained reader/rustdoc inputs, manifests,
+features, inventory and security records; fill only demonstrated new gaps.
+Keep historical results/dates and source limits intact. After the original
+YT-205 technical conditions and independent Reviewer PASS, mark YT-205 Done;
+formal trust/registry/publication gates remain separate with D1–D6 Pending.
+
+Current-turn evidence is retained under
+`target/yetlet-yt205-candidate-20261027-42p31ial/evidence/`: Commit Guard/receipt,
+explicit candidate-selection.json, remote-observation.json and read-only
+candidate-source-reconciliation.json. This turn performs selection/planning
+and document checks only; no hosted/MSVC/product verification is replayed.
+
+## Authorized current-C execution — 2026-10-27
+
+The owner authorizes strict/builtin Push of immutable C to PR12, followed by
+required CI, sixteen-package hosted/local rebuild comparison, affected MSVC
+checks and independent review. Preserve the seven uncommitted selection/order
+documents, all failures and D1–D6 Pending; do not Merge. C remains
+`118f3d0f496b487ef20fe243f4e73179f9eadc43`, tree
+`07faa3e90c0fca5d27a4e55262c75acf851d884a`. This report is external evidence
+metadata, not an overlay used for candidate execution or a successor candidate.
+
+### Actual delivery and new evidence
+
+| Required scope | Actual outcome |
+|---|---|
+| Exact outgoing strict/builtin Guard | PASS:4e5ef64→118f3d0,5commits,56file operations,0findings; unmodified pre-push hook also PASS |
+| Push/PR identity | Existing PR12 branch fast-forwards to C; seven document states remain unstaged/uncommitted; no Merge |
+| Required CI | Both `Rust 1.99 MSRV` and `Stable native, samples, and Chrome` PASS in [run40473956480](https://github.com/bohewu/yetlet/actions/runs/40473956480), including RustSec and Chrome E2E |
+| Explicit sixteen hosted rebuild | [Run40475829522/attempt1](https://github.com/bohewu/yetlet/actions/runs/40475829522) PASS; head/workflow/source all C, cohort sixteen, all33 native phases exit0 |
+| Matching local Git-archive recipe | C's existing packaging helper executes all33 phases successfully with fresh Cargo home/target; local execution is explicitly local, without forged GitHub identity |
+| Final package comparison | All16 archive names, sizes and SHA-256 digests match byte-for-byte; all payloads/original manifests/guides/dual licenses match C |
+| MSVC default and integrated consumers | Both PASS, exit0 and exact `packaged consumer OK`;29.920s/3.255s, inputs unchanged |
+| Owned cleanup | Local build/source/vendor/cache/OpenSSL scratch and Windows clone/source/build/vendor/cache/bootstrap/consumer removed; only inert records/archives retained |
+| Final independent acceptance | PASS,0 issues/required followups; registered reviewer/model/effective effort verified; YT-205 Done at selected technical/reader scope |
+
+PR CI actually checks synthetic merge `d53a0f6830e3c31ed8a00a9278dd8577f9e859b6`.
+Both native checkout logs identify it; its complete tree equals C's tree.
+This is source-equivalent CI evidence, not an actual Merge. Required check names,
+protection, workflow action pins and Guard policy remain unchanged. Accepted old
+qualification is not manually replayed; required new-C CI retains its existing
+workflow scope, including its informational baseline, without a new performance
+claim or benchmark campaign.
+
+The two rebuilds share the plain source-archive digest, selected input digest,
+all six lock hashes, Rust/Cargo/rustdoc identities and binary hashes, GNU target,
+source epoch, selected package set and default-package features. Each has one
+vendor, sixteen bootstrap collections and sixteen normal package verifications.
+Bootstrap receipts remain verification:false. OpenSSL3.5.9 versions/pinned source
+match; its compiled executable hashes differ across environments and are recorded
+honestly. This does not affect the sixteen byte-identical Cargo outputs.
+The hosted unsigned statement has exactly sixteen subjects matching actual files;
+its preparation_only status is preserved. This is technical reproducibility,
+not authenticated trusted-release provenance or a new public support promise.
+
+### MSVC input and retention boundaries
+
+The admitted Windows Git-source route acquires the same C/tree into owned
+scratch, then uses a Git archive and explicit license materialization. Native
+Rust/Cargo1.99.0 MSVC, VC Tools14.44.35207 and SDK10.0.26100.0 are observed.
+The accepted fourteen-package consumer source is reused; only its existing Tokio
+pin changes from1.53.2 to selected1.53.3. All external lock identities must belong
+to the four selected source-lock pools before execution. The second case enables
+Auth/session and Config/secret-provider, including the existing missing-Memory
+500 refusal and protected-field/redacted-Debug checks. Signing/Redis Windows,
+GPU/provider/network qualification and unrelated old suites are not selected.
+
+Windows Git applies CRLF conversion. The initial no-conversion metadata assumption
+is preserved in source-initial-assumed-newline.json and corrected before native
+execution. All124 observed files match committed blobs after explicit CRLF
+normalization/license materialization, with zero unexplained differences;
+119 package-source bindings plus consumer inputs remain unchanged after both runs.
+This is Git-source-equivalent Windows execution, not byte identity to GNU release
+archives. The generic non-Git host-project freshness label remains unproven;
+explicit source/lock/file bindings provide the bounded task evidence.
+
+Original Windows evidence remains in Project
+`agent:ncut-bohe-244143825ae3488e:localtasks`, under
+`artifacts/yt205-msvc-118f-20261027-qecriekl/evidence/`.
+Execution Job is `wc_job_mJiszQ7CCSADYkXi`; cleanup Job is
+`wc_job_Vp57-_m5M2OwymKH`, both terminal exit0. The58-file inert ZIP remains
+at that owned task root; its Windows-reported SHA-256 is
+`74a28d035ff4363ee94e606d3666e0c965a8b2204168a1cc441737f3fc69228d`.
+
+The one official result-ZIP transfer is rejected by destination artifact policy
+for the local target path. Preserve the refusal; no renamed, relocated, encoded
+or alternate ZIP transfer/reconstruction is attempted. Do not claim a received
+or locally hash-verified Windows ZIP. Original ordinary text records remain
+readable through the already admitted read_files route, including native results,
+tool/lock/source bindings and cleanup. Independent review must inspect those
+original records directly. No earlier blocked payload is reopened or transferred.
+
+### Reader, inventory and decision reconciliation
+
+All46 exact manuscript sources now hash-identically to the previously selected
+reader draft at immutable C; local targets exist and no image asset is selected.
+The two reviewed Session README corrections are now in C and both actual rebuild
+outputs. The earlier a2d6474 guidance gap is therefore dispositioned without
+rewriting its old archives. Package runtime/test/example/manifests and six source
+locks are unchanged from a2d6474; all16 new archived external-lock graphs equal
+the accepted packet. Retain source/API/browser/GPU, scoped security/inventory and
+rustdoc evidence only at those justified input scopes, not by relabeling old
+artifacts as new-C executions. No extra scan/rustdoc/provider/load suite runs.
+
+reader-source-inventory-C.json binds the actual C edition, separately from these
+seven post-selection notes. Mixed repository annotations and standalone-site
+link mapping/sanitation limits remain; no wholesale docs website is published or
+claimed ready. Repo guides plus rustdoc remain the contract source.
+The new sixteen-subject proposal uses actual new-C output digests and preserves
+normal/optional dependency order and partial-publication handling. It is unsigned
+preparation, not approval of formal D1 source/workflow/trust identity or any
+D2–D6 choice. YT-096 stays In progress and YT-020 stays Blocked.
+
+Local evidence and both sets of sixteen archives are retained under
+`target/yetlet-yt205-execution-20261027-qecriekl/`. Key records include
+push-receipt.json, ci-final-run.json, ci-final-jobs.json,
+hosted-local-rebuild-comparison.json, retained-archive-lock-reconciliation.json,
+reader-source-inventory-C.json, sixteen-subject-proposal-C.json,
+windows-original-record-index.json, windows-transfer-policy-rejection.json and
+local-cleanup.json in its evidence directory. The remote Windows index explicitly
+distinguishes original readable text from the rejected local ZIP receipt.
+
+### Final current-C independent acceptance
+
+Reviewer `/root/yt205_current_c_technical_acceptance_review_20261027` returns
+PASS with zero issues and required followups. It independently checks seven
+current-document/176 local evidence bindings, actual sixteen hosted/local archive
+byte equality and C payloads, sixteen retained external lock graphs, all33 native
+phases per side, the C-equivalent CI tree, reader/proposal identities, and original
+Windows source/lock/native/refusal/cleanup text records in their admitted Project.
+The denied ZIP transfer is retained and not bypassed; acceptance does not claim
+that a local Windows ZIP was received or independently byte-verified.
+
+Native trace confirms registered reviewer, configured gpt-6-astra and effective
+high matching the shared resolver; observed contract state is enforced. Review
+is read-only and replays no test/build/scan/workflow or ZIP transfer. Its result
+and bounded role/effort evidence are retained in the execution evidence directory.
+YT-205 is now Done at the original selected technical/reader scope. Only
+completion/navigation metadata follows PASS; code, archives and execution records
+remain unchanged. Seven document paths remain unstaged/uncommitted. PR12 stays
+open/unmerged at C; no further Commit/Push, signing or publication. D1–D6 stay
+Pending, YT-096 In progress and YT-020 Blocked.

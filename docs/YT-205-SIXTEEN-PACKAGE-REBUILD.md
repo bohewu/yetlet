@@ -2,6 +2,19 @@
 
 Date: 2026-10-27. Status: **Implemented and accepted at local preparation scope after independent Reviewer PASS.**
 
+**Later commit and candidate selection (2026-10-27):** The owner authorizes
+strict/builtin Commit of the ten accepted paths, without Push, and selects the
+resulting `118f3d0f496b487ef20fe243f4e73179f9eadc43` as new technical C. Explicit
+Guard/native hook pass with zero findings and the committed tree matches
+`07faa3e90c0fca5d27a4e55262c75acf851d884a`/`tree_oid`. The
+[remaining verification order](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
+supersedes only the earlier source-selection/uncommitted status below. The local
+review and historical results stay intact. The [later authorized execution](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)
+now records required CI, sixteen byte-identical hosted/local archives and affected
+MSVC PASS with final independent Reviewer PASS, zero issues/required followups.
+Whole YT-205 is Done at selected technical/reader scope. Source C was Pushed; no Merge
+or signing/publication occurs and D1–D6 stay Pending.
+
 ## Authority and preserved source boundary
 
 The owner authorizes strict/builtin Commit of the ten accepted YT-205 documents,
