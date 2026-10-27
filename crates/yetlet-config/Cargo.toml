@@ -30,7 +30,7 @@ libc = "=0.2.186"
 [dev-dependencies]
 secrecy = { version = "=0.10.3", features = ["serde"] }
 axum = { version = "=0.8.9", default-features = false, features = ["http1", "tokio"] }
-tokio = { version = "=1.53.2", features = ["macros", "rt-multi-thread", "net"] }
+tokio = { version = "=1.53.3", features = ["macros", "rt-multi-thread", "net"] }
 tower = { version = "=0.5.3", features = ["util"] }
 yetlet-core = { version = "0.1.0", path = "../yetlet-core" }
 yetlet-server-axum = { version = "0.1.0", path = "../yetlet-server-axum" }

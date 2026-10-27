@@ -22,5 +22,5 @@ yetlet-config = { version = "0.1.0", path = "../yetlet-config" }
 yetlet-core = { version = "0.1.0", path = "../yetlet-core" }
 yetlet-server-axum = { version = "0.1.0", path = "../yetlet-server-axum" }
 axum = { version = "=0.8.9", default-features = false, features = ["http1", "tokio"] }
-tokio = { version = "=1.53.2", features = ["macros", "rt-multi-thread", "process", "time"] }
+tokio = { version = "=1.53.3", features = ["macros", "rt-multi-thread", "process", "time"] }
 tower = { version = "=0.5.3", features = ["util"] }
