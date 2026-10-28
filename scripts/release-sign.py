@@ -17,6 +17,7 @@ import stat
 import subprocess
 import sys
 import tarfile
+import urllib.error
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -50,6 +51,25 @@ PACKAGES = {"yetlet-" + s for s in (
 def require(ok):
     if not ok:
         raise ValueError("signer input rejected")
+
+
+class GateRejected(Exception):
+    """Only fixed stages, error categories and numeric HTTP status may reach logs."""
+    def __init__(self, stage, error):
+        super().__init__("signer metadata gate rejected")
+        self.stage = stage
+        self.status = None
+        if isinstance(error, urllib.error.HTTPError):
+            self.kind = "http"
+            if type(error.code) is int and 400 <= error.code <= 599:
+                self.status = error.code
+            error.close()
+        elif isinstance(error, (urllib.error.URLError, TimeoutError, ConnectionError)):
+            self.kind = "network"
+        elif isinstance(error, (ValueError, KeyError, TypeError, IndexError)):
+            self.kind = "metadata"
+        else:
+            self.kind = "internal"
 
 
 def sha(raw):
@@ -152,34 +172,51 @@ def artifact_gate(a, run, source, artifact_id, expected_sha, name):
 
 
 def gate(r):
-    identity(r)
-    branch = api.api("/branches/master")
-    require(branch["protected"] is True and branch["commit"]["sha"] == r["signer_commit"])
-    environment_gate(api.api("/environments/release-sign"),
-                     api.api("/environments/release-sign/deployment-branch-policies?per_page=100"))
-    if r["mode"] == "prepare":
-        run_gate(api.api("/actions/runs/" + BUILD + "/attempts/1"), BUILD, C, TAG,
-                 ".github/workflows/release.yml")
-        artifact_gate(api.api("/actions/artifacts/" + BUILD_ARTIFACT), BUILD, C,
-                      BUILD_ARTIFACT, BUILD_ZIP, "encrypted-private-" + C + "-" + BUILD + "-1")
-        run_gate(api.api("/actions/runs/" + VERIFIER + "/attempts/1"), VERIFIER, C, TAG,
-                 ".github/workflows/evidence-verify.yml")
-        approvals = api.api("/actions/runs/" + VERIFIER + "/approvals")
-        require(any(a["state"] == "approved" and a["user"]["id"] == 35250002
-                    and any(e["id"] == 25525950662 for e in a["environments"]) for a in approvals))
-        release = api.api("/releases/" + str(RELEASE_ID))
-        require(release["draft"] is True and release["tag_name"] == TAG
-                and release["target_commitish"] == C)
-        assets = api.api("/releases/" + str(RELEASE_ID) + "/assets?per_page=100")
-        require(any(a["id"] == int(r["qualification_asset"])
-                    and a["digest"] == "sha256:" + r["qualification_sha256"]
-                    and a["name"] == "qualification-inputs.zip"
-                    and 0 < a["size"] <= api.LIMIT for a in assets))
-    else:
-        run_gate(api.api("/actions/runs/" + r["run"] + "/attempts/" + r["attempt"]),
-                 r["run"], r["signer_commit"], "master", ".github/workflows/release-sign.yml", r["attempt"])
-        artifact_gate(api.api("/actions/artifacts/" + r["artifact"]), r["run"], r["signer_commit"],
-                      r["artifact"], r["digest"], "signing-inputs-" + r["run"] + "-" + r["attempt"])
+    stage = "identity"
+    try:
+        identity(r)
+        stage = "branch"
+        branch = api.api("/branches/master")
+        require(branch["protected"] is True and branch["commit"]["sha"] == r["signer_commit"])
+        stage = "environment"
+        environment = api.api("/environments/release-sign")
+        stage = "branch-policy"
+        policies = api.api("/environments/release-sign/deployment-branch-policies?per_page=100")
+        stage = "environment-policy"
+        environment_gate(environment, policies)
+        if r["mode"] == "prepare":
+            stage = "build-run"
+            run_gate(api.api("/actions/runs/" + BUILD + "/attempts/1"), BUILD, C, TAG,
+                     ".github/workflows/release.yml")
+            stage = "build-artifact"
+            artifact_gate(api.api("/actions/artifacts/" + BUILD_ARTIFACT), BUILD, C,
+                          BUILD_ARTIFACT, BUILD_ZIP, "encrypted-private-" + C + "-" + BUILD + "-1")
+            stage = "verifier-run"
+            run_gate(api.api("/actions/runs/" + VERIFIER + "/attempts/1"), VERIFIER, C, TAG,
+                     ".github/workflows/evidence-verify.yml")
+            stage = "verifier-approval"
+            approvals = api.api("/actions/runs/" + VERIFIER + "/approvals")
+            require(any(a["state"] == "approved" and a["user"]["id"] == 35250002
+                        and any(e["id"] == 25525950662 for e in a["environments"]) for a in approvals))
+            stage = "qualification-release"
+            release = api.api("/releases/" + str(RELEASE_ID))
+            require(release["draft"] is True and release["tag_name"] == TAG
+                    and release["target_commitish"] == C)
+            stage = "qualification-assets"
+            assets = api.api("/releases/" + str(RELEASE_ID) + "/assets?per_page=100")
+            require(any(a["id"] == int(r["qualification_asset"])
+                        and a["digest"] == "sha256:" + r["qualification_sha256"]
+                        and a["name"] == "qualification-inputs.zip"
+                        and 0 < a["size"] <= api.LIMIT for a in assets))
+        else:
+            stage = "prepare-run"
+            run_gate(api.api("/actions/runs/" + r["run"] + "/attempts/" + r["attempt"]),
+                     r["run"], r["signer_commit"], "master", ".github/workflows/release-sign.yml", r["attempt"])
+            stage = "prepare-artifact"
+            artifact_gate(api.api("/actions/artifacts/" + r["artifact"]), r["run"], r["signer_commit"],
+                          r["artifact"], r["digest"], "signing-inputs-" + r["run"] + "-" + r["attempt"])
+    except Exception as error:
+        raise GateRejected(stage, error) from None
 
 
 def download(path, binary=False):
@@ -604,9 +641,19 @@ def seal_failure(r, output):
         "automatic_retry": False, "independent_verification": "Pending", "publication": False})
 
 
-if __name__ == "__main__":
+def cli():
     try:
         main()
+    except GateRejected as error:
+        status = "" if error.status is None else f" status={error.status}"
+        print(f"release signer rejected; gate={error.stage} class={error.kind}{status}; private diagnostics suppressed",
+              file=sys.stderr)
+        return 1
     except Exception:
         print("release signer rejected; private diagnostics suppressed", file=sys.stderr)
-        sys.exit(1)
+        return 1
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(cli())

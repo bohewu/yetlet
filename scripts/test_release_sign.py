@@ -11,6 +11,7 @@ from pathlib import Path
 import tarfile
 import tempfile
 import unittest
+import urllib.error
 from unittest.mock import patch
 import zipfile
 
@@ -32,6 +33,89 @@ def sign_request():
 
 
 class SignerTests(unittest.TestCase):
+    def preflight_metadata(self):
+        # Synthetic API responses only; no workflow token, identity or network.
+        def run(ident, path):
+            return {'id': int(ident), 'run_attempt': 1, 'head_sha': s.C,
+                    'head_branch': s.TAG, 'repository': {'id': 1409587171},
+                    'head_repository': {'id': 1409587171}, 'event': 'workflow_dispatch',
+                    'path': path, 'status': 'completed', 'conclusion': 'success'}
+        return {
+            '/branches/master': {'protected': True, 'commit': {'sha': S}},
+            '/environments/release-sign': {
+                'name': 'release-sign', 'can_admins_bypass': False,
+                'protection_rules': [{'type': 'required_reviewers', 'prevent_self_review': False,
+                                     'reviewers': [{'type': 'User', 'reviewer': {'login': 'bohewu', 'id': 35250002}}]}],
+                'deployment_branch_policy': {'protected_branches': False, 'custom_branch_policies': True}},
+            '/environments/release-sign/deployment-branch-policies?per_page=100': {
+                'total_count': 1, 'branch_policies': [{'name': 'master', 'type': 'branch'}]},
+            '/actions/runs/' + s.BUILD + '/attempts/1': run(s.BUILD, '.github/workflows/release.yml'),
+            '/actions/artifacts/' + s.BUILD_ARTIFACT: {
+                'id': int(s.BUILD_ARTIFACT), 'name': 'encrypted-private-' + s.C + '-' + s.BUILD + '-1',
+                'expired': False, 'digest': 'sha256:' + s.BUILD_ZIP, 'size_in_bytes': 1,
+                'workflow_run': {'id': int(s.BUILD), 'head_sha': s.C,
+                                 'repository_id': 1409587171, 'head_repository_id': 1409587171}},
+            '/actions/runs/' + s.VERIFIER + '/attempts/1': run(s.VERIFIER, '.github/workflows/evidence-verify.yml'),
+            '/actions/runs/' + s.VERIFIER + '/approvals': [
+                {'state': 'approved', 'user': {'id': 35250002}, 'environments': [{'id': 25525950662}]}],
+            '/releases/' + str(s.RELEASE_ID): {'draft': True, 'tag_name': s.TAG, 'target_commitish': s.C},
+            '/releases/' + str(s.RELEASE_ID) + '/assets?per_page=100': [
+                {'id': 1, 'digest': 'sha256:' + 'b' * 64, 'name': 'qualification-inputs.zip', 'size': 1}],
+        }
+
+    def test_preflight_draft_http_rejection_is_stage_bound_and_redacted(self):
+        responses = self.preflight_metadata()
+        with patch.dict(os.environ, {'SIGN_REQUEST': json.dumps(prepare_request())}), \
+                patch.object(s.sys, 'argv', ['release-sign.py', 'preflight']), \
+                patch.object(s, 'identity'), patch.object(s.api, 'api', side_effect=responses.__getitem__) as api, \
+                patch.object(s, 'command') as native, patch.object(s, 'oidc_token') as oidc, \
+                patch('sys.stderr', new_callable=io.StringIO) as stderr:
+            self.assertEqual(s.cli(), 0)
+            self.assertEqual(stderr.getvalue(), '')
+            api.reset_mock()
+            body = io.BytesIO(b'PRIVATE-BODY')
+            responses['/releases/' + str(s.RELEASE_ID)] = urllib.error.HTTPError(
+                'https://private.invalid/?token=PRIVATE-URL', 404, 'PRIVATE-REASON\nPRIVATE-CONTROL',
+                {'PRIVATE-HEADER': 'PRIVATE-VALUE'}, body)
+            def read(path):
+                value = responses[path]
+                if isinstance(value, Exception): raise value
+                return value
+            api.side_effect = read
+            self.assertEqual(s.cli(), 1)
+            self.assertEqual(stderr.getvalue(),
+                'release signer rejected; gate=qualification-release class=http status=404; private diagnostics suppressed\n')
+            self.assertNotIn('PRIVATE-', stderr.getvalue())
+            self.assertTrue(body.closed)
+            self.assertEqual(api.call_args.args, ('/releases/' + str(s.RELEASE_ID),))
+            native.assert_not_called(); oidc.assert_not_called()
+
+    def test_preflight_metadata_and_transport_rejections_remain_closed(self):
+        cases = [('metadata', 'environment-policy', None),
+                 ('network', 'branch', urllib.error.URLError('PRIVATE-NETWORK')),
+                 ('internal', 'branch', RuntimeError('PRIVATE-INTERNAL'))]
+        for kind, stage, error in cases:
+            responses = self.preflight_metadata()
+            if kind == 'metadata': responses['/environments/release-sign']['can_admins_bypass'] = True
+            def read(path):
+                if error is not None: raise error
+                return responses[path]
+            with self.subTest(kind=kind), patch.dict(os.environ, {'SIGN_REQUEST': json.dumps(prepare_request())}), \
+                    patch.object(s.sys, 'argv', ['release-sign.py', 'preflight']), \
+                    patch.object(s, 'identity'), patch.object(s.api, 'api', side_effect=read), \
+                    patch.object(s, 'command') as native, patch.object(s, 'oidc_token') as oidc, \
+                    patch('sys.stderr', new_callable=io.StringIO) as stderr:
+                self.assertEqual(s.cli(), 1)
+                self.assertEqual(stderr.getvalue(),
+                    f'release signer rejected; gate={stage} class={kind}; private diagnostics suppressed\n')
+                native.assert_not_called(); oidc.assert_not_called()
+
+    def test_preflight_cli_keeps_failures_outside_gate_private(self):
+        with patch.object(s, 'main', side_effect=ValueError('PRIVATE-REQUEST')), \
+                patch('sys.stderr', new_callable=io.StringIO) as stderr:
+            self.assertEqual(s.cli(), 1)
+            self.assertEqual(stderr.getvalue(), 'release signer rejected; private diagnostics suppressed\n')
+
     def test_closed_modes_exact_payload_approval_and_no_implicit_S(self):
         for r in [prepare_request(), sign_request()]:
             with patch.dict(os.environ, {"SIGN_REQUEST": json.dumps(r)}):

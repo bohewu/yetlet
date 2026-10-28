@@ -1,6 +1,6 @@
 # YT-096 — Separate signer and frozen payload contract
 
-**Real-input preparation blocker (2026-10-28):** Owner-authorized PR15 is squash
+**Historical real-input preparation blocker (2026-10-28):** Owner-authorized PR15 is squash
 merged as selected signer S `d2562e14af75d08c177c01e976cbd8f13124b8ff`, with the
 reviewed tree unchanged. The protected `release-sign` Environment and existing
 `AGE_IDENTITY` are installed at the approved scope. Before any hosted prepare,
@@ -12,7 +12,7 @@ and matching real-layout regression are now local, with independent followup
 review PASS and source delivery Pending. S is immutable; no corrected code is executed as if it
 were the selected S, and replacement source selection requires explicit authority.
 
-**Current alpha preparation checkpoint — 2026-10-28:** The owner accepts
+**Historical alpha preparation checkpoint — 2026-10-28:** The owner accepts
 preparing the two signing inputs and a separate signer workflow. Original alpha
 build `40669449040`/attempt1 and manually approved verifier `40688772221`/attempt1
 PASS at the [recorded custody scope](YT-096-ALPHA-HOSTED-PLAN.md#actual-alpha-protected-verifier-and-retention--pass).
@@ -21,17 +21,22 @@ The execution source is `bf3363801132f4481263ceb411d9bba3349df86d`, immutable un
 `5d7b918` was version-preflight C, not this hosted execution source. Historical
 `v0.1.0`, source `3eacfe3`, build/readback and retained payloads remain unchanged.
 
-Date: 2026-10-28 (Asia/Taipei). **Design adopted; local signer integration independently reviewed PASS; setup
-and execution Pending.** Public provenance bytes are now locally fixed and identified below;
-the complete private-manifest freeze, signer S and signing authority remain
-Pending. The source/payload readback is not a new independent implementation
-review. D6 Pending; YT-096 In progress; YT-020 Blocked.
+Date: 2026-10-29 (Asia/Taipei). **Current state: reviewed real-layout fix
+delivered; unsigned hosted preflight failed; local safe diagnostics independently reviewed PASS.**
+PR16 is squash merged as selected S `87d24e9e63b4c9486d63a4b0141c20368ceaf540`;
+PR and master CI pass. The one prepare run `40717870186/1` fails before the
+protected job. Setup is complete, but the complete private-manifest freeze and
+signing authority remain Pending. The uncommitted diagnostic code is not S and
+has not run hosted. See [the current failure and diagnostic scope](#hosted-preflight-failure-and-safe-local-diagnostics--2026-10-29).
+D6 Pending; YT-096 In progress; YT-020 Blocked. Dated checkpoints retain their
+original scopes and review results.
 
 This contract and [ADR 0009](adr/0009-release-build-and-signer-identities.md)
 preserve the [D1–D5 policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md), including D2
 disclosure and custody limits. Local preparation does not authorize hosted jobs,
 new Environment/Secret placement or private-key access, OIDC, signing,
-publication, Commit or Push. The local workflow exists below; its protected Environment is not configured.
+publication, Commit or Push. The protected Environment was subsequently configured
+under separate owner authority; this local diagnostic continuation changes no settings.
 
 ## Immutable build and separate signer identities
 
@@ -42,15 +47,15 @@ publication, Commit or Push. The local workflow exists below; its protected Envi
 | Product tag | Existing immutable unsigned `v0.9.0-alpha.1`; never move it |
 | Build workflow/run | `.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1`; `40669449040` / attempt1 |
 | Protected verifier | `40688772221` / attempt1 |
-| Signer source S | Pending: a different, future reviewed lowercase full forty-hex commit containing proposed `.github/workflows/release-sign.yml` and trusted helpers |
+| Selected signer source S | `87d24e9e63b4c9486d63a4b0141c20368ceaf540`, after PR16 squash Merge; later uncommitted diagnostics are not selected |
 | Proposed signer ref | Protected `refs/heads/master` |
 | Signer execution equality | Checked-out code SHA = event SHA = workflow SHA = `expected_signer_commit` = S |
 | Exact certificate SAN | `https://github.com/bohewu/yetlet/.github/workflows/release-sign.yml@refs/heads/master` |
 | OIDC issuer | `https://token.actions.githubusercontent.com` |
 | Repository/owner | `bohewu/yetlet`, repository ID1409587171; `bohewu`, owner ID35250002 |
 
-S is neither C nor current documentation HEAD `b271af0`; no current commit is selected
-implicitly. Verify the certificate's authenticated workflow/build-signer digest
+S is not C. It is the actual owner-authorized PR16 squash commit, with the
+reviewed tree unchanged. A later local edit never implicitly replaces S. Verify the certificate's authenticated workflow/build-signer digest
 cryptographically against S, alongside the exact issuer/SAN and repository/owner
 identities. SAN or branch name alone is insufficient. A mismatch fails closed.
 Check the actual default OIDC subject for the proposed Environment separately;
@@ -64,7 +69,8 @@ S built the products. Keep original archive and provenance bytes unchanged.
 
 Propose protected Environment `release-sign`: exact `master` **branch** policy,
 reviewer `bohewu`, prevent self-review `false` for the single-owner arrangement,
-administrator bypass `false`. These are design values, not observed settings.
+administrator bypass `false`. These adopted values were installed and read back
+under separate owner setup authority; the original proposal alone granted none.
 Existing `release-evidence-verify` tag policy and Secret stay unchanged.
 Installing a Secret or accessing `AGE_IDENTITY` in the new Environment needs
 explicit future custody/setup authority; this amendment does not broaden D2.
@@ -128,8 +134,8 @@ Keep the following conditions separate:
 | Source, unsigned build, verifier and retained bytes | PASS at the existing bounded scope; reuse without replay |
 | Public signing bytes | Fixed above; no signature or owner signing approval |
 | Complete private evidence assembly | Pending reviewed exact closure, protected assembly/verification, encryption and actual final manifest SHA |
-| Trusted signer | Pending implementation/review, fixed S, tool/root bootstrap and supplied-statement compatibility |
-| Protected preparation | Pending separate reviewed Environment/Secret setup and explicit hosted execution authority; no OIDC permission |
+| Trusted signer | Local implementation/review and tool compatibility retained; fixed S selected; hosted preflight failure remains unresolved |
+| Protected preparation | Owner-authorized setup complete; `40717870186/1` preflight FAIL, protected job skipped; no OIDC permission |
 | Exact D6 signing approval | Pending owner acceptance of S, identities, both raw payload hashes and the frozen preparation receipt/artifact binding |
 | Actual signatures and verification | Pending protected signing, independently verified bundles/certificate/log/S, all subjects and all private-manifest entries; retain failures without automatic retry |
 | Final disposition | Record the owner's acceptance against actual manifest/bundle digests; do not mark YT-096 Done from draft creation or technical preparation alone |
@@ -469,3 +475,84 @@ budget instruction, not interpreted as signing/publication authority or a new
 source/ref authorization. The six-file correction still needs explicit guarded
 Git delivery and replacement-S selection before the already authorized prepare
 can execute. The original one-shot hosted run has not started.
+
+## Hosted preflight failure and safe local diagnostics — 2026-10-29
+
+The owner authorizes delivery of the six-file real-layout correction and
+replacement S. Strict/builtin screening and native Commit/Push hooks pass;
+[PR16](https://github.com/bohewu/yetlet/pull/16) head `7acb517` has tree
+`977b82db0323e57f8692b8c22172f609a7c8c008`. Its initial
+[CI attempt](https://github.com/bohewu/yetlet/actions/runs/40710158856) fails at
+Chrome-debugger startup, before browser assertions; diagnostics and owned cleanup
+are retained. A separately authorized retry runs only the failed Stable job;
+MSRV keeps its original execution timestamps. Attempt 2 passes. Squash Merge
+selects S `87d24e9e63b4c9486d63a4b0141c20368ceaf540`, preserving that exact tree;
+[automatic master CI](https://github.com/bohewu/yetlet/actions/runs/40716085116)
+attempt 1 also passes. All original branches, C, tags and evidence remain intact.
+
+The one authorized [prepare run](https://github.com/bohewu/yetlet/actions/runs/40717870186),
+attempt 1 at S/master, fails in its read-only metadata preflight. Both `prepare`
+and `sign` are skipped, no pending Environment approval or output artifact
+exists, and no private-key step, decryption, OIDC issuance or signature occurs.
+This consumes the one dispatch, not a successful freeze. Final private-manifest
+SHA and D6 remain Pending. No automatic retry, permission change or replacement
+source follows this failure.
+
+The old source emits only a generic rejection, so its exact failing checkpoint
+is unknown. Owner-context cached metadata meets the same pure conditions; that
+does not prove access by the hosted read-only job token. Draft-carrier visibility
+is only a hypothesis. Do not report an observed HTTP status or raise permissions
+on that inference. The encrypted supplemental asset `685300857` remains on
+unpublished draft `426670086`; removal was conditional on successful frozen
+readback/retention, which did not occur. Original ciphertext stays retained.
+
+Failure/operational receipts are copied outside Git and reread at `0700`/`0600`:
+23 files, 200,037 indexed payload bytes; retention-index SHA-256
+`351cf237ce2010d36ca262f370da50d11ab8d1684f5288b7563aef8f6082d160`.
+This is failure custody, not the final signing manifest or a frozen assembly.
+Ignored `target/yt096-signer-prepare-batch-20261028/` retains the original
+records, including the first Chrome failure and both CI identities.
+
+The owner then asks to continue with the proposed safe diagnostic minimum:
+
+- Existing gate conditions and order stay unchanged. Fixed internal stage names
+  distinguish source/branch, Environment/policy, build/artifact, verifier/approval,
+  qualification Release/assets and prior prepare run/artifact checks.
+- Rejections emit only a stage, `http`, `network`, `metadata` or `internal` class,
+  and an integer HTTP error status in 400–599 when available. Never print a raw
+  exception, reason, URL, response body/header, token or private path. Close HTTP
+  error responses without reading their bodies so finalizer warnings cannot
+  accidentally expose reason text. Failures outside the gate stay generic.
+- Both success and rejection keep existing exit behavior, and rejection does
+  not reach native tools or OIDC. The helper's checks are also reused before
+  protected download/signing; their diagnostic classification grants no new rights.
+- Three new focused local tests use synthetic API objects only. They cover a
+  valid metadata sequence followed by a draft-HTTP rejection, blocked bypass,
+  network/internal failures and generic CLI redaction. The original missing-entry
+  failure and initial HTTP-resource warning are retained; the affected HTTP case
+  passes after explicit response closure. No accepted product test is replayed.
+
+Evidence is under `safe-preflight-diagnostics-20261029/` within the same ignored
+batch directory. Local focused cases, Python syntax and whitespace checks pass;
+`cargo xtask check docs` passes (75 documents, 207 backlog items). Independent
+review PASS0 accepts the bounded local change. No hosted diagnostic execution
+has occurred, so the original failure cause is still unknown. Diagnostic changes
+remain uncommitted/unpushed; changing S or executing another hosted attempt needs
+separate owner authority. D6 Pending; YT-096 In progress; YT-020 Blocked.
+
+### Safe diagnostic independent acceptance
+
+Reviewer `/root/yt096_safe_preflight_diagnostics_review_20261029` returns PASS,
+zero issues and required followups, after inspecting the six-file diff, relevant
+caller/helper/workflow/ADR, all six frozen hashes and retained focused results.
+The Reviewer reruns no tests and performs no network, key, hosted or Git action.
+This dispatch has matching native role/model/effort evidence: `reviewer`,
+`gpt-6-astra`, effective `high`. It is ordinary content review, not formal
+assurance or a diagnosis of the hosted failure. Earlier unavailable-trace
+limitations and accepted historical scopes are preserved.
+
+Only completion metadata follows review; the two reviewed code hashes are
+unchanged. The source remains selected S `87d24e9`, with six uncommitted paths
+and nothing staged. Next is owner-authorized strict/builtin Git delivery and,
+separately, selection of any replacement S/extra hosted attempt; no such action
+is implied by this PASS. D6 remains Pending and the final manifest is unfrozen.
