@@ -60,11 +60,18 @@ not a sanitized ready-to-publish site. Historical annotations and unselected-tar
 links still need an explicit reader edition/destination mapping before export.
 No image asset is selected and selection is not recursive.
 
-The [YT-206 public-source inventory](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md) separately
-lists repository/history/Actions exposure and selected GitHub private-reporting
-activation checks; a separate mailbox/domain is optional.
-Source-preview preparation does not publish a reader site or resolve formal
-signing/registry decisions. Repository visibility remains Private.
+The [YT-206 post-activation record](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#post-activation-status)
+preserves the pre-public inventory and records the owner's source/history/Actions
+disclosure approval. PR12 is merged as d7065bb and the repository is Public as an
+Experimental source preview. GitHub private reporting is enabled, its public entry
+is visible and maintainer repository notifications are subscribed/not ignored;
+a separate mailbox/domain is optional. The [authenticated external-reporter form
+and actual notification delivery](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#reporting-completion)
+now PASS: one authorized non-vulnerability private test reaches the maintainer's
+configured Gmail route and is closed without publication. Historical failures and
+earlier Not verified results are retained; independent completion Reviewer PASS,
+zero issues/followups, marks YT-206 Done at this selected scope. Public source access does not publish a reader site,
+sign artifacts, publish packages or resolve formal D1–D6/registry decisions.
 
 ## Retained evidence and maintainer material
 

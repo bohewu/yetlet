@@ -348,12 +348,38 @@ pub fn run(root: &Path, cohort: Cohort) -> Result<()> {
         env("GITHUB_EVENT_NAME")? == "workflow_dispatch",
         "private rebuild is manual-only",
     )?;
+    run_body(root, cohort, commit, &repository, &git_ref, false)
+}
+
+pub(super) fn run_preparation(root: &Path, commit: &str) -> Result<()> {
+    run_body(
+        root,
+        Cohort::Sixteen,
+        commit,
+        "bohewu/yetlet",
+        "refs/tags/v0.1.0",
+        true,
+    )
+}
+
+fn run_body(
+    root: &Path,
+    cohort: Cohort,
+    commit: &str,
+    repository: &str,
+    git_ref: &str,
+    preparation: bool,
+) -> Result<()> {
     let runner = PathBuf::from(env("RUNNER_TEMP")?);
     let temp = tempfile::Builder::new()
         .prefix("yetlet-private-rebuild-")
         .tempdir_in(runner)?;
     let work = temp.path();
-    let out = root.join("target/private-rebuild");
+    let out = root.join(if preparation {
+        "target/release-preparation/private"
+    } else {
+        "target/private-rebuild"
+    });
     fs::create_dir_all(out.parent().unwrap())?;
     fs::create_dir(&out)?;
     let result: Result<()> = (|| {
@@ -552,6 +578,9 @@ pub fn run(root: &Path, cohort: Cohort) -> Result<()> {
             }
             record["cargo_lock_sha256s"] = json!(locks);
         }
+        if preparation {
+            super::preparation::record_inputs(root, &out, &mut record)?;
+        }
         build_packages(
             &source,
             work,
@@ -595,6 +624,9 @@ pub fn run(root: &Path, cohort: Cohort) -> Result<()> {
         record["archives"] = json!(archives);
         record["finished_at"] = json!(now());
         write(&out, "BUILD-RECORD.json", &record)?;
+        if preparation {
+            return super::preparation::finish(root, &out, &source_record, &record, &archives);
+        }
         let repo_url = format!("https://github.com/{repository}");
         let workflow = json!({"repository":repo_url,"path":".github/workflows/private-rebuild.yml","ref":git_ref});
         let mut statement = json!({"_type":"https://in-toto.io/Statement/v1","subject":archives.iter().map(|(n,v)|json!({"name":n,"digest":{"sha256":v["sha256"]}})).collect::<Vec<_>>(),"predicateType":"https://slsa.dev/provenance/v1","predicate":{"buildDefinition":{"buildType":"https://actions.github.io/buildtypes/workflow/v1","externalParameters":{"workflow":workflow,"preparation_only":true,"rust_release":"1.99.0","target":"x86_64-unknown-linux-gnu","default_workspace_features":true,"commands_record":"BUILD-RECORD.json"},"resolvedDependencies":[{"uri":format!("git+{repo_url}"),"digest":{"gitCommit":commit}},{"name":"Cargo.lock","digest":{"sha256":record["cargo_lock_sha256"]}},{"name":"source.tar","digest":{"sha256":source_record["source_archive_sha256"]}}]},"runDetails":{"builder":{"id":"https://github.com/actions/runner/github-hosted"},"metadata":{"invocationId":format!("{repo_url}/actions/runs/{}/attempts/{}",env("GITHUB_RUN_ID")?,env("GITHUB_RUN_ATTEMPT")?),"startedOn":record["started_at"],"finishedOn":record["finished_at"]},"byproducts":[{"name":"SOURCE-INPUTS.json","digest":{"sha256":tooling::sha(&fs::read(out.join("SOURCE-INPUTS.json"))?)}},{"name":"BUILD-RECORD.json","digest":{"sha256":tooling::sha(&fs::read(out.join("BUILD-RECORD.json"))?)}}]}}});

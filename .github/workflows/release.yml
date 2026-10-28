@@ -1,0 +1,191 @@
+name: Yetlet source-package release
+
+# Build/verify-only preparation. Signing and publication require separate authority.
+on:
+  workflow_dispatch:
+    inputs:
+      expected_commit:
+        description: Explicit operator assertion of the reviewed co-located source SHA
+        type: string
+        required: true
+      cohort:
+        description: Closed source-package cohort
+        type: choice
+        required: true
+        default: sixteen
+        options:
+          - sixteen
+
+permissions:
+  contents: read
+
+concurrency:
+  group: yetlet-release-preparation
+  cancel-in-progress: false
+
+jobs:
+  preparation:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 45
+    env:
+      RUSTUP_TOOLCHAIN: 1.99.0
+      CARGO_BUILD_JOBS: '4'
+      EXPECTED_COMMIT: ${{ inputs.expected_commit }}
+      RELEASE_COHORT: ${{ inputs.cohort }}
+      BUILD_WORKFLOW_REF: ${{ github.workflow_ref }}
+      BUILD_WORKFLOW_SHA: ${{ github.workflow_sha }}
+    steps:
+      - name: Checkout immutable event source and complete history
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+      - name: Reject source and workflow identity disagreements before repository code
+        id: trusted
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]
+          [[ "$GITHUB_REPOSITORY" == bohewu/yetlet ]]
+          [[ "$GITHUB_REF" == refs/tags/v0.1.0 ]]
+          [[ "$BUILD_WORKFLOW_REF" == bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0 ]]
+          [[ "$EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$RELEASE_COHORT" == sixteen ]]
+          [[ "$EXPECTED_COMMIT" == "$GITHUB_SHA" && "$EXPECTED_COMMIT" == "$BUILD_WORKFLOW_SHA" ]]
+          [[ "$(git rev-parse HEAD)" == "$EXPECTED_COMMIT" ]]
+          [[ "$(git rev-parse --verify 'refs/tags/v0.1.0^{commit}')" == "$EXPECTED_COMMIT" ]]
+          git merge-base --is-ancestor "$EXPECTED_COMMIT" refs/remotes/origin/master
+          [[ -z "$(git status --porcelain)" ]]
+          [[ "$GITHUB_RUN_ID" =~ ^[0-9]+$ && "$GITHUB_RUN_ID" =~ [1-9] ]]
+          [[ "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ && "$GITHUB_RUN_ATTEMPT" =~ [1-9] ]]
+          printf 'trusted=true\n' >> "$GITHUB_OUTPUT"
+      - name: Authenticate pinned encryption tool and public recipient
+        id: custody_tools
+        shell: bash
+        run: |
+          set -euo pipefail
+          printf '%s  %s\n' b861a3c7e2abf3caf4c7071c045f6114704db94e8cc39ce010e7fa10711ff506 \
+            .github/release-evidence-recipient.txt | sha256sum --check --strict
+          [[ ! -L .github/release-evidence-recipient.txt && -f .github/release-evidence-recipient.txt ]]
+          [[ "$(wc -l < .github/release-evidence-recipient.txt)" == 1 ]]
+          grep -Ex 'age1[0-9a-z]{58}' .github/release-evidence-recipient.txt
+          mkdir -m 700 "$RUNNER_TEMP/yt096-age-tools"
+          BOOTSTRAP="$RUNNER_TEMP/yt096-age-tools" bash scripts/bootstrap-release-age.sh
+      - name: Install pinned compiler
+        run: rustup toolchain install 1.99.0 --profile minimal
+      - name: Build bounded custody helper before native preparation
+        id: custody_helper
+        shell: bash
+        run: |
+          set -euo pipefail
+          CARGO_TARGET_DIR="$RUNNER_TEMP/yt096-xtask-bootstrap" cargo build --locked --manifest-path xtask/Cargo.toml
+      - name: Prepare and retain pinned static OpenSSL input
+        id: openssl
+        shell: bash
+        run: |
+          set -euo pipefail
+          preparation_archive="$RUNNER_TEMP/openssl-3.5.9.tar.gz"
+          preparation_source="$RUNNER_TEMP/yetlet-openssl-source"
+          preparation_prefix="$RUNNER_TEMP/yetlet-openssl"
+          # Raw failure/success logs stay runner-local, including before Cargo starts.
+          set +e
+          (
+            set -euo pipefail
+            curl --fail --location --proto '=https' --tlsv1.2 --max-time 120 \
+              --output "$preparation_archive" \
+              https://github.com/openssl/openssl/releases/download/openssl-3.5.9/openssl-3.5.9.tar.gz
+            printf '%s  %s\n' 603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a \
+              "$preparation_archive" | sha256sum --check
+            mkdir "$preparation_source"
+            tar -xzf "$preparation_archive" --strip-components=1 -C "$preparation_source"
+            cd "$preparation_source"
+            ./Configure --prefix="$preparation_prefix" --libdir=lib no-shared
+            make -j4
+            make install_sw
+            "$preparation_prefix/bin/openssl" version
+          ) > "$RUNNER_TEMP/openssl-build.log" 2>&1
+          preparation_exit=$?
+          set -e
+          printf 'native_exit=%s\n' "$preparation_exit" >> "$GITHUB_OUTPUT"
+          printf '{"native_exit_code":%s}\n' "$preparation_exit" > "$RUNNER_TEMP/openssl-build-result.json"
+          if [[ "$preparation_exit" != 0 ]]; then
+            exit "$preparation_exit"
+          fi
+          printf 'OPENSSL_DIR=%s\nOPENSSL_STATIC=1\nOPENSSL_SOURCE_ARCHIVE=%s\n' \
+            "$preparation_prefix" "$preparation_archive" >> "$GITHUB_ENV"
+          rm -rf "$preparation_source"
+      - name: Build and verify unsigned sixteen-package preparation
+        id: preparation
+        shell: bash
+        run: |
+          set -euo pipefail
+          set +e
+          CARGO_TARGET_DIR="$RUNNER_TEMP/yt096-xtask-bootstrap" cargo run --locked --manifest-path xtask/Cargo.toml -- release preparation --expected-commit "$EXPECTED_COMMIT"
+          preparation_exit=$?
+          set -e
+          printf 'native_exit=%s\n' "$preparation_exit" >> "$GITHUB_OUTPUT"
+          exit "$preparation_exit"
+      - name: Encrypt available private evidence after trusted preparation success or failure
+        id: custody_capture
+        if: (success() || failure()) && steps.trusted.outputs.trusted == 'true' && steps.custody_tools.outcome == 'success' && steps.custody_helper.outcome == 'success'
+        shell: bash
+        env:
+          PREPARATION_EXIT: ${{ steps.preparation.outputs.native_exit }}
+          OPENSSL_EXIT: ${{ steps.openssl.outputs.native_exit }}
+        run: |
+          set -euo pipefail
+          umask 077
+          original_exit="${PREPARATION_EXIT:-${OPENSSL_EXIT:-1}}"
+          [[ "$original_exit" =~ ^[0-9]+$ ]]
+          mkdir -p target
+          "$RUNNER_TEMP/yt096-xtask-bootstrap/debug/yetlet-xtask" release custody capture \
+            --age "$RUNNER_TEMP/yt096-age-tools/age/age" \
+            --recipient "$GITHUB_WORKSPACE/.github/release-evidence-recipient.txt" \
+            --source "$EXPECTED_COMMIT" --run "$GITHUB_RUN_ID" --attempt "$GITHUB_RUN_ATTEMPT" \
+            --private "$GITHUB_WORKSPACE/target/release-preparation/private" \
+            --extras "$RUNNER_TEMP" --exit "$original_exit" \
+            --output "$GITHUB_WORKSPACE/target/release-custody"
+          python3 - <<'PYTHON'
+          import json, os
+          with open('target/release-custody/transport-receipt.json', encoding='utf-8') as receipt:
+              complete = json.load(receipt)['complete']
+          with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as output:
+              output.write('complete=' + str(complete).lower() + '\n')
+          PYTHON
+      - name: Transport encrypted private evidence and safe receipt only
+        id: custody_transport
+        if: (success() || failure()) && steps.trusted.outputs.trusted == 'true' && steps.custody_capture.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: encrypted-private-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            target/release-custody/private-evidence.tar.age
+            target/release-custody/transport-receipt.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Describe encrypted transport status
+        if: (success() || failure()) && steps.trusted.outputs.trusted == 'true'
+        shell: bash
+        env:
+          CAPTURE_OUTCOME: ${{ steps.custody_capture.outcome }}
+          TRANSPORT_OUTCOME: ${{ steps.custody_transport.outcome }}
+        run: |
+          set -euo pipefail
+          {
+            printf '%s\n' 'Unsigned build/verify-only preparation; no release approval.'
+            if [[ "$CAPTURE_OUTCOME" == success && "$TRANSPORT_OUTCOME" == success ]]; then
+              printf '%s\n' 'Encrypted transport uploaded (7-day artifact retention). Durable custody is NOT VERIFIED; actual decryption and full manifest verification are still required.'
+            else
+              printf '%s\n' 'Private custody: NOT SAVED. Capture/encryption/helper/upload was unavailable or failed; no plaintext fallback. Cancelled runners have no capture guarantee.'
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+      - name: Retain verified public preparation allowlist
+        if: success() && steps.custody_capture.outcome == 'success' && steps.custody_capture.outputs.complete == 'true' && steps.custody_transport.outcome == 'success'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: unsigned-preparation-${{ github.run_id }}-${{ github.run_attempt }}
+          path: target/release-preparation/public/
+          if-no-files-found: error
+          retention-days: 7

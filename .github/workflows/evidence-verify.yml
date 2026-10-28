@@ -1,0 +1,158 @@
+name: Verify encrypted release evidence
+
+# Code integration only. The owner must configure and review this Environment
+# (required reviewer bohewu, exact v0.1.0 tag policy, admin bypass disabled) before
+# separately authorizing secret installation or a hosted execution.
+on:
+  workflow_dispatch:
+    inputs:
+      expected_commit:
+        description: Reviewed co-located source and workflow SHA
+        type: string
+        required: true
+      build_run:
+        description: Original release.yml run ID
+        type: string
+        required: true
+      build_attempt:
+        description: Original release.yml attempt number
+        type: string
+        required: true
+      artifact_id:
+        description: Original encrypted-private artifact ID
+        type: string
+        required: true
+      artifact_sha256:
+        description: Original upload-artifact archive SHA-256 (without prefix)
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: yetlet-release-evidence-verify
+  cancel-in-progress: false
+
+env:
+  CUSTODY_SOURCE: ${{ inputs.expected_commit }}
+  CUSTODY_RUN: ${{ inputs.build_run }}
+  CUSTODY_ATTEMPT: ${{ inputs.build_attempt }}
+  CUSTODY_ARTIFACT: ${{ inputs.artifact_id }}
+  CUSTODY_DIGEST: ${{ inputs.artifact_sha256 }}
+  EXPECTED_WORKFLOW_SHA: ${{ github.workflow_sha }}
+  EXPECTED_WORKFLOW_REF: ${{ github.workflow_ref }}
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      verified: ${{ steps.metadata.outputs.verified }}
+    steps:
+      - name: Reject untrusted verifier identity before checkout or repository code
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REPOSITORY" == bohewu/yetlet ]]
+          [[ "$GITHUB_REF" == refs/tags/v0.1.0 ]]
+          [[ "$EXPECTED_WORKFLOW_REF" == bohewu/yetlet/.github/workflows/evidence-verify.yml@refs/tags/v0.1.0 ]]
+          [[ "$CUSTODY_SOURCE" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$GITHUB_SHA" == "$CUSTODY_SOURCE" && "$EXPECTED_WORKFLOW_SHA" == "$CUSTODY_SOURCE" ]]
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          fetch-tags: true
+          persist-credentials: false
+      - name: Prove source and existing protected Environment before scheduling secret job
+        id: metadata
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          [[ "$(git rev-parse HEAD)" == "$CUSTODY_SOURCE" ]]
+          [[ "$(git rev-parse --verify 'refs/tags/v0.1.0^{commit}')" == "$CUSTODY_SOURCE" ]]
+          git merge-base --is-ancestor "$CUSTODY_SOURCE" refs/remotes/origin/master
+          [[ -z "$(git status --porcelain)" ]]
+          python3 scripts/release-evidence-preflight.py preflight
+          printf 'verified=true\n' >> "$GITHUB_OUTPUT"
+  verify:
+    needs: preflight
+    if: needs.preflight.outputs.verified == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    # GitHub releases Environment secrets only after required protection rules pass.
+    environment: release-evidence-verify
+    env:
+      RUSTUP_TOOLCHAIN: 1.99.0
+      CARGO_BUILD_JOBS: '4'
+    steps:
+      - name: Recheck immutable verifier identity before checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REPOSITORY" == bohewu/yetlet ]]
+          [[ "$GITHUB_REF" == refs/tags/v0.1.0 ]]
+          [[ "$EXPECTED_WORKFLOW_REF" == bohewu/yetlet/.github/workflows/evidence-verify.yml@refs/tags/v0.1.0 ]]
+          [[ "$CUSTODY_SOURCE" =~ ^[0-9a-f]{40}$ ]]
+          [[ "$GITHUB_SHA" == "$CUSTODY_SOURCE" && "$EXPECTED_WORKFLOW_SHA" == "$CUSTODY_SOURCE" ]]
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Authenticate tools and compile local readback helper without private key
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/yt096-age-tools"
+          BOOTSTRAP="$RUNNER_TEMP/yt096-age-tools" bash scripts/bootstrap-release-age.sh
+          rustup toolchain install 1.99.0 --profile minimal
+          CARGO_TARGET_DIR="$RUNNER_TEMP/yt096-xtask-bootstrap" cargo build --locked --manifest-path xtask/Cargo.toml
+      - name: Recheck protected Environment and original artifact before private key access
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/yt096-custody-work"
+          CUSTODY_TRANSPORT="$RUNNER_TEMP/yt096-custody-work/transport" \
+            python3 scripts/release-evidence-preflight.py download
+      - name: Decrypt only inside approved isolated job and retain safe receipt
+        shell: bash
+        env:
+          AGE_IDENTITY: ${{ secrets.AGE_IDENTITY }}
+        run: |
+          set -euo pipefail
+          umask 077
+          custody_work="$RUNNER_TEMP/yt096-custody-work"
+          trap 'rm -rf "$custody_work"' EXIT HUP INT TERM
+          [[ -n "$AGE_IDENTITY" ]]
+          printf '%s\n' "$AGE_IDENTITY" > "$custody_work/identity"
+          unset AGE_IDENTITY
+          "$RUNNER_TEMP/yt096-xtask-bootstrap/debug/yetlet-xtask" release custody verify \
+            --age "$RUNNER_TEMP/yt096-age-tools/age/age" \
+            --recipient "$GITHUB_WORKSPACE/.github/release-evidence-recipient.txt" \
+            --source "$CUSTODY_SOURCE" --run "$CUSTODY_RUN" --attempt "$CUSTODY_ATTEMPT" \
+            --transport "$custody_work/transport" --identity "$custody_work/identity" \
+            --output "$custody_work/readback"
+          cp "$custody_work/readback/local-readback-receipt.json" "$RUNNER_TEMP/yt096-safe-readback-receipt.json"
+      - name: Upload safe verification receipt only
+        if: success()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: evidence-readback-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/yt096-safe-readback-receipt.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove isolated verification files after success or failure
+        if: success() || failure()
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/yt096-custody-work"
+          rm -f "$RUNNER_TEMP/yt096-safe-readback-receipt.json"
