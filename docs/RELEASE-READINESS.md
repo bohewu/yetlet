@@ -1,5 +1,18 @@
 # Yetlet Prototype Release Readiness
 
+**Owner-selected version update (2026-10-28):** The next sixteen-package
+Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md).
+The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
+(tree `6adff26fc4fec65e9aa8f40d7172ff266b7e500d`) as the new immutable alpha candidate C.
+The [minimum hosted/readback plan](YT-096-ALPHA-HOSTED-PLAN.md) records the
+remaining fixed-binding patch, consumed Guard-state disposition and separate
+execution-source selection/authorization gates. Existing `v0.1.0`, source
+`3eacfe3`, hosted/readback runs and retained bytes stay historical and unchanged;
+no alpha output or signing payload inherits their identity. No new execution C,
+alpha tag, hosted run or payload SHA is selected by the proposed future patch. The separate fixed-SHA signer design still applies. D6 Pending;
+YT-096 In progress; YT-020 Blocked. No tag, hosted execution, signing or publication
+is authorized by this migration.
+
 **Latest YT-205 execution:** Candidate118f3d0 has required CI PASS, sixteen
 byte-identical hosted/local package archives and both affected MSVC consumers
 PASS. [Current evidence and limits](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)

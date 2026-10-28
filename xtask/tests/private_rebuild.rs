@@ -83,20 +83,20 @@ fn fixture(source: &Path) {
         ]
         .contains(name);
         let mut manifest = format!(
-            "[package]\nname=\"{name}\"\nversion=\"0.1.0\"\nedition=\"2024\"\nlicense=\"MIT\"\ndescription=\"Synthetic rebuild fixture\"\n"
+            "[package]\nname=\"{name}\"\nversion=\"0.9.0-alpha.1\"\nedition=\"2024\"\nlicense=\"MIT\"\ndescription=\"Synthetic rebuild fixture\"\n"
         );
         if isolated {
             manifest.push_str("\n[workspace]\n");
             fs::write(dir.join("Cargo.lock"), "version = 4\n").unwrap();
         }
-        let dep = |n: &str| format!("{n} = {{ version=\"0.1.0\", path=\"../{n}\" }}\n");
+        let dep = |n: &str| format!("{n} = {{ version=\"0.9.0-alpha.1\", path=\"../{n}\" }}\n");
         match *name {
             "yetlet-html" | "yetlet-dom" | "yetlet-dom-keyed" => manifest.push_str(&format!("\n[dependencies]\n{}", dep("yetlet-core"))),
             "yetlet-server-axum" => manifest.push_str(&format!("\n[dependencies]\n{}{}", dep("yetlet-core"), dep("yetlet-html"))),
             "yetlet-request-id" | "yetlet-session" | "yetlet-session-redis" => manifest.push_str(&format!("\n[dependencies]\n{}", dep("yetlet-server-axum"))),
-            "yetlet-auth" => manifest.push_str("\n[features]\ndefault=[]\nsession=[\"dep:yetlet-session\"]\n[dependencies]\nyetlet-session={version=\"0.1.0\",path=\"../yetlet-session\",optional=true}\n"),
+            "yetlet-auth" => manifest.push_str("\n[features]\ndefault=[]\nsession=[\"dep:yetlet-session\"]\n[dependencies]\nyetlet-session={version=\"0.9.0-alpha.1\",path=\"../yetlet-session\",optional=true}\n"),
             "yetlet-rate-limit" | "yetlet-secrets" => manifest.push_str(&format!("\n[dev-dependencies]\n{}", dep("yetlet-config"))),
-            "yetlet-config" => manifest.push_str("\n[features]\ndefault=[]\nsecret-provider=[\"dep:yetlet-secrets\"]\n[dependencies]\nyetlet-secrets={version=\"0.1.0\",path=\"../yetlet-secrets\",optional=true}\n"),
+            "yetlet-config" => manifest.push_str("\n[features]\ndefault=[]\nsecret-provider=[\"dep:yetlet-secrets\"]\n[dependencies]\nyetlet-secrets={version=\"0.9.0-alpha.1\",path=\"../yetlet-secrets\",optional=true}\n"),
             _ => {}
         }
         fs::write(dir.join("Cargo.toml"), manifest).unwrap();
@@ -169,7 +169,7 @@ fn cargo_steps_keep_collection_separate_from_locked_default_verification() {
 
 #[cfg(target_os = "linux")]
 #[test]
-fn real_cargo_sixteen_cross_workspace_packages_and_normal_verification_refusal() {
+fn real_cargo_sixteen_alpha_packages_and_normal_verification_refusal() {
     use std::{process::Command, sync::atomic::AtomicBool, time::Duration};
     use yetlet_xtask::process::{self, Spec};
     let temp = tempfile::Builder::new()
@@ -228,7 +228,7 @@ fn real_cargo_sixteen_cross_workspace_packages_and_normal_verification_refusal()
     let expected: BTreeSet<_> = Cohort::Sixteen
         .names()
         .iter()
-        .map(|n| format!("{n}-0.1.0.crate"))
+        .map(|n| format!("{n}-0.9.0-alpha.1.crate"))
         .collect();
     let actual: BTreeSet<_> = fs::read_dir(work.join("cargo-target/package"))
         .unwrap()
@@ -238,6 +238,14 @@ fn real_cargo_sixteen_cross_workspace_packages_and_normal_verification_refusal()
         .collect();
     assert_eq!(expected, actual);
     for name in Cohort::Sixteen.names() {
+        let staged = work.join("vendor").join(format!("{name}-0.9.0-alpha.1"));
+        let manifest: toml::Value =
+            toml::from_str(&fs::read_to_string(staged.join("Cargo.toml")).unwrap()).unwrap();
+        assert_eq!(
+            manifest["package"]["version"].as_str(),
+            Some("0.9.0-alpha.1")
+        );
+        assert!(staged.join(".cargo-checksum.json").is_file());
         assert_eq!(record[format!("package-{name}_exit_code")], 0);
         assert_eq!(
             record["bootstrap_staging"][*name],

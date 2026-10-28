@@ -1,5 +1,18 @@
 # YT-096 — Reduce release supply-chain attacks: adopted D1–D5 policy
 
+**Owner-selected version update (2026-10-28):** The next sixteen-package
+Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md).
+The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
+(tree `6adff26fc4fec65e9aa8f40d7172ff266b7e500d`) as the new immutable alpha candidate C.
+The [minimum hosted/readback plan](YT-096-ALPHA-HOSTED-PLAN.md) records the
+remaining fixed-binding patch, consumed Guard-state disposition and separate
+execution-source selection/authorization gates. Existing `v0.1.0`, source
+`3eacfe3`, hosted/readback runs and retained bytes stay historical and unchanged;
+no alpha output or signing payload inherits their identity. No new execution C,
+alpha tag, hosted run or payload SHA is selected by the proposed future patch. The separate fixed-SHA signer design still applies. D6 Pending;
+YT-096 In progress; YT-020 Blocked. No tag, hosted execution, signing or publication
+is authorized by this migration.
+
 Date: 2026-10-27 (Asia/Taipei). Documentation source:
 `b834a2ba00e1be9cbe26e5326e52c457e88a039f` (original proposal).
 **Current status: D1–D5 Adopted (policy); D6 Pending.** On 2026-10-27 the owner
@@ -9,9 +22,33 @@ changes, sign or publish." This authorizes the bounded workflow implementation,
 not hosted execution, OIDC/certificate requests, signing or publication.
 
 The original independent read-only review PASS, zero blocking findings, applies
-to the proposal only; it does not approve the new implementation. No actual
-`C_release`, final output SHA, authenticated Cosign installation or new build
-result is selected or established by this adoption; no tag is created.
+to the proposal only. The original adoption did not select a release source or
+authorize execution. Later separate owner approvals selected `C_release`
+`3eacfe31f5e3281411d3bc4653a6baccab668b30` and unsigned lightweight `v0.1.0`;
+[the actual hosted checkpoint](YT-096-HOSTED-DRILL-PLAN.md) records build
+`40628943583` / attempt1, protected verifier `40631789238` / attempt1 and verified
+repository-external owner-host retention, all successful at their bounded scopes.
+D6 remains Pending. The resulting unsigned outputs are recorded evidence, not
+approved signing payloads, authenticated signing identities or a published release.
+
+## Owner-approved D1/D3 amendment — 2026-10-28
+
+The owner selects an independent, fixed-SHA signer workflow. The
+[signer contract](YT-096-SIGNER-CONTRACT.md) and
+[ADR 0009](adr/0009-release-build-and-signer-identities.md) define the amended
+trust boundary. This accepts the design only; it grants no implementation,
+settings/Secret change, payload preparation, OIDC/certificate issuance, signing,
+Commit/Push or publication. D6 remains Pending.
+
+Build source `C_release` stays `3eacfe31f5e3281411d3bc4653a6baccab668b30`, with
+its original `release.yml`, immutable unsigned `v0.1.0`, build/readback records
+and exact sixteen-package output bytes. Signer source `S` is a separate future
+reviewed full commit containing the proposed `release-sign.yml`; its actual SHA
+is Pending. The protected execution ref is `refs/heads/master`, with exact signer
+SHA verification as well as an exact issuer/SAN. A branch/SAN alone is insufficient.
+The former signer SAN at `release.yml@refs/tags/v0.1.0` and the no-source/signer-split
+selection are superseded for signing only. The original build identity checks
+and historical proposal/review/failure evidence remain unchanged.
 
 ## Purpose and consumer outcome
 
@@ -25,7 +62,7 @@ a valid signature from another repository/workflow must fail identity checks.
 |---|---|---|
 | Package bytes replaced after review | Exact archive digests, signed provenance and frozen evidence-manifest signature | Unsigned checksums alone can be replaced together with the files |
 | Someone impersonates an official publisher | GitHub workload OIDC, exact certificate issuer/SAN, source/ref checks and approved Sigstore trust roots | A compromised approved identity or CI can still sign malicious output |
-| Output claims the wrong source or build | Co-located immutable source/workflow, fresh run-bound provenance and independent output/evidence comparison | Self-reported provenance is not independent proof of every build claim |
+| Output claims the wrong source or build | Original immutable build source/workflow and run-bound provenance, separately pinned signer identity, exact payload digests and independent output/evidence comparison | Self-reported provenance is not independent proof of every build claim |
 
 This work provides release integrity and traceability. It does not establish
 defect-free code, complete compiled/system inventory, a SLSA level or production
@@ -36,17 +73,17 @@ certification. Public source-preview use is already available after
 
 | Decision | Concrete recommendation | Status |
 |---|---|---|
-| D1 — Public identity/log disclosure | GitHub CI workload identity for `bohewu/yetlet`, proposed `release.yml@refs/tags/v0.1.0`; accept the certificate/log/TSA disclosure listed below | Adopted (policy) |
+| D1 — Public identity/log disclosure | GitHub workload identity for the separate `release-sign.yml@refs/heads/master`, authenticated signer digest `S` and the existing certificate/log/TSA disclosure classes; `S` remains Pending | Adopted; design amended 2026-10-28 |
 | D2 — Public payload/attachments | Publish only the listed sixteen-subject provenance, its verification bundle and an approved release summary; keep the complete detailed evidence assembly private | Adopted (policy) |
-| D3 — Source/cohort | Sixteen coordinated experimental `0.1.0` source packages; use118f3d0 as technical reuse baseline and a future co-located `C_release` for the reviewed release workflow and proposed `v0.1.0` tag | Adopted (policy) |
+| D3 — Source/cohort | Preserve the sixteen actual `0.1.0` packages, build `C_release` `3eacfe3`, immutable `v0.1.0` and accepted technical baseline118f3d0. Independent signer `S` is a separate future reviewed commit, not a new product candidate or build source | Adopted; design amended 2026-10-28 |
 | D4 — Service/verifier | Sigstore Public Good production services; propose Cosign3.1.4 with the exact reference binary/root/config identities below, subject to bootstrap/compatibility verification before execution | Adopted (policy) |
 | D5 — Claims/evidence | in-toto Statement v1/SLSA provenance v1 with the existing proposed Yetlet source-package build type; claim the actual sixteen source-package build and bounded evidence scope only | Adopted (policy) |
 
-**D6 remains Pending.** The owner separately authorizes build/verify-only workflow
-implementation now. Actual immutable source selection, hosted execution, final
-payload/manifest/bundle approval, OIDC/certificate requests, signing and publication
-still require their explicit later authority.
-No future SHA, timestamp, certificate or output digest is invented here.
+**D6 remains Pending.** Source selection, unsigned tag, one build, one protected
+verifier and repository-external retention were separately authorized and completed.
+Their factual completion does not approve final signing payloads/manifests/bundles,
+OIDC/certificate issuance, signing or publication. Those remaining operations
+still require explicit authority; no certificate or signature is claimed.
 
 ## D3 — Candidate source and exact package scope
 
@@ -54,21 +91,22 @@ No future SHA, timestamp, certificate or output digest is invented here.
 |---|---|---|
 | Original nine-package candidate | `ce56e0814e5423782440acd2c959ca777d572cd4` | Preserve its original FAIL/release-ready NO, later bounded dispositions and historical signatures |
 | Accepted sixteen-package technical C | `118f3d0f496b487ef20fe243f4e73179f9eadc43`, tree `07faa3e90c0fca5d27a4e55262c75acf851d884a` | Reuse baseline for actual archives, inputs and scoped YT-202–205 evidence; not formal signing approval |
-| Public source-preview master | `d7065bbfb5b733c418f65ef55324f4d0ce6ac4d6` | PR12 squash merge; package/runtime/manifests/locks/xtask/workflows match technical C; later Markdown differs |
+| Historical source-preview master | `d7065bbfb5b733c418f65ef55324f4d0ce6ac4d6` | PR12 squash merge; package/runtime/manifests/locks/xtask/workflows match technical C; later Markdown differs |
 | Original packet documentation source | `b834a2ba00e1be9cbe26e5326e52c457e88a039f` | Adds accepted YT-206 completion documentation; not a selected formal candidate |
-| Proposed formal source | `C_release` — no SHA exists yet | A future reviewed commit containing the release workflow and minimal recipe/identity adaptation; source HEAD, workflow SHA and tag target must agree |
+| Owner-selected build source | `3eacfe31f5e3281411d3bc4653a6baccab668b30`, tree `86385d60cb4c3e595c670dbacce117ebeeb1a993` | Selected `C_release` for unsigned `v0.1.0`, actual sixteen-package build and protected readback; source/workflow/tag identities matched. Signing approval remains separate |
+| Independent signer source | `S` — Pending, no SHA selected | Future reviewed `release-sign.yml` code/event/workflow commit; must be authenticated separately from original build `C_release` |
 
-None of the listed historical sources has `.github/workflows/release.yml`. Adopt
-the co-located model from the [original formal proposal](YT-096-FORMAL-TRUST-PROPOSAL.md):
-implement/review the authorized manual build/verify-only workflow now, compare
-its actual delta against technical C, then approve the resulting immutable commit
-and proposed `refs/tags/v0.1.0`. Keep the existing private-rebuild guard intact;
-do not spoof its environment or relabel its preparation-only output as release.
+The historical sources above predate `.github/workflows/release.yml`; the selected
+co-located source contains it. The [original formal proposal](YT-096-FORMAL-TRUST-PROPOSAL.md)
+remains the design basis, while the [hosted checkpoint](YT-096-HOSTED-DRILL-PLAN.md)
+records the completed source/tag/build/readback/custody operations. Preserve the
+private-rebuild guard and immutable tag; unsigned preparation is not release approval.
 
 The sixteen source archives below are the **actual retained118f3d0 baseline**,
-not the unbuilt `C_release` subjects. All versions are `0.1.0`, sizes are bytes,
-and all16 hosted/local archive digests match. Final release digests must come from
-the actual later build. A source/workflow change, repackaging or VCS metadata can
+not a digest table for the later `C_release` build. All versions are `0.1.0`, sizes
+are bytes, and all16 historical hosted/local archive digests match. The actual
+`C_release` archive digests are retained in the new public checksum/provenance
+and matched by the completed local verification; signing approval is still pending. A source/workflow change, repackaging or VCS metadata can
 change bytes even when package code is unchanged.
 
 | Archive | Bytes | Baseline SHA-256 |
@@ -104,13 +142,13 @@ These are adopted release-policy values, not a certificate requested now.
 | Public field/class | Proposed value or constrained runtime value |
 |---|---|
 | OIDC issuer | `https://token.actions.githubusercontent.com`; workload identity, not a personal browser/email signer |
-| Certificate SAN | Exactly `https://github.com/bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0` |
+| Certificate SAN | Exactly `https://github.com/bohewu/yetlet/.github/workflows/release-sign.yml@refs/heads/master`, together with authenticated signer workflow digest `S`; no wildcard or branch-only acceptance |
 | Repository/owner URI and identifiers | `https://github.com/bohewu/yetlet`, repository ID1409587171; `https://github.com/bohewu`, owner ID35250002 |
-| OIDC token subject, if emitted as certificate metadata | Current read-only settings use the immutable default prefix `repo:bohewu@35250002/yetlet@1409587171`; without an environment claim the proposed tag subject is `repo:bohewu@35250002/yetlet@1409587171:ref:refs/tags/v0.1.0` |
-| Source/build-signer/build-config URI and digest | The reviewed release workflow URI, `C_release` and exact tag mapping; no reusable-workflow/source split is selected |
-| Workflow display name, if emitted in legacy certificate metadata | Proposed `Yetlet source-package release`, bound to the reviewed workflow bytes |
-| Trigger, runner and source visibility | `workflow_dispatch`, `github-hosted`, `public`; proposed Ubuntu24.04 GNU build |
-| Invocation and time | Actual `https://github.com/bohewu/yetlet/actions/runs/RUN_ID/attempts/ATTEMPT`, start/finish and certificate validity times |
+| OIDC token subject, if emitted as certificate metadata | Preserve immutable owner/repository IDs; proposed isolated Environment `release-sign` gives expected subject `repo:bohewu@35250002/yetlet@1409587171:environment:release-sign`, subject to actual settings/claim checks before issuance. This is distinct from the SAN and is not a raw JWT disclosure |
+| Source/build-signer/build-config URI and digest | Certificate signer/config identify actual `release-sign.yml`, protected `master` ref and authenticated `S`. The signed statement retains build source/workflow `C_release`, `release.yml@refs/tags/v0.1.0` and original build run; never substitute `S` into builder claims |
+| Workflow display name, if emitted in legacy certificate metadata | Actual reviewed signer-workflow display name from `S`; Pending until implementation. Historical builder display name remains `Yetlet source-package release` |
+| Trigger, runner and source visibility | `workflow_dispatch`, `github-hosted`, `public`; proposed isolated Ubuntu24.04 signer. Original build target/runner claims remain bound to its build record |
+| Invocation and time | Actual future signing run/attempt, start/finish and certificate validity; record separately from original build `40628943583`/attempt1 and its times. No future run or certificate exists yet |
 | Certificate/log-generated material | Ephemeral public key, serial, certificate/chain/SCT, log ID/index/checkpoint/inclusion material, signing digest/signature and TSA timestamp material |
 
 [GitHub's OIDC reference](https://docs.github.com/en/actions/reference/security/oidc)
@@ -177,12 +215,14 @@ wrappers/receipts stay outside the frozen evidence assembly. Complete plaintext
 private records and private identities never enter Git, build-job inputs, logs or
 artifacts. The latest owner choice permits the identity transiently only in a
 separate isolated, manually approved protected GitHub Environment verifier,
-superseding the earlier local-only CI policy. Current authority covers code
-integration and local proof, not actual settings/Secret installation or hosted
-execution. Independent integration review PASS, zero issues and required followups.
-See [custody integration and manual rotation](YT-096-AGE-CUSTODY-INTEGRATION.md).
-This encryption extension does not authorize OIDC, signing or publication; D6
-remains Pending and durable retention requires actual readback/custody evidence.
+superseding the earlier local-only CI policy. The original integration authority
+covered code/local proof only; its independent review PASS retains that scope.
+Later settings/Secret installation, hosted execution and owner-host retention were
+separately approved and completed in the [actual hosted checkpoint](YT-096-HOSTED-DRILL-PLAN.md).
+See [custody integration and manual rotation](YT-096-AGE-CUSTODY-INTEGRATION.md)
+for the preserved local and rotation evidence. This extension does not authorize
+OIDC, signing or publication. D6 remains Pending; recorded owner-host retention
+proves retained bytes at observation time, not indefinite availability.
 
 ## D4 — Concrete signing and verification recommendation
 
@@ -237,13 +277,13 @@ collect bootstrap inputs separately and verify each final archive with normal
 offline locked Cargo packaging. Record all actual inputs, tools, commands,
 outputs and errors. Bootstrap collection is never a verification PASS.
 
-The authorized preparation workflow remains manual-only with a contents-read
-build/verify job and no OIDC or signing path. A future separately authorized
-formal signing extension needs a narrowly scoped OIDC signing job after approved
-output/payload review.
-It must reject source/workflow/tag disagreement and unreviewed inputs. The
-existing private helper remains preparation-only; formal adaptation needs its
-own implementation review. No mandatory runtime dependency or custom crypto/
+The existing preparation workflow remains manual-only with a contents-read
+build/verify job and no OIDC or signing path. The amended
+[independent signer contract](YT-096-SIGNER-CONTRACT.md) separates a future
+no-OIDC `prepare` mode from a protected `sign` mode requiring explicit D6 and
+exact signer/payload approval. No workflow is changed by this design. Existing
+private helpers remain preparation-only; new signer implementation, isolated
+Environment/Secret custody and execution each need separate authority and review. No mandatory runtime dependency or custom crypto/
 verifier/validation framework is proposed. The [SLSA build-provenance schema](https://slsa.dev/spec/v1.2/build-provenance)
 defines the statement's structure; using it does not confer a SLSA level.
 
@@ -264,21 +304,30 @@ its selected Firefox configuration; source-resolution inventories omit complete
 compiled/native/system closure. The denied Windows result-ZIP transfer remains
 denied; prior accepted original text records are not relabelled as a local ZIP.
 
-For a later formal execution:
+For later signer preparation and execution:
 
-1. Review the real `C_release` delta; reuse unchanged product evidence and run only
-   changed-path/source/output checks needed for that actual workflow and tool pin.
-2. Build the sixteen source packages and derive fresh provenance from that run.
-   Bind source export, all six locks, build records and actual final archive bytes.
-3. Assemble the complete evidence checksum manifest including final provenance
-   and all required detailed records. Freeze it. Keep both signature bundles
-   outside its inputs; provenance must not hash this containing manifest or itself.
-4. Only after separate D6 authority, obtain workload certificates/log entries and
-   produce the provenance and manifest bundles. Preserve actual failures/proofs.
-5. Independently verify downloaded bytes, exact identity/source/tag, certificate/
-   log proofs, sixteen subjects and complete private-manifest entries. Record final
-   owner approval outside the frozen manifest, referencing its and both bundles'
-   digests. Promote only those approved bytes; any repackaging stops promotion.
+1. Implement/review and explicitly select signer `S`; authenticate its exact
+   workflow identity, Cosign/tool and root/config inputs. Reuse the preserved
+   `C_release` build and its scoped accepted qualification; do not rebuild merely
+   to add the signer or move the product tag.
+2. Under separately authorized isolated `prepare` custody, verify the original
+   artifact/run/receipt bindings and obtain the preparation-manifest SHA from
+   authenticated decrypted inventory and the actual manifest bytes. Existing safe
+   receipts expose no such SHA. They do not approve final signing completeness.
+3. Select the complete final evidence allowlist with original scopes/failures,
+   preserve the 9,022-byte original provenance SHA
+   `b3a1e66a34d316c6513ff4e0b9c8055c37b8f81daa598a8110f867e911a400fc`,
+   and create/verify/freeze a new complete manifest under existing checksum bounds.
+   Its final SHA is Pending. The public checksum file, retention index, inventory
+   SHA and ciphertext SHA cannot substitute for it. Store safe signing inputs,
+   both eventual signature bundles and final approval outside the frozen assembly.
+4. Only after D6 approves exact `S`, certificate identity and both payload SHAs,
+   execute the protected `sign` mode against the same frozen bytes; verify before
+   OIDC/certificate/log requests and preserve actual failures without auto-retry.
+5. Independently verify both bundles, exact signer `S` and separate build `C`,
+   certificate/log proofs, all sixteen subjects and complete private-manifest
+   entries. Record final owner approval outside the manifest. Registry/publication
+   remains separately authorized; any source/payload change stops promotion.
 
 This is the remaining formal integrity work, not a repeat of all accepted product
 qualification. Registry account/rights, immutable upload/download comparison,
@@ -288,15 +337,18 @@ operations. No new operational-readiness or business SLO gate is added.
 ## Review and current authority
 
 **D1–D5 Adopted (policy); D6 Pending; YT-096 In progress and YT-020 Blocked.**
-YT-206 remains Done at its source-preview/reporting scope. The owner authorizes
-build/verify-only workflow implementation with new changes left uncommitted and
-unpushed. This record makes no implementation PASS claim. Actual source/tag,
-output/payload and final signature execution remain unapproved; no OIDC,
-certificate, signing, publication or hosted run is authorized here.
+YT-206 remains Done at its source-preview/reporting scope. The original adoption
+and read-only review covered the proposal; later implementation/local reviews
+and separately authorized source/tag/build/verifier/custody operations retain
+their own evidence and scopes. The [actual checkpoint](YT-096-HOSTED-DRILL-PLAN.md)
+binds the selected source and unsigned outputs to the single successful build,
+protected verifier, owner approval and repository-external retention.
 
 Earlier nine-package reviews, failures, tool pins and sixteen-package technical
-evidence keep their original identities and scope. The original proposal's
-new-document checks and independent read-only review do not attest the later
-implementation. Current source/workflow/root/output values still need actual
-future execution bindings; reference hashes are not authenticated installation
-or qualified TUF/root evidence. No old qualification is replayed by this adoption.
+evidence keep their original identities and scopes. The original failed release
+verdict is not rewritten. Cosign bootstrap, signing-root validity/compatibility,
+exact signer `S` and signing-payload approval, OIDC/certificate issuance, signature execution,
+registry/trust checks and final release approval remain open. Reference signing
+hashes are not an authenticated installation or qualified TUF/root evidence.
+This factual documentation update grants no further operation, replays no
+accepted qualification and performs no Commit/Push, signing or publication.

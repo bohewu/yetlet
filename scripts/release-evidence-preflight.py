@@ -46,11 +46,11 @@ def check_metadata(run, artifact, environment, policies, expected):
     require(run["id"] == int(expected["run"]))
     require(run["run_attempt"] == int(expected["attempt"]))
     require(run["head_sha"] == expected["source"])
-    require(run["head_branch"] == "v0.1.0")
+    require(run["head_branch"] == "v0.9.0-alpha.1")
     require(run["event"] == "workflow_dispatch")
     require(run["path"] in (".github/workflows/release.yml",
-                            ".github/workflows/release.yml@refs/tags/v0.1.0",
-                            ".github/workflows/release.yml@v0.1.0"))
+                            ".github/workflows/release.yml@refs/tags/v0.9.0-alpha.1",
+                            ".github/workflows/release.yml@v0.9.0-alpha.1"))
     require(run["repository"]["full_name"] == "bohewu/yetlet")
     require(run["head_repository"]["full_name"] == "bohewu/yetlet")
     require(run["status"] == "completed" and run["conclusion"] in ("success", "failure"))
@@ -74,7 +74,7 @@ def check_metadata(run, artifact, environment, policies, expected):
             {"protected_branches": False, "custom_branch_policies": True})
     require(policies["total_count"] == 1 and len(policies["branch_policies"]) == 1)
     policy = policies["branch_policies"][0]
-    require(policy["name"] == "v0.1.0" and policy["type"] == "tag")
+    require(policy["name"] == "v0.9.0-alpha.1" and policy["type"] == "tag")
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):

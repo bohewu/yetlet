@@ -1,6 +1,6 @@
 # Developer Documentation
 
-Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then choose a [runnable sample](SAMPLES.md). Yetlet is an experimental, unpublished `0.1.0` prototype in a Private repository. Current task status belongs to [Backlog](BACKLOG.md), milestone gates to [Roadmap](ROADMAP.md), and release decisions to [Release readiness](RELEASE-READINESS.md).
+Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then choose a [runnable sample](SAMPLES.md). Yetlet is an experimental, unpublished source preview. The next coordinated library version is `0.9.0-alpha.1`; see the [version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md). Current task status belongs to [Backlog](BACKLOG.md), milestone gates to [Roadmap](ROADMAP.md), and release decisions to [Release readiness](RELEASE-READINESS.md).
 
 ## Reader entry points
 
@@ -8,6 +8,7 @@ Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 - [Build your first Yetlet app](FIRST-APP.md): local CLI → protected standalone project → local dependencies → app lock/cache → first build/run.
 - [Write Views and reusable components](VIEW-COMPONENTS.md): typed data → functions → lists/conditions → existing SSR handler.
 - [Opt-in integration quick reference](OPT-IN-QUICK-REFERENCE.md): package/feature → startup API/options → consumer settings/defaults.
+- [Settings, options and logging](SETTINGS-OPTIONS-LOGGING.md): startup loading → validation → typed options → native state and application-owned diagnostics, using existing examples.
 - [Integration guide template](GUIDE-TEMPLATE.md): prerequisites → minimal integration → expected result → configuration/errors → API reference.
 - [Current API reference](API-REFERENCE.md): package entry points, feature/target
   selection, application options and local rustdoc; read guides and signatures
@@ -104,6 +105,8 @@ shows existing patterns, intentional Reset/HTTP differences and the actual
 costs that remain app-owned.
 
 ## Architecture and contracts
+
+- [YT-096 independent signer contract](YT-096-SIGNER-CONTRACT.md) and [ADR 0009](adr/0009-release-build-and-signer-identities.md): maintainer release-engineering design, separate fixed-SHA build/signer identities and two-payload freeze; D6 execution remains Pending.
 
 - [Architecture](ARCHITECTURE.md) and [MVP contract](MVP.md): responsibilities, trust boundaries and original acceptance criteria.
 - [DOM capability and authoring review](YT-109-DOM-CAPABILITY-REVIEW.md): current renderer/consumer inventory, property and ownership boundaries, and staged proposals; research only, not runtime implementation.

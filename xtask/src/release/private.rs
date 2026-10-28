@@ -12,6 +12,7 @@ use std::{
     path::{Path, PathBuf},
     time::Duration,
 };
+pub(super) const PACKAGE_VERSION: &str = "0.9.0-alpha.1";
 pub const NAMES: [&str; 9] = [
     "yetlet-core",
     "yetlet-actions",
@@ -221,7 +222,7 @@ pub fn cargo_steps(source: &Path, work: &Path, cohort: Cohort) -> Vec<(String, V
 
 fn stage_bootstrap(source: &Path, work: &Path, name: &str) -> Result<()> {
     let vendor = work.join("vendor");
-    let directory = vendor.join(format!("{name}-0.1.0"));
+    let directory = vendor.join(format!("{name}-{PACKAGE_VERSION}"));
     require(!directory.exists(), "bootstrap package already exists")?;
     tooling::execute(
         source,
@@ -231,7 +232,7 @@ fn stage_bootstrap(source: &Path, work: &Path, name: &str) -> Result<()> {
             "--gzip".into(),
             "--file".into(),
             work.join("bootstrap-target/package")
-                .join(format!("{name}-0.1.0.crate"))
+                .join(format!("{name}-{PACKAGE_VERSION}.crate"))
                 .into_os_string(),
             "--directory".into(),
             vendor.into_os_string(),
@@ -617,7 +618,7 @@ fn run_body(
                 == cohort
                     .names()
                     .iter()
-                    .map(|n| format!("{n}-0.1.0.crate"))
+                    .map(|n| format!("{n}-{PACKAGE_VERSION}.crate"))
                     .collect(),
             "exact selected package archives",
         )?;

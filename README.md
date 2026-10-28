@@ -22,7 +22,8 @@ explicit browser enhancements in one language.
 
 ## Start with native SSR
 
-**Source preview:** Yetlet is experimental and unpublished. Use this repository
+**Source preview:** The next coordinated library version is `0.9.0-alpha.1`.
+Yetlet is experimental and unpublished. Use this repository
 checkout with the pinned Rust/Cargo 1.99.0 toolchain; APIs may change. Native SSR
 needs no Node.js or WASM toolchain. See [compatibility](docs/COMPATIBILITY.md)
 for the current usage and support boundary.

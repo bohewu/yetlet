@@ -22,6 +22,9 @@ loader, separate from `SecretProvider`; no SettingsProvider trait exists.
 Admin already depends on Loader for its own settings. That application choice
 is not a requirement for Board embedding or other Yetlet consumers.
 
+For the complete startup sequence and existing Config, Admin/Board, Shop and
+Starter examples, follow [Settings, options and logging](SETTINGS-OPTIONS-LOGGING.md).
+
 ## Framework capabilities
 
 “No built-in key” means the package does not read an ambient enable variable;

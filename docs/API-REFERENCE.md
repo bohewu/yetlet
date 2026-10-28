@@ -24,6 +24,9 @@ features, startup wiring and consumer settings/defaults in one place, use the
 [opt-in quick reference](OPT-IN-QUICK-REFERENCE.md); the tables below remain the
 API-carrier map, with full contracts in their linked guides.
 
+For source loading, startup validation, typed options and application-owned
+diagnostics together, follow [Settings, options and logging](SETTINGS-OPTIONS-LOGGING.md).
+
 ## HTML, HTTP and browser packages
 
 These packages provide the main HTML, HTTP and browser building blocks. Their

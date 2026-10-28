@@ -4,7 +4,7 @@
 
 This is a separate, explicitly selected async Session implementation, not an authentication system. It uses the reviewed single-primary Lua semantics and [selected pure-SSR Cookie contract](../../docs/YT-066B-COOKIE-ORDERING.md). No JavaScript, plugin registry, DI container, implicit Memory fallback or synchronous Redis facade is added.
 
-This package is included in the selected sixteen-package experimental 0.1.0
+This package is included in the selected sixteen-package experimental 0.9.0-alpha.1
 candidate. It remains unpublished; candidate selection and publication-prepared
 metadata do not establish registry availability or expand the support scope.
 

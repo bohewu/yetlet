@@ -24,8 +24,8 @@ fn options(temp: &Path, exit: i32) -> Options {
         binding: Binding {
             source: "a".repeat(40),
             workflow_sha: "a".repeat(40),
-            workflow: "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0".into(),
-            git_ref: "refs/tags/v0.1.0".into(),
+            workflow: "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1".into(),
+            git_ref: "refs/tags/v0.9.0-alpha.1".into(),
             run: "1".into(),
             attempt: "1".into(),
         },
@@ -78,7 +78,35 @@ fn closed_cli_rejects_unknown_duplicate_missing_and_invalid_bindings() {
     ]
     .map(Into::into)
     .into();
-    assert!(Options::parse(&args).is_ok());
+    assert_eq!(
+        Options::parse(&args).unwrap().binding,
+        options(t.path(), 17).binding
+    );
+    let verify: Vec<OsString> = [
+        "verify",
+        "--age",
+        "/age",
+        "--recipient",
+        "/recipient",
+        "--output",
+        "/output",
+        "--source",
+        &"a".repeat(40),
+        "--run",
+        "1",
+        "--attempt",
+        "1",
+        "--transport",
+        "/transport",
+        "--identity",
+        "/identity",
+    ]
+    .map(Into::into)
+    .into();
+    assert_eq!(
+        Options::parse(&verify).unwrap().binding,
+        options(t.path(), 17).binding
+    );
     args.extend(["--exit".into(), "0".into()]);
     assert!(Options::parse(&args).is_err());
     args.truncate(args.len() - 2);
@@ -92,6 +120,48 @@ fn closed_cli_rejects_unknown_duplicate_missing_and_invalid_bindings() {
     o.binding.workflow_sha = "b".repeat(40);
     assert!(custody::run(&o).is_err());
     assert!(!o.output.exists());
+}
+#[test]
+fn alpha_capture_and_verify_reject_legacy_identity_and_sha_mismatch_before_tools() {
+    let t = tempfile::tempdir().unwrap();
+    for verify in [false, true] {
+        for (workflow, git_ref, workflow_sha) in [
+            (
+                "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0",
+                "refs/tags/v0.9.0-alpha.1",
+                "a".repeat(40),
+            ),
+            (
+                "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1",
+                "refs/tags/v0.1.0",
+                "a".repeat(40),
+            ),
+            (
+                "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0",
+                "refs/tags/v0.1.0",
+                "a".repeat(40),
+            ),
+            (
+                "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1",
+                "refs/tags/v0.9.0-alpha.1",
+                "b".repeat(40),
+            ),
+        ] {
+            let mut o = options(t.path(), 17);
+            o.binding.workflow = workflow.into();
+            o.binding.git_ref = git_ref.into();
+            o.binding.workflow_sha = workflow_sha;
+            if verify {
+                o.operation = Operation::Verify {
+                    transport: t.path().join("transport"),
+                    identity: t.path().join("unavailable-identity"),
+                };
+            }
+            assert!(custody::run(&o).is_err());
+            assert!(!o.output.exists());
+        }
+    }
+    assert_eq!(fs::read_dir(t.path()).unwrap().count(), 0);
 }
 #[test]
 fn unsafe_nonregular_and_changed_recipient_inputs_fail_without_publication() {
@@ -320,24 +390,30 @@ import copy, hashlib, importlib.util, io, os, stat, tempfile, zipfile
 spec=importlib.util.spec_from_file_location('custody', 'scripts/release-evidence-preflight.py')
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
 e={'source':'a'*40,'run':'1','attempt':'2','artifact':'3','digest':'b'*64}
-r={'id':1,'run_attempt':2,'head_sha':'a'*40,'head_branch':'v0.1.0','event':'workflow_dispatch','path':'.github/workflows/release.yml','repository':{'id':4,'full_name':'bohewu/yetlet'},'head_repository':{'id':4,'full_name':'bohewu/yetlet'},'status':'completed','conclusion':'failure'}
+r={'id':1,'run_attempt':2,'head_sha':'a'*40,'head_branch':'v0.9.0-alpha.1','event':'workflow_dispatch','path':'.github/workflows/release.yml','repository':{'id':4,'full_name':'bohewu/yetlet'},'head_repository':{'id':4,'full_name':'bohewu/yetlet'},'status':'completed','conclusion':'failure'}
 a={'id':3,'name':'encrypted-private-'+'a'*40+'-1-2','expired':False,'size_in_bytes':100,'digest':'sha256:'+'b'*64,'workflow_run':{'id':1,'head_sha':'a'*40,'repository_id':4,'head_repository_id':4}}
 v={'name':'release-evidence-verify','id':5,'protection_rules':[{'type':'required_reviewers','reviewers':[{'type':'User','reviewer':{'login':'bohewu'}}]}],'deployment_branch_policy':{'protected_branches':False,'custom_branch_policies':True}}
-p={'total_count':1,'branch_policies':[{'name':'v0.1.0','type':'tag'}]}
+p={'total_count':1,'branch_policies':[{'name':'v0.9.0-alpha.1','type':'tag'}]}
 m.check_metadata(r,a,v,p,e)
+for path in ['.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1','.github/workflows/release.yml@v0.9.0-alpha.1']:
+ good=copy.deepcopy(r);good['path']=path;m.check_metadata(good,a,v,p,e)
 def rejects(run=r,artifact=a,environment=v,policies=p):
  try:m.check_metadata(run,artifact,environment,policies,e)
  except (ValueError,KeyError,StopIteration):return
  raise AssertionError('untrusted metadata accepted')
-for key,value in [('run_attempt',1),('head_sha','c'*40),('event','pull_request'),('path','.github/workflows/other.yml'),('head_branch','master'),('conclusion','cancelled')]:
+for key,value in [('run_attempt',1),('head_sha','c'*40),('event','pull_request'),('path','.github/workflows/other.yml'),('path','.github/workflows/release.yml@refs/tags/v0.1.0'),('path','.github/workflows/release.yml@v0.1.0'),('head_branch','master'),('head_branch','v0.1.0'),('conclusion','cancelled')]:
  bad=copy.deepcopy(r);bad[key]=value;rejects(run=bad)
+bad=copy.deepcopy(r);bad['head_branch']='v0.1.0';bad['path']='.github/workflows/release.yml@refs/tags/v0.1.0';rejects(run=bad)
 for key,value in [('name','other'),('expired',True),('digest','sha256:'+'c'*64),('id',9)]:
  bad=copy.deepcopy(a);bad[key]=value;rejects(artifact=bad)
+bad=copy.deepcopy(a);bad['workflow_run']['head_sha']='c'*40;rejects(artifact=bad)
 bad=copy.deepcopy(v);bad['protection_rules']=[];rejects(environment=bad)
 bad=copy.deepcopy(v);bad['protection_rules'][0]['reviewers'][0]['reviewer']['login']='other';rejects(environment=bad)
 bad=copy.deepcopy(v);bad['deployment_branch_policy']=None;rejects(environment=bad)
 bad=copy.deepcopy(p);bad['branch_policies'][0]['type']='branch';rejects(policies=bad)
 bad=copy.deepcopy(p);bad['branch_policies'][0]['name']='*';rejects(policies=bad)
+bad=copy.deepcopy(p);bad['branch_policies'][0]['name']='v0.1.0';rejects(policies=bad)
+bad=copy.deepcopy(p);bad['total_count']=2;bad['branch_policies'].append({'name':'v0.1.0','type':'tag'});rejects(policies=bad)
 def zipped(names,link=False):
  b=io.BytesIO()
  with zipfile.ZipFile(b,'w') as z:
@@ -375,6 +451,34 @@ print('documented metadata and two-file ZIP boundary: PASS')
         fs::read_to_string(repository_root().join(".github/workflows/evidence-verify.yml"))
             .unwrap();
     let (preflight, verify) = source.split_once("  verify:\n").unwrap();
+    for required in [
+        "on:\n  workflow_dispatch:",
+        "contents: read",
+        "actions: read",
+        "timeout-minutes: 5",
+        "timeout-minutes: 15",
+        "ref: ${{ github.sha }}",
+        "refs/tags/v0.9.0-alpha.1^{commit}",
+        "[[ \"$(git rev-parse HEAD)\" == \"$CUSTODY_SOURCE\" ]]",
+        "git merge-base --is-ancestor \"$CUSTODY_SOURCE\" refs/remotes/origin/master",
+        "[[ -z \"$(git status --porcelain)\" ]]",
+        "persist-credentials: false",
+    ] {
+        assert!(source.contains(required), "missing {required}");
+    }
+    for required in [
+        "[[ \"$GITHUB_EVENT_NAME\" == workflow_dispatch && \"$GITHUB_REPOSITORY\" == bohewu/yetlet ]]",
+        "[[ \"$GITHUB_REF\" == refs/tags/v0.9.0-alpha.1 ]]",
+        "[[ \"$EXPECTED_WORKFLOW_REF\" == bohewu/yetlet/.github/workflows/evidence-verify.yml@refs/tags/v0.9.0-alpha.1 ]]",
+        "[[ \"$GITHUB_SHA\" == \"$CUSTODY_SOURCE\" && \"$EXPECTED_WORKFLOW_SHA\" == \"$CUSTODY_SOURCE\" ]]",
+    ] {
+        assert_eq!(
+            source.matches(required).count(),
+            2,
+            "missing repeated {required}"
+        );
+    }
+    assert!(!source.contains("v0.1.0"));
     assert!(!preflight.contains("secrets."));
     assert!(!preflight.contains("environment:"));
     assert!(verify.contains("environment: release-evidence-verify"));

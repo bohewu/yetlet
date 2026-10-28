@@ -926,11 +926,11 @@ checksum = "550a2b930b62486a393c52d5c3b84bff264b28aa437ed64694d31e93b1757af7"
 
 [[package]]
 name = "yetlet-core"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 
 [[package]]
 name = "yetlet-html"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "yetlet-core",
 ]
@@ -948,7 +948,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-server-axum"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "axum",
  "serde",
@@ -959,7 +959,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-session-redis"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "axum",
  "getrandom",

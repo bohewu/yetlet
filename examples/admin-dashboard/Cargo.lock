@@ -2932,7 +2932,7 @@ checksum = "550a2b930b62486a393c52d5c3b84bff264b28aa437ed64694d31e93b1757af7"
 
 [[package]]
 name = "yetlet-actions"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -2964,14 +2964,14 @@ dependencies = [
 
 [[package]]
 name = "yetlet-auth"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "axum",
 ]
 
 [[package]]
 name = "yetlet-board-triage"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "serde",
  "serde_json",
@@ -2986,7 +2986,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-config"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "dotenvy",
  "libc",
@@ -2996,11 +2996,11 @@ dependencies = [
 
 [[package]]
 name = "yetlet-core"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 
 [[package]]
 name = "yetlet-dom-keyed"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "wasm-bindgen",
  "web-sys",
@@ -3009,14 +3009,14 @@ dependencies = [
 
 [[package]]
 name = "yetlet-html"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "yetlet-core",
 ]
 
 [[package]]
 name = "yetlet-lab-operations-board"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "axum",
  "futures-util",
@@ -3042,11 +3042,11 @@ dependencies = [
 
 [[package]]
 name = "yetlet-reactive"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 
 [[package]]
 name = "yetlet-request-id"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "axum",
  "yetlet-server-axum",
@@ -3054,14 +3054,14 @@ dependencies = [
 
 [[package]]
 name = "yetlet-secrets"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "secrecy",
 ]
 
 [[package]]
 name = "yetlet-server-axum"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "axum",
  "serde",
@@ -3072,7 +3072,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-session"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "axum",
  "cookie",
@@ -3083,7 +3083,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-session-redis"
-version = "0.1.0"
+version = "0.9.0-alpha.1"
 dependencies = [
  "axum",
  "getrandom 0.2.17",

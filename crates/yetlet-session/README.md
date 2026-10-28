@@ -66,7 +66,7 @@ Dual-licensed under [MIT](../../LICENSE-MIT) or [Apache-2.0](../../LICENSE-APACH
 <details>
 <summary>Historical delivery context and evidence</summary>
 
-**Experimental `0.1.0`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's nine library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
+**Experimental `0.9.0-alpha.1`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
 
 `yetlet-session` is an opt-in, synchronous process-local Memory Session provider. It owns random opaque identities, bounded in-memory values, absolute expiry, cookie lifecycle and session-bound CSRF tokens. It depends on Axum, cookie, getrandom, subtle and `yetlet-server-axum`; no browser runtime or Redis dependency is added.
 

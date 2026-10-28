@@ -4,10 +4,20 @@ Date: 2026-10-27. **D1–D5 Adopted (policy); D6 Pending.**
 YT-096 In progress; YT-020 Blocked; YT-206 Done.
 Original build/verify-only implementation independently reviewed PASS, zero issues
 and required followups. Added age custody integration/local fixture readback PASS;
-its independent review PASS, zero issues and required followups. Historical verification retains its original scope. No actual `C_release`, tag, hosted run or fresh sixteen-package output
-is selected or claimed by this implementation.
+its independent review PASS, zero issues and required followups. Historical verification retains its original scope. Later separate approvals
+completed the actual source-only tag, sixteen-package hosted build, protected
+readback and repository-external owner-host retention on 2026-10-28. The
+[actual hosted/custody checkpoint](YT-096-HOSTED-DRILL-PLAN.md#actual-hosted-and-custody-checkpoint--2026-10-28)
+is authoritative for exact source/run/artifact/approval/custody bindings and limits.
+The [minimum preparation plan](YT-096-HOSTED-PREPARATION-PLAN.md) retains its planning scope.
 
-For pending source/tag and one-attempt hosted authority, see the [minimum preparation plan](YT-096-HOSTED-PREPARATION-PLAN.md).
+**D1/D3 design amendment (2026-10-28):** The owner adopts a separate fixed-SHA
+[signer workflow contract](YT-096-SIGNER-CONTRACT.md) and
+[ADR 0009](adr/0009-release-build-and-signer-identities.md). Build source and
+workflow stay at `C_release`; future signer source `S` and `release-sign.yml`
+are separate. Proposed `prepare` mode has no OIDC; protected `sign` mode needs D6,
+exact signer/payload approval and actual Environment approval. Implementation,
+setup/custody and execution are not authorized by this documentation decision.
 
 ## Development path and separate authority
 
@@ -23,7 +33,8 @@ No branch, setting, protection or required-check change accompanies this slice.
 | Historical preparation | [private-rebuild.yml](../.github/workflows/private-rebuild.yml), unchanged identity guard, default original-nine or explicit sixteen |
 | New release preparation | [release.yml](../.github/workflows/release.yml), manual-only fixed sixteen, read-only contents, unsigned public allowlist |
 | Private readback | [evidence-verify.yml](../.github/workflows/evidence-verify.yml), separate manual protected Environment job; read-only contents/actions, safe receipt only |
-| Signing/publication | No implemented path; separately authorized D6 and YT-020 remain required |
+| Independent signer | Documentation-only `release-sign.yml` contract, signer `S` Pending; closed prepare/sign modes, implementation/setup/D6 execution not performed |
+| Publication | No implemented path; separate registry/final owner authority and YT-020 remain required |
 
 [qualification.yml](../.github/workflows/qualification.yml) retains its original
 scheduled/manual nine-library qualification. This source inventory is not a live
@@ -74,7 +85,11 @@ This statement confers neither a SLSA level nor release approval.
 
 Finalize raw source/build records, archive index and bounded inventory/coverage
 first; derive provenance second; create/verify the complete private checksum
-manifest last. Provenance never hashes itself or its containing manifest. Both
+manifest last. This manifest is complete for the preparation assembly; final
+signing completeness must separately reconcile all required reused qualification,
+security/support/review records under the signer contract. The preparation-manifest
+SHA and final signing-manifest SHA are separate bindings until shown identical
+under an approved complete scope. Provenance never hashes itself or its containing manifest. Both
 future signature bundles and final owner approval remain outside the assembly.
 Exact-set checksum verification rejects missing, extra, modified, nonregular or
 oversized files; existing bounds and no-overwrite behavior remain unchanged.
@@ -96,8 +111,9 @@ retain their existing semantics. The public eighteen-file set is unchanged.
 Build/capture receives only the source-pinned public recipient. The private identity
 stays outside Git, build jobs, logs and artifacts; only the separate manually
 approved Environment verification job may receive it transiently. This owner-adopted
-route supersedes the earlier local-only CI policy. Actual Environment protection,
-Secret installation and hosted execution remain unapproved and unverified.
+route supersedes the earlier local-only CI policy. The original integration review did not approve or verify Environment protection,
+Secret installation or hosted execution; their later separately approved completion
+is recorded in the hosted checkpoint above.
 
 On success or failure, trusted preparation can encrypt available records and upload
 only `private-evidence.tar.age` and `transport-receipt.json`. Failure records preserve
@@ -107,19 +123,21 @@ manifest. Capture/encryption/helper/upload failure or cancellation can mean
 The public package upload requires successful preparation, complete capture and
 successful encrypted transport. Seven-day artifact transport is not permanent
 archival storage. Actual download/decryption/inventory and complete-manifest
-verification plus durable retention still require an owner custody receipt.
+verification plus durable retention require an owner custody receipt; the dated
+checkpoint records the actual repository-external owner-host receipt and limits.
 
 ## Verification and next work
 
-Current custody evidence accepts thirteen focused Rust checks (eight integration,
+Retained local custody evidence accepts thirteen focused Rust checks (eight integration,
 two unit current PASS and three unchanged preparation checks with retained PASS),
 fmt/Clippy with warnings denied, both workflow YAML files, fifteen Bash blocks,
 bootstrap Bash, Python compilation and metadata/ZIP fixtures PASS. The authenticated
 age LOCAL roundtrip preserves the original/restored manifest bytes; native exit17
 partial evidence and tamper rejection remain explicit. See the [custody evidence
 record](YT-096-AGE-CUSTODY-INTEGRATION.md#recorded-local-evidence).
-`complete_product_custody=false`: no actual OpenSSL/sixteen-package build or hosted,
-release or durable production custody qualification is claimed. The five bounded
+The historical synthetic fixture had `complete_product_custody=false` and claimed
+no actual OpenSSL/sixteen-package build or hosted/release/durable custody
+qualification. The later hosted and owner-host results are recorded separately. The five bounded
 implementation repairs remain recorded; no failure is outstanding. Independent
 review of this custody delta PASS, zero issues and required followups.
 
@@ -128,14 +146,18 @@ Focused fixtures cover identity disagreements and valid isolated Git source/tag,
 closed CLI/workflow, actual digest bindings/closed fields, exact public disclosure,
 failure retention and unchanged private identity refusal. Related selected private
 recipe tests and the existing checksum suite protect the shared boundary.
-No hosted run, actual sixteen-product train, native/browser/CSP/security/platform
-qualification, external service, OIDC/certificate, signing, publication, commit or
-push is performed in this slice. Original preparation implementation review PASS,
+The original implementation slice performed no hosted run, actual sixteen-product
+train, native/browser/CSP/security/platform qualification, external service,
+OIDC/certificate, signing, publication, commit or push. The dated checkpoint
+records the later authorized tag/build/readback, without replaying accepted checks. Original preparation implementation review PASS,
 zero issues and required followups; earlier planning review PASS covers planning
 only. Both precede the current custody delta and do not attest its acceptance.
 
-Next unblockable YT-096 work is separate owner selection/approval of actual
-source/tag, protected Environment/Secret setup and hosted preparation. Age tool bootstrap is locally authenticated at Linux amd64 scope;
-Cosign/D6 bootstrap, exact final payloads/bundles, durable custody and immutable
-registry publication remain separate later work. Docker
-image delivery is outside this sixteen-source-package slice.
+Next unblockable YT-096 work is D6 identity/signing approval and the remaining
+trust, registry and final-release gates, including Cosign/D6 bootstrap and exact
+final payloads/bundles. Actual persistent owner-host custody is recorded;
+offsite replication and indefinite availability are not proved. No repeat build
+or verifier is needed for this document update. D6 Pending, YT-096 In progress
+and YT-020 Blocked remain unchanged. Docker image delivery is outside this
+sixteen-source-package slice. No new Commit/Push, signing or publication is
+authorized by this factual documentation update.
