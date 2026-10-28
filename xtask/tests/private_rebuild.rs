@@ -241,7 +241,10 @@ fn real_cargo_sixteen_alpha_packages_and_normal_verification_refusal() {
         let staged = work.join("vendor").join(format!("{name}-0.9.0-alpha.1"));
         let manifest: toml::Value =
             toml::from_str(&fs::read_to_string(staged.join("Cargo.toml")).unwrap()).unwrap();
-        assert_eq!(manifest["package"]["version"].as_str(), Some("0.9.0-alpha.1"));
+        assert_eq!(
+            manifest["package"]["version"].as_str(),
+            Some("0.9.0-alpha.1")
+        );
         assert!(staged.join(".cargo-checksum.json").is_file());
         assert_eq!(record[format!("package-{name}_exit_code")], 0);
         assert_eq!(
