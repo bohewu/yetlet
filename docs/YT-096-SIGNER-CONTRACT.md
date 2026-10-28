@@ -1,34 +1,35 @@
 # YT-096 — Separate signer and frozen payload contract
 
-**Owner-selected version update (2026-10-28):** The next sixteen-package
-Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md).
-The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
-(tree `6adff26fc4fec65e9aa8f40d7172ff266b7e500d`) as the new immutable alpha candidate C.
-The [minimum hosted/readback plan](YT-096-ALPHA-HOSTED-PLAN.md) records the
-remaining fixed-binding patch, consumed Guard-state disposition and separate
-execution-source selection/authorization gates. Existing `v0.1.0`, source
-`3eacfe3`, hosted/readback runs and retained bytes stay historical and unchanged;
-no alpha output or signing payload inherits their identity. No new execution C,
-alpha tag, hosted run or payload SHA is selected by the proposed future patch. The separate fixed-SHA signer design still applies. D6 Pending;
-YT-096 In progress; YT-020 Blocked. No tag, hosted execution, signing or publication
-is authorized by this migration.
+**Current alpha preparation checkpoint — 2026-10-28:** The owner accepts
+preparing the two signing inputs and a separate signer workflow. Original alpha
+build `40669449040`/attempt1 and manually approved verifier `40688772221`/attempt1
+PASS at the [recorded custody scope](YT-096-ALPHA-HOSTED-PLAN.md#actual-alpha-protected-verifier-and-retention--pass).
+The execution source is `bf3363801132f4481263ceb411d9bba3349df86d`, immutable unsigned
+`v0.9.0-alpha.1`, with sixteen Experimental `0.9.0-alpha.1` libraries. The earlier
+`5d7b918` was version-preflight C, not this hosted execution source. Historical
+`v0.1.0`, source `3eacfe3`, build/readback and retained payloads remain unchanged.
 
-Date: 2026-10-28 (Asia/Taipei). **Design adopted; implementation and setup Pending.**
-D1/D3 amendment only: D6 Pending; YT-096 In progress; YT-020 Blocked.
+Date: 2026-10-28 (Asia/Taipei). **Design adopted; signer implementation and setup
+Pending.** Public provenance bytes are now locally fixed and identified below;
+the complete private-manifest freeze, signer S and signing authority remain
+Pending. The source/payload readback is not a new independent implementation
+review. D6 Pending; YT-096 In progress; YT-020 Blocked.
+
 This contract and [ADR 0009](adr/0009-release-build-and-signer-identities.md)
 preserve the [D1–D5 policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md), including D2
-disclosure and custody limits. They authorize no execution, key access, signing,
-publication, Commit or Push. No signer workflow or Environment is configured here.
+disclosure and custody limits. Local preparation does not authorize hosted jobs,
+new Environment/Secret placement or private-key access, OIDC, signing,
+publication, Commit or Push. No signer workflow or Environment is configured yet.
 
 ## Immutable build and separate signer identities
 
 | Binding | Required value |
 |---|---|
-| Build source C | `3eacfe31f5e3281411d3bc4653a6baccab668b30` |
-| Build tree | `86385d60cb4c3e595c670dbacce117ebeeb1a993` |
-| Product tag | Existing immutable unsigned `v0.1.0`; never move it |
-| Build workflow/run | `.github/workflows/release.yml@refs/tags/v0.1.0`; `40628943583` / attempt1 |
-| Protected verifier | `40631789238` / attempt1 |
+| Build source C | `bf3363801132f4481263ceb411d9bba3349df86d` |
+| Build tree | `c4ee13aa558489ba3962874dbf5e0a0a1bc99605` |
+| Product tag | Existing immutable unsigned `v0.9.0-alpha.1`; never move it |
+| Build workflow/run | `.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1`; `40669449040` / attempt1 |
+| Protected verifier | `40688772221` / attempt1 |
 | Signer source S | Pending: a different, future reviewed lowercase full forty-hex commit containing proposed `.github/workflows/release-sign.yml` and trusted helpers |
 | Proposed signer ref | Protected `refs/heads/master` |
 | Signer execution equality | Checked-out code SHA = event SHA = workflow SHA = `expected_signer_commit` = S |
@@ -36,7 +37,7 @@ publication, Commit or Push. No signer workflow or Environment is configured her
 | OIDC issuer | `https://token.actions.githubusercontent.com` |
 | Repository/owner | `bohewu/yetlet`, repository ID1409587171; `bohewu`, owner ID35250002 |
 
-S is neither C nor documentation HEAD `5535a75`; no current commit is selected
+S is neither C nor current documentation HEAD `b271af0`; no current commit is selected
 implicitly. Verify the certificate's authenticated workflow/build-signer digest
 cryptographically against S, alongside the exact issuer/SAN and repository/owner
 identities. SAN or branch name alone is insufficient. A mismatch fails closed.
@@ -80,8 +81,17 @@ Environment approval does not substitute for D6 or secret-placement authority.
 
 | Target | Exact bytes and signature contract |
 |---|---|
-| Public provenance | Original build `public/PROVENANCE-UNSIGNED.json`, 9022 bytes, SHA-256 `b3a1e66a34d316c6513ff4e0b9c8055c37b8f81daa598a8110f867e911a400fc`; supplied-statement DSSE whose decoded payload is byte-identical |
+| Public provenance | Original alpha build `public/PROVENANCE-UNSIGNED.json`, 9158 bytes, SHA-256 `4d4de1a8ce9cc077c0aa62a1aafb3ab9799eed312deddb66d9e6f8fc6fef2d68`; supplied-statement DSSE whose decoded payload is byte-identical |
 | Private complete evidence manifest | Final frozen assembly's `RELEASE-CHECKSUMS.json`; SHA-256 Pending; detached blob signature over its actual bytes |
+
+The public payload is copied byte-for-byte from the verified repository-external
+alpha custody into ignored preparation storage, flushed and reread with that
+size/hash. This fixes the proposed public signing bytes only: it creates no
+signature, D6 approval, final private assembly or preparation receipt. The old
+`0.1.0` provenance remains 9022 bytes, SHA-256
+`b3a1e66a34d316c6513ff4e0b9c8055c37b8f81daa598a8110f867e911a400fc`,
+with its original `3eacfe3`/build `40628943583` identity; never sign or relabel it
+as the alpha provenance.
 
 The sixteen subjects cover the sixteen actual archives; this does not require
 sixteen individual signatures. Compatibility must prove preservation of the
@@ -94,6 +104,53 @@ only during later authorized isolated decryption: compare authenticated
 then export the digest, never plaintext. This is a historical input identity;
 the final manifest SHA can differ. Public `RELEASE-CHECKSUMS.json`, retention-index,
 inventory SHA and ciphertext SHA cannot substitute for either private manifest.
+
+## D6 completion and the GitHub draft boundary
+
+D6 is concrete authority for identity issuance/signing and later promotion; it
+is not satisfied by a green unsigned build or an evidence-decryption receipt.
+Keep the following conditions separate:
+
+| Gate | Actual alpha status / required outcome |
+|---|---|
+| Source, unsigned build, verifier and retained bytes | PASS at the existing bounded scope; reuse without replay |
+| Public signing bytes | Fixed above; no signature or owner signing approval |
+| Complete private evidence assembly | Pending reviewed exact closure, protected assembly/verification, encryption and actual final manifest SHA |
+| Trusted signer | Pending implementation/review, fixed S, tool/root bootstrap and supplied-statement compatibility |
+| Protected preparation | Pending separate reviewed Environment/Secret setup and explicit hosted execution authority; no OIDC permission |
+| Exact D6 signing approval | Pending owner acceptance of S, identities, both raw payload hashes and the frozen preparation receipt/artifact binding |
+| Actual signatures and verification | Pending protected signing, independently verified bundles/certificate/log/S, all subjects and all private-manifest entries; retain failures without automatic retry |
+| Final disposition | Record the owner's acceptance against actual manifest/bundle digests; do not mark YT-096 Done from draft creation or technical preparation alone |
+
+After those formal integrity conditions pass and the owner accepts the actual
+result, the signing work can close at that recorded scope. GitHub Release
+publication and crates.io upload still need their own explicit approvals; the
+separately blocked YT-020 registry gate does not disappear. This adds no business
+SLO, hardware or general operations requirement.
+
+The owner also asks to create a Release. A single **unpublished Draft
+pre-release** is created using existing `v0.9.0-alpha.1`, source C, release ID
+`426670086`: [alpha Release draft](https://github.com/bohewu/yetlet/releases/tag/untagged-cbcde6fe4a28746e82cc).
+Fresh readback confirms `draft=true`, `prerelease=true`, `published_at=null`,
+no uploaded assets and unchanged release-note bytes. The notes introduce native
+SSR, opt-in capabilities, source usage, library scope and documented limits;
+they explicitly disclose pending signing/registry publication. No new tag,
+GitHub Release publication, certificate, signature or package upload is created.
+The draft is a review surface, not evidence that D6 has passed; publication must
+reconcile its pending status wording against the actual verified outcome.
+
+The minimal workflow preparation remains the two closed modes above, with a
+read-only preflight before any protected job. `prepare` validates the exact
+alpha artifact/receipt/source inputs and selected evidence closure, emits only
+encrypted frozen input plus safe `SIGNING-INPUTS`, and has no `id-token: write`.
+`sign` later consumes those same frozen bytes under exact D6 approval and adds
+OIDC permission only to the protected signing job. Both use reviewed code at S,
+not product code execution or a new product build. This checkpoint is a concrete
+input/authority plan; it does not claim that `release-sign.yml` is implemented.
+
+Ignored `target/yt096-alpha-signer-preparation-20261028/` retains public payload
+bytes/readiness, exact Release request/response/readback, release notes and
+source/tag/disclosure checks. It contains no private key or decrypted evidence.
 
 ## Final assembly scope and freeze order
 

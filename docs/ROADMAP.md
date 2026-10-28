@@ -1,26 +1,32 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**Owner-selected alpha execution source (2026-10-28):** After making
-[PR #14](https://github.com/bohewu/yetlet/pull/14) Ready and squash-merging it,
-the owner selects `C_release_alpha`
+**Alpha signing inputs and Release draft (2026-10-28):** The owner accepts local
+preparation and requests a Release. The [current signer contract](YT-096-SIGNER-CONTRACT.md#d6-completion-and-the-github-draft-boundary)
+records actual alpha build source/run identities, fixed original public provenance
+bytes/SHA and Pending complete private-manifest/S/tool/setup/execution gates.
+Unpublished Draft pre-release `426670086` uses existing `v0.9.0-alpha.1`/C,
+with no uploaded assets. No signing, publication, hosted run, private-key access,
+Commit or Push; D6 Pending, YT-096 In progress, YT-020 Blocked.
+
+**Unsigned alpha build/readback and retention completed (2026-10-28):**
+The owner-selected `C_release_alpha` remains
 `bf3363801132f4481263ceb411d9bba3349df86d`, tree
-`c4ee13aa558489ba3962874dbf5e0a0a1bc99605`, for the sixteen Experimental
-`0.9.0-alpha.1` libraries. Fresh remote/object checks match the merged master tree
-exactly to CI-passed PR head `a041600`; its single parent is historical
-`3eacfe3`. The [source selection and remaining gates](YT-096-ALPHA-HOSTED-PLAN.md#selected-alpha-execution-source--pr-14-squash-merge)
-preserve the original version-preflight candidate `5d7b918`, original branches,
-`v0.1.0`, hosted/custody evidence and failures. Guard strict/builtin and PR CI
-PASS remain scope-labeled; exact-source automatic master CI `40654332287`,
-attempt 1, also PASSes for MSRV and Stable/RustSec/WASM/Chrome. The owner-authorized
-Environment update is complete: the same sole tag policy now names
-`v0.9.0-alpha.1`, with reviewer/protection/bypass rules, Secret metadata and pinned
-recipient preserved by before/after readback. Guard `0.45.0` is installed on all
-three runners and the exact old
-used binding remains privately archived, with no active/new acceptance.
-Next: separately authorize the alpha
-tag/build/readback gates. No tag, release/verifier
-dispatch, signing or publication occurs. Exact alpha payload hashes and signer S
-remain Pending. D6 Pending; YT-096 In progress; YT-020 Blocked.
+`c4ee13aa558489ba3962874dbf5e0a0a1bc99605`, for sixteen Experimental
+`0.9.0-alpha.1` libraries. Local tracking commit `b271af0` is not Pushed.
+The [actual alpha execution record](YT-096-ALPHA-HOSTED-PLAN.md#actual-alpha-protected-verifier-and-retention--pass)
+binds immutable unsigned `v0.9.0-alpha.1` to successful
+[build 40669449040](https://github.com/bohewu/yetlet/actions/runs/40669449040)
+and [protected verifier 40688772221](https://github.com/bohewu/yetlet/actions/runs/40688772221),
+each attempt 1. Actual owner Environment approval, isolated decryption/full
+private manifest and cleanup PASS. Independent local public checksum/16-package
+subject/source/receipt correspondence PASS; repository-external owner-host
+retention indexes 57 files, 130,178,085 bytes, flushed and reread successfully.
+No automatic expiry is configured; offsite/replication and indefinite host
+availability are not verified. No accepted qualification or hosted run is replayed.
+Original branches/history, `v0.1.0`, custody/failures and the retired old binding
+remain intact. The alpha Guard binding remains used; later ordinary Push needs
+explicit retirement. Exact signing-payload hashes, signer S and D6 remain
+Pending. No signing or publication occurs; YT-096 In progress, YT-020 Blocked.
 
 **Status:** Evidence-gated prototype roadmap; developer entry/status refresh 2026-10-12. Historical qualification dates and source identities remain unchanged.
 
@@ -35,7 +41,7 @@ Implementation, exact `S`, final manifest SHA and isolated Environment/key setup
 remain Pending. This is documentation only; D6 Pending, YT-096 In progress and
 YT-020 Blocked, with original failures and accepted evidence preserved.
 
-**Current YT-096 checkpoint (2026-10-28, Asia/Taipei):** The
+**Historical YT-096 0.1.0 checkpoint (2026-10-28, Asia/Taipei):** The
 [actual hosted build/verifier/custody record](YT-096-HOSTED-DRILL-PLAN.md) binds
 owner-selected `C_release` `3eacfe3` and unsigned `v0.1.0` to build
 `40628943583`/attempt1 and protected verifier `40631789238`/attempt1, both PASS.

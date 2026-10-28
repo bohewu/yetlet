@@ -1,5 +1,13 @@
 # YT-096 — Reduce release supply-chain attacks: adopted D1–D5 policy
 
+**Current alpha signing preparation (2026-10-28):** The [signer contract](YT-096-SIGNER-CONTRACT.md)
+now binds actual alpha source `bf33638`, unsigned `v0.9.0-alpha.1`, build
+`40669449040`/attempt1 and verifier `40688772221`/attempt1. It records the fixed
+9158-byte public provenance SHA and remaining private-manifest/S/D6 gates, plus
+an unpublished GitHub Draft pre-release. The `0.1.0` source/run/payload tables
+below retain their historical adoption scope; they are not the current alpha
+signing inputs. No signing/publication authority or private custody is broadened.
+
 **Owner-selected version update (2026-10-28):** The next sixteen-package
 Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md).
 The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
