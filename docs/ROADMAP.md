@@ -1,27 +1,26 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**Owner-selected version update (2026-10-28):** The next sixteen-package
-Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md).
-The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
-(tree `6adff26fc4fec65e9aa8f40d7172ff266b7e500d`) as the new immutable alpha candidate C.
-The [minimum hosted/readback plan and local implementation checkpoint](YT-096-ALPHA-HOSTED-PLAN.md)
-record the independently accepted alpha fixed-binding and Guard lifecycle
-implementation. Guard `0.45.0` is now released and installed through WebCodex on
-all three runners, preserving all twenty workspace configurations. The
-[actual used-binding retirement](YT-096-ALPHA-HOSTED-PLAN.md#current-operator-checkpoint--used-binding-retired)
-executes once with strict/builtin PASS: the exact 327-byte used record is
-privately archived, active selection is absent and all refs/hooks/profile/policy
-hashes remain unchanged. No new Push acceptance is armed. Live master `3eacfe3`
-is not an ancestor of local `e8be231`; the next proposed step is a separately
-authorized integration PR retaining the original branch, required CI and explicit
-merged execution-C selection. Environment policy, alpha tag, hosted build/readback,
-payload hashes and delivery authority remain Pending. Earlier implementation,
-review and failed execution records retain their original scopes. Existing `v0.1.0`, source
-`3eacfe3`, hosted/readback runs and retained bytes stay historical and unchanged;
-no alpha output or signing payload inherits their identity. No new execution C,
-alpha tag, hosted run or payload SHA is selected by this retirement checkpoint. The separate fixed-SHA signer design still applies. D6 Pending;
-YT-096 In progress; YT-020 Blocked. No tag, hosted execution, signing or publication
-is authorized by this migration.
+**Owner-selected alpha execution source (2026-10-28):** After making
+[PR #14](https://github.com/bohewu/yetlet/pull/14) Ready and squash-merging it,
+the owner selects `C_release_alpha`
+`bf3363801132f4481263ceb411d9bba3349df86d`, tree
+`c4ee13aa558489ba3962874dbf5e0a0a1bc99605`, for the sixteen Experimental
+`0.9.0-alpha.1` libraries. Fresh remote/object checks match the merged master tree
+exactly to CI-passed PR head `a041600`; its single parent is historical
+`3eacfe3`. The [source selection and remaining gates](YT-096-ALPHA-HOSTED-PLAN.md#selected-alpha-execution-source--pr-14-squash-merge)
+preserve the original version-preflight candidate `5d7b918`, original branches,
+`v0.1.0`, hosted/custody evidence and failures. Guard strict/builtin and PR CI
+PASS remain scope-labeled; exact-source automatic master CI `40654332287`,
+attempt 1, also PASSes for MSRV and Stable/RustSec/WASM/Chrome. The owner-authorized
+Environment update is complete: the same sole tag policy now names
+`v0.9.0-alpha.1`, with reviewer/protection/bypass rules, Secret metadata and pinned
+recipient preserved by before/after readback. Guard `0.45.0` is installed on all
+three runners and the exact old
+used binding remains privately archived, with no active/new acceptance.
+Next: separately authorize the alpha
+tag/build/readback gates. No tag, release/verifier
+dispatch, signing or publication occurs. Exact alpha payload hashes and signer S
+remain Pending. D6 Pending; YT-096 In progress; YT-020 Blocked.
 
 **Status:** Evidence-gated prototype roadmap; developer entry/status refresh 2026-10-12. Historical qualification dates and source identities remain unchanged.
 

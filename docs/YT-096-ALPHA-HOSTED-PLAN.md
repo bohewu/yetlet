@@ -3,6 +3,126 @@
 Date: 2026-10-28 (Asia/Taipei). Status: Plan independently reviewed PASS, zero issues/required followups.
 D6 Pending; YT-096 In progress; YT-020 Blocked. This packet authorizes no execution.
 
+## Selected alpha execution source — PR #14 squash merge
+
+On 2026-10-28, the owner explicitly authorizes making
+[PR #14](https://github.com/bohewu/yetlet/pull/14) Ready, squash-merging its
+approved source and selecting the verified resulting master commit as
+`C_release_alpha`. That selection is now complete. This is source selection
+only; no tag, release/verifier workflow, signing or publication is authorized.
+
+| Binding | Selected or verified value |
+|---|---|
+| Immutable `C_release_alpha` | `bf3363801132f4481263ceb411d9bba3349df86d` |
+| Exact tree | `c4ee13aa558489ba3962874dbf5e0a0a1bc99605` |
+| Single squash parent | `3eacfe31f5e3281411d3bc4653a6baccab668b30` |
+| Approved PR head | `a041600d04e89bf3f71ae30350c26cbfeb9f38c5`; the merged tree is identical |
+| Cohort/version | Sixteen Experimental `0.9.0-alpha.1` libraries |
+| Original version-preflight candidate | `5d7b91842f8188d45e5af22367245aebec7ca7d1`; historical scope retained |
+| Historical `C_release` / tag | `3eacfe31f5e3281411d3bc4653a6baccab668b30` / immutable unsigned `v0.1.0`; unchanged |
+
+Fresh preflight confirms the approved PR head/base, mergeable state and
+[PR CI run 40652377287](https://github.com/bohewu/yetlet/actions/runs/40652377287)
+SUCCESS for MSRV and Stable/native/RustSec/WASM/Chrome. The original
+[format failure 40651836854](https://github.com/bohewu/yetlet/actions/runs/40651836854)
+is retained; its only repair reformats one xtask version assertion. The exact
+two-commit merge-source range passes strict/builtin Guard with zero findings
+(79 file operations across 78 distinct paths). Existing staged and native-hook
+delivery receipts remain bound to their actual earlier operations.
+
+The GitHub Ready transition returns the same head/base. The squash request pins
+the approved full head SHA and returns `merged=true` with the selected SHA.
+A subsequent noninteractive no-tag fetch and fresh remote read both resolve
+master to that SHA. Raw Git object checks establish the exact tree equality,
+empty PR-head-versus-squash tree diff and single expected parent. The squash
+changes commit identity, so PR head `a041600` is not relabeled as the release
+commit. Server-side squash Merge does not run this clone's native commit/push
+hooks; no native-hook merge proof or new complete-history scan is claimed.
+
+The original local source branch stays at `80f6b83`, the integration branch
+stays at `a041600`, and their remote heads/history are preserved. Existing tag
+refs, owned hooks, workspace configuration and the exact retired used-binding
+archive remain unchanged; no active or newly armed acceptance exists. The
+earlier Guard rollout, candidate, build/readback/custody and failed-run records
+retain their original identities and acceptance scopes.
+
+### Remaining execution gates
+
+The subsequent read-only check confirms exact-source automatic
+[master CI 40654332287](https://github.com/bohewu/yetlet/actions/runs/40654332287),
+attempt 1, SUCCESS. Its source is the selected `C_release_alpha`, event `push`,
+branch `master`, workflow `.github/workflows/rust.yml`. Both Rust 1.99 MSRV and
+Stable/native/samples/RustSec/WASM/Chrome jobs completed successfully. This is
+the Merge-triggered CI result, not a manually dispatched release/verifier or a
+rerun. Pre-merge PR CI keeps its earlier scope; no old passing qualification is
+replayed locally. The technical master-CI prerequisite is complete.
+
+The historical read-only GitHub Environment/API observations below, made on
+2026-10-28 before the separately authorized update, establish its exact scope.
+That inspection itself granted no mutation authority:
+
+| Setting | Observed value / proposed disposition |
+|---|---|
+| Existing Environment | `release-evidence-verify`, ID `25525950662`; reuse |
+| Required reviewer | Exactly user `bohewu`; preserve |
+| Self-review / administrator bypass | `prevent_self_review=false`, `can_admins_bypass=false`; preserve the accepted single-owner boundary |
+| Deployment restriction | Custom branch policies enabled; exactly one `type=tag` policy |
+| Existing policy | ID `64604698`, name `v0.1.0`; proposed replacement name `v0.9.0-alpha.1`, retaining a single tag policy |
+| Existing `AGE_IDENTITY` | Metadata confirms presence; no value is read, no key upload/rotation or new decryption proof |
+| Pinned public recipient | SHA-256 `b861a3c7e2abf3caf4c7071c045f6114704db94e8cc39ce010e7fa10711ff506`, unchanged |
+
+The owner subsequently authorizes **only** replacement of that one existing
+tag-policy name with `v0.9.0-alpha.1`, preserving everything else. Fresh preflight
+matches the reviewed Environment ID, policy ID/type/count, protection rules,
+Secret metadata and pinned recipient. One name-only
+[documented policy update](https://docs.github.com/en/rest/deployments/branch-policies?apiVersion=2026-03-10#update-a-deployment-branch-policy)
+returns success; fresh Environment/policy/Secret-metadata GETs confirm:
+
+- Environment `release-evidence-verify` / ID `25525950662` is reused.
+- The same policy ID `64604698` now has name `v0.9.0-alpha.1`, type `tag`;
+  total policy count remains exactly one. No policy is appended or recreated.
+- Required reviewer `bohewu`, `prevent_self_review=false`,
+  `can_admins_bypass=false`, custom deployment restriction and all protection
+  rules remain identical to the fresh before-state.
+- `AGE_IDENTITY` metadata and the public recipient bytes/digest are unchanged.
+  No Secret value or private key is read, uploaded, replaced or rotated; this is
+  settings/readback evidence, not a new decrypt or key-pair qualification.
+
+The Environment policy prerequisite is complete. The old `v0.1.0` tag, runs and
+retained evidence remain intact, but a future old-tag Environment job is no
+longer eligible; re-enabling it requires separate settings authority. No
+Environment rewrite, extra policy, automatic retry or workflow dispatch occurs.
+The exact request, one-attempt response, before/after API observations and
+preservation proof are retained under
+`target/yt096-alpha-candidate-selection-20261028/environment-policy/`.
+
+GitHub connector discovery exposes only PR-filtered commit-run queries and no
+Environment query, so these observations use existing `gh` with explicit GETs.
+The known-run job readback uses the connector. Original API results, exact source/
+attempt/job bindings and gate assessment are retained under
+`target/yt096-alpha-candidate-selection-20261028/master-ci/`.
+
+Next, separately authorize the immutable unsigned `v0.9.0-alpha.1` tag at this
+exact selected source, fresh Guard history acceptance, one bounded manual build
+and protected readback/retention. Recheck actual remote/ref/settings boundaries
+at execution; completed CI/settings checks grant none of that authority. Only
+the approved policy name changes in this checkpoint. No Secret/key/recipient
+change, tag creation, hosted build/readback, payload freeze, signing or publication
+occurs. D6, signer S and both actual alpha payload SHA values remain Pending.
+
+These tracking notes are written after candidate selection and are not part of
+the selected immutable tree. A later documentation commit must not silently
+replace `C_release_alpha`. Preserve the original `0.1.0` payload hashes and obtain
+new alpha package/provenance/manifest bytes only through the separately approved
+new-source build/readback.
+
+Receipts are in ignored `target/yt096-alpha-candidate-selection-20261028/`:
+pinned PR/CI preflight, strict Guard output, Ready/squash responses, merged PR
+metadata, no-tag fetch logs and exact candidate/tree/ref preservation proof.
+No new independent implementation/release qualification review is claimed.
+The older checkpoints and reviewed plans below retain their historical scopes.
+D6 Pending; YT-096 In progress; YT-020 Blocked.
+
 ## Current operator checkpoint — used binding retired
 
 On 2026-10-28, the owner separately authorizes the exact reviewed local
