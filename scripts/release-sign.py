@@ -332,16 +332,22 @@ def prepare(r, work, output):
     closure = qualification(q)
     final = work / "assembly"
     final.mkdir(mode=0o700)
+    extra_labels = {}
     for directory, old_name in [(restored / "private", "BUILD-PREPARATION-CHECKSUMS.json"),
                                 (restored / "extras", None), (q, "QUALIFICATION-CHECKSUMS.json")]:
         for f in sorted(directory.iterdir()):
             name = old_name if f.name == MANIFEST else f.name
             require(name is not None)
+            if directory == restored / "extras":
+                name = "BUILD-EXTRA-" + f.name
+                checksums.safe_name(name)
+                extra_labels[f.name] = name
             write(final / name, read(f))
     json_write(final / "EVIDENCE-CLOSURE.json", {
         "schema": 1, "source": C, "build_run": BUILD, "build_attempt": "1", "verifier_run": VERIFIER,
         "original_inventory_sha256": sha(read(restored / "CUSTODY-INVENTORY.json")),
         "original_private_manifest_sha256": sha(original_manifest), "qualification": closure,
+        "original_extra_labels": extra_labels,
         "limits": "Selected evidence scopes/failures retained; tool digests do not assert retained executable bytes"})
     command([os.environ["SIGN_XTASK"], "release", "checksums", "create", final])
     command([os.environ["SIGN_XTASK"], "release", "checksums", "verify", final])
