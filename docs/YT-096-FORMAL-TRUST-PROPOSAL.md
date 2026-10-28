@@ -1,4 +1,28 @@
-# YT-096 — minimum formal trust and provenance proposal
+# YT-096 — Minimum supply-chain integrity and provenance proposal
+
+**Purpose:** Give consumers a way to detect substituted release artifacts,
+impersonated signing identities and mismatched source/build claims. This formal
+release-integrity work adds no framework runtime feature or production guarantee.
+
+**Owner adoption (2026-10-27): D1–D5 Adopted (policy); D6 Pending.** Read the
+[D1–D5 owner packet](YT-096-D1-D5-RELEASE-TRUST-PLAN.md) for the adopted sixteen
+source-package cohort, exact public disclosure/private-evidence boundaries,
+future co-located `C_release`/release workflow and proposed `v0.1.0`, Cosign3.1.4
+reference identities, source-package-only claims and acyclic evidence bindings.
+Actual bootstrap, root validity and compatibility remain unverified; reference
+hashes do not establish qualified TUF roots or an authenticated installation.
+The owner authorizes build/verify-only workflow implementation with new changes
+uncommitted/unpushed. No actual release SHA, final output/payload or signature
+execution is approved, and no tag is created. Hosted build/verify execution
+needs separate explicit authority and may be authorized while D6 remains Pending.
+D6 holds identity issuance/signing; publication needs separate explicit approval. YT-096 stays In progress, YT-020 Blocked and YT-206 Done.
+
+## Historical nine-package proposal — 2026-10-20
+
+The remaining proposal, original review PASS and later dated brief retain their
+historical scopes, pins and verdicts. Pending policy statements below describe
+their original dates; the adoption above is current. Original reviews do not
+approve the new workflow implementation or replace FAIL / release-ready NO.
 
 Date: 2026-10-20. **Research only; proposed, not an approved signing policy.**
 The reviewed support/inventory decision was committed as `0bd7596` after a

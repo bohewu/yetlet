@@ -1,5 +1,128 @@
 # YT-206 — Public source-preview disclosure preparation
 
+Current status: 2026-10-27 (Asia/Taipei). **The repository is Public as an
+Experimental source preview. Owner disclosure approval and the authorized
+Merge/visibility/reporting setup are complete. The signed-in reporting form and
+actual notification-delivery checks PASS. Independent completion Reviewer PASS,
+zero issues and required followups, marks YT-206 Done at this selected scope;
+no check is waived or moved to another item.**
+
+## Reporting completion
+
+The owner requested completion of both remaining checks, signed in to GitHub,
+explicitly authorized one private non-vulnerability test and supplied an existing
+non-admin reporter account. The test is clearly labelled as a reporting/delivery
+check, with no affected package/version, real security impact, severity or CVE
+assertion. No private advisory ID, mailbox address, reply token or mail body is
+published here; exact bindings remain in the local evidence below.
+
+| Check | Executed result | Scope |
+|---|---|---|
+| Authenticated private-reporting form | PASS: the non-admin reporter sees Report a vulnerability, the security-policy link, Title/Summary/Details/Proof of concept/Impact fields, private-maintainer visibility notice and Submit report; the browser submission creates one Triage record | Actual external-reporter flow, rather than the owner's draft-advisory interface; AI assistance disclosed |
+| Account-level notification route | PASS: the owner's configured default email matches the connected Gmail mailbox; Watching selects Email and the repository subscription is subscribed/not ignored | Existing personal mailbox, no new domain or dedicated address; no Web inbox delivery claim |
+| Actual maintainer notification delivery | PASS: GitHub's private-report email arrives21seconds after submission; a related collaborator notice arrives22seconds after submission | Matching advisory reference and approved test marker, Gmail delivery timestamps, exact Delivered-To recipient match and passing GitHub DKIM/SPF; one bounded sample, not a delivery SLA |
+| Controlled-test closeout | PASS: the owner closes the single private test after receipt; authenticated API readback reports Closed with no publication, CVE or private fork | Closed record and evidence retained; it is not a real vulnerability or published advisory |
+
+The report was created on2026-10-27 at20:25:29 Asia/Taipei; the two emails arrived
+at20:25:50 and20:25:51, and the record was closed at20:29:04. The API/source
+receipts retain the corresponding UTC timestamps. Only this newly authorized
+reporting/delivery check executed; accepted package/browser/provider/load
+qualification was not replayed. Independent completion Reviewer PASS, zero issues
+and required followups, accepts the actual form, delivery and private-test closeout
+evidence. Only this completion metadata follows review acceptance.
+
+The following earlier outcomes remain recorded as failures or limits:
+
+- The owner initially saw the admin draft-advisory form. A private-report API
+  submission under that identity returned403; readback confirmed0reports and
+  0notifications. The owner then supplied the non-admin reporter login. No
+  duplicate report was created and no permissions were weakened.
+- Attempts to add the optional On GitHub Watching channel did not persist in
+  their readbacks. The existing Email route was preserved and is the route
+  actually verified above; Web inbox delivery is not claimed.
+- The first mail-binding assertion expected the user in the To header, but
+  GitHub addressed a repository mailing list. One parser correction reused the
+  same two messages and checked Gmail's Delivered-To envelope instead. It did
+  not send another report or repeat the delivery test.
+
+This completion supplies the previously missing evidence. It does not reinterpret
+the earlier Not verified results as passes, waive notification delivery, create a
+future backlog substitute or approve formal D1–D6 decisions.
+
+## Post-activation status
+
+This section records activation before the reporting execution above. Its
+settings-only verification limits are retained as the earlier observation.
+
+The owner explicitly accepted the inventoried source/history/PR/image and Actions
+disclosure, preserving failed records, then authorized PR12 Merge, Public
+visibility and GitHub Private Vulnerability Reporting. This subsequent authority
+supersedes the pending disclosure/operation choices in the retained snapshot below.
+
+- [PR12](https://github.com/bohewu/yetlet/pull/12) was squash-merged as
+  `d7065bbfb5b733c418f65ef55324f4d0ce6ac4d6`. Its complete tree,
+  `cca0153c3e56bc5e13e651a4a4bb1469dc042cfe`, exactly matches reviewed head
+  `3d63f0bcaa12d23ab075bfd63e784c8d50f39cc4`. Both required jobs passed in
+  [CI40497321153](https://github.com/bohewu/yetlet/actions/runs/40497321153), including
+  RustSec and Chrome E2E. Accepted product qualification was not replayed.
+- The nine-commit merge range passed strict/builtin screening with exit0,
+  462file operations,0blocking findings and9non-blocking path warnings. Those
+  warnings remain recorded; no policy downgrade or suppression was introduced.
+- The [repository](https://github.com/bohewu/yetlet) is Public. The delivery branch
+  is retained and automatic merged-branch deletion is disabled. Both required
+  checks, administrator enforcement, force-push prohibition and collaborator-only
+  PR creation were preserved. No history or failed-run deletion was performed.
+- GitHub reports private vulnerability reporting `enabled=true`. The public
+  [Advisories page](https://github.com/bohewu/yetlet/security/advisories) displays
+  **Report a vulnerability**. This verifies enablement and the public entry,
+  without claiming that the signed-in form was rendered or submitted.
+- The maintainer's repository subscription reads `subscribed=true` and
+  `ignored=false`. This is notification-setting evidence, not proof of GitHub
+  inbox/email routing or delivery. A separate mailbox/domain remains optional.
+- Immediately before activation, metadata listed39runs and16artifacts. Only
+  new CI40497321153 logs and artifact12731428615 were read at the existing bounded
+  marker scope;28log members and1artifact member had0personal-path/private-key
+  marker matches. Earlier artifact12262540945 was no longer listed; the retained
+  download and absence observation were preserved, without a deletion operation.
+  The original38-run inventory below remains unchanged as historical evidence.
+- The subsequently authorized GitHub About description now states:
+  "Experimental HTML-first Rust UI framework with native SSR, optional browser
+  WASM, and Axum/Tower integration. Source preview; packages unpublished."
+  Repository topics are `rust`, `ui-framework`, `web-framework`, `html-first`,
+  `ssr`, `webassembly`, `axum`, `tower` and `experimental`; these are discovery
+  metadata, not Git version tags or release approval.
+
+Technical C remains `118f3d0f496b487ef20fe243f4e73179f9eadc43`; no successor
+candidate, release-artifact signing, version tag, package publication or reader
+site export was selected or performed. YT-096 remains In progress, YT-020 Blocked,
+and all formal D1–D6 decisions remain Pending.
+
+## Remaining reporting verification
+
+**Historical pending table:** These were the open checks at the3ecf6ff document
+checkpoint. Both are now exercised in [Reporting completion](#reporting-completion);
+the original Not verified wording and authorization boundary remain below.
+
+| Check | Accepted evidence | Still Not verified |
+|---|---|---|
+| Signed-in private reporting form | API enablement and the public Report a vulnerability entry | The authenticated reporter can open the form and see its private-reporting fields/notice. The available browser session was signed out; page-control observations failed and crawler access to the form was refused by robots policy. No alternate form fetch or submission was used |
+| Actual maintainer notification delivery | Repository watch is subscribed and not ignored | Delivery of a genuine private report to the intended GitHub inbox/email route, and any account-level email-routing preferences. No report was submitted, so no delivery or response-time claim is made |
+
+The remaining form check can be a read-only observation in a signed-in GitHub
+session; it does not require submitting a vulnerability. Delivery evidence can
+come from a genuine report or a separately authorized controlled notification
+check. This document does not authorize a fabricated vulnerability, outbound
+message or test submission. Preserve any later failed result and distinguish
+settings checks from actual delivery. YT-206 must not be marked Done from this
+documentation reconciliation or the earlier inventory Reviewer PASS alone.
+
+## Retained pre-activation snapshot
+
+All remaining sections retain the original pre-approval inventory, recommendation
+and settings observations. Their Private/Pending/no-external-mutation statements
+describe that earlier phase, not the current repository state. Original counts,
+failed checks, evidence identities and qualification limits are preserved.
+
 Date: 2026-10-27 (Asia/Taipei). **Inventory and recommendation prepared;
 owner disclosure/activation decisions remain Pending. GitHub private reporting
 is selected; YT-206 is In progress.**
@@ -68,7 +191,7 @@ not requalified here. Current C's artifact/sixteen archives use accepted YT-205
 input/review bindings. Raw downloaded evidence stays ignored/private locally.
 The Windows ZIP denied in YT-205 is not reopened, moved, reconstructed or retried.
 
-## Current settings and reporting requirement
+## Recorded pre-activation settings and reporting requirement
 
 - Visibility is Private; Pages/Discussions are disabled. Wiki/Projects feature
   flags are enabled; no successful Wiki content-ref read is observed. Feature
@@ -92,7 +215,7 @@ The Windows ZIP denied in YT-205 is not reopened, moved, reconstructed or retrie
   Actual enablement/form/notification verification belongs to authorized activation;
   do not require the public-only feature to be enabled before the visibility change.
 
-## Owner choices and minimal delivery
+## Owner choices and minimal delivery before approval
 
 | Choice | Recommendation | State |
 |---|---|---|
@@ -129,3 +252,22 @@ JSON decoding. Wiki/PVR unavailable observations remain explicit, with no admin
 recovery loop. No test/build/workflow rerun, external mutation or fresh runtime
 qualification occurs. Run only changed-document links/structure/whitespace and
 Backlog DAG checks. Inventory completion does not activate publication.
+
+The later `evidence/activation/` records add owner authorization, actual merged
+source/tree, pre/post settings, bounded new-CI disclosure observations, About
+metadata, merge-guard acceptance and activation closeout. The initial overstrict
+wrapper assertion on non-blocking Guard warnings is retained; it was corrected by
+reading the same exit0 result, without rerunning the Guard or changing policy.
+Browser/form failures and the unverified notification-delivery boundary remain
+explicit. No old failure or qualification result is replaced. This documentation
+reconciliation does not repeat product tests/builds/scans, submit a report, make
+further GitHub changes or authorize Commit/Push. The separately authorized About
+metadata update is recorded above.
+
+The later `evidence/activation/reporting-completion/` records preserve the explicit
+test authorization, owner403 refusal, authenticated reporter form/submission,
+created and closed private-record API responses, redacted account-routing
+observations, actual Gmail receipt bindings, mail-parser correction and browser
+screenshots. Mailbox addresses/reply tokens stay private. The newly executed
+checks do not authorize Commit/Push, artifact signing, package publication or a
+change to D1–D6.

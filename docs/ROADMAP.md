@@ -2,6 +2,21 @@
 
 **Status:** Evidence-gated prototype roadmap; developer entry/status refresh 2026-10-12. Historical qualification dates and source identities remain unchanged.
 
+**YT-096 local rotation slice (2026-10-28):** The [contract](YT-096-KEY-ROTATION-DRILL.md)
+selects thin manual public-key preparation and an actual LOCAL synthetic test-key
+custody drill from custody commit `4793620`. Implementation delivered; local drill
+PASS with nine focused tests, two offline builds and 25 real commands; independent
+Reviewer acceptance PASS (zero issues and required followups). First extraction failure/one material repair retained;
+new rotation changes remain uncommitted. No owner
+key/GitHub Secret recovery or hosted execution is claimed. D6 Pending, YT-096
+In progress and YT-020 Blocked remain unchanged.
+
+**YT-096 CI planning (2026-10-27):** The [integration plan](YT-096-RELEASE-CI-INTEGRATION.md)
+proposes separate PR, release-build/evidence and approved signing/publication lanes;
+feature/codex → PR → actual `master` initially, with `dev` optional. Documentation
+review is Pending; no workflow/settings change or release execution follows.
+D1–D6 Pending, YT-096 In progress, YT-020 Blocked and YT-206 Done remain unchanged.
+
 Milestones are sequenced by capability and dependencies rather than invented delivery dates. The [MVP specification](MVP.md) provides acceptance criteria. Each gate must retain real commands, results, and relevant architectural decisions.
 
 | Milestone | Outcome | Backlog | Exit evidence |
@@ -1720,3 +1735,94 @@ Actual collaborator-only
 PR creation and both required checks are observed/preserved. No Commit/Push/Merge,
 visibility/history/log deletion, signing or publication; YT-096/D1–D6 and YT-020
 remain separate.
+
+**YT-206 post-activation reconciliation (2026-10-27):** The later owner approval
+accepts the inventoried source/history/Actions disclosure and authorizes Merge and
+Public visibility. The [activation record](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#post-activation-status)
+records PR12 squash commit d7065bb, full-tree equality with reviewed3d63f0b,
+both required CI jobs PASS, and strict/builtin exit0 with0blocking findings and
+9retained non-blocking warnings. The repository is Public as an Experimental
+source preview; the delivery branch, failed records, required checks and
+collaborator-only PR policy are preserved. GitHub private reporting is enabled
+and its public entry is visible; maintainer watch is subscribed/not ignored.
+The [signed-in form and actual notification delivery](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#remaining-reporting-verification)
+remain Not verified, with no test report submitted; YT-206 stays In progress for
+those checks. Separately authorized About description/topics now reflect the
+experimental Rust/HTML-first/SSR/optional WASM scope. The earlier inventory and
+failures remain historical rather than being rewritten as current results.
+This documentation reconciliation reuses accepted product evidence without
+replay; no Commit/Push or further external operation. Technical C118f3d0 remains
+selected, YT-096 In progress, YT-020 Blocked and D1–D6 Pending; no release-artifact
+signing, version tag, package publication or reader-site export.
+
+**YT-206 executed reporting completion (2026-10-27):** The owner requests actual
+completion rather than a scope waiver and explicitly authorizes one private
+non-vulnerability test. The [non-admin reporting form and browser submission](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#reporting-completion)
+PASS with privacy/policy fields; an actual private-report email and collaborator
+notice arrive at the configured owner Gmail route after21s/22s. Recipient envelope,
+advisory reference, marker and GitHub DKIM/SPF reconcile; the single record is
+closed and retained, unpublished with no CVE or private fork. The earlier owner403,
+non-persisting optional Web inbox selection and corrected mail-To assertion remain
+failures/limits; Email is the verified route. No old qualification is replayed and
+no missing check is moved to another item. Independent completion Reviewer PASS0
+marks YT-206 Done at this selected scope; existing activation/inventory history remains intact. Technical
+C118f3d0, YT-096 In progress, YT-020 Blocked and D1–D6 Pending remain unchanged;
+no Commit/Push, signing, version tag, package publication or reader-site export.
+
+**YT-096 supply-chain purpose and D1–D5 recommendation (2026-10-27):** The
+[owner packet](YT-096-D1-D5-RELEASE-TRUST-PLAN.md) makes the remaining purpose
+explicit: reduce substituted release bytes, official-signer impersonation and
+source/build mismatch risks. It proposes exact public identity/payload fields,
+sixteen0.1.0 source packages, technical C118f3d0 as reuse baseline, a future
+co-located release-workflow source, Cosign3.1.4 with public upstream binary/root/
+configuration reference digests, and bounded evidence/attachment mapping.
+No future source SHA or fresh output/certificate is invented. Existing ce56e08
+failures, preparation-only provenance and technical evidence keep their identities;
+the recipe remains source-package scope without SLSA-level, defect-free-code or
+complete-system-inventory claims. Documentation and independent review only;
+no old validation replay, implementation, Commit/Push, signing or publication.
+All D1–D6 remain Pending, YT-096 In progress and YT-020 Blocked; YT-206 stays Done.
+
+
+**YT-096 D1–D5 owner adoption (2026-10-27):** The owner adopts the
+[recommended policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md): GitHub workload/public
+Sigstore disclosure, closed sixteen-subject public provenance/DSSE and complete
+private evidence, sixteen experimental `0.1.0` packages with technical baseline
+`118f3d0` and future co-located `C_release`/`release.yml`/proposed `v0.1.0`,
+Cosign3.1.4/reference roots subject to actual bootstrap/validity/compatibility
+checks, and source-package-only claims with acyclic bindings. D1–D5 are Adopted
+(policy); D6 remains Pending. The owner authorizes build/verify-only Release
+preparation workflow implementation, with new changes uncommitted/unpushed.
+No real release SHA, tag, final output/payload, authenticated Cosign installation
+or new build result is established by adoption; hosted execution, OIDC/certificate
+requests, signing and publication remain unapproved. Historical Pending notes,
+review PASS and failed release verdicts above retain their dated scope; they do
+not approve new implementation. YT-096 stays In progress, YT-020 Blocked and
+YT-206 Done. The authorized build/verify-only
+[`release.yml` and closed preparation helper](YT-096-RELEASE-CI-INTEGRATION.md)
+are implemented. All 27 focused checks (four unit, three integration, three
+selected legacy and seventeen checksum checks), fmt, Clippy, YAML and five Bash
+syntax checks PASS; the original private identity guard and provenance tail are
+byte-identical. Independent implementation review PASS, zero issues and required followups. No actual
+hosted run, real sixteen-product train, release candidate or tag is selected or
+executed; no new commit, push, signing or publication occurred. The next bounded
+step is owner selection/approval of actual source/tag and hosted preparation, without replaying accepted product
+qualification. Earlier failure history remains in the linked implementation
+record; focused checks do not establish a signing-ready or completed release.
+
+
+**YT-096 encrypted custody adoption (2026-10-27):** The owner adopts the
+[age custody and D2 safe-metadata extension](YT-096-AGE-CUSTODY-INTEGRATION.md),
+including a source-pinned public recipient for build/capture and transient private
+identity use only in an isolated manually approved protected Environment verifier.
+A dedicated local identity and authenticated task-scoped Linux amd64 age bootstrap
+exist; local integration/readback PASS with13 focused accepted checks, fmt/strict
+Clippy and syntax/API fixtures PASS. Authenticated age preserves original/restored
+LOCAL-manifest bytes; native17 partial and tamper rejection retain their scope.
+`complete_product_custody=false`; no actual OpenSSL/sixteen-package build is
+qualified. Independent implementation review PASS, zero issues and required followups. Actual
+Environment protection/Secret installation, hosted execution and durable retention
+are unperformed and unapproved. Source freeze follows these changes/review and an
+actual reviewed post-squash master SHA; no `C_release` or tag is selected. D6 stays
+Pending, YT-096 In progress and YT-020 Blocked; no new-change Commit/Push,
+OIDC/signing or publication. Historical checks/reviews retain their original scope.

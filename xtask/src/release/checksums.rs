@@ -22,7 +22,7 @@ pub fn safe_name(s: &str) -> bool {
         && s != MANIFEST
 }
 // serde_json::Value otherwise silently accepts duplicate keys, including nested entries.
-struct Unique(Value);
+pub(super) struct Unique(pub(super) Value);
 impl<'de> Deserialize<'de> for Unique {
     fn deserialize<D: de::Deserializer<'de>>(d: D) -> std::result::Result<Self, D::Error> {
         struct V;
@@ -131,7 +131,7 @@ pub fn parse_manifest(raw: &[u8]) -> Result<Vec<Value>> {
     Ok(entries)
 }
 #[cfg(unix)]
-mod posix {
+pub(super) mod posix {
     use super::*;
     use std::{
         ffi::{CStr, CString},

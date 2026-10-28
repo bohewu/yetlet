@@ -1,4 +1,35 @@
-# YT-096 — Formal trust and public metadata decisions
+# YT-096 — Release supply-chain integrity: trust and disclosure decisions
+
+**Purpose:** Reduce package substitution, official-signer impersonation and
+source/build mismatch risks for future Yetlet releases. Consumers need verifiable
+artifact bytes and an approved source/workflow identity; signatures alone do not
+prove defect-free code or an uncompromised CI system.
+
+**Current owner adoption (2026-10-27): D1–D5 Adopted (policy); D6 Pending.**
+The owner adopts the [concrete D1–D5 plan](YT-096-D1-D5-RELEASE-TRUST-PLAN.md):
+GitHub workload OIDC/public Sigstore metadata and log disclosure; the closed
+sixteen-subject public provenance/DSSE bundle with complete detailed evidence
+private; sixteen experimental `0.1.0` source packages using `118f3d0` as the
+technical baseline and a future co-located `C_release`/`release.yml` with proposed
+`v0.1.0`; Cosign3.1.4 and the exact reference root/config identities subject to
+actual bootstrap, validity and compatibility checks; and source-package-only
+provenance/evidence scope with acyclic bindings. Reference hashes are not qualified
+TUF/bootstrap evidence.
+
+The owner also authorizes implementing the build/verify-only Release preparation
+workflow, leaving new changes uncommitted/unpushed. No real `C_release`, tag, final
+output/payload, authenticated Cosign installation or new build result is approved
+by adoption. Hosted build/verify execution still needs separate explicit
+authority and may be authorized while D6 remains Pending. D6 holds identity
+issuance/signing; publication needs separate explicit approval. Policy adoption
+grants none of those execution authorities. YT-096 stays In progress, YT-020 Blocked
+and YT-206 Done. Original review PASS does not approve new implementation.
+
+## Historical decision brief — 2026-10-23
+
+The remaining text records the original nine-package recommendation and Pending
+decisions as of 2026-10-23. Its source, failures, pins, results and review remain
+unchanged; the adoption above supersedes those Pending policy statuses.
 
 **Date:** 2026-10-23. **Documentation source:** `a31f9ceed1579e8c6277d1d03102b2a12bd1e93f`.
 **Status:** Independent Reviewer PASS, zero issues and required followups. All

@@ -41,6 +41,16 @@ fn main() -> std::process::ExitCode {
                 &args,
             ));
         }
+        #[cfg(target_os = "linux")]
+        Cli::Custody(options) => {
+            return command_result(yetlet_xtask::release::custody::run(&options));
+        }
+        Cli::ReleasePreparation { expected_commit } => {
+            return command_result(yetlet_xtask::release::preparation::run(
+                &repository_root(),
+                &expected_commit,
+            ));
+        }
         Cli::PrivateRebuild { cohort } => {
             return command_result(yetlet_xtask::release::private::run(
                 &repository_root(),

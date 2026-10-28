@@ -75,15 +75,26 @@ disposition; formal integrity/trust, actual registry proof, public activation
 controls and concrete maintainer release approval remain open.
 No runtime rerun, signing or publication occurred.
 
-The [minimum formal trust/provenance proposal](YT-096-FORMAL-TRUST-PROPOSAL.md)
-lists required identities, evidence and future operations after commit
-`0bd7596`. GitHub OIDC/public Sigstore is conditional on disclosure and exact
-workflow/source approvals; no policy selection, signing or activation occurs.
-The [2026-10-23 decision brief](YT-096-TRUST-DISCLOSURE-DECISIONS.md) separates
-public certificate/log/payload exposure, impacts and D1–D6 pending owner choices;
-it retains the original candidate and evidence, with no validation reruns or
-execution. Independent Reviewer PASS, zero issues and required followups,
-applies to this documentation brief only; owner decisions remain Pending.
+The historical [minimum formal trust/provenance proposal](YT-096-FORMAL-TRUST-PROPOSAL.md)
+and [2026-10-23 decision brief](YT-096-TRUST-DISCLOSURE-DECISIONS.md) retain their
+original nine-package scope, pending decisions and independent review PASS.
+Those reviews apply to the original documentation, not the new implementation.
+
+The [D1–D5 release supply-chain policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md) is
+**Adopted (policy) as of 2026-10-27; D6 remains Pending**. It covers GitHub workload
+OIDC/public Sigstore disclosure, closed sixteen-subject public provenance/DSSE
+and complete private evidence, sixteen experimental `0.1.0` packages with
+`118f3d0` as technical baseline and future co-located `C_release`/release workflow
+with proposed `v0.1.0`, Cosign3.1.4/reference roots subject to actual bootstrap,
+validity and compatibility checks, and source-package-only claims with acyclic
+bindings. No actual release SHA, tag, final output/payload, authenticated Cosign
+installation or new build result is established by adoption.
+
+The owner authorizes build/verify-only [Release preparation workflow implementation](YT-096-RELEASE-CI-INTEGRATION.md),
+with new changes uncommitted/unpushed. Hosted build/verify execution needs separate
+explicit authority and may be authorized while D6 remains Pending. D6 holds
+identity issuance/signing; publication needs separate explicit approval.
+YT-096 remains In progress, YT-020 Blocked and YT-206 Done.
 
 [YT-107 form/save feedback](YT-107-FORM-FEEDBACK.md) is Done at the bounded
 Admin/Todo scope, with independent review of all three slices: server validation to field messages,
