@@ -3,7 +3,39 @@
 Date: 2026-10-28 (Asia/Taipei). Status: Plan independently reviewed PASS, zero issues/required followups.
 D6 Pending; YT-096 In progress; YT-020 Blocked. This packet authorizes no execution.
 
-## Owner-authorized prepare batch — actual source and pre-dispatch blocker
+
+## Current unsigned prepare failure and diagnostic continuation — 2026-10-29
+
+Owner-authorized PR16 delivery selects S `87d24e9e63b4c9486d63a4b0141c20368ceaf540`,
+with reviewed tree `977b82db0323e57f8692b8c22172f609a7c8c008`. PR CI
+`40710158856/2` and master CI `40716085116/1` pass; the initial Chrome startup
+failure and specifically authorized Stable-job retry remain retained. MSRV is
+inherited during that retry. C, product tags and original build/verifier are intact.
+
+The one owner-authorized [unsigned prepare](https://github.com/bohewu/yetlet/actions/runs/40717870186)
+attempt 1 fails in read-only preflight. Protected prepare/sign are skipped;
+there is no key access, decryption, pending approval, frozen artifact or signature.
+The final private-manifest SHA remains Pending. Generic rejection output prevents
+an exact diagnosis; owner-token metadata correspondence does not prove the hosted
+token can read all resources. Draft visibility is only a hypothesis.
+
+The [safe local diagnostic continuation](YT-096-SIGNER-CONTRACT.md#hosted-preflight-failure-and-safe-local-diagnostics--2026-10-29)
+adds fixed public gate/error labels and bounded numeric HTTP status without raw
+exception details or changed checks/permissions. Three new synthetic local cases
+pass, with the initial HTTP cleanup warning and focused correction preserved.
+No hosted retry occurs, and local changes do not replace S. Syntax/whitespace checks and docs (75 documents, 207 items) pass; independent
+review PASS0 accepts the six-file local change; new changes remain uncommitted.
+
+Original failure/CI receipts are retained outside Git: 23 files, 200,037 payload
+bytes, retention-index SHA-256
+`351cf237ce2010d36ca262f370da50d11ab8d1684f5288b7563aef8f6082d160`.
+The encrypted supplemental asset `685300857` remains on unpublished draft
+`426670086` because conditional successful frozen readback/retention and cleanup
+were not reached. This retention is not a final assembly. Additional execution
+or source replacement needs owner authority. D6 Pending; YT-096 In progress;
+YT-020 Blocked; no signing/publication.
+
+## Historical owner-authorized prepare batch — source and pre-dispatch blocker
 
 PR15 is squash merged, selecting actual S `d2562e14af75d08c177c01e976cbd8f13124b8ff`
 with the reviewed tree unchanged; original C/build/tag/output/custody remain intact.

@@ -1,5 +1,18 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-096 current checkpoint (2026-10-29):** Owner-authorized real-layout delivery
+is squash merged as S `87d24e9`; PR16 CI attempt 2 and automatic master CI pass,
+with the first Chrome startup failure retained. The one
+[unsigned prepare run](YT-096-SIGNER-CONTRACT.md#hosted-preflight-failure-and-safe-local-diagnostics--2026-10-29)
+`40717870186/1` fails in read-only preflight; protected prepare/sign are skipped,
+no key step or frozen artifact exists. Exact cause is unknown, D6 Pending,
+YT-096 In progress and YT-020 Blocked. Owner-requested local diagnostics add only
+fixed stages/error classes and safe HTTP status, preserving all checks and
+permissions; three new focused tests pass. Independent Reviewer PASS0 accepts
+this bounded local change; new-change Commit/Push remain Pending. No hosted retry,
+signing or publication is authorized.
+The dated checkpoints below retain their original historical scopes.
+
 **YT-096 pre-hosted correction (2026-10-28):** The owner batch merges PR15 and
 selects S `d2562e1`; the approved new Environment/Secret setup is complete, old
 verifier unchanged. [Actual-input inspection](YT-096-SIGNER-CONTRACT.md#pre-hosted-real-layout-correction--2026-10-28)
