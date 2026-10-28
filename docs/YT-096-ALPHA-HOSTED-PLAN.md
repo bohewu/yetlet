@@ -3,6 +3,19 @@
 Date: 2026-10-28 (Asia/Taipei). Status: Plan independently reviewed PASS, zero issues/required followups.
 D6 Pending; YT-096 In progress; YT-020 Blocked. This packet authorizes no execution.
 
+## Owner-authorized prepare batch — actual source and pre-dispatch blocker
+
+PR15 is squash merged, selecting actual S `d2562e14af75d08c177c01e976cbd8f13124b8ff`
+with the reviewed tree unchanged; original C/build/tag/output/custody remain intact.
+The approved new `release-sign` Environment/Secret exists, old verifier unchanged.
+[Real-input inspection before dispatch](YT-096-SIGNER-CONTRACT.md#pre-hosted-real-layout-correction--2026-10-28)
+finds an OpenSSL duplicate-label failure missed by the original local fixture.
+A minimal correction and exact preserved-evidence selection have independent
+followup review PASS0 with unavailable-runtime-trace limitation; no hosted attempt
+is consumed. Corrected code cannot be silently
+substituted for immutable S. New delivery/source authority is still required;
+D6 remains Pending, no formal signing/publication follows.
+
 ## Subsequent local signer integration
 
 The [local signer integration](YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)

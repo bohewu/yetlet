@@ -1,5 +1,15 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-096 pre-hosted correction (2026-10-28):** The owner batch merges PR15 and
+selects S `d2562e1`; the approved new Environment/Secret setup is complete, old
+verifier unchanged. [Actual-input inspection](YT-096-SIGNER-CONTRACT.md#pre-hosted-real-layout-correction--2026-10-28)
+finds duplicate OpenSSL log/result labels before hosted execution. The minimum
+local fix preserves both origins under explicit extra labels; focused regression
+FAIL-to-PASS retained. A 53-record existing-evidence selection preserves original
+scopes and unavailable/denied transfer limits. Independent followup review PASS0
+with unavailable-runtime-trace limitation; source delivery Pending; zero hosted attempts used, D6 Pending, YT-096 In progress,
+YT-020 Blocked, no official signing or publication.
+
 **YT-096 local signer integration (2026-10-28):** Prior five-document checkpoint
 is committed as `765757d` after strict/builtin/native-hook PASS, not Pushed. The
 [local implementation](YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)

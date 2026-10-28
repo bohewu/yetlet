@@ -1,5 +1,17 @@
 # YT-096 — Separate signer and frozen payload contract
 
+**Real-input preparation blocker (2026-10-28):** Owner-authorized PR15 is squash
+merged as selected signer S `d2562e14af75d08c177c01e976cbd8f13124b8ff`, with the
+reviewed tree unchanged. The protected `release-sign` Environment and existing
+`AGE_IDENTITY` are installed at the approved scope. Before any hosted prepare,
+static comparison against the actual original builder/custody layout reveals
+duplicate OpenSSL log/result basenames in private and extras. The initial
+synthetic fixture had no extras and missed this reachable failure. No hosted
+attempt or official identity is used. A minimal label-preservation correction
+and matching real-layout regression are now local, with independent followup
+review PASS and source delivery Pending. S is immutable; no corrected code is executed as if it
+were the selected S, and replacement source selection requires explicit authority.
+
 **Current alpha preparation checkpoint — 2026-10-28:** The owner accepts
 preparing the two signing inputs and a separate signer workflow. Original alpha
 build `40669449040`/attempt1 and manually approved verifier `40688772221`/attempt1
@@ -364,3 +376,96 @@ iterations; corrected/new paths are checked without replaying accepted product
 validation. This acceptance does not select S or qualify hosted service behavior.
 No Environment/Secret/asset change, hosted execution, official signing, new-change
 Commit/Push or publication follows. D6 remains Pending.
+
+## Pre-hosted real-layout correction — 2026-10-28
+
+The owner approves one batch: exact PR15 squash Merge/source selection, protected
+Environment/Secret setup, independently reviewed encrypted evidence selection,
+one prepare run and repository-external retention, without signing/publication.
+The merged S `d2562e1` has tree `74dd75a7f132f9080885190e1cecdc99245d57af`, identical
+to reviewed PR head `146a449`; original build C `bf33638`, tags and both source
+branches remain unchanged. The new Environment has ID `25580949441`, required
+reviewer `bohewu`, administrator bypass disabled, self-review permitted under the
+existing single-owner policy and sole `master` branch policy ID `64671016`.
+`AGE_IDENTITY` enrollment confirms the pinned recipient and unchanged owner key;
+no key is written into Git/logs, rotated or copied to a repository Secret. Old
+verifier Environment, policy and Secret metadata remain byte-identical.
+
+Before dispatch, `preparation::record_inputs` is observed to copy
+`openssl-build.log`/`openssl-build-result.json` into the private build assembly;
+`custody::capture` also retains both as extras alongside OpenSSL source. The new
+prepare helper previously attempted the same exclusive destination names for
+both sets and would always raise `FileExistsError` on successful actual inputs.
+The original implementation Reviewer PASS keeps its historical scope; it did
+not qualify real hosted execution, and this missed case is recorded explicitly.
+
+The minimum correction maps original extras to `BUILD-EXTRA-<original-name>` and
+records that exact map in `EVIDENCE-CLOSURE.json`. Original private files and
+preparation manifest stay intact; every extra byte remains retained under a
+unique reviewed logical label. There is no overwrite, discarded proof, bound
+increase, source rebuild, provenance edit, changed public payload, key change or
+OIDC permission change. Extending the existing synthetic assembly case with both
+real duplicate names reproduces the old failure; that focused case then PASSes
+with corrected code, preserved duplicate bytes and same frozen-input handoff.
+No previously accepted qualification is replayed.
+
+The separately authorized evidence preparation selects 53 existing local records
+outside Git: original C source/locks/recipes, alpha packaging/review, accepted
+native/browser/GPU/dependency/security/inventory summaries and proofs, actual
+alpha build/readback/custody and retained failures. The original verified
+370-member security inventory ZIP is retained byte-identically, not repackaged
+or used to hide unverified content. Windows denied ZIP transfer is not bypassed:
+its original remote evidence is represented only at the admitted result/index/
+reference scope. The later Tokio audit ZIP is referenced by accepted immutable
+reconciliation, not falsely asserted to be present in this selected local set.
+`REUSE-SCOPE.json` records these limits; the full actual C source export retains
+the support/qualification documents. Selection is not a new all-source security
+scan, complete compiled/native/system inventory or blanket platform claim.
+
+The selection proposal contains exact names/sizes/hashes, original sources and
+qualification/security/inventory/support/review/failure roles. All required
+original private build records/logs and extras will be independently authenticated
+by the existing bounded custody helper during future prepare. Adding the followup
+review receipt remains acyclic: that receipt reviews the fixed base selection
+and code, without containing the future outer manifest hash or signing outputs.
+Final assembly retains the existing 128-artifact/64-MiB-file/256-MiB-total and
+64-KiB-manifest limits; this selection leaves count/size margin. No real capsule
+is uploaded and no hosted attempt is started at this checkpoint.
+
+Independent followup review is **PASS**, zero issues and required followups. Evidence is kept in ignored
+`target/yt096-signer-prepare-batch-20261028/`: owner authority, actual S/tree,
+Environment/enrollment readbacks, original blocker, before/after focused case,
+exact selection and source-path bindings. Any Git delivery/replacement-S change
+is separate from the original exact-PR15 approval. D6 Pending, YT-096 In progress,
+YT-020 Blocked; no official certificate/signature or publication occurs.
+
+### Followup acceptance and prepared supplemental bytes
+
+Reviewer `/root/yt096_real_layout_and_evidence_selection_review_20261028`
+returns PASS0 for the six frozen source files and exact 53-record proposal,
+SHA-256 `91dc6c988e2d3452a1614b157ad1e71bfef1694cd65f6ccfe55cbe464683e999`.
+All file/source-copy hashes, sizes and 0700/0600 modes match. Actual C export,
+locks/recipes, support document membership and original 370-member security ZIP
+are checked; Windows/Tokio references keep their stated limits. The native trace
+helper remains unavailable, so configured reviewer model/effort are requested,
+unverified runtime metadata, not formal-assurance proof. No test or scan is replayed
+by review. Only acceptance/status metadata changes afterward; corrected code
+hashes remain identical to the reviewed bytes.
+
+Adding that non-self-referential review receipt yields 54 selected records plus
+closure and manifest (56 flat files, 18,267,605 bytes). Normal xtask checksum
+create/verify and the existing pack helper succeed. The immutable qualification
+manifest SHA-256 is
+`20757af3039310399145a93acf9bab06439d88235a55aa7e776aa90280bece3c`;
+the ciphertext ZIP SHA-256 is
+`c90d98d20d579ed76c9ba8e705a6b204e1e43186eb3e02ec0121e91d15596168`.
+These are supplementary input identities, **not** the final complete private
+signing-manifest hash. The temporary plaintext TAR is removed; encryption uses
+only the approved public recipient. No private identity is accessed for packing.
+The original C artifacts and source S `d2562e1` remain unchanged.
+
+The owner adds `+3` allowance without specifying a unit; this is retained as a
+budget instruction, not interpreted as signing/publication authority or a new
+source/ref authorization. The six-file correction still needs explicit guarded
+Git delivery and replacement-S selection before the already authorized prepare
+can execute. The original one-shot hosted run has not started.

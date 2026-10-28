@@ -168,6 +168,8 @@ class SignerTests(unittest.TestCase):
             statement={'_type':'https://in-toto.io/Statement/v1','subject':subjects,'predicateType':'https://slsa.dev/provenance/v1',
                        'predicate':{'buildDefinition':{'externalParameters':{'cohort':'sixteen','workflow':{'repository':'https://github.com/bohewu/yetlet','path':'.github/workflows/release.yml','ref':'refs/tags/'+s.TAG}},'resolvedDependencies':[{'uri':'git+https://github.com/bohewu/yetlet','digest':{'gitCommit':s.C}}]},'runDetails':{'metadata':{'invocationId':'https://github.com/bohewu/yetlet/actions/runs/'+s.BUILD+'/attempts/1'}}}}
             raw=json.dumps(statement).encode(); raw+=b' '*(9158-len(raw)); (fixture/'PROVENANCE-UNSIGNED.json').write_bytes(raw)
+            (fixture/'openssl-build.log').write_bytes(b'LOCAL original native log')
+            (fixture/'openssl-build-result.json').write_bytes(b'{"native_exit_code":0}')
             s.checksums.run('create',str(fixture)); original_sha=s.sha((fixture/s.MANIFEST).read_bytes())
             record=b'LOCAL synthetic historical FAIL and bounded disposition'; (q/'record').write_bytes(record)
             closure={'schema':1,'source':s.C,'entries':[{'name':'record','size':len(record),'sha256':s.sha(record),'roles':sorted(s.ROLES),'original_source':'LOCAL original fixture','scope':'historical failure, not product proof'}]}
@@ -179,6 +181,8 @@ class SignerTests(unittest.TestCase):
                 args=[str(a) for a in args]
                 if args[1:4]==['release','custody','verify']:
                     out=Path(args[args.index('--output')+1]); out.mkdir(); shutil.copytree(fixture,out/'private'); (out/'extras').mkdir()
+                    shutil.copyfile(fixture/'openssl-build.log',out/'extras/openssl-build.log')
+                    shutil.copyfile(fixture/'openssl-build-result.json',out/'extras/openssl-build-result.json')
                     s.json_write(out/'CUSTODY-INVENTORY.json',{'complete':True,'original_exit':0,'private_manifest_sha256':original_sha})
                 elif args[1:3]==['release','checksums']: s.checksums.run(args[3],args[4])
                 elif '--decrypt' in args: shutil.copyfile(args[-1],args[args.index('--output')+1])
@@ -192,6 +196,9 @@ class SignerTests(unittest.TestCase):
                 self.assertEqual(receipt['manifest_sha256'],s.sha((work/'assembly'/s.MANIFEST).read_bytes()))
                 self.assertEqual((work/'assembly/BUILD-PREPARATION-CHECKSUMS.json').read_bytes(),(fixture/s.MANIFEST).read_bytes())
                 self.assertEqual((work/'assembly/record').read_bytes(),record)
+                self.assertEqual((work/'assembly/BUILD-EXTRA-openssl-build.log').read_bytes(),(fixture/'openssl-build.log').read_bytes())
+                self.assertEqual((work/'assembly/BUILD-EXTRA-openssl-build-result.json').read_bytes(),(fixture/'openssl-build-result.json').read_bytes())
+                self.assertEqual((work/'assembly/openssl-build.log').read_bytes(),(fixture/'openssl-build.log').read_bytes())
                 self.assertEqual(receipt['D6'],'Pending'); self.assertFalse((work/'assembly/SIGNING-INPUTS.json').exists())
                 # The separately approved exact receipt/hash gate opens the SAME frozen bytes.
                 signed=sign_request(); signed.update({'run':'8','provenance_sha256':s.sha(raw),'manifest_sha256':receipt['manifest_sha256'],'receipt_sha256':s.sha((p/'output/SIGNING-INPUTS.json').read_bytes())})
