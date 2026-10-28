@@ -1,5 +1,16 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-096 local signer integration (2026-10-28):** Prior five-document checkpoint
+is committed as `765757d` after strict/builtin/native-hook PASS, not Pushed. The
+[local implementation](YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)
+adds closed manual prepare/sign modes, isolated encrypted evidence handling,
+exact S/C/payload/Environment/OIDC boundaries and no publication permissions.
+New Cosign3.1.4/TUF and local synthetic supplied-statement proof PASS; targeted
+new integration tests pass (13 unique cases). Independent Reviewer PASS0; native
+role/model/effort trace unavailable, retained as an ordinary review limitation. No real supplementary
+evidence upload, Environment/Secret setup, hosted prepare, signing or publication;
+new integration uncommitted, D6 Pending, YT-096 In progress, YT-020 Blocked.
+
 **Alpha signing inputs and Release draft (2026-10-28):** The owner accepts local
 preparation and requests a Release. The [current signer contract](YT-096-SIGNER-CONTRACT.md#d6-completion-and-the-github-draft-boundary)
 records actual alpha build source/run identities, fixed original public provenance

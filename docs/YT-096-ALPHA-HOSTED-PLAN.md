@@ -3,6 +3,16 @@
 Date: 2026-10-28 (Asia/Taipei). Status: Plan independently reviewed PASS, zero issues/required followups.
 D6 Pending; YT-096 In progress; YT-020 Blocked. This packet authorizes no execution.
 
+## Subsequent local signer integration
+
+The [local signer integration](YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)
+now exists, with independent implementation review PASS, zero issues/required
+followups, and an explicit unavailable-runtime-trace limitation. It reuses this exact
+alpha build/readback and immutable output bytes; no new product candidate/build,
+tag or hosted run follows. Prior result documents are committed locally as
+`765757d`, not Pushed. Signer S, real supplemental closure/asset, protected setup,
+final private-manifest freeze, D6 and actual signing remain Pending.
+
 ## Subsequent local signing preparation and Release draft
 
 After the successful custody continuation, the owner accepts preparing the two

@@ -234,6 +234,14 @@ proves retained bytes at observation time, not indefinite availability.
 
 ## D4 — Concrete signing and verification recommendation
 
+**Later local implementation evidence (2026-10-28):** The [signer integration](YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)
+now authenticates Cosign3.1.4 with production TUF, KMS bootstrap and upstream
+keyless verification; all adopted binary/root/config hashes below match. A LOCAL
+synthetic supplied-statement case preserves its exact bytes. Independent local
+implementation review PASS0 retains an unavailable-runtime-trace limitation;
+actual hosted service/certificate acceptance and D6 remain Pending. The original recommendation below predates this bounded tool execution;
+its earlier Not verified observations remain historical, not a new release claim.
+
 Recommend the public production Sigstore route, with no new KMS/private service.
 The upstream [Cosign3.1.4 release](https://github.com/sigstore/cosign/releases/tag/v3.1.4),
 published2026-10-20, is the adopted policy pin;3.1.3 remains the historical design/
