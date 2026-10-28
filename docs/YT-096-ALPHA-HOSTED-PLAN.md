@@ -3,6 +3,307 @@
 Date: 2026-10-28 (Asia/Taipei). Status: Plan independently reviewed PASS, zero issues/required followups.
 D6 Pending; YT-096 In progress; YT-020 Blocked. This packet authorizes no execution.
 
+## Subsequent local signer integration
+
+The [local signer integration](YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)
+now exists, with independent implementation review PASS, zero issues/required
+followups, and an explicit unavailable-runtime-trace limitation. It reuses this exact
+alpha build/readback and immutable output bytes; no new product candidate/build,
+tag or hosted run follows. Prior result documents are committed locally as
+`765757d`, not Pushed. Signer S, real supplemental closure/asset, protected setup,
+final private-manifest freeze, D6 and actual signing remain Pending.
+
+## Subsequent local signing preparation and Release draft
+
+After the successful custody continuation, the owner accepts preparing the two
+signing inputs and separate workflow, and asks to create a Release. The
+[updated signer contract](YT-096-SIGNER-CONTRACT.md#d6-completion-and-the-github-draft-boundary)
+records the fixed original alpha public-provenance bytes/SHA, the still-Pending
+complete private manifest and signer S, and exact remaining authority gates.
+A single unpublished Draft pre-release, ID `426670086`, uses the existing
+`v0.9.0-alpha.1` tag/C with no uploaded assets. Draft creation does not complete
+D6 or publish a release; no new tag, workflow execution, private-key access,
+signing, package upload, Commit or Push occurs in this preparation checkpoint.
+
+## Actual alpha protected verifier and retention — PASS
+
+On 2026-10-28, the owner authorizes the proposed one protected verifier and
+repository-external readback/retention continuation, then manually approves
+`release-evidence-verify` in GitHub. The approvals API confirms user `bohewu`,
+state `approved`, Environment ID `25525950662`, with administrator bypass still
+disabled. The agent does not submit or impersonate that approval.
+
+| Binding | Verified result |
+|---|---|
+| Unchanged source/tag | `bf3363801132f4481263ceb411d9bba3349df86d` / unsigned `v0.9.0-alpha.1`; sixteen `0.9.0-alpha.1` libraries |
+| Original build | [40669449040 / attempt 1](https://github.com/bohewu/yetlet/actions/runs/40669449040), SUCCESS; original artifacts retained |
+| Protected verifier | [40688772221 / attempt 1](https://github.com/bohewu/yetlet/actions/runs/40688772221), SUCCESS; `evidence-verify.yml` at the same source/tag, workflow ID `398888284` |
+| Actual jobs | Preflight `122817908170` and protected verify `122817975649`, both SUCCESS; identity, Environment/artifact recheck, isolated decrypt/manifest, safe receipt upload and isolated cleanup steps succeed |
+| Safe receipt transport | Artifact `12815558784`, `evidence-readback-40688772221-1`, 686 bytes; original ZIP SHA-256 `84e534b0ec70323b99870b198560a0fa42dd2f2fc45102a2a89a4e27705d55b5` |
+| Receipt contents | `PREPARATION_SUCCESS`, `complete=true`, original exit `0`, decryption/inventory and full private manifest verified |
+| Ciphertext | 56,436,360 bytes; SHA-256 `239103b3afadbb66e84ce316e833802bd32c8c3f01f19a1c3589bec8846def73`, matching transport and readback receipts |
+| Private inventory identity | SHA-256 `0ad0e25997f7bc0ca8fba953385130f7b639bf8b81b0b544b16b4b7e22ef2eb2`, matching both receipts |
+| Recipient | Unchanged pinned public recipient SHA-256 `b861a3c7e2abf3caf4c7071c045f6114704db94e8cc39ce010e7fa10711ff506` |
+
+The safe receipt exactly matches the original transport's source, workflow SHA,
+workflow/ref, run and attempt, status, exit, inventory and recipient. The original
+encrypted/public ZIP bytes and the safe-receipt ZIP are downloaded once and
+locally match all three GitHub artifact sizes/digests. No rerun, automatic retry,
+Secret replacement or Environment modification occurs during this continuation.
+
+Local correspondence verifies the public allowlist of exactly eighteen files:
+sixteen alpha crates, unsigned provenance and `RELEASE-CHECKSUMS.json`. All
+seventeen manifest entries match size/SHA-256; the provenance has exactly sixteen
+matching package subjects and the selected repository, source, tag, workflow,
+cohort and build invocation. The immutable Git source archive matches recorded
+SHA-256 `c2019cc5c0a2e0031aeaa4ea8aaf4d577bdecea28d77525ac238352a344ef4a2`.
+Six selected locks, the xtask lock and three recipe/workflow inputs match bytes
+from C. Runner executable digests remain recorded identities; local readback does
+not independently authenticate or rebuild them. Private byproduct correspondence
+relies on the approved job's full manifest verification, without local private
+plaintext or private-key access.
+
+### Repository-external retained copy
+
+A distinct owner-host directory outside the repository retains original ZIPs,
+ciphertext/transport receipt, public files, immutable source/input copies and
+actual approval/run/artifact/safe correspondence receipts. Historical `0.1.0`
+custody index/receipt fingerprints remain identical. The new custody directory
+and its files use `0700` and `0600`, respectively; indexed files are flushed,
+fsynced and fully reread before completion:
+
+- `retention-index.json`: 57 payload files, 130,178,085 bytes; index SHA-256
+  `426c4d0252a92cb5a39a658c7d3d95734d802dcbb431554b7954b64c41b62405`.
+- `retention-receipt.json`: SHA-256
+  `b19030437b5b32daff6e57300cba03fcda8074cfbf60d4f550050393f474006f`,
+  binding that index and successful local readback. The two index/receipt files
+  are outside the payload count to avoid circular hashing.
+- Retention has no automatic expiry and continues until explicit owner
+  disposition. This is owner-host storage; offsite backup, replication and
+  indefinite host availability are not verified. GitHub's seven-day transport
+  expiry remains unchanged and is no longer the only retained copy.
+
+Ignored `target/yt096-alpha-hosted-verifier-20261028/` retains dispatch, actual
+approval/final run/jobs/artifact metadata, correspondence and retention completion
+receipts; the latter identifies the separate custody directory. The earlier
+build/tag and historical failure receipts remain intact. No accepted product
+qualification or prior hosted run is replayed. This is operational execution and
+readback evidence, with no new independent implementation or release review claim.
+
+These artifact/ciphertext/inventory/retention digests are **not** the two frozen
+signing-payload hashes. Payload freezing, reviewed signer source S and concrete
+D6 signing approval remain future gates. No signing, GitHub Release or registry
+publication occurs. The three result documents remain uncommitted and not
+Pushed; D6 Pending, YT-096 In progress and YT-020 Blocked.
+
+## Historical unsigned alpha tag and hosted build — readback Pending
+
+This build-only checkpoint predates the separately authorized successful
+protected readback and retention above. Its original observations and proposed
+inputs retain that historical scope.
+
+
+On 2026-10-28, the owner accepts the proposed sequence: strict/builtin commit of
+the three tracking documents without branch Push, then the exact unsigned alpha
+tag and one bounded sixteen-package hosted build. Verifier, signing and
+publication remain separate approvals. All authorized steps are now complete.
+
+| Binding | Actual result |
+|---|---|
+| Local tracking commit | `b271af0d2b072b32ae2e4e47a26ffb7d760fc5d8`, tree `27a439b1161527e55b7a2ba98eb262ab45650093`; exactly three documents, not Pushed |
+| Unchanged `C_release_alpha` | `bf3363801132f4481263ceb411d9bba3349df86d`, tree `c4ee13aa558489ba3962874dbf5e0a0a1bc99605` |
+| New source tag | `v0.9.0-alpha.1`, raw object is that commit; unsigned lightweight, created/Pushed once without force or movement |
+| Hosted build | [run 40669449040](https://github.com/bohewu/yetlet/actions/runs/40669449040), attempt 1, `workflow_dispatch`, `release.yml`, `cohort=sixteen`; SUCCESS |
+| Workflow identity | `head_sha=C_release_alpha`, `head_branch=v0.9.0-alpha.1`, workflow ID `398888286`; source/ref checks pass before repository code |
+| Build limit | Pinned preparation job retains `timeout-minutes: 45`; no rerun or automatic retry |
+| Encrypted transport | Artifact `12807757693`, `encrypted-private-bf3363801132f4481263ceb411d9bba3349df86d-40669449040-1`, 56,454,320 bytes |
+| Encrypted artifact ZIP digest | GitHub-reported `sha256:a09c7e3e32d254a702c171333bfa01a1d08c2ed96f36eb5463ee9745a66e3dca` |
+| Unsigned public transport | Artifact `12807233590`, `unsigned-preparation-40669449040-1`, 326,966 bytes |
+| Public artifact ZIP digest | GitHub-reported `sha256:bff1e54b7e6aad1df45de8bd36dee6d52ba34de5509cdf1ab8af7066e6ea0613` |
+
+The three-document commit passes explicit staged strict/builtin Guard and the
+normal native hook, zero findings; committed tree matches `tree_oid`. It does
+not replace the selected release source or update the remote documentation branch.
+
+Fresh read-only preflight reconfirms master at the selected C, local/remote alpha
+tag absence, successful exact-source master CI, active fixed-alpha workflow with
+its original timeout/permissions, reviewed alpha Environment policy/protections,
+unchanged Secret metadata and pinned recipient, and no existing release run for
+this C. The read-only Guard tag plan PASS is followed by explicit one-use
+acceptance of only this already approved remote history/tag binding. Native
+tag-only Push PASSes strict/builtin and consumes that binding once. Its coverage
+is `operator-accepted-remote-history-first-screen`, zero outgoing/checked commits;
+it does not certify the old history clean. No hooks or policy are weakened.
+
+Fresh remote/raw-object checks confirm the new lightweight tag at C, unchanged
+master/`v0.1.0` and no documentation branch Push. The old retired used-binding
+archive is preserved. The new alpha binding remains `used`, byte fingerprint
+`974390181008df138e640a2c8e2b36bfe3ba6f87b3b5c1438017aedaf0e97f85`.
+A future ordinary Push needs its separately authorized supported retirement;
+no automatic rearm, retirement or reuse is performed here.
+
+The GitHub connector has no manual dispatch capability. One existing-`gh`
+[workflow-dispatch request](https://docs.github.com/en/rest/actions/workflows?apiVersion=2026-03-10#create-a-workflow-dispatch-event)
+pins `ref=v0.9.0-alpha.1`, full `expected_commit=C_release_alpha` and
+`cohort=sixteen`. Its returned run ID is read back before observing that same
+execution. Final run/attempt/source/path/ref metadata and preparation job/step
+records confirm successful source identity, sixteen-package build/verification,
+complete encrypted capture/transport and verified-public-allowlist upload. No
+local passing qualification or previous hosted execution is replayed.
+
+Both artifacts bind this repository, source, tag and run. Their recorded ZIP
+digests are API transport metadata, not locally downloaded/checksummed bytes,
+decrypted content validation or the two final signing-payload hashes. No
+protected verifier has run; durable private custody and independent public/private
+readback remain **Not verified**. Workflow success and uploaded ciphertext do not
+substitute for those later checks.
+
+### Next: one separately authorized protected readback
+
+The concrete proposed verifier uses `evidence-verify.yml` at this same immutable
+tag/source, build run `40669449040`, attempt `1`, encrypted artifact
+`12807757693` and raw ZIP digest
+`a09c7e3e32d254a702c171333bfa01a1d08c2ed96f36eb5463ee9745a66e3dca`.
+It retains the existing five-minute preflight, fifteen-minute protected job and
+real owner approval for `release-evidence-verify`. Private-key access is limited
+to that protected job. No verifier dispatch or Environment approval is performed
+by this checkpoint.
+
+Confirm/decrypt the full private manifest, actual public/private correspondence
+and distinct repository-external retention before the seven-day transport
+expiry, preferably within 24 hours. The encrypted artifact expires
+2026-11-04 18:10:26 Asia/Taipei; the public artifact expires three seconds later.
+Historical `0.1.0` custody stays intact. Payload freezing, signer S, D6 signing
+approval and publication remain Pending; no certificate/signature or package/
+GitHub Release publication occurs.
+
+Receipts are in ignored `target/yt096-alpha-hosted-build-20261028/`: actual
+document commit and Guard outputs, fresh source/settings/CI preflight, narrow tag
+plan/acceptance/Push and private-state fingerprints, one dispatch request/response,
+final run/job/artifact bindings and the unexecuted proposed verifier inputs.
+No new independent implementation or release-qualification review is claimed.
+D6 Pending; YT-096 In progress; YT-020 Blocked.
+
+## Selected alpha execution source — PR #14 squash merge
+
+On 2026-10-28, the owner explicitly authorizes making
+[PR #14](https://github.com/bohewu/yetlet/pull/14) Ready, squash-merging its
+approved source and selecting the verified resulting master commit as
+`C_release_alpha`. That selection is now complete. This is source selection
+only; no tag, release/verifier workflow, signing or publication is authorized.
+
+| Binding | Selected or verified value |
+|---|---|
+| Immutable `C_release_alpha` | `bf3363801132f4481263ceb411d9bba3349df86d` |
+| Exact tree | `c4ee13aa558489ba3962874dbf5e0a0a1bc99605` |
+| Single squash parent | `3eacfe31f5e3281411d3bc4653a6baccab668b30` |
+| Approved PR head | `a041600d04e89bf3f71ae30350c26cbfeb9f38c5`; the merged tree is identical |
+| Cohort/version | Sixteen Experimental `0.9.0-alpha.1` libraries |
+| Original version-preflight candidate | `5d7b91842f8188d45e5af22367245aebec7ca7d1`; historical scope retained |
+| Historical `C_release` / tag | `3eacfe31f5e3281411d3bc4653a6baccab668b30` / immutable unsigned `v0.1.0`; unchanged |
+
+Fresh preflight confirms the approved PR head/base, mergeable state and
+[PR CI run 40652377287](https://github.com/bohewu/yetlet/actions/runs/40652377287)
+SUCCESS for MSRV and Stable/native/RustSec/WASM/Chrome. The original
+[format failure 40651836854](https://github.com/bohewu/yetlet/actions/runs/40651836854)
+is retained; its only repair reformats one xtask version assertion. The exact
+two-commit merge-source range passes strict/builtin Guard with zero findings
+(79 file operations across 78 distinct paths). Existing staged and native-hook
+delivery receipts remain bound to their actual earlier operations.
+
+The GitHub Ready transition returns the same head/base. The squash request pins
+the approved full head SHA and returns `merged=true` with the selected SHA.
+A subsequent noninteractive no-tag fetch and fresh remote read both resolve
+master to that SHA. Raw Git object checks establish the exact tree equality,
+empty PR-head-versus-squash tree diff and single expected parent. The squash
+changes commit identity, so PR head `a041600` is not relabeled as the release
+commit. Server-side squash Merge does not run this clone's native commit/push
+hooks; no native-hook merge proof or new complete-history scan is claimed.
+
+The original local source branch stays at `80f6b83`, the integration branch
+stays at `a041600`, and their remote heads/history are preserved. Existing tag
+refs, owned hooks, workspace configuration and the exact retired used-binding
+archive remain unchanged; no active or newly armed acceptance exists. The
+earlier Guard rollout, candidate, build/readback/custody and failed-run records
+retain their original identities and acceptance scopes.
+
+### Remaining execution gates
+
+The subsequent read-only check confirms exact-source automatic
+[master CI 40654332287](https://github.com/bohewu/yetlet/actions/runs/40654332287),
+attempt 1, SUCCESS. Its source is the selected `C_release_alpha`, event `push`,
+branch `master`, workflow `.github/workflows/rust.yml`. Both Rust 1.99 MSRV and
+Stable/native/samples/RustSec/WASM/Chrome jobs completed successfully. This is
+the Merge-triggered CI result, not a manually dispatched release/verifier or a
+rerun. Pre-merge PR CI keeps its earlier scope; no old passing qualification is
+replayed locally. The technical master-CI prerequisite is complete.
+
+The historical read-only GitHub Environment/API observations below, made on
+2026-10-28 before the separately authorized update, establish its exact scope.
+That inspection itself granted no mutation authority:
+
+| Setting | Observed value / proposed disposition |
+|---|---|
+| Existing Environment | `release-evidence-verify`, ID `25525950662`; reuse |
+| Required reviewer | Exactly user `bohewu`; preserve |
+| Self-review / administrator bypass | `prevent_self_review=false`, `can_admins_bypass=false`; preserve the accepted single-owner boundary |
+| Deployment restriction | Custom branch policies enabled; exactly one `type=tag` policy |
+| Existing policy | ID `64604698`, name `v0.1.0`; proposed replacement name `v0.9.0-alpha.1`, retaining a single tag policy |
+| Existing `AGE_IDENTITY` | Metadata confirms presence; no value is read, no key upload/rotation or new decryption proof |
+| Pinned public recipient | SHA-256 `b861a3c7e2abf3caf4c7071c045f6114704db94e8cc39ce010e7fa10711ff506`, unchanged |
+
+The owner subsequently authorizes **only** replacement of that one existing
+tag-policy name with `v0.9.0-alpha.1`, preserving everything else. Fresh preflight
+matches the reviewed Environment ID, policy ID/type/count, protection rules,
+Secret metadata and pinned recipient. One name-only
+[documented policy update](https://docs.github.com/en/rest/deployments/branch-policies?apiVersion=2026-03-10#update-a-deployment-branch-policy)
+returns success; fresh Environment/policy/Secret-metadata GETs confirm:
+
+- Environment `release-evidence-verify` / ID `25525950662` is reused.
+- The same policy ID `64604698` now has name `v0.9.0-alpha.1`, type `tag`;
+  total policy count remains exactly one. No policy is appended or recreated.
+- Required reviewer `bohewu`, `prevent_self_review=false`,
+  `can_admins_bypass=false`, custom deployment restriction and all protection
+  rules remain identical to the fresh before-state.
+- `AGE_IDENTITY` metadata and the public recipient bytes/digest are unchanged.
+  No Secret value or private key is read, uploaded, replaced or rotated; this is
+  settings/readback evidence, not a new decrypt or key-pair qualification.
+
+The Environment policy prerequisite is complete. The old `v0.1.0` tag, runs and
+retained evidence remain intact, but a future old-tag Environment job is no
+longer eligible; re-enabling it requires separate settings authority. No
+Environment rewrite, extra policy, automatic retry or workflow dispatch occurs.
+The exact request, one-attempt response, before/after API observations and
+preservation proof are retained under
+`target/yt096-alpha-candidate-selection-20261028/environment-policy/`.
+
+GitHub connector discovery exposes only PR-filtered commit-run queries and no
+Environment query, so these observations use existing `gh` with explicit GETs.
+The known-run job readback uses the connector. Original API results, exact source/
+attempt/job bindings and gate assessment are retained under
+`target/yt096-alpha-candidate-selection-20261028/master-ci/`.
+
+Next, separately authorize the immutable unsigned `v0.9.0-alpha.1` tag at this
+exact selected source, fresh Guard history acceptance, one bounded manual build
+and protected readback/retention. Recheck actual remote/ref/settings boundaries
+at execution; completed CI/settings checks grant none of that authority. Only
+the approved policy name changes in this checkpoint. No Secret/key/recipient
+change, tag creation, hosted build/readback, payload freeze, signing or publication
+occurs. D6, signer S and both actual alpha payload SHA values remain Pending.
+
+These tracking notes are written after candidate selection and are not part of
+the selected immutable tree. A later documentation commit must not silently
+replace `C_release_alpha`. Preserve the original `0.1.0` payload hashes and obtain
+new alpha package/provenance/manifest bytes only through the separately approved
+new-source build/readback.
+
+Receipts are in ignored `target/yt096-alpha-candidate-selection-20261028/`:
+pinned PR/CI preflight, strict Guard output, Ready/squash responses, merged PR
+metadata, no-tag fetch logs and exact candidate/tree/ref preservation proof.
+No new independent implementation/release qualification review is claimed.
+The older checkpoints and reviewed plans below retain their historical scopes.
+D6 Pending; YT-096 In progress; YT-020 Blocked.
+
 ## Current operator checkpoint — used binding retired
 
 On 2026-10-28, the owner separately authorizes the exact reviewed local

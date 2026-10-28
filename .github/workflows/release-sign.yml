@@ -1,0 +1,199 @@
+name: Prepare or sign frozen release inputs
+
+# Integration only: execution, release-sign Environment/Secret setup and exact
+# D6 signing input approval require separate owner authority. Never auto-trigger.
+on:
+  workflow_dispatch:
+    inputs:
+      request:
+        description: Closed prepare/sign JSON, exact S and reviewed input digests
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: yetlet-release-sign
+  cancel-in-progress: false
+
+env:
+  SIGN_REQUEST: ${{ inputs.request }}
+  SIGN_WORKFLOW_SHA: ${{ github.workflow_sha }}
+  SIGN_WORKFLOW_REF: ${{ github.workflow_ref }}
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      mode: ${{ steps.gate.outputs.mode }}
+    steps:
+      - name: Reject foreign source before checkout or repository code
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REPOSITORY" == bohewu/yetlet ]]
+          [[ "$GITHUB_REPOSITORY_ID" == 1409587171 && "$GITHUB_REPOSITORY_OWNER_ID" == 35250002 ]]
+          [[ "$GITHUB_REF" == refs/heads/master ]]
+          [[ "$SIGN_WORKFLOW_REF" == bohewu/yetlet/.github/workflows/release-sign.yml@refs/heads/master ]]
+          [[ "$GITHUB_SHA" == "$SIGN_WORKFLOW_SHA" ]]
+          python3 - <<'PY'
+          import json, os, re
+          r = json.loads(os.environ['SIGN_REQUEST'])
+          assert re.fullmatch('[0-9a-f]{40}', r['signer_commit'])
+          assert r['signer_commit'] == os.environ['GITHUB_SHA']
+          assert r['mode'] in ('prepare', 'sign')
+          PY
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Validate source, input and existing Environment without a secret
+        id: gate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 scripts/release-sign.py preflight
+          python3 - <<'PY'
+          import json, os
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as f:
+              f.write('mode=' + json.loads(os.environ['SIGN_REQUEST'])['mode'] + '\n')
+          PY
+
+  prepare:
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'prepare'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: release-sign
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Authenticate tools and build trusted helper before key access
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/sign-tools"
+          BOOTSTRAP="$RUNNER_TEMP/sign-tools" bash scripts/bootstrap-release-sign.sh
+          rustup toolchain install 1.99.0 --profile minimal
+          CARGO_TARGET_DIR="$RUNNER_TEMP/sign-xtask" cargo +1.99.0 build --locked --manifest-path xtask/Cargo.toml
+      - name: Recheck Environment and retrieve only bound ciphertext
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SIGN_WORK: ${{ runner.temp }}/sign-work
+          SIGN_TOOLS: ${{ runner.temp }}/sign-tools
+        run: python3 scripts/release-sign.py download
+      - name: Isolated prepare with no OIDC permission
+        shell: bash
+        env:
+          AGE_IDENTITY: ${{ secrets.AGE_IDENTITY }}
+          SIGN_WORK: ${{ runner.temp }}/sign-work
+          SIGN_OUTPUT: ${{ runner.temp }}/sign-output
+          SIGN_TOOLS: ${{ runner.temp }}/sign-tools
+          SIGN_XTASK: ${{ runner.temp }}/sign-xtask/debug/yetlet-xtask
+          SIGN_AGE: ${{ runner.temp }}/sign-tools/age-tools/age/age
+        run: |
+          set -euo pipefail
+          umask 077
+          trap 'rm -rf "$SIGN_WORK"' EXIT HUP INT TERM
+          [[ -n "$AGE_IDENTITY" ]]
+          printf '%s\n' "$AGE_IDENTITY" > "$SIGN_WORK/identity"
+          unset AGE_IDENTITY
+          "$SIGN_TOOLS/venv/bin/python" scripts/release-sign.py decrypt
+      - name: Upload encrypted frozen assembly and safe immutable receipt only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: signing-inputs-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/sign-output/frozen-signing-inputs.tar.age
+            ${{ runner.temp }}/sign-output/SIGNING-INPUTS.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove private files after success or failure
+        if: always()
+        shell: bash
+        run: rm -rf "$RUNNER_TEMP/sign-work" "$RUNNER_TEMP/sign-output" "$RUNNER_TEMP/sign-tools" "$RUNNER_TEMP/sign-xtask"
+
+  sign:
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'sign'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: release-sign
+    permissions:
+      contents: read
+      actions: read
+      id-token: write
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Authenticate pinned tools without key access or issuance
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/sign-tools"
+          BOOTSTRAP="$RUNNER_TEMP/sign-tools" bash scripts/bootstrap-release-sign.sh
+      - name: Recheck Environment and original preparation artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SIGN_WORK: ${{ runner.temp }}/sign-work
+          SIGN_TOOLS: ${{ runner.temp }}/sign-tools
+        run: python3 scripts/release-sign.py download
+      - name: Verify approved frozen bytes and delete identity before signing
+        shell: bash
+        env:
+          AGE_IDENTITY: ${{ secrets.AGE_IDENTITY }}
+          SIGN_WORK: ${{ runner.temp }}/sign-work
+          SIGN_OUTPUT: ${{ runner.temp }}/sign-output
+          SIGN_TOOLS: ${{ runner.temp }}/sign-tools
+          SIGN_AGE: ${{ runner.temp }}/sign-tools/age-tools/age/age
+        run: |
+          set -euo pipefail
+          umask 077
+          trap 'rm -f "$SIGN_WORK/identity"' EXIT HUP INT TERM
+          [[ -n "$AGE_IDENTITY" ]]
+          printf '%s\n' "$AGE_IDENTITY" > "$SIGN_WORK/identity"
+          unset AGE_IDENTITY
+          "$SIGN_TOOLS/venv/bin/python" scripts/release-sign.py decrypt
+      - name: Sign exact approved payloads and verify original claims
+        id: issuance
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SIGN_WORK: ${{ runner.temp }}/sign-work
+          SIGN_OUTPUT: ${{ runner.temp }}/sign-output
+          SIGN_TOOLS: ${{ runner.temp }}/sign-tools
+          SIGN_AGE: ${{ runner.temp }}/sign-tools/age-tools/age/age
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          [[ ! -e "$SIGN_WORK/identity" ]]
+          "$SIGN_TOOLS/venv/bin/python" scripts/release-sign.py sign
+      - name: Upload only public provenance bundle, encrypted private bundle and safe execution receipt
+        if: success() || (failure() && steps.issuance.outcome == 'failure')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: signing-results-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/sign-output/provenance.sigstore.json
+            ${{ runner.temp }}/sign-output/manifest.sigstore.json.age
+            ${{ runner.temp }}/sign-output/SIGNING-EXECUTION.json
+            ${{ runner.temp }}/sign-output/failure-provenance.sigstore.json.age
+            ${{ runner.temp }}/sign-output/failure-manifest.sigstore.json.age
+            ${{ runner.temp }}/sign-output/SIGNING-FAILURE.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove private files after success or failure
+        if: always()
+        shell: bash
+        run: rm -rf "$RUNNER_TEMP/sign-work" "$RUNNER_TEMP/sign-output" "$RUNNER_TEMP/sign-tools"
