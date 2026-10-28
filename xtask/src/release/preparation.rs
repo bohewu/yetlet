@@ -15,8 +15,8 @@ use std::{
 };
 
 const REPOSITORY: &str = "bohewu/yetlet";
-const TAG: &str = "refs/tags/v0.1.0";
-const WORKFLOW: &str = "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0";
+const TAG: &str = "refs/tags/v0.9.0-alpha.1";
+const WORKFLOW: &str = "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1";
 const OPENSSL_SHA: &str = "603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a";
 const PROVENANCE: &str = "PROVENANCE-UNSIGNED.json";
 
@@ -60,7 +60,7 @@ fn identity(root: &Path, expected: &str, env: &BTreeMap<String, String>) -> Resu
         git(root, &["rev-parse", "HEAD"])?.trim() == expected
             && git(
                 root,
-                &["rev-parse", "--verify", "refs/tags/v0.1.0^{commit}"],
+                &["rev-parse", "--verify", "refs/tags/v0.9.0-alpha.1^{commit}"],
             )?
             .trim()
                 == expected,
@@ -164,7 +164,7 @@ pub(super) fn finish(
             == Cohort::Sixteen
                 .names()
                 .iter()
-                .map(|n| format!("{n}-0.1.0.crate"))
+                .map(|n| format!("{n}-{}.crate", private::PACKAGE_VERSION))
                 .collect(),
         "exact sixteen archive subjects required",
     )?;
@@ -309,7 +309,7 @@ mod tests {
         git_fixture(root, &["add", "."]);
         git_fixture(root, &["commit", "-qm", "fixture"]);
         let commit = git_fixture(root, &["rev-parse", "HEAD"]);
-        git_fixture(root, &["tag", "v0.1.0"]);
+        git_fixture(root, &["tag", "v0.9.0-alpha.1"]);
         git_fixture(root, &["update-ref", "refs/remotes/origin/master", &commit]);
         let env = [
             ("GITHUB_REPOSITORY", REPOSITORY),
@@ -339,9 +339,14 @@ mod tests {
             ("GITHUB_REF", "refs/heads/master"),
             ("GITHUB_REF", "refs/pull/1/merge"),
             ("GITHUB_REF", "refs/tags/v0.2.0"),
+            ("GITHUB_REF", "refs/tags/v0.1.0"),
             (
                 "BUILD_WORKFLOW_REF",
-                "bohewu/yetlet/.github/workflows/private-rebuild.yml@refs/tags/v0.1.0",
+                "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0",
+            ),
+            (
+                "BUILD_WORKFLOW_REF",
+                "bohewu/yetlet/.github/workflows/private-rebuild.yml@refs/tags/v0.9.0-alpha.1",
             ),
             (
                 "BUILD_WORKFLOW_SHA",
@@ -372,14 +377,14 @@ mod tests {
         let next = git_fixture(root, &["rev-parse", "HEAD"]);
         assert!(identity(root, &commit, &env).is_err()); // HEAD disagreement
         git_fixture(root, &["checkout", "-q", &commit]);
-        git_fixture(root, &["tag", "-f", "v0.1.0", &next]);
+        git_fixture(root, &["tag", "-f", "v0.9.0-alpha.1", &next]);
         assert!(identity(root, &commit, &env).is_err()); // tag disagreement
-        git_fixture(root, &["tag", "-f", "v0.1.0", &commit]);
-        git_fixture(root, &["tag", "-d", "v0.1.0"]);
+        git_fixture(root, &["tag", "-f", "v0.9.0-alpha.1", &commit]);
+        git_fixture(root, &["tag", "-d", "v0.9.0-alpha.1"]);
         assert!(identity(root, &commit, &env).is_err()); // missing tag
-        git_fixture(root, &["tag", "v0.1.0"]);
+        git_fixture(root, &["tag", "v0.9.0-alpha.1"]);
         git_fixture(root, &["checkout", "-q", &next]);
-        git_fixture(root, &["tag", "-f", "v0.1.0", &next]);
+        git_fixture(root, &["tag", "-f", "v0.9.0-alpha.1", &next]);
         let mut changed = env;
         changed.insert("GITHUB_SHA".into(), next.clone());
         changed.insert("BUILD_WORKFLOW_SHA".into(), next.clone());
@@ -405,7 +410,7 @@ mod tests {
         fs::create_dir_all(&out).unwrap();
         let mut archives = BTreeMap::new();
         for name in Cohort::Sixteen.names() {
-            let file = format!("{name}-0.1.0.crate");
+            let file = format!("{name}-0.9.0-alpha.1.crate");
             let bytes = file.as_bytes();
             archives.insert(
                 file.clone(),
@@ -456,6 +461,10 @@ mod tests {
         exact_keys(
             &definition["externalParameters"]["workflow"],
             &["repository", "path", "ref"],
+        );
+        assert_eq!(
+            definition["externalParameters"]["workflow"]["ref"],
+            "refs/tags/v0.9.0-alpha.1"
         );
         exact_keys(
             &definition["internalParameters"],

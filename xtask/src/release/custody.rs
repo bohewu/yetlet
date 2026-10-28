@@ -16,8 +16,8 @@ use std::{
 };
 
 pub const RECIPIENT_SHA: &str = "b861a3c7e2abf3caf4c7071c045f6114704db94e8cc39ce010e7fa10711ff506";
-const WORKFLOW: &str = "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0";
-const REF: &str = "refs/tags/v0.1.0";
+const WORKFLOW: &str = "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1";
+const REF: &str = "refs/tags/v0.9.0-alpha.1";
 const INVENTORY: &str = "CUSTODY-INVENTORY.json";
 pub const CIPHER: &str = "private-evidence.tar.age";
 pub const RECEIPT: &str = "transport-receipt.json";

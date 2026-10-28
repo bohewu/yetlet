@@ -1,6 +1,6 @@
 # yetlet-signing
 
-Experimental, unpublished `0.1.0` release preparation. Requires Rust 1.99+ and
+Experimental, unpublished `0.9.0-alpha.1` release preparation. Requires Rust 1.99+ and
 a native OpenSSL development/runtime configuration compatible with the pinned
 Rust bindings. Select this package explicitly; Core/HTML/browser consumers do
 not acquire it automatically. Publication eligibility does not activate release

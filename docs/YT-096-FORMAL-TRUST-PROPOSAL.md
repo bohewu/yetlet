@@ -4,18 +4,31 @@
 impersonated signing identities and mismatched source/build claims. This formal
 release-integrity work adds no framework runtime feature or production guarantee.
 
-**Owner adoption (2026-10-27): D1–D5 Adopted (policy); D6 Pending.** Read the
-[D1–D5 owner packet](YT-096-D1-D5-RELEASE-TRUST-PLAN.md) for the adopted sixteen
-source-package cohort, exact public disclosure/private-evidence boundaries,
-future co-located `C_release`/release workflow and proposed `v0.1.0`, Cosign3.1.4
-reference identities, source-package-only claims and acyclic evidence bindings.
-Actual bootstrap, root validity and compatibility remain unverified; reference
-hashes do not establish qualified TUF roots or an authenticated installation.
-The owner authorizes build/verify-only workflow implementation with new changes
-uncommitted/unpushed. No actual release SHA, final output/payload or signature
-execution is approved, and no tag is created. Hosted build/verify execution
-needs separate explicit authority and may be authorized while D6 remains Pending.
-D6 holds identity issuance/signing; publication needs separate explicit approval. YT-096 stays In progress, YT-020 Blocked and YT-206 Done.
+**Current checkpoint (2026-10-28, Asia/Taipei): D1–D5 Adopted (policy); D6 Pending.**
+The [D1–D5 owner packet](YT-096-D1-D5-RELEASE-TRUST-PLAN.md) retains the adopted
+sixteen-source-package disclosure, service and claim boundaries. Separate owner
+authority selected `C_release` `3eacfe31f5e3281411d3bc4653a6baccab668b30` and its
+unsigned lightweight `v0.1.0` tag. The [actual hosted checkpoint](YT-096-HOSTED-DRILL-PLAN.md)
+records build `40628943583` / attempt1 and protected verifier `40631789238` /
+attempt1, both PASS, followed by repository-external owner-host retention.
+
+The verifier established decryption, inventory and full private-manifest verification;
+local checks matched the public eighteen files, ciphertext/receipts and source/run
+bindings. This is unsigned build/readback/custody evidence. Cosign3.1.4 bootstrap,
+root validity/compatibility, exact signing-payload approval, OIDC/certificate
+issuance and release signing remain unperformed; reference hashes alone do not
+qualify trust roots. Publication and final release approval need separate authority.
+D6 remains Pending, YT-096 In progress, YT-020 Blocked and YT-206 Done. Original
+proposal, review and failure verdicts below keep their historical scope.
+
+**Owner-selected signer model (2026-10-28):** D1/D3 now accept the
+[independent fixed-SHA signer](YT-096-SIGNER-CONTRACT.md), recorded in
+[ADR 0009](adr/0009-release-build-and-signer-identities.md). The original build
+source/tag/output bytes remain fixed; future signer code `S` and certificate
+identity are distinct. The earlier co-located signer recommendation below is
+historical and superseded only for signer identity. D2 disclosure/private custody,
+D4 authentication and D5 bounded claims remain in force. D6 Pending; this is a
+design/documentation decision with no new implementation, secret access or execution.
 
 ## Historical nine-package proposal — 2026-10-20
 

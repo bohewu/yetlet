@@ -239,8 +239,8 @@ def drill(args):
         original = {p.name: file_bytes(p) for p in private.iterdir()}
         proof["original_manifest_sha256"] = sha(manifest_bytes)
         proof["synthetic_binding"] = {"source": args.base, "workflow_sha": args.base,
-            "workflow": "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0",
-            "git_ref": "refs/tags/v0.1.0", "run": "1", "attempt": "1",
+            "workflow": "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1",
+            "git_ref": "refs/tags/v0.9.0-alpha.1", "run": "1", "attempt": "1",
             "notice": "LOCAL fixture values only; no GitHub run or release candidate claim"}
 
         def custody(label, who, operation, transport, identity=None, success=True):

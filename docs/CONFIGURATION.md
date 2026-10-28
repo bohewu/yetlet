@@ -5,6 +5,10 @@ loader preserves finite source precedence and keeps secrets out of browser state
 
 **Experimental, unpublished.** Use this source checkout and the documented target scope.
 
+For the complete startup flow, see
+[Settings, typed options and application logging](SETTINGS-OPTIONS-LOGGING.md):
+validate application settings, map narrow options and initialize host diagnostics.
+
 
 ## Prerequisites
 

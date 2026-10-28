@@ -8,4 +8,4 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-yetlet-core = { version = "0.1.0", path = "../yetlet-core" }
+yetlet-core = { version = "0.9.0-alpha.1", path = "../yetlet-core" }

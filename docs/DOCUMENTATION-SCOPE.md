@@ -35,7 +35,7 @@ linked reports, screenshots, assets and source files are not silently included.
 | Troubleshooting | [TROUBLESHOOTING.md](TROUBLESHOOTING.md) | Symptom/cause/correction lookup linking existing setup and capability guides; no new execution qualification |
 | Guide authoring | [GUIDE-TEMPLATE.md](GUIDE-TEMPLATE.md) | Shared five-part integration guide format; current source, prerequisites, expected result and failure boundaries stay explicit |
 | Framework guides | [ARCHITECTURE.md](ARCHITECTURE.md), [HTTP-PIPELINE.md](HTTP-PIPELINE.md), [EXTENSIONS.md](EXTENSIONS.md), [NAMING.md](NAMING.md), [COMPATIBILITY.md](COMPATIBILITY.md), [CAPABILITIES.md](CAPABILITIES.md) | Architecture, composition, naming, current availability and explicit compatibility limits; dated task/review paragraphs remain historical annotations |
-| Settings guides | [CONFIGURATION.md](CONFIGURATION.md), [SECRET-PROVIDERS.md](SECRET-PROVIDERS.md), [SETTINGS-SECRET-PROVIDER.md](SETTINGS-SECRET-PROVIDER.md) | Current startup loading, secret lookup and protected-field injection; omit historical execution/review bookkeeping from a reader edition |
+| Settings guides | [SETTINGS-OPTIONS-LOGGING.md](SETTINGS-OPTIONS-LOGGING.md), [CONFIGURATION.md](CONFIGURATION.md), [SECRET-PROVIDERS.md](SECRET-PROVIDERS.md), [SETTINGS-SECRET-PROVIDER.md](SETTINGS-SECRET-PROVIDER.md) | Current startup composition, typed options, application-owned diagnostics, secret lookup and protected-field injection; omit historical execution/review bookkeeping from a reader edition |
 | Package guides | The sixteen package-guide/source links in the current API reference tables | Public entry points, examples, errors, ownership, targets and limitations; seven later packages remain outside the original nine release candidates |
 | Application and CLI guides | [SAMPLES.md](SAMPLES.md), [BOARD-START.md](BOARD-START.md), [sample index](../examples/README.md), [Board README](../examples/lab-operations-board/README.md), [Admin README](../examples/admin-dashboard/README.md), [Shop README](../examples/modular-shop/README.md), [Starter README](../examples/production-starter/README.md), [CLI README](../tools/yetlet-cli/README.md) | Existing runnable usage and application-owned options; follow the exact sample-local README links in the sample catalog when selecting additional sample pages |
 | Root overview and policies | [README](../README.md), [license choice](../LICENSE-MIT), [Apache license](../LICENSE-APACHE), [security policy](../SECURITY.md), [contribution policy](../CONTRIBUTING.md) | Introduction, license and existing reporting/contribution rules; selection does not activate reporting services or change governance |
@@ -59,6 +59,11 @@ corrections are now in C's actual archives. This is a versioned source selection
 not a sanitized ready-to-publish site. Historical annotations and unselected-target
 links still need an explicit reader edition/destination mapping before export.
 No image asset is selected and selection is not recursive.
+
+YT-207 adds the unified Settings/options/logging guide to the current reader
+sources. This documentation-only addition does not revise the historical
+46-manuscript inventory at `118f3d0`, select another release candidate or
+publish a documentation site.
 
 The [YT-206 post-activation record](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#post-activation-status)
 preserves the pre-public inventory and records the owner's source/history/Actions

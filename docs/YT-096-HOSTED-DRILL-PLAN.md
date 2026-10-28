@@ -1,12 +1,93 @@
 # YT-096 — First real hosted custody drill plan
 
-Date: 2026-10-28. **Plan only; independent plan review PASS (zero issues and required followups).**
+Date: 2026-10-28. **Hosted build/readback and repository-external retention completed; original plan review PASS (zero issues and required followups).**
 D1–D5 Adopted (policy); D6 Pending; YT-096 In progress; YT-020 Blocked.
+
+**Initial reviewed plan snapshot (retained):**
 No source is selected as `C_release`. No Commit, index/ref change, Push, PR,
 Merge, tag, settings/Secret write, private-key read, hosted execution/approval,
 OIDC, signing or publication is authorized by this packet.
 
-## Current facts and proposed source
+**Subsequent signer design decision (2026-10-28):** The owner adopts the
+[independent signer contract](YT-096-SIGNER-CONTRACT.md) and
+[ADR 0009](adr/0009-release-build-and-signer-identities.md), amending D1/D3 while
+preserving this completed build/readback/custody checkpoint and product tag.
+Future signer `S`, final evidence scope/SHA, implementation/setup and execution
+remain pending. No new payload preparation or key access is performed; D6 Pending.
+
+## Actual hosted and custody checkpoint — 2026-10-28
+
+This dated checkpoint supersedes the original Pending observations below. It
+records completed, separately authorized operations; it grants no new operation.
+
+| Binding / result | Actual evidence |
+|---|---|
+| Selected source | PR13 squash `C_release` `3eacfe31f5e3281411d3bc4653a6baccab668b30`, tree `86385d60cb4c3e595c670dbacce117ebeeb1a993`; [master CI accepted](https://github.com/bohewu/yetlet/actions/runs/40612890110). |
+| Guard and source tag | Installed `agents_pipeline` 0.44.0 managed hook upgrade and strict/builtin doctor PASS; preparation and actual native pre-push PASS with zero outgoing commits. One-use existing-remote binding consumed. Unsigned lightweight `v0.1.0` pushed at `C_release`; observed remote `master` unchanged. Historical ancestry is accepted-existing debt, not clean history. |
+| Hosted build | [40628943583](https://github.com/bohewu/yetlet/actions/runs/40628943583), attempt 1, manual `release.yml`, exact `refs/tags/v0.1.0` / `C_release`, `cohort=sixteen`; PASS, native exit 0, 259-second job, 2026-10-28 11:50:25–11:54:44 UTC+08. |
+| Encrypted transport | Artifact `12791140773`, `encrypted-private-3eacfe31f5e3281411d3bc4653a6baccab668b30-40628943583-1`; ZIP SHA-256 `da4697ddb6df167dbda24355d40b7be1dd658be1be1dec4a3cbc5181d50ad7c9`. |
+| Public transport | Artifact `12791125794`, `unsigned-preparation-40628943583-1`; ZIP SHA-256 `42aabfb4034767dba921e25c08cda6877f1f946c666e020789a6c2783b2ae63c`. |
+| Protected verifier | [40631789238](https://github.com/bohewu/yetlet/actions/runs/40631789238), attempt 1, manual `evidence-verify.yml`, same immutable tag/source and exact original build/artifact inputs; PASS. Preflight 6 seconds; protected verify 61 seconds, 2026-10-28 12:21:57–12:22:58 UTC+08. |
+| Environment approval | Actual `bohewu` approval retained in API observation; `release-evidence-verify`, exact `v0.1.0` tag policy and `can_admins_bypass=false` observed. Matching Environment-only `AGE_IDENTITY` used transiently by the approved verifier. |
+| Safe receipt transport | Artifact `12791094206`, `evidence-readback-40631789238-1`; ZIP SHA-256 `14fc44399e875e5e1a1b7d958c413aee6cf50f0bb324ff2e2668c8fc8378aa08`. |
+| Hosted readback | `PREPARATION_SUCCESS`, `complete=true`, original exit 0; decryption, inventory and full private-manifest verification true; isolated cleanup PASS. |
+| Independent local correspondence | ZIP/ciphertext/safe-receipt, exact eighteen public-file checksums, sixteen provenance subjects, source/workflow/run bindings PASS. `source.tar` SHA-256 `e1469c4d0caffab779be86132b0da0d7565b837ec29e902d18ff9ca81852bc31` matches provenance. No local private-key or private-plaintext access. |
+| Repository-external custody | Recorded 2026-10-28 12:25:12 UTC+08 at owner-host `$CUSTODY_ROOT`: 51 files, 129,846,094 bytes, directories0700/files0600, flushed and reread, retention index and receipt retained. Persistent owner-host storage through explicit owner disposition, no automatic expiry. Offsite/replicated backup and indefinite availability are not proved. |
+
+GitHub artifacts expire on 2026-11-04 and remain seven-day transport caches. The
+actual owner-host copy has no scheduled expiry; its existence and reread were
+recorded separately from hosted upload/readback. This checkpoint completes the
+bounded first hosted custody drill, not universal release qualification, signing,
+registry publication, hosted rotation or lost-Secret recovery.
+
+Evidence labels: `target/yt096-hosted-build-20261028-v044/{completion,hosted-build-summary,hosted-final-results,native-push-result,post-push-observation-correction}.json`
+and `target/yt096-hosted-verifier-20261028/{completion,verifier-final}.json` plus
+`HANDOFF`. Under `$CUSTODY_ROOT`, retain `retention-receipt.json`,
+`retention-index.json`, `receipts/hosted-readback-receipt.json`,
+`receipts/correspondence-verification.json` and
+`metadata/environment-approval-observation.json`. These are record labels, not
+tracked private evidence or machine-specific paths.
+
+| Original stage | Completed checkpoint |
+|---|---|
+| A — Source delivery | Authorized integration delivery and PR13 completed. |
+| B — CI, Merge, freeze | Actual squash source/tree selected; master CI accepted. |
+| C — Environment/Secret | Reviewed settings and matching Secret installed; actual protected approval observed. |
+| D — Real tag/build | One-use guarded source-only tag Push and build attempt 1 completed. |
+| E — Later verifier | Separately authorized attempt 1 and actual owner approval completed; full readback PASS. |
+| F — Retention | Download, independent correspondence verification and persistent repository-external owner-host retention completed within 24 hours and before transport expiry. |
+
+### Preserved stops and review history
+
+Before the successful operation, the direct strict/builtin planned-input
+`check --pre-push` assessment failed with exit 1: 13 findings in two historical
+commits across six files, 23 commits and 1,760 file operations inspected. It was
+not a native hook execution; no tag or hosted attempt existed at that stop.
+The original findings remain unresolved accepted-existing debt. The
+[existing-remote baseline design](YT-096-EXISTING-REMOTE-TAG-BASELINE.md)
+retains the original design Reviewer P2 FAIL and focused followup PASS, zero
+issues/required followups, correcting that distinction. Original plan and design
+reviews retain their own scopes and do not accept this new checkpoint.
+
+After the actual successful Push, the observation wrapper failed because it
+expected hook output in stderr while Git returned it in stdout. The correction
+inspected both streams of that same Push and observed remote refs. Push exit was
+0; no repush, binding rearm or replacement hosted attempt occurred. The original
+wrapper failure and correction remain retained.
+
+The next unblockable YT-096 work is D6 identity/signing approval and the remaining
+trust, registry and final-release gates. Reuse these accepted build/readback
+records; no repeat build, verifier or earlier accepted checks is required by this
+document update. D6 Pending; YT-096 In progress; YT-020 Blocked. No new Commit,
+Push, signing or publication is authorized.
+
+## Original reviewed plan snapshot (historical)
+
+The remaining planning sections preserve the initial proposal and its original
+Pending authorization packet. Their source/settings/authority observations apply
+to that snapshot; completed stages above supersede them for the dated drill.
+
+## Original facts and proposed source
 
 These are read-only observations, not fresh CI or permanent remote guarantees.
 Record labels: `source-findings.md`, `remote-summary.json` (observed
@@ -43,7 +124,7 @@ documented equivalent tree. No current tip or later commit is selected automatic
 
 ## Proposed protected settings
 
-All settings and Secret installation below are **Pending / not granted**.
+At the original review, all settings and Secret installation below were **Pending / not granted**.
 
 | Setting | Exact proposed value / review |
 |---|---|
@@ -70,7 +151,7 @@ and in the final step; cancellation/runner loss can prevent cleanup or capture.
 
 ## Sequential future authorization packet
 
-Every row is **Pending / not granted**. Approval of one row grants no successor.
+At the original review, every row was **Pending / not granted**. Approval of one row grants no successor.
 Freshly recheck remote source/protection, tag and workflow/settings before action.
 
 | Stage | Concrete operation requiring owner authorization and evidence |
@@ -132,7 +213,7 @@ tests and actual LOCAL rotation drill at their original sources/scopes; no test 
 qualification replay is part of this plan. See the [custody guide](YT-096-AGE-CUSTODY-INTEGRATION.md),
 [rotation record](YT-096-KEY-ROTATION-DRILL.md) and [CI integration guide](YT-096-RELEASE-CI-INTEGRATION.md).
 
-Next unblockable YT-096 work: owner decision on the independently reviewed
+Original next unblockable YT-096 work: owner decision on the independently reviewed
 staged authorization packet after refreshed bindings. No source,
 settings or execution approval is inferred. D6 is not a prerequisite to a separately
 authorized unsigned build; hosted green grants neither D6 nor release approval.

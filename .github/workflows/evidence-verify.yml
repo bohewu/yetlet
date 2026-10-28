@@ -1,7 +1,7 @@
 name: Verify encrypted release evidence
 
 # Code integration only. The owner must configure and review this Environment
-# (required reviewer bohewu, exact v0.1.0 tag policy, admin bypass disabled) before
+# (required reviewer bohewu, exact v0.9.0-alpha.1 tag policy, admin bypass disabled) before
 # separately authorizing secret installation or a hosted execution.
 on:
   workflow_dispatch:
@@ -56,8 +56,8 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REPOSITORY" == bohewu/yetlet ]]
-          [[ "$GITHUB_REF" == refs/tags/v0.1.0 ]]
-          [[ "$EXPECTED_WORKFLOW_REF" == bohewu/yetlet/.github/workflows/evidence-verify.yml@refs/tags/v0.1.0 ]]
+          [[ "$GITHUB_REF" == refs/tags/v0.9.0-alpha.1 ]]
+          [[ "$EXPECTED_WORKFLOW_REF" == bohewu/yetlet/.github/workflows/evidence-verify.yml@refs/tags/v0.9.0-alpha.1 ]]
           [[ "$CUSTODY_SOURCE" =~ ^[0-9a-f]{40}$ ]]
           [[ "$GITHUB_SHA" == "$CUSTODY_SOURCE" && "$EXPECTED_WORKFLOW_SHA" == "$CUSTODY_SOURCE" ]]
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -74,7 +74,7 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$(git rev-parse HEAD)" == "$CUSTODY_SOURCE" ]]
-          [[ "$(git rev-parse --verify 'refs/tags/v0.1.0^{commit}')" == "$CUSTODY_SOURCE" ]]
+          [[ "$(git rev-parse --verify 'refs/tags/v0.9.0-alpha.1^{commit}')" == "$CUSTODY_SOURCE" ]]
           git merge-base --is-ancestor "$CUSTODY_SOURCE" refs/remotes/origin/master
           [[ -z "$(git status --porcelain)" ]]
           python3 scripts/release-evidence-preflight.py preflight
@@ -95,8 +95,8 @@ jobs:
         run: |
           set -euo pipefail
           [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REPOSITORY" == bohewu/yetlet ]]
-          [[ "$GITHUB_REF" == refs/tags/v0.1.0 ]]
-          [[ "$EXPECTED_WORKFLOW_REF" == bohewu/yetlet/.github/workflows/evidence-verify.yml@refs/tags/v0.1.0 ]]
+          [[ "$GITHUB_REF" == refs/tags/v0.9.0-alpha.1 ]]
+          [[ "$EXPECTED_WORKFLOW_REF" == bohewu/yetlet/.github/workflows/evidence-verify.yml@refs/tags/v0.9.0-alpha.1 ]]
           [[ "$CUSTODY_SOURCE" =~ ^[0-9a-f]{40}$ ]]
           [[ "$GITHUB_SHA" == "$CUSTODY_SOURCE" && "$EXPECTED_WORKFLOW_SHA" == "$CUSTODY_SOURCE" ]]
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5

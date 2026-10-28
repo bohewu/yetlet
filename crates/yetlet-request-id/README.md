@@ -1,6 +1,6 @@
 # yetlet-request-id
 
-**Experimental `0.1.0`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's nine library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
+**Experimental `0.9.0-alpha.1`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
 
 `yetlet-request-id` adds explicitly installed process-local numeric request correlation to an Axum/Yetlet app. It depends on Axum and `yetlet-server-axum` and has no browser dependency. An app that does not select it allocates no provider counter.
 

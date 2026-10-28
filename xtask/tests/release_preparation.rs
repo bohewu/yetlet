@@ -41,14 +41,22 @@ fn workflow_has_manual_fixed_source_and_only_success_public_upload() {
         "on:\n  workflow_dispatch:",
         "options:\n          - sixteen",
         "contents: read",
+        "timeout-minutes: 45",
         "ref: ${{ github.sha }}",
         "fetch-depth: 0",
         "persist-credentials: false",
         "actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
         "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
         "[[ \"$EXPECTED_COMMIT\" =~ ^[0-9a-f]{40}$ ]]",
-        "refs/tags/v0.1.0^{commit}",
+        "[[ \"$GITHUB_EVENT_NAME\" == workflow_dispatch ]]",
+        "[[ \"$GITHUB_REPOSITORY\" == bohewu/yetlet ]]",
+        "[[ \"$GITHUB_REF\" == refs/tags/v0.9.0-alpha.1 ]]",
+        "[[ \"$BUILD_WORKFLOW_REF\" == bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1 ]]",
+        "[[ \"$EXPECTED_COMMIT\" == \"$GITHUB_SHA\" && \"$EXPECTED_COMMIT\" == \"$BUILD_WORKFLOW_SHA\" ]]",
+        "[[ \"$(git rev-parse HEAD)\" == \"$EXPECTED_COMMIT\" ]]",
+        "refs/tags/v0.9.0-alpha.1^{commit}",
         "git merge-base --is-ancestor \"$EXPECTED_COMMIT\" refs/remotes/origin/master",
+        "[[ -z \"$(git status --porcelain)\" ]]",
         "OPENSSL_SOURCE_ARCHIVE=%s",
         "if: success()",
         "path: target/release-preparation/public/",
@@ -61,6 +69,7 @@ fn workflow_has_manual_fixed_source_and_only_success_public_upload() {
         "workflow_run:",
         "push:",
         "id-token:",
+        "v0.1.0",
         "secrets.",
         "environment:",
         "actions/cache@",
@@ -116,9 +125,9 @@ fn legacy_private_entry_refuses_release_workflow_identity_before_build() {
         .env("BUILD_WORKFLOW_SHA", head)
         .env(
             "BUILD_WORKFLOW_REF",
-            "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0",
+            "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1",
         )
-        .env("GITHUB_REF", "refs/tags/v0.1.0")
+        .env("GITHUB_REF", "refs/tags/v0.9.0-alpha.1")
         .env("GITHUB_EVENT_NAME", "workflow_dispatch")
         .env("RUNNER_TEMP", temp.path())
         .output()

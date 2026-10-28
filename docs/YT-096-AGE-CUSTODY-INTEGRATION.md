@@ -2,8 +2,12 @@
 
 Date: 2026-10-27. **Custody scheme/D2 extension Adopted; local integration/readback PASS;
 independent implementation review PASS (zero issues and required followups).** D6 Pending; YT-096 In progress; YT-020 Blocked.
-Only code integration and local proof are authorized now. No GitHub settings or
-Secret installation, hosted run, tag, commit/Push, OIDC, signing or publication.
+The original integration scope authorized code and local proof only. Later
+separate approvals completed the hosted build, protected readback and persistent
+repository-external owner-host retention on 2026-10-28. See the authoritative
+[actual hosted/custody checkpoint](YT-096-HOSTED-DRILL-PLAN.md#actual-hosted-and-custody-checkpoint--2026-10-28)
+for source, runs, artifacts, approval, verification and retention evidence/limits.
+This update grants no new Commit/Push, OIDC, signing or publication authority.
 
 ## Files and trust boundary
 
@@ -14,14 +18,16 @@ The private identity never enters Git, build jobs, logs or artifacts. Its local
 copy is preserved outside Git for authorized proof, with directories0700/files0600.
 The latest owner choice permits transient key use only in the isolated, manually
 approved Environment job in [evidence-verify.yml](../.github/workflows/evidence-verify.yml).
-It supersedes the earlier local-only CI policy; actual Secret setup awaits authority.
+It supersedes the earlier local-only CI policy. Separately approved Secret setup
+and hosted use are recorded in the checkpoint above.
 
 [bootstrap-release-age.sh](../scripts/bootstrap-release-age.sh) pins age1.3.2,
 Sigsum0.13.1 and Go1.27.3. The local Linux amd64 bootstrap verified archive/proof
 SHA-256 and the explicit `sigsum-generic-2025-1` two-of-three witness quorum before
 first age execution. It uses official Go HTTPS/published checksum and module
 checksum-database trust roots, not TUF or independently reproduced binaries.
-No global install or hosted qualification is claimed; no floating latest/root override.
+This local bootstrap evidence makes no global-install or hosted-qualification
+claim; the later hosted execution is recorded separately. No floating latest/root override.
 
 ## Recorded local evidence
 
@@ -41,13 +47,13 @@ age authentication failure with recomputed receipt hash and original-manifest
 mismatch are rejected. All retained fixture directories are0700 and files0600;
 local identity metadata is unchanged and no key bytes were uploaded.
 
-**`complete_product_custody=false`:** the synthetic fixture contains no actual
+**Historical local fixture: `complete_product_custody=false`.** The synthetic fixture contains no actual
 pinned OpenSSL source/build result or sixteen-package build. This is local
 capture/readback/full-LOCAL-manifest proof only, not hosted qualification, release
 approval or durable production custody. Five bounded implementation repairs and
 their failures are preserved in run records; no failure remains outstanding.
-Actual Environment/Secret/protection setup and manual execution are unperformed
-and unauthorized. Independent implementation review PASS, zero issues and required followups;
+At this local checkpoint, Environment/Secret/protection setup and manual execution
+were unperformed and unauthorized. Independent implementation review PASS, zero issues and required followups;
 all eighteen reviewed source hashes matched before factual review-status updates.
 
 ## Minimum local use
@@ -89,7 +95,7 @@ permanent retention/release approval. A verified failure inventory remains
 Generic CLI failure is `custody NOT SAVED or readback rejected; private diagnostics suppressed`.
 No overwrite, plaintext fallback or raw diagnostic publication is permitted.
 
-## Future protected Environment verifier
+## Protected Environment verifier contract
 
 Before any separately authorized setup/run, the owner must configure and review
 Environment `release-evidence-verify`, required reviewer `bohewu`, exact custom
@@ -99,8 +105,9 @@ Secret **`AGE_IDENTITY`**, scoped only to this verifier; do not use a repository
 Secret or build-job key. GitHub's documented Environment gate releases secrets
 only after protection approval ([Environment contract](https://docs.github.com/en/actions/concepts/workflows-and-actions/deployment-environments),
 [reviewing deployments](https://docs.github.com/en/actions/how-tos/managing-workflow-runs-and-deployments/managing-deployments/reviewing-deployments)).
-Environment administrators remain a trusted policy root. Actual settings, no-bypass
-configuration, Secret installation and hosted approval behavior are not verified.
+Environment administrators remain a trusted policy root. The original local
+review did not verify settings, no-bypass configuration, Secret installation or
+hosted approval; the dated hosted checkpoint records the later actual evidence.
 
 The manual workflow inputs are `expected_commit`, `build_run`, `build_attempt`,
 `artifact_id`, `artifact_sha256` (the upload-artifact ZIP digest without `sha256:`).
@@ -143,12 +150,12 @@ permits ciphertext and safe source/run/status/size/digest verification metadata.
 
 ## Manual key review and replacement
 
-The next authorized local slice is [manual rotation preparation and a synthetic
+The separately authorized local slice was [manual rotation preparation and a synthetic
 test-key drill](YT-096-KEY-ROTATION-DRILL.md), based on custody commit `4793620`.
 Implementation is delivered; local drill PASS; independent Reviewer acceptance PASS (zero issues and required followups).
 Nine focused tests, two offline builds and 25 real commands cover the bounded
 LOCAL cases; the first extraction failure and one material repair are retained.
-New rotation changes remain uncommitted. This permits isolated LOCAL test keys,
+That record covers isolated LOCAL test keys,
 not owner-key rotation or GitHub Secret recovery. D6 Pending, YT-096 In progress
 and YT-020 Blocked remain unchanged.
 
@@ -162,6 +169,9 @@ private evidence and verify a new receipt outside the unchanged frozen
 manifest/provenance. Never overwrite/delete a still-needed old key. Re-encryption
 cannot revoke copied old ciphertext and does not change original build provenance.
 
-Next step: obtain owner approval of the reviewed source and protected Environment/Secret setup. Source-freeze/settings/Secret/hosted execution still requires
-separate authority. Hosted execution does not automatically unlock D6 approval,
-signing or publication. No actual `C_release` is selected.
+Next unblockable YT-096 work: D6 identity/signing approval and remaining trust,
+registry and final-release gates. The dated hosted checkpoint records the selected
+`C_release`, completed setup/readback and retained owner-host copy. Reuse those
+records without repeating the accepted drill. D6 remains Pending; signing and
+publication require separate authority. This factual document update grants no
+further operation.

@@ -11,8 +11,8 @@ repository.workspace = true
 axum.workspace = true
 serde = "1"
 tower = "0.5"
-yetlet-core = { version = "0.1.0", path = "../yetlet-core" }
-yetlet-html = { version = "0.1.0", path = "../yetlet-html" }
+yetlet-core = { version = "0.9.0-alpha.1", path = "../yetlet-core" }
+yetlet-html = { version = "0.9.0-alpha.1", path = "../yetlet-html" }
 
 [dev-dependencies]
 tokio.workspace = true

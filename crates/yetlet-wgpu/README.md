@@ -1,6 +1,6 @@
 # yetlet-wgpu — Experimental opt-in flat rectangles
 
-First-party Experimental `0.1.0`, unpublished and prepared for packaging. No performance, speedup,
+First-party Experimental `0.9.0-alpha.1`, unpublished and prepared for packaging. No performance, speedup,
 FPS, stable API, production readiness or publication guarantee. This is the
 bounded flat renderer extracted from the current `webgpu-scene-island` consumer.
 Future 3D is a motivation only; there is no 3D API, scene graph or engine.

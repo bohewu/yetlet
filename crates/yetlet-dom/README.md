@@ -60,7 +60,7 @@ Dual-licensed under [MIT](../../LICENSE-MIT) or [Apache-2.0](../../LICENSE-APACH
 <details>
 <summary>Historical delivery context and evidence</summary>
 
-**Experimental `0.1.0`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's nine library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
+**Experimental `0.9.0-alpha.1`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
 
 `yetlet-dom` mounts a shared View by constructing real browser nodes and replacing one owned subtree. It depends on `yetlet-core`; `wasm-bindgen` and `web-sys` are added only for `wasm32`. Native SSR does not require this crate.
 
