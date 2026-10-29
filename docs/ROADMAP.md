@@ -1,5 +1,24 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**Alpha.2 PR22 integration failure (2026-10-29):** MSRV PASS; Stable fails the
+existing rebuild fixture's stale alpha.1 version while its recipe expects
+alpha.2. The [minimum test-only correction](ALPHA2-VERSION-PREFLIGHT.md#subsequent-pr22-integration-failure-and-local-correction)
+passes the failed local case and owning-test Clippy/format; independent repair
+Reviewer PASS0, all four source hashes unchanged. Real sixteen-package preflight remains accepted at its original
+scope, but PR Merge is blocked until repaired delivery/required CI PASS. Original
+failure retained; no automatic CI retry, new Git delivery or release operation.
+
+**Alpha.2 version preflight (2026-10-29):** The
+[YT-096/YT-209 package follow-up](ALPHA2-VERSION-PREFLIGHT.md) updates the
+sixteen-library Experimental train and internal requirements without changing
+runtime, features, platform scope or third-party dependencies. Nineteen affected
+locked metadata roots, sixteen normally verified archives and an external
+packaged integration consumer PASS; independent Reviewer PASS0. All 53 reviewed
+source hashes match; only completion metadata follows. This is local
+uncommitted preflight, not a new candidate or hosted qualification. Existing
+alpha.1 publication/D6 remain Complete; YT-020 stays Blocked. No tag, signing or
+publication is authorized by this update.
+
 **YT-209 delivery and Environment setup (2026-10-29):** [PR20](https://github.com/bohewu/yetlet/pull/20)
 squash merged as `7de77c84e0e56e683cea4567048397caa0614590`, tree
 `95c65e754a51fadce648645791f41620b56f8bca`, identical to qualified repair head

@@ -2,6 +2,19 @@
 
 Status: proposed operational plan; no new operational authority granted.
 
+## Current disposition — 2026-10-29
+
+Tool delivery and the protected `release-result-verify` Environment/Secret
+installation are [complete](YT-209-RELEASE-AUTOMATION.md#owner-authorized-recovery-delivery-and-setup--2026-10-29).
+PR21 closeout merged as `c2d4bd085682cf86748bdd3ff18d6ca9f26534fc`;
+its required CI and automatic master CI `40884588178/1` PASS. The owner then
+approved the [alpha.2 version/package preflight](ALPHA2-VERSION-PREFLIGHT.md),
+without selecting C or authorizing a tag, hosted execution, signing or publication.
+Positive schema-1 hosted result verification is still Pending. Alpha.1 D6 and
+publication remain Complete. The inventory/proposals below preserve their dated
+pre-installation observation; do not recreate the Environment or reinstall its
+Secret merely because this historical plan proposed doing so.
+
 ## Recorded baseline — 2026-10-29
 
 The seventeen reviewed YT-209 paths were committed as

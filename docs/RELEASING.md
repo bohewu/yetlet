@@ -14,9 +14,11 @@ manifest. [Its actual signing/publication record](YT-096-SIGNER-CONTRACT.md#subs
 keeps exact historical C/S, hashes and owner decisions. It is not a template of
 run IDs to reuse. crates.io remains a separate, unexecuted YT-020 gate.
 
-**YT-209 provides versioned release inputs and separate protected result
-verification at locally reviewed implementation scope. Hosted qualification and
-Environment enablement remain Pending.** Before another release, review its
+**YT-209 tooling delivery, required CI and protected result Environment setup
+are complete. Positive schema-1 hosted result verification remains Pending.**
+The owner-approved [alpha.2 version preflight](ALPHA2-VERSION-PREFLIGHT.md)
+updates package identities without selecting a new C or authorizing execution.
+Before another release, review its
 source/record, applicable version changes and missing qualification, then use the
 [versioned interfaces](YT-209-RELEASE-AUTOMATION.md). No version change alone
 authorizes a dispatch. Historical tagged workflows retain their original guarded
@@ -120,7 +122,8 @@ YT-020's explicit registry/credential/order/readback requirements separately.
 This is the checked-in implementation baseline, not permission to dispatch it.
 [YT-209](YT-209-RELEASE-AUTOMATION.md) defines the versioned input and operator
 interfaces; focused local checks and independent implementation review PASS.
-Hosted qualification and operational enablement remain Pending.
+Tooling integration and Environment installation are accepted; positive hosted
+verification of new-format signing results remains Pending.
 
 | Carrier | Role and timeout |
 |---|---|
@@ -141,10 +144,12 @@ interfaces and identities. Do not dispatch a new interface against an old source
 
 The [minimum hosted/Environment plan](YT-209-HOSTED-VERIFICATION-PLAN.md) lists
 the observed configuration, legacy receipt limits and ready-to-authorize steps.
-The new independent verifier needs a separately configured `release-result-verify`
-Environment (required owner reviewer, master only, no admin bypass) and approved
-`AGE_IDENTITY` provisioning; this work does not install it. It verifies actual
-original signing bundles and all frozen entries without signing permission. The
+The `release-result-verify` Environment and existing `AGE_IDENTITY` provisioning
+are [installed and read back](YT-209-RELEASE-AUTOMATION.md#owner-authorized-recovery-delivery-and-setup--2026-10-29):
+required owner reviewer, master only, no admin bypass. Installation/name readback
+does not yet qualify actual decryption; each approved execution must recheck its
+settings and original input bindings. It verifies actual original signing bundles
+and all frozen entries without signing permission. The
 first release's one-time local-key exception remains spent.
 
 Local implementation checks do not qualify a hosted job or authorize a release.

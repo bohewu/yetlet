@@ -1,5 +1,19 @@
 # Yetlet Experimental Compatibility Policy
 
+**Current checkout (2026-10-29):** The owner approved the coordinated
+`0.9.0-alpha.2` [version/package preflight](ALPHA2-VERSION-PREFLIGHT.md).
+This changes library identities and internal version requirements, with no API,
+runtime, feature, MSRV or third-party dependency upgrade. No new immutable C or
+release authorization follows. Consumers must select the prerelease explicitly,
+for example `=0.9.0-alpha.2`, once those packages are actually distributed.
+
+The published baseline remains the sixteen-library Experimental
+[v0.9.0-alpha.1 GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
+at `bf3363801132f4481263ceb411d9bba3349df86d`. Its D6 acceptance is Complete;
+crates.io/YT-020 remains Blocked. New schema-1 hosted signing-result verification
+is Pending. The dated candidate/policy sections below retain their historical
+sources, decisions and failures; they do not override this current status.
+
 **Owner-selected version update (2026-10-28):** The next sixteen-package
 Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md).
 The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
@@ -62,15 +76,14 @@ The current `0.y` version remains experimental under SemVer. The classifications
 
 For the selected `0.1.x` train, patches preserve documented API behavior and MSRV. An incompatible change requires the next coordinated minor release with rationale, migration notes and the gates below. Publication alone does not promote an Experimental API to Stable Candidate or promise 1.0 stability.
 
-### Separately owned unpublished experimental workspaces
+### Isolated optional workspaces
 
-The optional Redis Session provider and the owner-approved
-`yetlet-wgpu` candidate use **isolated nested Cargo workspaces/locks**,
-publication-prepared metadata, and pre-public Experimental contracts. They are not
-among the original nine coordinated YT-020 release candidates; their
-shared prepared `0.1.0` version is not evidence that they
-have entered an approved immutable release. The default HTML/DOM/server
-dependency paths and root lock remain independent. See the
+The optional Redis Session provider and `yetlet-wgpu` use **isolated nested
+Cargo workspaces/locks** and Experimental contracts. Both belong to the current
+sixteen-library GitHub preview cohort, while the original nine-package records
+remain historical. Coordinated versioning does not merge dependency graphs,
+enable optional features or expand their selected platform/GPU support. The
+default HTML/DOM/server dependency paths and root lock remain independent. See the
 [YT-081 source/API audit](YT-081-API-CONTRACT-AUDIT.md) before assuming
 cross-provider interchangeability or a GPU stability guarantee.
 

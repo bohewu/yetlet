@@ -1,6 +1,6 @@
 # yetlet-core
 
-**Experimental `0.9.0-alpha.1`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
+**Experimental `0.9.0-alpha.2`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
 
 `yetlet-core` describes UI as owned Rust values shared by the native HTML and browser DOM renderers. It has no dependencies, browser runtime, server transport or implicit state scheduler.
 
