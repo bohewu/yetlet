@@ -36,7 +36,9 @@ distribution versus historical qualification to [Release readiness](RELEASE-READ
   Git authority, strict/builtin Guard, CI and merge reconciliation.
 - [New-version release workflow](RELEASING.md): one-time setup versus each version,
   immutable C/S, protected jobs, exact approvals, independent verification and
-  publication; explicitly identifies unfinished version-generic automation.
+  publication; distinguishes installed tooling from Pending hosted qualification.
+- [Alpha.2 version/package preflight](ALPHA2-VERSION-PREFLIGHT.md): current
+  coordinated package migration, affected verification and unchanged release gates.
 
 These are repository-maintenance guides, not application prerequisites or
 default reader-site exports. Use them for procedures; use dated records below

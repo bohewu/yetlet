@@ -1,5 +1,16 @@
 # Yetlet Backlog
 
+**Alpha.2 version preflight (2026-10-29):** Owner-approved
+[YT-096/YT-209 follow-up](ALPHA2-VERSION-PREFLIGHT.md) synchronizes sixteen
+libraries and eighteen internal version requirements to `0.9.0-alpha.2`.
+Nineteen affected locked metadata roots, sixteen normal package checks and the
+external packaged integration consumer PASS; 112 local lock version fields
+change, all 2,372 third-party blocks remain byte-identical. Current release and
+compatibility status is reconciled; historical evidence stays intact. Independent
+Reviewer PASS0; all 53 source/125 evidence hashes matched before/after review.
+No new C, Commit/Push, tag, hosted release work, signing or
+publication; alpha.1 D6 Complete and YT-020 Blocked remain unchanged.
+
 **YT-209 delivery and Environment setup (2026-10-29):** [PR20](https://github.com/bohewu/yetlet/pull/20)
 squash merged as `7de77c84e0e56e683cea4567048397caa0614590`, tree
 `95c65e754a51fadce648645791f41620b56f8bca`, identical to qualified repair head
