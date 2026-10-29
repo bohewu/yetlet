@@ -12,7 +12,15 @@ use std::{
     path::{Path, PathBuf},
     time::Duration,
 };
-pub(super) const PACKAGE_VERSION: &str = "0.9.0-alpha.1";
+pub(super) fn package_version() -> String {
+    // The reviewed source manifest is the version authority, not a second recipe constant.
+    let manifest: toml::Value =
+        toml::from_str(include_str!("../../../Cargo.toml")).expect("compiled workspace manifest");
+    manifest["workspace"]["package"]["version"]
+        .as_str()
+        .expect("workspace package version")
+        .to_owned()
+}
 pub const NAMES: [&str; 9] = [
     "yetlet-core",
     "yetlet-actions",
@@ -222,7 +230,7 @@ pub fn cargo_steps(source: &Path, work: &Path, cohort: Cohort) -> Vec<(String, V
 
 fn stage_bootstrap(source: &Path, work: &Path, name: &str) -> Result<()> {
     let vendor = work.join("vendor");
-    let directory = vendor.join(format!("{name}-{PACKAGE_VERSION}"));
+    let directory = vendor.join(format!("{name}-{}", package_version()));
     require(!directory.exists(), "bootstrap package already exists")?;
     tooling::execute(
         source,
@@ -232,7 +240,7 @@ fn stage_bootstrap(source: &Path, work: &Path, name: &str) -> Result<()> {
             "--gzip".into(),
             "--file".into(),
             work.join("bootstrap-target/package")
-                .join(format!("{name}-{PACKAGE_VERSION}.crate"))
+                .join(format!("{name}-{}.crate", package_version()))
                 .into_os_string(),
             "--directory".into(),
             vendor.into_os_string(),
@@ -618,7 +626,7 @@ fn run_body(
                 == cohort
                     .names()
                     .iter()
-                    .map(|n| format!("{n}-{PACKAGE_VERSION}.crate"))
+                    .map(|n| format!("{n}-{}.crate", package_version()))
                     .collect(),
             "exact selected package archives",
         )?;

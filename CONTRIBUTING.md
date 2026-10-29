@@ -29,4 +29,14 @@ Do not report a suspected vulnerability through a public Issue. Follow [SECURITY
 
 ## Developer entry points
 
-Start with the [native SSR quickstart](README.md#start-with-native-ssr), [documentation index](docs/README.md) and [sample guide](docs/SAMPLES.md). The source checkout is experimental and packages remain unpublished at `0.1.0` scope; retained verification is not release approval. Follow [repository instructions](AGENTS.md) for bounded changes and applicable checks.
+Start with the [native SSR quickstart](README.md#start-with-native-ssr),
+[documentation index](docs/README.md) and [sample guide](docs/SAMPLES.md).
+The Experimental `v0.9.0-alpha.1` source-package preview is
+[published on GitHub](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1);
+crates.io publication remains separate. Retained evidence applies to its exact
+source and scope, not every later checkout.
+
+Authorized maintainers and their agents should use the
+[development/PR SOP](docs/DEVELOPMENT.md) and [release SOP](docs/RELEASING.md),
+with [repository instructions](AGENTS.md) for bounded changes and authority.
+These links do not change the external contribution policy above.

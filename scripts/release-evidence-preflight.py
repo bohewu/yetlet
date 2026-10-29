@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""YT-096 fixed release-evidence API gate and two-file ciphertext download.
+"""YT-096 versioned release-evidence API gate and two-file ciphertext download.
 
 GitHub's protected Environment job gate supplies approval, not workflow_dispatch.
 The owner must review the Environment settings before installing its secret.
@@ -12,6 +12,7 @@ import hashlib
 import io
 import json
 import os
+from pathlib import Path
 import re
 import stat
 import sys
@@ -19,6 +20,10 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
+
+# Support the existing importlib consumer as well as direct script execution.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import release_record as records
 
 API = "https://api.github.com/repos/bohewu/yetlet"
 ENVIRONMENT = "release-evidence-verify"
@@ -33,24 +38,22 @@ def require(condition):
 
 
 def inputs():
-    result = {k: os.environ["CUSTODY_" + k.upper()] for k in
-              ("source", "run", "attempt", "artifact", "digest")}
-    require(re.fullmatch(r"[0-9a-f]{40}", result["source"]))
-    require(re.fullmatch(r"[0-9a-f]{64}", result["digest"]))
-    for name in ("run", "attempt", "artifact"):
-        require(re.fullmatch(r"[1-9][0-9]{0,19}", result[name]))
-    return result
+    r = records.environment('custody')
+    b = r['build']
+    return {'source': r['source'], 'tag': 'v' + r['version'], 'run': b['run'],
+            'attempt': b['attempt'], 'artifact': b['artifact'], 'digest': b['sha256']}
+
 
 
 def check_metadata(run, artifact, environment, policies, expected):
     require(run["id"] == int(expected["run"]))
     require(run["run_attempt"] == int(expected["attempt"]))
     require(run["head_sha"] == expected["source"])
-    require(run["head_branch"] == "v0.9.0-alpha.1")
+    require(run["head_branch"] == expected["tag"])
     require(run["event"] == "workflow_dispatch")
     require(run["path"] in (".github/workflows/release.yml",
-                            ".github/workflows/release.yml@refs/tags/v0.9.0-alpha.1",
-                            ".github/workflows/release.yml@v0.9.0-alpha.1"))
+                            ".github/workflows/release.yml@refs/tags/" + expected["tag"],
+                            ".github/workflows/release.yml@" + expected["tag"]))
     require(run["repository"]["full_name"] == "bohewu/yetlet")
     require(run["head_repository"]["full_name"] == "bohewu/yetlet")
     require(run["status"] == "completed" and run["conclusion"] in ("success", "failure"))
@@ -63,18 +66,19 @@ def check_metadata(run, artifact, environment, policies, expected):
     require(artifact["workflow_run"]["head_sha"] == expected["source"])
     require(artifact["workflow_run"]["repository_id"] == run["repository"]["id"])
     require(artifact["workflow_run"]["head_repository_id"] == run["repository"]["id"])
-    require(environment["name"] == ENVIRONMENT and isinstance(environment["id"], int))
+    require(environment["name"] == ENVIRONMENT and type(environment["id"]) is int
+            and environment["can_admins_bypass"] is False)
     reviewers = [r for r in environment["protection_rules"] if r["type"] == "required_reviewers"]
     require(len(reviewers) == 1)
     require(reviewers[0]["reviewers"] == [next(r for r in reviewers[0]["reviewers"]
-            if r["type"] == "User" and r["reviewer"]["login"] == "bohewu")])
+            if r["type"] == "User" and r["reviewer"]["login"] == "bohewu" and r["reviewer"]["id"] == 35250002)])
     # This single-owner workflow permits the owner to request and approve a job.
     # GitHub enforces the required reviewer gate before releasing Environment secrets.
     require(environment["deployment_branch_policy"] ==
             {"protected_branches": False, "custom_branch_policies": True})
     require(policies["total_count"] == 1 and len(policies["branch_policies"]) == 1)
     policy = policies["branch_policies"][0]
-    require(policy["name"] == "v0.9.0-alpha.1" and policy["type"] == "tag")
+    require(policy["name"] == expected["tag"] and policy["type"] == "tag")
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):

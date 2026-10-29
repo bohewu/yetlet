@@ -1,0 +1,111 @@
+name: Independently verify frozen signing results
+
+# Integration only. Environment/Secret provisioning and each run require owner authority.
+# No signing/OIDC permission, public upload, registry operation or automatic trigger.
+on:
+  workflow_dispatch:
+    inputs:
+      record:
+        description: Complete schema-1 release record, identical to original prepare/sign
+        type: string
+        required: true
+      request:
+        description: Closed result request pinning V and original prepare/sign artifacts
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: yetlet-release-result-verify
+  cancel-in-progress: false
+
+env:
+  RELEASE_RECORD: ${{ inputs.record }}
+  RESULT_REQUEST: ${{ inputs.request }}
+  RESULT_WORKFLOW_SHA: ${{ github.workflow_sha }}
+  RESULT_WORKFLOW_REF: ${{ github.workflow_ref }}
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - name: Reject foreign source before checkout or repository code
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REPOSITORY" == bohewu/yetlet ]]
+          [[ "$GITHUB_REPOSITORY_ID" == 1409587171 && "$GITHUB_REPOSITORY_OWNER_ID" == 35250002 ]]
+          [[ "$GITHUB_REF" == refs/heads/master && "$GITHUB_SHA" == "$RESULT_WORKFLOW_SHA" ]]
+          [[ "$RESULT_WORKFLOW_REF" == bohewu/yetlet/.github/workflows/release-result-verify.yml@refs/heads/master ]]
+          python3 - <<'PY'
+          import json, os, re
+          r = json.loads(os.environ['RESULT_REQUEST'])
+          assert re.fullmatch('[0-9a-f]{40}', r['verifier_commit'])
+          assert r['verifier_commit'] == os.environ['GITHUB_SHA']
+          PY
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Check protected source, Environment and both original artifacts without key
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/release-result-verify.py preflight
+
+  verify:
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    environment: release-result-verify
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Authenticate pinned verification tools before key access
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/result-tools"
+          BOOTSTRAP="$RUNNER_TEMP/result-tools" bash scripts/bootstrap-release-sign.sh
+      - name: Recheck identity and download exact frozen/result ciphertext
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RESULT_WORK: ${{ runner.temp }}/result-work
+        run: python3 scripts/release-result-verify.py download
+      - name: Independently verify actual bundles and every frozen entry, then remove plaintext
+        env:
+          AGE_IDENTITY: ${{ secrets.AGE_IDENTITY }}
+          GH_TOKEN: ${{ github.token }}
+          RESULT_WORK: ${{ runner.temp }}/result-work
+          RESULT_OUTPUT: ${{ runner.temp }}/RESULT-VERIFICATION.json
+          RESULT_TOOLS: ${{ runner.temp }}/result-tools
+          SIGN_AGE: ${{ runner.temp }}/result-tools/age-tools/age/age
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          trap 'rm -rf "$RESULT_WORK"' EXIT HUP INT TERM
+          [[ -n "$AGE_IDENTITY" ]]
+          printf '%s\n' "$AGE_IDENTITY" > "$RESULT_WORK/identity"
+          unset AGE_IDENTITY
+          "$RESULT_TOOLS/venv/bin/python" scripts/release-result-verify.py verify
+      - name: Export safe independent-verification receipt only
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: result-verification-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/RESULT-VERIFICATION.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove isolated tools, key and plaintext after every outcome
+        if: always()
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$RUNNER_TEMP/result-work" "$RUNNER_TEMP/result-tools"
+          rm -f "$RUNNER_TEMP/RESULT-VERIFICATION.json"

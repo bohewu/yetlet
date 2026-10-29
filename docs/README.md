@@ -1,6 +1,11 @@
 # Developer Documentation
 
-Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then choose a [runnable sample](SAMPLES.md). Yetlet is an experimental, unpublished source preview. The next coordinated library version is `0.9.0-alpha.1`; see the [version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md). Current task status belongs to [Backlog](BACKLOG.md), milestone gates to [Roadmap](ROADMAP.md), and release decisions to [Release readiness](RELEASE-READINESS.md).
+Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
+choose a [runnable sample](SAMPLES.md). The Experimental
+[v0.9.0-alpha.1 source-package pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
+is published on GitHub; crates.io remains separate. Current task status belongs
+to [Backlog](BACKLOG.md), milestone gates to [Roadmap](ROADMAP.md), and current
+distribution versus historical qualification to [Release readiness](RELEASE-READINESS.md).
 
 ## Reader entry points
 
@@ -24,6 +29,18 @@ Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 - [Current CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory).
 
 - [WebAssembly startup and loading UI](WASM-STARTUP.md): optional shared JS/CSS shell, customization, full-page/SSR-region integration and caller-owned lifetime.
+
+## Maintainer entry points
+
+- [Development and PR workflow](DEVELOPMENT.md): bounded changes, focused checks,
+  Git authority, strict/builtin Guard, CI and merge reconciliation.
+- [New-version release workflow](RELEASING.md): one-time setup versus each version,
+  immutable C/S, protected jobs, exact approvals, independent verification and
+  publication; explicitly identifies unfinished version-generic automation.
+
+These are repository-maintenance guides, not application prerequisites or
+default reader-site exports. Use them for procedures; use dated records below
+for evidence rather than replaying the first release's troubleshooting history.
 
 This repository index includes both reader guidance and maintainer history;
 it is not a documentation-site export. Current APIs belong to the reference

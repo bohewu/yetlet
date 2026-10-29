@@ -1,12 +1,38 @@
 # YT-096 — Reduce release supply-chain attacks: adopted D1–D5 policy
 
-**Current alpha signing preparation (2026-10-28):** The [signer contract](YT-096-SIGNER-CONTRACT.md)
-now binds actual alpha source `bf33638`, unsigned `v0.9.0-alpha.1`, build
-`40669449040`/attempt1 and verifier `40688772221`/attempt1. It records the fixed
-9158-byte public provenance SHA and remaining private-manifest/S/D6 gates, plus
-an unpublished GitHub Draft pre-release. The `0.1.0` source/run/payload tables
-below retain their historical adoption scope; they are not the current alpha
-signing inputs. No signing/publication authority or private custody is broadened.
+**Subsequent owner-approved GitHub pre-release (2026-10-29):**
+[Yetlet v0.9.0-alpha.1](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
+is public as an Experimental pre-release, not Latest, at unchanged C `bf33638`.
+The owner separately approves publication of the exact notes and 20 public
+attachments; anonymous API and bundle-download readback PASS. No private evidence,
+private bundle, registry upload, new signing or Git operation is included.
+D6 remains Complete, YT-096 Done at accepted source-package signing/integrity
+scope, YT-020 Blocked. Earlier unpublished/Pending records retain their dated scope.
+
+**Current signed output (2026-10-29):** The owner accepts the exact D6 packet
+and personally approves sign `40811275645/1` at unchanged S `d65e318`. Issuance,
+cleanup and independent public/private cryptographic checks PASS, covering the
+two fixed raw payloads, 16 subjects and all 117 complete-manifest entries.
+The [actual record](YT-096-SIGNER-CONTRACT.md#actual-signing-independent-verification-and-owner-acceptance--2026-10-29)
+binds the owner's explicit one-phase local custody exception and conditional
+final acceptance to the existing public/encrypted-private bundle hashes.
+Final Reviewer PASS0 activates the existing owner acceptance: D6 Complete,
+YT-096 Done at accepted source-package signing/integrity scope. D1–D5
+policy and historical adoption records remain intact; no publication or Git
+authority, YT-020 Blocked. Earlier Pending execution values below are historical.
+
+**Current alpha signing preparation (2026-10-29):** The
+[single D6 confirmation packet](YT-096-SIGNER-CONTRACT.md#d6-confirmation-packet--2026-10-29)
+binds actual C `bf33638`, unsigned `v0.9.0-alpha.1`, original build
+`40669449040/1`, verifier `40688772221/1` and selected signer S `d65e318`.
+Protected prepare `40806988578/1`, including cleanup, and repository-external
+retention PASS. Both actual raw payload hashes and exact artifact/receipt binding
+are now known; D6 signing approval remains Pending. The packet restates adopted
+D1/D2 public statement/workload/log disclosure with these exact alpha identities;
+no policy or private-evidence access is broadened. It grants no signing,
+publication or Git authority. The `0.1.0` and Pending-source tables below retain
+their historical adoption scope, superseded only for current execution by that
+packet. YT-096 In progress; YT-020 Blocked.
 
 **Owner-selected version update (2026-10-28):** The next sixteen-package
 Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md).
@@ -231,6 +257,20 @@ See [custody integration and manual rotation](YT-096-AGE-CUSTODY-INTEGRATION.md)
 for the preserved local and rotation evidence. This extension does not authorize
 OIDC, signing or publication. D6 remains Pending; recorded owner-host retention
 proves retained bytes at observation time, not indefinite availability.
+
+**Single-use owner exception — 2026-10-29:** After successful protected signing
+and independent public verification, the owner explicitly permits one local
+isolated readback with the existing owner-local age identity, maximum 300 seconds,
+and accepts the existing digest-fixed outputs conditional on private verification,
+plaintext cleanup and independent Reviewer PASS. Authenticated age reads the
+original identity directly; no key copy, move, rotation, upload or export occurs.
+The phase completes in 146.12 seconds including one field-name harness correction;
+every temporary plaintext directory is removed and identity metadata is unchanged.
+Only safe receipts/public certificate metadata and original encrypted bytes are
+retained. This exception grants no future local-key access and does not broaden
+the default protected-GitHub-Environment rule. See the actual result above;
+independent Reviewer PASS0 activates the owner's exact conditional acceptance.
+The local exception is now spent; D6 Complete at the recorded scope.
 
 ## D4 — Concrete signing and verification recommendation
 

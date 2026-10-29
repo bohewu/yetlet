@@ -22,8 +22,9 @@ explicit browser enhancements in one language.
 
 ## Start with native SSR
 
-**Source preview:** The next coordinated library version is `0.9.0-alpha.1`.
-Yetlet is experimental and unpublished. Use this repository
+**Experimental pre-release:** [v0.9.0-alpha.1](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
+provides sixteen source packages and signed provenance on GitHub; crates.io
+publication remains separate. Use this repository
 checkout with the pinned Rust/Cargo 1.99.0 toolchain; APIs may change. Native SSR
 needs no Node.js or WASM toolchain. See [compatibility](docs/COMPATIBILITY.md)
 for the current usage and support boundary.
@@ -110,5 +111,7 @@ export PATH="$HOME/.local/share/yetlet-tools/bin:$PATH"
 Planned work belongs in [Roadmap](docs/ROADMAP.md); tracked tasks belong in
 [Backlog](docs/BACKLOG.md). Reporting and participation follow
 [Contributing](CONTRIBUTING.md) and the [security policy](SECURITY.md).
+Maintainers: [development/PR workflow](docs/DEVELOPMENT.md) and
+[new-version release workflow](docs/RELEASING.md).
 
 Licensed under either [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE).

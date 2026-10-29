@@ -1,9 +1,44 @@
 # YT-096 — Release supply-chain integrity: trust and disclosure decisions
 
+**Subsequent owner-approved GitHub pre-release (2026-10-29):**
+[Yetlet v0.9.0-alpha.1](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
+is public as an Experimental pre-release, not Latest, at unchanged C `bf33638`.
+The owner separately approves publication of the exact notes and 20 public
+attachments; anonymous API and bundle-download readback PASS. No private evidence,
+private bundle, registry upload, new signing or Git operation is included.
+D6 remains Complete, YT-096 Done at accepted source-package signing/integrity
+scope, YT-020 Blocked. Earlier unpublished/Pending records retain their dated scope.
+
 **Purpose:** Reduce package substitution, official-signer impersonation and
 source/build mismatch risks for future Yetlet releases. Consumers need verifiable
 artifact bytes and an approved source/workflow identity; signatures alone do not
 prove defect-free code or an uncompromised CI system.
+
+**Actual signing and final condition (2026-10-29):** Owner-approved sign
+`40811275645/1` at S `d65e318` SUCCESS; independent public/private verification,
+all 16 subjects, all 117 complete-manifest entries and plaintext cleanup PASS.
+The owner explicitly grants one bounded local private-key readback exception
+and conditional acceptance of the existing public/encrypted-private bundle
+digests in the [actual acceptance record](YT-096-SIGNER-CONTRACT.md#actual-signing-independent-verification-and-owner-acceptance--2026-10-29).
+Final independent Reviewer PASS0 activates the existing owner acceptance;
+D6 Complete and YT-096 Done at accepted source-package signing/integrity scope.
+The default D2 rule remains unchanged for future work; actual disclosure stays
+within adopted D1/D2 scope. No registry/GitHub Release publication or Git mutation;
+YT-020 Blocked. Earlier decisions below retain their original dated statuses.
+
+**Current execution and owner decision (2026-10-29):** D1–D5 remain Adopted
+(policy); D6 Pending. The [single D6 confirmation packet](YT-096-SIGNER-CONTRACT.md#d6-confirmation-packet--2026-10-29)
+binds actual alpha C `bf33638`, unchanged unsigned `v0.9.0-alpha.1`, signer
+S `d65e318`, successful owner-approved prepare `40806988578/1`, both frozen raw
+payload hashes and exact artifact/receipt/custody. The
+[result record](YT-096-SIGNER-CONTRACT.md#successful-protected-prepare-and-retention--2026-10-29)
+preserves failures and confirms cleanup/retention without signing or publication.
+The proposed owner decision accepts public statement, workload identity and
+durable certificate/log metadata for one later protected signing run; private
+manifest/evidence bodies remain controlled. No such decision is taken by this
+documentation. Signing/verification/final acceptance and publication remain
+separate gates. Earlier adoption/proposal values below retain their dated scope;
+they are not current alpha signing inputs. YT-096 In progress; YT-020 Blocked.
 
 **Current owner adoption (2026-10-27): D1–D5 Adopted (policy); D6 Pending.**
 The owner adopts the [concrete D1–D5 plan](YT-096-D1-D5-RELEASE-TRUST-PLAN.md):

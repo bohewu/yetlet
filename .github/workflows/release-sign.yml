@@ -5,6 +5,10 @@ name: Prepare or sign frozen release inputs
 on:
   workflow_dispatch:
     inputs:
+      record:
+        description: Complete reviewed schema-1 release record, frozen before prepare
+        type: string
+        required: true
       request:
         description: Closed prepare/sign JSON, exact S and reviewed input digests
         type: string
@@ -19,6 +23,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  RELEASE_RECORD: ${{ inputs.record }}
   SIGN_REQUEST: ${{ inputs.request }}
   SIGN_WORKFLOW_SHA: ${{ github.workflow_sha }}
   SIGN_WORKFLOW_REF: ${{ github.workflow_ref }}

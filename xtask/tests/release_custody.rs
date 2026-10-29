@@ -386,28 +386,31 @@ fn gnu_tar_is_available_for_the_closed_archive_boundary() {
 #[test]
 fn isolated_manual_verifier_checks_documented_metadata_and_zip_allowlist() {
     let python = r#"
-import copy, hashlib, importlib.util, io, os, stat, tempfile, zipfile
+import copy, hashlib, importlib.util, io, json, os, stat, tempfile, zipfile
 spec=importlib.util.spec_from_file_location('custody', 'scripts/release-evidence-preflight.py')
 m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
-e={'source':'a'*40,'run':'1','attempt':'2','artifact':'3','digest':'b'*64}
-r={'id':1,'run_attempt':2,'head_sha':'a'*40,'head_branch':'v0.9.0-alpha.1','event':'workflow_dispatch','path':'.github/workflows/release.yml','repository':{'id':4,'full_name':'bohewu/yetlet'},'head_repository':{'id':4,'full_name':'bohewu/yetlet'},'status':'completed','conclusion':'failure'}
+os.environ['RELEASE_RECORD']=json.dumps({'schema':1,'version':'0.9.0-alpha.2','source':'a'*40,'cohort':'sixteen','build':{'run':'1','attempt':'2','artifact':'3','sha256':'b'*64}})
+e=m.inputs();assert e=={'source':'a'*40,'tag':'v0.9.0-alpha.2','run':'1','attempt':'2','artifact':'3','digest':'b'*64}
+r={'id':1,'run_attempt':2,'head_sha':'a'*40,'head_branch':e['tag'],'event':'workflow_dispatch','path':'.github/workflows/release.yml','repository':{'id':4,'full_name':'bohewu/yetlet'},'head_repository':{'id':4,'full_name':'bohewu/yetlet'},'status':'completed','conclusion':'failure'}
 a={'id':3,'name':'encrypted-private-'+'a'*40+'-1-2','expired':False,'size_in_bytes':100,'digest':'sha256:'+'b'*64,'workflow_run':{'id':1,'head_sha':'a'*40,'repository_id':4,'head_repository_id':4}}
-v={'name':'release-evidence-verify','id':5,'protection_rules':[{'type':'required_reviewers','reviewers':[{'type':'User','reviewer':{'login':'bohewu'}}]}],'deployment_branch_policy':{'protected_branches':False,'custom_branch_policies':True}}
-p={'total_count':1,'branch_policies':[{'name':'v0.9.0-alpha.1','type':'tag'}]}
+v={'name':'release-evidence-verify','id':5,'can_admins_bypass':False,'protection_rules':[{'type':'required_reviewers','reviewers':[{'type':'User','reviewer':{'login':'bohewu','id':35250002}}]}],'deployment_branch_policy':{'protected_branches':False,'custom_branch_policies':True}}
+p={'total_count':1,'branch_policies':[{'name':e['tag'],'type':'tag'}]}
 m.check_metadata(r,a,v,p,e)
-for path in ['.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1','.github/workflows/release.yml@v0.9.0-alpha.1']:
+for path in ['.github/workflows/release.yml@refs/tags/'+e['tag'],'.github/workflows/release.yml@'+e['tag']]:
  good=copy.deepcopy(r);good['path']=path;m.check_metadata(good,a,v,p,e)
 def rejects(run=r,artifact=a,environment=v,policies=p):
  try:m.check_metadata(run,artifact,environment,policies,e)
  except (ValueError,KeyError,StopIteration):return
  raise AssertionError('untrusted metadata accepted')
-for key,value in [('run_attempt',1),('head_sha','c'*40),('event','pull_request'),('path','.github/workflows/other.yml'),('path','.github/workflows/release.yml@refs/tags/v0.1.0'),('path','.github/workflows/release.yml@v0.1.0'),('head_branch','master'),('head_branch','v0.1.0'),('conclusion','cancelled')]:
+for key,value in [('run_attempt',1),('head_sha','c'*40),('event','pull_request'),('path','.github/workflows/other.yml'),('path','.github/workflows/release.yml@refs/tags/v0.1.0'),('path','.github/workflows/release.yml@v0.1.0'),('head_branch','master'),('head_branch','v0.1.0'),('head_branch','v0.9.0-alpha.1'),('conclusion','cancelled')]:
  bad=copy.deepcopy(r);bad[key]=value;rejects(run=bad)
 bad=copy.deepcopy(r);bad['head_branch']='v0.1.0';bad['path']='.github/workflows/release.yml@refs/tags/v0.1.0';rejects(run=bad)
 for key,value in [('name','other'),('expired',True),('digest','sha256:'+'c'*64),('id',9)]:
  bad=copy.deepcopy(a);bad[key]=value;rejects(artifact=bad)
 bad=copy.deepcopy(a);bad['workflow_run']['head_sha']='c'*40;rejects(artifact=bad)
 bad=copy.deepcopy(v);bad['protection_rules']=[];rejects(environment=bad)
+bad=copy.deepcopy(v);bad['can_admins_bypass']=True;rejects(environment=bad)
+bad=copy.deepcopy(v);bad['protection_rules'][0]['reviewers'][0]['reviewer']['id']=7;rejects(environment=bad)
 bad=copy.deepcopy(v);bad['protection_rules'][0]['reviewers'][0]['reviewer']['login']='other';rejects(environment=bad)
 bad=copy.deepcopy(v);bad['deployment_branch_policy']=None;rejects(environment=bad)
 bad=copy.deepcopy(p);bad['branch_policies'][0]['type']='branch';rejects(policies=bad)
@@ -458,19 +461,18 @@ print('documented metadata and two-file ZIP boundary: PASS')
         "timeout-minutes: 5",
         "timeout-minutes: 15",
         "ref: ${{ github.sha }}",
-        "refs/tags/v0.9.0-alpha.1^{commit}",
-        "[[ \"$(git rev-parse HEAD)\" == \"$CUSTODY_SOURCE\" ]]",
-        "git merge-base --is-ancestor \"$CUSTODY_SOURCE\" refs/remotes/origin/master",
-        "[[ -z \"$(git status --porcelain)\" ]]",
+        "record:",
+        "RELEASE_RECORD: ${{ inputs.record }}",
         "persist-credentials: false",
     ] {
         assert!(source.contains(required), "missing {required}");
     }
     for required in [
         "[[ \"$GITHUB_EVENT_NAME\" == workflow_dispatch && \"$GITHUB_REPOSITORY\" == bohewu/yetlet ]]",
-        "[[ \"$GITHUB_REF\" == refs/tags/v0.9.0-alpha.1 ]]",
-        "[[ \"$EXPECTED_WORKFLOW_REF\" == bohewu/yetlet/.github/workflows/evidence-verify.yml@refs/tags/v0.9.0-alpha.1 ]]",
-        "[[ \"$GITHUB_SHA\" == \"$CUSTODY_SOURCE\" && \"$EXPECTED_WORKFLOW_SHA\" == \"$CUSTODY_SOURCE\" ]]",
+        "[[ \"$GITHUB_SHA\" == \"$RECORD_WORKFLOW_SHA\" ]]",
+        "assert r['source'] == os.environ['GITHUB_SHA']",
+        "assert os.environ['RECORD_WORKFLOW_REF'] == 'bohewu/yetlet/.github/workflows/evidence-verify.yml@' + os.environ['GITHUB_REF']",
+        "python3 scripts/release_record.py source evidence-verify.yml",
     ] {
         assert_eq!(
             source.matches(required).count(),
@@ -479,6 +481,7 @@ print('documented metadata and two-file ZIP boundary: PASS')
         );
     }
     assert!(!source.contains("v0.1.0"));
+    assert!(!source.contains("v0.9.0-alpha.1"));
     assert!(!preflight.contains("secrets."));
     assert!(!preflight.contains("environment:"));
     assert!(verify.contains("environment: release-evidence-verify"));

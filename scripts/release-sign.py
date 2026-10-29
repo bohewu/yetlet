@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""YT-096: data-only preparation/signing of one retained alpha release.
+"""YT-096: data-only preparation/signing of one reviewed versioned release.
 
 No product build, tag mutation, publication or retries. Hosted execution uses no
 ambient personal login; owner-local handoff resolves ciphertext with existing gh auth.
@@ -32,13 +32,26 @@ import release_checksums as checksums
 spec = importlib.util.spec_from_file_location("custody_api", HERE / "release-evidence-preflight.py")
 api = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(api)
-C = "bf3363801132f4481263ceb411d9bba3349df86d"
-TAG = "v0.9.0-alpha.1"
-BUILD = "40669449040"
-VERIFIER = "40688772221"
-BUILD_ARTIFACT = "12807757693"
-BUILD_ZIP = "a09c7e3e32d254a702c171333bfa01a1d08c2ed96f36eb5463ee9745a66e3dca"
-PUBLIC_SHA = "4d4de1a8ce9cc077c0aa62a1aafb3ab9799eed312deddb66d9e6f8fc6fef2d68"
+import release_record as records
+
+# Bound once from the explicit validated record, never from an alpha fallback.
+RECORD = None
+C = TAG = BUILD = BUILD_ATTEMPT = VERIFIER = VERIFIER_ATTEMPT = None
+BUILD_ARTIFACT = BUILD_ZIP = PUBLIC_SHA = PUBLIC_SIZE = RELEASE_ID = None
+
+
+def bind_record(record):
+    global RECORD, C, TAG, BUILD, BUILD_ATTEMPT, VERIFIER, VERIFIER_ATTEMPT
+    global BUILD_ARTIFACT, BUILD_ZIP, PUBLIC_SHA, PUBLIC_SIZE, RELEASE_ID
+    RECORD = records.validate(record, 'complete')
+    C, TAG = RECORD['source'], 'v' + RECORD['version']
+    BUILD, BUILD_ATTEMPT = RECORD['build']['run'], RECORD['build']['attempt']
+    VERIFIER, VERIFIER_ATTEMPT = RECORD['custody_verifier']['run'], RECORD['custody_verifier']['attempt']
+    BUILD_ARTIFACT, BUILD_ZIP = RECORD['build']['artifact'], RECORD['build']['sha256']
+    PUBLIC_SHA, PUBLIC_SIZE = RECORD['provenance']['sha256'], RECORD['provenance']['size']
+    RELEASE_ID = int(RECORD['release_id'])
+
+
 RECIPIENT_SHA = "b861a3c7e2abf3caf4c7071c045f6114704db94e8cc39ce010e7fa10711ff506"
 SAN = "https://github.com/bohewu/yetlet/.github/workflows/release-sign.yml@refs/heads/master"
 ISSUER = "https://token.actions.githubusercontent.com"
@@ -46,12 +59,9 @@ ROOT_SHA = "6494e21ea73fa7ee769f85f57d5a3e6a08725eae1e38c755fc3517c9e6bc0b66"
 CONFIG_SHA = "0f5f38554e29e770d4d5d6f0e1b51fcbf84f61dc6934530a09b7a901eaad5bee"
 COSIGN_SHA = "424e2c97d0b45fd7a6b608a87f090f35633f4c23ece5f092d48bba11aaf4bbfa"
 AGE_SHA = "eb7dd1b518f0a307c99cd97782623c5321da049154b04acd2d98d21aa7bc9b2c"
-RELEASE_ID = 426670086
 MANIFEST = checksums.MANIFEST
 ROLES = {"qualification", "security", "inventory", "support", "review", "failures"}
-PACKAGES = {"yetlet-" + s for s in (
-    "actions", "auth", "config", "core", "dom", "dom-keyed", "html", "rate-limit",
-    "reactive", "request-id", "secrets", "server-axum", "session", "session-redis", "signing", "wgpu")}
+PACKAGES = records.PACKAGES
 
 
 def require(ok):
@@ -117,7 +127,10 @@ def digest(value):
 
 
 def request():
-    r = load(os.environ["SIGN_REQUEST"].encode())
+    return validate_request(load(os.environ["SIGN_REQUEST"].encode()))
+
+
+def validate_request(r):
     mode = r.get("mode")
     common = {"mode", "signer_commit"}
     fields = ({"qualification_asset", "qualification_sha256", "qualification_manifest_sha256",
@@ -126,7 +139,7 @@ def request():
               {"run", "attempt", "artifact", "digest", "receipt_sha256", "provenance_sha256",
                "manifest_sha256", "d6"})
     require(mode in {"prepare", "sign"} and set(r) == common | fields)
-    require(re.fullmatch(r"[0-9a-f]{40}", r["signer_commit"]) and r["signer_commit"] != C)
+    require(re.fullmatch(r"[0-9a-f]{40}", r["signer_commit"]) and r["signer_commit"] == RECORD["signer_commit"])
     for key in fields - {"d6", "qualification_handoff", "qualification_expires"}:
         require(number(r[key]) if key in {"qualification_asset", "run", "attempt", "artifact"}
                 else digest(r[key]))
@@ -193,7 +206,7 @@ def make_handoff(template, output):
     r = load(read(template))
     require(set(r) == {"mode", "signer_commit", "qualification_asset", "qualification_sha256",
                       "qualification_manifest_sha256"} and r["mode"] == "prepare")
-    require(re.fullmatch(r"[0-9a-f]{40}", r["signer_commit"]) and r["signer_commit"] != C
+    require(re.fullmatch(r"[0-9a-f]{40}", r["signer_commit"]) and r["signer_commit"] == RECORD["signer_commit"]
             and number(r["qualification_asset"]) and digest(r["qualification_sha256"])
             and digest(r["qualification_manifest_sha256"]))
     require(sha(read(os.environ["SIGN_AGE"])) == AGE_SHA)
@@ -292,8 +305,8 @@ def identity(r):
     require(subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip() == r["signer_commit"])
 
 
-def environment_gate(environment, policies):
-    require(environment["name"] == "release-sign" and environment["can_admins_bypass"] is False)
+def environment_gate(environment, policies, name="release-sign"):
+    require(environment["name"] == name and environment["can_admins_bypass"] is False)
     rules = [v for v in environment["protection_rules"] if v["type"] == "required_reviewers"]
     require(len(rules) == 1 and rules[0]["prevent_self_review"] is False)
     require(len(rules[0]["reviewers"]) == 1)
@@ -338,18 +351,26 @@ def gate(r, minimum_handoff_seconds=1200):
         environment_gate(environment, policies)
         if r["mode"] == "prepare":
             stage = "build-run"
-            run_gate(api.api("/actions/runs/" + BUILD + "/attempts/1"), BUILD, C, TAG,
-                     ".github/workflows/release.yml")
+            run_gate(api.api("/actions/runs/" + BUILD + "/attempts/" + BUILD_ATTEMPT), BUILD, C, TAG,
+                     ".github/workflows/release.yml", BUILD_ATTEMPT)
             stage = "build-artifact"
             artifact_gate(api.api("/actions/artifacts/" + BUILD_ARTIFACT), BUILD, C,
-                          BUILD_ARTIFACT, BUILD_ZIP, "encrypted-private-" + C + "-" + BUILD + "-1")
+                          BUILD_ARTIFACT, BUILD_ZIP, "encrypted-private-" + C + "-" + BUILD + "-" + BUILD_ATTEMPT)
             stage = "verifier-run"
-            run_gate(api.api("/actions/runs/" + VERIFIER + "/attempts/1"), VERIFIER, C, TAG,
-                     ".github/workflows/evidence-verify.yml")
+            run_gate(api.api("/actions/runs/" + VERIFIER + "/attempts/" + VERIFIER_ATTEMPT), VERIFIER, C, TAG,
+                     ".github/workflows/evidence-verify.yml", VERIFIER_ATTEMPT)
+            stage = "custody-environment"
+            custody_env = api.api("/environments/release-evidence-verify")
+            require(custody_env["id"] == int(RECORD["custody_verifier"]["environment_id"]))
+            api.check_metadata(api.api("/actions/runs/" + BUILD + "/attempts/" + BUILD_ATTEMPT),
+                api.api("/actions/artifacts/" + BUILD_ARTIFACT), custody_env,
+                api.api("/environments/release-evidence-verify/deployment-branch-policies?per_page=100"),
+                {"source": C, "tag": TAG, "run": BUILD, "attempt": BUILD_ATTEMPT,
+                 "artifact": BUILD_ARTIFACT, "digest": BUILD_ZIP})
             stage = "verifier-approval"
             approvals = api.api("/actions/runs/" + VERIFIER + "/approvals")
             require(any(a["state"] == "approved" and a["user"]["id"] == 35250002
-                        and any(e["id"] == 25525950662 for e in a["environments"]) for a in approvals))
+                        and any(e["id"] == int(RECORD["custody_verifier"]["environment_id"]) for e in a["environments"]) for a in approvals))
             stage = "qualification-handoff"
             handoff_input(r, minimum_handoff_seconds)
         else:
@@ -443,14 +464,13 @@ def qualification(directory):
     return closure
 
 
-def payloads(directory):
-    checksums.run("verify", str(directory))
+def provenance(directory):
     raw = read(directory / "PROVENANCE-UNSIGNED.json")
-    require(len(raw) == 9158 and sha(raw) == PUBLIC_SHA)
+    require(len(raw) == PUBLIC_SIZE and sha(raw) == PUBLIC_SHA)
     p = load(raw)
     require(p["_type"] == "https://in-toto.io/Statement/v1"
             and p["predicateType"] == "https://slsa.dev/provenance/v1")
-    names = {n + "-0.9.0-alpha.1.crate" for n in PACKAGES}
+    names = {n + "-" + RECORD["version"] + ".crate" for n in PACKAGES}
     require(len(p["subject"]) == 16 and {s["name"] for s in p["subject"]} == names)
     for s in p["subject"]:
         require(s["digest"] == {"sha256": sha(read(directory / s["name"]))})
@@ -461,8 +481,13 @@ def payloads(directory):
     require({"uri": "git+https://github.com/bohewu/yetlet", "digest": {"gitCommit": C}}
             in definition["resolvedDependencies"])
     require(p["predicate"]["runDetails"]["metadata"]["invocationId"] ==
-            "https://github.com/bohewu/yetlet/actions/runs/" + BUILD + "/attempts/1")
-    return PUBLIC_SHA, sha(read(directory / MANIFEST, checksums.MAX_MANIFEST_BYTES))
+            "https://github.com/bohewu/yetlet/actions/runs/" + BUILD + "/attempts/" + BUILD_ATTEMPT)
+    return PUBLIC_SHA
+
+
+def payloads(directory):
+    checksums.run("verify", str(directory))
+    return provenance(directory), sha(read(directory / MANIFEST, checksums.MAX_MANIFEST_BYTES))
 
 
 def tools(directory):
@@ -480,7 +505,7 @@ def prepare(r, work, output):
     restored = work / "original"
     command([os.environ["SIGN_XTASK"], "release", "custody", "verify", "--age", os.environ["SIGN_AGE"],
              "--recipient", HERE.parent / ".github/release-evidence-recipient.txt", "--source", C,
-             "--run", BUILD, "--attempt", "1", "--transport", work / "transport",
+             "--run", BUILD, "--attempt", BUILD_ATTEMPT, "--transport", work / "transport",
              "--identity", work / "identity", "--output", restored])
     inventory = load(read(restored / "CUSTODY-INVENTORY.json"))
     require(inventory["complete"] is True and inventory["original_exit"] == 0)
@@ -506,7 +531,7 @@ def prepare(r, work, output):
                 extra_labels[f.name] = name
             write(final / name, read(f))
     json_write(final / "EVIDENCE-CLOSURE.json", {
-        "schema": 1, "source": C, "build_run": BUILD, "build_attempt": "1", "verifier_run": VERIFIER,
+        "schema": 1, "source": C, "build_run": BUILD, "build_attempt": BUILD_ATTEMPT, "verifier_run": VERIFIER,
         "original_inventory_sha256": sha(read(restored / "CUSTODY-INVENTORY.json")),
         "original_private_manifest_sha256": sha(original_manifest), "qualification": closure,
         "original_extra_labels": extra_labels,
@@ -520,8 +545,9 @@ def prepare(r, work, output):
              HERE.parent / ".github/release-evidence-recipient.txt", "--output",
              output / "frozen-signing-inputs.tar.age", work / "frozen.tar"])
     json_write(output / "SIGNING-INPUTS.json", {
-        "schema": 1, "source": C, "signer_commit": r["signer_commit"], "tag": TAG,
-        "build_run": BUILD, "build_attempt": "1", "verifier_run": VERIFIER, "verifier_attempt": "1",
+        "schema": 1, "record_sha256": records.digest(RECORD),
+        "source": C, "signer_commit": r["signer_commit"], "tag": TAG,
+        "build_run": BUILD, "build_attempt": BUILD_ATTEMPT, "verifier_run": VERIFIER, "verifier_attempt": VERIFIER_ATTEMPT,
         "build_artifact": BUILD_ARTIFACT, "build_zip_sha256": BUILD_ZIP,
         "prepare_run": os.environ["GITHUB_RUN_ID"], "prepare_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
         "qualification_asset": r["qualification_asset"], "qualification_sha256": r["qualification_sha256"],
@@ -541,8 +567,9 @@ def signing_input(r, work):
     receipt_raw = read(work / "transport" / "SIGNING-INPUTS.json")
     require(sha(receipt_raw) == r["receipt_sha256"])
     receipt = load(receipt_raw)
-    expected = {"schema": 1, "source": C, "signer_commit": r["signer_commit"], "tag": TAG,
-                "build_run": BUILD, "build_attempt": "1", "verifier_run": VERIFIER, "verifier_attempt": "1",
+    expected = {"schema": 1, "record_sha256": records.digest(RECORD),
+        "source": C, "signer_commit": r["signer_commit"], "tag": TAG,
+                "build_run": BUILD, "build_attempt": BUILD_ATTEMPT, "verifier_run": VERIFIER, "verifier_attempt": VERIFIER_ATTEMPT,
                 "build_artifact": BUILD_ARTIFACT, "build_zip_sha256": BUILD_ZIP,
                 "prepare_run": r["run"], "prepare_attempt": r["attempt"], "provenance_sha256": PUBLIC_SHA,
                 "manifest_sha256": r["manifest_sha256"], "cosign_sha256": COSIGN_SHA,
@@ -558,7 +585,7 @@ def signing_input(r, work):
     require(sha(read(work / "assembly/EVIDENCE-CLOSURE.json")) == receipt["closure_sha256"])
 
 
-def certificate(bundle, r):
+def certificate(bundle, r, run=None, attempt=None):
     from cryptography import x509
     from cryptography.x509.oid import ObjectIdentifier
     vm = bundle["verificationMaterial"]
@@ -570,8 +597,8 @@ def certificate(bundle, r):
                 12: "https://github.com/bohewu/yetlet", 13: r["signer_commit"],
                 14: "refs/heads/master", 15: "1409587171", 16: "https://github.com/bohewu",
                 17: "35250002", 18: SAN, 19: r["signer_commit"], 20: "workflow_dispatch",
-                21: "https://github.com/bohewu/yetlet/actions/runs/" + os.environ["GITHUB_RUN_ID"] +
-                    "/attempts/" + os.environ["GITHUB_RUN_ATTEMPT"],
+                21: "https://github.com/bohewu/yetlet/actions/runs/" + (run or os.environ["GITHUB_RUN_ID"]) +
+                    "/attempts/" + (attempt or os.environ["GITHUB_RUN_ATTEMPT"]),
                 22: "public", 23: "release-sign",
                 24: "repo:bohewu@35250002/yetlet@1409587171:environment:release-sign"}
     for suffix, text in expected.items():
@@ -603,7 +630,7 @@ def sign(r, work, output, tool_dir):
         command([cosign, "sign-blob", final / MANIFEST, "--bundle", output / "manifest.sigstore.json", *common])
     finally:
         token_path.unlink(missing_ok=True)
-    first = sorted(PACKAGES)[0] + "-0.9.0-alpha.1.crate"
+    first = sorted(PACKAGES)[0] + "-" + RECORD["version"] + ".crate"
     command([cosign, "verify-blob-attestation", final / first, "--bundle", output / "provenance.sigstore.json",
              "--type", "slsaprovenance1", *verify])
     command([cosign, "verify-blob", final / MANIFEST, "--bundle", output / "manifest.sigstore.json", *verify])
@@ -617,7 +644,7 @@ def sign(r, work, output, tool_dir):
              HERE.parent / ".github/release-evidence-recipient.txt", "--output",
              output / "manifest.sigstore.json.age", output / "manifest.sigstore.json"])
     (output / "manifest.sigstore.json").unlink()
-    json_write(output / "SIGNING-EXECUTION.json", {"schema": 1, "source": C,
+    json_write(output / "SIGNING-EXECUTION.json", {"schema": 1, "record_sha256": records.digest(RECORD), "source": C,
         "signer_commit": r["signer_commit"], "approved_inputs": r,
         "sign_run": os.environ["GITHUB_RUN_ID"], "sign_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
         "provenance_bundle_sha256": sha(read(output / "provenance.sigstore.json")),
@@ -686,6 +713,7 @@ def oidc_token(r):
 
 
 def main():
+    bind_record(records.environment())
     action = sys.argv[1]
     if action == "pack" and len(sys.argv) == 4:
         pack(Path(sys.argv[2]), outside(sys.argv[3]))

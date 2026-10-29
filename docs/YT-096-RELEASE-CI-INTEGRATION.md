@@ -1,5 +1,15 @@
 # YT-096 — Development and release CI integration
 
+**Procedure entry points (2026-10-29):** Use the maintained
+[development/PR SOP](DEVELOPMENT.md) and [release SOP](RELEASING.md).
+The body below preserves the 2026-10-27 integration/design checkpoint and its
+source-bound review; its old `v0.1.0` invocation and Pending signer/publication
+rows are historical, not instructions for a new version. Current code has the
+separate signer and an accepted alpha publication, but still has explicit alpha
+source/tag/artifact bindings and no general publication/private-result verifier.
+The SOP lists these actual limits and YT-209 follow-up without claiming that
+documentation implemented automation. No workflow or Environment is changed.
+
 Date: 2026-10-27. **D1–D5 Adopted (policy); D6 Pending.**
 YT-096 In progress; YT-020 Blocked; YT-206 Done.
 Original build/verify-only implementation independently reviewed PASS, zero issues
