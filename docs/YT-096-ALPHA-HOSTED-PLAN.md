@@ -4,6 +4,29 @@ Date: 2026-10-28 (Asia/Taipei). Status: Plan independently reviewed PASS, zero i
 D6 Pending; YT-096 In progress; YT-020 Blocked. This packet authorizes no execution.
 
 
+## Current protected output and cleanup failure — 2026-10-29
+
+PR18 guarded delivery selects S `e2d4a9f`; PR CI `40794539309/1` and master CI
+`40795652719/1` PASS. The owner approves actual Environment protection for prepare
+`40795794183/1`. Its complete data/tool/manifest/freeze/upload path passes;
+final cleanup fails only on task-private read-only Go module cache entries.
+The overall workflow remains FAIL, sign skipped, and the existing signing gate
+rejects this run. No automatic retry or status exception is introduced.
+
+[Candidate output and minimal repair](YT-096-SIGNER-CONTRACT.md#actual-frozen-output-and-go-cache-cleanup-failure--2026-10-29)
+retain original artifact ZIP `12863583130`, frozen ciphertext and safe receipt
+outside Git, with byte/hash/source/run/recipient/tool correspondence verified.
+Observed candidate manifest SHA is
+`e0921075e47a5c2f16948dde94bf006ec8afac14c8730ba68b22d28d0533d93f`;
+it is not an accepted final signing input. No local formal key/private plaintext
+is read. All previous failures and C/tag identities are preserved.
+
+The task-private bootstrap flag repair and one offline native Go regression
+reproduce FAIL-to-PASS for removal; no cryptographic check or permission is
+weakened. New repair/status changes are uncommitted; syntax/docs PASS and independent
+followup Reviewer PASS0. The Draft asset stays retained because eligible-run
+completion was not reached. D6 Pending, YT-096 In progress, YT-020 Blocked.
+
 ## Current local ciphertext handoff correction — 2026-10-29
 
 PR17 is delivered as S `0e8fb60`; PR/master CI PASS. Additional prepare

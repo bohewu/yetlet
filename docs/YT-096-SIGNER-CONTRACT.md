@@ -21,15 +21,16 @@ The execution source is `bf3363801132f4481263ceb411d9bba3349df86d`, immutable un
 `5d7b918` was version-preflight C, not this hosted execution source. Historical
 `v0.1.0`, source `3eacfe3`, build/readback and retained payloads remain unchanged.
 
-Date: 2026-10-29 (Asia/Taipei). **Current state: PR17 delivered; additional
-preflight identifies Draft API HTTP403; local encrypted handoff implemented.**
-Selected S is `0e8fb600af7aaebd4641a78c477035afe637c67e`, with PR/master CI PASS.
-Prepare `40789535074/1` fails before protected work. The new uncommitted handoff
-code is not S and has not run hosted. Real ciphertext transfer and nine focused
-local cases and independent Reviewer PASS0 accept the bounded implementation. See the
-[current handoff contract](#encrypted-ciphertext-capability-handoff--2026-10-29).
-D6 Pending; YT-096 In progress; YT-020 Blocked. All dated earlier checkpoints
-keep their original source, scope and acceptance results.
+Date: 2026-10-29 (Asia/Taipei). **Current state: real protected preparation
+and output upload PASS; tools-cache cleanup FAIL; local cleanup repair Reviewer PASS0.**
+Selected S is `e2d4a9f64925f2a20c35c7e7aeae6e352e4938ef`, with PR/master CI PASS.
+Owner-approved prepare `40795794183/1` produces and uploads the actual encrypted
+frozen candidate and receipt. Final cleanup fails on read-only Go cache entries;
+the overall run is FAIL and its output is not eligible for signing. The candidate
+manifest SHA is observed, but accepted final inputs and D6 remain Pending. See
+[actual output and repair](#actual-frozen-output-and-go-cache-cleanup-failure--2026-10-29).
+Local repair changes are uncommitted; no automatic retry or replacement S follows.
+YT-096 In progress; YT-020 Blocked. Earlier checkpoints retain historical scope.
 
 This contract and [ADR 0009](adr/0009-release-build-and-signer-identities.md)
 preserve the [D1–D5 policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md), including D2
@@ -47,14 +48,14 @@ under separate owner authority; this local diagnostic continuation changes no se
 | Product tag | Existing immutable unsigned `v0.9.0-alpha.1`; never move it |
 | Build workflow/run | `.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1`; `40669449040` / attempt1 |
 | Protected verifier | `40688772221` / attempt1 |
-| Selected signer source S | `0e8fb600af7aaebd4641a78c477035afe637c67e`, after PR17 squash Merge; uncommitted handoff code is not selected |
+| Selected signer source S | `e2d4a9f64925f2a20c35c7e7aeae6e352e4938ef`, after PR18 squash Merge; uncommitted cache cleanup repair is not selected |
 | Proposed signer ref | Protected `refs/heads/master` |
 | Signer execution equality | Checked-out code SHA = event SHA = workflow SHA = `expected_signer_commit` = S |
 | Exact certificate SAN | `https://github.com/bohewu/yetlet/.github/workflows/release-sign.yml@refs/heads/master` |
 | OIDC issuer | `https://token.actions.githubusercontent.com` |
 | Repository/owner | `bohewu/yetlet`, repository ID1409587171; `bohewu`, owner ID35250002 |
 
-S is not C. It is the actual owner-authorized PR17 squash commit, with the
+S is not C. It is the actual owner-authorized PR18 squash commit, with the
 reviewed tree unchanged. A later local edit never implicitly replaces S. Verify the certificate's authenticated workflow/build-signer digest
 cryptographically against S, alongside the exact issuer/SAN and repository/owner
 identities. SAN or branch name alone is insufficient. A mismatch fails closed.
@@ -699,3 +700,85 @@ their reviewed hashes. Eight changes remain uncommitted, none staged; the
 selected S stays `0e8fb60`. Guarded delivery, explicit replacement-S selection
 and any additional hosted run still need owner authority. D6 remains Pending,
 YT-096 In progress and YT-020 Blocked; the final manifest is not frozen.
+
+## Actual frozen output and Go cache cleanup failure — 2026-10-29
+
+The owner approves guarded delivery of the eight reviewed handoff paths and one
+new prepare. Commit `4292754`, tree `07404415d79443c83109a1205b0ccb6a25584cd7`,
+passes strict/builtin staged/outgoing checks and native hooks.
+[PR18](https://github.com/bohewu/yetlet/pull/18) CI `40794539309/1` passes;
+squash Merge selects S `e2d4a9f64925f2a20c35c7e7aeae6e352e4938ef` with that same
+tree. Automatic master CI `40795652719/1` passes. Original C/tags remain intact.
+
+The owner-local helper creates a fresh capsule using the original public
+recipient, proves unauthenticated original ZIP retrieval/hash/receipt, and emits
+handoff SHA `13ee340c421a5384cbe87f296bc569367860035c36fbcf0ead0a04f5041f199f`.
+The owner then personally approves Environment `25580949441`; approvals identify
+user `35250002`. [Prepare run 40795794183](https://github.com/bohewu/yetlet/actions/runs/40795794183),
+attempt 1, passes all data/tool steps through upload. Both the one-shot dispatch
+and the real formal-key phase occurred at this fixed S; sign is skipped.
+
+| Actual stage | Result |
+|---|---|
+| Preflight `123191847380` | PASS |
+| Tool/root authentication and trusted helper build | PASS |
+| Original build ciphertext/Environment recheck | PASS |
+| Isolated capability retrieval, custody/qualification decryption, full manifest, sixteen subjects and encrypted freeze | PASS |
+| Encrypted frozen output/receipt upload | PASS |
+| Final owned-work cleanup | FAIL: 200 permission-denied entries, all under the task-private Go module cache |
+| Overall prepare job `123191897780` / workflow run | FAIL; never relabeled PASS |
+| Sign job `123191900050` | Skipped; no OIDC issuance or signatures |
+
+Full logs show no `rm` errors outside `sign-tools/age-tools/gomodcache`; the
+isolated phase and its own work cleanup complete successfully. This does not
+constitute an independent post-job filesystem inspection or full cleanup PASS.
+The failure is the bootstrap's default read-only Go cache combined with ordinary
+recursive removal, not a failure of the observed data/manifest/upload steps.
+
+### Preserved candidate readback
+
+Artifact `12863583130`, `signing-inputs-40795794183-1`, has size 74,815,048 and
+ZIP SHA-256 `561058586354c54c935af000f7b5fac3d1084d93ae12f606dd257262cfc49b4b`.
+The original ZIP and exact two regular payload files are downloaded and retained
+outside Git. ZIP, ciphertext and all safe receipt bindings match source S/C,
+run/attempts, original build/verifier/artifact, qualification data, handoff,
+recipient and authenticated tools. No local private decryption occurs.
+
+- Safe receipt SHA-256: `b6b79e3b98a21c1caa226ea27a004fab367ac7d2eb951e6785340f06025e19a5`.
+- Original public provenance SHA-256: `4d4de1a8ce9cc077c0aa62a1aafb3ab9799eed312deddb66d9e6f8fc6fef2d68`.
+- Observed frozen candidate manifest SHA-256: `e0921075e47a5c2f16948dde94bf006ec8afac14c8730ba68b22d28d0533d93f`.
+- Original private build manifest SHA-256: `9585635674d073b740b83ccd4d1e7edf1e60aab52e1b0a7efff8102a911cc4ec`.
+- Frozen ciphertext SHA-256: `e47f1d0544acc240f31310eec7f1c79d169187312f5e1a4bec716086b83a4f27`.
+
+These are actual candidate bytes, not signing authority or accepted final
+inputs. The existing run gate still rejects the failed workflow; no
+`continue-on-error`, exception or relaxed status acceptance is added. The
+qualification Draft asset is retained because the successful eligible-run
+condition for deletion was not reached. D6 Pending; final accepted manifest
+remains Pending, despite the now-known candidate hash.
+
+### Minimum local cleanup repair
+
+Set `GOFLAGS=-modcacherw` only in the existing task-private age bootstrap, whose
+Go cache/path/toolchain environment already points exclusively at its empty
+owned directory. [Go documents this flag](https://go.dev/ref/mod#build-commands)
+for creating removable module-cache directories. No global `go env` settings,
+sudo, hook, scope expansion, crypto version/hash, sumdb policy, key or permission
+change occurs. The normal cleanup command and strict gate are retained.
+
+One focused native Go case uses the existing authenticated Go1.27.3 and pinned
+Sigsum module ZIP through an offline file proxy. It first reproduces ordinary
+`rm -rf` failure with the old default, then proves full removal using the flag
+read from the actual bootstrap script. The original test failure and passing
+repair are retained. Offline fixture mode is solely a permission/removal test;
+it does not replace production sumdb/signature checks. Temporary fixture caches
+are removed with scoped `go clean -modcache`, including on assertion failure.
+No prior qualification, crypto bootstrap, private preparation or hosted job is
+replayed. Shell/Python syntax and docs PASS (75 documents / 207 backlog items).
+Independent followup Reviewer PASS0 accepts the six-file local repair/status
+delta, with zero issues or required followups; it does not certify a repaired
+hosted run. Only completion metadata changes after that review; the two code
+files retain their reviewed hashes.
+New repair/status changes remain uncommitted; no new S or hosted retry is
+implied. The effective release status remains YT-096 In progress / D6 Pending,
+with YT-020 Blocked and no signing/publication.

@@ -1,5 +1,17 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-096 current execution (2026-10-29):** PR18 strict/builtin delivery selects
+S `e2d4a9f`; PR/master CI PASS. Owner-approved prepare `40795794183/1` passes
+preflight, tool authentication, original ciphertext retrieval, isolated
+handoff/decryption/full manifest/freeze, and encrypted output upload. Final owned
+cleanup fails only on read-only Go module-cache entries; the run remains FAIL.
+[Actual output/custody and minimal cleanup repair](YT-096-SIGNER-CONTRACT.md#actual-frozen-output-and-go-cache-cleanup-failure--2026-10-29)
+retain all evidence and the ineligible frozen candidate. One new offline native
+Go regression reproduces the failure and passes with task-private
+`GOFLAGS=-modcacherw`; no key, data, permission or signing-gate change. New repair
+and status docs are uncommitted; independent followup Reviewer PASS0. No run was
+retried, D6 Pending, YT-096 In progress, YT-020 Blocked. Prior records keep scope.
+
 **YT-096 current repair (2026-10-29):** Strict/builtin delivery of PR17 selects
 S `0e8fb60`; PR/master CI pass. The additional prepare `40789535074/1` rejects
 reading the Draft Release with HTTP403; protected jobs are skipped. The

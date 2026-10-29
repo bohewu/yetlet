@@ -11,7 +11,8 @@ printf '%s\n' '65efbc80fdc1fa2cd2631cad5b481777a68e8725f34e89f50fc6ac714e379b40 
 tar --extract --gzip --file go1.27.3.linux-amd64.tar.gz --no-same-owner
 export GOTOOLCHAIN=local GOENV=off GOSUMDB=sum.golang.org
 export GOPROXY=https://proxy.golang.org CGO_ENABLED=0
-export GOPRIVATE= GONOSUMDB= GONOPROXY= GOFLAGS= GOWORK=off
+# Keep this task-private module cache removable by ordinary owned-work cleanup.
+export GOPRIVATE= GONOSUMDB= GONOPROXY= GOFLAGS=-modcacherw GOWORK=off
 export GOBIN="$BOOTSTRAP/bin" GOPATH="$BOOTSTRAP/gopath"
 export GOMODCACHE="$BOOTSTRAP/gomodcache" GOCACHE="$BOOTSTRAP/gocache"
 "$BOOTSTRAP/go/bin/go" version
