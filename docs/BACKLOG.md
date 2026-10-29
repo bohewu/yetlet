@@ -1,10 +1,17 @@
 # Yetlet Backlog
 
+**YT-209 release automation (2026-10-29):** Contract independent Reviewer PASS0;
+versioned inputs, separate protected result verification and closed public
+attachments complete at local implementation scope. Final independent Reviewer
+PASS0; 30 distinct focused checks plus docs/format/syntax PASS. Hosted qualification
+and operational enablement remain Pending. No hosted run, key access,
+signing, Git operation or publication accompanies these new changes.
+
 **YT-208 maintainer SOP (2026-10-29):** Documentation-only development/PR and
 new-version release procedures, one-time versus per-version controls, batched
 authority, exact C/S and current automation limits; entry points reconciled to
 actual alpha distribution. Document/whitespace checks and independent Reviewer
-PASS0; YT-208 Done at documentation scope. YT-209 is Todo for observed version-generic/protected
+PASS0; YT-208 Done at documentation scope. YT-209 was registered Todo for observed version-generic/protected
 verification/publication automation gaps, not implemented by these documents.
 Prior six-file D6/publication work is preserved; no runtime/workflow/environment,
 Git or distribution operation accompanies this slice.
@@ -650,7 +657,7 @@ separate implementation authority.
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
 | YT-208 | P2 | S | M10 | Maintainer development and new-version release SOP | YT-096, YT-207 | [Development](DEVELOPMENT.md) and [release](RELEASING.md) guides separate normal PR work, one-time setup, per-version source/evidence/approval steps and failure-only recovery. Current distribution/navigation reconciled; C/S, strict/builtin, key/publication boundaries and original histories preserved; YT-209 remains explicitly future tooling. Independent Reviewer PASS0, zero issues/required followups, verifies all ten incremental hashes, new-guide structure/local links/anchors and current workflow/helper/policy correspondence. Fixed75-document/209-item check and tracked/new-file whitespace PASS; original four D6-only files unchanged and prior Backlog/Roadmap content preserved. Only completion metadata changes after review; no runtime/workflow/environment, old qualification replay, Git or distribution action | Done |
-| YT-209 | P2 | M | M10 | Versioned release inputs and protected result-verification automation | YT-208 | Observed [tooling gaps](RELEASING.md#existing-workflow-map-and-limits): review a data-only per-version record to replace scattered alpha C/tag/run/artifact constants; separately protected independent signing-result verification; exact Release-ID-based public staging/publication/readback with preserved tag/C and a closed allowlist. Preserve strict/builtin/hooks, C/S identity, key isolation, explicit owner gates, immutable old results and bounded failure handling. No arbitrary executable input, default framework dependency, automatic signing/registry upload or reuse of the spent local-key exception. Requires a separately approved implementation, focused changed-behavior checks and independent Reviewer; not implemented here | Todo |
+| YT-209 | P2 | M | M10 | Versioned release inputs and protected result-verification automation | YT-208 | Observed [tooling gaps](RELEASING.md#existing-workflow-map-and-limits): review a data-only per-version record to replace scattered alpha C/tag/run/artifact constants; separately protected independent signing-result verification; exact Release-ID-based public staging/publication/readback with preserved tag/C and a closed allowlist. Preserve strict/builtin/hooks, C/S identity, key isolation, explicit owner gates, immutable old results and bounded failure handling. No arbitrary executable input, default framework dependency, automatic signing/registry upload or reuse of the spent local-key exception. [Contract and implementation](YT-209-RELEASE-AUTOMATION.md): strict schema-1 record replaces scattered alpha bindings; source-derived Cargo/tag identities and complete-record receipt hashes; independent protected V verifier has no OIDC/signing and validates original S bundles/all entries before safe receipt; exact Release-ID public staging/readback/publication has closed20 assets and explicit owner confirmation. 23 new Python +5 affected signer +2 affected Rust checks, docs/format/syntax PASS; two fixture failures/corrections retained. Contract and final independent Reviewer PASS0, all 17 source hashes match; Done at local implementation scope only. Hosted qualification/Environment setup remain Pending, no key access, old proof replay, new-change Commit/Push, hosted/signing/publication execution | Done |
 
 ## YT-096 hosted build, verifier and retention — 2026-10-28
 

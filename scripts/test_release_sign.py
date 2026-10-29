@@ -21,6 +21,16 @@ spec.loader.exec_module(s)
 S = "a" * 40
 
 
+# Retained alpha test data, now explicit rather than command defaults.
+FIXTURE_RECORD = {
+    'schema': 1, 'version': '0.9.0-alpha.1', 'source': 'bf3363801132f4481263ceb411d9bba3349df86d',
+    'cohort': 'sixteen', 'build': {'run': '40669449040', 'attempt': '1', 'artifact': '12807757693',
+        'sha256': 'a09c7e3e32d254a702c171333bfa01a1d08c2ed96f36eb5463ee9745a66e3dca'},
+    'custody_verifier': {'run': '40688772221', 'attempt': '1', 'environment_id': '25525950662'},
+    'signer_commit': S, 'provenance': {'sha256': '4d4de1a8ce9cc077c0aa62a1aafb3ab9799eed312deddb66d9e6f8fc6fef2d68',
+        'size': 9158}, 'release_id': '426670086'}
+
+
 def prepare_request():
     raw = '-----BEGIN AGE ENCRYPTED FILE-----\nTE9DQUw=\n-----END AGE ENCRYPTED FILE-----\n'
     return {"mode": "prepare", "signer_commit": S, "qualification_asset": "1",
@@ -36,6 +46,12 @@ def sign_request():
 
 
 class SignerTests(unittest.TestCase):
+    def setUp(self):
+        s.bind_record(copy.deepcopy(FIXTURE_RECORD))
+        env = patch.dict(os.environ, {'RELEASE_RECORD': json.dumps(FIXTURE_RECORD)})
+        env.start()
+        self.addCleanup(env.stop)
+
     def test_age_bootstrap_owned_module_cache_is_removable(self):
         go = os.environ.get('YETLET_CLEANUP_TEST_GO')
         proxy = os.environ.get('YETLET_CLEANUP_TEST_PROXY')
@@ -182,10 +198,10 @@ class SignerTests(unittest.TestCase):
         # Synthetic API responses only; no workflow token, identity or network.
         def run(ident, path):
             return {'id': int(ident), 'run_attempt': 1, 'head_sha': s.C,
-                    'head_branch': s.TAG, 'repository': {'id': 1409587171},
-                    'head_repository': {'id': 1409587171}, 'event': 'workflow_dispatch',
+                    'head_branch': s.TAG, 'repository': {'id': 1409587171, 'full_name': 'bohewu/yetlet'},
+                    'head_repository': {'id': 1409587171, 'full_name': 'bohewu/yetlet'}, 'event': 'workflow_dispatch',
                     'path': path, 'status': 'completed', 'conclusion': 'success'}
-        return {
+        responses = {
             '/branches/master': {'protected': True, 'commit': {'sha': S}},
             '/environments/release-sign': {
                 'name': 'release-sign', 'can_admins_bypass': False,
@@ -204,6 +220,11 @@ class SignerTests(unittest.TestCase):
             '/actions/runs/' + s.VERIFIER + '/approvals': [
                 {'state': 'approved', 'user': {'id': 35250002}, 'environments': [{'id': 25525950662}]}],
         }
+        responses['/environments/release-evidence-verify'] = copy.deepcopy(responses['/environments/release-sign'])
+        responses['/environments/release-evidence-verify'].update(name='release-evidence-verify', id=25525950662)
+        responses['/environments/release-evidence-verify/deployment-branch-policies?per_page=100'] = {
+            'total_count': 1, 'branch_policies': [{'name': s.TAG, 'type': 'tag'}]}
+        return responses
 
     def test_preflight_never_reads_draft_and_http_rejection_stays_redacted(self):
         responses = self.preflight_metadata()

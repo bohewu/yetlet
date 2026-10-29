@@ -14,12 +14,15 @@ manifest. [Its actual signing/publication record](YT-096-SIGNER-CONTRACT.md#subs
 keeps exact historical C/S, hashes and owner decisions. It is not a template of
 run IDs to reuse. crates.io remains a separate, unexecuted YT-020 gate.
 
-**The current release tools are still bound to that alpha. There is no generic
-"change the version and dispatch" path yet.** Before another release, review
-the new version's source bindings and close the applicable gaps in YT-209 below
-or obtain a separately reviewed, explicit version-specific implementation plan.
-This documentation delivery does not implement that automation or qualify a new
-candidate. Do not dispatch the old guarded workflow with invented new inputs.
+**YT-209 provides versioned release inputs and separate protected result
+verification at locally reviewed implementation scope. Hosted qualification and
+Environment enablement remain Pending.** Before another release, review its
+source/record, applicable version changes and missing qualification, then use the
+[versioned interfaces](YT-209-RELEASE-AUTOMATION.md). No version change alone
+authorizes a dispatch. Historical tagged workflows retain their original guarded
+interfaces; never pass invented new inputs to those old sources. Local tooling
+acceptance does not qualify a new candidate or grant key/signing/publication
+permission.
 
 ## Separate one-time setup from each release
 
@@ -112,38 +115,38 @@ YT-020's explicit registry/credential/order/readback requirements separately.
 ## Existing workflow map and limits
 
 This is the checked-in implementation baseline, not permission to dispatch it.
+[YT-209](YT-209-RELEASE-AUTOMATION.md) defines the versioned input and operator
+interfaces; focused local checks and independent implementation review PASS.
+Hosted qualification and operational enablement remain Pending.
 
-| Carrier | Existing role and timeout |
+| Carrier | Role and timeout |
 |---|---|
 | [rust.yml](../.github/workflows/rust.yml) | Unprivileged development PR/master CI; MSRV45 minutes, Stable60 minutes |
-| [release.yml](../.github/workflows/release.yml) | Manual fixed-sixteen unsigned build/preparation at the alpha tag;45 minutes |
-| [evidence-verify.yml](../.github/workflows/evidence-verify.yml) | Original encrypted build-evidence readback; preflight5 / protected verifier15 minutes |
-| [release-sign.yml](../.github/workflows/release-sign.yml) | Separate closed prepare/sign modes at approved S on master; preflight5 / protected job30 minutes, not an automatic release trigger |
+| [release.yml](../.github/workflows/release.yml) | Manual unsigned sixteen-package preparation at reviewed C/tag, using a versioned core record;45 minutes |
+| [evidence-verify.yml](../.github/workflows/evidence-verify.yml) | Original encrypted build-evidence readback, versioned record plus exact original build identity; preflight5 / protected15 minutes |
+| [release-sign.yml](../.github/workflows/release-sign.yml) | Closed prepare/sign modes at approved S on protected master; complete record plus exact request, preflight5 / protected30 minutes |
+| [release-result-verify.yml](../.github/workflows/release-result-verify.yml) | Separately protected independent signing-result readback at reviewed V, no OIDC/signing; preflight5 / protected30 minutes |
+| [release-public.py](../scripts/release-public.py) | Explicit local stage/readback/publish by Release ID and closed twenty-file plan; no automatic trigger or registry support |
 | [private-rebuild.yml](../.github/workflows/private-rebuild.yml), [qualification.yml](../.github/workflows/qualification.yml) | Historical rebuilding/qualification scopes; not substitutes for current cohort/source approval |
-| GitHub publication | Existing Draft plus owner-approved API operations; there is no checked-in general publication workflow |
 
-Actual gaps that must remain visible:
+The source-manifest version and a strict [release record](../scripts/release_record.py)
+replace scattered alpha C/tag/run/artifact constants in new workflow execution.
+Keep core, build-readback and complete snapshots separately; freeze the complete
+record before prepare and preserve its digest through signing and independent
+readback. Original tagged workflows and accepted alpha results retain their old
+interfaces and identities. Do not dispatch a new interface against an old source.
 
-- `release.yml`, `evidence-verify.yml`,
-  [preparation.rs](../xtask/src/release/preparation.rs) and
-  [release-evidence-preflight.py](../scripts/release-evidence-preflight.py) contain
-  alpha tag/ref bindings. `expected_commit` alone does not make them version-generic.
-- [release-sign.py](../scripts/release-sign.py) fixes product C/tag, original build,
-  verifier/artifact and digest identities. Its request selects S and frozen inputs;
-  it does not select an arbitrary new product release.
-- The protected readback workflow verifies original build custody, not a separate
-  encrypted **signing-result** bundle. The first release's one-time local-key
-  exception is spent. Do not reuse it or silently access the formal key locally.
-- Long-term retention, public attachment preparation and Draft publication were
-  operator-driven. Their accepted result is not a reusable scripted pipeline.
+The new independent verifier needs a separately configured `release-result-verify`
+Environment (required owner reviewer, master only, no admin bypass) and approved
+`AGE_IDENTITY` provisioning; this work does not install it. It verifies actual
+original signing bundles and all frozen entries without signing permission. The
+first release's one-time local-key exception remains spent.
 
-YT-209 registers the minimum future automation: a reviewed per-version input
-record instead of scattered run/source constants, separately protected independent
-signing-result verification, and explicit release-ID-based public staging/readback.
-It must preserve strict/builtin, exact identities and private/unsigned/signed
-boundaries; no new framework runtime, automatic signing or registry publication.
-Implementation needs its own scope/review/authority. YT-208 completes the SOP,
-not that future work.
+Local implementation checks do not qualify a hosted job or authorize a release.
+Long-term/off-host retention remains operator-owned. Draft creation, key/tool
+rotation, source/tag selection, each hosted phase, owner acceptance and publication
+still require their applicable explicit authority. No default framework dependency,
+automatic signing, mutable tag or registry publication is introduced.
 
 ## Public attachments and publication mechanics
 

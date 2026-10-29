@@ -1,13 +1,16 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-209 release automation (2026-10-29):** [Contract](YT-209-RELEASE-AUTOMATION.md) and minimal implementation Done at local scope after contract/final independent Reviewer PASS0. 30 distinct focused checks plus docs/format/syntax PASS; all 17 reviewed source hashes match. Versioned data-only inputs, protected independent result verification and closed public attachment operations preserve C/S, key and owner gates. Hosted qualification/Environment setup remain Pending. No formal key, old qualification replay, hosted, signing, publication or new-change Commit/Push.
+
 **YT-208 maintainer SOP (2026-10-29):** The
 [development/PR guide](DEVELOPMENT.md) and [new-version release guide](RELEASING.md)
 separate normal development, one-time setup, per-version promotion and failure-only
 recovery. Current distribution/navigation is reconciled without replaying
 qualification or changing workflows/settings. Docs/whitespace and independent
-Reviewer PASS0; YT-208 Done at documentation scope. YT-209 Todo addresses the observed hard-coded release inputs,
+Reviewer PASS0; YT-208 Done at documentation scope. YT-209 was registered to address the observed hard-coded release inputs,
 missing protected independent private-result verifier and operator-only public
-staging/readback; this is future tooling, not a claimed generic pipeline.
+staging/readback; at YT-208 completion these were future tooling, not a claimed
+generic pipeline. The subsequent YT-209 entry above records the later local scope.
 D6/YT-096 alpha acceptance and YT-020 Blocked retain their existing scopes.
 
 **Subsequent owner-approved GitHub pre-release (2026-10-29):**

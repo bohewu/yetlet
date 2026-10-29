@@ -4,17 +4,10 @@ name: Yetlet source-package release
 on:
   workflow_dispatch:
     inputs:
-      expected_commit:
-        description: Explicit operator assertion of the reviewed co-located source SHA
+      record:
+        description: Reviewed versioned release-record JSON (schema 1, sixteen cohort)
         type: string
         required: true
-      cohort:
-        description: Closed source-package cohort
-        type: choice
-        required: true
-        default: sixteen
-        options:
-          - sixteen
 
 permissions:
   contents: read
@@ -30,8 +23,9 @@ jobs:
     env:
       RUSTUP_TOOLCHAIN: 1.99.0
       CARGO_BUILD_JOBS: '4'
-      EXPECTED_COMMIT: ${{ inputs.expected_commit }}
-      RELEASE_COHORT: ${{ inputs.cohort }}
+      RELEASE_RECORD: ${{ inputs.record }}
+      RECORD_WORKFLOW_REF: ${{ github.workflow_ref }}
+      RECORD_WORKFLOW_SHA: ${{ github.workflow_sha }}
       BUILD_WORKFLOW_REF: ${{ github.workflow_ref }}
       BUILD_WORKFLOW_SHA: ${{ github.workflow_sha }}
     steps:
@@ -49,17 +43,25 @@ jobs:
           set -euo pipefail
           [[ "$GITHUB_EVENT_NAME" == workflow_dispatch ]]
           [[ "$GITHUB_REPOSITORY" == bohewu/yetlet ]]
-          [[ "$GITHUB_REF" == refs/tags/v0.9.0-alpha.1 ]]
-          [[ "$BUILD_WORKFLOW_REF" == bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1 ]]
-          [[ "$EXPECTED_COMMIT" =~ ^[0-9a-f]{40}$ ]]
-          [[ "$RELEASE_COHORT" == sixteen ]]
-          [[ "$EXPECTED_COMMIT" == "$GITHUB_SHA" && "$EXPECTED_COMMIT" == "$BUILD_WORKFLOW_SHA" ]]
-          [[ "$(git rev-parse HEAD)" == "$EXPECTED_COMMIT" ]]
-          [[ "$(git rev-parse --verify 'refs/tags/v0.9.0-alpha.1^{commit}')" == "$EXPECTED_COMMIT" ]]
-          git merge-base --is-ancestor "$EXPECTED_COMMIT" refs/remotes/origin/master
-          [[ -z "$(git status --porcelain)" ]]
-          [[ "$GITHUB_RUN_ID" =~ ^[0-9]+$ && "$GITHUB_RUN_ID" =~ [1-9] ]]
-          [[ "$GITHUB_RUN_ATTEMPT" =~ ^[0-9]+$ && "$GITHUB_RUN_ATTEMPT" =~ [1-9] ]]
+          [[ "$GITHUB_REPOSITORY_ID" == 1409587171 && "$GITHUB_REPOSITORY_OWNER_ID" == 35250002 ]]
+          [[ "$GITHUB_SHA" == "$BUILD_WORKFLOW_SHA" ]]
+          python3 - <<'PYRECORD'
+          import json, os, re
+          r = json.loads(os.environ['RELEASE_RECORD'])
+          assert re.fullmatch('[0-9a-f]{40}', r['source'])
+          assert r['source'] == os.environ['GITHUB_SHA']
+          assert os.environ['GITHUB_REF'].startswith('refs/tags/v')
+          assert os.environ['BUILD_WORKFLOW_REF'] == 'bohewu/yetlet/.github/workflows/release.yml@' + os.environ['GITHUB_REF']
+          PYRECORD
+          python3 scripts/release_record.py source release.yml
+          python3 - <<'PYRECORD'
+          import os, sys
+          sys.path.insert(0, 'scripts')
+          import release_record as records
+          r = records.environment('build')
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write('EXPECTED_COMMIT=' + r['source'] + '\nRELEASE_COHORT=sixteen\n')
+          PYRECORD
           printf 'trusted=true\n' >> "$GITHUB_OUTPUT"
       - name: Authenticate pinned encryption tool and public recipient
         id: custody_tools
