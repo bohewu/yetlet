@@ -21,15 +21,15 @@ The execution source is `bf3363801132f4481263ceb411d9bba3349df86d`, immutable un
 `5d7b918` was version-preflight C, not this hosted execution source. Historical
 `v0.1.0`, source `3eacfe3`, build/readback and retained payloads remain unchanged.
 
-Date: 2026-10-29 (Asia/Taipei). **Current state: reviewed real-layout fix
-delivered; unsigned hosted preflight failed; local safe diagnostics independently reviewed PASS.**
-PR16 is squash merged as selected S `87d24e9e63b4c9486d63a4b0141c20368ceaf540`;
-PR and master CI pass. The one prepare run `40717870186/1` fails before the
-protected job. Setup is complete, but the complete private-manifest freeze and
-signing authority remain Pending. The uncommitted diagnostic code is not S and
-has not run hosted. See [the current failure and diagnostic scope](#hosted-preflight-failure-and-safe-local-diagnostics--2026-10-29).
-D6 Pending; YT-096 In progress; YT-020 Blocked. Dated checkpoints retain their
-original scopes and review results.
+Date: 2026-10-29 (Asia/Taipei). **Current state: PR17 delivered; additional
+preflight identifies Draft API HTTP403; local encrypted handoff implemented.**
+Selected S is `0e8fb600af7aaebd4641a78c477035afe637c67e`, with PR/master CI PASS.
+Prepare `40789535074/1` fails before protected work. The new uncommitted handoff
+code is not S and has not run hosted. Real ciphertext transfer and nine focused
+local cases and independent Reviewer PASS0 accept the bounded implementation. See the
+[current handoff contract](#encrypted-ciphertext-capability-handoff--2026-10-29).
+D6 Pending; YT-096 In progress; YT-020 Blocked. All dated earlier checkpoints
+keep their original source, scope and acceptance results.
 
 This contract and [ADR 0009](adr/0009-release-build-and-signer-identities.md)
 preserve the [D1–D5 policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md), including D2
@@ -47,14 +47,14 @@ under separate owner authority; this local diagnostic continuation changes no se
 | Product tag | Existing immutable unsigned `v0.9.0-alpha.1`; never move it |
 | Build workflow/run | `.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1`; `40669449040` / attempt1 |
 | Protected verifier | `40688772221` / attempt1 |
-| Selected signer source S | `87d24e9e63b4c9486d63a4b0141c20368ceaf540`, after PR16 squash Merge; later uncommitted diagnostics are not selected |
+| Selected signer source S | `0e8fb600af7aaebd4641a78c477035afe637c67e`, after PR17 squash Merge; uncommitted handoff code is not selected |
 | Proposed signer ref | Protected `refs/heads/master` |
 | Signer execution equality | Checked-out code SHA = event SHA = workflow SHA = `expected_signer_commit` = S |
 | Exact certificate SAN | `https://github.com/bohewu/yetlet/.github/workflows/release-sign.yml@refs/heads/master` |
 | OIDC issuer | `https://token.actions.githubusercontent.com` |
 | Repository/owner | `bohewu/yetlet`, repository ID1409587171; `bohewu`, owner ID35250002 |
 
-S is not C. It is the actual owner-authorized PR16 squash commit, with the
+S is not C. It is the actual owner-authorized PR17 squash commit, with the
 reviewed tree unchanged. A later local edit never implicitly replaces S. Verify the certificate's authenticated workflow/build-signer digest
 cryptographically against S, alongside the exact issuer/SAN and repository/owner
 identities. SAN or branch name alone is insufficient. A mismatch fails closed.
@@ -556,3 +556,146 @@ unchanged. The source remains selected S `87d24e9`, with six uncommitted paths
 and nothing staged. Next is owner-authorized strict/builtin Git delivery and,
 separately, selection of any replacement S/extra hosted attempt; no such action
 is implied by this PASS. D6 remains Pending and the final manifest is unfrozen.
+
+## Encrypted ciphertext capability handoff — 2026-10-29
+
+### Actual blocked delivery
+
+Owner-authorized strict/builtin/native-hook delivery of six paths creates
+`e6bf25e` and [PR17](https://github.com/bohewu/yetlet/pull/17). PR CI
+`40788520807/1` and master CI `40789389079/1` PASS, including Chrome. Squash Merge
+selects S `0e8fb600af7aaebd4641a78c477035afe637c67e`, tree
+`a4abae728a957991611c2f362ba5b005522b1abd`. The one additional
+[prepare](https://github.com/bohewu/yetlet/actions/runs/40789535074), attempt 1,
+reports `gate=qualification-release class=http status=403`. Earlier source,
+Environment/policy, build/artifact and verifier/approval checks pass; protected
+prepare/sign are skipped. There is no key step, pending approval or output
+artifact. This newly observed endpoint/status does not retroactively explain
+previous generic rejection `40717870186/1`. The exact provider error body and
+rate-limit/accepted-permission headers were deliberately not retained.
+
+Failure custody retains 41 files outside Git, 224,168 indexed payload bytes,
+index SHA-256 `517c584090f91c6318275263dbb51f0b770a9755d229c29b35e0fb7ea258824d`.
+The encrypted asset `685300857` remains on unpublished draft `426670086`, with
+original ZIP SHA-256 `c90d98d20d579ed76c9ba8e705a6b204e1e43186eb3e02ec0121e91d15596168`.
+Conditional post-freeze deletion was not reached. C, both tags and original
+proof remain unchanged. No automatic retry follows.
+
+### Selected local correction and boundaries
+
+The owner asks to implement the complete data path. Use the existing encrypted
+asset through an owner-resolved, age-encrypted download capability. This requires
+no new upload workflow, repository write permission, PAT or Secret. Actions
+artifacts remain suitable for existing build and frozen outputs, but creating a
+new artifact needs a runner-side upload path; an operator REST read is not an
+artifact upload. The selected minimum reuses the current stored ciphertext.
+
+1. The owner-local `handoff` command reads the selected template, authenticated
+   age binary and pinned public recipient. Existing `gh` authentication is read
+   for exactly `github.com` and used only against its repository API. The command
+   verifies protected master/S, Draft/tag/C and selected asset ID/name/digest/size.
+   It resolves the provider's temporary binary redirect, then actually retrieves
+   the ZIP **without GitHub authentication** and verifies its SHA, two-file shape
+   and safe qualification receipt before emitting a request.
+2. Only exact HTTPS `release-assets.githubusercontent.com` URLs under this
+   repository's release-asset prefix are accepted, without userinfo, port,
+   fragment or redirects. Provider capability permissions must be read-only.
+   The earlier of SAS expiry and the download JWT's unverified `exp` bounds the
+   deadline. This claim only shortens validity; it is not JWT authentication or
+   a replacement for TLS/provider authorization and immutable ZIP/manifest hashes.
+   Direct-stream API responses and unsupported destinations fail closed.
+3. The short URL is encrypted with authenticated age and the existing pinned
+   public recipient. Output is `request.json` and `HANDOFF-RECEIPT.json`, outside
+   Git at `0700`/`0600`; temporary capability plaintext is removed. Neither the
+   owner credential nor the plaintext URL enters CI inputs, logs, receipts or
+   final provenance. The owner key is not accessed to make a handoff.
+4. CI preflight retains source/S, Environment, original build/artifact and
+   verifier/approval checks; it validates the bounded armored capsule/hash and
+   expiry instead of attempting the unavailable Draft read. It requires at least
+   20 minutes remaining. Original build ciphertext is fetched by the existing
+   read-only step. No owner token or new credential is installed in CI.
+5. Only the existing owner-approved isolated decryption phase opens the URL
+   capsule with `AGE_IDENTITY`. It verifies every binding, performs a bounded
+   unauthenticated download with no redirects, and checks ZIP/hash/receipt before
+   any original private-build or qualification plaintext decryption. Download
+   phases require five minutes remaining; a delayed approval cannot reuse the
+   preflight's freshness assumption. Capability files are removed on rejection
+   and success, with the existing whole-work cleanup retained. This places one
+   tightly scoped ciphertext HTTPS transfer inside the protected phase; the
+   credential is still restricted to that phase, with no OIDC or write permission.
+6. Existing original-custody checks, qualification decrypt/full manifest, final
+   assembly, sixteen subjects, output encryption and later frozen-input signing
+   remain unchanged. The safe frozen-input receipt adds only the handoff hash
+   and expiry, never its URL. Signing consumes frozen bytes; expiry does not cause
+   a later sign job to retrieve or rebuild qualification data.
+
+Prepare requests now require `qualification_handoff`, its SHA-256 and
+`qualification_expires` in addition to the original five fields. The old bare
+prepare JSON is an **operator template only**, rejected as a hosted request;
+there is no silent old-carrier fallback. The two hosted modes remain prepare
+and sign. Sign requests are unchanged. The handoff action is owner-local only.
+
+### Operator use after separately authorized source delivery
+
+Create a new repository-external `0700` evidence directory. The template has
+exactly `mode=prepare`, explicitly selected replacement `signer_commit`,
+`qualification_asset`, `qualification_sha256` and
+`qualification_manifest_sha256`. Preserve the reviewed original data hashes.
+Set `EVIDENCE_ROOT` to that directory; use the already authenticated age1.3.2:
+
+```sh
+(
+  SIGN_AGE=/path/to/authenticated/age \
+    python3 scripts/release-sign.py handoff \
+      "$EVIDENCE_ROOT/prepare-template.json" "$EVIDENCE_ROOT/new-handoff"
+)
+```
+
+Generate immediately before dispatch, **after** the reviewed S is selected;
+require an unused output directory. Review the safe receipt and use the generated
+request unchanged. The observed provider capability lasts about 30 minutes;
+actual parsed expiry controls. Approve the real Environment gate promptly, with
+sufficient time for tool/bootstrap work. Expiry stops the attempt; no automatic
+refresh, retry, source replacement, signature or publication occurs. This is not
+permission to commit, push or dispatch another run.
+
+### Bounded local evidence
+
+The real encrypted ZIP was retrieved through the new owner-to-receiver path
+using a disposable **test** age identity. Both SHA-256 values match the existing
+ZIP and internal ciphertext; the safe receipt matches C and the qualification
+manifest. The receiver sends only `Accept`, even with a synthetic ambient token;
+no GitHub credential is forwarded. Formal owner identity and qualification
+plaintext were not read. All test-key/capability plaintext files were removed.
+This is actual local data-transfer proof, not hosted source-S qualification.
+
+Nine affected/new focused cases pass: request migration, preflight without Draft
+access, diagnostic rejection, unchanged downstream assembly, capability
+expiry/tampering/destination limits, unauthenticated hash-bound download,
+receiver cleanup/bindings, owner generation and early receipt mismatch rejection.
+The real transfer preceded the added explicit CLI-host binding and earlier
+receipt/phase-expiry guards; these tighten checks on the same observed bytes and
+are covered by focused cases rather than replaying the accepted network transfer.
+Evidence is in ignored `target/yt096-signer-prepare-batch-20261028/ciphertext-handoff-20261029/`.
+Syntax/docs/whitespace checks and independent Reviewer PASS0 accept this local
+implementation (75 documents, 207 backlog items).
+No new hosted run, formal key use, signing or publication is claimed. New code
+remains uncommitted; replacement S, final frozen manifest and D6 remain Pending.
+
+### Encrypted handoff independent acceptance
+
+Reviewer `/root/yt096_encrypted_capability_handoff_review_20261029` returns
+PASS, zero issues and required followups, for the actual eight-file diff and
+retained focused/real-data proof. All eight review-input hashes match. The
+Reviewer checks owner credential confinement, exact capability/data bindings,
+phase-specific freshness, restricted unauthenticated retrieval, early safe
+receipt checks, cleanup, redaction and unchanged signing/permission boundaries.
+No product/network test is replayed and no source is changed during review.
+Native role/model/effective effort match `reviewer`, `gpt-6-astra`, `max`;
+this is ordinary local content review, not formal or hosted qualification.
+
+Completion metadata alone follows review; both scripts and workflow retain
+their reviewed hashes. Eight changes remain uncommitted, none staged; the
+selected S stays `0e8fb60`. Guarded delivery, explicit replacement-S selection
+and any additional hosted run still need owner authority. D6 remains Pending,
+YT-096 In progress and YT-020 Blocked; the final manifest is not frozen.

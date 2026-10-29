@@ -4,6 +4,26 @@ Date: 2026-10-28 (Asia/Taipei). Status: Plan independently reviewed PASS, zero i
 D6 Pending; YT-096 In progress; YT-020 Blocked. This packet authorizes no execution.
 
 
+## Current local ciphertext handoff correction — 2026-10-29
+
+PR17 is delivered as S `0e8fb60`; PR/master CI PASS. Additional prepare
+`40789535074/1` reports HTTP403 at Draft metadata access, with both protected jobs
+skipped. The [new local transfer contract](YT-096-SIGNER-CONTRACT.md#encrypted-ciphertext-capability-handoff--2026-10-29)
+moves that owner-only read to a local encrypted capability handoff, keeps CI
+read-only and retains existing Environment/Secret/C/tag identities. No new upload
+service, Secret or key is installed. The protected phase retrieves only the
+hash-bound existing ciphertext from a restricted GitHub resource host.
+
+Real ZIP/ciphertext retrieval and age handoff pass with a disposable test key;
+formal owner key and qualification plaintext remain unread. Nine focused cases
+pass; syntax/docs/whitespace checks and independent Reviewer PASS0 accept the
+bounded local implementation. These are local
+changes, not selected S or hosted proof. Both previous failed attempts and their
+separate repository-external failure indexes remain preserved; the encrypted
+Draft asset is retained because successful frozen readback/cleanup was not reached.
+No new dispatch or automatic retry is authorized; D6 Pending, YT-096 In progress,
+YT-020 Blocked, final manifest unfrozen. Earlier dated records keep their scopes.
+
 ## Current unsigned prepare failure and diagnostic continuation — 2026-10-29
 
 Owner-authorized PR16 delivery selects S `87d24e9e63b4c9486d63a4b0141c20368ceaf540`,

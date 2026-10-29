@@ -73,3 +73,29 @@ This accepts the design only. Independent document review, signer implementation
 tool/root bootstrap and compatibility, Environment/custody setup, payload freeze,
 exact D6 authority, OIDC/signing and publication remain separate gates. No workflow,
 certificate, signature, hosted execution, Commit or Push is produced by this ADR.
+
+## Local ciphertext handoff amendment — 2026-10-29
+
+A separately owner-authorized additional run `40789535074/1` at selected S
+`0e8fb60` fails at Draft metadata HTTP403 before protected work. The owner requests
+a working data path while preserving the read-only signer and existing custody.
+The [handoff contract](../YT-096-SIGNER-CONTRACT.md#encrypted-ciphertext-capability-handoff--2026-10-29)
+uses an owner-local read to obtain a short-lived, specific-asset read capability,
+verifies unauthenticated ciphertext retrieval, and encrypts the URL to the
+existing age public recipient. CI receives no owner credential or plaintext URL.
+
+The protected isolated phase now decrypts this bounded capability and performs
+one restricted HTTPS ciphertext retrieval before private evidence decryption.
+Host/path, no-redirect, expiry, ZIP and safe-receipt checks constrain that transfer.
+Private-key access remains confined to this existing approved phase; no OIDC,
+repository write, new Secret or changes to original C/tag/build are introduced.
+Owner-generated input replaces direct CI Draft API access. Frozen signing bytes,
+D6 approval and later signing/verification contracts remain unchanged.
+
+This avoids a new upload workflow and does not grant write access to a key-bearing
+job. Its tradeoff is a short operator-to-job time window: generate immediately
+before dispatch, enforce stage-specific freshness and stop on expiry without
+retry. Real local transfer/test-key proof and focused cases exist; independent
+review PASS0 accepts the local implementation. This amendment records the local correction, not new Git,
+source-S, hosted, formal-key, signing or publication authority. Original failures
+and earlier independent results retain their historical scope.
