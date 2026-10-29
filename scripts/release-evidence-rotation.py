@@ -238,10 +238,6 @@ def drill(args):
         write(root / "original-RELEASE-CHECKSUMS.json", manifest_bytes)
         original = {p.name: file_bytes(p) for p in private.iterdir()}
         proof["original_manifest_sha256"] = sha(manifest_bytes)
-        proof["synthetic_binding"] = {"source": args.base, "workflow_sha": args.base,
-            "workflow": "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1",
-            "git_ref": "refs/tags/v0.9.0-alpha.1", "run": "1", "attempt": "1",
-            "notice": "LOCAL fixture values only; no GitHub run or release candidate claim"}
 
         def custody(label, who, operation, transport, identity=None, success=True):
             helper, recipient, default_identity = snapshots[who]
@@ -273,6 +269,10 @@ def drill(args):
             return output
 
         a = custody("A-capture", "A", "capture", None)
+        proof["synthetic_binding"] = {
+            **proof["cases"]["A-capture"]["receipt"]["binding"],
+            "notice": "LOCAL fixture values only; no GitHub run or release candidate claim"}
+        write_proof()
         custody("A-readback", "A", "verify", a)
         b = custody("B-capture", "B", "capture", None)
         custody("B-readback", "B", "verify", b)

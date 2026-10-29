@@ -16,8 +16,12 @@ use std::{
 };
 
 pub const RECIPIENT_SHA: &str = "b861a3c7e2abf3caf4c7071c045f6114704db94e8cc39ce010e7fa10711ff506";
-const WORKFLOW: &str = "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1";
-const REF: &str = "refs/tags/v0.9.0-alpha.1";
+fn git_ref() -> String {
+    format!("refs/tags/v{}", super::private::package_version())
+}
+fn workflow() -> String {
+    format!("bohewu/yetlet/.github/workflows/release.yml@{}", git_ref())
+}
 const INVENTORY: &str = "CUSTODY-INVENTORY.json";
 pub const CIPHER: &str = "private-evidence.tar.age";
 pub const RECEIPT: &str = "transport-receipt.json";
@@ -49,8 +53,8 @@ impl Binding {
         };
         if !super::preparation::commit_token(&self.source)
             || self.workflow_sha != self.source
-            || self.workflow != WORKFLOW
-            || self.git_ref != REF
+            || self.workflow != workflow()
+            || self.git_ref != git_ref()
             || !number(&self.run)
             || !number(&self.attempt)
         {
@@ -122,8 +126,8 @@ impl Options {
         let binding = Binding {
             workflow_sha: source.clone(),
             source,
-            workflow: WORKFLOW.into(),
-            git_ref: REF.into(),
+            workflow: workflow(),
+            git_ref: git_ref(),
             run,
             attempt,
         };
@@ -906,7 +910,7 @@ mod tests {
     fn inventory_rejects_duplicate_json_and_unsafe_or_mismatched_sets() {
         assert!(parse(br#"{"a":1,"a":2}"#).is_err());
         assert!(parse(br#"{"a":{"b":1,"b":2}}"#).is_err());
-        let v = json!({"schema":1,"binding":{"source":"a".repeat(40),"workflow_sha":"a".repeat(40),"workflow":WORKFLOW,"git_ref":REF,"run":"1","attempt":"1"},"recipient_sha256":RECIPIENT_SHA,"original_exit":17,"status":"FAILED_INCOMPLETE","complete":false,"private_manifest_sha256":null,"missing_extras":EXTRAS,"files":[{"member":"private-fixture","origin":"private","name":"fixture","size":1,"sha256":"a".repeat(64)}]});
+        let v = json!({"schema":1,"binding":{"source":"a".repeat(40),"workflow_sha":"a".repeat(40),"workflow":workflow(),"git_ref":git_ref(),"run":"1","attempt":"1"},"recipient_sha256":RECIPIENT_SHA,"original_exit":17,"status":"FAILED_INCOMPLETE","complete":false,"private_manifest_sha256":null,"missing_extras":EXTRAS,"files":[{"member":"private-fixture","origin":"private","name":"fixture","size":1,"sha256":"a".repeat(64)}]});
         let mut i = inventory_parse(&v).unwrap();
         validate_inventory(&i).unwrap();
         i.files[0].member = "../escape".into();

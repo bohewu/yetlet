@@ -1,6 +1,6 @@
 # yetlet-config
 
-Experimental, unpublished `0.9.0-alpha.2` release preparation. Requires Rust 1.99+.
+Experimental, unpublished `0.9.0-alpha.3` release preparation. Requires Rust 1.99+.
 This native-only package is an explicit opt-in; it is not a global Settings
 service and is rejected in browser Wasm. Publication eligibility does not
 authorize a registry upload or establish a supported public release.

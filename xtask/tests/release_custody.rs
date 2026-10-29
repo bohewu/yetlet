@@ -15,6 +15,11 @@ use yetlet_xtask::{
 };
 
 fn options(temp: &Path, exit: i32) -> Options {
+    let manifest: toml::Value = toml::from_str(include_str!("../../Cargo.toml")).unwrap();
+    let version = manifest["workspace"]["package"]["version"]
+        .as_str()
+        .unwrap();
+    let git_ref = format!("refs/tags/v{version}");
     Options {
         operation: Operation::Capture {
             private: temp.join("private"),
@@ -24,8 +29,8 @@ fn options(temp: &Path, exit: i32) -> Options {
         binding: Binding {
             source: "a".repeat(40),
             workflow_sha: "a".repeat(40),
-            workflow: "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1".into(),
-            git_ref: "refs/tags/v0.9.0-alpha.1".into(),
+            workflow: format!("bohewu/yetlet/.github/workflows/release.yml@{git_ref}"),
+            git_ref,
             run: "1".into(),
             attempt: "1".into(),
         },
@@ -124,28 +129,24 @@ fn closed_cli_rejects_unknown_duplicate_missing_and_invalid_bindings() {
 #[test]
 fn alpha_capture_and_verify_reject_legacy_identity_and_sha_mismatch_before_tools() {
     let t = tempfile::tempdir().unwrap();
+    let current = options(t.path(), 17).binding;
+    let legacy_workflow = "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0";
+    let legacy_ref = "refs/tags/v0.1.0";
+    let other_ref = "refs/tags/v0.0.0-fixture";
+    let other_workflow = "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.0.0-fixture";
     for verify in [false, true] {
         for (workflow, git_ref, workflow_sha) in [
+            (legacy_workflow, current.git_ref.as_str(), "a".repeat(40)),
+            (current.workflow.as_str(), legacy_ref, "a".repeat(40)),
+            (legacy_workflow, legacy_ref, "a".repeat(40)),
             (
-                "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0",
-                "refs/tags/v0.9.0-alpha.1",
-                "a".repeat(40),
-            ),
-            (
-                "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1",
-                "refs/tags/v0.1.0",
-                "a".repeat(40),
-            ),
-            (
-                "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.1.0",
-                "refs/tags/v0.1.0",
-                "a".repeat(40),
-            ),
-            (
-                "bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1",
-                "refs/tags/v0.9.0-alpha.1",
+                current.workflow.as_str(),
+                current.git_ref.as_str(),
                 "b".repeat(40),
             ),
+            (other_workflow, current.git_ref.as_str(), "a".repeat(40)),
+            (current.workflow.as_str(), other_ref, "a".repeat(40)),
+            (other_workflow, other_ref, "a".repeat(40)),
         ] {
             let mut o = options(t.path(), 17);
             o.binding.workflow = workflow.into();
@@ -229,6 +230,8 @@ fn actual_age_local_roundtrip_manifest_partial_tamper_binding_and_noclobber() {
     }
     let receipt: Value =
         serde_json::from_slice(&fs::read(o.output.join(custody::RECEIPT)).unwrap()).unwrap();
+    assert_eq!(receipt["binding"]["git_ref"], o.binding.git_ref);
+    assert_eq!(receipt["binding"]["workflow"], o.binding.workflow);
     assert_eq!(receipt["complete"], false); // Missing OpenSSL inputs never qualify a complete preparation.
     assert_eq!(receipt["status"], "FAILED_INCOMPLETE");
     assert!(custody::run(&o).is_err()); // Atomic publication never replaces a prior transport.

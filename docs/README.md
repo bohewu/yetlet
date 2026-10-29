@@ -37,8 +37,11 @@ distribution versus historical qualification to [Release readiness](RELEASE-READ
 - [New-version release workflow](RELEASING.md): one-time setup versus each version,
   immutable C/S, protected jobs, exact approvals, independent verification and
   publication; distinguishes installed tooling from Pending hosted qualification.
-- [Alpha.2 version/package preflight](ALPHA2-VERSION-PREFLIGHT.md): current
-  coordinated package migration, affected verification and unchanged release gates.
+- [Alpha.3 version/package preflight](ALPHA3-VERSION-PREFLIGHT.md): current
+  coordinated package migration, custody correction and unchanged release gates.
+- [Alpha.2 retained build/custody failure](ALPHA2-HOSTED-RECORD.md): immutable
+  unpromoted tag, original outputs and correction rationale; its
+  [earlier local package preflight](ALPHA2-VERSION-PREFLIGHT.md) keeps its scope.
 
 These are repository-maintenance guides, not application prerequisites or
 default reader-site exports. Use them for procedures; use dated records below

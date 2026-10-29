@@ -1,5 +1,28 @@
 # Yetlet Backlog
 
+**Alpha.3 approved recovery (2026-10-29):** The owner approved the
+[bounded recovery/preflight](ALPHA3-VERSION-PREFLIGHT.md), preserving failed
+alpha.2 C/tag/evidence. Used Guard binding retirement PASS; sixteen-library
+version/internal dependency migration, nineteen locked metadata roots, sixteen
+normal archives, external packaged consumer and four changed-version cases PASS.
+Third-party records unchanged. Optional synthetic readback remains unverified
+after an isolated recipient-pin harness mismatch; failed outputs retained, no
+formal key accessed. Final independent Reviewer PASS0, all 56 source/126 evidence
+files unchanged before/after review; authorized Git/CI/conditional Merge/new C and one tag/build/readback
+follow only their gates. No signing or publication; historical alpha.1 D6 stays
+Complete and YT-020 Blocked.
+
+**Alpha.2 hosted custody failure (2026-10-29):** Owner-approved C/tag
+`af7bbe5`/`v0.9.0-alpha.2` and build40895514392/1 complete sixteen-package
+preparation, but the [actual custody receipt](ALPHA2-HOSTED-RECORD.md) incorrectly
+claims alpha.1 workflow/git refs. Qualification FAIL; raw ZIPs/ciphertext/public
+bytes retained outside Git. No verifier, key access, Environment mutation,
+signing or publication. Minimal local custody-version correction and three
+affected checks/Clippy PASS; independent Reviewer PASS0, all six source hashes
+unchanged. New source/version,
+Git delivery, Guard retirement and execution require separate authority; old
+tags, alpha.1 D6/publication and all failures remain unchanged.
+
 **Alpha.2 PR22 integration failure (2026-10-29):** Original CI40888941346/1
 passes MSRV but fails Stable's existing synthetic rebuild fixture before later
 audit/browser steps: fixture alpha.1 differs from compiled recipe alpha.2.

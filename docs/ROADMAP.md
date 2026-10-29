@@ -1,5 +1,24 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**Alpha.3 recovery/preflight (2026-10-29):** [Approved bounded batch](ALPHA3-VERSION-PREFLIGHT.md)
+retires the used Guard binding without changing alpha.2 tag/evidence and fixes
+custody version construction/validation and its consumers. Sixteen normal
+new-version package checks, external consumer, nineteen locked roots and four
+changed-version cases PASS, with no third-party upgrade. Optional synthetic
+readback unverified after an isolated recipient-pin harness mismatch, failures
+retained and no formal key access. Final independent Reviewer PASS0, all 56 source
+hashes matched before/after review; Git delivery/CI/conditional
+Merge. New source/tag/build/readback remain individually gated within the one
+approved batch; no signing/publication or expanded product support.
+
+**Alpha.2 hosted outcome (2026-10-29):** [Build40895514392/1 and custody disposition](ALPHA2-HOSTED-RECORD.md):
+sixteen-package preparation PASS, custody qualification FAIL because the actual
+receipt retains fixed alpha.1 workflow/ref fields. Original outputs and immutable
+alpha.2 tag retained; no decrypt/readback or Environment change. Local minimal
+helper/fixture correction and three affected checks PASS; independent Reviewer
+PASS0, all six source hashes unchanged. A corrected candidate/version and any execution need new authority;
+positive schema-1 qualification remains Pending, with alpha.1 D6 Complete.
+
 **Alpha.2 PR22 integration failure (2026-10-29):** MSRV PASS; Stable fails the
 existing rebuild fixture's stale alpha.1 version while its recipe expects
 alpha.2. The [minimum test-only correction](ALPHA2-VERSION-PREFLIGHT.md#subsequent-pr22-integration-failure-and-local-correction)
