@@ -1,9 +1,11 @@
 # Documentation sources and publication scope
 
-Date: 2026-10-26. This is a documentation preparation contract. No website,
-Wiki, package publication or repository-visibility change is activated.
-Yetlet remains unpublished and experimental; the original release-candidate
-scope and approval gates are unchanged.
+Date: 2026-10-26 classification, updated 2026-10-29 for current navigation.
+The Experimental `v0.9.0-alpha.1` source-package preview is
+[published on GitHub](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
+under separate owner authority; crates.io remains separate. This documentation
+classification activates no website/Wiki or additional publication, support or
+repository-visibility change. Historical candidate decisions retain their scope.
 
 ## Canonical sources
 
@@ -36,7 +38,7 @@ linked reports, screenshots, assets and source files are not silently included.
 | Guide authoring | [GUIDE-TEMPLATE.md](GUIDE-TEMPLATE.md) | Shared five-part integration guide format; current source, prerequisites, expected result and failure boundaries stay explicit |
 | Framework guides | [ARCHITECTURE.md](ARCHITECTURE.md), [HTTP-PIPELINE.md](HTTP-PIPELINE.md), [EXTENSIONS.md](EXTENSIONS.md), [NAMING.md](NAMING.md), [COMPATIBILITY.md](COMPATIBILITY.md), [CAPABILITIES.md](CAPABILITIES.md) | Architecture, composition, naming, current availability and explicit compatibility limits; dated task/review paragraphs remain historical annotations |
 | Settings guides | [SETTINGS-OPTIONS-LOGGING.md](SETTINGS-OPTIONS-LOGGING.md), [CONFIGURATION.md](CONFIGURATION.md), [SECRET-PROVIDERS.md](SECRET-PROVIDERS.md), [SETTINGS-SECRET-PROVIDER.md](SETTINGS-SECRET-PROVIDER.md) | Current startup composition, typed options, application-owned diagnostics, secret lookup and protected-field injection; omit historical execution/review bookkeeping from a reader edition |
-| Package guides | The sixteen package-guide/source links in the current API reference tables | Public entry points, examples, errors, ownership, targets and limitations; seven later packages remain outside the original nine release candidates |
+| Package guides | The sixteen package-guide/source links in the current API reference tables | Public entry points, examples, errors, ownership, targets and limitations; the original nine-candidate comparison is historical, not the current sixteen-package cohort |
 | Application and CLI guides | [SAMPLES.md](SAMPLES.md), [BOARD-START.md](BOARD-START.md), [sample index](../examples/README.md), [Board README](../examples/lab-operations-board/README.md), [Admin README](../examples/admin-dashboard/README.md), [Shop README](../examples/modular-shop/README.md), [Starter README](../examples/production-starter/README.md), [CLI README](../tools/yetlet-cli/README.md) | Existing runnable usage and application-owned options; follow the exact sample-local README links in the sample catalog when selecting additional sample pages |
 | Root overview and policies | [README](../README.md), [license choice](../LICENSE-MIT), [Apache license](../LICENSE-APACHE), [security policy](../SECURITY.md), [contribution policy](../CONTRIBUTING.md) | Introduction, license and existing reporting/contribution rules; selection does not activate reporting services or change governance |
 
@@ -86,6 +88,11 @@ repository but excluded from the default reader-site selection:
 
 - [Backlog](BACKLOG.md), [Roadmap](ROADMAP.md), agent/workflow instructions and
   task-delivery records, including this documentation delivery's own record.
+- Stable maintainer procedures [DEVELOPMENT.md](DEVELOPMENT.md) and
+  [RELEASING.md](RELEASING.md). These are the how-to entry points for repository
+  work, distinct from application/API guidance and from dated execution records.
+  YT-208 adds navigation/SOP only; it does not select these for a reader-site
+  export or make the unfinished YT-209 automation available.
 - `docs/YT-*`, milestone verification/planning/review documents, research
   experiments, API classification snapshots, performance measurements and
   screenshot/evidence inventories. A current guide may cite an exact historical
@@ -117,5 +124,8 @@ of site navigation or a directory named `internal`. Moving a file or hiding a
 link does not make it private. Any history/visibility or private-archive decision
 requires separate owner direction; no removal or history rewrite is selected here.
 
-The existing release/trust decisions stay pending. Documentation preparation
-does not publish packages, sign artifacts, enable hosting or expand support.
+For actual distribution and release decisions, use the current status in
+[Release readiness](RELEASE-READINESS.md) and [the release SOP](RELEASING.md).
+D6/YT-096 completion at the recorded alpha signing scope does not resolve the
+separate YT-020 registry gate. Documentation preparation does not itself publish
+packages, sign artifacts, enable hosting or expand support.

@@ -1,5 +1,14 @@
 # YT-096 — Separate signer and frozen payload contract
 
+**Subsequent owner-approved GitHub pre-release (2026-10-29):**
+[Yetlet v0.9.0-alpha.1](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
+is public as an Experimental pre-release, not Latest, at unchanged C `bf33638`.
+The owner separately approves publication of the exact notes and 20 public
+attachments; anonymous API and bundle-download readback PASS. No private evidence,
+private bundle, registry upload, new signing or Git operation is included.
+D6 remains Complete, YT-096 Done at accepted source-package signing/integrity
+scope, YT-020 Blocked. Earlier unpublished/Pending records retain their dated scope.
+
 **Historical real-input preparation blocker (2026-10-28):** Owner-authorized PR15 is squash
 merged as selected signer S `d2562e14af75d08c177c01e976cbd8f13124b8ff`, with the
 reviewed tree unchanged. The protected `release-sign` Environment and existing
@@ -21,16 +30,21 @@ The execution source is `bf3363801132f4481263ceb411d9bba3349df86d`, immutable un
 `5d7b918` was version-preflight C, not this hosted execution source. Historical
 `v0.1.0`, source `3eacfe3`, build/readback and retained payloads remain unchanged.
 
-Date: 2026-10-29 (Asia/Taipei). **Current state: real protected preparation
-and output upload PASS; tools-cache cleanup FAIL; local cleanup repair Reviewer PASS0.**
-Selected S is `e2d4a9f64925f2a20c35c7e7aeae6e352e4938ef`, with PR/master CI PASS.
-Owner-approved prepare `40795794183/1` produces and uploads the actual encrypted
-frozen candidate and receipt. Final cleanup fails on read-only Go cache entries;
-the overall run is FAIL and its output is not eligible for signing. The candidate
-manifest SHA is observed, but accepted final inputs and D6 remain Pending. See
-[actual output and repair](#actual-frozen-output-and-go-cache-cleanup-failure--2026-10-29).
-Local repair changes are uncommitted; no automatic retry or replacement S follows.
-YT-096 In progress; YT-020 Blocked. Earlier checkpoints retain historical scope.
+Date: 2026-10-29 (Asia/Taipei). **Current state: actual signing and independent
+public/private verification and final Reviewer PASS; owner conditional acceptance activated, D6 Complete.**
+PR19 squash Merge selects S `d65e3180ad3076659f03c069fc71cd0e7e3f0518`, with
+reviewed tree `5812dcfbc9e50a76c4d230bd5d32a336568db12a` and PR/master CI PASS.
+Owner-approved prepare `40806988578/1` and sign `40811275645/1` both pass every
+step, including cleanup. The owner adopts the fixed confirmation packet and
+personally approves signing, then authorizes one local private-verification
+exception and conditional acceptance of the actual fixed bundle hashes.
+[Actual execution and acceptance](#actual-signing-independent-verification-and-owner-acceptance--2026-10-29)
+record both independent cryptographic checks, all 117 complete-manifest entries,
+16 subjects, cleanup and completed Reviewer condition. Original C/tags, frozen
+bytes and all previous failures stay unchanged. No new source selection, signing
+retry, Git operation or publication is authorized. D6 Complete;
+YT-096 Done at source-package signing/integrity scope; YT-020 Blocked. Earlier checkpoints retain their
+original source, result, review and acceptance scope.
 
 This contract and [ADR 0009](adr/0009-release-build-and-signer-identities.md)
 preserve the [D1–D5 policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md), including D2
@@ -48,14 +62,15 @@ under separate owner authority; this local diagnostic continuation changes no se
 | Product tag | Existing immutable unsigned `v0.9.0-alpha.1`; never move it |
 | Build workflow/run | `.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1`; `40669449040` / attempt1 |
 | Protected verifier | `40688772221` / attempt1 |
-| Selected signer source S | `e2d4a9f64925f2a20c35c7e7aeae6e352e4938ef`, after PR18 squash Merge; uncommitted cache cleanup repair is not selected |
+| Selected signer source S | `d65e3180ad3076659f03c069fc71cd0e7e3f0518`, after PR19 squash Merge |
+| Signer tree | `5812dcfbc9e50a76c4d230bd5d32a336568db12a`, identical to reviewed correction commit `a29796b66fb19686474ce7f120ae3eecf694ce5b` |
 | Proposed signer ref | Protected `refs/heads/master` |
 | Signer execution equality | Checked-out code SHA = event SHA = workflow SHA = `expected_signer_commit` = S |
 | Exact certificate SAN | `https://github.com/bohewu/yetlet/.github/workflows/release-sign.yml@refs/heads/master` |
 | OIDC issuer | `https://token.actions.githubusercontent.com` |
 | Repository/owner | `bohewu/yetlet`, repository ID1409587171; `bohewu`, owner ID35250002 |
 
-S is not C. It is the actual owner-authorized PR18 squash commit, with the
+S is not C. It is the actual owner-authorized PR19 squash commit, with the
 reviewed tree unchanged. A later local edit never implicitly replaces S. Verify the certificate's authenticated workflow/build-signer digest
 cryptographically against S, alongside the exact issuer/SAN and repository/owner
 identities. SAN or branch name alone is insufficient. A mismatch fails closed.
@@ -86,8 +101,9 @@ The proposed manual workflow has only two closed modes:
 Read-only preflight precedes protected work. Neither mode receives contents or
 packages write permission. Privileged jobs execute only reviewed trusted helpers
 at S: no PR/untrusted code, unreviewed remote scripts or product code execution. Authenticate
-age and Cosign3.1.4 and pin valid approved trust roots/configuration before use;
-bootstrap and supplied-statement compatibility remain Pending. Never use floating
+age and Cosign3.1.4 and pin valid approved trust roots/configuration before use.
+Authenticated bootstrap and local supplied-statement compatibility evidence are
+retained; actual OIDC issuance/service acceptance remains Pending. Never use floating
 tools, artifact-supplied roots or disabled certificate/log checks.
 
 The age private identity is available only in an isolated, manually approved
@@ -101,12 +117,13 @@ Environment approval does not substitute for D6 or secret-placement authority.
 | Target | Exact bytes and signature contract |
 |---|---|
 | Public provenance | Original alpha build `public/PROVENANCE-UNSIGNED.json`, 9158 bytes, SHA-256 `4d4de1a8ce9cc077c0aa62a1aafb3ab9799eed312deddb66d9e6f8fc6fef2d68`; supplied-statement DSSE whose decoded payload is byte-identical |
-| Private complete evidence manifest | Final frozen assembly's `RELEASE-CHECKSUMS.json`; SHA-256 Pending; detached blob signature over its actual bytes |
+| Private complete evidence manifest | Final frozen assembly's `RELEASE-CHECKSUMS.json`; SHA-256 `e0921075e47a5c2f16948dde94bf006ec8afac14c8730ba68b22d28d0533d93f`; detached blob signature over its actual bytes |
 
 The public payload is copied byte-for-byte from the verified repository-external
 alpha custody into ignored preparation storage, flushed and reread with that
-size/hash. This fixes the proposed public signing bytes only: it creates no
-signature, D6 approval, final private assembly or preparation receipt. The old
+size/hash. That earlier public-only copying checkpoint fixed the public bytes;
+the successful protected preparation below subsequently froze the full assembly.
+Neither operation grants D6 or signing approval. The old
 `0.1.0` provenance remains 9022 bytes, SHA-256
 `b3a1e66a34d316c6513ff4e0b9c8055c37b8f81daa598a8110f867e911a400fc`,
 with its original `3eacfe3`/build `40628943583` identity; never sign or relabel it
@@ -121,8 +138,89 @@ only. Safe transport/readback receipts omit its SHA. Obtain that original SHA
 only during later authorized isolated decryption: compare authenticated
 `inventory.private_manifest_sha256` with the actual restored manifest file hash,
 then export the digest, never plaintext. This is a historical input identity;
-the final manifest SHA can differ. Public `RELEASE-CHECKSUMS.json`, retention-index,
+the final manifest SHA can differ. The successful protected preparation exports
+the original private build-manifest SHA as
+`9585635674d073b740b83ccd4d1e7edf1e60aab52e1b0a7efff8102a911cc4ec`;
+this is not the final signing target above. Public `RELEASE-CHECKSUMS.json`, retention-index,
 inventory SHA and ciphertext SHA cannot substitute for either private manifest.
+
+## D6 confirmation packet — 2026-10-29
+
+This is the historical packet presented before owner signing approval. Its
+original Pending language records that checkpoint; the actual owner decisions,
+signatures and conditional final acceptance are recorded below.
+
+**Recommendation: accept one later signing execution for the exact two raw
+payloads above, subject to the bindings and disclosure below. D6 is still
+Pending; this packet requests no execution now.** Sixteen Experimental
+`0.9.0-alpha.1` source-package subjects are covered by the unchanged provenance;
+this is two payload signatures, not sixteen separate package-signing operations.
+It adds no binary, platform, production-readiness or SLSA-level claim.
+
+### Frozen input binding to accept together
+
+| Input | Exact value |
+|---|---|
+| Original product/build | C `bf3363801132f4481263ceb411d9bba3349df86d`, unsigned immutable `v0.9.0-alpha.1`, build `40669449040/1`, verifier `40688772221/1` |
+| Signer | S `d65e3180ad3076659f03c069fc71cd0e7e3f0518`; workflow `.github/workflows/release-sign.yml` at protected `refs/heads/master` |
+| Successful preparation | Run `40806988578`, attempt `1`; original artifact `12867774698`, `signing-inputs-40806988578-1`, 74,815,047 bytes |
+| Artifact ZIP SHA-256 (`digest`) | `bee5cb493b35ea681a20054e7a095b13989d523c3f7a8dd17a4c3cbd9c8d23c8` |
+| Safe `SIGNING-INPUTS.json` SHA-256 (`receipt_sha256`) | `f7a0cc5df0f471f3d47526fb8e41822a647e51519124ec43fddd338f5e9570a9` |
+| Frozen ciphertext SHA-256 | `89cbc583a9c27f4cd4c1c3350ae3c1cd47ca241458b1920adac237adc2143e52` |
+| Assembly `EVIDENCE-CLOSURE.json` SHA-256 | `a13ccb85554d4ab68f7aaf95bd151758841a03392496a59685a4adf1bce2760c` |
+| Public raw payload SHA-256 (`provenance_sha256`) | `4d4de1a8ce9cc077c0aa62a1aafb3ab9799eed312deddb66d9e6f8fc6fef2d68` |
+| Complete private raw manifest SHA-256 (`manifest_sha256`) | `e0921075e47a5c2f16948dde94bf006ec8afac14c8730ba68b22d28d0533d93f` |
+
+The ZIP, ciphertext, receipt, closure and retention-index hashes are bindings,
+not additional signing targets. The full private manifest is the final frozen
+assembly manifest, not the old private build manifest or a public summary.
+The preparation receipt's `D6: Pending` remains immutable after approval; a later
+sign request/execution receipt records the new authority outside that assembly.
+
+### Public metadata and controlled material
+
+| Disclosure class | Exact identity or accepted field scope |
+|---|---|
+| Full public statement and DSSE bundle | The unchanged 9,158-byte provenance: `_type`, exactly sixteen archive names/SHA-256 values, `predicateType`, build type `urn:yetlet:build:cargo-source-package:v1`; original repository/release workflow/alpha tag and `cohort=sixteen`; Rust1.99.0, GNU target, default-feature policy, OpenSSL3.5.9 and source epoch; source/lock/recipe/tool dependency names and digests; builder ID, original invocation/times and four byproduct names/digests. No new field or replacement builder S is inserted |
+| Certificate identity | OIDC issuer `https://token.actions.githubusercontent.com`; exact SAN `https://github.com/bohewu/yetlet/.github/workflows/release-sign.yml@refs/heads/master`; authenticated workflow/config/signer digest S above |
+| Repository and workload claims | `https://github.com/bohewu/yetlet`, ID1409587171; `https://github.com/bohewu`, ID35250002; ref `refs/heads/master`, `workflow_dispatch`, `github-hosted`, `public`, Environment `release-sign`; expected subject `repo:bohewu@35250002/yetlet@1409587171:environment:release-sign`, distinct from the certificate SAN |
+| Runtime signing metadata | Actual future signing run/attempt URI, certificate validity/serial/public key/chain/SCT, signatures and approved log ID/index/inclusion/checkpoint/time and TSA material. Future run, certificate and bundle hashes do not exist yet and must not be invented |
+| Private manifest disclosure | Its digest, detached signature and certificate/log material may be public through signing services. The manifest body, filenames/entries, detailed evidence and raw findings remain controlled; the manifest bundle is encrypted before upload |
+
+GitHub workload OIDC authenticates to Fulcio; the adopted production Sigstore
+profile uses Fulcio `https://fulcio.sigstore.dev`, approved Rekor API2
+`https://log2025-1.rekor.sigstore.dev` / API1 `https://rekor.sigstore.dev` with
+the adopted `ANY` selection, and TSA
+`https://timestamp.sigstore.dev/api/v1/timestamp`. Cosign3.1.4 and root/config
+digests remain those bound by the preparation receipt and
+[D4](YT-096-D1-D5-RELEASE-TRUST-PLAN.md#d4--concrete-signing-and-verification-recommendation).
+Actual service/certificate acceptance still needs the later authorized signing
+run. Treat the full statement, certificate and transparency material as public
+and durable; deleting a GitHub asset/release cannot retract public log copies.
+Raw JWTs authenticate only to their intended service; tokens, private keys,
+short-lived handoff URLs and decrypted evidence are never public payload fields.
+Existing source/Actions publicity is separate from disclosure of private evidence.
+
+### Recommended single owner decision and execution limit
+
+A later explicit owner decision should accept this whole packet: exact C/S,
+both payload SHA-256 values, receipt/artifact binding, workload identity and
+public disclosure; authorize **one `sign` dispatch**, five-minute preflight and
+thirty-minute protected job, with the owner personally approving `release-sign`.
+Retain failures/partial issuance and stop without automatic retry. Reuse the
+frozen assembly, verify both raw hashes and every required binding before OIDC,
+remove the decryption identity before signing, then verify and retain the actual
+bundles. No new build, reassembly, payload edit, tag, GitHub Release publication
+or crates.io upload is included. Signing success alone does not close YT-096:
+independent verification and final owner acceptance of actual output digests
+remain required. Publication and YT-020 retain separate authority.
+
+Keep protected master at S for that proposed dispatch. These result documents
+may be committed on a separate documentation branch under later authority, but
+must not be merged into master before signing at S. The existing gate rejects
+a moved master rather than silently selecting new code. If it advances, stop
+for owner disposition; this packet authorizes no replacement S or re-prepare.
+No Commit/Push, issuance, signing or publication is authorized now.
 
 ## D6 completion and the GitHub draft boundary
 
@@ -133,13 +231,13 @@ Keep the following conditions separate:
 | Gate | Actual alpha status / required outcome |
 |---|---|
 | Source, unsigned build, verifier and retained bytes | PASS at the existing bounded scope; reuse without replay |
-| Public signing bytes | Fixed above; no signature or owner signing approval |
-| Complete private evidence assembly | Pending reviewed exact closure, protected assembly/verification, encryption and actual final manifest SHA |
-| Trusted signer | Local implementation/review and tool compatibility retained; fixed S selected; hosted preflight failure remains unresolved |
-| Protected preparation | Owner-authorized setup complete; `40717870186/1` preflight FAIL, protected job skipped; no OIDC permission |
-| Exact D6 signing approval | Pending owner acceptance of S, identities, both raw payload hashes and the frozen preparation receipt/artifact binding |
-| Actual signatures and verification | Pending protected signing, independently verified bundles/certificate/log/S, all subjects and all private-manifest entries; retain failures without automatic retry |
-| Final disposition | Record the owner's acceptance against actual manifest/bundle digests; do not mark YT-096 Done from draft creation or technical preparation alone |
+| Public signing bytes | Fixed original bytes; owner-approved supplied-statement DSSE issued in `40811275645/1`, independently verified |
+| Complete private evidence assembly | PASS: allowlisted closure, protected checksum verification, freeze/encryption and final manifest SHA exported in `40806988578/1` |
+| Trusted signer | Reviewed S `d65e318`; actual issuer/SAN/S/repository/owner/Environment/run claims and normal trust/CT/log/timestamp verification PASS for both bundles |
+| Protected preparation | `40806988578/1` SUCCESS including cleanup and retained readback; no OIDC permission. Earlier failed runs retain FAIL and are ineligible |
+| Exact D6 signing approval | Owner accepts the reviewed exact packet by reference and personally approves `release-sign`; exact original C/S/payload/artifact/receipt preserved |
+| Actual signatures and verification | Sign `40811275645/1` and independent public/private checks PASS; 16 subjects and all 117 complete-manifest entries verified; wrapper errors retained, no cryptographic check/signing retry |
+| Final disposition | All owner conditions PASS, including final independent Reviewer PASS0; acceptance of actual fixed public/encrypted-private bundles is activated, D6 Complete and YT-096 Done at accepted source-package signing/integrity scope |
 
 After those formal integrity conditions pass and the owner accepts the actual
 result, the signing work can close at that recorded scope. GitHub Release
@@ -782,3 +880,248 @@ files retain their reviewed hashes.
 New repair/status changes remain uncommitted; no new S or hosted retry is
 implied. The effective release status remains YT-096 In progress / D6 Pending,
 with YT-020 Blocked and no signing/publication.
+
+## Successful protected prepare and retention — 2026-10-29
+
+The owner authorizes strict/builtin delivery of the six independently reviewed
+cache-cleanup correction/status paths, CI-gated squash Merge, actual replacement
+S selection and one additional prepare. Commit `a29796b`, tree
+`5812dcfbc9e50a76c4d230bd5d32a336568db12a`, passes staged/outgoing strict/builtin
+checks and native hooks. [PR19](https://github.com/bohewu/yetlet/pull/19) CI
+`40805140129/1` PASS; squash Merge selects S
+`d65e3180ad3076659f03c069fc71cd0e7e3f0518` with that exact tree and parent
+`e2d4a9f64925f2a20c35c7e7aeae6e352e4938ef`. Master CI `40806189605/1` PASS.
+Original product C, both immutable tags and accepted build/verifier stay unchanged.
+
+The owner-local helper verifies original encrypted qualification ZIP/receipt and
+creates a fresh age capability handoff without reading the local formal key.
+Exactly one dispatch creates
+[prepare 40806988578](https://github.com/bohewu/yetlet/actions/runs/40806988578),
+attempt1. Read-only preflight `123228194489` PASS. The owner personally approves
+Environment ID25580949441; GitHub's approval record identifies user ID35250002.
+Protected prepare `123228240593` passes every step: authenticated tools/helper,
+Environment/original input recheck, isolated handoff/decryption/full checksum
+verification/freeze, encrypted upload and final owned-work cleanup. Sign job
+`123228242222` is skipped; no OIDC issuance, signature or publication occurs.
+No failed job or hosted attempt is automatically retried.
+
+Artifact `12867774698` and its exact two regular payload files are downloaded
+once for owner readback. ZIP size/digest, ciphertext digest and every safe receipt
+binding match the fixed C/S, original build/verifier, qualification, preparation,
+recipient and authenticated tools. The complete private manifest SHA is exported
+by the authorized protected verification, not obtained through local plaintext
+decryption. The original provenance bytes are also matched to their retained
+9,158-byte public copy. The two raw signing hashes are in the packet above.
+This confirms preparation eligibility; it is not D6 signing authority or proof
+of a certificate/signature that has not been issued.
+
+The owner-local repository-external custody set retains the original artifact
+ZIP, frozen ciphertext, safe receipt, a copy of the original encrypted
+qualification ZIP, source/Guard/CI/approval/run/job/log records, prior focused
+cleanup-regression/review evidence and actual readback/cleanup receipts. Its
+final index covers 42 files / 168,101,480 payload bytes, SHA-256
+`46eb08c7cbccac1f569d0505c6fad7749e5166cb3b20958622c40c27370f0140`;
+the index itself is excluded to avoid a self-hash. Files are private, flushed,
+reread and indexed; this is local owner custody, not an off-host backup claim.
+The frozen GitHub artifact's recorded expiry is 2026-11-05 10:35:06 Asia/Taipei.
+The future signing gate still requires the original successful run/artifact;
+local custody does not authorize reupload or reconstruction if it expires.
+
+After successful readback and durable retention, the previously authorized
+conditional cleanup deletes only temporary qualification asset `685300857`:
+HTTP204, then owner-authenticated Release readback confirms zero assets and
+`draft=true`, `published_at=null`. Draft `426670086` remains unpublished at C.
+Both original/local encrypted qualification copies, both product tags, original
+build artifacts and all failed-run custody records remain. In particular,
+`40795794183/1` stays FAIL/ineligible, even though the final manifest bytes match
+this successful preparation. Its prior index SHA remains
+`1b374f38414cd7dcf770c24deef2e6a1c977645e560e48820324e059e24687fc`.
+
+Execution/readback evidence is retained under ignored
+`target/yt096-owned-cache-cleanup-delivery-20261029/` and the owner-local
+repository-external run custody set. This documentation update reuses it without
+replaying tests, builds, bootstrap, decryption or hosted jobs. Documentation
+checks PASS (75 documents / 207 backlog items), and whitespace PASS. Independent
+Reviewer `/root/yt096_d6_confirmation_review_20261029` PASS, zero issues or
+required followups, accepts the six-file documentation delta against retained
+evidence without replaying validation. Native role/model/effort verification
+matches the requested reviewer configuration; this is ordinary independent
+review, not formal signing qualification. Only completion metadata changes after
+review. Six documentation files remain uncommitted and unstaged; no Commit/Push,
+signing or publication occurs. D6 Pending, YT-096 In progress, YT-020 Blocked.
+
+## Actual signing, independent verification and owner acceptance — 2026-10-29
+
+The owner instructs continuation to complete D6 immediately after the reviewed
+exact confirmation packet. This accepts that packet by reference: unchanged
+C/S, both raw payload hashes, exact frozen artifact/receipt and adopted public
+statement/workload/certificate/log/TSA disclosure. The single `sign` request uses
+`d6=approve-exact-signing-inputs` and consumes successful prepare `40806988578/1`,
+artifact `12867774698`; no source change, product rebuild or payload reassembly.
+
+[Sign run 40811275645](https://github.com/bohewu/yetlet/actions/runs/40811275645),
+attempt1, succeeds at S `d65e3180ad3076659f03c069fc71cd0e7e3f0518`. Preflight
+`123241908097` PASS; the owner personally approves Environment25580949441,
+with user ID35250002 confirmed by GitHub. Protected sign job `123241955416`
+passes authenticated-tool bootstrap, frozen input download/verification,
+identity removal before OIDC, both signing operations, normal same-job
+verification, encrypted upload and cleanup. Prepare job `123241956871` is skipped.
+There is one sign dispatch/attempt, no automatic hosted or signing retry.
+
+### Actual immutable signed outputs
+
+| Output | SHA-256 |
+|---|---|
+| Artifact `12870551335`, `signing-results-40811275645-1`, 20,484-byte ZIP | `27ea5d5315f17ca9728943c944db653b6f56e2297a4efded76ded4b7c170eef7` |
+| Immutable `SIGNING-EXECUTION.json` | `8a7648ed0fd13c8fa065289514b84a10299c9394bc0b27e5d1c4b92d94e6f2ac` |
+| Public `provenance.sigstore.json` | `524c4f2aa6c611959d3c3b6acf6e27dce3e0a55cc58c68a80513345d20434a21` |
+| Controlled `manifest.sigstore.json.age` | `37608522d8c8162d62052b7d3fe918ae1d1ac5014c148564fabf36923d4700b8` |
+| Raw private manifest bundle, transiently decrypted for verification only | `8a365ad5c7f530e98b08b5a26aa70c0d1d0db764bbc701d571f525b70c6618e0` |
+| Signed original provenance | `4d4de1a8ce9cc077c0aa62a1aafb3ab9799eed312deddb66d9e6f8fc6fef2d68` |
+| Signed complete private manifest | `e0921075e47a5c2f16948dde94bf006ec8afac14c8730ba68b22d28d0533d93f` |
+
+Original ZIP and its exact three regular members are downloaded, hashed and
+bound to successful run/attempt/S and the exact approved input request. The
+execution receipt and original preparation receipt are immutable: their
+`independent_verification` / `final_owner_acceptance` Pending values describe
+issuance time. Later checks/acceptance are recorded separately, not patched
+into those original bytes or into the signed assembly.
+
+### Independent technical verification and bounded custody exception
+
+On the owner host, retained authenticated Cosign/root independently verify the
+public DSSE signature, chain/CT/log/timestamp and exact issuer/SAN. Exact
+certificate claims match S, source/config digest, repository/owner IDs, actual
+signing invocation and `release-sign`. The decoded statement is exactly the
+original 9,158 bytes; its 16 subject digests match all retained public archives.
+This is a new verification of actual signatures, not a rebuild or qualification
+rerun. A missing local interpreter path interrupted only the not-started
+certificate wrapper; system cryptography completes that check without replaying
+the successful Cosign/subject checks. The operational error is retained.
+
+For the private result, the owner explicitly answers: permit local verification
+and accept/close after all checks pass. The approved one-time exception uses the
+existing owner-local identity directly with authenticated age in private temporary
+storage outside Git, with a 300-second total limit. No key copy, move, rotation,
+upload or export occurs; the default future D2 protected-Environment rule remains.
+
+The existing bounded restore/checksum verifier passes all 117 complete-manifest
+entries and the actual manifest SHA matches the approved target. A local
+bookkeeping wrapper then uses `name` instead of the manifest's `path` field and
+raises KeyError; actual complete-entry verification has already passed. Its
+temporary plaintext is removed. One canonical harness correction continues only
+the not-started checks within the original phase/deadline: reacquire metadata
+from identical authenticated ciphertext, bind all 16 subjects to the already
+verified entries and closure, decrypt the private bundle, and run independent
+Cosign `verify-blob` with exact issuer/SAN, pinned root, signed timestamps and
+normal CT/log checks. Every private certificate S/repository/owner/Environment/run
+claim matches, as does its message digest to the actual complete manifest.
+No passed full-entry check, cryptographic check or hosted job is replayed.
+
+The complete phase takes 146.12 seconds, including correction. Both temporary
+plaintext directories are removed; existing identity metadata is unchanged.
+Private bundle/body/evidence plaintext is not retained or uploaded. Only safe
+verification/cleanup records, public certificate/log metadata, raw bundle digest
+and original encrypted bytes are retained. The wrapper failure and both cleanup
+records remain available; it is not relabeled as a signing/cryptographic failure
+or silently dropped from history.
+
+Public certificate SHA-256 is
+`b490d4b3a134c3191a573b7ad386dd326826f8b48b54d172c5b151a610f6c12e`;
+private-signature certificate SHA-256 is
+`5fce264e6b9f2a66437d10fc572a5fa4c334d5213a429e825d7f425744dd249a`.
+Verified Rekor log indices are `174117699` and `174117716`; each bundle has one
+RFC3161 timestamp. These are actual independent-check observations, not future
+identities inferred from a green build. They add no support, SLSA or production
+qualification claim.
+
+### Conditional final acceptance and retained scope
+
+The owner approves the one-time local exception and accepts the **already
+existing** public bundle SHA `524c4f2a…` and encrypted private bundle SHA
+`37608522…`, with the fixed raw provenance/manifest, S and original C, conditional
+on independent private verification, plaintext cleanup and independent Reviewer
+all passing. The raw private-bundle SHA above is subsequently learned as a
+binding to that approved ciphertext; no unknown replacement output is approved.
+Verification/cleanup and final independent Reviewer
+`/root/yt096_d6_confirmation_review_20261029` PASS, zero issues/required followups.
+Native reviewer/model/effort evidence matches the resolved configuration. The
+owner's existing conditional acceptance is therefore activated against these
+exact output identities; D6 Complete, YT-096 Done at the accepted source-package
+signing/integrity scope. This ordinary independent review is not a new formal
+assurance or product/platform qualification claim.
+
+Signed output, immutable receipts, exact source/run/job/approval metadata,
+independent verification results, original wrapper failures, cleanup and owner
+authority are retained outside Git. The pre-final-review custody index covers
+30 files / 123,052 payload bytes, SHA-256
+`704c41a65f8db02012b798530486cd4180a4c9fc2572f9d8d480d5ba595dd439`.
+It references the unchanged original frozen preparation custody; no private
+plaintext is included. This is owner-local retention, not indefinite/off-host
+backup. That pre-review index remains immutable. Final repository-external
+retention adds final review/authority/acceptance records: 36 files / 134,686
+payload bytes, final index SHA-256
+`e940be86c4d121696c93a4465593624c01208306e336cedfc3bb6a2946952d9d`.
+The index excludes itself; document completion metadata stays outside its hash
+closure. A separate immutable `FINAL-OWNER-ACCEPTANCE.json` records the condition
+activation; original issuance receipts, signed bytes and failure records remain
+unchanged. The one local identity exception is spent and grants no further use.
+
+This closes only the accepted sixteen Experimental `0.9.0-alpha.1` source-package
+signing/integrity scope. All original failures,
+qualification limits and evidence dispositions stay intact. No GitHub Release
+publication, crates.io upload, tag change, Commit or Push occurs; YT-020 remains
+Blocked. The six-document result update, docs (75 documents / 207 backlog items)
+and whitespace checks PASS; final independent Reviewer PASS0. Only completion,
+status and final custody metadata change after review. All six documents remain
+unstaged/uncommitted; no old qualification is rerun.
+
+## Subsequent GitHub pre-release publication — 2026-10-29
+
+After D6 closure, the owner separately approves publishing the prepared existing
+GitHub Draft as Experimental `v0.9.0-alpha.1`. Release ID `426670086` is published
+at 2026-10-29 12:09:39 Asia/Taipei, with `draft=false`, `prerelease=true` and
+`make_latest=false`. Existing unsigned lightweight tag and C `bf33638` stay
+unchanged; signer S `d65e318` and both signed payload/bundle identities remain
+those in the accepted record above. No new tag, build, signature or Git action.
+
+The exact 20 public attachments are the original sixteen `.crate` subjects,
+original `PROVENANCE-UNSIGNED.json` and public `RELEASE-CHECKSUMS.json`, unchanged
+public `provenance.sigstore.json`, and a reduced `SIGNING-APPROVAL.json` containing
+only adopted source/tag/subject/manifest/bundle identities and support limits.
+They total 358,948 bytes. Complete private evidence, manifest body, private bundle
+and raw operational records are not Release attachments. The original public
+checksum manifest is distinguished from the signed complete private manifest;
+GitHub-generated source ZIP/tar archives are not signed subjects.
+
+The owner approves the exact staged notes, SHA-256
+`f16a974b7136e27202db42c7eca7b6c4f4b201069c5bfc9f85caac2bcd04c6ce`.
+The notes reflect actual signing/verification completion and retain Experimental,
+source-package-only, compatibility and no-registry limits. Owner-authenticated
+and anonymous API readbacks both confirm all 20 names/sizes/digests and published
+state. Anonymous public bundle download matches the already verified
+`524c4f2aa6c611959d3c3b6acf6e27dce3e0a55cc58c68a80513345d20434a21`;
+no passed signature/qualification check is replayed. The published pre-release
+is not the latest stable release.
+
+A draft-update wrapper initially omits `tag_name`; GitHub returns its internal
+untagged placeholder, and tag-based CLI asset lookup fails before uploading any
+file. Explicit full tag/C binding corrects that draft-interface error, then each
+of the 20 assets is uploaded once using the same existing Release ID, without
+clobber or changed credentials/permissions. The lookup, observed temporary
+binding and correction records are preserved. There is exactly one publication
+PATCH; no publication or failed binary-upload write is automatically repeated.
+
+Publication receipts, exact public copies, notes/allowlist, owner authority,
+readbacks and retained interface errors are stored outside Git. Publication index
+covers 56 files / 572686 bytes, SHA-256 `677f68d2eb14e0b23b432d1025b6f3b8a33927848f66c9c73adb20c4d1aba63e` (index excluded).
+It binds the unchanged signed-output/frozen-input custody indexes rather than
+copying private material into the public set. This is local owner custody, not
+an indefinite/off-host-backup claim.
+
+GitHub publication does not include crates.io upload or change YT-020's Blocked
+state. No new support/production/SLSA claim follows. D6 Complete and YT-096 Done
+retain their accepted source-package signing/integrity scope. The six local result
+documents remain uncommitted/unstaged. Their prior independent acceptance covers
+D6; this later publication checkpoint records the owner's separate approval and
+actual API/asset readback only.

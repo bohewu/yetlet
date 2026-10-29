@@ -1,6 +1,50 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**YT-096 current execution (2026-10-29):** PR18 strict/builtin delivery selects
+**YT-208 maintainer SOP (2026-10-29):** The
+[development/PR guide](DEVELOPMENT.md) and [new-version release guide](RELEASING.md)
+separate normal development, one-time setup, per-version promotion and failure-only
+recovery. Current distribution/navigation is reconciled without replaying
+qualification or changing workflows/settings. Docs/whitespace and independent
+Reviewer PASS0; YT-208 Done at documentation scope. YT-209 Todo addresses the observed hard-coded release inputs,
+missing protected independent private-result verifier and operator-only public
+staging/readback; this is future tooling, not a claimed generic pipeline.
+D6/YT-096 alpha acceptance and YT-020 Blocked retain their existing scopes.
+
+**Subsequent owner-approved GitHub pre-release (2026-10-29):**
+[Yetlet v0.9.0-alpha.1](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
+is public as an Experimental pre-release, not Latest, at unchanged C `bf33638`.
+The owner separately approves publication of the exact notes and 20 public
+attachments; anonymous API and bundle-download readback PASS. No private evidence,
+private bundle, registry upload, new signing or Git operation is included.
+D6 remains Complete, YT-096 Done at accepted source-package signing/integrity
+scope, YT-020 Blocked. Earlier unpublished/Pending records retain their dated scope.
+
+**YT-096 actual signing (2026-10-29):** Owner-approved sign `40811275645/1`
+SUCCESS at unchanged S `d65e318`, including cleanup. Independent public/private
+verification PASS covers both fixed payloads, all 16 subjects, all 117 manifest
+entries and exact signer/CT/log/timestamp claims. The owner's explicit one-phase
+local custody exception and conditional acceptance of actual bundle hashes are
+[recorded](YT-096-SIGNER-CONTRACT.md#actual-signing-independent-verification-and-owner-acceptance--2026-10-29).
+All temporary plaintext removed; retained wrapper errors cause no signing or
+cryptographic retry. Final independent Reviewer PASS0 activates the owner's
+acceptance: D6 Complete, YT-096 Done at source-package signing/integrity scope.
+Six docs uncommitted/unstaged, no Git or
+publication; YT-020 Blocked. Historical records below keep their original scope.
+
+**YT-096 current execution (2026-10-29):** PR19 strict/builtin delivery selects
+S `d65e318`, reviewed tree unchanged; PR/master CI PASS. Owner-approved prepare
+`40806988578/1` SUCCESS includes final cleanup and verified encrypted readback.
+Repository-external retention PASS; conditional temporary asset deletion is
+complete, Draft remains unpublished, earlier failures retain their outcomes.
+The [single D6 confirmation packet](YT-096-SIGNER-CONTRACT.md#d6-confirmation-packet--2026-10-29)
+lists both actual raw payload hashes, exact source/artifact/receipt and public
+metadata for one recommended later sign run. Keep master at fixed S; this
+documentation grants no execution/Git authority. Six docs are uncommitted/unstaged;
+docs/whitespace and independent Reviewer PASS0; no qualification replay.
+D6 Pending, YT-096 In progress,
+YT-020 Blocked. Earlier dated checkpoints retain their original scope.
+
+**YT-096 historical execution (2026-10-29, PR18):** PR18 strict/builtin delivery selects
 S `e2d4a9f`; PR/master CI PASS. Owner-approved prepare `40795794183/1` passes
 preflight, tool authentication, original ciphertext retrieval, isolated
 handoff/decryption/full manifest/freeze, and encrypted output upload. Final owned

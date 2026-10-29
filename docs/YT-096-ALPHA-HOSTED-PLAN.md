@@ -1,7 +1,71 @@
 # YT-096 — Alpha candidate and minimum hosted build/readback plan
 
-Date: 2026-10-28 (Asia/Taipei). Status: Plan independently reviewed PASS, zero issues/required followups.
-D6 Pending; YT-096 In progress; YT-020 Blocked. This packet authorizes no execution.
+**Subsequent owner-approved GitHub pre-release (2026-10-29):**
+[Yetlet v0.9.0-alpha.1](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
+is public as an Experimental pre-release, not Latest, at unchanged C `bf33638`.
+The owner separately approves publication of the exact notes and 20 public
+attachments; anonymous API and bundle-download readback PASS. No private evidence,
+private bundle, registry upload, new signing or Git operation is included.
+D6 remains Complete, YT-096 Done at accepted source-package signing/integrity
+scope, YT-020 Blocked. Earlier unpublished/Pending records retain their dated scope.
+
+Date: 2026-10-28 (Asia/Taipei), with actual closure recorded 2026-10-29.
+Status: Plan/result independently reviewed PASS, zero issues/required followups.
+D6 Complete; YT-096 Done at accepted source-package signing/integrity scope;
+YT-020 Blocked. This packet authorizes no further execution.
+
+## Current actual signing and conditional acceptance — 2026-10-29
+
+At unchanged S `d65e318`, one owner-authorized sign run `40811275645/1` SUCCESS
+includes issuance, same-job checks, encrypted upload and cleanup; prepare is
+skipped. The owner personally approves the existing `release-sign` gate. Exact
+frozen inputs from successful prepare `40806988578/1` remain unchanged.
+
+Independent public verification PASS binds the original DSSE statement and all
+16 archives. After an explicit single-use local D2 exception, private verification
+PASS binds the manifest signature, all 117 complete-manifest entries, all subjects
+and exact signer claims/CT/log/timestamps. All temporary plaintext is removed;
+the existing identity is unchanged. One local field-name harness correction stays
+within the original 300-second phase (146.12 seconds total); previously passed
+full-entry checks are reused, not replayed. No signing or cryptographic retry.
+
+The [actual output/acceptance record](YT-096-SIGNER-CONTRACT.md#actual-signing-independent-verification-and-owner-acceptance--2026-10-29)
+lists artifact `12870551335`, both raw/transport bundle hashes and the owner's
+conditional acceptance of these exact existing outputs after all checks and
+independent Reviewer PASS. Final Reviewer PASS0 fulfills the last condition;
+the owner's acceptance is activated, D6 Complete and YT-096 Done at accepted
+source-package signing/integrity scope. Six documents remain uncommitted/unstaged.
+No publication or Git mutation; YT-020 Blocked. Historical checkpoints below
+retain their dated outcomes and scopes.
+
+## Current successful prepare and D6 packet — 2026-10-29
+
+PR19 strict/builtin delivery and squash Merge select S
+`d65e3180ad3076659f03c069fc71cd0e7e3f0518`, tree
+`5812dcfbc9e50a76c4d230bd5d32a336568db12a`, identical to reviewed correction
+`a29796b`. PR CI `40805140129/1` and master CI `40806189605/1` PASS.
+Owner-approved prepare `40806988578/1` SUCCESS includes the previously failing
+final cleanup; sign is skipped. This is one authorized additional run, no retry.
+
+The [execution/custody record](YT-096-SIGNER-CONTRACT.md#successful-protected-prepare-and-retention--2026-10-29)
+binds artifact `12867774698`, verified encrypted readback and the final owner-local
+42-file / 168,101,480-byte retention set, index SHA-256
+`46eb08c7cbccac1f569d0505c6fad7749e5166cb3b20958622c40c27370f0140`.
+No local formal key or private plaintext is read. Temporary qualification asset
+`685300857` is deleted only after successful retention (HTTP204 and Release
+readback); its encrypted input copies remain local. The Draft remains unpublished.
+Previous failed runs, both product tags and original C/build/verifier stay intact.
+
+The [single D6 confirmation packet](YT-096-SIGNER-CONTRACT.md#d6-confirmation-packet--2026-10-29)
+now lists both actual raw payload SHA-256 values, exact C/S and artifact/receipt,
+public workload/statement/log metadata and the recommended one-sign-run boundary.
+Keep master at S until that separately authorized signing; result documentation
+must not silently replace it. Signing, independent verification, final owner
+acceptance and publication are still separate gates. This documentation-only
+update authorizes no execution or Git operation; documentation/whitespace checks
+and independent Reviewer PASS0. Six result documents remain uncommitted/unstaged.
+D6 Pending, YT-096 In progress, YT-020 Blocked. The dated sections below preserve
+historical outcomes and Pending states at their recorded sources.
 
 
 ## Current protected output and cleanup failure — 2026-10-29
