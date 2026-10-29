@@ -1,8 +1,8 @@
 # YT-209 — Versioned release automation
 
-Status: Done at local implementation scope. Independent contract and final
-implementation Reviewer PASS, zero issues/required followups. Hosted qualification
-and operational enablement remain Pending.
+Status: initial local acceptance retained; integration delivery reopened after
+PR20 CI failure. Compatibility repair passed independent local review and has not been
+Committed/Pushed or retried in CI. Hosted qualification and enablement remain Pending.
 
 ## Scope and authority
 
@@ -235,3 +235,46 @@ PASS; no Push. [The hosted/Environment plan](YT-209-HOSTED-VERIFICATION-PLAN.md)
 records current read-only settings, old-receipt compatibility limits and the
 proposed minimum authority packets. It grants no operational authority. YT-209
 remains Done at the accepted local scope; hosted qualification is Pending.
+
+
+## Subsequent integration CI — 2026-10-29
+
+Owner-authorized tooling delivery created [PR20](https://github.com/bohewu/yetlet/pull/20)
+at `c0fae63871ee9910eb9182007615950e96f627d7`, preserving the original branch.
+The original staged/range/native strict/builtin checks passed. CI
+[40871149693/1](https://github.com/bohewu/yetlet/actions/runs/40871149693) passed
+MSRV but failed Stable's Rust-tool test step before the later audit/browser steps.
+No Merge, Environment/Secret installation or release workflow followed that failure.
+
+The concrete failure is `ModuleNotFoundError: release_record` when the existing
+Rust custody test loads the preflight script through `importlib` from repo root.
+Initial YT-209 checks covered the new helper/direct invocation but omitted this
+existing caller. The custody metadata fixture and the separate preparation
+workflow test also retained obsolete fixed-alpha input/identity assumptions.
+Those are changed consumers, not unrelated qualification to replay.
+
+The minimum repair changes three source/test files: resolve the trusted sibling
+module directory in `release-evidence-preflight.py`, migrate the custody fixture
+through actual schema-1 inputs using a synthetic alpha.2 tag, and update the
+preparation/custody workflow assertions to the reviewed record/source guard.
+The identity, protected reviewer/no-bypass, exact tag/ZIP and secret-order checks
+remain; no legacy fallback, ignore, skipped assertion or weaker workflow is added.
+The caller inventory covers direct workflow execution, signer module loading and
+the Rust `importlib` caller. Existing new-record behavior evidence remains scoped
+and retained.
+
+Local evidence: the two affected Rust cases PASS individually, xtask all-target
+Clippy with `--offline --locked -- -D warnings` PASS, plus changed-file format,
+Python syntax and whitespace PASS. The initial local edit script aborted before
+writing the Rust fixture; its subsequent targeted run therefore still failed on
+missing `tag`. That editing failure and local test failure are retained with the
+first remote failure, then corrected at the existing fixture seam. No CI retry
+or new remote source follows automatically. Independent repair Reviewer `/root/yt096_d6_confirmation_review_20261029`
+PASS0; all six reviewed hashes match and native reviewer/gpt-6-astra/actual max
+identity is verified. Only completion metadata changes after this review.
+
+Original PASS results are historical evidence, not permission to merge the failed
+head. YT-209 stays In progress for this integration repair until the repaired
+source passes required CI. Commit/Push of the new repair, its new CI attempt and
+continuation to conditional Merge/Environment setup need an explicit remaining-
+batch decision under the owner's no-automatic-retry instruction.

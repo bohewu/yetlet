@@ -1,5 +1,12 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-209 integration delivery (2026-10-29):** Reopened after [PR20](https://github.com/bohewu/yetlet/pull/20)
+CI `40871149693/1`: MSRV PASS, Stable failed at the existing preflight importlib
+consumer before browser/audit steps. Three-file compatibility repair and two
+consumer checks/xtask Clippy PASS locally; independent repair Reviewer PASS0.
+No CI retry, Merge or Environment/Secret write. Initial local acceptance and
+failed evidence retained; see the [repair record](YT-209-RELEASE-AUTOMATION.md#subsequent-integration-ci--2026-10-29).
+
 **YT-209 release automation (2026-10-29):** [Contract](YT-209-RELEASE-AUTOMATION.md) and minimal implementation Done at local scope after contract/final independent Reviewer PASS0. 30 distinct focused checks plus docs/format/syntax PASS; all 17 reviewed source hashes match. Versioned data-only inputs, protected independent result verification and closed public attachment operations preserve C/S, key and owner gates. Hosted qualification/Environment setup remain Pending. No formal key, old qualification replay, hosted, signing, publication or new-change Commit/Push.
 
 **YT-208 maintainer SOP (2026-10-29):** The

@@ -39,7 +39,8 @@ fn workflow_has_manual_fixed_source_and_only_success_public_upload() {
         fs::read_to_string(repository_root().join(".github/workflows/release.yml")).unwrap();
     for required in [
         "on:\n  workflow_dispatch:",
-        "options:\n          - sixteen",
+        "record:",
+        "RELEASE_RECORD: ${{ inputs.record }}",
         "contents: read",
         "timeout-minutes: 45",
         "ref: ${{ github.sha }}",
@@ -47,16 +48,15 @@ fn workflow_has_manual_fixed_source_and_only_success_public_upload() {
         "persist-credentials: false",
         "actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
         "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
-        "[[ \"$EXPECTED_COMMIT\" =~ ^[0-9a-f]{40}$ ]]",
         "[[ \"$GITHUB_EVENT_NAME\" == workflow_dispatch ]]",
         "[[ \"$GITHUB_REPOSITORY\" == bohewu/yetlet ]]",
-        "[[ \"$GITHUB_REF\" == refs/tags/v0.9.0-alpha.1 ]]",
-        "[[ \"$BUILD_WORKFLOW_REF\" == bohewu/yetlet/.github/workflows/release.yml@refs/tags/v0.9.0-alpha.1 ]]",
-        "[[ \"$EXPECTED_COMMIT\" == \"$GITHUB_SHA\" && \"$EXPECTED_COMMIT\" == \"$BUILD_WORKFLOW_SHA\" ]]",
-        "[[ \"$(git rev-parse HEAD)\" == \"$EXPECTED_COMMIT\" ]]",
-        "refs/tags/v0.9.0-alpha.1^{commit}",
-        "git merge-base --is-ancestor \"$EXPECTED_COMMIT\" refs/remotes/origin/master",
-        "[[ -z \"$(git status --porcelain)\" ]]",
+        "[[ \"$GITHUB_REPOSITORY_ID\" == 1409587171 && \"$GITHUB_REPOSITORY_OWNER_ID\" == 35250002 ]]",
+        "[[ \"$GITHUB_SHA\" == \"$BUILD_WORKFLOW_SHA\" ]]",
+        "assert re.fullmatch('[0-9a-f]{40}', r['source'])",
+        "assert r['source'] == os.environ['GITHUB_SHA']",
+        "assert os.environ['BUILD_WORKFLOW_REF'] == 'bohewu/yetlet/.github/workflows/release.yml@' + os.environ['GITHUB_REF']",
+        "python3 scripts/release_record.py source release.yml",
+        "RELEASE_COHORT=sixteen",
         "OPENSSL_SOURCE_ARCHIVE=%s",
         "if: success()",
         "path: target/release-preparation/public/",
@@ -70,6 +70,7 @@ fn workflow_has_manual_fixed_source_and_only_success_public_upload() {
         "push:",
         "id-token:",
         "v0.1.0",
+        "v0.9.0-alpha.1",
         "secrets.",
         "environment:",
         "actions/cache@",
@@ -95,6 +96,14 @@ fn workflow_has_manual_fixed_source_and_only_success_public_upload() {
     }
     assert!(
         source.find("Reject source and workflow identity").unwrap()
+            < source
+                .find("bash scripts/bootstrap-release-age.sh")
+                .unwrap()
+    );
+    assert!(
+        source
+            .find("python3 scripts/release_record.py source release.yml")
+            .unwrap()
             < source
                 .find("bash scripts/bootstrap-release-age.sh")
                 .unwrap()

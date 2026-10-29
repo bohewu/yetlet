@@ -12,6 +12,7 @@ import hashlib
 import io
 import json
 import os
+from pathlib import Path
 import re
 import stat
 import sys
@@ -19,6 +20,9 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import zipfile
+
+# Support the existing importlib consumer as well as direct script execution.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
 import release_record as records
 
 API = "https://api.github.com/repos/bohewu/yetlet"
