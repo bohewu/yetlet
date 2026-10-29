@@ -1,8 +1,9 @@
 # YT-209 — Versioned release automation
 
-Status: initial local acceptance retained; integration delivery reopened after
-PR20 CI failure. Compatibility repair passed independent local review and has not been
-Committed/Pushed or retried in CI. Hosted qualification and enablement remain Pending.
+Status: Done at implementation, repaired integration CI and Environment setup
+scope. Positive release-result hosted qualification remains Pending. Automatic
+post-merge master CI PASS; earlier failures are retained below.
+
 
 ## Scope and authority
 
@@ -273,8 +274,47 @@ or new remote source follows automatically. Independent repair Reviewer `/root/y
 PASS0; all six reviewed hashes match and native reviewer/gpt-6-astra/actual max
 identity is verified. Only completion metadata changes after this review.
 
-Original PASS results are historical evidence, not permission to merge the failed
-head. YT-209 stays In progress for this integration repair until the repaired
-source passes required CI. Commit/Push of the new repair, its new CI attempt and
-continuation to conditional Merge/Environment setup need an explicit remaining-
-batch decision under the owner's no-automatic-retry instruction.
+At that failure, original PASS results remained historical evidence, not
+permission to merge the failed head. YT-209 was reopened for integration repair.
+New repair delivery/CI and continuation to conditional Merge/Environment setup
+required a separate owner decision under the no-automatic-retry instruction; the
+subsequent authorized recovery is recorded below.
+
+
+## Owner-authorized recovery delivery and setup — 2026-10-29
+
+The owner explicitly approved the six-file repair, one new-source required CI
+run and continuation to the previously approved Merge/Environment batch. Repair
+commit `cdde3c4e785cd0822b73d0535a1501305dde3489` passed staged/range/native
+strict/builtin checks and was pushed once to PR20. Both required jobs in
+[40873628263/1](https://github.com/bohewu/yetlet/actions/runs/40873628263) PASS:
+MSRV and Stable native/samples/Chrome, including the previously unstarted audit
+and browser phases. First failed run `40871149693/1` and local failures remain.
+
+PR20 was squash merged as `7de77c84e0e56e683cea4567048397caa0614590`.
+Protected master and Git tree `95c65e754a51fadce648645791f41620b56f8bca` match
+the qualified repair source; candidate/merged-range strict/builtin checks PASS.
+Original branch/history and the local integration branch remain preserved. This
+is tooling delivery, not selection of a new product C, signer S or version tag.
+
+Environment `release-result-verify` ID `25684187945` was created with owner
+reviewer bohewu/35250002, `prevent_self_review=false`, admin bypass disabled,
+and exactly one custom branch policy for master. Configuration passed the same
+reviewed Environment predicate before Secret installation. The existing custody
+identity was supplied only through stdin to GitHub's Environment Secret installer;
+no plaintext copy/log, key rotation or local evidence decryption was performed.
+`AGE_IDENTITY` name readback and final configuration PASS. The original identity
+file and the other two Environments/policies/Secret metadata remain unchanged.
+
+Installation does not qualify decryption: only a separately approved compatible
+future protected run can establish that. No release workflow, new tag, formal
+signing, registry upload or public release mutation occurred. The accepted alpha
+D6 remains Complete. Automatic post-merge baseline CI
+[40875245510/1](https://github.com/bohewu/yetlet/actions/runs/40875245510) PASS,
+both required jobs;
+it is a normal master push trigger, not a release dispatch or manual CI retry.
+
+Local operational evidence is retained in `target/yt209-delivery-20261029/`:
+`repair-ci-success.json`, `merge-result.json`, `environment-setup-result.json`,
+`result-environment-readback.json`, Guard outputs and original failure logs.
+These closeout documents remain uncommitted unless separately authorized.

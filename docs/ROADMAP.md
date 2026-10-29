@@ -1,6 +1,18 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**YT-209 integration delivery (2026-10-29):** Reopened after [PR20](https://github.com/bohewu/yetlet/pull/20)
+**YT-209 delivery and Environment setup (2026-10-29):** [PR20](https://github.com/bohewu/yetlet/pull/20)
+squash merged as `7de77c84e0e56e683cea4567048397caa0614590`, tree
+`95c65e754a51fadce648645791f41620b56f8bca`, identical to qualified repair head
+`cdde3c4`. Both required jobs in CI `40873628263/1` PASS, including Chrome.
+The new `release-result-verify` Environment `25684187945` and existing
+`AGE_IDENTITY` installation/readback PASS: owner reviewer, exact master policy,
+admin bypass disabled; other Environments and owner identity unchanged. No local
+private-evidence decryption, release dispatch, new tag, signing or publication.
+Automatic post-merge master CI `40875245510/1` PASS, both required jobs. YT-209 Done at
+implementation/integration/setup scope; positive release-result hosted
+qualification remains Pending. Earlier failures stay recorded below.
+
+**Historical YT-209 integration failure (2026-10-29):** Reopened after [PR20](https://github.com/bohewu/yetlet/pull/20)
 CI `40871149693/1`: MSRV PASS, Stable failed at the existing preflight importlib
 consumer before browser/audit steps. Three-file compatibility repair and two
 consumer checks/xtask Clippy PASS locally; independent repair Reviewer PASS0.
