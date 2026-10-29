@@ -36,6 +36,33 @@ def sign_request():
 
 
 class SignerTests(unittest.TestCase):
+    def test_age_bootstrap_owned_module_cache_is_removable(self):
+        go = os.environ.get('YETLET_CLEANUP_TEST_GO')
+        proxy = os.environ.get('YETLET_CLEANUP_TEST_PROXY')
+        if not go or not proxy:
+            self.skipTest('requires the retained authenticated Go and offline module fixture')
+        fixture = Path(proxy)/'sigsum.org/sigsum-go/@v/v0.13.1.zip'
+        self.assertEqual(s.sha(fixture.read_bytes()), '747d88da11131cd3e26841965e8e3b95057a6cfabda993dc0f43cd913512479a')
+        script = (Path(__file__).with_name('bootstrap-release-age.sh')).read_text()
+        flags = s.re.search(r'GOFLAGS=(\S*) GOWORK=off', script).group(1)
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            for label, flag, should_remove in [('original', '', False), ('configured', flags, True)]:
+                cache = root/label
+                env = dict(os.environ, GOTOOLCHAIN='local', GOENV='off', GOWORK='off', GOFLAGS=flag,
+                           GOMODCACHE=str(cache), GOPATH=str(root/'gopath'), GOCACHE=str(root/'gocache'),
+                           GOPROXY=Path(proxy).as_uri(), GOSUMDB='off', GOPRIVATE='', GONOPROXY='', GONOSUMDB='')
+                try:
+                    s.subprocess.run([go, 'mod', 'download', '-json', 'sigsum.org/sigsum-go@v0.13.1'],
+                                     env=env, check=True, stdout=s.subprocess.PIPE, stderr=s.subprocess.PIPE, timeout=30)
+                    removed = s.subprocess.run(['rm', '-rf', str(cache)], capture_output=True, timeout=30)
+                    self.assertEqual(removed.returncode == 0, should_remove, label)
+                    self.assertEqual(not cache.exists(), should_remove, label)
+                finally:
+                    if cache.exists():
+                        s.subprocess.run([go, 'clean', '-modcache'], env=env, check=True,
+                                         stdout=s.subprocess.PIPE, stderr=s.subprocess.PIPE, timeout=30)
+
     def handoff_fixture(self):
         r = prepare_request()
         claims = base64.urlsafe_b64encode(json.dumps({'exp': int(r['qualification_expires'])}).encode()).decode().rstrip('=')
