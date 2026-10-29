@@ -44,11 +44,14 @@ is reusable setup; its current authentication/validity checks are not waived.
 |---|---|
 | C | Immutable product/build source, selected after the intended version/package inputs and necessary verification are ready |
 | S | Separately approved signer workflow/code commit, distinct from C under [ADR0009](adr/0009-release-build-and-signer-identities.md); not an alias for a mutable branch |
-| Release record | Version, cohort, C/tag, supported features/targets, S/identity/tool pins, original run/attempt/artifact IDs and digests, closure, both raw signing hashes, receipts/bundles, approvals, limits and destinations |
+| Release dossier | Reviewed scope, source/evidence/approval documents and receipts: version/cohort/C/tag, feature/target limits, S/identity/tool pins, original runs/digests, closure, both raw signing hashes, approvals and destinations |
+| Schema-1 release record | Strict data-only input implemented by YT-209: core version/C/cohort, then exact build, custody verifier, S, raw public provenance identity and Release ID; extra fields are rejected |
 
-The record is a proposed data handoff, not a newly implemented CLI/schema. Keep
-its new fields grounded in actual outputs, and its approval records outside the
-frozen assembly. Never overwrite an earlier version's record or verdict.
+The [implemented record schema](YT-209-RELEASE-AUTOMATION.md#integration-reference)
+is the workflow input, not the complete release dossier. Keep additional scope,
+trust pins, later results and approvals in their defined external records/trusted
+code. Populate inputs from actual outputs and retain each snapshot; never overwrite
+an earlier record or place approval/result receipts inside its frozen assembly.
 
 Prepare the build workflow's version/ref bindings **before selecting C and
 creating its immutable tag**. Obtain build/readback IDs and reconcile the
@@ -136,6 +139,8 @@ record before prepare and preserve its digest through signing and independent
 readback. Original tagged workflows and accepted alpha results retain their old
 interfaces and identities. Do not dispatch a new interface against an old source.
 
+The [minimum hosted/Environment plan](YT-209-HOSTED-VERIFICATION-PLAN.md) lists
+the observed configuration, legacy receipt limits and ready-to-authorize steps.
 The new independent verifier needs a separately configured `release-result-verify`
 Environment (required owner reviewer, master only, no admin bypass) and approved
 `AGE_IDENTITY` provisioning; this work does not install it. It verifies actual

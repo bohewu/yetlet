@@ -229,6 +229,9 @@ replayed. Completion-only documentation metadata follows the frozen review.
 | `xtask/src/release/preparation.rs`, `private.rs` | Version derived from selected compiled manifest |
 | `docs/YT-209-RELEASE-AUTOMATION.md`, `RELEASING.md`, `BACKLOG.md`, `ROADMAP.md` | Contract, operator interface, evidence and bounded completion |
 
-Next unblockable step: review this uncommitted delivery for an explicitly
-authorized strict/builtin commit. Operational rehearsal needs its own reviewed
-source/record and Environment/run authority; it is not automatically started.
+The seventeen implementation paths were subsequently committed as
+`c70a7431226c307a097c218050348477de85671d` after strict/builtin/native-hook
+PASS; no Push. [The hosted/Environment plan](YT-209-HOSTED-VERIFICATION-PLAN.md)
+records current read-only settings, old-receipt compatibility limits and the
+proposed minimum authority packets. It grants no operational authority. YT-209
+remains Done at the accepted local scope; hosted qualification is Pending.
