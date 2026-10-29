@@ -1,6 +1,6 @@
 # yetlet-dom-keyed
 
-**Experimental `0.9.0-alpha.2`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
+**Experimental `0.9.0-alpha.3`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
 
 `yetlet-dom-keyed` is an opt-in owner for keyed browser children and event listeners. It depends on `yetlet-core`; browser dependencies (`wasm-bindgen`, `web-sys`) are target-specific. It does not require the reactive graph, HTML renderer or server adapter.
 

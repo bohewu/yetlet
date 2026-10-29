@@ -16,8 +16,9 @@ run IDs to reuse. crates.io remains a separate, unexecuted YT-020 gate.
 
 **YT-209 tooling delivery, required CI and protected result Environment setup
 are complete. Positive schema-1 hosted result verification remains Pending.**
-The owner-approved [alpha.2 version preflight](ALPHA2-VERSION-PREFLIGHT.md)
-updates package identities without selecting a new C or authorizing execution.
+The owner-approved [alpha.3 recovery preflight](ALPHA3-VERSION-PREFLIGHT.md)
+updates package identities and custody bindings. The bounded operational batch
+is separately authorized; each actual C/run/hash and owner gate still applies.
 Before another release, review its
 source/record, applicable version changes and missing qualification, then use the
 [versioned interfaces](YT-209-RELEASE-AUTOMATION.md). No version change alone

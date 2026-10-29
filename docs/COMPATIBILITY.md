@@ -1,11 +1,15 @@
 # Yetlet Experimental Compatibility Policy
 
 **Current checkout (2026-10-29):** The owner approved the coordinated
-`0.9.0-alpha.2` [version/package preflight](ALPHA2-VERSION-PREFLIGHT.md).
+`0.9.0-alpha.3` [version/package preflight](ALPHA3-VERSION-PREFLIGHT.md).
 This changes library identities and internal version requirements, with no API,
 runtime, feature, MSRV or third-party dependency upgrade. No new immutable C or
 release authorization follows. Consumers must select the prerelease explicitly,
-for example `=0.9.0-alpha.2`, once those packages are actually distributed.
+for example `=0.9.0-alpha.3`, once those packages are actually distributed.
+
+Immutable alpha.2 is an unpromoted candidate with a retained
+[custody-binding failure](ALPHA2-HOSTED-RECORD.md). Its tag and original evidence
+are preserved; the alpha.3 correction does not rewrite them.
 
 The published baseline remains the sixteen-library Experimental
 [v0.9.0-alpha.1 GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)

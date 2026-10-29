@@ -523,7 +523,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-config"
-version = "0.9.0-alpha.2"
+version = "0.9.0-alpha.3"
 dependencies = [
  "dotenvy",
  "libc",
@@ -533,7 +533,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-signing"
-version = "0.9.0-alpha.2"
+version = "0.9.0-alpha.3"
 dependencies = [
  "foreign-types",
  "openssl",
