@@ -1,5 +1,19 @@
 # Yetlet Backlog
 
+**YT-096 current repair (2026-10-29):** Strict/builtin delivery of PR17 selects
+S `0e8fb60`; PR/master CI pass. The additional prepare `40789535074/1` rejects
+reading the Draft Release with HTTP403; protected jobs are skipped. The
+[local encrypted capability handoff](YT-096-SIGNER-CONTRACT.md#encrypted-ciphertext-capability-handoff--2026-10-29)
+now moves that owner-only read to the operator and gives the protected job an
+age-encrypted, short-lived, read-only asset capability. Existing CI permissions,
+Secret and C/tags stay unchanged. Real encrypted-ZIP retrieval/age handoff passes
+locally with a disposable test key; formal key and qualification plaintext remain
+unread. Nine affected/new focused cases, docs/syntax/whitespace and independent
+Reviewer PASS0 accept this bounded local implementation;
+new changes are uncommitted, with no additional hosted run. D6 Pending,
+YT-096 In progress, YT-020 Blocked; final manifest remains unfrozen.
+The dated checkpoints below preserve their original scopes and failures.
+
 **YT-096 current checkpoint (2026-10-29):** Owner-authorized real-layout delivery
 is squash merged as S `87d24e9`; PR16 CI attempt 2 and automatic master CI pass,
 with the first Chrome startup failure retained. The one

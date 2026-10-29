@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """YT-096: data-only preparation/signing of one retained alpha release.
 
-No product build, tag mutation, publication, ambient personal login or retries.
+No product build, tag mutation, publication or retries. Hosted execution uses no
+ambient personal login; owner-local handoff resolves ciphertext with existing gh auth.
 Run only reviewed code at S. Private material must remain outside the checkout.
 """
 import base64
+from datetime import datetime
 import hashlib
 import importlib.util
 import io
@@ -17,7 +19,11 @@ import stat
 import subprocess
 import sys
 import tarfile
+import tempfile
+import time
 import urllib.error
+import urllib.parse
+import urllib.request
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -114,18 +120,164 @@ def request():
     r = load(os.environ["SIGN_REQUEST"].encode())
     mode = r.get("mode")
     common = {"mode", "signer_commit"}
-    fields = ({"qualification_asset", "qualification_sha256", "qualification_manifest_sha256"}
+    fields = ({"qualification_asset", "qualification_sha256", "qualification_manifest_sha256",
+               "qualification_handoff", "qualification_handoff_sha256", "qualification_expires"}
               if mode == "prepare" else
               {"run", "attempt", "artifact", "digest", "receipt_sha256", "provenance_sha256",
                "manifest_sha256", "d6"})
     require(mode in {"prepare", "sign"} and set(r) == common | fields)
     require(re.fullmatch(r"[0-9a-f]{40}", r["signer_commit"]) and r["signer_commit"] != C)
-    for key in fields - {"d6"}:
+    for key in fields - {"d6", "qualification_handoff", "qualification_expires"}:
         require(number(r[key]) if key in {"qualification_asset", "run", "attempt", "artifact"}
                 else digest(r[key]))
     if mode == "sign":
         require(r["d6"] == "approve-exact-signing-inputs" and r["provenance_sha256"] == PUBLIC_SHA)
+    else:
+        handoff_input(r)
     return r
+
+
+def handoff_input(r, minimum_seconds=300):
+    raw = r["qualification_handoff"].encode("ascii")
+    require(len(raw) <= 16384 and re.fullmatch(
+        rb"-----BEGIN AGE ENCRYPTED FILE-----\n[A-Za-z0-9+/=\n]+-----END AGE ENCRYPTED FILE-----\n", raw))
+    require(sha(raw) == r["qualification_handoff_sha256"])
+    require(number(r["qualification_expires"]))
+    require(minimum_seconds <= int(r["qualification_expires"]) - time.time() <= 7200)
+    return raw
+
+
+def handoff_url(url, expires):
+    require(isinstance(url, str) and len(url) <= 8192 and "\\" not in url)
+    u = urllib.parse.urlsplit(url)
+    require(u.scheme == "https" and u.netloc == "release-assets.githubusercontent.com"
+            and not u.fragment and u.path.startswith("/github-production-release-asset/1409587171/"))
+    q = urllib.parse.parse_qs(u.query, strict_parsing=True)
+    require(q.get("sp") == ["r"] and q.get("spr") == ["https"]
+            and len(q.get("se", [])) == 1 and len(q.get("jwt", [])) == 1)
+    se = datetime.fromisoformat(q["se"][0].replace("Z", "+00:00"))
+    require(se.utcoffset() is not None)
+    token = q["jwt"][0].split(".")
+    require(len(token) == 3 and len(token[1]) <= 8192)
+    claims = load(base64.urlsafe_b64decode(token[1] + "=" * (-len(token[1]) % 4)))
+    require(type(claims.get("exp")) is int)
+    # This unverified claim only SHORTENS validity; TLS/provider and the ZIP hash establish trust.
+    deadline = min(int(se.timestamp()), claims["exp"])
+    require(deadline == int(expires) and time.time() < deadline)
+    return deadline
+
+
+def qualification_download(url, r):
+    handoff_url(url, r["qualification_expires"])
+    # No GitHub token, ambient auth handler, redirect or arbitrary destination.
+    req = urllib.request.Request(url, headers={"Accept": "application/octet-stream"})
+    try:
+        with urllib.request.build_opener(api.NoRedirect()).open(req, timeout=120) as response:
+            require(response.status == 200)
+            raw = response.read(api.LIMIT + 1)
+    except urllib.error.HTTPError as error:
+        error.close()
+        raise
+    require(0 < len(raw) <= api.LIMIT and sha(raw) == r["qualification_sha256"])
+    return raw
+
+
+def qualification_transport(r, directory):
+    receipt = load(read(directory / "qualification-receipt.json"))
+    require(receipt == {"schema": 1, "source": C,
+        "manifest_sha256": r["qualification_manifest_sha256"],
+        "ciphertext_sha256": sha(read(directory / "qualification.tar.age", api.LIMIT))})
+
+
+def make_handoff(template, output):
+    r = load(read(template))
+    require(set(r) == {"mode", "signer_commit", "qualification_asset", "qualification_sha256",
+                      "qualification_manifest_sha256"} and r["mode"] == "prepare")
+    require(re.fullmatch(r"[0-9a-f]{40}", r["signer_commit"]) and r["signer_commit"] != C
+            and number(r["qualification_asset"]) and digest(r["qualification_sha256"])
+            and digest(r["qualification_manifest_sha256"]))
+    require(sha(read(os.environ["SIGN_AGE"])) == AGE_SHA)
+    require(sha(read(HERE.parent / ".github/release-evidence-recipient.txt")) == RECIPIENT_SHA)
+    # Owner-local reads. The captured credential is never emitted or included in CI inputs.
+    token = subprocess.check_output(["gh", "auth", "token", "--hostname", "github.com"],
+                                    stderr=subprocess.PIPE, text=True, timeout=30).strip()
+    def owner_get(path, binary=False):
+        req = urllib.request.Request(api.API + path, headers={
+            "Accept": "application/octet-stream" if binary else "application/vnd.github+json",
+            "Authorization": "Bearer " + token, "X-GitHub-Api-Version": "2026-03-10",
+            "Cache-Control": "no-cache"})
+        try:
+            response = urllib.request.build_opener(api.NoRedirect()).open(req, timeout=30)
+        except urllib.error.HTTPError as e:
+            try:
+                require(binary and e.code == 302)
+                return e.headers["Location"]
+            finally:
+                e.close()
+        with response:
+            require(not binary and response.status == 200)
+            return load(response.read(checksums.MAX_MANIFEST_BYTES + 1))
+    branch = owner_get("/branches/master")
+    require(branch["protected"] is True and branch["commit"]["sha"] == r["signer_commit"])
+    release = owner_get("/releases/" + str(RELEASE_ID))
+    require(release["draft"] is True and release["tag_name"] == TAG and release["target_commitish"] == C)
+    assets = owner_get("/releases/" + str(RELEASE_ID) + "/assets?per_page=100")
+    require(any(a["id"] == int(r["qualification_asset"]) and a["digest"] == "sha256:" + r["qualification_sha256"]
+                and a["name"] == "qualification-inputs.zip" and 0 < a["size"] <= api.LIMIT for a in assets))
+    url = owner_get("/releases/assets/" + r["qualification_asset"], True)
+    del token
+    q = urllib.parse.parse_qs(urllib.parse.urlsplit(url).query)
+    claims = load(base64.urlsafe_b64decode(q["jwt"][0].split(".")[1] + "=" * (-len(q["jwt"][0].split(".")[1]) % 4)))
+    r["qualification_expires"] = str(min(int(datetime.fromisoformat(q["se"][0].replace("Z", "+00:00")).timestamp()), claims["exp"]))
+    require(1200 <= int(r["qualification_expires"]) - time.time() <= 7200)
+    handoff_url(url, r["qualification_expires"])
+    raw = qualification_download(url, r)  # Prove this exact capability works WITHOUT owner/CI authentication.
+    output.mkdir(mode=0o700)
+    with tempfile.TemporaryDirectory(prefix="handoff-", dir=output) as temp:
+        temp = Path(temp)
+        unpack_zip(raw, r["qualification_sha256"], temp / "qualification",
+                   {"qualification.tar.age": api.LIMIT, "qualification-receipt.json": 65536})
+        qualification_transport(r, temp / "qualification")
+        payload = {"schema": 1, "source": C, "release": RELEASE_ID,
+                   "signer_commit": r["signer_commit"], "asset": r["qualification_asset"],
+                   "zip_sha256": r["qualification_sha256"], "manifest_sha256": r["qualification_manifest_sha256"],
+                   "expires": r["qualification_expires"], "url": url}
+        json_write(temp / "capability.json", payload)
+        command([os.environ["SIGN_AGE"], "--encrypt", "--armor", "--recipients-file",
+                 HERE.parent / ".github/release-evidence-recipient.txt", "--output", temp / "handoff.age", temp / "capability.json"])
+        r["qualification_handoff"] = read(temp / "handoff.age", 16384).decode("ascii")
+    r["qualification_handoff_sha256"] = sha(r["qualification_handoff"].encode("ascii"))
+    handoff_input(r)
+    json_write(output / "request.json", r)
+    json_write(output / "HANDOFF-RECEIPT.json", {"schema": 1, "source": C, "signer_commit": r["signer_commit"],
+        "asset": r["qualification_asset"], "zip_sha256": r["qualification_sha256"],
+        "handoff_sha256": r["qualification_handoff_sha256"], "expires": r["qualification_expires"],
+        "unauthenticated_ciphertext_hash_verified": True, "private_key_accessed": False, "D6": "Pending"})
+
+
+def receive_qualification(r, work):
+    cipher, plain = work / "qualification-handoff.age", work / "qualification-capability.json"
+    stage = "qualification-handoff"
+    try:
+        write(cipher, handoff_input(r))
+        command([os.environ["SIGN_AGE"], "--decrypt", "--identity", work / "identity", "--output", plain, cipher])
+        p = load(read(plain, 16384))
+        require(set(p) == {"schema", "source", "release", "signer_commit", "asset", "zip_sha256",
+                           "manifest_sha256", "expires", "url"})
+        require(all(p[k] == v for k, v in {"schema": 1, "source": C, "release": RELEASE_ID,
+            "signer_commit": r["signer_commit"], "asset": r["qualification_asset"],
+            "zip_sha256": r["qualification_sha256"], "manifest_sha256": r["qualification_manifest_sha256"],
+            "expires": r["qualification_expires"]}.items()))
+        stage = "qualification-download"
+        raw = qualification_download(p["url"], r)
+        unpack_zip(raw, r["qualification_sha256"], work / "qualification",
+                   {"qualification.tar.age": api.LIMIT, "qualification-receipt.json": 65536})
+        qualification_transport(r, work / "qualification")
+    except Exception as error:
+        raise GateRejected(stage, error) from None
+    finally:
+        cipher.unlink(missing_ok=True)
+        plain.unlink(missing_ok=True)
 
 
 def identity(r):
@@ -171,7 +323,7 @@ def artifact_gate(a, run, source, artifact_id, expected_sha, name):
             and a["workflow_run"]["head_repository_id"] == 1409587171)
 
 
-def gate(r):
+def gate(r, minimum_handoff_seconds=1200):
     stage = "identity"
     try:
         identity(r)
@@ -198,16 +350,8 @@ def gate(r):
             approvals = api.api("/actions/runs/" + VERIFIER + "/approvals")
             require(any(a["state"] == "approved" and a["user"]["id"] == 35250002
                         and any(e["id"] == 25525950662 for e in a["environments"]) for a in approvals))
-            stage = "qualification-release"
-            release = api.api("/releases/" + str(RELEASE_ID))
-            require(release["draft"] is True and release["tag_name"] == TAG
-                    and release["target_commitish"] == C)
-            stage = "qualification-assets"
-            assets = api.api("/releases/" + str(RELEASE_ID) + "/assets?per_page=100")
-            require(any(a["id"] == int(r["qualification_asset"])
-                        and a["digest"] == "sha256:" + r["qualification_sha256"]
-                        and a["name"] == "qualification-inputs.zip"
-                        and 0 < a["size"] <= api.LIMIT for a in assets))
+            stage = "qualification-handoff"
+            handoff_input(r, minimum_handoff_seconds)
         else:
             stage = "prepare-run"
             run_gate(api.api("/actions/runs/" + r["run"] + "/attempts/" + r["attempt"]),
@@ -219,24 +363,8 @@ def gate(r):
         raise GateRejected(stage, error) from None
 
 
-def download(path, binary=False):
-    # The binary release-asset endpoint needs octet-stream; never forward GH_TOKEN to storage.
-    if binary:
-        import urllib.request
-        import urllib.error
-        headers = {"Accept": "application/octet-stream", "Authorization": "Bearer " + os.environ["GH_TOKEN"],
-                   "X-GitHub-Api-Version": "2026-03-10"}
-        try:
-            response = urllib.request.build_opener(api.NoRedirect()).open(
-                urllib.request.Request(api.API + path, headers=headers), timeout=120)
-        except urllib.error.HTTPError as e:
-            require(e.code == 302)
-            raw, location = None, e.headers["Location"]
-        else:
-            with response:
-                raw, location = response.read(api.LIMIT + 1), None
-    else:
-        raw, location = api.request(api.API + path, True, api.LIMIT)
+def download(path):
+    raw, location = api.request(api.API + path, True, api.LIMIT)
     for _ in range(3):
         if location is None:
             break
@@ -348,6 +476,7 @@ def tools(directory):
 
 
 def prepare(r, work, output):
+    receive_qualification(r, work)
     restored = work / "original"
     command([os.environ["SIGN_XTASK"], "release", "custody", "verify", "--age", os.environ["SIGN_AGE"],
              "--recipient", HERE.parent / ".github/release-evidence-recipient.txt", "--source", C,
@@ -359,10 +488,6 @@ def prepare(r, work, output):
     require(sha(original_manifest) == inventory["private_manifest_sha256"])
     command([os.environ["SIGN_AGE"], "--decrypt", "--identity", work / "identity", "--output",
              work / "qualification.tar", work / "qualification" / "qualification.tar.age"])
-    capsule_receipt = load(read(work / "qualification" / "qualification-receipt.json"))
-    require(capsule_receipt == {"schema": 1, "source": C,
-                               "manifest_sha256": r["qualification_manifest_sha256"],
-                               "ciphertext_sha256": sha(read(work / "qualification" / "qualification.tar.age", api.LIMIT))})
     q = work / "qualification-files"
     restore(work / "qualification.tar", q)
     require(sha(read(q / MANIFEST)) == r["qualification_manifest_sha256"])
@@ -401,6 +526,8 @@ def prepare(r, work, output):
         "prepare_run": os.environ["GITHUB_RUN_ID"], "prepare_attempt": os.environ["GITHUB_RUN_ATTEMPT"],
         "qualification_asset": r["qualification_asset"], "qualification_sha256": r["qualification_sha256"],
         "qualification_manifest_sha256": r["qualification_manifest_sha256"],
+        "qualification_handoff_sha256": r["qualification_handoff_sha256"],
+        "qualification_expires": r["qualification_expires"],
         "original_private_manifest_sha256": sha(original_manifest),
         "provenance_sha256": provenance, "manifest_sha256": manifest,
         "closure_sha256": sha(read(final / "EVIDENCE-CLOSURE.json")),
@@ -563,6 +690,9 @@ def main():
     if action == "pack" and len(sys.argv) == 4:
         pack(Path(sys.argv[2]), outside(sys.argv[3]))
         return
+    if action == "handoff" and len(sys.argv) == 4:
+        make_handoff(Path(sys.argv[2]), outside(sys.argv[3]))
+        return
     r = request()
     identity(r)
     if action == "preflight":
@@ -571,14 +701,11 @@ def main():
     work = outside(os.environ["SIGN_WORK"])
     tool_dir = Path(os.environ["SIGN_TOOLS"])
     if action == "download":
-        gate(r)
+        gate(r, minimum_handoff_seconds=300)
         work.mkdir(mode=0o700)
         if r["mode"] == "prepare":
             raw = download("/actions/artifacts/" + BUILD_ARTIFACT + "/zip")
             api.unpack(raw, {"digest": BUILD_ZIP}, str(work / "transport"))
-            raw = download("/releases/assets/" + r["qualification_asset"], binary=True)
-            unpack_zip(raw, r["qualification_sha256"], work / "qualification",
-                       {"qualification.tar.age": api.LIMIT, "qualification-receipt.json": 65536})
         else:
             raw = download("/actions/artifacts/" + r["artifact"] + "/zip")
             unpack_zip(raw, r["digest"], work / "transport",

@@ -84,13 +84,15 @@ jobs:
           BOOTSTRAP="$RUNNER_TEMP/sign-tools" bash scripts/bootstrap-release-sign.sh
           rustup toolchain install 1.99.0 --profile minimal
           CARGO_TARGET_DIR="$RUNNER_TEMP/sign-xtask" cargo +1.99.0 build --locked --manifest-path xtask/Cargo.toml
-      - name: Recheck Environment and retrieve only bound ciphertext
+      - name: Recheck Environment and retrieve bound original build ciphertext
         env:
           GH_TOKEN: ${{ github.token }}
           SIGN_WORK: ${{ runner.temp }}/sign-work
           SIGN_TOOLS: ${{ runner.temp }}/sign-tools
         run: python3 scripts/release-sign.py download
-      - name: Isolated prepare with no OIDC permission
+      # The owner-created input carries an age-encrypted short-lived download capability.
+      # Only this protected phase decrypts it; no plaintext URL or owner token is an input.
+      - name: Isolated encrypted handoff and prepare with no OIDC permission
         shell: bash
         env:
           AGE_IDENTITY: ${{ secrets.AGE_IDENTITY }}

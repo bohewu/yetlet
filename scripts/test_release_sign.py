@@ -22,8 +22,11 @@ S = "a" * 40
 
 
 def prepare_request():
+    raw = '-----BEGIN AGE ENCRYPTED FILE-----\nTE9DQUw=\n-----END AGE ENCRYPTED FILE-----\n'
     return {"mode": "prepare", "signer_commit": S, "qualification_asset": "1",
-            "qualification_sha256": "b" * 64, "qualification_manifest_sha256": "c" * 64}
+            "qualification_sha256": "b" * 64, "qualification_manifest_sha256": "c" * 64,
+            "qualification_handoff": raw, "qualification_handoff_sha256": s.sha(raw.encode()),
+            "qualification_expires": str(int(s.time.time()) + 2400)}
 
 
 def sign_request():
@@ -33,6 +36,121 @@ def sign_request():
 
 
 class SignerTests(unittest.TestCase):
+    def handoff_fixture(self):
+        r = prepare_request()
+        claims = base64.urlsafe_b64encode(json.dumps({'exp': int(r['qualification_expires'])}).encode()).decode().rstrip('=')
+        expires = s.datetime.fromtimestamp(int(r['qualification_expires']), s.datetime.now().astimezone().tzinfo).astimezone(__import__('datetime').timezone.utc).isoformat()
+        query = s.urllib.parse.urlencode({'se': expires, 'sp': 'r', 'spr': 'https', 'jwt': 'header.' + claims + '.signature'})
+        url = 'https://release-assets.githubusercontent.com/github-production-release-asset/1409587171/LOCAL?' + query
+        p = {'schema': 1, 'source': s.C, 'release': s.RELEASE_ID, 'signer_commit': r['signer_commit'],
+             'asset': r['qualification_asset'], 'zip_sha256': r['qualification_sha256'],
+             'manifest_sha256': r['qualification_manifest_sha256'], 'expires': r['qualification_expires'], 'url': url}
+        return r, p
+
+    def test_handoff_rejects_plaintext_tampering_and_expiry(self):
+        r, payload = self.handoff_fixture()
+        s.handoff_input(r); s.handoff_url(payload['url'], r['qualification_expires'])
+        waiting = dict(r); waiting['qualification_expires'] = str(int(s.time.time()) + 600)
+        s.handoff_input(waiting, minimum_seconds=300)
+        with self.assertRaises(ValueError): s.handoff_input(waiting, minimum_seconds=1200)
+        for key, value in [('qualification_handoff', payload['url']),
+                           ('qualification_handoff_sha256', '0' * 64),
+                           ('qualification_expires', str(int(s.time.time()) - 1))]:
+            bad = dict(r); bad[key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError): s.handoff_input(bad)
+        for url in [payload['url'].replace('https:', 'http:', 1),
+                    payload['url'].replace('release-assets.githubusercontent.com', '127.0.0.1'),
+                    payload['url'].replace('release-assets.githubusercontent.com', 'release-assets.githubusercontent.com.evil.invalid'),
+                    payload['url'].replace('/1409587171/', '/7/'),
+                    payload['url'].replace('sp=r&', 'sp=rw&'), payload['url'] + '#PRIVATE-FRAGMENT']:
+            with self.subTest(url=url), self.assertRaises(ValueError): s.handoff_url(url, r['qualification_expires'])
+
+    def test_handoff_download_has_no_auth_redirect_and_requires_exact_zip(self):
+        r, payload = self.handoff_fixture(); raw = b'LOCAL encrypted ZIP'; r['qualification_sha256'] = s.sha(raw)
+        response = io.BytesIO(raw); response.status = 200
+        with patch.object(s.urllib.request, 'build_opener') as opener, patch.dict(os.environ, {'GH_TOKEN': 'LOCAL-NEVER-FORWARD'}):
+            opener.return_value.open.return_value = response
+            self.assertEqual(s.qualification_download(payload['url'], r), raw)
+            self.assertIsInstance(opener.call_args.args[0], s.api.NoRedirect)
+            req = opener.return_value.open.call_args.args[0]
+            self.assertEqual(req.headers, {'Accept': 'application/octet-stream'})
+            response = io.BytesIO(b'LOCAL tampered ZIP'); response.status = 200
+            opener.return_value.open.return_value = response
+            with self.assertRaises(ValueError): s.qualification_download(payload['url'], r)
+            private = io.BytesIO(b'PRIVATE-RESPONSE')
+            opener.return_value.open.side_effect = urllib.error.HTTPError(payload['url'], 302, 'PRIVATE-REDIRECT', {}, private)
+            with self.assertRaises(urllib.error.HTTPError): s.qualification_download(payload['url'], r)
+            self.assertTrue(private.closed)
+
+    def test_handoff_receive_binds_metadata_cleans_plaintext_and_stops_bad_source(self):
+        r, payload = self.handoff_fixture()
+        with tempfile.TemporaryDirectory() as t:
+            root = Path(t)
+            def decrypt(args): s.json_write(Path(args[args.index('--output') + 1]), payload)
+            with patch.object(s, 'command', side_effect=decrypt), patch.object(s, 'qualification_download', return_value=b'LOCAL ZIP') as fetch, \
+                    patch.object(s, 'unpack_zip') as unpack, patch.object(s, 'qualification_transport'), \
+                    patch.dict(os.environ, {'SIGN_AGE': 'LOCAL synthetic age'}):
+                s.receive_qualification(r, root)
+                unpack.assert_called_once(); fetch.assert_called_once()
+                self.assertFalse((root/'qualification-capability.json').exists())
+                self.assertFalse((root/'qualification-handoff.age').exists())
+                payload['source'] = '0' * 40; fetch.reset_mock()
+                with self.assertRaises(s.GateRejected) as error: s.receive_qualification(r, root)
+                self.assertEqual(error.exception.stage, 'qualification-handoff')
+                fetch.assert_not_called()
+                self.assertFalse((root/'qualification-capability.json').exists())
+
+    def test_owner_handoff_uses_fixed_host_read_only_and_removes_capability(self):
+        r, payload = self.handoff_fixture()
+        cipher = b'LOCAL encrypted qualification'; receipt = {'schema': 1, 'source': s.C,
+            'manifest_sha256': r['qualification_manifest_sha256'], 'ciphertext_sha256': s.sha(cipher)}
+        archive = io.BytesIO()
+        with zipfile.ZipFile(archive, 'w') as z:
+            z.writestr('qualification.tar.age', cipher); z.writestr('qualification-receipt.json', json.dumps(receipt))
+        raw = archive.getvalue(); r['qualification_sha256'] = s.sha(raw)
+        template = {k: v for k, v in r.items() if k not in {'qualification_handoff', 'qualification_handoff_sha256', 'qualification_expires'}}
+        responses = [
+            {'protected': True, 'commit': {'sha': S}},
+            {'draft': True, 'tag_name': s.TAG, 'target_commitish': s.C},
+            [{'id': 1, 'name': 'qualification-inputs.zip', 'digest': 'sha256:' + r['qualification_sha256'], 'size': 1}]]
+        native = []
+        def encrypt(args):
+            native.append(args); target = Path(args[args.index('--output') + 1]); target.write_text(r['qualification_handoff'])
+        def open_read(req, **kwargs):
+            self.assertEqual(req.get_method(), 'GET'); self.assertTrue(req.full_url.startswith(s.api.API + '/'))
+            self.assertEqual(req.get_header('Authorization'), 'Bearer LOCAL-OWNER')
+            if responses: return io.BytesIO(json.dumps(responses.pop(0)).encode())
+            raise urllib.error.HTTPError(req.full_url, 302, 'LOCAL redirect', {'Location': payload['url']}, io.BytesIO())
+        # BytesIO fixtures carry the same public 200 status as provider responses.
+        def successful_read(req, **kwargs):
+            out = open_read(req, **kwargs); out.status = 200; return out
+        with tempfile.TemporaryDirectory() as t:
+            p = Path(t); repo = p/'repo'; (repo/'.github').mkdir(parents=True); (repo/'scripts').mkdir()
+            recipient = b'LOCAL public recipient\n'; (repo/'.github/release-evidence-recipient.txt').write_bytes(recipient)
+            age = p/'age'; age.write_bytes(b'LOCAL tool'); s.json_write(p/'template.json', template)
+            with patch.object(s,'HERE',repo/'scripts'),patch.object(s,'RECIPIENT_SHA',s.sha(recipient)),patch.object(s,'AGE_SHA',s.sha(age.read_bytes())), \
+                    patch.object(s.subprocess,'check_output',return_value='LOCAL-OWNER\n') as auth,patch.object(s.urllib.request,'build_opener') as opener, \
+                    patch.object(s,'qualification_download',return_value=raw) as fetch,patch.object(s,'command',side_effect=encrypt), \
+                    patch.dict(os.environ,{'SIGN_AGE':str(age)}):
+                opener.return_value.open.side_effect = successful_read
+                s.make_handoff(p/'template.json', p/'output')
+                self.assertEqual(auth.call_args.args[0], ['gh','auth','token','--hostname','github.com'])
+                fetch.assert_called_once(); self.assertEqual(len(native), 1)
+                self.assertEqual(sorted(x.name for x in (p/'output').iterdir()), ['HANDOFF-RECEIPT.json','request.json'])
+                output=s.load((p/'output/request.json').read_bytes());s.handoff_input(output)
+                self.assertNotIn(payload['url'], (p/'output/request.json').read_text())
+
+    def test_qualification_transport_rejects_wrong_manifest_before_private_decrypt(self):
+        r = prepare_request()
+        with tempfile.TemporaryDirectory() as t:
+            p = Path(t); (p/'qualification.tar.age').write_bytes(b'LOCAL cipher')
+            receipt = {'schema': 1, 'source': s.C, 'manifest_sha256': r['qualification_manifest_sha256'],
+                       'ciphertext_sha256': s.sha(b'LOCAL cipher')}
+            s.json_write(p/'qualification-receipt.json', receipt); s.qualification_transport(r, p)
+            receipt['manifest_sha256'] = '0' * 64
+            (p/'qualification-receipt.json').unlink(); s.json_write(p/'qualification-receipt.json', receipt)
+            with self.assertRaises(ValueError): s.qualification_transport(r, p)
+
     def preflight_metadata(self):
         # Synthetic API responses only; no workflow token, identity or network.
         def run(ident, path):
@@ -58,12 +176,9 @@ class SignerTests(unittest.TestCase):
             '/actions/runs/' + s.VERIFIER + '/attempts/1': run(s.VERIFIER, '.github/workflows/evidence-verify.yml'),
             '/actions/runs/' + s.VERIFIER + '/approvals': [
                 {'state': 'approved', 'user': {'id': 35250002}, 'environments': [{'id': 25525950662}]}],
-            '/releases/' + str(s.RELEASE_ID): {'draft': True, 'tag_name': s.TAG, 'target_commitish': s.C},
-            '/releases/' + str(s.RELEASE_ID) + '/assets?per_page=100': [
-                {'id': 1, 'digest': 'sha256:' + 'b' * 64, 'name': 'qualification-inputs.zip', 'size': 1}],
         }
 
-    def test_preflight_draft_http_rejection_is_stage_bound_and_redacted(self):
+    def test_preflight_never_reads_draft_and_http_rejection_stays_redacted(self):
         responses = self.preflight_metadata()
         with patch.dict(os.environ, {'SIGN_REQUEST': json.dumps(prepare_request())}), \
                 patch.object(s.sys, 'argv', ['release-sign.py', 'preflight']), \
@@ -74,7 +189,7 @@ class SignerTests(unittest.TestCase):
             self.assertEqual(stderr.getvalue(), '')
             api.reset_mock()
             body = io.BytesIO(b'PRIVATE-BODY')
-            responses['/releases/' + str(s.RELEASE_ID)] = urllib.error.HTTPError(
+            responses['/actions/artifacts/' + s.BUILD_ARTIFACT] = urllib.error.HTTPError(
                 'https://private.invalid/?token=PRIVATE-URL', 404, 'PRIVATE-REASON\nPRIVATE-CONTROL',
                 {'PRIVATE-HEADER': 'PRIVATE-VALUE'}, body)
             def read(path):
@@ -84,10 +199,10 @@ class SignerTests(unittest.TestCase):
             api.side_effect = read
             self.assertEqual(s.cli(), 1)
             self.assertEqual(stderr.getvalue(),
-                'release signer rejected; gate=qualification-release class=http status=404; private diagnostics suppressed\n')
+                'release signer rejected; gate=build-artifact class=http status=404; private diagnostics suppressed\n')
             self.assertNotIn('PRIVATE-', stderr.getvalue())
             self.assertTrue(body.closed)
-            self.assertEqual(api.call_args.args, ('/releases/' + str(s.RELEASE_ID),))
+            self.assertEqual(api.call_args.args, ('/actions/artifacts/' + s.BUILD_ARTIFACT,))
             native.assert_not_called(); oidc.assert_not_called()
 
     def test_preflight_metadata_and_transport_rejections_remain_closed(self):
@@ -273,7 +388,7 @@ class SignerTests(unittest.TestCase):
                 elif '--encrypt' in args: shutil.copyfile(args[-1],args[args.index('--output')+1])
                 else: self.fail('unexpected command')
             env={'SIGN_AGE':'LOCAL synthetic age','SIGN_XTASK':'LOCAL synthetic custody','GITHUB_RUN_ID':'8','GITHUB_RUN_ATTEMPT':'1'}
-            with patch.object(s,'PUBLIC_SHA',s.sha(raw)),patch.object(s,'command',side_effect=commands),patch.dict(os.environ,env):
+            with patch.object(s,'PUBLIC_SHA',s.sha(raw)),patch.object(s,'command',side_effect=commands),patch.object(s,'receive_qualification'),patch.dict(os.environ,env):
                 s.prepare(qr,work,p/'output')
                 receipt=s.load((p/'output/SIGNING-INPUTS.json').read_bytes())
                 self.assertEqual(receipt['provenance_sha256'],s.sha(raw)); self.assertEqual(receipt['original_private_manifest_sha256'],original_sha)
