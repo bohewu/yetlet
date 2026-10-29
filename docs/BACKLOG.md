@@ -1,5 +1,15 @@
 # Yetlet Backlog
 
+**Alpha.2 PR22 integration failure (2026-10-29):** Original CI40888941346/1
+passes MSRV but fails Stable's existing synthetic rebuild fixture before later
+audit/browser steps: fixture alpha.1 differs from compiled recipe alpha.2.
+The [one-file test correction](ALPHA2-VERSION-PREFLIGHT.md#subsequent-pr22-integration-failure-and-local-correction)
+uses source-derived versions and retains normal verification/refusal checks.
+The failed case and owning-test Clippy/format PASS locally; independent repair
+Reviewer PASS0, all four reviewed hashes unchanged. Prior 53-path/local package acceptance stays historical and
+valid at that scope. No Merge, CI retry or new Commit/Push; alpha.1 D6 and
+publication remain Complete, YT-020 Blocked.
+
 **Alpha.2 version preflight (2026-10-29):** Owner-approved
 [YT-096/YT-209 follow-up](ALPHA2-VERSION-PREFLIGHT.md) synchronizes sixteen
 libraries and eighteen internal version requirements to `0.9.0-alpha.2`.

@@ -1,5 +1,13 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**Alpha.2 PR22 integration failure (2026-10-29):** MSRV PASS; Stable fails the
+existing rebuild fixture's stale alpha.1 version while its recipe expects
+alpha.2. The [minimum test-only correction](ALPHA2-VERSION-PREFLIGHT.md#subsequent-pr22-integration-failure-and-local-correction)
+passes the failed local case and owning-test Clippy/format; independent repair
+Reviewer PASS0, all four source hashes unchanged. Real sixteen-package preflight remains accepted at its original
+scope, but PR Merge is blocked until repaired delivery/required CI PASS. Original
+failure retained; no automatic CI retry, new Git delivery or release operation.
+
 **Alpha.2 version preflight (2026-10-29):** The
 [YT-096/YT-209 package follow-up](ALPHA2-VERSION-PREFLIGHT.md) updates the
 sixteen-library Experimental train and internal requirements without changing

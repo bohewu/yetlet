@@ -3,6 +3,9 @@
 Date: 2026-10-29 (Asia/Taipei). Status: Local preflight and independent Reviewer
 PASS, zero issues/required followups. This is the YT-096/YT-209 new-version follow-up, not a new release
 approval or a reopening of the accepted alpha.1 D6 result.
+Subsequent PR22 integration CI failed at a synthetic rebuild fixture; the
+original local acceptance remains scoped below. Merge is blocked pending repair
+delivery and successful required CI.
 
 ## Authority and source
 
@@ -112,3 +115,43 @@ Future exact evidence-tag policy rollover is separate from current version
 editing. Alpha.1 D6 stays Complete; future signing/publication is not authorized,
 and no local private-key exception is renewed. No Commit/Push, tag, hosted
 dispatch, signing or publication occurs in this slice.
+
+## Subsequent PR22 integration failure and local correction
+
+The owner authorized strict/builtin Commit of the reviewed 53 paths as
+`dbe1fbbb139fe3d7814ec8188a119a365286464c`, then Push and PR22. The staged and
+exact outgoing range/native hook checks PASS. Original
+[CI40888941346/1](https://github.com/bohewu/yetlet/actions/runs/40888941346)
+passed MSRV but failed Stable's Rust-tool tests before audit/browser execution.
+No Merge or automatic retry followed. Earlier archive/consumer PASS results
+remain valid at their local preflight scope; they are not a current CI PASS.
+
+The failed existing case is
+`private_rebuild::real_cargo_sixteen_alpha_packages_and_normal_verification_refusal`.
+Its synthetic manifests, internal requirements and expected archive names were
+still literal alpha.1; the reviewed recipe derives alpha.2 from its compiled
+root manifest. Cargo collected an alpha.1 fixture archive while staging correctly
+looked for alpha.2. This version-sensitive test consumer was missed in the
+initial migration/verification selection. It is a fixture mismatch, not a failed
+real sixteen-library package check.
+
+The minimal correction changes only `xtask/tests/private_rebuild.rs`: synthetic
+versions, dependency requirements, filenames and manifest assertions read the
+same compiled workspace-version authority. No public helper, runtime, recipe,
+historical trust pin, feature or dependency is changed. Normal verification and
+the intentional compile-error refusal remain required. An inventory of the other
+alpha.1 literals identifies retained legacy custody pins and deliberate negative
+or self-contained synthetic inputs, not additional current-version fixtures.
+
+The one failed case passes locally with `--offline --locked`, including all
+sixteen synthetic archives and its expected negative verification refusal.
+Owning-test Clippy with `-D warnings` and format PASS. No already accepted package,
+consumer, browser or platform check is replayed. Original CI metadata/full log
+and focused repair output are retained at `target/yt096-alpha2-pr22-20261029/`.
+The expected compile-error output is the passing negative assertion, not a new
+product failure. Independent repair Reviewer
+`/root/alpha2_version_independent_review_20261029` PASS0; all four source hashes
+match before/after read-only review, and the negative block remains byte-identical.
+Native reviewer/model/actual high effort are verified; only completion metadata
+follows the review. New Commit/Push/CI
+delivery requires the applicable authority; conditional Merge remains blocked.
