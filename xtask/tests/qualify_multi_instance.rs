@@ -10,6 +10,54 @@ use yetlet_xtask::{
 fn strings(a: &[OsString]) -> Vec<String> {
     a.iter().map(|s| s.to_string_lossy().into_owned()).collect()
 }
+#[cfg(unix)]
+#[test]
+fn docker_lab_preserves_unix_setup() {
+    for redis in [false, true] {
+        let root = tempfile::tempdir().unwrap();
+        let lab = yetlet_xtask::qualify::docker::Lab::new(root.path(), redis).unwrap();
+        assert_eq!(lab.redis, redis);
+        assert!(lab.work.is_dir() && lab.logs.is_dir());
+        assert!(lab.work.starts_with(root.path().join("target/m12/yt086")));
+        assert!(lab.logs.starts_with(root.path().join("target/m12/yt086")));
+        assert!(!lab.started);
+    }
+}
+#[cfg(not(unix))]
+#[test]
+fn docker_qualification_requires_posix_before_setup() {
+    let root = tempfile::tempdir().unwrap();
+    let absent = root.path().join("not-created");
+    for suite in ["multi-instance", "redis-three-app"] {
+        let error = yetlet_xtask::qualify::run(&absent, suite, &[]).unwrap_err();
+        assert_eq!(error.code, 1);
+        assert!(error.message.contains("unsupported on this platform"));
+        assert!(error.message.contains("POSIX"));
+        assert!(!absent.exists());
+
+        let output = std::process::Command::new(env!("CARGO_BIN_EXE_yetlet-xtask"))
+            .args(["qualify", suite])
+            .output()
+            .unwrap();
+        assert_eq!(output.status.code(), Some(1));
+        assert!(String::from_utf8_lossy(&output.stderr).contains("POSIX"));
+        assert!(String::from_utf8_lossy(&output.stderr).contains("unsupported on this platform"));
+    }
+}
+#[cfg(not(unix))]
+#[test]
+fn docker_build_requires_posix_before_writes() {
+    for redis in [false, true] {
+        let root = tempfile::tempdir().unwrap();
+        let mut lab = fixture_lab(root.path());
+        lab.redis = redis;
+        let error = lab.build().unwrap_err();
+        assert!(error.message.contains("POSIX"));
+        assert!(!lab.work.join("build").exists());
+        assert!(!lab.work.join("image").exists());
+        assert_eq!(fs::read_dir(&lab.logs).unwrap().count(), 0);
+    }
+}
 #[test]
 fn last_upstream_uses_successful_retry() {
     assert_eq!(

@@ -1,15 +1,32 @@
 # Yetlet Backlog
 
-**YT-212 alpha.5 workflow and qualification followup (2026-10-30):**
-The owner authorizes repairing active qualification/guides and supplementing
-normal two-package assembly, MSVC, necessary DOM/browser and CI gaps under the
-[alpha.5 plan](ALPHA5-RELEASE-PLAN.md). Only missing or affected checks are run;
-no runtime/dependency/support expansion. Existing local evidence, failures and
-original platform scopes remain retained. New Commit/Push/Merge, release-hosted,
-tag, Environment/Secret, signing and publication actions remain unauthorized;
-final-source/remote-CI acceptance must reflect actual later delivery.
+**YT-213 Windows xtask POSIX isolation (2026-10-30):**
+The owner authorizes a repository-tooling correction for the retained MSVC E0277:
+ordinary xtask commands must compile/run; POSIX Docker qualification must reject
+unsupported platforms explicitly before setup/build effects. Preserve Unix
+identity, Docker arguments/limits and cleanup. Only affected GNU/MSVC proof and
+independent review are selected; SDK/browser evidence and selected C `0f0c84a`
+remain unchanged. No Commit/Push/tag, release-hosted, signing or publication.
+GNU24 and MSVC13 affected tests, ordinary help/docs commands and cleanup PASS;
+final independent acceptance PASS0; YT-213 Done. One existing unused-function Windows
+warning is retained without suppression.
 
-**Alpha.5 two-package release planning (2026-10-30):**
+**YT-212 qualification and delivery (2026-10-30):**
+[PR30](https://github.com/bohewu/yetlet/pull/30) is squash-merged at R
+`0f0c84abf9b6c269987cef31c2d0651fa2d1f3ff`, tree
+`a0940f6806fc92ac8b16b96fc4827645ac82b316`, after strict/builtin delivery and
+independent A/B correction PASS0. Both PR/master CI jobs pass; normal two-package
+archives, native/WASM consumers, selected MSVC consumers, current Firefox/Chrome
+DOM journeys and inventory/security correspondence pass. GNU/MSVC archive bytes
+and the MSVC consumer lock match. See the [actual qualification record](ALPHA5-RELEASE-PLAN.md#actual-qualification-results--yt-212)
+for failures, exclusions and the unresolved Windows xtask/POSIX tooling limit.
+Windows test resources are removed; inert evidence retained. Final independent
+PASS0 accepts YT-212 Done at qualification scope; unchanged R is the owner-authorized
+alpha.5 C. The five closeout documents remain uncommitted.
+No tag, release-hosted run, Secret/Environment change, signing or publication.
+Original branches/history and paused PR29 remain preserved.
+
+**Historical alpha.5 planning checkpoint (2026-10-30):**
 Owner-authorized strict/builtin Commit records the accepted consolidation as
 `0f867f11a7e73675158597f0ec3caff71f1d8d0f`, tree
 `4c612e6b3418641114f91bff2e66fee58930f3c6`, without Push.
@@ -889,7 +906,8 @@ separate implementation authority.
 |---|---|---|---|---|---|---|---|
 | YT-210 | P2 | M | M10 | Public package consolidation contract and one-package feasibility | YT-200, YT-209 | [Contract/prototype](YT-210-PACKAGING-STUDY.md): owner pauses publication and accepts bounded single-package/default-HTML proof. Contract Reviewer PASS0; real Core/HTML/Axum/DOM source in publish=false prototype, normally verified archive, three new tests/three doctests, native/wasm32 archive consumers and mixed-feature target/dependency/API isolation PASS. One native fixture correction and formatter incident retained; no production source or third-party upgrade. Final independent Reviewer PASS0 verifies four documents/96 evidence hashes; Done at bounded feasibility scope, not full migration/API adoption or release readiness. No new distribution authority | Done |
 | YT-211 | P2 | L | M10 | Consolidate implementation packages and migrate current consumers | YT-210 | [Selected two-package contract](YT-211-TWO-PACKAGE-MIGRATION.md): owner selects yetlet/default HTML plus yetlet-browser/default DOM, one shared View, opt-in modules, unreleased alpha.5, coherent consumer/CLI/current-guide migration and closed consolidated release cohort. Preserve provider/security/target behavior and existing version identities; no facade fleet, reverse dependency cycle, old-signature reuse or automatic alpha.4 continuation. Initial contract P2 rate-limit omission and final two P2 test/guide feature mismatches retained/fixed. Contract PASS0 and final followup PASS0; native/WASM consumers,34 example manifests, CLI generation, normal two-archive/predecessor proof, target/dependency isolation and closed release cohorts accepted. No fresh platform/cloud/long workload qualification, Git or release authority | Done |
-| YT-212 | P1 | M | M10 | Two-package release workflow and qualification gaps | YT-211 | [Alpha.5 plan](ALPHA5-RELEASE-PLAN.md): repair active native selection and schema/guide vocabulary; normally verify two archives and source/checksum consumers, supplement selected MSVC/DOM/inventory/CI gaps without replaying accepted unrelated qualification. Preserve runtime/security/feature boundaries and failures; independent acceptance and actual source/CI reconciliation required. No new Git or release authority | In progress |
+| YT-212 | P1 | M | M10 | Two-package release workflow and qualification gaps | YT-211 | [Alpha.5 plan](ALPHA5-RELEASE-PLAN.md): repair active native selection and schema/guide vocabulary; normally verify two archives and source/checksum consumers, supplement selected MSVC/DOM/inventory/CI gaps without replaying accepted unrelated qualification. Preserve runtime/security/feature boundaries and failures. PR30 merged at R0f0c84a, both required PR/master CI jobs PASS; GNU/MSVC final archive bytes and selected consumer lock match, current DOM and inventory/security checks PASS. Cleanup and final independent acceptance PASS0; YT-212 Done at selected qualification scope, unchanged R is alpha.5 C under conditional owner authority. No release execution authority | Done |
+| YT-213 | P2 | S | M10 | Make repository xtask compile on Windows and isolate POSIX qualification | YT-212 | [Tooling followup](ALPHA5-RELEASE-PLAN.md#windows-xtask-followup--yt-213): private typed identity result; unsupported Lab setup/direct build reject before side effects, ordinary commands remain usable. Preserve Unix Docker identity/limits/cleanup and all SDK/package/browser inputs. GNU24/MSVC13 tests, scoped GNU Clippy and ordinary Windows help/docs PASS; same source hashes, original failure/warning retained, cleanup PASS and final independent PASS0. YT-213 Done at tooling scope. No Git or release execution authority | Done |
 | YT-208 | P2 | S | M10 | Maintainer development and new-version release SOP | YT-096, YT-207 | [Development](DEVELOPMENT.md) and [release](RELEASING.md) guides separate normal PR work, one-time setup, per-version source/evidence/approval steps and failure-only recovery. Current distribution/navigation reconciled; C/S, strict/builtin, key/publication boundaries and original histories preserved; YT-209 remains explicitly future tooling. Independent Reviewer PASS0, zero issues/required followups, verifies all ten incremental hashes, new-guide structure/local links/anchors and current workflow/helper/policy correspondence. Fixed75-document/209-item check and tracked/new-file whitespace PASS; original four D6-only files unchanged and prior Backlog/Roadmap content preserved. Only completion metadata changes after review; no runtime/workflow/environment, old qualification replay, Git or distribution action | Done |
 | YT-209 | P2 | M | M10 | Versioned release inputs and protected result-verification automation | YT-208 | Observed [tooling gaps](RELEASING.md#existing-workflow-map-and-limits): review a data-only per-version record to replace scattered alpha C/tag/run/artifact constants; separately protected independent signing-result verification; exact Release-ID-based public staging/publication/readback with preserved tag/C and a closed allowlist. Preserve strict/builtin/hooks, C/S identity, key isolation, explicit owner gates, immutable old results and bounded failure handling. No arbitrary executable input, default framework dependency, automatic signing/registry upload or reuse of the spent local-key exception. [Contract and implementation](YT-209-RELEASE-AUTOMATION.md): strict schema-1 record replaces scattered alpha bindings; source-derived Cargo/tag identities and complete-record receipt hashes; independent protected V verifier has no OIDC/signing and validates original S bundles/all entries before safe receipt; exact Release-ID public staging/readback/publication has closed20 assets and explicit owner confirmation. 23 new Python +5 affected signer +2 affected Rust checks, docs/format/syntax PASS; two fixture failures/corrections retained. Initial contract/final independent Reviewer PASS0 matched the original17-file frozen boundary; initial acceptance and failed PR20 run retained; compatibility repair Reviewer PASS0 and both required new-source CI jobs40873628263/1 PASS. Owner-approved squash Merge7de77c8/tree95c65e7 matches qualified head. Protected result Environment25684187945 and existing AGE_IDENTITY installation/readback PASS; other Environments and identity unchanged. At that setup checkpoint positive hosted verification was Pending; alpha.3 result40983028507/1 subsequently PASS at the [recorded scope](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30). Key read only for approved Secret installation; no local private-evidence decryption, release dispatch, new tag, signing or publication | Done |
 

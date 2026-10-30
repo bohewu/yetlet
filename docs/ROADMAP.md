@@ -1,15 +1,32 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**YT-212 alpha.5 workflow and qualification followup (2026-10-30):**
-The owner authorizes repairing active qualification/guides and supplementing
-normal two-package assembly, MSVC, necessary DOM/browser and CI gaps under the
-[alpha.5 plan](ALPHA5-RELEASE-PLAN.md). Only missing or affected checks are run;
-no runtime/dependency/support expansion. Existing local evidence, failures and
-original platform scopes remain retained. New Commit/Push/Merge, release-hosted,
-tag, Environment/Secret, signing and publication actions remain unauthorized;
-final-source/remote-CI acceptance must reflect actual later delivery.
+**YT-213 Windows xtask POSIX isolation (2026-10-30):**
+The owner authorizes a repository-tooling correction for the retained MSVC E0277:
+ordinary xtask commands must compile/run; POSIX Docker qualification must reject
+unsupported platforms explicitly before setup/build effects. Preserve Unix
+identity, Docker arguments/limits and cleanup. Only affected GNU/MSVC proof and
+independent review are selected; SDK/browser evidence and selected C `0f0c84a`
+remain unchanged. No Commit/Push/tag, release-hosted, signing or publication.
+GNU24 and MSVC13 affected tests, ordinary help/docs commands and cleanup PASS;
+final independent acceptance PASS0; YT-213 Done. One existing unused-function Windows
+warning is retained without suppression.
 
-**Alpha.5 two-package release planning (2026-10-30):**
+**YT-212 qualification and delivery (2026-10-30):**
+[PR30](https://github.com/bohewu/yetlet/pull/30) is squash-merged at R
+`0f0c84abf9b6c269987cef31c2d0651fa2d1f3ff`, tree
+`a0940f6806fc92ac8b16b96fc4827645ac82b316`, after strict/builtin delivery and
+independent A/B correction PASS0. Both PR/master CI jobs pass; normal two-package
+archives, native/WASM consumers, selected MSVC consumers, current Firefox/Chrome
+DOM journeys and inventory/security correspondence pass. GNU/MSVC archive bytes
+and the MSVC consumer lock match. See the [actual qualification record](ALPHA5-RELEASE-PLAN.md#actual-qualification-results--yt-212)
+for failures, exclusions and the unresolved Windows xtask/POSIX tooling limit.
+Windows test resources are removed; inert evidence retained. Final independent
+PASS0 accepts YT-212 Done at qualification scope; unchanged R is the owner-authorized
+alpha.5 C. The five closeout documents remain uncommitted.
+No tag, release-hosted run, Secret/Environment change, signing or publication.
+Original branches/history and paused PR29 remain preserved.
+
+**Historical alpha.5 planning checkpoint (2026-10-30):**
 Owner-authorized strict/builtin Commit records the accepted consolidation as
 `0f867f11a7e73675158597f0ec3caff71f1d8d0f`, tree
 `4c612e6b3418641114f91bff2e66fee58930f3c6`, without Push.

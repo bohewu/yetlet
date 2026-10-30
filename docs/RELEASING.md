@@ -13,7 +13,8 @@ Current unreleased source is `0.9.0-alpha.5`: exactly `yetlet` followed by
 schema1/`sixteen` remains for earlier artifacts at their matching source.
 The library count is derived only from that validated cohort throughout build,
 provenance, signing, result verification, public planning and registry promotion.
-There is no arbitrary package-list input and no selected alpha.5 C/S/tag yet.
+There is no arbitrary package-list input. The [alpha.5 qualification record](ALPHA5-RELEASE-PLAN.md#actual-qualification-results--yt-212)
+records R and actual C selection; S/tag and release execution remain pending.
 
 Normal packaging verifies the final base archive, stages its exact checksum,
 then verifies the Browser archive against it. No reverse development edge,
