@@ -8,6 +8,16 @@ This batch does not create a tag, execute release-hosted jobs, change Environmen
 or Secrets, sign or publish. The initial planning checkpoint and failures below
 remain historical evidence.
 
+## Later source and execution selection — 2026-10-31
+
+The owner subsequently authorizes advancing to the final publication gate.
+[The alpha.5 hosted record](ALPHA5-HOSTED-RECORD.md) records the new
+C `0a9fa8a594e3dd2ce753422dd848df10cd8c98df`, after PR31 and actual master CI,
+with unchanged package inputs and the now-qualified Windows xtask correction.
+Old `0f0c84a`, the original qualification limits and all failed outputs below
+remain historical. Tag/build/readback/S/frozen payloads and publication have
+separate actual records; this does not promote a future output to PASS.
+
 ## Committed input and proposed release scope
 
 | Input | Actual value / disposition |
