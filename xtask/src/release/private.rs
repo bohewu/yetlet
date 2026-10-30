@@ -298,31 +298,6 @@ fn publication_order(source: &Path) -> Result<()> {
     Ok(())
 }
 
-#[cfg(test)]
-mod publication_tests {
-    use super::*;
-
-    #[test]
-    fn development_and_optional_target_backedges_are_rejected() {
-        let temp = tempfile::tempdir().unwrap();
-        fs::write(temp.path().join("Cargo.toml"), "[workspace]\n").unwrap();
-        for name in SIXTEEN_NAMES {
-            let path = temp.path().join("crates").join(name);
-            fs::create_dir_all(&path).unwrap();
-            fs::write(path.join("Cargo.toml"), "[package]\nname='fixture'\n").unwrap();
-        }
-        publication_order(temp.path()).unwrap();
-        let secret = temp.path().join("crates/yetlet-secrets/Cargo.toml");
-        for declaration in [
-            "[dev-dependencies]\nyetlet-config='0.9'\n",
-            "[target.'cfg(unix)'.dependencies]\nyetlet-config={version='0.9',optional=true}\n",
-        ] {
-            fs::write(&secret, format!("[package]\nname='fixture'\n{declaration}")).unwrap();
-            assert!(publication_order(temp.path()).is_err());
-        }
-    }
-}
-
 /// Execute only the packaging phase. CI identity and immutable-source guards remain in `run`.
 pub fn build_packages(
     source: &Path,
@@ -737,4 +712,29 @@ fn run_body(
     let cleanup = temp.close();
     cleanup?;
     result
+}
+
+#[cfg(test)]
+mod publication_tests {
+    use super::*;
+
+    #[test]
+    fn development_and_optional_target_backedges_are_rejected() {
+        let temp = tempfile::tempdir().unwrap();
+        fs::write(temp.path().join("Cargo.toml"), "[workspace]\n").unwrap();
+        for name in SIXTEEN_NAMES {
+            let path = temp.path().join("crates").join(name);
+            fs::create_dir_all(&path).unwrap();
+            fs::write(path.join("Cargo.toml"), "[package]\nname='fixture'\n").unwrap();
+        }
+        publication_order(temp.path()).unwrap();
+        let secret = temp.path().join("crates/yetlet-secrets/Cargo.toml");
+        for declaration in [
+            "[dev-dependencies]\nyetlet-config='0.9'\n",
+            "[target.'cfg(unix)'.dependencies]\nyetlet-config={version='0.9',optional=true}\n",
+        ] {
+            fs::write(&secret, format!("[package]\nname='fixture'\n{declaration}")).unwrap();
+            assert!(publication_order(temp.path()).is_err());
+        }
+    }
 }
