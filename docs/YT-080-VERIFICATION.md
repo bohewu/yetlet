@@ -56,7 +56,7 @@ does not rewrite the prior receipt or claim the source files are identical.
 
 The crate README, crate-level rustdoc, consumer README and documentation entry
 points identify the Experimental opt-in status and link the selected
-[support boundary](../crates/yetlet-wgpu/SUPPORT.md). No runtime logic, WGSL,
+[support boundary](../crates/yetlet-browser/guides/wgpu-support.md). No runtime logic, WGSL,
 API signature, limit, dependency pin, scheduler or default feature changes were
 made in this item.
 

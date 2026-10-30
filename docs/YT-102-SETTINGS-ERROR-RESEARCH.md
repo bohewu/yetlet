@@ -27,7 +27,7 @@ is sufficient; this research does not make implementation a completion gate.
 
 ## Current behavior and concrete gap
 
-The shared [configuration Error](../crates/yetlet-config/src/lib.rs) has eight
+The shared [configuration Error](../crates/yetlet/src/config/mod.rs) has eight
 ordinary variants: Prefix, Environment, Input, File, Toml, EnvironmentKey,
 Type and Settings. Its Display strings are fixed, the enum retains no input,
 and its Error implementation exposes no parser/IO/Serde source chain. Optional

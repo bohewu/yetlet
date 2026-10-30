@@ -8,8 +8,9 @@ on:
         description: Source-package set (preparation only)
         type: choice
         required: true
-        default: original-nine
+        default: consolidated
         options:
+          - consolidated
           - original-nine
           - sixteen
 
@@ -28,7 +29,7 @@ jobs:
     env:
       RUSTUP_TOOLCHAIN: 1.99.0
       CARGO_BUILD_JOBS: '4'
-      REBUILD_COHORT: ${{ inputs.cohort || 'original-nine' }}
+      REBUILD_COHORT: ${{ inputs.cohort || 'consolidated' }}
     steps:
       - name: Checkout immutable workflow source
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -38,7 +39,7 @@ jobs:
       - name: Install pinned compiler
         run: rustup toolchain install 1.99.0 --profile minimal
       - name: Prepare selected static OpenSSL recipe
-        if: inputs.cohort == 'sixteen'
+        if: inputs.cohort != 'original-nine'
         run: |
           set -euo pipefail
           rebuild_openssl_archive="$RUNNER_TEMP/openssl-3.5.9.tar.gz"

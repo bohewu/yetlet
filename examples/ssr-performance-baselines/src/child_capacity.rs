@@ -1,6 +1,6 @@
 //! YT-152: identical fixture calls against pinned actual Core versions.
 use super::*;
-use yetlet_html::RenderError;
+use yetlet::html::RenderError;
 
 const ROWS: usize = 1024;
 const TEXT: &str = "Safe <&> \"café\"";
@@ -108,7 +108,7 @@ pub fn output(variant: &str, directory: &Path) -> Result<(), Box<dyn Error>> {
     .into_iter()
     .chain(CASES.map(|(name, rows)| (name, page(rows), expected(rows))))
     {
-        let body = yetlet_html::render_to_string(&input.1)?;
+        let body = yetlet::html::render_to_string(&input.1)?;
         let document = render_document_with_metadata(&input.0, &input.1)?;
         assert_eq!(body, oracle.0);
         assert_eq!(document, oracle.1);
@@ -258,7 +258,7 @@ mod tests {
             .into_iter()
             .chain(CASES.map(|(_, rows)| (page(rows), expected(rows))))
         {
-            assert_eq!(yetlet_html::render_to_string(&input.1).unwrap(), oracle.0);
+            assert_eq!(yetlet::html::render_to_string(&input.1).unwrap(), oracle.0);
             assert_eq!(
                 render_document_with_metadata(&input.0, &input.1).unwrap(),
                 oracle.1
@@ -284,11 +284,11 @@ mod tests {
                         .child(View::text(TEXT)),
                 )
                 .into();
-            assert_eq!(yetlet_html::render_to_string(&view), Err(expected));
+            assert_eq!(yetlet::html::render_to_string(&view), Err(expected));
         }
         let view = Element::new("input").child(View::text(TEXT)).into();
         assert!(matches!(
-            yetlet_html::render_to_string(&view),
+            yetlet::html::render_to_string(&view),
             Err(RenderError::VoidElementHasChildren(_))
         ));
     }

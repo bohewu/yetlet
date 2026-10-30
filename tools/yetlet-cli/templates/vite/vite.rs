@@ -701,8 +701,8 @@ use axum::{
     routing::get,
 };
 use std::{io, sync::Arc};
-use yetlet_core::View;
-use yetlet_server_axum::{DEFAULT_CSP, render_document};
+use yetlet::view::View;
+use yetlet::server_axum::{DEFAULT_CSP, render_document};
 
 impl Snapshot {
     pub(crate) fn load_with_env() -> io::Result<Arc<Self>> {

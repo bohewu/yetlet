@@ -23,11 +23,11 @@ Only the three gaps in section 6 are priority-ranked. Other matrices define thei
 
 | Ref | Inspected source or retained record | Relevant boundary |
 |---|---|---|
-| S1 | [core](../crates/yetlet-core/src/lib.rs), lines 8–49 | Text/Element only; static names and string-valued attributes |
-| S2 | [HTML renderer](../crates/yetlet-html/src/lib.rs), lines 41–129 and 137–187 | Escaping, name/tag/attribute policy, selected URL schemes, test source |
-| S3 | [DOM renderer](../crates/yetlet-dom/src/lib.rs), lines 24–118 and 125–154 | Narrow preflight allowlist, DOM creation, owned-subtree replacement |
-| S4 | [server renderer](../crates/yetlet-server-axum/src/lib.rs), lines 30, 41–91; [Page](../crates/yetlet-server-axum/src/response.rs), lines 53–61; [metadata](../crates/yetlet-server-axum/src/document.rs), lines 54–87 | CSP response paths versus string helpers; title/language only |
-| S5 | [keyed guide](../crates/yetlet-dom-keyed/README.md), lines 9–26; [fixed binding example](../examples/keyed-bindings/src/lib.rs), lines 1018–1027 and 1109–1167 | Caller-owned callbacks/properties; model-aware text input updates |
+| S1 | [core](../crates/yetlet/src/view/mod.rs), lines 8–49 | Text/Element only; static names and string-valued attributes |
+| S2 | [HTML renderer](../crates/yetlet/src/html/mod.rs), lines 41–129 and 137–187 | Escaping, name/tag/attribute policy, selected URL schemes, test source |
+| S3 | [DOM renderer](../crates/yetlet-browser/src/dom/mod.rs), lines 24–118 and 125–154 | Narrow preflight allowlist, DOM creation, owned-subtree replacement |
+| S4 | [server renderer](../crates/yetlet/src/server_axum/mod.rs), lines 30, 41–91; [Page](../crates/yetlet/src/server_axum/response.rs), lines 53–61; [metadata](../crates/yetlet/src/server_axum/document.rs), lines 54–87 | CSP response paths versus string helpers; title/language only |
+| S5 | [keyed guide](../crates/yetlet-browser/guides/dom-keyed.md), lines 9–26; [fixed binding example](../examples/keyed-bindings/src/lib.rs), lines 1018–1027 and 1109–1167 | Caller-owned callbacks/properties; model-aware text input updates |
 | S6 | [browser build](../scripts/build_browser.py), lines 69–79 and 97–147; [Todo server](../examples/todo-server/src/lib.rs), lines 75–111 and 136 | Separate builds, hashed CSS/JS/WASM, validated application head insertion |
 | S7 | [dashboard source](../examples/multi-island-dashboard/src/lib.rs), lines 136–205 and 212–251; [dashboard guide](../examples/multi-island-dashboard/README.md) | Asset existence/path checks, per-island fallback and application response policy |
 | S8 | [SQLite source](../examples/sqlite-crud/src/lib.rs), lines 1–78; [Modular Shop](../examples/modular-shop/README.md) | Direct SQL, bounded blocking work, explicit version and transaction concepts |

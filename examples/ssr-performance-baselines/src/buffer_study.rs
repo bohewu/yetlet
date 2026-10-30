@@ -1,6 +1,6 @@
 //! YT-153: source-derived adapter observations using the actual HTML renderer.
 use super::*;
-use yetlet_html::{RenderError, escape_text};
+use yetlet::html::{RenderError, escape_text};
 
 const ROWS: usize = 1024;
 const OPEN: &str = "<!doctype html><html lang=\"";
@@ -155,7 +155,7 @@ fn title(value: &str, envelope: (usize, usize), points: &mut Points) -> String {
     owned
 }
 fn body(view: &View, envelope: (usize, usize), points: &mut Points) -> Result<String, RenderError> {
-    let owned = tagged(Scope::Body, || yetlet_html::render_to_string(view))?;
+    let owned = tagged(Scope::Body, || yetlet::html::render_to_string(view))?;
     points[6] = point(envelope, (owned.len(), owned.capacity()));
     Ok(owned)
 }
@@ -214,7 +214,7 @@ pub fn output(directory: &Path) -> Result<(), Box<dyn Error>> {
     for (name, rows) in CASES {
         let (metadata, view) = page(rows);
         let mut points = [Point::default(); 9];
-        let actual_body = yetlet_html::render_to_string(&view)?;
+        let actual_body = yetlet::html::render_to_string(&view)?;
         let actual_document = observed_document(&metadata, &view, &mut points)?;
         let oracle = expected(rows);
         assert_eq!(actual_body, oracle.0);
@@ -247,7 +247,7 @@ pub fn timing(repetition: usize) -> Result<(), Box<dyn Error>> {
             return Err("expected repetition 1|2".into());
         }
         let (metadata, view) = page(ROWS);
-        let body = yetlet_html::render_to_string(&view)?;
+        let body = yetlet::html::render_to_string(&view)?;
         let mut probes = ["envelope", "body_append", "suffix_append"];
         if repetition == 2 {
             probes.reverse();
@@ -427,7 +427,7 @@ mod tests {
             let (metadata, view) = page(rows);
             let mut points = [Point::default(); 9];
             let document = observed_document(&metadata, &view, &mut points).unwrap();
-            let actual_body = yetlet_html::render_to_string(&view).unwrap();
+            let actual_body = yetlet::html::render_to_string(&view).unwrap();
             let oracle = expected(rows);
             assert_eq!(
                 document,

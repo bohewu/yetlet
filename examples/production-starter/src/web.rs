@@ -23,10 +23,10 @@ use secrecy::{ExposeSecret, SecretString};
 use serde::{Deserialize, Serialize};
 use subtle::ConstantTimeEq;
 use tracing::Instrument;
-use yetlet_core::{Element, View};
-use yetlet_request_id::{RequestId, RequestIds};
-use yetlet_server_axum::{App, DocumentMetadata, LanguageTag, Page, middleware::with_global};
-use yetlet_session::{Session, SessionConfig, SessionManager};
+use yetlet::view::{Element, View};
+use yetlet::request_id::{RequestId, RequestIds};
+use yetlet::server_axum::{App, DocumentMetadata, LanguageTag, Page, middleware::with_global};
+use yetlet::session::{Session, SessionConfig, SessionManager};
 
 use crate::store::{Issue, IssueStatus, Store, StoreError};
 

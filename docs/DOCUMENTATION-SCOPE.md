@@ -1,9 +1,11 @@
 # Documentation sources and publication scope
 
-Date: 2026-10-26 classification, updated 2026-10-29 for current navigation.
-The Experimental `v0.9.0-alpha.1` source-package preview is
-[published on GitHub](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
-under separate owner authority; crates.io remains separate. This documentation
+Date: 2026-10-26 classification, updated 2026-10-30 for the two-package source.
+The current checkout is unreleased `0.9.0-alpha.5`: `yetlet` and
+`yetlet-browser`, with module guides and rustdoc at the same revision.
+The [existing alpha.4 release](ALPHA4-HOSTED-RECORD.md) and older previews retain
+their own sixteen-package documentation and evidence. Only its first registry
+package was published; the old continuation is paused. This documentation
 classification activates no website/Wiki or additional publication, support or
 repository-visibility change. Historical candidate decisions retain their scope.
 
@@ -38,12 +40,13 @@ linked reports, screenshots, assets and source files are not silently included.
 | Guide authoring | [GUIDE-TEMPLATE.md](GUIDE-TEMPLATE.md) | Shared five-part integration guide format; current source, prerequisites, expected result and failure boundaries stay explicit |
 | Framework guides | [ARCHITECTURE.md](ARCHITECTURE.md), [HTTP-PIPELINE.md](HTTP-PIPELINE.md), [EXTENSIONS.md](EXTENSIONS.md), [NAMING.md](NAMING.md), [COMPATIBILITY.md](COMPATIBILITY.md), [CAPABILITIES.md](CAPABILITIES.md) | Architecture, composition, naming, current availability and explicit compatibility limits; dated task/review paragraphs remain historical annotations |
 | Settings guides | [SETTINGS-OPTIONS-LOGGING.md](SETTINGS-OPTIONS-LOGGING.md), [CONFIGURATION.md](CONFIGURATION.md), [SECRET-PROVIDERS.md](SECRET-PROVIDERS.md), [SETTINGS-SECRET-PROVIDER.md](SETTINGS-SECRET-PROVIDER.md) | Current startup composition, typed options, application-owned diagnostics, secret lookup and protected-field injection; omit historical execution/review bookkeeping from a reader edition |
-| Package guides | The sixteen package-guide/source links in the current API reference tables | Public entry points, examples, errors, ownership, targets and limitations; the original nine-candidate comparison is historical, not the current sixteen-package cohort |
+| Package guides | The `yetlet` and `yetlet-browser` READMEs and module-guide/source links in the current API reference tables | Public entry points, features, examples, errors, ownership, targets and limitations; original nine/sixteen-package inventories retain their historical scope |
 | Application and CLI guides | [SAMPLES.md](SAMPLES.md), [BOARD-START.md](BOARD-START.md), [sample index](../examples/README.md), [Board README](../examples/lab-operations-board/README.md), [Admin README](../examples/admin-dashboard/README.md), [Shop README](../examples/modular-shop/README.md), [Starter README](../examples/production-starter/README.md), [CLI README](../tools/yetlet-cli/README.md) | Existing runnable usage and application-owned options; follow the exact sample-local README links in the sample catalog when selecting additional sample pages |
 | Root overview and policies | [README](../README.md), [license choice](../LICENSE-MIT), [Apache license](../LICENSE-APACHE), [security policy](../SECURITY.md), [contribution policy](../CONTRIBUTING.md) | Introduction, license and existing reporting/contribution rules; selection does not activate reporting services or change governance |
 
-YT-201 adds package-local configuration and signing READMEs to the current API
-map. They provide archive-local introductions and licenses; the maintained
+YT-201 historically added package-local configuration and signing READMEs.
+YT-211 moves those guides into the base SDK archive and maps the current API
+reference to both implementation packages. They provide archive-local introductions and licenses; the maintained
 configuration guide and signing source/rustdoc retain their respective ownership.
 A historical signing contract is context, not an additional current reader-source
 selection or automatic publication input.

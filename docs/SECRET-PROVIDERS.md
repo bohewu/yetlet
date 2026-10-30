@@ -9,12 +9,12 @@ separate, explicitly selected operations.
 
 ## Prerequisites
 
-Use the pinned Rust/Cargo toolchain and the isolated `yetlet-secrets` workspace.
+Use the pinned Rust/Cargo toolchain and the isolated `yetlet::secrets` workspace.
 Select a provider explicitly. The existing state example also selects the config
 loader and bundled example settings. From the repository root, pass only the
 synthetic token below; no cloud account, real credential or listener is needed.
 
-The current composition example is owned by `yetlet-config` as `secrets_state`,
+The current composition example is owned by `yetlet::config` as `secrets_state`,
 behind its existing `secret-provider` feature. Its four fixture files moved with
 it. Dated evidence below preserves the old `yetlet-secrets --example state`
 commands and their original results; current navigation points to the new source.
@@ -26,7 +26,7 @@ Run the existing listener-free composition example:
 ```sh
 (
   export YTSECRETS_SERVICE__TOKEN=example
-  cargo run --locked --manifest-path crates/yetlet-config/Cargo.toml --example secrets_state --features secret-provider
+  cargo run --locked -p yetlet --features config --example config-secrets-state --features secret-provider
 )
 ```
 
@@ -57,7 +57,7 @@ get(name) -> Result<Option<SecretString>, SecretError>
 The object-safe Rust method returns a boxed, Send future so ordinary
 `Arc<dyn SecretProvider>` handles can be passed into constructors and application
 state. The concrete signature and examples are in the
-[crate guide](../crates/yetlet-secrets/README.md).
+[crate guide](../crates/yetlet/guides/secrets.md).
 
 - `Ok(Some(value))` returns an owned protected string at lookup time.
 - `Ok(None)` means that name does not exist. The application decides whether it
@@ -82,7 +82,7 @@ environment precedence. Then select that field explicitly:
 
 ```rust
 use std::{collections::BTreeMap, sync::Arc};
-use yetlet_secrets::{SecretProvider, SettingsSecrets};
+use yetlet::secrets::{SecretProvider, SettingsSecrets};
 
 let secrets: Arc<dyn SecretProvider> = Arc::new(SettingsSecrets::new(
     BTreeMap::from([("remote-token".into(), settings.service.token)]),
@@ -179,7 +179,7 @@ ordering rule. Loader or application-validation failure must skip `replace`,
 leaving the prior healthy snapshot usable; a later valid reload may retry the
 same entry. Provider lock poisoning still makes lookup/replacement Unavailable,
 so this is not a promise to recover from every internal failure. The
-[State example tests](../crates/yetlet-config/examples/secrets_state.rs) demonstrate
+[State example tests](../crates/yetlet/examples/config/secrets_state.rs) demonstrate
 this application-owned pattern; the executable still loads once at startup.
 
 This prevents reload completion inversion within that application entry. It
@@ -232,8 +232,8 @@ the business app should not require its powerful
 
 ## API reference
 
-Use the [crate guide/source](../crates/yetlet-secrets/README.md),
-[state example](../crates/yetlet-config/examples/secrets_state.rs),
+Use the [crate guide/source](../crates/yetlet/guides/secrets.md),
+[state example](../crates/yetlet/examples/config/secrets_state.rs),
 [settings injection guide](SETTINGS-SECRET-PROVIDER.md) and
 the [current API reference](API-REFERENCE.md).
 
@@ -248,7 +248,7 @@ required followups. The separately authorized
 slice; its current results and review are recorded separately. Local commit is
 owner-authorized; publication and production qualification remain separate.
 
-The unpublished, Experimental `yetlet-secrets` nested workspace supplies a
+The unpublished, Experimental `yetlet::secrets` nested workspace supplies a
 small native string-secret contract. Applications explicitly select its path
 dependency and construct a provider. Core, browser, the default configuration loader,
 signing, CLI scaffolds and existing applications do not acquire a dependency
@@ -259,7 +259,7 @@ can resolve an injected provider into selected protected settings fields through
 the loader's `secret-provider` feature. `SettingsSecrets` retains the reverse,
 already-loaded-settings adapter; neither direction implicitly enables the other.
 
-`yetlet_config::Loader` is the settings loader. `SecretProvider` is the distinct
+`yetlet::config::Loader` is the settings loader. `SecretProvider` is the distinct
 async secret-lookup trait; there is no SettingsProvider interface. The
 [naming guide](NAMING.md) records canonical loader entry points and the separate
 external settings boundary; secret provider behavior is unchanged.
@@ -269,10 +269,10 @@ external settings boundary; secret provider behavior is unchanged.
 The initial read-contract commands completed with exit 0:
 
 ```text
-cargo test --offline --locked --manifest-path crates/yetlet-secrets/Cargo.toml --all-targets
-cargo test --offline --locked --manifest-path crates/yetlet-secrets/Cargo.toml --doc
-cargo clippy --offline --locked --manifest-path crates/yetlet-secrets/Cargo.toml --all-targets -- -D warnings
-cargo fmt --manifest-path crates/yetlet-secrets/Cargo.toml --check
+cargo test --offline --locked -p yetlet --features secrets --all-targets
+cargo test --offline --locked -p yetlet --features secrets --doc
+cargo clippy --offline --locked -p yetlet --features secrets --all-targets -- -D warnings
+cargo fmt -p yetlet --features secrets --check
 cargo xtask check docs
 ```
 
@@ -283,7 +283,7 @@ precedence, ignored secret-file selection in Staging/Production, ordinary
 service and Axum State injection, substitution, escaped SSR/CSP and absence of
 synthetic secrets in rendered output. One rustdoc example also passed.
 
-The configured [state example](../crates/yetlet-config/examples/secrets_state.rs) ran
+The configured [state example](../crates/yetlet/examples/config/secrets_state.rs) ran
 successfully with explicit synthetic environment input and reported only
 `Example request status: 200 OK`. Normal dependencies are exactly
 `yetlet-secrets -> secrecy 0.10.3 -> zeroize 1.9.1`. Root Cargo metadata has 34

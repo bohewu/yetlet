@@ -192,7 +192,7 @@ PASS before changing YT-117 to Done.
 
 ## Initial implementation and local evidence — 2026-10-22
 
-The selected crate is implemented in [the native package](../crates/yetlet-rate-limit/README.md).
+The selected crate is implemented in [the native package](../crates/yetlet/guides/rate-limit.md).
 The public surface is `Policy::new`, `Budget::new`/Clone, `Key::new` and
 `RateLimitLayer::new`, plus its native Tower service and value-free construction
 error. Governor is pinned to `=0.10.4` with default features disabled and only
@@ -205,7 +205,7 @@ clock addition can approach its u64 nanosecond boundary. A successful admission
 records a subsequent real monotonic sample under the same mutex. This preserves
 safe full-refill reclamation even when a thread is suspended during admission.
 
-The originally reviewed [native example](../crates/yetlet-rate-limit/examples/native.rs)
+The originally reviewed [native example](../crates/yetlet/examples/rate_limit/native.rs)
 used `RATE_LIMIT_ENABLED` (absent/`false` means disabled),
 `RATE_LIMIT_INTERVAL_MS` (2000), `RATE_LIMIT_BURST` (5) and
 `RATE_LIMIT_MAX_KEYS` (64). Numeric settings are read and validated only when
@@ -279,12 +279,12 @@ Cargo files remained byte-identical. No commit or push was made. YT-118 Audit re
 the next independent Todo candidate and needs separate owner selection.
 
 Changed files are the workspace [Cargo.toml](../Cargo.toml) and
-[Cargo.lock](../Cargo.lock); new crate [manifest](../crates/yetlet-rate-limit/Cargo.toml),
-[README](../crates/yetlet-rate-limit/README.md),
-[implementation](../crates/yetlet-rate-limit/src/lib.rs),
-[state tests](../crates/yetlet-rate-limit/src/tests.rs),
+[Cargo.lock](../Cargo.lock); new crate [manifest](../crates/yetlet/Cargo.toml),
+[README](../crates/yetlet/guides/rate-limit.md),
+[implementation](../crates/yetlet/src/rate_limit/mod.rs),
+[state tests](../crates/yetlet/src/rate_limit/tests.rs),
 [middleware/HTTP tests](../crates/yetlet-rate-limit/tests/middleware.rs) and
-[native example](../crates/yetlet-rate-limit/examples/native.rs); this contract,
+[native example](../crates/yetlet/examples/rate_limit/native.rs); this contract,
 [Backlog](BACKLOG.md), [Roadmap](ROADMAP.md), [documentation index](README.md),
 [Extensions](EXTENSIONS.md), [M21 plan](YT-113-123-OPT-IN-CAPABILITIES.md) and
 [ADR 0005](adr/0005-opt-in-capability-modules.md).
@@ -311,7 +311,7 @@ and APIs are not modified.
 
 The application owns `Settings { enabled, policy }`, where `policy` holds
 `interval_ms`, `burst` and `max_keys`. Loader reads the explicit
-[example settings directory](../crates/yetlet-rate-limit/examples/settings/base.toml)
+[example settings directory](../crates/yetlet/examples/rate_limit/settings/base.toml)
 at startup, applying base TOML, exactly one selected finite profile, then OS
 snapshot overrides. The prefix `RATE_LIMIT` preserves `RATE_LIMIT_ENABLED`;
 policy overrides use `RATE_LIMIT_POLICY__INTERVAL_MS`,
@@ -326,7 +326,7 @@ performs no extraction/accounting/pruning. Enabled values must pass Policy's
 existing bounds before serving. A fixed `--check` success path loads and validates
 settings without binding a listener. Restart is required for setting changes.
 
-The [crate README](../crates/yetlet-rate-limit/README.md#opt-in-settings-loader-in-the-native-example)
+The [crate README](../crates/yetlet/guides/rate-limit.md#opt-in-settings-loader-in-the-native-example)
 shows actual TOML, provider environment names and runnable commands. Focused
 example tests will use the existing Loader's environment snapshot API and actual
 settings files; accepted library/Governor/HTTP/Auth/Valkey/browser tests will not

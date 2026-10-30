@@ -11,7 +11,7 @@ They add no required DI container, settings service or new runtime.
 ## Prerequisites
 
 Run the command below from the repository root with the pinned Rust toolchain
-and native target. The optional `yetlet-config` package is a separate native-only
+and native target. The optional `yetlet::config` package is a separate native-only
 workspace; it does not support browser/WASM builds. `--offline` requires its
 locked dependencies in an already populated Cargo cache. See the
 [configuration guide](CONFIGURATION.md#prerequisites) for setup and source rules.
@@ -34,11 +34,11 @@ assignments are scoped to the subshell and contain only a synthetic placeholder:
 (
   export YTCONFIG_ENVIRONMENT=Production
   export YTCONFIG_SERVICE__TOKEN=example
-  cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --example typed -- --check
+  cargo run --offline --locked -p yetlet --features config --example typed -- --check
 )
 ```
 
-The [complete typed example](../crates/yetlet-config/examples/typed.rs) defines
+The [complete typed example](../crates/yetlet/examples/config/typed.rs) defines
 its own `Deserialize` settings structs, uses `SecretString` for its token and
 rejects unknown fields. Its startup wiring contains:
 
@@ -207,7 +207,7 @@ ordinary loading and introduces no automatic refresh or secret logging.
 
 ## API reference
 
-See [Loader source/rustdoc](../crates/yetlet-config/src/lib.rs),
+See [Loader source/rustdoc](../crates/yetlet/src/config/mod.rs),
 [configuration details](CONFIGURATION.md),
 [Board options and constructors](../examples/lab-operations-board/src/lib.rs),
 [Shop options](../examples/modular-shop/src/database.rs),

@@ -118,8 +118,9 @@ traversal. Creation never overwrites or merges an existing destination.
 The CLI has its own Cargo workspace and lock. New apps have their own standalone
 workspace and no Cargo.lock. Current Yetlet crate versions are unpublished:
 explicitly replace generated dependencies with compatible local Cargo path
-entries or patches, using the generated README's example. Core/server use
-0.1.0 and config uses 0.0.0. Then prepare the app's lock separately:
+entries or patches, using the generated README's example. The current SDK is
+`yetlet` version `=0.9.0-alpha.5`, with `server-axum` and optionally `config`
+features; browser creation separately selects `yetlet-browser` at that version. Then prepare the app's lock separately:
 
 ```sh
 cd "$HOME/yetlet-apps/sampleapp"
@@ -172,7 +173,7 @@ auto_build = true
 replicas = 1
 ```
 
-The shared `yetlet-config` loader applies base, exactly one selected overlay,
+The shared `yetlet::config` loader applies base, exactly one selected overlay,
 and real scoped ENV overrides. APP_ENVIRONMENT selects Development, Staging or
 Production and defaults to Production. Examples include
 APP_CLI__RUST__WATCH=true, APP_CLI__VITE__AUTO_START=false, APP_CLI__VITE__AUTO_BUILD=false,
@@ -196,7 +197,7 @@ auto-discovery is disabled. See [configuration](../../docs/CONFIGURATION.md).
 
 For `run`, `watch` and `build`, resolve these choices in order using the
 existing [CLI settings projection](src/settings.rs) and
-[shared Loader](../../crates/yetlet-config/src/lib.rs):
+[shared Loader](../../crates/yetlet/src/config/mod.rs):
 
 | Decision | Existing rule | Practical effect |
 |---|---|---|

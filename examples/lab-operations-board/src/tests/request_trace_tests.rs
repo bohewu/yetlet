@@ -137,7 +137,7 @@ async fn request_trace_authenticated_ssr_json_privacy_and_worker_link() {
     );
     assert_eq!(response.headers()[header::CACHE_CONTROL], "no-store");
     assert!(!response.headers().contains_key(header::SET_COOKIE));
-    let id = response.headers()[yetlet_request_id::HEADER]
+    let id = response.headers()[yetlet::request_id::HEADER]
         .to_str()
         .unwrap()
         .parse::<u64>()
@@ -221,7 +221,7 @@ async fn request_trace_concurrent_requests_keep_independent_roots() {
     assert_eq!(a.status(), StatusCode::OK);
     assert_eq!(b.status(), StatusCode::OK);
     let id = |r: &Response| {
-        r.headers()[yetlet_request_id::HEADER]
+        r.headers()[yetlet::request_id::HEADER]
             .to_str()
             .unwrap()
             .parse::<u64>()
@@ -264,7 +264,7 @@ async fn request_trace_disabled_and_unknown_context_do_not_emit() {
         .with_subscriber(dispatch.clone())
         .await
         .unwrap();
-    assert!(!response.headers().contains_key(yetlet_request_id::HEADER));
+    assert!(!response.headers().contains_key(yetlet::request_id::HEADER));
     assert!(capture.text().is_empty());
     let selected = board(&dir.path().join("unknown.sqlite"), ids).await;
     let foreign = tracing::dispatcher::with_default(

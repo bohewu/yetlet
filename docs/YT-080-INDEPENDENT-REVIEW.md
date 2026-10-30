@@ -76,7 +76,7 @@ observed Job/thread identity, final package and no-repeat recovery boundary.
 The selected positive configuration is **Ubuntu 26.04.1 / XFCE X11 /
 Firefox 158 Stable Snap / Intel UHD Graphics 770 Vulkan**, with
 `dom.webgpu.enabled=true` only in the disposable acceptance profile.
-The [support matrix](../crates/yetlet-wgpu/SUPPORT.md) preserves all unsupported
+The [support matrix](../crates/yetlet-browser/guides/wgpu-support.md) preserves all unsupported
 and unverified combinations. Earlier Linux Chrome failures and Windows
 standalone JavaScript results are not extracted-candidate support evidence.
 Physical mobile/touch, assistive speech, real IME, native rendering backends,

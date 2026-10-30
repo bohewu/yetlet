@@ -1,6 +1,6 @@
 //! Disposable signing workflow; the key CLI manages separate persistent identities.
 use std::process::ExitCode;
-use yetlet_signing::{
+use yetlet::signing::{
     Error, KeyRef, KeyState, LocalProvider, LocalSigner, Policy, PublicKeySet, SigningService,
     TrustedKey, Verifier, generate_self_signed,
 };

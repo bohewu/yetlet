@@ -13,8 +13,8 @@ use std::{
     path::{Path, PathBuf},
 };
 use tower_http::services::ServeDir;
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{
+use yetlet::view::{Element, View};
+use yetlet::server_axum::{
     DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document_with_metadata,
 };
 
@@ -239,7 +239,7 @@ mod tests {
         http::Request,
     };
     use tower::ServiceExt;
-    use yetlet_server_axum::render_document;
+    use yetlet::server_axum::render_document;
     #[tokio::test]
     async fn ssr_without_assets_is_searchable_paginated_and_escaped() {
         let root = tempfile::tempdir().unwrap();

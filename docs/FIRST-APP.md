@@ -76,25 +76,23 @@ the optional runtime Settings loader. This path needs no `--settings`,
 ### 3. Select compatible local Yetlet dependencies
 
 Open `$yetlet_app/Cargo.toml` in your editor. Under its existing `[dependencies]`,
-replace the two generated Yetlet dependency lines with the following shape.
+replace the generated Yetlet dependency line with the following shape.
 Replace `/absolute/yetlet` with the real physical checkout path stored in
 `yetlet_repo`; TOML does not expand shell variables or `~`.
 
 ```toml
-yetlet-core = { version = "=0.1.0", path = "/absolute/yetlet/crates/yetlet-core" }
-yetlet-server-axum = { version = "=0.1.0", path = "/absolute/yetlet/crates/yetlet-server-axum" }
+yetlet = { version = "=0.9.0-alpha.5", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["server-axum"] }
+
 ```
 
 Keep the existing package metadata, standalone workspace, Axum/Tokio entries
-and exact version requirements. Select both crates from the same compatible
-checkout. The generated versions are unpublished; leaving version-only entries
+and exact version requirements. Use the matching SDK from the same compatible checkout. The generated versions are unpublished; leaving version-only entries
 does not make them resolvable from a registry. A moved or modified local checkout
 also changes the source used by later Cargo commands.
 
 The generated [selected README source](../tools/yetlet-cli/templates/SELECTED-README.md)
-describes the same Cargo-owned overrides. Configuration requires an additional
-local `yetlet-config` dependency only when that capability is separately selected;
-do not add it for this plain app.
+describes the same Cargo-owned override. Settings/Vite creation additionally
+selects `config` on that same dependency; this plain app does not need it.
 
 ### 4. Prepare the app lock/cache, then build and run
 
@@ -152,7 +150,7 @@ own declared variables and validation; follow their guide when you select them.
 |---|---|
 | CLI build cannot find OpenSSL headers/libraries | Prepare the native CLI prerequisites or your already-selected OpenSSL prefix using the CLI guide; this is separate from app dependencies |
 | `new` refuses the destination | Use an unused app name and an explicitly trusted parent; it does not merge or overwrite projects |
-| Cargo cannot find the unpublished Yetlet version | Complete both local `path` declarations with actual compatible checkout paths, retaining their exact version requirements |
+| Cargo cannot find the unpublished Yetlet version | Complete the SDK `path` declaration with actual compatible checkout paths, retaining their exact version requirements |
 | CLI refuses a missing/stale lock or missing offline dependency | After an intentional dependency edit, explicitly regenerate this app's lock and fetch its locked dependencies before frozen execution; do not copy another workspace's lock |
 | Unsafe application/tool path or permissions are rejected | Use owned local protected inputs and the documented CLI filesystem setup; do not weaken checks or change unrelated system directories |
 | Port 3000 is occupied | Stop the owned conflicting listener or select an unused `YETLET_PORT`; keep the loopback boundary |
@@ -175,7 +173,7 @@ to pass data and compose the existing home handler. Use the
 
 - [Current CLI prerequisites and creation](../tools/yetlet-cli/README.md#first-use-prerequisites)
   and [selected scaffold source](../tools/yetlet-cli/src/scaffold.rs).
-- [Server guide](../crates/yetlet-server-axum/README.md),
+- [Server guide](../crates/yetlet/guides/server-axum.md),
   [HTTP pipeline](HTTP-PIPELINE.md) and [current API reference](API-REFERENCE.md).
 - [Configuration](CONFIGURATION.md) and [opt-in composition](EXTENSIONS.md) when
   selecting additional capabilities.

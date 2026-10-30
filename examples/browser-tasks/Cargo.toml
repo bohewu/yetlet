@@ -13,9 +13,7 @@ name = "tasks"
 crate-type = ["cdylib", "rlib"]
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-yetlet-core = { path = "../../crates/yetlet-core" }
-yetlet-dom = { path = "../../crates/yetlet-dom" }
-yetlet-dom-keyed = { path = "../../crates/yetlet-dom-keyed" }
-yetlet-reactive = { path = "../../crates/yetlet-reactive" }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.5", default-features = false, features = ["reactive"] }
+yetlet-browser = { path = "../../crates/yetlet-browser", version = "0.9.0-alpha.5", default-features = false, features = ["dom", "dom-keyed"] }
 wasm-bindgen = "=0.2.129"
 web-sys = { version = "0.3", features = ["Document", "Element", "Event", "EventTarget", "HtmlElement", "HtmlInputElement", "Node", "Window"] }

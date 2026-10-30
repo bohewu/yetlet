@@ -26,11 +26,11 @@ use tokio::{
 };
 use tokio_util::io::ReaderStream;
 use tower_http::services::ServeFile;
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{
+use yetlet::server_axum::{
     App, Page,
     middleware::{Next, from_fn, from_fn_with_state, with_global},
 };
+use yetlet::view::{Element, View};
 
 pub const MAX_FILE_BYTES: usize = 1024 * 1024;
 pub const MAX_BODY_BYTES: usize = MAX_FILE_BYTES + 8 * 1024;

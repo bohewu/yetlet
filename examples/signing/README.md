@@ -1,7 +1,7 @@
 # Local signing reference — YT-093
 
 This opt-in, nonpublishable sample demonstrates exact-byte signing and public-only
-verification using the experimental `yetlet-signing` crate and OpenSSL. It is a
+verification using the experimental `yetlet::signing` crate and OpenSSL. It is a
 console application, with no HTTP listener, UI, cloud SDK or real certificate.
 The sample does not implement CMS, XMLDSig, PDF signing, PKI chain validation or
 trusted historical signing time.

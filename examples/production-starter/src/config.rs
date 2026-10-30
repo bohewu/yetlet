@@ -7,7 +7,7 @@ use std::{
     net::SocketAddr,
     path::{Component, Path, PathBuf},
 };
-use yetlet_config::{Loader, SecretFormat};
+use yetlet::config::{Loader, SecretFormat};
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]

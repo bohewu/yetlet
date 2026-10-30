@@ -301,7 +301,7 @@ Bounds describe the recorded histogram interval, not exact p95 values.
 | ssr-recovery | 4.769 / 100 | 230.056 / 500 | 687.023 / 2000 | 0 |
 
 The reachable failure class is the existing provider admission gate:
-[`call`](../crates/yetlet-session-redis/src/store.rs) returns `Busy` when its
+[`call`](../crates/yetlet/src/session_redis/store.rs) returns `Busy` when its
 fixed eight total admission slots (four active plus bounded waiting) are
 occupied. This is authoritative error attribution, not proof of exhausted
 physical CPU or a universal 500/s or 2000/s ceiling. SQL pool p95 is bounded by

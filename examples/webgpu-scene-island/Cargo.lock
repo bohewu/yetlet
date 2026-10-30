@@ -1156,25 +1156,22 @@ dependencies = [
 ]
 
 [[package]]
-name = "yetlet-core"
-version = "0.9.0-alpha.4"
-
-[[package]]
-name = "yetlet-html"
-version = "0.9.0-alpha.4"
-dependencies = [
- "yetlet-core",
-]
-
-[[package]]
-name = "yetlet-server-axum"
-version = "0.9.0-alpha.4"
+name = "yetlet"
+version = "0.9.0-alpha.5"
 dependencies = [
  "axum",
  "serde",
  "tower",
- "yetlet-core",
- "yetlet-html",
+]
+
+[[package]]
+name = "yetlet-browser"
+version = "0.9.0-alpha.5"
+dependencies = [
+ "wasm-bindgen",
+ "web-sys",
+ "wgpu",
+ "yetlet",
 ]
 
 [[package]]
@@ -1191,18 +1188,8 @@ dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
  "web-sys",
- "yetlet-core",
- "yetlet-server-axum",
- "yetlet-wgpu",
-]
-
-[[package]]
-name = "yetlet-wgpu"
-version = "0.9.0-alpha.4"
-dependencies = [
- "wasm-bindgen",
- "web-sys",
- "wgpu",
+ "yetlet",
+ "yetlet-browser",
 ]
 
 [[package]]

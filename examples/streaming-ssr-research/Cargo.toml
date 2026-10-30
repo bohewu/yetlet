@@ -15,8 +15,7 @@ futures-util = "0.3"
 http-body-util = "0.1"
 hyper = { version = "1", features = ["client", "http1"] }
 hyper-util = { version = "0.1", features = ["tokio"] }
-yetlet-core = { path = "../../crates/yetlet-core" }
-yetlet-html = { path = "../../crates/yetlet-html" }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.5", default-features = false, features = ["html"] }
 
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }

@@ -110,7 +110,7 @@ bounded reverse O(n) scan with one-based slot IDs; the application alone maps
 slots to stable business records. Successful updates/replacements advance data
 version; stale version/generation/retired picks fail. Zero/detached targets
 suspend. Errors/categories and explicit recovery responsibilities are documented
-in the [crate README](../crates/yetlet-wgpu/README.md) and public rustdoc.
+in the [crate README](../crates/yetlet-browser/guides/wgpu.md) and public rustdoc.
 
 No initialization occurs on linking. Each explicitly constructed owner owns CPU
 data separately from its device. The injected callback retains generation and

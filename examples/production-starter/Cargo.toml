@@ -20,11 +20,7 @@ subtle = "2.6"
 prometheus = { version = "0.14", default-features = false }
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["json"] }
-yetlet-config = { path = "../../crates/yetlet-config" }
-yetlet-core = { path = "../../crates/yetlet-core" }
-yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
-yetlet-request-id = { path = "../../crates/yetlet-request-id" }
-yetlet-session = { path = "../../crates/yetlet-session" }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.5", default-features = false, features = ["config", "request-id", "server-axum", "session"] }
 
 [dev-dependencies]
 http-body = "1"

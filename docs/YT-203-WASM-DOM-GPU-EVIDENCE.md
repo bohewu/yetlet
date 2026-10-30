@@ -70,7 +70,7 @@ loss/recovery, stale completions, first/repeated disposal and meaningful HTML
 fallback at that original exact configuration. It does not qualify a newly
 compiled GPU binary, the current native server binary, the new consumer lock,
 Firefox154 GPU, Chrome GPU or a native GPU backend.
-The [package support boundary](../crates/yetlet-wgpu/SUPPORT.md) stays unchanged.
+The [package support boundary](../crates/yetlet-browser/guides/wgpu-support.md) stays unchanged.
 Metadata-only changes do not create authority or necessity to replay that GPU run.
 
 ## New packaged-source WASM evidence

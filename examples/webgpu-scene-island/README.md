@@ -20,7 +20,7 @@ extend the supported browser scope. See [selected Firefox evidence](../../docs/Y
 **Current extracted candidate:** [YT-079](../../docs/YT-079-VERIFICATION.md)
 passed actual browser qualification and independent API/dependency/security
 review. Final [YT-080 qualification](../../docs/YT-080-VERIFICATION.md) and the
-[Experimental support boundary](../../crates/yetlet-wgpu/SUPPORT.md) distinguish
+[Experimental support boundary](../../crates/yetlet-browser/guides/wgpu-support.md) distinguish
 this source from the historical pre-extraction receipts below. This is not a
 speedup, stable-API, production or 3D promise.
 
@@ -289,14 +289,14 @@ YT-079 implementation. Prior successful browser/benchmark suites are not rerun.
 ## YT-079 Experimental extracted candidate
 
 The real scene owner now delegates to the first-party
-[`yetlet-wgpu`](../../crates/yetlet-wgpu/README.md) nested-workspace candidate.
+[`yetlet_browser::wgpu`](../../crates/yetlet-browser/guides/wgpu.md) nested-workspace candidate.
 Its default graph is CPU-only; its wasm32 `browser` feature is explicit in this
 application manifest. Synthetic work-record generation/status patches, business
 IDs/SSR labels, counter, safe DOM selection and `window.__yt076Fault` stay here.
 The crate owns trusted WGSL and configured context release; the application
 retains scheduling, visibility, semantic fallback and delayed Wasm wrapper free.
 The old application WGSL file remains a preserved pre-extraction fixture; the
-renderer compiles only `crates/yetlet-wgpu/src/scene.wgsl`.
+renderer compiles only `crates/yetlet-browser/src/wgpu/scene.wgsl`.
 
 The existing `/scene` and `/scene-comparison` routes and all twelve focused
 native contracts remain. Exact dependency pins and the root lock/unrelated

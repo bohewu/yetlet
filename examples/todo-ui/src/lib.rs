@@ -5,8 +5,8 @@
 pub mod controls;
 
 use serde::{Deserialize, Serialize};
-use yetlet_actions::{ActionError, Command};
-use yetlet_core::{Element, View};
+use yetlet::actions::{ActionError, Command};
+use yetlet::view::{Element, View};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -416,8 +416,8 @@ mod tests {
         decode_search_state, encode_search_state, filtered_todos, initial_todos, search_page,
         search_page_with_todos, search_results, todo_list, toggle_first,
     };
-    use yetlet_actions::ActionError;
-    use yetlet_html::render_to_string;
+    use yetlet::actions::ActionError;
+    use yetlet::html::render_to_string;
 
     #[test]
     fn browser_page_declares_initial_title_feedback_hidden() {

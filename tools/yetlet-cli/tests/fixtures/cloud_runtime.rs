@@ -159,7 +159,7 @@ mod cloud_tests {
                 assert!(response.starts_with("HTTP/1.1 200"), "{response}");
                 assert!(response.contains("content-security-policy:"), "{response}");
                 assert!(
-                    response.contains(yetlet_server_axum::DEFAULT_CSP),
+                    response.contains(yetlet::server_axum::DEFAULT_CSP),
                     "{response}"
                 );
                 assert!(response.contains(text), "{response}");

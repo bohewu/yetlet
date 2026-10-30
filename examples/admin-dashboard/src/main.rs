@@ -8,7 +8,7 @@ use std::io;
 use std::sync::Arc;
 use tokio::sync::watch;
 use yetlet_lab_operations_board::{Board, BoardOptions, DemoIdentities};
-use yetlet_secrets::{SecretProvider, SettingsSecrets};
+use yetlet::secrets::{SecretProvider, SettingsSecrets};
 
 fn application(board: &Board, assets: Arc<vite::Snapshot>) -> axum::Router {
     // Board's global middleware is a fallback service. Keep it intact behind

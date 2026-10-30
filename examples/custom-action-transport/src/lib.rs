@@ -6,7 +6,7 @@ use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
 use tokio::{net::TcpStream, time::timeout};
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
-use yetlet_actions::{ActionError, ActionExecutor, Command};
+use yetlet::actions::{ActionError, ActionExecutor, Command};
 
 pub const MAX_FRAME_BYTES: usize = 1024;
 pub const SERVER_DEADLINE: Duration = Duration::from_secs(1);

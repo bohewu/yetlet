@@ -202,8 +202,8 @@ fn scene_profiles_scenarios_sources_and_geometry_are_explicit() {
         serde_json::json!({"args":["-headless"],"prefs":{"dom.webgpu.enabled":true}})
     );
     let root = tempfile::tempdir().unwrap();
-    let name = "crates/yetlet-wgpu/src/browser.rs";
-    std::fs::create_dir_all(root.path().join("crates/yetlet-wgpu/src")).unwrap();
+    let name = "crates/yetlet-browser/src/wgpu/browser.rs";
+    std::fs::create_dir_all(root.path().join("crates/yetlet-browser/src/wgpu")).unwrap();
     std::fs::write(root.path().join(name), b"current").unwrap();
     let manifest =
         serde_json::json!({"candidate_sources":{name:yetlet_xtask::tooling::sha(b"current")}});

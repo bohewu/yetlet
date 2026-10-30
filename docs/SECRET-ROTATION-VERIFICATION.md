@@ -34,7 +34,7 @@ password, scheduling rotation or restarting consumers.
 
 ## Azure experiment boundary
 
-The [read-only Azure CLI example](../crates/yetlet-secrets/examples/azure_cli.rs)
+The [read-only Azure CLI example](../crates/yetlet/examples/secrets/azure_cli.rs)
 implements the same trait with a current-version or pinned-version lookup.
 It uses a separately installed/authenticated official Azure CLI through literal
 argv, captures JSON without trimming secret contents and discards backend error

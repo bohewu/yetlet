@@ -1,5 +1,5 @@
 //! State for this example's one explicit remote create and read-only recovery.
-use yetlet_actions::ActionError;
+use yetlet::actions::ActionError;
 use yetlet_todo_ui::{MAX_TITLE_LENGTH, MAX_TODOS, TodoSnapshot};
 
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]

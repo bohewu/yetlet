@@ -11,10 +11,11 @@ use wasm_bindgen_futures::{JsFuture, spawn_local};
 use web_sys::{
     Document, Element, HtmlButtonElement, HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement,
 };
-use yetlet_actions::{ActionError, ApiErrorEnvelope, HttpExecutor};
-use yetlet_core::binding::BindingKey;
-use yetlet_dom_keyed::{DomEventListener, KeyedChildren, KeyedEntry};
-use yetlet_reactive::{GraphHandle, LocalGraph};
+use yetlet::actions::{ActionError, ApiErrorEnvelope};
+use yetlet::reactive::{GraphHandle, LocalGraph};
+use yetlet::view::binding::BindingKey;
+use yetlet_browser::actions::HttpExecutor;
+use yetlet_browser::dom_keyed::{DomEventListener, KeyedChildren, KeyedEntry};
 
 type Handle = GraphHandle<Workspace, Msg, &'static str>;
 

@@ -1,7 +1,7 @@
 use secrecy::{ExposeSecret, SecretString};
 use serde::Deserialize;
 use std::{io, net::SocketAddr, path::PathBuf};
-use yetlet_config::{Loader, SecretFormat};
+use yetlet::config::{Loader, SecretFormat};
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]

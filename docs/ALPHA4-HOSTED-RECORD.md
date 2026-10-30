@@ -1,9 +1,10 @@
 # Alpha.4 — Hosted source packages and signing checkpoint
 
-Date: 2026-10-30 (Asia/Taipei). **Original build/readback, preparation, signing,
-independent result verification and retention PASS. Combined publication failed
-at GitHub staging; crates.io was not attempted.** The owner approved the actual
-publication run below. Its failure remains preserved without an automatic retry.
+Date: 2026-10-30 (Asia/Taipei). **Build/readback, preparation, signing and
+independent verification PASS. GitHub pre-release is public with twenty verified
+assets; registry completion is one of sixteen.** Both failed attempts remain
+preserved. Current local work corrects response parsing and prepares an explicit
+registry-only continuation, without Git delivery, upload or re-signing.
 
 ## Immutable product source and actual evidence
 
@@ -186,3 +187,89 @@ and actual high effort are verified. This acceptance-only metadata follows the
 reviewed boundary. Actionlint is unavailable; hosted cache-hit/performance and
 corrected live publisher acceptance remain unverified. No Commit/Push, new
 hosted execution, retry or publication occurred in this local slice.
+
+## Actual public release and one-package registry outcome
+
+[PR28](https://github.com/bohewu/yetlet/pull/28) delivered the upload-length and
+bounded-diagnostic repair with strict/builtin Guard. Both PR CI41026724358/1 and
+master CI41027664663/1 passed. Publisher P is
+`1c0bb3157e27db026b8f8c050c658e7c48973749`; its reviewed tree is
+`9fc1936369ce95963ca5db2a9f8443a84680f981`. C/tag/S/V, all original archives and
+signatures remain fixed. CI tool caching completed cold restore/save; no warm
+speedup is claimed.
+
+The owner approved [41028646006/1](https://github.com/bohewu/yetlet/actions/runs/41028646006).
+GitHub publication and authenticated/anonymous readback succeeded for all twenty
+exact planned assets. [Release428745799](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.4)
+is a public Experimental prerelease, not Latest. No private evidence was attached.
+The job subsequently failed in registry response validation, and cleanup passed.
+Its original receipt records `github: published_and_verified`, registry attempted
+and overall incomplete; it is not rewritten as an overall success.
+
+Only `yetlet-actions0.9.0-alpha.4` was sent. Independent observation confirms its
+owner is bohewu, it is not yanked, and API/index/download all match the exact
+11,597-byte archive SHA-256
+`ca5decf8a93c213fe60bfad981d75e52ac01f9b3ca56c49e8f2d8eddbad411e3`.
+The other fifteen packages and registry consumer were not attempted by that run.
+The original registry receipt remains incomplete with one attempted entry; a
+separate read-only reconciliation records the observed successful write.
+
+The parser incorrectly required `krate.name`. Cargo's published success contract
+does not require that field, and crates.io's API type renames its Rust `krate`
+member to JSON `crate`. The old mocks encoded the same wrong assumption. The
+original PUT body was not retained; its exact fields are not fabricated.
+
+## Local registry-only continuation
+
+The [continuation contract](RELEASE-PUBLICATION.md#registry-only-continuation-contract--2026-10-30)
+binds original result artifact12964529138, ZIP SHA-256
+`d264113a13efb9ee6bef900d78a9dfe3d8c5db01a8cf53d1b7d1cc3b3fabedb7`.
+The unchanged sixteen-package registry plan SHA-256 is
+`83841e02ce97c22cc41902de67af7f042a75ca95c65eba26ea72916dc8d162a7`.
+An explicit known one-plus-fifteen selection preserves the public acceptance
+summary and all twenty asset IDs/bytes. The new protected job has GitHub read
+permissions and the existing final owner gate; it has no GitHub mutation,
+signing or age-key path. Existing-package readback/owner and all target-version
+absence checks precede writes; any detected target version stops rather than
+being silently skipped or resent.
+
+Local affected checks use official warnings-only and additional-`crate` success
+formats, fifteen original body/dependency ordering, unchanged published metadata,
+bound failed artifacts/receipts, owner/job gates and zero-write refusal cases.
+Read-only preparation with actual artifacts matches the original request/plans,
+confirms all twenty public assets, verifies the existing package/owner and
+observes all fifteen remaining versions absent. No registry token/private key or
+mutation is used. A non-executable request template leaves the future P Pending.
+
+Independent local review is recorded separately. New P delivery/CI, actual
+account new-crate capacity, a separately authorized hosted attempt and its owner
+gate remain open. No complete registry consumer, Commit/Push, upload, re-signing,
+GitHub asset change or YT-020 completion is claimed by this local preparation.
+
+Local continuation acceptance: **fifteen distinct focused checks PASS**, with
+only the two extended cases rerun; actual original-artifact/read-only state
+preparation PASS. Docs75/209, workflow YAML/nine shell blocks/Python syntax and
+whitespace PASS. Independent Reviewer
+`/root/alpha4_hosted_checkpoint_review_20261030` returns **PASS**, zero issues or
+required followups; all nine reviewed source hashes match. Native reviewer/model
+and actual high effort are verified. Only this acceptance metadata follows the
+reviewed boundary. New P/CI, hosted acceptance, account capacity and full registry
+consumer proof remain Pending; this verdict grants no upload or Git authority.
+
+### Owner-selected conservative continuation cadence
+
+The owner authorizes delivery of the local parser/continuation correction and
+then selects one new name per11minutes, with a210minute protected-job bound.
+The original nine-path correction is locally committed as `f743366`; it has not
+yet been pushed. The fixed policy waits660seconds before each of fifteen unique
+PUTs, including the first (165minutes scheduled waiting). Each wait is followed
+by live P/CI, owner-approval and unchanged-public-release checks; target absence
+is checked before intent/PUT. Errors including429 stop without retry. The normal
+publisher remains60minutes. No quota probe or registry write is performed by
+this adjustment. It does not establish the account's actual quota.
+
+Only affected pacing/continuation checks and documentary checks are required;
+the original accepted archive, signing, platform and browser evidence is reused.
+Pacing review and delivery results are recorded separately from the earlier
+local PASS. Hosted preflight may proceed after reviewed delivery/green CI, but
+the final `release-publish` gate still belongs to the owner. YT-020 stays Blocked.

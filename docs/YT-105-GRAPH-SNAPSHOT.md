@@ -10,7 +10,7 @@ verified and complete.
 
 ## Implemented contract
 
-[`GraphHandle::snapshot`](../crates/yetlet-reactive/src/lib.rs) now exposes:
+[`GraphHandle::snapshot`](../crates/yetlet/src/reactive/mod.rs) now exposes:
 
 ```rust
 pub fn snapshot(&self) -> Result<State, ReactiveError<Error>>;
@@ -42,7 +42,7 @@ The change is additive and remains Experimental under the existing
 [API classification](API-CONTRACTS.md). It preserves
 [ADR 0007](adr/0007-bounded-keyed-dom-and-local-graph.md); the graph's publication,
 queue, callback and failure order has not changed. The
-[crate guide](../crates/yetlet-reactive/README.md) documents callback use and limits.
+[crate guide](../crates/yetlet/guides/reactive.md) documents callback use and limits.
 
 ## Focused verification
 

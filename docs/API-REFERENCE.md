@@ -1,23 +1,14 @@
 # Current API reference
 
-Date: 2026-10-27. Scope: the current checkout, including the existing opt-in
-application options. All packages remain unpublished and experimental. This
-entry map does not promise SemVer stability or requalify the current source for
-every platform. All sixteen implemented libraries are included in the selected
-experimental 0.1.0 candidate; package selection does not install a capability.
+Date: 2026-10-30. This map describes the unreleased two-package SDK
+(`0.9.0-alpha.5`) in this checkout. `yetlet` contains the shared View and opt-in
+native capabilities; `yetlet-browser` contains browser integrations and depends
+one-way on the same View. Neither package is currently published to crates.io.
+Earlier release tags retain their original layouts and evidence.
 
-Use repository guides for behavior and integration, and source/rustdoc from the
-same revision for signatures and feature/target availability. The
-[documentation scope](DOCUMENTATION-SCOPE.md) defines publication inputs.
-[Compatibility](COMPATIBILITY.md) and [naming](NAMING.md) govern change discipline;
-the [historical M9 classification](API-CONTRACTS.md) retains its original scope.
-The [capability map](CAPABILITIES.md) distinguishes framework packages,
-application integrations and research decisions.
-
-The packages have compatible 0.1.0 metadata, licenses and package guides. They
-remain unpublished; the selected candidate is undergoing technical evidence
-reconciliation. Support remains specific to each package, target and feature.
-Historical nine-package evidence keeps its original source and support limits.
+Use guides for behavior and rustdoc from the same revision for signatures.
+[The migration contract](YT-211-TWO-PACKAGE-MIGRATION.md) records the complete
+source break, feature names and preserved boundaries.
 
 For first authoring, follow [Views/components](VIEW-COMPONENTS.md). For package
 features, startup wiring and consumer settings/defaults in one place, use the
@@ -27,41 +18,40 @@ API-carrier map, with full contracts in their linked guides.
 For source loading, startup validation, typed options and application-owned
 diagnostics together, follow [Settings, options and logging](SETTINGS-OPTIONS-LOGGING.md).
 
-## HTML, HTTP and browser packages
+## HTML, HTTP and browser modules
 
-These packages provide the main HTML, HTTP and browser building blocks. Their
+These modules provide the main HTML, HTTP and browser building blocks. Their
 presence here is not registry availability; start from the existing checkout. Renderer validation
 and native Axum/Tower semantics remain separate responsibilities.
 
 | Package and current guide | Main entry points | Selection, ownership and failure boundary |
 |---|---|---|
-| [yetlet-core](../crates/yetlet-core/README.md) | `View`, `Element`, `binding` validated vocabulary | Owned renderer-neutral values; construction does not sanitize HTML. Binding validation can return `BindingContractError`; the renderer owns output policy |
-| [yetlet-html](../crates/yetlet-html/README.md) | `render_to_string`, `escape_text`, `RenderError` | Borrow a View, return an owned escaped fragment or policy error. Complete buffering; no raw HTML escape hatch or HTTP-header ownership |
-| [yetlet-server-axum](../crates/yetlet-server-axum/README.md) | `App`, `Page`, `RequestContext`, `DocumentMetadata`, `LanguageTag`, `middleware` | Native routing/extractors/State/Extensions; fallible rendering maps to generic HTTP 500. Metadata and strict CSP stay bounded; no mandatory Session, configuration, MVC or DI |
-| [yetlet-dom](../crates/yetlet-dom/README.md) | `validate`; WASM `mount` | Optional browser subtree replacement, finite DOM policy. Static validation returns `DomPolicyError`; browser failures use `JsValue`. No general identity preservation; mount can reject navigation that static validation accepted |
-| [yetlet-dom-keyed](../crates/yetlet-dom-keyed/README.md) | `validate_keyed_order`; WASM `KeyedChildren`, `KeyedEntry`, `DomEventListener` | Explicit keyed/listener lifetime; duplicate-key preflight and browser failures. Callbacks and DOM failures do not provide transactional rollback or a generic sanitizer |
-| [yetlet-reactive](../crates/yetlet-reactive/README.md) | `LocalGraph`, `GraphHandle`, `Subscription`, `ReactiveError` | Synchronous thread-local reducer/commit ownership; weak handles and explicit disposal. Snapshot clones published state; faults and queued re-entrant work retain their documented semantics |
-| [yetlet-actions](../crates/yetlet-actions/README.md) | `Command`, `ActionExecutor`, `LocalExecutor`, `HttpExecutor`, `ActionError` | Explicit local versus typed HTTP actions; native HTTP-executor construction is not native fetch execution. WASM executes HTTP; no implicit Auth/CSRF, retries or remote DOM-event circuit |
-| [yetlet-request-id](../crates/yetlet-request-id/README.md) | `RequestIds`, `RequestId`, `HEADER`, `InvalidStart` | Explicit scoped/global installation. Clones share a bounded numeric counter; independent providers/restarts do not. Generated IDs replace untrusted inbound values; overflow refuses with 503, not distributed trace identity |
-| [yetlet-session](../crates/yetlet-session/README.md) | `SessionConfig`, `SessionManager`, `Session`, typed Session errors | Explicit bounded Memory store, synchronous operations, cookie/CSRF and rotation/revocation. Process-local state disappears on restart; anonymous Session is not authentication or durable business storage |
+| [`yetlet::view`](../crates/yetlet/guides/core.md) | `View`, `Element`, `binding` validated vocabulary | Owned renderer-neutral values; construction does not sanitize HTML. Binding validation can return `BindingContractError`; the renderer owns output policy |
+| [`yetlet::html`](../crates/yetlet/guides/html.md) | `render_to_string`, `escape_text`, `RenderError` | Borrow a View, return an owned escaped fragment or policy error. Complete buffering; no raw HTML escape hatch or HTTP-header ownership |
+| [`yetlet::server_axum`](../crates/yetlet/guides/server-axum.md) | `App`, `Page`, `RequestContext`, `DocumentMetadata`, `LanguageTag`, `middleware` | Native routing/extractors/State/Extensions; fallible rendering maps to generic HTTP 500. Metadata and strict CSP stay bounded; no mandatory Session, configuration, MVC or DI |
+| [`yetlet_browser::dom`](../crates/yetlet-browser/guides/dom.md) | `validate`; WASM `mount` | Optional browser subtree replacement, finite DOM policy. Static validation returns `DomPolicyError`; browser failures use `JsValue`. No general identity preservation; mount can reject navigation that static validation accepted |
+| [`yetlet_browser::dom_keyed`](../crates/yetlet-browser/guides/dom-keyed.md) | `validate_keyed_order`; WASM `KeyedChildren`, `KeyedEntry`, `DomEventListener` | Explicit keyed/listener lifetime; duplicate-key preflight and browser failures. Callbacks and DOM failures do not provide transactional rollback or a generic sanitizer |
+| [`yetlet::reactive`](../crates/yetlet/guides/reactive.md) | `LocalGraph`, `GraphHandle`, `Subscription`, `ReactiveError` | Synchronous thread-local reducer/commit ownership; weak handles and explicit disposal. Snapshot clones published state; faults and queued re-entrant work retain their documented semantics |
+| [`yetlet::actions`](../crates/yetlet/guides/actions.md) | `Command`, `ActionExecutor`, `LocalExecutor`, `ActionError`; browser `yetlet_browser::actions::HttpExecutor` | Explicit local versus typed HTTP actions; native HTTP-executor construction is not native fetch execution. WASM executes HTTP; no implicit Auth/CSRF, retries or remote DOM-event circuit |
+| [`yetlet::request_id`](../crates/yetlet/guides/request-id.md) | `RequestIds`, `RequestId`, `HEADER`, `InvalidStart` | Explicit scoped/global installation. Clones share a bounded numeric counter; independent providers/restarts do not. Generated IDs replace untrusted inbound values; overflow refuses with 503, not distributed trace identity |
+| [`yetlet::session`](../crates/yetlet/guides/session.md) | `SessionConfig`, `SessionManager`, `Session`, typed Session errors | Explicit bounded Memory store, synchronous operations, cookie/CSRF and rotation/revocation. Process-local state disappears on restart; anonymous Session is not authentication or durable business storage |
 
-## Additional opt-in packages
+## Additional opt-in modules
 
-These seven packages are also included in the selected sixteen-package
-candidate and are available for explicit source-checkout use. A separate
-workspace/lock is a build boundary, not an interchangeable provider or
-platform-support guarantee. Their default installation and support do not
-follow from coordinated versioning.
+Each native capability below is a feature of `yetlet`; WebGPU belongs to
+`yetlet-browser`. Selecting a feature compiles an API, while startup installation
+and application-owned configuration remain explicit. Native modules are absent
+on wasm32 even in a broad feature union.
 
 | Package and current guide/source | Main entry points | Selection, ownership and failure boundary |
 |---|---|---|
-| [yetlet-auth](../crates/yetlet-auth/README.md) | `Principal`, `Authentication`, `authenticate`, `Authenticated`, resolver types | Native route-scoped identity resolution; required versus optional extraction, missing-layer refusal and responses follow the guide. Verified identity does not grant business authorization. Optional `session` explicitly bridges Memory Session only |
-| [yetlet-rate-limit](../crates/yetlet-rate-limit/README.md) | `Policy`, `Budget`, `Key`, `RateLimitLayer`, `InvalidRateLimitInput` | Native per-process memory admission. Policy reuse shares configuration; Budget/layer clones share accounting. Trusted keys, bounded capacity and rejection semantics are explicit; no distributed quota |
-| [yetlet-config](../crates/yetlet-config/README.md) / [full guide](CONFIGURATION.md) | `Loader`, `Environment`, `Error::Key`; optional `SecretBinding` | Opt-in startup loading with finite precedence. `load_with_env` applies a supplied snapshot after ordinary sources; optional `secret-provider` resolves selected protected fields. No ambient Settings service, live reload or browser secrets |
-| [yetlet-secrets](../crates/yetlet-secrets/README.md) | `SecretProvider`, `SecretFuture`, `SecretError`, `SettingsSecrets` | Injected native async lookup: missing `None` differs from access/unavailable errors. Settings adapter owns an explicitly replaceable snapshot; no automatic rotation, registry or browser dependency |
-| [yetlet-signing](../crates/yetlet-signing/README.md) / [source](../crates/yetlet-signing/src/lib.rs) | `SigningBackend`, `PublicKeySource`, `PublicKeySet`, `Policy`, `Verifier`, `SigningService` | Explicit exact-byte operations, versioned keys and caller-owned trust. Public material membership does not establish trust; local OpenSSL support does not activate release signing or imply general PKI validation |
-| [yetlet-session-redis](../crates/yetlet-session-redis/README.md) | `RedisSessionConfig`, `RedisSessionManager`, `RedisSession`, typed operation/errors | Separately selected async provider; configured namespace, limits, lifecycle and uncertain-outcome handling remain explicit. Optional native `tls` selects checked `rediss://`; Redis names the protocol API and Valkey the selected reference server. No generic HA/failover/restore promise |
-| [yetlet-wgpu](../crates/yetlet-wgpu/README.md) / [support](../crates/yetlet-wgpu/SUPPORT.md) | Bounded scene/batch/lifetime and picking APIs | Separate optional flat-scene renderer. CPU-only defaults; explicit `browser` plus WASM target selects WebGPU. Scene/device/lifecycle errors remain explicit; no DOM acceleration, stable API, 3D or performance guarantee |
+| [`yetlet::auth`](../crates/yetlet/guides/auth.md) | `Principal`, `Authentication`, `authenticate`, `Authenticated`, resolver types | Native route-scoped identity resolution; required versus optional extraction, missing-layer refusal and responses follow the guide. Verified identity does not grant business authorization. Optional `auth-session` explicitly bridges Memory Session only |
+| [`yetlet::rate_limit`](../crates/yetlet/guides/rate-limit.md) | `Policy`, `Budget`, `Key`, `RateLimitLayer`, `InvalidRateLimitInput` | Native per-process memory admission. Policy reuse shares configuration; Budget/layer clones share accounting. Trusted keys, bounded capacity and rejection semantics are explicit; no distributed quota |
+| [`yetlet::config`](../crates/yetlet/guides/config.md) / [full guide](CONFIGURATION.md) | `Loader`, `Environment`, `Error::Key`; optional `SecretBinding` | Opt-in startup loading with finite precedence. `load_with_env` applies a supplied snapshot after ordinary sources; optional `secret-provider` resolves selected protected fields. No ambient Settings service, live reload or browser secrets |
+| [`yetlet::secrets`](../crates/yetlet/guides/secrets.md) | `SecretProvider`, `SecretFuture`, `SecretError`, `SettingsSecrets` | Injected native async lookup: missing `None` differs from access/unavailable errors. Settings adapter owns an explicitly replaceable snapshot; no automatic rotation, registry or browser dependency |
+| [`yetlet::signing`](../crates/yetlet/guides/signing.md) / [source](../crates/yetlet/src/signing/mod.rs) | `SigningBackend`, `PublicKeySource`, `PublicKeySet`, `Policy`, `Verifier`, `SigningService` | Explicit exact-byte operations, versioned keys and caller-owned trust. Public material membership does not establish trust; local OpenSSL support does not activate release signing or imply general PKI validation |
+| [`yetlet::session_redis`](../crates/yetlet/guides/session-redis.md) | `RedisSessionConfig`, `RedisSessionManager`, `RedisSession`, typed operation/errors | Separately selected async provider; configured namespace, limits, lifecycle and uncertain-outcome handling remain explicit. Optional native `session-redis-tls` selects checked `rediss://`; Redis names the protocol API and Valkey the selected reference server. No generic HA/failover/restore promise |
+| [`yetlet_browser::wgpu`](../crates/yetlet-browser/guides/wgpu.md) / [support](../crates/yetlet-browser/guides/wgpu-support.md) | Bounded scene/batch/lifetime and picking APIs | Separate optional flat-scene renderer. CPU-only defaults; explicit `wgpu-browser` plus WASM target selects WebGPU. Scene/device/lifecycle errors remain explicit; no DOM acceleration, stable API, 3D or performance guarantee |
 
 Native Auth, configuration, secrets, signing and remote Session capabilities
 must not enter browser builds or serialized hydration state. Package selection
@@ -91,35 +81,14 @@ infer an implemented API from a research item marked Done.
 
 ## Local rustdoc
 
-Generate the reference for the package/configuration being used. For example,
-from the repository root with the pinned toolchain and required dependencies:
+From the repository root, select features and target explicitly:
 
 ```sh
-cargo doc --locked --no-deps -p yetlet-core -p yetlet-html -p yetlet-server-axum
-cargo doc --locked --no-deps -p yetlet-auth --features session
-cargo doc --locked --no-deps -p yetlet-rate-limit
+cargo doc --offline --locked --no-deps -p yetlet --features server-axum,auth-session,rate-limit,config,secret-provider
+cargo doc --offline --locked --no-deps -p yetlet-browser --target wasm32-unknown-unknown --all-features
 ```
 
-The first command writes the server entry page under
-`target/doc/yetlet_server_axum/index.html`. Features remain explicit; `--no-deps`
-selects documented packages, not a promise that dependencies need no compilation.
-For an isolated workspace, use its manifest and its own lock/target directory:
-
-```sh
-cargo doc --locked --no-deps --manifest-path crates/yetlet-config/Cargo.toml
-cargo doc --locked --no-deps --manifest-path crates/yetlet-secrets/Cargo.toml
-cargo doc --locked --no-deps --manifest-path crates/yetlet-signing/Cargo.toml
-cargo doc --locked --no-deps --manifest-path crates/yetlet-session-redis/Cargo.toml --features tls
-```
-
-A native default reference omits cfg-gated browser items. With the documented
-WASM prerequisites, select that target (and the GPU feature only if desired):
-
-```sh
-cargo doc --locked --no-deps --target wasm32-unknown-unknown -p yetlet-dom -p yetlet-dom-keyed -p yetlet-actions
-cargo doc --locked --no-deps --manifest-path crates/yetlet-wgpu/Cargo.toml --target wasm32-unknown-unknown --features browser
-```
-
-These are local documentation-generation instructions, not qualification commands
-or a claim that every combination has been executed. No hosted rustdoc, docs.rs
-package, separate Wiki or documentation website is selected by this reference.
+The native entry page is `target/doc/yetlet/index.html`; browser output is under
+`target/wasm32-unknown-unknown/doc/yetlet_browser/index.html`. Signing separately
+requires its documented native OpenSSL dependency. Local rustdoc instructions
+are not fresh platform qualification or a docs.rs publication claim.

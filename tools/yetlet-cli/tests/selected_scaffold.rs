@@ -67,15 +67,19 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                         .unwrap()
                         .parse()
                         .unwrap();
-                    for krate in ["yetlet-core", "yetlet-server-axum"] {
+                    for krate in ["yetlet"] {
                         assert_eq!(
                             manifest["dependencies"][krate]["version"].as_str(),
-                            Some("=0.1.0")
+                            Some("=0.9.0-alpha.5")
                         );
                         assert!(manifest["dependencies"][krate].get("path").is_none());
                     }
                     assert_eq!(
-                        manifest["dependencies"].get("yetlet-config").is_some(),
+                        manifest["dependencies"]["yetlet"]["features"]
+                            .as_array()
+                            .unwrap()
+                            .iter()
+                            .any(|f| f.as_str() == Some("config")),
                         settings || vite
                     );
                     assert_eq!(before.contains_key("src/config.rs"), settings || vite);
@@ -338,7 +342,7 @@ fn selected_vite_runtime_settings_and_custom_root_compile_with_explicit_cargo_ov
         .unwrap();
     let manifest_path = app.join("Cargo.toml");
     let mut manifest: toml::Value = fs::read_to_string(&manifest_path).unwrap().parse().unwrap();
-    for krate in ["yetlet-core", "yetlet-server-axum", "yetlet-config"] {
+    for krate in ["yetlet"] {
         manifest["dependencies"][krate]
             .as_table_mut()
             .unwrap()

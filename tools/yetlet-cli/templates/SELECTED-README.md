@@ -1,21 +1,13 @@
 # @NAME@
 
-Experimental Yetlet SSR application scaffold. The CLI release @VERSION@ emits
-exact template crate versions (core/server 0.1.0; config 0.0.0 when selected). These crates are **unpublished and not
-usable from a registry until YT-096/YT-020 release qualification**. No registry
-availability, production support or clean-source identity is asserted.
-
-For local evaluation, explicitly replace the Yetlet dependencies with compatible
-Cargo path declarations (or add Cargo patches), then prepare this application's
-own lockfile. Dependency overrides belong to Cargo; the CLI does not locate a
-framework checkout. For example, set `path` alongside the matching `version` in
-each selected dependency (replace the paths explicitly):
+Experimental Yetlet SSR application scaffold. CLI @VERSION@ emits the selected
+SDK version @SDK_VERSION@. The current two-package layout is unreleased.
+For local evaluation, set an explicit compatible Cargo path before preparing
+this application's own lockfile; the CLI does not locate a framework checkout.
+Preserve the generated feature list (including `config` for Settings/Vite):
 
 ```toml
-yetlet-core = { version = "=0.1.0", path = "/absolute/yetlet/crates/yetlet-core" }
-yetlet-server-axum = { version = "=0.1.0", path = "/absolute/yetlet/crates/yetlet-server-axum" }
-# Only when settings/Vite was selected:
-yetlet-config = { version = "=0.0.0", path = "/absolute/yetlet/crates/yetlet-config" }
+yetlet = { version = "=@SDK_VERSION@", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["server-axum"] }
 ```
 
 Provision dependencies separately before frozen commands:

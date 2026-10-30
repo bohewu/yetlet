@@ -50,10 +50,10 @@ the original immutable release candidate and YT-096/020 gates remain unchanged.
 
 | Inspected source | Boundary retained by this contract |
 |---|---|
-| [Auth resolver/extractors](../crates/yetlet-auth/src/lib.rs), `Resolver`, `authenticate`, `Authenticated` | Native async Parts/state resolution once per installed scope; private resolved state; explicit required/optional outcomes; body untouched |
-| [Current Memory bridge](../crates/yetlet-auth/src/session.rs), `memory` | Synchronous typed Memory Session read; no Valkey selection or async rewrite |
-| [Remote provider](../crates/yetlet-session-redis/src/lib.rs), `open`, `read`, `replace_and_rotate`, `destroy`, `finalize`, `shutdown` | Cookie parsing is not authentication; reads are authoritative; mutation acknowledgment, cookie finalization and owned-work drain are separate boundaries |
-| [Provider guide](../crates/yetlet-session-redis/README.md) | Existing bounded single-primary semantics, standalone workspace, private cookies, uncertain outcomes and pure-SSR ordering limits |
+| [Auth resolver/extractors](../crates/yetlet/src/auth/mod.rs), `Resolver`, `authenticate`, `Authenticated` | Native async Parts/state resolution once per installed scope; private resolved state; explicit required/optional outcomes; body untouched |
+| [Current Memory bridge](../crates/yetlet/src/auth/session.rs), `memory` | Synchronous typed Memory Session read; no Valkey selection or async rewrite |
+| [Remote provider](../crates/yetlet/src/session_redis/mod.rs), `open`, `read`, `replace_and_rotate`, `destroy`, `finalize`, `shutdown` | Cookie parsing is not authentication; reads are authoritative; mutation acknowledgment, cookie finalization and owned-work drain are separate boundaries |
+| [Provider guide](../crates/yetlet/guides/session-redis.md) | Existing bounded single-primary semantics, standalone workspace, private cookies, uncertain outcomes and pure-SSR ordering limits |
 | [Board Session composition](../examples/lab-operations-board/src/sessions.rs), `ensure_anonymous`, `remote_error` | Explicit login-page anonymous creation, async remote handles and no local fallback |
 | [Board identity DTO](../examples/lab-operations-board/src/domain.rs), `Principal`, `LoginSession` | Serialized local identity name is reconstructed through a fixed per-process table; permissions are not trusted from stored objects |
 | [Board authorization](../examples/lab-operations-board/src/lib.rs), `user`, `save` | Resource checks and Session reread before SQL work; this does not make separate stores one atomic transaction |

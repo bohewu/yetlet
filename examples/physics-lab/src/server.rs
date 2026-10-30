@@ -14,8 +14,8 @@ use std::{
     path::{Path, PathBuf},
     sync::Arc,
 };
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{
+use yetlet::view::{Element, View};
+use yetlet::server_axum::{
     DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document_with_metadata,
 };
 const CSP: &str = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";

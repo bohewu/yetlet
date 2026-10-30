@@ -1,5 +1,5 @@
 use crate::domain::{Fields, History, ListQuery, Listing, Principal, Snapshot, WorkItem};
-use yetlet_core::{Element, View};
+use yetlet::view::{Element, View};
 
 pub(crate) fn text(tag: &'static str, value: impl Into<String>) -> Element {
     Element::new(tag).child(View::text(value))

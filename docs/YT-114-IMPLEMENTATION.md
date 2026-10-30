@@ -10,7 +10,7 @@ runtime, application migration, push or release is part of this slice.
 
 ## Delivered surface
 
-The new unpublished [yetlet-auth crate](../crates/yetlet-auth/README.md) is an
+The new unpublished [yetlet-auth crate](../crates/yetlet/guides/auth.md) is an
 explicit workspace member, with only Axum in its normal direct dependencies.
 Core and the server adapter do not depend on or reexport it. `publish = false`
 keeps it outside the original nine-library release candidate; wasm32 use is

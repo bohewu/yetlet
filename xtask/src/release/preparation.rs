@@ -163,14 +163,19 @@ pub(super) fn finish(
     record: &Value,
     archives: &BTreeMap<String, Value>,
 ) -> Result<()> {
+    let cohort = Cohort::from_label(
+        record["cohort"]
+            .as_str()
+            .ok_or_else(|| fail("release cohort required"))?,
+    )?;
     require(
         archives.keys().cloned().collect::<BTreeSet<_>>()
-            == Cohort::Sixteen
+            == cohort
                 .names()
                 .iter()
                 .map(|n| format!("{n}-{}.crate", private::package_version()))
                 .collect(),
-        "exact sixteen archive subjects required",
+        "exact selected archive subjects required",
     )?;
     for (name, value) in archives {
         require(
@@ -183,9 +188,9 @@ pub(super) fn finish(
         out,
         "INVENTORY-COVERAGE.json",
         &json!({
-            "scope":"sixteen Cargo source packages; 17 recipe phases with all-kind dependency order, normal offline locked verification and final predecessor checksums",
+            "scope":format!("{} Cargo source packages; {} recipe phases with all-kind dependency order, normal offline locked verification and final predecessor checksums", cohort.names().len(), cohort.names().len()+1),
             "fresh_cargo_and_target":true,"hermetic_environment":false,
-            "inventory":"selected source, six locks, recipe and tool hashes; not complete compiled/native/system closure",
+            "inventory":"selected source, selected locks, recipe and tool hashes; not complete compiled/native/system closure",
             "qualification":"no new browser, CSP, Windows, GPU, security or operational qualification; historical evidence retains its original source and scope",
             "custody":"complete private assembly is runner-local ephemeral; no durable private storage configured",
             "release_approved":false,"unsigned":true
@@ -197,9 +202,12 @@ pub(super) fn finish(
     ];
     let locks = record["cargo_lock_sha256s"]
         .as_object()
-        .ok_or_else(|| fail("six lock inputs required"))?;
-    require(locks.len() == 6, "six lock inputs required")?;
-    for manifest in Cohort::Sixteen.manifests() {
+        .ok_or_else(|| fail("selected lock inputs required"))?;
+    require(
+        locks.len() == cohort.manifests().len(),
+        "selected lock inputs required",
+    )?;
+    for manifest in cohort.manifests() {
         let path = Path::new(manifest).with_file_name("Cargo.lock");
         let key = path.to_string_lossy().replace('\\', "/");
         let digest = locks
@@ -248,7 +256,7 @@ pub(super) fn finish(
         "predicate":{
             "buildDefinition":{
                 "buildType":"urn:yetlet:build:cargo-source-package:v1",
-                "externalParameters":{"workflow":{"repository":"https://github.com/bohewu/yetlet","path":".github/workflows/release.yml","ref":tag()},"cohort":"sixteen"},
+                "externalParameters":{"workflow":{"repository":"https://github.com/bohewu/yetlet","path":".github/workflows/release.yml","ref":tag()},"cohort":cohort.label()},
                 "internalParameters":{"rust_release":"1.99.0","target":"x86_64-unknown-linux-gnu","default_package_features":true,"openssl":"3.5.9","source_date_epoch":record["source_date_epoch"]},
                 "resolvedDependencies":dependencies
             },
@@ -417,12 +425,16 @@ mod tests {
     }
     #[test]
     fn fresh_statement_has_closed_fields_actual_bindings_and_exact_public_allowlist() {
+        check_statement(Cohort::Sixteen);
+        check_statement(Cohort::Consolidated);
+    }
+    fn check_statement(cohort: Cohort) {
         let temp = tempfile::tempdir().unwrap();
         let root = temp.path();
         let out = root.join("target/release-preparation/private");
         fs::create_dir_all(&out).unwrap();
         let mut archives = BTreeMap::new();
-        for name in Cohort::Sixteen.names() {
+        for name in cohort.names() {
             let file = format!("{name}-{}.crate", private::package_version());
             let bytes = file.as_bytes();
             archives.insert(
@@ -432,7 +444,7 @@ mod tests {
             fs::write(out.join(&file), bytes).unwrap();
         }
         let mut locks = BTreeMap::new();
-        for manifest in Cohort::Sixteen.manifests() {
+        for manifest in cohort.manifests() {
             let path = Path::new(manifest).with_file_name("Cargo.lock");
             locks.insert(
                 path.to_string_lossy().into_owned(),
@@ -440,7 +452,7 @@ mod tests {
             );
         }
         let source = json!({"source_archive_sha256":tooling::sha(b"actual export")});
-        let record = json!({"source_commit":"a".repeat(40),"source_date_epoch":"123", "cargo_lock_sha256s":locks,
+        let record = json!({"cohort":cohort.label(),"source_commit":"a".repeat(40),"source_date_epoch":"123", "cargo_lock_sha256s":locks,
             "tool_sha256":{"cargo":tooling::sha(b"cargo"),"rustc":tooling::sha(b"rustc"),"rustdoc":tooling::sha(b"rustdoc")},
             "recipe_sha256":{"release-workflow":tooling::sha(b"recipe")},
             "openssl":{"source_sha256":OPENSSL_SHA,"executable_sha256":tooling::sha(b"openssl")},
@@ -486,7 +498,10 @@ mod tests {
                 "source_date_epoch",
             ],
         );
-        assert_eq!(statement["subject"].as_array().unwrap().len(), 16);
+        assert_eq!(
+            statement["subject"].as_array().unwrap().len(),
+            cohort.names().len()
+        );
         for subject in statement["subject"].as_array().unwrap() {
             exact_keys(subject, &["name", "digest"]);
             exact_keys(&subject["digest"], &["sha256"]);
@@ -496,7 +511,7 @@ mod tests {
             );
         }
         let deps = definition["resolvedDependencies"].as_array().unwrap();
-        for manifest in Cohort::Sixteen.manifests() {
+        for manifest in cohort.manifests() {
             let path = Path::new(manifest).with_file_name("Cargo.lock");
             let label = path.parent().and_then(Path::file_name).map_or_else(
                 || "Cargo.lock".into(),

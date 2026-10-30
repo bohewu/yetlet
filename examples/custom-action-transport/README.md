@@ -1,7 +1,7 @@
 # Custom action transport research — YT-024
 
 This unpublished, native-only research fixture explicitly implements the existing
-`yetlet_actions::ActionExecutor<Add>` boundary using one TCP connection per command.
+`yetlet::actions::ActionExecutor<Add>` boundary using one TCP connection per command.
 It is excluded from the user-facing sample catalog and adds no supported crate API.
 
 From the repository root:
@@ -13,7 +13,7 @@ cargo test -p yetlet-custom-action-transport --offline -- --nocapture --test-thr
 The direct product tests bind only `127.0.0.1:0`, use synthetic read-only arithmetic,
 and join every peer task before checking that reconnect is refused. There is no
 long-lived server command, browser runtime, UI, HTTP route, credential or external
-service. The adapter and server handler depend only on `yetlet-actions`, Tokio,
+service. The adapter and server handler depend only on `yetlet::actions`, Tokio,
 `tokio-util`'s mature length-delimited codec, futures and serde; no renderer,
 reactive runtime, server adapter, controllers, DI or plugin registry is installed.
 

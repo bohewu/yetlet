@@ -6,9 +6,35 @@ decisions live in [Backlog](BACKLOG.md) and [Roadmap](ROADMAP.md). The current o
 [Release automation and registry promotion](RELEASE-PUBLICATION.md). This guide
 is not itself authority for Git, hosted/key/signing or publication actions.
 
+## Current two-package development boundary — YT-211
+
+Current unreleased source is `0.9.0-alpha.5`: exactly `yetlet` followed by
+`yetlet-browser`. Schema2/`consolidated` is the closed two-package record;
+schema1/`sixteen` remains for earlier artifacts at their matching source.
+The library count is derived only from that validated cohort throughout build,
+provenance, signing, result verification, public planning and registry promotion.
+There is no arbitrary package-list input and no selected alpha.5 C/S/tag yet.
+
+Normal packaging verifies the final base archive, stages its exact checksum,
+then verifies the Browser archive against it. No reverse development edge,
+bootstrap crate or `--no-verify` is used. Old sixteen-package records below
+remain historical instructions for their own checkouts, not an instruction to
+publish removed crates from this tree. The old one-plus-fifteen alpha.4 registry
+continuation remains paused and is explicitly invalid for schema2.
+
+The final publication Environment still requires the owner's approval. This
+migration does not execute hosted jobs, signing, a Release or crates.io upload.
+
 ## Read this before starting another version
 
-The published baseline is the Experimental
+For the current two-package source and remaining gates, use the
+[alpha.5 plan](ALPHA5-RELEASE-PLAN.md). The
+[alpha.4 hosted record](ALPHA4-HOSTED-RECORD.md) is the latest recorded GitHub
+pre-release, with one of sixteen packages published to crates.io and its old
+continuation paused. It is not a two-package candidate. The alpha.3 account below
+is retained at its original scope.
+
+The historical alpha.3 published baseline is the Experimental
 [v0.9.0-alpha.3 GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.3):
 sixteen source packages and signed provenance. The
 [actual record](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30)
@@ -16,7 +42,8 @@ binds C `557ab76`, S/V `30baf25`, both verified signatures, all sixteen package
 subjects and the private112-entry manifest, owner acceptance and exact20 public
 files. It is a prerelease, not Latest. Alpha.1 and failed alpha.2 evidence remain
 historical; none of their run IDs or signatures is a new-version template.
-crates.io remains a separate, unexecuted YT-020 gate.
+At that alpha.3 checkpoint, crates.io was a separate, unexecuted YT-020 gate;
+the alpha.4 record above supersedes only that distribution status.
 
 **YT-209 now has positive protected result-verification and public-delivery
 evidence.** Its first Python upload failed before creating assets; accepted
@@ -105,7 +132,7 @@ continue to apply; its per-stage human approvals are historical.
 | 8. Publish/read back | Prepare exact public attachments/notes, authorize the selected destination, publish once and verify public delivery | Exact names/sizes/hashes, unchanged tag/C, publication flags and anonymous reader/download correspondence; no private evidence attachment |
 | 9. Close out | Retain immutable outputs, approvals, failed attempts and final custody; update item/roadmap and current entry points | Done only at accepted scope; commit result documents only with Git authority |
 
-For the present coordinated cohort, the maintained source is sixteen libraries;
+For the historical sixteen-package cohort, the maintained source was sixteen libraries;
 the original nine-package records and old `0.1.0` artifacts remain historical.
 The fixed workflow/cohort is not evidence of uniform support across all sixteen.
 
@@ -183,7 +210,7 @@ statements retain their original checkpoints.
 | Carrier | Role and timeout |
 |---|---|
 | [rust.yml](../.github/workflows/rust.yml) | Unprivileged development PR/master CI; MSRV45 minutes, Stable60 minutes |
-| [release.yml](../.github/workflows/release.yml) | Manual unsigned sixteen-package preparation at reviewed C/tag, using a versioned core record;45 minutes |
+| [release.yml](../.github/workflows/release.yml) | Manual unsigned closed-cohort preparation at reviewed C/tag, using a versioned core record;45 minutes |
 | [evidence-verify.yml](../.github/workflows/evidence-verify.yml) | Original encrypted build-evidence readback, versioned record plus exact original build identity; preflight5 / protected15 minutes |
 | [release-sign.yml](../.github/workflows/release-sign.yml) | Closed prepare/sign modes at approved S on protected master; complete record plus exact request, preflight5 / protected30 minutes |
 | [release-result-verify.yml](../.github/workflows/release-result-verify.yml) | Separately protected independent signing-result readback at reviewed V, no OIDC/signing; preflight5 / protected30 minutes |
@@ -235,6 +262,21 @@ failures preserve their numeric status without the provider body. Raw binary
 stdin uploads explicitly set `Content-Length` to the verified byte length;
 stdin alone does not establish that header. See the retained
 [alpha.4 failure and local correction](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair).
+
+If GitHub publication succeeded but registry delivery is partial, preserve both
+the public release and every existing immutable crate version. The explicit
+[registry-only continuation](RELEASE-PUBLICATION.md#registry-only-continuation-contract--2026-10-30)
+binds the original failed result and unchanged archive plan. Reconcile published
+bytes/owner and remaining-version absence before a separately authorized attempt;
+do not rerun GitHub publication, resend existing versions or re-sign. The known
+one-plus-fifteen path still needs a reviewed new P, green CI, adequate first-name
+capacity and its actual owner gate. For the owner-selected conservative path,
+the registry-only job waits11minutes before each unique PUT, including the first:
+165minutes scheduled waiting for fifteen names, within a210minute job bound.
+After every wait it rechecks P/CI, owner approval and unchanged Release/assets,
+then checks target-version absence. Keep master=P until completion. Unknown
+account limits can still reject a write; HTTP429 stops without retry. The normal
+publication job retains its60minute bound. It is not an automatic/general resume.
 
 Use the adopted [D1/D2 field/attachment policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md)
 and a closed exact list. The first alpha has twenty public files: sixteen `.crate`

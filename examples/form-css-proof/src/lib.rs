@@ -13,10 +13,10 @@ use axum::{
     response::{IntoResponse, Redirect, Response},
 };
 use serde::Deserialize;
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{
+use yetlet::server_axum::{
     App, DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document_with_metadata,
 };
+use yetlet::view::{Element, View};
 
 const MANIFEST: &str = include_str!("../assets/manifest.json");
 const MAX_BODY: usize = 64 * 1024;
@@ -223,7 +223,7 @@ pub fn app_with_manifest(manifest: &str) -> Router {
         })
         .into_router()
         .layer(DefaultBodyLimit::max(MAX_BODY));
-    yetlet_server_axum::middleware::with_global(router, from_fn(security))
+    yetlet::server_axum::middleware::with_global(router, from_fn(security))
 }
 
 #[cfg(test)]

@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Frozen sixteen-archive registry promotion. No packaging, signing or write retries."""
+"""Frozen closed-cohort registry promotion. No packaging, signing or write retries."""
 import hashlib
 import io
 import json
@@ -15,6 +15,7 @@ import urllib.request
 import release_record as records
 
 API = 'https://crates.io/api/v1/crates/new'
+OWNER_API = 'https://crates.io/api/v1/crates/yetlet-actions/owners'
 MAX = 32 * 1024 * 1024
 
 
@@ -80,19 +81,20 @@ def envelope(meta, raw):
 
 def prepare(record, directory, subjects):
     records.validate(record, 'complete')
-    expected = {n + '-' + record['version'] + '.crate' for n in records.PACKAGES}
+    packages = records.packages(record)
+    expected = {n + '-' + record['version'] + '.crate' for n in packages}
     require(set(subjects) == expected)
     rows, blobs = {}, {}
-    for name in sorted(records.PACKAGES):
+    for name in sorted(packages):
         filename = name + '-' + record['version'] + '.crate'
         path = Path(directory) / filename
         require(path.is_file() and not path.is_symlink() and 0 < path.stat().st_size <= MAX)
         raw = path.read_bytes()
         require(sha(raw) == subjects[filename])
         meta = metadata(raw, name, record['version'])
-        dependencies = sorted({d['name'] for d in meta['deps'] if d['name'] in records.PACKAGES})
+        dependencies = sorted({d['name'] for d in meta['deps'] if d['name'] in packages})
         for d in meta['deps']:
-            if d['name'] in records.PACKAGES:
+            if d['name'] in packages:
                 require(d['version_req'] in (record['version'], '^' + record['version'], '=' + record['version']))
         body = envelope(meta, raw)
         rows[name] = {'name': name, 'filename': filename, 'size': len(raw), 'sha256': sha(raw),
@@ -127,8 +129,13 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 def request(url, method='GET', body=None):
     require(method in ('GET', 'PUT'))
-    require(url == API if method == 'PUT' else url.startswith(
-        ('https://index.crates.io/ye/tl/yetlet-', 'https://static.crates.io/crates/yetlet-')))
+    names = records.PACKAGES | records.CONSOLIDATED
+    allowed_read = url == OWNER_API or any(
+        url == 'https://index.crates.io/ye/tl/' + name or (
+            url.startswith('https://static.crates.io/crates/' + name + '/' + name + '-')
+            and records.token(url.removeprefix('https://static.crates.io/crates/' + name + '/' + name + '-').removesuffix('.crate'), records.VERSION)
+            and url.endswith('.crate')) for name in names)
+    require(url == API if method == 'PUT' else allowed_read)
     headers = {'Accept': 'application/json', 'User-Agent': 'Yetlet-release/1 (https://github.com/bohewu/yetlet)',
                'Cache-Control': 'no-cache'}
     if method == 'PUT':
@@ -178,7 +185,55 @@ def save(path, value):
     os.replace(temporary, path)
 
 
-def publish(plan, bodies, receipt_path):
+def publish_response(raw):
+    """Cargo publish success has optional warnings; identity comes from readback."""
+    response = json.loads(raw)
+    require(type(response) is dict and response.get('errors') in (None, []))
+    warnings = response.get('warnings')
+    require(warnings is None or type(warnings) is dict)
+    counts = {}
+    for key in ('invalid_categories', 'invalid_badges', 'other'):
+        values = (warnings or {}).get(key)
+        require(values is None or (type(values) is list and all(type(v) is str for v in values)))
+        counts[key] = len(values or [])
+    return counts  # Never retain provider strings, URLs or error bodies.
+
+
+def continuation_rows(plan, selection):
+    require(type(selection) is dict and set(selection) == {'existing', 'remaining'})
+    names = [r['name'] for r in plan['packages']]
+    require(len(names) == 16 and set(names) == records.PACKAGES)
+    require(selection['existing'] == ['yetlet-actions'] and names[0] == 'yetlet-actions')
+    require(selection['remaining'] == names[1:])
+    return plan['packages'][0], plan['packages'][1:]
+
+
+def require_absent(row, version):
+    try:
+        raw = request('https://index.crates.io/ye/tl/' + row['name'])
+    except RegistryError as error:
+        if error.kind == 'http' and error.status == 404:
+            return
+        raise
+    entries = [json.loads(line) for line in raw.splitlines() if line]
+    require(entries and all(e['name'] == row['name'] for e in entries))
+    if any(e['vers'] == version for e in entries):
+        raise RegistryError('version_exists')
+
+
+def reconcile(plan, selection):
+    """Read-only, known one-plus-fifteen boundary; no implicit recovery decisions."""
+    existing, remaining = continuation_rows(plan, selection)
+    proof = readback(existing, plan['version'])
+    owners = json.loads(request(OWNER_API))
+    require(any(u.get('login') == 'bohewu' and u.get('kind') == 'user' for u in owners['users']))
+    for row in remaining:
+        require_absent(row, plan['version'])
+    return {'name': existing['name'], 'status': 'verified_existing', 'sha256': existing['sha256'],
+            'owner': 'bohewu', **proof}
+
+
+def publish(plan, bodies, receipt_path, *, selection=None, before_put=None):
     """Caller must authenticate the final GitHub approval and public release first."""
     require(not Path(receipt_path).exists())  # No implicit retry/resume of an uncertain batch.
     proof = {'schema': 1, 'plan_sha256': records.digest(plan), 'status': 'in_progress',
@@ -186,14 +241,25 @@ def publish(plan, bodies, receipt_path):
     save(receipt_path, proof)
     try:
         complete = set()
-        for row in plan['packages']:
+        rows = plan['packages']
+        if selection is not None:
+            require(callable(before_put))
+            existing = reconcile(plan, selection)  # All state checks precede the first PUT.
+            proof['existing'] = [existing]
+            complete.add(existing['name'])
+            _, rows = continuation_rows(plan, selection)
+            save(receipt_path, proof)
+        for row in rows:
             require(set(row['requires']) <= complete and sha(bodies[row['name']]) == row['body_sha256'])
+            if selection is not None:
+                before_put(row)  # Caller-owned pacing and authority recheck; no PUT has been attempted yet.
+                require_absent(row, plan['version'])  # Stop on state drift; never resend or silently skip.
             entry = {'name': row['name'], 'status': 'attempted', 'sha256': row['sha256']}
             proof['packages'].append(entry)
             save(receipt_path, proof)  # Record intent before a possibly successful uncertain write.
-            response = json.loads(request(API, 'PUT', bodies[row['name']]))
-            require(not response.get('errors') and response['krate']['name'] == row['name'])
+            counts = publish_response(request(API, 'PUT', bodies[row['name']]))
             entry['upload_response'] = 'accepted'
+            entry['warning_counts'] = counts
             save(receipt_path, proof)
             entry.update(readback(row, plan['version'], 30))
             entry['status'] = 'verified'

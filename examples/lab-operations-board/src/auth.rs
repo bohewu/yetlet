@@ -14,8 +14,8 @@ use std::{
     time::Duration,
 };
 use tokio::io::AsyncReadExt;
-use yetlet_auth::{Authentication, ResolveFuture};
-use yetlet_session_valkey::RedisSession;
+use yetlet::auth::{Authentication, ResolveFuture};
+use yetlet::session_redis::RedisSession;
 
 const ISSUER: &str = "urn:yetlet:admin:local-accounts";
 const SCHEME: &str = "admin-session";
@@ -121,7 +121,7 @@ fn tenant(user: Principal) -> &'static str {
     }
 }
 pub(crate) fn check_identity(
-    identity: &yetlet_auth::Principal,
+    identity: &yetlet::auth::Principal,
     user: Principal,
 ) -> Result<(), Failure> {
     if identity.issuer() != ISSUER
@@ -159,7 +159,7 @@ fn resolve<'a>(parts: &'a mut Parts, policy: &'a PolicyFile) -> ResolveFuture<'a
         rules.account(user).map_err(IntoResponse::into_response)?;
         // The stored local binding came from verified demo or OIDC login. This
         // namespace is not an assertion about an external IdP issuer/subject.
-        yetlet_auth::Principal::from_verified(ISSUER, user.name, SCHEME, Some(tenant(user)))
+        yetlet::auth::Principal::from_verified(ISSUER, user.name, SCHEME, Some(tenant(user)))
             .map(Some)
             .map_err(|_| Failure::Configuration.into_response())
     })
@@ -199,7 +199,7 @@ mod tests {
             Err(Failure::Forbidden)
         );
         let identity =
-            yetlet_auth::Principal::from_verified(ISSUER, "alice", SCHEME, Some("project-1"))
+            yetlet::auth::Principal::from_verified(ISSUER, "alice", SCHEME, Some("project-1"))
                 .unwrap();
         assert!(check_identity(&identity, alice).is_ok());
         assert_eq!(check_identity(&identity, viewer), Err(Failure::Forbidden));
@@ -258,7 +258,7 @@ mod tests {
             500
         );
         assert_eq!(
-            yetlet_auth::Authenticated::from_request_parts(&mut parts, &())
+            yetlet::auth::Authenticated::from_request_parts(&mut parts, &())
                 .await
                 .err()
                 .unwrap()

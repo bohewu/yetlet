@@ -180,11 +180,19 @@ fn missing_stale_unsupported_lock_profile_source_and_output_are_refused() {
             0 => fs::remove_file(f.app.join("Cargo.lock")).unwrap(),
             1 | 2 => {
                 let text = fs::read_to_string(f.app.join("Cargo.lock")).unwrap();
-                let text = if mutation == 1 {
-                    text.replace("name='composeapp'", "name='stale'")
+                let mut lock: toml::Value = text.parse().unwrap();
+                if mutation == 1 {
+                    let app = lock["package"]
+                        .as_array_mut()
+                        .unwrap()
+                        .iter_mut()
+                        .find(|p| p["name"].as_str() == Some("composeapp"))
+                        .unwrap();
+                    app["name"] = "stale".into();
                 } else {
-                    text.replace("version=4", "version=3")
-                };
+                    lock["version"] = 3.into();
+                }
+                let text = toml::to_string(&lock).unwrap();
                 fs::write(f.app.join("Cargo.lock"), text).unwrap();
             }
             3 => {

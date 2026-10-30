@@ -49,7 +49,7 @@ mod shadow {
     }
 
     use std::fmt::Write as _;
-    use yetlet_html::{RenderError, escape_text};
+    use yetlet::html::{RenderError, escape_text};
 
     // Source-derived from the pinned HTML serializer. Only scoped event tags added.
     pub fn render_to_string(view: &View) -> Result<String, RenderError> {
@@ -197,7 +197,7 @@ pub fn output(directory: &Path) -> Result<(), Box<dyn Error>> {
         let oracle = expected(rows);
         assert_eq!(body, oracle.0);
         assert_eq!(document, oracle.1);
-        assert_eq!(body, yetlet_html::render_to_string(&view)?);
+        assert_eq!(body, yetlet::html::render_to_string(&view)?);
         assert_eq!(document, render_document_with_metadata(&metadata, &view)?);
         std::fs::write(directory.join(format!("{name}-body.html")), body)?;
         std::fs::write(directory.join(format!("{name}-document.html")), document)?;
@@ -345,7 +345,7 @@ fn envelope(metadata: &DocumentMetadata, body: &str) -> String {
     let mut html = String::from("<!doctype html><html lang=\"");
     html.push_str(metadata.language().as_str());
     html.push_str("\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>");
-    html.push_str(&yetlet_html::escape_text(metadata.title()));
+    html.push_str(&yetlet::html::escape_text(metadata.title()));
     html.push_str("</title></head><body>");
     html.push_str(body);
     html.push_str("</body></html>");
@@ -373,7 +373,7 @@ pub fn component_timing(repetition: usize) -> Result<(), Box<dyn Error>> {
         let expected = expected_corpus();
         assert_eq!(inputs.len(), 6150);
         for (input, expected) in inputs.iter().zip(&expected) {
-            assert_eq!(yetlet_html::escape_text(input), *expected);
+            assert_eq!(yetlet::html::escape_text(input), *expected);
         }
         assert_eq!(envelope(&metadata, &body), oracle.1);
         let input_bytes: usize = inputs.iter().map(|s| s.len()).sum();
@@ -397,7 +397,7 @@ pub fn component_timing(repetition: usize) -> Result<(), Box<dyn Error>> {
                 let (elapsed, result_len) = if probe == "escape-corpus" {
                     let mut total = 0;
                     for input in black_box(&inputs) {
-                        let output = black_box(yetlet_html::escape_text(black_box(input)));
+                        let output = black_box(yetlet::html::escape_text(black_box(input)));
                         total += black_box(output.len());
                         drop(output);
                     }
@@ -440,7 +440,7 @@ mod tests {
             );
             assert_eq!(
                 shadow::render_to_string(&view),
-                yetlet_html::render_to_string(&view)
+                yetlet::html::render_to_string(&view)
             );
             assert_eq!(
                 shadow::render_document_with_metadata(&metadata, &view),
@@ -500,7 +500,7 @@ mod tests {
         for view in validation_views() {
             assert_eq!(
                 shadow::render_to_string(&view),
-                yetlet_html::render_to_string(&view)
+                yetlet::html::render_to_string(&view)
             );
             assert_eq!(
                 shadow::render_document_with_metadata(&metadata, &view),
@@ -531,7 +531,7 @@ mod tests {
     #[cfg(feature = "escape-comparison")]
     #[test]
     fn yt147_reference_current_preserve_errors_and_control_content() {
-        use yetlet_html::RenderError;
+        use yetlet::html::RenderError;
         let metadata =
             DocumentMetadata::with_language("<&> \"'café", LanguageTag::new("en").unwrap());
         let mut views = validation_views();
@@ -595,7 +595,7 @@ mod tests {
         assert_eq!(inputs.len(), 6150);
         assert_eq!(escaped.len(), 6150);
         for (input, expected) in inputs.iter().zip(&escaped) {
-            assert_eq!(yetlet_html::escape_text(input), *expected);
+            assert_eq!(yetlet::html::escape_text(input), *expected);
         }
         let (body, document) = expected(1024);
         assert_eq!(envelope(&metadata, &body), document);
@@ -608,11 +608,11 @@ fn comparison_render(
     phase: &str,
     metadata: &DocumentMetadata,
     view: &View,
-) -> Result<String, yetlet_html::RenderError> {
+) -> Result<String, yetlet::html::RenderError> {
     match (variant, phase) {
         ("reference", "body") => shadow::render_to_string(view),
         ("reference", "document") => shadow::render_document_with_metadata(metadata, view),
-        ("current", "body") => yetlet_html::render_to_string(view),
+        ("current", "body") => yetlet::html::render_to_string(view),
         ("current", "document") => render_document_with_metadata(metadata, view),
         _ => unreachable!("comparison variant/phase validated before work"),
     }
@@ -1054,7 +1054,7 @@ mod url_tests {
             .child(Element::new("form").attribute("action", "/third"))
             .into();
         assert_eq!(url_corpus(&selected), ["/first", "/second", "/third"]);
-        let product = include_str!("../../../crates/yetlet-html/src/lib.rs");
+        let product = include_str!("../../../crates/yetlet/src/html/mod.rs");
         let sample = include_str!("attribution.rs");
         // Pinned legacy normalizer from product baseline f01d981c9e924cecc0713b3494772628c6542954.
         let legacy_fn = r#"
@@ -1107,7 +1107,7 @@ mod url_tests {
     }
 
     fn literal_url_security_and_public_render_results() {
-        use yetlet_html::{RenderError, render_to_string};
+        use yetlet::html::{RenderError, render_to_string};
         let cases: &[(&str, bool, Result<&str, RenderError>)] = &[
             ("", false, Ok("<a href=\"\"></a>")),
             (
@@ -1251,7 +1251,7 @@ mod url_tests {
     #[test]
     fn yt149_source_identity_and_borrowed_population() {
         borrowed_corpus_and_legacy_source_identity();
-        let product = include_str!("../../../crates/yetlet-html/src/lib.rs");
+        let product = include_str!("../../../crates/yetlet/src/html/mod.rs");
         let sample = include_str!("attribution.rs");
         let product_fn = product
             .split_once("fn unsafe_scheme(value: &str) -> bool {")

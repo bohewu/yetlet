@@ -2,10 +2,10 @@
 use crate::{Failure, domain::LoginSession};
 use axum::{extract::FromRequestParts, http::request::Parts};
 use std::time::Duration;
-use yetlet_server_axum::App;
-use yetlet_session::{Session as MemorySession, SessionConfig, SessionManager};
+use yetlet::server_axum::App;
+use yetlet::session::{Session as MemorySession, SessionConfig, SessionManager};
 #[cfg(feature = "valkey")]
-use yetlet_session_valkey::{
+use yetlet::session_redis::{
     RedisSession, RedisSessionConfig, RedisSessionError, RedisSessionManager,
     RedisSessionUpdateError,
 };
@@ -250,7 +250,7 @@ mod tests {
 pub(crate) struct ProtectedSession {
     session: Session,
     #[cfg(feature = "auth-valkey")]
-    pub(crate) auth: Option<(crate::auth::PolicyFile, yetlet_auth::Authenticated)>,
+    pub(crate) auth: Option<(crate::auth::PolicyFile, yetlet::auth::Authenticated)>,
 }
 impl ProtectedSession {
     pub(crate) fn failure(&self, error: Failure) -> Failure {
@@ -276,7 +276,7 @@ impl FromRequestParts<crate::AppState> for ProtectedSession {
         use axum::response::IntoResponse;
         #[cfg(feature = "auth-valkey")]
         let auth = if let Some(policy) = &state.policy {
-            let identity = yetlet_auth::Authenticated::from_request_parts(parts, state).await?;
+            let identity = yetlet::auth::Authenticated::from_request_parts(parts, state).await?;
             Some((policy.clone(), identity))
         } else {
             None

@@ -142,9 +142,9 @@ Changed files by area:
 
 | Area | Actual files |
 |---|---|
-| Auth | [library](../crates/yetlet-auth/src/lib.rs), [README](../crates/yetlet-auth/README.md), historical `crates/yetlet-auth/tests/naming_compatibility.rs` at checkpoint `83f417e` |
-| Configuration | [loader](../crates/yetlet-config/src/lib.rs), [optional secret methods](../crates/yetlet-config/src/secrets.rs), [typed example](../crates/yetlet-config/examples/typed.rs), [secret example](../crates/yetlet-config/examples/secret_provider.rs), historical `crates/yetlet-config/tests/naming_compatibility.rs` at checkpoint `83f417e` |
-| Rate-limit | [library](../crates/yetlet-rate-limit/src/lib.rs), [README](../crates/yetlet-rate-limit/README.md), [native example](../crates/yetlet-rate-limit/examples/native.rs), historical `crates/yetlet-rate-limit/tests/naming_compatibility.rs` at checkpoint `83f417e` |
+| Auth | [library](../crates/yetlet/src/auth/mod.rs), [README](../crates/yetlet/guides/auth.md), historical `crates/yetlet-auth/tests/naming_compatibility.rs` at checkpoint `83f417e` |
+| Configuration | [loader](../crates/yetlet/src/config/mod.rs), [optional secret methods](../crates/yetlet/src/config/secrets.rs), [typed example](../crates/yetlet/examples/config/typed.rs), [secret example](../crates/yetlet/examples/config/secret_provider.rs), historical `crates/yetlet-config/tests/naming_compatibility.rs` at checkpoint `83f417e` |
+| Rate-limit | [library](../crates/yetlet/src/rate_limit/mod.rs), [README](../crates/yetlet/guides/rate-limit.md), [native example](../crates/yetlet/examples/rate_limit/native.rs), historical `crates/yetlet-rate-limit/tests/naming_compatibility.rs` at checkpoint `83f417e` |
 | Documentation | This record, [configuration guide](CONFIGURATION.md), [Extensions](EXTENSIONS.md), [index](README.md), [Roadmap](ROADMAP.md), [secret providers](SECRET-PROVIDERS.md), [settings/secret integration](SETTINGS-SECRET-PROVIDER.md), [YT-117 evidence](YT-117-RATE-LIMIT.md) |
 
 The closure changes only this evidence document and its index status; reviewed

@@ -42,16 +42,17 @@ def record():
         'signer_commit': 'a' * 40, 'provenance': {'sha256': 'e' * 64, 'size': 123}, 'release_id': '15'}
 
 
-def fixture(directory):
+def fixture(directory, consolidated=False):
     r = record()
+    if consolidated: r.update(schema=2, cohort="consolidated")
     subjects = []
-    for name in sorted(records.PACKAGES):
+    for name in sorted(records.packages(r)):
         name += '-' + r['version'] + '.crate'
         raw = ('SYNTHETIC ' + name).encode()
         (directory / name).write_bytes(raw)
         subjects.append({'name': name, 'digest': {'sha256': s.sha(raw)}})
     statement = {'_type': 'https://in-toto.io/Statement/v1', 'predicateType': 'https://slsa.dev/provenance/v1',
-        'subject': subjects, 'predicate': {'buildDefinition': {'externalParameters': {'cohort': 'sixteen',
+        'subject': subjects, 'predicate': {'buildDefinition': {'externalParameters': {'cohort': r['cohort'],
         'workflow': {'repository': 'https://github.com/bohewu/yetlet', 'path': '.github/workflows/release.yml',
         'ref': 'refs/tags/v' + r['version']}}, 'resolvedDependencies': [
         {'uri': 'git+https://github.com/bohewu/yetlet', 'digest': {'gitCommit': r['source']}}]},
@@ -100,6 +101,31 @@ class RecordTests(unittest.TestCase):
         for raw in ('{"schema":1,"schema":1}', '{"value":NaN}', ' ' * 16385):
             with self.assertRaises(ValueError): records.loads(raw)
 
+    def test_two_package_cohort_is_closed_and_cannot_use_legacy_names(self):
+        r = record(); r.update(schema=2, cohort='consolidated')
+        self.assertEqual(records.packages(r), {'yetlet', 'yetlet-browser'})
+        s.bind_record(r); self.assertEqual(s.PACKAGES, records.CONSOLIDATED)
+        for schema, cohort in ((1, 'consolidated'), (2, 'sixteen'), (3, 'consolidated')):
+            bad = dict(r, schema=schema, cohort=cohort)
+            with self.assertRaises(ValueError): records.validate(bad)
+        with self.assertRaises(ValueError): records.validate(dict(r, packages=['arbitrary']))
+        s.bind_record(record()); self.assertEqual(s.PACKAGES, records.PACKAGES)
+
+    def test_signer_provenance_and_public_names_follow_validated_cohort(self):
+        for consolidated in (False, True):
+            with tempfile.TemporaryDirectory() as temp:
+                directory = Path(temp); r = fixture(directory, consolidated)
+                pub.s.bind_record(r)
+                self.assertEqual(pub.s.provenance(directory), r['provenance']['sha256'])
+                self.assertEqual(len(pub.names()), len(records.packages(r)) + 4)
+                statement = records.loads((directory / 'PROVENANCE-UNSIGNED.json').read_bytes())
+                statement['subject'].append(statement['subject'][0])
+                raw = records.canonical(statement); (directory / 'PROVENANCE-UNSIGNED.json').write_bytes(raw)
+                r['provenance'] = {'sha256': s.sha(raw), 'size': len(raw)}
+                pub.s.bind_record(r)
+                with self.assertRaises(ValueError): pub.s.provenance(directory)
+        pub.s.bind_record(record())
+
     def test_stage_requirements_and_canonical_digest(self):
         r = record(); core = {k: r[k] for k in records.CORE}
         records.validate(core)
@@ -111,9 +137,9 @@ class RecordTests(unittest.TestCase):
         self.assertNotEqual(records.digest(r), records.digest(other))
         with patch.dict(os.environ, {}, clear=True), self.assertRaises(KeyError): records.environment()
 
-    def test_source_version_reads_actual_sixteen_manifests_and_rejects_mismatch(self):
+    def test_source_version_reads_actual_consolidated_manifests_and_rejects_mismatch(self):
         import tomllib
-        r = record(); r['version'] = tomllib.loads((ROOT / 'Cargo.toml').read_text())['workspace']['package']['version']
+        r = record(); r.update(schema=2, cohort='consolidated'); r['version'] = tomllib.loads((ROOT / 'Cargo.toml').read_text())['workspace']['package']['version']
         records.source_version(r, ROOT)
         r['version'] = '1.2.3'
         with self.assertRaises(ValueError): records.source_version(r, ROOT)
@@ -610,7 +636,7 @@ class WorkflowTests(unittest.TestCase):
         self.assertEqual(w['jobs']['verify']['environment'], 'release-result-verify')
         for job in w['jobs'].values(): self.assertNotIn('permissions', job)
         self.assertTrue(any(s.get('if') == 'always()' for s in w['jobs']['verify']['steps']))
-        self.assertEqual(w['jobs']['verify']['steps'][-2]['with']['path'], '${{ runner.temp }}/RESULT-VERIFICATION.json')
+        self.assertTrue(any(step.get('with', {}).get('path') == '${{ runner.temp }}/RESULT-VERIFICATION.json' for step in w['jobs']['verify']['steps']))
 
 
 if __name__ == '__main__':

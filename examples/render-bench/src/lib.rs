@@ -165,7 +165,7 @@ mod browser {
     use serde::Serialize;
     use wasm_bindgen::{JsCast, JsValue, prelude::wasm_bindgen};
     use web_sys::{Document, Element, HtmlInputElement, Node, Text};
-    use yetlet_core::{Attribute, Element as ViewElement, View};
+    use yetlet::view::{Attribute, Element as ViewElement, View};
 
     use super::{
         BenchOperation, DomOperations, RowModel, apply_model, deterministic_toggles, initial_model,
@@ -664,14 +664,14 @@ mod browser {
             StrategyKind::SubtreeReplacement => {
                 let view = full_view(model);
                 let nodes = count_view_nodes(&view);
-                yetlet_dom::mount(&target, &view)?;
+                yetlet_browser::dom::mount(&target, &view)?;
                 operations.node_creations += nodes;
                 operations.child_insertions += nodes;
                 Ok(StrategyState::Subtree { target })
             }
             StrategyKind::ViewTreePatch => {
                 let view = full_view(model);
-                yetlet_dom::validate(&view)
+                yetlet_browser::dom::validate(&view)
                     .map_err(|error| JsValue::from_str(&error.to_string()))?;
                 let node = create_node(document, &view, operations)?;
                 target.append_child(&node)?;
@@ -722,13 +722,13 @@ mod browser {
                     if target.first_child().is_some() {
                         operations.child_removals += 1;
                     }
-                    yetlet_dom::mount(target, &view)?;
+                    yetlet_browser::dom::mount(target, &view)?;
                     operations.node_creations += nodes;
                     operations.child_insertions += nodes;
                 }
                 Self::TreePatch { target, current } => {
                     let next = full_view(model);
-                    yetlet_dom::validate(&next)
+                    yetlet_browser::dom::validate(&next)
                         .map_err(|error| JsValue::from_str(&error.to_string()))?;
                     let root = target
                         .first_child()

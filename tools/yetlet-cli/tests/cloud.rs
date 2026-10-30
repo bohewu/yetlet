@@ -12,7 +12,7 @@ fn fixture_framework(root: &Path) -> std::path::PathBuf {
         "[workspace]\n[workspace.package]\nrust-version='1.99'\n",
     )
     .unwrap();
-    for name in ["yetlet-core", "yetlet-server-axum"] {
+    for name in ["yetlet"] {
         let dir = source.join("crates").join(name);
         fs::create_dir_all(dir.join("src")).unwrap();
         fs::write(
@@ -81,24 +81,12 @@ fn both_profiles_use_safe_no_replace_without_subprocess_lock_or_extra_files() {
         );
         assert_eq!(fs::read_dir(app.join("src")).unwrap().count(), 1);
         let manifest = fs::read(app.join("Cargo.toml")).unwrap();
-        // Frozen pre-YT-097 bytes, including dependency order and cloud marker.
-        let core = toml::Value::String(
-            framework
-                .join("crates/yetlet-core")
-                .to_str()
-                .unwrap()
-                .into(),
-        );
-        let server = toml::Value::String(
-            framework
-                .join("crates/yetlet-server-axum")
-                .to_str()
-                .unwrap()
-                .into(),
-        );
+        // Keep layout-independent template bytes; SDK declarations migrate together.
+        let framework_package =
+            toml::Value::String(framework.join("crates/yetlet").to_str().unwrap().into());
         let signal = if cloud { ", \"signal\"" } else { "" };
         let mut expected = format!(
-            "[package]\nname = \"{name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\nrust-version = \"1.99\"\ndescription = \"Native Yetlet SSR application preview\"\nlicense = \"MIT OR Apache-2.0\"\npublish = false\n\n[workspace]\nresolver = \"3\"\n\n[dependencies]\naxum = \"0.8\"\ntokio = {{ version = \"1\", features = [\"macros\", \"net\", \"rt-multi-thread\"{signal}] }}\nyetlet-core = {{ path = {core} }}\nyetlet-server-axum = {{ path = {server} }}\n"
+            "[package]\nname = \"{name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\nrust-version = \"1.99\"\ndescription = \"Native Yetlet SSR application preview\"\nlicense = \"MIT OR Apache-2.0\"\npublish = false\n\n[workspace]\nresolver = \"3\"\n\n[dependencies]\naxum = \"0.8\"\ntokio = {{ version = \"1\", features = [\"macros\", \"net\", \"rt-multi-thread\"{signal}] }}\nyetlet = {{ path = {framework_package}, default-features = false, features = [\"server-axum\"] }}\n"
         );
         if cloud {
             expected.push_str("\n[package.metadata.yetlet]\ncloud-profile = \"native-ssr-v1\"\n");

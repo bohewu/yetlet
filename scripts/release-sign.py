@@ -43,8 +43,9 @@ BUILD_ARTIFACT = BUILD_ZIP = PUBLIC_SHA = PUBLIC_SIZE = RELEASE_ID = None
 
 def bind_record(record):
     global RECORD, C, TAG, BUILD, BUILD_ATTEMPT, VERIFIER, VERIFIER_ATTEMPT
-    global BUILD_ARTIFACT, BUILD_ZIP, PUBLIC_SHA, PUBLIC_SIZE, RELEASE_ID
+    global BUILD_ARTIFACT, BUILD_ZIP, PUBLIC_SHA, PUBLIC_SIZE, RELEASE_ID, PACKAGES
     RECORD = records.validate(record, 'complete')
+    PACKAGES = records.packages(RECORD)
     C, TAG = RECORD['source'], 'v' + RECORD['version']
     BUILD, BUILD_ATTEMPT = RECORD['build']['run'], RECORD['build']['attempt']
     VERIFIER, VERIFIER_ATTEMPT = RECORD['custody_verifier']['run'], RECORD['custody_verifier']['attempt']
@@ -472,11 +473,11 @@ def provenance(directory):
     require(p["_type"] == "https://in-toto.io/Statement/v1"
             and p["predicateType"] == "https://slsa.dev/provenance/v1")
     names = {n + "-" + RECORD["version"] + ".crate" for n in PACKAGES}
-    require(len(p["subject"]) == 16 and {s["name"] for s in p["subject"]} == names)
+    require(len(p["subject"]) == len(PACKAGES) and {s["name"] for s in p["subject"]} == names)
     for s in p["subject"]:
         require(s["digest"] == {"sha256": sha(read(directory / s["name"]))})
     definition = p["predicate"]["buildDefinition"]
-    require(definition["externalParameters"] == {"cohort": "sixteen", "workflow": {
+    require(definition["externalParameters"] == {"cohort": RECORD["cohort"], "workflow": {
         "repository": "https://github.com/bohewu/yetlet", "path": ".github/workflows/release.yml",
         "ref": "refs/tags/" + TAG}})
     require({"uri": "git+https://github.com/bohewu/yetlet", "digest": {"gitCommit": C}}

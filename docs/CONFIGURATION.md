@@ -12,7 +12,7 @@ validate application settings, map narrow options and initialize host diagnostic
 
 ## Prerequisites
 
-Use the pinned Rust/Cargo toolchain and the isolated config workspace from this
+Use the pinned Rust/Cargo toolchain and the optional `yetlet/config` module from this
 checkout. The example needs its manifest-relative base/profile files and a
 nonempty synthetic token. Run from the repository root. The three profile
 commands below are alternatives; `--offline` assumes a populated Cargo cache.
@@ -26,11 +26,11 @@ From the repository root, use synthetic placeholders with each finite profile:
 
 ```sh
 YTCONFIG_ENVIRONMENT=Development YTCONFIG_SERVICE__TOKEN=000123-placeholder \
-  cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --example typed -- --check
+  cargo run --offline --locked -p yetlet --features config --example typed -- --check
 YTCONFIG_ENVIRONMENT=Staging YTCONFIG_SERVICE__TOKEN=000123-placeholder \
-  cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --example typed -- --check
+  cargo run --offline --locked -p yetlet --features config --example typed -- --check
 YTCONFIG_ENVIRONMENT=Production YTCONFIG_SERVICE__TOKEN=000123-placeholder \
-  cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --example typed -- --check
+  cargo run --offline --locked -p yetlet --features config --example typed -- --check
 ```
 
 Each exits before binding and prints only the fixed summary
@@ -50,18 +50,18 @@ is called unless the explicit `secret-provider` path is selected. Removing
 
 ### Choose an application-owned settings type
 
-The configuration/settings **loader** is `yetlet_config::Loader`; it is an opt-in
+The configuration/settings **loader** is `yetlet::config::Loader`; it is an opt-in
 startup loader, not a `SettingsProvider` service or trait. `SecretProvider` names
 the separate optional secret-lookup interface. The [naming guide](NAMING.md)
 records canonical Rust names and deliberate external settings boundaries.
 
-The isolated [yetlet-config workspace](../crates/yetlet-config/Cargo.toml) loads
+The opt-in [configuration module](../crates/yetlet/Cargo.toml) loads
 ordinary Serde settings once at startup. It adds no DI container, framework-wide
 configuration interface, provider registry, middleware or per-request IO.
 Applications opt in with an explicit path dependency; callers control when to
 load, validate and construct native Axum state.
 
-The [runnable typed example](../crates/yetlet-config/examples/typed.rs) derives
+The [runnable typed example](../crates/yetlet/examples/config/typed.rs) derives
 `Deserialize` and `Debug` on app-owned settings, uses `#[serde(deny_unknown_fields)]`
 on every settings struct, and stores its synthetic token in
 `secrecy::SecretString`. Its explicit `validate()` runs **before binding a
@@ -149,14 +149,14 @@ bytes and OS values at most 64 KiB.
 Development secrets are disabled unless the caller explicitly selects a path.
 An ignored `.env.local` is a local convenience, **not an encrypted vault**. There
 is no secret write/import command. The committed
-[dotenv example](../crates/yetlet-config/examples/settings/.env.example)
+[dotenv example](../crates/yetlet/examples/config/settings/.env.example)
 contains synthetic placeholders only. The commands below require the pinned
-Rust 1.99 toolchain and the dependencies from this isolated workspace's lockfile.
+Rust 1.99 toolchain and the dependencies from the root workspace lockfile.
 Before the first offline build, explicitly fetch those public dependencies into
 a writable Cargo cache (this command uses the network):
 
 ```sh
-cargo fetch --locked --manifest-path crates/yetlet-config/Cargo.toml
+cargo fetch --locked -p yetlet --features config
 ```
 
 A restricted environment may instead use an explicitly selected, user-owned
@@ -166,8 +166,8 @@ development file without creating a secret file:
 
 ```sh
 YTCONFIG_ENVIRONMENT=Development cargo run --offline --locked \
-  --manifest-path crates/yetlet-config/Cargo.toml --example typed -- \
-  --check --dev-secrets crates/yetlet-config/examples/settings/.env.example
+  -p yetlet --features config --example typed -- \
+  --check --dev-secrets crates/yetlet/examples/config/settings/.env.example
 ```
 
 Dotenv parsing uses `dotenvy::from_read_iter`, never its process-environment
@@ -251,8 +251,8 @@ acceptance does not activate publication, production qualification or any later 
 
 ## API reference
 
-Use [Loader source/rustdoc](../crates/yetlet-config/src/lib.rs),
-[typed example source](../crates/yetlet-config/examples/typed.rs),
+Use [Loader source/rustdoc](../crates/yetlet/src/config/mod.rs),
+[typed example source](../crates/yetlet/examples/config/typed.rs),
 [Settings from SecretProvider](SETTINGS-SECRET-PROVIDER.md) and
 the [current API reference](API-REFERENCE.md). External settings keys and source
 precedence remain the current contracts; later evidence does not turn an old

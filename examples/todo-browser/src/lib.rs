@@ -12,7 +12,7 @@ mod tests {
     #[test]
     fn complete_browser_page_obeys_dom_policy() {
         let page = yetlet_todo_ui::browser_page(&yetlet_todo_ui::TodoSnapshot::initial().items);
-        assert_eq!(yetlet_dom::validate(&page), Ok(()));
+        assert_eq!(yetlet_browser::dom::validate(&page), Ok(()));
     }
 }
 
@@ -27,11 +27,12 @@ mod runtime {
     use wasm_bindgen::{JsCast, JsValue, prelude::wasm_bindgen};
     use wasm_bindgen_futures::{JsFuture, spawn_local};
     use web_sys::{Document, Element, HtmlInputElement, Node};
-    use yetlet_actions::{ActionError, ActionExecutor, HttpExecutor};
-    use yetlet_core::binding::BindingKey;
-    use yetlet_dom::mount as mount_view;
-    use yetlet_dom_keyed::{DomEventListener, KeyedChildren, KeyedEntry};
-    use yetlet_reactive::{GraphHandle, LocalGraph, ReactiveError};
+    use yetlet::actions::{ActionError, ActionExecutor};
+    use yetlet::reactive::{GraphHandle, LocalGraph, ReactiveError};
+    use yetlet::view::binding::BindingKey;
+    use yetlet_browser::actions::HttpExecutor;
+    use yetlet_browser::dom::mount as mount_view;
+    use yetlet_browser::dom_keyed::{DomEventListener, KeyedChildren, KeyedEntry};
     use yetlet_todo_ui::{
         Todo, TodoCommand, TodoSnapshot, apply_todo_command, browser_page, todo_list,
     };

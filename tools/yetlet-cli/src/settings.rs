@@ -137,8 +137,8 @@ const SOURCE: &str = "CLI_PROJECT settings source: check the public settings dir
 const PROFILE: &str = "CLI_PROJECT settings profile: select exactly Development, Staging or Production; the default is Production";
 const VALUES: &str = "CLI_PROJECT settings values: check public TOML syntax, base-declared keys/types, ranges and target/TLS requirements";
 
-fn loader_hint(error: yetlet_config::Error) -> &'static str {
-    use yetlet_config::Error;
+fn loader_hint(error: yetlet::config::Error) -> &'static str {
+    use yetlet::config::Error;
     match error {
         Error::File => SOURCE,
         Error::Environment => PROFILE,
@@ -228,7 +228,7 @@ pub(crate) fn load_selected(
     }
     // No Development secret source is enabled, and no backend APP overrides enter
     // this projection. Parser/merge/type/ENV behavior belongs to yetlet-config.
-    let merged: serde_json::Value = yetlet_config::Loader::new(root, "APP")
+    let merged: serde_json::Value = yetlet::config::Loader::new(root, "APP")
         .load_with_env(filtered)
         .map_err(|error| loader_hint(error).to_owned())?;
     let mut settings: Settings = match merged.get("cli") {
@@ -550,7 +550,7 @@ mod tests {
                 PROFILE
             );
         }
-        assert_eq!(loader_hint(yetlet_config::Error::Prefix), INVALID);
+        assert_eq!(loader_hint(yetlet::config::Error::Prefix), INVALID);
     }
 
     #[test]

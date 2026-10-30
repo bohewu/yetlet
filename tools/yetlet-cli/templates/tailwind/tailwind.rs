@@ -8,8 +8,8 @@ use axum::{
 };
 use sha2::{Digest, Sha256};
 use std::{fs::File, io, io::Read, path::Path, sync::Arc};
-use yetlet_core::View;
-use yetlet_server_axum::{DEFAULT_CSP, render_document};
+use yetlet::view::View;
+use yetlet::server_axum::{DEFAULT_CSP, render_document};
 
 const MAX_CSS: u64 = 1024 * 1024;
 const BANNER: &str = "/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */";
@@ -216,7 +216,7 @@ mod tests {
         assert!(html.contains("&lt;/title&gt;&lt;script&gt;"));
         assert!(html.contains("&lt;img&gt; &amp; safe"));
         assert!(!html.contains("<script") && !html.contains("<style") && !html.contains(" style="));
-        let response = stylesheet.page("error", yetlet_core::Element::new("script").into());
+        let response = stylesheet.page("error", yetlet::view::Element::new("script").into());
         assert_eq!(response.status(), StatusCode::INTERNAL_SERVER_ERROR);
         assert_eq!(
             response.headers()[header::CONTENT_SECURITY_POLICY],

@@ -1,6 +1,6 @@
 # SSR Session Cart Sample
 
-This native-only application demonstrates an explicitly installed `yetlet-session` provider, server-rendered forms and bounded process-local cart state. It does not use JavaScript, WASM, a browser companion, Controllers or dependency injection.
+This native-only application demonstrates an explicitly installed `yetlet::session` provider, server-rendered forms and bounded process-local cart state. It does not use JavaScript, WASM, a browser companion, Controllers or dependency injection.
 
 ## Run
 
@@ -25,7 +25,7 @@ Unknown session IDs are never adopted, expired records are replaced, clear rotat
 ## Verify
 
 ```bash
-cargo test --locked -p yetlet-session -p yetlet-cart-server --all-targets
+cargo test --locked -p yetlet --features session -p yetlet-cart-server --all-targets
 cargo build --locked -p yetlet-cart-server
 cargo xtask smoke cart
 ```

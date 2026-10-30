@@ -3,8 +3,9 @@
 This preview writes configuration only. It does not run Cargo, Docker, buildx,
 kubectl, a shell, or network clients, and does not copy app/framework sources.
 It targets **Linux OCI amd64**, even when generation runs on Windows. Only the
-standalone, unedited `new --cloud` native-ssr-v1 profile is supported. The main
-source is parsed as Rust and matched to the accepted cloud template, including
+standalone, unedited `new --service` profile is supported. Settings/Vite
+selections have their own emitted profile guide. The main source is parsed as Rust and
+matched to the accepted service template, including
 pre-bind signal registration. Metadata alone is insufficient. Extra sources,
 build scripts, Cargo configuration, dependencies, features and manual layouts
 are rejected. This is a bounded profile, not a general Cargo dependency solver.
@@ -26,19 +27,23 @@ No source-export automation is provided by this slice.
    source. Freeze source writers during export, inventory verification and build.
    If a source changes or cannot be inspected safely, stop and regenerate into a
    new output directory. Never replace an existing generated directory.
-2. Manually create `APP_EXPORT/src`. Copy **only** the selected app's existing
-   `Cargo.lock` and `src/main.rs`, byte for byte, then copy `DIR/app-src.dockerignore`
+2. Copy **only** the app files in `build-context-inventory.json` under `app-src`,
+   using `app-src-source-paths` when present to find their inspected source paths;
+   otherwise each inventory key is the same application-relative source path.
+   Preserve each byte and relative export path, then copy `DIR/app-src.dockerignore`
    to `APP_EXPORT/.dockerignore`. Do not copy raw app `Cargo.toml`: it contains
    local absolute paths. Do not generate or refresh Cargo.lock as part of export.
-3. Manually create `FRAMEWORK_EXPORT/crates/{yetlet-core,yetlet-html,yetlet-server-axum}/src`
-   as individual directories. Copy **only** the three package `Cargo.toml` files
-   and the exact source paths listed in `build-context-inventory.json` under
-   `yetlet-src`. Copy `DIR/framework-workspace.toml` to `FRAMEWORK_EXPORT/Cargo.toml`,
+3. Create only the directories required by the exact `yetlet-src` inventory.
+   Copy the complete compiled `crates/yetlet` source closure listed there,
+   including its Cargo manifest, resources, guides, tests and examples.
+   An inventoried `.env.example` is synthetic example input; it is not permission
+   to export live dotenv files. Copy `DIR/framework-workspace.toml` to `FRAMEWORK_EXPORT/Cargo.toml`,
    and `DIR/yetlet-src.dockerignore` to `FRAMEWORK_EXPORT/.dockerignore`. The
-   generated minimal workspace has resolver 3, exactly three members and exact
+   generated minimal workspace has resolver 3, exactly one SDK member and exact
    supported inherited workspace.package and workspace.dependencies values.
-   Do not copy the monorepo root Cargo.toml or Cargo.lock. Tests, examples, unrelated
-   crates and unknown files are outside this export profile.
+   Do not copy the monorepo root Cargo.toml or Cargo.lock. Unrelated crates,
+   caches and unknown files are outside this export profile. Native service
+   delivery does not add `yetlet-browser` or enable every exported SDK feature.
 4. Audit every exported file as public, non-secret build input. Recursively list
    every entry including hidden files and directories **without following links**;
    compare file paths exactly with its context's inventory keys (directories must
@@ -50,17 +55,17 @@ No source-export automation is provided by this slice.
    against `generated_files_except_inventory` before using DIR. The inventory
    records no timestamps, source absolute paths, environment values or unknown
    files. It is a local snapshot contract, not a signed authenticity guarantee.
-5. Explicitly confirm `.env`, `.env.*`, SSH keys, credentials, `.git`, `target`,
+5. Explicitly confirm live `.env`/`.env.*`, SSH keys, credentials, `.git`, `target`,
    caches and planted secret fixtures are absent from **all** three contexts.
    Do not recursively copy a source tree and rely on ignore rules to remove them.
    No blanket `cp -r`, `COPY . .`, shell evaluation, sed replacement, Git archive
    or live-directory build context is part of this recipe. Keep DIR unchanged.
 
-The app overlay is reconstructed by TOML parsing. Exactly two dependency path
-values change, to `/work/yetlet/crates/yetlet-core` and
-`/work/yetlet/crates/yetlet-server-axum`; all other supported manifest semantics
-remain equal. Internal HTML/core relative dependencies retain their source
-values. App sources and the source Cargo.lock are never modified by generation.
+The app overlay is reconstructed by TOML parsing. Exactly one SDK dependency
+path changes, to `/work/yetlet/crates/yetlet`; its existing selected features and
+all other supported manifest semantics remain equal. HTML and the server adapter
+are modules in that SDK. App sources and the source Cargo.lock are never modified
+by generation.
 
 ## Explicit operator build and local runtime verification
 

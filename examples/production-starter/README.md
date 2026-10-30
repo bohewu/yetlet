@@ -91,7 +91,7 @@ accessibility and cross-browser qualification remain separate work.
 
 ## Settings and secrets
 
-`yetlet-config` loads `base.toml` → selected `development.toml`, `staging.toml` or
+`yetlet::config` loads `base.toml` → selected `development.toml`, `staging.toml` or
 `production.toml` → explicitly selected Development secret file → `APP_*` OS
 overrides. `APP_ENVIRONMENT` accepts exactly `Development`, `Staging`,
 `Production`; omission selects Production. Every application settings structure
@@ -254,7 +254,7 @@ multiple replicas, migration rollback, long-load performance or HA.
 
 Copy this directory and retain its `Cargo.lock`. Until Yetlet is published, adjust
 the five Yetlet dependency paths in `Cargo.toml` to your framework checkout;
-`yetlet-server-axum` resolves its companion local crates there. No registry
+`yetlet::server_axum` resolves its companion local crates there. No registry
 release is assumed. Application-specific SQL lives in `migrations/`, settings in
 `src/config.rs`, handlers/views in `src/web.rs`, persistence in `src/store.rs`,
 and startup/signal ownership in `src/main.rs`. There is no ORM, DI container or

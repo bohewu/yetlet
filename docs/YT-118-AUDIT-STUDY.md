@@ -47,7 +47,7 @@ redaction, sink dispatch or delivery that a new trait would remove.
 
 The [YT-063 threat model](THREAT-MODEL.md#13-logging-audit-metrics-and-privacy)
 is authoritative for protected audit evidence and redaction. Request IDs are
-correlation, not identity. The [existing provider](../crates/yetlet-request-id/src/lib.rs)
+correlation, not identity. The [existing provider](../crates/yetlet/src/request_id/mod.rs)
 is process/provider-local; replicas/restarts require an explicitly selected
 application namespace or other trusted correlation strategy. Do not reuse
 Session IDs, CSRF tokens, OIDC state/nonce or arbitrary inbound headers as audit
@@ -107,7 +107,7 @@ does not justify replaying a non-idempotent mutation. Persisted row IDs and
 timestamps are not an exactly-once or total-order guarantee. Cross-store
 atomicity/recovery must remain an explicit application decision.
 
-In particular, [Redis Session](../crates/yetlet-session-redis/src/lib.rs)
+In particular, [Redis Session](../crates/yetlet/src/session_redis/mod.rs)
 `try_update` does not roll back external callback effects, and middleware
 finalization can replace a handler's response with 503. HTTP status therefore
 does not establish whether a business operation committed. An audit failure

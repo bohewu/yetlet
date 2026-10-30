@@ -52,7 +52,7 @@ mod tailwind_app_tests {
         assert_eq!(response.status(), axum::http::StatusCode::OK);
         assert_eq!(
             response.headers()[axum::http::header::CONTENT_SECURITY_POLICY],
-            yetlet_server_axum::DEFAULT_CSP
+            yetlet::server_axum::DEFAULT_CSP
         );
         let bytes = axum::body::to_bytes(response.into_body(), 8192)
             .await

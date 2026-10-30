@@ -1,6 +1,6 @@
 use axum::extract::State;
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{App, Page};
+use yetlet::server_axum::{App, Page};
+use yetlet::view::{Element, View};
 
 use crate::{AppState, Failure, money};
 

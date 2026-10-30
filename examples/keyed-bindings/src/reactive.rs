@@ -4,4 +4,4 @@
 //! M7g. Keeping this module path avoids coupling the experimental authoring
 //! fixture to a second copy of the ownership and batching logic.
 
-pub use yetlet_reactive::*;
+pub use yetlet::reactive::*;

@@ -6,6 +6,8 @@ pub mod compose;
 pub mod docker;
 pub mod doctor;
 mod framework;
+mod framework_files;
+mod framework_source;
 mod image;
 pub mod inspect;
 mod k8s;
@@ -620,8 +622,8 @@ mod tests {
             );
             let manifest: toml::Value = files[0].1.parse().unwrap();
             assert_eq!(
-                manifest["dependencies"]["yetlet-config"]["path"].as_str(),
-                framework.join("crates/yetlet-config").to_str()
+                manifest["dependencies"]["yetlet"]["path"].as_str(),
+                framework.join("crates/yetlet").to_str()
             );
             assert_eq!(
                 manifest["dependencies"]["serde"]["features"][0].as_str(),
@@ -633,7 +635,7 @@ mod tests {
             );
             assert_eq!(manifest["package"]["publish"].as_bool(), Some(false));
             assert_eq!(manifest["package"].get("metadata").is_some(), service);
-            assert_eq!(manifest["dependencies"].as_table().unwrap().len(), 7);
+            assert_eq!(manifest["dependencies"].as_table().unwrap().len(), 5);
             for (_, contents) in &files[5..9] {
                 contents.parse::<toml::Value>().unwrap();
             }
@@ -723,16 +725,14 @@ mod tests {
         assert_eq!(parsed["package"]["rust-version"].as_str(), Some("1.99"));
         assert!(parsed["workspace"].is_table());
         assert!(
-            parsed["dependencies"]["yetlet-core"]["path"]
+            parsed["dependencies"]["yetlet"]["path"]
                 .as_str()
                 .unwrap()
                 .contains("框 架\"local")
         );
         assert_eq!(
-            parsed["dependencies"]["yetlet-core"]["path"]
-                .as_str()
-                .unwrap(),
-            framework.join("crates/yetlet-core").to_str().unwrap()
+            parsed["dependencies"]["yetlet"]["path"].as_str().unwrap(),
+            framework.join("crates/yetlet").to_str().unwrap()
         );
         let source = &files
             .iter()

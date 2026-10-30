@@ -46,10 +46,12 @@ does not perform this export.
 - APP_EXPORT contains only app-src inventory keys. Copy each mapped original
   file byte for byte. Copy DIR/app-src.dockerignore to APP_EXPORT/.dockerignore.
   Public CLI TOMLs may be inventoried even when the application has no runtime
-  settings dependency. Their presence does not add yetlet-config to that app.
+  settings feature. Their presence does not select `yetlet/config` for that app.
 - FRAMEWORK_EXPORT contains only yetlet-src inventory keys. Copy the named
-  qualified crate files, DIR/framework-workspace.toml as Cargo.toml, and
-  DIR/yetlet-src.dockerignore as .dockerignore.
+  complete `crates/yetlet` source closure, including resources/guides/tests/examples,
+  DIR/framework-workspace.toml as Cargo.toml, and DIR/yetlet-src.dockerignore as
+  .dockerignore. The workspace has one SDK member; Settings selects its `config`
+  feature. No separate Config workspace or Browser SDK is added to native delivery.
 - DIR remains the default generated-configuration context. Check its
   generated_files_except_inventory hashes as well as default_context.
 
@@ -58,8 +60,9 @@ only inventory file keys and necessary parent directories. Reject missing/extra
 files, traversal, links, junctions/reparse points, special files, hardlinks to
 mutable sources and untrusted writable ownership/ancestry. Verify every byte
 count and SHA-256 with trusted OS tools. Named-context ignore rules do not
-replace these physical checks. No dotenv, secrets, node_modules, .git, target,
+replace these physical checks. No live dotenv, secrets, node_modules, .git, target,
 frontend sources/dev scripts or source maps belong in an exported context.
+An exactly inventoried SDK `.env.example` is synthetic package input only.
 Abort and regenerate if any inspected input changes.
 
 Asset limits retain the existing contract: flat assets/, 128 KiB manifest,

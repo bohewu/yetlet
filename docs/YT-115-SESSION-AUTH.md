@@ -9,7 +9,7 @@ No commit/push, new IdP, distributed provider or release was authorized.
 
 The [reviewed authentication contract](YT-113-AUTHENTICATION-CONTRACT.md) and
 [YT-114 foundation](YT-114-IMPLEMENTATION.md) remain authoritative. The smallest
-new surface is [session::memory](../crates/yetlet-auth/src/session.rs), behind
+new surface is [session::memory](../crates/yetlet/src/auth/session.rs), behind
 the explicitly enabled `yetlet-auth` **session** Cargo feature. Defaults remain
 empty; `yetlet-session` is an optional dependency, not a core/server default.
 

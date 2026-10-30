@@ -1,16 +1,7 @@
 [workspace]
 members = [
-    "crates/yetlet-core",
-    "crates/yetlet-reactive",
-    "crates/yetlet-html",
-    "crates/yetlet-dom",
-    "crates/yetlet-dom-keyed",
-    "crates/yetlet-actions",
-    "crates/yetlet-server-axum",
-    "crates/yetlet-request-id",
-    "crates/yetlet-session",
-    "crates/yetlet-auth",
-    "crates/yetlet-rate-limit",
+    "crates/yetlet",
+    "crates/yetlet-browser",
     "examples/todo-ui",
     "examples/todo-browser",
     "examples/search-island",
@@ -41,14 +32,11 @@ members = [
 resolver = "3"
 exclude = [
     "examples/webgpu-scene-island",
-    "crates/yetlet-session-redis",
-    "crates/yetlet-config",
-    "crates/yetlet-secrets",
     "vendor/openidconnect",
 ]
 
 [workspace.package]
-version = "0.9.0-alpha.4"
+version = "0.9.0-alpha.5"
 edition = "2024"
 rust-version = "1.99"
 license = "MIT OR Apache-2.0"

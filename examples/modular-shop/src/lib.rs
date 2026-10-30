@@ -22,9 +22,9 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Redirect, Response},
 };
-use yetlet_core::{Element, View};
-use yetlet_server_axum::App;
-use yetlet_session::{Session, SessionConfig, SessionConfigError, SessionError, SessionManager};
+use yetlet::server_axum::App;
+use yetlet::session::{Session, SessionConfig, SessionConfigError, SessionError, SessionManager};
+use yetlet::view::{Element, View};
 
 pub use database::{Database, DatabaseOptions};
 pub use identity::DemoIdentities;

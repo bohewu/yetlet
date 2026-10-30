@@ -12,12 +12,9 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-yetlet-dom = { path = "../../crates/yetlet-dom" }
-yetlet-dom-keyed = { path = "../../crates/yetlet-dom-keyed" }
-yetlet-reactive = { path = "../../crates/yetlet-reactive" }
-yetlet-core = { path = "../../crates/yetlet-core" }
+yetlet-browser = { path = "../../crates/yetlet-browser", version = "0.9.0-alpha.5", default-features = false, features = ["actions", "dom", "dom-keyed"] }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.5", default-features = false, features = ["actions", "reactive"] }
 yetlet-todo-ui = { path = "../todo-ui" }
-yetlet-actions = { path = "../../crates/yetlet-actions" }
 serde_json = "1"
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

@@ -38,7 +38,7 @@ jobs:
         run: |
           cargo +1.99.0 check --locked --target wasm32-unknown-unknown \
             -p yetlet-todo-browser -p yetlet-search-island \
-            -p yetlet-reactive -p yetlet-dom-keyed \
+            -p yetlet -p yetlet-browser \
             -p yetlet-render-bench -p yetlet-keyed-bindings \
             -p yetlet-dashboard-counter-island -p yetlet-dashboard-filter-island
 
@@ -112,7 +112,7 @@ jobs:
         run: |
           cargo check --locked --target wasm32-unknown-unknown \
             -p yetlet-todo-browser -p yetlet-search-island \
-            -p yetlet-reactive -p yetlet-dom-keyed \
+            -p yetlet -p yetlet-browser \
             -p yetlet-render-bench -p yetlet-keyed-bindings \
             -p yetlet-dashboard-counter-island -p yetlet-dashboard-filter-island
       - name: Browser tooling and release assets

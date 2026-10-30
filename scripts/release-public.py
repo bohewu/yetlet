@@ -155,7 +155,7 @@ def public_inputs(p, directory, notes, verification):
     v = s.load(verification)
     s.require(type(v['schema']) is int and v['schema'] == 1 and v['status'] == 'PASS' and v['independent_verification'] is True)
     s.require(v['record_sha256'] == p['record_sha256'] and v['source'] == s.C
-              and v['signer_commit'] == s.RECORD['signer_commit'] and v['subjects_verified'] == 16)
+              and v['signer_commit'] == s.RECORD['signer_commit'] and v['subjects_verified'] == len(s.PACKAGES))
     s.require(type(v['entries_verified']) is int and 0 < v['entries_verified'] <= s.checksums.MAX_FILES)
     s.require(v['provenance_sha256'] == s.PUBLIC_SHA and s.digest(v['manifest_sha256']))
     blobs = {}
@@ -179,7 +179,7 @@ def public_inputs(p, directory, notes, verification):
     s.require(s.sha(blobs['provenance.sigstore.json']) == v['provenance_bundle_sha256'])
     bundle = s.load(blobs['provenance.sigstore.json'])
     s.require(base64.b64decode(bundle['dsseEnvelope']['payload'], validate=True) == blobs['PROVENANCE-UNSIGNED.json'])
-    s.provenance(directory)  # Original raw statement and all sixteen subjects, C/tag/run.
+    s.provenance(directory)  # Original raw statement and all selected subjects, C/tag/run.
     checksum = s.load(blobs[s.MANIFEST])
     s.require(set(checksum) == {'schema_version', 'notice', 'artifacts'} and checksum['schema_version'] == 1
               and checksum['notice'] == s.checksums.NOTICE)

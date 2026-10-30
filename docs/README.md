@@ -1,9 +1,10 @@
 # Developer Documentation
 
 Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
-choose a [runnable sample](SAMPLES.md). The Experimental
-[v0.9.0-alpha.1 source-package pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
-is published on GitHub; crates.io remains separate. Current task status belongs
+choose a [runnable sample](SAMPLES.md). This checkout uses the unreleased
+two-package alpha.5 SDK. The existing
+[alpha.4 GitHub pre-release](ALPHA4-HOSTED-RECORD.md) retains its original
+sixteen-package scope and one-package registry outcome. Current task status belongs
 to [Backlog](BACKLOG.md), milestone gates to [Roadmap](ROADMAP.md), and current
 distribution versus historical qualification to [Release readiness](RELEASE-READINESS.md).
 
@@ -31,6 +32,9 @@ distribution versus historical qualification to [Release readiness](RELEASE-READ
 - [WebAssembly startup and loading UI](WASM-STARTUP.md): optional shared JS/CSS shell, customization, full-page/SSR-region integration and caller-owned lifetime.
 
 ## Maintainer entry points
+
+- [Alpha.5 two-package release plan](ALPHA5-RELEASE-PLAN.md): committed migration
+  input, intended package/platform scope, current gaps and later execution gates.
 
 - [Alpha.4 hosted checkpoint](ALPHA4-HOSTED-RECORD.md): fixed C/tag, original
   successful build/readback, preserved failures/custody, distinct signer delivery
@@ -279,8 +283,8 @@ The owner separately approved [Experimental renderer extraction](M11-G-EXPERIMEN
 without a performance guarantee. [YT-078 picking](YT-078-VERIFICATION.md) and
 [YT-079 candidate extraction](YT-079-VERIFICATION.md) have individual browser
 and independent-review PASS at their selected scopes. Use the
-[`yetlet-wgpu` guide](../crates/yetlet-wgpu/README.md), its
-[support matrix](../crates/yetlet-wgpu/SUPPORT.md), and
+[`yetlet-wgpu` guide](../crates/yetlet-browser/guides/wgpu.md), its
+[support matrix](../crates/yetlet-browser/guides/wgpu-support.md), and
 [YT-080 qualification](YT-080-VERIFICATION.md) and its
 [independent Reviewer PASS](YT-080-INDEPENDENT-REVIEW.md). YT-075–YT-080 are
 complete at their declared scopes; [YT-081](YT-081-M11-CLOSEOUT.md) reconciles the final evidence, while publication remains excluded.
@@ -411,17 +415,17 @@ These nine unpublished candidate pages describe the implemented APIs and their p
 
 | Area | Package guide |
 |---|---|
-| Shared View and binding vocabulary | [yetlet-core](../crates/yetlet-core/README.md) |
-| Native escaped HTML | [yetlet-html](../crates/yetlet-html/README.md) |
-| Browser subtree mount | [yetlet-dom](../crates/yetlet-dom/README.md) |
-| Optional keyed children/listeners | [yetlet-dom-keyed](../crates/yetlet-dom-keyed/README.md) |
-| Optional owned local update graph | [yetlet-reactive](../crates/yetlet-reactive/README.md) |
-| Explicit typed actions | [yetlet-actions](../crates/yetlet-actions/README.md) |
-| Native handlers, routing and Page responses | [yetlet-server-axum](../crates/yetlet-server-axum/README.md) |
-| Optional request correlation | [yetlet-request-id](../crates/yetlet-request-id/README.md) |
-| Optional Memory Session | [yetlet-session](../crates/yetlet-session/README.md) |
+| Shared View and binding vocabulary | [yetlet-core](../crates/yetlet/guides/core.md) |
+| Native escaped HTML | [yetlet-html](../crates/yetlet/guides/html.md) |
+| Browser subtree mount | [yetlet-dom](../crates/yetlet-browser/guides/dom.md) |
+| Optional keyed children/listeners | [yetlet-dom-keyed](../crates/yetlet-browser/guides/dom-keyed.md) |
+| Optional owned local update graph | [yetlet-reactive](../crates/yetlet/guides/reactive.md) |
+| Explicit typed actions | [yetlet-actions](../crates/yetlet/guides/actions.md) |
+| Native handlers, routing and Page responses | [yetlet-server-axum](../crates/yetlet/guides/server-axum.md) |
+| Optional request correlation | [yetlet-request-id](../crates/yetlet/guides/request-id.md) |
+| Optional Memory Session | [yetlet-session](../crates/yetlet/guides/session.md) |
 
-The isolated [Redis provider](../crates/yetlet-session-redis/README.md) is outside the nine candidates and remains nonpublishable. Its bounded qualification does not confer durable or production Session guarantees.
+The isolated [Redis provider](../crates/yetlet/guides/session-redis.md) is outside the nine candidates and remains nonpublishable. Its bounded qualification does not confer durable or production Session guarantees.
 
 ## Completed research prototypes
 

@@ -1,6 +1,6 @@
 //! YT-150: identical sample code compiled against two pinned product sources.
 use super::*;
-use yetlet_html::RenderError;
+use yetlet::html::RenderError;
 
 const ROWS: usize = 1024;
 const NODES: usize = 11 + 7 * ROWS;

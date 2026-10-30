@@ -26,7 +26,7 @@ Set `YETLET_SHOP_DISABLE_ORDERS=1` to demonstrate a disabled feature module. The
 
 ## Transaction and authorization boundary
 
-The cart lives in the opt-in `yetlet-session` provider. Products, inventory, orders and lines live in application-local bundled SQLite through direct parameterized `rusqlite`; synchronous work is limited by a four-operation semaphore and executes through `spawn_blocking`.
+The cart lives in the opt-in `yetlet::session` provider. Products, inventory, orders and lines live in application-local bundled SQLite through direct parameterized `rusqlite`; synchronous work is limited by a four-operation semaphore and executes through `spawn_blocking`.
 
 Checkout uses `BEGIN IMMEDIATE`. Inventory decrements and order/line inserts commit together; insufficient stock or a line-insert failure rolls back the whole order. An idempotency key derived from the Session CSRF identity plus cart revision returns the same committed order if a database commit succeeded before Session-cart cleanup completed. A concurrent cart change is never cleared by an older checkout response.
 

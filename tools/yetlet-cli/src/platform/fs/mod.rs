@@ -103,12 +103,14 @@ fn generated_subdirectories(files: &[(&str, String)]) -> Result<Vec<&'static str
     for (path, _) in files {
         let directory = match *path {
             "src/main.rs" | "src/lib.rs" | "src/model.rs" | "src/config.rs" | "src/tailwind.rs"
-            | "src/vite.rs" => Some("src"),
+            | "src/vite.rs" | "src/tls.rs" => Some("src"),
             "cargo-overlay/Cargo.toml" => Some("cargo-overlay"),
             "frontend/package.json"
             | "frontend/index.html"
             | "frontend/build-wasm.mjs"
             | "frontend/serve.mjs"
+            | "frontend/wasm-startup.mjs"
+            | "frontend/wasm-startup.css"
             | "frontend/package-lock.json"
             | "frontend/vite.config.mjs"
             | "frontend/vite.dev.config.mjs"

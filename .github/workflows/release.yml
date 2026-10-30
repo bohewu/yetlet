@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       record:
-        description: Reviewed versioned release-record JSON (schema 1, sixteen cohort)
+        description: Reviewed versioned release-record JSON (schema 1/sixteen or schema 2/consolidated)
         type: string
         required: true
 
@@ -60,7 +60,7 @@ jobs:
           import release_record as records
           r = records.environment('build')
           with open(os.environ['GITHUB_ENV'], 'a') as f:
-              f.write('EXPECTED_COMMIT=' + r['source'] + '\nRELEASE_COHORT=sixteen\n')
+              f.write('EXPECTED_COMMIT=' + r['source'] + '\nRELEASE_COHORT=' + r['cohort'] + '\n')
           PYRECORD
           printf 'trusted=true\n' >> "$GITHUB_OUTPUT"
       - name: Authenticate pinned encryption tool and public recipient
@@ -118,7 +118,7 @@ jobs:
           printf 'OPENSSL_DIR=%s\nOPENSSL_STATIC=1\nOPENSSL_SOURCE_ARCHIVE=%s\n' \
             "$preparation_prefix" "$preparation_archive" >> "$GITHUB_ENV"
           rm -rf "$preparation_source"
-      - name: Build and verify unsigned sixteen-package preparation
+      - name: Build and verify unsigned selected-package preparation
         id: preparation
         shell: bash
         run: |

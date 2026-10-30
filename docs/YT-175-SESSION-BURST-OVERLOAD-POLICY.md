@@ -28,9 +28,9 @@ short-run/arrival-distribution confounds and advisory cross-clock limits.
 
 ## Current contract and responsibility boundaries
 
-The [provider implementation](../crates/yetlet-session-redis/src/store.rs),
-[configuration](../crates/yetlet-session-redis/src/lib.rs) and
-[provider contract](../crates/yetlet-session-redis/README.md) establish:
+The [provider implementation](../crates/yetlet/src/session_redis/store.rs),
+[configuration](../crates/yetlet/src/session_redis/mod.rs) and
+[provider contract](../crates/yetlet/guides/session-redis.md) establish:
 
 - The selected reference uses **four active operations and eight total admitted
   operations**, including active work. Eight total is not eight extra waiters.
@@ -123,8 +123,8 @@ unselected designs, not capabilities implied by this contract.
 
 This mapping recommendation matches the
 [Auth workload](../examples/axum-workload-comparison/src/bin/auth_postgres.rs),
-[Auth contract](../crates/yetlet-auth/README.md) and
-[rate limiter](../crates/yetlet-rate-limit/README.md); the Session provider does
+[Auth contract](../crates/yetlet/guides/auth.md) and
+[rate limiter](../crates/yetlet/guides/rate-limit.md); the Session provider does
 not itself define every handler's HTTP policy. Keep actual malformed-input,
 configuration and conflict semantics separate. Do not clear/rotate cookies,
 replay login/logout or emit successful authentication because a lookup is busy.

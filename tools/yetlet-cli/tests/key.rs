@@ -4,7 +4,7 @@ use std::{
     path::{Path, PathBuf},
     process::{Command, Output},
 };
-use yetlet_signing::{
+use yetlet::signing::{
     KeyRef, KeyState, LocalProvider, LocalSigner, Policy, PublicKeySet, PublicMaterial,
     SigningService, TrustedKey, generate_self_signed,
 };
@@ -91,7 +91,7 @@ impl Fixture {
         self.cmd("rotate").args([key, "--yes"]).output().unwrap()
     }
     fn selected(&self, profile: &str) -> serde_json::Value {
-        yetlet_config::Loader::new(&self.root, "APP")
+        yetlet::config::Loader::new(&self.root, "APP")
             .load_with_env([("APP_ENVIRONMENT".into(), profile.into())])
             .unwrap()
     }

@@ -18,7 +18,7 @@ retains its original scope, failures and owner waivers.
 | [Board OIDC](../examples/lab-operations-board/src/oidc.rs), `discover/start/finish/callback` | One configured issuer, maintained openidconnect client, callback transaction and local permission mapping |
 | [Admin composition](../examples/admin-dashboard/src/oidc.rs), `configure` | Resolves SecretProvider at startup and builds that same Board client; not a second independent protocol implementation |
 | [Board Session](../examples/lab-operations-board/src/sessions.rs) and [domain](../examples/lab-operations-board/src/domain.rs) | App-local Memory/Valkey selection and local-name permission reconstruction; existing store DTO is not the new generic Principal |
-| [Auth foundation](../crates/yetlet-auth/src/lib.rs) and [Memory bridge](../crates/yetlet-auth/src/session.rs) | Verified-input Principal plus explicit resolver/extractors; no discovery, callback, token exchange, keys or account store |
+| [Auth foundation](../crates/yetlet/src/auth/mod.rs) and [Memory bridge](../crates/yetlet/src/auth/session.rs) | Verified-input Principal plus explicit resolver/extractors; no discovery, callback, token exchange, keys or account store |
 
 Admin and Board already share the mature client implementation. Auth Notes is
 a synthetic credential demonstration, not another OIDC consumer. Thus another

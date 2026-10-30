@@ -7,8 +7,8 @@ use axum::{
     routing::get,
 };
 use serde::Serialize;
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{App, DocumentMetadata, LanguageTag, Page};
+use yetlet::view::{Element, View};
+use yetlet::server_axum::{App, DocumentMetadata, LanguageTag, Page};
 
 const CSP: &str = "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
 

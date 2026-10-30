@@ -10,9 +10,9 @@ mod browser {
     };
     use wasm_bindgen::{JsCast, JsValue, prelude::wasm_bindgen};
     use web_sys::{Document, Element, HtmlInputElement};
-    use yetlet_core::{Element as ViewElement, View, binding::BindingKey};
-    use yetlet_dom_keyed::{DomEventListener, KeyedChildren, KeyedEntry};
-    use yetlet_reactive::{GraphHandle, LocalGraph};
+    use yetlet::view::{Element as ViewElement, View, binding::BindingKey};
+    use yetlet_browser::dom_keyed::{DomEventListener, KeyedChildren, KeyedEntry};
+    use yetlet::reactive::{GraphHandle, LocalGraph};
 
     type Handle = GraphHandle<Tasks, Command, String>;
 
@@ -90,7 +90,7 @@ mod browser {
                     .child(View::text("Edit")),
             )
             .into();
-        yetlet_dom::mount(&host, &view)?;
+        yetlet_browser::dom::mount(&host, &view)?;
         let element = host
             .first_element_child()
             .ok_or_else(|| JsValue::from_str("Missing task row"))?;

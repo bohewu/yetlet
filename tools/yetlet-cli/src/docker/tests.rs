@@ -150,7 +150,7 @@ fn deterministic_selected_files_exact_overlay_and_minimal_workspace_without_leak
     let values: BTreeMap<_, _> = first.iter().map(|(p, v)| (*p, v)).collect();
     let original: Value = parse(&before).unwrap();
     let mut overlay: Value = values["cargo-overlay/Cargo.toml"].parse().unwrap();
-    for name in ["yetlet-core", "yetlet-server-axum"] {
+    for name in ["yetlet"] {
         assert_eq!(
             overlay["dependencies"][name]["path"].as_str(),
             Some(format!("/work/yetlet/crates/{name}").as_str())
@@ -177,7 +177,10 @@ fn deterministic_selected_files_exact_overlay_and_minimal_workspace_without_leak
             .collect::<Vec<_>>(),
         ["dependencies", "members", "package", "resolver"]
     );
-    assert_eq!(minimal["workspace"]["members"].as_array().unwrap().len(), 3);
+    assert_eq!(
+        minimal["workspace"]["members"].as_array().unwrap(),
+        &[Value::String("crates/yetlet".into())]
+    );
     let inventory: serde_json::Value =
         serde_json::from_str(values["build-context-inventory.json"]).unwrap();
     assert_eq!(
@@ -189,7 +192,10 @@ fn deterministic_selected_files_exact_overlay_and_minimal_workspace_without_leak
             .collect::<Vec<_>>(),
         [".dockerignore", "Cargo.lock", "src/main.rs"]
     );
-    assert_eq!(inventory["yetlet-src"].as_object().unwrap().len(), 14);
+    assert_eq!(
+        inventory["yetlet-src"].as_object().unwrap().len(),
+        crate::framework_source::FILES.len() + 2
+    );
     assert_eq!(
         inventory["app-src"]["Cargo.lock"]["sha256"],
         digest(&snapshot.lock)
@@ -258,33 +264,23 @@ fn strict_generated_manifest_lock_and_framework_closure_gating() {
             4 => disk::remove_file(f.app.join("Cargo.lock")).unwrap(),
             5 => disk::write(f.app.join("Cargo.lock"), "invalid").unwrap(),
             6 => {
-                let path = f.framework.join("crates/yetlet-html/Cargo.toml");
+                let path = f.framework.join("crates/yetlet/Cargo.toml");
                 let data = disk::read_to_string(&path).unwrap();
                 disk::write(path, format!("{data}\nunknown={{path='../unknown'}}\n")).unwrap();
             }
             7 => {
                 let path = f.framework.join("Cargo.toml");
-                let data = disk::read_to_string(&path).unwrap();
-                disk::write(
-                    path,
-                    data.replace("rust-version='1.99'", "rust-version='1.98'"),
-                )
-                .unwrap();
+                let mut data: Value = disk::read_to_string(&path).unwrap().parse().unwrap();
+                data["workspace"]["package"]["rust-version"] = Value::String("1.98".into());
+                disk::write(path, toml::to_string(&data).unwrap()).unwrap();
             }
-            8 => disk::write(
-                f.framework.join("crates/yetlet-core/build.rs"),
-                "fn main(){}\n",
-            )
-            .unwrap(),
-            9 => disk::write(f.framework.join("crates/yetlet-core/src/unknown.rs"), "").unwrap(),
+            8 => disk::write(f.framework.join("crates/yetlet/build.rs"), "fn main(){}\n").unwrap(),
+            9 => disk::write(f.framework.join("crates/yetlet/src/view/unknown.rs"), "").unwrap(),
             _ => {
-                let path = f.framework.join("crates/yetlet-core/Cargo.toml");
-                let data = disk::read_to_string(&path).unwrap();
-                disk::write(
-                    path,
-                    data.replace("license.workspace=true", "unknown.workspace=true"),
-                )
-                .unwrap();
+                let path = f.framework.join("crates/yetlet/Cargo.toml");
+                let mut data: Value = disk::read_to_string(&path).unwrap().parse().unwrap();
+                data["package"]["license"] = Value::String("unapproved".into());
+                disk::write(path, toml::to_string(&data).unwrap()).unwrap();
             }
         }
         f.refused();
@@ -351,13 +347,13 @@ fn no_follow_app_or_output_symlinks_and_pinned_app_rename_race() {
             }
             _ => {
                 disk::rename(
-                    f.framework.join("crates/yetlet-core/src/lib.rs"),
+                    f.framework.join("crates/yetlet/src/view/mod.rs"),
                     f.framework.join("saved.rs"),
                 )
                 .unwrap();
                 symlink(
                     f.framework.join("saved.rs"),
-                    f.framework.join("crates/yetlet-core/src/lib.rs"),
+                    f.framework.join("crates/yetlet/src/view/mod.rs"),
                 )
                 .unwrap();
             }
@@ -377,39 +373,6 @@ fn no_follow_app_or_output_symlinks_and_pinned_app_rename_race() {
 // Structural fixtures exercise generation only; actual npm/Cargo builds are separate.
 fn delivery_fixture(config: bool, assets: bool, plugin: bool) -> crate::cloud_fixture::Fixture {
     let f = crate::cloud_fixture::Fixture::new();
-    if config {
-        for (path, bytes) in [
-            (
-                "crates/yetlet-config/Cargo.toml",
-                include_bytes!("../../../../crates/yetlet-config/Cargo.toml").as_slice(),
-            ),
-            (
-                "crates/yetlet-config/src/lib.rs",
-                include_bytes!("../../../../crates/yetlet-config/src/lib.rs").as_slice(),
-            ),
-            (
-                "crates/yetlet-config/src/secrets.rs",
-                include_bytes!("../../../../crates/yetlet-config/src/secrets.rs").as_slice(),
-            ),
-            (
-                "crates/yetlet-config/examples/secret_provider.rs",
-                include_bytes!("../../../../crates/yetlet-config/examples/secret_provider.rs")
-                    .as_slice(),
-            ),
-            (
-                "crates/yetlet-secrets/Cargo.toml",
-                include_bytes!("../../../../crates/yetlet-secrets/Cargo.toml").as_slice(),
-            ),
-            (
-                "crates/yetlet-secrets/src/lib.rs",
-                include_bytes!("../../../../crates/yetlet-secrets/src/lib.rs").as_slice(),
-            ),
-        ] {
-            let path = f.framework.join(path);
-            disk::create_dir_all(path.parent().unwrap()).unwrap();
-            disk::write(path, bytes).unwrap();
-        }
-    }
     let entries = if assets {
         scaffold::vite_files("composeapp", &f.framework, true, config, plugin).unwrap()
     } else {
@@ -443,25 +406,6 @@ fn delivery_fixture(config: bool, assets: bool, plugin: bool) -> crate::cloud_fi
             .as_array_mut()
             .unwrap()
             .sort_by(|a, b| a.as_str().cmp(&b.as_str()));
-    }
-    packages
-        .iter_mut()
-        .find(|p| p["name"].as_str() == Some("serde"))
-        .unwrap()["version"] = Value::String("1.0.229".into());
-    for (name, version, enabled) in [
-        ("serde_json", "1.0.149", assets),
-        ("tempfile", "3.27.0", assets),
-        ("secrecy", "0.10.3", config),
-        ("toml", "0.9.12+spec-1.1.0", config),
-        ("dotenvy", "0.15.7", config),
-        ("libc", "0.2.186", config),
-    ] {
-        if enabled {
-            packages.push(format!("name='{name}'\nversion='{version}'\nsource='registry+https://github.com/rust-lang/crates.io-index'\nchecksum='{}'\n", "a".repeat(64)).parse().unwrap());
-        }
-    }
-    if config {
-        packages.push("name='yetlet-config'\nversion='0.0.0'\ndependencies=['dotenvy','libc','serde','toml']\n".parse().unwrap());
     }
     disk::write(f.app.join("Cargo.lock"), toml::to_string(&lock).unwrap()).unwrap();
     if assets {
@@ -533,7 +477,7 @@ fn delivery_profile_matrix_exact_inventory_env_and_no_secrets_or_developer_paths
         }
         assert_eq!(
             inv["yetlet-src"].as_object().unwrap().len(),
-            if config { 20 } else { 14 }
+            crate::framework_source::FILES.len() + 2
         );
         for (path, record) in inv["yetlet-src"].as_object().unwrap() {
             let bytes = match path.as_str() {
@@ -575,8 +519,8 @@ fn delivery_profile_matrix_exact_inventory_env_and_no_secrets_or_developer_paths
         let overlay: Value = files["cargo-overlay/Cargo.toml"].parse().unwrap();
         if config {
             assert_eq!(
-                overlay["dependencies"]["yetlet-config"]["path"].as_str(),
-                Some("/work/yetlet/crates/yetlet-config")
+                overlay["dependencies"]["yetlet"]["path"].as_str(),
+                Some("/work/yetlet/crates/yetlet")
             );
         }
         for text in files.values() {
@@ -629,12 +573,12 @@ fn delivery_profile_matrix_exact_inventory_env_and_no_secrets_or_developer_paths
 #[test]
 fn delivery_config_secrets_closure_refuses_missing_tampered_and_extra_sources() {
     for selected in [
-        "crates/yetlet-config/Cargo.toml",
-        "crates/yetlet-config/src/lib.rs",
-        "crates/yetlet-config/src/secrets.rs",
-        "crates/yetlet-config/examples/secret_provider.rs",
-        "crates/yetlet-secrets/Cargo.toml",
-        "crates/yetlet-secrets/src/lib.rs",
+        "crates/yetlet/Cargo.toml",
+        "crates/yetlet/src/config/mod.rs",
+        "crates/yetlet/src/config/secrets.rs",
+        "crates/yetlet/examples/config/secret_provider.rs",
+        "crates/yetlet/Cargo.toml",
+        "crates/yetlet/src/secrets/mod.rs",
     ] {
         for missing in [false, true] {
             let f = delivery_fixture(true, false, false);
@@ -652,7 +596,7 @@ fn delivery_config_secrets_closure_refuses_missing_tampered_and_extra_sources() 
             assert!(!out.exists());
         }
     }
-    for package in ["yetlet-config", "yetlet-secrets"] {
+    for package in ["yetlet"] {
         for selected in ["src/extra.rs", "build.rs", ".cargo/config.toml"] {
             let f = delivery_fixture(true, false, false);
             let path = f.framework.join("crates").join(package).join(selected);
@@ -672,12 +616,12 @@ fn delivery_config_secrets_closure_refuses_missing_tampered_and_extra_sources() 
 #[test]
 fn delivery_config_secrets_closure_refuses_symlink_sources() {
     for selected in [
-        "crates/yetlet-config/Cargo.toml",
-        "crates/yetlet-config/src/lib.rs",
-        "crates/yetlet-config/src/secrets.rs",
-        "crates/yetlet-config/examples/secret_provider.rs",
-        "crates/yetlet-secrets/Cargo.toml",
-        "crates/yetlet-secrets/src/lib.rs",
+        "crates/yetlet/Cargo.toml",
+        "crates/yetlet/src/config/mod.rs",
+        "crates/yetlet/src/config/secrets.rs",
+        "crates/yetlet/examples/config/secret_provider.rs",
+        "crates/yetlet/Cargo.toml",
+        "crates/yetlet/src/secrets/mod.rs",
     ] {
         let f = delivery_fixture(true, false, false);
         let path = f.framework.join(selected);
@@ -746,9 +690,9 @@ fn delivery_refuses_attacker_inputs_stale_missing_and_unbounded_artifacts() {
                 .unwrap()
                 .set_len(1024 * 1024 + 1)
                 .unwrap(),
-            14 => disk::write(f.framework.join("crates/yetlet-config/src/extra.rs"), "").unwrap(),
+            14 => disk::write(f.framework.join("crates/yetlet/src/config/extra.rs"), "").unwrap(),
             15 => disk::write(
-                f.framework.join("crates/yetlet-config/src/lib.rs"),
+                f.framework.join("crates/yetlet/src/config/mod.rs"),
                 "// changed config closure\n",
             )
             .unwrap(),
@@ -799,7 +743,7 @@ fn delivery_rejects_symlink_assets_config_and_manifest_paths() {
 }
 
 #[test]
-fn legacy_docker_template_outputs_retain_pre_yt101_bytes() {
+fn docker_templates_preserve_unchanged_bytes_and_migrated_guide() {
     let f = Fixture::new();
     let app = fs::open_app(&f.manifest()).unwrap();
     let mut snapshot = inspect(&app).unwrap();
@@ -812,7 +756,7 @@ fn legacy_docker_template_outputs_retain_pre_yt101_bytes() {
         ),
         (
             "README.md",
-            "3a0df474b3c2ccf47707a987ec21490802977f4a372470088bccc0e208f0f4bb",
+            "e71661ff3263b76938699f97c1d756cc203990194454b469422c7afe5fd510d5",
         ),
         (
             ".dockerignore",
@@ -822,21 +766,20 @@ fn legacy_docker_template_outputs_retain_pre_yt101_bytes() {
             "app-src.dockerignore",
             "303ea146ebcbf3f6caf512b12886effd25c9122b3658c55e64c57dbb3556c52d",
         ),
-        (
-            "yetlet-src.dockerignore",
-            "01ab32213fc7cf4a5a2e0f8bcc07b47ef3f75f4b39e8a804f3f24c8a3c5bf9ff",
-        ),
-        (
-            "framework-workspace.toml",
-            "573adfb0e4bbedc9647fcf2767a901391a002971603046c00ec7d0bd8944726f",
-        ),
-        (
-            "cargo-overlay/Cargo.toml",
-            "16da14664d33cafc54df39569f50e16df238167ad4a835b7613277ae293b78d1",
-        ),
     ] {
         assert_eq!(digest(files[path].as_bytes()), hash, "{path}");
     }
+    // These three outputs intentionally follow the new package layout; the
+    // original hashes remain in the pre-migration source and failure record.
+    let workspace: Value = files["framework-workspace.toml"].parse().unwrap();
+    assert_eq!(
+        workspace["workspace"]["members"].as_array().unwrap(),
+        &[Value::String("crates/yetlet".into())]
+    );
+    let overlay: Value = files["cargo-overlay/Cargo.toml"].parse().unwrap();
+    assert!(overlay["dependencies"].get("yetlet").is_some());
+    assert!(!files["yetlet-src.dockerignore"].contains("yetlet-core"));
+    assert!(files["yetlet-src.dockerignore"].contains("crates/yetlet/src/config/mod.rs"));
 }
 
 fn selected_fixture(config: bool, assets: bool, plugin: bool) -> crate::cloud_fixture::Fixture {
@@ -876,7 +819,7 @@ fn selected_fixture(config: bool, assets: bool, plugin: bool) -> crate::cloud_fi
         disk::write(destination, content).unwrap();
     }
     let mut manifest = parse(&disk::read(f.manifest()).unwrap()).unwrap();
-    for name in ["yetlet-core", "yetlet-server-axum", "yetlet-config"] {
+    for name in ["yetlet"] {
         if manifest["dependencies"].get(name).is_some() {
             manifest["dependencies"][name]
                 .as_table_mut()
@@ -906,7 +849,9 @@ fn selected_fixture(config: bool, assets: bool, plugin: bool) -> crate::cloud_fi
         dependencies.extend(["axum-server", "rustls"].map(|name| Value::String(name.into())));
         dependencies.sort_by(|a, b| a.as_str().cmp(&b.as_str()));
         for (name, version) in [("axum-server", "0.8.0"), ("rustls", "0.23.46")] {
-            packages.push(format!("name='{name}'\nversion='{version}'\nsource='registry+https://github.com/rust-lang/crates.io-index'\nchecksum='{}'\n", "a".repeat(64)).parse().unwrap());
+            if !packages.iter().any(|p| p["name"].as_str() == Some(name)) {
+                packages.push(format!("name='{name}'\nversion='{version}'\nsource='registry+https://github.com/rust-lang/crates.io-index'\nchecksum='{}'\n", "a".repeat(64)).parse().unwrap());
+            }
         }
         disk::write(f.app.join("Cargo.lock"), toml::to_string(&lock).unwrap()).unwrap();
     }
@@ -975,7 +920,7 @@ fn current_selected_profiles_refuse_edited_sources_dependencies_and_runtime_publ
             0 => disk::write(f.app.join("src/config.rs"), "// edited\n").unwrap(),
             1 => {
                 let mut manifest = parse(&disk::read(f.manifest()).unwrap()).unwrap();
-                manifest["dependencies"]["yetlet-core"]["version"] = Value::String("*".into());
+                manifest["dependencies"]["yetlet"]["version"] = Value::String("*".into());
                 disk::write(f.manifest(), toml::to_string(&manifest).unwrap()).unwrap();
             }
             _ => {

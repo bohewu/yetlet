@@ -62,6 +62,8 @@ pub fn validate_name(name: &str) -> Result<(), &'static str> {
         "deps",
         "examples",
         "incremental",
+        "yetlet",
+        "yetlet-browser",
         // Cargo package IDs must not collide with our path dependencies at 0.1.0.
         "yetlet-core",
         "yetlet-html",
@@ -120,11 +122,10 @@ pub(crate) fn files(
         )
         .to_string())
     };
-    let core = quoted(&framework.join("crates/yetlet-core"))?;
-    let server = quoted(&framework.join("crates/yetlet-server-axum"))?;
+    let framework_package = quoted(&framework.join("crates/yetlet"))?;
     let signal = if service { ", \"signal\"" } else { "" };
     let manifest = format!(
-        "[package]\nname = \"{name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\nrust-version = \"1.99\"\ndescription = \"Native Yetlet SSR application preview\"\nlicense = \"MIT OR Apache-2.0\"\npublish = false\n\n[workspace]\nresolver = \"3\"\n\n[dependencies]\naxum = \"0.8\"\ntokio = {{ version = \"1\", features = [\"macros\", \"net\", \"rt-multi-thread\"{signal}] }}\nyetlet-core = {{ path = {core} }}\nyetlet-server-axum = {{ path = {server} }}\n"
+        "[package]\nname = \"{name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\nrust-version = \"1.99\"\ndescription = \"Native Yetlet SSR application preview\"\nlicense = \"MIT OR Apache-2.0\"\npublish = false\n\n[workspace]\nresolver = \"3\"\n\n[dependencies]\naxum = \"0.8\"\ntokio = {{ version = \"1\", features = [\"macros\", \"net\", \"rt-multi-thread\"{signal}] }}\nyetlet = {{ path = {framework_package}, default-features = false, features = [\"server-axum\"] }}\n"
     );
     let (manifest, readme, main) = if service {
         (
@@ -168,16 +169,16 @@ pub(crate) fn config_files(
     service: bool,
 ) -> Result<Vec<(&'static str, String)>, String> {
     let mut entries = files(name, framework, service)?;
-    let path = framework.join("crates/yetlet-config");
-    let path = toml::Value::String(path.to_str().ok_or("framework path must be UTF-8")?.into());
-    let dependencies = format!(
-        "yetlet-config = {{ path = {path} }}\nserde = {{ version = \"=1.0.229\", features = [\"derive\"] }}\nsecrecy = {{ version = \"=0.10.3\", features = [\"serde\"] }}\n"
-    );
+    let dependencies = "serde = { version = \"=1.0.229\", features = [\"derive\"] }\nsecrecy = { version = \"=0.10.3\", features = [\"serde\"] }\n";
     // Insert inside [dependencies], before the existing service metadata table.
     entries[0].1 = entries[0].1.replacen(
         "[dependencies]\n",
         &format!("[dependencies]\n{dependencies}"),
         1,
+    );
+    entries[0].1 = entries[0].1.replace(
+        "features = [\"server-axum\"]",
+        "features = [\"server-axum\", \"config\"]",
     );
     entries[1].1 = include_str!("../templates/config/README.md").replace("@NAME@", name);
     entries[2].1.push_str("!.env.example\n");
@@ -261,7 +262,7 @@ pub(crate) fn tailwind_files(
     main.replace_range(start..end, handlers);
     *main = format!("mod tailwind;\n\n{main}");
     *main = main
-        .replace("use yetlet_server_axum::{App, Page};", "use yetlet_server_axum::App;")
+        .replace("use yetlet::server_axum::{App, Page};", "use yetlet::server_axum::App;")
         .replace(".page(\"/\", \"Yetlet\", home)", ".get(\"/\", home)")
         .replace(
             "async fn main() -> Result<(), Box<dyn std::error::Error>> {",
@@ -396,7 +397,7 @@ pub(crate) fn vite_files(
     };
     entries[0].1 = entries[0].1.replacen(
         "[dependencies]\n",
-        &format!("[dependencies]\n{serde}serde_json = \"=1.0.149\"\n"),
+        &format!("[dependencies]\n{serde}serde_json = \"=1.0.151\"\n"),
         1,
     );
     entries[0].1.push_str(
@@ -438,7 +439,7 @@ pub(crate) fn vite_files(
         );
     main.replace_range(start..end, &format!("{handlers}\n"));
     *main = format!("mod vite;\n\n{main}")
-        .replace("use yetlet_server_axum::{App, Page};", "use yetlet_server_axum::App;")
+        .replace("use yetlet::server_axum::{App, Page};", "use yetlet::server_axum::App;")
         .replace("use axum::extract::{Path, State};", "use axum::extract::Path;")
         .replace("extract::{Path, State},", "extract::Path,")
         .replace("use std::sync::Arc;\n", "")
@@ -648,24 +649,19 @@ pub(crate) fn selected_files(
     } else {
         files(name, framework, service)?
     };
-    let manifest = &mut entries[0].1;
-    for (krate, version) in [
-        ("yetlet-core", "0.1.0"),
-        ("yetlet-server-axum", "0.1.0"),
-        ("yetlet-config", "0.0.0"),
-    ] {
-        let prefix = format!("{krate} = {{ path = ");
-        if let Some(start) = manifest.find(&prefix) {
-            let end = start
-                + manifest[start..]
-                    .find('\n')
-                    .ok_or("invalid built-in dependency")?;
-            manifest.replace_range(
-                start..end,
-                &format!("{krate} = {{ version = \"={version}\" }}"),
-            );
-        }
-    }
+    let mut manifest: toml::Value = entries[0]
+        .1
+        .parse()
+        .map_err(|_| "invalid built-in manifest")?;
+    let dependency = manifest["dependencies"]["yetlet"]
+        .as_table_mut()
+        .ok_or("invalid built-in framework dependency")?;
+    dependency.remove("path");
+    dependency.insert(
+        "version".into(),
+        toml::Value::String(format!("={}", crate::framework::package_version())),
+    );
+    entries[0].1 = toml::to_string(&manifest).map_err(|_| "cannot render generated manifest")?;
     let cli = format!(
         "\n[cli.rust]\nwatch = false\n\n[cli.vite]\nenabled = {vite}\nroot = \"frontend/\"\nauto_start = {vite}\nauto_build = {vite}\n\n[cli.generate.k8s]\nreplicas = 1\n"
     );
@@ -758,7 +754,8 @@ pub(crate) fn selected_files(
     }
     entries[1].1 = include_str!("../templates/SELECTED-README.md")
         .replace("@NAME@", name)
-        .replace("@VERSION@", env!("CARGO_PKG_VERSION"));
+        .replace("@VERSION@", env!("CARGO_PKG_VERSION"))
+        .replace("@SDK_VERSION@", &crate::framework::package_version());
     if runtime_settings {
         entries[1]
             .1

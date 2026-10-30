@@ -1,72 +1,13 @@
 //! Bounded generated cloud delivery profiles. No frontend execution or source export.
-use super::{Snapshot, fs, read_framework};
+use super::{Snapshot, fs};
 use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet},
-    path::Path,
     time::SystemTime,
 };
 
-pub(super) fn dependencies(snapshot: &Snapshot) -> Vec<&'static str> {
-    let mut names = vec!["yetlet-core", "yetlet-server-axum"];
-    if snapshot.runtime_settings {
-        names.push("yetlet-config");
-    }
-    names
-}
-
-pub(super) fn config_framework(
-    root: &Path,
-    files: &mut BTreeMap<String, Vec<u8>>,
-) -> Result<(), String> {
-    for (directory, sources) in [
-        ("crates/yetlet-config", &["lib.rs", "secrets.rs"][..]),
-        ("crates/yetlet-secrets", &["lib.rs"][..]),
-    ] {
-        if super::directory_names(&root.join(directory).join("src"))? != sources
-            || super::directory_names(&root.join(directory))?
-                .iter()
-                .any(|n| matches!(n.as_str(), "build.rs" | ".cargo"))
-        {
-            return Err("unsupported config/secrets crate layout".into());
-        }
-    }
-    for (path, expected) in [
-        (
-            "crates/yetlet-config/Cargo.toml",
-            include_bytes!("../../../../crates/yetlet-config/Cargo.toml").as_slice(),
-        ),
-        (
-            "crates/yetlet-config/src/lib.rs",
-            include_bytes!("../../../../crates/yetlet-config/src/lib.rs").as_slice(),
-        ),
-        (
-            "crates/yetlet-config/src/secrets.rs",
-            include_bytes!("../../../../crates/yetlet-config/src/secrets.rs").as_slice(),
-        ),
-        // Cargo requires this explicitly declared target even when the
-        // optional provider feature and example are not being compiled.
-        (
-            "crates/yetlet-config/examples/secret_provider.rs",
-            include_bytes!("../../../../crates/yetlet-config/examples/secret_provider.rs")
-                .as_slice(),
-        ),
-        (
-            "crates/yetlet-secrets/Cargo.toml",
-            include_bytes!("../../../../crates/yetlet-secrets/Cargo.toml").as_slice(),
-        ),
-        (
-            "crates/yetlet-secrets/src/lib.rs",
-            include_bytes!("../../../../crates/yetlet-secrets/src/lib.rs").as_slice(),
-        ),
-    ] {
-        let bytes = read_framework(root, path)?;
-        if super::normalize(&bytes)? != super::normalize(expected)? {
-            return Err("unsupported config crate source or dependencies".into());
-        }
-        files.insert(path.into(), bytes);
-    }
-    Ok(())
+pub(super) fn dependencies(_snapshot: &Snapshot) -> Vec<&'static str> {
+    vec!["yetlet"]
 }
 
 fn safe(value: &str) -> bool {

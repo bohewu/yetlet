@@ -18,14 +18,14 @@ Its existing imports, Tokio main, listener and route registration remain needed.
 
 ## Minimal integration
 
-Keep exactly one `use yetlet_core::{Element, View};` import as shown below;
+Keep exactly one `use yetlet::view::{Element, View};` import as shown below;
 the plain scaffold already has it. Replace the original `home` function with
 the following type, helper functions and `home` handler. Keep the other imports,
 `hello` route/handler and main function. The existing `.page("/", "Yetlet", home)` registration can call
 this same no-argument async `View` handler without a Controller or adapter.
 
 ```rust
-use yetlet_core::{Element, View};
+use yetlet::view::{Element, View};
 
 struct Task {
     title: String,
@@ -65,7 +65,7 @@ async fn home() -> View {
 }
 ```
 
-The public [core constructors](../crates/yetlet-core/src/lib.rs) own the tree.
+The public [core constructors](../crates/yetlet/src/view/mod.rs) own the tree.
 `child` takes one value convertible into View; `children` takes an iterator of
 Views. `tasks.iter().map(task_item)` therefore supplies the latter directly.
 Tag/attribute names are static strings; dynamic text and attribute values become
@@ -118,10 +118,10 @@ reusable display model for generic browser serialization.
 For the server, the existing `App::page` adapter returns a complete escaped
 HTTP document with its strict CSP. Use ordinary `.get` handlers returning
 `Page` for parameterized/fallible cases, following the
-[server guide](../crates/yetlet-server-axum/README.md). A rendering policy error
+[server guide](../crates/yetlet/guides/server-axum.md). A rendering policy error
 maps to a generic 500; check supported tags/attributes, duplicates, void children
 and URL policy rather than weakening validation. The
-[HTML guide](../crates/yetlet-html/README.md) owns fragment/error details.
+[HTML guide](../crates/yetlet/guides/html.md) owns fragment/error details.
 
 Native form semantics, business validation, authentication, authorization and
 CSRF remain application responsibilities; composition alone supplies none of
@@ -129,16 +129,16 @@ them. Follow [forms](../examples/forms-validation/README.md) and
 [Session cart](../examples/cart-server/README.md) for existing complete paths.
 
 The renderer-neutral shape does not make all Views browser-compatible.
-[DOM mounting](../crates/yetlet-dom/README.md) has a finite vocabulary and browser
+[DOM mounting](../crates/yetlet-browser/guides/dom.md) has a finite vocabulary and browser
 navigation/lifetime checks. List children and CSS classes do not create keyed
-identity or events. Use the explicit [keyed DOM](../crates/yetlet-dom-keyed/README.md)
-and [reactive](../crates/yetlet-reactive/README.md) guides only when selecting
+identity or events. Use the explicit [keyed DOM](../crates/yetlet-browser/guides/dom-keyed.md)
+and [reactive](../crates/yetlet/guides/reactive.md) guides only when selecting
 those capabilities, with their ownership and disposal contracts.
 
 ## API reference
 
-- [Core guide](../crates/yetlet-core/README.md) and
-  [core source/rustdoc](../crates/yetlet-core/src/lib.rs): constructors and ownership.
+- [Core guide](../crates/yetlet/guides/core.md) and
+  [core source/rustdoc](../crates/yetlet/src/view/mod.rs): constructors and ownership.
 - [Hello World handlers](../examples/hello-world/src/lib.rs) and
   [Todo shared Views](../examples/todo-ui/src/lib.rs): existing application patterns.
 - [Current API reference](API-REFERENCE.md) and

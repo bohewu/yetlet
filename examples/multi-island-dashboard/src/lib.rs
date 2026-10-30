@@ -17,8 +17,8 @@ use axum::{
 };
 use serde_json::{Value, json};
 use tower_http::services::ServeDir;
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{App, DEFAULT_CSP, render_document};
+use yetlet::server_axum::{App, DEFAULT_CSP, render_document};
+use yetlet::view::{Element, View};
 
 const BROWSER_CSP: &str = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
 const FILTER_ITEMS: [&str; 4] = [

@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       record:
-        description: Complete schema-1 release record, identical to original prepare/sign
+        description: Complete schema1/sixteen or schema2/consolidated record, identical to original prepare/sign
         type: string
         required: true
       request:

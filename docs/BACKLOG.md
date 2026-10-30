@@ -1,6 +1,70 @@
 # Yetlet Backlog
 
-**YT-020 / YT-209 publication maintenance (2026-10-30):**
+**YT-212 alpha.5 workflow and qualification followup (2026-10-30):**
+The owner authorizes repairing active qualification/guides and supplementing
+normal two-package assembly, MSVC, necessary DOM/browser and CI gaps under the
+[alpha.5 plan](ALPHA5-RELEASE-PLAN.md). Only missing or affected checks are run;
+no runtime/dependency/support expansion. Existing local evidence, failures and
+original platform scopes remain retained. New Commit/Push/Merge, release-hosted,
+tag, Environment/Secret, signing and publication actions remain unauthorized;
+final-source/remote-CI acceptance must reflect actual later delivery.
+
+**Alpha.5 two-package release planning (2026-10-30):**
+Owner-authorized strict/builtin Commit records the accepted consolidation as
+`0f867f11a7e73675158597f0ec3caff71f1d8d0f`, tree
+`4c612e6b3418641114f91bff2e66fee58930f3c6`, without Push.
+[Scope/source/gate inventory](ALPHA5-RELEASE-PLAN.md) proposes schema2/consolidated,
+exactly `yetlet` then `yetlet-browser`, version `0.9.0-alpha.5`. Final C/S/V/P,
+tag and new output hashes remain unselected. Existing migration proof is reused;
+remaining active qualification/guide carryovers must be corrected before final C,
+then only missing package/platform/inventory/CI and original hosted/signing/
+distribution gates are supplemented under later authority. No new execution,
+Secret/Environment change or publication; the old fifteen-package continuation
+stays paused and YT-020 remains Blocked. This is planning, not release readiness.
+
+**YT-211 two implementation packages (2026-10-30):**
+The owner accepts continuing after YT-210. [The migration contract](YT-211-TWO-PACKAGE-MIGRATION.md)
+selects `yetlet` (default HTML) plus `yetlet-browser` (default DOM), shared View,
+opt-in qualified modules and unreleased
+`0.9.0-alpha.5`; it preserves target/security/startup boundaries, current
+third-party versions, active consumer/CLI migrations and closed versioned
+release cohorts. Implementation and affected local proof are complete. Independent final review
+first found two P2 test/guide feature mismatches; both are corrected with focused
+proof and followup PASS0. YT-211 is Done at migration scope. No Git delivery, hosted run, signing or publication;
+PR29 and the old alpha.4 continuation remain paused.
+
+**YT-210 public packaging study / publication pause (2026-10-30):**
+The owner pauses the alpha.4 registry continuation and asks to consider fewer
+public packages, including one. [The proposed consolidation study](YT-210-PACKAGING-STUDY.md)
+compares a real implementation package with a facade/current split, maps all
+sixteen modules/features and records target isolation, migration and release
+binding impacts. Contract Reviewer PASS0 permits a local default-HTML,
+publish=false Core/HTML/Axum/DOM experiment. Normal archive verification,
+native/wasm32 consumers, three new tests/three doctests and target/feature
+isolation pass; original fixture/formatter failures remain. Final independent
+Reviewer PASS0 verifies four documents/96 evidence hashes and accepts YT-210
+Done at bounded feasibility scope. Full package adoption remains open. PR29 is
+open/unmerged, with no new
+hosted continuation or publication. Existing published bytes/signatures and
+failure histories remain unchanged; YT-020 stays Blocked. No runtime or manifest
+change, new Commit/Push or release action occurs in this research slice.
+
+**YT-020 registry-only continuation preparation (2026-10-30):**
+[Actual outcome](ALPHA4-HOSTED-RECORD.md#actual-public-release-and-one-package-registry-outcome)
+publishes/readbacks the GitHub twenty-asset prerelease at P `1c0bb31`, then stops
+after the first registry write due to an incorrect success-response contract.
+`yetlet-actions` owner/index/download match the frozen archive; fifteen packages
+and the registry consumer were not attempted. Local parser/explicit continuation
+work preserves that version, original GitHub assets/C/tag/S/V/signatures and
+failures. [The contract](RELEASE-PUBLICATION.md#registry-only-continuation-contract--2026-10-30)
+retains owner approval and no retries, with GitHub-read-only continuation and
+fresh state checks. The owner authorizes delivery and selects11minutes before
+each unique PUT (including the first), a210minute registry-only job, and live
+authority/release checks after every wait. Pacing review, new P/CI and hosted
+continuation/full consumer remain open; account quota is not proven. No new
+upload; YT-020 Blocked.
+
+**Earlier YT-020 / YT-209 publication maintenance (2026-10-30):**
 [Actual alpha.4 execution](ALPHA4-HOSTED-RECORD.md#actual-preparation-signing-and-independent-verification)
 passes prepare/sign/independent verification at fixed S/V `6ed70c3`, sixteen
 subjects/all98 entries. Owner-approved publication41022282283/1 fails during
@@ -823,6 +887,9 @@ separate implementation authority.
 
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
+| YT-210 | P2 | M | M10 | Public package consolidation contract and one-package feasibility | YT-200, YT-209 | [Contract/prototype](YT-210-PACKAGING-STUDY.md): owner pauses publication and accepts bounded single-package/default-HTML proof. Contract Reviewer PASS0; real Core/HTML/Axum/DOM source in publish=false prototype, normally verified archive, three new tests/three doctests, native/wasm32 archive consumers and mixed-feature target/dependency/API isolation PASS. One native fixture correction and formatter incident retained; no production source or third-party upgrade. Final independent Reviewer PASS0 verifies four documents/96 evidence hashes; Done at bounded feasibility scope, not full migration/API adoption or release readiness. No new distribution authority | Done |
+| YT-211 | P2 | L | M10 | Consolidate implementation packages and migrate current consumers | YT-210 | [Selected two-package contract](YT-211-TWO-PACKAGE-MIGRATION.md): owner selects yetlet/default HTML plus yetlet-browser/default DOM, one shared View, opt-in modules, unreleased alpha.5, coherent consumer/CLI/current-guide migration and closed consolidated release cohort. Preserve provider/security/target behavior and existing version identities; no facade fleet, reverse dependency cycle, old-signature reuse or automatic alpha.4 continuation. Initial contract P2 rate-limit omission and final two P2 test/guide feature mismatches retained/fixed. Contract PASS0 and final followup PASS0; native/WASM consumers,34 example manifests, CLI generation, normal two-archive/predecessor proof, target/dependency isolation and closed release cohorts accepted. No fresh platform/cloud/long workload qualification, Git or release authority | Done |
+| YT-212 | P1 | M | M10 | Two-package release workflow and qualification gaps | YT-211 | [Alpha.5 plan](ALPHA5-RELEASE-PLAN.md): repair active native selection and schema/guide vocabulary; normally verify two archives and source/checksum consumers, supplement selected MSVC/DOM/inventory/CI gaps without replaying accepted unrelated qualification. Preserve runtime/security/feature boundaries and failures; independent acceptance and actual source/CI reconciliation required. No new Git or release authority | In progress |
 | YT-208 | P2 | S | M10 | Maintainer development and new-version release SOP | YT-096, YT-207 | [Development](DEVELOPMENT.md) and [release](RELEASING.md) guides separate normal PR work, one-time setup, per-version source/evidence/approval steps and failure-only recovery. Current distribution/navigation reconciled; C/S, strict/builtin, key/publication boundaries and original histories preserved; YT-209 remains explicitly future tooling. Independent Reviewer PASS0, zero issues/required followups, verifies all ten incremental hashes, new-guide structure/local links/anchors and current workflow/helper/policy correspondence. Fixed75-document/209-item check and tracked/new-file whitespace PASS; original four D6-only files unchanged and prior Backlog/Roadmap content preserved. Only completion metadata changes after review; no runtime/workflow/environment, old qualification replay, Git or distribution action | Done |
 | YT-209 | P2 | M | M10 | Versioned release inputs and protected result-verification automation | YT-208 | Observed [tooling gaps](RELEASING.md#existing-workflow-map-and-limits): review a data-only per-version record to replace scattered alpha C/tag/run/artifact constants; separately protected independent signing-result verification; exact Release-ID-based public staging/publication/readback with preserved tag/C and a closed allowlist. Preserve strict/builtin/hooks, C/S identity, key isolation, explicit owner gates, immutable old results and bounded failure handling. No arbitrary executable input, default framework dependency, automatic signing/registry upload or reuse of the spent local-key exception. [Contract and implementation](YT-209-RELEASE-AUTOMATION.md): strict schema-1 record replaces scattered alpha bindings; source-derived Cargo/tag identities and complete-record receipt hashes; independent protected V verifier has no OIDC/signing and validates original S bundles/all entries before safe receipt; exact Release-ID public staging/readback/publication has closed20 assets and explicit owner confirmation. 23 new Python +5 affected signer +2 affected Rust checks, docs/format/syntax PASS; two fixture failures/corrections retained. Initial contract/final independent Reviewer PASS0 matched the original17-file frozen boundary; initial acceptance and failed PR20 run retained; compatibility repair Reviewer PASS0 and both required new-source CI jobs40873628263/1 PASS. Owner-approved squash Merge7de77c8/tree95c65e7 matches qualified head. Protected result Environment25684187945 and existing AGE_IDENTITY installation/readback PASS; other Environments and identity unchanged. At that setup checkpoint positive hosted verification was Pending; alpha.3 result40983028507/1 subsequently PASS at the [recorded scope](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30). Key read only for approved Secret installation; no local private-evidence decryption, release dispatch, new tag, signing or publication | Done |
 
