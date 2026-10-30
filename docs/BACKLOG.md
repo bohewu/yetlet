@@ -1,5 +1,17 @@
 # Yetlet Backlog
 
+**Alpha.3 hosted custody and prepare grant (2026-10-30):** The
+[actual record](ALPHA3-HOSTED-RECORD.md) fixes C `557ab76` / tree `c890b4c`,
+PR23 squash Merge, both PR/master CI jobs PASS, immutable unsigned alpha.3 tag,
+build40906989456/1 and owner-approved readback40908551139/1 SUCCESS including
+complete manifest/inventory and cleanup. Qualified owner-local retention covers
+70 indexed files; alpha.2 failure and optional local harness FAILED/UNVERIFIED
+remain. The owner authorizes document review, strict/builtin Git/PR/CI-conditional
+Merge and independent S selection, a new unpublished Draft/encrypted handoff and
+one owner-gated prepare. S/prepare/outputs remain Pending; failures retained,
+no automatic retry, signing/publication or replay of accepted qualification.
+Historical alpha.1 D6 stays Complete and YT-020 Blocked.
+
 **Alpha.3 approved recovery (2026-10-29):** The owner approved the
 [bounded recovery/preflight](ALPHA3-VERSION-PREFLIGHT.md), preserving failed
 alpha.2 C/tag/evidence. Used Guard binding retirement PASS; sixteen-library

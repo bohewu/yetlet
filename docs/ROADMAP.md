@@ -1,5 +1,15 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**Alpha.3 hosted custody and prepare grant (2026-10-30):**
+[Actual C `557ab76` and immutable tag](ALPHA3-HOSTED-RECORD.md), PR23 Merge and
+both PR/master CI jobs PASS; build40906989456/1 and protected readback40908551139/1
+SUCCESS, complete manifest/inventory and cleanup verified. Qualified owner-local
+retention covers 70 files; no offsite backup claim. Failures remain. The next
+authorized batch ends at prepare: reviewed document PR/CI-conditional Merge,
+actual independent S, unpublished Draft/encrypted handoff, one owner-gated
+prepare. S/execution/outputs remain Pending; no product qualification replay,
+signing/publication. Historical alpha.1 D6 remains Complete and YT-020 Blocked.
+
 **Alpha.3 recovery/preflight (2026-10-29):** [Approved bounded batch](ALPHA3-VERSION-PREFLIGHT.md)
 retires the used Guard binding without changing alpha.2 tag/evidence and fixes
 custody version construction/validation and its consumers. Sixteen normal
