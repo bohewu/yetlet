@@ -35,32 +35,30 @@ impl Fixture {
     }
 }
 
-fn lock() -> String {
-    let mut lock = "version=4\n".to_owned();
-    for (name, dependencies) in [
-        (
-            "composeapp",
-            "['axum','tokio','yetlet-core','yetlet-server-axum']",
-        ),
-        ("yetlet-core", "[]"),
-        ("yetlet-html", "['yetlet-core']"),
-        (
-            "yetlet-server-axum",
-            "['axum','serde','tower','yetlet-core','yetlet-html']",
-        ),
-    ] {
-        lock.push_str(&format!(
-            "[[package]]\nname='{name}'\nversion='0.1.0'\ndependencies={dependencies}\n"
-        ));
-    }
-    for (name, version, dependencies) in [
-        ("axum", "0.8.9", "['tokio','tower']"),
-        ("tokio", "1.53.2", "['signal-hook-registry']"),
-        ("signal-hook-registry", "1.4.8", "[]"),
-        ("serde", "1.0.228", "[]"),
-        ("tower", "0.5.3", "[]"),
-    ] {
-        lock.push_str(&format!("[[package]]\nname='{name}'\nversion='{version}'\nsource='registry+https://github.com/rust-lang/crates.io-index'\nchecksum='{}'\ndependencies={dependencies}\n", "a".repeat(64)));
-    }
-    lock
+pub fn lock() -> String {
+    let mut value: toml::Value = include_str!("../../../../Cargo.lock").parse().unwrap();
+    let source = value["package"].as_array().unwrap();
+    let mut sdk = source
+        .iter()
+        .find(|p| p["name"].as_str() == Some("yetlet"))
+        .unwrap()
+        .clone();
+    let normal = crate::docker_fixture::normal_dependencies(false);
+    sdk["dependencies"]
+        .as_array_mut()
+        .unwrap()
+        .retain(|v| normal.contains(v.as_str().unwrap().split_whitespace().next().unwrap()));
+    let mut packages: Vec<_> = source
+        .iter()
+        .filter(|p| p.get("source").is_some())
+        .cloned()
+        .collect();
+    packages.push(sdk);
+    packages.push(
+        "name='composeapp'\nversion='0.1.0'\ndependencies=['axum','tokio','yetlet']\n"
+            .parse()
+            .unwrap(),
+    );
+    value["package"] = toml::Value::Array(packages);
+    toml::to_string(&value).unwrap()
 }

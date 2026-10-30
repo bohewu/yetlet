@@ -603,7 +603,7 @@ pub fn validate_candidate(root: &Path, manifest: &Value) -> Result<()> {
         .as_object()
         .ok_or_else(|| fail("Source-bound extracted candidate manifest required"))?;
     require(
-        sources.contains_key("crates/yetlet-wgpu/src/browser.rs"),
+        sources.contains_key("crates/yetlet-browser/src/wgpu/browser.rs"),
         "candidate browser source missing",
     )?;
     for (p, h) in sources {

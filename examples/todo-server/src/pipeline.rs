@@ -1,6 +1,6 @@
 //! Example-local API scope; request correlation is now an opt-in crate.
 use axum::{http::HeaderValue, response::Response};
-use yetlet_server_axum::{
+use yetlet::server_axum::{
     App, RequestContext,
     middleware::{Next, from_fn},
 };

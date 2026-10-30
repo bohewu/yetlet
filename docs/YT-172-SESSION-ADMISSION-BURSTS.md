@@ -128,9 +128,9 @@ Independent contract Reviewer
 `/root/yt172_session_admission_contract_review_20261025` returns **PASS, zero
 issues/required followups** before implementation. The only production-source
 edit is private `cfg(test)` hooks in
-[`store.rs`](../crates/yetlet-session-redis/src/store.rs); all observation state,
+[`store.rs`](../crates/yetlet/src/session_redis/store.rs); all observation state,
 monotonic clocks and the ignored
-[research module](../crates/yetlet-session-redis/src/store/admission_probe.rs)
+[research module](../crates/yetlet/src/session_redis/store/admission_probe.rs)
 are excluded from normal builds. Existing timeout/error propagation is preserved
 without changing awaits, admission/worker ownership or Lua/security semantics.
 Normal provider compilation and new test-binary compilation/strict Clippy pass

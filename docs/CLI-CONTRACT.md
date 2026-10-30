@@ -17,7 +17,7 @@ Inspected checkout: `$REPO`, branch `feat/yt090-configuration`, HEAD `a883469862
 | `doctor` | Rust/Cargo probes, optional framework check, new-platform capability; unversioned JSON, no explicit probe deadline/output bound. |
 | `build` / `dev` | Explicit manifest, protected standalone app and lock; one foreground frozen Cargo build/run. No frontend automation. |
 | Generators | Configuration only, exact qualified generated-source/lock inspection, source revalidation and native no-overwrite publication. YT-101's local-source matrix remains bounded. |
-| Settings | `yetlet-config` merges base/profile/explicit Development secrets/OS overrides into caller-owned typed settings. Existing generated Settings has server/service only. CLI/Vite settings are not implemented. |
+| Settings | `yetlet::config` merges base/profile/explicit Development secrets/OS overrides into caller-owned typed settings. Existing generated Settings has server/service only. CLI/Vite settings are not implemented. |
 
 Explicit user direction and safety invariants take priority over earlier proposed names. Historical verification remains valid only for its recorded source/scope. Yetlet is independent, small, Rust-native and HTML-first; it does not target another framework's API or DX parity. [ADRs 0001](adr/0001-separation-of-concerns.md), [0005](adr/0005-opt-in-capability-modules.md) and [0006](adr/0006-handler-first-mvc-optional.md) remain: no mandatory Controller, DI, frontend runtime, provider registry or new project system. This CLI/tooling revision does not change those framework decisions.
 

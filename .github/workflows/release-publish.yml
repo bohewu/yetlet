@@ -8,7 +8,7 @@ on:
         type: string
         required: true
       request:
-        description: Frozen publication request binding P, verified public artifact, notes and registry plan SHA
+        description: Frozen publication request; optional closed continuation binds the original failed one-plus-fifteen batch
         type: string
         required: true
 
@@ -32,6 +32,8 @@ jobs:
   preflight:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
+    outputs:
+      mode: ${{ steps.preflight.outputs.mode }}
     steps:
       - name: Reject foreign source before checkout
         shell: bash
@@ -50,10 +52,18 @@ jobs:
           ref: ${{ github.sha }}
           persist-credentials: false
       - name: Verify CI, independent result, frozen plans and tag without publication secrets
+        id: preflight
         env:
           GH_TOKEN: ${{ github.token }}
           PUBLICATION_OUTPUT: ${{ runner.temp }}/publication-preflight
-        run: python3 scripts/release-publish.py preflight
+        run: |
+          python3 scripts/release-publish.py preflight
+          python3 - <<'PY'
+          import json, os
+          mode = 'registry-only' if 'continuation' in json.loads(os.environ['PUBLICATION_REQUEST']) else 'publication'
+          with open(os.environ['GITHUB_OUTPUT'], 'a') as output:
+              output.write('mode=' + mode + '\n')
+          PY
       - name: Retain safe plan and preflight receipt
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -68,6 +78,7 @@ jobs:
 
   publish:
     needs: preflight
+    if: needs.preflight.outputs.mode == 'publication'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     environment: release-publish
@@ -91,6 +102,43 @@ jobs:
           PUBLICATION_OUTPUT: ${{ runner.temp }}/publication-result
         run: python3 scripts/release-publish.py publish
       - name: Retain partial or complete receipts without secrets
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: publication-result-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/publication-result/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Remove temporary publication files
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/publication-result"
+
+  registry-continuation:
+    needs: preflight
+    if: needs.preflight.outputs.mode == 'registry-only'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 210
+    environment: release-publish
+    permissions:
+      contents: read
+      actions: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install consumer compiler and native TLS prerequisites
+        run: |
+          rustup toolchain install 1.99.0 --profile minimal
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+      - name: Reconcile existing release and crate, then publish only the selected fifteen versions
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+          PUBLICATION_OUTPUT: ${{ runner.temp }}/publication-result
+        run: python3 scripts/release-publish.py publish
+      - name: Retain partial or complete continuation receipts without secrets
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:

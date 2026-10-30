@@ -2,10 +2,11 @@
 
 Configuration generation only: no source export, Cargo/npm execution, image
 build, network, publication or deployment. Linux/amd64 images; Linux/Windows
-native generators. Supports exact generated --cloud with --assets vite (plain
-or official Tailwind plugin), optionally --with-config, and --cloud
---with-config without assets. Standalone Tailwind and Vite dev bridge exports
-are outside this profile. Legacy cloud-only generation retains its own recipe.
+native generators. Supports the accepted generated service layouts with optional
+runtime Settings and Vite assets. Current creation uses `--service`, `--settings`,
+`--vite` and `--tailwind`; removed argv aliases are not supported. The selected
+CLI profile emits its own guide. Standalone Tailwind and Vite dev bridge exports
+are outside this delivery profile. Plain service generation retains its own recipe.
 
 ## Explicit operator preparation
 
@@ -28,9 +29,9 @@ are outside this profile. Legacy cloud-only generation retains its own recipe.
    and optional four public TOMLs. Copy DIR/app-src.dockerignore as
    APP_EXPORT/.dockerignore. Do not copy raw app Cargo.toml or frontend inputs.
 5. FRAMEWORK_EXPORT: copy only enumerated yetlet-src crate sources/manifests.
-   The core/html/axum closure retains exact workspace inheritance. Config adds
-   only the exact isolated yetlet-config manifest and src/lib.rs; its own
-   standalone workspace/dependencies remain intact. Copy
+   The closure is the complete compiled `crates/yetlet` member, including
+   inventoried resources, guides, tests and examples. Settings selects `config`
+   on the same SDK edge, not another crate or workspace. Copy
    DIR/framework-workspace.toml as FRAMEWORK_EXPORT/Cargo.toml and
    DIR/yetlet-src.dockerignore as FRAMEWORK_EXPORT/.dockerignore.
 6. Physically enumerate ALL entries, including hidden entries, without following
@@ -41,8 +42,10 @@ are outside this profile. Legacy cloud-only generation retains its own recipe.
    inventory using trusted OS tools (sha256sum or Get-FileHash). Check DIR's
    generated_files_except_inventory as well. Named-context ignore processing is
    not a security boundary: physical allowlists are mandatory before upload.
-   No .env, credentials, node_modules, .git, target, source maps or arbitrary
-   files may enter ANY context. Abort and regenerate if any input changes.
+   No live .env, credentials, node_modules, .git, target, source maps or arbitrary
+   files may enter ANY context. An exactly inventoried SDK `.env.example` is
+   synthetic package input, not permission to export live dotenv files.
+   Abort and regenerate if any input changes.
 
 Limits: flat dist/assets only, 128 KiB manifest, 128 nodes, 512 references,
 256 distinct asset files, 1 MiB per native-read input, 16 MiB aggregate assets.

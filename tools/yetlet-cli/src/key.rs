@@ -13,7 +13,7 @@ use std::{
     io::{self, BufRead, IsTerminal, Write},
     path::{Path, PathBuf},
 };
-use yetlet_signing::{KeyRef, KeyState, LocalSigner, PublicMaterial, generate_self_signed};
+use yetlet::signing::{KeyRef, KeyState, LocalSigner, PublicMaterial, generate_self_signed};
 
 pub const HELP: &str = "Usage:\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n\nNames select configured aliases; omitted names require explicit signing defaults.\nStatus is public-only and read-only. Rotate updates the selected profile TOML after confirmation.\n--yes approves the displayed exact plan for automation; otherwise stdin/stdout must be a terminal.\n--from imports a replacement encrypted PFX using the configured password_env.\nWithout --from, only mode=self_signed_test can generate a fresh 30-day test certificate.\nRotation retains old material; it does not revoke or delete keys. No cloud adapters or signing command.\n";
 const INVALID: &str = "invalid signing configuration or unsafe settings/material path";
@@ -203,7 +203,7 @@ impl Loaded {
         let base = Snapshot::open(&settings_root.join("base.toml"), false).map_err(|_| INVALID)?;
         let profile = Snapshot::open(&profile_path, c.rotate)
             .map_err(|_| "selected settings profile is unsafe, read-only or unwritable")?;
-        let merged: serde_json::Value = yetlet_config::Loader::new(&settings_root, "APP")
+        let merged: serde_json::Value = yetlet::config::Loader::new(&settings_root, "APP")
             .defaults(String::from_utf8(base.bytes.clone()).map_err(|_| INVALID)?)
             .load_with_env(filtered)
             .map_err(|_| INVALID)?;

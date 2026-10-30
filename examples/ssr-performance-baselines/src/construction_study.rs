@@ -255,7 +255,7 @@ pub fn output(directory: &Path) -> Result<(), Box<dyn Error>> {
     for (name, rows) in CASES {
         let actual = attributed_page(rows);
         assert_eq!(actual, page(rows));
-        let body = yetlet_html::render_to_string(&actual.1)?;
+        let body = yetlet::html::render_to_string(&actual.1)?;
         let document = render_document_with_metadata(&actual.0, &actual.1)?;
         let oracle = expected(rows);
         assert_eq!(body, oracle.0);
@@ -279,7 +279,7 @@ pub fn output(directory: &Path) -> Result<(), Box<dyn Error>> {
         ("size_element", std::mem::size_of::<Element>()),
         (
             "size_attribute",
-            std::mem::size_of::<yetlet_core::Attribute>(),
+            std::mem::size_of::<yetlet::view::Attribute>(),
         ),
         ("size_metadata", std::mem::size_of::<DocumentMetadata>()),
     ] {
@@ -451,7 +451,7 @@ mod tests {
             assert!(values.iter().all(Option::is_none));
             let literal = super::super::expected(rows);
             assert_eq!(
-                yetlet_html::render_to_string(&expected.1).unwrap(),
+                yetlet::html::render_to_string(&expected.1).unwrap(),
                 literal.0
             );
             assert_eq!(

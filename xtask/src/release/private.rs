@@ -55,27 +55,46 @@ pub const SIXTEEN_NAMES: [&str; 16] = [
 pub enum Cohort {
     OriginalNine,
     Sixteen,
+    Consolidated,
 }
 impl Cohort {
     pub fn parse(args: &[OsString]) -> std::result::Result<Self, &'static str> {
         match args {
-            [] => Ok(Self::OriginalNine),
+            [] => Ok(Self::Consolidated),
             [flag, value] if flag == "--cohort" && value == "original-nine" => {
                 Ok(Self::OriginalNine)
             }
             [flag, value] if flag == "--cohort" && value == "sixteen" => Ok(Self::Sixteen),
-            _ => Err("private-rebuild [--cohort original-nine|sixteen]"),
+            [flag, value] if flag == "--cohort" && value == "consolidated" => {
+                Ok(Self::Consolidated)
+            }
+            _ => Err("private-rebuild [--cohort original-nine|sixteen|consolidated]"),
+        }
+    }
+    pub fn label(self) -> &'static str {
+        match self {
+            Self::OriginalNine => "original-nine",
+            Self::Sixteen => "sixteen",
+            Self::Consolidated => "consolidated",
+        }
+    }
+    pub fn from_label(label: &str) -> Result<Self> {
+        match label {
+            "sixteen" => Ok(Self::Sixteen),
+            "consolidated" => Ok(Self::Consolidated),
+            _ => Err(fail("unsupported release cohort")),
         }
     }
     pub fn names(self) -> &'static [&'static str] {
         match self {
             Self::OriginalNine => &NAMES,
             Self::Sixteen => &SIXTEEN_NAMES,
+            Self::Consolidated => &["yetlet", "yetlet-browser"],
         }
     }
     pub fn manifests(self) -> &'static [&'static str] {
         match self {
-            Self::OriginalNine => &["Cargo.toml"],
+            Self::OriginalNine | Self::Consolidated => &["Cargo.toml"],
             Self::Sixteen => &[
                 "Cargo.toml",
                 "crates/yetlet-config/Cargo.toml",
@@ -249,15 +268,16 @@ fn stage_verified(source: &Path, work: &Path, name: &str) -> Result<String> {
 }
 
 /// A first publication also requires development dependency names to exist.
-fn publication_order(source: &Path) -> Result<()> {
+fn publication_order(source: &Path, cohort: Cohort) -> Result<()> {
     let root: toml::Value = toml::from_str(&fs::read_to_string(source.join("Cargo.toml"))?)
         .map_err(|_| fail("publication workspace manifest"))?;
-    let order: BTreeMap<_, _> = SIXTEEN_NAMES
+    let order: BTreeMap<_, _> = cohort
+        .names()
         .iter()
         .enumerate()
         .map(|(i, n)| (*n, i))
         .collect();
-    for name in SIXTEEN_NAMES {
+    for name in cohort.names() {
         let manifest: toml::Value = toml::from_str(&fs::read_to_string(
             source.join("crates").join(name).join("Cargo.toml"),
         )?)
@@ -308,7 +328,7 @@ pub fn build_packages(
     environment: &[(OsString, Option<OsString>)],
     record: &mut Value,
 ) -> Result<()> {
-    if cohort == Cohort::Sixteen {
+    if cohort != Cohort::OriginalNine {
         fs::create_dir(work.join("vendor"))?;
         let directory = work
             .join("vendor")
@@ -358,11 +378,11 @@ pub fn build_packages(
                 message: "private rebuild command failed".into(),
             });
         }
-        if cohort == Cohort::Sixteen && label == "vendor" {
-            publication_order(source)?;
-            record["publication_order"] = json!(SIXTEEN_NAMES);
+        if cohort != Cohort::OriginalNine && label == "vendor" {
+            publication_order(source, cohort)?;
+            record["publication_order"] = json!(cohort.names());
         }
-        if cohort == Cohort::Sixteen
+        if cohort != Cohort::OriginalNine
             && let Some(name) = label.strip_prefix("package-")
         {
             let staged = stage_verified(source, work, name);
@@ -409,10 +429,10 @@ pub fn run(root: &Path, cohort: Cohort) -> Result<()> {
 pub(super) fn run_preparation(root: &Path, commit: &str) -> Result<()> {
     run_body(
         root,
-        Cohort::Sixteen,
+        Cohort::from_label(&env("RELEASE_COHORT")?)?,
         commit,
         "bohewu/yetlet",
-        "refs/tags/v0.1.0",
+        &format!("refs/tags/v{}", package_version()),
         true,
     )
 }
@@ -500,8 +520,8 @@ fn run_body(
             serde_json::to_vec(&inputs).map_err(|_| fail("canonical selected inputs"))?;
         let digest = tooling::sha(&canonical);
         let mut source_record = json!({"source_commit":commit,"source_archive_sha256":tooling::sha(&fs::read(&archive)?),"overlays":{},"selected_package_inputs":inputs,"selected_package_input_digest":digest});
-        if cohort == Cohort::Sixteen {
-            source_record["cohort"] = json!("sixteen");
+        if cohort != Cohort::OriginalNine {
+            source_record["cohort"] = json!(cohort.label());
             source_record["package_manifests"] = json!(cohort.manifests());
         }
         write(&out, "SOURCE-INPUTS.json", &source_record)?;
@@ -547,7 +567,7 @@ fn run_body(
                 && cargo.starts_with("cargo 1.99.0 "),
             "pinned GNU tool identity",
         )?;
-        let openssl = if cohort == Cohort::Sixteen {
+        let openssl = if cohort != Cohort::OriginalNine {
             require(
                 env("OPENSSL_STATIC")? == "1",
                 "static OpenSSL recipe required",
@@ -620,7 +640,7 @@ fn run_body(
                 .unwrap()
                 .remove("default_workspace_features");
             record["default_package_features"] = json!(true);
-            record["cohort"] = json!("sixteen");
+            record["cohort"] = json!(cohort.label());
             record["packages"] = json!(cohort.names());
             record["openssl"] = json!({"version":version.trim(),"executable_sha256":sha});
             let mut locks = BTreeMap::new();
@@ -685,7 +705,7 @@ fn run_body(
         let repo_url = format!("https://github.com/{repository}");
         let workflow = json!({"repository":repo_url,"path":".github/workflows/private-rebuild.yml","ref":git_ref});
         let mut statement = json!({"_type":"https://in-toto.io/Statement/v1","subject":archives.iter().map(|(n,v)|json!({"name":n,"digest":{"sha256":v["sha256"]}})).collect::<Vec<_>>(),"predicateType":"https://slsa.dev/provenance/v1","predicate":{"buildDefinition":{"buildType":"https://actions.github.io/buildtypes/workflow/v1","externalParameters":{"workflow":workflow,"preparation_only":true,"rust_release":"1.99.0","target":"x86_64-unknown-linux-gnu","default_workspace_features":true,"commands_record":"BUILD-RECORD.json"},"resolvedDependencies":[{"uri":format!("git+{repo_url}"),"digest":{"gitCommit":commit}},{"name":"Cargo.lock","digest":{"sha256":record["cargo_lock_sha256"]}},{"name":"source.tar","digest":{"sha256":source_record["source_archive_sha256"]}}]},"runDetails":{"builder":{"id":"https://github.com/actions/runner/github-hosted"},"metadata":{"invocationId":format!("{repo_url}/actions/runs/{}/attempts/{}",env("GITHUB_RUN_ID")?,env("GITHUB_RUN_ATTEMPT")?),"startedOn":record["started_at"],"finishedOn":record["finished_at"]},"byproducts":[{"name":"SOURCE-INPUTS.json","digest":{"sha256":tooling::sha(&fs::read(out.join("SOURCE-INPUTS.json"))?)}},{"name":"BUILD-RECORD.json","digest":{"sha256":tooling::sha(&fs::read(out.join("BUILD-RECORD.json"))?)}}]}}});
-        if cohort == Cohort::Sixteen {
+        if cohort != Cohort::OriginalNine {
             let definition = &mut statement["predicate"]["buildDefinition"];
             let parameters = &mut definition["externalParameters"];
             parameters
@@ -693,7 +713,7 @@ fn run_body(
                 .unwrap()
                 .remove("default_workspace_features");
             parameters["default_package_features"] = json!(true);
-            parameters["cohort"] = json!("sixteen");
+            parameters["cohort"] = json!(cohort.label());
             parameters["packages"] = json!(cohort.names());
             parameters["openssl"] = record["openssl"].clone();
             for (path, sha) in record["cargo_lock_sha256s"].as_object().unwrap() {
@@ -727,14 +747,14 @@ mod publication_tests {
             fs::create_dir_all(&path).unwrap();
             fs::write(path.join("Cargo.toml"), "[package]\nname='fixture'\n").unwrap();
         }
-        publication_order(temp.path()).unwrap();
+        publication_order(temp.path(), Cohort::Sixteen).unwrap();
         let secret = temp.path().join("crates/yetlet-secrets/Cargo.toml");
         for declaration in [
             "[dev-dependencies]\nyetlet-config='0.9'\n",
             "[target.'cfg(unix)'.dependencies]\nyetlet-config={version='0.9',optional=true}\n",
         ] {
             fs::write(&secret, format!("[package]\nname='fixture'\n{declaration}")).unwrap();
-            assert!(publication_order(temp.path()).is_err());
+            assert!(publication_order(temp.path(), Cohort::Sixteen).is_err());
         }
     }
 }

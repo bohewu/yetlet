@@ -7,8 +7,8 @@
 
 use std::{collections::HashSet, fmt, rc::Rc};
 
-pub use yetlet_core::binding::ComponentIdentity;
-use yetlet_core::{
+pub use yetlet::view::binding::ComponentIdentity;
+use yetlet::view::{
     Element as ViewElement, View,
     binding::{BindingContractError, BindingKey, InertAttributeName, SlotName},
 };
@@ -575,7 +575,7 @@ pub fn demo_ssr_view() -> Result<View, TemplateError> {
 }
 
 pub fn demo_ssr_html() -> Result<String, Box<dyn std::error::Error>> {
-    Ok(yetlet_html::render_to_string(&demo_ssr_view()?)?)
+    Ok(yetlet::html::render_to_string(&demo_ssr_view()?)?)
 }
 
 #[cfg(target_arch = "wasm32")]
@@ -588,8 +588,8 @@ mod browser {
 
     use wasm_bindgen::{JsCast, JsValue, prelude::wasm_bindgen};
     use web_sys::{Document, Element, HtmlInputElement, Node};
-    use yetlet_core::binding::BindingKey;
-    use yetlet_dom_keyed::{DomEventListener, KeyedChildren, KeyedEntry};
+    use yetlet::view::binding::BindingKey;
+    use yetlet_browser::dom_keyed::{DomEventListener, KeyedChildren, KeyedEntry};
 
     use super::{
         DemoItem, DemoMessage, KeyedListTemplate, RowAction, RowInput, TemplateError, demo_items,
@@ -1790,7 +1790,7 @@ mod tests {
         let mut items = demo_items();
         items[0].title = "<img src=x onerror=1> &".into();
         items[0].draft = "<script>alert(\"x\")</script> &".into();
-        let html = yetlet_html::render_to_string(&template.ssr_view(&items).unwrap()).unwrap();
+        let html = yetlet::html::render_to_string(&template.ssr_view(&items).unwrap()).unwrap();
         assert!(html.contains("&lt;img src=x onerror=1&gt; &amp;"));
         assert!(html.contains("value=\"&lt;script&gt;alert(&quot;x&quot;)&lt;/script&gt; &amp;\""));
         items[1].id = items[0].id;

@@ -16,10 +16,8 @@ name = "render-ssr"
 path = "src/bin/render_ssr.rs"
 
 [dependencies]
-yetlet-core = { path = "../../crates/yetlet-core" }
-yetlet-dom-keyed = { path = "../../crates/yetlet-dom-keyed" }
-yetlet-html = { path = "../../crates/yetlet-html" }
-yetlet-reactive = { path = "../../crates/yetlet-reactive" }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.5", default-features = false, features = ["html", "reactive"] }
+yetlet-browser = { path = "../../crates/yetlet-browser", version = "0.9.0-alpha.5", default-features = false, features = ["dom-keyed"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 wasm-bindgen = "=0.2.129"

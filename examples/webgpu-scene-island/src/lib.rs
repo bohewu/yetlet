@@ -1,5 +1,5 @@
 //! Application-owned synthetic work records, SSR and thin Experimental renderer binding.
-pub use yetlet_wgpu::{
+pub use yetlet_browser::wgpu::{
     BackingSize, Batch, Lifetime, MAX_RECORDS, PickToken, PickViewport, RECORD_BYTES, SceneError,
     backing_size, pick_records, validate_records,
 };

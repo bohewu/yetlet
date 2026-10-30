@@ -67,12 +67,12 @@ pub(crate) fn validate_lock(snapshot: &docker::Snapshot) -> Result<(), String> {
         }
         Ok(package)
     };
-    let mut app_dependencies = vec!["axum", "tokio", "yetlet-core", "yetlet-server-axum"];
+    let mut app_dependencies = vec!["axum", "tokio", "yetlet"];
     if snapshot.with_assets {
         app_dependencies.extend(["serde", "serde_json", "tempfile", "tower"]);
     }
     if snapshot.runtime_settings {
-        app_dependencies.extend(["secrecy", "serde", "yetlet-config"]);
+        app_dependencies.extend(["secrecy", "serde"]);
     }
     // Source inspection already requires the exact generated manifest. Cargo
     // records its optional TLS dependencies even when the feature is disabled.
@@ -86,51 +86,43 @@ pub(crate) fn validate_lock(snapshot: &docker::Snapshot) -> Result<(), String> {
     }
     app_dependencies.sort();
     app_dependencies.dedup();
-    for (name, expected) in [
-        (
-            snapshot.manifest["package"]["name"].as_str().unwrap(),
-            app_dependencies.as_slice(),
-        ),
-        ("yetlet-core", &[][..]),
-        ("yetlet-html", &["yetlet-core"][..]),
-        (
-            "yetlet-server-axum",
-            &["axum", "serde", "tower", "yetlet-core", "yetlet-html"][..],
-        ),
-    ] {
-        let package = one(name)?;
-        if package.get("version").and_then(Value::as_str) != Some("0.1.0")
-            || package.get("source").is_some()
-            || package.get("checksum").is_some()
-        {
-            return Err(invalid());
-        }
-        let actual = match package.get("dependencies") {
-            Some(dependencies) => dependencies
-                .as_array()
-                .ok_or_else(invalid)?
-                .iter()
-                .map(|d| d.as_str().ok_or_else(invalid))
-                .collect::<Result<Vec<_>, _>>()?,
-            None => Vec::new(),
-        };
-        if actual != expected {
-            return Err(invalid());
-        }
+    let app = one(snapshot.manifest["package"]["name"].as_str().unwrap())?;
+    if app.get("version").and_then(Value::as_str)
+        != snapshot.manifest["package"]
+            .get("version")
+            .and_then(Value::as_str)
+        || app.get("source").is_some()
+        || app.get("checksum").is_some()
+    {
+        return Err(invalid());
     }
-    if snapshot.runtime_settings {
-        let package = one("yetlet-config")?;
-        if package.get("version").and_then(Value::as_str) != Some("0.0.0")
-            || package.get("source").is_some()
-            || package.get("checksum").is_some()
-            || package
-                .get("dependencies")
-                .and_then(Value::as_array)
-                .map(|a| a.iter().filter_map(Value::as_str).collect::<Vec<_>>())
-                != Some(vec!["dotenvy", "libc", "serde", "toml"])
-        {
-            return Err(invalid());
-        }
+    let dependency_names = |p: &Value| -> Result<Vec<String>, String> {
+        p.get("dependencies")
+            .and_then(Value::as_array)
+            .ok_or_else(invalid)?
+            .iter()
+            .map(|d| {
+                d.as_str()
+                    .and_then(|s| s.split_whitespace().next())
+                    .map(str::to_owned)
+                    .ok_or_else(invalid)
+            })
+            .collect()
+    };
+    if dependency_names(app)? != app_dependencies {
+        return Err(invalid());
+    }
+    let sdk = one("yetlet")?;
+    if sdk.get("version").and_then(Value::as_str)
+        != Some(crate::framework::package_version().as_str())
+        || sdk.get("source").is_some()
+        || sdk.get("checksum").is_some()
+        || dependency_names(sdk)?
+            .into_iter()
+            .collect::<std::collections::BTreeSet<_>>()
+            != crate::framework_source::normal_dependencies(snapshot.runtime_settings)
+    {
+        return Err(invalid());
     }
     for (name, version, enabled) in [
         (
@@ -138,7 +130,7 @@ pub(crate) fn validate_lock(snapshot: &docker::Snapshot) -> Result<(), String> {
             "1.0.229",
             snapshot.with_assets || snapshot.runtime_settings,
         ),
-        ("serde_json", "1.0.149", snapshot.with_assets),
+        ("serde_json", "1.0.151", snapshot.with_assets),
         ("secrecy", "0.10.3", snapshot.runtime_settings),
         ("toml", "0.9.12+spec-1.1.0", snapshot.runtime_settings),
         ("dotenvy", "0.15.7", snapshot.runtime_settings),
@@ -195,12 +187,9 @@ pub(crate) fn validate_lock(snapshot: &docker::Snapshot) -> Result<(), String> {
             && package.get("source").is_none()
             && ![
                 snapshot.manifest["package"]["name"].as_str().unwrap(),
-                "yetlet-core",
-                "yetlet-html",
-                "yetlet-server-axum",
+                "yetlet",
             ]
             .contains(&name)
-            && !(snapshot.runtime_settings && name == "yetlet-config")
         {
             return Err(invalid());
         }

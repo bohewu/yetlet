@@ -4,7 +4,7 @@
 **Scope:** nine original unpublished `0.1.0` library candidates, the separate experimental Redis provider, and the approved Experimental `yetlet-wgpu` crate.
 **Assessment:** no demonstrated cross-crate P0/P1 contract failure on the selected exercised consumer paths. The owner then authorized a targeted Experimental `yetlet-wgpu` API refinement. Its CPU errors and logical retirement now have precise typed/boolean contracts, while unrelated P2 design boundaries remain intentionally independent. [Refinement evidence](YT-081-WGPU-API-REFINEMENT.md) records the new candidate and the need for a fresh source-bound reviewer.
 
-The original nine candidates remain the only YT-020 release inventory. The Redis and GPU crates are unpublished, independent nested workspaces, and no broad platform, stability or compatibility promise is implied. See [API Contracts](API-CONTRACTS.md), [Compatibility](COMPATIBILITY.md) and the GPU [support boundary](../crates/yetlet-wgpu/SUPPORT.md).
+The original nine candidates remain the only YT-020 release inventory. The Redis and GPU crates are unpublished, independent nested workspaces, and no broad platform, stability or compatibility promise is implied. See [API Contracts](API-CONTRACTS.md), [Compatibility](COMPATIBILITY.md) and the GPU [support boundary](../crates/yetlet-browser/guides/wgpu-support.md).
 
 ## 1. Implemented contract matrix
 

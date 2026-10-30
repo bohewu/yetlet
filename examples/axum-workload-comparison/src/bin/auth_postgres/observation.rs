@@ -4,7 +4,7 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
     time::Duration,
 };
-use yetlet_session_valkey::RedisSessionError;
+use yetlet::session_redis::RedisSessionError;
 const BOUNDS_US: [u64; 13] = [
     100,
     250,

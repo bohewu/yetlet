@@ -376,32 +376,36 @@ fn scene(root: &Path, cargo: &OsStr, bindgen: &OsStr) -> Result<()> {
             files[&format!("{module}_bg.wasm")].len()
         );
     }
-    let mut sources = vec![format!("{here}/Cargo.toml"), format!("{here}/Cargo.lock")];
-    for (folder, rs_only) in [
-        (format!("{here}/src"), true),
-        ("crates/yetlet-wgpu/src".into(), false),
-    ] {
-        if !rs_only {
-            sources.extend([
-                "crates/yetlet-wgpu/Cargo.toml".into(),
-                "crates/yetlet-wgpu/Cargo.lock".into(),
-            ]);
-        }
-        let mut names = fs::read_dir(safe(root, &folder, false)?)?
+    let mut sources = vec![
+        format!("{here}/Cargo.toml"),
+        format!("{here}/Cargo.lock"),
+        "Cargo.lock".into(),
+    ];
+    fn collect(root: &Path, folder: &str, rs_only: bool, out: &mut Vec<String>) -> Result<()> {
+        let mut entries = fs::read_dir(safe(root, folder, false)?)?
             .map(|e| e.map(|e| e.path()))
             .collect::<std::io::Result<Vec<_>>>()?;
-        names.sort();
-        for path in names {
-            if path.is_file() && (!rs_only || path.extension() == Some(OsStr::new("rs"))) {
-                sources.push(
-                    path.strip_prefix(root)
-                        .map_err(|_| fail("source root mismatch"))?
-                        .to_str()
-                        .ok_or_else(|| fail("non-UTF-8 source name"))?
-                        .replace('\\', "/"),
-                );
+        entries.sort();
+        for path in entries {
+            let name = path
+                .strip_prefix(root)
+                .map_err(|_| fail("source root mismatch"))?
+                .to_str()
+                .ok_or_else(|| fail("non-UTF-8 source name"))?
+                .replace('\\', "/");
+            let checked = safe(root, &name, false)?;
+            if checked.is_dir() {
+                collect(root, &name, rs_only, out)?;
+            } else if !rs_only || checked.extension() == Some(OsStr::new("rs")) {
+                out.push(name);
             }
         }
+        Ok(())
+    }
+    collect(root, &format!("{here}/src"), true, &mut sources)?;
+    for package in ["yetlet", "yetlet-browser"] {
+        sources.push(format!("crates/{package}/Cargo.toml"));
+        collect(root, &format!("crates/{package}/src"), false, &mut sources)?;
     }
     let mut values = serde_json::Map::new();
     for path in sources {
@@ -410,7 +414,8 @@ fn scene(root: &Path, cargo: &OsStr, bindgen: &OsStr) -> Result<()> {
         }
     }
     manifest["candidate_sources"] = Value::Object(values);
-    // Additive port provenance: keep the original candidate_sources/digests intact.
+    // Current source bindings follow the consolidated packages. Historical
+    // manifests and their original digests remain evidence for their own inputs.
     manifest["rust_build_sources"] = scene_build_sources(root)?;
     write(
         root,

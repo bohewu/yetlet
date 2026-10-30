@@ -2,8 +2,8 @@ mod config;
 
 use axum::extract::{Path, State};
 use std::sync::Arc;
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{App, Page};
+use yetlet::view::{Element, View};
+use yetlet::server_axum::{App, Page};
 
 async fn home(State(settings): State<Arc<config::Settings>>) -> Page {
     // Explicitly select public data only; Settings has no Serialize or Debug.

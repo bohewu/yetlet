@@ -19,22 +19,22 @@ For an existing complete app, use the [REST guide](../examples/rest-api/README.m
 ### The baseline has no optional capability
 
 ```rust
-use yetlet_core::View;
-use yetlet_server_axum::App;
+use yetlet::view::View;
+use yetlet::server_axum::App;
 
 async fn home() -> View { View::text("Hello") }
 let app: axum::Router = App::new().page("/", "Home", home).into_router();
 ```
 
-This requires no `yetlet-request-id`, Session, Cookie Auth or Cache dependency. The runnable `crates/yetlet-server-axum/examples/minimal.rs` example uses only the server adapter and existing core. Cargo's normal dependency graph for the server adapter excludes the optional provider. Building `--workspace` intentionally tests all workspace members; that is different from application dependencies.
+This requires no `yetlet::request_id`, Session, Cookie Auth or Cache dependency. The runnable `crates/yetlet-server-axum/examples/minimal.rs` example uses only the server adapter and existing core. Cargo's normal dependency graph for the server adapter excludes the optional provider. Building `--workspace` intentionally tests all workspace members; that is different from application dependencies.
 
 ### The independent opt-in proof: request correlation
 
-`yetlet-request-id` is an optional crate, depending on the server adapter, **not the reverse**. It extracts the old Todo demo's numeric ID behavior into an explicitly selected provider.
+`yetlet::request_id` is an optional crate, depending on the server adapter, **not the reverse**. It extracts the old Todo demo's numeric ID behavior into an explicitly selected provider.
 
 ```rust
-use yetlet_request_id::{RequestId, RequestIds};
-use yetlet_server_axum::{App, extract::Extension};
+use yetlet::request_id::{RequestId, RequestIds};
+use yetlet::server_axum::{App, extract::Extension};
 
 async fn item(Extension(id): Extension<RequestId>) -> String { id.0.to_string() }
 let app: axum::Router = App::new()
@@ -51,8 +51,8 @@ Only matching `/api/item` requests receive `RequestId` and `x-yetlet-request-id`
 Global correlation instead **finalizes** a fully assembled `App<()>`:
 
 ```rust
-use yetlet_request_id::RequestIds;
-use yetlet_server_axum::App;
+use yetlet::request_id::RequestIds;
+use yetlet::server_axum::App;
 let router = RequestIds::new().global(App::new().get("/", || async { "ok" }));
 ```
 
@@ -79,12 +79,12 @@ A module can register routes, call `route_layer`, customize its native Router th
 
 ### Bounded opt-in Session provider
 
-`yetlet-session` is another optional crate, depending on the server adapter rather than the reverse. An application supplies a validated `SessionConfig` and installs `SessionManager<T>` only on the routes that need anonymous server-side state:
+`yetlet::session` is another optional crate, depending on the server adapter rather than the reverse. An application supplies a validated `SessionConfig` and installs `SessionManager<T>` only on the routes that need anonymous server-side state:
 
 ```rust
 use std::time::Duration;
-use yetlet_server_axum::App;
-use yetlet_session::{SessionConfig, SessionManager};
+use yetlet::server_axum::App;
+use yetlet::session::{SessionConfig, SessionManager};
 
 #[derive(Clone, Default)]
 struct Cart;
@@ -94,7 +94,7 @@ let sessions = SessionManager::<Cart>::new(
 let app = App::new().group("/cart", move |group| {
     group.get("/", page).configure(|group| sessions.scoped(group))
 });
-# Ok::<_, yetlet_session::SessionConfigError>(app)
+# Ok::<_, yetlet::session::SessionConfigError>(app)
 ```
 
 The provider generates opaque IDs and CSRF tokens from the operating-system RNG, stores data and absolute expiry in a bounded memory map, rejects malformed/duplicate cookies, never adopts an unknown supplied ID, and exposes typed synchronous read/update/rotate/destroy operations. It applies `HttpOnly`, `SameSite=Lax`, `Path=/`, bounded `Max-Age`, `no-store`, `Vary: Cookie` and `nosniff`; `Secure` is the default. The localhost cart opts out of Secure explicitly because it runs without TLS.
@@ -103,11 +103,11 @@ The Session lock is never held across downstream `await`. `try_update` mutates a
 
 ### Separately selected experimental Redis Session
 
-M10g qualifies the opt-in `yetlet-session-redis` nested workspace at single-host
+M10g qualifies the opt-in `yetlet::session_redis` nested workspace at single-host
 Docker multi-instance, single-primary and no-persistence scope. It uses explicit
 async operations and native scoped Axum middleware; the synchronous Memory API
 and Core/default-server/browser graphs remain unchanged. See the [provider
-README](../crates/yetlet-session-redis/README.md), [selected Cookie contract](YT-066B-COOKIE-ORDERING.md)
+README](../crates/yetlet/guides/session-redis.md), [selected Cookie contract](YT-066B-COOKIE-ORDERING.md)
 and [bounded closeout](M10G-VERIFICATION.md#yt-066-bounded-framework-closeout--2026-10-11).
 The pure-SSR Cookie contract preserves retired-ID rejection but permits login
 loss under extreme response reordering. This is not a Stable Candidate API,
@@ -115,9 +115,9 @@ authentication system, production durability/HA result or mandatory dependency.
 
 ### Separately selected Experimental scene renderer
 
-`yetlet-wgpu` is a first-party **Experimental opt-in** module, not a
+`yetlet_browser::wgpu` is a first-party **Experimental opt-in** module, not a
 runtime plugin registry or automatic DOM/CSS accelerator. Its
-[nested crate](../crates/yetlet-wgpu/README.md) has dependency-free,
+[nested crate](../crates/yetlet-browser/guides/wgpu.md) has dependency-free,
 CPU-only defaults and an explicit wasm32 `browser` feature. Consumers
 select it as a local path dependency and explicitly create a per-canvas
 owner; device initialization is never caused by default SSR, HTTP,
@@ -125,7 +125,7 @@ HTML or ordinary DOM usage. The application retains the scheduler,
 semantic HTML alternatives, trusted selection IDs and lifecycle
 bridge. Browser errors are local to that capability; queue completion
 is not FPS. Its actual support is limited to the
-[documented Experimental configuration](../crates/yetlet-wgpu/SUPPORT.md),
+[documented Experimental configuration](../crates/yetlet-browser/guides/wgpu-support.md),
 without a speedup or future-3D API claim. See the
 [YT-081 cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) for typed
 error and disposal-contract differences.
@@ -154,8 +154,8 @@ See [ADR 0005](adr/0005-opt-in-capability-modules.md), [ADR 0006](adr/0006-handl
 
 ## API reference
 
-Use the [server facade](../crates/yetlet-server-axum/README.md),
-[request-ID API](../crates/yetlet-request-id/README.md),
+Use the [server facade](../crates/yetlet/guides/server-axum.md),
+[request-ID API](../crates/yetlet/guides/request-id.md),
 [current capability map](CAPABILITIES.md) and [current API reference](API-REFERENCE.md).
 The registration/research/adoption sequence below retains its original decisions;
 current example options live in the [Board](../examples/lab-operations-board/README.md)
@@ -171,9 +171,9 @@ and [Shop](../examples/modular-shop/README.md) guides.
 
 The [M21 batch plan](YT-113-123-OPT-IN-CAPABILITIES.md) registers
 YT-113–YT-123 as Todo at registration. [YT-113 contract research](YT-113-AUTHENTICATION-CONTRACT.md)
-is Done after independent Reviewer PASS. The separate [yetlet-auth foundation](../crates/yetlet-auth/README.md)
+is Done after independent Reviewer PASS. The separate [yetlet-auth foundation](../crates/yetlet/guides/auth.md)
 is Done at [YT-114 scope](YT-114-IMPLEMENTATION.md) after its separate independent Reviewer PASS;
-YT-115 is Done at Memory bridge scope and YT-116/119/120 are Done at independently reviewed research scopes; [YT-117 rate limiting](YT-117-RATE-LIMIT.md) is Done at the separately selected per-process scope after independent Reviewer PASS; [YT-118 Audit research](YT-118-AUDIT-STUDY.md) is Done after independent Reviewer PASS; [YT-121 Cache research](YT-121-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-122 Output Cache research](YT-122-OUTPUT-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-123 Tracing/Correlation research](YT-123-TRACING-CORRELATION-STUDY.md) is Done after independent Reviewer PASS. The plan separates the `yetlet-auth` verified-identity contract from application-owned authorization and separately selected Session integration. Existing app-owned OIDC and opaque Bearer capabilities do not establish generic adapters. A separate Cookie crate, generic audit event/sink capability,
+YT-115 is Done at Memory bridge scope and YT-116/119/120 are Done at independently reviewed research scopes; [YT-117 rate limiting](YT-117-RATE-LIMIT.md) is Done at the separately selected per-process scope after independent Reviewer PASS; [YT-118 Audit research](YT-118-AUDIT-STUDY.md) is Done after independent Reviewer PASS; [YT-121 Cache research](YT-121-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-122 Output Cache research](YT-122-OUTPUT-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-123 Tracing/Correlation research](YT-123-TRACING-CORRELATION-STUDY.md) is Done after independent Reviewer PASS. The plan separates the `yetlet::auth` verified-identity contract from application-owned authorization and separately selected Session integration. Existing app-owned OIDC and opaque Bearer capabilities do not establish generic adapters. A separate Cookie crate, generic audit event/sink capability,
 data/output caches and tracing remain unselected candidates;
 the existing native Axum/Tower and module setup APIs stay authoritative.
 Registration does not provide these runtime capabilities or qualify
@@ -231,7 +231,7 @@ after independent Reviewer PASS; no tracing crate/subscriber/exporter is selecte
 [YT-124](YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md) is an owner-selected
 documentation-only study, Done after independent Reviewer PASS. The Admin
 reference already selects Valkey through `valkey` settings/features and the
-compatible existing `yetlet-session-redis` package; its [two-app and TTL
+compatible existing `yetlet::session_redis` package; its [two-app and TTL
 evidence](YT-094-VALKEY-SESSIONS.md) is distinct from historical YT-066b3 Redis
 execution. The new Auth crate currently bridges only Memory. The study defines
 explicit async resolver composition, shared authority, lifecycle/freshness and

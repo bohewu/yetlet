@@ -1,6 +1,6 @@
 use super::*;
 use tokio::{io::AsyncWriteExt, net::TcpListener, sync::oneshot, task::JoinHandle};
-use yetlet_actions::LocalExecutor;
+use yetlet::actions::LocalExecutor;
 
 // Direct product fixture: owns exactly one listener and one connection task.
 struct Peer {

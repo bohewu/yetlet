@@ -26,10 +26,10 @@ use std::{
     time::Duration,
 };
 use tokio::time::timeout;
-use yetlet_auth::{Authenticated, Authentication, Principal, ResolveFuture, authenticate};
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{App, DEFAULT_CSP, DocumentMetadata, LanguageTag, Page};
-use yetlet_session_valkey::{
+use yetlet::auth::{Authenticated, Authentication, Principal, ResolveFuture, authenticate};
+use yetlet::view::{Element, View};
+use yetlet::server_axum::{App, DEFAULT_CSP, DocumentMetadata, LanguageTag, Page};
+use yetlet::session_redis::{
     RedisSession, RedisSessionConfig, RedisSessionError, RedisSessionManager, session_middleware,
 };
 
@@ -424,7 +424,7 @@ async fn admission_timeline(request: Request, next: Next) -> Response {
         .and_then(|v| v.parse::<u32>().ok())
         .filter(|v| (1..=65535).contains(v));
     match id {
-        Some(id) => yetlet_session_valkey::admission_trace::request(id, next.run(request)).await,
+        Some(id) => yetlet::session_redis::admission_trace::request(id, next.run(request)).await,
         None => next.run(request).await,
     }
 }
@@ -669,7 +669,7 @@ async fn run() -> Result<(), ()> {
     state.pool.close().await;
     #[cfg(yetlet_session_admission_probe)]
     let trace_ok = std::env::var("YT173_TRACE_PATH").ok().is_some_and(|p| {
-        yetlet_session_valkey::admission_trace::flush(std::path::Path::new(&p)).is_ok()
+        yetlet::session_redis::admission_trace::flush(std::path::Path::new(&p)).is_ok()
     });
     let c = &state.counters;
     println!(

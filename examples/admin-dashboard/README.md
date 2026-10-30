@@ -285,7 +285,7 @@ files fail closed with 503. Opened handles must be regular files; Linux opens us
 `O_NONBLOCK | O_NOFOLLOW`. Trusted parent directories and local filesystems are
 required; the deadline bounds the request wait, not arbitrary filesystem work.
 
-The resolver uses the existing typed Valkey Session DTO and `yetlet-auth`.
+The resolver uses the existing typed Valkey Session DTO and `yetlet::auth`.
 Handlers consume `Authenticated` through a private adapter and independently
 recheck Session, account and project permission. Identity uses the application
 namespace `urn:yetlet:admin:local-accounts`, scheme `admin-session`, the verified

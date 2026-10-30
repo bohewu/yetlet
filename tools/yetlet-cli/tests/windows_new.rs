@@ -30,12 +30,12 @@ fn new_uses_shared_standalone_templates_without_cargo_or_network() {
     assert_eq!(manifest["package"]["publish"].as_bool(), Some(false));
     assert_eq!(manifest["workspace"]["resolver"].as_str(), Some("3"));
     assert_eq!(
-        manifest["dependencies"]["yetlet-core"]["version"].as_str(),
-        Some("=0.1.0")
+        manifest["dependencies"]["yetlet"]["version"].as_str(),
+        Some("=0.9.0-alpha.5")
     );
     assert_eq!(
-        manifest["dependencies"]["yetlet-server-axum"]["version"].as_str(),
-        Some("=0.1.0")
+        manifest["dependencies"]["yetlet"]["version"].as_str(),
+        Some("=0.9.0-alpha.5")
     );
     assert_eq!(
         fs::read(app.join("src/main.rs")).unwrap(),

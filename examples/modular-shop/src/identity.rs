@@ -7,9 +7,9 @@ use axum::{
 };
 use serde::Deserialize;
 use subtle::ConstantTimeEq;
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{App, Page};
-use yetlet_session::{Session, SessionManager};
+use yetlet::server_axum::{App, Page};
+use yetlet::session::{Session, SessionManager};
+use yetlet::view::{Element, View};
 
 use crate::{
     AppState, FORM_LIMIT, Failure, ShopSession, UserId, current_user, hidden, map_session,

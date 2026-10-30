@@ -21,7 +21,7 @@ No Push occurred; earlier evidence and decisions retain their original scopes.
 
 Follow [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md): HTML
 controls and semantic content stay separate from GPU rendering. The existing
-[yetlet-wgpu contract](../crates/yetlet-wgpu/SUPPORT.md) supports bounded flat
+[yetlet-wgpu contract](../crates/yetlet-browser/guides/wgpu-support.md) supports bounded flat
 rectangles only. Its Batch, packing, picking and SceneOwner APIs are not 3D
 interfaces. A proposed private example, `examples/physics-lab`, may later own its
 3D pipeline and physics world in a separate unpublished workspace. That path
@@ -44,7 +44,7 @@ extraction; it does not grant extraction approval now.
 | State/render bridge | Application-owned stable object IDs map to Rapier handles; poses feed the private renderer | No raw physics handles or wgpu types become a Yetlet API. Do not reinterpret the existing flat Batch stride, normalized geometry or slot identity |
 
 The named wgpu baseline is already selected by the existing
-[renderer manifest](../crates/yetlet-wgpu/Cargo.toml) and
+[renderer manifest](../crates/yetlet-browser/Cargo.toml) and
 [consumer manifest](../examples/webgpu-scene-island/Cargo.toml). The cached
 27.0.1 package manifest declares Rust 1.88; its RenderPipelineDescriptor includes
 depth-stencil state. This is source evidence for a plausible private pipeline,

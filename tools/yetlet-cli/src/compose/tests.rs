@@ -177,24 +177,57 @@ fn missing_stale_or_inconsistent_locks_are_refused_without_output() {
         let f = Fixture::new();
         let path = f.app.join("Cargo.lock");
         let original = fs::read_to_string(&path).unwrap();
-        let updated = match mutation {
-            0 => {
-                fs::remove_file(&path).unwrap();
-                original
+        let mut lock: toml::Value = original.parse().unwrap();
+        if mutation == 0 {
+            fs::remove_file(&path).unwrap();
+        } else if mutation == 8 {
+            lock["version"] = toml::Value::Integer(3);
+        } else {
+            let packages = lock["package"].as_array_mut().unwrap();
+            let name = match mutation {
+                1 | 2 | 3 => "composeapp",
+                4 | 12 => "yetlet",
+                5 => "axum",
+                6 | 7 | 11 => "tokio",
+                9 => "serde",
+                _ => "tower",
+            };
+            let package = packages
+                .iter_mut()
+                .find(|p| p["name"].as_str() == Some(name))
+                .unwrap();
+            match mutation {
+                1 | 4 => package["name"] = toml::Value::String("missing-package".into()),
+                2 | 5 | 9 | 10 | 11 => {
+                    package["version"] = toml::Value::String(
+                        match mutation {
+                            2 => "0.0.9",
+                            5 => "0.7.9",
+                            9 => "0.9.0",
+                            10 => "0.4.0",
+                            _ => "1.invalid",
+                        }
+                        .into(),
+                    )
+                }
+                3 => {
+                    package["dependencies"]
+                        .as_array_mut()
+                        .unwrap()
+                        .retain(|v| v.as_str() != Some("yetlet"));
+                }
+                6 => package["dependencies"] = toml::Value::Array(vec![]),
+                7 => package["dependencies"]
+                    .as_array_mut()
+                    .unwrap()
+                    .push(toml::Value::String("missing-package".into())),
+                _ => {
+                    let duplicate = package.clone();
+                    packages.push(duplicate);
+                }
             }
-            1 => original.replace("name='composeapp'", "name='oldapp'"),
-            2 => original.replacen("version='0.1.0'", "version='0.0.9'", 1),
-            3 => original.replace("'yetlet-core','yetlet-server-axum'", "'yetlet-core'"),
-            4 => original.replace("name='yetlet-html'", "name='missing-html'"),
-            5 => original.replace("version='0.8.9'", "version='0.7.9'"),
-            6 => original.replace("dependencies=['signal-hook-registry']", "dependencies=[]"),
-            7 => original.replace("'signal-hook-registry']", "'missing']"),
-            8 => original.replace("version=4", "version=3"),
-            9 => original.replace("version='1.0.228'", "version='0.9.0'"),
-            10 => original.replace("version='0.5.3'", "version='0.4.0'"),
-            11 => original.replace("version='1.53.2'", "version='1.invalid'"),
-            _ => format!("{original}\n[[package]]\nname='yetlet-core'\nversion='0.1.0'\n"),
-        };
+        }
+        let updated = toml::to_string(&lock).unwrap();
         if mutation != 0 {
             fs::write(path, updated).unwrap();
         }
@@ -220,11 +253,11 @@ fn unchanged_cloud_source_manifest_and_framework_closure_are_required() {
                 fs::write(f.manifest(), text.replace("native-ssr-v1", "invalid")).unwrap();
             }
             4 => fs::write(
-                f.framework.join("crates/yetlet-html/Cargo.toml"),
+                f.framework.join("crates/yetlet/Cargo.toml"),
                 "[package]\nname='other'\n",
             )
             .unwrap(),
-            _ => fs::write(f.framework.join("crates/yetlet-core/src/extra.rs"), "").unwrap(),
+            _ => fs::write(f.framework.join("crates/yetlet/src/view/extra.rs"), "").unwrap(),
         }
         let output = f.parent.join("out");
         assert!(generate(&f.manifest(), &output, IMAGE).is_err());
@@ -279,7 +312,7 @@ fn changed_source_lock_framework_and_late_destination_fail_closed() {
                         }
                     }
                     2 => {
-                        let path = f.framework.join("crates/yetlet-core/src/lib.rs");
+                        let path = f.framework.join("crates/yetlet/src/view/mod.rs");
                         if let Err(error) = fs::write(&path, "// changed\n") {
                             assert!(
                                 cfg!(windows) && error.raw_os_error() == Some(32),

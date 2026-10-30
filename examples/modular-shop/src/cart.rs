@@ -6,9 +6,9 @@ use axum::{
     response::{IntoResponse, Redirect, Response},
 };
 use serde::Deserialize;
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{App, Page};
-use yetlet_session::{Session, SessionManager, SessionUpdateError};
+use yetlet::server_axum::{App, Page};
+use yetlet::session::{Session, SessionManager, SessionUpdateError};
+use yetlet::view::{Element, View};
 
 use crate::{
     AppState, FORM_LIMIT, Failure, ShopSession, current_user, database::Product, hidden,

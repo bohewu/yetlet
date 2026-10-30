@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-11
 **Status:** Done at bounded experimental async-provider implementation scope. Focused runtime validation and independent YT-066b2 review passed after the explicitly authorized barrier repair. Rust 1.88 compilation, stable strict Clippy, the retained actual-Redis cancellation/drain test and all five provider integration tests passed. The two prior stalled attempts remain recorded below. YT-066 remains In progress and YT-020 remains Blocked.
-**Related:** [Design](YT-066B-REDIS-SESSION-DESIGN.md), [Cookie PASS](YT-066B-COOKIE-ORDERING.md), [provider API/bounds](../crates/yetlet-session-redis/README.md), [backlog](BACKLOG.md).
+**Related:** [Design](YT-066B-REDIS-SESSION-DESIGN.md), [Cookie PASS](YT-066B-COOKIE-ORDERING.md), [provider API/bounds](../crates/yetlet/guides/session-redis.md), [backlog](BACKLOG.md).
 
 ## Authority and boundary
 

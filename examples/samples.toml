@@ -37,7 +37,7 @@ routes = [
 browser_runtime = true
 browser_packages = ["yetlet-todo-browser", "yetlet-search-island"]
 browser_build = "cargo xtask build browser"
-optional_dependencies = ["yetlet-request-id", "yetlet-reactive", "yetlet-dom-keyed"]
+optional_dependencies = ["yetlet", "yetlet-browser"]
 evidence = "docs/M7J-VERIFICATION.md"
 
 [[sample]]
@@ -57,7 +57,7 @@ routes = [
 browser_runtime = false
 browser_packages = []
 browser_build = ""
-optional_dependencies = ["yetlet-request-id"]
+optional_dependencies = ["yetlet"]
 evidence = "docs/M8B-VERIFICATION.md"
 
 [[sample]]
@@ -81,7 +81,7 @@ routes = [
 browser_runtime = false
 browser_packages = []
 browser_build = ""
-optional_dependencies = ["yetlet-session"]
+optional_dependencies = ["yetlet"]
 evidence = "docs/M8C-VERIFICATION.md"
 
 [[sample]]
@@ -105,7 +105,7 @@ routes = [
 browser_runtime = false
 browser_packages = []
 browser_build = ""
-optional_dependencies = ["yetlet-session"]
+optional_dependencies = ["yetlet"]
 evidence = "docs/M9H-VERIFICATION.md"
 
 [[sample]]
@@ -195,7 +195,7 @@ routes = [
 browser_runtime = false
 browser_packages = []
 browser_build = ""
-optional_dependencies = ["yetlet-session"]
+optional_dependencies = ["yetlet"]
 evidence = "docs/M9I-VERIFICATION.md"
 
 [[sample]]

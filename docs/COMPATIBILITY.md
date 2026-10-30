@@ -1,5 +1,33 @@
 # Yetlet Experimental Compatibility Policy
 
+## Current two-package source — 2026-10-30
+
+The unreleased development train is `0.9.0-alpha.5`, with exactly `yetlet` and
+`yetlet-browser`. [YT-211](YT-211-TWO-PACKAGE-MIGRATION.md) records the intentional
+crate/module import migration, one shared View and native/browser feature
+boundaries. Base defaults select HTML; Browser defaults select DOM. Applications
+still opt into capabilities and startup installation explicitly. There are no
+compiling old-crate aliases, mandatory providers or new runtime protocols.
+
+The [alpha.5 plan](ALPHA5-RELEASE-PLAN.md) separates accepted local migration
+proof from missing release qualification. Final C/tag and alpha.5 signatures or
+publication remain unselected. Experimental versioning does not promise API
+stability or production readiness, and unchanged runtime semantics do not make
+old artifacts/signatures attest to a new package layout.
+
+The existing [alpha.4 GitHub pre-release](ALPHA4-HOSTED-RECORD.md) keeps its
+sixteen-package source, twenty public assets and signatures. Only
+`yetlet-actions0.9.0-alpha.4` reached crates.io; its fifteen-package continuation
+is paused. The new names are not registry aliases for those old crates. Existing
+platform/GPU/provider observations retain their original inputs; see the
+[current feature/platform proposal](ALPHA5-RELEASE-PLAN.md#proposed-feature-and-platform-boundary).
+
+## Historical version and candidate checkpoints
+
+The dated entries below describe their own source/package sets and acceptance
+states. References to isolated workspaces or earlier current candidates do not
+override the two-package source and qualification boundary above.
+
 **Current checkout (2026-10-29):** The owner approved the coordinated
 `0.9.0-alpha.3` [version/package preflight](ALPHA3-VERSION-PREFLIGHT.md).
 This changes library identities and internal version requirements, with no API,
@@ -82,7 +110,7 @@ For the selected `0.1.x` train, patches preserve documented API behavior and MSR
 
 ### Isolated optional workspaces
 
-The optional Redis Session provider and `yetlet-wgpu` use **isolated nested
+The optional Redis Session provider and `yetlet_browser::wgpu` use **isolated nested
 Cargo workspaces/locks** and Experimental contracts. Both belong to the current
 sixteen-library GitHub preview cohort, while the original nine-package records
 remain historical. Coordinated versioning does not merge dependency graphs,

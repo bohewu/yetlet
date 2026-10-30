@@ -24,8 +24,8 @@ mod page_comparison;
 #[cfg(not(feature = "allocation-counts"))]
 use std::time::Instant;
 use std::{error::Error, hint::black_box, path::Path};
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{DocumentMetadata, LanguageTag, render_document_with_metadata};
+use yetlet::view::{Element, View};
+use yetlet::server_axum::{DocumentMetadata, LanguageTag, render_document_with_metadata};
 
 const CASES: [(&str, usize); 3] = [("small", 8), ("medium", 128), ("large", 1024)];
 const PHASES: [&str; 4] = ["construct", "body", "document", "combined"];
@@ -87,7 +87,7 @@ fn expected(rows: usize) -> (String, String) {
 
 fn verify(rows: usize) -> Result<(String, String), Box<dyn Error>> {
     let (metadata, view) = page(rows);
-    let actual_body = yetlet_html::render_to_string(&view)?;
+    let actual_body = yetlet::html::render_to_string(&view)?;
     let actual_document = render_document_with_metadata(&metadata, &view)?;
     let (body, document) = expected(rows);
     assert_eq!(actual_body, body);
@@ -150,7 +150,7 @@ fn timing(repetition: usize) -> Result<(), Box<dyn Error>> {
                     }
                     "body" => {
                         let view = &retained.as_ref().unwrap().1;
-                        let output = black_box(yetlet_html::render_to_string(black_box(view))?);
+                        let output = black_box(yetlet::html::render_to_string(black_box(view))?);
                         let elapsed = started.elapsed().as_nanos();
                         let len = output.len();
                         drop(output);
@@ -221,7 +221,7 @@ fn allocation_counts(name: &str, phase: &str) -> Result<(), Box<dyn Error>> {
                 drop(owned);
             }
             "body" => {
-                let output = black_box(yetlet_html::render_to_string(black_box(
+                let output = black_box(yetlet::html::render_to_string(black_box(
                     &retained.as_ref().unwrap().1,
                 ))?);
                 held = counts::snapshot();

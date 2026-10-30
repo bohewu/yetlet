@@ -12,9 +12,7 @@ publish = false
 axum.workspace = true
 tokio.workspace = true
 serde = { version = "1", features = ["derive"] }
-yetlet-core = { path = "../../crates/yetlet-core" }
-yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
-yetlet-session = { path = "../../crates/yetlet-session" }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.5", default-features = false, features = ["server-axum", "session"] }
 
 [dev-dependencies]
 tower = { version = "0.5", features = ["util"] }

@@ -1,6 +1,69 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**Alpha.4 publication maintenance (2026-10-30):**
+**YT-212 alpha.5 workflow and qualification followup (2026-10-30):**
+The owner authorizes repairing active qualification/guides and supplementing
+normal two-package assembly, MSVC, necessary DOM/browser and CI gaps under the
+[alpha.5 plan](ALPHA5-RELEASE-PLAN.md). Only missing or affected checks are run;
+no runtime/dependency/support expansion. Existing local evidence, failures and
+original platform scopes remain retained. New Commit/Push/Merge, release-hosted,
+tag, Environment/Secret, signing and publication actions remain unauthorized;
+final-source/remote-CI acceptance must reflect actual later delivery.
+
+**Alpha.5 two-package release planning (2026-10-30):**
+Owner-authorized strict/builtin Commit records the accepted consolidation as
+`0f867f11a7e73675158597f0ec3caff71f1d8d0f`, tree
+`4c612e6b3418641114f91bff2e66fee58930f3c6`, without Push.
+[Scope/source/gate inventory](ALPHA5-RELEASE-PLAN.md) proposes schema2/consolidated,
+exactly `yetlet` then `yetlet-browser`, version `0.9.0-alpha.5`. Final C/S/V/P,
+tag and new output hashes remain unselected. Existing migration proof is reused;
+remaining active qualification/guide carryovers must be corrected before final C,
+then only missing package/platform/inventory/CI and original hosted/signing/
+distribution gates are supplemented under later authority. No new execution,
+Secret/Environment change or publication; the old fifteen-package continuation
+stays paused and YT-020 remains Blocked. This is planning, not release readiness.
+
+**YT-211 two-package migration complete (2026-10-30):**
+The owner continues from the accepted YT-210 prototype. [Selected migration
+contract](YT-211-TWO-PACKAGE-MIGRATION.md) uses one `yetlet` implementation
+archive for shared/native features and a separate `yetlet-browser` implementation
+archive; default HTML/DOM respectively, shared View, opt-in target-gated modules
+and unreleased alpha.5. The explicit two-package selection replaces the initial
+one-package proposal before source migration.
+Current consumers/tools/guides and closed release-subject checks are migrated.
+Native/WASM consumers,34 example manifests, CLI generation and normal archive/
+predecessor proof pass. The first final review found two P2 test/guide feature
+mismatches; focused corrections and independent followup PASS0 accept Done
+at the bounded migration scope. Original failures and evidence stay retained. No Commit/Push, new hosted/signing/publication action
+or PR29 Merge is authorized; publication stays paused.
+
+**YT-210 package consolidation proposal / publication paused (2026-10-30):**
+The owner asks to evaluate one package as well as a smaller public set.
+[Static feasibility and candidate contract](YT-210-PACKAGING-STUDY.md) recommend
+one implementation package with opt-in modules/features, preserving native/
+browser isolation, existing provider semantics and explicit startup selection.
+Contract Reviewer PASS0 and owner continuation permit a local four-module proof:
+normal package verification, three new tests/three doctests, native/wasm32
+archive consumers and mixed-feature target isolation PASS. Original formatter/
+fixture failures remain. Final independent Reviewer PASS0 accepts YT-210 Done
+at bounded feasibility scope (four documents/96 evidence hashes); full package
+adoption was deferred to YT-211, whose bounded migration completion is recorded above. PR29 stays
+open/unmerged; no continuation is dispatched. Preserve existing alpha.4
+publication/signatures and failed evidence; YT-020 remains Blocked. This is
+documentation research, not an adopted API or new release candidate.
+
+**Alpha.4 registry-only continuation preparation (2026-10-30):**
+[Actual P `1c0bb31` execution](ALPHA4-HOSTED-RECORD.md#actual-public-release-and-one-package-registry-outcome)
+verifies the public twenty-asset GitHub prerelease and the first registry archive;
+the job stops on a wrong success-response assumption. Local correction prepares
+only the remaining fifteen, preserves all published/signed bytes and history,
+and retains a single owner gate in a GitHub-read-only continuation job.
+The owner authorizes delivery and selects a fixed11minute wait before each
+unique PUT, including the first, within a210minute registry-only job. Live
+authority/release checks follow each wait; errors including429 stop. Pacing
+review, new source/CI and actual registry/consumer completion remain open;
+actual account quota is not proven and no new upload occurs. YT-020 Blocked.
+
+**Earlier alpha.4 publication maintenance (2026-10-30):**
 [Actual prepare/sign/independent verification](ALPHA4-HOSTED-RECORD.md#actual-preparation-signing-and-independent-verification)
 PASS at unchanged C/tag and S/V `6ed70c3`. The owner-approved final run fails
 at GitHub staging with no assets or registry attempt. Local length/diagnostic

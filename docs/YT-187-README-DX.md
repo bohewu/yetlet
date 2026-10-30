@@ -131,7 +131,7 @@ From this checkout, install the Rust/Cargo 1.99.0 toolchain pinned in `rust-tool
 cargo run --locked -p yetlet-server-axum --example minimal
 ```
 
-Open `http://127.0.0.1:3000/` for a script-free HTML page and `/api/status` for JSON. The complete [minimal example](../crates/yetlet-server-axum/examples/minimal.rs) is:
+Open `http://127.0.0.1:3000/` for a script-free HTML page and `/api/status` for JSON. The complete [minimal example](../crates/yetlet/examples/server_axum/minimal.rs) is:
 
 ```rust
 use yetlet_core::View;
@@ -232,15 +232,15 @@ These are the original nine unpublished `0.1.0` candidates. Use them from the ch
 
 | Crate | Responsibility |
 |---|---|
-| [`yetlet-core`](../crates/yetlet-core/README.md) | Renderer-neutral View/component model and validated identity, key and binding-slot vocabulary |
-| [`yetlet-html`](../crates/yetlet-html/README.md) | Escaped HTML serialization with safe element/attribute policy |
-| [`yetlet-dom`](../crates/yetlet-dom/README.md) | Direct browser DOM mount over a restricted HTML subset |
-| [`yetlet-dom-keyed`](../crates/yetlet-dom-keyed/README.md) | Optional keyed child identity and disposable listener/entry ownership |
-| [`yetlet-reactive`](../crates/yetlet-reactive/README.md) | Optional synchronous local message/reducer/commit graph with explicit lifetime |
-| [`yetlet-actions`](../crates/yetlet-actions/README.md) | Typed command and local/HTTP executor boundaries |
-| [`yetlet-server-axum`](../crates/yetlet-server-axum/README.md) | App/Page facade, request context and native Axum/Tower composition |
-| [`yetlet-request-id`](../crates/yetlet-request-id/README.md) | Opt-in process-local numeric request correlation |
-| [`yetlet-session`](../crates/yetlet-session/README.md) | Opt-in process-local server-side Session, expiry, CSRF and cookie lifecycle |
+| [`yetlet-core`](../crates/yetlet/guides/core.md) | Renderer-neutral View/component model and validated identity, key and binding-slot vocabulary |
+| [`yetlet-html`](../crates/yetlet/guides/html.md) | Escaped HTML serialization with safe element/attribute policy |
+| [`yetlet-dom`](../crates/yetlet-browser/guides/dom.md) | Direct browser DOM mount over a restricted HTML subset |
+| [`yetlet-dom-keyed`](../crates/yetlet-browser/guides/dom-keyed.md) | Optional keyed child identity and disposable listener/entry ownership |
+| [`yetlet-reactive`](../crates/yetlet/guides/reactive.md) | Optional synchronous local message/reducer/commit graph with explicit lifetime |
+| [`yetlet-actions`](../crates/yetlet/guides/actions.md) | Typed command and local/HTTP executor boundaries |
+| [`yetlet-server-axum`](../crates/yetlet/guides/server-axum.md) | App/Page facade, request context and native Axum/Tower composition |
+| [`yetlet-request-id`](../crates/yetlet/guides/request-id.md) | Opt-in process-local numeric request correlation |
+| [`yetlet-session`](../crates/yetlet/guides/session.md) | Opt-in process-local server-side Session, expiry, CSRF and cookie lifecycle |
 
 The separate experimental Redis provider is outside these nine candidates and remains nonpublishable. Its retained qualification is limited to the selected single-host/single-primary/no-persistence scope.
 
@@ -251,11 +251,11 @@ not expand these nine release candidates or imply production qualification.
 
 #### Experimental opt-in scene renderer
 
-[`yetlet-wgpu`](../crates/yetlet-wgpu/README.md) is a separate first-party
+[`yetlet-wgpu`](../crates/yetlet-browser/guides/wgpu.md) is a separate first-party
 **Experimental, unpublished, opt-in** flat-scene renderer. CPU defaults have no
 GPU dependency or initialization; only explicit wasm32 `browser` activation
 adds WebGPU. It does not accelerate ordinary DOM/CSS or alter the nine release
-candidates. The [support boundary](../crates/yetlet-wgpu/SUPPORT.md) separates the
+candidates. The [support boundary](../crates/yetlet-browser/guides/wgpu-support.md) separates the
 qualified Firefox/X11/Intel opt-in configuration from unverified platforms.
 There is no performance, FPS, stable-API or production guarantee. Future 3D
 is motivation, not a shipped 3D API. See the [real consumer](../examples/webgpu-scene-island/README.md).

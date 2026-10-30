@@ -260,7 +260,7 @@ fn fixture(root: &Path) -> PathBuf {
         "[workspace]\n[workspace.package]\nrust-version='1.99'\n",
     )
     .unwrap();
-    for name in ["yetlet-core", "yetlet-server-axum"] {
+    for name in ["yetlet"] {
         let dir = framework.join("crates").join(name);
         fs::create_dir_all(dir.join("src")).unwrap();
         fs::write(

@@ -18,7 +18,7 @@ It checks that reconnecting to the owned listener fails. Requests use `/full`
 and `/stream` beneath `/small`, `/large` and `/delayed`.
 
 `src/lib.rs` constructs only the heading before streaming. Each subsequent body
-poll constructs and escapes one list-row View through `yetlet-html`; the full
+poll constructs and escapes one list-row View through `yetlet::html`; the full
 baseline constructs and renders the complete main View. A oneshot barrier test
 proves initial-fragment availability before later row construction. The HTML
 uses native `main`, `h1` and `ul`/`li` semantics, an English root language and a

@@ -1,6 +1,6 @@
 //! YT-154: identical consumer compiled against two pinned real adapters.
 use super::*;
-use yetlet_html::RenderError;
+use yetlet::html::RenderError;
 
 type Input = (DocumentMetadata, View);
 #[derive(Clone, Copy)]
@@ -55,7 +55,7 @@ pub fn output(variant: &str, directory: &Path) -> Result<(), Box<dyn Error>> {
     }
     for (name, rows) in CASES {
         let input = page(rows);
-        let body = yetlet_html::render_to_string(&input.1)?;
+        let body = yetlet::html::render_to_string(&input.1)?;
         let document = document(&input)?;
         let oracle = expected(rows);
         assert_eq!(body, oracle.0);
@@ -175,7 +175,7 @@ fn relative(value: counts::Snapshot, start: counts::Snapshot) -> [usize; 12] {
 }
 #[cfg(feature = "allocation-counts")]
 fn body_info(input: &Input) -> Result<(usize, usize), RenderError> {
-    let body = yetlet_html::render_to_string(&input.1)?;
+    let body = yetlet::html::render_to_string(&input.1)?;
     Ok((body.len(), body.capacity()))
 }
 #[cfg(feature = "allocation-counts")]
@@ -301,7 +301,7 @@ mod tests {
         for (_, rows) in CASES {
             let input = page(rows);
             let oracle = expected(rows);
-            assert_eq!(yetlet_html::render_to_string(&input.1).unwrap(), oracle.0);
+            assert_eq!(yetlet::html::render_to_string(&input.1).unwrap(), oracle.0);
             assert_eq!(document(&input).unwrap(), oracle.1);
         }
         let metadata =
@@ -311,7 +311,7 @@ mod tests {
         assert!(document.starts_with("<!doctype html><html lang=\"en-US\">"));
         assert!(document.contains("<title>&lt;&gt;&amp;&quot;&#39;café</title>"));
         assert!(document.ends_with("<body><p>&lt;&amp;&gt;</p></body></html>"));
-        let default = yetlet_server_axum::render_document("<&>", &View::text("<&>")).unwrap();
+        let default = yetlet::server_axum::render_document("<&>", &View::text("<&>")).unwrap();
         assert!(default.starts_with("<!doctype html><html lang=\"zh-Hant\">"));
         assert!(default.contains("<title>&lt;&amp;&gt;</title>"));
         for (view, error) in [

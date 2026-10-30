@@ -6,12 +6,22 @@ first combined registry publication remains incomplete.** See the
 [RELEASING.md](RELEASING.md) remains the general SOP; dated alpha.3 results and
 immutable tags/archives are preserved.
 
+## Current cohort boundary — alpha.5
+
+The [two-package plan](ALPHA5-RELEASE-PLAN.md) uses schema2/`consolidated`, exactly
+`yetlet` followed by `yetlet-browser`, unreleased `0.9.0-alpha.5`. Existing
+helpers derive the subject/asset sets from that validated cohort. Alpha.4's
+schema1/sixteen execution and the original one-plus-fifteen continuation below
+remain historical; the continuation is paused and invalid for schema2.
+There is no new C/tag, hosted execution, signature or publication approval here.
+
 ## Owner-selected policy
 
 The owner requested that the assistant handle preparation, signing and
 verification, with human intervention only for final publication. The final
 request covers **GitHub Experimental pre-release, followed by crates.io for the
-same sixteen frozen archives**. Git delivery still uses explicit authority and
+same frozen archives in the selected closed cohort** (sixteen for schema1;
+two for schema2). Git delivery still uses explicit authority and
 strict/builtin Guard. This local work does not execute any hosted stage, access
 a registry token, change an Environment or publish anything.
 
@@ -65,7 +75,7 @@ These changes are **not installed** by editing this document:
 3. Create `release-publish`: sole required reviewer User `bohewu` ID35250002,
    `prevent_self_review=false`, admin bypass disabled, exact master branch only.
    Store a publish-authorized, **90-day** crates.io token as its Environment
-   Secret `CRATES_IO_TOKEN`. Restrict scope to the sixteen selected names,
+   Secret `CRATES_IO_TOKEN`. Restrict scope to the selected cohort's names,
    including first-name creation authority where required. No repository-wide
    publish token. The workflow exposes it as `CARGO_REGISTRY_TOKEN` only to the
    final publishing step. Expiry needs renewal before the next release; never
@@ -86,8 +96,9 @@ needed for local protocol tests.
    immutable C, then use strict/builtin Guard and the existing authorized tag
    procedure. Never move a tag or reuse an accepted version for changed bytes.
 2. Dispatch one bounded unsigned build and original readback using the existing
-   versioned release record. The sixteen-package recipe now has one vendor step
-   and sixteen normal verified package steps, in all-kind dependency order.
+   versioned release record. The recipe has one vendor step and one normal
+   verified package step per selected library, in all-kind dependency order
+   (two package steps for schema2, sixteen for historical schema1).
    Each predecessor is staged with its **actual `.crate` digest**; no bootstrap
    archive, `--no-verify` or null dependency checksum. Original nine-package
    historical recipes remain unchanged.
@@ -101,9 +112,10 @@ needed for local protocol tests.
    the owner manually approved that run. Dispatch independent result readback at
    V. Keep all original failures; no automatic write/job retries.
 5. The independent verifier exports `verified-publication-RUN-ATTEMPT` only after
-   verifying both bundles, sixteen subjects and the full private manifest, and
-   cleaning private work. It contains nineteen allowlisted public files plus
-   `RESULT-VERIFICATION.json`. Private manifest/bundle/evidence remain excluded.
+   verifying both bundles, the exact selected subjects and the full private
+   manifest, and cleaning private work. It contains five allowlisted public
+   files for schema2 (nineteen for schema1), plus `RESULT-VERIFICATION.json`.
+   Private manifest/bundle/evidence remain excluded.
 6. Freeze the publication request and read-only registry plan. The assistant
    obtains full P/V/run/attempt/artifact IDs and digests from actual results, the
    raw verification receipt SHA, notes/name/notes SHA and registry-plan SHA.
@@ -122,12 +134,14 @@ needed for local protocol tests.
    then checks Draft metadata and all existing asset bytes before any mutation.
    Draft API reads require the approved job's contents-write token; the read-only
    preflight deliberately does not access those endpoints.
-   It stages only the closed twenty-file public set using `gh api`, publishes the
+   It stages only the closed public set (six files for schema2, twenty for
+   schema1) using `gh api`, publishes the
    existing Experimental pre-release without Latest, and completes authenticated
    and anonymous byte readback. Only then does it PUT the unchanged archive bytes
    to crates.io in dependency order. No `cargo package` regeneration is allowed.
    Each upload needs exact index checksum and downloaded-byte readback before a
-   dependent upload. A fresh registry-only consumer pins all sixteen versions,
+   dependent upload. A fresh registry-only consumer pins both schema2 versions
+   (all sixteen for historical schema1),
    uses no token/path patch/source replacement and must resolve/check successfully.
    Only that complete result can close YT-020; reflect actual results in the
    release record and retain receipts outside temporary CI artifacts.
@@ -147,9 +161,85 @@ automatic recovery.
 The combined schema-2 publication plan/acceptance summary binds both registry
 plan and request digests. The legacy local GitHub-only CLI accepts schema1 only;
 it cannot claim that a combined registry request was fulfilled. Public attachments
-remain sixteen `.crate` files, original unsigned provenance, public checksum,
+remain the exact selected `.crate` files, original unsigned provenance, public checksum,
 public Sigstore bundle and reduced acceptance summary. Publication receipts and
 the complete private evidence are not added through a directory glob.
+
+## Registry-only continuation contract — 2026-10-30
+
+The owner authorizes a local parser correction and preparation of one explicit
+continuation after publication41028646006/1. GitHub is already public with the
+original twenty assets; `yetlet-actions0.9.0-alpha.4` is published under bohewu
+and its API/index/download match the frozen archive. The old incomplete receipt
+is retained. The other fifteen packages and registry consumer were not attempted.
+This local slice does not authorize Git delivery or another network write.
+
+Cargo's [publish response contract](https://doc.rust-lang.org/cargo/reference/registry-web-api.html#publish)
+returns optional warnings, without requiring `krate.name`. Accept a successful
+JSON object with no errors and optional valid warning arrays; retain only warning
+counts. Identity/version/content acceptance still requires index/download
+readback. Never log raw provider warning/error strings or treat a parse failure
+after PUT as proof that the write did not happen.
+The [upstream API type](https://github.com/rust-lang/crates.io/blob/daa3c146d99e5db0a2fb74062ac480f3f03797a0/crates/crates_io_api_types/src/lib.rs#L1133)
+renames Rust's `krate` member to JSON `crate`; that extra field is accepted but
+is not an identity substitute for readback.
+
+Keep the normal closed publication request unchanged. An optional, closed
+`continuation` object selects only this known one-plus-fifteen case:
+
+| Field | Binding |
+|---|---|
+| `run`, `attempt` | Original failed publication run/attempt |
+| `artifact`, `sha256` | Original `publication-result-RUN-ATTEMPT` ZIP and digest |
+| `existing` | Exactly `["yetlet-actions"]` |
+| `remaining` | Exactly the other fifteen names, in the unchanged registry-plan order |
+
+Validate the original completed failure, source/workflow/repository, owner
+approval and original five-file result artifact. Reconstruct its original
+publication request using its actual P; its digest, original public plan,
+registry plan and GitHub-success/registry-failure receipts must agree. Preserve
+the original public acceptance summary rather than generating a replacement.
+Current published Release/tag/name/notes and all twenty asset IDs/sizes/digests
+must still match that accepted plan and original readback receipt.
+
+The new reviewed P receives its own request and owner approval. A separate
+`registry-continuation` job uses the existing `release-publish` Environment,
+GitHub contents/actions **read**, registry token only after the owner gate, and
+no OIDC/age identity. It never calls GitHub stage/publish/update operations.
+The read-only preflight and protected phase reconcile the existing package's
+index/download/not-yanked state and owner, and require all fifteen selected
+versions absent before the first write. Recheck each selected version before
+its single PUT; a newly observed existing version stops instead of being
+silently skipped or resent. There is no generalized or automatic resume.
+
+Use a fresh continuation receipt. Record the first package as verified existing,
+and only the fifteen newly attempted writes as uploads. Keep the old failure
+immutable. After all fifteen readbacks succeed, run the existing fresh,
+credential-free registry consumer for all sixteen exact versions. Any partial
+or uncertain failure remains incomplete without retry, deletion, yank, version
+bump, re-signing or GitHub asset mutation. C/tag/S/V, original package bytes and
+signatures remain fixed. Hosted continuation remains separately authorized;
+YT-020 stays Blocked until complete registry and consumer evidence exists.
+
+First-name capacity is not established by the read-only checks. The pinned
+[upstream rate limiter](https://github.com/rust-lang/crates.io/blob/daa3c146d99e5db0a2fb74062ac480f3f03797a0/src/rate_limiter.rs#L22)
+defaults to a five-name burst and one new-crate token per ten minutes, with
+deployment configuration and per-user overrides. These are source defaults,
+not observed production/account limits. Before a live fifteen-new-name batch,
+confirm sufficient account capacity or separately agree a different bounded
+batch/budget. The owner selects a conservative fixed cadence: wait660seconds
+before every selected package's unique PUT, including the first. Fifteen waits
+total165minutes; the registry-only protected job is bounded to210minutes,
+including setup, readbacks and consumer checks. The normal publication job
+remains60minutes. Request JSON cannot shorten or disable this policy.
+
+After each wait, recheck protected master=P, CI, the actual owner approval and
+the unchanged public Release/assets, then require the target version absent
+immediately before its PUT. Keep master at P during the batch; source or state
+drift stops it. This cadence is conservative against the documented defaults,
+not a guarantee of an unknown production/account allowance. No quota is probed
+by uploading, and no override is requested. Any HTTP429 or other failure stops
+with the original partial receipts, without retry or automatic batch splitting.
 
 ## Local verification and remaining limits
 

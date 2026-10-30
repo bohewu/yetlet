@@ -55,7 +55,7 @@ Replacing this with per-keystroke graph synchronization would add behavior.
 
 ## Existing seams and their limits
 
-- [`DomEventListener`](../crates/yetlet-dom-keyed/src/lib.rs), lines 65–120,
+- [`DomEventListener`](../crates/yetlet-browser/src/dom_keyed/mod.rs), lines 65–120,
   already owns target/callback registration and removes the callback on explicit
   disposal or drop. Callers must retain the returned owner. Its callback receives
   a native `Event`; it does not choose a property, event type or application
@@ -63,7 +63,7 @@ Replacing this with per-keystroke graph synchronization would add behavior.
 - Admin's private helpers already handle its three control types. The read
   helper is also used for hidden bootstrap/CSRF values; those reads should not
   acquire editing/listener behavior through a broad replacement.
-- [`yetlet-dom`](../crates/yetlet-dom/src/lib.rs), lines 27–76, renders a bounded
+- [`yetlet-dom`](../crates/yetlet-browser/src/dom/mod.rs), lines 27–76, renders a bounded
   View subset, without select/textarea/form support or general live-property
   synchronization. Admin's editor is SSR-created native HTML; its controls do
   not need a renderer expansion to be read or updated through `web-sys`.

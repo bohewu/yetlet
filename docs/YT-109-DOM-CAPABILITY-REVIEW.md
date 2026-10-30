@@ -34,16 +34,16 @@ The exact current DOM allowlist has **15 tags and 12 attributes**:
   aria-pressed, for, placeholder, maxlength and autocomplete.
 
 These are source counts, not browser-compatibility or performance measurements.
-See [DOM validation and construction](../crates/yetlet-dom/src/lib.rs).
+See [DOM validation and construction](../crates/yetlet-browser/src/dom/mod.rs).
 
 | Surface | Implemented responsibility | Boundary to retain |
 | --- | --- | --- |
-| [yetlet-core View/Element](../crates/yetlet-core/src/lib.rs) | Text/element tree; static tag/attribute names, owned string values and children | No event handlers, live-control properties, renderer scheduler or DOM namespace model |
-| [Core binding vocabulary](../crates/yetlet-core/src/binding.rs) | Validated keys/slots; InertAttributeName accepts class/title and bounded lowercase data-/aria- names, excluding data-yetlet-* | This is a dynamic-slot contract, not the existing View renderer's allowlist or proof of accessibility/third-party-script safety |
-| [yetlet-html](../crates/yetlet-html/src/lib.rs) | Escaped text/attributes, identifier checks, forbidden markup checks, limited URL-scheme rejection and void-child rejection | Broader SSR vocabulary; not an arbitrary-HTML sanitizer or complete HTML-conformance engine |
-| [yetlet-dom](../crates/yetlet-dom/src/lib.rs) | Recursively validate the finite View subset, build detached nodes, then replace an owned target's contents | No keyed diff, hydration, live-property synchronization or automatic event/listener ownership |
-| [yetlet-dom-keyed](../crates/yetlet-dom-keyed/README.md) | Keyed child identity, explicit create/update callbacks and owned event listeners | Caller owns created markup, property updates and callback atomicity; final DOM operations do not roll back |
-| [yetlet-reactive](../crates/yetlet-reactive/README.md) | Optional synchronous message/reducer/commit graph and weak state-read/dispatch handles | No implicit DOM dependency, effects, HTTP or form state machine |
+| [yetlet-core View/Element](../crates/yetlet/src/view/mod.rs) | Text/element tree; static tag/attribute names, owned string values and children | No event handlers, live-control properties, renderer scheduler or DOM namespace model |
+| [Core binding vocabulary](../crates/yetlet/src/view/binding.rs) | Validated keys/slots; InertAttributeName accepts class/title and bounded lowercase data-/aria- names, excluding data-yetlet-* | This is a dynamic-slot contract, not the existing View renderer's allowlist or proof of accessibility/third-party-script safety |
+| [yetlet-html](../crates/yetlet/src/html/mod.rs) | Escaped text/attributes, identifier checks, forbidden markup checks, limited URL-scheme rejection and void-child rejection | Broader SSR vocabulary; not an arbitrary-HTML sanitizer or complete HTML-conformance engine |
+| [yetlet-dom](../crates/yetlet-browser/src/dom/mod.rs) | Recursively validate the finite View subset, build detached nodes, then replace an owned target's contents | No keyed diff, hydration, live-property synchronization or automatic event/listener ownership |
+| [yetlet-dom-keyed](../crates/yetlet-browser/guides/dom-keyed.md) | Keyed child identity, explicit create/update callbacks and owned event listeners | Caller owns created markup, property updates and callback atomicity; final DOM operations do not roll back |
+| [yetlet-reactive](../crates/yetlet/guides/reactive.md) | Optional synchronous message/reducer/commit graph and weak state-read/dispatch handles | No implicit DOM dependency, effects, HTTP or form state machine |
 | Application and JS component bindings | Draft policy, live properties, focus, HTTP/CSRF, feedback, chart/editor subtrees | One owner per subtree; no migration into yetlet-dom solely to shorten application code |
 
 This preserves [ADR 0003](adr/0003-renderers-and-loading.md) and

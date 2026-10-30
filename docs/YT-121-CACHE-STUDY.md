@@ -92,7 +92,7 @@ remains: authorization can precede queued/running SQL and concurrent revocation.
 No cache TTL fixes that race or supplies a transaction across policy, Valkey
 and SQLite. This study adds no cross-store fencing guarantee.
 
-The existing [Redis/Valkey Session provider](../crates/yetlet-session-redis/src/lib.rs)
+The existing [Redis/Valkey Session provider](../crates/yetlet/src/session_redis/mod.rs)
 is an authoritative Session store, with lifecycle scripts, expiry and bounded
 payload/IO. It is not a general data-cache API. Keep any future cache namespace,
 value lifecycle and failure policy separate; eviction or outage must not restore

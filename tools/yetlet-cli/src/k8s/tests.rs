@@ -222,7 +222,7 @@ fn source_lock_framework_substitution_and_late_destinations_fail_closed() {
                         let path = if mutation == 1 {
                             f.app.join("Cargo.lock")
                         } else {
-                            f.framework.join("crates/yetlet-core/src/lib.rs")
+                            f.framework.join("crates/yetlet/src/view/mod.rs")
                         };
                         let before = fs::read(&path).unwrap();
                         if let Err(error) = fs::write(&path, "changed\n") {

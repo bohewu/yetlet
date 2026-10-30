@@ -4,7 +4,7 @@ use yetlet_lab_operations_board::{
     Failure,
     oidc::{ClientSecret, Oidc},
 };
-use yetlet_secrets::{ExposeSecret, SecretProvider};
+use yetlet::secrets::{ExposeSecret, SecretProvider};
 
 pub async fn configure(
     settings: &crate::config::Oidc,
@@ -37,9 +37,9 @@ mod tests {
     use super::*;
     struct Unavailable;
     impl SecretProvider for Unavailable {
-        fn get<'a>(&'a self, name: &'a str) -> yetlet_secrets::SecretFuture<'a> {
+        fn get<'a>(&'a self, name: &'a str) -> yetlet::secrets::SecretFuture<'a> {
             assert_eq!(name, "oidc-client-secret");
-            Box::pin(async { Err(yetlet_secrets::SecretError::AccessDenied) })
+            Box::pin(async { Err(yetlet::secrets::SecretError::AccessDenied) })
         }
     }
     #[tokio::test]

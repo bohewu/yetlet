@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       record:
-        description: Reviewed schema-1 release record including original build artifact
+        description: Reviewed schema1/sixteen or schema2/consolidated record including original build artifact
         type: string
         required: true
 

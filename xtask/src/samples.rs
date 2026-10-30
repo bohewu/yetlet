@@ -11,9 +11,7 @@ const BROWSER_DEPS: &[&str] = &[
     "wasm-bindgen-futures",
     "web-sys",
     "js-sys",
-    "yetlet-dom",
-    "yetlet-dom-keyed",
-    "yetlet-reactive",
+    "yetlet-browser",
 ];
 fn string(v: Option<&Value>) -> Option<&str> {
     v.and_then(Value::as_str)
@@ -532,7 +530,11 @@ pub fn check_data(root: &Path, data: &Value) -> Result<Vec<String>> {
             }
         }
         match strings(sample.get("optional_dependencies")) {
-            Some(names) if names.iter().all(|n| n.starts_with("yetlet-")) => {
+            Some(names)
+                if names
+                    .iter()
+                    .all(|n| n == "yetlet" || n.starts_with("yetlet-")) =>
+            {
                 if names.iter().collect::<BTreeSet<_>>().len() != names.len() {
                     errors.push(format!("{label} optional_dependencies must be unique"));
                 }

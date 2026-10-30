@@ -33,7 +33,7 @@ pub(crate) fn validate(path: &Path) -> Result<PathBuf, &'static str> {
     {
         return Err("framework must declare the expected Rust 1.99 baseline");
     }
-    for name in ["yetlet-core", "yetlet-server-axum"] {
+    for name in ["yetlet"] {
         let crate_dir = path.join("crates").join(name);
         let value = manifest(&crate_dir.join("Cargo.toml"))?;
         if value
@@ -64,17 +64,37 @@ fn read(path: &Path) -> io::Result<Vec<u8>> {
 
 // Only the opted-in profile inspects this additional framework package.
 pub(crate) fn validate_config(root: &Path) -> Result<(), &'static str> {
-    let dir = root.join("crates/yetlet-config");
+    let dir = root.join("crates/yetlet");
     let value = manifest(&dir.join("Cargo.toml"))?;
     if value
         .get("package")
         .and_then(|p| p.get("name"))
         .and_then(toml::Value::as_str)
-        != Some("yetlet-config")
+        != Some("yetlet")
     {
         return Err("framework configuration package identity is invalid");
     }
-    read(&dir.join("src/lib.rs"))
+    if value
+        .get("features")
+        .and_then(|f| f.get("config"))
+        .is_none()
+    {
+        return Err("framework configuration feature is unavailable");
+    }
+    read(&dir.join("src/config/mod.rs"))
         .map_err(|_| "framework configuration source is unavailable or unsafe")?;
     Ok(())
+}
+
+pub(crate) fn workspace_baseline() -> toml::Value {
+    include_str!("../../../Cargo.toml")
+        .parse::<toml::Value>()
+        .expect("compiled framework workspace manifest")
+}
+
+pub(crate) fn package_version() -> String {
+    workspace_baseline()["workspace"]["package"]["version"]
+        .as_str()
+        .expect("compiled framework version")
+        .to_owned()
 }

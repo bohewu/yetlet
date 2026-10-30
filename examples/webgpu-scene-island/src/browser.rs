@@ -1,6 +1,6 @@
 use wasm_bindgen::{JsValue, prelude::wasm_bindgen};
 use web_sys::HtmlCanvasElement;
-use yetlet_wgpu::{Batch, browser};
+use yetlet_browser::wgpu::{Batch, browser};
 
 #[wasm_bindgen]
 extern "C" {

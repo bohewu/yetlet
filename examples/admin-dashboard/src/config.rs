@@ -6,8 +6,8 @@ use std::{
     net::SocketAddr,
     path::{Component, Path, PathBuf},
 };
-use yetlet_config::{Loader, SecretFormat};
-use yetlet_secrets::SecretString;
+use yetlet::config::{Loader, SecretFormat};
+use yetlet::secrets::SecretString;
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -170,7 +170,7 @@ impl Settings {
             "valkey" => {
                 #[cfg(feature = "valkey")]
                 {
-                    use yetlet_secrets::ExposeSecret;
+                    use yetlet::secrets::ExposeSecret;
                     let selected = &self.session.valkey;
                     let endpoint = selected.endpoint.expose_secret();
                     if !endpoint.starts_with("redis://")
@@ -302,7 +302,7 @@ pub fn load_with_env(vars: Vec<(OsString, OsString)>) -> io::Result<Settings> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use yetlet_secrets::ExposeSecret;
+    use yetlet::secrets::ExposeSecret;
 
     #[test]
     fn request_trace_selection_is_default_off_and_requires_feature() {

@@ -9,7 +9,7 @@ repository.workspace = true
 publish = false
 
 [dependencies]
-yetlet-actions = { path = "../../crates/yetlet-actions" }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.5", default-features = false, features = ["actions"] }
 tokio = { workspace = true, features = ["time"] }
 tokio-util = { version = "0.7", features = ["codec"] }
 futures-util = { version = "0.3", features = ["sink"] }

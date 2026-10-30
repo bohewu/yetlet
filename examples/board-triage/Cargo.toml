@@ -14,12 +14,11 @@ crate-type = ["cdylib", "rlib"]
 [dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-yetlet-actions = { path = "../../crates/yetlet-actions" }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.5", default-features = false, features = ["actions"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-yetlet-core = { path = "../../crates/yetlet-core" }
-yetlet-reactive = { path = "../../crates/yetlet-reactive" }
-yetlet-dom-keyed = { path = "../../crates/yetlet-dom-keyed" }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.5", default-features = false, features = ["reactive"] }
+yetlet-browser = { path = "../../crates/yetlet-browser", version = "0.9.0-alpha.5", default-features = false, features = ["actions", "dom-keyed"] }
 wasm-bindgen = "=0.2.129"
 wasm-bindgen-futures = "0.4"
 web-sys = { version = "0.3", features = ["Document", "Element", "Event", "EventTarget", "HtmlCollection", "HtmlInputElement", "HtmlTextAreaElement", "HtmlSelectElement", "HtmlButtonElement", "Node", "Window", "Request", "RequestInit", "Response", "Headers"] }

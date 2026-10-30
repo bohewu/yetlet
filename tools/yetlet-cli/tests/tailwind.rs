@@ -147,7 +147,15 @@ fn selected_cli_keeps_runtime_settings_opt_in_and_adds_public_tool_settings() {
             assert_eq!(app.join("src/config.rs").exists(), config);
             let manifest = fs::read_to_string(app.join("Cargo.toml")).unwrap();
             assert!(!manifest.contains("path ="));
-            assert_eq!(manifest.contains("yetlet-config"), config);
+            let manifest: toml::Value = manifest.parse().unwrap();
+            assert_eq!(
+                manifest["dependencies"]["yetlet"]["features"]
+                    .as_array()
+                    .unwrap()
+                    .iter()
+                    .any(|f| f.as_str() == Some("config")),
+                config
+            );
             let settings: toml::Value = fs::read_to_string(app.join("base.toml"))
                 .unwrap()
                 .parse()

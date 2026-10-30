@@ -91,7 +91,7 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
         let app = root.path().join(&name);
         let path = app.join("Cargo.toml");
         let mut manifest: toml::Value = fs::read_to_string(&path).unwrap().parse().unwrap();
-        for krate in ["yetlet-core", "yetlet-server-axum", "yetlet-config"] {
+        for krate in ["yetlet"] {
             if let Some(dependency) = manifest["dependencies"].get_mut(krate) {
                 // Explicit Cargo-owned preparation retains the selected version.
                 let dependency_path = framework.join("crates").join(krate);
@@ -190,20 +190,17 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
                 )
                 .unwrap();
                 let mapping = contexts["app-src-source-paths"].as_object().unwrap();
-                assert_eq!(
-                    contexts["yetlet-src"].as_object().unwrap().len(),
-                    if index > 0 { 20 } else { 14 }
-                );
+                assert_eq!(contexts["yetlet-src"].as_object().unwrap().len(), 82);
                 for source in [
-                    "crates/yetlet-config/Cargo.toml",
-                    "crates/yetlet-config/src/lib.rs",
-                    "crates/yetlet-config/src/secrets.rs",
-                    "crates/yetlet-config/examples/secret_provider.rs",
-                    "crates/yetlet-secrets/Cargo.toml",
-                    "crates/yetlet-secrets/src/lib.rs",
+                    "crates/yetlet/Cargo.toml",
+                    "crates/yetlet/src/config/mod.rs",
+                    "crates/yetlet/src/config/secrets.rs",
+                    "crates/yetlet/examples/config/secret_provider.rs",
+                    "crates/yetlet/Cargo.toml",
+                    "crates/yetlet/src/secrets/mod.rs",
                 ] {
                     let record = contexts["yetlet-src"].get(source);
-                    assert_eq!(record.is_some(), index > 0, "{source}");
+                    assert!(record.is_some(), "{source}");
                     if let Some(record) = record {
                         let bytes = fs::read(framework.join(source)).unwrap();
                         assert_eq!(record["bytes"], bytes.len(), "{source}");
@@ -226,7 +223,11 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
                         .parse()
                         .unwrap();
                 assert_eq!(
-                    overlay["dependencies"].get("yetlet-config").is_some(),
+                    overlay["dependencies"]["yetlet"]["features"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .any(|f| f.as_str() == Some("config")),
                     index > 0
                 );
                 assert!(
@@ -272,7 +273,7 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
                     // Model the Docker overlay's fixed /work/yetlet mount at
                     // this temporary native location, changing paths only.
                     let mut exported_overlay = overlay.clone();
-                    for name in ["yetlet-core", "yetlet-server-axum", "yetlet-config"] {
+                    for name in ["yetlet"] {
                         exported_overlay["dependencies"][name]["path"] = exported_framework
                             .join("crates")
                             .join(name)
@@ -307,13 +308,25 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
                             let metadata: serde_json::Value =
                                 serde_json::from_slice(&result.stdout).unwrap();
                             let nodes = metadata["resolve"]["nodes"].as_array().unwrap();
-                            assert!(!nodes.iter().any(|node| {
-                                node["id"].as_str().unwrap().contains("yetlet-secrets")
-                            }));
+                            let sdk_id = metadata["packages"]
+                                .as_array()
+                                .unwrap()
+                                .iter()
+                                .find(|p| p["name"] == "yetlet")
+                                .unwrap()["id"]
+                                .as_str()
+                                .unwrap();
                             let config = nodes
                                 .iter()
-                                .find(|node| node["id"].as_str().unwrap().contains("yetlet-config"))
+                                .find(|node| node["id"].as_str() == Some(sdk_id))
                                 .unwrap();
+                            assert!(
+                                !config["features"]
+                                    .as_array()
+                                    .unwrap()
+                                    .iter()
+                                    .any(|f| f == "secrets")
+                            );
                             assert!(
                                 !config["features"]
                                     .as_array()

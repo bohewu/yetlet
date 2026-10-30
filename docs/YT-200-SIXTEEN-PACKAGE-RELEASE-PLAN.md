@@ -111,7 +111,7 @@ Ubuntu 26.04 host is a preflight environment, not an Ubuntu 24.04 substitute.
 Chrome/Firefox selection for DOM does not imply Chrome WebGPU support. A default
 Chrome page opening on this host did not demonstrate a successful 3D Run, and
 there is no blanket Chrome-requires-Weston claim. For wgpu, reuse/reconcile its
-[recorded support boundary](../crates/yetlet-wgpu/SUPPORT.md) and
+[recorded support boundary](../crates/yetlet-browser/guides/wgpu-support.md) and
 [YT-081 refinement](YT-081-WGPU-API-REFINEMENT.md). No new GPU/OS matrix, physical
 device, IME/AT/mobile/WebKit qualification is selected here. Existing waivers and
 Not verified cells remain visible; public support cannot be inferred from Rust

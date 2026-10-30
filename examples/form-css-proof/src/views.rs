@@ -1,5 +1,5 @@
 use crate::{Draft, Errors};
-use yetlet_core::{Element, View};
+use yetlet::view::{Element, View};
 
 fn flag(element: Element, name: &'static str, enabled: bool) -> Element {
     if enabled {

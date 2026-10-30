@@ -14,15 +14,15 @@ use axum::{
 };
 use serde_json::{Value, json};
 use tower_http::services::ServeDir;
-use yetlet_request_id::{RequestId, RequestIds};
-use yetlet_server_axum::{App, DEFAULT_CSP, Page, middleware::from_fn, render_document};
+use yetlet::request_id::{RequestId, RequestIds};
+use yetlet::server_axum::{App, DEFAULT_CSP, Page, middleware::from_fn, render_document};
 use yetlet_todo_ui::{home_page, search_page};
 
 async fn root(request_id: Option<Extension<RequestId>>) -> Page {
     let mut view = home_page();
     // Select only this numeric extension; never serialize the request/context.
     if let Some(Extension(RequestId(id))) = request_id {
-        view = yetlet_core::Element::new("div")
+        view = yetlet::view::Element::new("div")
             .attribute("data-request-id", id.to_string())
             .child(view)
             .into();

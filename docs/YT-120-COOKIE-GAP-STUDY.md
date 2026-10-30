@@ -11,8 +11,8 @@ selected by the observed consumers.
 |---|---|
 | [Auth Notes](../examples/auth-notes/src/lib.rs) and [YT-115 HTTP consumer](../crates/yetlet-auth/tests/session_http.rs) | Authenticated Session continuity, native hidden-form CSRF, rotation/logout and private responses; no independent app cookie API requirement |
 | [Production Starter](../examples/production-starter/src/web.rs) and [Cart](../examples/cart-server/src/lib.rs) | Anonymous Session/CSRF and ordinary app data, demonstrating Session is useful without authentication; existing Memory provider already owns cookie operations |
-| [Memory Session](../crates/yetlet-session/src/lib.rs), `session_cookie/session_middleware/apply_cookie` | Existing cookie crate parser/builder, rejects duplicate/malformed designated identity, opaque random ID, Secure-by-default/HttpOnly/Lax/Path=/, explicit local insecure choice, expiry/rotation/destruction and appended Set-Cookie/private headers |
-| [Redis Session](../crates/yetlet-session-redis/src/lib.rs), `open/finalize/destroy` | Narrow configured-ID parsing, duplicate rejection, default __Host- naming with Secure and no Domain, distinct local HTTP name; authoritative finalize checks replacement state before emitting a cookie and preserves uncertain-operation semantics |
+| [Memory Session](../crates/yetlet/src/session/mod.rs), `session_cookie/session_middleware/apply_cookie` | Existing cookie crate parser/builder, rejects duplicate/malformed designated identity, opaque random ID, Secure-by-default/HttpOnly/Lax/Path=/, explicit local insecure choice, expiry/rotation/destruction and appended Set-Cookie/private headers |
+| [Redis Session](../crates/yetlet/src/session_redis/mod.rs), `open/finalize/destroy` | Narrow configured-ID parsing, duplicate rejection, default __Host- naming with Secure and no Domain, distinct local HTTP name; authoritative finalize checks replacement state before emitting a cookie and preserves uncertain-operation semantics |
 
 The second application use is concrete, but it repeats use of the same Session
 provider rather than duplicating independent cookie-management glue. Neither

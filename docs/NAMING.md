@@ -19,7 +19,7 @@ performed. Preserve domain-specific sync/async semantics: Memory operations are
 synchronous, Redis operations perform asynchronous IO. A universal `Async`
 suffix would add no useful distinction to the current contracts.
 
-Use the crate, module or receiver as context. `yetlet_rate_limit::Policy`,
+Use the crate, module or receiver as context. `yetlet::rate_limit::Policy`,
 `Budget` and `Key` are valid concise names; applications can import
 `Policy as RateLimitPolicy` where several policies coexist. A `Policy` is
 reusable configuration; a `Budget` owns accounting state and its clones share
@@ -27,9 +27,9 @@ that state. Do not rename both to the same concept or add a framework-wide
 policy registry. `build_rate_limit_policy` is appropriate in an application
 that builds several kinds of policy.
 
-Names must cover their actual inputs. `yetlet_config::Error::Key` applies across
+Names must cover their actual inputs. `yetlet::config::Error::Key` applies across
 configuration sources, while TOML syntax and application deserialization retain
-their separate error categories. `yetlet_signing::PublicKeySet` can contain
+their separate error categories. `yetlet::signing::PublicKeySet` can contain
 certificate-backed or certificate-free `PublicMaterial`; membership alone does
 not establish trust. `InvalidAuthenticationInput` and `InvalidRateLimitInput`
 cover their existing construction boundaries without implying authentication
@@ -39,8 +39,8 @@ failure or startup-only configuration failure.
 
 | Term | Current meaning |
 |---|---|
-| Settings loader | Opt-in `yetlet_config::Loader`, loading typed startup settings from base/profile TOML and explicit overrides; no `SettingsProvider` service or trait |
-| Secret provider | Separately selected async `yetlet_secrets::SecretProvider` lookup contract, explicitly injected by the application |
+| Settings loader | Opt-in `yetlet::config::Loader`, loading typed startup settings from base/profile TOML and explicit overrides; no `SettingsProvider` service or trait |
+| Secret provider | Separately selected async `yetlet::secrets::SecretProvider` lookup contract, explicitly injected by the application |
 | `load_with_env` | Load ordinary sources and apply a supplied environment snapshot; it is not environment-only loading |
 | `authentication_name` | Application-configured resolver/registration label, compared exactly; not an HTTP challenge scheme, issuer, storage backend or permission |
 | Authentication | Establish verified identity through an explicit resolver and native extractor |
@@ -99,7 +99,7 @@ The owner selected these intentional Rust source migrations after checkpoint
 |---|---|
 | `Loader::load_from_env` | `Loader::load_with_env` |
 | `Loader::load_from_env_with_secrets` | `Loader::load_with_env_and_secrets` |
-| `Error::EnvironmentKey` | `yetlet_config::Error::Key` |
+| `Error::EnvironmentKey` | `yetlet::config::Error::Key` |
 | `Principal::scheme` | `Principal::authentication_name` |
 | `MAX_SCHEME_BYTES` | `MAX_AUTHENTICATION_NAME_BYTES` |
 | `InvalidPrincipal` | `InvalidAuthenticationInput` |
@@ -142,3 +142,18 @@ Options are independent of their settings source. The existing Admin Settings
 loader and Shop environment keys are unchanged, and the loader remains optional
 for other consumers. Transport URI/TLS and YT-184's experiment fixture inputs
 keep their distinct native roles.
+
+## Two-package module paths — YT-211
+
+The unreleased alpha.5 source replaces the former sixteen library crates with
+`yetlet` and `yetlet-browser`. Import shared types from `yetlet::view` (or root
+`yetlet::View`), native capabilities from qualified modules such as
+`yetlet::auth`, and browser APIs from `yetlet_browser::dom`. HTTP Action execution
+is `yetlet_browser::actions::HttpExecutor`; portable contracts remain
+`yetlet::actions`. There are no old-crate compatibility facades.
+
+Feature names use Cargo kebab-case: `server-axum`, `auth-session`,
+`session-redis-tls`, `rate-limit`, `dom-keyed`, `wgpu-browser`. Rust modules use
+snake_case. Existing type/method names, application feature names, settings keys
+and wire formats remain unchanged. Historical release documentation keeps its
+original names. See the [migration map](YT-211-TWO-PACKAGE-MIGRATION.md).

@@ -274,6 +274,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4148590afebada386688f18773da617792bf2ef03ffc1e4cbd2b1d45b023e0ba"
 dependencies = [
  "serde_core",
+ "serde_derive",
 ]
 
 [[package]]
@@ -472,34 +473,19 @@ dependencies = [
 ]
 
 [[package]]
-name = "yetlet-core"
-version = "0.9.0-alpha.4"
-
-[[package]]
-name = "yetlet-html"
-version = "0.9.0-alpha.4"
-dependencies = [
- "yetlet-core",
-]
-
-[[package]]
-name = "yetlet-server-axum"
-version = "0.9.0-alpha.4"
+name = "yetlet"
+version = "0.9.0-alpha.5"
 dependencies = [
  "axum",
  "serde",
  "tower",
- "yetlet-core",
- "yetlet-html",
 ]
 
 [[package]]
 name = "yetlet-ssr-performance-baselines"
 version = "0.1.0"
 dependencies = [
- "yetlet-core",
- "yetlet-html",
- "yetlet-server-axum",
+ "yetlet",
 ]
 
 [[package]]

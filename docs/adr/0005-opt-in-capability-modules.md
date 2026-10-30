@@ -22,6 +22,27 @@ Yetlet's baseline SSR/HTTP and browser WASM must remain useful without sessions,
 
 ## Historical M6 capability candidates — 2026-10-08
 
+**Selected two-package migration (2026-10-30; implementation pending):** The
+owner explicitly selects `yetlet` for portable contracts and optional native
+capabilities, plus `yetlet-browser` for DOM/keyed/browser execution and optional
+WebGPU. [YT-211](../YT-211-TWO-PACKAGE-MIGRATION.md) keeps one shared View and a
+one-way browser-to-base dependency, additive features, explicit startup options
+and native-only security/storage dependencies outside wasm32. This supersedes
+the earlier single-package implementation proposal, while preserving its
+bounded YT-210 evidence and all historical package results. Source migration
+requires independent contract/final review; publication remains paused.
+
+**Packaging reconsideration (2026-10-30; proposal only):** The owner pauses new
+publication and asks to consider consolidating the public packages, including
+one implementation crate. [YT-210](../YT-210-PACKAGING-STUDY.md) preserves these
+capability/target/security/runtime boundaries through proposed modules and
+additive features. It does not adopt that package shape, enable providers,
+replace current crate APIs or change historical acceptance. Independent
+contract review PASS0 and owner continuation now permit only a local
+Core/HTML/Axum/DOM publish=false experiment. Its package/target proof is separate
+from full adoption and production migration. Final independent prototype review
+PASS0 closes YT-210 at bounded feasibility scope; YT-211 remains unstarted.
+
 This table records the original proposal vocabulary. Implemented carriers,
 selected features and research decisions are maintained in the
 [current capability map](../CAPABILITIES.md); a candidate name alone does not

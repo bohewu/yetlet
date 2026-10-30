@@ -1,6 +1,6 @@
 //! YT-155: unchanged actual APIs and a source-derived same-process tail proxy.
 use super::*;
-use yetlet_html::{RenderError, escape_text};
+use yetlet::html::{RenderError, escape_text};
 
 type Input = (DocumentMetadata, View);
 type Prepared = (String, String);
@@ -25,7 +25,7 @@ fn prepare(input: &Input) -> Result<Prepared, RenderError> {
     html.push_str("\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>");
     html.push_str(&escape_text(input.0.title()));
     html.push_str("</title></head><body>");
-    let body = yetlet_html::render_to_string(&input.1)?;
+    let body = yetlet::html::render_to_string(&input.1)?;
     Ok((html, body))
 }
 #[inline(never)]

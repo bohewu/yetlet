@@ -2,6 +2,53 @@ use std::{fs, process::Command};
 use yetlet_xtask::{Cli, parse, repository_root};
 
 #[test]
+fn qualification_selects_the_original_capabilities_through_two_packages() {
+    use std::collections::BTreeSet;
+    let root = repository_root();
+    let source = fs::read_to_string(root.join(".github/workflows/qualification.yml")).unwrap();
+    assert!(source.contains("os: [ubuntu-24.04, windows-2025, macos-15]"));
+    assert!(source.contains("packages=(-p yetlet -p yetlet-browser)"));
+    let selection = source
+        .split("features=(--no-default-features --features '")
+        .nth(1)
+        .unwrap()
+        .split('\'')
+        .next()
+        .unwrap();
+    let features: BTreeSet<_> = selection.split(',').collect();
+    assert_eq!(
+        features,
+        BTreeSet::from([
+            "yetlet/html",
+            "yetlet/actions",
+            "yetlet/reactive",
+            "yetlet/server-axum",
+            "yetlet/request-id",
+            "yetlet/session",
+            "yetlet-browser/dom",
+            "yetlet-browser/dom-keyed",
+            "yetlet-browser/actions",
+        ])
+    );
+    for selected in features {
+        let (package, feature) = selected.split_once('/').unwrap();
+        let manifest: toml::Value = toml::from_str(
+            &fs::read_to_string(root.join("crates").join(package).join("Cargo.toml")).unwrap(),
+        )
+        .unwrap();
+        assert!(manifest["features"].get(feature).is_some(), "{selected}");
+    }
+    assert_eq!(
+        source
+            .matches("\"${packages[@]}\" \"${features[@]}\"")
+            .count(),
+        3
+    );
+    assert!(!source.contains("-p yetlet-core"));
+    assert!(!source.contains("--all-features"));
+}
+
+#[test]
 fn release_cli_is_closed_and_requires_explicit_lowercase_commit() {
     let commit = "a".repeat(40);
     assert_eq!(
@@ -56,7 +103,7 @@ fn workflow_has_manual_fixed_source_and_only_success_public_upload() {
         "assert r['source'] == os.environ['GITHUB_SHA']",
         "assert os.environ['BUILD_WORKFLOW_REF'] == 'bohewu/yetlet/.github/workflows/release.yml@' + os.environ['GITHUB_REF']",
         "python3 scripts/release_record.py source release.yml",
-        "RELEASE_COHORT=sixteen",
+        "RELEASE_COHORT=' + r['cohort']",
         "OPENSSL_SOURCE_ARCHIVE=%s",
         "if: success()",
         "path: target/release-preparation/public/",

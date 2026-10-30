@@ -1,6 +1,6 @@
 use axum::extract::Path;
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{App, Page};
+use yetlet::view::{Element, View};
+use yetlet::server_axum::{App, Page};
 
 async fn home() -> View {
     Element::new("main")

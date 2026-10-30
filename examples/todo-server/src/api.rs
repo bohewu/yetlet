@@ -11,8 +11,8 @@ use axum::{
     http::{HeaderMap, Method, StatusCode, header},
     response::{IntoResponse, Response},
 };
-use yetlet_actions::{ActionError, ActionExecutor, ApiErrorBody, ApiErrorEnvelope, LocalExecutor};
-use yetlet_server_axum::{RequestContext, middleware::Next};
+use yetlet::actions::{ActionError, ActionExecutor, ApiErrorBody, ApiErrorEnvelope, LocalExecutor};
+use yetlet::server_axum::{RequestContext, middleware::Next};
 use yetlet_todo_ui::{TodoCommand, TodoSnapshot, apply_todo_command};
 
 pub(crate) const MAX_ACTION_BODY: usize = 4 * 1024;

@@ -1,0 +1,162 @@
+[package]
+name = "yetlet"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "HTML-first Rust framework with explicit optional native capabilities"
+readme = "README.md"
+include = ["src/**", "guides/**", "tests/**", "examples/**", "README.md", "LICENSE-*", "Cargo.toml", "Cargo.lock"]
+
+[features]
+default = ["html"]
+html = []
+actions = ["dep:serde"]
+reactive = []
+server-axum = ["html", "dep:axum", "dep:serde", "dep:tower"]
+request-id = ["server-axum"]
+session = ["server-axum", "dep:cookie", "dep:getrandom", "dep:subtle"]
+auth = ["dep:axum"]
+auth-session = ["auth", "session"]
+session-redis = ["server-axum", "dep:tokio", "dep:redis", "dep:serde", "dep:serde_json", "dep:getrandom", "dep:sha2", "dep:subtle"]
+session-redis-tls = ["session-redis", "redis/tokio-rustls-comp", "dep:rustls"]
+config = ["dep:serde", "dep:toml", "dep:dotenvy", "dep:libc"]
+secrets = ["dep:secrecy"]
+secret-provider = ["config", "secrets"]
+signing = ["dep:openssl", "dep:openssl-sys", "dep:foreign-types", "dep:serde"]
+rate-limit = ["dep:axum", "dep:tower", "dep:governor"]
+
+[dependencies]
+serde = { version = "=1.0.229", features = ["derive"], optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+axum = { version = "=0.8.9", optional = true }
+tower = { version = "=0.5.3", optional = true }
+cookie = { version = "0.18", optional = true }
+getrandom = { version = "0.2", optional = true }
+subtle = { version = "2.6", optional = true }
+tokio = { version = "=1.53.3", features = ["macros", "rt-multi-thread", "sync", "time", "net"], optional = true }
+redis = { version = "=1.7.1", default-features = false, features = ["tokio-comp", "connection-manager", "script"], optional = true }
+rustls = { version = "0.23", default-features = false, features = ["std", "ring", "tls12"], optional = true }
+serde_json = { version = "=1.0.151", optional = true }
+sha2 = { version = "0.10", optional = true }
+toml = { version = "=0.9.12", default-features = false, features = ["std", "parse", "serde"], optional = true }
+dotenvy = { version = "=0.15.7", optional = true }
+secrecy = { version = "=0.10.3", optional = true }
+openssl = { version = "=0.10.81", optional = true }
+openssl-sys = { version = "=0.9.117", optional = true }
+foreign-types = { version = "0.3", optional = true }
+governor = { version = "=0.10.4", default-features = false, features = ["std"], optional = true }
+
+[target.'cfg(all(unix, not(target_arch = "wasm32")))'.dependencies]
+libc = { version = "=0.2.186", optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+tokio = { version = "=1.53.3", features = ["macros", "rt-multi-thread", "sync", "time", "signal", "process", "net"] }
+tower = { version = "=0.5.3", features = ["util"] }
+tower-http = { version = "0.6", features = ["set-header"] }
+http-body = "1"
+http-body-util = "0.1"
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+secrecy = { version = "=0.10.3", features = ["serde"] }
+reqwest = { version = "=0.12.28", default-features = false, features = ["cookies"] }
+futures = { version = "0.3", default-features = false, features = ["executor"] }
+
+[lints.rust]
+unexpected_cfgs = { level = "warn", check-cfg = ['cfg(yetlet_session_admission_probe)'] }
+
+[[test]]
+name = "server_axum_handler_results"
+required-features = ["server-axum"]
+
+[[test]]
+name = "server_axum_http_pipeline"
+required-features = ["server-axum"]
+
+[[test]]
+name = "server_axum_configuration"
+required-features = ["server-axum"]
+
+[[test]]
+name = "server_axum_app_builder"
+required-features = ["server-axum"]
+
+[[test]]
+name = "server_axum_public_api_compat"
+required-features = ["server-axum"]
+
+[[test]]
+name = "request_id_opt_in"
+required-features = ["request-id"]
+
+[[test]]
+name = "auth_public_naming"
+required-features = ["auth"]
+
+[[test]]
+name = "auth_authentication"
+required-features = ["auth", "server-axum"]
+
+[[test]]
+name = "auth_session_http"
+required-features = ["auth-session"]
+
+[[test]]
+name = "session_redis_provider"
+required-features = ["session-redis"]
+
+[[test]]
+name = "config_loading"
+required-features = ["config"]
+
+[[test]]
+name = "config_public_naming"
+required-features = ["config"]
+
+[[test]]
+name = "secrets_provider"
+required-features = ["secrets"]
+
+[[test]]
+name = "signing_signing"
+required-features = ["signing"]
+
+[[test]]
+name = "rate_limit_middleware"
+required-features = ["rate-limit"]
+
+[[test]]
+name = "rate_limit_public_naming"
+required-features = ["rate-limit"]
+
+[[example]]
+name = "server-axum-minimal"
+path = "examples/server_axum/minimal.rs"
+required-features = ["server-axum"]
+
+[[example]]
+name = "config-secrets-state"
+path = "examples/config/secrets_state.rs"
+required-features = ["config", "secret-provider", "server-axum"]
+
+[[example]]
+name = "config-secret-provider"
+path = "examples/config/secret_provider.rs"
+required-features = ["config", "secret-provider", "server-axum"]
+
+[[example]]
+name = "config-typed"
+path = "examples/config/typed.rs"
+required-features = ["config", "server-axum"]
+
+[[example]]
+name = "secrets-azure-cli"
+path = "examples/secrets/azure_cli.rs"
+required-features = ["secrets"]
+
+[[example]]
+name = "rate-limit-native"
+path = "examples/rate_limit/native.rs"
+required-features = ["rate-limit", "config"]

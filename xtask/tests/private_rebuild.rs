@@ -6,18 +6,25 @@ use yetlet_xtask::{
 };
 
 #[test]
-fn closed_cohort_cli_preserves_legacy_default_and_rejects_extra_inputs() {
-    for args in [
-        vec!["release", "private-rebuild"],
-        vec!["release", "private-rebuild", "--cohort", "original-nine"],
-    ] {
-        assert_eq!(
-            parse(args.into_iter().map(Into::into)).unwrap(),
-            Cli::PrivateRebuild {
-                cohort: Cohort::OriginalNine
-            }
-        );
-    }
+fn closed_cohort_cli_preserves_legacy_selection_and_rejects_extra_inputs() {
+    assert_eq!(
+        parse(["release", "private-rebuild"].map(Into::into)).unwrap(),
+        Cli::PrivateRebuild {
+            cohort: Cohort::Consolidated
+        }
+    );
+    assert_eq!(
+        parse(["release", "private-rebuild", "--cohort", "consolidated"].map(Into::into)).unwrap(),
+        Cli::PrivateRebuild {
+            cohort: Cohort::Consolidated
+        }
+    );
+    assert_eq!(
+        parse(["release", "private-rebuild", "--cohort", "original-nine"].map(Into::into)).unwrap(),
+        Cli::PrivateRebuild {
+            cohort: Cohort::OriginalNine
+        }
+    );
     assert_eq!(
         parse(["release", "private-rebuild", "--cohort", "sixteen"].map(Into::into)).unwrap(),
         Cli::PrivateRebuild {
@@ -292,4 +299,101 @@ fn real_cargo_sixteen_alpha_packages_and_normal_verification_refusal() {
         r.exit_code(),
         String::from_utf8_lossy(&r.stderr.bytes)
     );
+}
+
+/// Uses the actual two SDK sources; explicitly invoked when the offline cache is complete.
+#[test]
+#[ignore = "requires the complete existing offline dependency cache"]
+fn real_current_consolidated_archives_use_final_predecessor() {
+    fn copy(from: &Path, to: &Path) {
+        fs::create_dir_all(to).unwrap();
+        for e in fs::read_dir(from).unwrap() {
+            let e = e.unwrap();
+            let p = e.path();
+            if e.file_name() == "target" || e.file_name() == "Cargo.lock" {
+                continue;
+            }
+            assert!(!e.file_type().unwrap().is_symlink());
+            if p.is_dir() {
+                copy(&p, &to.join(e.file_name()));
+            } else {
+                fs::copy(p, to.join(e.file_name())).unwrap();
+            }
+        }
+    }
+    let root = Path::new(env!("CARGO_MANIFEST_DIR")).parent().unwrap();
+    let retained = std::env::var_os("YETLET_PACKAGE_PROOF_OUTPUT")
+        .map(std::path::PathBuf::from)
+        .unwrap_or_else(|| root.join("target/yt211-single-package-20261030/packaging"));
+    fs::create_dir(&retained).unwrap();
+    let source = retained.join("source");
+    fs::create_dir(&source).unwrap();
+    let mut manifest: toml::Value =
+        toml::from_str(&fs::read_to_string(root.join("Cargo.toml")).unwrap()).unwrap();
+    manifest["workspace"]["members"] = json!(["crates/yetlet", "crates/yetlet-browser"])
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|v| toml::Value::String(v.as_str().unwrap().into()))
+        .collect::<Vec<_>>()
+        .into();
+    manifest["workspace"]
+        .as_table_mut()
+        .unwrap()
+        .remove("exclude");
+    manifest.as_table_mut().unwrap().remove("patch");
+    fs::write(
+        source.join("Cargo.toml"),
+        toml::to_string(&manifest).unwrap(),
+    )
+    .unwrap();
+    fs::copy(root.join("Cargo.lock"), source.join("Cargo.lock")).unwrap();
+    for n in Cohort::Consolidated.names() {
+        copy(&root.join("crates").join(n), &source.join("crates").join(n));
+    }
+    let prep = std::process::Command::new(env!("CARGO"))
+        .args([
+            "metadata",
+            "--offline",
+            "--format-version",
+            "1",
+            "--manifest-path",
+        ])
+        .arg(source.join("Cargo.toml"))
+        .output()
+        .unwrap();
+    fs::write(retained.join("metadata.stderr"), &prep.stderr).unwrap();
+    assert!(prep.status.success());
+    let work = retained.join("work");
+    fs::create_dir(&work).unwrap();
+    let out = retained.join("records");
+    fs::create_dir(&out).unwrap();
+    let environment = vec![
+        ("CARGO_NET_OFFLINE".into(), Some("true".into())),
+        ("RUSTUP_AUTO_INSTALL".into(), Some("0".into())),
+    ];
+    let mut record = json!({});
+    let result = private::build_packages(
+        &source,
+        &work,
+        &out,
+        Cohort::Consolidated,
+        Path::new(env!("CARGO")),
+        &environment,
+        &mut record,
+    );
+    fs::write(
+        retained.join("RESULT.json"),
+        serde_json::to_vec_pretty(&record).unwrap(),
+    )
+    .unwrap();
+    result.unwrap();
+    assert_eq!(
+        record["publication_order"],
+        json!(["yetlet", "yetlet-browser"])
+    );
+    for name in Cohort::Consolidated.names() {
+        assert_eq!(record["verified_staging"][*name]["verification"], true);
+        assert_eq!(record[format!("package-{name}_exit_code")], 0);
+    }
 }

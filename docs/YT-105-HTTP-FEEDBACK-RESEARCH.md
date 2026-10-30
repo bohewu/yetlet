@@ -57,7 +57,7 @@ Source anchors, all relative to the inspected revision:
   [Todo API](../examples/todo-server/src/api.rs), lines 46–74 (29 lines), builds
   the envelope and status/message mapping. These server mappings are
   application policy, not duplicated fetch infrastructure.
-- [Common executor](../crates/yetlet-actions/src/lib.rs), lines 128–161
+- [Common executor](../crates/yetlet/src/actions/mod.rs), lines 128–161
   (34 lines), serializes, fetches, reads and decodes the response. The
   non-success branch at 155–159 retains only status/code, discarding message;
   the current envelope has no field details at all.

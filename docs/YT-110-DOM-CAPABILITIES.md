@@ -33,8 +33,8 @@ crates and direct web-sys access remain separate and unchanged.
 
 ## Shared structure and compatibility
 
-[DOM validation](../crates/yetlet-dom/src/lib.rs) rejects repeated attribute names
-with DuplicateAttribute; [HTML serialization](../crates/yetlet-html/src/lib.rs)
+[DOM validation](../crates/yetlet-browser/src/dom/mod.rs) rejects repeated attribute names
+with DuplicateAttribute; [HTML serialization](../crates/yetlet/src/html/mod.rs)
 uses the corresponding RenderError. Element::attribute still appends; there is no
 implicit first-wins/last-wins rewrite in core. Callers must choose one value.
 This deliberately removes the ambiguous pre-public input for which HTML parsing

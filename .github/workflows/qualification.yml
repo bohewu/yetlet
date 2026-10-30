@@ -46,15 +46,14 @@ jobs:
             rustc +stable -vV
             cargo +stable --version
           } 2>&1 | tee target/qualification/native-identity.log
-      - name: Check and test nine reusable library crates
+      - name: Check and test the consolidated equivalent of the original nine capabilities
         run: |
           set -euo pipefail
-          packages=(-p yetlet-core -p yetlet-reactive -p yetlet-html -p yetlet-dom
-                    -p yetlet-dom-keyed -p yetlet-actions -p yetlet-server-axum
-                    -p yetlet-request-id -p yetlet-session)
-          cargo +stable check --locked --all-targets "${packages[@]}" 2>&1 | tee target/qualification/native-check.log
-          cargo +stable test --locked --all-targets "${packages[@]}" 2>&1 | tee target/qualification/native-test.log
-          cargo +stable test --locked --doc "${packages[@]}" 2>&1 | tee target/qualification/native-doc.log
+          packages=(-p yetlet -p yetlet-browser)
+          features=(--no-default-features --features 'yetlet/html,yetlet/actions,yetlet/reactive,yetlet/server-axum,yetlet/request-id,yetlet/session,yetlet-browser/dom,yetlet-browser/dom-keyed,yetlet-browser/actions')
+          cargo +stable check --locked --all-targets "${packages[@]}" "${features[@]}" 2>&1 | tee target/qualification/native-check.log
+          cargo +stable test --locked --all-targets "${packages[@]}" "${features[@]}" 2>&1 | tee target/qualification/native-test.log
+          cargo +stable test --locked --doc "${packages[@]}" "${features[@]}" 2>&1 | tee target/qualification/native-doc.log
       - name: Retain native qualification logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4

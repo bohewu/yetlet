@@ -12,8 +12,8 @@ use std::{
         atomic::{AtomicBool, Ordering},
     },
 };
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{App, Page};
+use yetlet::view::{Element, View};
+use yetlet::server_axum::{App, Page};
 
 async fn home(State(settings): State<Arc<config::Settings>>) -> Page {
     Page::new("Yetlet", View::text(&settings.service.public_message))

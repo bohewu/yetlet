@@ -11,8 +11,8 @@ use axum::{
     routing::get,
 };
 use futures_util::stream;
-use yetlet_core::{Element, View};
-use yetlet_html::{RenderError, render_to_string};
+use yetlet::html::{RenderError, render_to_string};
+use yetlet::view::{Element, View};
 
 const PREFIX: &str = "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1\"><title>Streaming SSR research</title></head><body><main>";
 const SUFFIX: &str = "</main></body></html>";

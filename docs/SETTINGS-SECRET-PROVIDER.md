@@ -19,8 +19,8 @@ synthetic provider. The wiring fragment assumes application-owned `Settings`,
 Run the existing complete listener-free example from the repository root:
 
 ```sh
-cargo run --locked --manifest-path crates/yetlet-config/Cargo.toml \
-  --features secret-provider --example secret_provider
+cargo run --locked -p yetlet --features config \
+  --features secret-provider --example config-secret-provider
 ```
 
 To embed it, enable the feature and call `load_with_secrets` or the explicit
@@ -41,14 +41,14 @@ partially resolved settings are returned after failure.
 
 ### Contract
 
-The existing `yetlet-config` loader adds the optional `secret-provider` feature.
+The existing `yetlet::config` loader adds the optional `secret-provider` feature.
 Its ordinary `load`/`load_with_env` methods,
 file/environment precedence and
 Development-only secret-file rules are unchanged. Default builds have no normal
-dependency on `yetlet-secrets`. Core/browser and application defaults are unchanged.
+dependency on `yetlet::secrets`. Core/browser and application defaults are unchanged.
 
-Use **settings loader** for `yetlet_config::Loader` and **secret provider** for
-`yetlet_secrets::SecretProvider`. These are separate optional capabilities; no
+Use **settings loader** for `yetlet::config::Loader` and **secret provider** for
+`yetlet::secrets::SecretProvider`. These are separate optional capabilities; no
 SettingsProvider trait is introduced. Explicit snapshots use
 `load_with_env_and_secrets`. The owner-selected pre-public migration removed
 former Rust aliases while preserving precedence and provider semantics. See the
@@ -58,11 +58,11 @@ retains its accepted historical compatibility evidence.
 Enable the feature and inject an already-constructed read-only provider:
 
 ```toml
-yetlet-config = { path = "../yetlet-config", features = ["secret-provider"] }
+yetlet = { version = "=0.9.0-alpha.5", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["config"] }
 ```
 
 ```rust
-use yetlet_config::SecretBinding;
+use yetlet::config::SecretBinding;
 
 let settings: Settings = loader.load_with_secrets(
     provider.as_ref(),
@@ -97,7 +97,7 @@ are not mutated. Separate lookups are not an atomic external-vault snapshot.
 
 The application owns assembly. Give each module its needed typed settings or
 specific secret, rather than the entire root settings/provider. The
-[listener-free example](../crates/yetlet-config/examples/secret_provider.rs)
+[listener-free example](../crates/yetlet/examples/config/secret_provider.rs)
 passes only a protected token and attempts to its delivery module; web state
 receives presentation data and the constructed service. Public SSR uses only
 the selected message. No automatic Serialize, browser export or settings dump
@@ -121,8 +121,8 @@ zeroization guarantee.
 
 ## API reference
 
-Use [binding implementation](../crates/yetlet-config/src/secrets.rs),
-[Loader source/rustdoc](../crates/yetlet-config/src/lib.rs),
+Use [binding implementation](../crates/yetlet/src/config/secrets.rs),
+[Loader source/rustdoc](../crates/yetlet/src/config/mod.rs),
 [SecretProvider guide](SECRET-PROVIDERS.md) and the [current API reference](API-REFERENCE.md).
 
 <details>
@@ -140,13 +140,13 @@ issues and required followups.
 Focused checks passed with exit 0:
 
 ```sh
-cargo test --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --features secret-provider --all-targets
-cargo test --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --all-targets
-cargo test --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --features secret-provider --doc
-cargo clippy --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --features secret-provider --all-targets -- -D warnings
-cargo fmt --manifest-path crates/yetlet-config/Cargo.toml --check
-cargo test --offline --manifest-path crates/yetlet-secrets/Cargo.toml --all-targets
-cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml --features secret-provider --example secret_provider
+cargo test --offline --locked -p yetlet --features config --features secret-provider --all-targets
+cargo test --offline --locked -p yetlet --features config --all-targets
+cargo test --offline --locked -p yetlet --features config --features secret-provider --doc
+cargo clippy --offline --locked -p yetlet --features config --features secret-provider --all-targets -- -D warnings
+cargo fmt -p yetlet --features config --check
+cargo test --offline -p yetlet --features secrets --all-targets
+cargo run --offline --locked -p yetlet --features config --features secret-provider --example config-secret-provider
 cargo xtask check docs
 ```
 
@@ -156,7 +156,7 @@ doctests pass, including rejection of an ordinary String selector. Secret-provid
 regressions pass 15/15 across library/provider and existing example targets.
 The listener-free example returns 200 without printing a secret. Normal Cargo
 dependency trees confirm no default secret-provider dependency; opting in adds
-only the existing `yetlet-secrets`/`secrecy`/`zeroize` chain. Root locked Cargo
+only the existing `yetlet::secrets`/`secrecy`/`zeroize` chain. Root locked Cargo
 metadata succeeds. New-file whitespace and documentation checks pass.
 
 The new cases cover file/env precedence plus authoritative provider selection,

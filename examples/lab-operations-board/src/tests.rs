@@ -1129,7 +1129,7 @@ async fn triage_json_reuses_authorization_csrf_validation_and_atomic_conflicts()
     let (status, body) = triage_json(&board, &client, 1, payload).await;
     assert_eq!(status, StatusCode::CONFLICT);
     assert_eq!(
-        serde_json::from_str::<yetlet_actions::ApiErrorEnvelope>(&body)
+        serde_json::from_str::<yetlet::actions::ApiErrorEnvelope>(&body)
             .unwrap()
             .error
             .code,

@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
     inputs:
       record:
-        description: Complete reviewed schema-1 release record, frozen before prepare
+        description: Complete reviewed schema1/sixteen or schema2/consolidated record, frozen before prepare
         type: string
         required: true
       request:

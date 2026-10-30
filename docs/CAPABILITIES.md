@@ -1,14 +1,12 @@
 # Current capability and API carrier map
 
-Date: 2026-10-26. This is the current package/integration inventory, not a
-promotion to Stable Candidate or an expansion of the immutable release set.
-Every package below is unpublished and experimental. The original nine
-candidates retain their [M9 API classification](API-CONTRACTS.md) and
-[release gates](RELEASE-READINESS.md); later additions are outside that inventory.
-
-[YT-201](YT-201-PACKAGE-PREPARATION.md) prepares all sixteen library manifests
-for experimental 0.1.0 packaging, without selecting a new immutable candidate
-or changing runtime installation and platform guarantees.
+Date: 2026-10-30. Current development has two implementation packages:
+`yetlet` and `yetlet-browser`, version `0.9.0-alpha.5`, not yet registry-published.
+The module map below describes capabilities, not additional installable crates.
+Base defaults select HTML; Browser defaults select DOM. Native capabilities and
+GPU/action integrations are additive opt-ins with explicit startup wiring.
+Earlier sixteen-package releases and qualification records keep their original
+source, API names and scope. See [the migration](YT-211-TWO-PACKAGE-MIGRATION.md).
 
 Start at [Current API reference](API-REFERENCE.md) for current entry points,
 ownership/error boundaries and local rustdoc. [Documentation scope](DOCUMENTATION-SCOPE.md)
@@ -19,24 +17,24 @@ publication of its linked execution records.
 
 | Carrier | Implemented scope and maturity | Original nine release candidates? | Authoritative contract |
 |---|---|---|---|
-| `yetlet-core` | Renderer-neutral Views/components and bounded binding vocabulary; M9 classification applies | Yes | [Core guide](../crates/yetlet-core/README.md) |
-| `yetlet-html` | Escaped HTML serialization and allowlisted elements/attributes; M9 classification applies | Yes | [HTML guide](../crates/yetlet-html/README.md) |
-| `yetlet-dom` | Restricted native browser DOM mount; M9 classification applies | Yes | [DOM guide](../crates/yetlet-dom/README.md) |
-| `yetlet-dom-keyed` | Optional keyed children and disposable listener/entry ownership | Yes | [Keyed DOM guide](../crates/yetlet-dom-keyed/README.md) |
-| `yetlet-reactive` | Optional synchronous local reducer/commit graph with explicit lifetime | Yes | [Reactive guide](../crates/yetlet-reactive/README.md) |
-| `yetlet-actions` | Typed commands and explicit local/HTTP execution boundaries | Yes | [Actions guide](../crates/yetlet-actions/README.md) |
-| `yetlet-server-axum` | App/Page, request context and native Axum/Tower routing/composition | Yes | [Server guide](../crates/yetlet-server-axum/README.md) |
-| `yetlet-request-id` | Explicit scoped/global process-local numeric correlation | Yes | [Request ID guide](../crates/yetlet-request-id/README.md) |
-| `yetlet-session` | Opt-in bounded Memory Session, anonymous state, expiry, CSRF, cookie lifecycle, rotation/revocation; synchronous API | Yes | [Session guide](../crates/yetlet-session/README.md) |
-| `yetlet-session-redis` | Isolated, publication-prepared/unpublished, async provider. Retained qualification is single-host, single-primary, no persistence; compatible Valkey use is separately evidenced | No | [Provider guide](../crates/yetlet-session-redis/README.md), [Valkey evidence](YT-094-VALKEY-SESSIONS.md) |
-| `yetlet-session-redis/tls` | Default-off native Rustls/Ring transport for checked `rediss://`; unchanged Session/Lua/limits, no insecure fragments. YT-184 bounded evidence complete from generation4 Auth plus generation5 authority recovery/persistent restart/new-epoch re-login; transient503/failures retained, all five groups deleted. Done at bounded isolated Linux reference scope after final independent Reviewer PASS0; no general HA/restore/platform claim | No | [Provider TLS guide](../crates/yetlet-session-redis/README.md#optional-native-tls--yt-184-reference), [YT-184](YT-184-AZURE-AUTH-SESSION-RESTART.md) |
-| `yetlet-config` | Isolated, publication-prepared/unpublished, opt-in typed startup loader and finite source precedence; optional `secret-provider` integration | No | [Configuration](CONFIGURATION.md), [settings/secret integration](SETTINGS-SECRET-PROVIDER.md) |
-| `yetlet-secrets` | Isolated, publication-prepared/unpublished, native async secret lookup and explicit settings adapter; later local rotation/Azure evidence remains separately bounded | No | [Secret providers](SECRET-PROVIDERS.md), [rotation evidence](SECRET-ROTATION-VERIFICATION.md) |
-| `yetlet-signing` | Isolated, publication-prepared/unpublished, injected signer/public-key source and explicit trust/version policy; local OpenSSL-backed sample/CLI consumers | No | [Signing contract](YT-093-SIGNING-CONTRACT.md), [verification](YT-093-SIGNING-VERIFICATION.md) |
-| `yetlet-auth` | Root workspace, publication-prepared/unpublished, native identity foundation/resolver/extractors. YT-114 Done after independent review; business authorization remains application-owned | No | [Auth guide](../crates/yetlet-auth/README.md), [contract](YT-113-AUTHENTICATION-CONTRACT.md) |
-| `yetlet-auth/session` | Explicit optional feature bridging the existing Memory Session to application identity mapping. YT-115 Done after independent review; not a generic Redis bridge or complete auth product | No | [Memory bridge](YT-115-SESSION-AUTH.md) |
-| `yetlet-rate-limit` | Root workspace, publication-prepared/unpublished, native opt-in Tower middleware, endpoint/group Policy and explicitly shared Budget. YT-117 Done at per-process memory scope; configured example defaults off | No | [Rate-limit guide](../crates/yetlet-rate-limit/README.md), [contract/evidence](YT-117-RATE-LIMIT.md) |
-| `yetlet-wgpu` | Isolated, publication-prepared/unpublished, optional flat-scene renderer, CPU-only defaults and explicit wasm32 browser feature; selected configuration only | No | [GPU guide](../crates/yetlet-wgpu/README.md), [support](../crates/yetlet-wgpu/SUPPORT.md) |
+| `yetlet::view` | Renderer-neutral Views/components and bounded binding vocabulary; M9 classification applies | Yes | [Core guide](../crates/yetlet/guides/core.md) |
+| `yetlet::html` | Escaped HTML serialization and allowlisted elements/attributes; M9 classification applies | Yes | [HTML guide](../crates/yetlet/guides/html.md) |
+| `yetlet_browser::dom` | Restricted native browser DOM mount; M9 classification applies | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md) |
+| `yetlet_browser::dom_keyed` | Optional keyed children and disposable listener/entry ownership | Yes | [Keyed DOM guide](../crates/yetlet-browser/guides/dom-keyed.md) |
+| `yetlet::reactive` | Optional synchronous local reducer/commit graph with explicit lifetime | Yes | [Reactive guide](../crates/yetlet/guides/reactive.md) |
+| `yetlet::actions` | Typed commands and explicit local/HTTP execution boundaries | Yes | [Actions guide](../crates/yetlet/guides/actions.md) |
+| `yetlet::server_axum` | App/Page, request context and native Axum/Tower routing/composition | Yes | [Server guide](../crates/yetlet/guides/server-axum.md) |
+| `yetlet::request_id` | Explicit scoped/global process-local numeric correlation | Yes | [Request ID guide](../crates/yetlet/guides/request-id.md) |
+| `yetlet::session` | Opt-in bounded Memory Session, anonymous state, expiry, CSRF, cookie lifecycle, rotation/revocation; synchronous API | Yes | [Session guide](../crates/yetlet/guides/session.md) |
+| `yetlet::session_redis` | Opt-in native module, unpublished in the consolidated SDK. Retained qualification is single-host, single-primary, no persistence; compatible Valkey use is separately evidenced | No | [Provider guide](../crates/yetlet/guides/session-redis.md), [Valkey evidence](YT-094-VALKEY-SESSIONS.md) |
+| `yetlet/session-redis-tls` | Default-off native Rustls/Ring transport for checked `rediss://`; unchanged Session/Lua/limits, no insecure fragments. YT-184 bounded evidence complete from generation4 Auth plus generation5 authority recovery/persistent restart/new-epoch re-login; transient503/failures retained, all five groups deleted. Done at bounded isolated Linux reference scope after final independent Reviewer PASS0; no general HA/restore/platform claim | No | [Provider TLS guide](../crates/yetlet/guides/session-redis.md#optional-native-tls--yt-184-reference), [YT-184](YT-184-AZURE-AUTH-SESSION-RESTART.md) |
+| `yetlet::config` | Opt-in native module providing typed startup loader and finite source precedence; optional `secret-provider` integration | No | [Configuration](CONFIGURATION.md), [settings/secret integration](SETTINGS-SECRET-PROVIDER.md) |
+| `yetlet::secrets` | Opt-in native async secret lookup and explicit settings adapter; later local rotation/Azure evidence remains separately bounded | No | [Secret providers](SECRET-PROVIDERS.md), [rotation evidence](SECRET-ROTATION-VERIFICATION.md) |
+| `yetlet::signing` | Opt-in native injected signer/public-key source and explicit trust/version policy; local OpenSSL-backed sample/CLI consumers | No | [Signing contract](YT-093-SIGNING-CONTRACT.md), [verification](YT-093-SIGNING-VERIFICATION.md) |
+| `yetlet::auth` | Root workspace, publication-prepared/unpublished, native identity foundation/resolver/extractors. YT-114 Done after independent review; business authorization remains application-owned | No | [Auth guide](../crates/yetlet/guides/auth.md), [contract](YT-113-AUTHENTICATION-CONTRACT.md) |
+| `yetlet/auth-session` | Explicit optional feature bridging the existing Memory Session to application identity mapping. YT-115 Done after independent review; not a generic Redis bridge or complete auth product | No | [Memory bridge](YT-115-SESSION-AUTH.md) |
+| `yetlet::rate_limit` | Root workspace, publication-prepared/unpublished, native opt-in Tower middleware, endpoint/group Policy and explicitly shared Budget. YT-117 Done at per-process memory scope; configured example defaults off | No | [Rate-limit guide](../crates/yetlet/guides/rate-limit.md), [contract/evidence](YT-117-RATE-LIMIT.md) |
+| `yetlet_browser::wgpu` | Isolated, publication-prepared/unpublished, optional flat-scene renderer, CPU-only defaults and explicit wasm32 browser feature; selected configuration only | No | [GPU guide](../crates/yetlet-browser/guides/wgpu.md), [support](../crates/yetlet-browser/guides/wgpu-support.md) |
 
 Root workspace membership is a development/build choice, not automatic
 installation in an application's dependency graph or inclusion in the release

@@ -12,6 +12,13 @@ import tomllib
 PACKAGES = frozenset('yetlet-' + n for n in (
     'actions', 'auth', 'config', 'core', 'dom', 'dom-keyed', 'html', 'rate-limit',
     'reactive', 'request-id', 'secrets', 'server-axum', 'session', 'session-redis', 'signing', 'wgpu'))
+CONSOLIDATED = frozenset({'yetlet', 'yetlet-browser'})
+
+def packages(record):
+    validate(record)
+    return PACKAGES if record['schema'] == 1 else CONSOLIDATED
+
+
 CORE = {'schema', 'version', 'source', 'cohort'}
 COMPLETE = CORE | {'build', 'custody_verifier', 'signer_commit', 'provenance', 'release_id'}
 NUM = r'[1-9][0-9]{0,19}'
@@ -54,7 +61,7 @@ def digest(value):
 
 def validate(value, stage='build'):
     require(type(value) is dict and CORE <= set(value) <= COMPLETE)
-    require(type(value['schema']) is int and value['schema'] == 1 and value['cohort'] == 'sixteen')
+    require(type(value['schema']) is int and (value['schema'], value['cohort']) in ((1, 'sixteen'), (2, 'consolidated')))
     version = value['version']
     require(token(version, VERSION) and len(version) <= 128)
     if '-' in version:
@@ -90,11 +97,11 @@ def environment(stage='complete'):
 
 
 def source_version(record, root):
-    """No Cargo invocation or dependency resolution. Check all sixteen selected manifests."""
+    """No Cargo invocation or dependency resolution. Check the closed selected manifests."""
     root = Path(root)
     workspace = tomllib.loads((root / 'Cargo.toml').read_text())['workspace']['package']['version']
     require(workspace == record['version'])
-    for name in PACKAGES:
+    for name in packages(record):
         p = tomllib.loads((root / 'crates' / name / 'Cargo.toml').read_text())['package']
         version = workspace if p['version'] == {'workspace': True} else p['version']
         require(p['name'] == name and version == record['version'])

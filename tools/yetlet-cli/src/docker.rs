@@ -8,24 +8,6 @@ mod delivery;
 
 type Files = Vec<(&'static str, String)>;
 
-const PACKAGES: &[(&str, &[&str])] = &[
-    ("yetlet-core", &["binding.rs", "lib.rs"]),
-    ("yetlet-html", &["lib.rs"]),
-    (
-        "yetlet-server-axum",
-        &[
-            "app.rs",
-            "context.rs",
-            "document.rs",
-            "lib.rs",
-            "middleware.rs",
-            "response.rs",
-        ],
-    ),
-];
-const INHERITED: &str = "version.workspace=true\nedition.workspace=true\nrust-version.workspace=true\nlicense.workspace=true\nrepository.workspace=true\n";
-const ROOT_VALUES: &str = "[package]\nversion='0.1.0'\nedition='2024'\nrust-version='1.99'\nlicense='MIT OR Apache-2.0'\nrepository='https://github.com/bohewu/yetlet'\n[dependencies]\naxum='0.8'\ntokio={version='1',features=['macros','net','rt-multi-thread']}\n";
-
 /// Write a NEW protected directory using the existing native no-replace adapter.
 /// The operator must prepare and verify both named contexts separately.
 pub fn generate(manifest: &Path, output: &Path) -> Result<(), String> {
@@ -114,34 +96,32 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
     let dependencies = manifest
         .get("dependencies")
         .ok_or("generated app dependencies are required")?;
-    let mut roots = Vec::new();
-    for package in ["yetlet-core", "yetlet-server-axum"] {
-        let path = dependencies
-            .get(package)
-            .and_then(|d| d.get("path"))
-            .and_then(Value::as_str)
-            .ok_or("both generated framework path dependencies are required")?;
-        let path = Path::new(path);
-        if !path.is_absolute() {
-            return Err("generated framework dependencies must be absolute local paths".into());
-        }
-        let path = framework::absolute(path).map_err(|_| "unsafe framework dependency path")?;
-        if path.file_name() != Some(package.as_ref())
-            || path.parent().and_then(Path::file_name) != Some("crates".as_ref())
-        {
-            return Err("unsupported framework dependency layout".into());
-        }
-        roots.push(
-            path.parent()
-                .and_then(Path::parent)
-                .ok_or("missing framework root")?
-                .to_owned(),
-        );
+    let dependency = dependencies
+        .get("yetlet")
+        .ok_or("generated framework dependency is required")?;
+    let path = dependency
+        .get("path")
+        .and_then(Value::as_str)
+        .ok_or("generated framework path is required")?;
+    let path = Path::new(path);
+    if !path.is_absolute() {
+        return Err("generated framework dependency must be absolute".into());
     }
-    if roots[0] != roots[1] {
-        return Err("framework dependencies must share one workspace".into());
+    let path = framework::absolute(path).map_err(|_| "unsafe framework dependency path")?;
+    if path.file_name() != Some("yetlet".as_ref())
+        || path.parent().and_then(Path::file_name) != Some("crates".as_ref())
+    {
+        return Err("unsupported framework dependency layout".into());
     }
-    let runtime_settings = dependencies.get("yetlet-config").is_some();
+    let roots = [path
+        .parent()
+        .and_then(Path::parent)
+        .ok_or("missing framework root")?
+        .to_owned()];
+    let runtime_settings = dependency
+        .get("features")
+        .and_then(Value::as_array)
+        .is_some_and(|features| features.iter().any(|f| f.as_str() == Some("config")));
     let with_assets = dependencies.get("serde_json").is_some();
     let selected = if root_entries.iter().any(|p| p == "base.toml") {
         parse(&fs::read_app_file(app, "base.toml")?)?
@@ -199,7 +179,7 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
     if selected {
         // Only normal explicit path overrides of the pinned declarations qualify.
         // Every other manifest key, version, feature and dependency stays exact.
-        for package in ["yetlet-core", "yetlet-server-axum", "yetlet-config"] {
+        for package in ["yetlet"] {
             if expected_manifest["dependencies"].get(package).is_some() {
                 let path = dependencies
                     .get(package)
@@ -282,10 +262,7 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
     }
     let lock = fs::read_app_file(app, "Cargo.lock")?;
     crate::app::validate_lock(&parse(&lock)?)?;
-    let (minimal_workspace, mut framework_files) = inspect_framework(&roots[0])?;
-    if runtime_settings {
-        delivery::config_framework(&roots[0], &mut framework_files)?;
-    }
+    let (minimal_workspace, framework_files) = inspect_framework(&roots[0])?;
     Ok(Snapshot {
         manifest,
         lock,
@@ -333,90 +310,24 @@ fn inspect_framework(root: &Path) -> Result<(String, BTreeMap<String, Vec<u8>>),
     let workspace = manifest
         .get("workspace")
         .ok_or("framework workspace is required")?;
-    let baseline: Value = ROOT_VALUES.parse().unwrap();
-    // This is a bounded v1 profile, not a general Cargo graph resolver. Preserve
-    // exact inherited values and reject a framework baseline we cannot build.
+    let baseline = framework::workspace_baseline();
+    let baseline = &baseline["workspace"];
     if workspace.get("resolver").and_then(Value::as_str) != Some("3")
         || workspace.get("package") != baseline.get("package")
         || workspace.get("dependencies") != baseline.get("dependencies")
     {
-        return Err(
-            "unsupported framework workspace inheritance; expected the inspected v1 baseline"
-                .into(),
-        );
+        return Err("unsupported framework workspace inheritance".into());
     }
-    let mut minimal: Value = "[workspace]\nresolver='3'\nmembers=['crates/yetlet-core','crates/yetlet-html','crates/yetlet-server-axum']\n".parse().unwrap();
-    let minimal_workspace = minimal["workspace"].as_table_mut().unwrap();
-    minimal_workspace.insert("package".into(), workspace["package"].clone());
-    minimal_workspace.insert("dependencies".into(), workspace["dependencies"].clone());
-    let mut files = BTreeMap::new();
-    for (package, sources) in PACKAGES {
-        let directory = format!("crates/{package}");
-        let names = directory_names(&root.join(&directory))?;
-        if names
-            .iter()
-            .any(|n| matches!(n.as_str(), "build.rs" | ".cargo"))
-        {
-            return Err("framework build scripts and Cargo config are unsupported".into());
-        }
-        if directory_names(&root.join(&directory).join("src"))? != *sources {
-            return Err("unsupported framework source layout".into());
-        }
-        let path = format!("{directory}/Cargo.toml");
-        let bytes = read_framework(root, &path)?;
-        validate_package(package, &parse(&bytes)?)?;
-        files.insert(path, bytes);
-        for source in *sources {
-            let path = format!("{directory}/src/{source}");
-            files.insert(path.clone(), read_framework(root, &path)?);
-        }
-    }
-    Ok((
-        toml::to_string(&minimal).map_err(|_| "cannot render minimal workspace")?,
-        files,
-    ))
-}
-
-fn directory_names(path: &Path) -> Result<Vec<String>, String> {
-    // No contents are read through enumeration. Every selected file is opened
-    // through the native no-symlink/reparse reader and later rehashed.
-    let mut names = Vec::new();
-    for entry in std::fs::read_dir(path).map_err(|_| "cannot enumerate framework layout")? {
-        names.push(
-            entry
-                .map_err(|_| "cannot enumerate framework layout")?
-                .file_name()
-                .into_string()
-                .map_err(|_| "framework source names must be Unicode")?,
-        );
-    }
-    names.sort();
-    Ok(names)
-}
-
-fn validate_package(name: &str, manifest: &Value) -> Result<(), String> {
-    let dependencies = match name {
-        "yetlet-core" => "[dependencies]\n",
-        "yetlet-html" => "[dependencies]\nyetlet-core={version='0.1.0',path='../yetlet-core'}\n",
-        "yetlet-server-axum" => {
-            "[dependencies]\naxum.workspace=true\nserde='1'\ntower='0.5'\nyetlet-core={version='0.1.0',path='../yetlet-core'}\nyetlet-html={version='0.1.0',path='../yetlet-html'}\n[dev-dependencies]\ntokio.workspace=true\nserde={version='1',features=['derive']}\ntower={version='0.5',features=['util']}\ntower-http={version='0.6',features=['set-header']}\nhttp-body='1'\nhttp-body-util='0.1'\n"
-        }
-        _ => return Err("unknown framework package".into()),
-    };
-    let expected: Value = format!("[package]\nname='{name}'\n{INHERITED}{dependencies}")
+    let mut minimal: Value = "[workspace]\nresolver='3'\nmembers=['crates/yetlet']\n"
         .parse()
         .unwrap();
-    let mut actual = manifest.clone();
-    let package = actual
-        .get_mut("package")
-        .and_then(Value::as_table_mut)
-        .ok_or("framework package is required")?;
-    if !package.remove("description").is_some_and(|v| v.is_str()) || actual != expected {
-        return Err(
-            "unsupported framework package, inheritance, features or dependency closure".into(),
-        );
-    }
-    Ok(())
+    let table = minimal["workspace"].as_table_mut().unwrap();
+    table.insert("package".into(), workspace["package"].clone());
+    table.insert("dependencies".into(), workspace["dependencies"].clone());
+    Ok((
+        toml::to_string(&minimal).map_err(|_| "cannot render minimal workspace")?,
+        crate::framework_source::collect(root)?,
+    ))
 }
 
 fn digest(bytes: &[u8]) -> String {

@@ -19,8 +19,8 @@ use axum::{
     routing::get,
 };
 use serde::{Deserialize, Serialize};
-use yetlet_request_id::RequestIds;
-use yetlet_server_axum::{
+use yetlet::request_id::RequestIds;
+use yetlet::server_axum::{
     App, RequestContext,
     middleware::{Next, from_fn},
 };

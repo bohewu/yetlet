@@ -62,7 +62,7 @@ synchronization. No consumer in this comparison installs a graph observer.
 ## Existing graph semantics that constrain the proposal
 
 The source of truth is
-[`crates/yetlet-reactive/src/lib.rs`](../crates/yetlet-reactive/src/lib.rs):
+[`crates/yetlet-reactive/src/lib.rs`](../crates/yetlet/src/reactive/mod.rs):
 
 | Existing surface | Observed behavior |
 | --- | --- |

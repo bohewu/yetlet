@@ -1,0 +1,32 @@
+[package]
+name = "yetlet-browser"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Optional browser DOM, action transport and WebGPU integrations for Yetlet"
+readme = "README.md"
+include = ["src/**", "guides/**", "tests/**", "examples/**", "README.md", "LICENSE-*", "Cargo.toml", "Cargo.lock"]
+
+[features]
+default = ["dom"]
+dom = ["dep:wasm-bindgen", "dep:web-sys", "web-sys/Document", "web-sys/Element", "web-sys/Node", "web-sys/Text", "web-sys/Url"]
+dom-keyed = ["dep:wasm-bindgen", "dep:web-sys", "web-sys/Document", "web-sys/Element", "web-sys/Node", "web-sys/Event", "web-sys/EventTarget", "web-sys/HtmlCollection"]
+actions = ["yetlet/actions", "dep:serde", "dep:serde_json", "dep:wasm-bindgen", "dep:wasm-bindgen-futures", "dep:web-sys", "web-sys/Window", "web-sys/Request", "web-sys/RequestInit", "web-sys/Headers", "web-sys/Response"]
+wgpu = []
+wgpu-browser = ["wgpu", "dep:wgpu-backend", "dep:wasm-bindgen", "dep:web-sys", "web-sys/HtmlCanvasElement"]
+
+[dependencies]
+yetlet = { version = "0.9.0-alpha.5", path = "../yetlet", default-features = false }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+wasm-bindgen = { version = "=0.2.129", optional = true }
+wasm-bindgen-futures = { version = "0.4", optional = true }
+web-sys = { version = "=0.3.106", optional = true }
+serde = { version = "=1.0.229", optional = true }
+serde_json = { version = "=1.0.151", optional = true }
+wgpu-backend = { version = "=27.0.1", package = "wgpu", default-features = false, features = ["std", "webgpu", "wgsl"], optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+tokio = { version = "=1.53.3", features = ["macros", "rt-multi-thread", "sync", "time", "signal", "process", "net"] }

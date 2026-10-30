@@ -1,5 +1,5 @@
 //! A shared native-draft form: the browser owns edits and reset; GET only previews.
-use yetlet_core::{Element, View};
+use yetlet::view::{Element, View};
 
 #[derive(Debug, Clone)]
 pub struct NativeDraft {
@@ -83,7 +83,7 @@ mod tests {
     #[test]
     fn defaults_and_text_are_serialized_without_a_binding_runtime() {
         let html =
-            yetlet_html::render_to_string(&native_controls(&NativeDraft::default())).unwrap();
+            yetlet::html::render_to_string(&native_controls(&NativeDraft::default())).unwrap();
         assert!(html.contains("value=\"Draft task\""));
         assert!(html.contains("value=\"normal\" selected=\"\""));
         assert!(html.contains("value=\"yes\" checked=\"\""));
@@ -93,7 +93,7 @@ mod tests {
             completed: false,
             ..NativeDraft::default()
         };
-        let html = yetlet_html::render_to_string(&native_controls(&draft)).unwrap();
+        let html = yetlet::html::render_to_string(&native_controls(&draft)).unwrap();
         assert!(html.contains("&lt;script&gt;not markup&lt;/script&gt;"));
         assert!(!html.contains("checked="));
     }

@@ -15,8 +15,8 @@ ssr-stage-probe = []
 ssr-thread-cpu-probe = ["ssr-stage-probe"]
 ssr-context-study = []
 postgres = ["dep:sqlx"]
-auth-session-postgres = ["postgres", "dep:yetlet-auth", "dep:yetlet-session-valkey"]
-auth-cross-host = ["auth-session-postgres", "sqlx/tls-rustls-ring-native-roots", "yetlet-session-valkey/tls"]
+auth-session-postgres = ["postgres", "yetlet/auth", "yetlet/session-redis"]
+auth-cross-host = ["auth-session-postgres", "sqlx/tls-rustls-ring-native-roots", "yetlet/session-redis-tls"]
 auth-workload-observation = ["auth-session-postgres"]
 auth-workload-admission = ["auth-session-postgres"]
 
@@ -39,12 +39,9 @@ axum = "=0.8.9"
 tokio = { version = "=1.53.3", features = ["net", "rt-multi-thread", "signal", "macros"] }
 serde = { version = "=1.0.229", features = ["derive"] }
 serde_json = "=1.0.151"
-yetlet-core = { path = "../../crates/yetlet-core" }
-yetlet-server-axum = { path = "../../crates/yetlet-server-axum" }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.5", default-features = false, features = ["server-axum"] }
 
 sqlx = { version = "=0.8.6", default-features = false, features = ["runtime-tokio", "postgres"], optional = true }
-yetlet-auth = { path = "../../crates/yetlet-auth", default-features = false, optional = true }
-yetlet-session-valkey = { package = "yetlet-session-redis", path = "../../crates/yetlet-session-redis", optional = true }
 
 [dev-dependencies]
 tower = { version = "=0.5.3", features = ["util"] }

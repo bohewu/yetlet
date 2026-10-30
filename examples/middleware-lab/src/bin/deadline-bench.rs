@@ -13,11 +13,11 @@ use axum::{
     routing::get,
 };
 use tower::{ServiceBuilder, ServiceExt};
-use yetlet_middleware_lab::deadline::with_deadline;
-use yetlet_server_axum::{
+use yetlet::server_axum::{
     RequestContext,
     middleware::{Next, from_fn, with_global},
 };
+use yetlet_middleware_lab::deadline::with_deadline;
 
 async fn context(context: RequestContext, next: Next) -> Response {
     next.run(context.into_request()).await

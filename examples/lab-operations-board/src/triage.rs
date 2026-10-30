@@ -2,12 +2,12 @@
 use super::*;
 use axum::{Json, extract::rejection::JsonRejection};
 use domain::WorkItem;
-use yetlet_actions::{ApiErrorBody, ApiErrorEnvelope};
+use yetlet::actions::{ApiErrorBody, ApiErrorEnvelope};
+use yetlet::view::Element;
 use yetlet_board_triage::{
     Bootstrap, Item, MAX_ITEMS, STATUS_LABELS, Save, ValidationBody, ValidationEnvelope,
     status_counts,
 };
-use yetlet_core::Element;
 
 #[derive(Clone)]
 pub(super) struct WasmPage {

@@ -10,6 +10,7 @@ import tarfile
 import tempfile
 import unittest
 from unittest.mock import patch
+import zipfile
 
 import release_policy as policy
 import release_record as records
@@ -28,13 +29,16 @@ def record():
         'signer_commit': 'b' * 40, 'provenance': {'sha256': 'e' * 64, 'size': 123}, 'release_id': '15'}
 
 
-def archives(directory, cycle=False):
+def archives(directory, cycle=False, consolidated=False):
     r = record()
+    if consolidated: r.update(schema=2, cohort="consolidated")
     subjects = {}
-    for name in records.PACKAGES:
+    for name in records.packages(r):
         manifest = '[package]\nname=' + json.dumps(name) + '\nversion=' + json.dumps(r['version']) + '\n'
         manifest += 'readme="README.md"\nlicense="MIT"\ndescription="Fixture"\nrust-version="1.99"\n'
         dep = lambda n: n + ' = { version="' + r['version'] + '" }\n'
+        if name == 'yetlet-browser':
+            manifest += '[dependencies]\n' + dep('yetlet')
         if name == 'yetlet-config':
             manifest += '[dependencies]\n' + dep('yetlet-secrets')
         if name == 'yetlet-secrets':
@@ -56,6 +60,31 @@ def archives(directory, cycle=False):
 
 
 class RegistryTests(unittest.TestCase):
+    def test_consolidated_archives_bind_exact_two_subjects_and_predecessor(self):
+        with tempfile.TemporaryDirectory() as temp:
+            r, subjects = archives(Path(temp), consolidated=True)
+            plan, bodies = registry.prepare(r, temp, subjects)
+            self.assertEqual([p['name'] for p in plan['packages']], ['yetlet', 'yetlet-browser'])
+            self.assertEqual(plan['packages'][1]['requires'], ['yetlet'])
+            self.assertEqual(set(bodies), records.CONSOLIDATED)
+            with self.assertRaises(ValueError): registry.prepare(record(), temp, subjects)
+            with self.assertRaises(ValueError): registry.continuation_rows(plan, {'existing':['yetlet-actions'], 'remaining':['yetlet-browser']})
+
+    def test_publish_success_uses_official_optional_warnings_not_krate(self):
+        for response in ({}, {'warnings': None}, {'warnings': {}},
+                         {'crate': {'name': 'fixture'}, 'warnings': {'other': []}},
+                         {'warnings': {'invalid_categories': [], 'invalid_badges': [], 'other': ['private warning']},
+                          'future_field': True}):
+            counts = registry.publish_response(records.canonical(response))
+            self.assertEqual(set(counts), {'invalid_categories', 'invalid_badges', 'other'})
+            self.assertNotIn('private', json.dumps(counts))
+        self.assertEqual(counts['other'], 1)
+        for response in ([], {'errors': [{'detail': 'private error'}]}, {'errors': {}},
+                         {'warnings': []}, {'warnings': {'other': 'bad'}},
+                         {'warnings': {'invalid_categories': [False]}}):
+            with self.subTest(response=response), self.assertRaises(ValueError):
+                registry.publish_response(records.canonical(response))
+
     def test_all_sixteen_original_archive_bytes_and_dependency_metadata_are_frozen(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -125,7 +154,11 @@ class RegistryTests(unittest.TestCase):
               patch.object(registry.urllib.request, 'build_opener', return_value=Opener())):
             registry.request(registry.API, 'PUT', b'body')
             registry.request('https://index.crates.io/ye/tl/yetlet-core')
-            registry.request('https://static.crates.io/crates/yetlet-core/file.crate')
+            registry.request('https://static.crates.io/crates/yetlet-core/yetlet-core-1.2.3.crate')
+            registry.request(registry.OWNER_API)
+            registry.request('https://index.crates.io/ye/tl/yetlet')
+            registry.request('https://static.crates.io/crates/yetlet/yetlet-0.9.0-alpha.5.crate')
+            registry.request('https://index.crates.io/ye/tl/yetlet-browser')
             self.assertEqual(seen[0].get_header('Authorization'), 'synthetic-test-token')
             self.assertTrue(all(r.get_header('Authorization') is None for r in seen[1:]))
             with self.assertRaises(ValueError): registry.request('https://example.invalid', 'PUT', b'body')
@@ -143,7 +176,7 @@ class RegistryTests(unittest.TestCase):
                 name = json.loads(body[4:4+size])['name']
                 row = next(x for x in plan['packages'] if x['name'] == name)
                 self.assertTrue(set(row['requires']) <= complete)
-                return records.canonical({'krate': {'name': name}})
+                return records.canonical({'warnings': {'invalid_categories': [], 'invalid_badges': [], 'other': []}})
             def read(row, version, attempts):
                 complete.add(row['name'])
                 return {'index_sha256': row['sha256'], 'download_sha256': row['sha256']}
@@ -152,6 +185,126 @@ class RegistryTests(unittest.TestCase):
                 result = registry.publish(plan, bodies, root/'receipt.json')
             self.assertEqual(len(complete), 16)
             self.assertEqual(result['status'], 'registry_verified_consumer_pending')
+
+
+class RegistryContinuationTests(unittest.TestCase):
+    def fixture(self, root):
+        r, subjects = archives(root)
+        plan, bodies = registry.prepare(r, root, subjects)
+        selection = {'existing': ['yetlet-actions'], 'remaining': [x['name'] for x in plan['packages'][1:]]}
+        return plan, bodies, selection
+
+    def test_only_fifteen_original_bodies_are_sent_in_dependency_order(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            plan, bodies, selection = self.fixture(root)
+            rows = {x['name']: x for x in plan['packages']}
+            published, writes, waits = {'yetlet-actions'}, [], []
+            def remote(url, method='GET', body=None):
+                if method == 'PUT':
+                    size = struct.unpack_from('<I', body)[0]
+                    name = json.loads(body[4:4+size])['name']
+                    self.assertNotEqual(name, 'yetlet-actions')
+                    self.assertNotIn(name, published)
+                    self.assertEqual(waits, writes + [name])
+                    self.assertEqual(body, bodies[name])
+                    self.assertTrue(set(rows[name]['requires']) <= published)
+                    writes.append(name); published.add(name)
+                    return b'{"warnings":{"other":[]}}'
+                if url == registry.OWNER_API:
+                    return b'{"users":[{"login":"bohewu","kind":"user"}]}'
+                if url.startswith('https://index.crates.io/'):
+                    name = url.rsplit('/', 1)[1]
+                    if name not in published: raise registry.RegistryError('http', 404)
+                    return records.canonical({'name': name, 'vers': plan['version'],
+                        'cksum': rows[name]['sha256'], 'yanked': False})
+                name = url.split('/')[4]
+                return (root / rows[name]['filename']).read_bytes()
+            receipt = root / 'continuation.json'
+            with patch.object(registry, 'request', side_effect=remote) as network:
+                result = registry.publish(plan, bodies, receipt, selection=selection,
+                                          before_put=lambda row: waits.append(row['name']))
+                self.assertEqual(writes, selection['remaining'])
+                self.assertEqual(len(result['packages']), 15)
+                self.assertEqual(result['existing'][0]['status'], 'verified_existing')
+                self.assertTrue(all(e['status'] == 'verified' for e in result['packages']))
+                calls = network.call_count
+                with self.assertRaises(ValueError):
+                    registry.publish(plan, bodies, receipt, selection=selection, before_put=lambda row: None)
+                self.assertEqual(network.call_count, calls)
+
+    def test_unknown_selection_is_rejected_before_network(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            plan, _, good = self.fixture(Path(temporary))
+            for bad in ({'existing': [], 'remaining': good['remaining']},
+                        {'existing': ['yetlet-core'], 'remaining': good['remaining']},
+                        dict(good, remaining=list(reversed(good['remaining']))),
+                        dict(good, extra=True)):
+                with patch.object(registry, 'request') as network, self.assertRaises(ValueError):
+                    registry.reconcile(plan, bad)
+                network.assert_not_called()
+
+    def test_existing_drift_owner_change_or_target_presence_prevents_all_writes(self):
+        for failure in ('content', 'owner', 'target'):
+            with self.subTest(failure=failure), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary); plan, bodies, selection = self.fixture(root)
+                def remote(url, method='GET', body=None):
+                    self.assertEqual(method, 'GET')
+                    if url == registry.OWNER_API:
+                        return records.canonical({'users': [{'login': 'other' if failure == 'owner' else 'bohewu', 'kind': 'user'}]})
+                    return records.canonical({'name': selection['remaining'][0], 'vers': plan['version']})
+                with (patch.object(registry, 'readback', side_effect=ValueError('changed') if failure == 'content' else None,
+                                   return_value={'index_sha256': 'a'*64, 'download_sha256': 'a'*64}),
+                      patch.object(registry, 'request', side_effect=remote) as network):
+                    with self.assertRaises((ValueError, registry.RegistryError)):
+                        registry.publish(plan, bodies, root/'result.json', selection=selection, before_put=lambda row: None)
+                self.assertTrue(all(len(c.args) < 2 or c.args[1] != 'PUT' for c in network.call_args_list))
+                proof = json.loads((root/'result.json').read_text())
+                self.assertEqual(proof['packages'], [])
+                self.assertEqual(proof['status'], 'incomplete')
+
+    def test_newly_present_version_is_not_resent_after_initial_reconciliation(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); plan, bodies, selection = self.fixture(root)
+            count = 0
+            def remote(url, method='GET', body=None):
+                nonlocal count
+                self.assertEqual(method, 'GET')
+                if url == registry.OWNER_API: return b'{"users":[{"login":"bohewu","kind":"user"}]}'
+                count += 1
+                if count <= 15: raise registry.RegistryError('http', 404)
+                return records.canonical({'name': selection['remaining'][0], 'vers': plan['version']})
+            with patch.object(registry, 'readback', return_value={}), patch.object(registry, 'request', side_effect=remote):
+                with self.assertRaises(registry.RegistryError) as caught:
+                    registry.publish(plan, bodies, root/'result.json', selection=selection, before_put=lambda row: None)
+            self.assertEqual(caught.exception.kind, 'version_exists')
+            self.assertEqual(json.loads((root/'result.json').read_text())['packages'], [])
+
+    def test_uncertain_put_stops_with_one_new_intent_and_keeps_existing_separate(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); plan, bodies, selection = self.fixture(root)
+            def remote(url, method='GET', body=None):
+                self.assertEqual(method, 'PUT')
+                raise registry.RegistryError('transport')
+            with (patch.object(registry, 'reconcile', return_value={'name': 'yetlet-actions', 'status': 'verified_existing'}),
+                  patch.object(registry, 'require_absent'), patch.object(registry, 'request', side_effect=remote) as write):
+                with self.assertRaises(registry.RegistryError):
+                    registry.publish(plan, bodies, root/'result.json', selection=selection, before_put=lambda row: None)
+            write.assert_called_once()
+            proof = json.loads((root/'result.json').read_text())
+            self.assertEqual(proof['existing'][0]['name'], 'yetlet-actions')
+            self.assertEqual([(p['name'], p['status']) for p in proof['packages']], [(selection['remaining'][0], 'attempted')])
+            self.assertEqual(proof['consumer'], 'not_attempted')
+
+    def test_continuation_requires_pacing_and_recheck_before_any_put(self):
+        for callback in (None, lambda row: (_ for _ in ()).throw(ValueError('source changed'))):
+            with self.subTest(callback=callback is not None), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary); plan, bodies, selection = self.fixture(root)
+                with (patch.object(registry, 'reconcile', return_value={'name': 'yetlet-actions'}),
+                      patch.object(registry, 'request') as network, self.assertRaises(ValueError)):
+                    registry.publish(plan, bodies, root/'result.json', selection=selection, before_put=callback)
+                network.assert_not_called()
+                self.assertEqual(json.loads((root/'result.json').read_text())['packages'], [])
 
 
 class PublicationTests(unittest.TestCase):
@@ -259,6 +412,195 @@ class PublicationTests(unittest.TestCase):
                 self.assertEqual(proof['github'], 'published_and_verified')
                 self.assertEqual(proof['status'], 'incomplete' if fail else 'complete')
                 self.assertEqual('consumer' in events, not fail)
+
+
+class PublicationContinuationTests(unittest.TestCase):
+    def fixture(self, root):
+        rec, subjects = archives(root)
+        reg, bodies = registry.prepare(rec, root, subjects)
+        publication.s.bind_record(rec)
+        old = {'publication_commit': 'e'*40, 'verifier_commit': 'd'*40, 'verifier_run': '21',
+            'verifier_attempt': '1', 'artifact': '22', 'artifact_sha256': 'a'*64,
+            'verification_sha256': 'b'*64, 'name': 'Fixture', 'notes': 'Fixture notes',
+            'notes_sha256': registry.sha(b'Fixture notes'), 'registry_plan_sha256': records.digest(reg)}
+        p = {'schema': 2, 'record_sha256': records.digest(rec), 'release_id': rec['release_id'],
+            'name': old['name'], 'notes_sha256': old['notes_sha256'], 'verification_sha256': old['verification_sha256'],
+            'approval_sha256': 'a'*64, 'registry_plan_sha256': records.digest(reg),
+            'publication_request_sha256': records.digest(old), 'assets': [
+                {'name': n, 'size': 1, 'sha256': 'a'*64} for n in sorted(publication.pub.names())]}
+        github = {'schema': 1, 'action': 'publish', 'record_sha256': records.digest(rec),
+            'plan_sha256': records.digest(p), 'release_id': rec['release_id'], 'source': rec['source'],
+            'tag': 'v'+rec['version'], 'notes_sha256': old['notes_sha256'],
+            'assets': [dict(a, id=i+1) for i,a in enumerate(p['assets'])],
+            'automatic_retry': False, 'registry_upload': False}
+        prior = {'PUBLICATION-PLAN.json': p, 'REGISTRY-PLAN.json': reg, 'GITHUB-PUBLICATION.json': github,
+            'PUBLICATION-RESULT.json': {'schema': 1, 'status': 'incomplete', 'github': 'published_and_verified',
+                'registry': 'attempted', 'automatic_retry': False, 'record_sha256': records.digest(rec),
+                'publication_request_sha256': records.digest(old), 'failure': {'phase': 'registry-publish',
+                    'operation': 'validation', 'class': 'validation', 'http_status': None}},
+            'REGISTRY-RESULT.json': {'schema': 1, 'status': 'incomplete', 'plan_sha256': records.digest(reg),
+                'packages': [{'name': 'yetlet-actions', 'status': 'attempted', 'sha256': reg['packages'][0]['sha256']}],
+                'consumer': 'not_attempted', 'error': {'class': 'validation', 'http_status': None}}}
+        request = dict(old, publication_commit='f'*40, continuation={'run': '31', 'attempt': '1',
+            'artifact': '32', 'sha256': 'c'*64, 'existing': ['yetlet-actions'],
+            'remaining': [r['name'] for r in reg['packages'][1:]]})
+        return rec, request, old, p, reg, bodies, github, prior
+
+    def prior_api(self, request, raw):
+        c = request['continuation']
+        run = {'id': 31, 'run_attempt': 1, 'head_sha': 'e'*40, 'head_branch': 'master',
+            'event': 'workflow_dispatch', 'path': '.github/workflows/release-publish.yml',
+            'status': 'completed', 'conclusion': 'failure', 'repository': {'id': 1409587171},
+            'head_repository': {'id': 1409587171}}
+        artifact = {'id': 32, 'name': 'publication-result-31-1', 'expired': False,
+            'digest': 'sha256:'+registry.sha(raw), 'size_in_bytes': len(raw),
+            'workflow_run': {'id': 31, 'head_sha': 'e'*40, 'repository_id': 1409587171, 'head_repository_id': 1409587171}}
+        c['sha256'] = registry.sha(raw)
+        return {'/actions/runs/31/attempts/1': run, '/actions/artifacts/32': artifact,
+            '/environments/release-publish': {'id': 44}, '/actions/runs/31/approvals': [
+                {'state': 'approved', 'user': {'id': 35250002}, 'environments': [{'id': 44}]}]}
+
+    def prior_zip(self, prior):
+        raw = io.BytesIO()
+        with zipfile.ZipFile(raw, 'w') as archive:
+            for name, value in prior.items(): archive.writestr(name, records.canonical(value))
+        return raw.getvalue()
+
+    def test_closed_continuation_request_rejects_other_subsets_and_extra_fields(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            rec, r, *_ = self.fixture(Path(temporary))
+            with patch.dict(os.environ, {'RELEASE_RECORD': json.dumps(rec), 'PUBLICATION_REQUEST': json.dumps(r)}):
+                self.assertEqual(publication.request(), r)
+            for field, value in [('existing', []), ('remaining', r['continuation']['remaining'][:-1]),
+                                  ('remaining', ['yetlet-actions']*15), ('attempt', '0'), ('extra', True)]:
+                bad = copy.deepcopy(r); bad['continuation'][field] = value
+                with patch.dict(os.environ, {'RELEASE_RECORD': json.dumps(rec), 'PUBLICATION_REQUEST': json.dumps(bad)}):
+                    with self.assertRaises(ValueError): publication.request()
+
+    def test_original_failed_artifact_and_request_are_bound_without_rewriting_receipts(self):
+        for corruption in (None, 'request', 'prefix', 'approval', 'run'):
+            with self.subTest(corruption=corruption), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary); rec, r, old, p, reg, bodies, github, prior = self.fixture(root)
+                if corruption == 'request': prior['PUBLICATION-RESULT.json']['publication_request_sha256'] = '0'*64
+                if corruption == 'prefix': prior['REGISTRY-RESULT.json']['packages'].append({'name': 'yetlet-core'})
+                raw = self.prior_zip(prior); api = self.prior_api(r, raw)
+                if corruption == 'approval': api['/actions/runs/31/approvals'][0]['user']['id'] = 1
+                if corruption == 'run': api['/actions/runs/31/attempts/1']['conclusion'] = 'success'
+                work = root/'work'; work.mkdir()
+                with (patch.object(publication.pub, 'api', side_effect=lambda path: api[path]),
+                      patch.object(publication.s, 'download', return_value=raw),
+                      patch.object(publication, 'distribution', return_value=(p, {}, reg, bodies)) as derive,
+                      patch.object(publication.pub, 'operate') as mutate):
+                    if corruption:
+                        with self.assertRaises(ValueError): publication.continuation_distribution(r, work)
+                    else:
+                        actual = publication.continuation_distribution(r, work)
+                        self.assertEqual(actual, (p, {}, reg, bodies, github))
+                        self.assertEqual(derive.call_args.args[0], old)
+                        for name, value in prior.items():
+                            self.assertEqual((work/'prior'/name).read_bytes(), records.canonical(value))
+                mutate.assert_not_called()
+
+    def test_published_asset_identity_and_content_drift_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            _, _, _, p, _, _, previous, _ = self.fixture(Path(temporary))
+            assets = [dict(a, state='uploaded', digest='sha256:'+a['sha256']) for a in previous['assets']]
+            for corruption in (None, 'id', 'digest'):
+                actual = copy.deepcopy(assets)
+                if corruption == 'id': actual[0]['id'] += 100
+                if corruption == 'digest': actual[0]['digest'] = 'sha256:'+'0'*64
+                with patch.object(publication.pub, 'release', return_value={'assets': actual}), \
+                        patch.object(publication.pub, 'operate') as mutate:
+                    if corruption:
+                        with self.assertRaises(ValueError): publication.published_release(p, previous)
+                    else:
+                        self.assertFalse(publication.published_release(p, previous)['github_mutations'])
+                mutate.assert_not_called()
+
+    def test_registry_only_branch_never_stages_or_publishes_github(self):
+        for mode in ('preflight', 'publish'):
+            with self.subTest(mode=mode), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary); _, r, _, p, reg, bodies, previous, _ = self.fixture(root)
+                selection = {k:r['continuation'][k] for k in ('existing', 'remaining')}
+                with (patch.object(publication.sys, 'argv', ['release-publish.py', mode]),
+                      patch.dict(os.environ, {'PUBLICATION_OUTPUT': str(root/'output'),
+                                             'GITHUB_STEP_SUMMARY': str(root/'summary')}),
+                      patch.object(publication, 'request', return_value=r),
+                      patch.object(publication.s, 'outside', side_effect=Path), patch.object(publication, 'gate'),
+                      patch.object(publication, 'continuation_distribution', return_value=(p, {}, reg, bodies, previous)),
+                      patch.object(publication, 'published_release', return_value={'github_mutations': False}),
+                      patch.object(registry, 'reconcile', return_value={'name': 'yetlet-actions'}),
+                      patch.object(registry, 'publish', return_value={'status': 'registry_verified_consumer_pending'}) as upload,
+                      patch.object(publication, 'consumer', return_value={'status': 'PASS'}) as consumer,
+                      patch.object(publication.pub, 'operate') as mutate):
+                    publication.main()
+                mutate.assert_not_called()
+                proof = json.loads((root/'output/PUBLICATION-RESULT.json').read_text())
+                self.assertFalse((root/'output/GITHUB-PUBLICATION.json').exists())
+                if mode == 'publish':
+                    self.assertEqual(upload.call_args.kwargs['selection'], selection)
+                    self.assertTrue(callable(upload.call_args.kwargs['before_put']))
+                    consumer.assert_called_once_with(record()['version'], root/'output')
+                    self.assertEqual(proof['github'], 'existing_public_release_verified')
+                    self.assertEqual(proof['status'], 'complete')
+                    self.assertTrue((root/'output/GITHUB-PRESERVED.json').is_file())
+                else:
+                    upload.assert_not_called(); consumer.assert_not_called()
+                    self.assertEqual(proof['status'], 'preflight_pass')
+                    self.assertEqual((proof['github'], proof['registry']), ('not_attempted', 'not_attempted'))
+
+    def test_fifteen_waits_recheck_authority_and_release_before_each_unique_put(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); _, r, _, p, reg, bodies, previous, _ = self.fixture(root)
+            events = []
+            def upload(plan, raw, receipt, *, selection, before_put):
+                self.assertEqual(selection['remaining'], [row['name'] for row in plan['packages'][1:]])
+                for row in plan['packages'][1:]:
+                    before_put(row)
+                    events.append(('put', row['name']))
+                return {'status': 'registry_verified_consumer_pending'}
+            with (patch.object(publication.sys, 'argv', ['release-publish.py', 'publish']),
+                  patch.dict(os.environ, {'PUBLICATION_OUTPUT': str(root/'output')}),
+                  patch.object(publication, 'request', return_value=r),
+                  patch.object(publication.s, 'outside', side_effect=Path),
+                  patch.object(publication, 'gate', side_effect=lambda *args: events.append(('gate', None))),
+                  patch.object(publication, 'continuation_distribution', return_value=(p, {}, reg, bodies, previous)),
+                  patch.object(publication, 'published_release', side_effect=lambda *args: events.append(('release', None)) or {}),
+                  patch.object(registry, 'reconcile', return_value={'name': 'yetlet-actions'}),
+                  patch.object(publication.time, 'sleep', side_effect=lambda seconds: events.append(('sleep', seconds))),
+                  patch.object(registry, 'publish', side_effect=upload),
+                  patch.object(publication, 'consumer', return_value={'status': 'PASS'})):
+                publication.main()
+            paced = events[next(i for i, event in enumerate(events) if event[0] == 'sleep'):]
+            expected = []
+            for name in r['continuation']['remaining']:
+                expected.extend([('sleep', 660), ('gate', None), ('release', None), ('put', name)])
+            self.assertEqual(paced, expected)
+            proof = json.loads((root/'output/CONTINUATION-PLAN.json').read_text())
+            self.assertEqual((proof['scheduled_wait_seconds'], proof['job_timeout_minutes']), (9900, 210))
+
+    def test_new_owner_approval_and_readonly_job_are_required(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            _, r, *_ = self.fixture(Path(temporary))
+            env = {'GITHUB_EVENT_NAME': 'workflow_dispatch', 'GITHUB_REPOSITORY': 'bohewu/yetlet',
+                'GITHUB_REPOSITORY_ID': '1409587171', 'GITHUB_REPOSITORY_OWNER_ID': '35250002',
+                'GITHUB_REF': 'refs/heads/master', 'GITHUB_SHA': r['publication_commit'],
+                'PUBLICATION_WORKFLOW_SHA': r['publication_commit'],
+                'PUBLICATION_WORKFLOW_REF': 'bohewu/yetlet/.github/workflows/release-publish.yml@refs/heads/master',
+                'GITHUB_RUN_ATTEMPT': '1', 'GITHUB_RUN_ID': '41', 'GITHUB_JOB': 'registry-continuation'}
+            for job, owner in [('publish', 35250002), ('registry-continuation', 1), ('registry-continuation', 35250002)]:
+                api = {'/branches/master': {'protected': True, 'commit': {'sha': r['publication_commit']}},
+                    '/environments/release-publish': {'id': 44},
+                    '/actions/runs/41/approvals': [{'state': 'approved', 'user': {'id': owner}, 'environments': [{'id':44}]}]}
+                with (patch.dict(os.environ, dict(env, GITHUB_JOB=job), clear=True),
+                      patch.object(publication.policy, 'automatic', return_value=True),
+                      patch.object(publication.policy, 'ci'), patch.object(publication.s, 'environment_gate'),
+                      patch.object(publication.s, 'run_gate'), patch.object(publication.s, 'artifact_gate'),
+                      patch.object(publication.subprocess, 'check_output', return_value=r['publication_commit']),
+                      patch.object(publication.pub, 'api', side_effect=lambda path: api.get(path, {}))):
+                    if job == 'registry-continuation' and owner == 35250002: publication.gate(r, True)
+                    else:
+                        with self.assertRaises(ValueError): publication.gate(r, True)
 
 
 class PolicyTests(unittest.TestCase):

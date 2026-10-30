@@ -2,8 +2,8 @@
 //! No optional Session, request ID, database, DOM or WASM dependencies.
 
 use axum::{Router, extract::Path};
-use yetlet_core::{Element, View};
-use yetlet_server_axum::{App, Page};
+use yetlet::server_axum::{App, Page};
+use yetlet::view::{Element, View};
 
 async fn home() -> View {
     Element::new("main")

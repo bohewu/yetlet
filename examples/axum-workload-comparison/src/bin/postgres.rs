@@ -20,7 +20,7 @@ use std::{
     time::Duration,
 };
 use tokio::time::timeout;
-use yetlet_server_axum::App;
+use yetlet::server_axum::App;
 
 const QUERY: &str = "SELECT id, random_number FROM public.world WHERE id = $1";
 const ACQUIRE_MS: u64 = 250;

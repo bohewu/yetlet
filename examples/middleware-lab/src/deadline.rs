@@ -4,7 +4,7 @@ use std::time::Duration;
 
 use axum::{BoxError, Router, error_handling::HandleErrorLayer, http::StatusCode};
 use tower::{ServiceBuilder, timeout::TimeoutLayer};
-use yetlet_server_axum::middleware::with_global;
+use yetlet::server_axum::middleware::with_global;
 
 /// Explicitly bound service execution until a response is returned.
 ///

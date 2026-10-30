@@ -10,7 +10,7 @@ mod browser {
 
     use wasm_bindgen::{JsCast, JsValue, closure::Closure, prelude::wasm_bindgen};
     use web_sys::{Event, HtmlInputElement};
-    use yetlet_dom::mount as mount_view;
+    use yetlet_browser::dom::mount as mount_view;
     use yetlet_todo_ui::{decode_search_state, filtered_todos, search_results};
 
     struct InputBinding {

@@ -35,10 +35,10 @@ use serde::Deserialize;
 use sessions::{Manager as SessionManager, ProtectedSession, Session};
 use std::{convert::Infallible, net::SocketAddr, path::Path, sync::Arc, time::Duration};
 use tokio::sync::{Semaphore, watch};
-use yetlet_core::View;
-use yetlet_server_axum::{
+use yetlet::server_axum::{
     App, DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document_with_metadata,
 };
+use yetlet::view::View;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Failure {
@@ -114,7 +114,7 @@ impl IntoResponse for Failure {
         }
         let mut response = (
             self.status(),
-            yetlet_server_axum::Page::with_metadata(
+            yetlet::server_axum::Page::with_metadata(
                 DocumentMetadata::with_language(
                     "Lab Operations",
                     LanguageTag::new("en").expect("static language"),
@@ -435,7 +435,7 @@ impl Board {
                         // MethodRouter leaves its native 405 fallback outside Auth.
                         return methods.route_layer(from_fn_with_state(
                             authentication.clone(),
-                            yetlet_auth::authenticate,
+                            yetlet::auth::authenticate,
                         ));
                     }
                     methods
@@ -495,7 +495,7 @@ impl Board {
             app
         };
         let router =
-            yetlet_server_axum::middleware::with_global(app, from_fn_with_state(state, security));
+            yetlet::server_axum::middleware::with_global(app, from_fn_with_state(state, security));
         Ok(Self {
             router,
             database,
