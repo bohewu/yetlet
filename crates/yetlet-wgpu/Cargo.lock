@@ -693,7 +693,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-wgpu"
-version = "0.9.0-alpha.3"
+version = "0.9.0-alpha.4"
 dependencies = [
  "wasm-bindgen",
  "web-sys",

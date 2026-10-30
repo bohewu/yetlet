@@ -1,5 +1,12 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**Alpha.4 preparation (2026-10-30):**
+[Sixteen-package version preflight](ALPHA4-VERSION-PREFLIGHT.md) coordinates
+manifests, internal requirements and local lock versions without third-party
+upgrades. Affected package/consumer/version checks and independent Reviewer PASS0;
+accepted unaffected evidence is retained. Candidate selection, Git delivery, tag/hosted/signing and
+publication remain separate; YT-020 stays Blocked.
+
 
 **Release automation / registry followup (2026-10-30):** the owner-selected
 [single publication gate](RELEASE-PUBLICATION.md) keeps build, signer, independent

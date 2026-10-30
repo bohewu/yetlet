@@ -1,6 +1,6 @@
 # yetlet-html
 
-**Experimental `0.9.0-alpha.3`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
+**Experimental `0.9.0-alpha.4`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
 
 `yetlet-html` serializes a `yetlet-core::View` into escaped HTML on native Rust. Its only dependency is `yetlet-core`; it installs no HTTP server or browser runtime.
 
