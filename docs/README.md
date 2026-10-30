@@ -37,6 +37,18 @@ distribution versus historical qualification to [Release readiness](RELEASE-READ
 - [New-version release workflow](RELEASING.md): one-time setup versus each version,
   immutable C/S, protected jobs, exact approvals, independent verification and
   publication; distinguishes installed tooling from Pending hosted qualification.
+- [Single-gate release automation and registry promotion](RELEASE-PUBLICATION.md):
+  automated build/sign/verification, final owner-approved GitHub then crates.io
+  publication, local implementation and one-time rollout limits.
+- [Sixteen-package crates.io readiness](YT-020-REGISTRY-READINESS.md): live name
+  and public-account observations, dependency order, first-publication bootstrap
+  and remaining registry-only evidence; no upload authorization.
+- [Config/Secrets first-publication contract](YT-020-FIRST-PUBLISH-CONTRACT.md):
+  unchanged manifests, local normal publish dry-runs and their artifact/checksum
+  limits; registry activation remains separate.
+- [Formal registry publication and artifact binding](YT-020-REGISTRY-PUBLICATION-CONTRACT.md):
+  selected dependency correction/order, sixteen frozen artifacts, exact-byte API
+  promotion and bounded isolated prototype results; actual upload remains gated.
 - [Alpha.3 hosted record and prepare scope](ALPHA3-HOSTED-RECORD.md): actual C,
   build/readback/retention results and the owner-approved batch ending at prepare.
 - [Alpha.3 version/package preflight](ALPHA3-VERSION-PREFLIGHT.md): retained

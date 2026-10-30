@@ -104,7 +104,7 @@ fn fixture(source: &Path) {
             "yetlet-server-axum" => manifest.push_str(&format!("\n[dependencies]\n{}{}", dep("yetlet-core"), dep("yetlet-html"))),
             "yetlet-request-id" | "yetlet-session" | "yetlet-session-redis" => manifest.push_str(&format!("\n[dependencies]\n{}", dep("yetlet-server-axum"))),
             "yetlet-auth" => manifest.push_str(&format!("\n[features]\ndefault=[]\nsession=[\"dep:yetlet-session\"]\n[dependencies]\nyetlet-session={{version=\"{version}\",path=\"../yetlet-session\",optional=true}}\n")),
-            "yetlet-rate-limit" | "yetlet-secrets" => manifest.push_str(&format!("\n[dev-dependencies]\n{}", dep("yetlet-config"))),
+            "yetlet-rate-limit" => manifest.push_str(&format!("\n[dev-dependencies]\n{}", dep("yetlet-config"))),
             "yetlet-config" => manifest.push_str(&format!("\n[features]\ndefault=[]\nsecret-provider=[\"dep:yetlet-secrets\"]\n[dependencies]\nyetlet-secrets={{version=\"{version}\",path=\"../yetlet-secrets\",optional=true}}\n")),
             _ => {}
         }
@@ -152,14 +152,14 @@ fn selected_sixteen_inputs_bind_isolated_locks_without_widening_legacy_aliases()
 }
 
 #[test]
-fn cargo_steps_keep_collection_separate_from_locked_default_verification() {
+fn cargo_steps_verify_once_and_stage_final_dependency_checksums() {
     let legacy = private::cargo_steps(Path::new("source"), Path::new("work"), Cohort::OriginalNine);
     assert_eq!(legacy.len(), 2);
     assert_eq!(legacy[0].0, "fetch");
     assert_eq!(legacy[1].0, "package");
     assert_eq!(legacy[1].1.iter().filter(|a| *a == "-p").count(), 9);
     let steps = private::cargo_steps(Path::new("source"), Path::new("work"), Cohort::Sixteen);
-    assert_eq!(steps.len(), 33);
+    assert_eq!(steps.len(), 17);
     assert_eq!(steps[0].1.iter().filter(|a| *a == "--sync").count(), 5);
     for (label, args) in &steps[1..] {
         assert!(args.iter().any(|a| a == "--offline"));
@@ -258,8 +258,8 @@ fn real_cargo_sixteen_alpha_packages_and_normal_verification_refusal() {
         assert!(staged.join(".cargo-checksum.json").is_file());
         assert_eq!(record[format!("package-{name}_exit_code")], 0);
         assert_eq!(
-            record["bootstrap_staging"][*name],
-            json!({"ok":true,"verification":false})
+            record["verified_staging"][*name]["verification"],
+            json!(true)
         );
     }
     // This new negative input must fail normal verification; do not repeat the full pipeline.

@@ -1,6 +1,7 @@
 name: Independently verify frozen signing results
 
-# Integration only. Environment/Secret provisioning and each run require owner authority.
+# Automated independent worker under the reviewed single-publication policy.
+# Environment/Secret rollout remains separate from this local implementation.
 # No signing/OIDC permission, public upload, registry operation or automatic trigger.
 on:
   workflow_dispatch:
@@ -23,6 +24,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  RELEASE_AUTOMATION: single-publication-v1
   RELEASE_RECORD: ${{ inputs.record }}
   RESULT_REQUEST: ${{ inputs.request }}
   RESULT_WORKFLOW_SHA: ${{ github.workflow_sha }}
@@ -84,6 +86,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           RESULT_WORK: ${{ runner.temp }}/result-work
           RESULT_OUTPUT: ${{ runner.temp }}/RESULT-VERIFICATION.json
+          RESULT_PUBLIC_OUTPUT: ${{ runner.temp }}/verified-publication
           RESULT_TOOLS: ${{ runner.temp }}/result-tools
           SIGN_AGE: ${{ runner.temp }}/result-tools/age-tools/age/age
         shell: bash
@@ -102,10 +105,18 @@ jobs:
           path: ${{ runner.temp }}/RESULT-VERIFICATION.json
           if-no-files-found: error
           retention-days: 7
+      - name: Export exact verified public projection for the final publication gate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: verified-publication-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/verified-publication/
+          if-no-files-found: error
+          retention-days: 7
       - name: Remove isolated tools, key and plaintext after every outcome
         if: always()
         shell: bash
         run: |
           set -euo pipefail
           rm -rf "$RUNNER_TEMP/result-work" "$RUNNER_TEMP/result-tools"
+          rm -rf "$RUNNER_TEMP/verified-publication"
           rm -f "$RUNNER_TEMP/RESULT-VERIFICATION.json"

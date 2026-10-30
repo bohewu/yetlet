@@ -1,7 +1,7 @@
 name: Prepare or sign frozen release inputs
 
 # Integration only: execution, release-sign Environment/Secret setup and exact
-# D6 signing input approval require separate owner authority. Never auto-trigger.
+# signing inputs require reviewed automation authority. Never trigger on push/PR.
 on:
   workflow_dispatch:
     inputs:
@@ -23,6 +23,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  RELEASE_AUTOMATION: single-publication-v1
   RELEASE_RECORD: ${{ inputs.record }}
   SIGN_REQUEST: ${{ inputs.request }}
   SIGN_WORKFLOW_SHA: ${{ github.workflow_sha }}

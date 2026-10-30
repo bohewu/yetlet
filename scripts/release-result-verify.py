@@ -48,6 +48,8 @@ def gate(r):
     identity(r)
     branch = s.api.api('/branches/master')
     s.require(branch['protected'] is True and branch['commit']['sha'] == r['verifier_commit'])
+    if s.policy.automatic():
+        s.policy.ci(r['verifier_commit'], s.api.api)
     env = s.api.api('/environments/' + ENVIRONMENT)
     policies = s.api.api('/environments/' + ENVIRONMENT + '/deployment-branch-policies?per_page=100')
     s.environment_gate(env, policies, ENVIRONMENT)
@@ -147,12 +149,36 @@ def main():
         download(r, work)
         return
     output = s.outside(os.environ['RESULT_OUTPUT'])
+    public = s.outside(os.environ['RESULT_PUBLIC_OUTPUT']) if s.policy.automatic() else None
     try:
         gate(r)  # Recheck exact V and metadata in protected no-OIDC job.
         proof = verify(r, work, Path(os.environ['RESULT_TOOLS']))
+        if public is not None:
+            export_public(work, public)
+    except Exception:
+        if public is not None and public.exists():
+            shutil.rmtree(public)
+        raise
     finally:
         shutil.rmtree(work)  # A cleanup failure prevents receipt output and success.
     s.json_write(output, proof)
+    if public is not None:
+        s.json_write(public / 'RESULT-VERIFICATION.json', proof)
+
+
+def export_public(work, output):
+    """Closed public projection only; never copy a private manifest or private bundle."""
+    output.mkdir(mode=0o700)
+    original = work / 'assembly'
+    names = {n + '-' + s.RECORD['version'] + '.crate' for n in s.PACKAGES} | {'PROVENANCE-UNSIGNED.json'}
+    entries = []
+    for name in sorted(names):
+        raw = s.read(original / name)
+        s.write(output / name, raw)
+        entries.append({'path': name, 'size': len(raw), 'sha256': s.sha(raw)})
+    s.json_write(output / s.MANIFEST, {'schema_version': 1, 'notice': s.checksums.NOTICE,
+                                      'artifacts': entries})
+    s.write(output / 'provenance.sigstore.json', s.read(work / 'results/provenance.sigstore.json'))
 
 
 if __name__ == '__main__':

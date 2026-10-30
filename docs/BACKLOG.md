@@ -1,5 +1,68 @@
 # Yetlet Backlog
 
+
+**YT-020 / YT-209 local followup (2026-10-30):** the owner selected automated
+build/sign/verification and one final combined GitHub/crates.io publication gate.
+[Implementation and rollout](RELEASE-PUBLICATION.md) removes the Config/Secrets
+first-name cycle, stages normally verified predecessor archives and adds frozen
+exact-byte registry promotion. Local verification/review is tracked separately
+from hosted installation. YT-020 remains Blocked pending actual registry
+activation, credential authority, new candidate/artifact freeze and readback.
+Existing release acceptance and historical failures are preserved.
+
+**YT-020 formal registry contract (2026-10-30):** The five dependency-study
+documents committed as `15abc44` after strict/builtin Guard/native hook PASS,
+no Push; the prose-only initial Guard refusal remains. The
+[formal publication and sixteen-artifact contract](YT-020-REGISTRY-PUBLICATION-CONTRACT.md)
+accounts for registry checks on development dependency names: move the Settings
+state example to Config and remove Secrets' reverse development edge, then
+prepare normally verified final artifacts in all-kind order and promote frozen
+bytes through the official publish API. The isolated prototype has sixteen
+nodes/seventeen declarations/no cycle; two metadata observations, relocated
+test-target compile without execution and sixteen offline exact-byte envelope
+previews PASS. Current manifests/runtime/locks are unchanged. Owner reports
+existing Cargo login; token rights were not inspected. R/V/source preparation,
+reviewed live transport, actual artifact freeze/registry activation remain open.
+Independent re-review PASS0 after a retained P2 correction separating frozen
+plans from subsequent receipts; five source hashes match, cleanup PASS.
+YT-020 Blocked.
+
+**YT-020 first-publication dependency contract (2026-10-30):** Five inventory
+documents committed as `d71d976` with strict/builtin Guard/hook PASS, no Push.
+The [unchanged-input contract and dry-runs](YT-020-FIRST-PUBLISH-CONTRACT.md)
+retain Config/Secrets manifests and use accepted archive directory sources:
+Secrets and Config/secret-provider normal publish verification PASS, no upload.
+Offline preflight and first Config rustup failures remain; only failed Config
+was repeated with pinned compiler. Both output archives differ from accepted
+signed bytes solely by four Yetlet packaged-lock checksum fields each. This is
+local dependency-path evidence, not an upload-ready sixteen-package set. Registry
+artifact/checksum policy, source/authority, credentials and actual registry proof
+remain open. Independent Reviewer PASS0, all five source hashes unchanged;
+owned temporary directories removed with evidence retained. YT-020 Blocked.
+
+**YT-020 registry inventory (2026-10-30):** The seven reviewed upload-tool/SOP
+paths are committed locally as `6371ba8` after strict/builtin Guard and native
+hook PASS; no Push. The [sixteen-package inventory](YT-020-REGISTRY-READINESS.md)
+finds all sixteen requested crates.io names absent in public GET observations
+and confirms the public `bohewu` account, without proving name claimability or
+credential rights. Normal/build dependencies form five layers; Config/Secrets
+versioned development dependencies and five independent workspaces need a
+first-publication bootstrap plan. Reuse accepted alpha.3 evidence; registry
+source/authority, authenticated rights, publish preflight, archive identity and
+actual registry download/resolution remain open. No upload or repeated product
+verification; YT-020 remains Blocked.
+
+**Alpha.3 publication and YT-209 maintenance (2026-10-30):**
+[Actual signing/result/publication](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30)
+complete at fixed C `557ab76`, S/V `30baf25`: both signatures, all16 package
+subjects/all112 private entries, protected cleanup and exact20 authenticated/
+anonymous public downloads PASS. Existing Release428536609 is an Experimental
+prerelease, not Latest. Original failed Python upload/zero-asset snapshot remains;
+owner-approved `gh api` recovery completes delivery without another signature or
+publication attempt. YT-209's maintenance makes this upload path canonical and
+documents actual human gates; focused verification/independent review are its
+acceptance conditions. No new live release or registry operation; YT-020 Blocked.
+
 **Alpha.3 hosted custody and prepare grant (2026-10-30):** The
 [actual record](ALPHA3-HOSTED-RECORD.md) fixes C `557ab76` / tree `c890b4c`,
 PR23 squash Merge, both PR/master CI jobs PASS, immutable unsigned alpha.3 tag,
@@ -240,7 +303,7 @@ Priority: `P0` is the critical path, `P1` is required for the MVP, and `P2` cove
 | YT-017 | P1 | M | M3 | Island state schema/version/security | YT-012 | Bounded v1 JSON, HTML escaping, invalid state tests and Chrome fail-closed SSR fallback PASS | Done |
 | YT-018 | P1 | M | M4 | Strict CSP and browser security verification | YT-013, YT-016, YT-017 | Headless Chrome/CSP, JSON errors, origin/media/body limits PASS at anonymous prototype scope | Done |
 | YT-019 | P1 | L | M5 | Cross-target/E2E tests and performance baseline | YT-006, YT-010, YT-013, YT-016, YT-018 | [M5 verification](M5-VERIFICATION.md): A01–A10 local proof, release metrics, Chrome 155/Firefox 157 smoke | Done |
-| YT-020 | P1 | S | M5 | Build/run docs and release readiness | YT-019 | [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [hosted rebuilding](YT-020-HOSTED-REBUILD.md), [trust/registry policy](YT-020-PRIVATE-TRUST-POLICY.md) and [actual Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md): dedicated key/fingerprint, three signatures, separate public-only verification and six negative cases pass; formal source/tag/identity/certificate/log/builder trust, registry/reporting/scanner gates and explicit activation approval remain open | Blocked |
+| YT-020 | P1 | S | M5 | Build/run docs and release readiness | YT-019 | Historical [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [hosted rebuilding](YT-020-HOSTED-REBUILD.md), [trust policy](YT-020-PRIVATE-TRUST-POLICY.md) and [Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md) retain their scope. Later [alpha.3 signing/verification/GitHub publication](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30) remain accepted at fixed C/S. [Inventory](YT-020-REGISTRY-READINESS.md) and [local dry-runs](YT-020-FIRST-PUBLISH-CONTRACT.md) retain their exact limits. The [formal registry contract](YT-020-REGISTRY-PUBLICATION-CONTRACT.md) selects corrected all-kind dependency ordering, new R/V preparation and frozen sixteen-artifact API promotion; isolated graph/metadata/relocated compile and offline envelope previews PASS. Independent re-review PASS0 after retained plan/receipt P2 correction, five source hashes match, cleanup PASS. Actual source correction, normally verified final artifact preparation, reviewed live transport, R/V/artifact freeze, authenticated rights, upload authority and downloaded registry consumer remain open; current Cargo login is owner-reported complete, token rights unverified. No actual registry upload or old qualification replay | Blocked |
 | YT-021 | P2 | M | Later | Streaming SSR benchmark | YT-006 | [Bounded incremental SSR research](YT-021-STREAMING-SSR-RESEARCH.md): equivalent escaped fragments, barrier/error proof, matched HTTP first-body/completion/throughput measurements; app-owned prototype retained, core promotion rejected | Done |
 | YT-022 | P2 | L | Later | Serializable handler/resumability spike | YT-017 | [Bounded resumability research](YT-022-RESUMABILITY-RESEARCH.md): finite versioned handlers, constrained numeric capture round trips, rejection/trust tests and native encoded-size/cost measurements; app-owned descriptor pattern retained, generic/core promotion rejected | Done |
 | YT-023 | P2 | L | Later | Independent WebGPU scene renderer spike | YT-009 | [Bounded native scene research](YT-023-WEBGPU-RESEARCH.md): opt-in wgpu/Vulkan instanced draw and all-center readback at 10k/50k/100k, raw completion-wall-time and explicit allocation-byte observations; retain app-owned prototype, reject core/browser-portability promotion | Done |
@@ -732,7 +795,7 @@ separate implementation authority.
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
 | YT-208 | P2 | S | M10 | Maintainer development and new-version release SOP | YT-096, YT-207 | [Development](DEVELOPMENT.md) and [release](RELEASING.md) guides separate normal PR work, one-time setup, per-version source/evidence/approval steps and failure-only recovery. Current distribution/navigation reconciled; C/S, strict/builtin, key/publication boundaries and original histories preserved; YT-209 remains explicitly future tooling. Independent Reviewer PASS0, zero issues/required followups, verifies all ten incremental hashes, new-guide structure/local links/anchors and current workflow/helper/policy correspondence. Fixed75-document/209-item check and tracked/new-file whitespace PASS; original four D6-only files unchanged and prior Backlog/Roadmap content preserved. Only completion metadata changes after review; no runtime/workflow/environment, old qualification replay, Git or distribution action | Done |
-| YT-209 | P2 | M | M10 | Versioned release inputs and protected result-verification automation | YT-208 | Observed [tooling gaps](RELEASING.md#existing-workflow-map-and-limits): review a data-only per-version record to replace scattered alpha C/tag/run/artifact constants; separately protected independent signing-result verification; exact Release-ID-based public staging/publication/readback with preserved tag/C and a closed allowlist. Preserve strict/builtin/hooks, C/S identity, key isolation, explicit owner gates, immutable old results and bounded failure handling. No arbitrary executable input, default framework dependency, automatic signing/registry upload or reuse of the spent local-key exception. [Contract and implementation](YT-209-RELEASE-AUTOMATION.md): strict schema-1 record replaces scattered alpha bindings; source-derived Cargo/tag identities and complete-record receipt hashes; independent protected V verifier has no OIDC/signing and validates original S bundles/all entries before safe receipt; exact Release-ID public staging/readback/publication has closed20 assets and explicit owner confirmation. 23 new Python +5 affected signer +2 affected Rust checks, docs/format/syntax PASS; two fixture failures/corrections retained. Initial contract/final independent Reviewer PASS0 matched the original17-file frozen boundary; initial acceptance and failed PR20 run retained; compatibility repair Reviewer PASS0 and both required new-source CI jobs40873628263/1 PASS. Owner-approved squash Merge7de77c8/tree95c65e7 matches qualified head. Protected result Environment25684187945 and existing AGE_IDENTITY installation/readback PASS; other Environments and identity unchanged. Positive release-result hosted qualification remains Pending. Key read only for approved Secret installation; no local private-evidence decryption, release dispatch, new tag, signing or publication | Done |
+| YT-209 | P2 | M | M10 | Versioned release inputs and protected result-verification automation | YT-208 | Observed [tooling gaps](RELEASING.md#existing-workflow-map-and-limits): review a data-only per-version record to replace scattered alpha C/tag/run/artifact constants; separately protected independent signing-result verification; exact Release-ID-based public staging/publication/readback with preserved tag/C and a closed allowlist. Preserve strict/builtin/hooks, C/S identity, key isolation, explicit owner gates, immutable old results and bounded failure handling. No arbitrary executable input, default framework dependency, automatic signing/registry upload or reuse of the spent local-key exception. [Contract and implementation](YT-209-RELEASE-AUTOMATION.md): strict schema-1 record replaces scattered alpha bindings; source-derived Cargo/tag identities and complete-record receipt hashes; independent protected V verifier has no OIDC/signing and validates original S bundles/all entries before safe receipt; exact Release-ID public staging/readback/publication has closed20 assets and explicit owner confirmation. 23 new Python +5 affected signer +2 affected Rust checks, docs/format/syntax PASS; two fixture failures/corrections retained. Initial contract/final independent Reviewer PASS0 matched the original17-file frozen boundary; initial acceptance and failed PR20 run retained; compatibility repair Reviewer PASS0 and both required new-source CI jobs40873628263/1 PASS. Owner-approved squash Merge7de77c8/tree95c65e7 matches qualified head. Protected result Environment25684187945 and existing AGE_IDENTITY installation/readback PASS; other Environments and identity unchanged. At that setup checkpoint positive hosted verification was Pending; alpha.3 result40983028507/1 subsequently PASS at the [recorded scope](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30). Key read only for approved Secret installation; no local private-evidence decryption, release dispatch, new tag, signing or publication | Done |
 
 ## YT-096 hosted build, verifier and retention — 2026-10-28
 

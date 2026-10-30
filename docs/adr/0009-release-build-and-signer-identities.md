@@ -99,3 +99,25 @@ retry. Real local transfer/test-key proof and focused cases exist; independent
 review PASS0 accepts the local implementation. This amendment records the local correction, not new Git,
 source-S, hosted, formal-key, signing or publication authority. Original failures
 and earlier independent results retain their historical scope.
+
+## Single publication policy amendment — 2026-10-30
+
+The owner selected assistant-operated build, preparation, signing and independent
+verification, with one human approval for final combined GitHub/crates.io
+publication. [The implementation and rollout contract](../RELEASE-PUBLICATION.md)
+supersedes the earlier requirement for an owner click on each key-bearing job
+for future executions using this reviewed policy. It does not rewrite the
+historical manual approvals or completed release evidence above.
+
+Keep immutable C, distinct S, both frozen payload hashes, public identity/log
+disclosure, isolation/key cleanup before OIDC and a separate no-OIDC independent
+verifier V. Standing automation authority is limited to the already reviewed
+identity/disclosure scope; request data cannot change the committed policy.
+The final publisher P has a separate owner-reviewed Environment and registry
+token, no age identity or OIDC. It rechecks exact-source CI and original verifier
+artifacts, publishes/readbacks GitHub first, then promotes identical registry
+bytes. Partial publication is retained as incomplete without automatic retries.
+
+This is local policy/code integration. Existing remote Environment reviewers
+remain until separately delivered configuration rollout; no tag, hosted job,
+signing or publication is executed by this amendment. YT-020 remains Blocked.

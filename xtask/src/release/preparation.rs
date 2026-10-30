@@ -183,7 +183,7 @@ pub(super) fn finish(
         out,
         "INVENTORY-COVERAGE.json",
         &json!({
-            "scope":"sixteen Cargo source packages; 33 recipe phases including separate bootstrap collection and normal offline locked verification",
+            "scope":"sixteen Cargo source packages; 17 recipe phases with all-kind dependency order, normal offline locked verification and final predecessor checksums",
             "fresh_cargo_and_target":true,"hermetic_environment":false,
             "inventory":"selected source, six locks, recipe and tool hashes; not complete compiled/native/system closure",
             "qualification":"no new browser, CSP, Windows, GPU, security or operational qualification; historical evidence retains its original source and scope",

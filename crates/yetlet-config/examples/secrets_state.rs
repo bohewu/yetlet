@@ -52,7 +52,7 @@ struct AppState {
 
 fn loader() -> Loader {
     Loader::new(
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("examples/settings"),
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("examples/secrets-state-settings"),
         "YTSECRETS",
     )
 }

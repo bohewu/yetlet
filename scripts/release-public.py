@@ -5,6 +5,8 @@ import base64
 import importlib.util
 import os
 from pathlib import Path
+import re
+import subprocess
 import sys
 import urllib.error
 import urllib.parse
@@ -18,6 +20,35 @@ spec.loader.exec_module(s)
 API = s.api.API
 
 
+class UploadError(Exception):
+    """Only bounded transport diagnostics may leave the upload subprocess."""
+    def __init__(self, kind, http_status=None):
+        super().__init__('release asset upload rejected')
+        self.kind = kind
+        self.http_status = http_status
+
+
+def upload(url, body):
+    # Use the same GitHub CLI transport as the accepted alpha.3 delivery.
+    # Raw stdin preserves bytes; credentials stay in the existing environment.
+    try:
+        result = subprocess.run(['gh', 'api', '--method', 'POST', url,
+            '--header', 'Accept: application/vnd.github+json',
+            '--header', 'Content-Type: application/octet-stream', '--input', '-'],
+            input=body, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=120)
+    except subprocess.TimeoutExpired:
+        raise UploadError('timeout') from None
+    except OSError:
+        raise UploadError('unavailable') from None
+    if result.returncode:
+        codes = re.findall(rb'\(HTTP ([45][0-9]{2})\)', result.stderr)
+        raise UploadError('http' if codes else 'cli', int(codes[-1]) if codes else None)
+    try:
+        return s.load(result.stdout)
+    except (ValueError, RecursionError):
+        raise UploadError('response') from None
+
+
 def http(url, method='GET', body=None, binary=False, authenticated=True, redirects=0):
     s.require(redirects <= 3)
     headers = {'Accept': 'application/octet-stream' if binary else 'application/vnd.github+json',
@@ -26,6 +57,10 @@ def http(url, method='GET', body=None, binary=False, authenticated=True, redirec
         s.require(url.startswith(API + '/') or url.startswith(
             'https://uploads.github.com/repos/bohewu/yetlet/releases/'))
         headers['Authorization'] = 'Bearer ' + os.environ['GH_TOKEN']
+    if method == 'POST' and binary:
+        s.require(authenticated and url.startswith(
+            'https://uploads.github.com/repos/bohewu/yetlet/releases/'))
+        return upload(url, body)
     if body is not None:
         headers['Content-Type'] = 'application/octet-stream' if binary else 'application/json'
     request = urllib.request.Request(url, data=body, headers=headers, method=method)
@@ -59,9 +94,14 @@ def names():
 
 
 def plan(value):
-    s.require(type(value) is dict and set(value) == {'schema', 'record_sha256', 'release_id',
-        'name', 'notes_sha256', 'assets', 'verification_sha256', 'approval_sha256'})
-    s.require(type(value['schema']) is int and value['schema'] == 1)
+    fields = {'schema', 'record_sha256', 'release_id', 'name', 'notes_sha256', 'assets',
+              'verification_sha256', 'approval_sha256'}
+    s.require(type(value) is dict and type(value.get('schema')) is int and value['schema'] in (1, 2))
+    s.require(set(value) == fields | ({'registry_plan_sha256', 'publication_request_sha256'}
+                                    if value['schema'] == 2 else set()))
+    if value['schema'] == 2:
+        s.require(all(s.records.token(value[k], s.records.SHA)
+            for k in ('registry_plan_sha256', 'publication_request_sha256')))
     s.require(value['record_sha256'] == s.records.digest(s.RECORD) and value['release_id'] == str(s.RELEASE_ID))
     s.require(type(value['name']) is str and 0 < len(value['name']) <= 256
               and all(ord(c) >= 32 for c in value['name']))
@@ -97,12 +137,17 @@ def public_inputs(p, directory, notes, verification):
         blobs[a['name']] = raw
     s.require(s.sha(blobs['SIGNING-APPROVAL.json']) == p['approval_sha256'])
     approval = s.load(blobs['SIGNING-APPROVAL.json'])
-    s.require(approval == {'schema': 1, 'record_sha256': p['record_sha256'], 'source': s.C,
+    expected_approval = {'schema': 1, 'record_sha256': p['record_sha256'], 'source': s.C,
         'signer_commit': s.RECORD['signer_commit'], 'verification_sha256': p['verification_sha256'],
         'manifest_sha256': v['manifest_sha256'], 'provenance_bundle_sha256': v['provenance_bundle_sha256'],
         'accepted': True, 'scope': 'Experimental source packages', 'publication': 'GitHub pre-release',
-        'registry_upload': False})
-    s.require(approval['accepted'] is True and approval['registry_upload'] is False)
+        'registry_upload': False}
+    if p['schema'] == 2:
+        expected_approval.update({'schema': 2, 'publication': 'GitHub pre-release + crates.io',
+            'registry_upload': True, 'registry_plan_sha256': p['registry_plan_sha256'],
+            'publication_request_sha256': p['publication_request_sha256']})
+    s.require(approval == expected_approval)
+    s.require(approval['accepted'] is True)
     s.require(s.sha(blobs['provenance.sigstore.json']) == v['provenance_bundle_sha256'])
     bundle = s.load(blobs['provenance.sigstore.json'])
     s.require(base64.b64decode(bundle['dsseEnvelope']['payload'], validate=True) == blobs['PROVENANCE-UNSIGNED.json'])
@@ -118,11 +163,15 @@ def public_inputs(p, directory, notes, verification):
     return blobs
 
 
-def release(p, draft, authenticated=True):
+def tag(authenticated=True):
     tag = api('/git/ref/tags/' + s.TAG, authenticated)
     # Current unsigned lightweight-tag contract; never create or move a tag.
     s.require(tag['ref'] == 'refs/tags/' + s.TAG and tag['object'] == {'sha': s.C, 'type': 'commit',
               'url': 'https://api.github.com/repos/bohewu/yetlet/git/commits/' + s.C})
+
+
+def release(p, draft, authenticated=True):
+    tag(authenticated)
     r = api('/releases/' + str(s.RELEASE_ID), authenticated)
     s.require(r['id'] == s.RELEASE_ID and r['tag_name'] == s.TAG and r['target_commitish'] == s.C)
     s.require(r['draft'] is draft and r['prerelease'] is True and r['name'] == p['name'])
@@ -202,23 +251,38 @@ def main():
     output = s.outside(args.output)
     s.require(not output.exists())
     p = plan(s.load(s.read(args.plan)))
+    s.require(p['schema'] == 1)  # Combined distribution is gated only by release-publish.yml.
     notes = s.read(args.notes, 65536)
     verification = s.read(args.verification, 65536)
     blobs = public_inputs(p, Path(args.public_dir), notes, verification)
     try:
         result = operate(args.action, p, blobs, notes, args.confirm)
-    except Exception:
-        s.json_write(output, {'schema': 1, 'status': 'FAIL', 'action': args.action,
+    except Exception as error:
+        failure = {'schema': 1, 'status': 'FAIL', 'action': args.action,
             'record_sha256': p['record_sha256'], 'plan_sha256': s.records.digest(p),
             'release_id': str(s.RELEASE_ID), 'remote_partial_state_may_exist': True,
-            'automatic_retry': False, 'registry_upload': False})
+            'automatic_retry': False, 'registry_upload': False}
+        if isinstance(error, UploadError):
+            failure['transport_error'] = {'operation': 'upload', 'class': error.kind,
+                                          'http_status': error.http_status}
+        s.json_write(output, failure)
         raise
     s.json_write(output, result)
 
 
-if __name__ == '__main__':
+def cli():
     try:
         main()
+    except UploadError as error:
+        status = '' if error.http_status is None else ' http_status=' + str(error.http_status)
+        print('public release operation rejected; operation=upload class=' + error.kind + status +
+              '; inspect retained partial state, no retry', file=sys.stderr)
+        return 1
     except Exception:
         print('public release operation rejected; inspect retained partial state, no retry', file=sys.stderr)
-        sys.exit(1)
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(cli())

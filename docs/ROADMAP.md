@@ -1,5 +1,57 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+
+**Release automation / registry followup (2026-10-30):** the owner-selected
+[single publication gate](RELEASE-PUBLICATION.md) keeps build, signer, independent
+verifier and publisher privileges separate. Config/Secrets source-cycle repair
+and exact-byte promotion are local work; Environment rollout and actual
+registry proof remain open. This does not expand product support or mark
+YT-020 complete.
+
+**YT-020 registry method and artifact contract (2026-10-30):** The
+[formal contract](YT-020-REGISTRY-PUBLICATION-CONTRACT.md) resolves the policy:
+break the first-name development cycle by moving the Settings state example to
+Config, keep runtime/feature/workspace boundaries, prepare final artifacts in
+all-kind dependency order, bind all sixteen subjects to new R/V and promote the
+frozen bytes through the official API. Prototype metadata/compile and sixteen
+offline wire previews PASS; no old tests replayed or actual source/registry
+mutation. Existing Cargo login is reported complete; publishing rights remain
+unverified. Independent re-review PASS0 after the retained plan/receipt P2
+correction; all five source hashes match, temporary cleanup PASS.
+Implementation/freeze/live acceptance remain open, YT-020 Blocked. The five prior documents are committed as `15abc44`;
+no Push or new-change Commit.
+
+**YT-020 Config/Secrets local preflight (2026-10-30):** The
+[dependency contract](YT-020-FIRST-PUBLISH-CONTRACT.md) preserves manifests,
+features and source locks. Secrets and Config/secret-provider publish dry-runs
+normally verify using accepted archive directory sources, with explicit upload
+abort. Failed offline/configuration and Config rustup observations remain; no
+passed suite replay. Generated archives differ solely in internal packaged-lock
+checksums and cannot inherit old signatures. Next resolve the registry artifact/
+checksum contract, then rights/source/authority and actual registry proof.
+Independent Reviewer PASS0, all five reviewed source hashes match; temporary
+source, Cargo home, vendor and build cleanup PASS. YT-020 Blocked, no new Commit/Push or upload.
+
+**YT-020 registry next step (2026-10-30):** [Read-only sixteen-package
+inventory](YT-020-REGISTRY-READINESS.md) follows guarded local seven-path commit
+`6371ba8`, without Push. All requested names return not-found and the public
+publisher account exists; actual publishing rights/claimability remain
+unverified. Five normal/build layers do not resolve the Config/Secrets versioned
+development bootstrap across five independent workspaces. Plan and verify that
+missing registry path and archive-byte identity, then obtain actual upload
+authority; reuse the accepted alpha.3 build/platform/security/signing evidence.
+No new build, hosted run, signing or registry upload; YT-020 stays Blocked.
+
+**Alpha.3 publication and tooling maintenance (2026-10-30):**
+[Fixed C `557ab76`, S/V `30baf25`](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30):
+sign40982672108/1 and independent result40983028507/1 PASS, all16 subjects/all112
+private entries and cleanup. Existing alpha.3 Release428536609 is public with
+exact20 owner-approved files, authenticated/anonymous byte readback PASS and no
+Latest selection. First upload failure retained; accepted `gh api` recovery
+completes delivery. Local YT-209 maintenance standardizes upload transport and
+clarifies four protected approvals without changing Environment policy or
+replaying qualification. No new release or crates.io upload; YT-020 Blocked.
+
 **Alpha.3 hosted custody and prepare grant (2026-10-30):**
 [Actual C `557ab76` and immutable tag](ALPHA3-HOSTED-RECORD.md), PR23 Merge and
 both PR/master CI jobs PASS; build40906989456/1 and protected readback40908551139/1

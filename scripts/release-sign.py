@@ -33,6 +33,7 @@ spec = importlib.util.spec_from_file_location("custody_api", HERE / "release-evi
 api = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(api)
 import release_record as records
+import release_policy as policy
 
 # Bound once from the explicit validated record, never from an alpha fallback.
 RECORD = None
@@ -144,7 +145,7 @@ def validate_request(r):
         require(number(r[key]) if key in {"qualification_asset", "run", "attempt", "artifact"}
                 else digest(r[key]))
     if mode == "sign":
-        require(r["d6"] == "approve-exact-signing-inputs" and r["provenance_sha256"] == PUBLIC_SHA)
+        require(r["d6"] == ("reviewed-automation" if policy.automatic() else "approve-exact-signing-inputs") and r["provenance_sha256"] == PUBLIC_SHA)
     else:
         handoff_input(r)
     return r
@@ -307,12 +308,7 @@ def identity(r):
 
 def environment_gate(environment, policies, name="release-sign"):
     require(environment["name"] == name and environment["can_admins_bypass"] is False)
-    rules = [v for v in environment["protection_rules"] if v["type"] == "required_reviewers"]
-    require(len(rules) == 1 and rules[0]["prevent_self_review"] is False)
-    require(len(rules[0]["reviewers"]) == 1)
-    reviewer = rules[0]["reviewers"][0]
-    require(reviewer["type"] == "User" and reviewer["reviewer"]["login"] == "bohewu"
-            and reviewer["reviewer"]["id"] == 35250002)
+    policy.reviewers(environment, publication=name == "release-publish")
     require(environment["deployment_branch_policy"] ==
             {"protected_branches": False, "custom_branch_policies": True})
     require(policies["total_count"] == 1 and len(policies["branch_policies"]) == 1)
@@ -343,6 +339,10 @@ def gate(r, minimum_handoff_seconds=1200):
         stage = "branch"
         branch = api.api("/branches/master")
         require(branch["protected"] is True and branch["commit"]["sha"] == r["signer_commit"])
+        if policy.automatic():
+            stage = "source-ci"
+            policy.ci(C, api.api)
+            policy.ci(r["signer_commit"], api.api)
         stage = "environment"
         environment = api.api("/environments/release-sign")
         stage = "branch-policy"
@@ -367,10 +367,11 @@ def gate(r, minimum_handoff_seconds=1200):
                 api.api("/environments/release-evidence-verify/deployment-branch-policies?per_page=100"),
                 {"source": C, "tag": TAG, "run": BUILD, "attempt": BUILD_ATTEMPT,
                  "artifact": BUILD_ARTIFACT, "digest": BUILD_ZIP})
-            stage = "verifier-approval"
-            approvals = api.api("/actions/runs/" + VERIFIER + "/approvals")
-            require(any(a["state"] == "approved" and a["user"]["id"] == 35250002
-                        and any(e["id"] == int(RECORD["custody_verifier"]["environment_id"]) for e in a["environments"]) for a in approvals))
+            if not policy.automatic():
+                stage = "verifier-approval"
+                approvals = api.api("/actions/runs/" + VERIFIER + "/approvals")
+                require(any(a["state"] == "approved" and a["user"]["id"] == 35250002
+                            and any(e["id"] == int(RECORD["custody_verifier"]["environment_id"]) for e in a["environments"]) for a in approvals))
             stage = "qualification-handoff"
             handoff_input(r, minimum_handoff_seconds)
         else:

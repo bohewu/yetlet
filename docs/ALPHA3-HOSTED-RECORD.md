@@ -1,7 +1,8 @@
 # Alpha.3 — Hosted build, readback and signing preparation
 
 Date: 2026-10-30 (Asia/Taipei). Status: build/readback and owner-local retention
-PASS; signer source selection and the newly authorized prepare remain Pending.
+PASS at the original checkpoint. The later signing/publication completion is
+recorded below; the original prepare grant retains its historical scope.
 This is the execution record after the [local preflight](ALPHA3-VERSION-PREFLIGHT.md).
 Original local acceptance, optional harness failure and alpha.2 failed
 qualification remain unchanged. Alpha.1 D6/publication stay Complete.
@@ -125,3 +126,39 @@ Do not invent a self-referential S in this commit. Document review accepts
 recorded results and prepare readiness, not future execution. Signing, positive
 independent result verification, output acceptance, publication and crates.io
 remain outside this grant. Alpha.1 D6 stays Complete; no alpha.3 signature exists.
+
+## Signing, independent verification and publication — 2026-10-30
+
+The owner subsequently authorizes the exact prepared inputs and then accepts
+the actual verified outputs/public plan. The prior Pending statements above
+remain historical; no original receipt or failed result is rewritten.
+
+| Binding | Actual result |
+|---|---|
+| Product C / unchanged tag | `557ab76e03b619e959eae7529dbe03317fe1f952` / `v0.9.0-alpha.3` |
+| Signer S / verifier V | `30baf2504a14859223416bccdc2d05755ae000f6`; PR24 squash Merge, reviewed tree `7a46e5dd0710fde1b1bf83e33ecacbdc8e8390fa` |
+| Prepare | [40981466538/1](https://github.com/bohewu/yetlet/actions/runs/40981466538), SUCCESS including cleanup |
+| Public raw payload | SHA-256 `4192b2f57fbe44080dd967b9d58cc53273948cb4620d623417ae92182a666434` |
+| Full private raw manifest | SHA-256 `d5374f1bf0e34ebe0728a8b127398d8b83f4332a21877aaf79d148bad9319069` |
+| Formal signing | [40982672108/1](https://github.com/bohewu/yetlet/actions/runs/40982672108), both signatures/verification/cleanup PASS |
+| Protected independent result verification | [40983028507/1](https://github.com/bohewu/yetlet/actions/runs/40983028507), both bundles, all16 subjects/all112 private entries and cleanup PASS |
+| Actual manual approvals | Owner `bohewu`, `release-sign` and `release-result-verify`; original approvals retained |
+| Owner-local signing-output index | 68 files; SHA-256 `1debb47e1b463e689d099998670d31697bf0910becc456f006011fcba96242a3` |
+| Final publication | Existing Release428536609, [Experimental alpha.3 prerelease](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.3), published 2026-10-30 09:17:18 +08:00; not Latest |
+| Public delivery | Exact20 approved files, authenticated and anonymous complete-byte readback PASS; no private attachment or crates.io upload |
+| Publication custody index | 97 files; SHA-256 `d4ebc76e961cc5b0ca940f7ca7b77072f3c4c45b73a4b6a50f63081514104a90` |
+
+The first native Python upload stage failed before any asset was created; exact
+Draft/tag and zero-asset reads passed. Its generic error did not retain provider
+HTTP details, so no specific HTTP status or root cause is claimed. After the
+owner authorizes autonomous transport recovery, `gh api` uploads the same20 files
+once each. Original closed-plan, digest, readback and publication checks remain;
+one publication PATCH completes the existing Draft. The initial FAIL and later
+success receipts remain separate. Neither signing nor publication was repeated.
+
+The owner accepted the actual results and activated the exact acceptance summary
+before publication. Original `SIGNING-INPUTS` and result receipts retain their
+then-Pending fields; new authority/outcome receipts live outside the frozen
+assembly. No formal private key or private plaintext was accessed locally.
+Earlier alpha.1/alpha.2 and optional local failures remain unchanged. Owner-local
+retention is not offsite or indefinite-availability proof.

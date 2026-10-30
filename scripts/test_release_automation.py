@@ -356,6 +356,78 @@ class PublicTests(unittest.TestCase):
             'assets': [{'name': name, 'size': len(raw), 'sha256': s.sha(raw)} for name, raw in sorted(self.blobs.items())]}
         pub.plan(self.p)
 
+    def test_asset_upload_uses_gh_json_response_and_exact_binary_stdin(self):
+        asset = self.p['assets'][0]
+        url = 'https://uploads.github.com/repos/bohewu/yetlet/releases/15/assets?name=' + asset['name']
+        response = records.canonical({'id': 123, 'name': asset['name']})
+        process = subprocess.CompletedProcess([], 0, response, b'')
+        with patch.dict(os.environ, {'GH_TOKEN': 'SYNTHETIC token'}), \
+                patch.object(pub.subprocess, 'run', return_value=process) as run, \
+                patch.object(pub.urllib.request, 'build_opener') as native:
+            self.assertEqual(pub.http(url, 'POST', self.blobs[asset['name']], binary=True), json.loads(response))
+        args, kwargs = run.call_args
+        self.assertEqual(args[0], ['gh', 'api', '--method', 'POST', url,
+            '--header', 'Accept: application/vnd.github+json',
+            '--header', 'Content-Type: application/octet-stream', '--input', '-'])
+        self.assertEqual(kwargs['input'], self.blobs[asset['name']])
+        self.assertEqual(kwargs['timeout'], 120)
+        self.assertNotIn('SYNTHETIC token', ' '.join(args[0]))
+        self.assertNotIn('shell', kwargs)
+        run.assert_called_once(); native.assert_not_called()
+
+    def test_upload_rejects_anonymous_or_foreign_destination_before_gh(self):
+        upload_url = 'https://uploads.github.com/repos/bohewu/yetlet/releases/15/assets?name=public'
+        with patch.dict(os.environ, {'GH_TOKEN': 'SYNTHETIC token'}), \
+                patch.object(pub.subprocess, 'run') as run:
+            with self.assertRaises(ValueError):
+                pub.http(upload_url, 'POST', b'bytes', binary=True, authenticated=False)
+            with self.assertRaises(ValueError):
+                pub.http('https://example.invalid/assets', 'POST', b'bytes', binary=True)
+        run.assert_not_called()
+
+    def test_upload_failure_reports_only_safe_status_and_never_retries(self):
+        process = subprocess.CompletedProcess([], 1, b'', b'gh: SYNTHETIC private diagnostic (HTTP 422)')
+        with patch.object(pub.subprocess, 'run', return_value=process) as run:
+            with self.assertRaises(pub.UploadError) as caught:
+                pub.upload('https://uploads.github.com/repos/bohewu/yetlet/releases/15/assets', b'bytes')
+        run.assert_called_once()
+        error = caught.exception
+        self.assertEqual((error.kind, error.http_status), ('http', 422))
+        stderr = io.StringIO()
+        with patch.object(pub, 'main', side_effect=error), patch.object(sys, 'stderr', stderr):
+            self.assertEqual(pub.cli(), 1)
+        self.assertIn('operation=upload class=http http_status=422', stderr.getvalue())
+        self.assertNotIn('private diagnostic', stderr.getvalue())
+
+    def test_upload_timeout_missing_cli_and_invalid_response_stop(self):
+        for failure, kind in [(subprocess.TimeoutExpired('gh', 120), 'timeout'),
+                              (FileNotFoundError('SYNTHETIC path'), 'unavailable')]:
+            with self.subTest(kind=kind), patch.object(pub.subprocess, 'run', side_effect=failure) as run:
+                with self.assertRaises(pub.UploadError) as caught: pub.upload('unused', b'bytes')
+                self.assertEqual(caught.exception.kind, kind); run.assert_called_once()
+        process = subprocess.CompletedProcess([], 0, b'not JSON', b'')
+        with patch.object(pub.subprocess, 'run', return_value=process), self.assertRaises(pub.UploadError) as caught:
+            pub.upload('unused', b'bytes')
+        self.assertEqual(caught.exception.kind, 'response')
+
+    def test_failed_upload_retains_safe_receipt_and_stops_publication(self):
+        plan = self.directory / 'plan.json'; plan.write_bytes(records.canonical(self.p))
+        notes = self.directory / 'notes.md'; notes.write_bytes(self.notes)
+        verification = self.directory / 'verified.json'; verification.write_bytes(self.verification)
+        output = self.directory / 'failed.json'
+        argv = ['release-public.py', 'stage', '--plan', str(plan), '--public-dir', str(self.directory),
+                '--notes', str(notes), '--verification', str(verification), '--output', str(output)]
+        with patch.dict(os.environ, {'RELEASE_RECORD': json.dumps(self.r)}), patch.object(sys, 'argv', argv), \
+                patch.object(pub, 'operate', side_effect=pub.UploadError('http', 422)) as operate:
+            with self.assertRaises(pub.UploadError): pub.main()
+        operate.assert_called_once()
+        receipt = json.loads(output.read_bytes())
+        self.assertEqual(receipt['transport_error'], {'operation': 'upload', 'class': 'http', 'http_status': 422})
+        self.assertEqual(receipt['status'], 'FAIL')
+        self.assertTrue(receipt['remote_partial_state_may_exist'])
+        self.assertFalse(receipt['automatic_retry'])
+        self.assertFalse(receipt['registry_upload'])
+
     def test_public_allowlist_and_local_proof_are_closed(self):
         self.assertEqual(pub.public_inputs(self.p, self.directory, self.notes, self.verification), self.blobs)
         for name in ('manifest.sigstore.json', 'private-evidence.tar.age', '../private', self.p['assets'][1]['name']):
