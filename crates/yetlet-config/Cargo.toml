@@ -34,3 +34,8 @@ tokio = { version = "=1.53.3", features = ["macros", "rt-multi-thread", "net"] }
 tower = { version = "=0.5.3", features = ["util"] }
 yetlet-core = { version = "0.9.0-alpha.3", path = "../yetlet-core" }
 yetlet-server-axum = { version = "0.9.0-alpha.3", path = "../yetlet-server-axum" }
+
+[[example]]
+name = "secrets_state"
+path = "examples/secrets_state.rs"
+required-features = ["secret-provider"]

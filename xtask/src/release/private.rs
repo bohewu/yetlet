@@ -36,19 +36,19 @@ pub const SIXTEEN_NAMES: [&str; 16] = [
     "yetlet-core",
     "yetlet-actions",
     "yetlet-reactive",
+    "yetlet-signing",
+    "yetlet-wgpu",
     "yetlet-html",
     "yetlet-dom",
     "yetlet-dom-keyed",
     "yetlet-server-axum",
     "yetlet-request-id",
-    "yetlet-session",
-    "yetlet-auth",
-    "yetlet-rate-limit",
-    "yetlet-config",
     "yetlet-secrets",
-    "yetlet-signing",
+    "yetlet-session",
     "yetlet-session-redis",
-    "yetlet-wgpu",
+    "yetlet-auth",
+    "yetlet-config",
+    "yetlet-rate-limit",
 ];
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -156,7 +156,7 @@ fn write(out: &Path, name: &str, value: &Value) -> Result<()> {
     fs::write(out.join(name), tooling::json_bytes(value))?;
     Ok(())
 }
-/// Fixed Cargo steps; bootstrap collection and normal verification are distinct.
+/// Normal package verification in an order covering every internal dependency kind.
 pub fn cargo_steps(source: &Path, work: &Path, cohort: Cohort) -> Vec<(String, Vec<OsString>)> {
     let target = work.join("cargo-target");
     if cohort == Cohort::OriginalNine {
@@ -194,44 +194,35 @@ pub fn cargo_steps(source: &Path, work: &Path, cohort: Cohort) -> Vec<(String, V
         work.join("vendor").into_os_string(),
     ]);
     let mut steps = vec![("vendor".into(), vendor)];
-    for bootstrap in [true, false] {
-        for n in cohort.names() {
-            let mut args = vec![
-                "package".into(),
-                "--offline".into(),
-                "--locked".into(),
-                "--manifest-path".into(),
-                source
-                    .join("crates")
-                    .join(n)
-                    .join("Cargo.toml")
-                    .into_os_string(),
-                "--target-dir".into(),
-                work.join(if bootstrap {
-                    "bootstrap-target"
-                } else {
-                    "cargo-target"
-                })
+    for n in cohort.names() {
+        let args = vec![
+            "package".into(),
+            "--offline".into(),
+            "--locked".into(),
+            "--manifest-path".into(),
+            source
+                .join("crates")
+                .join(n)
+                .join("Cargo.toml")
                 .into_os_string(),
-                "--config".into(),
-                work.join("vendor-config.toml").into_os_string(),
-            ];
-            if bootstrap {
-                args.extend(["--no-verify".into(), "--exclude-lockfile".into()]);
-            }
-            steps.push((
-                format!("{}-{n}", if bootstrap { "bootstrap" } else { "package" }),
-                args,
-            ));
-        }
+            "--target-dir".into(),
+            work.join("cargo-target").into_os_string(),
+            "--config".into(),
+            work.join("vendor-config.toml").into_os_string(),
+        ];
+        steps.push((format!("package-{n}"), args));
     }
     steps
 }
 
-fn stage_bootstrap(source: &Path, work: &Path, name: &str) -> Result<()> {
+fn stage_verified(source: &Path, work: &Path, name: &str) -> Result<String> {
     let vendor = work.join("vendor");
     let directory = vendor.join(format!("{name}-{}", package_version()));
-    require(!directory.exists(), "bootstrap package already exists")?;
+    require(!directory.exists(), "verified package already staged")?;
+    let archive = work
+        .join("cargo-target/package")
+        .join(format!("{name}-{}.crate", package_version()));
+    let digest = tooling::sha(&fs::read(&archive)?);
     tooling::execute(
         source,
         "tar".as_ref(),
@@ -239,9 +230,7 @@ fn stage_bootstrap(source: &Path, work: &Path, name: &str) -> Result<()> {
             "--extract".into(),
             "--gzip".into(),
             "--file".into(),
-            work.join("bootstrap-target/package")
-                .join(format!("{name}-{}.crate", package_version()))
-                .into_os_string(),
+            archive.into_os_string(),
             "--directory".into(),
             vendor.into_os_string(),
             "--keep-old-files".into(),
@@ -254,9 +243,84 @@ fn stage_bootstrap(source: &Path, work: &Path, name: &str) -> Result<()> {
     visit(&directory, &directory, &mut files)?;
     fs::write(
         directory.join(".cargo-checksum.json"),
-        tooling::json_bytes(&json!({"files":files,"package":null})),
+        tooling::json_bytes(&json!({"files":files,"package":digest})),
     )?;
+    Ok(digest)
+}
+
+/// A first publication also requires development dependency names to exist.
+fn publication_order(source: &Path) -> Result<()> {
+    let root: toml::Value = toml::from_str(&fs::read_to_string(source.join("Cargo.toml"))?)
+        .map_err(|_| fail("publication workspace manifest"))?;
+    let order: BTreeMap<_, _> = SIXTEEN_NAMES
+        .iter()
+        .enumerate()
+        .map(|(i, n)| (*n, i))
+        .collect();
+    for name in SIXTEEN_NAMES {
+        let manifest: toml::Value = toml::from_str(&fs::read_to_string(
+            source.join("crates").join(name).join("Cargo.toml"),
+        )?)
+        .map_err(|_| fail("publication crate manifest"))?;
+        let mut containers = vec![&manifest];
+        if let Some(targets) = manifest.get("target").and_then(toml::Value::as_table) {
+            containers.extend(targets.values());
+        }
+        for container in containers {
+            for kind in ["dependencies", "dev-dependencies", "build-dependencies"] {
+                if let Some(deps) = container.get(kind).and_then(toml::Value::as_table) {
+                    for (alias, value) in deps {
+                        let inherited =
+                            value.get("workspace").and_then(toml::Value::as_bool) == Some(true);
+                        let declaration = if inherited {
+                            root.get("workspace")
+                                .and_then(|w| w.get("dependencies"))
+                                .and_then(|d| d.get(alias))
+                                .ok_or_else(|| fail("workspace dependency missing"))?
+                        } else {
+                            value
+                        };
+                        let dependency = declaration
+                            .get("package")
+                            .and_then(toml::Value::as_str)
+                            .unwrap_or(alias);
+                        if let Some(position) = order.get(dependency) {
+                            require(
+                                *position < order[name],
+                                "internal publication dependency order",
+                            )?;
+                        }
+                    }
+                }
+            }
+        }
+    }
     Ok(())
+}
+
+#[cfg(test)]
+mod publication_tests {
+    use super::*;
+
+    #[test]
+    fn development_and_optional_target_backedges_are_rejected() {
+        let temp = tempfile::tempdir().unwrap();
+        fs::write(temp.path().join("Cargo.toml"), "[workspace]\n").unwrap();
+        for name in SIXTEEN_NAMES {
+            let path = temp.path().join("crates").join(name);
+            fs::create_dir_all(&path).unwrap();
+            fs::write(path.join("Cargo.toml"), "[package]\nname='fixture'\n").unwrap();
+        }
+        publication_order(temp.path()).unwrap();
+        let secret = temp.path().join("crates/yetlet-secrets/Cargo.toml");
+        for declaration in [
+            "[dev-dependencies]\nyetlet-config='0.9'\n",
+            "[target.'cfg(unix)'.dependencies]\nyetlet-config={version='0.9',optional=true}\n",
+        ] {
+            fs::write(&secret, format!("[package]\nname='fixture'\n{declaration}")).unwrap();
+            assert!(publication_order(temp.path()).is_err());
+        }
+    }
 }
 
 /// Execute only the packaging phase. CI identity and immutable-source guards remain in `run`.
@@ -319,9 +383,16 @@ pub fn build_packages(
                 message: "private rebuild command failed".into(),
             });
         }
-        if let Some(name) = label.strip_prefix("bootstrap-") {
-            let staged = stage_bootstrap(source, work, name);
-            record["bootstrap_staging"][name] = json!({"ok":staged.is_ok(),"verification":false});
+        if cohort == Cohort::Sixteen && label == "vendor" {
+            publication_order(source)?;
+            record["publication_order"] = json!(SIXTEEN_NAMES);
+        }
+        if cohort == Cohort::Sixteen
+            && let Some(name) = label.strip_prefix("package-")
+        {
+            let staged = stage_verified(source, work, name);
+            record["verified_staging"][name] = json!({"ok":staged.is_ok(),"verification":true,
+                "package_sha256":staged.as_ref().ok()});
             write(out, "BUILD-RECORD.json", record)?;
             staged?;
         }

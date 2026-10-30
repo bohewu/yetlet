@@ -24,6 +24,7 @@ import zipfile
 # Support the existing importlib consumer as well as direct script execution.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 import release_record as records
+import release_policy as policy
 
 API = "https://api.github.com/repos/bohewu/yetlet"
 ENVIRONMENT = "release-evidence-verify"
@@ -68,12 +69,7 @@ def check_metadata(run, artifact, environment, policies, expected):
     require(artifact["workflow_run"]["head_repository_id"] == run["repository"]["id"])
     require(environment["name"] == ENVIRONMENT and type(environment["id"]) is int
             and environment["can_admins_bypass"] is False)
-    reviewers = [r for r in environment["protection_rules"] if r["type"] == "required_reviewers"]
-    require(len(reviewers) == 1)
-    require(reviewers[0]["reviewers"] == [next(r for r in reviewers[0]["reviewers"]
-            if r["type"] == "User" and r["reviewer"]["login"] == "bohewu" and r["reviewer"]["id"] == 35250002)])
-    # This single-owner workflow permits the owner to request and approve a job.
-    # GitHub enforces the required reviewer gate before releasing Environment secrets.
+    policy.reviewers(environment)
     require(environment["deployment_branch_policy"] ==
             {"protected_branches": False, "custom_branch_policies": True})
     require(policies["total_count"] == 1 and len(policies["branch_policies"]) == 1)

@@ -1,5 +1,13 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+
+**Release automation / registry followup (2026-10-30):** the owner-selected
+[single publication gate](RELEASE-PUBLICATION.md) keeps build, signer, independent
+verifier and publisher privileges separate. Config/Secrets source-cycle repair
+and exact-byte promotion are local work; Environment rollout and actual
+registry proof remain open. This does not expand product support or mark
+YT-020 complete.
+
 **YT-020 registry method and artifact contract (2026-10-30):** The
 [formal contract](YT-020-REGISTRY-PUBLICATION-CONTRACT.md) resolves the policy:
 break the first-name development cycle by moving the Settings state example to

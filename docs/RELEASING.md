@@ -2,8 +2,9 @@
 
 Use this SOP to prepare a new Yetlet version and promote its verified artifacts.
 Development/PR steps live in [DEVELOPMENT.md](DEVELOPMENT.md); actual work and
-decisions live in [Backlog](BACKLOG.md) and [Roadmap](ROADMAP.md). This guide is
-not authority to execute Git, hosted/key/signing or publication actions.
+decisions live in [Backlog](BACKLOG.md) and [Roadmap](ROADMAP.md). The current owner-selected automation policy is in
+[Release automation and registry promotion](RELEASE-PUBLICATION.md). This guide
+is not itself authority for Git, hosted/key/signing or publication actions.
 
 ## Read this before starting another version
 
@@ -84,7 +85,13 @@ a consumed binding, force a tag, treat history acceptance as full-history
 cleanliness, or reinstall hooks as routine release work. Tool/platform support
 and a passing Guard do not themselves authorize a tag or Push.
 
-## Normal release checklist
+## Baseline release checklist
+
+This is the accepted alpha.3/manual-signing sequence. For the newly selected
+combined GitHub/crates.io path, use the [single publication checklist](RELEASE-PUBLICATION.md#each-version).
+The candidate, payload, identity and independent-verification requirements below
+continue to apply; its per-stage human approvals are historical.
+
 
 | Stage | Action | Required evidence before continuing |
 |---|---|---|
@@ -104,6 +111,13 @@ The fixed workflow/cohort is not evidence of uniform support across all sixteen.
 
 ## Keep owner decisions concrete and batched
 
+The exact-input manual signing decisions below describe the original policy.
+Under the [new policy](RELEASE-PUBLICATION.md), the assistant freezes and verifies
+those inputs under standing automation authority; only the final joined
+GitHub/crates.io publication request needs the owner at its Environment gate.
+Git delivery authority remains separate.
+
+
 Avoid asking for permission for every tool call. Before requesting an action,
 finish the already-authorized work needed to make its scope reviewable. A normal
 owner decision can cover a bounded sequence, its CI/merge condition, per-stage
@@ -121,10 +135,17 @@ does not permit signing; a green signature job does not permit publication. GitH
 Release publication does not permit crates.io upload. For the latter, resolve
 YT-020's explicit registry/credential/order/readback requirements separately.
 
-## Actual human gates
+## Historical deployed human gates — alpha.3
 
-These are the existing GitHub settings, not a new approval policy. A complete
-new-version execution currently has **four** protected-job approval occurrences:
+The owner subsequently selected **one final publication gate**, with automated
+build/readback/prepare/sign/independent verification. The local implementation and
+one-time rollout are in [the current policy](RELEASE-PUBLICATION.md). Until that
+code and Environment change are delivered, the following deployed baseline still
+applies; local implementation does not silently remove GitHub protections.
+
+
+These are the existing GitHub settings, not a new approval policy. The alpha.3
+execution had **four** protected-job approval occurrences:
 
 | Phase | GitHub Environment | Reason for the gate |
 |---|---|---|
@@ -166,6 +187,7 @@ statements retain their original checkpoints.
 | [evidence-verify.yml](../.github/workflows/evidence-verify.yml) | Original encrypted build-evidence readback, versioned record plus exact original build identity; preflight5 / protected15 minutes |
 | [release-sign.yml](../.github/workflows/release-sign.yml) | Closed prepare/sign modes at approved S on protected master; complete record plus exact request, preflight5 / protected30 minutes |
 | [release-result-verify.yml](../.github/workflows/release-result-verify.yml) | Separately protected independent signing-result readback at reviewed V, no OIDC/signing; preflight5 / protected30 minutes |
+| [release-publish.yml](../.github/workflows/release-publish.yml) | New combined path: no-secret preflight10 minutes, owner-gated publication60 minutes, GitHub first then exact registry bytes and fresh consumer; rollout Pending |
 | [release-public.py](../scripts/release-public.py) | Explicit local stage/readback/publish by Release ID and closed twenty-file plan; no automatic trigger or registry support |
 | [private-rebuild.yml](../.github/workflows/private-rebuild.yml), [qualification.yml](../.github/workflows/qualification.yml) | Historical rebuilding/qualification scopes; not substitutes for current cohort/source approval |
 
@@ -187,7 +209,7 @@ and all frozen entries without signing permission. The
 first release's one-time local-key exception remains spent.
 
 Local implementation checks do not qualify a hosted job or authorize a release.
-Long-term/off-host retention remains operator-owned. Draft creation, key/tool
+Long-term/off-host retention remains operator-owned. Under the historical deployed policy, Draft creation, key/tool
 rotation, source/tag selection, each hosted phase, owner acceptance and publication
 still require their applicable explicit authority. No default framework dependency,
 automatic signing, mutable tag or registry publication is introduced.

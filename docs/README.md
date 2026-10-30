@@ -37,6 +37,9 @@ distribution versus historical qualification to [Release readiness](RELEASE-READ
 - [New-version release workflow](RELEASING.md): one-time setup versus each version,
   immutable C/S, protected jobs, exact approvals, independent verification and
   publication; distinguishes installed tooling from Pending hosted qualification.
+- [Single-gate release automation and registry promotion](RELEASE-PUBLICATION.md):
+  automated build/sign/verification, final owner-approved GitHub then crates.io
+  publication, local implementation and one-time rollout limits.
 - [Sixteen-package crates.io readiness](YT-020-REGISTRY-READINESS.md): live name
   and public-account observations, dependency order, first-publication bootstrap
   and remaining registry-only evidence; no upload authorization.

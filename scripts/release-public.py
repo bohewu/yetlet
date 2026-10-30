@@ -94,9 +94,14 @@ def names():
 
 
 def plan(value):
-    s.require(type(value) is dict and set(value) == {'schema', 'record_sha256', 'release_id',
-        'name', 'notes_sha256', 'assets', 'verification_sha256', 'approval_sha256'})
-    s.require(type(value['schema']) is int and value['schema'] == 1)
+    fields = {'schema', 'record_sha256', 'release_id', 'name', 'notes_sha256', 'assets',
+              'verification_sha256', 'approval_sha256'}
+    s.require(type(value) is dict and type(value.get('schema')) is int and value['schema'] in (1, 2))
+    s.require(set(value) == fields | ({'registry_plan_sha256', 'publication_request_sha256'}
+                                    if value['schema'] == 2 else set()))
+    if value['schema'] == 2:
+        s.require(all(s.records.token(value[k], s.records.SHA)
+            for k in ('registry_plan_sha256', 'publication_request_sha256')))
     s.require(value['record_sha256'] == s.records.digest(s.RECORD) and value['release_id'] == str(s.RELEASE_ID))
     s.require(type(value['name']) is str and 0 < len(value['name']) <= 256
               and all(ord(c) >= 32 for c in value['name']))
@@ -132,12 +137,17 @@ def public_inputs(p, directory, notes, verification):
         blobs[a['name']] = raw
     s.require(s.sha(blobs['SIGNING-APPROVAL.json']) == p['approval_sha256'])
     approval = s.load(blobs['SIGNING-APPROVAL.json'])
-    s.require(approval == {'schema': 1, 'record_sha256': p['record_sha256'], 'source': s.C,
+    expected_approval = {'schema': 1, 'record_sha256': p['record_sha256'], 'source': s.C,
         'signer_commit': s.RECORD['signer_commit'], 'verification_sha256': p['verification_sha256'],
         'manifest_sha256': v['manifest_sha256'], 'provenance_bundle_sha256': v['provenance_bundle_sha256'],
         'accepted': True, 'scope': 'Experimental source packages', 'publication': 'GitHub pre-release',
-        'registry_upload': False})
-    s.require(approval['accepted'] is True and approval['registry_upload'] is False)
+        'registry_upload': False}
+    if p['schema'] == 2:
+        expected_approval.update({'schema': 2, 'publication': 'GitHub pre-release + crates.io',
+            'registry_upload': True, 'registry_plan_sha256': p['registry_plan_sha256'],
+            'publication_request_sha256': p['publication_request_sha256']})
+    s.require(approval == expected_approval)
+    s.require(approval['accepted'] is True)
     s.require(s.sha(blobs['provenance.sigstore.json']) == v['provenance_bundle_sha256'])
     bundle = s.load(blobs['provenance.sigstore.json'])
     s.require(base64.b64decode(bundle['dsseEnvelope']['payload'], validate=True) == blobs['PROVENANCE-UNSIGNED.json'])
@@ -153,11 +163,15 @@ def public_inputs(p, directory, notes, verification):
     return blobs
 
 
-def release(p, draft, authenticated=True):
+def tag(authenticated=True):
     tag = api('/git/ref/tags/' + s.TAG, authenticated)
     # Current unsigned lightweight-tag contract; never create or move a tag.
     s.require(tag['ref'] == 'refs/tags/' + s.TAG and tag['object'] == {'sha': s.C, 'type': 'commit',
               'url': 'https://api.github.com/repos/bohewu/yetlet/git/commits/' + s.C})
+
+
+def release(p, draft, authenticated=True):
+    tag(authenticated)
     r = api('/releases/' + str(s.RELEASE_ID), authenticated)
     s.require(r['id'] == s.RELEASE_ID and r['tag_name'] == s.TAG and r['target_commitish'] == s.C)
     s.require(r['draft'] is draft and r['prerelease'] is True and r['name'] == p['name'])
@@ -237,6 +251,7 @@ def main():
     output = s.outside(args.output)
     s.require(not output.exists())
     p = plan(s.load(s.read(args.plan)))
+    s.require(p['schema'] == 1)  # Combined distribution is gated only by release-publish.yml.
     notes = s.read(args.notes, 65536)
     verification = s.read(args.verification, 65536)
     blobs = public_inputs(p, Path(args.public_dir), notes, verification)

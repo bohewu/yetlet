@@ -14,6 +14,11 @@ Select a provider explicitly. The existing state example also selects the config
 loader and bundled example settings. From the repository root, pass only the
 synthetic token below; no cloud account, real credential or listener is needed.
 
+The current composition example is owned by `yetlet-config` as `secrets_state`,
+behind its existing `secret-provider` feature. Its four fixture files moved with
+it. Dated evidence below preserves the old `yetlet-secrets --example state`
+commands and their original results; current navigation points to the new source.
+
 ## Minimal integration
 
 Run the existing listener-free composition example:
@@ -21,7 +26,7 @@ Run the existing listener-free composition example:
 ```sh
 (
   export YTSECRETS_SERVICE__TOKEN=example
-  cargo run --locked --manifest-path crates/yetlet-secrets/Cargo.toml --example state
+  cargo run --locked --manifest-path crates/yetlet-config/Cargo.toml --example secrets_state --features secret-provider
 )
 ```
 
@@ -174,7 +179,7 @@ ordering rule. Loader or application-validation failure must skip `replace`,
 leaving the prior healthy snapshot usable; a later valid reload may retry the
 same entry. Provider lock poisoning still makes lookup/replacement Unavailable,
 so this is not a promise to recover from every internal failure. The
-[State example tests](../crates/yetlet-secrets/examples/state.rs) demonstrate
+[State example tests](../crates/yetlet-config/examples/secrets_state.rs) demonstrate
 this application-owned pattern; the executable still loads once at startup.
 
 This prevents reload completion inversion within that application entry. It
@@ -228,7 +233,7 @@ the business app should not require its powerful
 ## API reference
 
 Use the [crate guide/source](../crates/yetlet-secrets/README.md),
-[state example](../crates/yetlet-secrets/examples/state.rs),
+[state example](../crates/yetlet-config/examples/secrets_state.rs),
 [settings injection guide](SETTINGS-SECRET-PROVIDER.md) and
 the [current API reference](API-REFERENCE.md).
 
@@ -278,7 +283,7 @@ precedence, ignored secret-file selection in Staging/Production, ordinary
 service and Axum State injection, substitution, escaped SSR/CSP and absence of
 synthetic secrets in rendered output. One rustdoc example also passed.
 
-The configured [state example](../crates/yetlet-secrets/examples/state.rs) ran
+The configured [state example](../crates/yetlet-config/examples/secrets_state.rs) ran
 successfully with explicit synthetic environment input and reported only
 `Example request status: 200 OK`. Normal dependencies are exactly
 `yetlet-secrets -> secrecy 0.10.3 -> zeroize 1.9.1`. Root Cargo metadata has 34

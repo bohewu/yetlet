@@ -35,6 +35,23 @@ typed `SecretBinding` fields. The normal default path calls no provider.
 There is no automatic reload or provider registry. Applications offering reload
 own serialization of load, validation and whole-snapshot publication.
 
+The listener-free `secrets_state` example owns the Settings/SecretProvider
+composition. From the repository root, use a synthetic value:
+
+```sh
+(
+  export YTSECRETS_SERVICE__TOKEN=example
+  cargo run --offline --locked --manifest-path crates/yetlet-config/Cargo.toml \
+    --example secrets_state --features secret-provider
+)
+```
+
+Expected output: `Example request status: 200 OK`. This example moved from
+`yetlet-secrets`; the provider package no longer depends on Config in tests.
+The public Settings/provider APIs and default feature selection are unchanged.
+Its focused test target is `cargo test --offline --locked --manifest-path
+crates/yetlet-config/Cargo.toml --example secrets_state --features secret-provider`.
+
 `Error` exposes bounded categories, including `Error::Key` for key selection,
 without raw parser/IO diagnostics or secret values. Read the OS-specific file
 ownership/permission limits before choosing a deployment configuration. Do not

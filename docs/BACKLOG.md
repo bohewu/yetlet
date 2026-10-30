@@ -1,5 +1,15 @@
 # Yetlet Backlog
 
+
+**YT-020 / YT-209 local followup (2026-10-30):** the owner selected automated
+build/sign/verification and one final combined GitHub/crates.io publication gate.
+[Implementation and rollout](RELEASE-PUBLICATION.md) removes the Config/Secrets
+first-name cycle, stages normally verified predecessor archives and adds frozen
+exact-byte registry promotion. Local verification/review is tracked separately
+from hosted installation. YT-020 remains Blocked pending actual registry
+activation, credential authority, new candidate/artifact freeze and readback.
+Existing release acceptance and historical failures are preserved.
+
 **YT-020 formal registry contract (2026-10-30):** The five dependency-study
 documents committed as `15abc44` after strict/builtin Guard/native hook PASS,
 no Push; the prose-only initial Guard refusal remains. The

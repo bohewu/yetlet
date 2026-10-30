@@ -1,0 +1,103 @@
+name: Publish verified GitHub release and crates.io packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      record:
+        description: Complete frozen release record shared by build, signing and verification
+        type: string
+        required: true
+      request:
+        description: Frozen publication request binding P, verified public artifact, notes and registry plan SHA
+        type: string
+        required: true
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: yetlet-release-publication
+  cancel-in-progress: false
+
+env:
+  RELEASE_AUTOMATION: single-publication-v1
+  RELEASE_RECORD: ${{ inputs.record }}
+  PUBLICATION_REQUEST: ${{ inputs.request }}
+  PUBLICATION_WORKFLOW_SHA: ${{ github.workflow_sha }}
+  PUBLICATION_WORKFLOW_REF: ${{ github.workflow_ref }}
+  RUSTUP_TOOLCHAIN: 1.99.0
+
+jobs:
+  preflight:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: Reject foreign source before checkout
+        shell: bash
+        run: |
+          set -euo pipefail
+          [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REPOSITORY" == bohewu/yetlet ]]
+          [[ "$GITHUB_REPOSITORY_ID" == 1409587171 && "$GITHUB_REPOSITORY_OWNER_ID" == 35250002 ]]
+          [[ "$GITHUB_REF" == refs/heads/master && "$GITHUB_SHA" == "$PUBLICATION_WORKFLOW_SHA" ]]
+          [[ "$PUBLICATION_WORKFLOW_REF" == bohewu/yetlet/.github/workflows/release-publish.yml@refs/heads/master ]]
+          python3 - <<'PY'
+          import json, os
+          assert json.loads(os.environ['PUBLICATION_REQUEST'])['publication_commit'] == os.environ['GITHUB_SHA']
+          PY
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Verify CI, independent result, frozen plans and tag without publication secrets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PUBLICATION_OUTPUT: ${{ runner.temp }}/publication-preflight
+        run: python3 scripts/release-publish.py preflight
+      - name: Retain safe plan and preflight receipt
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: publication-preflight-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/publication-preflight/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Remove temporary preflight files
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/publication-preflight"
+
+  publish:
+    needs: preflight
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    environment: release-publish
+    permissions:
+      contents: write
+      actions: read
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Install consumer compiler and native TLS prerequisites
+        run: |
+          rustup toolchain install 1.99.0 --profile minimal
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+      - name: Recheck owner approval, publish GitHub first, then exact registry bytes and consumer
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CARGO_REGISTRY_TOKEN: ${{ secrets.CRATES_IO_TOKEN }}
+          PUBLICATION_OUTPUT: ${{ runner.temp }}/publication-result
+        run: python3 scripts/release-publish.py publish
+      - name: Retain partial or complete receipts without secrets
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: publication-result-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/publication-result/
+          if-no-files-found: warn
+          retention-days: 7
+      - name: Remove temporary publication files
+        if: always()
+        run: rm -rf "$RUNNER_TEMP/publication-result"

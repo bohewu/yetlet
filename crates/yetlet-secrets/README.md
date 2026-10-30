@@ -64,7 +64,7 @@ or a client that copied its credential keeps the old value. Applications must
 explicitly reconfigure or rebuild those clients. This slice adds no cloud SDK,
 remote provider, secret writer, cache, watcher, retry, or automatic rotation.
 
-The listener-free [state example](examples/state.rs) loads typed app-owned
+The listener-free [state example](../yetlet-config/examples/secrets_state.rs) loads typed app-owned
 `service.token`, explicitly maps it to `delivery-token`, constructs an ordinary
 service with the provider, and installs that service in app-owned Axum/Yetlet
 state. The public page uses only a selected public message. It makes no external
@@ -74,7 +74,7 @@ and the example reports HTTP 503; a runtime override supplies a configured value
 
 ```sh
 YTSECRETS_SERVICE__TOKEN="${YTSECRETS_SERVICE__TOKEN:?Set a local test value first}" cargo run --offline --locked \
-  --manifest-path crates/yetlet-secrets/Cargo.toml --example state
+  --manifest-path crates/yetlet-config/Cargo.toml --example secrets_state --features secret-provider
 ```
 
 For an explicit local development secret file, application startup can retain the
@@ -94,6 +94,13 @@ loads once at startup; no reload loop or provider administration is installed.
 The provider tests cover whole-map replacement through shared handles,
 retained owned values, empty/missing distinctions, Send execution, fixed poison
 errors, protected ownership, and redacted Debug/errors.
+
+The State example and its four fixtures now belong to `yetlet-config`, behind
+its existing `secret-provider` feature. Run that target with `cargo test --offline
+--locked --manifest-path crates/yetlet-config/Cargo.toml --example secrets_state
+--features secret-provider`. The provider-only commands below do not run the
+moved composition target. This removes the reverse Config development dependency
+for first publication without changing provider APIs or runtime dependencies.
 
 ```sh
 cargo test --offline --locked --manifest-path crates/yetlet-secrets/Cargo.toml --all-targets
