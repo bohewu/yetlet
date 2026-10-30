@@ -231,6 +231,37 @@ class PublicationTests(unittest.TestCase):
 
 
 class PolicyTests(unittest.TestCase):
+    def test_real_custody_metadata_gate_supports_legacy_and_automatic_modes(self):
+        spec = importlib.util.spec_from_file_location('custody_policy_test', HERE/'release-evidence-preflight.py')
+        custody = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(custody)
+        e = {'source': 'c'*40, 'tag': 'v1.2.3-alpha.4', 'run': '11', 'attempt': '1',
+             'artifact': '12', 'digest': 'b'*64}
+        run = {'id': 11, 'run_attempt': 1, 'head_sha': e['source'], 'head_branch': e['tag'],
+            'event': 'workflow_dispatch', 'path': '.github/workflows/release.yml',
+            'repository': {'id': 1409587171, 'full_name': 'bohewu/yetlet'},
+            'head_repository': {'full_name': 'bohewu/yetlet'}, 'status': 'completed', 'conclusion': 'success'}
+        artifact = {'id': 12, 'name': 'encrypted-private-'+e['source']+'-11-1', 'expired': False,
+            'size_in_bytes': 1, 'digest': 'sha256:'+e['digest'], 'workflow_run': {'id': 11,
+            'head_sha': e['source'], 'repository_id': 1409587171, 'head_repository_id': 1409587171}}
+        environment = {'name': custody.ENVIRONMENT, 'id': 14, 'can_admins_bypass': False,
+            'deployment_branch_policy': {'protected_branches': False, 'custom_branch_policies': True},
+            'protection_rules': []}
+        policies = {'total_count': 1, 'branch_policies': [{'name': e['tag'], 'type': 'tag'}]}
+        reviewer = {'type': 'required_reviewers', 'reviewers': [{'type': 'User',
+            'reviewer': {'login': 'bohewu', 'id': 35250002}}]}
+        with patch.dict(os.environ, {'RELEASE_AUTOMATION': 'single-publication-v1'}):
+            custody.check_metadata(run, artifact, environment, policies, e)
+            wrong = copy.deepcopy(policies)
+            wrong['branch_policies'][0]['name'] = '*'
+            with self.assertRaises(ValueError): custody.check_metadata(run, artifact, environment, wrong, e)
+            environment['protection_rules'] = [reviewer]
+            with self.assertRaises(ValueError): custody.check_metadata(run, artifact, environment, policies, e)
+        with patch.dict(os.environ, {}, clear=True):
+            custody.check_metadata(run, artifact, environment, policies, e)
+            environment['protection_rules'] = []
+            with self.assertRaises(ValueError): custody.check_metadata(run, artifact, environment, policies, e)
+
     def test_automatic_workers_and_single_owner_publication_gate(self):
         worker = {'protection_rules': []}
         owner = {'protection_rules': [{'type': 'required_reviewers', 'prevent_self_review': False,

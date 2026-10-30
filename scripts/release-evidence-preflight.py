@@ -73,8 +73,8 @@ def check_metadata(run, artifact, environment, policies, expected):
     require(environment["deployment_branch_policy"] ==
             {"protected_branches": False, "custom_branch_policies": True})
     require(policies["total_count"] == 1 and len(policies["branch_policies"]) == 1)
-    policy = policies["branch_policies"][0]
-    require(policy["name"] == expected["tag"] and policy["type"] == "tag")
+    branch_policy = policies["branch_policies"][0]
+    require(branch_policy["name"] == expected["tag"] and branch_policy["type"] == "tag")
 
 
 class NoRedirect(urllib.request.HTTPRedirectHandler):
