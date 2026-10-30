@@ -1,5 +1,14 @@
 # Yetlet Backlog
 
+**Alpha.4 actual hosted checkpoint (2026-10-30):**
+[Fixed C/tag, original build41015091274/1 and readback41015782685/1](ALPHA4-HOSTED-RECORD.md)
+PASS; all16 hosted archives match local accepted bytes. Original encrypted
+custody and public provenance are retained outside the repo; operator failures
+and limits remain. Next select distinct reviewed S through normal delivery/CI,
+then prepare/sign/independently verify under standing automation authority.
+Final GitHub/crates.io publication still needs owner confirmation; YT-020 Blocked.
+
+
 **Alpha.4 local version preparation (2026-10-30):** the owner selected
 `0.9.0-alpha.4` for sixteen libraries, preserving third-party dependencies.
 [Affected preflight](ALPHA4-VERSION-PREFLIGHT.md) follows merged PR25/master
