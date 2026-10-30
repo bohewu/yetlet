@@ -1,6 +1,15 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**Alpha.4 hosted evidence (2026-10-30):**
+**Alpha.4 publication maintenance (2026-10-30):**
+[Actual prepare/sign/independent verification](ALPHA4-HOSTED-RECORD.md#actual-preparation-signing-and-independent-verification)
+PASS at unchanged C/tag and S/V `6ed70c3`. The owner-approved final run fails
+at GitHub staging with no assets or registry attempt. Local length/diagnostic
+repair and [pinned CI tool caching](RELEASE-PUBLICATION.md#alpha4-timing-and-bounded-ci-maintenance--2026-10-30)
+retain all required checks, independent verification and final owner gate.
+Local review and corrected hosted publication are separate gates; no measured
+cache speedup, live delivery or YT-020 completion is claimed.
+
+**Earlier alpha.4 hosted evidence checkpoint (2026-10-30):**
 [Original build/readback and retained source-package evidence](ALPHA4-HOSTED-RECORD.md)
 PASS at fixed C `c45e10c` and immutable unsigned tag. Distinct signer selection,
 actual prepare/signature/results remain Pending. Keep the selected Experimental

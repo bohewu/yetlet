@@ -28,13 +28,40 @@ class UploadError(Exception):
         self.http_status = http_status
 
 
+class ApiError(Exception):
+    """Preserve a bounded HTTP failure without its URL, headers or body."""
+    def __init__(self, method, status):
+        super().__init__('release API request rejected')
+        self.method = method
+        self.http_status = status
+
+
+def failure_details(error):
+    if isinstance(error, UploadError):
+        kind = error.kind if error.kind in {'timeout', 'unavailable', 'http', 'cli', 'response'} else 'internal'
+        operation, status = 'upload', error.http_status
+    elif isinstance(error, ApiError):
+        operation = {'GET': 'api-read', 'PATCH': 'release-update'}.get(error.method, 'api-request')
+        kind, status = 'http', error.http_status
+    else:
+        operation, status = 'validation', None
+        kind = 'validation' if isinstance(error, (ValueError, KeyError, TypeError)) else 'internal'
+        if isinstance(error, TimeoutError):
+            operation, kind = 'api-request', 'timeout'
+        elif isinstance(error, urllib.error.URLError):
+            operation, kind = 'api-request', 'network'
+    return {'operation': operation, 'class': kind,
+            'http_status': status if type(status) is int and 300 <= status <= 599 else None}
+
+
 def upload(url, body):
     # Use the same GitHub CLI transport as the accepted alpha.3 delivery.
     # Raw stdin preserves bytes; credentials stay in the existing environment.
     try:
         result = subprocess.run(['gh', 'api', '--method', 'POST', url,
             '--header', 'Accept: application/vnd.github+json',
-            '--header', 'Content-Type: application/octet-stream', '--input', '-'],
+            '--header', 'Content-Type: application/octet-stream',
+            '--header', 'Content-Length: ' + str(len(body)), '--input', '-'],
             input=body, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=120)
     except subprocess.TimeoutExpired:
         raise UploadError('timeout') from None
@@ -70,7 +97,8 @@ def http(url, method='GET', body=None, binary=False, authenticated=True, redirec
         try:
             if e.code == 404 and method == 'GET' and url == API + '/releases/latest' and not binary:
                 return None
-            s.require(method == 'GET' and binary and e.code == 302 and redirects < 3)
+            if not (method == 'GET' and binary and e.code == 302 and redirects < 3):
+                raise ApiError(method, e.code) from None
             location = urllib.parse.urlsplit(e.headers['Location'])
             s.require(location.scheme == 'https' and location.netloc == 'release-assets.githubusercontent.com'
                       and not location.fragment and not location.username)
@@ -262,9 +290,8 @@ def main():
             'record_sha256': p['record_sha256'], 'plan_sha256': s.records.digest(p),
             'release_id': str(s.RELEASE_ID), 'remote_partial_state_may_exist': True,
             'automatic_retry': False, 'registry_upload': False}
-        if isinstance(error, UploadError):
-            failure['transport_error'] = {'operation': 'upload', 'class': error.kind,
-                                          'http_status': error.http_status}
+        if isinstance(error, (UploadError, ApiError)):
+            failure['transport_error'] = failure_details(error)
         s.json_write(output, failure)
         raise
     s.json_write(output, result)
@@ -273,9 +300,10 @@ def main():
 def cli():
     try:
         main()
-    except UploadError as error:
-        status = '' if error.http_status is None else ' http_status=' + str(error.http_status)
-        print('public release operation rejected; operation=upload class=' + error.kind + status +
+    except (UploadError, ApiError) as error:
+        detail = failure_details(error)
+        status = '' if detail['http_status'] is None else ' http_status=' + str(detail['http_status'])
+        print('public release operation rejected; operation=' + detail['operation'] + ' class=' + detail['class'] + status +
               '; inspect retained partial state, no retry', file=sys.stderr)
         return 1
     except Exception:

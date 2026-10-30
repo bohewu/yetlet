@@ -1,8 +1,10 @@
 # Single-gate release automation and registry promotion
 
-YT-020 / YT-209 followup, 2026-10-30. **Local implementation; hosted rollout and
-first registry publication Pending.** [RELEASING.md](RELEASING.md) remains the
-general SOP; dated alpha.3 results and immutable tags/archives are preserved.
+YT-020 / YT-209 followup, 2026-10-30. **Worker rollout verified by alpha.4;
+first combined registry publication remains incomplete.** See the
+[actual hosted outcome and local repair](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair).
+[RELEASING.md](RELEASING.md) remains the general SOP; dated alpha.3 results and
+immutable tags/archives are preserved.
 
 ## Owner-selected policy
 
@@ -35,7 +37,7 @@ promoted by this change, and an unsuccessful publication cannot retract a log.
 | Frozen preparation at S | `release-sign`, existing age identity, master only, no OIDC | None |
 | Sign exact frozen payloads at S | `release-sign`, master only; identity removed before OIDC; no registry token | None |
 | Independent result verification at V | `release-result-verify`, existing age identity, master only; no OIDC or publishing writes | None |
-| Publication preflight at P | No Environment Secret, read-only CI/artifact/Draft checks | None |
+| Publication preflight at P | No Environment Secret, read-only CI/artifact/public-tag checks; no Draft read | None |
 | GitHub then crates.io at P | `release-publish`, master only; GitHub contents write and `CRATES_IO_TOKEN`, no OIDC or age identity | **Owner `bohewu` approves this exact run** |
 
 S differs from C; V and P may equal S or be later reviewed commits. Live protected
@@ -177,3 +179,56 @@ No registry network write, real token use, Environment change, new candidate,
 hosted job, signature or publication occurs in this slice. Historical evidence
 is reused at its original scope. New source/package qualification, rollout and
 actual publication/readback remain separate work; YT-020 remains **Blocked**.
+
+## Alpha.4 timing and bounded CI maintenance — 2026-10-30
+
+The actual interval from candidate master CI creation at06:18:42Z to failed
+publication completion at07:51:09Z is92m27s. This measures an incomplete delivery.
+The retained original run/job timestamps separate the elapsed categories:
+
+| Category | Approximate elapsed minutes |
+|---|---:|
+| Candidate master CI and signer-document PR/master CI | 25.87 |
+| Build, original readback, prepare, sign and independent verification | 9.25 |
+| Publication run, including owner waiting and failed execution | 3.35 |
+| Gaps between the recorded workflows | 53.98 |
+
+Gaps include evidence selection/retention, a75MB local prepare-artifact download,
+document/review/Git delivery, Draft corrections and assistant orchestration.
+They are not all runner compute or owner waiting. The signer master Stable job
+spends146s on RustSec installation/audit and136s on browser tooling/build;
+Chrome E2E itself takes23s. These observations identify work, not a promised
+future duration.
+
+The minimal current workflow change caches only the pinned `cargo-audit0.22.2`
+and `wasm-bindgen-cli0.2.129` installation root. Its exact key includes OS,
+architecture, complete `rustc -vV` digest and both tool versions, with no broad
+restore prefix. A miss retains the normal locked installs. Restored tools must
+report the expected versions before use. The SHA-pinned
+[official cache action](https://github.com/actions/cache/tree/caa296126883cff596d87d8935842f9db880ef25)
+uses Node24; the observed hosted runner2.338.0 exceeds its2.327.1 minimum.
+Only unprivileged baseline CI uses this cache. No Cargo home/credential, private
+evidence, product target directory or release bootstrap/signing tool is cached.
+MSRV, format, audit, native/WASM, Chrome and all required statuses remain.
+Local syntax/review does not prove a hosted cache hit or performance gain;
+observe cold/warm behavior in subsequent necessary CI, without an extra replay
+of product qualification solely to obtain timing.
+
+Further optimization is a proposal, not an implemented trust-policy change:
+
+1. Connect existing fixed-source worker stages and process safe receipts without
+   serial chat/operator handoffs. Preserve separate no-OIDC verification and
+   the sole owner publication gate. Do not merge worker permissions.
+2. Evaluate parallel encrypted long-term retention against the existing custody
+   acceptance boundary. Do not discard retention or claim that expiring Actions
+   artifacts are durable storage.
+3. Evaluate repeat full CI for status-only document delivery. Any reuse must bind
+   the exact reviewed tree, workflows, toolchain and locks and amend the existing
+   exact-source green-master contract through review. No required status or
+   immutable source check is skipped by this slice.
+
+Fixing the publisher needs a reviewed P and refrozen publication request/plan,
+not another product build, prepare, signature or independent verifier when
+their frozen inputs remain unchanged. Retain the failed attempt and inspect
+remote state before requesting a bounded continuation. No Git delivery,
+Environment change, hosted retry or publication is performed by local maintenance.
