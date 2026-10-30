@@ -278,30 +278,39 @@ generated archives differ from the signed set in internal packaged-lock
 checksums; resolve the sixteen-package artifact/checksum contract before
 uploading or claiming existing signatures cover a repackaged registry set.
 
-For a first manual upload, sign in to crates.io with GitHub, verify the account
+The [formal registry contract](YT-020-REGISTRY-PUBLICATION-CONTRACT.md) now selects
+the first-name dependency correction and exact-byte promotion of sixteen newly
+prepared artifacts. It requires a separately selected immutable R/V, artifact
+freeze and reviewed transport. Current alpha.3 archives have a Config/Secrets
+development-name cycle and are not approved initial registry inputs. The
+isolated prototype and offline envelopes do not activate a publisher.
+
+If registry credentials are not configured, sign in to crates.io with GitHub, verify the account
 email and create a token permitted to publish the selected names. Enter it with
-`cargo login`; keep it out of repo files, shell arguments and reports. The
+`cargo login`; reuse an existing installation rather than creating another token.
+Keep token values out of repo files, shell arguments and reports. The
 [Cargo publishing guide](https://doc.rust-lang.org/cargo/reference/publishing.html)
 documents account setup, names, metadata and ownership.
 
-Example for the dependency-free foundation crate, after separate authorization
-and clean-source selection:
+Cargo source-preflight illustration for the dependency-free foundation crate,
+after clean-source selection; this is not frozen-artifact promotion:
 
 ```sh
-cargo login
 cargo publish --manifest-path crates/yetlet-core/Cargo.toml --registry crates-io --locked --dry-run
-cargo publish --manifest-path crates/yetlet-core/Cargo.toml --registry crates-io --locked
 ```
 
 The [publish command](https://doc.rust-lang.org/cargo/commands/cargo-publish.html)
 packages and verifies before upload; `--dry-run` performs checks without an
-upload. Do not use a verification bypass. Publish foundational crates before
-their dependents and wait for each actual index entry. A downstream registry
+upload. Do not use a verification bypass. First-publication ordering includes
+versioned development dependency names as well as normal/build/optional/target
+declarations. Wait for each prerequisite's actual index entry. A downstream registry
 dry-run may remain blocked while its selected sibling versions are unpublished;
 local directory-source/package proof is not registry proof.
 
-`cargo publish` packages source; it does not blindly promote a GitHub `.crate`
-attachment. Inspect generated archives and compare intended payload/digests,
+`cargo publish` packages source. The selected frozen-artifact method uses the
+official upload protocol after normal verification and separate transport review;
+it never regenerates or patches a frozen archive during transmission. Inspect
+prepared archives and compare intended payload/digests,
 then download every accepted name/version and test a clean consumer resolving
 from crates.io, without local path patches. Do not claim the GitHub signatures
 attest different registry bytes. An index-wait timeout does not prove upload

@@ -43,6 +43,9 @@ distribution versus historical qualification to [Release readiness](RELEASE-READ
 - [Config/Secrets first-publication contract](YT-020-FIRST-PUBLISH-CONTRACT.md):
   unchanged manifests, local normal publish dry-runs and their artifact/checksum
   limits; registry activation remains separate.
+- [Formal registry publication and artifact binding](YT-020-REGISTRY-PUBLICATION-CONTRACT.md):
+  selected dependency correction/order, sixteen frozen artifacts, exact-byte API
+  promotion and bounded isolated prototype results; actual upload remains gated.
 - [Alpha.3 hosted record and prepare scope](ALPHA3-HOSTED-RECORD.md): actual C,
   build/readback/retention results and the owner-approved batch ending at prepare.
 - [Alpha.3 version/package preflight](ALPHA3-VERSION-PREFLIGHT.md): retained

@@ -1,5 +1,18 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-020 registry method and artifact contract (2026-10-30):** The
+[formal contract](YT-020-REGISTRY-PUBLICATION-CONTRACT.md) resolves the policy:
+break the first-name development cycle by moving the Settings state example to
+Config, keep runtime/feature/workspace boundaries, prepare final artifacts in
+all-kind dependency order, bind all sixteen subjects to new R/V and promote the
+frozen bytes through the official API. Prototype metadata/compile and sixteen
+offline wire previews PASS; no old tests replayed or actual source/registry
+mutation. Existing Cargo login is reported complete; publishing rights remain
+unverified. Independent re-review PASS0 after the retained plan/receipt P2
+correction; all five source hashes match, temporary cleanup PASS.
+Implementation/freeze/live acceptance remain open, YT-020 Blocked. The five prior documents are committed as `15abc44`;
+no Push or new-change Commit.
+
 **YT-020 Config/Secrets local preflight (2026-10-30):** The
 [dependency contract](YT-020-FIRST-PUBLISH-CONTRACT.md) preserves manifests,
 features and source locks. Secrets and Config/secret-provider publish dry-runs
