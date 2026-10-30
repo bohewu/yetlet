@@ -243,7 +243,13 @@ binds the original failed result and unchanged archive plan. Reconcile published
 bytes/owner and remaining-version absence before a separately authorized attempt;
 do not rerun GitHub publication, resend existing versions or re-sign. The known
 one-plus-fifteen path still needs a reviewed new P, green CI, adequate first-name
-capacity and its actual owner gate. It is not an automatic/general resume.
+capacity and its actual owner gate. For the owner-selected conservative path,
+the registry-only job waits11minutes before each unique PUT, including the first:
+165minutes scheduled waiting for fifteen names, within a210minute job bound.
+After every wait it rechecks P/CI, owner approval and unchanged Release/assets,
+then checks target-version absence. Keep master=P until completion. Unknown
+account limits can still reject a write; HTTP429 stops without retry. The normal
+publication job retains its60minute bound. It is not an automatic/general resume.
 
 Use the adopted [D1/D2 field/attachment policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md)
 and a closed exact list. The first alpha has twenty public files: sixteen `.crate`

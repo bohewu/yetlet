@@ -6,8 +6,11 @@ verifies the public twenty-asset GitHub prerelease and the first registry archiv
 the job stops on a wrong success-response assumption. Local correction prepares
 only the remaining fifteen, preserves all published/signed bytes and history,
 and retains a single owner gate in a GitHub-read-only continuation job.
-Future source/CI, first-name capacity and actual registry/consumer completion
-remain unverified; no new upload or Git delivery is performed. YT-020 Blocked.
+The owner authorizes delivery and selects a fixed11minute wait before each
+unique PUT, including the first, within a210minute registry-only job. Live
+authority/release checks follow each wait; errors including429 stop. Pacing
+review, new source/CI and actual registry/consumer completion remain open;
+actual account quota is not proven and no new upload occurs. YT-020 Blocked.
 
 **Earlier alpha.4 publication maintenance (2026-10-30):**
 [Actual prepare/sign/independent verification](ALPHA4-HOSTED-RECORD.md#actual-preparation-signing-and-independent-verification)

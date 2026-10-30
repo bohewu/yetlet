@@ -255,3 +255,21 @@ required followups; all nine reviewed source hashes match. Native reviewer/model
 and actual high effort are verified. Only this acceptance metadata follows the
 reviewed boundary. New P/CI, hosted acceptance, account capacity and full registry
 consumer proof remain Pending; this verdict grants no upload or Git authority.
+
+### Owner-selected conservative continuation cadence
+
+The owner authorizes delivery of the local parser/continuation correction and
+then selects one new name per11minutes, with a210minute protected-job bound.
+The original nine-path correction is locally committed as `f743366`; it has not
+yet been pushed. The fixed policy waits660seconds before each of fifteen unique
+PUTs, including the first (165minutes scheduled waiting). Each wait is followed
+by live P/CI, owner-approval and unchanged-public-release checks; target absence
+is checked before intent/PUT. Errors including429 stop without retry. The normal
+publisher remains60minutes. No quota probe or registry write is performed by
+this adjustment. It does not establish the account's actual quota.
+
+Only affected pacing/continuation checks and documentary checks are required;
+the original accepted archive, signing, platform and browser evidence is reused.
+Pacing review and delivery results are recorded separately from the earlier
+local PASS. Hosted preflight may proceed after reviewed delivery/green CI, but
+the final `release-publish` gate still belongs to the owner. YT-020 stays Blocked.

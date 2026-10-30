@@ -8,6 +8,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import time
 
 HERE = Path(__file__).resolve().parent
 sys.path.insert(0, str(HERE))
@@ -20,6 +21,7 @@ spec.loader.exec_module(pub)
 s = pub.s
 REQUEST_FIELDS = {'publication_commit', 'verifier_commit', 'verifier_run', 'verifier_attempt',
     'artifact', 'artifact_sha256', 'verification_sha256', 'name', 'notes', 'notes_sha256', 'registry_plan_sha256'}
+FIRST_NAME_INTERVAL_SECONDS = 660  # Reviewed fixed policy; request JSON cannot disable it.
 
 
 def request():
@@ -235,7 +237,10 @@ def main():
                     'record_sha256': s.records.digest(s.RECORD), 'publication_request_sha256': s.records.digest(r),
                     'prior': r['continuation'], 'original_public_plan_sha256': s.records.digest(p),
                     'registry_plan_sha256': s.records.digest(reg), 'existing': [existing],
-                    'remaining': selection['remaining'], 'github_mutations': False, 'automatic_retry': False})
+                    'remaining': selection['remaining'], 'github_mutations': False, 'automatic_retry': False,
+                    'wait_before_every_put_seconds': FIRST_NAME_INTERVAL_SECONDS,
+                    'scheduled_wait_seconds': FIRST_NAME_INTERVAL_SECONDS * len(selection['remaining']),
+                    'job_timeout_minutes': 210})
             else:
                 p, blobs, reg, bodies = distribution(r, Path(temporary))
             s.json_write(output / 'PUBLICATION-PLAN.json', p)
@@ -246,7 +251,9 @@ def main():
                         s.RECORD['version'] + '`\n\nRequest SHA256: `' + s.records.digest(r) +
                         '`\n\nGitHub plan SHA256: `' + s.records.digest(p) + '`\n\nRegistry plan SHA256: `' +
                         s.records.digest(reg) + '`\n\n' + ('Registry-only: preserve existing GitHub release and '
-                        'yetlet-actions; publish only the selected fifteen packages.\n' if selection is not None else
+                        'yetlet-actions; publish only the selected fifteen packages. '
+                        'Wait 11 minutes before every unique PUT (165 minutes total); job bound 210 minutes. '
+                        'Recheck source/owner approval/release after each wait; stop on any error including429.\n' if selection is not None else
                         'Destinations: GitHub pre-release, then crates.io (16 packages).\n'))
                 receipt['status'] = 'preflight_pass'
                 return
@@ -276,7 +283,18 @@ def main():
             if selection is None:
                 reg_result = registry.publish(reg, bodies, output / 'REGISTRY-RESULT.json')
             else:
-                reg_result = registry.publish(reg, bodies, output / 'REGISTRY-RESULT.json', selection=selection)
+                def before_put(row):
+                    nonlocal phase
+                    phase = 'continuation-wait'
+                    print('registry continuation waiting before ' + row['name'] + ': ' +
+                          str(FIRST_NAME_INTERVAL_SECONDS) + ' seconds', flush=True)
+                    time.sleep(FIRST_NAME_INTERVAL_SECONDS)
+                    phase = 'continuation-recheck'
+                    gate(r, True)
+                    published_release(p, previous_github)
+                    phase = 'registry-publish'
+                reg_result = registry.publish(reg, bodies, output / 'REGISTRY-RESULT.json',
+                                              selection=selection, before_put=before_put)
             receipt['registry'] = 'published_and_verified'
             registry.save(output / 'PUBLICATION-RESULT.json', receipt)
             phase = 'registry-consumer'

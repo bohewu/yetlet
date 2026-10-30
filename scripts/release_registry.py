@@ -227,7 +227,7 @@ def reconcile(plan, selection):
             'owner': 'bohewu', **proof}
 
 
-def publish(plan, bodies, receipt_path, *, selection=None):
+def publish(plan, bodies, receipt_path, *, selection=None, before_put=None):
     """Caller must authenticate the final GitHub approval and public release first."""
     require(not Path(receipt_path).exists())  # No implicit retry/resume of an uncertain batch.
     proof = {'schema': 1, 'plan_sha256': records.digest(plan), 'status': 'in_progress',
@@ -237,6 +237,7 @@ def publish(plan, bodies, receipt_path, *, selection=None):
         complete = set()
         rows = plan['packages']
         if selection is not None:
+            require(callable(before_put))
             existing = reconcile(plan, selection)  # All state checks precede the first PUT.
             proof['existing'] = [existing]
             complete.add(existing['name'])
@@ -245,6 +246,7 @@ def publish(plan, bodies, receipt_path, *, selection=None):
         for row in rows:
             require(set(row['requires']) <= complete and sha(bodies[row['name']]) == row['body_sha256'])
             if selection is not None:
+                before_put(row)  # Caller-owned pacing and authority recheck; no PUT has been attempted yet.
                 require_absent(row, plan['version'])  # Stop on state drift; never resend or silently skip.
             entry = {'name': row['name'], 'status': 'attempted', 'sha256': row['sha256']}
             proof['packages'].append(entry)

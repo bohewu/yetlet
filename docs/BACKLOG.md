@@ -9,8 +9,11 @@ and the registry consumer were not attempted. Local parser/explicit continuation
 work preserves that version, original GitHub assets/C/tag/S/V/signatures and
 failures. [The contract](RELEASE-PUBLICATION.md#registry-only-continuation-contract--2026-10-30)
 retains owner approval and no retries, with GitHub-read-only continuation and
-fresh state checks. Future P/CI, account first-name capacity, hosted continuation
-and complete registry consumer remain open. No Commit/Push or upload; YT-020 Blocked.
+fresh state checks. The owner authorizes delivery and selects11minutes before
+each unique PUT (including the first), a210minute registry-only job, and live
+authority/release checks after every wait. Pacing review, new P/CI and hosted
+continuation/full consumer remain open; account quota is not proven. No new
+upload; YT-020 Blocked.
 
 **Earlier YT-020 / YT-209 publication maintenance (2026-10-30):**
 [Actual alpha.4 execution](ALPHA4-HOSTED-RECORD.md#actual-preparation-signing-and-independent-verification)

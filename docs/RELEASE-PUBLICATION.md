@@ -213,10 +213,19 @@ defaults to a five-name burst and one new-crate token per ten minutes, with
 deployment configuration and per-user overrides. These are source defaults,
 not observed production/account limits. Before a live fifteen-new-name batch,
 confirm sufficient account capacity or separately agree a different bounded
-batch/budget. The current sixty-minute job does not establish that all fifteen
-can complete under those defaults. No quota was probed by an upload, no account
-override was requested, and no sleep/retry/batch-splitting behavior was added;
-HTTP429 stops with the original partial receipts.
+batch/budget. The owner selects a conservative fixed cadence: wait660seconds
+before every selected package's unique PUT, including the first. Fifteen waits
+total165minutes; the registry-only protected job is bounded to210minutes,
+including setup, readbacks and consumer checks. The normal publication job
+remains60minutes. Request JSON cannot shorten or disable this policy.
+
+After each wait, recheck protected master=P, CI, the actual owner approval and
+the unchanged public Release/assets, then require the target version absent
+immediately before its PUT. Keep master at P during the batch; source or state
+drift stops it. This cadence is conservative against the documented defaults,
+not a guarantee of an unknown production/account allowance. No quota is probed
+by uploading, and no override is requested. Any HTTP429 or other failure stops
+with the original partial receipts, without retry or automatic batch splitting.
 
 ## Local verification and remaining limits
 

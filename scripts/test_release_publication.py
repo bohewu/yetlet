@@ -183,13 +183,14 @@ class RegistryContinuationTests(unittest.TestCase):
             root = Path(temporary)
             plan, bodies, selection = self.fixture(root)
             rows = {x['name']: x for x in plan['packages']}
-            published, writes = {'yetlet-actions'}, []
+            published, writes, waits = {'yetlet-actions'}, [], []
             def remote(url, method='GET', body=None):
                 if method == 'PUT':
                     size = struct.unpack_from('<I', body)[0]
                     name = json.loads(body[4:4+size])['name']
                     self.assertNotEqual(name, 'yetlet-actions')
                     self.assertNotIn(name, published)
+                    self.assertEqual(waits, writes + [name])
                     self.assertEqual(body, bodies[name])
                     self.assertTrue(set(rows[name]['requires']) <= published)
                     writes.append(name); published.add(name)
@@ -205,13 +206,15 @@ class RegistryContinuationTests(unittest.TestCase):
                 return (root / rows[name]['filename']).read_bytes()
             receipt = root / 'continuation.json'
             with patch.object(registry, 'request', side_effect=remote) as network:
-                result = registry.publish(plan, bodies, receipt, selection=selection)
+                result = registry.publish(plan, bodies, receipt, selection=selection,
+                                          before_put=lambda row: waits.append(row['name']))
                 self.assertEqual(writes, selection['remaining'])
                 self.assertEqual(len(result['packages']), 15)
                 self.assertEqual(result['existing'][0]['status'], 'verified_existing')
                 self.assertTrue(all(e['status'] == 'verified' for e in result['packages']))
                 calls = network.call_count
-                with self.assertRaises(ValueError): registry.publish(plan, bodies, receipt, selection=selection)
+                with self.assertRaises(ValueError):
+                    registry.publish(plan, bodies, receipt, selection=selection, before_put=lambda row: None)
                 self.assertEqual(network.call_count, calls)
 
     def test_unknown_selection_is_rejected_before_network(self):
@@ -238,7 +241,7 @@ class RegistryContinuationTests(unittest.TestCase):
                                    return_value={'index_sha256': 'a'*64, 'download_sha256': 'a'*64}),
                       patch.object(registry, 'request', side_effect=remote) as network):
                     with self.assertRaises((ValueError, registry.RegistryError)):
-                        registry.publish(plan, bodies, root/'result.json', selection=selection)
+                        registry.publish(plan, bodies, root/'result.json', selection=selection, before_put=lambda row: None)
                 self.assertTrue(all(len(c.args) < 2 or c.args[1] != 'PUT' for c in network.call_args_list))
                 proof = json.loads((root/'result.json').read_text())
                 self.assertEqual(proof['packages'], [])
@@ -257,7 +260,7 @@ class RegistryContinuationTests(unittest.TestCase):
                 return records.canonical({'name': selection['remaining'][0], 'vers': plan['version']})
             with patch.object(registry, 'readback', return_value={}), patch.object(registry, 'request', side_effect=remote):
                 with self.assertRaises(registry.RegistryError) as caught:
-                    registry.publish(plan, bodies, root/'result.json', selection=selection)
+                    registry.publish(plan, bodies, root/'result.json', selection=selection, before_put=lambda row: None)
             self.assertEqual(caught.exception.kind, 'version_exists')
             self.assertEqual(json.loads((root/'result.json').read_text())['packages'], [])
 
@@ -269,12 +272,23 @@ class RegistryContinuationTests(unittest.TestCase):
                 raise registry.RegistryError('transport')
             with (patch.object(registry, 'reconcile', return_value={'name': 'yetlet-actions', 'status': 'verified_existing'}),
                   patch.object(registry, 'require_absent'), patch.object(registry, 'request', side_effect=remote) as write):
-                with self.assertRaises(registry.RegistryError): registry.publish(plan, bodies, root/'result.json', selection=selection)
+                with self.assertRaises(registry.RegistryError):
+                    registry.publish(plan, bodies, root/'result.json', selection=selection, before_put=lambda row: None)
             write.assert_called_once()
             proof = json.loads((root/'result.json').read_text())
             self.assertEqual(proof['existing'][0]['name'], 'yetlet-actions')
             self.assertEqual([(p['name'], p['status']) for p in proof['packages']], [(selection['remaining'][0], 'attempted')])
             self.assertEqual(proof['consumer'], 'not_attempted')
+
+    def test_continuation_requires_pacing_and_recheck_before_any_put(self):
+        for callback in (None, lambda row: (_ for _ in ()).throw(ValueError('source changed'))):
+            with self.subTest(callback=callback is not None), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary); plan, bodies, selection = self.fixture(root)
+                with (patch.object(registry, 'reconcile', return_value={'name': 'yetlet-actions'}),
+                      patch.object(registry, 'request') as network, self.assertRaises(ValueError)):
+                    registry.publish(plan, bodies, root/'result.json', selection=selection, before_put=callback)
+                network.assert_not_called()
+                self.assertEqual(json.loads((root/'result.json').read_text())['packages'], [])
 
 
 class PublicationTests(unittest.TestCase):
@@ -508,7 +522,8 @@ class PublicationContinuationTests(unittest.TestCase):
                 proof = json.loads((root/'output/PUBLICATION-RESULT.json').read_text())
                 self.assertFalse((root/'output/GITHUB-PUBLICATION.json').exists())
                 if mode == 'publish':
-                    self.assertEqual(upload.call_args.kwargs, {'selection': selection})
+                    self.assertEqual(upload.call_args.kwargs['selection'], selection)
+                    self.assertTrue(callable(upload.call_args.kwargs['before_put']))
                     consumer.assert_called_once_with(record()['version'], root/'output')
                     self.assertEqual(proof['github'], 'existing_public_release_verified')
                     self.assertEqual(proof['status'], 'complete')
@@ -517,6 +532,36 @@ class PublicationContinuationTests(unittest.TestCase):
                     upload.assert_not_called(); consumer.assert_not_called()
                     self.assertEqual(proof['status'], 'preflight_pass')
                     self.assertEqual((proof['github'], proof['registry']), ('not_attempted', 'not_attempted'))
+
+    def test_fifteen_waits_recheck_authority_and_release_before_each_unique_put(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary); _, r, _, p, reg, bodies, previous, _ = self.fixture(root)
+            events = []
+            def upload(plan, raw, receipt, *, selection, before_put):
+                self.assertEqual(selection['remaining'], [row['name'] for row in plan['packages'][1:]])
+                for row in plan['packages'][1:]:
+                    before_put(row)
+                    events.append(('put', row['name']))
+                return {'status': 'registry_verified_consumer_pending'}
+            with (patch.object(publication.sys, 'argv', ['release-publish.py', 'publish']),
+                  patch.dict(os.environ, {'PUBLICATION_OUTPUT': str(root/'output')}),
+                  patch.object(publication, 'request', return_value=r),
+                  patch.object(publication.s, 'outside', side_effect=Path),
+                  patch.object(publication, 'gate', side_effect=lambda *args: events.append(('gate', None))),
+                  patch.object(publication, 'continuation_distribution', return_value=(p, {}, reg, bodies, previous)),
+                  patch.object(publication, 'published_release', side_effect=lambda *args: events.append(('release', None)) or {}),
+                  patch.object(registry, 'reconcile', return_value={'name': 'yetlet-actions'}),
+                  patch.object(publication.time, 'sleep', side_effect=lambda seconds: events.append(('sleep', seconds))),
+                  patch.object(registry, 'publish', side_effect=upload),
+                  patch.object(publication, 'consumer', return_value={'status': 'PASS'})):
+                publication.main()
+            paced = events[next(i for i, event in enumerate(events) if event[0] == 'sleep'):]
+            expected = []
+            for name in r['continuation']['remaining']:
+                expected.extend([('sleep', 660), ('gate', None), ('release', None), ('put', name)])
+            self.assertEqual(paced, expected)
+            proof = json.loads((root/'output/CONTINUATION-PLAN.json').read_text())
+            self.assertEqual((proof['scheduled_wait_seconds'], proof['job_timeout_minutes']), (9900, 210))
 
     def test_new_owner_approval_and_readonly_job_are_required(self):
         with tempfile.TemporaryDirectory() as temporary:
