@@ -1,5 +1,13 @@
 # Yetlet Backlog
 
+**Alpha.4 local version preparation (2026-10-30):** the owner selected
+`0.9.0-alpha.4` for sixteen libraries, preserving third-party dependencies.
+[Affected preflight](ALPHA4-VERSION-PREFLIGHT.md) follows merged PR25/master
+`1740ba2`; affected checks and independent Reviewer PASS0. This local acceptance
+is separate from candidate selection and hosted qualification.
+No Git delivery, tag, signing or publication is authorized
+in this slice. YT-020 remains Blocked; accepted releases and failures stay intact.
+
 
 **YT-020 / YT-209 local followup (2026-10-30):** the owner selected automated
 build/sign/verification and one final combined GitHub/crates.io publication gate.

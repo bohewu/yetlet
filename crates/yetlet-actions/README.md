@@ -1,6 +1,6 @@
 # yetlet-actions
 
-**Experimental `0.9.0-alpha.3`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
+**Experimental `0.9.0-alpha.4`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
 
 `yetlet-actions` defines typed semantic commands and explicitly selected executors. It does not forward DOM events or create a persistent remote event circuit. Its ordinary dependencies are serde/serde_json; WASM adds browser fetch bindings.
 

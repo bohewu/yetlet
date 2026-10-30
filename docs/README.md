@@ -32,6 +32,10 @@ distribution versus historical qualification to [Release readiness](RELEASE-READ
 
 ## Maintainer entry points
 
+- [Alpha.4 local version preparation](ALPHA4-VERSION-PREFLIGHT.md): sixteen
+  coordinated package versions, unchanged third-party dependencies and bounded
+  affected verification; no candidate or execution authority.
+
 - [Development and PR workflow](DEVELOPMENT.md): bounded changes, focused checks,
   Git authority, strict/builtin Guard, CI and merge reconciliation.
 - [New-version release workflow](RELEASING.md): one-time setup versus each version,
