@@ -32,6 +32,11 @@ distribution versus historical qualification to [Release readiness](RELEASE-READ
 
 ## Maintainer entry points
 
+- [Alpha.4 hosted checkpoint](ALPHA4-HOSTED-RECORD.md): fixed C/tag, original
+  successful build/readback, preserved failures/custody, distinct signer delivery
+  and final publication boundary.
+
+
 - [Alpha.4 local version preparation](ALPHA4-VERSION-PREFLIGHT.md): sixteen
   coordinated package versions, unchanged third-party dependencies and bounded
   affected verification; no candidate or execution authority.

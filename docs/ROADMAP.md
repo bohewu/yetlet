@@ -1,5 +1,12 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**Alpha.4 hosted evidence (2026-10-30):**
+[Original build/readback and retained source-package evidence](ALPHA4-HOSTED-RECORD.md)
+PASS at fixed C `c45e10c` and immutable unsigned tag. Distinct signer selection,
+actual prepare/signature/results remain Pending. Keep the selected Experimental
+scope and one final owner publication gate; no new support or registry claim.
+
+
 **Alpha.4 preparation (2026-10-30):**
 [Sixteen-package version preflight](ALPHA4-VERSION-PREFLIGHT.md) coordinates
 manifests, internal requirements and local lock versions without third-party
