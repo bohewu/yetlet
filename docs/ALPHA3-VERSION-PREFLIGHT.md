@@ -4,6 +4,11 @@ Date: 2026-10-29 (Asia/Taipei). Status: Required local affected checks and final
 independent Reviewer PASS0; optional synthetic readback FAILED/UNVERIFIED.
 No new immutable C is selected by this record.
 
+Later execution: the [actual hosted record](ALPHA3-HOSTED-RECORD.md) records
+selected C `557ab76`, PR/master CI, immutable alpha.3 tag, original successful
+build/readback and qualified owner-local retention. Its separate prepare grant
+does not rewrite this local preflight or make the optional failed harness PASS.
+
 ## Approved bounded batch
 
 After the [retained alpha.2 custody failure](ALPHA2-HOSTED-RECORD.md), the owner

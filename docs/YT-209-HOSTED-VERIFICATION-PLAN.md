@@ -2,6 +2,12 @@
 
 Status: proposed operational plan; no new operational authority granted.
 
+Later owner authority: the [alpha.3 actual record](ALPHA3-HOSTED-RECORD.md)
+records C `557ab76`, successful build/readback/retention and the next separately
+approved batch ending at prepare. Actual S/Draft/prepare outputs remain Pending;
+signing and positive result verification are not authorized. The dated proposal
+below preserves its original state and is not a floating execution grant.
+
 ## Current disposition — 2026-10-29
 
 Tool delivery and the protected `release-result-verify` Environment/Secret

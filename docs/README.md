@@ -37,8 +37,10 @@ distribution versus historical qualification to [Release readiness](RELEASE-READ
 - [New-version release workflow](RELEASING.md): one-time setup versus each version,
   immutable C/S, protected jobs, exact approvals, independent verification and
   publication; distinguishes installed tooling from Pending hosted qualification.
-- [Alpha.3 version/package preflight](ALPHA3-VERSION-PREFLIGHT.md): current
-  coordinated package migration, custody correction and unchanged release gates.
+- [Alpha.3 hosted record and prepare scope](ALPHA3-HOSTED-RECORD.md): actual C,
+  build/readback/retention results and the owner-approved batch ending at prepare.
+- [Alpha.3 version/package preflight](ALPHA3-VERSION-PREFLIGHT.md): retained
+  coordinated migration/custody correction, accepted checks and harness limits.
 - [Alpha.2 retained build/custody failure](ALPHA2-HOSTED-RECORD.md): immutable
   unpromoted tag, original outputs and correction rationale; its
   [earlier local package preflight](ALPHA2-VERSION-PREFLIGHT.md) keeps its scope.
