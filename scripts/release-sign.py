@@ -148,17 +148,18 @@ def validate_request(r):
     if mode == "sign":
         require(r["d6"] == ("reviewed-automation" if policy.automatic() else "approve-exact-signing-inputs") and r["provenance_sha256"] == PUBLIC_SHA)
     else:
-        handoff_input(r)
+        handoff_input(r, None)  # Freshness is checked where the capability is actually used.
     return r
 
 
-def handoff_input(r, minimum_seconds=300):
+def handoff_input(r, minimum_seconds=120):
     raw = r["qualification_handoff"].encode("ascii")
     require(len(raw) <= 16384 and re.fullmatch(
         rb"-----BEGIN AGE ENCRYPTED FILE-----\n[A-Za-z0-9+/=\n]+-----END AGE ENCRYPTED FILE-----\n", raw))
     require(sha(raw) == r["qualification_handoff_sha256"])
     require(number(r["qualification_expires"]))
-    require(minimum_seconds <= int(r["qualification_expires"]) - time.time() <= 7200)
+    if minimum_seconds is not None:
+        require(minimum_seconds <= int(r["qualification_expires"]) - time.time() <= 7200)
     return raw
 
 
@@ -244,7 +245,7 @@ def make_handoff(template, output):
     q = urllib.parse.parse_qs(urllib.parse.urlsplit(url).query)
     claims = load(base64.urlsafe_b64decode(q["jwt"][0].split(".")[1] + "=" * (-len(q["jwt"][0].split(".")[1]) % 4)))
     r["qualification_expires"] = str(min(int(datetime.fromisoformat(q["se"][0].replace("Z", "+00:00")).timestamp()), claims["exp"]))
-    require(1200 <= int(r["qualification_expires"]) - time.time() <= 7200)
+    require(120 <= int(r["qualification_expires"]) - time.time() <= 7200)
     handoff_url(url, r["qualification_expires"])
     raw = qualification_download(url, r)  # Prove this exact capability works WITHOUT owner/CI authentication.
     output.mkdir(mode=0o700)
@@ -274,7 +275,7 @@ def receive_qualification(r, work):
     cipher, plain = work / "qualification-handoff.age", work / "qualification-capability.json"
     stage = "qualification-handoff"
     try:
-        write(cipher, handoff_input(r))
+        write(cipher, handoff_input(r, 60))
         command([os.environ["SIGN_AGE"], "--decrypt", "--identity", work / "identity", "--output", plain, cipher])
         p = load(read(plain, 16384))
         require(set(p) == {"schema", "source", "release", "signer_commit", "asset", "zip_sha256",
@@ -293,6 +294,51 @@ def receive_qualification(r, work):
     finally:
         cipher.unlink(missing_ok=True)
         plain.unlink(missing_ok=True)
+
+
+def intake_receipt(r, directory):
+    """Bind encrypted-only intake to this exact dispatch, source and closed inputs."""
+    run, attempt = os.environ["GITHUB_RUN_ID"], os.environ["GITHUB_RUN_ATTEMPT"]
+    require(number(run) and number(attempt) and r["mode"] == "prepare")
+    qualification_transport(r, directory)
+    return {"schema": 1, "source": C, "signer_commit": r["signer_commit"],
+            "run": run, "attempt": attempt, "record_sha256": records.digest(RECORD),
+            "request_sha256": sha(json.dumps(r, sort_keys=True, separators=(",", ":")).encode()),
+            "qualification_zip_sha256": r["qualification_sha256"],
+            "qualification_manifest_sha256": r["qualification_manifest_sha256"],
+            "ciphertext_sha256": sha(read(directory / "qualification.tar.age", api.LIMIT))}
+
+
+def intake(r, work, output):
+    try:
+        receive_qualification(r, work)
+        receipt = intake_receipt(r, work / "qualification")
+        output.mkdir(mode=0o700)
+        for name in ("qualification.tar.age", "qualification-receipt.json"):
+            shutil.move(work / "qualification" / name, output / name)
+        json_write(output / "QUALIFICATION-INTAKE.json", receipt)
+    finally:
+        (work / "identity").unlink(missing_ok=True)
+
+
+def download_intake(r, work):
+    """Consume only the successful dependency's immutable, same-attempt artifact."""
+    run, attempt = os.environ["GITHUB_RUN_ID"], os.environ["GITHUB_RUN_ATTEMPT"]
+    artifact, expected = os.environ["SIGN_INTAKE_ARTIFACT"], os.environ["SIGN_INTAKE_SHA256"]
+    require(number(run) and number(attempt) and number(artifact) and digest(expected))
+    metadata = api.api("/actions/runs/" + run + "/attempts/" + attempt)
+    require(metadata["id"] == int(run) and metadata["run_attempt"] == int(attempt)
+            and metadata["head_sha"] == r["signer_commit"] and metadata["head_branch"] == "master"
+            and metadata["repository"]["id"] == 1409587171 and metadata["head_repository"]["id"] == 1409587171
+            and metadata["event"] == "workflow_dispatch" and metadata["path"] == ".github/workflows/release-sign.yml"
+            and metadata["status"] == "in_progress" and metadata["conclusion"] is None)
+    artifact_gate(api.api("/actions/artifacts/" + artifact), run, r["signer_commit"], artifact,
+                  expected, "qualification-intake-" + run + "-" + attempt)
+    raw = download("/actions/artifacts/" + artifact + "/zip")
+    directory = work / "qualification"
+    unpack_zip(raw, expected, directory, {"qualification.tar.age": api.LIMIT,
+               "qualification-receipt.json": 65536, "QUALIFICATION-INTAKE.json": 65536})
+    require(load(read(directory / "QUALIFICATION-INTAKE.json")) == intake_receipt(r, directory))
 
 
 def identity(r):
@@ -333,7 +379,7 @@ def artifact_gate(a, run, source, artifact_id, expected_sha, name):
             and a["workflow_run"]["head_repository_id"] == 1409587171)
 
 
-def gate(r, minimum_handoff_seconds=1200):
+def gate(r, minimum_handoff_seconds=120):
     stage = "identity"
     try:
         identity(r)
@@ -503,7 +549,9 @@ def tools(directory):
 
 
 def prepare(r, work, output):
-    receive_qualification(r, work)
+    # Already captured before the long bootstrap, with exact-run/attempt/input binding.
+    require(load(read(work / "qualification" / "QUALIFICATION-INTAKE.json")) ==
+            intake_receipt(r, work / "qualification"))
     restored = work / "original"
     command([os.environ["SIGN_XTASK"], "release", "custody", "verify", "--age", os.environ["SIGN_AGE"],
              "--recipient", HERE.parent / ".github/release-evidence-recipient.txt", "--source", C,
@@ -728,15 +776,26 @@ def main():
     if action == "preflight":
         gate(r)
         return
+    if action in {"intake-preflight", "intake"}:
+        require(r["mode"] == "prepare")
+        require(sha(read(os.environ["SIGN_AGE"])) == AGE_SHA)
+        require(sha(read(HERE.parent / ".github/release-evidence-recipient.txt")) == RECIPIENT_SHA)
+        if action == "intake-preflight":
+            gate(r, 60)
+        else:
+            intake(r, outside(os.environ["SIGN_WORK"]), outside(os.environ["SIGN_OUTPUT"]))
+        return
     work = outside(os.environ["SIGN_WORK"])
     tool_dir = Path(os.environ["SIGN_TOOLS"])
     if action == "download":
-        gate(r, minimum_handoff_seconds=300)
         work.mkdir(mode=0o700)
         if r["mode"] == "prepare":
+            download_intake(r, work)
+            gate(r, minimum_handoff_seconds=None)
             raw = download("/actions/artifacts/" + BUILD_ARTIFACT + "/zip")
             api.unpack(raw, {"digest": BUILD_ZIP}, str(work / "transport"))
         else:
+            gate(r)
             raw = download("/actions/artifacts/" + r["artifact"] + "/zip")
             unpack_zip(raw, r["digest"], work / "transport",
                        {"frozen-signing-inputs.tar.age": api.LIMIT, "SIGNING-INPUTS.json": 65536})

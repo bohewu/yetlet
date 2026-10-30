@@ -70,11 +70,74 @@ jobs:
               f.write('mode=' + json.loads(os.environ['SIGN_REQUEST'])['mode'] + '\n')
           PY
 
-  prepare:
+  qualification_intake:
     needs: preflight
     if: needs.preflight.outputs.mode == 'prepare'
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 3
+    environment: release-sign
+    outputs:
+      artifact: ${{ steps.upload.outputs.artifact-id }}
+      sha256: ${{ steps.upload.outputs.artifact-digest }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Authenticate the exact pinned age binary before key access
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -m 700 "$RUNNER_TEMP/intake-tools"
+          cd "$RUNNER_TEMP/intake-tools"
+          curl --fail --location --silent --show-error --proto '=https' --tlsv1.2 --max-time 60 \
+            -o age.tar.gz https://github.com/FiloSottile/age/releases/download/v1.3.2/age-v1.3.2-linux-amd64.tar.gz
+          printf '%s\n' 'cbe24006683f8eb669266162894b9a522a1af52f2665fbc63a4bb032ed26ac10  age.tar.gz' | sha256sum --check --strict
+          tar --extract --gzip --file age.tar.gz --no-same-owner age/age
+          printf '%s\n' 'eb7dd1b518f0a307c99cd97782623c5321da049154b04acd2d98d21aa7bc9b2c  age/age' | sha256sum --check --strict
+      - name: Recheck source and live capability before key access
+        env:
+          GH_TOKEN: ${{ github.token }}
+          SIGN_AGE: ${{ runner.temp }}/intake-tools/age/age
+        run: python3 scripts/release-sign.py intake-preflight
+      - name: Capture encrypted qualification and immediately remove key and capability
+        shell: bash
+        env:
+          AGE_IDENTITY: ${{ secrets.AGE_IDENTITY }}
+          SIGN_WORK: ${{ runner.temp }}/intake-work
+          SIGN_OUTPUT: ${{ runner.temp }}/intake-output
+          SIGN_AGE: ${{ runner.temp }}/intake-tools/age/age
+        run: |
+          set -euo pipefail
+          umask 077
+          mkdir -m 700 "$SIGN_WORK"
+          trap 'rm -rf "$SIGN_WORK"' EXIT HUP INT TERM
+          [[ -n "$AGE_IDENTITY" ]]
+          printf '%s\n' "$AGE_IDENTITY" > "$SIGN_WORK/identity"
+          unset AGE_IDENTITY
+          python3 scripts/release-sign.py intake
+      - name: Upload only bound ciphertext and safe intake receipts
+        id: upload
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: qualification-intake-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/intake-output/qualification.tar.age
+            ${{ runner.temp }}/intake-output/qualification-receipt.json
+            ${{ runner.temp }}/intake-output/QUALIFICATION-INTAKE.json
+          if-no-files-found: error
+          retention-days: 7
+      - name: Remove intake files after success or failure
+        if: always()
+        shell: bash
+        run: rm -rf "$RUNNER_TEMP/intake-work" "$RUNNER_TEMP/intake-output" "$RUNNER_TEMP/intake-tools"
+
+  prepare:
+    needs: [preflight, qualification_intake]
+    if: needs.preflight.outputs.mode == 'prepare'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 27
     environment: release-sign
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
@@ -95,10 +158,11 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           SIGN_WORK: ${{ runner.temp }}/sign-work
           SIGN_TOOLS: ${{ runner.temp }}/sign-tools
+          SIGN_INTAKE_ARTIFACT: ${{ needs.qualification_intake.outputs.artifact }}
+          SIGN_INTAKE_SHA256: ${{ needs.qualification_intake.outputs.sha256 }}
         run: python3 scripts/release-sign.py download
-      # The owner-created input carries an age-encrypted short-lived download capability.
-      # Only this protected phase decrypts it; no plaintext URL or owner token is an input.
-      - name: Isolated encrypted handoff and prepare with no OIDC permission
+      # A fresh runner authenticates all build tools before decrypting private evidence.
+      - name: Prepare captured encrypted inputs with no OIDC permission
         shell: bash
         env:
           AGE_IDENTITY: ${{ secrets.AGE_IDENTITY }}

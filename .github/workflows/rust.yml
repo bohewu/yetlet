@@ -81,7 +81,7 @@ jobs:
       - name: Format
         run: cargo fmt --all -- --check
       - name: Changed release publication and compatibility boundaries
-        run: PYTHONPATH=scripts python3 -m unittest test_release_publication test_release_automation.PublicTests
+        run: PYTHONPATH=scripts python3 -m unittest test_release_publication test_release_automation.PublicTests test_release_sign
       - name: Clippy
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - name: Native tests and doctests

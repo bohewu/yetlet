@@ -1125,3 +1125,32 @@ retain their accepted source-package signing/integrity scope. The six local resu
 documents remain uncommitted/unstaged. Their prior independent acceptance covers
 D6; this later publication checkpoint records the owner's separate approval and
 actual API/asset readback only.
+
+
+### Alpha.5 short-lived capability correction — 2026-10-31
+
+The20/5minute minimums and approximately30minute provider lifetime above describe
+the original retained implementation/evidence. The actual small alpha.5 Draft
+asset produces a five-minute capability; this current correction supersedes
+those timing assumptions without changing C, input bytes or signing identity pins.
+Local handoff/preflight require120seconds remaining. A separate protected
+`qualification_intake` job authenticates the same SHA-pinned age binary before
+key access, repeats source/CI/Environment checks and requires60seconds at actual
+capability use. It downloads the original encrypted ZIP without credentials or
+redirects, verifies its exact hash/receipt, then removes key and plaintext URL.
+Only original qualification ciphertext/receipt and a safe closed intake receipt
+are uploaded to a seven-day Actions artifact. No OIDC or repository writes.
+
+Preparation uses a fresh runner, authenticates its complete original toolchain
+before key access, and consumes only the successful dependency's artifact ID and
+digest. Repository, exact S, current run/attempt/name, complete record/request
+hashes, original ZIP/manifest and ciphertext hashes must match. A missing/stale
+artifact fails; there is no expired-URL fallback. Request structure can be
+validated after expiry, but actual URL use always requires freshness. The late
+private decryption checks the captured receipt again and never retrieves the
+capability. Intake is3minutes and preparation27minutes, preserving the original
+protected30minute ceiling; preflight remains5minutes. Sign mode is unchanged.
+Scheduling beyond the provider deadline fails closed and does not authorize a
+retry. No artifact padding, extra upload, longer lifetime assumption or new
+credential is used. The original S/input snapshot and local rejection remain
+retained; a replacement S is selected only after reviewed delivery and green CI.

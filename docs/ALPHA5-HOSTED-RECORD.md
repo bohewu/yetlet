@@ -1,7 +1,8 @@
 # Alpha.5 hosted release record
 
-Date: 2026-10-31 (Asia/Taipei). Status: source and unsigned tag selected; first hosted build started. Custody,
-frozen payloads, signatures and publication remain Pending.
+Date: 2026-10-31 (Asia/Taipei). Status: unsigned build and original custody readback PASS;
+short-lived handoff compatibility correction is under review. Frozen payloads,
+signatures and publication remain Pending.
 The owner authorizes advancing to the final publication gate under the adopted
 [single-publication policy](RELEASE-PUBLICATION.md); publishing GitHub/crates.io
 and approving the owner gate remain excluded.
@@ -29,25 +30,34 @@ The lightweight unsigned `v0.9.0-alpha.5` tag is pushed and read back at C with
 strict/builtin accepted-remote-history Guard/native hook PASS. The consumed
 binding is preserved/retired without moving the tag or changing hooks.
 [Build41087985092/1](https://github.com/bohewu/yetlet/actions/runs/41087985092)
-has started with the existing45minute normal base-to-Browser recipe; one original readback
-uses the5/15minute preflight/protected bounds. Reconcile the exact two archives,
+passes with the existing45minute normal base-to-Browser recipe. Original readback
+[41089439159/1](https://github.com/bohewu/yetlet/actions/runs/41089439159) passes
+both5/15minute preflight/protected phases. Reconcile the exact two archives,
 provenance and complete encrypted private evidence before retaining receipts
 outside transient Actions artifacts. No local formal private key/decryption.
 The original readback Environment retains its identity/no-reviewer/admin-bypass
 policy and now permits exactly the alpha.5 tag; sign/result/publish policies and
 Secrets are unchanged.
 
-This tracking-only document change provides a separately reviewed signer source
-S distinct from C. Select actual S only after its PR is merged and exact master
-CI passes; no future squash SHA is invented here. Signing workflow/helper/trust
-pins and package inputs are unchanged. Buffer master after S selection through
-prepare/sign/result and publication preflight. V/P may equal S.
+The original tracking-only source S is `035033ea4c3ea8e1792738df6b2af25fe486fe09`
+after PR32 and exact master CI41089812359/1 pass. Its unexecuted complete record
+and failed local handoff remain historical evidence. The small encrypted Draft
+asset returns a provider capability with299seconds remaining, incompatible with
+the old1200second minimum and delayed retrieval. No prepare/sign workflow has
+started and no payload is frozen. The required signer-only correction gets a
+new reviewed S after guarded PR/CI/Merge and exact master CI; select that observed
+SHA in a separately named record. C/tag/build/readback,65 qualification entries,
+original manifests and encrypted asset692720632 stay unchanged. No re-upload,
+SDK qualification replay, private-key access locally or silent payload refreeze.
+Buffer master after the replacement S selection; V/P may equal S.
 
 An unpublished Draft carries only temporary encrypted qualification inputs until
 verified retention/cleanup. One prepare freezes the complete selected assembly
 and both raw payload hashes. One `reviewed-automation` signing attempt uses the
 standing D1/D2 disclosure authority; independent result verification has no
-OIDC/signing permission. Keep the existing5/30minute bounds for each worker,
+OIDC/signing permission. Prepare splits its existing protected30minute budget
+into a3minute encrypted intake and27minute fresh-runner preparation; the5minute
+preflight and sign/result worker bounds remain unchanged. Preserve the
 complete private manifest, actual certificates/logs, original failures and
 cleanup receipts. No automatic failed-job/write retry or silent refreeze.
 
@@ -61,8 +71,9 @@ directory glob. GitHub Experimental pre-release precedes registry writes, uses
 no Latest designation, and both destinations require the owner gate.
 
 Public absence of the two new registry names does not prove token/create rights.
-The existing dedicated90day publication token must permit both names, including
-first creation; Secret presence alone is insufficient. Never import local cargo
+The owner explicitly confirms the existing dedicated90day publication token
+permits both names, including first creation; Secret presence alone was not
+treated as proof. Never import local cargo
 credentials or print a token. Keep old alpha.4 and its published actions crate
 immutable; its fifteen-package continuation stays paused.
 

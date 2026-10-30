@@ -79,8 +79,9 @@ class SignerTests(unittest.TestCase):
                         s.subprocess.run([go, 'clean', '-modcache'], env=env, check=True,
                                          stdout=s.subprocess.PIPE, stderr=s.subprocess.PIPE, timeout=30)
 
-    def handoff_fixture(self):
+    def handoff_fixture(self, seconds=2400):
         r = prepare_request()
+        r["qualification_expires"] = str(int(s.time.time()) + seconds)
         claims = base64.urlsafe_b64encode(json.dumps({'exp': int(r['qualification_expires'])}).encode()).decode().rstrip('=')
         expires = s.datetime.fromtimestamp(int(r['qualification_expires']), s.datetime.now().astimezone().tzinfo).astimezone(__import__('datetime').timezone.utc).isoformat()
         query = s.urllib.parse.urlencode({'se': expires, 'sp': 'r', 'spr': 'https', 'jwt': 'header.' + claims + '.signature'})
@@ -144,7 +145,7 @@ class SignerTests(unittest.TestCase):
                 self.assertFalse((root/'qualification-capability.json').exists())
 
     def test_owner_handoff_uses_fixed_host_read_only_and_removes_capability(self):
-        r, payload = self.handoff_fixture()
+        r, payload = self.handoff_fixture(seconds=299)
         cipher = b'LOCAL encrypted qualification'; receipt = {'schema': 1, 'source': s.C,
             'manifest_sha256': r['qualification_manifest_sha256'], 'ciphertext_sha256': s.sha(cipher)}
         archive = io.BytesIO()
@@ -193,6 +194,71 @@ class SignerTests(unittest.TestCase):
             receipt['manifest_sha256'] = '0' * 64
             (p/'qualification-receipt.json').unlink(); s.json_write(p/'qualification-receipt.json', receipt)
             with self.assertRaises(ValueError): s.qualification_transport(r, p)
+
+    def test_intake_captures_five_minute_capability_and_removes_identity_on_failure(self):
+        r, payload = self.handoff_fixture(seconds=299)
+        cipher = b'LOCAL qualification ciphertext'
+        receipt = {'schema': 1, 'source': s.C, 'manifest_sha256': r['qualification_manifest_sha256'],
+                   'ciphertext_sha256': s.sha(cipher)}
+        archive = io.BytesIO()
+        with zipfile.ZipFile(archive, 'w') as z:
+            z.writestr('qualification.tar.age', cipher)
+            z.writestr('qualification-receipt.json', json.dumps(receipt))
+        raw = archive.getvalue(); r['qualification_sha256'] = s.sha(raw); payload['zip_sha256'] = s.sha(raw)
+        def decrypt(args): s.json_write(Path(args[args.index('--output') + 1]), payload)
+        with tempfile.TemporaryDirectory() as temp, patch.dict(os.environ, {'SIGN_AGE': 'LOCAL age', 'GITHUB_RUN_ID': '8', 'GITHUB_RUN_ATTEMPT': '1'}):
+            root = Path(temp); work = root/'work'; work.mkdir(); (work/'identity').write_text('LOCAL identity')
+            with patch.object(s, 'command', side_effect=decrypt), patch.object(s, 'qualification_download', return_value=raw):
+                s.intake(r, work, root/'output')
+                self.assertEqual(sorted(x.name for x in (root/'output').iterdir()),
+                                 ['QUALIFICATION-INTAKE.json', 'qualification-receipt.json', 'qualification.tar.age'])
+                self.assertEqual(s.load(s.read(root/'output/QUALIFICATION-INTAKE.json')), s.intake_receipt(r, root/'output'))
+                self.assertFalse((work/'identity').exists())
+                self.assertFalse((work/'qualification-capability.json').exists())
+                self.assertFalse((work/'qualification-handoff.age').exists())
+                (work/'identity').write_text('LOCAL identity')
+                payload['source'] = '0'*40
+                with self.assertRaises(s.GateRejected): s.intake(r, work, root/'bad')
+                self.assertFalse((work/'identity').exists()); self.assertFalse((root/'bad').exists())
+
+    def test_intake_artifact_requires_same_attempt_source_inputs_and_digest_after_expiry(self):
+        r, payload = self.handoff_fixture(seconds=299)
+        env = {'GITHUB_RUN_ID': '8', 'GITHUB_RUN_ATTEMPT': '2', 'SIGN_INTAKE_ARTIFACT': '9'}
+        with tempfile.TemporaryDirectory() as temp, patch.dict(os.environ, env):
+            root = Path(temp); captured = root/'captured'; captured.mkdir()
+            (captured/'qualification.tar.age').write_bytes(b'LOCAL encrypted')
+            s.json_write(captured/'qualification-receipt.json', {'schema':1,'source':s.C,
+                'manifest_sha256':r['qualification_manifest_sha256'],'ciphertext_sha256':s.sha(b'LOCAL encrypted')})
+            s.json_write(captured/'QUALIFICATION-INTAKE.json', s.intake_receipt(r, captured))
+            archive = io.BytesIO()
+            with zipfile.ZipFile(archive, 'w') as z:
+                for p in captured.iterdir(): z.writestr(p.name, p.read_bytes())
+            raw = archive.getvalue(); os.environ['SIGN_INTAKE_SHA256'] = s.sha(raw)
+            metadata = {'id':8,'run_attempt':2,'head_sha':S,'head_branch':'master',
+                'repository':{'id':1409587171},'head_repository':{'id':1409587171},
+                'event':'workflow_dispatch','path':'.github/workflows/release-sign.yml','status':'in_progress','conclusion':None}
+            artifact = {'id':9,'name':'qualification-intake-8-2','expired':False,'digest':'sha256:'+s.sha(raw),'size_in_bytes':len(raw),
+                'workflow_run':{'id':8,'head_sha':S,'repository_id':1409587171,'head_repository_id':1409587171}}
+            def get(path):
+                if path == '/actions/runs/8/attempts/2': return metadata
+                if path == '/actions/artifacts/9': return artifact
+                self.fail('unexpected API')
+            with patch.object(s.api, 'api', side_effect=get), patch.object(s, 'download', return_value=raw), \
+                    patch.object(s.time, 'time', return_value=int(r['qualification_expires'])+1), \
+                    patch.object(s, 'qualification_download') as url_fetch:
+                work = root/'work'; work.mkdir(); s.download_intake(s.validate_request(r), work)
+                url_fetch.assert_not_called()
+                with self.assertRaises(ValueError): s.handoff_input(r, 60)
+                for obj, key, value in [(metadata,'run_attempt',1),(metadata,'head_sha','0'*40),
+                                        (artifact,'digest','sha256:'+'0'*64),(artifact,'name','qualification-intake-8-1')]:
+                    before=obj[key]; obj[key]=value
+                    with self.subTest(key=key), self.assertRaises(ValueError): s.download_intake(r, root/'bad')
+                    obj[key]=before
+                (root/'wrong-input').mkdir()
+                bad = dict(r); bad['qualification_asset']='77'
+                with self.assertRaises(ValueError): s.download_intake(bad, root/'wrong-input')
+                with patch.object(s.api, 'api', side_effect=KeyError('missing artifact')):
+                    with self.assertRaises(KeyError): s.download_intake(r, root/'missing')
 
     def preflight_metadata(self):
         # Synthetic API responses only; no workflow token, identity or network.
@@ -436,7 +502,9 @@ class SignerTests(unittest.TestCase):
                 elif '--encrypt' in args: shutil.copyfile(args[-1],args[args.index('--output')+1])
                 else: self.fail('unexpected command')
             env={'SIGN_AGE':'LOCAL synthetic age','SIGN_XTASK':'LOCAL synthetic custody','GITHUB_RUN_ID':'8','GITHUB_RUN_ATTEMPT':'1'}
-            with patch.object(s,'PUBLIC_SHA',s.sha(raw)),patch.object(s,'command',side_effect=commands),patch.object(s,'receive_qualification'),patch.dict(os.environ,env):
+            with patch.dict(os.environ, env):
+                s.json_write(work/'qualification/QUALIFICATION-INTAKE.json', s.intake_receipt(qr, work/'qualification'))
+            with patch.object(s,'PUBLIC_SHA',s.sha(raw)),patch.object(s,'command',side_effect=commands),patch.dict(os.environ,env):
                 s.prepare(qr,work,p/'output')
                 receipt=s.load((p/'output/SIGNING-INPUTS.json').read_bytes())
                 self.assertEqual(receipt['provenance_sha256'],s.sha(raw)); self.assertEqual(receipt['original_private_manifest_sha256'],original_sha)
@@ -471,14 +539,21 @@ class SignerTests(unittest.TestCase):
         workflow=yaml.load((Path(__file__).parents[1]/'.github/workflows/release-sign.yml').read_text(),Loader=yaml.BaseLoader)
         self.assertEqual(set(workflow['on']),{'workflow_dispatch'})
         self.assertNotIn('id-token',workflow['permissions'])
-        for name in ['preflight','prepare']:
+        for name in ['preflight','qualification_intake','prepare']:
             self.assertNotIn('id-token',workflow['jobs'][name].get('permissions',{}))
         self.assertEqual(workflow['jobs']['sign']['permissions']['id-token'],'write')
-        for name in ['prepare','sign']:
+        for name in ['qualification_intake','prepare','sign']:
             self.assertEqual(workflow['jobs'][name]['environment'],'release-sign')
             self.assertTrue(any(step.get('if')=='always()' for step in workflow['jobs'][name]['steps']))
         for name,job in workflow['jobs'].items():
             self.assertNotIn('write',[v for k,v in job.get('permissions',{}).items() if k!='id-token'])
+        intake = workflow['jobs']['qualification_intake']; prepare = workflow['jobs']['prepare']
+        self.assertEqual(int(intake['timeout-minutes']) + int(prepare['timeout-minutes']), 30)
+        self.assertIn('qualification_intake', prepare['needs'])
+        capture = next(x for x in intake['steps'] if x.get('run', '').endswith('release-sign.py intake\n'))
+        self.assertIn('unset AGE_IDENTITY', capture['run'])
+        self.assertNotIn('GH_TOKEN', capture['env'])
+        self.assertTrue(all(not s.re.search(r'\b(cargo|pip)\s', x.get('run','')) for x in intake['steps']))
 
 
 if __name__ == '__main__':
