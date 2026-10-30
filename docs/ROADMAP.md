@@ -1,5 +1,15 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-020 registry next step (2026-10-30):** [Read-only sixteen-package
+inventory](YT-020-REGISTRY-READINESS.md) follows guarded local seven-path commit
+`6371ba8`, without Push. All requested names return not-found and the public
+publisher account exists; actual publishing rights/claimability remain
+unverified. Five normal/build layers do not resolve the Config/Secrets versioned
+development bootstrap across five independent workspaces. Plan and verify that
+missing registry path and archive-byte identity, then obtain actual upload
+authority; reuse the accepted alpha.3 build/platform/security/signing evidence.
+No new build, hosted run, signing or registry upload; YT-020 stays Blocked.
+
 **Alpha.3 publication and tooling maintenance (2026-10-30):**
 [Fixed C `557ab76`, S/V `30baf25`](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30):
 sign40982672108/1 and independent result40983028507/1 PASS, all16 subjects/all112

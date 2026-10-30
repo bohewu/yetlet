@@ -37,6 +37,9 @@ distribution versus historical qualification to [Release readiness](RELEASE-READ
 - [New-version release workflow](RELEASING.md): one-time setup versus each version,
   immutable C/S, protected jobs, exact approvals, independent verification and
   publication; distinguishes installed tooling from Pending hosted qualification.
+- [Sixteen-package crates.io readiness](YT-020-REGISTRY-READINESS.md): live name
+  and public-account observations, dependency order, first-publication bootstrap
+  and remaining registry-only evidence; no upload authorization.
 - [Alpha.3 hosted record and prepare scope](ALPHA3-HOSTED-RECORD.md): actual C,
   build/readback/retention results and the owner-approved batch ending at prepare.
 - [Alpha.3 version/package preflight](ALPHA3-VERSION-PREFLIGHT.md): retained

@@ -1,5 +1,17 @@
 # Yetlet Backlog
 
+**YT-020 registry inventory (2026-10-30):** The seven reviewed upload-tool/SOP
+paths are committed locally as `6371ba8` after strict/builtin Guard and native
+hook PASS; no Push. The [sixteen-package inventory](YT-020-REGISTRY-READINESS.md)
+finds all sixteen requested crates.io names absent in public GET observations
+and confirms the public `bohewu` account, without proving name claimability or
+credential rights. Normal/build dependencies form five layers; Config/Secrets
+versioned development dependencies and five independent workspaces need a
+first-publication bootstrap plan. Reuse accepted alpha.3 evidence; registry
+source/authority, authenticated rights, publish preflight, archive identity and
+actual registry download/resolution remain open. No upload or repeated product
+verification; YT-020 remains Blocked.
+
 **Alpha.3 publication and YT-209 maintenance (2026-10-30):**
 [Actual signing/result/publication](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30)
 complete at fixed C `557ab76`, S/V `30baf25`: both signatures, all16 package
@@ -251,7 +263,7 @@ Priority: `P0` is the critical path, `P1` is required for the MVP, and `P2` cove
 | YT-017 | P1 | M | M3 | Island state schema/version/security | YT-012 | Bounded v1 JSON, HTML escaping, invalid state tests and Chrome fail-closed SSR fallback PASS | Done |
 | YT-018 | P1 | M | M4 | Strict CSP and browser security verification | YT-013, YT-016, YT-017 | Headless Chrome/CSP, JSON errors, origin/media/body limits PASS at anonymous prototype scope | Done |
 | YT-019 | P1 | L | M5 | Cross-target/E2E tests and performance baseline | YT-006, YT-010, YT-013, YT-016, YT-018 | [M5 verification](M5-VERIFICATION.md): A01–A10 local proof, release metrics, Chrome 155/Firefox 157 smoke | Done |
-| YT-020 | P1 | S | M5 | Build/run docs and release readiness | YT-019 | [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [hosted rebuilding](YT-020-HOSTED-REBUILD.md), [trust/registry policy](YT-020-PRIVATE-TRUST-POLICY.md) and [actual Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md): dedicated key/fingerprint, three signatures, separate public-only verification and six negative cases pass; formal source/tag/identity/certificate/log/builder trust, registry/reporting/scanner gates and explicit activation approval remain open | Blocked |
+| YT-020 | P1 | S | M5 | Build/run docs and release readiness | YT-019 | Historical [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [hosted rebuilding](YT-020-HOSTED-REBUILD.md), [trust/registry policy](YT-020-PRIVATE-TRUST-POLICY.md) and [Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md) retain their original scope. Later [alpha.3 signing, independent verification and GitHub publication](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30) are accepted at fixed C/S. Current [sixteen-package crates.io inventory](YT-020-REGISTRY-READINESS.md): sixteen names not found and public account exists; claimability/credential rights unverified. Registry source/authority, Config/Secrets first-publication bootstrap, normally verified publish preflight, actual archive/signature identity and downloaded registry consumer remain open; no registry upload or qualification replay | Blocked |
 | YT-021 | P2 | M | Later | Streaming SSR benchmark | YT-006 | [Bounded incremental SSR research](YT-021-STREAMING-SSR-RESEARCH.md): equivalent escaped fragments, barrier/error proof, matched HTTP first-body/completion/throughput measurements; app-owned prototype retained, core promotion rejected | Done |
 | YT-022 | P2 | L | Later | Serializable handler/resumability spike | YT-017 | [Bounded resumability research](YT-022-RESUMABILITY-RESEARCH.md): finite versioned handlers, constrained numeric capture round trips, rejection/trust tests and native encoded-size/cost measurements; app-owned descriptor pattern retained, generic/core promotion rejected | Done |
 | YT-023 | P2 | L | Later | Independent WebGPU scene renderer spike | YT-009 | [Bounded native scene research](YT-023-WEBGPU-RESEARCH.md): opt-in wgpu/Vulkan instanced draw and all-center readback at 10k/50k/100k, raw completion-wall-time and explicit allocation-byte observations; retain app-owned prototype, reject core/browser-portability promotion | Done |

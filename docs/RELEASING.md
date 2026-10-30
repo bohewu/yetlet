@@ -264,6 +264,13 @@ confirm each name/owner right, derive dependency order, record credentials and
 limits, and verify actual registry bytes/resolution. The old nine-package YT-020
 records remain historical; do not reuse their scope as a sixteen-package grant.
 
+The [2026-10-30 sixteen-package inventory](YT-020-REGISTRY-READINESS.md) records
+not-found name observations, the public account and unverified publishing rights.
+Use its normal/build layers together with the Config/Secrets versioned
+development-dependency caveat. Five independent workspaces prevent selecting
+all sixteen with a root-only `--workspace`; the first-publication verification
+strategy remains to be proven. This inventory does not authorize an upload.
+
 For a first manual upload, sign in to crates.io with GitHub, verify the account
 email and create a token permitted to publish the selected names. Enter it with
 `cargo login`; keep it out of repo files, shell arguments and reports. The
