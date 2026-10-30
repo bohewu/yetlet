@@ -19,6 +19,20 @@ pub const NGINX_IMAGE: &str =
     "nginx@sha256:0985e772fb9f729e6fa0980da05fca5d9c468e870eed43071545afa9d2e27d94";
 pub const REDIS_IMAGE: &str =
     "redis@sha256:47670742d7924adbcdb404d1288b6327815b23141969c0939b8e5d61f78c2634";
+fn posix_user() -> Result<String> {
+    #[cfg(unix)]
+    {
+        Ok(format!("{}:{}", unsafe { libc::getuid() }, unsafe {
+            libc::getgid()
+        }))
+    }
+    #[cfg(not(unix))]
+    {
+        Err(fail(
+            "Docker qualification is unsupported on this platform: POSIX user identity is required",
+        ))
+    }
+}
 pub struct Lab {
     pub root: PathBuf,
     pub redis: bool,
@@ -35,6 +49,8 @@ pub struct Lab {
 }
 impl Lab {
     pub fn new(root: &Path, redis: bool) -> Result<Self> {
+        #[cfg(not(unix))]
+        posix_user()?;
         let parent = root.join("target/m12/yt086");
         fs::create_dir_all(&parent)?;
         let work = tempfile::Builder::new()
@@ -159,6 +175,7 @@ impl Lab {
         )
     }
     pub fn build(&self) -> Result<Value> {
+        let user = posix_user()?;
         let build = self.work.join("build");
         let context = self.work.join("image");
         fs::create_dir(&build)?;
@@ -186,12 +203,6 @@ impl Lab {
             require(p.is_dir(), "retained locked vendor directory missing")?;
             p
         };
-        #[cfg(unix)]
-        let user = format!("{}:{}", unsafe { libc::getuid() }, unsafe {
-            libc::getgid()
-        });
-        #[cfg(not(unix))]
-        let user = return Err(fail("Docker qualification requires POSIX user identity"));
         let command = if self.redis {
             "cargo build --release --locked --offline --manifest-path qualification/yt066b3/Cargo.toml"
         } else {

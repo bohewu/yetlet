@@ -1,10 +1,12 @@
 # Alpha.5 — Two-package release scope and remaining gates
 
-Date: 2026-10-30 (Asia/Taipei). Status: proposed release plan, not an immutable
-candidate selection or execution approval. The owner authorizes committing the
-accepted consolidation, then documenting scope, candidate inputs and missing
-verification. This planning step does not Push, Merge, create a tag, execute
-hosted jobs, change Environments/Secrets, sign or publish anything.
+Date: 2026-10-30 (Asia/Taipei). Status: YT-212 Done at A-E qualification scope after
+final independent PASS0; unchanged R is selected as candidate C. The owner separately
+authorizes strict/builtin delivery through PR30, conditional squash Merge, MSVC
+verification and selecting unchanged R as C after all necessary evidence passes.
+This batch does not create a tag, execute release-hosted jobs, change Environments
+or Secrets, sign or publish. The initial planning checkpoint and failures below
+remain historical evidence.
 
 ## Committed input and proposed release scope
 
@@ -16,7 +18,7 @@ hosted jobs, change Environments/Secrets, sign or publish anything.
 | Parent / branch | `678adfec81f1878b0f3d0a886d8a12ef2e83eccc`; `codex/alpha4-registry-continuation` |
 | Commit authority/result | Owner-authorized strict/builtin staged scan and native hook; zero blocking findings, twelve non-blocking UNC/drive-path warnings. Exact scanned tree equals commit tree; worktree clean immediately after Commit; no Push |
 | Proposed product version/cohort | `0.9.0-alpha.5`; schema2 / `consolidated`, exactly `yetlet` and `yetlet-browser` |
-| Final C / remote master CI | Pending: checkpoint above is an implementation input, not a selected release C. The concrete gaps below must close before final source reconciliation |
+| Qualification R / current acceptance | `0f0c84abf9b6c269987cef31c2d0651fa2d1f3ff`, tree `a0940f6806fc92ac8b16b96fc4827645ac82b316`; PR30 and master CI PASS. Final independent acceptance PASS0; unchanged R selected as C |
 | Tag / S / V / P / hosted outputs | Not selected or created for alpha.5; no frozen payload, run, artifact or signature identity is invented |
 
 The two public implementation packages share one View type. `yetlet` owns the
@@ -97,22 +99,22 @@ records retain their original scope; the
 [YT-204](YT-204-PACKAGE-SECURITY-COVERAGE.md) matrices are historical evidence,
 not alpha.5 package names or new-source acceptance labels.
 
-## Concrete remaining work, in order
+## Original qualification and remaining release gates
 
 | Gate | Smallest remaining work | Exit evidence / reuse limit |
 |---|---|---|
-| A. Active workflow/source vocabulary | `.github/workflows/qualification.yml` still runs `-p yetlet-core` and eight other retired library names. Migrate its active native selection to the two packages and explicitly equivalent selected features, preserving OS/support limits. Evidence/sign/result workflow input descriptions still say schema1 despite accepting schema2; align that user-facing input text | Focused workflow/argument/feature check and required PR CI; no hosted release execution and no broad new platform claim |
-| B. Current distribution/consumer instructions | The generated Docker guide still describes two old dependency path replacements; its actual overlay now has one `yetlet` edge. Update that guide. Reconcile current headers in Compatibility, Documentation Scope and release-policy navigation with the two-package source, while preserving dated history and all accepted old outputs | Exact guide/overlay correspondence and documentation checks. Existing generated-source proof is retained unless an executable template/input changes |
-| C. Delivery and final source | Under later Git authority, deliver reviewed remaining corrections/docs and the consolidation through required PR CI, then record the actual merged immutable checkpoint R, its SHA/tree and master CI. Preserve the original branch/history and paused PR29; do not auto-Merge its old continuation-only scope | Exact `Rust 1.99 MSRV` and `Stable native, samples, and Chrome` checks on actual delivered source. R is the input to D/E; select unchanged R as C only after their required evidence is accepted. Do not prefill a future squash SHA |
+| A. Active workflow/source vocabulary | Completed at R: the previous `-p yetlet-core` and eight retired library selections are replaced by the two SDKs. Migrate its active native selection to the two packages and explicitly equivalent selected features, preserving OS/support limits. Evidence/sign/result workflow input descriptions still say schema1 despite accepting schema2; align that user-facing input text | Focused workflow/argument/feature check and required PR CI; no hosted release execution and no broad new platform claim |
+| B. Current distribution/consumer instructions | Completed at R: generated Docker guides describe the actual single `yetlet` overlay, complete SDK closure and conditional source-path mapping. Reconcile current headers in Compatibility, Documentation Scope and release-policy navigation with the two-package source, while preserving dated history and all accepted old outputs | Exact guide/overlay correspondence and documentation checks. Existing generated-source proof is retained unless an executable template/input changes |
+| C. Delivery and final source | Completed under separate owner authority: reviewed corrections and consolidation delivered through PR30; exact merged R, tree and master CI recorded below. Preserve the original branch/history and paused PR29; do not auto-Merge its old continuation-only scope | Exact `Rust 1.99 MSRV` and `Stable native, samples, and Chrome` checks on actual delivered source. R is the input to D/E; select unchanged R as C only after their required evidence is accepted. Do not prefill a future squash SHA |
 | D. Final two-package assembly | Normally package immutable checkpoint R in base-to-Browser order, staging the verified base archive/checksum. Verify normalized manifests, packaged locks, licenses/notices, included source and external native/WASM consumers. Produce current inventory/security/license correspondence for the changed package/feature/target map | No bootstrap, `--no-verify`, ignore or policy downgrade. Reuse unchanged upstream/advisory/license decisions; check only changed or still-missing closure cells with the existing tools |
 | E. Remaining platform cells | At the same R, supplement the new source/package MSVC default and supported integrated consumer; exclude Signing/Redis Windows claims. Use required CI's new Chrome assets/results and add only the remaining selected Firefox DOM/CSP observation. Keep actual GPU observations historical unless fresh hardware qualification is explicitly selected | Record exact source/archive/consumer/tool/feature/target and cleanup. Do not replay old long workloads, Valkey/IdP/cloud tests or complete device matrices |
 | F. Original hosted build/custody | After C and explicit execution authority, create its immutable unsigned tag, run the two-package build and independent original readback, compare the final local/hosted bytes and retain complete private evidence outside transient artifacts | New C/tag/run/attempt/receipt/digest bindings; historical alpha.4 hashes cannot substitute. Build45min; original readback preflight5min/protected15min are existing workflow bounds, not a dispatch grant |
 | G. Signing and independent result | Select reviewed S distinct from C; use fresh complete schema2 record, encrypted qualification handoff, prepare and freeze both raw payload hashes, sign, then independently verify both actual bundles, two package subjects and complete private manifest. Preserve S/V/P separation and actual master CI | Existing automatic-worker policy and custody/trust pins remain; prepare/sign/result each retain their committed timeout and single-attempt/no-automatic-retry rules. Source or payload changes require disposition, not reuse of an old signature |
 | H. Distribution/rights and final owner gate | Refresh read-only name/owner/verified-email/index checks for both names. Confirm the existing90-day `CRATES_IO_TOKEN` can create/update these names; old sixteen-name scope or Secret presence alone is insufficient. Prepare exact six-file public plan/notes and owner-gated GitHub-then-registry promotion | Final owner approves the actual `release-publish` run after preflight; verify every GitHub asset and registry archive/checksum, then a fresh registry-only two-package consumer. Each write once; preserve failure/429, no automatic retries |
 
-A/B are newly identified static carryovers, not failures from rerun CI or hosted
-jobs. They are concrete pre-release followups, and this plan does not implement
-them or claim the consolidation checkpoint is release-ready. Old-name strings
+A/B were static carryovers discovered during planning. Their corrections are now
+accepted at delivery scope and present in R; this does not make the original
+consolidation checkpoint or old artifacts release-ready. Old-name strings
 in the intentionally preserved legacy-cohort test fixtures remain legitimate;
 they must not be mechanically renamed as if all were active package selection.
 
@@ -150,11 +152,80 @@ continuation remains paused and is invalid for schema2. Do not re-upload that
 published archive, retag old bytes, resume its210minute job, or treat either
 new name as a registry alias for the old package.
 
-## Recommended next bounded step
+## Actual qualification results — YT-212
 
-First repair A/B with focused checks and independent review, without changing
-runtime or dependencies. Then request the appropriate Git/PR delivery authority,
-confirm exact-source CI and complete only missing D/E evidence against that
-immutable checkpoint R; choose unchanged R as final C after acceptance. This planning document remains
-uncommitted; the current instruction grants none of the later Git, Environment,
-tag, hosted, signing or distribution operations above.
+| Evidence | Actual result / source limit |
+|---|---|
+| Delivery | Local corrections `82cc685`, then integration `17693f5`; strict/builtin staged and exact outgoing range scans plus native hooks PASS, twelve previously inspected non-blocking path warnings. [PR30](https://github.com/bohewu/yetlet/pull/30) squash-merged; original branch/history and paused PR29 preserved |
+| Immutable R | `0f0c84abf9b6c269987cef31c2d0651fa2d1f3ff`; tree `a0940f6806fc92ac8b16b96fc4827645ac82b316`, equal to reviewed PR tree |
+| Required CI | [PR run41075755771/1](https://github.com/bohewu/yetlet/actions/runs/41075755771) and [master run41076622827/1](https://github.com/bohewu/yetlet/actions/runs/41076622827): both MSRV and Stable/native/samples/Chrome jobs PASS; no retry. Chrome156.0.8078.47, three actual DOM suites |
+| Local assembly / consumers | Normal base then Browser verification and final-predecessor checksums PASS; fresh native/WASM archive consumers PASS, native Auth API refusal on WASM accepted. All101 SDK/root manifest/lock/license/toolchain inputs match R, so unchanged GNU proof is reused rather than replayed for workflow/root-guide edits |
+| MSVC | Online WebCodex runner `ncut-bohe-244143825ae3488e`: exact R, Rust1.99.0, VC14.44.35207 / SDK10.0.26100.0; both normal packages and general / integrated Auth-Session plus SecretProvider consumers PASS. The general consumer explicitly selects features; it does not mean all capabilities are SDK defaults. Signing, Redis provider and actual GPU are excluded |
+| Cross-platform archive binding | Both GNU/MSVC archives are byte-identical: `yetlet` SHA256 `662d67180cec2fd6e50c3757bdc910d057cd37428785ab695b0d275a9e4e5091`; `yetlet-browser` SHA256 `2fbeec5d4324367cf682d722fc25a35f851fc5293fc6e353aedc35ca6771c9a6`. MSVC consumer lock also matches the locally inventoried consumer, SHA256 `0ffb747be8105a215c3fd02eaf286208a0b2e15a74d27da4e700141edb7723a4` |
+| Firefox | Firefox159 Todo, keyed bindings, multi-island dashboard and forms/accessibility suites PASS with current assets and cleanup receipts. Existing native/WASM/GPU/provider/benchmark evidence retains its original scope; no new physical GPU, macOS or cloud qualification is claimed |
+| Inventory / security | Unchanged policy: GNU/native160, selected MSVC89, broad WASM73 normal/build dependencies; licenses/sources PASS, CycloneDX1.5 SBOM components exactly match each indexed closure. Current packaged lock RustSec PASS0 vulnerabilities/warnings; exact-source CI also passes its root audit. No ignore, allowlist change or dependency upgrade |
+| Focused workflow / guides | Original nine-capability selection, equivalent native feature compile, generated service/settings/Vite export/compile, template golden, workflow shell syntax and repaired xtask checks PASS; docs75 / backlog212 and whitespace PASS at the correction checkpoint |
+| Independent review | A/B and local CI repairs PASS0 before Commit; final evidence/closeout review PASS0 (Reviewer/gpt-6-astra/high verified). YT-212 Done at the selected qualification scope |
+| Custody / cleanup | Task-owned Windows checkout, dependency cache, vendor and builds removed;71 inert receipts/archives retained separately (1,557,858 bytes), manifest SHA256 `d956dfafaa9c221cb059f4b5ad2196f45b024d096b735e14432db2a63de54a31`. Linux source maps/logs/receipts/failures are retained outside the repo at `~/.local/share/yetlet-release-evidence/preparation/yt212-alpha5-qualification-20261030/`; compiler/dependency caches and rejected ZIP payloads are excluded |
+
+The Windows ZIP metadata policy rejection remains recorded; no transfer was
+attempted and the payload was not relocated or encoded to bypass it. Separately
+authorized public Git clone provides the reviewed source. One PowerShell/cmd
+environment quoting failure is retained. Repository-only `xtask` failed to
+compile on MSVC in its pre-existing POSIX Docker branch (`qualify/docker.rs:194`,
+E0277); SDK qualification then uses the same normal Cargo commands directly.
+At R this is an unresolved repository tooling limit, not a passing Windows xtask
+claim. The later YT-213 working-tree correction below retains that original
+failure; it does not silently alter the selected immutable C.
+
+Windows Git's inherited `core.autocrlf=true` initially converted `git archive`
+inputs to CRLF. Those successful CRLF builds/consumers and their checksums are
+retained at that scope; they do not bind the final LF archives. A single canonical
+`git -c core.autocrlf=false archive` correction, without global configuration
+changes, supplements only the affected package/consumer inputs in the same task.
+The final LF archives and consumer lock exactly match GNU. Clone/fetch/vendor,
+CI, browsers and unrelated accepted tests were not repeated. Earlier local
+workspace/fixture-license, stale scene-path and Clippy failures are also retained
+with their focused corrections; none is relabeled as an original PASS.
+
+Final independent acceptance is PASS0. Under the owner's conditional authority,
+candidate C is `0f0c84abf9b6c269987cef31c2d0651fa2d1f3ff`, tree
+`a0940f6806fc92ac8b16b96fc4827645ac82b316`. The qualification sources and accepted
+archives are unchanged; these closeout documents do not change SDK/package inputs.
+The next bounded step is an owner-authorized alpha.5 tag/two-package hosted build
+and original readback at that exact C (F), then newly bound prepare/sign/result
+and final owner-gated publication (G/H). These operations are not authorized or
+executed by this qualification batch. Historical D6 and all old releases/tags,
+signatures, registry packages and paused continuation remain unchanged.
+
+## Windows xtask followup — YT-213
+
+The owner separately authorizes fixing the repository-only MSVC compilation
+limit above before the next release step. This does not reopen YT-212's SDK
+qualification or relabel its original E0277/CRLF/operational failures. The selected
+immutable C `0f0c84abf9b6c269987cef31c2d0651fa2d1f3ff` remains recorded; this
+uncommitted tooling correction is not silently included in it.
+
+A private `Result<String>` POSIX identity helper replaces the diverging, inferred
+`str` local. Non-Unix Lab construction rejects before files/sockets/Docker are
+created, and a directly constructed Lab's build rejects before filesystem writes.
+Unix keeps its uid/gid, Docker arguments, limits, scenario and cleanup. No new
+Windows Docker support, package/API dependency or framework runtime is added.
+
+| Affected proof | Actual result / limit |
+|---|---|
+| GNU | `cargo test --offline --locked --manifest-path xtask/Cargo.toml --test qualify_multi_instance`:24 PASS, including new Unix setup preservation. Scoped library/binary/test Clippy with `-D warnings` PASS; ordinary `--help` PASS |
+| MSVC | Rust1.99 / VC14.44.35207 / SDK10.0.26100.0 on the existing Windows runner: same two source hashes as GNU; normal `cargo test --offline --locked ... --test qualify_multi_instance`:13 PASS, including both suite entrypoints/actual CLI refusal and direct-build refusal before writes. `--help` and `check docs` PASS; the latter reads the immutable R fixture's75 documents/212 items |
+| Platform limit | Docker qualification still requires POSIX; no Docker command/container is started by these checks. Unix's existing identity, arguments, limits and cleanup are unchanged. No new Windows Docker capability claim |
+| Existing warning | Windows `release/checksums.rs::sort_json` is unused. An extra task-local `RUSTFLAGS=-D warnings` experiment failed on it after the original E0277 was fixed; that failure is retained. Normal compilation leaves the warning visible; no allow/ignore or unrelated checksum-source edit. Zero-warning Windows lint is not claimed |
+| Source access / custody | Parent-project canonical editing refused the `target` artifact path. Formal registration of the exact existing checkout reauthorized its source root under Runner authority; the registered Project reports `allow_patch=true` and canonical source edits PASS. No relocation or alternate script write. Source status/hash and bounded diff were preserved before unregistering the temporary Project.19 inert receipt/source files retained (61,549 bytes); clone/cache/build removed, manifest SHA256 `e4c959d310cf657d8058a2db13741a85f383a5311e75aacb89e488200ebd9175` |
+| Independent acceptance | PASS0, registered Reviewer/gpt-6-astra/high verified; YT-213 Done at tooling scope. No Git/tag/release operation |
+
+Only affected tooling checks are supplemented. All101 selected SDK/package inputs
+and xtask Cargo manifest/lock remain byte-identical to the previous accepted
+source. Existing SDK/archive/WASM/browser evidence is reused, with no rerun.
+
+For a future alpha.5 tag to include this fix, separately authorized guarded
+Commit/PR delivery, actual CI and a new candidate selection are needed; preserve
+old C and compare package inputs before reusing its unchanged SDK proof. This
+batch does not Commit, Push, create a tag, execute release-hosted, sign or publish.

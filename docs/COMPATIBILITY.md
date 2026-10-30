@@ -10,7 +10,8 @@ still opt into capabilities and startup installation explicitly. There are no
 compiling old-crate aliases, mandatory providers or new runtime protocols.
 
 The [alpha.5 plan](ALPHA5-RELEASE-PLAN.md) separates accepted local migration
-proof from missing release qualification. Final C/tag and alpha.5 signatures or
+proof from the current qualification at R `0f0c84a` and remaining release gates.
+See that record for actual C selection; tag, signer and alpha.5 signatures or
 publication remain unselected. Experimental versioning does not promise API
 stability or production readiness, and unchanged runtime semantics do not make
 old artifacts/signatures attest to a new package layout.
