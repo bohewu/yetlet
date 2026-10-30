@@ -8,21 +8,20 @@ not authority to execute Git, hosted/key/signing or publication actions.
 ## Read this before starting another version
 
 The published baseline is the Experimental
-[v0.9.0-alpha.1 GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1):
-sixteen source packages, signed provenance and a controlled complete evidence
-manifest. [Its actual signing/publication record](YT-096-SIGNER-CONTRACT.md#subsequent-github-pre-release-publication--2026-10-29)
-keeps exact historical C/S, hashes and owner decisions. It is not a template of
-run IDs to reuse. crates.io remains a separate, unexecuted YT-020 gate.
+[v0.9.0-alpha.3 GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.3):
+sixteen source packages and signed provenance. The
+[actual record](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30)
+binds C `557ab76`, S/V `30baf25`, both verified signatures, all sixteen package
+subjects and the private112-entry manifest, owner acceptance and exact20 public
+files. It is a prerelease, not Latest. Alpha.1 and failed alpha.2 evidence remain
+historical; none of their run IDs or signatures is a new-version template.
+crates.io remains a separate, unexecuted YT-020 gate.
 
-**YT-209 tooling delivery, required CI and protected result Environment setup
-are complete. Positive schema-1 hosted result verification remains Pending.**
-The [alpha.3 hosted record](ALPHA3-HOSTED-RECORD.md) records C `557ab76`, its
-immutable tag, successful sixteen-package build/protected readback and qualified
-owner-local retention after the [recovery preflight](ALPHA3-VERSION-PREFLIGHT.md).
-The next owner-approved batch ends at preparation: reviewed follow-up delivery,
-separate actual S, an unpublished Draft, encrypted qualification handoff and one
-protected prepare. Each actual input/hash and owner gate still applies; no
-alpha.3 signing or publication is authorized.
+**YT-209 now has positive protected result-verification and public-delivery
+evidence.** Its first Python upload failed before creating assets; accepted
+recovery used `gh api` for uploads and the same exact-plan/readback/publication
+checks. The current maintenance correction makes that successful upload
+transport canonical; local checks do not claim another live release.
 Before another release, review its
 source/record, applicable version changes and missing qualification, then use the
 [versioned interfaces](YT-209-RELEASE-AUTOMATION.md). No version change alone
@@ -122,13 +121,43 @@ does not permit signing; a green signature job does not permit publication. GitH
 Release publication does not permit crates.io upload. For the latter, resolve
 YT-020's explicit registry/credential/order/readback requirements separately.
 
+## Actual human gates
+
+These are the existing GitHub settings, not a new approval policy. A complete
+new-version execution currently has **four** protected-job approval occurrences:
+
+| Phase | GitHub Environment | Reason for the gate |
+|---|---|---|
+| Original evidence readback | `release-evidence-verify` | Formal age identity decrypts original build evidence |
+| Frozen-input preparation | `release-sign` | Formal identity verifies evidence and freezes the complete assembly; no OIDC |
+| Exact-payload signing | `release-sign` | Issues public signing identity for approved hashes; the decryption identity is removed first |
+| Independent result readback | `release-result-verify` | Separate no-OIDC job verifies both bundles and every frozen entry using isolated decryption |
+
+Ordinary development PR CI and unsigned builds have no Environment approval.
+Synthetic/disposable-key checks belong before real-key execution; do not use a
+protected production-key job as the first transport test. This does not authorize
+a parallel validation framework or replay of unchanged qualification.
+
+Git operations, source selection and execution budgets can be covered by a
+concrete bounded owner batch. Exact signing needs two actual frozen hashes;
+final publication acceptance needs verified outputs, notes and the public list.
+Routine preparation, copies and uploads inside that grant need no additional
+conversational permission. Preserve failures and follow the granted recovery
+limits. Publication itself has no Environment gate: exact-plan owner acceptance
+can authorize staging, readback and publication together.
+
+Reducing or combining real-key gates changes Environment/custody policy and
+needs a separate explicit decision after the technical path is stable. This
+maintenance work does not remove reviewers or enable bypass.
+
 ## Existing workflow map and limits
 
 This is the checked-in implementation baseline, not permission to dispatch it.
 [YT-209](YT-209-RELEASE-AUTOMATION.md) defines the versioned input and operator
 interfaces; focused local checks and independent implementation review PASS.
-Tooling integration and Environment installation are accepted; positive hosted
-verification of new-format signing results remains Pending.
+Tooling integration, Environment installation and alpha.3 positive protected
+verification are recorded in the actual execution record. Historical Pending
+statements retain their original checkpoints.
 
 | Carrier | Role and timeout |
 |---|---|
@@ -164,6 +193,19 @@ still require their applicable explicit authority. No default framework dependen
 automatic signing, mutable tag or registry publication is introduced.
 
 ## Public attachments and publication mechanics
+
+The local operator tool requires Python and authenticated GitHub CLI `gh`;
+`GH_TOKEN` comes from the existing credential environment, never a command
+argument or tracked file. Asset POSTs use only `gh api` with a JSON response and
+raw binary stdin (`--input -`). Python keeps the fixed record, closed20-file
+allowlist, exact size/SHA checks and authenticated/anonymous full readbacks.
+Metadata reads and publication PATCH retain their bounded HTTP path. Do not use
+a directory glob, clobber assets or skip downloaded-byte checks.
+
+Upload failure exits once, retains a FAIL receipt and reports only operation,
+bounded error class and HTTP status when available. Timeout can leave partial
+remote state: inspect it before an authorized continuation. Raw CLI stderr,
+tokens, provider bodies and signed URLs are never reported as diagnostics.
 
 Use the adopted [D1/D2 field/attachment policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md)
 and a closed exact list. The first alpha has twenty public files: sixteen `.crate`
@@ -212,3 +254,50 @@ indexes outside the frozen manifest to avoid hash cycles. Indexes exclude themse
 
 Consult the dated records only for diagnosis and evidence. Do not copy an old
 run ID, local key exception, candidate or successful result into a new release.
+
+## Publishing to crates.io is a separate operation
+
+GitHub Release attachments are not a registry upload. YT-020 remains Blocked;
+this section is an operator reference, not execution authority. A real registry
+batch must select the current sixteen-package cohort/version and immutable source,
+confirm each name/owner right, derive dependency order, record credentials and
+limits, and verify actual registry bytes/resolution. The old nine-package YT-020
+records remain historical; do not reuse their scope as a sixteen-package grant.
+
+For a first manual upload, sign in to crates.io with GitHub, verify the account
+email and create a token permitted to publish the selected names. Enter it with
+`cargo login`; keep it out of repo files, shell arguments and reports. The
+[Cargo publishing guide](https://doc.rust-lang.org/cargo/reference/publishing.html)
+documents account setup, names, metadata and ownership.
+
+Example for the dependency-free foundation crate, after separate authorization
+and clean-source selection:
+
+```sh
+cargo login
+cargo publish --manifest-path crates/yetlet-core/Cargo.toml --registry crates-io --locked --dry-run
+cargo publish --manifest-path crates/yetlet-core/Cargo.toml --registry crates-io --locked
+```
+
+The [publish command](https://doc.rust-lang.org/cargo/commands/cargo-publish.html)
+packages and verifies before upload; `--dry-run` performs checks without an
+upload. Do not use a verification bypass. Publish foundational crates before
+their dependents and wait for each actual index entry. A downstream registry
+dry-run may remain blocked while its selected sibling versions are unpublished;
+local directory-source/package proof is not registry proof.
+
+`cargo publish` packages source; it does not blindly promote a GitHub `.crate`
+attachment. Inspect generated archives and compare intended payload/digests,
+then download every accepted name/version and test a clean consumer resolving
+from crates.io, without local path patches. Do not claim the GitHub signatures
+attest different registry bytes. An index-wait timeout does not prove upload
+failure: inspect the registry before another attempt. A published version cannot
+be overwritten; yanking is distinct from replacing its contents.
+
+For subsequent CI publishing, prefer configured crates.io Trusted Publishing
+with short-lived OIDC credentials rather than a long-lived registry Secret.
+The [official introduction](https://blog.rust-lang.org/2025/07/11/crates-io-development-update-2025-07/)
+and [current enhancements](https://blog.rust-lang.org/2026/01/21/crates-io-development-update/)
+describe that model. Registry publisher configuration/credentials are separate
+from GitHub Release rights and Sigstore identity. No crates.io token, publisher
+workflow, registry Environment, name claim or upload is installed by this work.

@@ -1,8 +1,10 @@
 # YT-209 — Versioned release automation
 
 Status: Done at implementation, repaired integration CI and Environment setup
-scope. Positive release-result hosted qualification remains Pending. Automatic
-post-merge master CI PASS; earlier failures are retained below.
+scope. [Alpha.3 actual execution](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30)
+adds positive protected result verification and accepted public delivery.
+The upload transport maintenance below is a local follow-up, without another
+release, source/tag change or qualification replay. Earlier failures remain.
 
 
 ## Scope and authority
@@ -14,6 +16,31 @@ hosted run, Environment/Secret changes, signing, a tag, publication, registry
 upload, Commit or Push. The accepted alpha release and all failed attempts remain
 immutable evidence; no old qualification is replayed. See [the release SOP](RELEASING.md)
 and [the signer contract](YT-096-SIGNER-CONTRACT.md).
+
+## Publication upload maintenance — 2026-10-30
+
+The real alpha.3 Python upload attempt failed with zero assets. Its error was
+generic; successful read-only gates and later successful `gh api` transport do
+not recover the original HTTP status. The owner authorizes a minimal upload fix,
+SOP/gate clarification, focused verification and independent review, with no
+Commit/Push, new hosted execution, signing or publication in this maintenance.
+
+Asset POSTs now use one canonical `gh api` path: fixed repository upload origin,
+authenticated caller, explicit JSON response, binary Content-Type and byte-exact
+stdin. No shell, token argument, wildcard, clobber, automatic retry or silent
+transport fallback is added. Python retains record/allowlist/size/hash validation,
+existing-asset checks, exact-ID publication and authenticated/anonymous downloaded
+bytes. The existing HTTP read/redirect path remains, including no credential
+forwarding to the public asset host.
+
+The subprocess timeout, unavailable CLI, failed command/HTTP status and invalid
+response have bounded diagnostics. Upload errors retain a FAIL receipt with
+operation/class/status; provider stderr/bodies, tokens and signed URLs stay out
+of output. This uses the accepted live transport evidence plus focused synthetic
+request/failure/receipt tests; no second real release or signature is needed.
+The [SOP](RELEASING.md#actual-human-gates) lists all four existing protected-job
+approvals and distinguishes bounded batch authority from individual tool calls.
+No Environment policy or mandatory framework dependency changes.
 
 ## Versioned input contract
 

@@ -1,5 +1,15 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**Alpha.3 publication and tooling maintenance (2026-10-30):**
+[Fixed C `557ab76`, S/V `30baf25`](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30):
+sign40982672108/1 and independent result40983028507/1 PASS, all16 subjects/all112
+private entries and cleanup. Existing alpha.3 Release428536609 is public with
+exact20 owner-approved files, authenticated/anonymous byte readback PASS and no
+Latest selection. First upload failure retained; accepted `gh api` recovery
+completes delivery. Local YT-209 maintenance standardizes upload transport and
+clarifies four protected approvals without changing Environment policy or
+replaying qualification. No new release or crates.io upload; YT-020 Blocked.
+
 **Alpha.3 hosted custody and prepare grant (2026-10-30):**
 [Actual C `557ab76` and immutable tag](ALPHA3-HOSTED-RECORD.md), PR23 Merge and
 both PR/master CI jobs PASS; build40906989456/1 and protected readback40908551139/1

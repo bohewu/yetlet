@@ -5,6 +5,8 @@ import base64
 import importlib.util
 import os
 from pathlib import Path
+import re
+import subprocess
 import sys
 import urllib.error
 import urllib.parse
@@ -18,6 +20,35 @@ spec.loader.exec_module(s)
 API = s.api.API
 
 
+class UploadError(Exception):
+    """Only bounded transport diagnostics may leave the upload subprocess."""
+    def __init__(self, kind, http_status=None):
+        super().__init__('release asset upload rejected')
+        self.kind = kind
+        self.http_status = http_status
+
+
+def upload(url, body):
+    # Use the same GitHub CLI transport as the accepted alpha.3 delivery.
+    # Raw stdin preserves bytes; credentials stay in the existing environment.
+    try:
+        result = subprocess.run(['gh', 'api', '--method', 'POST', url,
+            '--header', 'Accept: application/vnd.github+json',
+            '--header', 'Content-Type: application/octet-stream', '--input', '-'],
+            input=body, stdout=subprocess.PIPE, stderr=subprocess.PIPE, timeout=120)
+    except subprocess.TimeoutExpired:
+        raise UploadError('timeout') from None
+    except OSError:
+        raise UploadError('unavailable') from None
+    if result.returncode:
+        codes = re.findall(rb'\(HTTP ([45][0-9]{2})\)', result.stderr)
+        raise UploadError('http' if codes else 'cli', int(codes[-1]) if codes else None)
+    try:
+        return s.load(result.stdout)
+    except (ValueError, RecursionError):
+        raise UploadError('response') from None
+
+
 def http(url, method='GET', body=None, binary=False, authenticated=True, redirects=0):
     s.require(redirects <= 3)
     headers = {'Accept': 'application/octet-stream' if binary else 'application/vnd.github+json',
@@ -26,6 +57,10 @@ def http(url, method='GET', body=None, binary=False, authenticated=True, redirec
         s.require(url.startswith(API + '/') or url.startswith(
             'https://uploads.github.com/repos/bohewu/yetlet/releases/'))
         headers['Authorization'] = 'Bearer ' + os.environ['GH_TOKEN']
+    if method == 'POST' and binary:
+        s.require(authenticated and url.startswith(
+            'https://uploads.github.com/repos/bohewu/yetlet/releases/'))
+        return upload(url, body)
     if body is not None:
         headers['Content-Type'] = 'application/octet-stream' if binary else 'application/json'
     request = urllib.request.Request(url, data=body, headers=headers, method=method)
@@ -207,18 +242,32 @@ def main():
     blobs = public_inputs(p, Path(args.public_dir), notes, verification)
     try:
         result = operate(args.action, p, blobs, notes, args.confirm)
-    except Exception:
-        s.json_write(output, {'schema': 1, 'status': 'FAIL', 'action': args.action,
+    except Exception as error:
+        failure = {'schema': 1, 'status': 'FAIL', 'action': args.action,
             'record_sha256': p['record_sha256'], 'plan_sha256': s.records.digest(p),
             'release_id': str(s.RELEASE_ID), 'remote_partial_state_may_exist': True,
-            'automatic_retry': False, 'registry_upload': False})
+            'automatic_retry': False, 'registry_upload': False}
+        if isinstance(error, UploadError):
+            failure['transport_error'] = {'operation': 'upload', 'class': error.kind,
+                                          'http_status': error.http_status}
+        s.json_write(output, failure)
         raise
     s.json_write(output, result)
 
 
-if __name__ == '__main__':
+def cli():
     try:
         main()
+    except UploadError as error:
+        status = '' if error.http_status is None else ' http_status=' + str(error.http_status)
+        print('public release operation rejected; operation=upload class=' + error.kind + status +
+              '; inspect retained partial state, no retry', file=sys.stderr)
+        return 1
     except Exception:
         print('public release operation rejected; inspect retained partial state, no retry', file=sys.stderr)
-        sys.exit(1)
+        return 1
+    return 0
+
+
+if __name__ == '__main__':
+    sys.exit(cli())
