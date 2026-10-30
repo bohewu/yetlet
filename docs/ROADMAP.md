@@ -1,6 +1,15 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**Alpha.4 publication maintenance (2026-10-30):**
+**Alpha.4 registry-only continuation preparation (2026-10-30):**
+[Actual P `1c0bb31` execution](ALPHA4-HOSTED-RECORD.md#actual-public-release-and-one-package-registry-outcome)
+verifies the public twenty-asset GitHub prerelease and the first registry archive;
+the job stops on a wrong success-response assumption. Local correction prepares
+only the remaining fifteen, preserves all published/signed bytes and history,
+and retains a single owner gate in a GitHub-read-only continuation job.
+Future source/CI, first-name capacity and actual registry/consumer completion
+remain unverified; no new upload or Git delivery is performed. YT-020 Blocked.
+
+**Earlier alpha.4 publication maintenance (2026-10-30):**
 [Actual prepare/sign/independent verification](ALPHA4-HOSTED-RECORD.md#actual-preparation-signing-and-independent-verification)
 PASS at unchanged C/tag and S/V `6ed70c3`. The owner-approved final run fails
 at GitHub staging with no assets or registry attempt. Local length/diagnostic

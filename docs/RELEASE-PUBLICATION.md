@@ -151,6 +151,73 @@ remain sixteen `.crate` files, original unsigned provenance, public checksum,
 public Sigstore bundle and reduced acceptance summary. Publication receipts and
 the complete private evidence are not added through a directory glob.
 
+## Registry-only continuation contract — 2026-10-30
+
+The owner authorizes a local parser correction and preparation of one explicit
+continuation after publication41028646006/1. GitHub is already public with the
+original twenty assets; `yetlet-actions0.9.0-alpha.4` is published under bohewu
+and its API/index/download match the frozen archive. The old incomplete receipt
+is retained. The other fifteen packages and registry consumer were not attempted.
+This local slice does not authorize Git delivery or another network write.
+
+Cargo's [publish response contract](https://doc.rust-lang.org/cargo/reference/registry-web-api.html#publish)
+returns optional warnings, without requiring `krate.name`. Accept a successful
+JSON object with no errors and optional valid warning arrays; retain only warning
+counts. Identity/version/content acceptance still requires index/download
+readback. Never log raw provider warning/error strings or treat a parse failure
+after PUT as proof that the write did not happen.
+The [upstream API type](https://github.com/rust-lang/crates.io/blob/daa3c146d99e5db0a2fb74062ac480f3f03797a0/crates/crates_io_api_types/src/lib.rs#L1133)
+renames Rust's `krate` member to JSON `crate`; that extra field is accepted but
+is not an identity substitute for readback.
+
+Keep the normal closed publication request unchanged. An optional, closed
+`continuation` object selects only this known one-plus-fifteen case:
+
+| Field | Binding |
+|---|---|
+| `run`, `attempt` | Original failed publication run/attempt |
+| `artifact`, `sha256` | Original `publication-result-RUN-ATTEMPT` ZIP and digest |
+| `existing` | Exactly `["yetlet-actions"]` |
+| `remaining` | Exactly the other fifteen names, in the unchanged registry-plan order |
+
+Validate the original completed failure, source/workflow/repository, owner
+approval and original five-file result artifact. Reconstruct its original
+publication request using its actual P; its digest, original public plan,
+registry plan and GitHub-success/registry-failure receipts must agree. Preserve
+the original public acceptance summary rather than generating a replacement.
+Current published Release/tag/name/notes and all twenty asset IDs/sizes/digests
+must still match that accepted plan and original readback receipt.
+
+The new reviewed P receives its own request and owner approval. A separate
+`registry-continuation` job uses the existing `release-publish` Environment,
+GitHub contents/actions **read**, registry token only after the owner gate, and
+no OIDC/age identity. It never calls GitHub stage/publish/update operations.
+The read-only preflight and protected phase reconcile the existing package's
+index/download/not-yanked state and owner, and require all fifteen selected
+versions absent before the first write. Recheck each selected version before
+its single PUT; a newly observed existing version stops instead of being
+silently skipped or resent. There is no generalized or automatic resume.
+
+Use a fresh continuation receipt. Record the first package as verified existing,
+and only the fifteen newly attempted writes as uploads. Keep the old failure
+immutable. After all fifteen readbacks succeed, run the existing fresh,
+credential-free registry consumer for all sixteen exact versions. Any partial
+or uncertain failure remains incomplete without retry, deletion, yank, version
+bump, re-signing or GitHub asset mutation. C/tag/S/V, original package bytes and
+signatures remain fixed. Hosted continuation remains separately authorized;
+YT-020 stays Blocked until complete registry and consumer evidence exists.
+
+First-name capacity is not established by the read-only checks. The pinned
+[upstream rate limiter](https://github.com/rust-lang/crates.io/blob/daa3c146d99e5db0a2fb74062ac480f3f03797a0/src/rate_limiter.rs#L22)
+defaults to a five-name burst and one new-crate token per ten minutes, with
+deployment configuration and per-user overrides. These are source defaults,
+not observed production/account limits. Before a live fifteen-new-name batch,
+confirm sufficient account capacity or separately agree a different bounded
+batch/budget. The current sixty-minute job does not establish that all fifteen
+can complete under those defaults. No quota was probed by an upload, no account
+override was requested, and no sleep/retry/batch-splitting behavior was added;
+HTTP429 stops with the original partial receipts.
+
 ## Local verification and remaining limits
 
 Focused policy/protocol/order/receipt tests and the revised Cargo preparation

@@ -1,6 +1,18 @@
 # Yetlet Backlog
 
-**YT-020 / YT-209 publication maintenance (2026-10-30):**
+**YT-020 registry-only continuation preparation (2026-10-30):**
+[Actual outcome](ALPHA4-HOSTED-RECORD.md#actual-public-release-and-one-package-registry-outcome)
+publishes/readbacks the GitHub twenty-asset prerelease at P `1c0bb31`, then stops
+after the first registry write due to an incorrect success-response contract.
+`yetlet-actions` owner/index/download match the frozen archive; fifteen packages
+and the registry consumer were not attempted. Local parser/explicit continuation
+work preserves that version, original GitHub assets/C/tag/S/V/signatures and
+failures. [The contract](RELEASE-PUBLICATION.md#registry-only-continuation-contract--2026-10-30)
+retains owner approval and no retries, with GitHub-read-only continuation and
+fresh state checks. Future P/CI, account first-name capacity, hosted continuation
+and complete registry consumer remain open. No Commit/Push or upload; YT-020 Blocked.
+
+**Earlier YT-020 / YT-209 publication maintenance (2026-10-30):**
 [Actual alpha.4 execution](ALPHA4-HOSTED-RECORD.md#actual-preparation-signing-and-independent-verification)
 passes prepare/sign/independent verification at fixed S/V `6ed70c3`, sixteen
 subjects/all98 entries. Owner-approved publication41022282283/1 fails during

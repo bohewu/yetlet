@@ -236,6 +236,15 @@ stdin uploads explicitly set `Content-Length` to the verified byte length;
 stdin alone does not establish that header. See the retained
 [alpha.4 failure and local correction](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair).
 
+If GitHub publication succeeded but registry delivery is partial, preserve both
+the public release and every existing immutable crate version. The explicit
+[registry-only continuation](RELEASE-PUBLICATION.md#registry-only-continuation-contract--2026-10-30)
+binds the original failed result and unchanged archive plan. Reconcile published
+bytes/owner and remaining-version absence before a separately authorized attempt;
+do not rerun GitHub publication, resend existing versions or re-sign. The known
+one-plus-fifteen path still needs a reviewed new P, green CI, adequate first-name
+capacity and its actual owner gate. It is not an automatic/general resume.
+
 Use the adopted [D1/D2 field/attachment policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md)
 and a closed exact list. The first alpha has twenty public files: sixteen `.crate`
 archives, original provenance/public checksum, public DSSE bundle and a reduced
