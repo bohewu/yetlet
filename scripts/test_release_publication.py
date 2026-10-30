@@ -155,6 +155,37 @@ class RegistryTests(unittest.TestCase):
 
 
 class PublicationTests(unittest.TestCase):
+    def test_github_failure_keeps_safe_diagnostics_and_stops_registry(self):
+        cases = [(publication.pub.UploadError('http', 411), 'upload', 'http', 411),
+                 (publication.pub.ApiError('GET', 403), 'api-read', 'http', 403),
+                 (ValueError('private URL/token/body'), 'validation', 'validation', None)]
+        for error, operation, kind, status in cases:
+            with self.subTest(operation=operation), tempfile.TemporaryDirectory() as temporary:
+                output = Path(temporary) / 'output'
+                publication.s.bind_record(record())
+                stderr = io.StringIO()
+                with (patch.object(publication.sys, 'argv', ['release-publish.py', 'publish']),
+                      patch.dict(os.environ, {'PUBLICATION_OUTPUT': str(output)}),
+                      patch.object(publication, 'request', return_value={'notes': 'Fixture'}),
+                      patch.object(publication.s, 'outside', side_effect=Path),
+                      patch.object(publication, 'gate'),
+                      patch.object(publication, 'distribution', return_value=({}, {}, {}, {})),
+                      patch.object(publication.pub, 'operate', side_effect=error) as github,
+                      patch.object(registry, 'publish') as promote,
+                      patch.object(publication, 'consumer') as consumer,
+                      patch.object(publication.sys, 'stderr', stderr)):
+                    with self.assertRaises(type(error)): publication.main()
+                github.assert_called_once()
+                promote.assert_not_called()
+                consumer.assert_not_called()
+                proof = json.loads((output / 'PUBLICATION-RESULT.json').read_text())
+                self.assertEqual(proof['failure'], {'phase': 'github-stage', 'operation': operation,
+                    'class': kind, 'http_status': status})
+                self.assertEqual((proof['status'], proof['github'], proof['registry']),
+                    ('incomplete', 'stage_attempted', 'not_attempted'))
+                self.assertFalse(proof['automatic_retry'])
+                self.assertNotIn('private', json.dumps(proof) + stderr.getvalue())
+
     def test_preflight_never_reads_a_draft_and_stage_checks_it_before_writing(self):
         s, pub = publication.s, publication.pub
         r = record()

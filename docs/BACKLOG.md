@@ -1,6 +1,18 @@
 # Yetlet Backlog
 
-**Alpha.4 actual hosted checkpoint (2026-10-30):**
+**YT-020 / YT-209 publication maintenance (2026-10-30):**
+[Actual alpha.4 execution](ALPHA4-HOSTED-RECORD.md#actual-preparation-signing-and-independent-verification)
+passes prepare/sign/independent verification at fixed S/V `6ed70c3`, sixteen
+subjects/all98 entries. Owner-approved publication41022282283/1 fails during
+GitHub staging; Release428745799 remains a Draft with zero assets, registry
+not attempted. Preserve that failure and valid C/tag/signatures. Local repair
+adds explicit upload length and safe phase/HTTP diagnostics; pinned CI tool
+caching is separate from release evidence. Local focused checks and independent
+Reviewer PASS0; corrected hosted publication remains open. No retry, Commit or
+Push occurs here. YT-020 Blocked.
+See the [measured timing and bounded followups](RELEASE-PUBLICATION.md#alpha4-timing-and-bounded-ci-maintenance--2026-10-30).
+
+**Earlier alpha.4 hosted checkpoint (2026-10-30):**
 [Fixed C/tag, original build41015091274/1 and readback41015782685/1](ALPHA4-HOSTED-RECORD.md)
 PASS; all16 hosted archives match local accepted bytes. Original encrypted
 custody and public provenance are retained outside the repo; operator failures

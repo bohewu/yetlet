@@ -141,9 +141,11 @@ def main():
     receipt = {'schema': 1, 'record_sha256': s.records.digest(s.RECORD),
         'publication_request_sha256': s.records.digest(r), 'status': 'not_attempted',
         'github': 'not_attempted', 'registry': 'not_attempted', 'automatic_retry': False}
+    phase = 'gate'
     try:
         gate(r, approved)
         with tempfile.TemporaryDirectory(prefix='yetlet-publication-') as temporary:
+            phase = 'distribution'
             p, blobs, reg, bodies = distribution(r, Path(temporary))
             s.json_write(output / 'PUBLICATION-PLAN.json', p)
             s.json_write(output / 'REGISTRY-PLAN.json', reg)
@@ -155,27 +157,39 @@ def main():
                         s.records.digest(reg) + '`\n\nDestinations: GitHub pre-release, then crates.io (16 packages).\n')
                 receipt['status'] = 'preflight_pass'
                 return
+            phase = 'publication-recheck'
             gate(r, True)  # Recheck approval, source/CI and original artifact immediately before writes.
             receipt['status'] = 'attempted'
             receipt['github'] = 'stage_attempted'
             registry.save(output / 'PUBLICATION-RESULT.json', receipt)
+            phase = 'github-stage'
             pub.operate('stage', p, blobs, r['notes'].encode())
             receipt['github'] = 'publish_attempted'
             registry.save(output / 'PUBLICATION-RESULT.json', receipt)
+            phase = 'github-publish'
             gh = pub.operate('publish', p, blobs, r['notes'].encode(), 'publish-exact-approved-plan')
             s.json_write(output / 'GITHUB-PUBLICATION.json', gh)
             receipt['github'] = 'published_and_verified'
             receipt['registry'] = 'attempted'
             registry.save(output / 'PUBLICATION-RESULT.json', receipt)
+            phase = 'registry-publish'
             reg_result = registry.publish(reg, bodies, output / 'REGISTRY-RESULT.json')
             receipt['registry'] = 'published_and_verified'
             registry.save(output / 'PUBLICATION-RESULT.json', receipt)
+            phase = 'registry-consumer'
             reg_result['consumer'] = consumer(s.RECORD['version'], output)
             reg_result['status'] = 'complete'
             registry.save(output / 'REGISTRY-RESULT.json', reg_result)
             receipt['status'] = 'complete'
-    except Exception:
+    except Exception as error:
         receipt['status'] = 'incomplete'
+        detail = pub.failure_details(error)
+        if isinstance(error, registry.RegistryError):
+            detail = {'operation': 'registry',
+                'class': error.kind if error.kind in {'http', 'transport', 'not_indexed'} else 'internal',
+                'http_status': error.status if type(error.status) is int and 400 <= error.status <= 599 else None}
+        receipt['failure'] = dict(detail, phase=phase)
+        print('publication failure: ' + json.dumps(receipt['failure'], sort_keys=True), file=sys.stderr)
         raise
     finally:
         registry.save(output / 'PUBLICATION-RESULT.json', receipt)

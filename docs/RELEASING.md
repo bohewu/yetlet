@@ -229,6 +229,13 @@ bounded error class and HTTP status when available. Timeout can leave partial
 remote state: inspect it before an authorized continuation. Raw CLI stderr,
 tokens, provider bodies and signed URLs are never reported as diagnostics.
 
+The combined publisher retains these bounded details with a fixed phase such as
+`github-stage` or `registry-publish` in `PUBLICATION-RESULT.json`. HTTP query
+failures preserve their numeric status without the provider body. Raw binary
+stdin uploads explicitly set `Content-Length` to the verified byte length;
+stdin alone does not establish that header. See the retained
+[alpha.4 failure and local correction](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair).
+
 Use the adopted [D1/D2 field/attachment policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md)
 and a closed exact list. The first alpha has twenty public files: sixteen `.crate`
 archives, original provenance/public checksum, public DSSE bundle and a reduced

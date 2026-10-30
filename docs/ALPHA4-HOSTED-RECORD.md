@@ -1,9 +1,9 @@
 # Alpha.4 — Hosted source packages and signing checkpoint
 
-Date: 2026-10-30 (Asia/Taipei). **Original build/readback and owner-local retention
-PASS. Signing preparation/result Pending.** The owner authorizes continuation
-through preparation, signing and independent verification, stopping for the
-final combined GitHub/crates.io publication confirmation.
+Date: 2026-10-30 (Asia/Taipei). **Original build/readback, preparation, signing,
+independent result verification and retention PASS. Combined publication failed
+at GitHub staging; crates.io was not attempted.** The owner approved the actual
+publication run below. Its failure remains preserved without an automatic retry.
 
 ## Immutable product source and actual evidence
 
@@ -58,7 +58,11 @@ The consumed tag Guard binding is retired through the supported exact-digest
 metadata transition. Original used bytes, tag/history and strict/builtin hooks
 are preserved; no rearming or history rewrite occurred.
 
-## Signer checkpoint and selected evidence
+## Historical signer checkpoint and selected evidence
+
+The following is the accepted pre-signer checkpoint. Its Pending fields are
+superseded only by the actual dated execution below; its evidence scope and
+independent acceptance remain unchanged.
 
 Use a distinct reviewed full-SHA signer S under
 [ADR0009](adr/0009-release-build-and-signer-identities.md). The real build/readback
@@ -100,6 +104,61 @@ package correspondences were independently checked. Native reviewer/model/actual
 high effort are verified. Only this acceptance metadata follows the reviewed
 boundary; future S/prepare/sign/results remain separately verified stages.
 
+## Actual preparation, signing and independent verification
+
+[PR27](https://github.com/bohewu/yetlet/pull/27) delivered the reviewed checkpoint
+with strict/builtin Guard. Both PR CI41017621833/1 and master CI41018603003/1
+passed. Actual S/V is `6ed70c3edb2f122b9a40da1aca1d038e189892f6`, tree
+`a7c7518ca709c60cd4caed3a66d013bc945ac8a4`; product C/tag/archives did not change.
+
+| Stage | Original run / outcome |
+|---|---|
+| Prepare | [41019469360/1](https://github.com/bohewu/yetlet/actions/runs/41019469360), SUCCESS including private cleanup |
+| Actual signing | [41020727145/1](https://github.com/bohewu/yetlet/actions/runs/41020727145), SUCCESS; two fixed payloads signed and verified in the signing job |
+| Independent verification | [41020913657/1](https://github.com/bohewu/yetlet/actions/runs/41020913657), SUCCESS; both bundles, sixteen subjects and all98 manifest entries verified; plaintext cleanup completed |
+| Final independent review | PASS, zero issues/required followups; actual receipts, retained originals, closed20 public projection and exact-byte registry plan accepted |
+
+Complete record SHA-256 is
+`ad5524f314d39648d191d0e0a58ca443221123f33fa59ba27b288695dc1f9dd3`.
+Original prepare artifact12960503201 has ZIP SHA-256
+`3f23d0c51a385b871c8ec1d510d2bfaac27566eb36adf69bdfec2b4c88d45fb9`.
+The independent public projection artifact12961677010 has ZIP SHA-256
+`61be9005f26486fb4af960862c32a84e910a3c09ab048a8840ccdf4106b98bff`.
+Original ZIPs, safe receipts, encrypted private bundles and indexed copies remain
+outside the repository. No formal private key or original private plaintext was
+read locally. The temporary qualification asset was deleted after retention.
+
+The first Draft metadata update omitted tag/source fields and read back an
+unexpected `untagged-*` Draft label. One same-Draft update explicitly bound all
+fields; exact name/body/tag/C readback then passed. Product tag C remained
+unchanged. Both the first observation and successful correction are retained.
+
+## Owner-approved publication failure and local repair
+
+[Publication41022282283/1](https://github.com/bohewu/yetlet/actions/runs/41022282283)
+passed its read-only preflight; its plans matched the local frozen plans. The
+owner approved `release-publish`. The protected job failed with
+`github: stage_attempted`, `registry: not_attempted`, `status: incomplete`.
+Actual Release428745799 remains a Draft with zero assets and exact reviewed
+metadata. Approval was recorded; no registry write or consumer check was reached.
+This is an incomplete publication, not a release-success claim.
+
+The old combined publisher discarded exception details, so that run's exact
+failing HTTP status/suboperation cannot be recovered. Owner-login production
+read-only Draft/assets checks pass; they do not prove hosted-token behavior.
+Do not retroactively label the original failure as a known HTTP411.
+
+A separate reachable uploader defect is reproduced: `gh api --input -` emits a
+chunked request without `Content-Length` with the observed local CLI2.46.0.
+[GitHub requires that header](https://docs.github.com/en/rest/releases/assets#upload-a-release-asset).
+An isolated loopback endpoint rejects the old command with411. The local repair
+sets exact byte length while preserving raw binary stdin; the real CLI loopback
+check accepts the exact bytes without chunked transfer. No real token or
+external write is involved. Upload/HTTP errors now retain bounded operation,
+class/status and publisher phase, excluding raw messages, URLs and bodies.
+Local checks and independent repair review are recorded separately from any
+future hosted qualification. No publication retry follows from this repair.
+
 ## Final owner boundary
 
 The [single final publication gate](RELEASE-PUBLICATION.md) covers an exact
@@ -109,5 +168,21 @@ and original verified public artifacts. The owner must review the real result,
 public attachment/metadata scope and request/plan hashes before approving
 `release-publish`. Do not approve that gate on the owner's behalf. No Release
 publication, Latest selection, registry write, yank or credential rotation is
-performed by this checkpoint. YT-020 remains **Blocked** until actual registry
+performed by this local repair. A later reviewed publisher P may reuse the
+unchanged C/S/V/artifacts and signatures; select P only after normal delivery and
+green master CI, then refreeze the publication request/summary/plan hashes.
+Another hosted attempt needs explicit continuation authority and its actual
+owner gate. YT-020 remains **Blocked** until actual registry
 readback and registry-only consumer proof succeed.
+
+## Local repair acceptance
+
+Seven affected checks PASS, including the real CLI loopback binary/length check
+and safe HTTP/upload/combined-publisher failure cases. Docs75/209, YAML, all16
+shell syntax blocks and whitespace PASS. Independent Reviewer
+`/root/alpha4_hosted_checkpoint_review_20261030` returns **PASS**, zero issues or
+required followups; all ten reviewed source hashes match. Native reviewer/model
+and actual high effort are verified. This acceptance-only metadata follows the
+reviewed boundary. Actionlint is unavailable; hosted cache-hit/performance and
+corrected live publisher acceptance remain unverified. No Commit/Push, new
+hosted execution, retry or publication occurred in this local slice.

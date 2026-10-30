@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""YT-209 changed-behavior checks. Synthetic bytes/API/crypto; no key, network or signing."""
+"""YT-209 checks: synthetic fixtures and loopback CLI; no keys, external network or signing."""
 import base64
 import copy
+import http.server
 import importlib.util
 import io
 import json
@@ -11,6 +12,7 @@ import shutil
 import subprocess
 import sys
 import tempfile
+import threading
 import unittest
 from unittest.mock import patch
 import urllib.error
@@ -368,12 +370,59 @@ class PublicTests(unittest.TestCase):
         args, kwargs = run.call_args
         self.assertEqual(args[0], ['gh', 'api', '--method', 'POST', url,
             '--header', 'Accept: application/vnd.github+json',
-            '--header', 'Content-Type: application/octet-stream', '--input', '-'])
+            '--header', 'Content-Type: application/octet-stream',
+            '--header', 'Content-Length: ' + str(len(self.blobs[asset['name']])), '--input', '-'])
         self.assertEqual(kwargs['input'], self.blobs[asset['name']])
         self.assertEqual(kwargs['timeout'], 120)
         self.assertNotIn('SYNTHETIC token', ' '.join(args[0]))
         self.assertNotIn('shell', kwargs)
         run.assert_called_once(); native.assert_not_called()
+
+    @unittest.skipUnless(shutil.which('gh'), 'GitHub CLI unavailable for loopback transport check')
+    def test_real_gh_stdin_has_known_length_and_exact_binary_body(self):
+        seen = []
+        class Handler(http.server.BaseHTTPRequestHandler):
+            def do_POST(self):
+                length = self.headers.get('Content-Length')
+                body = self.rfile.read(int(length)) if length else b''
+                seen.append((length, self.headers.get('Transfer-Encoding'), body))
+                self.send_response(201 if length else 411)
+                raw = b'{"id":123}'
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Content-Length', str(len(raw)))
+                self.end_headers()
+                self.wfile.write(raw)
+            def log_message(self, *args):
+                pass
+        server = http.server.HTTPServer(('127.0.0.1', 0), Handler)
+        worker = threading.Thread(target=server.serve_forever, daemon=True)
+        worker.start()
+        try:
+            env = {'PATH': os.environ.get('PATH', ''),
+                'GH_CONFIG_DIR': str(self.directory), 'GH_TOKEN': 'synthetic-loopback-only',
+                'GH_ENTERPRISE_TOKEN': 'synthetic-loopback-only', 'NO_PROXY': '127.0.0.1',
+                'GH_PROMPT_DISABLED': '1'}
+            raw = b'SYNTHETIC\x00\xff\r\n' * 1024
+            with patch.dict(os.environ, env, clear=True):
+                self.assertEqual(pub.upload('http://127.0.0.1:' + str(server.server_port) + '/upload', raw), {'id': 123})
+            self.assertEqual(seen, [(str(len(raw)), None, raw)])
+        finally:
+            server.shutdown()
+            server.server_close()
+            worker.join(timeout=2)
+        self.assertFalse(worker.is_alive())
+
+    def test_api_http_status_survives_without_url_headers_or_body(self):
+        error = urllib.error.HTTPError('https://private.invalid/?token=secret', 403,
+            'private message', {'Private': 'header'}, io.BytesIO(b'private body'))
+        with patch.dict(os.environ, {'GH_TOKEN': 'SYNTHETIC'}), \
+                patch.object(pub.urllib.request, 'build_opener') as opener:
+            opener.return_value.open.side_effect = error
+            with self.assertRaises(pub.ApiError) as caught: pub.api('/releases/15')
+        detail = pub.failure_details(caught.exception)
+        self.assertEqual(detail, {'operation': 'api-read', 'class': 'http', 'http_status': 403})
+        self.assertTrue(error.fp.closed)
+        self.assertNotIn('private', json.dumps(detail) + str(caught.exception))
 
     def test_upload_rejects_anonymous_or_foreign_destination_before_gh(self):
         upload_url = 'https://uploads.github.com/repos/bohewu/yetlet/releases/15/assets?name=public'

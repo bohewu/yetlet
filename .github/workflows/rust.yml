@@ -46,6 +46,8 @@ jobs:
     name: Stable native, samples, and Chrome
     env:
       RUSTUP_TOOLCHAIN: stable
+      AUDIT_VERSION: '0.22.2'
+      WASM_BINDGEN_VERSION: '0.2.129'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     steps:
@@ -54,11 +56,20 @@ jobs:
         with:
           persist-credentials: false
       - name: Rust tools
+        id: rust-tools
         run: |
           rustup update stable
           rustup default stable
           rustup component add rustfmt clippy
           rustup target add wasm32-unknown-unknown
+          echo "rustc=$(rustc -vV | sha256sum | cut -d ' ' -f1)" >> "$GITHUB_OUTPUT"
+          echo "CI_TOOLS_ROOT=$RUNNER_TEMP/yetlet-ci-tools" >> "$GITHUB_ENV"
+          echo "$RUNNER_TEMP/yetlet-ci-tools/bin" >> "$GITHUB_PATH"
+      - name: Cache pinned CI tools
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ${{ runner.temp }}/yetlet-ci-tools
+          key: yetlet-ci-tools-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.rust-tools.outputs.rustc }}-audit-${{ env.AUDIT_VERSION }}-bindgen-${{ env.WASM_BINDGEN_VERSION }}
       - name: Documentation, catalog, and Rust tool tests
         run: |
           cargo xtask check docs
@@ -79,7 +90,10 @@ jobs:
           cargo test --workspace --doc --locked
       - name: RustSec dependency audit
         run: |
-          cargo install cargo-audit --version 0.22.2 --locked
+          if [[ ! -x "$CI_TOOLS_ROOT/bin/cargo-audit" ]]; then
+            cargo install cargo-audit --version "$AUDIT_VERSION" --locked --root "$CI_TOOLS_ROOT"
+          fi
+          [[ "$("$CI_TOOLS_ROOT/bin/cargo-audit" --version)" == "cargo-audit $AUDIT_VERSION" ]]
           cargo audit
       - name: Native application binaries and smokes
         run: |
@@ -103,7 +117,10 @@ jobs:
             -p yetlet-dashboard-counter-island -p yetlet-dashboard-filter-island
       - name: Browser tooling and release assets
         run: |
-          cargo install wasm-bindgen-cli --version 0.2.129 --locked
+          if [[ ! -x "$CI_TOOLS_ROOT/bin/wasm-bindgen" ]]; then
+            cargo install wasm-bindgen-cli --version "$WASM_BINDGEN_VERSION" --locked --root "$CI_TOOLS_ROOT"
+          fi
+          [[ "$("$CI_TOOLS_ROOT/bin/wasm-bindgen" --version)" == "wasm-bindgen $WASM_BINDGEN_VERSION" ]]
           cargo xtask build browser --release
           cargo xtask build keyed-bindings --release
           cargo xtask build multi-island-dashboard --release
