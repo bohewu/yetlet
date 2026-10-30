@@ -256,7 +256,7 @@ def main():
                         'yetlet-actions; publish only the selected fifteen packages. '
                         'Wait 11 minutes before every unique PUT (165 minutes total); job bound 210 minutes. '
                         'Recheck source/owner approval/release after each wait; stop on any error including429.\n' if selection is not None else
-                        'Destinations: GitHub pre-release, then crates.io (16 packages).\n'))
+                        'Destinations: GitHub pre-release, then crates.io (' + str(len(s.PACKAGES)) + ' packages).\n'))
                 receipt['status'] = 'preflight_pass'
                 return
             phase = 'publication-recheck'

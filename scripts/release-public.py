@@ -135,7 +135,7 @@ def plan(value):
               and all(ord(c) >= 32 for c in value['name']))
     for key in ('notes_sha256', 'verification_sha256', 'approval_sha256'):
         s.require(s.records.token(value[key], s.records.SHA))
-    s.require(type(value['assets']) is list and len(value['assets']) == 20)
+    s.require(type(value['assets']) is list and len(value['assets']) == len(names()))
     found = set()
     for a in value['assets']:
         s.require(type(a) is dict and set(a) == {'name', 'size', 'sha256'})
@@ -184,7 +184,7 @@ def public_inputs(p, directory, notes, verification):
     s.require(set(checksum) == {'schema_version', 'notice', 'artifacts'} and checksum['schema_version'] == 1
               and checksum['notice'] == s.checksums.NOTICE)
     expected = names() - {s.MANIFEST, 'provenance.sigstore.json', 'SIGNING-APPROVAL.json'}
-    s.require(len(checksum['artifacts']) == 17 and {e['path'] for e in checksum['artifacts']} == expected)
+    s.require(len(checksum['artifacts']) == len(expected) and {e['path'] for e in checksum['artifacts']} == expected)
     for e in checksum['artifacts']:
         s.require(set(e) == {'path', 'size', 'sha256'} and e['sha256'] == s.sha(blobs[e['path']])
                   and e['size'] == len(blobs[e['path']]))

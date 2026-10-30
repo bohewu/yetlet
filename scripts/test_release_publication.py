@@ -15,6 +15,7 @@ import zipfile
 import release_policy as policy
 import release_record as records
 import release_registry as registry
+import release_ci
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location('publication_tests', HERE / 'release-publish.py')
@@ -601,6 +602,60 @@ class PublicationContinuationTests(unittest.TestCase):
                     if job == 'registry-continuation' and owner == 35250002: publication.gate(r, True)
                     else:
                         with self.assertRaises(ValueError): publication.gate(r, True)
+
+
+class ReleaseCiTests(unittest.TestCase):
+    def test_preflight_summary_reports_the_selected_two_package_scope(self):
+        r=record();r.update(schema=2,cohort='consolidated');publication.s.bind_record(r)
+        with tempfile.TemporaryDirectory() as temp:
+            root=Path(temp)
+            with (patch.object(publication.sys,'argv',['release-publish.py','preflight']),
+                  patch.dict(os.environ,{'PUBLICATION_OUTPUT':str(root/'out'),'GITHUB_STEP_SUMMARY':str(root/'summary')}),
+                  patch.object(publication,'request',return_value={}),patch.object(publication,'gate'),
+                  patch.object(publication,'distribution',return_value=({}, {}, {}, {})),
+                  patch.object(publication.pub,'operate') as mutate):
+                publication.main()
+            self.assertIn('crates.io (2 packages)',(root/'summary').read_text())
+            mutate.assert_not_called()
+
+    def test_only_explicit_tools_and_docs_can_reuse_sdk_proof(self):
+        self.assertTrue(release_ci.tooling_only(['scripts/release-public.py','scripts/release_ci.py',
+            'scripts/test_release_publication.py','.github/workflows/rust.yml','docs/DEVELOPMENT.md']))
+        for path in ['Cargo.toml','Cargo.lock','crates/yetlet/src/lib.rs','crates/yetlet/README.md',
+                     'examples/hello-world/src/main.rs','xtask/src/lib.rs','.github/actions/other.yml','scripts/other.py']:
+            self.assertFalse(release_ci.tooling_only(['docs/README.md',path]),path)
+        self.assertFalse(release_ci.tooling_only([]))
+
+    def test_complete_diff_and_green_exact_base_are_both_required(self):
+        import subprocess
+        base,head='a'*40,'b'*40
+        event={'pull_request':{'base':{'sha':base}}}; proof={'source':base,'run':'1','attempt':'1'}
+        def output(args,**kwargs):
+            return head+'\n' if args[1]=='rev-parse' else b'scripts/release-public.py\0docs/DEVELOPMENT.md\0'
+        with (patch.object(release_ci.subprocess,'check_output',side_effect=output),
+              patch.object(release_ci.subprocess,'run',return_value=subprocess.CompletedProcess([],0)),
+              patch.object(release_ci.release_policy,'ci',return_value=proof) as check):
+            self.assertEqual(release_ci.select(event,head,None),proof);check.assert_called_once_with(base,None)
+            with patch.object(release_ci.release_policy,'ci',side_effect=ValueError('base CI unverified')):
+                with self.assertRaises(ValueError):release_ci.select(event,head,None)
+            check.reset_mock()
+            with patch.object(release_ci.subprocess,'check_output',side_effect=[head+'\n',b'crates/yetlet/src/lib.rs\0']):
+                self.assertIsNone(release_ci.select({'before':base},head,None))
+            check.assert_not_called()
+            self.assertIsNone(release_ci.select({'before':'0'*40},head,None))
+
+    def test_workflow_keeps_both_required_jobs_and_complementary_checks(self):
+        import yaml
+        workflow=yaml.load((HERE.parent/'.github/workflows/rust.yml').read_text(),Loader=yaml.BaseLoader)
+        self.assertEqual(workflow['permissions'],{'contents':'read','actions':'read'})
+        self.assertEqual(set(workflow['jobs']),{'msrv','native-and-browser'})
+        for job in workflow['jobs'].values():
+            self.assertNotIn('if',job)
+            self.assertEqual(job['steps'][0]['with']['fetch-depth'],'0')
+            scope=next(s for s in job['steps'] if s.get('id')=='scope')
+            self.assertEqual(scope['run'],'python3 scripts/release_ci.py')
+            self.assertTrue(any(s.get('if')=="steps.scope.outputs.release_only == 'true'" for s in job['steps']))
+            self.assertTrue(any(s.get('if')=="steps.scope.outputs.release_only != 'true'" for s in job['steps']))
 
 
 class PolicyTests(unittest.TestCase):

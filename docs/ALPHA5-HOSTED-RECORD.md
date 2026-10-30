@@ -81,3 +81,30 @@ Actual tag/build/readback/S/payload/run/digest/Draft/publication identities belo
 to the frozen data-only execution records and later result entry. Pending values
 are not accepted outputs. Historical D6 acceptance is preserved and does not
 automatically attest to alpha.5 payloads.
+
+
+## Actual frozen inputs and verified signatures — 2026-10-31
+
+PR33 and exact master CI41095951188/1 select signer/verifier S/V
+`864f2abc7ca076db13f18ddd5fbcc1aa0145fe0b`. The short-lived intake, prepare and
+cleanup pass in [41096828780/1](https://github.com/bohewu/yetlet/actions/runs/41096828780).
+The same frozen bytes are signed in
+[41097671841/1](https://github.com/bohewu/yetlet/actions/runs/41097671841), then
+independently verified in
+[41097893900/1](https://github.com/bohewu/yetlet/actions/runs/41097893900):
+**two subjects and84 private manifest entries PASS**, with plaintext cleanup.
+Original encrypted build, intake, frozen assembly, both bundles and safe receipts
+are retained outside transient Actions storage. No local formal key was accessed.
+
+Before dispatching publication preflight, a local audit finds two remaining
+sixteen-package counts in the public allowlist validator:20 assets and17 checksum
+entries. These would reject the actual six public files/three checksum entries.
+Use the validated record's closed package names to derive the counts, retaining
+exact names, duplicate rejection, hashes and private-file exclusion. Legacy
+sixteen-package continuation remains unchanged. Exercise the entire consolidated
+stage/readback/publish boundary with synthetic transport and the actual verified
+projection with read-only metadata before delivery. No hosted publisher attempt
+or publication write has occurred. Deliver one reviewed publisher correction;
+select actual P after guarded PR/CI/Merge. C/tag/S/V and signatures stay fixed,
+with no rebuild, re-signing or independent-result replay. Final publication
+continues to require the owner's `release-publish` approval.
