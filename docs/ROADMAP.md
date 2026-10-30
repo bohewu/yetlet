@@ -1,5 +1,15 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**Alpha.5 pre-publication execution (2026-10-31):**
+The owner authorizes advancing to the final publication gate under the adopted
+[single-gate policy](RELEASE-PUBLICATION.md). [The new hosted record](ALPHA5-HOSTED-RECORD.md)
+selects C `0a9fa8a594e3dd2ce753422dd848df10cd8c98df` after PR31 and exact master
+CI PASS; all101 SDK inputs and two MSVC-tested tool hashes retain their accepted
+proof. The fixed unsigned alpha.5 tag is pushed with strict/builtin/native Guard
+PASS; one two-package build41087985092/1 is running. Original readback, actual S,
+frozen payloads, signing/result and final plans remain Pending. No publication
+or owner-gate approval; old source/tags/results/failures and paused PR29 remain.
+
 **YT-213 Windows xtask POSIX isolation (2026-10-30):**
 The owner authorizes a repository-tooling correction for the retained MSVC E0277:
 ordinary xtask commands must compile/run; POSIX Docker qualification must reject
