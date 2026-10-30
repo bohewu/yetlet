@@ -513,6 +513,42 @@ class PublicTests(unittest.TestCase):
         (self.directory / 'provenance.sigstore.json').write_bytes(b'tampered')
         with self.assertRaises(ValueError): pub.public_inputs(self.p, self.directory, self.notes, self.verification)
 
+    def test_consolidated_six_assets_validate_stage_readback_and_publish(self):
+        with tempfile.TemporaryDirectory() as temp:
+            self.directory = Path(temp)
+            self.r = fixture(self.directory, consolidated=True); pub.s.bind_record(self.r)
+            s.checksums.run('create', str(self.directory))
+            bundle = records.canonical({'dsseEnvelope': {'payload': base64.b64encode(
+                (self.directory/'PROVENANCE-UNSIGNED.json').read_bytes()).decode()}})
+            (self.directory/'provenance.sigstore.json').write_bytes(bundle)
+            proof = dict(self.v, record_sha256=records.digest(self.r), subjects_verified=2,
+                         provenance_sha256=self.r['provenance']['sha256'], provenance_bundle_sha256=s.sha(bundle))
+            self.verification = records.canonical(proof)
+            approval = {'schema':2,'record_sha256':records.digest(self.r),'source':self.r['source'],
+                'signer_commit':self.r['signer_commit'],'verification_sha256':s.sha(self.verification),
+                'manifest_sha256':proof['manifest_sha256'],'provenance_bundle_sha256':s.sha(bundle),
+                'accepted':True,'scope':'Experimental source packages','publication':'GitHub pre-release + crates.io',
+                'registry_upload':True,'registry_plan_sha256':'d'*64,'publication_request_sha256':'e'*64}
+            (self.directory/'SIGNING-APPROVAL.json').write_bytes(records.canonical(approval))
+            self.blobs = {n:(self.directory/n).read_bytes() for n in pub.names()}
+            self.p = dict(self.p, schema=2, record_sha256=records.digest(self.r),
+                verification_sha256=s.sha(self.verification), approval_sha256=s.sha(self.blobs['SIGNING-APPROVAL.json']),
+                registry_plan_sha256='d'*64,publication_request_sha256='e'*64,
+                assets=[{'name':n,'size':len(b),'sha256':s.sha(b)} for n,b in sorted(self.blobs.items())])
+            pub.plan(self.p)
+            self.assertEqual(len(self.p['assets']), 6)
+            self.assertEqual(pub.public_inputs(self.p,self.directory,self.notes,self.verification),self.blobs)
+            for bad in (dict(self.p,assets=self.p['assets'][:-1]),
+                        dict(self.p,assets=self.p['assets']+[{'name':'private-evidence.tar.age','size':1,'sha256':'a'*64}])):
+                with self.assertRaises(ValueError): pub.plan(bad)
+            state, http = self.remote(0)
+            with patch.object(pub,'http',side_effect=http):
+                pub.operate('stage',self.p,self.blobs,self.notes)
+                pub.operate('readback',self.p,self.blobs,self.notes)
+                result=pub.operate('publish',self.p,self.blobs,self.notes,'publish-exact-approved-plan')
+            self.assertEqual(state['uploads'],6); self.assertEqual(len(result['assets']),6)
+            self.assertFalse(state['draft'])
+
     def remote(self, count=20, fail_upload=False):
         state = {'draft': True, 'assets': [], 'writes': [], 'anonymous': [], 'uploads': 0}
         def asset(a, ident):

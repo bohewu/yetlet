@@ -32,6 +32,18 @@ needs the authority appropriate to that operation.
 
 ## Local checks and CI
 
+Release-tool/document-only changes use a bounded CI lane when the complete Git
+delta matches an explicit allowlist and both required checks have already passed
+on the exact protected-master base. Both required job names still execute and
+record the reused SDK source/run. CI has only `contents: read` and `actions: read`;
+the latter reads baseline run/job metadata. This is source correspondence, not a new
+Rust/browser qualification. Changed release tools run their focused Python tests,
+and documentation runs the existing checker. Any SDK, package/lockfile, sample,
+xtask or unknown-path change uses the full original checks. Missing history,
+uncertain scope or unavailable/failed baseline CI also selects the full lane.
+Release preparation/signing/result/publisher gates and Commit Guard are unchanged.
+
+
 Run the smallest existing check set that proves the change. Examples of selection:
 
 | Change | Verification to select |

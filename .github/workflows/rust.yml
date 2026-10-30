@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: yetlet-${{ github.workflow }}-${{ github.ref }}
@@ -26,15 +27,27 @@ jobs:
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           persist-credentials: false
+          fetch-depth: 0
+      - name: Select verified unchanged SDK baseline for release-only changes
+        id: scope
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/release_ci.py
+      - name: Check release-only scope policy
+        if: steps.scope.outputs.release_only == 'true'
+        run: PYTHONPATH=scripts python3 -m unittest test_release_publication.ReleaseCiTests
       - name: Install declared toolchain
+        if: steps.scope.outputs.release_only != 'true'
         run: |
           rustup toolchain install 1.99.0 --profile minimal
           rustup target add --toolchain 1.99.0 wasm32-unknown-unknown
       - name: Native MSRV tests and doctests
+        if: steps.scope.outputs.release_only != 'true'
         run: |
           cargo +1.99.0 test --workspace --all-targets --locked
           cargo +1.99.0 test --workspace --doc --locked
       - name: Browser and renderer MSRV targets
+        if: steps.scope.outputs.release_only != 'true'
         run: |
           cargo +1.99.0 check --locked --target wasm32-unknown-unknown \
             -p yetlet-todo-browser -p yetlet-search-island \
@@ -55,7 +68,20 @@ jobs:
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           persist-credentials: false
+          fetch-depth: 0
+      - name: Select verified unchanged SDK baseline for release-only changes
+        id: scope
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 scripts/release_ci.py
+      - name: Validate changed release tools and documentation
+        if: steps.scope.outputs.release_only == 'true'
+        run: |
+          PYTHONPATH=scripts python3 -m unittest test_release_publication test_release_automation.PublicTests test_release_sign
+          rustup toolchain install 1.99.0 --profile minimal
+          cargo +1.99.0 xtask check docs
       - name: Rust tools
+        if: steps.scope.outputs.release_only != 'true'
         id: rust-tools
         run: |
           rustup update stable
@@ -66,11 +92,13 @@ jobs:
           echo "CI_TOOLS_ROOT=$RUNNER_TEMP/yetlet-ci-tools" >> "$GITHUB_ENV"
           echo "$RUNNER_TEMP/yetlet-ci-tools/bin" >> "$GITHUB_PATH"
       - name: Cache pinned CI tools
+        if: steps.scope.outputs.release_only != 'true'
         uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
         with:
           path: ${{ runner.temp }}/yetlet-ci-tools
           key: yetlet-ci-tools-v1-${{ runner.os }}-${{ runner.arch }}-${{ steps.rust-tools.outputs.rustc }}-audit-${{ env.AUDIT_VERSION }}-bindgen-${{ env.WASM_BINDGEN_VERSION }}
       - name: Documentation, catalog, and Rust tool tests
+        if: steps.scope.outputs.release_only != 'true'
         run: |
           cargo xtask check docs
           cargo xtask check samples
@@ -79,16 +107,21 @@ jobs:
           cargo fmt --manifest-path xtask/Cargo.toml --check
           cargo clippy --locked --manifest-path xtask/Cargo.toml --all-targets -- -D warnings
       - name: Format
+        if: steps.scope.outputs.release_only != 'true'
         run: cargo fmt --all -- --check
       - name: Changed release publication and compatibility boundaries
+        if: steps.scope.outputs.release_only != 'true'
         run: PYTHONPATH=scripts python3 -m unittest test_release_publication test_release_automation.PublicTests test_release_sign
       - name: Clippy
+        if: steps.scope.outputs.release_only != 'true'
         run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - name: Native tests and doctests
+        if: steps.scope.outputs.release_only != 'true'
         run: |
           cargo test --workspace --all-targets --locked
           cargo test --workspace --doc --locked
       - name: RustSec dependency audit
+        if: steps.scope.outputs.release_only != 'true'
         run: |
           if [[ ! -x "$CI_TOOLS_ROOT/bin/cargo-audit" ]]; then
             cargo install cargo-audit --version "$AUDIT_VERSION" --locked --root "$CI_TOOLS_ROOT"
@@ -96,6 +129,7 @@ jobs:
           [[ "$("$CI_TOOLS_ROOT/bin/cargo-audit" --version)" == "cargo-audit $AUDIT_VERSION" ]]
           cargo audit
       - name: Native application binaries and smokes
+        if: steps.scope.outputs.release_only != 'true'
         run: |
           cargo build --workspace --bins --locked
           cargo xtask smoke hello-world
@@ -109,6 +143,7 @@ jobs:
           cargo xtask smoke auth-notes
           cargo xtask smoke modular-shop
       - name: Browser and renderer wasm32 targets
+        if: steps.scope.outputs.release_only != 'true'
         run: |
           cargo check --locked --target wasm32-unknown-unknown \
             -p yetlet-todo-browser -p yetlet-search-island \
@@ -116,6 +151,7 @@ jobs:
             -p yetlet-render-bench -p yetlet-keyed-bindings \
             -p yetlet-dashboard-counter-island -p yetlet-dashboard-filter-island
       - name: Browser tooling and release assets
+        if: steps.scope.outputs.release_only != 'true'
         run: |
           if [[ ! -x "$CI_TOOLS_ROOT/bin/wasm-bindgen" ]]; then
             cargo install wasm-bindgen-cli --version "$WASM_BINDGEN_VERSION" --locked --root "$CI_TOOLS_ROOT"
@@ -127,16 +163,19 @@ jobs:
           cargo build --release --locked \
             -p yetlet-todo-server -p yetlet-multi-island-dashboard
       - name: Chrome version
+        if: steps.scope.outputs.release_only != 'true'
         run: google-chrome --version
       - name: Chrome E2E suites
+        if: steps.scope.outputs.release_only != 'true'
         run: |
           cargo xtask smoke browser-chrome --profile release
           cargo xtask smoke keyed-bindings-chrome --profile release
           cargo xtask smoke multi-island-dashboard-chrome --profile release
       - name: M5 local-style baseline (informational only)
+        if: steps.scope.outputs.release_only != 'true'
         run: cargo xtask measure baseline --profile release --samples 15 --browser-runs 3 --out target/m5-baseline-ci.json
       - name: Retain browser diagnostics on failure
-        if: failure()
+        if: failure() && steps.scope.outputs.release_only != 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: yetlet-browser-failure-logs
@@ -147,6 +186,7 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
       - name: Retain M5 baseline artifact
+        if: steps.scope.outputs.release_only != 'true'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: yetlet-m5-baseline
