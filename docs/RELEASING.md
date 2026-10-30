@@ -271,6 +271,13 @@ development-dependency caveat. Five independent workspaces prevent selecting
 all sixteen with a root-only `--workspace`; the first-publication verification
 strategy remains to be proven. This inventory does not authorize an upload.
 
+The subsequent [Config/Secrets contract and dry-runs](YT-020-FIRST-PUBLISH-CONTRACT.md)
+verify the pair normally with accepted local package sources and unchanged
+manifests. Actual registry availability/acceptance is not simulated. Their
+generated archives differ from the signed set in internal packaged-lock
+checksums; resolve the sixteen-package artifact/checksum contract before
+uploading or claiming existing signatures cover a repackaged registry set.
+
 For a first manual upload, sign in to crates.io with GitHub, verify the account
 email and create a token permitted to publish the selected names. Enter it with
 `cargo login`; keep it out of repo files, shell arguments and reports. The

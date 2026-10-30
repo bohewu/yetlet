@@ -1,5 +1,16 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-020 Config/Secrets local preflight (2026-10-30):** The
+[dependency contract](YT-020-FIRST-PUBLISH-CONTRACT.md) preserves manifests,
+features and source locks. Secrets and Config/secret-provider publish dry-runs
+normally verify using accepted archive directory sources, with explicit upload
+abort. Failed offline/configuration and Config rustup observations remain; no
+passed suite replay. Generated archives differ solely in internal packaged-lock
+checksums and cannot inherit old signatures. Next resolve the registry artifact/
+checksum contract, then rights/source/authority and actual registry proof.
+Independent Reviewer PASS0, all five reviewed source hashes match; temporary
+source, Cargo home, vendor and build cleanup PASS. YT-020 Blocked, no new Commit/Push or upload.
+
 **YT-020 registry next step (2026-10-30):** [Read-only sixteen-package
 inventory](YT-020-REGISTRY-READINESS.md) follows guarded local seven-path commit
 `6371ba8`, without Push. All requested names return not-found and the public

@@ -1,5 +1,18 @@
 # Yetlet Backlog
 
+**YT-020 first-publication dependency contract (2026-10-30):** Five inventory
+documents committed as `d71d976` with strict/builtin Guard/hook PASS, no Push.
+The [unchanged-input contract and dry-runs](YT-020-FIRST-PUBLISH-CONTRACT.md)
+retain Config/Secrets manifests and use accepted archive directory sources:
+Secrets and Config/secret-provider normal publish verification PASS, no upload.
+Offline preflight and first Config rustup failures remain; only failed Config
+was repeated with pinned compiler. Both output archives differ from accepted
+signed bytes solely by four Yetlet packaged-lock checksum fields each. This is
+local dependency-path evidence, not an upload-ready sixteen-package set. Registry
+artifact/checksum policy, source/authority, credentials and actual registry proof
+remain open. Independent Reviewer PASS0, all five source hashes unchanged;
+owned temporary directories removed with evidence retained. YT-020 Blocked.
+
 **YT-020 registry inventory (2026-10-30):** The seven reviewed upload-tool/SOP
 paths are committed locally as `6371ba8` after strict/builtin Guard and native
 hook PASS; no Push. The [sixteen-package inventory](YT-020-REGISTRY-READINESS.md)
@@ -263,7 +276,7 @@ Priority: `P0` is the critical path, `P1` is required for the MVP, and `P2` cove
 | YT-017 | P1 | M | M3 | Island state schema/version/security | YT-012 | Bounded v1 JSON, HTML escaping, invalid state tests and Chrome fail-closed SSR fallback PASS | Done |
 | YT-018 | P1 | M | M4 | Strict CSP and browser security verification | YT-013, YT-016, YT-017 | Headless Chrome/CSP, JSON errors, origin/media/body limits PASS at anonymous prototype scope | Done |
 | YT-019 | P1 | L | M5 | Cross-target/E2E tests and performance baseline | YT-006, YT-010, YT-013, YT-016, YT-018 | [M5 verification](M5-VERIFICATION.md): A01–A10 local proof, release metrics, Chrome 155/Firefox 157 smoke | Done |
-| YT-020 | P1 | S | M5 | Build/run docs and release readiness | YT-019 | Historical [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [hosted rebuilding](YT-020-HOSTED-REBUILD.md), [trust/registry policy](YT-020-PRIVATE-TRUST-POLICY.md) and [Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md) retain their original scope. Later [alpha.3 signing, independent verification and GitHub publication](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30) are accepted at fixed C/S. Current [sixteen-package crates.io inventory](YT-020-REGISTRY-READINESS.md): sixteen names not found and public account exists; claimability/credential rights unverified. Registry source/authority, Config/Secrets first-publication bootstrap, normally verified publish preflight, actual archive/signature identity and downloaded registry consumer remain open; no registry upload or qualification replay | Blocked |
+| YT-020 | P1 | S | M5 | Build/run docs and release readiness | YT-019 | Historical [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [hosted rebuilding](YT-020-HOSTED-REBUILD.md), [trust/registry policy](YT-020-PRIVATE-TRUST-POLICY.md) and [Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md) retain their original scope. Later [alpha.3 signing, independent verification and GitHub publication](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30) are accepted at fixed C/S. [Sixteen-package inventory](YT-020-REGISTRY-READINESS.md): names not found and public account exists; claimability/credential rights unverified. [Config/Secrets contract and normal publish dry-runs](YT-020-FIRST-PUBLISH-CONTRACT.md) PASS at local source-replacement scope, with retained failures; generated packaged-lock checksum differences prevent archive/signature identity acceptance. Independent Reviewer PASS0 accepts bounded local study, five source hashes match, temporary cleanup PASS. Supported first-publication bootstrap, registry artifact/checksum policy, source/upload authority, authenticated rights and actual downloaded registry consumer remain open; no registry upload or qualification replay | Blocked |
 | YT-021 | P2 | M | Later | Streaming SSR benchmark | YT-006 | [Bounded incremental SSR research](YT-021-STREAMING-SSR-RESEARCH.md): equivalent escaped fragments, barrier/error proof, matched HTTP first-body/completion/throughput measurements; app-owned prototype retained, core promotion rejected | Done |
 | YT-022 | P2 | L | Later | Serializable handler/resumability spike | YT-017 | [Bounded resumability research](YT-022-RESUMABILITY-RESEARCH.md): finite versioned handlers, constrained numeric capture round trips, rejection/trust tests and native encoded-size/cost measurements; app-owned descriptor pattern retained, generic/core promotion rejected | Done |
 | YT-023 | P2 | L | Later | Independent WebGPU scene renderer spike | YT-009 | [Bounded native scene research](YT-023-WEBGPU-RESEARCH.md): opt-in wgpu/Vulkan instanced draw and all-center readback at 10k/50k/100k, raw completion-wall-time and explicit allocation-byte observations; retain app-owned prototype, reject core/browser-portability promotion | Done |
