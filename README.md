@@ -27,8 +27,17 @@ explicit browser enhancements in one language.
 [`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.5), version
 `0.9.0-alpha.5`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.5)
 contains the archives and verification material. To create a standalone app,
-follow [Build your first Yetlet app](docs/FIRST-APP.md); the optional CLI is a
-separately source-installed preview.
+follow [Build your first Yetlet app](docs/FIRST-APP.md). The independently
+published CLI `0.1.1` creates apps without a repository clone:
+
+```sh
+cargo +1.99.0 install yetlet-cli --version 0.1.1 --locked
+yetlet --version
+```
+
+Expected output: `yetlet 0.1.1`. Cargo builds the CLI from source; see the
+[native build prerequisites](tools/yetlet-cli/README.md#first-use-prerequisites),
+including its OpenSSL dependency, before installing.
 
 Use the pinned Rust/Cargo 1.99.0 toolchain. Native SSR needs no Node.js or WASM
 toolchain. APIs may change; see [compatibility](docs/COMPATIBILITY.md).
@@ -101,7 +110,8 @@ export PATH="$HOME/.local/share/yetlet-tools/bin:$PATH"
 ## Documentation
 
 - [Current API reference](docs/API-REFERENCE.md): packages, features, ownership,
-  errors and local rustdoc.
+  errors, [how to read Rust API docs](docs/API-REFERENCE.md#reading-rust-api-documentation)
+  and local rustdoc.
 - [Troubleshooting](docs/TROUBLESHOOTING.md): symptoms, likely causes and linked fixes.
 - [Opt-in quick reference](docs/OPT-IN-QUICK-REFERENCE.md): features, startup wiring,
   application settings and defaults.

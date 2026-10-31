@@ -1,0 +1,50 @@
+# Exact reader inputs; links never recursively add pages or assets.
+mdbook-version = "0.5.4"
+
+# Explicitly reviewed guide edition; workspace versions alone do not publish it.
+[edition]
+sdk = "0.9.0-alpha.5"
+cli = "0.1.1"
+
+[[pages]]
+source = "README.md"
+output = "index.md"
+title = "Overview"
+until = "## Project and license"
+
+[[pages]]
+source = "docs/FIRST-APP.md"
+output = "first-app.md"
+title = "Create your first app"
+
+[[pages]]
+source = "docs/VIEW-COMPONENTS.md"
+output = "views.md"
+title = "Views and components"
+
+[[pages]]
+source = "crates/yetlet/guides/server-axum.md"
+output = "http.md"
+title = "HTML and HTTP"
+until = "<details>"
+
+[[pages]]
+source = "crates/yetlet-browser/guides/dom.md"
+output = "browser.md"
+title = "Optional browser DOM"
+until = "<details>"
+
+[[pages]]
+source = "docs/OPT-IN-QUICK-REFERENCE.md"
+output = "features.md"
+title = "Choose opt-in features"
+
+[[pages]]
+source = "docs/API-REFERENCE.md"
+output = "api.md"
+title = "Read the API reference"
+
+[[pages]]
+source = "docs/TROUBLESHOOTING.md"
+output = "troubleshooting.md"
+title = "Troubleshooting"

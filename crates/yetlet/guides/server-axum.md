@@ -3,7 +3,9 @@
 Build native HTML pages and JSON endpoints with a small facade over Axum/Tower.
 The server adapter does not install browser, Session or configuration capabilities.
 
-**Experimental, unpublished.** Use this source checkout and the documented target scope.
+**Experimental SDK `0.9.0-alpha.5`, published on crates.io.** Select the
+`server-axum` feature. The commands below run checkout examples; application
+authors can start without cloning using the [first-app guide](../../../docs/FIRST-APP.md).
 
 
 ## Prerequisites
@@ -74,7 +76,12 @@ Native upstream routing and extraction contracts remain Axum/Tower-owned.
 
 ### License and compatibility
 
-Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE). The privately prepared `0.1.x` policy preserves documented behavior and Rust 1.99 in patches; public activation remains blocked. See [compatibility](../../../docs/COMPATIBILITY.md), [API classifications](../../../docs/API-CONTRACTS.md) and [developer guides](../../../docs/README.md). Links to companion packages and records assume this checkout; they do not imply public hosting or distribution.
+Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE).
+SDK `0.9.0-alpha.5` is published; APIs remain Experimental. Read
+[compatibility](../../../docs/COMPATIBILITY.md) and the
+[current API reference](../../../docs/API-REFERENCE.md) at the matching revision.
+The historical evidence below retains its original candidate and scope; it does
+not qualify every later checkout or promise production support.
 
 <details>
 <summary>Historical delivery context and evidence</summary>

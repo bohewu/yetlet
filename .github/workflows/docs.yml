@@ -1,0 +1,131 @@
+name: Yetlet documentation
+
+on:
+  pull_request:
+    paths:
+      - README.md
+      - docs/FIRST-APP.md
+      - docs/VIEW-COMPONENTS.md
+      - docs/OPT-IN-QUICK-REFERENCE.md
+      - docs/API-REFERENCE.md
+      - docs/TROUBLESHOOTING.md
+      - crates/yetlet/guides/server-axum.md
+      - crates/yetlet-browser/guides/dom.md
+      - site/**
+      - tools/build_docs.py
+      - tools/test_build_docs.py
+      - Cargo.toml
+      - tools/yetlet-cli/Cargo.toml
+      - .github/workflows/docs.yml
+  push:
+    branches: [master]
+    paths:
+      - README.md
+      - docs/FIRST-APP.md
+      - docs/VIEW-COMPONENTS.md
+      - docs/OPT-IN-QUICK-REFERENCE.md
+      - docs/API-REFERENCE.md
+      - docs/TROUBLESHOOTING.md
+      - crates/yetlet/guides/server-axum.md
+      - crates/yetlet-browser/guides/dom.md
+      - site/**
+      - tools/build_docs.py
+      - tools/test_build_docs.py
+      - Cargo.toml
+      - tools/yetlet-cli/Cargo.toml
+      - .github/workflows/docs.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Documentation build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    outputs:
+      public: ${{ steps.mode.outputs.public }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - name: Select preview or authorized public build
+        id: mode
+        env:
+          DEPLOY_ENABLED: ${{ vars.PAGES_DEPLOY_ENABLED }}
+        run: |
+          set -euo pipefail
+          if [[ "$GITHUB_EVENT_NAME" == workflow_dispatch && "$GITHUB_REF" != refs/heads/master ]]; then
+            echo "Manual documentation publication requires master" >&2
+            exit 1
+          fi
+          public=false
+          if [[ "$GITHUB_REF" == refs/heads/master && "$DEPLOY_ENABLED" == true ]] &&
+             [[ "$GITHUB_EVENT_NAME" == push || "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
+            public=true
+          fi
+          echo "public=$public" >> "$GITHUB_OUTPUT"
+      - name: Prepare pinned mdBook
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/docs-tools"
+          curl --fail --location --silent --show-error \
+            https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-unknown-linux-musl.tar.gz \
+            --output "$RUNNER_TEMP/docs-tools/mdbook.tar.gz"
+          echo "5222beabd3e37dc5be0d18ff99b79058469354db5c220153a1b92db5ba12be89  $RUNNER_TEMP/docs-tools/mdbook.tar.gz" | sha256sum --check
+          tar -xzf "$RUNNER_TEMP/docs-tools/mdbook.tar.gz" -C "$RUNNER_TEMP/docs-tools" mdbook
+      - name: Check publication labels and output boundaries
+        run: PYTHONPATH=tools python3 -m unittest test_build_docs
+      - name: Build and check the selected guide
+        env:
+          PUBLIC_BUILD: ${{ steps.mode.outputs.public }}
+        run: |
+          set -euo pipefail
+          args=()
+          if [[ "$PUBLIC_BUILD" == true ]]; then args+=(--public); fi
+          python3 tools/build_docs.py --mdbook "$RUNNER_TEMP/docs-tools/mdbook" "${args[@]}"
+          tee -a "$GITHUB_STEP_SUMMARY" < target/docs-site/EXPORT-MANIFEST.json
+      - name: Upload only the generated site root
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: target/docs-site/yetlet
+          name: github-pages
+          retention-days: 7
+
+  deploy:
+    name: Deploy documentation
+    needs: build
+    if: >-
+      github.ref == 'refs/heads/master' &&
+      (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      vars.PAGES_DEPLOY_ENABLED == 'true' && needs.build.outputs.public == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      pages: write
+      id-token: write
+    concurrency:
+      group: yetlet-docs-pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Read existing Pages configuration
+        id: pages
+        uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d # v6.0.0
+        with:
+          enablement: 'false'
+      - name: Check the accepted project URL
+        env:
+          PAGES_ORIGIN: ${{ steps.pages.outputs.origin }}
+          PAGES_BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: |
+          [[ "$PAGES_ORIGIN" == https://bohewu.github.io && "$PAGES_BASE_PATH" == /yetlet ]]
+      - name: Deploy this run's Pages artifact
+        id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+        with:
+          artifact_name: github-pages

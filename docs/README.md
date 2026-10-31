@@ -11,13 +11,13 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 ## Reader entry points
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
-- [Build your first Yetlet app](FIRST-APP.md): source-installed CLI → protected standalone project → published SDK → app lock/cache → first build/run.
+- [Build your first Yetlet app](FIRST-APP.md): published CLI0.1.1 → protected standalone project → published SDK0.9.0-alpha.5 → app lock/cache → first build/run.
 - [Write Views and reusable components](VIEW-COMPONENTS.md): typed data → functions → lists/conditions → existing SSR handler.
 - [Opt-in integration quick reference](OPT-IN-QUICK-REFERENCE.md): package/feature → startup API/options → consumer settings/defaults.
 - [Settings, options and logging](SETTINGS-OPTIONS-LOGGING.md): startup loading → validation → typed options → native state and application-owned diagnostics, using existing examples.
 - [Integration guide template](GUIDE-TEMPLATE.md): prerequisites → minimal integration → expected result → configuration/errors → API reference.
 - [Current API reference](API-REFERENCE.md): package entry points, feature/target
-  selection, application options and local rustdoc; read guides and signatures
+  selection, application options, a Rust API reading guide and local rustdoc; read guides and signatures
   at the same revision.
 - [Documentation sources and publication scope](DOCUMENTATION-SCOPE.md): selected
   reader sources, separate maintainer/evidence material and no automatic export
@@ -31,7 +31,24 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 - [WebAssembly startup and loading UI](WASM-STARTUP.md): optional shared JS/CSS shell, customization, full-page/SSR-region integration and caller-owned lifetime.
 
+- [Public documentation plan](PUBLIC-DOCS-PLAN.md): proposed Pages navigation,
+  versioned source/API boundaries, doc-comment gaps and deferred Wiki; not a live site.
+
 ## Maintainer entry points
+
+- [Minimum GitHub Pages publication plan](GITHUB-PAGES-PUBLICATION.md): exact
+  YT-217 edition, proposed build/deploy workflow, permissions/settings, initial
+  owner authorization and subsequent automatic document updates; not activated.
+
+- [Local reader preview](../site/README.md): pinned mdBook builder, exact chapter
+  selection and loopback-only usage. [YT-217 completion](YT-217-DOCS-PREVIEW.md)
+  records API comments and independently accepted local reader checks with retained failures;
+  no Pages deployment is installed.
+
+- [Completed CLI0.1.1 release](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31):
+  accepted output, owner-approved publication and installed consumer; the
+  [CLI0.1.0 failure](YT-215-CLI-FIRST-RELEASE.md#actual-first-publication-and-consumer-failure--2026-10-31)
+  remains preserved.
 
 - [Alpha.5 two-package release plan](ALPHA5-RELEASE-PLAN.md): committed migration
   input, intended package/platform scope, current gaps and later execution gates.
@@ -84,7 +101,7 @@ current checkout. Current task status remains in [Backlog](BACKLOG.md).
 <summary>Existing repository navigation, delivery records and historical evidence</summary>
 
 
-## Current release-candidate qualification
+## Historical release-candidate qualification
 
 [YT-096 candidate selection and package preflight](YT-096-CANDIDATE-QUALIFICATION.md) records the owner-approved `ce56e08` source, original nine experimental `0.1.0` libraries, Rust 1.99 and selected support targets. Nine source packages and a clean packaged-input native consumer pass on Ubuntu 26.04.1. The [selected dependency/API delta](YT-096-SUPPLY-CHAIN-DELTA.md) records 23 SBOMs and license/source checks, nine passing RustSec package-lock scans, API/threat reconciliation and an unsigned checksum bundle with explicit coverage limits. The selected Ubuntu 24.04 baseline and remaining platform/build-bound inventory/rebuild/formal review/trust gates are explicit. YT-096 is In progress and YT-020 remains Blocked. Historical accepted evidence is preserved; no publication or production support is activated.
 

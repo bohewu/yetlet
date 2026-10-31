@@ -1,5 +1,28 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**Current distribution and next reader milestone (2026-10-31):**
+The two-package SDK `0.9.0-alpha.5` and independent CLI `0.1.1` are published.
+[YT-216's completed output and installed consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+close the CLI defect; YT-215 closes through that patch while its original0.1.0
+consumer FAIL remains. SDK/platform proof is not replayed or expanded.
+[YT-217](YT-217-DOCS-PREVIEW.md) is Done at bounded local scope: selected doc comments, four new
+examples, native/WASM rustdoc and an eight-chapter local static build pass. All454
+local links/assets/anchors pass after a genuine old step-link correction. The
+two original sidebar-count failures remain. The owner-authorized check correction
+separates eight chapter URLs from four heading fragments; navigation/search,
+mobile touch interaction and three screenshots PASS at local Chromium scope.
+Original source/build acceptance is reused; final independent browser-acceptance
+review PASS0 explicitly allows Done, with registered model/effective effort verified.
+No API/runtime/version,
+workflow or hosting change; Pages/Wiki are not activated.
+[YT-218](GITHUB-PAGES-PUBLICATION.md) is In progress: the owner-adopted
+publication plan now has a local workflow/public-label implementation and
+passing focused checks. Accepted YT-217 guide/body proof is reused. Independent
+review and authorized Git/CI/settings/first deployment remain pending; the switch
+is absent/off, release CI and Secrets unchanged.
+Dated checkpoints below retain historical authorization/status wording and do
+not override these completed release records.
+
 **YT-216 fixed candidate and tag (2026-10-31):**
 [PR39/source Cae5dd4c](YT-216-CLI-011-PATCH-RELEASE.md#selected-candidate-and-source-delivery--2026-10-31)
 passes reviewed implementation/normal packaging and required CI. Preserve the

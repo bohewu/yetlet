@@ -2,8 +2,9 @@
 
 Choose an existing capability, then follow its linked guide. This lookup page
 concentrates compile selection, explicit startup installation, consumer-owned
-settings and defaults. It describes the current experimental, unpublished
-checkout; it does not introduce another configuration schema or a generic
+settings and defaults. It describes the published Experimental SDK
+`0.9.0-alpha.5` and the explicitly identified application-owned integrations;
+it does not introduce another configuration schema or a generic
 capability builder. Read source/rustdoc and guides at the same revision.
 
 ## Three separate decisions

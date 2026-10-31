@@ -1,19 +1,19 @@
 # Build your first Yetlet app
 
-Create a standalone native SSR app with the source-installed CLI and published
+Create a standalone native SSR app with the published source-installed CLI and
 `yetlet` SDK `0.9.0-alpha.5`. This Linux/POSIX walkthrough uses the existing
 scaffold; the app needs no local SDK source or Cargo path overrides. APIs remain
-Experimental. The CLI is a separate unpublished source preview.
+Experimental. CLI `0.1.1` and SDK `0.9.0-alpha.5` have independent versions.
 
 ## Prerequisites
 
-- Start in the Yetlet repository root, using the same POSIX terminal for all
-  stages. Have Rust/Cargo 1.99.0 installed, a native C/link toolchain and the
+- Use the same POSIX terminal for all stages; no repository clone is needed.
+  Have Rust/Cargo 1.99.0 installed, a native C/link toolchain and the
   OpenSSL development headers/libraries needed to build the CLI's signing
   dependency. The [CLI prerequisite table](../tools/yetlet-cli/README.md#first-use-prerequisites)
   owns tool details and custom OpenSSL setup. This first app does not select
   signing or inherit the CLI's OpenSSL dependency.
-- Use a trusted physical checkout and an owned local application parent with
+- Use an owned local application parent with
   no group/world write access. Choose unused directory/application names. The
   CLI refuses overwrite and unsafe paths; do not disable those checks.
 - Prepare network access for explicit Cargo dependency preparation, or an
@@ -27,32 +27,24 @@ Experimental. The CLI is a separate unpublished source preview.
   these POSIX commands are not a Windows walkthrough.
 
 Stop at the first error. All paths below are explicit; no ancestor search,
-global CLI installation or existing-project overwrite is assumed.
+existing-project overwrite is assumed. The installation below places the CLI
+in Cargo's user install directory.
 
 ## Minimal integration
 
 ### 1. Install the CLI
 
-The selected end-user interface, after the first CLI publication, is:
+Install the independently published CLI from crates.io:
 
 ```sh
-cargo install yetlet-cli --locked
+cargo +1.99.0 install yetlet-cli --version 0.1.1 --locked
 yetlet --version
 ```
 
 This downloads the CLI source archive from crates.io and compiles the `yetlet`
-executable; users do not need to clone this repository. The CLI is not uploaded
-yet: the command above is the planned distribution interface, not an availability
-claim. Until that separately authorized publication, maintainers can install the
-same package from a trusted source checkout (or an unpacked verified CLI archive).
-From the repository root:
-
-```sh
-(
-    export RUSTUP_TOOLCHAIN=1.99.0
-    cargo install --path tools/yetlet-cli --locked
-)
-```
+executable. Expected version output is exactly `yetlet 0.1.1`. This is a native
+source installation, so the prerequisites above apply. Maintainers evaluating a
+checkout can use the separate [source-install instructions](../tools/yetlet-cli/README.md#build-locally-and-create-an-application).
 
 Cargo places `yetlet` under its install root's `bin` directory (normally
 `~/.cargo/bin`). Ensure it is on PATH, then check the installed command:
@@ -65,9 +57,8 @@ env PATH="$yetlet_rust_bin:$PATH" yetlet doctor --json
 ```
 
 For an isolated prefix, add `--root /absolute/owned/cli-prefix` to the install
-command and invoke `/absolute/owned/cli-prefix/bin/yetlet`. This is a native Cargo
-source installation; `cargo install yetlet-cli` is not available from crates.io
-yet. The CLI currently reports `0.1.0`, separately from SDK `0.9.0-alpha.5`.
+command and invoke `/absolute/owned/cli-prefix/bin/yetlet`. The CLI version is
+independent of SDK `0.9.0-alpha.5`.
 `--locked` allows downloading locked dependencies. A version or doctor result
 identifies a tool/environment, not application readiness. For a Rustup setup,
 `rustup which` selects the actual already-installed toolchain directory. The

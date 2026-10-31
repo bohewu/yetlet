@@ -4,7 +4,7 @@ The CLI creates applications and executes selected tasks. Persistent behavior us
 Yetlet's existing public base/profile settings and scoped environment overrides.
 This standalone Cargo binary package installs the `yetlet` command. Generated
 apps use the published `yetlet` / `yetlet-browser` SDK `0.9.0-alpha.5`; normal
-build/run needs no SDK checkout or Cargo path override. CLI version `0.1.0` and
+build/run needs no SDK checkout or Cargo path override. CLI version `0.1.1` and
 SDK versions are independent. This is an Experimental developer tool, with
 platform evidence limited to the documented qualification scopes.
 See the [CLI contract](../../docs/CLI-CONTRACT.md) and
@@ -101,13 +101,13 @@ see [native tool preparation](../../docs/WINDOWS-CLI-125-VERIFICATION.md#reuse-t
 The selected user installation interface is:
 
 ```sh
-cargo install yetlet-cli --locked
+cargo +1.99.0 install yetlet-cli --version 0.1.1 --locked
 yetlet new myapp
 ```
 
 Cargo downloads and compiles the selected published CLI package; no manual
-repository clone or npm is needed. Use `--version 0.1.0` to select this release
-explicitly. [Release status and scope](https://github.com/bohewu/yetlet/blob/master/docs/YT-215-CLI-FIRST-RELEASE.md)
+repository clone or npm is needed. `yetlet --version` reports exactly
+`yetlet 0.1.1`. [Release status and scope](https://github.com/bohewu/yetlet/blob/master/docs/YT-216-CLI-011-PATCH-RELEASE.md)
 are tracked separately from this installation reference. Prebuilt executables
 and `cargo binstall` support are later distribution options.
 

@@ -2,7 +2,8 @@
 
 Find the symptom below, check the possible cause, then follow the linked guide
 for the complete correction. Read guides and API source from the same checkout.
-The SDK is an Experimental published alpha; the CLI is a source-installed preview. These are source-backed explanations of
+The SDK `0.9.0-alpha.5` and independent source-installed CLI `0.1.1` are published
+Experimental versions. These are source-backed explanations of
 existing behavior, not new execution or platform qualification results.
 
 Start with the **first failing stage**: CLI build → app creation/dependencies →

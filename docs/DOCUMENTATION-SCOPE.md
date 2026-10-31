@@ -1,11 +1,13 @@
 # Documentation sources and publication scope
 
-Date: 2026-10-26 classification, updated 2026-10-30 for the two-package source.
-The current checkout is unreleased `0.9.0-alpha.5`: `yetlet` and
-`yetlet-browser`, with module guides and rustdoc at the same revision.
-The [existing alpha.4 release](ALPHA4-HOSTED-RECORD.md) and older previews retain
-their own sixteen-package documentation and evidence. Only its first registry
-package was published; the old continuation is paused. This documentation
+Date: 2026-10-26 classification, updated 2026-10-31 for current distribution.
+The published Experimental SDK is `yetlet` and `yetlet-browser`
+`0.9.0-alpha.5`; the independently published CLI is `yetlet-cli` `0.1.1`.
+Use module guides and rustdoc from the version/revision you consume. The
+[alpha.5 record](ALPHA5-HOSTED-RECORD.md) and
+[CLI0.1.1 record](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+retain their actual distribution/consumer evidence. Older previews retain their
+own package layouts, partial registry results and failure histories. This documentation
 classification activates no website/Wiki or additional publication, support or
 repository-visibility change. Historical candidate decisions retain their scope.
 
@@ -22,6 +24,11 @@ Do not maintain a second independently edited API contract. Record the source
 revision and feature/target selection of any generated rustdoc. Existing tests
 and qualification records remain bound to their own source identities; publishing
 documentation does not renew that evidence or make an API stable.
+
+[The public documentation plan](PUBLIC-DOCS-PLAN.md) proposes GitHub Pages as
+the reader entry point, with selected repository guides and version-matched API
+documentation. A separate Wiki contract is not recommended. The plan activates
+no site; source doc-comment gaps and the minimum implementation order are explicit.
 
 ## Classification and selected reader sources
 
@@ -95,7 +102,8 @@ repository but excluded from the default reader-site selection:
   [RELEASING.md](RELEASING.md). These are the how-to entry points for repository
   work, distinct from application/API guidance and from dated execution records.
   YT-208 adds navigation/SOP only; it does not select these for a reader-site
-  export or make the unfinished YT-209 automation available.
+  export. Current automation and its actual evidence belong to the maintainer
+  release SOP, not the application onboarding path.
 - `docs/YT-*`, milestone verification/planning/review documents, research
   experiments, API classification snapshots, performance measurements and
   screenshot/evidence inventories. A current guide may cite an exact historical
@@ -121,7 +129,7 @@ behavior and security limits in the reader edition; do not remove them to make
 an experimental feature appear complete. This preparation does not certify a
 ready-to-host site or authorize another validation campaign.
 
-Website content and repository visibility are different boundaries. A future
+Website content and repository visibility are different boundaries. This
 public repository exposes its tracked files and accessible history regardless
 of site navigation or a directory named `internal`. Moving a file or hiding a
 link does not make it private. Any history/visibility or private-archive decision
@@ -129,6 +137,7 @@ requires separate owner direction; no removal or history rewrite is selected her
 
 For actual distribution and release decisions, use the current status in
 [Release readiness](RELEASE-READINESS.md) and [the release SOP](RELEASING.md).
-D6/YT-096 completion at the recorded alpha signing scope does not resolve the
-separate YT-020 registry gate. Documentation preparation does not itself publish
+Signing, registry and consumer outcomes remain separately scoped in those records;
+an old Pending registry checkpoint is not current distribution status.
+Documentation preparation does not itself publish
 packages, sign artifacts, enable hosting or expand support.
