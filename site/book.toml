@@ -1,0 +1,20 @@
+[book]
+title = "Yetlet Developer Guide"
+description = "HTML-first Rust applications, explicit capabilities, and API reference"
+language = "en"
+src = "src"
+
+[build]
+create-missing = false
+
+[output.html]
+site-url = "/yetlet/"
+git-repository-url = "https://github.com/bohewu/yetlet"
+default-theme = "light"
+preferred-dark-theme = "navy"
+
+[output.html.playground]
+runnable = false
+
+[output.html.search]
+enable = true

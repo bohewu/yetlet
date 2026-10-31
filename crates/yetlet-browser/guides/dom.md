@@ -3,7 +3,9 @@
 Mount a shared Rust View into an explicitly owned browser surface. This optional
 renderer replaces a subtree; native SSR works without selecting it.
 
-**Experimental, unpublished.** Use this source checkout and the documented target scope.
+**Experimental SDK `0.9.0-alpha.5`, published on crates.io.** `yetlet-browser`
+selects `dom` by default; actual mounting requires the WASM target and browser
+host. The commands below run checkout examples at their documented scope.
 
 
 ## Prerequisites
@@ -46,7 +48,7 @@ Initial input/textarea/select/checkbox defaults are declarative; live values, ch
 
 `href` accepts a root-relative path or fragment; form `action` accepts a root-relative path. Static `validate` checks the narrow spelling. WASM mount additionally uses the browser URL parser and effective document base, rejects non-HTTP(S), cross-origin or credential-bearing destinations, and stores absolute URLs before touching the target. Therefore mount can reject a View that passed static validation. Later base changes do not retarget accepted attributes. The broader SSR URL policy remains separate; see [navigation limits](../../../docs/YT-110-DOM-CAPABILITIES.md#navigation-and-submission-boundary).
 
-The caller owns the target and event listener lifetime. Keep listeners outside the replaced subtree or explicitly release/rebind them. Subtree replacement does not preserve child identity, focus or selection as a general contract, and unexpected DOM API failures are not transactional rollback. Choose the separate opt-in keyed crate for proven identity-sensitive collections. There is no general VDOM, hydration, resumability or GPU acceleration.
+The caller owns the target and event listener lifetime. Keep listeners outside the replaced subtree or explicitly release/rebind them. Subtree replacement does not preserve child identity, focus or selection as a general contract, and unexpected DOM API failures are not transactional rollback. Choose the opt-in `dom-keyed` feature for proven identity-sensitive collections. There is no general VDOM, hydration, resumability or GPU acceleration.
 
 ## API reference
 
@@ -55,7 +57,12 @@ and the linked supported-vocabulary/navigation contract below.
 
 ### License and compatibility
 
-Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE). The privately prepared `0.1.x` policy preserves documented behavior and Rust 1.99 in patches; public activation remains blocked. See [compatibility](../../../docs/COMPATIBILITY.md), [API classifications](../../../docs/API-CONTRACTS.md) and [developer guides](../../../docs/README.md). Links to companion packages and records assume this checkout; they do not imply public hosting or distribution.
+Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE).
+SDK `0.9.0-alpha.5` is published; APIs remain Experimental. Read
+[compatibility](../../../docs/COMPATIBILITY.md) and the
+[current API reference](../../../docs/API-REFERENCE.md) at the matching revision.
+The historical evidence below retains its original candidate and scope; it does
+not qualify every later checkout or promise production support.
 
 <details>
 <summary>Historical delivery context and evidence</summary>

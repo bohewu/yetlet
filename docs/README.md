@@ -36,6 +36,11 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Maintainer entry points
 
+- [Local reader preview](../site/README.md): pinned mdBook builder, exact chapter
+  selection and loopback-only usage. [YT-217 completion](YT-217-DOCS-PREVIEW.md)
+  records API comments and independently accepted local reader checks with retained failures;
+  no Pages deployment is installed.
+
 - [Completed CLI0.1.1 release](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31):
   accepted output, owner-approved publication and installed consumer; the
   [CLI0.1.0 failure](YT-215-CLI-FIRST-RELEASE.md#actual-first-publication-and-consumer-failure--2026-10-31)

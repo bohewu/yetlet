@@ -29,10 +29,14 @@ const MAX_TOKEN_ATTEMPTS: usize = 8;
 const MAX_TTL_SECONDS: u64 = 30 * 24 * 60 * 60;
 const MAX_SESSION_CAPACITY: usize = 1_000_000;
 
+/// A configuration rejected before creating a Memory Session manager.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum SessionConfigError {
+    /// The cookie name is empty, longer than 64 bytes or contains a non-token byte.
     InvalidCookieName,
+    /// The TTL, truncated to whole seconds, is outside 1 second through 30 days.
     InvalidTtl,
+    /// The maximum Session count is outside 1 through 1,000,000.
     InvalidCapacity,
 }
 
@@ -49,6 +53,16 @@ impl fmt::Display for SessionConfigError {
 
 impl std::error::Error for SessionConfigError {}
 
+/// Validated cookie, absolute lifetime and capacity options for Memory Sessions.
+///
+/// Available with the native `session` feature. Constructing options installs no
+/// middleware or store. [`SessionManager`] owns process-local state; Session data
+/// disappears on process restart and does not establish authenticated identity.
+/// The separate remote provider has its own configuration and async operations.
+///
+/// Secure cookies are the default. Cookie handling/CSRF do not replace business
+/// authorization. Follow the [Session guide](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/session.md)
+/// for explicit manager installation and unsafe-method protection.
 #[derive(Debug, Clone)]
 pub struct SessionConfig {
     cookie_name: String,
@@ -58,6 +72,33 @@ pub struct SessionConfig {
 }
 
 impl SessionConfig {
+    /// Validate an absolute Session lifetime, cookie name and bounded store capacity.
+    ///
+    /// The lifetime is truncated to whole seconds and must be 1 second through
+    /// 30 days inclusive. Capacity must be 1 through 1,000,000 inclusive. A cookie
+    /// name must be a nonempty HTTP token of at most 64 bytes. No special cookie
+    /// prefix semantics are validated by this constructor.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`SessionConfigError`] for an invalid cookie name, lifetime or
+    /// capacity, checked in that order. No manager or middleware is created.
+    ///
+    /// # Example
+    ///
+    /// ```
+    /// use std::time::Duration;
+    /// use yetlet::session::{SessionConfig, SessionConfigError};
+    ///
+    /// let options = SessionConfig::new("app-session", Duration::from_secs(900), 1_000)?;
+    /// assert!(options.is_secure());
+    /// assert_eq!(options.cookie_name(), "app-session");
+    /// assert!(matches!(
+    ///     SessionConfig::new("app-session", Duration::ZERO, 1_000),
+    ///     Err(SessionConfigError::InvalidTtl)
+    /// ));
+    /// # Ok::<(), SessionConfigError>(())
+    /// ```
     pub fn new(
         cookie_name: impl Into<String>,
         ttl: Duration,
@@ -89,10 +130,14 @@ impl SessionConfig {
         self
     }
 
+    /// Borrow the validated name used for the Session cookie.
     pub fn cookie_name(&self) -> &str {
         &self.cookie_name
     }
 
+    /// Whether cookies retain the default `Secure` attribute.
+    ///
+    /// This describes a cookie option, not proof that the deployment uses HTTPS.
     pub fn is_secure(&self) -> bool {
         self.secure
     }

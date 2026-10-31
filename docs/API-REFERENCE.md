@@ -110,23 +110,26 @@ read its version's docs; checkout rustdoc can describe later source changes.
 
 ### Current doc-comment coverage and gaps
 
-Source inspection on 2026-10-31 found useful documentation, with uneven coverage.
-This is a focused inventory, not a complete public-item coverage measurement or
-a fresh rustdoc/doctest execution:
+YT-217 improves the selected entry points below in the current working source.
+Four new examples and selected native/WASM rustdoc builds PASS. This is a focused
+inventory, not a complete public-item coverage measurement or new browser/runtime
+qualification. Published archives retain their original documentation:
 
-| Inspected entry | Existing documentation | Recommended next improvement |
+| Inspected entry | Current documentation | Remaining boundary |
 |---|---|---|
-| [`yetlet` crate root](../crates/yetlet/src/lib.rs) and [`yetlet-browser` crate root](../crates/yetlet-browser/src/lib.rs) | A short crate description and gated module exports | Add a first example, feature/target map and links to the relevant guides |
-| [`server_axum::App`](../crates/yetlet/src/server_axum/app.rs) | Module context, an application example, state/ownership explanation and method comments | Use this as a model; retain ordinary Axum semantics |
-| [`View` / `Element`](../crates/yetlet/src/view/mod.rs) | Type summaries and `View::text` trust boundary | Document common `Element` builders/accessors and `Attribute`; explain ownership and renderer validation |
-| [`session::SessionConfig`](../crates/yetlet/src/session/mod.rs) | Session module responsibilities | Add item/constructor/error-variant docs for validation, capacity, expiry and cookie selection; link the existing Session guide |
+| [`yetlet` crate root](../crates/yetlet/src/lib.rs) and [`yetlet-browser` crate root](../crates/yetlet-browser/src/lib.rs) | First example, feature/target map, startup ownership and guide links | Other feature-specific examples remain in their existing guides; no all-API coverage claim |
+| [`server_axum::App`](../crates/yetlet/src/server_axum/app.rs) | Existing module context, application example, state/ownership explanation and method comments | Unchanged in YT-217; native Axum semantics remain authoritative |
+| [`View` / `Element`](../crates/yetlet/src/view/mod.rs) | Variant/field docs, builder/accessor semantics, an owned-tree example and renderer trust boundaries | Constructors still perform no sanitization or renderer validation |
+| [`session::SessionConfig`](../crates/yetlet/src/session/mod.rs) | Constructor/example/error-variant docs, exact TTL/capacity/name validation, Secure default and guide link | No provider installation, authenticated identity, cookie-prefix validation or remote-provider qualification |
 
-Prioritize these beginner-facing gaps in [YT-217](PUBLIC-DOCS-PLAN.md#implementation-order--yt-217).
+The selected work follows [YT-217](PUBLIC-DOCS-PLAN.md#implementation-order--yt-217);
+other modules retain their existing documentation and can be improved when needed.
 Guides should explain how to integrate a capability; doc comments should explain
 the callable API's behavior, ownership, errors and applicable security limits.
 Add a runnable example where it clarifies usage. Use `Errors`, `Panics` or
 `Safety` sections only when applicable; document existing behavior rather than
-adding guarantees. This inventory changes no Rust source or public API.
+adding guarantees. The YT-217 source changes contain doc comments only, with unchanged executable
+Rust tokens and public API.
 
 ## Local rustdoc
 

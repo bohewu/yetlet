@@ -1,8 +1,12 @@
 # Public documentation and rustdoc plan
 
-Date: 2026-10-31. Status: recommendation and backlog scope, not an implemented
-or published website. YT-217 is Todo. This document optimizes the reader path
-without changing runtime, API, package versions or hosting settings.
+Date: 2026-10-31. Status: YT-217 Done at selected API-doc/local reader-preview
+scope after independent final Reviewer PASS0. Source/build evidence is reused;
+authorized sidebar/navigation/search/touch/screenshot checks pass. No published
+website or hosting setting change. The
+[execution record](YT-217-DOCS-PREVIEW.md) distinguishes passing source/build
+checks, retained stopped harness and subsequent authorized correction. Runtime,
+API and versions are unchanged.
 
 ## Recommended destinations
 
@@ -102,10 +106,13 @@ Do not add repeated release-style manual gates for each wording correction.
 
 ## Evidence and current limits
 
-This batch reconciles existing release receipts and source comments; it does
-not rerun installation, browser, build, signing or publication validation.
+The original planning batch reconciled existing release receipts and source
+comments without product verification replay. The later owner-authorized
+YT-217 slice adds only its new examples, selected rustdoc and preview checks.
 [CLI0.1.1's completed consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
 and the [SDK release record](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup)
 keep their original sources and limits. The API inventory is a manual sample of
-public entry points, not a full coverage score. Rust comments, website build,
-rendered navigation and external publication remain future YT-217 work.
+public entry points, not a full coverage score. Source comments and the local
+static build retain their accepted scope. Navigation/search/mobile/screenshot
+checks pass at local Chromium/emulated-mobile scope after final independent review.
+External publication is not claimed.

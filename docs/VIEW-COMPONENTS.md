@@ -3,12 +3,13 @@
 Continue [your first native application](FIRST-APP.md) by expanding its initial
 heading into a small page. Use ordinary Rust functions and the existing
 `View`/`Element` API to pass data, compose components and render a list.
-**Experimental, unpublished:** this guide follows the current source checkout.
+**Experimental SDK `0.9.0-alpha.5`, published on crates.io.** This guide
+continues the registry-first application from the linked walkthrough.
 
 ## Prerequisites
 
 Complete the plain native [first-app walkthrough](FIRST-APP.md), including the
-compatible local core/server dependencies, app lock/cache and existing routes.
+published `yetlet` SDK dependency, app lock/cache and existing routes.
 Use its same Rust/Cargo toolchain and explicit app/CLI paths. This guide needs
 no additional package, Cargo feature, Settings loader, browser build or database.
 
@@ -81,7 +82,7 @@ no Component trait, registration, macro, implicit state subscription or DI step.
 The existing [Todo list](../examples/todo-ui/src/lib.rs) uses the same iterator/
 child composition with real app-owned records.
 
-Use the first-app [build/run instructions](FIRST-APP.md#4-prepare-the-app-lockcache-then-build-and-run)
+Use the first-app [build/run instructions](FIRST-APP.md#3-prepare-the-app-lockcache-then-build-and-run)
 with the same explicit app manifest. These edits do not change dependencies;
 there is no reason to regenerate the app lock just to change a View. Commands
 remain reader instructions, not a claim that this documentation example was run.

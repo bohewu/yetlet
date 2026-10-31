@@ -6,8 +6,10 @@ The SDK `yetlet` / `yetlet-browser` `0.9.0-alpha.5` and independent
 close the CLI version defect: installation, exact version, help and scaffold
 PASS, SDK unchanged. YT-215 closes through that follow-up while its original
 CLI0.1.0 consumer FAIL and immutable release remain intact. No old qualification
-is replayed. [YT-217](PUBLIC-DOCS-PLAN.md) registers the next bounded reader/rustdoc
-improvement and Pages preview, still Todo; no site or Wiki is enabled.
+is replayed. [YT-217](YT-217-DOCS-PREVIEW.md) is Done at selected API-doc/local
+reader-preview scope: source/build proof is reused, authorized sidebar correction
+and navigation/search/touch/screenshots pass, final independent Reviewer PASS0.
+Original failures remain; no Pages site or Wiki is enabled.
 Dated checkpoints below retain their original Pending/authorization wording;
 use the item rows and current release records for present status.
 
@@ -573,10 +575,10 @@ The owner requested Rust-native repository tooling before a public CLI. The inde
 
 ## Ready queue
 
-**Current next item (2026-10-31):** YT-217, beginning with the bounded
-[source doc-comment gaps](API-REFERENCE.md#current-doc-comment-coverage-and-gaps).
-Implementation and site activation are not started. Earlier queue snapshots
-below retain their historical scope.
+**Current reader-documentation closeout (2026-10-31):** YT-217 is Done after
+independent final acceptance at bounded local preview scope. No implementation
+item starts automatically; Pages activation/publication remains separately
+owner-authorized future work. Earlier queue snapshots retain their historical scope.
 
 **M12 next gate (2026-10-15):** YT-085 is Done after independent read-only Reviewer PASS with zero issues/followups (`target/m12/yt085/reviewer-board-retention-20261015/result.json`). The approved 30 Rust smoke/integration mappings retain 25 positive runtime results, one nonzero unavailable Chrome GPU path, and focused later Server/Browser/cleanup/Board receipt repair tests. Windows persistent-Service and Redis external integration are unverified; live Python callers/workflow transition is not yet completed. YT-086 is Done at bounded Rust migration scope after final independent Reviewer `wc_job_6UfDDdHnNCBXkMhA` PASS with zero issues/followups ([evidence](YT-086-VERIFICATION.md)). Full runtime invocation graph, GPU/Docker/Redis/hosted rebuild and full suite remain unverified. YT-087 is Done at the bounded unpublished Linux CLI preview scope after separate 087a/087b/087c independent Reviewer PASS decisions; no public release. YT-020 remains Blocked.
 **Framework/deployment scope clarification (2026-10-11):** Peon committed reviewed b3 as `4da0f6c`, preserving all inputs; no push. The [reconciled responsibility boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md) keeps provider semantics, supported configuration/error behavior and honest persistence limits in Yetlet scope. Production TLS/ACL policy, backup protection, business RPO/RTO and operational ownership belong to applications/operators and do not block framework completion. AOF/crash/restore rehearsals remain Not verified optional proposals; no implementation or new execution started. YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope; its final documentation review gate is recorded in M10g. YT-020 remains Blocked.
@@ -942,7 +944,7 @@ separate implementation authority.
 | YT-215 | P1 | M | M10 | Prepare first independent CLI source release through final owner gate | YT-214 | [Original publication and follow-up disposition](YT-215-CLI-FIRST-RELEASE.md#follow-up-disposition--2026-10-31): CLI0.1.0 GitHub/crates.io upload and install succeed, exact-version consumer FAIL; help/new not reached. Close through separately accepted YT-216 CLI0.1.1 correction and actual consumer PASS. Preserve original FAIL, partial/wrong-ref receipts, archive/tag/signatures and consumed attempts; no relabeling of0.1.0, retry, re-upload or SDK change | Done |
 | YT-216 | P1 | S | M10 | Correct real CLI version contract and prepare CLI0.1.1 | YT-214 | [Completed record](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31): implementation and final output independent Reviewer PASS0; Cae5dd4c and S/V/P1207ba5. Build/custody/prepare/sign/independent result PASS, one CLI subject/all68 private entries,34 frozen hashes. Owner-approved41174511818/1 publishes five-file GitHub prerelease then identical CLI archive to crates.io; anonymous install/exact version/help/scaffold PASS, generated SDK pin unchanged, no path/patch/replace or forwarded credentials. First master CI failure and authorized failed-Stable-only retry retained; no release-stage retry, SDK republishing or new generated-app compilation claim | Done |
 
-| YT-217 | P2 | M | M10 | Improve beginner API docs and preview a selected public guide site | YT-186, YT-191, YT-216 | [Reader/rustdoc plan](PUBLIC-DOCS-PLAN.md): first improve two crate homepages, View/Element/Attribute and SessionConfig/errors with unchanged contracts; then a local static reader preview using canonical Markdown and version-matched API links, explicit page/asset export selection and project base path. Validate only affected docs/examples and navigation; retain history/security limits. Pages recommended, Wiki deferred; initial hosting/deployment needs separate authority. No runtime, package release or broad qualification replay | Todo |
+| YT-217 | P2 | M | M10 | Improve beginner API docs and preview a selected public guide site | YT-186, YT-191, YT-216 | [Progress/evidence](YT-217-DOCS-PREVIEW.md): accepted four doc-comment-only Rust files, four doctests, selected native/WASM rustdoc and eight-chapter explicit local build/static links retained without reruns. Owner authorizes correcting the stopped sidebar check: eight exact chapter URLs versus four extra heading fragments; desktop navigation, SessionConfig search,390x844 touch/menu journey and three screenshots PASS with no captured console/page/HTTP errors. Original two assertion failures and first reader-status P2 remain preserved. Evidence archived outside repo; owned server/browser cleanup complete. Final independent Reviewer PASS0 accepts all19 source hashes/eight evidence files and allows Done; registered role/model and effective high effort verified; no runtime/API/version, new Commit/Push or Pages/release activation | Done |
 
 ## YT-096 hosted build, verifier and retention — 2026-10-28
 
