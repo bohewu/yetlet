@@ -1,5 +1,14 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-215 immutable CLI source checkpoint (2026-10-31):**
+PR36 and exact merged-master CI pass; selected C is6f26961. Unsigned
+cli-v0.1.0 is pushed/read back with strict/builtin/native Guard, consumed binding
+retired and old tags preserved. One45minute CLI build41165581554/1 subsequently PASS without retry; public and
+encrypted artifact digests are retained/verified, original protected readback is dispatched.
+This documentation source can provide later S distinct from C; no new runtime
+or workflow input changes. Actual archive/custody/signature/result identities
+and final owner publication approval remain Pending. SDK uploads are absent.
+
 **YT-215 first independent CLI release preparation (2026-10-31):**
 The owner selects [yetlet-cli0.1.0](YT-215-CLI-FIRST-RELEASE.md) preparation through
 the final owner gate, using the already-published SDK0.9.0-alpha.5. Closed
