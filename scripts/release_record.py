@@ -100,7 +100,7 @@ def environment(stage='complete'):
 
 def tag(record):
     validate(record)
-    return ('cli-v' if record['schema'] == 3 else 'v') + record['version']
+    return ('yetlet-cli-v' if record['schema'] == 3 else 'v') + record['version']
 
 
 def source_version(record, root):

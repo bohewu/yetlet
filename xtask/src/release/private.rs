@@ -112,7 +112,11 @@ impl Cohort {
     pub fn tag(self) -> String {
         format!(
             "refs/tags/{}{}",
-            if self == Self::Cli { "cli-v" } else { "v" },
+            if self == Self::Cli {
+                "yetlet-cli-v"
+            } else {
+                "v"
+            },
             self.version()
         )
     }
@@ -768,7 +772,7 @@ mod publication_tests {
     fn cli_cohort_uses_own_version_manifest_and_one_package_without_sdk_subjects() {
         let cohort = Cohort::Cli;
         assert_eq!(cohort.version(), "0.1.0");
-        assert_eq!(cohort.tag(), "refs/tags/cli-v0.1.0");
+        assert_eq!(cohort.tag(), "refs/tags/yetlet-cli-v0.1.0");
         assert_eq!(cohort.names(), ["yetlet-cli"]);
         assert_eq!(cohort.manifests(), ["tools/yetlet-cli/Cargo.toml"]);
         let temp = tempfile::tempdir().unwrap();

@@ -22,6 +22,53 @@ fn git_ref() -> String {
 fn workflow() -> String {
     format!("bohewu/yetlet/.github/workflows/release.yml@{}", git_ref())
 }
+struct BindingContext {
+    source: Option<String>,
+    workflow: String,
+    git_ref: String,
+}
+fn selected_context(record: Option<&str>) -> Result<BindingContext> {
+    let Some(raw) = record else {
+        return Ok(BindingContext {
+            source: None,
+            workflow: workflow(),
+            git_ref: git_ref(),
+        });
+    };
+    let value = parse(raw.as_bytes())?;
+    let schema = value["schema"].as_u64();
+    let label = value["cohort"]
+        .as_str()
+        .ok_or_else(|| fail("custody release cohort"))?;
+    if !matches!(
+        (schema, label),
+        (Some(1), "sixteen") | (Some(2), "consolidated") | (Some(3), "cli")
+    ) {
+        return Err(fail("custody release schema/cohort mismatch"));
+    }
+    let cohort = super::private::Cohort::from_label(label)?;
+    let source = value["source"]
+        .as_str()
+        .ok_or_else(|| fail("custody source required"))?;
+    if value["version"].as_str() != Some(cohort.version().as_str())
+        || !super::preparation::commit_token(source)
+    {
+        return Err(fail("custody release version/source mismatch"));
+    }
+    let git_ref = cohort.tag();
+    Ok(BindingContext {
+        source: Some(source.to_owned()),
+        workflow: format!("bohewu/yetlet/.github/workflows/release.yml@{git_ref}"),
+        git_ref,
+    })
+}
+fn current_context() -> Result<BindingContext> {
+    match std::env::var("RELEASE_RECORD") {
+        Ok(raw) => selected_context(Some(&raw)),
+        Err(std::env::VarError::NotPresent) => selected_context(None),
+        Err(_) => Err(fail("custody release record encoding")),
+    }
+}
 const INVENTORY: &str = "CUSTODY-INVENTORY.json";
 pub const CIPHER: &str = "private-evidence.tar.age";
 pub const RECEIPT: &str = "transport-receipt.json";
@@ -45,6 +92,9 @@ pub struct Binding {
 }
 impl Binding {
     fn validate(&self) -> Result<()> {
+        self.validate_context(&current_context()?)
+    }
+    fn validate_context(&self, context: &BindingContext) -> Result<()> {
         let number = |s: &str| {
             !s.is_empty()
                 && s.len() <= 20
@@ -53,8 +103,9 @@ impl Binding {
         };
         if !super::preparation::commit_token(&self.source)
             || self.workflow_sha != self.source
-            || self.workflow != workflow()
-            || self.git_ref != git_ref()
+            || context.source.as_ref().is_some_and(|s| s != &self.source)
+            || self.workflow != context.workflow
+            || self.git_ref != context.git_ref
             || !number(&self.run)
             || !number(&self.attempt)
         {
@@ -123,11 +174,12 @@ impl Options {
         if !values.is_empty() {
             return Err(err);
         }
+        let context = current_context().map_err(|_| err)?;
         let binding = Binding {
             workflow_sha: source.clone(),
             source,
-            workflow: workflow(),
-            git_ref: git_ref(),
+            workflow: context.workflow,
+            git_ref: context.git_ref,
             run,
             attempt,
         };
@@ -905,6 +957,56 @@ mod tests {
             .unwrap();
         make(&["large"]);
         assert!(listing(&archive, t.path()).is_err());
+    }
+    #[test]
+    fn cli_custody_uses_record_context_and_rejects_sdk_or_wrong_source_bindings() {
+        let record = json!({"schema":3,"cohort":"cli","version":"0.1.0","source":"a".repeat(40)});
+        let context = selected_context(Some(&record.to_string())).unwrap();
+        assert_eq!(context.git_ref, "refs/tags/yetlet-cli-v0.1.0");
+        let mut binding = Binding {
+            source: "a".repeat(40),
+            workflow_sha: "a".repeat(40),
+            workflow: context.workflow.clone(),
+            git_ref: context.git_ref.clone(),
+            run: "1".into(),
+            attempt: "1".into(),
+        };
+        binding.validate_context(&context).unwrap();
+        binding.git_ref = git_ref();
+        binding.workflow = workflow();
+        assert!(binding.validate_context(&context).is_err());
+        binding.git_ref = context.git_ref.clone();
+        binding.workflow = context.workflow.clone();
+        binding.source = "b".repeat(40);
+        binding.workflow_sha = binding.source.clone();
+        assert!(binding.validate_context(&context).is_err());
+        let mut bad = record.clone();
+        bad["version"] = json!(super::super::private::package_version());
+        assert!(selected_context(Some(&bad.to_string())).is_err());
+        bad = record;
+        bad["schema"] = json!(2);
+        assert!(selected_context(Some(&bad.to_string())).is_err());
+        let legacy = selected_context(None).unwrap();
+        assert_eq!(legacy.git_ref, git_ref());
+    }
+    #[test]
+    fn sdk_custody_record_context_preserves_existing_sdk_identity() {
+        let record = json!({"schema":2,"cohort":"consolidated","version":super::super::private::package_version(),"source":"a".repeat(40)});
+        let context = selected_context(Some(&record.to_string())).unwrap();
+        assert_eq!(context.git_ref, git_ref());
+        assert_eq!(context.workflow, workflow());
+        let binding = Binding {
+            source: "a".repeat(40),
+            workflow_sha: "a".repeat(40),
+            workflow: workflow(),
+            git_ref: git_ref(),
+            run: "1".into(),
+            attempt: "1".into(),
+        };
+        binding.validate_context(&context).unwrap();
+        binding
+            .validate_context(&selected_context(None).unwrap())
+            .unwrap();
     }
     #[test]
     fn inventory_rejects_duplicate_json_and_unsafe_or_mismatched_sets() {

@@ -9,7 +9,7 @@ immutable tags/archives are preserved.
 ## Independent CLI cohort — YT-215
 
 [CLI first-release preparation](YT-215-CLI-FIRST-RELEASE.md) adds closed schema3/cli:
-only yetlet-cli, version from its own manifest, tag cli-vVERSION, one source
+only yetlet-cli, version from its own manifest, tag yetlet-cli-vVERSION, one source
 archive and five public files. Its dependency on the published SDK is not another
 release subject or upload. The existing source-bound builder, signer identity,
 separate verifier/custody and final owner gate apply. The final consumer installs
