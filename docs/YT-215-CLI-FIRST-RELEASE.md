@@ -14,7 +14,7 @@ unchanged. No dependency upgrade, runtime change, prebuilt binary or new sample.
 
 Use closed release-record **schema3 / cli**, exactly one allowed package. Read
 its version from `tools/yetlet-cli/Cargo.toml`, independently of the SDK workspace
-version. Use **`cli-v0.1.0`**; the existing SDK `v0.1.0` tag is unrelated and must
+version. Use **`yetlet-cli-v0.1.0`**; the existing SDK `v0.1.0` tag is unrelated and must
 not move. Cargo publication does not choose or increment a version.
 
 The CLI README describes the installation interface without a permanently stale
@@ -35,7 +35,7 @@ not Latest, followed by the same exact CLI archive on crates.io.
 
 The owner authorizes preparation through the final gate: necessary reviewed
 source delivery with strict/builtin Guard, PR/required CI/Merge, immutable CLI tag,
-one hosted build/readback, automated exact signing and separate verification.
+source-bound hosted build/readback, automated exact signing and separate verification.
 The final `release-publish` approval remains with the owner. Do not approve that
 gate or perform a GitHub/public registry publication during preparation.
 
@@ -145,3 +145,32 @@ size 471525 bytes. No SDK archive is present. Original protected readback is
 now dispatched once at the same immutable CLI tag; decryption/custody completion
 is still Pending. This status update uses actual retained receipts and does not
 claim a signature, final verification or publication result.
+
+## Custody identity correction — 2026-10-31
+
+The original build41165581554/1 and readback41166121653/1 report GitHub success.
+The public CLI archive/provenance and encrypted ZIP digest checks remain valid at
+their recorded scope. However, inspection of the actual readback receipt finds
+`git_ref` and builder workflow bound to the SDK `v0.9.0-alpha.5` tag. The helper
+used the SDK workspace version during both capture and verification, so a green
+job did not establish the intended CLI custody identity. Reject that receipt as
+CLI identity proof; preserve the original jobs, artifact bytes and wrong-ref
+receipt. No CLI payload has been signed or published.
+
+The material fix derives capture and verification context from the validated
+record's schema/cohort, own manifest version and source SHA. A CLI record rejects
+SDK refs, wrong sources and incompatible schema/version combinations; existing
+SDK and standalone legacy context retain their behavior. Focused identity tests
+cover these affected boundaries. No dependency/runtime/platform suite is replayed.
+
+Keep `cli-v0.1.0` immutable as the original preparation attempt. Before any first
+publication, adopt the full package-name namespace `yetlet-cli-v0.1.0` for the
+corrected source; CLI0.1.0 and SDK0.9.0-alpha.5 remain unchanged. PR37 now delivers
+this material fix rather than selecting its earlier documentation-only head as
+S. Select a new C only after its required CI and merged-master CI pass; new-source
+build/readback must prove the corrected actual receipt fields. The original
+one-build/one-readback attempts remain consumed and recorded; this changed-source
+qualification is not a retry of either old job. Continue the same task/evidence
+ledger and final owner gate, without moving old tags, resetting counters or
+claiming future outputs. The later S, payloads, signatures and result proof
+remain Pending.

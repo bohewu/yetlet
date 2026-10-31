@@ -1,24 +1,18 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**YT-215 immutable CLI source checkpoint (2026-10-31):**
-PR36 and exact merged-master CI pass; selected C is6f26961. Unsigned
-cli-v0.1.0 is pushed/read back with strict/builtin/native Guard, consumed binding
-retired and old tags preserved. One45minute CLI build41165581554/1 subsequently PASS without retry; public and
-encrypted artifact digests are retained/verified, original protected readback is dispatched.
-This documentation source can provide later S distinct from C; no new runtime
-or workflow input changes. Actual archive/custody/signature/result identities
-and final owner publication approval remain Pending. SDK uploads are absent.
-
 **YT-215 first independent CLI release preparation (2026-10-31):**
-The owner selects [yetlet-cli0.1.0](YT-215-CLI-FIRST-RELEASE.md) preparation through
-the final owner gate, using the already-published SDK0.9.0-alpha.5. Closed
-schema3/cli uses its own manifest and cli-v0.1.0 namespace, one archive and five
-public files. Preserve SDK releases and existing identity/custody/protections;
-reuse accepted runtime/platform proof and supplement only missing CLI release
-boundaries. Contract and implementation independent Reviewer PASS0 after the preserved
-inherited-RSA-exception disclosure correction. Actual source/tag/build/readback/
-signature/result identities remain Pending. No registry
-upload or public CLI release yet.
+The owner selects [yetlet-cli0.1.0](YT-215-CLI-FIRST-RELEASE.md) through the final
+owner gate, retaining published SDK0.9.0-alpha.5. Initial C6f26961, PR36/master
+CI, cli-v0.1.0 tag and build41165581554/1 pass at their recorded scope. Actual
+readback41166121653/1 is GitHub green but rejected as CLI identity proof: its
+receipt incorrectly uses the SDK tag/workflow. Original jobs/bytes and immutable
+old tag remain evidence. PR37 delivers the record-derived custody correction;
+new C and canonical yetlet-cli-v0.1.0 tag need affected source-bound proof.
+Focused CLI/SDK context tests preserve old SDK/legacy semantics; no runtime,
+platform or dependency suite replay. CLI-only schema3, one archive/five public
+files, existing signing identity/custody/protections and final owner gate remain.
+Later S, successful actual CLI custody, signatures/result and owner publication
+approval remain Pending. No CLI signing, public release or SDK upload yet.
 
 **Current alpha.5 publication and CLI installation (2026-10-31):**
 The [two-package alpha.5 release](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup)
