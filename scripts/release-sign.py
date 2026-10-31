@@ -46,7 +46,7 @@ def bind_record(record):
     global BUILD_ARTIFACT, BUILD_ZIP, PUBLIC_SHA, PUBLIC_SIZE, RELEASE_ID, PACKAGES
     RECORD = records.validate(record, 'complete')
     PACKAGES = records.packages(RECORD)
-    C, TAG = RECORD['source'], 'v' + RECORD['version']
+    C, TAG = RECORD['source'], records.tag(RECORD)
     BUILD, BUILD_ATTEMPT = RECORD['build']['run'], RECORD['build']['attempt']
     VERIFIER, VERIFIER_ATTEMPT = RECORD['custody_verifier']['run'], RECORD['custody_verifier']['attempt']
     BUILD_ARTIFACT, BUILD_ZIP = RECORD['build']['artifact'], RECORD['build']['sha256']

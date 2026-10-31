@@ -13,10 +13,12 @@ PACKAGES = frozenset('yetlet-' + n for n in (
     'actions', 'auth', 'config', 'core', 'dom', 'dom-keyed', 'html', 'rate-limit',
     'reactive', 'request-id', 'secrets', 'server-axum', 'session', 'session-redis', 'signing', 'wgpu'))
 CONSOLIDATED = frozenset({'yetlet', 'yetlet-browser'})
+CLI = frozenset({'yetlet-cli'})
+CLI_SDK_VERSION = '0.9.0-alpha.5'
 
 def packages(record):
     validate(record)
-    return PACKAGES if record['schema'] == 1 else CONSOLIDATED
+    return {1: PACKAGES, 2: CONSOLIDATED, 3: CLI}[record['schema']]
 
 
 CORE = {'schema', 'version', 'source', 'cohort'}
@@ -61,7 +63,7 @@ def digest(value):
 
 def validate(value, stage='build'):
     require(type(value) is dict and CORE <= set(value) <= COMPLETE)
-    require(type(value['schema']) is int and (value['schema'], value['cohort']) in ((1, 'sixteen'), (2, 'consolidated')))
+    require(type(value['schema']) is int and (value['schema'], value['cohort']) in ((1, 'sixteen'), (2, 'consolidated'), (3, 'cli')))
     version = value['version']
     require(token(version, VERSION) and len(version) <= 128)
     if '-' in version:
@@ -96,9 +98,22 @@ def environment(stage='complete'):
     return validate(loads(os.environ['RELEASE_RECORD']), stage)
 
 
+def tag(record):
+    validate(record)
+    return ('cli-v' if record['schema'] == 3 else 'v') + record['version']
+
+
 def source_version(record, root):
     """No Cargo invocation or dependency resolution. Check the closed selected manifests."""
     root = Path(root)
+    if record['schema'] == 3:
+        manifest = tomllib.loads((root / 'tools/yetlet-cli/Cargo.toml').read_text())
+        p = manifest['package']
+        require(p['name'] == 'yetlet-cli' and p['version'] == record['version'] and p['publish'] is True)
+        dependency = manifest['dependencies']['yetlet']
+        require(dependency['version'] == '=' + CLI_SDK_VERSION and 'path' not in dependency)
+        require(any(b['name'] == 'yetlet' for b in manifest['bin']))
+        return
     workspace = tomllib.loads((root / 'Cargo.toml').read_text())['workspace']['package']['version']
     require(workspace == record['version'])
     for name in packages(record):
@@ -108,17 +123,17 @@ def source_version(record, root):
 
 
 def source_identity(record, root, workflow):
-    tag = 'refs/tags/v' + record['version']
+    tag_ref = 'refs/tags/' + tag(record)
     for key, expected in {'GITHUB_EVENT_NAME': 'workflow_dispatch', 'GITHUB_REPOSITORY': 'bohewu/yetlet',
                           'GITHUB_REPOSITORY_ID': '1409587171', 'GITHUB_REPOSITORY_OWNER_ID': '35250002',
-                          'GITHUB_REF': tag, 'GITHUB_SHA': record['source'],
+                          'GITHUB_REF': tag_ref, 'GITHUB_SHA': record['source'],
                           'RECORD_WORKFLOW_SHA': record['source'],
-                          'RECORD_WORKFLOW_REF': 'bohewu/yetlet/.github/workflows/' + workflow + '@' + tag}.items():
+                          'RECORD_WORKFLOW_REF': 'bohewu/yetlet/.github/workflows/' + workflow + '@' + tag_ref}.items():
         require(os.environ.get(key) == expected)
     def git(*args):
         return subprocess.check_output(['git', '-C', str(root), *args], stderr=subprocess.PIPE, text=True).strip()
     require(git('rev-parse', 'HEAD') == record['source'])
-    require(git('rev-parse', '--verify', tag + '^{commit}') == record['source'])
+    require(git('rev-parse', '--verify', tag_ref + '^{commit}') == record['source'])
     git('merge-base', '--is-ancestor', record['source'], 'refs/remotes/origin/master')
     require(not git('status', '--porcelain'))
     source_version(record, root)

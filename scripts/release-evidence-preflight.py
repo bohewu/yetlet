@@ -41,7 +41,7 @@ def require(condition):
 def inputs():
     r = records.environment('custody')
     b = r['build']
-    return {'source': r['source'], 'tag': 'v' + r['version'], 'run': b['run'],
+    return {'source': r['source'], 'tag': records.tag(r), 'run': b['run'],
             'attempt': b['attempt'], 'artifact': b['artifact'], 'digest': b['sha256']}
 
 

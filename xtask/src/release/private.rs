@@ -56,6 +56,7 @@ pub enum Cohort {
     OriginalNine,
     Sixteen,
     Consolidated,
+    Cli,
 }
 impl Cohort {
     pub fn parse(args: &[OsString]) -> std::result::Result<Self, &'static str> {
@@ -76,12 +77,14 @@ impl Cohort {
             Self::OriginalNine => "original-nine",
             Self::Sixteen => "sixteen",
             Self::Consolidated => "consolidated",
+            Self::Cli => "cli",
         }
     }
     pub fn from_label(label: &str) -> Result<Self> {
         match label {
             "sixteen" => Ok(Self::Sixteen),
             "consolidated" => Ok(Self::Consolidated),
+            "cli" => Ok(Self::Cli),
             _ => Err(fail("unsupported release cohort")),
         }
     }
@@ -90,11 +93,40 @@ impl Cohort {
             Self::OriginalNine => &NAMES,
             Self::Sixteen => &SIXTEEN_NAMES,
             Self::Consolidated => &["yetlet", "yetlet-browser"],
+            Self::Cli => &["yetlet-cli"],
+        }
+    }
+    pub fn version(self) -> String {
+        if self == Self::Cli {
+            let manifest: toml::Value =
+                toml::from_str(include_str!("../../../tools/yetlet-cli/Cargo.toml"))
+                    .expect("compiled CLI manifest");
+            manifest["package"]["version"]
+                .as_str()
+                .expect("CLI version")
+                .to_owned()
+        } else {
+            package_version()
+        }
+    }
+    pub fn tag(self) -> String {
+        format!(
+            "refs/tags/{}{}",
+            if self == Self::Cli { "cli-v" } else { "v" },
+            self.version()
+        )
+    }
+    fn package_manifest(self, name: &str) -> PathBuf {
+        if self == Self::Cli {
+            PathBuf::from("tools/yetlet-cli/Cargo.toml")
+        } else {
+            Path::new("crates").join(name).join("Cargo.toml")
         }
     }
     pub fn manifests(self) -> &'static [&'static str] {
         match self {
             Self::OriginalNine | Self::Consolidated => &["Cargo.toml"],
+            Self::Cli => &["tools/yetlet-cli/Cargo.toml"],
             Self::Sixteen => &[
                 "Cargo.toml",
                 "crates/yetlet-config/Cargo.toml",
@@ -167,7 +199,11 @@ pub fn selected(source: &Path, cohort: Cohort) -> Result<BTreeMap<String, String
         out.insert(f.into(), tooling::sha(&fs::read(source.join(f))?));
     }
     for n in cohort.names() {
-        visit(source, &source.join("crates").join(n), &mut out)?;
+        visit(
+            source,
+            source.join(cohort.package_manifest(n)).parent().unwrap(),
+            &mut out,
+        )?;
     }
     Ok(out)
 }
@@ -203,7 +239,7 @@ pub fn cargo_steps(source: &Path, work: &Path, cohort: Cohort) -> Vec<(String, V
         "vendor".into(),
         "--locked".into(),
         "--manifest-path".into(),
-        source.join("Cargo.toml").into_os_string(),
+        source.join(cohort.manifests()[0]).into_os_string(),
     ];
     for m in &cohort.manifests()[1..] {
         vendor.extend(["--sync".into(), source.join(m).into_os_string()]);
@@ -219,11 +255,7 @@ pub fn cargo_steps(source: &Path, work: &Path, cohort: Cohort) -> Vec<(String, V
             "--offline".into(),
             "--locked".into(),
             "--manifest-path".into(),
-            source
-                .join("crates")
-                .join(n)
-                .join("Cargo.toml")
-                .into_os_string(),
+            source.join(cohort.package_manifest(n)).into_os_string(),
             "--target-dir".into(),
             work.join("cargo-target").into_os_string(),
             "--config".into(),
@@ -234,13 +266,13 @@ pub fn cargo_steps(source: &Path, work: &Path, cohort: Cohort) -> Vec<(String, V
     steps
 }
 
-fn stage_verified(source: &Path, work: &Path, name: &str) -> Result<String> {
+fn stage_verified(source: &Path, work: &Path, name: &str, version: &str) -> Result<String> {
     let vendor = work.join("vendor");
-    let directory = vendor.join(format!("{name}-{}", package_version()));
+    let directory = vendor.join(format!("{name}-{version}"));
     require(!directory.exists(), "verified package already staged")?;
     let archive = work
         .join("cargo-target/package")
-        .join(format!("{name}-{}.crate", package_version()));
+        .join(format!("{name}-{version}.crate"));
     let digest = tooling::sha(&fs::read(&archive)?);
     tooling::execute(
         source,
@@ -279,7 +311,7 @@ fn publication_order(source: &Path, cohort: Cohort) -> Result<()> {
         .collect();
     for name in cohort.names() {
         let manifest: toml::Value = toml::from_str(&fs::read_to_string(
-            source.join("crates").join(name).join("Cargo.toml"),
+            source.join(cohort.package_manifest(name)),
         )?)
         .map_err(|_| fail("publication crate manifest"))?;
         let mut containers = vec![&manifest];
@@ -385,7 +417,7 @@ pub fn build_packages(
         if cohort != Cohort::OriginalNine
             && let Some(name) = label.strip_prefix("package-")
         {
-            let staged = stage_verified(source, work, name);
+            let staged = stage_verified(source, work, name, &cohort.version());
             record["verified_staging"][name] = json!({"ok":staged.is_ok(),"verification":true,
                 "package_sha256":staged.as_ref().ok()});
             write(out, "BUILD-RECORD.json", record)?;
@@ -427,14 +459,8 @@ pub fn run(root: &Path, cohort: Cohort) -> Result<()> {
 }
 
 pub(super) fn run_preparation(root: &Path, commit: &str) -> Result<()> {
-    run_body(
-        root,
-        Cohort::from_label(&env("RELEASE_COHORT")?)?,
-        commit,
-        "bohewu/yetlet",
-        &format!("refs/tags/v{}", package_version()),
-        true,
-    )
+    let cohort = Cohort::from_label(&env("RELEASE_COHORT")?)?;
+    run_body(root, cohort, commit, "bohewu/yetlet", &cohort.tag(), true)
 }
 
 fn run_body(
@@ -692,7 +718,7 @@ fn run_body(
                 == cohort
                     .names()
                     .iter()
-                    .map(|n| format!("{n}-{}.crate", package_version()))
+                    .map(|n| format!("{n}-{}.crate", cohort.version()))
                     .collect(),
             "exact selected package archives",
         )?;
@@ -737,6 +763,44 @@ fn run_body(
 #[cfg(test)]
 mod publication_tests {
     use super::*;
+
+    #[test]
+    fn cli_cohort_uses_own_version_manifest_and_one_package_without_sdk_subjects() {
+        let cohort = Cohort::Cli;
+        assert_eq!(cohort.version(), "0.1.0");
+        assert_eq!(cohort.tag(), "refs/tags/cli-v0.1.0");
+        assert_eq!(cohort.names(), ["yetlet-cli"]);
+        assert_eq!(cohort.manifests(), ["tools/yetlet-cli/Cargo.toml"]);
+        let temp = tempfile::tempdir().unwrap();
+        let source = temp.path();
+        for name in [
+            "Cargo.toml",
+            "Cargo.lock",
+            "LICENSE-MIT",
+            "LICENSE-APACHE",
+            "rust-toolchain.toml",
+        ] {
+            fs::write(source.join(name), "fixture").unwrap();
+        }
+        let cli = source.join("tools/yetlet-cli");
+        fs::create_dir_all(cli.join("src")).unwrap();
+        fs::write(cli.join("Cargo.toml"), "[package]\nname='yetlet-cli'\nversion='0.1.0'\n[dependencies]\nyetlet='=0.9.0-alpha.5'\n").unwrap();
+        fs::write(cli.join("Cargo.lock"), "fixture").unwrap();
+        fs::write(cli.join("src/main.rs"), "fn main() {} ").unwrap();
+        let inputs = selected(source, cohort).unwrap();
+        assert!(inputs.contains_key("tools/yetlet-cli/src/main.rs"));
+        assert!(!inputs.keys().any(|p| p.starts_with("crates/")));
+        fs::write(source.join("Cargo.toml"), "[workspace]\n").unwrap();
+        publication_order(source, cohort).unwrap();
+        let steps = cargo_steps(source, &source.join("work"), cohort);
+        assert_eq!(steps.len(), 2);
+        assert_eq!(steps[0].0, "vendor");
+        assert_eq!(steps[1].0, "package-yetlet-cli");
+        for (_, args) in steps {
+            assert!(args.contains(&cli.join("Cargo.toml").into_os_string()));
+            assert!(!args.contains(&source.join("Cargo.toml").into_os_string()));
+        }
+    }
 
     #[test]
     fn development_and_optional_target_backedges_are_rejected() {

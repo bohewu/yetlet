@@ -1,12 +1,12 @@
-# Yetlet CLI — Unpublished Linux/Windows Developer Preview
+# Yetlet CLI — Experimental Developer Tool
 
 The CLI creates applications and executes selected tasks. Persistent behavior uses
 Yetlet's existing public base/profile settings and scoped environment overrides.
-The CLI remains unpublished on crates.io, but can be installed from its
-self-contained source package. Generated apps use the published `yetlet` /
-`yetlet-browser` SDK `0.9.0-alpha.5`; ordinary build/run needs no SDK checkout or
-Cargo path override. The CLI package is `yetlet-cli` (currently `0.1.0`), while
-the installed command is `yetlet`. CLI and SDK versions are separate.
+This standalone Cargo binary package installs the `yetlet` command. Generated
+apps use the published `yetlet` / `yetlet-browser` SDK `0.9.0-alpha.5`; normal
+build/run needs no SDK checkout or Cargo path override. CLI version `0.1.0` and
+SDK versions are independent. This is an Experimental developer tool, with
+platform evidence limited to the documented qualification scopes.
 See the [CLI contract](../../docs/CLI-CONTRACT.md) and
 [implementation evidence](../../docs/YT-102-CLI-IMPLEMENTATION.md).
 The subsequent [DX audit](../../docs/YT-102-DX-AUDIT.md) compares actual setup,
@@ -105,13 +105,13 @@ cargo install yetlet-cli --locked
 yetlet new myapp
 ```
 
-Cargo downloads and compiles the standalone CLI package; no manual repository
-clone or npm is needed. **First CLI publication is still Pending:** the command
-above becomes available only after a separate authorized crates.io upload. The
-SDK release does not publish this CLI automatically. Prebuilt executables and
-`cargo binstall` support are later distribution options.
+Cargo downloads and compiles the selected published CLI package; no manual
+repository clone or npm is needed. Use `--version 0.1.0` to select this release
+explicitly. [Release status and scope](https://github.com/bohewu/yetlet/blob/master/docs/YT-215-CLI-FIRST-RELEASE.md)
+are tracked separately from this installation reference. Prebuilt executables
+and `cargo binstall` support are later distribution options.
 
-For maintainer evaluation before publication, install from a trusted physical
+For maintainer source evaluation, install from a trusted physical
 checkout or an unpacked verified CLI archive:
 
 ```sh
@@ -126,8 +126,8 @@ checkout or an unpacked verified CLI archive:
 Cargo installs the `yetlet` executable under its install root's `bin` directory
 (normally `~/.cargo/bin`). Add that directory to PATH, or invoke the executable
 by its absolute path. This command compiles native Rust; it is not an npm
-installation. `cargo install yetlet-cli` is not available until a separate CLI
-publication is selected. No prebuilt CLI downloads are provided by this slice.
+installation. Registry installation requires a published version of
+`yetlet-cli`. No prebuilt CLI downloads are provided by this source release.
 For a private install prefix, add `--root /absolute/owned/cli-prefix` and use its
 `bin/yetlet`. Compilation requires the native/OpenSSL prerequisites above.
 

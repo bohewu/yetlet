@@ -6,7 +6,17 @@ first combined registry publication remains incomplete.** See the
 [RELEASING.md](RELEASING.md) remains the general SOP; dated alpha.3 results and
 immutable tags/archives are preserved.
 
-## Current cohort boundary — alpha.5
+## Independent CLI cohort — YT-215
+
+[CLI first-release preparation](YT-215-CLI-FIRST-RELEASE.md) adds closed schema3/cli:
+only yetlet-cli, version from its own manifest, tag cli-vVERSION, one source
+archive and five public files. Its dependency on the published SDK is not another
+release subject or upload. The existing source-bound builder, signer identity,
+separate verifier/custody and final owner gate apply. The final consumer installs
+the executable with its packaged lock. Existing SDK schemas/outputs remain
+unchanged; actual first CLI publication is Pending.
+
+## Historical cohort planning boundary — alpha.5
 
 The [two-package plan](ALPHA5-RELEASE-PLAN.md) uses schema2/`consolidated`, exactly
 `yetlet` followed by `yetlet-browser`, unreleased `0.9.0-alpha.5`. Existing

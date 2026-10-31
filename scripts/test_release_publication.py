@@ -30,14 +30,17 @@ def record():
         'signer_commit': 'b' * 40, 'provenance': {'sha256': 'e' * 64, 'size': 123}, 'release_id': '15'}
 
 
-def archives(directory, cycle=False, consolidated=False):
+def archives(directory, cycle=False, consolidated=False, cli=False):
     r = record()
     if consolidated: r.update(schema=2, cohort="consolidated")
+    if cli: r.update(schema=3, cohort="cli", version="0.1.0")
     subjects = {}
     for name in records.packages(r):
         manifest = '[package]\nname=' + json.dumps(name) + '\nversion=' + json.dumps(r['version']) + '\n'
         manifest += 'readme="README.md"\nlicense="MIT"\ndescription="Fixture"\nrust-version="1.99"\n'
         dep = lambda n: n + ' = { version="' + r['version'] + '" }\n'
+        if name == 'yetlet-cli':
+            manifest += '[dependencies]\nyetlet = { version="=' + records.CLI_SDK_VERSION + '" }\n'
         if name == 'yetlet-browser':
             manifest += '[dependencies]\n' + dep('yetlet')
         if name == 'yetlet-config':
@@ -70,6 +73,19 @@ class RegistryTests(unittest.TestCase):
             self.assertEqual(set(bodies), records.CONSOLIDATED)
             with self.assertRaises(ValueError): registry.prepare(record(), temp, subjects)
             with self.assertRaises(ValueError): registry.continuation_rows(plan, {'existing':['yetlet-actions'], 'remaining':['yetlet-browser']})
+
+    def test_cli_freezes_one_archive_and_does_not_stage_or_publish_sdk(self):
+        with tempfile.TemporaryDirectory() as temp:
+            r, subjects = archives(Path(temp), cli=True)
+            plan, bodies = registry.prepare(r, temp, subjects)
+            self.assertEqual([row['name'] for row in plan['packages']], ['yetlet-cli'])
+            self.assertEqual(plan['packages'][0]['requires'], [])
+            self.assertEqual(set(bodies), {'yetlet-cli'})
+            size = struct.unpack_from('<I', bodies['yetlet-cli'])[0]
+            metadata = json.loads(bodies['yetlet-cli'][4:4+size])
+            self.assertEqual(metadata['deps'][0]['version_req'], '=' + records.CLI_SDK_VERSION)
+            bad = dict(r, schema=2, cohort='consolidated')
+            with self.assertRaises(ValueError): registry.prepare(bad, temp, subjects)
 
     def test_publish_success_uses_official_optional_warnings_not_krate(self):
         for response in ({}, {'warnings': None}, {'warnings': {}},
@@ -186,6 +202,38 @@ class RegistryTests(unittest.TestCase):
                 result = registry.publish(plan, bodies, root/'receipt.json')
             self.assertEqual(len(complete), 16)
             self.assertEqual(result['status'], 'registry_verified_consumer_pending')
+
+
+class CliConsumerTests(unittest.TestCase):
+    def test_cli_consumer_installs_exact_binary_without_registry_token(self):
+        import subprocess
+        from types import SimpleNamespace
+        commands = []
+        def run(args, **kwargs):
+            commands.append(args)
+            env = kwargs['env']
+            self.assertNotIn('CARGO_REGISTRY_TOKEN', env)
+            self.assertNotIn('CARGO_REGISTRIES_CRATES_IO_TOKEN', env)
+            root = Path(kwargs['cwd'])
+            stdout = b''
+            if args[0] == 'cargo':
+                self.assertEqual(args[:4], ['cargo', '+1.99.0', 'install', 'yetlet-cli'])
+                self.assertEqual(args[args.index('--version')+1], '0.1.0')
+                self.assertIn('--locked', args)
+                package = root / 'cargo-home/registry/src/fixture/yetlet-cli-0.1.0'
+                package.mkdir(parents=True); (package / 'Cargo.lock').write_text('version = 4\n')
+            elif args[1:] == ['--version']: stdout = b'yetlet 0.1.0\n'
+            elif args[1] == 'new':
+                app = root / 'consumerapp'; app.mkdir()
+                (app / 'Cargo.toml').write_text('[dependencies]\nyetlet = {version="=' + records.CLI_SDK_VERSION + '"}\n')
+            return SimpleNamespace(returncode=0, stdout=stdout, stderr=b'')
+        with tempfile.TemporaryDirectory() as temp, patch.dict(os.environ, {'CARGO_REGISTRY_TOKEN':'SYNTHETIC'}), \
+             patch.object(publication.subprocess, 'run', side_effect=run):
+            result = publication.cli_consumer('0.1.0', Path(temp))
+            self.assertTrue(result['source_install'])
+            self.assertEqual(result['sdk_version'], records.CLI_SDK_VERSION)
+            self.assertEqual(len(commands), 4)
+            self.assertTrue((Path(temp) / 'REGISTRY-CONSUMER.lock').is_file())
 
 
 class RegistryContinuationTests(unittest.TestCase):
@@ -339,6 +387,29 @@ class PublicationTests(unittest.TestCase):
                     ('incomplete', 'stage_attempted', 'not_attempted'))
                 self.assertFalse(proof['automatic_retry'])
                 self.assertNotIn('private', json.dumps(proof) + stderr.getvalue())
+
+    def test_cli_existing_version_stops_before_github_or_registry_writes(self):
+        r = record(); r.update(schema=3, cohort='cli', version='0.1.0')
+        publication.s.bind_record(r)
+        try:
+            for mode in ('preflight', 'publish'):
+                with self.subTest(mode=mode), tempfile.TemporaryDirectory() as temporary:
+                    output = Path(temporary) / 'output'
+                    plan = {'packages': [{'name': 'yetlet-cli'}]}
+                    with (patch.object(publication.sys, 'argv', ['release-publish.py', mode]),
+                          patch.dict(os.environ, {'PUBLICATION_OUTPUT': str(output)}),
+                          patch.object(publication, 'request', return_value={'notes': 'Fixture'}),
+                          patch.object(publication.s, 'outside', side_effect=Path),
+                          patch.object(publication, 'gate'),
+                          patch.object(publication, 'distribution', return_value=({}, {}, plan, {})),
+                          patch.object(registry, 'require_absent', side_effect=registry.RegistryError('version_exists')) as absent,
+                          patch.object(publication.pub, 'operate') as github,
+                          patch.object(registry, 'publish') as upload,
+                          patch.object(publication.sys, 'stderr', io.StringIO())):
+                        with self.assertRaises(registry.RegistryError): publication.main()
+                    absent.assert_called_once_with(plan['packages'][0], '0.1.0')
+                    github.assert_not_called(); upload.assert_not_called()
+        finally: publication.s.bind_record(record())
 
     def test_preflight_never_reads_a_draft_and_stage_checks_it_before_writing(self):
         s, pub = publication.s, publication.pub
