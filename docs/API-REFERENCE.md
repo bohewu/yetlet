@@ -65,7 +65,7 @@ builds are not the default dependency graph of a small SSR application.
 |---|---|---|
 | [Board](../examples/lab-operations-board/README.md) / [Admin](../examples/admin-dashboard/README.md) | `BoardOptions`; `Board::open_with_options` and `open_with_oidc_and_options` | Independent default-false `write_authorization` / `request_tracing`, plus frontend/Session inputs. Uncompiled selections fail before storage; existing simpler constructors stay off. Admin maps its existing typed Settings; Board loads no ambient settings or global subscriber |
 | [Shop](../examples/modular-shop/README.md) | `DatabaseOptions`; `Database::open_with_options` | Default-false `catalog_cache`; the binary maps its existing environment key. Display freshness is bounded; Session, authorization and checkout SQL stay authoritative. No mandatory Settings loader or framework cache crate |
-| [CLI](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) | Existing parser, commands and configured generators | Separate unpublished tool; settings, supported source layouts and platform limits belong to its current guide. Generators do not silently install or deploy services |
+| [CLI](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) | Existing parser, commands and configured generators | Independently published `yetlet-cli` `0.1.1`, executable `yetlet`; settings, supported source layouts and platform limits belong to its current guide. Generators do not silently install or deploy services |
 
 These options are public Rust interfaces of example applications, not methods
 on a framework-wide capability builder. Their public fields do not grant trust
@@ -78,6 +78,55 @@ OIDC, opaque Bearer checks, native tracing and catalog caching have existing
 application-owned integrations. Audit history and output-cache studies do not
 imply `yetlet-audit`, `yetlet-output-cache` or other extracted packages. Do not
 infer an implemented API from a research item marked Done.
+
+## Reading Rust API documentation
+
+Start with [the first-app walkthrough](FIRST-APP.md) for a working application
+and [Views/components](VIEW-COMPONENTS.md) for UI authoring. Use rustdoc when you
+need an exact function, type or error. It is the API reference generated from
+Rust source comments, also shown by Rust-aware editor hover/help. The
+[Rust documentation guide](https://doc.rust-lang.org/rustdoc/how-to-write-documentation.html)
+explains `///` comments on an item and `//!` comments on its containing module
+or crate. Ordinary `//` comments are implementation notes, not API pages.
+
+| What you see | How to read it in Yetlet |
+|---|---|
+| Crate and module | A crate is a compiled Rust library/package target; a module groups APIs. Cargo package `yetlet-browser` is imported as `yetlet_browser` |
+| Struct / enum | A struct represents a value such as `Element`; an enum lists alternatives such as `View::Text` and `View::Element` |
+| `Type::new(...)` / `value.method(...)` | An associated constructor versus an operation on a value; open the item's page for its contract |
+| `&View`, `self`, `&self` | A shared borrow, consuming the value, or borrowing the receiver. A builder taking `self` returns the value used for the next chained call |
+| `impl Into<String>` | An accepted conversion, for example from a string literal or owned `String`; you do not need a custom type |
+| `Result<T, E>` | Success returns `T`; failure returns `E`. Read error variants and the integration guide before deciding how the application responds |
+| `async fn` | Produces a future; ordinary asynchronous application code awaits it. Async does not select a provider or install middleware |
+| Feature / target gate | The item exists only for the documented Cargo features and compilation target. Feature selection and runtime installation are separate |
+
+For example, [`Element::child`](../crates/yetlet/src/view/mod.rs) takes the
+current element and a value convertible into `View`, then returns an element
+for chaining. Constructing a View does not validate or escape HTML; rendering
+owns that policy. Follow the [View guide](VIEW-COMPONENTS.md) for complete usage.
+An API missing from one generated page can be feature-gated: check the selected
+features/target before assuming it was removed. For a published dependency,
+read its version's docs; checkout rustdoc can describe later source changes.
+
+### Current doc-comment coverage and gaps
+
+Source inspection on 2026-10-31 found useful documentation, with uneven coverage.
+This is a focused inventory, not a complete public-item coverage measurement or
+a fresh rustdoc/doctest execution:
+
+| Inspected entry | Existing documentation | Recommended next improvement |
+|---|---|---|
+| [`yetlet` crate root](../crates/yetlet/src/lib.rs) and [`yetlet-browser` crate root](../crates/yetlet-browser/src/lib.rs) | A short crate description and gated module exports | Add a first example, feature/target map and links to the relevant guides |
+| [`server_axum::App`](../crates/yetlet/src/server_axum/app.rs) | Module context, an application example, state/ownership explanation and method comments | Use this as a model; retain ordinary Axum semantics |
+| [`View` / `Element`](../crates/yetlet/src/view/mod.rs) | Type summaries and `View::text` trust boundary | Document common `Element` builders/accessors and `Attribute`; explain ownership and renderer validation |
+| [`session::SessionConfig`](../crates/yetlet/src/session/mod.rs) | Session module responsibilities | Add item/constructor/error-variant docs for validation, capacity, expiry and cookie selection; link the existing Session guide |
+
+Prioritize these beginner-facing gaps in [YT-217](PUBLIC-DOCS-PLAN.md#implementation-order--yt-217).
+Guides should explain how to integrate a capability; doc comments should explain
+the callable API's behavior, ownership, errors and applicable security limits.
+Add a runnable example where it clarifies usage. Use `Errors`, `Panics` or
+`Safety` sections only when applicable; document existing behavior rather than
+adding guarantees. This inventory changes no Rust source or public API.
 
 ## Local rustdoc
 

@@ -1,5 +1,16 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**Current distribution and next reader milestone (2026-10-31):**
+The two-package SDK `0.9.0-alpha.5` and independent CLI `0.1.1` are published.
+[YT-216's completed output and installed consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+close the CLI defect; YT-215 closes through that patch while its original0.1.0
+consumer FAIL remains. SDK/platform proof is not replayed or expanded.
+[YT-217](PUBLIC-DOCS-PLAN.md) is Todo: improve beginner-facing rustdoc entry
+points, then preview selected canonical guides for GitHub Pages; Wiki is deferred.
+This document-only scope changes no Rust API, workflow or hosting setting.
+Dated checkpoints below retain historical authorization/status wording and do
+not override these completed release records.
+
 **YT-216 fixed candidate and tag (2026-10-31):**
 [PR39/source Cae5dd4c](YT-216-CLI-011-PATCH-RELEASE.md#selected-candidate-and-source-delivery--2026-10-31)
 passes reviewed implementation/normal packaging and required CI. Preserve the

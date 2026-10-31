@@ -1,6 +1,13 @@
 # YT-215 — First independent CLI release
 
-Date: 2026-10-31. Status: In progress. Contract and implementation independent
+**Current disposition (2026-10-31): Done through the separately completed
+[YT-216 patch release](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31).**
+CLI0.1.0 was published but retains its failed version-output consumer result;
+CLI0.1.1 supplies the verified correction. Done closes the follow-up work, not
+the historical failed test. The dated execution checkpoints below retain their
+original states and identities.
+
+Historical preparation checkpoint, 2026-10-31. Status then: In progress. Contract and implementation independent
 Reviewer PASS0; actual release preparation/output review remain required. Stop at
 the final owner publication gate; no CLI registry upload is authorized yet.
 
@@ -229,4 +236,13 @@ and verifies a real binary for0.1.1. Published0.1.0, its tag/signatures/release,
 SDK0.9.0-alpha.5 and earlier failures remain unchanged. Local monitoring writes
 no source or remote changes; source master remains clean at S. Actual outcome
 records and raw ZIPs/logs are retained outside the repo. This record does not
-mark YT-215 Done or authorize a replacement publication.
+mark YT-215 Done or authorize a replacement publication at that checkpoint.
+
+## Follow-up disposition — 2026-10-31
+
+[YT-216's accepted CLI0.1.1 output and actual publication](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+complete the separate correction: registry installation, exact version, help
+and new-project checks PASS at owner-approved run41174511818/1. Close YT-215
+through that follow-up. Keep CLI0.1.0's overall consumer FAIL, partial receipt,
+wrong-ref custody history and immutable released bytes unchanged. No rerun,
+replacement upload or new SDK qualification is implied by this disposition.

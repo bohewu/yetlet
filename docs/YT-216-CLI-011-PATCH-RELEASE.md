@@ -1,7 +1,9 @@
 # YT-216 — CLI0.1.1 version-contract patch release
 
-Date:2026-10-31. Status:In progress. Prepare through the final owner publication
-gate after independent Reviewer PASS; no CLI0.1.1 upload is authorized yet.
+Date:2026-10-31. Status:Done at CLI-only publication and registry-consumer scope.
+The owner-approved publication and actual installation/version/help/scaffold
+checks PASS; SDK `0.9.0-alpha.5` is unchanged. Earlier preparation checkpoints
+below retain their original Pending wording and consumed attempts.
 
 ## Trigger and smallest scope
 
@@ -69,8 +71,8 @@ fixed payloads, signatures, result and public/registry projection need new proof
 Do not treat an old signature or a green job with wrong receipt fields as proof.
 
 Initial baseline:master `ed68b840dc445d9a95c03692f9b32c2e07c0cb6b`.
-New C/S/tag/run/output identities remain unselected until their actual stages
-succeed. Run-local evidence: `target/yt216-cli-011-release-20261031/`; encrypted
+At that initial checkpoint, new C/S/tag/run/output identities were unselected.
+Run-local evidence: `target/yt216-cli-011-release-20261031/`; encrypted
 and long-term evidence stay outside the repository. Only complete actual results
 may update the following execution record; final approval remains with the owner.
 
@@ -113,3 +115,54 @@ document record delivery provides later S distinct from C; select only its actua
 green merged SHA. It changes no CLI/builder/signer/SDK inputs. Continue the same
 ledger, preserving the old0.1.0 publication/consumer failure and first master CI
 failure. No0.1.1 publication or final owner approval is claimed.
+
+## Completed publication and installed consumer — 2026-10-31
+
+The final candidate remains C `ae5dd4c55e1124f56fcc3b07a9fc9e5bf083b25f`,
+bound to immutable unsigned tag `yetlet-cli-v0.1.1`. The later green
+S=V=P is `1207ba5c7dbb7611df27d971a856c69538feeb0b`; its delivery changes
+only three tracking documents, preserving CLI/builder/SDK inputs. Final
+independent output Reviewer PASS has zero issues/required followups, matches
+34 frozen evidence hashes and accepts advancement to the owner's final gate.
+That review precedes publication; the actual result below comes from retained
+publication artifacts and anonymous destination observations.
+
+| Actual stage | Run / attempt | Result and boundary |
+|---|---|---|
+| Build | [41173099066/1](https://github.com/bohewu/yetlet/actions/runs/41173099066) | PASS; one normally verified CLI archive |
+| Original custody readback | [41173607423/1](https://github.com/bohewu/yetlet/actions/runs/41173607423) | PASS; actual CLI source/tag/workflow bindings |
+| Prepare | [41173859392/1](https://github.com/bohewu/yetlet/actions/runs/41173859392) | PASS; frozen exact payloads |
+| Sign | [41174067628/1](https://github.com/bohewu/yetlet/actions/runs/41174067628) | PASS; existing identity and roots |
+| Independent signing-result verification | [41174191139/1](https://github.com/bohewu/yetlet/actions/runs/41174191139) | PASS; one CLI subject and all 68 private manifest entries, plaintext cleanup; no signing/OIDC permission |
+| Owner-approved publication and consumer | [41174511818/1](https://github.com/bohewu/yetlet/actions/runs/41174511818) | PASS; GitHub then crates.io, anonymous download/checksum and actual installed binary checks |
+
+The [GitHub Experimental pre-release](https://github.com/bohewu/yetlet/releases/tag/yetlet-cli-v0.1.1)
+is published, not Latest, with exactly five public files:
+`yetlet-cli-0.1.1.crate`, `PROVENANCE-UNSIGNED.json`,
+`RELEASE-CHECKSUMS.json`, `provenance.sigstore.json` and `SIGNING-APPROVAL.json`.
+Release ID is `429747388`. The [crates.io version](https://crates.io/crates/yetlet-cli/0.1.1)
+downloads as the same 471926-byte archive, SHA256
+`10a1ffebf42de0baba9604ee2764b2304f601c5119ddcb5fcb988fbe319e1424`.
+Complete version-record SHA256 is
+`db07ee9c302fd5194e1c8db29582ce7ade2989617da9429cb845ca9c43798e9a`.
+
+A fresh credential-free, isolated `cargo +1.99.0 install yetlet-cli --version
+0.1.1 --locked` succeeds. The actual executable prints exactly `yetlet 0.1.1`
+and one newline; help and `new consumerapp --parent <owned-isolated-parent>`
+also PASS. The generated manifest pins `yetlet = "=0.9.0-alpha.5"`, with no
+path/patch/replace override. No credentials are forwarded. This consumer check
+does not compile or browser-qualify the generated application.
+
+Publication result artifact `13031589501` is retained outside the repository:
+ZIP9422 bytes, SHA256
+`fa35871ed0d02d68929ad9a3bd1f05dceaa8ec2989e991299c796d679bb5a394`.
+Raw logs, original artifacts and subsequent anonymous GitHub/registry readback
+are preserved there; private evidence is not added to public assets. The
+run-local summary is `target/yt216-cli-011-release-20261031/FINAL-PUBLICATION-RESULT.json`.
+
+No release-stage retry or SDK republishing occurs. The explicitly authorized
+failed-Stable CI retry above remains consumed; the first master CI failure,
+offline-cache/setup failure, private-parent fixture correction, three inherited
+optional Clippy diagnostics and all CLI0.1.0 failures remain recorded. YT-216
+closes the version-output defect through a new version, without relabeling
+CLI0.1.0's consumer FAIL or changing its archive, signature, tag or receipt.
