@@ -46,6 +46,7 @@ jobs:
         run: |
           cargo +1.99.0 test --workspace --all-targets --locked
           cargo +1.99.0 test --workspace --doc --locked
+          cargo +1.99.0 test --locked --manifest-path tools/yetlet-cli/Cargo.toml --test release_interface
       - name: Browser and renderer MSRV targets
         if: steps.scope.outputs.release_only != 'true'
         run: |

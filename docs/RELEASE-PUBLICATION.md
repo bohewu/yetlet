@@ -14,7 +14,10 @@ archive and five public files. Its dependency on the published SDK is not anothe
 release subject or upload. The existing source-bound builder, signer identity,
 separate verifier/custody and final owner gate apply. The final consumer installs
 the executable with its packaged lock. Existing SDK schemas/outputs remain
-unchanged; actual first CLI publication is Pending.
+unchanged. [CLI0.1.0 is published](YT-215-CLI-FIRST-RELEASE.md#actual-first-publication-and-consumer-failure--2026-10-31),
+with successful installation but failed exact version-output validation.
+[CLI0.1.1 preparation](YT-216-CLI-011-PATCH-RELEASE.md) repairs that bounded
+interface without replacing0.1.0 or re-publishing SDK; its final owner gate remains.
 
 ## Historical cohort planning boundary — alpha.5
 
