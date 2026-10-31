@@ -174,3 +174,32 @@ qualification is not a retry of either old job. Continue the same task/evidence
 ledger and final owner gate, without moving old tags, resetting counters or
 claiming future outputs. The later S, payloads, signatures and result proof
 remain Pending.
+
+## Corrected candidate and fixed tag — 2026-10-31
+
+PR37 passes required CI41167383412/1 and is squash-merged as corrected C
+`6f013ac1d067eabaf539c5e332772a655bea18b6`; exact-source master CI41167703911/1
+also passes. The merged tree equals the independently reviewed strict/builtin
+index tree. Four focused binding/namespace checks, Clippy and docs pass; the
+independent material fix review is PASS0. Original failed/green-but-rejected
+results keep their earlier scope and consumed attempts.
+
+Unsigned lightweight `yetlet-cli-v0.1.0` is pushed and read back at corrected C
+with strict/builtin accepted-remote-history/native Guard PASS. Its consumed
+binding is explicitly retired without tag, hook or history changes. The old SDK
+and original CLI preparation tags remain fixed. PR37's branch is removed after
+identical merged-tree correspondence and a verified external bundle; no stale
+open PR remains at this checkpoint.
+
+The changed-source [build41168153070/1](https://github.com/bohewu/yetlet/actions/runs/41168153070)
+is dispatched once with the same45minute bound. Its actual package/custody
+outputs remain Pending here. The existing evidence Environment's single exact
+tag policy advances to `yetlet-cli-v0.1.0`, with keys and protections unchanged.
+No SDK upload, signing or CLI publication occurs.
+
+This narrow record delivery provides later S distinct from C under the existing
+signer separation contract; choose only its actual green merge SHA. It changes
+no CLI/runtime/builder/signer inputs. Actual corrected archive/ref/workflow/source
+receipt, frozen payload hashes and separate verification still require acceptance
+before the final owner publication gate. The first attempt is not retried and
+no counters or task folder are reset.
