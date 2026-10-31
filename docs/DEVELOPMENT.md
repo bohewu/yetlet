@@ -66,6 +66,31 @@ focused checks do not replace required CI. CI success covers its actual matrix,
 not every platform or feature. A squash merge has a new commit identity: record
 its actual SHA/tree and the resulting master CI without relabeling the PR run.
 
+## Batch small documentation changes
+
+Collect related spelling, wording, navigation and recorded-status corrections
+into one coherent delivery at a useful checkpoint. Prepare the complete local
+change before opening a PR; update that PR for an affected correction instead of
+creating another PR for every small edit. Unchanged accepted checks are evidence
+to reuse at their original scope, not work to repeat for a new paragraph.
+
+| Actual effect | Proportional delivery and checking |
+|---|---|
+| Wording, formatting or navigation only | Batch related edits; use documentation, link and whitespace checks plus the existing bounded CI lane when eligible |
+| Commands/examples, API or security meaning, versions/checksums, publication instructions | Review the changed meaning and affected source/evidence; use the relevant existing checks even when the edited file is Markdown |
+| Code, dependencies, package inputs or workflow behavior | Complete affected local checks and required PR CI; select full qualification when the existing scope classifier requires it |
+
+This guidance retains protected `master`, Git authorization, strict/builtin Guard
+and required check names. It does not select direct-to-master delivery or change
+branch protection. A future alternative delivery policy needs a separate owner
+decision. Under the existing path, reduce PR frequency by batching work and CI
+cost by selecting the bounded lane, while keeping the required checks present.
+GitHub documents that skipping a required workflow with path filters or
+`[skip ci]` can leave its checks Pending and block Merge; use the existing
+[bounded lane](#local-checks-and-ci) rather than that skip mechanism.
+See [GitHub's explanation](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs)
+and the [release retrospective](RELEASE-RETROSPECTIVE.md).
+
 ## Git authority and strict Commit Guard
 
 For agents, implementation authority is not Commit, Push, Merge, tag or release
