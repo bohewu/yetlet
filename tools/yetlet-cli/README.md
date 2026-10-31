@@ -2,9 +2,11 @@
 
 The CLI creates applications and executes selected tasks. Persistent behavior uses
 Yetlet's existing public base/profile settings and scoped environment overrides.
-This experimental preview is unpublished. Its emitted version declarations are
-not usable from a registry before YT-096/YT-020 qualification. Local evaluation
-uses explicit Cargo dependency overrides; no framework source flag is needed.
+The CLI remains unpublished on crates.io, but can be installed from its
+self-contained source package. Generated apps use the published `yetlet` /
+`yetlet-browser` SDK `0.9.0-alpha.5`; ordinary build/run needs no SDK checkout or
+Cargo path override. The CLI package is `yetlet-cli` (currently `0.1.0`), while
+the installed command is `yetlet`. CLI and SDK versions are separate.
 See the [CLI contract](../../docs/CLI-CONTRACT.md) and
 [implementation evidence](../../docs/YT-102-CLI-IMPLEMENTATION.md).
 The subsequent [DX audit](../../docs/YT-102-DX-AUDIT.md) compares actual setup,
@@ -64,7 +66,7 @@ Building the CLI and building an app are separate steps.
 | Selection | Tools and inputs to prepare | Initial workflow |
 |---|---|---|
 | Build this CLI from the checkout | Rust/Cargo 1.99+, a native C/link toolchain, OpenSSL development files (reference: 3.5 LTS) and cached locked dependencies | [Build the CLI](#build-locally-and-create-an-application), then inspect help/doctor |
-| Native `new NAME` | Native Rust toolchain, compatible local Yetlet dependency paths and a separately prepared app Cargo.lock | `yetlet build`, then `yetlet run`; no Node or frontend tool is required |
+| Native `new NAME` | Native Rust toolchain, the published SDK and a separately prepared app Cargo.lock | `yetlet build`, then `yetlet run`; no Node or frontend tool is required |
 | Native `new NAME --vite`, optionally `--tailwind` | Native prerequisites plus Node `^20.19.0` or `>=22.12.0`, npm and the generated frontend dependencies | [Vite preparation](templates/vite/SELECTED-README.md), initial `yetlet build` with auto_build enabled, then `yetlet run` |
 | `new NAME --template browser`, optionally `--tailwind` | Rust/Cargo 1.99+, `wasm32-unknown-unknown`, wasm-bindgen-cli 0.2.129, the same Node/npm prerequisites and the generated dependencies | [Browser preparation](templates/browser/README.md), `yetlet build`, then `yetlet run` to preview the existing dist |
 | Native `new NAME --tailwind` without Vite | Native prerequisites plus the separately provisioned standalone Tailwind 4.3.3 CLI | [Build `dist/tailwind.css` explicitly](templates/tailwind/SELECTED-README.md) before running Rust |
@@ -78,7 +80,7 @@ before startup; use the existing [settings/Development-secret mechanism](templat
 keeping credentials out of public TOMLs and frontend files.
 
 Use this order: prepare tools/cache, build the CLI, create the selected app,
-configure its local Cargo dependencies and generate its lock, prepare any
+generate its own Cargo lock and fetch its locked dependencies, prepare any
 selected frontend dependencies/assets, then build/run. `new` does not install
 tools, generate Cargo.lock or produce dist; selected frontend templates include
 their pinned package lock. `run` does not create the initial dist;
@@ -96,44 +98,100 @@ see [native tool preparation](../../docs/WINDOWS-CLI-125-VERIFICATION.md#reuse-t
 
 ## Build locally and create an application
 
-The following POSIX-shell example starts at the repository root after the
-prerequisites above are ready. For an existing custom static OpenSSL prefix,
-select it in this shell before the build:
+The selected user installation interface is:
 
 ```sh
-# Only when using your separately prepared static OpenSSL installation:
-# export OPENSSL_DIR=/path/to/prepared/openssl
-# export OPENSSL_STATIC=1
-cargo build --offline --locked --manifest-path tools/yetlet-cli/Cargo.toml
-tools/yetlet-cli/target/debug/yetlet --help
-tools/yetlet-cli/target/debug/yetlet doctor --json
-mkdir -p -m 700 "$HOME/yetlet-apps"
-tools/yetlet-cli/target/debug/yetlet new sampleapp --parent "$HOME/yetlet-apps"
+cargo install yetlet-cli --locked
+yetlet new myapp
 ```
 
-Use an existing protected parent: Linux owner-protected directories or trusted
-sticky creation parents; Windows protected local fixed NTFS without reparse
-traversal. Creation never overwrites or merges an existing destination.
+Cargo downloads and compiles the standalone CLI package; no manual repository
+clone or npm is needed. **First CLI publication is still Pending:** the command
+above becomes available only after a separate authorized crates.io upload. The
+SDK release does not publish this CLI automatically. Prebuilt executables and
+`cargo binstall` support are later distribution options.
 
-The CLI has its own Cargo workspace and lock. New apps have their own standalone
-workspace and no Cargo.lock. Current Yetlet crate versions are unpublished:
-explicitly replace generated dependencies with compatible local Cargo path
-entries or patches, using the generated README's example. The current SDK is
-`yetlet` version `=0.9.0-alpha.5`, with `server-axum` and optionally `config`
-features; browser creation separately selects `yetlet-browser` at that version. Then prepare the app's lock separately:
+For maintainer evaluation before publication, install from a trusted physical
+checkout or an unpacked verified CLI archive:
 
 ```sh
-cd "$HOME/yetlet-apps/sampleapp"
-cargo generate-lockfile --offline
-cargo check --frozen
-yetlet build
-yetlet run
+(
+    # Optional, only for a separately prepared static OpenSSL installation:
+    # export OPENSSL_DIR=/path/to/prepared/openssl
+    # export OPENSSL_STATIC=1
+    cargo install --path tools/yetlet-cli --locked
+)
 ```
 
-The example assumes the locally built CLI is explicitly available as `yetlet`.
-It does not install it globally. Missing cached dependencies fail offline.
-`--release` changes only the Cargo compilation profile, not APP_ENVIRONMENT.
-Frozen execution is not a sandbox for package scripts, build scripts or app code.
+Cargo installs the `yetlet` executable under its install root's `bin` directory
+(normally `~/.cargo/bin`). Add that directory to PATH, or invoke the executable
+by its absolute path. This command compiles native Rust; it is not an npm
+installation. `cargo install yetlet-cli` is not available until a separate CLI
+publication is selected. No prebuilt CLI downloads are provided by this slice.
+For a private install prefix, add `--root /absolute/owned/cli-prefix` and use its
+`bin/yetlet`. Compilation requires the native/OpenSSL prerequisites above.
+
+After installation, work outside the Yetlet checkout:
+
+```sh
+(
+    # Rustup: explicitly select the already-installed physical toolchain.
+    yetlet_rust_bin="$(dirname "$(rustup which --toolchain 1.99.0 cargo)")"
+    export PATH="$yetlet_rust_bin:$PATH"
+    yetlet --version
+    yetlet --help
+    yetlet doctor --json
+    mkdir -m 700 "$HOME/yetlet-apps"
+    yetlet new sampleapp --parent "$HOME/yetlet-apps"
+    cd "$HOME/yetlet-apps/sampleapp"
+    cargo generate-lockfile
+    cargo fetch --locked
+    yetlet build
+    yetlet run
+)
+```
+
+Use a new owned parent; if it already exists, deliberately select an existing
+protected parent or choose another location. Linux supports owner-protected
+directories or trusted sticky creation parents; Windows requires protected local
+fixed NTFS without reparse traversal. Creation never overwrites or merges an
+existing destination. This walkthrough is POSIX/GNU; existing Windows setup and
+qualification remain separate.
+
+The CLI checks executable and ancestor ownership/permissions; group/world-
+writable tool installations are refused. With Rustup, explicitly select the
+installed physical toolchain as above; with another installation, select its
+protected real Cargo/rustc directory. Doctor never synchronizes/installs a Rustup
+toolchain. Do not disable the checks. The subshell keeps this PATH selection
+local to the walkthrough.
+
+The CLI and each app have separate workspaces/locks. New apps declare exact
+registry SDK versions and create no Cargo.lock. The two explicit Cargo commands
+prepare the app's lock/cache; CLI build/run then use frozen Cargo. Offline
+preparation requires a populated cache. `--release` changes the Cargo profile,
+not APP_ENVIRONMENT. Frozen execution is not a sandbox for package scripts,
+build scripts or app code. For the complete walkthrough and expected HTTP
+result, see [Build your first Yetlet app](../../docs/FIRST-APP.md).
+
+### Maintainer resource updates
+
+The CLI archive includes templates, pre-Wasm loading assets, licenses and a
+fixed public SDK source snapshot for the existing qualified-source generators.
+Compilation does not read files outside the CLI package or fetch source at
+build time. Normal Cargo dependency fetching remains explicit.
+After deliberately selecting the matching published SDK and updating the exact
+CLI dependency, refresh these resources from a trusted repository checkout:
+
+```sh
+python3 tools/yetlet-cli/scripts/sync_resources.py
+```
+
+Review the snapshot diff and run the CLI `resources` test. The command copies
+only Git-tracked public SDK files plus the workspace manifest/lock baseline and two startup
+assets; it does not package ignored files, secrets or a user's application.
+The snapshot is compatibility data for inspection, not a third public SDK.
+Registry-only Docker/Compose/Kubernetes generation is still unselected; those
+commands retain their explicit compatible local-source requirements below.
 
 ## Creation choices and settings
 

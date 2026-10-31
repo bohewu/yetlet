@@ -1,0 +1,51 @@
+[workspace]
+members = [
+    "crates/yetlet",
+    "crates/yetlet-browser",
+    "examples/todo-ui",
+    "examples/todo-browser",
+    "examples/search-island",
+    "examples/render-bench",
+    "examples/streaming-ssr-research",
+    "examples/custom-action-transport",
+    "examples/resumability-research",
+    "examples/webgpu-scene-research",
+    "examples/keyed-bindings",
+    "examples/rest-api",
+    "examples/cart-server",
+    "examples/hello-world",
+    "examples/middleware-lab",
+    "examples/forms-validation",
+    "examples/form-css-proof",
+    "examples/lab-operations-board",
+    "examples/board-triage",
+    "examples/file-server",
+    "examples/sqlite-crud",
+    "examples/sse-notifications",
+    "examples/dashboard-counter-island",
+    "examples/dashboard-filter-island",
+    "examples/multi-island-dashboard",
+    "examples/auth-notes",
+    "examples/modular-shop",
+    "examples/todo-server",
+]
+resolver = "3"
+exclude = [
+    "examples/webgpu-scene-island",
+    "vendor/openidconnect",
+]
+
+[workspace.package]
+version = "0.9.0-alpha.5"
+edition = "2024"
+rust-version = "1.99"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/bohewu/yetlet"
+
+[workspace.dependencies]
+axum = "0.8"
+tokio = { version = "1", features = ["macros", "net", "rt-multi-thread"] }
+
+[patch.crates-io]
+# Temporary application OIDC dependency patch; see vendor/openidconnect/UPSTREAM.md.
+openidconnect = { path = "vendor/openidconnect" }

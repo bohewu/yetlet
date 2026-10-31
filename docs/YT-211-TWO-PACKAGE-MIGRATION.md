@@ -9,6 +9,23 @@ The owner subsequently explicitly selects two packages, `yetlet` and
 initial one-package contract; the initial P2 omission of rate limiting and its
 failed review remain retained. The complete map below includes that capability.
 
+## Subsequent publication status — 2026-10-31
+
+The contract and development-state statements below describe the migration
+checkpoint on 2026-10-30. Subsequently, the two SDK packages
+[`yetlet`](https://crates.io/crates/yetlet/0.9.0-alpha.5) and
+[`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.5) were
+published as `0.9.0-alpha.5`, with the matching
+[GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.5).
+The owner then deleted the old `yetlet-actions 0.9.0-alpha.4` crates.io package;
+it is no longer an available registry dependency. This was a separate owner
+action after publication, not an operation performed by the alpha.5 workflow.
+Old tags, signed artifacts and failed results retain their historical identities.
+[PR29](https://github.com/bohewu/yetlet/pull/29) was closed without merging;
+its fifteen-package continuation is retired. See the
+[actual hosted/publication record](ALPHA5-HOSTED-RECORD.md) for final C/S/V/P and
+receipts. The original source-bound migration snapshot cannot be rewritten.
+
 ## Selected package and API shape
 
 Use two implementation packages at `crates/yetlet` and `crates/yetlet-browser`, with
@@ -129,8 +146,10 @@ Keep the final owner publication Environment gate and strict/builtin Git policy.
 The old one-plus-fifteen continuation remains a legacy-only path and is not
 valid for a schema2 record. No new concrete release record, candidate C/S/V/P,
 tag, run, payload SHA or release approval is selected by this implementation.
-Existing GitHub alpha.4, `yetlet-actions0.9.0-alpha.4`, all signatures and failures
-stay untouched. PR29 remains open/unmerged and publication remains paused.
+At this historical migration checkpoint, existing GitHub alpha.4,
+`yetlet-actions0.9.0-alpha.4`, signatures and failures were to stay untouched;
+PR29 was open/unmerged and publication was paused. Subsequent owner deletion,
+PR closure and two-package publication are recorded above.
 
 ## Bounded verification and completion
 

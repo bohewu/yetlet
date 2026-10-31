@@ -1,12 +1,15 @@
 # Yetlet Prototype Release Readiness
 
-**Current distribution (2026-10-29):** The Experimental
-[v0.9.0-alpha.1 GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
-is public with twenty selected attachments. D6 is Complete and YT-096 Done at
-the accepted sixteen-source-package signing/integrity scope; YT-020 remains
-Blocked and crates.io has not been published. This is not Stable API, production,
-SLSA or universal platform qualification. Exact accepted source/output/limits
-are in the [actual record](YT-096-SIGNER-CONTRACT.md#subsequent-github-pre-release-publication--2026-10-29).
+**Current distribution (2026-10-31):** The Experimental
+[v0.9.0-alpha.5 GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.5)
+is public with six checked attachments. The matching `yetlet` and
+`yetlet-browser` versions are published on crates.io; registry download/checksum
+and a fresh external consumer PASS. Exact C/S/V/P, source/feature/platform limits
+and original failures are in the [actual record](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup).
+D6/YT-096 acceptance retains its original signing/integrity scope. This is not
+Stable API, production, SLSA or universal platform qualification. The owner
+subsequently deletes the obsolete actions crate and PR29 is closed unmerged;
+old tags, signed artifacts and failure evidence remain unchanged.
 
 For a new release, use [RELEASING.md](RELEASING.md), including its current
 version-binding/tooling gaps. This page retains historical readiness decisions,

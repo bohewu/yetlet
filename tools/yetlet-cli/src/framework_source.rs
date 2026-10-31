@@ -42,20 +42,20 @@ pub(crate) fn collect(root: &Path) -> Result<BTreeMap<String, Vec<u8>>, String> 
     }
     let mut found = BTreeSet::new();
     walk(root, Path::new("crates/yetlet"), &mut found)?;
-    if found != FILES.iter().map(|(p, _)| (*p).to_owned()).collect() {
+    if found != FILES.iter().map(|(p, _)| p.to_owned()).collect() {
         return Err("unsupported framework source layout".into());
     }
     let mut files = BTreeMap::new();
-    for (path, expected) in FILES {
+    for (path, expected) in FILES.iter() {
         let bytes = fs::read_framework(&root.join(path))
             .map_err(|_| "framework input is missing, oversized or unsafe")?;
         let text = std::str::from_utf8(&bytes).map_err(|_| "framework source must be UTF-8")?;
-        let expected =
-            std::str::from_utf8(expected).map_err(|_| "compiled framework source must be UTF-8")?;
+        let expected = std::str::from_utf8(expected.as_bytes())
+            .map_err(|_| "compiled framework source must be UTF-8")?;
         if text.replace("\r\n", "\n") != expected.replace("\r\n", "\n") {
             return Err("unsupported framework source or dependency closure".into());
         }
-        files.insert((*path).to_owned(), bytes);
+        files.insert(path.to_owned(), bytes);
     }
     Ok(files)
 }

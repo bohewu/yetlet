@@ -36,7 +36,9 @@ impl Fixture {
 }
 
 pub fn lock() -> String {
-    let mut value: toml::Value = include_str!("../../../../Cargo.lock").parse().unwrap();
+    let mut value: toml::Value = include_str!("../../resources/framework.lock")
+        .parse()
+        .unwrap();
     let source = value["package"].as_array().unwrap();
     let mut sdk = source
         .iter()

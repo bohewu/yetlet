@@ -1,6 +1,22 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**Alpha.5 pre-publication execution (2026-10-31):**
+**Current alpha.5 publication and CLI installation (2026-10-31):**
+The [two-package alpha.5 release](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup)
+and both registry uploads complete at owner-approved run41104391525/1, with
+registry download/checksum and external consumer PASS. The owner subsequently
+deletes the obsolete actions crate; PR29 is closed unmerged. Preserve original
+source/tag/signature and failure evidence. [YT-214](YT-214-CLI-INSTALLATION.md)
+is Done at bounded local GNU implementation/package/install proof scope after
+independent Reviewer PASS0: twelve affected tests, normal archive verification,
+token-free publish dry-run and registry-backed first-app build/HTTP/cleanup pass.
+First CLI publication remains Pending; the no-clone `cargo install yetlet-cli`
+interface is prepared, not live yet. YT-020 is Done at Experimental distribution
+scope from retained successful publication/consumer receipts and final review.
+No new CLI publication, SDK change, hosted/signing run or source Git delivery is
+selected. Stale branch cleanup preserves a verified external Git bundle and the
+one local checkpoint with four unproven unique commits.
+
+**Historical alpha.5 pre-publication execution (2026-10-31):**
 The owner authorizes advancing to the final publication gate under the adopted
 [single-gate policy](RELEASE-PUBLICATION.md). [The new hosted record](ALPHA5-HOSTED-RECORD.md)
 selects C `0a9fa8a594e3dd2ce753422dd848df10cd8c98df` after PR31 and exact master

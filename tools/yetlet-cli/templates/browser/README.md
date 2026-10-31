@@ -10,8 +10,8 @@ This persists `cli.target = "browser"` in `base.toml`; plain `yetlet new` keeps
 the native SSR default. Browser creation implies Vite/public CLI settings.
 `--vite` and `--settings` are accepted but unnecessary here. `--service` is a
 native-only profile. No dependency install, lock generation or process starts
-during creation. Yetlet crates are unpublished previews: before local use,
-replace their exact registry declarations with your trusted checkout's paths.
+during creation. The generated manifest selects the published `yetlet` and
+`yetlet-browser` SDK @SDK_VERSION@ from crates.io; no local path override is needed.
 
 Prepare Rust/Cargo 1.99+, `wasm32-unknown-unknown`, `wasm-bindgen-cli` 0.2.129,
 Node ^20.19 or >=22.12 and the selected dependencies separately. Put
@@ -19,7 +19,8 @@ Node ^20.19 or >=22.12 and the selected dependencies separately. Put
 
 ```sh
 cd @NAME@
-cargo generate-lockfile --offline
+cargo generate-lockfile
+cargo fetch --locked
 npm ci --prefix frontend --ignore-scripts --no-audit --no-fund
 yetlet build
 npm run typecheck --prefix frontend

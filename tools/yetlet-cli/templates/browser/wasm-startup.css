@@ -1,0 +1,7 @@
+/* Optional classes: initial markup, layout, brand and theme belong to the app. */
+.wasm-startup-panel{padding:1rem;border:1px solid var(--wasm-startup-track,#c9d2e2);border-radius:.5rem}
+.wasm-startup-indicator{display:inline-block;width:2rem;height:2rem;border:.22rem solid var(--wasm-startup-track,#c9d2e2);border-top-color:var(--wasm-startup-accent,#4338ca);border-radius:50%;animation:wasm-startup-spin 1s linear infinite}
+.wasm-startup-indicator[hidden]{display:none}
+[data-startup-state="ready"]>.wasm-startup-panel{display:none}
+@keyframes wasm-startup-spin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.wasm-startup-indicator{animation:none}}
