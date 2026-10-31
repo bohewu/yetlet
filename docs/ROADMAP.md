@@ -1,5 +1,14 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-215 corrected candidate selected (2026-10-31):**
+[PR37 and exact master CI](YT-215-CLI-FIRST-RELEASE.md#corrected-candidate-and-fixed-tag--2026-10-31)
+PASS at corrected C6f013ac. New immutable yetlet-cli-v0.1.0 tag/strict Guard
+readback PASS; consumed binding retired. Changed-source build41168153070/1 is
+running once; corrected actual custody and later S/signatures/result remain
+Pending. This documentation delivery provides a separate later S without new
+runtime inputs. Old tags/jobs/wrong-ref receipt remain intact, with no SDK upload
+or CLI signing/publication. Final owner gate remains required.
+
 **YT-215 first independent CLI release preparation (2026-10-31):**
 The owner selects [yetlet-cli0.1.0](YT-215-CLI-FIRST-RELEASE.md) through the final
 owner gate, retaining published SDK0.9.0-alpha.5. Initial C6f26961, PR36/master
