@@ -94,7 +94,7 @@ fn workflow_has_manual_fixed_source_and_only_success_public_upload() {
         "fetch-depth: 0",
         "persist-credentials: false",
         "actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
-        "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02",
+        "actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9",
         "[[ \"$GITHUB_EVENT_NAME\" == workflow_dispatch ]]",
         "[[ \"$GITHUB_REPOSITORY\" == bohewu/yetlet ]]",
         "[[ \"$GITHUB_REPOSITORY_ID\" == 1409587171 && \"$GITHUB_REPOSITORY_OWNER_ID\" == 35250002 ]]",

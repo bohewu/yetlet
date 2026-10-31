@@ -177,7 +177,7 @@ jobs:
         run: cargo xtask measure baseline --profile release --samples 15 --browser-runs 3 --out target/m5-baseline-ci.json
       - name: Retain browser diagnostics on failure
         if: failure() && steps.scope.outputs.release_only != 'true'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: yetlet-browser-failure-logs
           path: |
@@ -188,7 +188,7 @@ jobs:
           retention-days: 7
       - name: Retain M5 baseline artifact
         if: steps.scope.outputs.release_only != 'true'
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: yetlet-m5-baseline
           path: target/m5-baseline-ci.json
