@@ -31,19 +31,21 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 - [WebAssembly startup and loading UI](WASM-STARTUP.md): optional shared JS/CSS shell, customization, full-page/SSR-region integration and caller-owned lifetime.
 
-- [Public documentation plan](PUBLIC-DOCS-PLAN.md): proposed Pages navigation,
-  versioned source/API boundaries, doc-comment gaps and deferred Wiki; not a live site.
+- [Public developer guide](https://bohewu.github.io/yetlet/): eight selected chapters,
+  navigation and search, labeled with SDK/CLI edition and source commit.
+- [Public documentation plan](PUBLIC-DOCS-PLAN.md): source/API boundaries,
+  doc-comment gaps and deferred Wiki.
 
 ## Maintainer entry points
 
-- [Minimum GitHub Pages publication plan](GITHUB-PAGES-PUBLICATION.md): exact
-  YT-217 edition, proposed build/deploy workflow, permissions/settings, initial
-  owner authorization and subsequent automatic document updates; not activated.
+- [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
+  dedicated workflow, master-only Environment, initial deployment/readback,
+  retained observations and automatic relevant master document updates.
 
 - [Local reader preview](../site/README.md): pinned mdBook builder, exact chapter
   selection and loopback-only usage. [YT-217 completion](YT-217-DOCS-PREVIEW.md)
-  records API comments and independently accepted local reader checks with retained failures;
-  no Pages deployment is installed.
+  records API comments and independently accepted local reader checks with retained
+  failures; the separate YT-218 record covers actual public hosting.
 
 - [Completed CLI0.1.1 release](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31):
   accepted output, owner-approved publication and installed consumer; the

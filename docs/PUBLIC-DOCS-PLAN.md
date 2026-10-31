@@ -1,30 +1,26 @@
 # Public documentation and rustdoc plan
 
-Date: 2026-10-31. Status: YT-217 Done at selected API-doc/local reader-preview
-scope after independent final Reviewer PASS0. Source/build evidence is reused;
-authorized sidebar/navigation/search/touch/screenshot checks pass. No published
-website or hosting setting change. The
-[execution record](YT-217-DOCS-PREVIEW.md) distinguishes passing source/build
-checks, retained stopped harness and subsequent authorized correction. Runtime,
-API and versions are unchanged.
-
-[YT-218's minimum Pages publication plan](GITHUB-PAGES-PUBLICATION.md) records
-the exact eight-page first edition, CI/deployment settings and outstanding owner
-confirmations. YT-217 remains Done; hosting implementation and activation are
-not implied by that local acceptance.
+Date: 2026-10-31. YT-217 is Done at selected API-doc/local reader-preview
+scope after independent final Reviewer PASS0. Its [execution record](YT-217-DOCS-PREVIEW.md)
+retains the original passing proof, stopped harness and authorized correction.
+YT-218 subsequently delivered the separate Pages workflow/settings and first
+publication; [the guide](https://bohewu.github.io/yetlet/) is live at source
+64d1074. [Actual publication evidence](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31)
+records green CI, source/artifact/edition matching and hosted reader acceptance,
+accepted by final independent Reviewer PASS0; YT-218 is Done. No product API/runtime/version change
+or expansion of signed release-candidate scope follows from website publication.
 
 ## Recommended destinations
 
 Use **GitHub Pages** for the public guide site, the existing repository for
 canonical Markdown/source, and **rustdoc** for version-matched API reference.
 GitHub Pages serves static HTML/CSS/JavaScript and is available for public
-repositories on GitHub Free; the project URL would be
-`https://bohewu.github.io/yetlet/`. That URL is a proposed destination, not a
-live-site claim. See [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
+repositories on GitHub Free; the published project URL is
+[bohewu.github.io/yetlet](https://bohewu.github.io/yetlet/). See [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
 
 Recommend [mdBook](https://rust-lang.github.io/mdBook/) for a small Markdown-based
 guide with navigation and search. Keep one repository and existing guide
-sources; a future site build can stage explicitly selected files into its book
+sources; the installed site build stages explicitly selected files into its book
 input. Do not copy the guides into a second manually edited source tree.
 YT-217 pins mdBook0.5.4 as local ignored tooling; the checked-in builder validates
 that version. No site tooling becomes a Yetlet runtime dependency.
@@ -120,4 +116,6 @@ keep their original sources and limits. The API inventory is a manual sample of
 public entry points, not a full coverage score. Source comments and the local
 static build retain their accepted scope. Navigation/search/mobile/screenshot
 checks pass at local Chromium/emulated-mobile scope after final independent review.
-External publication is not claimed.
+The later YT-218 publication adds actual public routing/assets/reader evidence
+at its recorded source and Chromium/emulated-mobile scope. Physical mobile,
+additional browsers and hosted generated rustdoc are not newly qualified.

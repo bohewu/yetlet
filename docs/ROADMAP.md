@@ -13,13 +13,16 @@ separates eight chapter URLs from four heading fragments; navigation/search,
 mobile touch interaction and three screenshots PASS at local Chromium scope.
 Original source/build acceptance is reused; final independent browser-acceptance
 review PASS0 explicitly allows Done, with registered model/effective effort verified.
-No API/runtime/version,
-workflow or hosting change; Pages/Wiki are not activated.
-[YT-218](GITHUB-PAGES-PUBLICATION.md) is In progress: the owner-adopted
-publication plan now has a local workflow/public-label implementation and
-passing focused checks. Accepted YT-217 guide/body proof is reused. Independent
-review and authorized Git/CI/settings/first deployment remain pending; the switch
-is absent/off, release CI and Secrets unchanged.
+YT-217 itself changed no API/runtime/version or hosting; its original local
+scope is preserved.
+[YT-218](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31)
+has completed PR43 reviewed strict/builtin delivery and green merged-master CI
+at64d1074. [The guide](https://bohewu.github.io/yetlet/) is live after successful
+first build/deploy41198529190/1, actual artifact/source/edition/HTTPS readback and
+desktop navigation/search plus emulated-mobile touch acceptance. Final independent
+evidence Reviewer PASS0 accepts completion; YT-218 is Done. The Pages Environment allows only master,
+relevant master updates deploy automatically, release CI/Secrets are unchanged,
+and original404 settings/harness observations remain recorded without hosted retry.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 

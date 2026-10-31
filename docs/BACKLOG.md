@@ -9,11 +9,15 @@ CLI0.1.0 consumer FAIL and immutable release remain intact. No old qualification
 is replayed. [YT-217](YT-217-DOCS-PREVIEW.md) is Done at selected API-doc/local
 reader-preview scope: source/build proof is reused, authorized sidebar correction
 and navigation/search/touch/screenshots pass, final independent Reviewer PASS0.
-Original failures remain; no Pages site or Wiki is enabled.
-[YT-218](GITHUB-PAGES-PUBLICATION.md) is In progress under the owner-adopted
-publication plan. New workflow/public-label/output checks pass locally; review
-and authorized Git/CI/settings/first deployment remain pending at this checkpoint.
-The deployment switch remains absent/off; no Pages activation yet.
+Original failures remain; Wiki is deferred.
+[YT-218](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31)
+has completed reviewed strict/builtin delivery through PR43 and green merged-
+master CI. The public eight-chapter guide is live at
+[GitHub Pages](https://bohewu.github.io/yetlet/), source64d1074, with master-only
+Environment and automatic relevant master updates. First deploy41198529190/1,
+artifact/source/edition/HTTPS and hosted navigation/search/touch readback PASS;
+final independent Reviewer PASS0 permits Done. Retained settings/harness
+404 observations caused no hosted retry; release CI/Secrets are unchanged.
 Dated checkpoints below retain their original Pending/authorization wording;
 use the item rows and current release records for present status.
 
@@ -579,11 +583,11 @@ The owner requested Rust-native repository tooling before a public CLI. The inde
 
 ## Ready queue
 
-**Current next item (2026-10-31):** [YT-218](GITHUB-PAGES-PUBLICATION.md), a
-bounded Pages build/publication item dependent on Done YT-217. The owner accepts
-the scope/update policy and reviewed delivery sequence; local implementation
-is complete pending independent review, Git/CI and first deployment. Earlier
-queue snapshots retain their historical scope.
+**Current reader delivery (2026-10-31):** [YT-218](GITHUB-PAGES-PUBLICATION.md)
+is Done after initial publication/readback and final independent Reviewer PASS0.
+No additional feature or test item is selected. Subsequent relevant
+protected-master guide updates use the installed automatic Pages workflow;
+Wiki/domain/rustdoc hosting are optional future decisions.
 
 **M12 next gate (2026-10-15):** YT-085 is Done after independent read-only Reviewer PASS with zero issues/followups (`target/m12/yt085/reviewer-board-retention-20261015/result.json`). The approved 30 Rust smoke/integration mappings retain 25 positive runtime results, one nonzero unavailable Chrome GPU path, and focused later Server/Browser/cleanup/Board receipt repair tests. Windows persistent-Service and Redis external integration are unverified; live Python callers/workflow transition is not yet completed. YT-086 is Done at bounded Rust migration scope after final independent Reviewer `wc_job_6UfDDdHnNCBXkMhA` PASS with zero issues/followups ([evidence](YT-086-VERIFICATION.md)). Full runtime invocation graph, GPU/Docker/Redis/hosted rebuild and full suite remain unverified. YT-087 is Done at the bounded unpublished Linux CLI preview scope after separate 087a/087b/087c independent Reviewer PASS decisions; no public release. YT-020 remains Blocked.
 **Framework/deployment scope clarification (2026-10-11):** Peon committed reviewed b3 as `4da0f6c`, preserving all inputs; no push. The [reconciled responsibility boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md) keeps provider semantics, supported configuration/error behavior and honest persistence limits in Yetlet scope. Production TLS/ACL policy, backup protection, business RPO/RTO and operational ownership belong to applications/operators and do not block framework completion. AOF/crash/restore rehearsals remain Not verified optional proposals; no implementation or new execution started. YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope; its final documentation review gate is recorded in M10g. YT-020 remains Blocked.
@@ -951,7 +955,7 @@ separate implementation authority.
 
 | YT-217 | P2 | M | M10 | Improve beginner API docs and preview a selected public guide site | YT-186, YT-191, YT-216 | [Progress/evidence](YT-217-DOCS-PREVIEW.md): accepted four doc-comment-only Rust files, four doctests, selected native/WASM rustdoc and eight-chapter explicit local build/static links retained without reruns. Owner authorizes correcting the stopped sidebar check: eight exact chapter URLs versus four extra heading fragments; desktop navigation, SessionConfig search,390x844 touch/menu journey and three screenshots PASS with no captured console/page/HTTP errors. Original two assertion failures and first reader-status P2 remain preserved. Evidence archived outside repo; owned server/browser cleanup complete. Final independent Reviewer PASS0 accepts all19 source hashes/eight evidence files and allows Done; registered role/model and effective high effort verified; no runtime/API/version, new Commit/Push or Pages/release activation | Done |
 
-| YT-218 | P2 | M | M10 | Publish the selected reader guide with GitHub Pages | YT-217 | [Adopted plan/implementation checkpoint](GITHUB-PAGES-PUBLICATION.md): owner accepts exact eight-source edition, separate read-only PR build and master-only switched Pages deployment with no release Secrets. New public/preview labels enforce clean source and explicit edition; actual artifact root/source exclusions/local links checked. Nine focused tests, eight real workflow-mode cases, actionlint and unchanged-guide preview PASS. Independent review, strict Git/required CI/Merge, Pages/Environment setup and first hosted source/artifact/readback remain pending; retain failures, no automatic retry or old local product-suite replay | In progress |
+| YT-218 | P2 | M | M10 | Publish the selected reader guide with GitHub Pages | YT-217 | [Plan and publication evidence](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31): implementation Reviewer PASS0,9 tests/8 actual mode cases/actionlint/clean public build454 links PASS; strict/builtin PR43 squash Merge64d1074 with matching qualified tree, PR/master required CI and four CodeQL analyses PASS. Pages workflow/HTTPS, exact-master Environment and deploy switch active; first run41198529190/1 SUCCESS.42-file artifact scope/digest,8 source hashes/edition, anonymous HTML/search-index byte readback and desktop/search/touch/screenshots PASS. Prior proof reused; settings/harness404 records retained, no hosted retry or release changes. Final independent Reviewer PASS0 accepts five doc hashes and actual hosted evidence;0 issues/followups, registered role/model/effective high verified; Done at bounded public-guide scope | Done |
 
 ## YT-096 hosted build, verifier and retention — 2026-10-28
 
