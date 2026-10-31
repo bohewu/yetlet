@@ -130,8 +130,14 @@ all six items Todo at its accepted checkpoint. The later
 [YT-219 contract](YT-219-HTML-DOM-CONTRACT.md) is Done at documentation scope
 after independent Reviewer PASS0. YT-220's [unreleased source implementation](YT-220-HTML-DOM-IMPLEMENTATION.md)
 is now Done at its unreleased-source scope after independent Reviewer PASS0;
-YT-221–224 remain Todo. The proposed static mode is not an existing
-CLI command.
+YT-221's [controlled links/images](YT-221-DOM-URL-IMAGE-CONTRACT.md) has contract
+PASS0 and a minimal unreleased implementation with new native/Chrome/Firefox
+evidence; final independent Reviewer PASS0 completes YT-221 at unreleased-source
+scope. [YT-222](YT-222-STATIC-HTML-CONTRACT.md) is Done at documentation-only
+static-export/CLI contract scope: finite public fragments/assets, bounded head,
+project-prefix paths, local CSP/islands and protected create-only output.
+Independent Reviewer PASS0; YT-223/224 remain Todo. The proposed static mode is
+not an existing CLI command.
 
 Retain the current mdBook site/workflow and these eight source/excerpt/disclosure
 boundaries during the pilot. The existing browser CLI already produces static-

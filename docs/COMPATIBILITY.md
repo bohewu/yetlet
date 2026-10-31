@@ -15,6 +15,17 @@ not globally tighten SSR vocabulary or change escape_text. Old snapshots needing
 those bytes should adopt this documented correction when selecting the new
 source. No package/version/tag/signature is changed or republished by this item.
 
+[YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md) adds unreleased DomOptions,
+NavigationPolicy, ImagePolicy, validate_with_options and Wasm mount_with_options.
+Existing validate/mount signatures and error variants are unchanged and delegate
+to strict default options: no images or external navigation; forms stay
+same-origin. Explicit policies select finite anchor attributes and optional img,
+with independent canonical HTTPS origin lists. Native validation remains
+provisional; browser preflight owns configuration parsing/origin enforcement.
+Existing consumers need no migration. Public View, SSR and package/dependency/
+feature/version identities are unchanged. Published artifacts do not contain
+these source APIs or inherit their new verification.
+
 ## Historical two-package pre-publication source — 2026-10-30
 
 The unreleased development train is `0.9.0-alpha.5`, with exactly `yetlet` and

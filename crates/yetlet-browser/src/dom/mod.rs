@@ -11,8 +11,11 @@
 
 use yetlet::view::View;
 
+mod options;
 mod structure;
 mod vocabulary;
+
+pub use options::{DomOptions, ImagePolicy, NavigationPolicy};
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DomPolicyError {
@@ -46,22 +49,34 @@ impl std::fmt::Display for DomPolicyError {
 /// checks that spelling; mount additionally resolves URLs with the browser parser
 /// and requires HTTP(S), no credentials and the owner document's origin.
 pub fn validate(view: &View) -> Result<(), DomPolicyError> {
-    validate_inside(view, false, None)
+    validate_with_options(view, &DomOptions::default())
+}
+
+/// Check selected structure and URL spelling without DOM mutation or requests.
+///
+/// This does not parse option origins or establish browser origin membership,
+/// effective-base safety, CSP acceptance or resource availability. A successful
+/// native result can still fail browser mounting; it is not authorization.
+pub fn validate_with_options(view: &View, options: &DomOptions) -> Result<(), DomPolicyError> {
+    validate_inside(view, false, None, options)
 }
 
 fn validate_inside(
     view: &View,
     inside_form: bool,
     parent: Option<&str>,
+    options: &DomOptions,
 ) -> Result<(), DomPolicyError> {
     let View::Element(element) = view else {
         return Ok(());
     };
     let tag = element.tag();
-    if !vocabulary::supported_tag(tag) {
+    if !vocabulary::supported_tag(tag) && !(tag == "img" && options.images()) {
         return Err(DomPolicyError::UnsupportedTag(tag.into()));
     }
-    if matches!(tag, "input" | "br" | "hr" | "col" | "wbr") && !element.child_views().is_empty() {
+    if matches!(tag, "input" | "br" | "hr" | "col" | "wbr" | "img")
+        && !element.child_views().is_empty()
+    {
         return Err(DomPolicyError::VoidElementHasChildren(tag.into()));
     }
     if tag == "form" && inside_form {
@@ -73,22 +88,25 @@ fn validate_inside(
         if element.attributes()[..index].iter().any(|a| a.name == name) {
             return Err(DomPolicyError::DuplicateAttribute(name.into()));
         }
-        if !vocabulary::attribute_allowed(tag, name) {
+        if !vocabulary::attribute_allowed(tag, name) && !options.attribute(tag, name) {
             return Err(DomPolicyError::UnsupportedAttribute(name.into()));
         }
-        if !vocabulary::attribute_value_allowed(tag, name, &attribute.value) {
+        if !vocabulary::attribute_value_allowed(tag, name, &attribute.value)
+            || !options::attribute_value(name, &attribute.value)
+        {
             return Err(DomPolicyError::InvalidAttributeValue(name.into()));
         }
-        if (matches!(name, "href" | "action")
-            && !navigation_spelling(&attribute.value, name == "href"))
+        if (matches!(name, "href" | "action" | "src")
+            && !options.url_spelling(name, &attribute.value))
             || (name == "method" && !matches!(attribute.value.as_str(), "get" | "post"))
         {
             return Err(DomPolicyError::InvalidAttributeValue(name.into()));
         }
     }
     vocabulary::validate_element_values(element)?;
+    options::element_values(element)?;
     for child in element.child_views() {
-        validate_inside(child, inside_form || tag == "form", Some(tag))?;
+        validate_inside(child, inside_form || tag == "form", Some(tag), options)?;
     }
     Ok(())
 }
@@ -104,42 +122,110 @@ fn navigation_spelling(value: &str, fragments: bool) -> bool {
 
 #[cfg(target_arch = "wasm32")]
 mod browser {
-    use super::{View, validate};
+    use super::{DomOptions, ImagePolicy, NavigationPolicy, View, validate_with_options};
     use wasm_bindgen::JsValue;
     use web_sys::{Document, Element, Node, Url};
 
-    fn navigation_url(document: &Document, value: &str) -> Result<String, JsValue> {
-        let page = Url::new(&document.url()?)?;
+    fn policy_origins(values: &[String]) -> Result<Vec<String>, JsValue> {
+        values
+            .iter()
+            .map(|value| {
+                let url =
+                    Url::new(value).map_err(|_| JsValue::from_str("invalid DOM policy origin"))?;
+                let origin = url.origin();
+                if url.protocol() != "https:"
+                    || !url.username().is_empty()
+                    || !url.password().is_empty()
+                    || (value != &origin && value != &(origin.clone() + "/"))
+                {
+                    return Err(JsValue::from_str(
+                        "DOM policy origins must be canonical HTTPS origins",
+                    ));
+                }
+                Ok(origin)
+            })
+            .collect()
+    }
+
+    fn resolved_url(
+        document: &Document,
+        value: &str,
+        additional: &[String],
+    ) -> Result<String, JsValue> {
+        let page = Url::new(&document.url()?)
+            .map_err(|_| JsValue::from_str("invalid DOM document URL"))?;
         let base = document
             .base_uri()?
             .ok_or_else(|| JsValue::from_str("missing document base URL"))?;
-        let target = Url::new_with_base(value, &base)?;
+        let target = Url::new_with_base(value, &base)
+            .map_err(|_| JsValue::from_str("invalid DOM URL or base"))?;
+        let same = target.origin() == page.origin();
+        let named_https = value.starts_with("https://")
+            && target.protocol() == "https:"
+            && additional.contains(&target.origin());
         if !matches!(page.protocol().as_str(), "http:" | "https:")
             || !matches!(target.protocol().as_str(), "http:" | "https:")
-            || target.origin() != page.origin()
+            || (!same && !named_https)
             || !target.username().is_empty()
             || !target.password().is_empty()
         {
             return Err(JsValue::from_str(
-                "DOM navigation must stay on the HTTP(S) document origin",
+                "DOM navigation must stay on the HTTP(S) document origin or explicit policy origin",
             ));
         }
-        // Freeze the accepted destination; later <base> changes cannot redirect it.
         Ok(target.href())
     }
 
-    fn create_node(document: &Document, view: &View, in_pre: bool) -> Result<Node, JsValue> {
+    fn collect_urls(
+        document: &Document,
+        view: &View,
+        links: &[String],
+        images: &[String],
+        output: &mut Vec<String>,
+    ) -> Result<(), JsValue> {
+        if let View::Element(element) = view {
+            for a in element.attributes() {
+                let origins = match a.name {
+                    "href" => links,
+                    "src" => images,
+                    "action" => &[],
+                    _ => continue,
+                };
+                output.push(resolved_url(document, &a.value, origins)?);
+            }
+            for child in element.child_views() {
+                collect_urls(document, child, links, images, output)?;
+            }
+        }
+        Ok(())
+    }
+
+    fn create_node(
+        document: &Document,
+        view: &View,
+        in_pre: bool,
+        urls: &mut std::vec::IntoIter<String>,
+    ) -> Result<Node, JsValue> {
         match view {
             View::Text(value) => Ok(document.create_text_node(value).into()),
             View::Element(element) => {
                 let node = document.create_element(element.tag())?;
+                let mut image_source = None;
                 for attribute in element.attributes() {
-                    let value = if matches!(attribute.name, "href" | "action") {
-                        navigation_url(document, &attribute.value)?
+                    let value = if matches!(attribute.name, "href" | "action" | "src") {
+                        urls.next()
+                            .ok_or_else(|| JsValue::from_str("missing preflighted DOM URL"))?
                     } else {
                         attribute.value.clone()
                     };
-                    node.set_attribute(attribute.name, &value)?;
+                    if attribute.name == "src" {
+                        image_source = Some(value);
+                    } else {
+                        node.set_attribute(attribute.name, &value)?;
+                    }
+                }
+                if let Some(src) = image_source {
+                    node.set_attribute("src", &src)?;
                 }
                 if element.tag() == "textarea" {
                     // Join first so a CR/LF split across adjacent text nodes normalizes once.
@@ -171,6 +257,7 @@ mod browser {
                                 document,
                                 &children[index],
                                 normalize,
+                                urls,
                             )?)?;
                             index += 1;
                         }
@@ -186,11 +273,33 @@ mod browser {
     /// The View is validated and constructed before clearing the old subtree.
     /// Event listeners must live outside the replaced subtree.
     pub fn mount(target: &Element, view: &View) -> Result<(), JsValue> {
-        validate(view).map_err(|error| JsValue::from_str(&error.to_string()))?;
+        mount_with_options(target, view, &DomOptions::default())
+    }
+
+    /// Preflight all policies/URLs before assigning any resource attribute.
+    ///
+    /// Invalid input preserves the old target without resource requests. After
+    /// admission, native loads/redirects and final DOM errors are not rollback.
+    pub fn mount_with_options(
+        target: &Element,
+        view: &View,
+        options: &DomOptions,
+    ) -> Result<(), JsValue> {
+        validate_with_options(view, options).map_err(|e| JsValue::from_str(&e.to_string()))?;
+        let links = match options.navigation_policy() {
+            NavigationPolicy::SameOrigin => Vec::new(),
+            NavigationPolicy::HttpsOrigins(values) => policy_origins(values)?,
+        };
+        let images = match options.image_policy() {
+            ImagePolicy::Disabled | ImagePolicy::SameOrigin => Vec::new(),
+            ImagePolicy::HttpsOrigins(values) => policy_origins(values)?,
+        };
         let document = target
             .owner_document()
             .ok_or_else(|| JsValue::from_str("DOM mount target has no document"))?;
-        let replacement = create_node(&document, view, false)?;
+        let mut urls = Vec::new();
+        collect_urls(&document, view, &links, &images, &mut urls)?;
+        let replacement = create_node(&document, view, false, &mut urls.into_iter())?;
         target.set_text_content(None);
         target.append_child(&replacement)?;
         Ok(())
@@ -198,7 +307,7 @@ mod browser {
 }
 
 #[cfg(target_arch = "wasm32")]
-pub use browser::mount;
+pub use browser::{mount, mount_with_options};
 
 #[cfg(test)]
 mod tests {
@@ -397,3 +506,6 @@ mod tests {
 
 #[cfg(test)]
 mod tests_yt220;
+
+#[cfg(test)]
+mod tests_yt221;

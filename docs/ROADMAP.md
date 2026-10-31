@@ -31,7 +31,15 @@ at documentation scope after independent Reviewer PASS0, with a complete dated
 element/attribute inventory and stable seven doc/ten product-input bindings.
 [YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md) is now Done with unreleased89-tag
 implementation, a shared consumer and focused native/Wasm/Chrome/Firefox evidence;
-independent Reviewer PASS0, zero issues/followups and16 source hashes matched. YT-221–224 remain Todo; live site/releases unchanged.
+independent Reviewer PASS0, zero issues/followups and16 source hashes matched.
+[YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md) is Done: contract PASS0,
+minimal typed per-mount URL/image implementation and new native/Chrome/Firefox
+evidence complete; final independent Reviewer PASS0,0 issues/followups and23 stable
+input hashes. [YT-222](YT-222-STATIC-HTML-CONTRACT.md) is Done at
+documentation-only finite static-export/CLI contract scope, independent Reviewer
+PASS0,0 issues/followups and21 stable input hashes;
+YT-223/224 remain Todo;
+live site/releases unchanged.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
@@ -2386,8 +2394,8 @@ resource/event/keyed ownership remain the compatibility baseline.
 |---|---|---|
 | YT-219 | [Complete inventory and compatibility contract](YT-219-HTML-DOM-CONTRACT.md):90 selected target HTML elements, explicit exclusions, typed defaults and scoped parser/DOM parity; independent Reviewer PASS0 | Done |
 | YT-220 | [Unreleased89-tag implementation](YT-220-HTML-DOM-IMPLEMENTATION.md), scoped attributes/structures and pre parity; new native/Wasm/Chrome/Firefox checks PASS, independent Reviewer PASS0 | Done |
-| YT-221 | Review and implement explicit external-navigation/image policies without relaxing form/default boundaries | Todo |
-| YT-222 | Freeze finite public static HTML export, app-owned entry, CLI naming and output/config/CSP contract; docs only | Todo |
+| YT-221 | [Controlled link/image implementation](YT-221-DOM-URL-IMAGE-CONTRACT.md), contract PASS0, unchanged defaults/full resource preflight and new native/Wasm/Chrome/Firefox evidence; final independent Reviewer PASS0 | Done |
+| YT-222 | [Finite static export/CLI contract](YT-222-STATIC-HTML-CONTRACT.md): app-owned exporter, typed build --static request, bounded documents/assets/base/CSP, protected create-only publication and private receipts; docs only, independent Reviewer PASS0 | Done |
 | YT-223 | Implement minimal static build/CLI and standalone no-backend consumer, optional island separately selected | Todo |
 | YT-224 | Pilot Yetlet-built docs from the same eight sources with static content and optional Wasm; no live replacement | Todo |
 
@@ -2420,3 +2428,30 @@ browsers/profiles cleaned. Independent Reviewer PASS0,0 issues/followups and16
 hashes matched with registered role/model/effective high verified; YT-220 Done.
 YT-221–224 Todo, new work uncommitted/unpushed and existing distribution/live
 site untouched. This is not89-element exhaustive browser or performance proof.
+
+### YT-221 implementation checkpoint — 2026-10-31
+
+The owner authorizes strict/builtin commit4b88f3f of all16 accepted YT-220 paths,
+no Push; one unchanged hostile-URL test PATH_UNC warning is nonblocking.
+[YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md) is Done after contract PASS0 and
+minimal implementation. Typed policies retain strict defaults, separate named
+HTTPS navigation/image origins from form actions, and require complete browser
+URL preflight/frozen destinations before resource construction. Explicit Todo
+consumer and new native/Wasm/Chrome/Firefox policy/resource evidence PASS; first
+contract P2 and Firefox navigation-wait harness failure retained. Final independent
+Reviewer PASS0,0 issues/followups,23 stable inputs and verified model/effective
+high; owned cleanup complete. No old verification replay or new Git/publication step.
+YT-222–224 remain Todo. Current checkpoint supersedes earlier next-item wording.
+
+### YT-222 contract checkpoint — 2026-10-31
+
+The owner continues with [YT-222](YT-222-STATIC-HTML-CONTRACT.md), documentation
+only. Existing YT-221 product/contract/evidence remain accepted and uncommitted;
+shared status documents advance without replaying runtime validation. Select a
+finite native exporter protocol, typed build --static request, app-owned public
+Views/assets, bounded private document writer, root/project paths and create-only
+output. Optional prepared islands reuse the current startup/build boundary;
+HTML-only applications require no server/browser/Settings loader or Node.
+Independent Reviewer PASS0,0 issues/followups,21 matching inputs and verified
+model/effective high; YT-222 Done at contract scope and YT-223/224 Todo. No new runtime,
+Git delivery, hosted job or public-site/package change.

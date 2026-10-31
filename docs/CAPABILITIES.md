@@ -19,7 +19,7 @@ publication of its linked execution records.
 |---|---|---|---|
 | `yetlet::view` | Renderer-neutral Views/components and bounded binding vocabulary; M9 classification applies | Yes | [Core guide](../crates/yetlet/guides/core.md) |
 | `yetlet::html` | Escaped HTML serialization and allowlisted elements/attributes; M9 classification applies | Yes | [HTML guide](../crates/yetlet/guides/html.md) |
-| `yetlet_browser::dom` | Native validation/Wasm-only owned mount. Published SDK baseline:38 tags; unreleased YT-220 source:89, with selected scoped structures/attributes. Resources/external navigation stay restricted; not full HTML conformance | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md), [unreleased record](YT-220-HTML-DOM-IMPLEMENTATION.md) |
+| `yetlet_browser::dom` | Native validation/Wasm-only owned mount. Published SDK baseline:38 tags; unreleased source:89 default,90 with explicit ImagePolicy. YT-221 adds independent per-mount HTTPS link/image policies; strict defaults and same-origin forms remain. Not full HTML conformance | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md), [vocabulary](YT-220-HTML-DOM-IMPLEMENTATION.md), [URL/image contract](YT-221-DOM-URL-IMAGE-CONTRACT.md) |
 | `yetlet_browser::dom_keyed` | Optional keyed children and disposable listener/entry ownership | Yes | [Keyed DOM guide](../crates/yetlet-browser/guides/dom-keyed.md) |
 | `yetlet::reactive` | Optional synchronous local reducer/commit graph with explicit lifetime | Yes | [Reactive guide](../crates/yetlet/guides/reactive.md) |
 | `yetlet::actions` | Typed commands and explicit local/HTTP execution boundaries | Yes | [Actions guide](../crates/yetlet/guides/actions.md) |

@@ -284,3 +284,31 @@ PASS0, zero issues/followups and16 stable inputs with registered model/effective
 high effort verified. YT-221–224 remain Todo. No package/dependency/version, external navigation/image
 policy or live-site replacement is included; earlier checkpoints retain their
 own states and evidence.
+
+## Subsequent YT-221 implementation checkpoint — 2026-10-31
+
+The owner selects strict/builtin commit4b88f3f of YT-220's16 paths without Push,
+then contract-first [controlled links/images](YT-221-DOM-URL-IMAGE-CONTRACT.md).
+Contract review PASS0 precedes minimal per-mount typed options and the separate
+Todo sample. Defaults stay strict; named HTTPS link/image origins are independent,
+forms remain same-origin, and browser preflight freezes all destinations before
+resource assignment. Focused new native/Wasm/Chrome/Firefox evidence passes;
+first contract P2 and Firefox popup-navigation assertion failure are retained.
+Final independent Reviewer PASS0,0 issues/followups and23 stable input hashes
+complete YT-221 at selected unreleased-source scope; registered model/effective
+high verified. YT-222–224 remain Todo. No new package/dependency/version, Git
+delivery or live-site change; original checkpoints and failures remain historical.
+
+## Subsequent YT-222 contract checkpoint — 2026-10-31
+
+The owner continues with [YT-222's finite contract](YT-222-STATIC-HTML-CONTRACT.md),
+preserving accepted YT-221 code/contract/evidence without Commit/Push. This selects
+the future build --static spelling, typed CLI request, native app-owned export
+protocol1, public fragment/asset inventory, small private document writer and
+separate prepared islands. HTML-only apps need no server/browser/Settings/Node;
+output is protected and create-only, with prefix/index/404/CSP and private receipt
+boundaries. Existing settings validation remains and no new settings wire is
+required. Documentation-only inspection and checks PASS; independent Reviewer
+PASS0,0 issues/followups,21 matching inputs and verified model/effective high.
+YT-222 Done at contract scope, YT-223/224 Todo; no implementation, old verification replay or live
+site/release change. Earlier checkpoints retain their own dates/status/evidence.

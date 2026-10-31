@@ -49,6 +49,14 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [Unreleased ordinary HTML DOM implementation — YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md):
   89-tag checkout, scoped attributes/structures, pre consistency, shared consumer
   and focused native/Chrome/Firefox evidence; published SDK baseline stays separate.
+- [Unreleased controlled DOM navigation/images — YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md):
+  typed opt-in options, strict defaults, finite URL/image attributes and browser
+  preflight, explicit sample and new Chrome/Firefox evidence; independent Reviewer
+  PASS0, Done at unreleased-source scope.
+- [Static HTML export and CLI contract — YT-222](YT-222-STATIC-HTML-CONTRACT.md):
+  proposed build --static, finite public pages/assets, project prefixes, local
+  CSP/islands, create-only output and private receipts; independent Reviewer
+  PASS0, Done at documentation-only contract scope.
 
 - [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
   dedicated workflow, master-only Environment, initial deployment/readback,
