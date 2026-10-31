@@ -119,3 +119,19 @@ checks pass at local Chromium/emulated-mobile scope after final independent revi
 The later YT-218 publication adds actual public routing/assets/reader evidence
 at its recorded source and Chromium/emulated-mobile scope. Physical mobile,
 additional browsers and hosted generated rustdoc are not newly qualified.
+
+## Proposed Yetlet-built consumer — M25
+
+[YT-219–YT-224](YT-219-224-DOM-STATIC-SITE-PLAN.md) registers a separate path:
+review broad HTML/DOM coverage, implement selected vocabulary and controlled
+URL/images, define/implement finite static HTML build/CLI, then pilot this guide
+as an application-owned Yetlet consumer. All six items are Todo; registration
+is planning only. The proposed static mode is not an existing CLI command.
+
+Retain the current mdBook site/workflow and these eight source/excerpt/disclosure
+boundaries during the pilot. The existing browser CLI already produces static-
+hosted Wasm assets; the new static HTML mode supplies build-time readable content
+with separately selected browser interactions. A pilot does not authorize
+changing Pages, replacing the public site, publishing a package or changing
+release identities. Live replacement requires later owner acceptance after
+independent review and source-bound consumer evidence.

@@ -583,11 +583,12 @@ The owner requested Rust-native repository tooling before a public CLI. The inde
 
 ## Ready queue
 
-**Current reader delivery (2026-10-31):** [YT-218](GITHUB-PAGES-PUBLICATION.md)
-is Done after initial publication/readback and final independent Reviewer PASS0.
-No additional feature or test item is selected. Subsequent relevant
-protected-master guide updates use the installed automatic Pages workflow;
-Wiki/domain/rustdoc hosting are optional future decisions.
+**Current next item (2026-10-31):** YT-219, the documentation-only HTML/DOM
+coverage and compatibility contract in [M25](YT-219-224-DOM-STATIC-SITE-PLAN.md).
+YT-219–YT-224 are all Todo: broad ordinary-HTML support, controlled URL/images,
+static HTML build contract/CLI and an isolated Yetlet documentation pilot.
+This batch registers/reviews the plan only. YT-218 is Done and its public guide
+continues unchanged; implementation and Git/publication need later authority.
 
 **M12 next gate (2026-10-15):** YT-085 is Done after independent read-only Reviewer PASS with zero issues/followups (`target/m12/yt085/reviewer-board-retention-20261015/result.json`). The approved 30 Rust smoke/integration mappings retain 25 positive runtime results, one nonzero unavailable Chrome GPU path, and focused later Server/Browser/cleanup/Board receipt repair tests. Windows persistent-Service and Redis external integration are unverified; live Python callers/workflow transition is not yet completed. YT-086 is Done at bounded Rust migration scope after final independent Reviewer `wc_job_6UfDDdHnNCBXkMhA` PASS with zero issues/followups ([evidence](YT-086-VERIFICATION.md)). Full runtime invocation graph, GPU/Docker/Redis/hosted rebuild and full suite remain unverified. YT-087 is Done at the bounded unpublished Linux CLI preview scope after separate 087a/087b/087c independent Reviewer PASS decisions; no public release. YT-020 remains Blocked.
 **Framework/deployment scope clarification (2026-10-11):** Peon committed reviewed b3 as `4da0f6c`, preserving all inputs; no push. The [reconciled responsibility boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md) keeps provider semantics, supported configuration/error behavior and honest persistence limits in Yetlet scope. Production TLS/ACL policy, backup protection, business RPO/RTO and operational ownership belong to applications/operators and do not block framework completion. AOF/crash/restore rehearsals remain Not verified optional proposals; no implementation or new execution started. YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope; its final documentation review gate is recorded in M10g. YT-020 remains Blocked.
@@ -956,6 +957,23 @@ separate implementation authority.
 | YT-217 | P2 | M | M10 | Improve beginner API docs and preview a selected public guide site | YT-186, YT-191, YT-216 | [Progress/evidence](YT-217-DOCS-PREVIEW.md): accepted four doc-comment-only Rust files, four doctests, selected native/WASM rustdoc and eight-chapter explicit local build/static links retained without reruns. Owner authorizes correcting the stopped sidebar check: eight exact chapter URLs versus four extra heading fragments; desktop navigation, SessionConfig search,390x844 touch/menu journey and three screenshots PASS with no captured console/page/HTTP errors. Original two assertion failures and first reader-status P2 remain preserved. Evidence archived outside repo; owned server/browser cleanup complete. Final independent Reviewer PASS0 accepts all19 source hashes/eight evidence files and allows Done; registered role/model and effective high effort verified; no runtime/API/version, new Commit/Push or Pages/release activation | Done |
 
 | YT-218 | P2 | M | M10 | Publish the selected reader guide with GitHub Pages | YT-217 | [Plan and publication evidence](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31): implementation Reviewer PASS0,9 tests/8 actual mode cases/actionlint/clean public build454 links PASS; strict/builtin PR43 squash Merge64d1074 with matching qualified tree, PR/master required CI and four CodeQL analyses PASS. Pages workflow/HTTPS, exact-master Environment and deploy switch active; first run41198529190/1 SUCCESS.42-file artifact scope/digest,8 source hashes/edition, anonymous HTML/search-index byte readback and desktop/search/touch/screenshots PASS. Prior proof reused; settings/harness404 records retained, no hosted retry or release changes. Final independent Reviewer PASS0 accepts five doc hashes and actual hosted evidence;0 issues/followups, registered role/model/effective high verified; Done at bounded public-guide scope | Done |
+
+## M25 — Broader HTML DOM support and static-site delivery
+
+[Selected planning scope](YT-219-224-DOM-STATIC-SITE-PLAN.md): the owner asks for
+several reviewed items before implementation, with comprehensive ordinary HTML
+coverage and explicit reasons for specialized exclusions. Planning acceptance
+never marks the six future items Done. Existing renderer/URL defaults, opt-in
+boundaries and YT-218's live site retain their current scope.
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-219 | P1 | M | M25 | HTML/DOM coverage and compatibility contract | YT-110 | [Contract scope](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-219--coverage-attributes-and-compatibility-contract): classify every conforming element in a dated standards snapshot, scoped attributes and actual HTML/DOM consumers; select broad ordinary-content batches, precise structure/URL/default/API compatibility boundaries and focused checks. Documentation only; independent Reviewer PASS before Done | Todo |
+| YT-220 | P1 | L | M25 | Broad semantic, table and native-control DOM vocabulary | YT-219 | [Implementation scope](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-220--ordinary-html-tables-and-native-controls): reviewed ordinary semantic/text/list/table/form/disclosure vocabulary, scoped attributes and parser/DOM structure consistency; canvas host only. Preserve View/event/keyed ownership, escaping and strict resource policy. Focused changed native/Wasm/browser/consumer evidence and independent Reviewer PASS | Todo |
+| YT-221 | P1 | M | M25 | Controlled navigation and image-resource DOM support | YT-219, YT-220 | [URL/image scope](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-221--navigation-and-image-url-policies): typed explicit opt-in external-link/image policy, unchanged existing strict defaults, browser-parsed/frozen destinations, separate form/resource rules and preflight before resource effects; responsive images require candidate grammar or explicit deferral. Focused isolated-origin/denied-request/consumer evidence and independent Reviewer PASS | Todo |
+| YT-222 | P2 | M | M25 | Static HTML export and CLI contract | YT-219 | [Contract scope](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-222--static-html-build-contract): finite public View/page and asset export, native app-owned build entry, safe output/base-prefix/CSP/config/error/receipt boundaries; propose build --static without claiming it exists. No handler crawl or mandatory browser/server/Settings provider. Docs only; independent Reviewer PASS | Todo |
+| YT-223 | P2 | L | M25 | Minimal opt-in static HTML build and CLI integration | YT-222 | [Implementation scope](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-223--minimal-static-build-and-cli-delivery): reviewed finite export protocol/build mode, small standalone multi-page consumer, HTML-only no-JS output, separately selected island using existing build tooling; focused CLI/output-root/project-prefix/CSP/MIME/GNU-MSVC affected evidence and cleanup, no deploy. Independent Reviewer PASS before Done | Todo |
+| YT-224 | P2 | M | M25 | Yetlet-built documentation-site pilot | YT-218, YT-220, YT-221, YT-223 | [Pilot scope](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-224--application-owned-documentation-pilot): same eight canonical Markdown inputs/excerpts, build-time maintained parser with no raw-HTML bypass, static readable content and optional owned Wasm interactions; source/edition/exclusions/navigation/search/touch/keyboard and bounded load-size comparison. Reuse prior evidence; independent review before a separately accepted live replacement | Todo |
 
 ## YT-096 hosted build, verifier and retention — 2026-10-28
 

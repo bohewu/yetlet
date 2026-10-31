@@ -23,6 +23,10 @@ desktop navigation/search plus emulated-mobile touch acceptance. Final independe
 evidence Reviewer PASS0 accepts completion; YT-218 is Done. The Pages Environment allows only master,
 relevant master updates deploy automatically, release CI/Secrets are unchanged,
 and original404 settings/harness observations remain recorded without hosted retry.
+[M25](YT-219-224-DOM-STATIC-SITE-PLAN.md) now registers six Todo items, YT-219–224,
+for broader ordinary-HTML DOM coverage, controlled navigation/images, static HTML
+export/CLI and an isolated Yetlet documentation pilot. The current batch is
+planning only, independently reviewed PASS0; YT-219 contract work is next.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
@@ -2363,3 +2367,33 @@ backup or indefinite-availability guarantee. D6 remains Pending, YT-096 In progr
 and YT-020 Blocked; signing identity/bootstrap/roots, exact signing payloads,
 registry/trust and final maintainer release approval remain open. No signing,
 publication, Commit or Push occurs in this document update.
+
+## M25 — Broader HTML DOM support and static-site delivery
+
+[YT-219–YT-224 plan](YT-219-224-DOM-STATIC-SITE-PLAN.md) prioritizes the renderer
+before a Yetlet-built guide. Aim for comprehensive ordinary modern body HTML,
+with a dated standard-element/attribute matrix and explicit specialized exclusions.
+Do not equate accepting a tag with implementing every attribute, live browser API,
+namespace or security policy. Existing strict defaults, shared View and explicit
+resource/event/keyed ownership remain the compatibility baseline.
+
+| Item | Gate | State |
+|---|---|---|
+| YT-219 | Classify standard elements/attributes and review coverage, structure and compatibility; docs only | Todo |
+| YT-220 | Implement reviewed semantic/table/native-control vocabulary with changed HTML/DOM/browser evidence | Todo |
+| YT-221 | Review and implement explicit external-navigation/image policies without relaxing form/default boundaries | Todo |
+| YT-222 | Freeze finite public static HTML export, app-owned entry, CLI naming and output/config/CSP contract; docs only | Todo |
+| YT-223 | Implement minimal static build/CLI and standalone no-backend consumer, optional island separately selected | Todo |
+| YT-224 | Pilot Yetlet-built docs from the same eight sources with static content and optional Wasm; no live replacement | Todo |
+
+Dependency paths are YT-219→YT-220→YT-221 and YT-219→YT-222→YT-223;
+YT-224 joins YT-220/221/223 and Done YT-218. Static HTML serialization does not
+technically depend on DOM completion. Each implementation follows its reviewed
+contract and obtains independent Reviewer PASS before Done. Reuse accepted
+unchanged evidence and retain failures; only changed behavior needs new checks.
+
+Planning review PASS0 has zero issues/required followups, with registered reviewer
+model/effective high effort verified. All six items remain Todo; no new runtime/API,
+package/version/dependency, sample, CLI command, hosted job, Commit/Push or
+Pages/release change is performed by this registration. YT-218's accepted live
+guide and workflow remain in place. Next unblockable item: YT-219 contract only.

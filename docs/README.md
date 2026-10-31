@@ -38,6 +38,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Maintainer entry points
 
+- [DOM coverage and static-site plan — YT-219–224](YT-219-224-DOM-STATIC-SITE-PLAN.md):
+  broader standard HTML, explicit URL/image policy, proposed static build and
+  isolated Yetlet documentation pilot; six Todo items, no live replacement.
+
 - [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
   dedicated workflow, master-only Environment, initial deployment/readback,
   retained observations and automatic relevant master document updates.
