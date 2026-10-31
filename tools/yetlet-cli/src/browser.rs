@@ -25,7 +25,7 @@ pub(crate) fn files(name: &str, tailwind: bool) -> Result<Vec<(&'static str, Str
     let version = crate::framework::package_version();
     Ok(vec![
         ("Cargo.toml", format!("[package]\nname = \"{name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\nrust-version = \"1.99\"\npublish = false\n\n[workspace]\nresolver = \"3\"\n\n[lib]\nname = \"tasks\"\ncrate-type = [\"cdylib\", \"rlib\"]\n\n[target.'cfg(target_arch = \"wasm32\")'.dependencies]\nyetlet = {{ version = \"={version}\", default-features = false, features = [\"reactive\"] }}\nyetlet-browser = {{ version = \"={version}\", default-features = false, features = [\"dom\", \"dom-keyed\"] }}\nwasm-bindgen = \"=0.2.129\"\nweb-sys = {{ version = \"0.3\", features = [\"Document\", \"Element\", \"Event\", \"EventTarget\", \"HtmlElement\", \"HtmlInputElement\", \"Node\", \"Window\"] }}\n")),
-        ("README.md", include_str!("../templates/browser/README.md").replace("@NAME@", name)),
+        ("README.md", include_str!("../templates/browser/README.md").replace("@NAME@", name).replace("@SDK_VERSION@", &version)),
         (".gitignore", "/target/\n/frontend/node_modules/\n/frontend/dist/\n/frontend/generated/\n/frontend/.env*\n!/frontend/.env.example\n".into()),
         ("base.toml", "[cli]\ntarget = \"browser\"\n\n[cli.rust]\nwatch = false\n\n[cli.vite]\nenabled = true\nroot = \"frontend/\"\nauto_start = true\nauto_build = true\n\n[cli.generate.k8s]\nreplicas = 1\n".into()),
         ("development.toml", "# Public CLI overrides inherit base.toml.\n".into()),
@@ -35,8 +35,8 @@ pub(crate) fn files(name: &str, tailwind: bool) -> Result<Vec<(&'static str, Str
         ("src/model.rs", include_str!("../templates/browser/model.rs").into()),
         ("frontend/index.html", include_str!("../templates/browser/index.html").into()),
         ("frontend/app.ts", include_str!("../templates/browser/app.ts").into()),
-        ("frontend/wasm-startup.mjs", include_str!("../../../assets/wasm-startup.mjs").into()),
-        ("frontend/wasm-startup.css", include_str!("../../../assets/wasm-startup.css").into()),
+        ("frontend/wasm-startup.mjs", include_str!("../templates/browser/wasm-startup.mjs").into()),
+        ("frontend/wasm-startup.css", include_str!("../templates/browser/wasm-startup.css").into()),
         ("frontend/app.css", format!("{}{}", if tailwind { "@import \"tailwindcss\";\n@source \"../src/lib.rs\";\n" } else { "" }, include_str!("../templates/browser/app.css"))),
         ("frontend/serve.mjs", include_str!("../templates/browser/serve.mjs").into()),
         ("frontend/build-wasm.mjs", include_str!("../templates/browser/build-wasm.mjs").into()),
@@ -64,11 +64,11 @@ mod startup_tests {
         };
         assert_eq!(
             get("frontend/wasm-startup.mjs"),
-            include_str!("../../../assets/wasm-startup.mjs")
+            include_str!("../templates/browser/wasm-startup.mjs")
         );
         assert_eq!(
             get("frontend/wasm-startup.css"),
-            include_str!("../../../assets/wasm-startup.css")
+            include_str!("../templates/browser/wasm-startup.css")
         );
         let html = get("frontend/index.html");
         assert!(

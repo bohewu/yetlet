@@ -1,17 +1,17 @@
 # Developer Documentation
 
 Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
-choose a [runnable sample](SAMPLES.md). This checkout uses the unreleased
-two-package alpha.5 SDK. The existing
-[alpha.4 GitHub pre-release](ALPHA4-HOSTED-RECORD.md) retains its original
-sixteen-package scope and one-package registry outcome. Current task status belongs
-to [Backlog](BACKLOG.md), milestone gates to [Roadmap](ROADMAP.md), and current
-distribution versus historical qualification to [Release readiness](RELEASE-READINESS.md).
+choose a [runnable sample](SAMPLES.md). The two-package SDK `0.9.0-alpha.5`
+is published on crates.io with a matching
+[Experimental GitHub pre-release](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup).
+Earlier release layouts and registry outcomes remain historical. Current task
+status belongs to [Backlog](BACKLOG.md), milestone gates to [Roadmap](ROADMAP.md),
+and distribution versus qualification to [Release readiness](RELEASE-READINESS.md).
 
 ## Reader entry points
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
-- [Build your first Yetlet app](FIRST-APP.md): local CLI → protected standalone project → local dependencies → app lock/cache → first build/run.
+- [Build your first Yetlet app](FIRST-APP.md): source-installed CLI → protected standalone project → published SDK → app lock/cache → first build/run.
 - [Write Views and reusable components](VIEW-COMPONENTS.md): typed data → functions → lists/conditions → existing SSR handler.
 - [Opt-in integration quick reference](OPT-IN-QUICK-REFERENCE.md): package/feature → startup API/options → consumer settings/defaults.
 - [Settings, options and logging](SETTINGS-OPTIONS-LOGGING.md): startup loading → validation → typed options → native state and application-owned diagnostics, using existing examples.

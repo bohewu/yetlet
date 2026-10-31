@@ -1,11 +1,40 @@
 # Alpha.5 hosted release record
 
-Date: 2026-10-31 (Asia/Taipei). Status: unsigned build and original custody readback PASS;
-short-lived handoff compatibility correction is under review. Frozen payloads,
-signatures and publication remain Pending.
-The owner authorizes advancing to the final publication gate under the adopted
-[single-publication policy](RELEASE-PUBLICATION.md); publishing GitHub/crates.io
-and approving the owner gate remain excluded.
+Date: 2026-10-31 (Asia/Taipei). Status: GitHub pre-release and both crates.io
+packages published successfully. Earlier Pending statements below belong to
+their historical execution checkpoints; failures are preserved.
+
+## Completed publication and subsequent cleanup
+
+The owner-approved [publisher41104391525/1](https://github.com/bohewu/yetlet/actions/runs/41104391525)
+succeeds at P `bb414d173ad960356347bb9aaa1ddd0a27f0ef03`. It retains product C
+`0a9fa8a594e3dd2ce753422dd848df10cd8c98df`, S/V
+`864f2abc7ca076db13f18ddd5fbcc1aa0145fe0b` and the existing unsigned tag.
+[GitHub alpha.5](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.5) is a
+public Experimental pre-release, not Latest, with the six checked public assets.
+Both registry versions are available, not yanked, and their downloaded archives
+match the frozen public checksums:
+
+| Package | Version | SHA-256 |
+|---|---|---|
+| yetlet | 0.9.0-alpha.5 | 662d67180cec2fd6e50c3757bdc910d057cd37428785ab695b0d275a9e4e5091 |
+| yetlet-browser | 0.9.0-alpha.5 | 2fbeec5d4324367cf682d722fc25a35f851fc5293fc6e353aedc35ca6771c9a6 |
+
+An isolated registry-only consumer passes without Cargo path overrides or
+forwarded credentials. Its lock SHA-256 is
+`4116b7b8342c048b52ea1f71d5a5c612b32ccb8575e6ea27f1590d5d5c939c1b`.
+These are retained publication receipts, not newly replayed qualification.
+Local receipts: `target/yt096-alpha5-execution-20261031/PUBLICATION-COMPLETE.json`
+and its `publication-result/` directory. Durable copies are in the repo-external
+release-evidence store under the source/build-bound alpha.5 run.
+
+After this publication, the owner separately deletes the old `yetlet-actions`
+crates.io package; it must no longer be described as an available dependency.
+The old signed artifacts/tags and first-publication result remain historical
+evidence. PR29 is closed unmerged and its legacy continuation is retired.
+Later release-note status corrections do not alter those signed attachments or
+move any tag. CLI installation followup is [YT-214](YT-214-CLI-INSTALLATION.md),
+not a third SDK publication or a new version of either released package.
 
 ## Source and selected scope
 

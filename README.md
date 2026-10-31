@@ -22,11 +22,13 @@ explicit browser enhancements in one language.
 
 ## Start with native SSR
 
-**Experimental source preview.** The current checkout consolidates the SDK into
-`yetlet` and `yetlet-browser` at unreleased `0.9.0-alpha.5`. These two packages
-are not yet available from crates.io. The existing
-[alpha.4 GitHub release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.4)
-retains its earlier sixteen-package layout; use its matching source and docs.
+**Experimental alpha.** The two-package SDK is available on crates.io:
+[`yetlet`](https://crates.io/crates/yetlet/0.9.0-alpha.5) and
+[`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.5), version
+`0.9.0-alpha.5`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.5)
+contains the archives and verification material. To create a standalone app,
+follow [Build your first Yetlet app](docs/FIRST-APP.md); the optional CLI is a
+separately source-installed preview.
 
 Use the pinned Rust/Cargo 1.99.0 toolchain. Native SSR needs no Node.js or WASM
 toolchain. APIs may change; see [compatibility](docs/COMPATIBILITY.md).

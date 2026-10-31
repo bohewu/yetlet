@@ -1,9 +1,9 @@
 # Build your first Yetlet app
 
-Create your own standalone native SSR application using the existing CLI and
-local Yetlet checkout. This Linux/POSIX walkthrough connects the current setup
-steps; it adds no new scaffold or sample. **Experimental and unpublished:**
-use compatible local source, not an assumed registry release.
+Create a standalone native SSR app with the source-installed CLI and published
+`yetlet` SDK `0.9.0-alpha.5`. This Linux/POSIX walkthrough uses the existing
+scaffold; the app needs no local SDK source or Cargo path overrides. APIs remain
+Experimental. The CLI is a separate unpublished source preview.
 
 ## Prerequisites
 
@@ -31,24 +31,50 @@ global CLI installation or existing-project overwrite is assumed.
 
 ## Minimal integration
 
-### 1. Build the local CLI
+### 1. Install the CLI
 
-From the repository root, keep the checkout and CLI paths for later stages.
-The toolchain selection is local to this terminal and inherited by child Cargo
-commands, including the standalone app's commands:
+The selected end-user interface, after the first CLI publication, is:
 
 ```sh
-export RUSTUP_TOOLCHAIN=1.99.0
-yetlet_repo="$(pwd -P)"
-yetlet_cli="$yetlet_repo/tools/yetlet-cli/target/debug/yetlet"
-cargo build --locked --manifest-path "$yetlet_repo/tools/yetlet-cli/Cargo.toml"
-"$yetlet_cli" --version
+cargo install yetlet-cli --locked
+yetlet --version
 ```
 
-The CLI has its own workspace/lock. `--locked` allows downloading its locked
-dependencies; it is not offline mode. Use the explicit binary path throughout
-instead of assuming that `yetlet` is installed on PATH. A version or
-`doctor` result identifies a tool/environment, not application readiness.
+This downloads the CLI source archive from crates.io and compiles the `yetlet`
+executable; users do not need to clone this repository. The CLI is not uploaded
+yet: the command above is the planned distribution interface, not an availability
+claim. Until that separately authorized publication, maintainers can install the
+same package from a trusted source checkout (or an unpacked verified CLI archive).
+From the repository root:
+
+```sh
+(
+    export RUSTUP_TOOLCHAIN=1.99.0
+    cargo install --path tools/yetlet-cli --locked
+)
+```
+
+Cargo places `yetlet` under its install root's `bin` directory (normally
+`~/.cargo/bin`). Ensure it is on PATH, then check the installed command:
+
+```sh
+yetlet --version
+yetlet --help
+yetlet_rust_bin="$(dirname "$(rustup which --toolchain 1.99.0 cargo)")"
+env PATH="$yetlet_rust_bin:$PATH" yetlet doctor --json
+```
+
+For an isolated prefix, add `--root /absolute/owned/cli-prefix` to the install
+command and invoke `/absolute/owned/cli-prefix/bin/yetlet`. This is a native Cargo
+source installation; `cargo install yetlet-cli` is not available from crates.io
+yet. The CLI currently reports `0.1.0`, separately from SDK `0.9.0-alpha.5`.
+`--locked` allows downloading locked dependencies. A version or doctor result
+identifies a tool/environment, not application readiness. For a Rustup setup,
+`rustup which` selects the actual already-installed toolchain directory. The
+CLI checks executable and ancestor ownership/permissions; group/world-writable
+tool installations are refused. With another Rust installation, select its real
+protected Cargo/rustc directory instead. This does not install tools or relax
+CLI checks. Doctor does not synchronize/install Rustup toolchains.
 
 ### 2. Create the plain native app
 
@@ -60,7 +86,7 @@ parent and skip its creation.
 ```sh
 yetlet_parent="$HOME/yetlet-first-apps"
 mkdir -m 700 "$yetlet_parent"
-"$yetlet_cli" new firstapp --parent "$yetlet_parent"
+yetlet new firstapp --parent "$yetlet_parent"
 yetlet_app="$yetlet_parent/firstapp"
 ```
 
@@ -73,44 +99,29 @@ The public TOMLs configure CLI behavior. They do not mean the app has selected
 the optional runtime Settings loader. This path needs no `--settings`,
 `--service`, `--vite` or `--tailwind` option.
 
-### 3. Select compatible local Yetlet dependencies
+### 3. Prepare the app lock/cache, then build and run
 
-Open `$yetlet_app/Cargo.toml` in your editor. Under its existing `[dependencies]`,
-replace the generated Yetlet dependency line with the following shape.
-Replace `/absolute/yetlet` with the real physical checkout path stored in
-`yetlet_repo`; TOML does not expand shell variables or `~`.
-
-```toml
-yetlet = { version = "=0.9.0-alpha.5", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["server-axum"] }
-
-```
-
-Keep the existing package metadata, standalone workspace, Axum/Tokio entries
-and exact version requirements. Use the matching SDK from the same compatible checkout. The generated versions are unpublished; leaving version-only entries
-does not make them resolvable from a registry. A moved or modified local checkout
-also changes the source used by later Cargo commands.
-
-The generated [selected README source](../tools/yetlet-cli/templates/SELECTED-README.md)
-describes the same Cargo-owned override. Settings/Vite creation additionally
-selects `config` on that same dependency; this plain app does not need it.
-
-### 4. Prepare the app lock/cache, then build and run
-
-Remain in the repository-root terminal; each command selects the app explicitly:
+The generated manifest already selects `yetlet = "=0.9.0-alpha.5"` from crates.io
+with `server-axum`; keep that dependency and its selected features. No manifest
+editing, SDK checkout, `[patch]` or path override is required. Work in the new
+app directory, outside the Yetlet checkout:
 
 ```sh
-cargo generate-lockfile --manifest-path "$yetlet_app/Cargo.toml"
-cargo fetch --locked --manifest-path "$yetlet_app/Cargo.toml"
-"$yetlet_cli" build --manifest-path "$yetlet_app/Cargo.toml"
-"$yetlet_cli" run --manifest-path "$yetlet_app/Cargo.toml"
+cd "$yetlet_app"
+(
+    export PATH="$yetlet_rust_bin:$PATH"
+    cargo generate-lockfile
+    cargo fetch --locked
+    yetlet build
+    yetlet run
+)
 ```
 
-The first two commands are explicit dependency preparation: lock generation
-resolves this app's graph, and fetch populates its locked dependency cache.
-Keep this app's Cargo.lock; do not copy Yetlet's, the CLI's or xtask's lock.
-The CLI's native build/run then use frozen Cargo: they cannot repair a stale
-lock or fetch a missing dependency. The app's source is still ordinary Rust;
-frozen execution is not a sandbox for build scripts or application code.
+The first two commands explicitly prepare this app's dependency graph and cache.
+Keep its own Cargo.lock; do not copy Yetlet's, the CLI's or xtask's lock. CLI
+build/run use frozen Cargo: they cannot repair a stale lock or download a missing
+dependency. Frozen execution is not a sandbox for build scripts or application
+code. Node/npm is unnecessary for this plain native app.
 
 ## Expected result
 
@@ -138,7 +149,11 @@ The plain native template reads `YETLET_PORT`, defaulting to 3000, and always
 binds IPv4 loopback. For another unused port, use the same explicit app manifest:
 
 ```sh
-YETLET_PORT=3001 "$yetlet_cli" run --manifest-path "$yetlet_app/Cargo.toml"
+(
+    export PATH="$yetlet_rust_bin:$PATH"
+    export YETLET_PORT=3001
+    yetlet run --manifest-path "$yetlet_app/Cargo.toml"
+)
 ```
 
 CLI profile selection is separate: `APP_ENVIRONMENT` accepts `Development`,
@@ -150,7 +165,7 @@ own declared variables and validation; follow their guide when you select them.
 |---|---|
 | CLI build cannot find OpenSSL headers/libraries | Prepare the native CLI prerequisites or your already-selected OpenSSL prefix using the CLI guide; this is separate from app dependencies |
 | `new` refuses the destination | Use an unused app name and an explicitly trusted parent; it does not merge or overwrite projects |
-| Cargo cannot find the unpublished Yetlet version | Complete the SDK `path` declaration with actual compatible checkout paths, retaining their exact version requirements |
+| Cargo cannot resolve the SDK or download a dependency | Confirm the exact published version and registry/network access; explicitly prepare the app lock/cache before frozen CLI commands |
 | CLI refuses a missing/stale lock or missing offline dependency | After an intentional dependency edit, explicitly regenerate this app's lock and fetch its locked dependencies before frozen execution; do not copy another workspace's lock |
 | Unsafe application/tool path or permissions are rejected | Use owned local protected inputs and the documented CLI filesystem setup; do not weaken checks or change unrelated system directories |
 | Port 3000 is occupied | Stop the owned conflicting listener or select an unused `YETLET_PORT`; keep the loopback boundary |
@@ -180,5 +195,6 @@ to pass data and compose the existing home handler. Use the
 - [Existing sample catalog](SAMPLES.md), [Todo browser setup](../README.md#choose-your-next-step)
   and [Admin reference](../examples/admin-dashboard/README.md) for later paths.
 
-This is a source-backed walkthrough of existing behavior. Its commands are
-instructions, not a new execution or platform/production qualification receipt.
+The isolated GNU source-package install and registry-only first-app path are
+recorded in [YT-214](YT-214-CLI-INSTALLATION.md). That evidence does not extend
+Windows, browser/GPU or production qualification.

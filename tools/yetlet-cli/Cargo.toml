@@ -3,9 +3,12 @@ name = "yetlet-cli"
 version = "0.1.0"
 edition = "2024"
 rust-version = "1.99"
-description = "Unpublished local Yetlet developer CLI preview"
+description = "Source-installable Yetlet developer CLI preview"
 license = "MIT OR Apache-2.0"
-publish = false
+publish = true
+repository = "https://github.com/bohewu/yetlet"
+readme = "README.md"
+include = ["src/**", "templates/**", "resources/**", "tests/**", "scripts/**", "README.md", "LICENSE-*", "Cargo.toml", "Cargo.lock"]
 
 [workspace]
 resolver = "3"
@@ -16,7 +19,7 @@ path = "src/main.rs"
 
 [dependencies]
 serde = { version = "=1.0.229", features = ["derive"] }
-yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.5", default-features = false, features = ["config", "signing"] }
+yetlet = { version = "=0.9.0-alpha.5", default-features = false, features = ["config", "signing"] }
 toml_edit = "=0.22.20"
 serde_json = "=1.0.151"
 toml = "=0.8.19"

@@ -1,4 +1,4 @@
-//! Unpublished local CLI: literal arguments, diagnostics, SSR scaffolding and frozen Cargo.
+//! Source-installable CLI preview: literal arguments, diagnostics, SSR scaffolding and frozen Cargo.
 
 pub mod app;
 mod browser;

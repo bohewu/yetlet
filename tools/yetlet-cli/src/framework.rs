@@ -87,7 +87,7 @@ pub(crate) fn validate_config(root: &Path) -> Result<(), &'static str> {
 }
 
 pub(crate) fn workspace_baseline() -> toml::Value {
-    include_str!("../../../Cargo.toml")
+    include_str!("../resources/workspace.toml")
         .parse::<toml::Value>()
         .expect("compiled framework workspace manifest")
 }

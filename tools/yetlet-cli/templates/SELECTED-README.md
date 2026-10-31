@@ -1,20 +1,15 @@
 # @NAME@
 
 Experimental Yetlet SSR application scaffold. CLI @VERSION@ emits the selected
-SDK version @SDK_VERSION@. The current two-package layout is unreleased.
-For local evaluation, set an explicit compatible Cargo path before preparing
-this application's own lockfile; the CLI does not locate a framework checkout.
-Preserve the generated feature list (including `config` for Settings/Vite):
-
-```toml
-yetlet = { version = "=@SDK_VERSION@", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["server-axum"] }
-```
+published SDK version @SDK_VERSION@. The generated manifest selects the registry
+package and its required features (including `config` for Settings/Vite).
+No framework checkout or Cargo path override is needed for normal build/run.
 
 Provision dependencies separately before frozen commands:
 
 ```sh
-cargo generate-lockfile --offline
-cargo check --frozen
+cargo generate-lockfile
+cargo fetch --locked
 yetlet build
 yetlet run
 ```

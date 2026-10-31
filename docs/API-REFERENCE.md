@@ -1,9 +1,9 @@
 # Current API reference
 
-Date: 2026-10-30. This map describes the unreleased two-package SDK
+Date: 2026-10-31. This map describes the published Experimental two-package SDK
 (`0.9.0-alpha.5`) in this checkout. `yetlet` contains the shared View and opt-in
 native capabilities; `yetlet-browser` contains browser integrations and depends
-one-way on the same View. Neither package is currently published to crates.io.
+one-way on the same View. Both packages are available from crates.io at this version.
 Earlier release tags retain their original layouts and evidence.
 
 Use guides for behavior and rustdoc from the same revision for signatures.
@@ -21,7 +21,7 @@ diagnostics together, follow [Settings, options and logging](SETTINGS-OPTIONS-LO
 ## HTML, HTTP and browser modules
 
 These modules provide the main HTML, HTTP and browser building blocks. Their
-presence here is not registry availability; start from the existing checkout. Renderer validation
+feature selection remains explicit; see the [first-app guide](FIRST-APP.md). Renderer validation
 and native Axum/Tower semantics remain separate responsibilities.
 
 | Package and current guide | Main entry points | Selection, ownership and failure boundary |
