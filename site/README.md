@@ -3,7 +3,8 @@
 YT-217 uses existing English Markdown as the sole guide source and Rust doc
 comments as the API source. This directory contains only build configuration
 and the explicit chapter selection; it contains no second copy of the guides.
-No GitHub Pages workflow or deployment is installed.
+The separate Pages workflow builds previews without deployment by default.
+Publication requires the owner-adopted [Pages settings and policy](../docs/GITHUB-PAGES-PUBLICATION.md).
 
 ## Prerequisites
 
@@ -29,6 +30,12 @@ The generated site lives under ignored `target/docs-site/yetlet`; no public
 hosting, keys or release services are used. Rebuilding replaces only this
 builder's generated staging/site directories.
 
+The CI publication build uses `--public` with the same command. This only builds
+files: it never enables Pages or deploys. It requires a clean checkout and the
+explicit SDK/CLI edition in `pages.toml` to match the workspace versions. Its
+public banner links the full source commit; local/PR builds retain preview labels.
+Both modes check the rendered upload root, selected chapters and local links.
+
 ## Selection, versions and API docs
 
 [`pages.toml`](pages.toml) selects eight exact chapter sources. The root README
@@ -48,6 +55,6 @@ entry pages; the guide does not substitute native rustdoc for browser-only APIs.
 
 Navigation, search and assets use mdBook's built-in HTML renderer with project
 base `/yetlet/`; Rust playground execution is disabled. Initial Pages enablement
-and public publication remain separately authorized future work under the
+and public publication follow the separately owner-authorized sequence under the
 [publication scope](../docs/DOCUMENTATION-SCOPE.md) and
 [public documentation plan](../docs/PUBLIC-DOCS-PLAN.md).

@@ -36,6 +36,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Maintainer entry points
 
+- [Minimum GitHub Pages publication plan](GITHUB-PAGES-PUBLICATION.md): exact
+  YT-217 edition, proposed build/deploy workflow, permissions/settings, initial
+  owner authorization and subsequent automatic document updates; not activated.
+
 - [Local reader preview](../site/README.md): pinned mdBook builder, exact chapter
   selection and loopback-only usage. [YT-217 completion](YT-217-DOCS-PREVIEW.md)
   records API comments and independently accepted local reader checks with retained failures;

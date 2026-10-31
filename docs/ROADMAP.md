@@ -15,6 +15,11 @@ Original source/build acceptance is reused; final independent browser-acceptance
 review PASS0 explicitly allows Done, with registered model/effective effort verified.
 No API/runtime/version,
 workflow or hosting change; Pages/Wiki are not activated.
+[YT-218](GITHUB-PAGES-PUBLICATION.md) is In progress: the owner-adopted
+publication plan now has a local workflow/public-label implementation and
+passing focused checks. Accepted YT-217 guide/body proof is reused. Independent
+review and authorized Git/CI/settings/first deployment remain pending; the switch
+is absent/off, release CI and Secrets unchanged.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 

@@ -8,6 +8,11 @@ website or hosting setting change. The
 checks, retained stopped harness and subsequent authorized correction. Runtime,
 API and versions are unchanged.
 
+[YT-218's minimum Pages publication plan](GITHUB-PAGES-PUBLICATION.md) records
+the exact eight-page first edition, CI/deployment settings and outstanding owner
+confirmations. YT-217 remains Done; hosting implementation and activation are
+not implied by that local acceptance.
+
 ## Recommended destinations
 
 Use **GitHub Pages** for the public guide site, the existing repository for
@@ -20,9 +25,9 @@ live-site claim. See [GitHub Pages documentation](https://docs.github.com/en/pag
 Recommend [mdBook](https://rust-lang.github.io/mdBook/) for a small Markdown-based
 guide with navigation and search. Keep one repository and existing guide
 sources; a future site build can stage explicitly selected files into its book
-input. Do not copy the guides into a second manually edited source tree. Pin
-the builder when implementing it; no builder/dependency is installed now and
-no site tooling becomes a Yetlet runtime dependency.
+input. Do not copy the guides into a second manually edited source tree.
+YT-217 pins mdBook0.5.4 as local ignored tooling; the checked-in builder validates
+that version. No site tooling becomes a Yetlet runtime dependency.
 
 Defer GitHub Wiki. It can host long-form documentation, but a second editable
 API reference would duplicate the repository contract. If a community need

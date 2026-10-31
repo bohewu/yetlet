@@ -1,6 +1,11 @@
 # Exact reader inputs; links never recursively add pages or assets.
 mdbook-version = "0.5.4"
 
+# Explicitly reviewed guide edition; workspace versions alone do not publish it.
+[edition]
+sdk = "0.9.0-alpha.5"
+cli = "0.1.1"
+
 [[pages]]
 source = "README.md"
 output = "index.md"
