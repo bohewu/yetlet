@@ -1,5 +1,16 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-216 CLI0.1.1 patch preparation (2026-10-31):**
+[YT-215 publishes CLI0.1.0](YT-215-CLI-FIRST-RELEASE.md#actual-first-publication-and-consumer-failure--2026-10-31)
+and installs it successfully, but final run41169732818/1 fails on the stale
+unpublished version suffix before help/new. Preserve that partial outcome,
+release, archive, tag and signatures. [YT-216](YT-216-CLI-011-PATCH-RELEASE.md)
+fixes the version/help labels, adds real executable checks to existing MSRV CI
+and prepares only CLI0.1.1 through the final owner gate. SDK0.9.0-alpha.5,
+third-party dependencies and generator/runtime semantics remain unchanged.
+Reuse original proof at its scope; new source-bound outputs require acceptance.
+No failed-job retry or new publication is authorized before the final gate.
+
 **YT-215 corrected candidate selected (2026-10-31):**
 [PR37 and exact master CI](YT-215-CLI-FIRST-RELEASE.md#corrected-candidate-and-fixed-tag--2026-10-31)
 PASS at corrected C6f013ac. New immutable yetlet-cli-v0.1.0 tag/strict Guard

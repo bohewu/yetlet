@@ -771,8 +771,8 @@ mod publication_tests {
     #[test]
     fn cli_cohort_uses_own_version_manifest_and_one_package_without_sdk_subjects() {
         let cohort = Cohort::Cli;
-        assert_eq!(cohort.version(), "0.1.0");
-        assert_eq!(cohort.tag(), "refs/tags/yetlet-cli-v0.1.0");
+        assert_eq!(cohort.version(), "0.1.1");
+        assert_eq!(cohort.tag(), "refs/tags/yetlet-cli-v0.1.1");
         assert_eq!(cohort.names(), ["yetlet-cli"]);
         assert_eq!(cohort.manifests(), ["tools/yetlet-cli/Cargo.toml"]);
         let temp = tempfile::tempdir().unwrap();
@@ -788,7 +788,7 @@ mod publication_tests {
         }
         let cli = source.join("tools/yetlet-cli");
         fs::create_dir_all(cli.join("src")).unwrap();
-        fs::write(cli.join("Cargo.toml"), "[package]\nname='yetlet-cli'\nversion='0.1.0'\n[dependencies]\nyetlet='=0.9.0-alpha.5'\n").unwrap();
+        fs::write(cli.join("Cargo.toml"), "[package]\nname='yetlet-cli'\nversion='0.1.1'\n[dependencies]\nyetlet='=0.9.0-alpha.5'\n").unwrap();
         fs::write(cli.join("Cargo.lock"), "fixture").unwrap();
         fs::write(cli.join("src/main.rs"), "fn main() {} ").unwrap();
         let inputs = selected(source, cohort).unwrap();

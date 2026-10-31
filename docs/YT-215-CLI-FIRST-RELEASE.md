@@ -203,3 +203,30 @@ no CLI/runtime/builder/signer inputs. Actual corrected archive/ref/workflow/sour
 receipt, frozen payload hashes and separate verification still require acceptance
 before the final owner publication gate. The first attempt is not retried and
 no counters or task folder are reset.
+
+## Actual first publication and consumer failure — 2026-10-31
+
+Corrected build41168153070/1, original readback41168601390/1, prepare41168975786/1,
+sign41169191799/1 and independent result41169320285/1 all PASS at C6f013ac and
+S/V/P `ed68b840dc445d9a95c03692f9b32c2e07c0cb6b`. Actual result verifies one CLI
+subject and all73 private entries with plaintext cleanup. Final output Reviewer
+PASS0, exact five-file public plan and no-secret publication preflight PASS;
+old wrong-ref evidence and all original attempts remain preserved.
+
+After actual owner approval, run41169732818/1 publishes the Experimental GitHub
+pre-release and CLI0.1.0 to crates.io. Both destinations and the anonymous registry
+download/checksum verify; the archive stays471525 bytes/SHA256
+`e53a1389a667b153425901602cf18bc084c54b192330d74c25f2ae95fafe46ae`.
+Actual anonymous locked Cargo install succeeds. The version subprocess prints
+`yetlet 0.1.0 (unpublished preview)`, failing the exact output assertion before
+help/new. Overall run is FAIL at registry-consumer, not a failed upload. Preserve
+partial receipt `consumer:not_attempted`: the function raises before returning,
+while raw install/version logs prove that partial execution. Do not claim the
+full consumer suite PASS or automatically retry/re-sign/re-upload.
+
+[YT-216](YT-216-CLI-011-PATCH-RELEASE.md) separately repairs the stale CLI labels
+and verifies a real binary for0.1.1. Published0.1.0, its tag/signatures/release,
+SDK0.9.0-alpha.5 and earlier failures remain unchanged. Local monitoring writes
+no source or remote changes; source master remains clean at S. Actual outcome
+records and raw ZIPs/logs are retained outside the repo. This record does not
+mark YT-215 Done or authorize a replacement publication.

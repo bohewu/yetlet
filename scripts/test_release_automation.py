@@ -128,9 +128,9 @@ class RecordTests(unittest.TestCase):
         pub.s.bind_record(record())
 
     def test_cli_uses_its_own_version_tag_manifest_and_single_public_subject(self):
-        r = record(); r.update(schema=3, cohort='cli', version='0.1.0')
+        r = record(); r.update(schema=3, cohort='cli', version='0.1.1')
         self.assertEqual(records.packages(r), {'yetlet-cli'})
-        self.assertEqual(records.tag(r), 'yetlet-cli-v0.1.0')
+        self.assertEqual(records.tag(r), 'yetlet-cli-v0.1.1')
         records.source_version(r, ROOT)
         for schema, cohort in ((1, 'cli'), (2, 'cli'), (3, 'sixteen'), (3, 'consolidated')):
             with self.assertRaises(ValueError): records.validate(dict(r, schema=schema, cohort=cohort))
