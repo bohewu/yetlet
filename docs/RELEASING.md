@@ -6,6 +6,11 @@ decisions live in [Backlog](BACKLOG.md) and [Roadmap](ROADMAP.md). The current o
 [Release automation and registry promotion](RELEASE-PUBLICATION.md). This guide
 is not itself authority for Git, hosted/key/signing or publication actions.
 
+Before the next delivery, read the [release retrospective](RELEASE-RETROSPECTIVE.md)
+for retained failures, their concrete prevention steps and the successful CLI
+0.1.1 reference execution. Batch incidental documentation updates as described in
+[Development](DEVELOPMENT.md#batch-small-documentation-changes).
+
 ## Current two-package development boundary — YT-211
 
 Current unreleased source is `0.9.0-alpha.5`: exactly `yetlet` followed by
