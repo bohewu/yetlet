@@ -125,8 +125,11 @@ additional browsers and hosted generated rustdoc are not newly qualified.
 [YT-219–YT-224](YT-219-224-DOM-STATIC-SITE-PLAN.md) registers a separate path:
 review broad HTML/DOM coverage, implement selected vocabulary and controlled
 URL/images, define/implement finite static HTML build/CLI, then pilot this guide
-as an application-owned Yetlet consumer. All six items are Todo; registration
-is planning only. The proposed static mode is not an existing CLI command.
+as an application-owned Yetlet consumer. Registration was planning only, with
+all six items Todo at its accepted checkpoint. The later
+[YT-219 contract](YT-219-HTML-DOM-CONTRACT.md) is Done at documentation scope
+after independent Reviewer PASS0; other items remain Todo. The proposed static mode is not an existing
+CLI command.
 
 Retain the current mdBook site/workflow and these eight source/excerpt/disclosure
 boundaries during the pilot. The existing browser CLI already produces static-

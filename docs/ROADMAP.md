@@ -23,10 +23,13 @@ desktop navigation/search plus emulated-mobile touch acceptance. Final independe
 evidence Reviewer PASS0 accepts completion; YT-218 is Done. The Pages Environment allows only master,
 relevant master updates deploy automatically, release CI/Secrets are unchanged,
 and original404 settings/harness observations remain recorded without hosted retry.
-[M25](YT-219-224-DOM-STATIC-SITE-PLAN.md) now registers six Todo items, YT-219–224,
-for broader ordinary-HTML DOM coverage, controlled navigation/images, static HTML
-export/CLI and an isolated Yetlet documentation pilot. The current batch is
-planning only, independently reviewed PASS0; YT-219 contract work is next.
+[M25](YT-219-224-DOM-STATIC-SITE-PLAN.md) registers YT-219–224 for broader
+ordinary-HTML DOM coverage, controlled navigation/images, static HTML export/CLI
+and a Yetlet documentation pilot. Planning passed independent review;
+[YT-219's source-backed contract](YT-219-HTML-DOM-CONTRACT.md) is now Done
+at documentation scope after independent Reviewer PASS0, with a complete dated
+element/attribute inventory and stable seven doc/ten product-input bindings.
+YT-220–224 remain Todo; no runtime or live-site change.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
@@ -2379,7 +2382,7 @@ resource/event/keyed ownership remain the compatibility baseline.
 
 | Item | Gate | State |
 |---|---|---|
-| YT-219 | Classify standard elements/attributes and review coverage, structure and compatibility; docs only | Todo |
+| YT-219 | [Complete inventory and compatibility contract](YT-219-HTML-DOM-CONTRACT.md):90 selected target HTML elements, explicit exclusions, typed defaults and scoped parser/DOM parity; independent Reviewer PASS0 | Done |
 | YT-220 | Implement reviewed semantic/table/native-control vocabulary with changed HTML/DOM/browser evidence | Todo |
 | YT-221 | Review and implement explicit external-navigation/image policies without relaxing form/default boundaries | Todo |
 | YT-222 | Freeze finite public static HTML export, app-owned entry, CLI naming and output/config/CSP contract; docs only | Todo |
@@ -2393,7 +2396,10 @@ contract and obtains independent Reviewer PASS before Done. Reuse accepted
 unchanged evidence and retain failures; only changed behavior needs new checks.
 
 Planning review PASS0 has zero issues/required followups, with registered reviewer
-model/effective high effort verified. All six items remain Todo; no new runtime/API,
-package/version/dependency, sample, CLI command, hosted job, Commit/Push or
-Pages/release change is performed by this registration. YT-218's accepted live
-guide and workflow remain in place. Next unblockable item: YT-219 contract only.
+model/effective high effort verified. At planning acceptance all six items were
+Todo. The later owner-authorized YT-219 contract/source inventory is now Done
+at documentation scope after independent Reviewer PASS0; YT-220–224 remain Todo. The planning commit
+d1b8ac5 passed strict/builtin and was not pushed. No runtime/API, package/version/
+dependency, sample, CLI command, hosted job or Pages/release change is performed.
+YT-218's accepted live guide remains in place. Next unblockable item: YT-220 under later implementation
+authority; no implementation starts from this contract acceptance alone.

@@ -40,7 +40,12 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 - [DOM coverage and static-site plan — YT-219–224](YT-219-224-DOM-STATIC-SITE-PLAN.md):
   broader standard HTML, explicit URL/image policy, proposed static build and
-  isolated Yetlet documentation pilot; six Todo items, no live replacement.
+  isolated Yetlet documentation pilot; original reviewed registration and later
+  execution status, no live replacement.
+- [HTML/DOM compatibility contract — YT-219](YT-219-HTML-DOM-CONTRACT.md) and
+  [complete standards inventory](YT-219-HTML-INVENTORY.md): current versus selected
+  elements/attributes, explicit exceptions, parser parity and opt-in defaults;
+  documentation-only, not implemented capability claims.
 
 - [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
   dedicated workflow, master-only Environment, initial deployment/readback,

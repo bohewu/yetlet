@@ -2,7 +2,8 @@
 
 Date: 2026-10-31. Status: reviewed plan; independent Reviewer PASS0.
 Source baseline: `c92c56af0a4dd7fd34a9bf809d6c6919d017b4ad`.
-All six registered items are **Todo**. This batch plans work only; it does not
+At this reviewed planning checkpoint all six items were **Todo**. This batch
+plans work only; it does not
 implement a renderer, CLI command, new package, sample or website replacement.
 
 ## Purpose and authority
@@ -254,4 +255,19 @@ Independent planning review: **PASS0**, zero issues/required followups. All five
 planning-document hashes matched at acceptance; registered reviewer model
 `gpt-6-astra` and effective high effort were verified. Evidence is retained under
 `target/yt219224-plan-20261031/`. This accepts planning only; all six items remain
-Todo. Next unblockable item: **YT-219**, contract only.
+Todo at that checkpoint. Next selected item was **YT-219**, contract only.
+
+## Subsequent YT-219 contract checkpoint — 2026-10-31
+
+The owner separately authorizes committing these five planning documents with
+strict/builtin (local d1b8ac5, zero findings, no Push), then source/standards
+inspection for [YT-219](YT-219-HTML-DOM-CONTRACT.md). Its
+[complete inventory](YT-219-HTML-INVENTORY.md) selects90 target named HTML
+elements:38 current,51 ordinary additions and an opt-in img. Picture/source
+remain deferred until responsive/media grammar is selected. The contract freezes
+boundaries, attribute scope, typed option names/defaults and limited SSR/DOM
+parity; no implementation follows from this documentation-only item.
+YT-219 is Done at documentation/source-contract scope after independent Reviewer
+PASS0, zero issues/followups and verified role/model/effective high effort.
+YT-220–224 remain Todo; later implementation needs its own authority.
+The original planning PASS and source baseline above remain historical evidence.
