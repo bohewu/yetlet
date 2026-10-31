@@ -73,3 +73,43 @@ New C/S/tag/run/output identities remain unselected until their actual stages
 succeed. Run-local evidence: `target/yt216-cli-011-release-20261031/`; encrypted
 and long-term evidence stay outside the repository. Only complete actual results
 may update the following execution record; final approval remains with the owner.
+
+## Selected candidate and source delivery — 2026-10-31
+
+Implementation independent Reviewer PASS0 accepts the frozen13-file boundary.
+Real binary version/help checks PASS; one Linux scaffold fixture correction to
+private0700 parent PASS without replaying the other two cases. Four affected
+release identity/cohort/custody checks, one own-manifest Python check, normal
+136-file package verification, docs/format/whitespace PASS. Only the CLI self-lock
+entry changes; SDK/dependencies remain identical. Optional standalone CLI Clippy
+retains three unrelated existing style diagnostics in unchanged files; no policy
+suppression or unrelated source repair. Initial offline-cache and fixture failures
+remain recorded. Normal local dirty-package proof is not the final archive identity.
+
+Strict/builtin staged/index-tree and exact outgoing/native Guard PASS0 deliver
+commit3303911 in [PR39](https://github.com/bohewu/yetlet/pull/39). Required PR
+CI41171706263/1 passes both checks, including the real CLI binary command in native
+MSRV. Squash-merged source C is `ae5dd4c55e1124f56fcc3b07a9fc9e5bf083b25f`, tree
+`f269070be7da68f6355606f0b217f7e14fb4f144`, identical to the reviewed index tree.
+The source branch is removed after external verified backup/tree correspondence.
+
+Original master CI41172082238/1 fails the unchanged Lab SQLite concurrency test:
+expected303/409, observed303/503; MSRV passes. Preserve its raw log and exact
+failure, without app/test changes. The owner separately authorizes one failed-
+Stable-only rerun. Attempt2 succeeds; MSRV retains its original execution timestamp.
+Both checks therefore pass at exact C. That exceptional CI retry is consumed and
+does not reset any old result or authorize another job retry.
+
+New unsigned immutable `yetlet-cli-v0.1.1` is pushed/read back exactly at C through
+strict/builtin accepted-remote-history/native Guard PASS. The consumed binding is
+explicitly retired; old SDK/CLI tags and history remain untouched. Existing evidence
+Environment advances only its single exact-tag policy to0.1.1, preserving its key
+and protection rules. No new Secret or local private-key access.
+
+One [build41173099066/1](https://github.com/bohewu/yetlet/actions/runs/41173099066)
+is dispatched at this tag under the45minute bound. Actual archive/custody/payload/
+signature/result identities remain Pending at this checkpoint. This narrow three-
+document record delivery provides later S distinct from C; select only its actual
+green merged SHA. It changes no CLI/builder/signer/SDK inputs. Continue the same
+ledger, preserving the old0.1.0 publication/consumer failure and first master CI
+failure. No0.1.1 publication or final owner approval is claimed.

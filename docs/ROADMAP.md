@@ -1,5 +1,15 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-216 fixed candidate and tag (2026-10-31):**
+[PR39/source Cae5dd4c](YT-216-CLI-011-PATCH-RELEASE.md#selected-candidate-and-source-delivery--2026-10-31)
+passes reviewed implementation/normal packaging and required CI. Preserve the
+first master SQLite failure; the owner-authorized failed-Stable-only attempt2
+passes with original MSRV reused. Strict/builtin0.1.1 tag/readback and consumed-
+binding retirement PASS; build41173099066/1 dispatched once. This documentation
+source provides later S without new code/SDK inputs. Actual archive/custody/
+signatures/result and final owner approval remain Pending; old0.1.0 release and
+all failures remain unchanged. No0.1.1 upload or additional retry is authorized.
+
 **YT-216 CLI0.1.1 patch preparation (2026-10-31):**
 [YT-215 publishes CLI0.1.0](YT-215-CLI-FIRST-RELEASE.md#actual-first-publication-and-consumer-failure--2026-10-31)
 and installs it successfully, but final run41169732818/1 fails on the stale
