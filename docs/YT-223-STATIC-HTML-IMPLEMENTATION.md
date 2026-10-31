@@ -196,3 +196,13 @@ now satisfies the workspace format check. The first MSRV job passed. These resul
 are retained independently; no failed job or unchanged source was automatically
 retried. New-source MSVC/runtime verification, CI and independent acceptance remain
 pending. Receipts are under target/yt223-20261101-delivery/.
+
+The source repair23fb5bc passes the documentation CI and MSRV job. On that exact
+source, Windows compiles and passes all seven static-export parser/filesystem/
+protocol tests; the ignored helper is not counted. The sole new deadline fixture
+fails before starting its child because it calls the Cargo-only cwd admission
+with an absolute libtest helper. Its one scoped fixture correction uses the
+existing private Windows native test seam and inherited-DACL byte-copy pattern.
+The product admission policy and GNU execution stay unchanged. Source review
+passes with zero findings; only that unpassed Windows case remains to execute,
+followed by the previously unstarted binary/static CLI runtime checks.

@@ -265,7 +265,16 @@ mod static_deadline_tests {
         } else {
             "helper"
         });
+        #[cfg(not(windows))]
         std::fs::copy(std::env::current_exe().unwrap(), &executable).unwrap();
+        #[cfg(windows)]
+        {
+            // Inherit the private app DACL instead of copying the test binary's
+            // security metadata, as in the existing Windows native fixtures.
+            let mut source = std::fs::File::open(std::env::current_exe().unwrap()).unwrap();
+            let mut destination = std::fs::File::create_new(&executable).unwrap();
+            io::copy(&mut source, &mut destination).unwrap();
+        }
         let mut command = Command::new(executable);
         command.args([
             "--exact",
@@ -274,8 +283,20 @@ mod static_deadline_tests {
             "--nocapture",
         ]);
         let started = std::time::Instant::now();
+        #[cfg(not(windows))]
         let result = run_static(&app, &mut command, std::time::Duration::from_secs(2));
-        assert!(matches!(result,Err(ref e) if e.kind()==io::ErrorKind::TimedOut));
+        #[cfg(windows)]
+        let result = {
+            // The product's pin_cwd admits Cargo build/run, not an absolute
+            // libtest fixture. Exercise the existing private native test seam.
+            command.current_dir(crate::platform::fs::app_root(&app));
+            imp::run_bounded(&app, &mut command, std::time::Duration::from_secs(2))
+        };
+        assert!(
+            matches!(result,Err(ref e) if e.kind()==io::ErrorKind::TimedOut),
+            "expected owned deadline, got {:?}",
+            result.as_ref().err()
+        );
         assert!(started.elapsed() < std::time::Duration::from_secs(10));
         let pid: u32 =
             std::fs::read_to_string(crate::platform::fs::app_root(&app).join("child.pid"))
