@@ -214,7 +214,7 @@ fn native_fixture() {
                     .args(["--skip", "literal"])
                     .env("CARGO_NET_OFFLINE", "true")
                     .env("RUSTUP_AUTO_INSTALL", "0");
-                let Completion::Exited(status) = run_owned(&app, &mut command, true).unwrap()
+                let Completion::Exited(status) = run_owned(&app, &mut command, true, None).unwrap()
                 else {
                     panic!("native status required")
                 };
@@ -232,7 +232,7 @@ fn native_fixture() {
                     // Only this fixture's new private console is in scope.
                     assert_ne!(unsafe { GenerateConsoleCtrlEvent(event, 0) }, 0);
                 });
-                let result = run_owned(&app, &mut command, true);
+                let result = run_owned(&app, &mut command, true, None);
                 sender.join().unwrap();
                 let Completion::Exited(status) = result.unwrap() else {
                     panic!("native exit required")
@@ -265,7 +265,7 @@ fn native_fixture() {
                     assert_ne!(unsafe { GenerateConsoleCtrlEvent(CTRL_C_EVENT, 0) }, 0);
                 });
                 let began = Instant::now();
-                let result = run_owned(&app, &mut command, true);
+                let result = run_owned(&app, &mut command, true, None);
                 sender.join().unwrap();
                 assert!(
                     began.elapsed() < CLEANUP + GRACE + Duration::from_secs(8),
@@ -302,7 +302,7 @@ fn native_fixture() {
                 assert_previous_restored();
             }
             let mut missing = Command::new(app.cwd.join("missing-native.exe"));
-            assert!(run_owned(&app, &mut missing, true).is_err());
+            assert!(run_owned(&app, &mut missing, true, None).is_err());
             assert_previous_restored();
             assert_ne!(
                 unsafe { SetConsoleCtrlHandler(Some(previous_control), 0) },

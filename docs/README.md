@@ -31,19 +31,44 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 - [WebAssembly startup and loading UI](WASM-STARTUP.md): optional shared JS/CSS shell, customization, full-page/SSR-region integration and caller-owned lifetime.
 
-- [Public documentation plan](PUBLIC-DOCS-PLAN.md): proposed Pages navigation,
-  versioned source/API boundaries, doc-comment gaps and deferred Wiki; not a live site.
+- [Public developer guide](https://bohewu.github.io/yetlet/): eight selected chapters,
+  navigation and search, labeled with SDK/CLI edition and source commit.
+- [Public documentation plan](PUBLIC-DOCS-PLAN.md): source/API boundaries,
+  doc-comment gaps and deferred Wiki.
 
 ## Maintainer entry points
 
-- [Minimum GitHub Pages publication plan](GITHUB-PAGES-PUBLICATION.md): exact
-  YT-217 edition, proposed build/deploy workflow, permissions/settings, initial
-  owner authorization and subsequent automatic document updates; not activated.
+- [DOM coverage and static-site plan — YT-219–224](YT-219-224-DOM-STATIC-SITE-PLAN.md):
+  broader standard HTML, explicit URL/image policy, proposed static build and
+  isolated Yetlet documentation pilot; original reviewed registration and later
+  execution status, no live replacement.
+- [HTML/DOM compatibility contract — YT-219](YT-219-HTML-DOM-CONTRACT.md) and
+  [complete standards inventory](YT-219-HTML-INVENTORY.md): current versus selected
+  elements/attributes, explicit exceptions, parser parity and opt-in defaults;
+  documentation-only, not implemented capability claims.
+- [Unreleased ordinary HTML DOM implementation — YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md):
+  89-tag checkout, scoped attributes/structures, pre consistency, shared consumer
+  and focused native/Chrome/Firefox evidence; published SDK baseline stays separate.
+- [Unreleased controlled DOM navigation/images — YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md):
+  typed opt-in options, strict defaults, finite URL/image attributes and browser
+  preflight, explicit sample and new Chrome/Firefox evidence; independent Reviewer
+  PASS0, Done at unreleased-source scope.
+- [Static HTML export and CLI contract — YT-222](YT-222-STATIC-HTML-CONTRACT.md):
+  proposed build --static, finite public pages/assets, project prefixes, local
+  CSP/islands, create-only output and private receipts; independent Reviewer
+  PASS0, Done at documentation-only contract scope.
+- [Unreleased static HTML export implementation — YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md):
+  explicit CLI/native exporter, bounded public documents/assets and optional
+  island; local evidence and the required pending MSVC gate are separate.
+
+- [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
+  dedicated workflow, master-only Environment, initial deployment/readback,
+  retained observations and automatic relevant master document updates.
 
 - [Local reader preview](../site/README.md): pinned mdBook builder, exact chapter
   selection and loopback-only usage. [YT-217 completion](YT-217-DOCS-PREVIEW.md)
-  records API comments and independently accepted local reader checks with retained failures;
-  no Pages deployment is installed.
+  records API comments and independently accepted local reader checks with retained
+  failures; the separate YT-218 record covers actual public hosting.
 
 - [Completed CLI0.1.1 release](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31):
   accepted output, owner-approved publication and installed consumer; the

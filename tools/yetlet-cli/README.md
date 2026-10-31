@@ -33,6 +33,7 @@ Independent implementation Reviewer PASS has zero issues or required followups.
 | `yetlet run [--manifest-path PATH]` | Native frozen Cargo/watch/Vite, or settings-selected browser-only static preview |
 | `yetlet watch [--manifest-path PATH]` | Native Rust watch, or explicitly selected browser WASM rebuild/full reload; Vite still uses settings |
 | `yetlet build [--manifest-path PATH] [--release]` | Native frontend-then-Cargo, or settings-selected browser-only production build |
+| `yetlet build --static --export-bin NAME --output DIRECTORY [--base-path /] [--release] [--wasm-islands]` | **Unreleased source only:** finite public HTML export; explicit native entry, create-only output and private receipts |
 | `yetlet generate docker [--manifest-path PATH] --output DIRECTORY` | Qualified-source configuration/inventory only |
 | `yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE` | Configuration for a separately built Linux/amd64 image |
 | `yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE` | Deployment/Service configuration; replicas use settings, default 1, range 1–100 |
@@ -51,6 +52,52 @@ prints `CLI_PROCESS stage=executable` with the error kind and optional numeric O
 code before returning exit 125. Prepare a protected tool installation and select
 its physical directory on PATH; tool permissions are managed separately from the CLI.
 See the [native Windows diagnosis and verification](../../docs/WINDOWS-CLI-125-VERIFICATION.md).
+
+## Unreleased static HTML build
+
+This mode exists only in the current source, not published CLI0.1.1. Build the
+checkout CLI and follow the [standalone static example](../../examples/static-site/README.md).
+The example uses registry SDK0.9.0-alpha.5 without an SDK clone/path override.
+
+The canonical invocation is build --static --export-bin NAME --output DIRECTORY,
+with optional --base-path /yetlet/, --release and --wasm-islands. It runs one
+explicit trusted native exporter with frozen Cargo, validates finite protocol1
+fragments/assets and writes complete public HTML. It does not crawl handlers,
+start a backend, install tools, clean/overwrite output or deploy. HTML-only apps
+need no Node/Wasm/server or runtime Settings loader.
+
+Existing public settings are still validated and cli.target must be native.
+The explicit static mode does not select watch/Vite auto stages. No new settings
+keys are added; --release changes Cargo profile only. Static export differs from
+the existing browser-only target, whose statically hosted app mounts after Wasm.
+Ordinary build/run/watch and inspect schema1 retain their settings-selected scope;
+inspect does not plan static mode.
+
+For static mode, preflight captures CARGO_TARGET_DIR (otherwise
+CARGO_BUILD_TARGET_DIR, otherwise app/target) and a plain CARGO_BUILD_BUILD_DIR
+(otherwise that target). The child explicitly uses these same target/intermediate
+directories, overriding file-config directory selection; Cargo path templates in
+the intermediate path are refused. Output cannot overlap either selected tree,
+including a physical cache alias. These are existing Cargo variables, not Yetlet
+settings; other CLI modes retain their existing Cargo behavior.
+
+Choose an absent output below app-local artifacts/ or a separate protected
+existing parent. Another build requires another directory; prior output remains
+the last-good artifact. / and /yetlet/ base paths map canonical directory-index
+routes without emitting a base element or SPA fallback. The host owns directory
+indexes,404 status, MIME and any response headers beyond meta CSP.
+
+--wasm-islands admits already-prepared local JS/Wasm assets and a selected module
+entry; it does not invoke npm or create a bundler. The application owns readable
+initial content, activation, startup/error text and disposal. Private receipts
+under target/yetlet-static/RUN_ID/ bind selected inputs/output hashes and outcomes;
+keep them outside uploaded content. A supervision error retains private export
+evidence and does not claim child cleanup or success. No automatic retry.
+
+Cli::BuildStatic and build_static are unreleased Experimental CLI support APIs;
+downstream exhaustive Rust matches may need a new arm. Current-source evidence
+and pending MSVC validation are explicit in [YT-223](../../docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
+No SDK/CLI version is republished by this source change.
 
 ## First-use prerequisites
 

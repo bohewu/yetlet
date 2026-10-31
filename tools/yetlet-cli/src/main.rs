@@ -35,6 +35,13 @@ fn main() -> ExitCode {
             }
         },
         Ok(Cli::Build { manifest, release }) => application(&manifest, false, release, false),
+        Ok(command @ Cli::BuildStatic { .. }) => match command.build_static() {
+            Ok(completion) => completion.finish(),
+            Err(error) => {
+                eprintln!("CLI_STATIC: {}", error.message);
+                ExitCode::from(error.code as u8)
+            }
+        },
         Ok(Cli::Run { manifest }) => application(&manifest, true, false, false),
         Ok(Cli::Watch { manifest }) => application(&manifest, true, false, true),
         Ok(command @ Cli::GenerateK8s { .. }) => match command.generate_k8s() {

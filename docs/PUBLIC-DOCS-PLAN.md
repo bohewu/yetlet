@@ -1,30 +1,26 @@
 # Public documentation and rustdoc plan
 
-Date: 2026-10-31. Status: YT-217 Done at selected API-doc/local reader-preview
-scope after independent final Reviewer PASS0. Source/build evidence is reused;
-authorized sidebar/navigation/search/touch/screenshot checks pass. No published
-website or hosting setting change. The
-[execution record](YT-217-DOCS-PREVIEW.md) distinguishes passing source/build
-checks, retained stopped harness and subsequent authorized correction. Runtime,
-API and versions are unchanged.
-
-[YT-218's minimum Pages publication plan](GITHUB-PAGES-PUBLICATION.md) records
-the exact eight-page first edition, CI/deployment settings and outstanding owner
-confirmations. YT-217 remains Done; hosting implementation and activation are
-not implied by that local acceptance.
+Date: 2026-10-31. YT-217 is Done at selected API-doc/local reader-preview
+scope after independent final Reviewer PASS0. Its [execution record](YT-217-DOCS-PREVIEW.md)
+retains the original passing proof, stopped harness and authorized correction.
+YT-218 subsequently delivered the separate Pages workflow/settings and first
+publication; [the guide](https://bohewu.github.io/yetlet/) is live at source
+64d1074. [Actual publication evidence](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31)
+records green CI, source/artifact/edition matching and hosted reader acceptance,
+accepted by final independent Reviewer PASS0; YT-218 is Done. No product API/runtime/version change
+or expansion of signed release-candidate scope follows from website publication.
 
 ## Recommended destinations
 
 Use **GitHub Pages** for the public guide site, the existing repository for
 canonical Markdown/source, and **rustdoc** for version-matched API reference.
 GitHub Pages serves static HTML/CSS/JavaScript and is available for public
-repositories on GitHub Free; the project URL would be
-`https://bohewu.github.io/yetlet/`. That URL is a proposed destination, not a
-live-site claim. See [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
+repositories on GitHub Free; the published project URL is
+[bohewu.github.io/yetlet](https://bohewu.github.io/yetlet/). See [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
 
 Recommend [mdBook](https://rust-lang.github.io/mdBook/) for a small Markdown-based
 guide with navigation and search. Keep one repository and existing guide
-sources; a future site build can stage explicitly selected files into its book
+sources; the installed site build stages explicitly selected files into its book
 input. Do not copy the guides into a second manually edited source tree.
 YT-217 pins mdBook0.5.4 as local ignored tooling; the checked-in builder validates
 that version. No site tooling becomes a Yetlet runtime dependency.
@@ -120,4 +116,35 @@ keep their original sources and limits. The API inventory is a manual sample of
 public entry points, not a full coverage score. Source comments and the local
 static build retain their accepted scope. Navigation/search/mobile/screenshot
 checks pass at local Chromium/emulated-mobile scope after final independent review.
-External publication is not claimed.
+The later YT-218 publication adds actual public routing/assets/reader evidence
+at its recorded source and Chromium/emulated-mobile scope. Physical mobile,
+additional browsers and hosted generated rustdoc are not newly qualified.
+
+## Proposed Yetlet-built consumer — M25
+
+[YT-219–YT-224](YT-219-224-DOM-STATIC-SITE-PLAN.md) registers a separate path:
+review broad HTML/DOM coverage, implement selected vocabulary and controlled
+URL/images, define/implement finite static HTML build/CLI, then pilot this guide
+as an application-owned Yetlet consumer. Registration was planning only, with
+all six items Todo at its accepted checkpoint. The later
+[YT-219 contract](YT-219-HTML-DOM-CONTRACT.md) is Done at documentation scope
+after independent Reviewer PASS0. YT-220's [unreleased source implementation](YT-220-HTML-DOM-IMPLEMENTATION.md)
+is now Done at its unreleased-source scope after independent Reviewer PASS0;
+YT-221's [controlled links/images](YT-221-DOM-URL-IMAGE-CONTRACT.md) has contract
+PASS0 and a minimal unreleased implementation with new native/Chrome/Firefox
+evidence; final independent Reviewer PASS0 completes YT-221 at unreleased-source
+scope. [YT-222](YT-222-STATIC-HTML-CONTRACT.md) is Done at documentation-only
+static-export/CLI contract scope: finite public fragments/assets, bounded head,
+project-prefix paths, local CSP/islands and protected create-only output.
+Independent Reviewer PASS0. [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md) now has
+an unreleased static-build implementation and explicit standalone consumer;
+local independent review PASS0 and pending MSVC gate are separate. YT-223
+is In progress and YT-224 Todo. Published CLI0.1.1 does not contain this mode.
+
+Retain the current mdBook site/workflow and these eight source/excerpt/disclosure
+boundaries during the pilot. The existing browser CLI already produces static-
+hosted Wasm assets; the new static HTML mode supplies build-time readable content
+with separately selected browser interactions. A pilot does not authorize
+changing Pages, replacing the public site, publishing a package or changing
+release identities. Live replacement requires later owner acceptance after
+independent review and source-bound consumer evidence.

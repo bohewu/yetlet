@@ -32,6 +32,13 @@ pub(crate) fn run(command: &mut Command) -> io::Result<Completion> {
     foreground::run(command)
 }
 
+pub(crate) fn run_bounded(
+    command: &mut Command,
+    budget: std::time::Duration,
+) -> io::Result<Completion> {
+    foreground::run_bounded(command, budget)
+}
+
 pub(crate) fn run_pair(rust: &mut Command, frontend: &mut Command) -> io::Result<Completion> {
     foreground::run_pair(rust, frontend)
 }

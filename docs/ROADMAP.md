@@ -13,13 +13,35 @@ separates eight chapter URLs from four heading fragments; navigation/search,
 mobile touch interaction and three screenshots PASS at local Chromium scope.
 Original source/build acceptance is reused; final independent browser-acceptance
 review PASS0 explicitly allows Done, with registered model/effective effort verified.
-No API/runtime/version,
-workflow or hosting change; Pages/Wiki are not activated.
-[YT-218](GITHUB-PAGES-PUBLICATION.md) is In progress: the owner-adopted
-publication plan now has a local workflow/public-label implementation and
-passing focused checks. Accepted YT-217 guide/body proof is reused. Independent
-review and authorized Git/CI/settings/first deployment remain pending; the switch
-is absent/off, release CI and Secrets unchanged.
+YT-217 itself changed no API/runtime/version or hosting; its original local
+scope is preserved.
+[YT-218](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31)
+has completed PR43 reviewed strict/builtin delivery and green merged-master CI
+at64d1074. [The guide](https://bohewu.github.io/yetlet/) is live after successful
+first build/deploy41198529190/1, actual artifact/source/edition/HTTPS readback and
+desktop navigation/search plus emulated-mobile touch acceptance. Final independent
+evidence Reviewer PASS0 accepts completion; YT-218 is Done. The Pages Environment allows only master,
+relevant master updates deploy automatically, release CI/Secrets are unchanged,
+and original404 settings/harness observations remain recorded without hosted retry.
+[M25](YT-219-224-DOM-STATIC-SITE-PLAN.md) registers YT-219–224 for broader
+ordinary-HTML DOM coverage, controlled navigation/images, static HTML export/CLI
+and a Yetlet documentation pilot. Planning passed independent review;
+[YT-219's source-backed contract](YT-219-HTML-DOM-CONTRACT.md) is now Done
+at documentation scope after independent Reviewer PASS0, with a complete dated
+element/attribute inventory and stable seven doc/ten product-input bindings.
+[YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md) is now Done with unreleased89-tag
+implementation, a shared consumer and focused native/Wasm/Chrome/Firefox evidence;
+independent Reviewer PASS0, zero issues/followups and16 source hashes matched.
+[YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md) is Done: contract PASS0,
+minimal typed per-mount URL/image implementation and new native/Chrome/Firefox
+evidence complete; final independent Reviewer PASS0,0 issues/followups and23 stable
+input hashes. [YT-222](YT-222-STATIC-HTML-CONTRACT.md) is Done at
+documentation-only finite static-export/CLI contract scope, independent Reviewer
+PASS0,0 issues/followups and21 stable input hashes;
+the [YT-223 implementation](YT-223-STATIC-HTML-IMPLEMENTATION.md) is In progress
+with local independent followup PASS0, required MSVC gate policy-blocked and
+Not verified; YT-224 remains Todo;
+live site/releases unchanged.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
@@ -2360,3 +2382,93 @@ backup or indefinite-availability guarantee. D6 remains Pending, YT-096 In progr
 and YT-020 Blocked; signing identity/bootstrap/roots, exact signing payloads,
 registry/trust and final maintainer release approval remain open. No signing,
 publication, Commit or Push occurs in this document update.
+
+## M25 — Broader HTML DOM support and static-site delivery
+
+[YT-219–YT-224 plan](YT-219-224-DOM-STATIC-SITE-PLAN.md) prioritizes the renderer
+before a Yetlet-built guide. Aim for comprehensive ordinary modern body HTML,
+with a dated standard-element/attribute matrix and explicit specialized exclusions.
+Do not equate accepting a tag with implementing every attribute, live browser API,
+namespace or security policy. Existing strict defaults, shared View and explicit
+resource/event/keyed ownership remain the compatibility baseline.
+
+| Item | Gate | State |
+|---|---|---|
+| YT-219 | [Complete inventory and compatibility contract](YT-219-HTML-DOM-CONTRACT.md):90 selected target HTML elements, explicit exclusions, typed defaults and scoped parser/DOM parity; independent Reviewer PASS0 | Done |
+| YT-220 | [Unreleased89-tag implementation](YT-220-HTML-DOM-IMPLEMENTATION.md), scoped attributes/structures and pre parity; new native/Wasm/Chrome/Firefox checks PASS, independent Reviewer PASS0 | Done |
+| YT-221 | [Controlled link/image implementation](YT-221-DOM-URL-IMAGE-CONTRACT.md), contract PASS0, unchanged defaults/full resource preflight and new native/Wasm/Chrome/Firefox evidence; final independent Reviewer PASS0 | Done |
+| YT-222 | [Finite static export/CLI contract](YT-222-STATIC-HTML-CONTRACT.md): app-owned exporter, typed build --static request, bounded documents/assets/base/CSP, protected create-only publication and private receipts; docs only, independent Reviewer PASS0 | Done |
+| YT-223 | [Minimal static build/CLI](YT-223-STATIC-HTML-IMPLEMENTATION.md), explicit no-backend consumer and optional island; local evidence/followup PASS0, required current-source MSVC gate policy-blocked/Not verified | In progress |
+| YT-224 | Pilot Yetlet-built docs from the same eight sources with static content and optional Wasm; no live replacement | Todo |
+
+Dependency paths are YT-219→YT-220→YT-221 and YT-219→YT-222→YT-223;
+YT-224 joins YT-220/221/223 and Done YT-218. Static HTML serialization does not
+technically depend on DOM completion. Each implementation follows its reviewed
+contract and obtains independent Reviewer PASS before Done. Reuse accepted
+unchanged evidence and retain failures; only changed behavior needs new checks.
+
+Planning review PASS0 has zero issues/required followups, with registered reviewer
+model/effective high effort verified. At planning acceptance all six items were
+Todo. The later owner-authorized YT-219 contract/source inventory is now Done
+at documentation scope after independent Reviewer PASS0; YT-220–224 remain Todo. The planning commit
+d1b8ac5 passed strict/builtin and was not pushed. No runtime/API, package/version/
+dependency, sample, CLI command, hosted job or Pages/release change is performed.
+YT-218's accepted live guide remains in place. Next unblockable item: YT-220 under later implementation
+authority; no implementation starts from this contract acceptance alone.
+
+### YT-220 implementation checkpoint — 2026-10-31
+
+The owner commits the seven YT-219 documents locally as c52ba85 with strict/
+builtin/native Guard PASS0, then selects [YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md).
+All51 ordinary additions are implemented in private DOM modules (89 total tags),
+with scoped attributes/canonical structures, bounded pre newline consistency and
+shared Todo consumer adoption. No new API/dependency/feature or URL permission.
+New native7 tests and1 affected old case, scoped Clippy, actual Wasm, Chrome156/
+Firefox159 parser/DOM/native-control/rejection cases and Chrome390x844 touch PASS.
+Initial lint and two-browser fixture/base failures remain recorded; owned server/
+browsers/profiles cleaned. Independent Reviewer PASS0,0 issues/followups and16
+hashes matched with registered role/model/effective high verified; YT-220 Done.
+YT-221–224 Todo, new work uncommitted/unpushed and existing distribution/live
+site untouched. This is not89-element exhaustive browser or performance proof.
+
+### YT-221 implementation checkpoint — 2026-10-31
+
+The owner authorizes strict/builtin commit4b88f3f of all16 accepted YT-220 paths,
+no Push; one unchanged hostile-URL test PATH_UNC warning is nonblocking.
+[YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md) is Done after contract PASS0 and
+minimal implementation. Typed policies retain strict defaults, separate named
+HTTPS navigation/image origins from form actions, and require complete browser
+URL preflight/frozen destinations before resource construction. Explicit Todo
+consumer and new native/Wasm/Chrome/Firefox policy/resource evidence PASS; first
+contract P2 and Firefox navigation-wait harness failure retained. Final independent
+Reviewer PASS0,0 issues/followups,23 stable inputs and verified model/effective
+high; owned cleanup complete. No old verification replay or new Git/publication step.
+YT-222–224 remain Todo. Current checkpoint supersedes earlier next-item wording.
+
+### YT-222 contract checkpoint — 2026-10-31
+
+The owner continues with [YT-222](YT-222-STATIC-HTML-CONTRACT.md), documentation
+only. Existing YT-221 product/contract/evidence remain accepted and uncommitted;
+shared status documents advance without replaying runtime validation. Select a
+finite native exporter protocol, typed build --static request, app-owned public
+Views/assets, bounded private document writer, root/project paths and create-only
+output. Optional prepared islands reuse the current startup/build boundary;
+HTML-only applications require no server/browser/Settings loader or Node.
+Independent Reviewer PASS0,0 issues/followups,21 matching inputs and verified
+model/effective high; YT-222 Done at contract scope and YT-223/224 Todo. No new runtime,
+Git delivery, hosted job or public-site/package change.
+
+### YT-223 implementation checkpoint — 2026-11-01
+
+Following authorized strict/builtin15-path commit9b46c30 (no Push), the owner
+selects [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md). Unreleased source adds
+finite static export/CLI, bounded metadata/CSP, protected create-only output and
+private receipts. The standalone registry-SDK consumer supports root/project
+HTML-only pages and separately prepared local Wasm. New native, actual failure/
+cancellation and local browser/packaging evidence is retained without replaying
+old qualification. Three unchanged strict-lint warnings remain explicit.
+MSVC current-source execution is Not verified after official transfer policy
+refusal; no transport bypass or new Git action. Independent local followup PASS0
+closes the retained Cargo-directory P2,46 inputs matched and0 issues/followups;
+prepared Windows Runner readiness does not verify this source. YT-223 In progress,
+YT-224 Todo. Public versions/site unchanged.

@@ -6,6 +6,10 @@ The module map below describes capabilities, not additional installable crates.
 Base defaults select HTML; Browser defaults select DOM. Native capabilities and
 GPU/action integrations are additive opt-ins with explicit startup wiring.
 Earlier sixteen-package releases and qualification records keep their original
+sources. [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md) separately implements an
+unreleased opt-in CLI static HTML export and standalone consumer; it adds no SDK
+module/default and retains an explicit pending MSVC gate. Published CLI0.1.1
+does not contain that command. Earlier records keep their original
 source, API names and scope. See [the migration](YT-211-TWO-PACKAGE-MIGRATION.md).
 
 Start at [Current API reference](API-REFERENCE.md) for current entry points,
@@ -19,7 +23,7 @@ publication of its linked execution records.
 |---|---|---|---|
 | `yetlet::view` | Renderer-neutral Views/components and bounded binding vocabulary; M9 classification applies | Yes | [Core guide](../crates/yetlet/guides/core.md) |
 | `yetlet::html` | Escaped HTML serialization and allowlisted elements/attributes; M9 classification applies | Yes | [HTML guide](../crates/yetlet/guides/html.md) |
-| `yetlet_browser::dom` | Restricted native browser DOM mount; M9 classification applies | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md) |
+| `yetlet_browser::dom` | Native validation/Wasm-only owned mount. Published SDK baseline:38 tags; unreleased source:89 default,90 with explicit ImagePolicy. YT-221 adds independent per-mount HTTPS link/image policies; strict defaults and same-origin forms remain. Not full HTML conformance | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md), [vocabulary](YT-220-HTML-DOM-IMPLEMENTATION.md), [URL/image contract](YT-221-DOM-URL-IMAGE-CONTRACT.md) |
 | `yetlet_browser::dom_keyed` | Optional keyed children and disposable listener/entry ownership | Yes | [Keyed DOM guide](../crates/yetlet-browser/guides/dom-keyed.md) |
 | `yetlet::reactive` | Optional synchronous local reducer/commit graph with explicit lifetime | Yes | [Reactive guide](../crates/yetlet/guides/reactive.md) |
 | `yetlet::actions` | Typed commands and explicit local/HTTP execution boundaries | Yes | [Actions guide](../crates/yetlet/guides/actions.md) |

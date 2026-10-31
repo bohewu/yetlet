@@ -10,6 +10,13 @@ Use guides for behavior and rustdoc from the same revision for signatures.
 [The migration contract](YT-211-TWO-PACKAGE-MIGRATION.md) records the complete
 source break, feature names and preserved boundaries.
 
+**Unreleased checkout additions:** YT-220 expands the DOM vocabulary;
+[YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md) adds DomOptions, NavigationPolicy,
+ImagePolicy, validate_with_options and Wasm mount_with_options. The
+[DOM guide](../crates/yetlet-browser/guides/dom.md#explicit-links-and-images-unreleased-source)
+shows their per-mount selection and provisional native validation. The published
+SDK table below retains its baseline; these additions are not yet distributed.
+
 For first authoring, follow [Views/components](VIEW-COMPONENTS.md). For package
 features, startup wiring and consumer settings/defaults in one place, use the
 [opt-in quick reference](OPT-IN-QUICK-REFERENCE.md); the tables below remain the
