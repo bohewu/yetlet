@@ -25,18 +25,29 @@ impl Default for NativeDraft {
 /// Optional URL/image surface; the caller explicitly supplies per-mount policies.
 /// This is not installed by `native_controls` and does not select browser options.
 pub fn controlled_links_and_image(href: &str, src: &str) -> View {
-    Element::new("section").attribute("id", "controlled-resources")
+    Element::new("section")
+        .attribute("id", "controlled-resources")
         .child(Element::new("h2").child(View::text("Controlled links and images")))
-        .child(Element::new("a").attribute("id", "controlled-link")
-            .attribute("href", href).attribute("target", "_blank")
-            .attribute("rel", "noopener noreferrer")
-            .attribute("referrerpolicy", "no-referrer")
-            .child(View::text("Open the selected documentation origin")))
-        .child(Element::new("img").attribute("id", "controlled-image")
-            .attribute("src", src).attribute("alt", "Selected example asset")
-            .attribute("width", "16").attribute("height", "16")
-            .attribute("loading", "eager").attribute("decoding", "async")
-            .attribute("referrerpolicy", "no-referrer"))
+        .child(
+            Element::new("a")
+                .attribute("id", "controlled-link")
+                .attribute("href", href)
+                .attribute("target", "_blank")
+                .attribute("rel", "noopener noreferrer")
+                .attribute("referrerpolicy", "no-referrer")
+                .child(View::text("Open the selected documentation origin")),
+        )
+        .child(
+            Element::new("img")
+                .attribute("id", "controlled-image")
+                .attribute("src", src)
+                .attribute("alt", "Selected example asset")
+                .attribute("width", "16")
+                .attribute("height", "16")
+                .attribute("loading", "eager")
+                .attribute("decoding", "async")
+                .attribute("referrerpolicy", "no-referrer"),
+        )
         .into()
 }
 
@@ -104,12 +115,18 @@ mod tests {
     #[test]
     fn yt221_controlled_surface_is_separate_and_escaped() {
         let html = yetlet::html::render_to_string(&controlled_links_and_image(
-            "https://docs.example.invalid/?a=1&b=2", "/mark.png?label=<demo>"
-        )).unwrap();
+            "https://docs.example.invalid/?a=1&b=2",
+            "/mark.png?label=<demo>",
+        ))
+        .unwrap();
         assert!(html.contains("rel=\"noopener noreferrer\""));
         assert!(html.contains("&amp;b=2"));
         assert!(html.contains("label=&lt;demo&gt;"));
-        assert!(!yetlet::html::render_to_string(&native_controls(&Default::default())).unwrap().contains("controlled-image"));
+        assert!(
+            !yetlet::html::render_to_string(&native_controls(&Default::default()))
+                .unwrap()
+                .contains("controlled-image")
+        );
     }
 
     #[test]

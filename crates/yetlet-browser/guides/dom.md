@@ -68,8 +68,8 @@ This subset has no separate orphan-table-part/summary fragment context API. Nati
 disclosure/control behavior remains browser-owned; imperative dialog methods and
 focus are explicitly application-owned. Pre's parsed initial newline and adjacent
 CR/LF stream now match direct DOM construction; affected serialized pre bytes may
-change. Published artifacts retain their old behavior. See the [implementation
-record and limits](../../../docs/YT-220-HTML-DOM-IMPLEMENTATION.md).
+change. Published artifacts retain their old behavior.
+See the [implementation record and limits](../../../docs/YT-220-HTML-DOM-IMPLEMENTATION.md).
 
 Initial input/textarea/select/checkbox defaults are declarative; live values, chosen events, reset and submission remain browser/application-owned. Textarea text has LF normalization and preserves an initial newline across SSR and DOM. See the shared [native controls example](../../../examples/todo-ui/src/controls.rs), available at `/app` and the no-JS `/controls` route in Todo.
 

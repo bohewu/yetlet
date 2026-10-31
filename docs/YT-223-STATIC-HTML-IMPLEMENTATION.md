@@ -171,3 +171,28 @@ retains five accepted unpushed commits (YT-218 closeout and YT-219–222). A fut
 delivery including this item would therefore expose53 combined changed paths,
 not merely this item's36 paths. The exact path/commit inventory and proposed
 Windows handoff are retained in target/yt223-20261031/.
+
+## Authorized delivery and first platform attempt (2026-11-01)
+
+The owner authorized the36-path implementation commit and delivery together with
+the five earlier unpushed commits. Commit6b42803 and its six-commit outgoing range
+passed strict/builtin Guard and normal hooks, with zero blocking findings.
+[PR44](https://github.com/bohewu/yetlet/pull/44) preserves the existing history;
+its accepted remote-master boundary is64d10742d62059c91dd2e46931aab1cb3b65d897.
+No Merge or publication is authorized.
+
+The prepared Windows Runner cloned that exact Git source successfully. Its first
+MSVC test compilation failed before executing tests: four old Windows console
+fixtures omitted the new optional budget argument to run_owned. The smallest
+compatibility correction explicitly passes None, preserving their prior unbounded
+behavior. The CLI binary build/runtime steps had not started. Fetch succeeded;
+it is not repeated by the followup.
+
+The first PR documentation build failed because one new multiline Markdown link
+escaped the existing line-based rewrite. Keeping that link on one line fixes the
+actual local eight-chapter build without changing the publisher. Stable CI stopped
+on rustfmt differences in the earlier Todo controls example; formatting that file
+now satisfies the workspace format check. The first MSRV job passed. These results
+are retained independently; no failed job or unchanged source was automatically
+retried. New-source MSVC/runtime verification, CI and independent acceptance remain
+pending. Receipts are under target/yt223-20261101-delivery/.
