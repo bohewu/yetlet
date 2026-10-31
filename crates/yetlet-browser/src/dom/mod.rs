@@ -11,6 +11,9 @@
 
 use yetlet::view::View;
 
+mod structure;
+mod vocabulary;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum DomPolicyError {
     UnsupportedTag(String),
@@ -43,106 +46,38 @@ impl std::fmt::Display for DomPolicyError {
 /// checks that spelling; mount additionally resolves URLs with the browser parser
 /// and requires HTTP(S), no credentials and the owner document's origin.
 pub fn validate(view: &View) -> Result<(), DomPolicyError> {
-    validate_inside(view, false)
+    validate_inside(view, false, None)
 }
 
-fn validate_inside(view: &View, inside_form: bool) -> Result<(), DomPolicyError> {
+fn validate_inside(
+    view: &View,
+    inside_form: bool,
+    parent: Option<&str>,
+) -> Result<(), DomPolicyError> {
     let View::Element(element) = view else {
         return Ok(());
     };
     let tag = element.tag();
-    if !matches!(
-        tag,
-        "main"
-            | "section"
-            | "div"
-            | "article"
-            | "header"
-            | "footer"
-            | "nav"
-            | "aside"
-            | "h1"
-            | "h2"
-            | "h3"
-            | "h4"
-            | "h5"
-            | "h6"
-            | "p"
-            | "span"
-            | "ul"
-            | "ol"
-            | "li"
-            | "dl"
-            | "dt"
-            | "dd"
-            | "strong"
-            | "em"
-            | "small"
-            | "code"
-            | "br"
-            | "hr"
-            | "button"
-            | "input"
-            | "label"
-            | "form"
-            | "fieldset"
-            | "legend"
-            | "textarea"
-            | "select"
-            | "option"
-            | "a"
-    ) {
+    if !vocabulary::supported_tag(tag) {
         return Err(DomPolicyError::UnsupportedTag(tag.into()));
     }
-    if matches!(tag, "input" | "br" | "hr") && !element.child_views().is_empty() {
+    if matches!(tag, "input" | "br" | "hr" | "col" | "wbr") && !element.child_views().is_empty() {
         return Err(DomPolicyError::VoidElementHasChildren(tag.into()));
     }
-    if (tag == "form" && inside_form)
-        || (matches!(tag, "textarea" | "option")
-            && element
-                .child_views()
-                .iter()
-                .any(|v| !matches!(v, View::Text(_))))
-        || (tag == "select"
-            && element.child_views().iter().any(|v| {
-                !matches!(v, View::Element(e) if e.tag() == "option")
-                    && !matches!(v, View::Text(s) if s.trim().is_empty())
-            }))
-    {
+    if tag == "form" && inside_form {
         return Err(DomPolicyError::InvalidChildren(tag.into()));
     }
+    structure::validate(element, parent)?;
     for (index, attribute) in element.attributes().iter().enumerate() {
         let name = attribute.name;
         if element.attributes()[..index].iter().any(|a| a.name == name) {
             return Err(DomPolicyError::DuplicateAttribute(name.into()));
         }
-        let global = matches!(
-            name,
-            "id" | "class" | "hidden" | "title" | "lang" | "dir" | "role" | "tabindex"
-            | "data-id" | "data-completed" | "data-select" | "data-title" | "data-meta" | "data-selected"
-            | "aria-live" | "aria-pressed" | "aria-label" | "aria-labelledby" | "aria-describedby"
-            | "aria-invalid" | "aria-busy" | "aria-hidden" | "aria-current" | "aria-expanded" | "aria-controls"
-            // Preserve the original subset's admission of these inert names.
-            | "type" | "for" | "placeholder" | "maxlength" | "autocomplete"
-        );
-        let scoped = match name {
-            "href" => tag == "a",
-            "action" | "method" => tag == "form",
-            "name" => matches!(tag, "input" | "button" | "textarea" | "select" | "form"),
-            "value" => matches!(tag, "input" | "button" | "option"),
-            "checked" => tag == "input",
-            "selected" => tag == "option",
-            "disabled" => matches!(
-                tag,
-                "input" | "button" | "textarea" | "select" | "fieldset" | "option"
-            ),
-            "required" => matches!(tag, "input" | "textarea" | "select"),
-            "readonly" => matches!(tag, "input" | "textarea"),
-            "rows" | "cols" => tag == "textarea",
-            _ => false,
-        };
-        if !global && !scoped {
+        if !vocabulary::attribute_allowed(tag, name) {
             return Err(DomPolicyError::UnsupportedAttribute(name.into()));
+        }
+        if !vocabulary::attribute_value_allowed(tag, name, &attribute.value) {
+            return Err(DomPolicyError::InvalidAttributeValue(name.into()));
         }
         if (matches!(name, "href" | "action")
             && !navigation_spelling(&attribute.value, name == "href"))
@@ -151,8 +86,9 @@ fn validate_inside(view: &View, inside_form: bool) -> Result<(), DomPolicyError>
             return Err(DomPolicyError::InvalidAttributeValue(name.into()));
         }
     }
+    vocabulary::validate_element_values(element)?;
     for child in element.child_views() {
-        validate_inside(child, inside_form || tag == "form")?;
+        validate_inside(child, inside_form || tag == "form", Some(tag))?;
     }
     Ok(())
 }
@@ -192,7 +128,7 @@ mod browser {
         Ok(target.href())
     }
 
-    fn create_node(document: &Document, view: &View) -> Result<Node, JsValue> {
+    fn create_node(document: &Document, view: &View, in_pre: bool) -> Result<Node, JsValue> {
         match view {
             View::Text(value) => Ok(document.create_text_node(value).into()),
             View::Element(element) => {
@@ -217,8 +153,27 @@ mod browser {
                         .collect();
                     node.set_text_content(Some(&text.replace("\r\n", "\n").replace('\r', "\n")));
                 } else {
-                    for child in element.child_views() {
-                        node.append_child(&create_node(document, child)?)?;
+                    let children = element.child_views();
+                    let normalize = in_pre || element.tag() == "pre";
+                    let mut index = 0;
+                    while index < children.len() {
+                        if normalize && matches!(children[index], View::Text(_)) {
+                            // HTML parses adjacent text as one stream, including split CR/LF.
+                            let mut text = String::new();
+                            while let Some(View::Text(value)) = children.get(index) {
+                                text.push_str(value);
+                                index += 1;
+                            }
+                            let text = text.replace("\r\n", "\n").replace('\r', "\n");
+                            node.append_child(&document.create_text_node(&text))?;
+                        } else {
+                            node.append_child(&create_node(
+                                document,
+                                &children[index],
+                                normalize,
+                            )?)?;
+                            index += 1;
+                        }
                     }
                 }
                 Ok(node.into())
@@ -235,7 +190,7 @@ mod browser {
         let document = target
             .owner_document()
             .ok_or_else(|| JsValue::from_str("DOM mount target has no document"))?;
-        let replacement = create_node(&document, view)?;
+        let replacement = create_node(&document, view, false)?;
         target.set_text_content(None);
         target.append_child(&replacement)?;
         Ok(())
@@ -327,7 +282,7 @@ mod tests {
             ("textarea", "value"),
             ("div", "href"),
             ("input", "selected"),
-            ("select", "multiple"),
+            ("div", "multiple"),
             ("button", "formaction"),
             ("a", "target"),
             ("p", "data-yetlet-owner"),
@@ -439,3 +394,6 @@ mod tests {
         assert!(validate(&link).is_err());
     }
 }
+
+#[cfg(test)]
+mod tests_yt220;

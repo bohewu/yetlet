@@ -1,6 +1,21 @@
 # Yetlet Experimental Compatibility Policy
 
-## Current two-package source — 2026-10-30
+## Current distribution and unreleased DOM source — 2026-10-31
+
+SDK0.9.0-alpha.5 is [published](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup)
+as yetlet/yetlet-browser; CLI0.1.1 is independently distributed. Historical
+checkpoints below retain their original pre-publication sources/status.
+
+[YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md) is an unreleased source change:
+DOM admission expands from38 to89 tags, with selected scoped attributes and
+structures, while URL/resource exclusions and public entry points stay intact.
+Pre serialization now compensates a leading parsed newline, including CR/CRLF
+input; affected output bytes can change while parsed text is preserved. It does
+not globally tighten SSR vocabulary or change escape_text. Old snapshots needing
+those bytes should adopt this documented correction when selecting the new
+source. No package/version/tag/signature is changed or republished by this item.
+
+## Historical two-package pre-publication source — 2026-10-30
 
 The unreleased development train is `0.9.0-alpha.5`, with exactly `yetlet` and
 `yetlet-browser`. [YT-211](YT-211-TWO-PACKAGE-MIGRATION.md) records the intentional

@@ -271,3 +271,16 @@ YT-219 is Done at documentation/source-contract scope after independent Reviewer
 PASS0, zero issues/followups and verified role/model/effective high effort.
 YT-220–224 remain Todo; later implementation needs its own authority.
 The original planning PASS and source baseline above remain historical evidence.
+
+## Subsequent YT-220 implementation checkpoint — 2026-10-31
+
+After strict/builtin commit c52ba85 of the accepted YT-219 documents (no Push),
+the owner selects [YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md). The unreleased
+checkout implements all51 ordinary additions and selected attributes/structures,
+pre parity and a shared Todo consumer. Focused new native/Wasm/Chrome/Firefox
+checks pass with original lint/fixture failures retained and owned cleanup.
+YT-220 is Done at selected unreleased-source scope after independent Reviewer
+PASS0, zero issues/followups and16 stable inputs with registered model/effective
+high effort verified. YT-221–224 remain Todo. No package/dependency/version, external navigation/image
+policy or live-site replacement is included; earlier checkpoints retain their
+own states and evidence.

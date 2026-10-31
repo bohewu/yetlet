@@ -583,17 +583,17 @@ The owner requested Rust-native repository tooling before a public CLI. The inde
 
 ## Ready queue
 
-**Current next item (2026-10-31):** YT-219 is Done at documentation-only
-[HTML/DOM contract scope](YT-219-HTML-DOM-CONTRACT.md), with the complete dated
-[element/attribute inventory](YT-219-HTML-INVENTORY.md). Source inspection selects
-90 target HTML elements (38 current,51 ordinary additions,1 controlled image),
-explicit exceptions, typed opt-in defaults and bounded SSR/parser/DOM parity.
-Independent Reviewer PASS0 accepts all seven doc/ten product-input bindings,
-zero issues/followups; registered model/effective high effort verified.
-YT-220 is next under later implementation authority; YT-220–224 remain Todo.
-The planning batch was
-committed locally as d1b8ac5 with strict/builtin PASS0; no Push. No runtime or
-old product-suite replay; YT-218's live guide remains unchanged.
+**Current next item (2026-10-31):** [YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md)
+is Done at selected unreleased-source scope after the owner-authorized
+strict/builtin YT-219 commit c52ba85
+(no Push). The reviewed contract stays Done. Unreleased source implements all51
+ordinary additions (89 tags total), scoped attributes/structures, pre parser
+parity and a shared Todo content consumer. New native7 tests plus1 affected case,
+scoped Clippy, Wasm and actual Chrome/Firefox changed-behavior checks PASS;
+initial lint/fixture failures remain. Independent implementation Reviewer PASS0,
+zero issues/followups,16 input hashes stable and registered model/effective high
+verified. Next is YT-221 under separate selection; YT-221–224 remain Todo. New changes are uncommitted/unpushed, SDK distribution
+and YT-218's live guide unchanged; no old qualification replay.
 
 **M12 next gate (2026-10-15):** YT-085 is Done after independent read-only Reviewer PASS with zero issues/followups (`target/m12/yt085/reviewer-board-retention-20261015/result.json`). The approved 30 Rust smoke/integration mappings retain 25 positive runtime results, one nonzero unavailable Chrome GPU path, and focused later Server/Browser/cleanup/Board receipt repair tests. Windows persistent-Service and Redis external integration are unverified; live Python callers/workflow transition is not yet completed. YT-086 is Done at bounded Rust migration scope after final independent Reviewer `wc_job_6UfDDdHnNCBXkMhA` PASS with zero issues/followups ([evidence](YT-086-VERIFICATION.md)). Full runtime invocation graph, GPU/Docker/Redis/hosted rebuild and full suite remain unverified. YT-087 is Done at the bounded unpublished Linux CLI preview scope after separate 087a/087b/087c independent Reviewer PASS decisions; no public release. YT-020 remains Blocked.
 **Framework/deployment scope clarification (2026-10-11):** Peon committed reviewed b3 as `4da0f6c`, preserving all inputs; no push. The [reconciled responsibility boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md) keeps provider semantics, supported configuration/error behavior and honest persistence limits in Yetlet scope. Production TLS/ACL policy, backup protection, business RPO/RTO and operational ownership belong to applications/operators and do not block framework completion. AOF/crash/restore rehearsals remain Not verified optional proposals; no implementation or new execution started. YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope; its final documentation review gate is recorded in M10g. YT-020 remains Blocked.
@@ -974,7 +974,7 @@ boundaries and YT-218's live site retain their current scope.
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
 | YT-219 | P1 | M | M25 | HTML/DOM coverage and compatibility contract | YT-110 | [Source-backed contract](YT-219-HTML-DOM-CONTRACT.md) and [complete inventory](YT-219-HTML-INVENTORY.md):113 named HTML elements/2 foreign roots/1 custom family,180 ordinary attribute-scope rows/144 names and89 inline-event names classified. Select38 current+51 YT-220+1 YT-221 elements, explicit document/executable/deferred boundaries; typed option names/defaults, finite scoped attributes, canonical table/control/pre parser parity and source-compatible entry points. Docs/source inspection only; independent Reviewer PASS0,0 issues/followups,7 doc/10 product-input bindings stable and registered role/model/effective high verified. Docs/links/structure/whitespace/DAG PASS, no runtime or old verification replay; YT-219 Done at contract scope | Done |
-| YT-220 | P1 | L | M25 | Broad semantic, table and native-control DOM vocabulary | YT-219 | [Implementation scope](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-220--ordinary-html-tables-and-native-controls): reviewed ordinary semantic/text/list/table/form/disclosure vocabulary, scoped attributes and parser/DOM structure consistency; canvas host only. Preserve View/event/keyed ownership, escaping and strict resource policy. Focused changed native/Wasm/browser/consumer evidence and independent Reviewer PASS | Todo |
+| YT-220 | P1 | L | M25 | Broad semantic, table and native-control DOM vocabulary | YT-219 | [Unreleased implementation/evidence](YT-220-HTML-DOM-IMPLEMENTATION.md):51 selected additions/89 tags, scoped ordinary attributes and canonical table/disclosure/figure/control checks; preserved legacy API/URL/ownership, private pre text-stream and SSR compensation, shared Todo content. New7 native tests plus1 affected rejection case, strict scoped Clippy, actual Wasm/Chrome156/Firefox159 tree/pre/native-interaction/8rejection and Chrome touch PASS; initial lint and common-base fixture failures retained. Independent Reviewer PASS0,0 issues/followups,16 hashes stable and registered role/model/effective high verified; no package/dependency/release change or old suite replay | Done |
 | YT-221 | P1 | M | M25 | Controlled navigation and image-resource DOM support | YT-219, YT-220 | [URL/image scope](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-221--navigation-and-image-url-policies): typed explicit opt-in external-link/image policy, unchanged existing strict defaults, browser-parsed/frozen destinations, separate form/resource rules and preflight before resource effects; responsive images require candidate grammar or explicit deferral. Focused isolated-origin/denied-request/consumer evidence and independent Reviewer PASS | Todo |
 | YT-222 | P2 | M | M25 | Static HTML export and CLI contract | YT-219 | [Contract scope](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-222--static-html-build-contract): finite public View/page and asset export, native app-owned build entry, safe output/base-prefix/CSP/config/error/receipt boundaries; propose build --static without claiming it exists. No handler crawl or mandatory browser/server/Settings provider. Docs only; independent Reviewer PASS | Todo |
 | YT-223 | P2 | L | M25 | Minimal opt-in static HTML build and CLI integration | YT-222 | [Implementation scope](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-223--minimal-static-build-and-cli-delivery): reviewed finite export protocol/build mode, small standalone multi-page consumer, HTML-only no-JS output, separately selected island using existing build tooling; focused CLI/output-root/project-prefix/CSP/MIME/GNU-MSVC affected evidence and cleanup, no deploy. Independent Reviewer PASS before Done | Todo |

@@ -29,7 +29,9 @@ and a Yetlet documentation pilot. Planning passed independent review;
 [YT-219's source-backed contract](YT-219-HTML-DOM-CONTRACT.md) is now Done
 at documentation scope after independent Reviewer PASS0, with a complete dated
 element/attribute inventory and stable seven doc/ten product-input bindings.
-YT-220–224 remain Todo; no runtime or live-site change.
+[YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md) is now Done with unreleased89-tag
+implementation, a shared consumer and focused native/Wasm/Chrome/Firefox evidence;
+independent Reviewer PASS0, zero issues/followups and16 source hashes matched. YT-221–224 remain Todo; live site/releases unchanged.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
@@ -2383,7 +2385,7 @@ resource/event/keyed ownership remain the compatibility baseline.
 | Item | Gate | State |
 |---|---|---|
 | YT-219 | [Complete inventory and compatibility contract](YT-219-HTML-DOM-CONTRACT.md):90 selected target HTML elements, explicit exclusions, typed defaults and scoped parser/DOM parity; independent Reviewer PASS0 | Done |
-| YT-220 | Implement reviewed semantic/table/native-control vocabulary with changed HTML/DOM/browser evidence | Todo |
+| YT-220 | [Unreleased89-tag implementation](YT-220-HTML-DOM-IMPLEMENTATION.md), scoped attributes/structures and pre parity; new native/Wasm/Chrome/Firefox checks PASS, independent Reviewer PASS0 | Done |
 | YT-221 | Review and implement explicit external-navigation/image policies without relaxing form/default boundaries | Todo |
 | YT-222 | Freeze finite public static HTML export, app-owned entry, CLI naming and output/config/CSP contract; docs only | Todo |
 | YT-223 | Implement minimal static build/CLI and standalone no-backend consumer, optional island separately selected | Todo |
@@ -2403,3 +2405,18 @@ d1b8ac5 passed strict/builtin and was not pushed. No runtime/API, package/versio
 dependency, sample, CLI command, hosted job or Pages/release change is performed.
 YT-218's accepted live guide remains in place. Next unblockable item: YT-220 under later implementation
 authority; no implementation starts from this contract acceptance alone.
+
+### YT-220 implementation checkpoint — 2026-10-31
+
+The owner commits the seven YT-219 documents locally as c52ba85 with strict/
+builtin/native Guard PASS0, then selects [YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md).
+All51 ordinary additions are implemented in private DOM modules (89 total tags),
+with scoped attributes/canonical structures, bounded pre newline consistency and
+shared Todo consumer adoption. No new API/dependency/feature or URL permission.
+New native7 tests and1 affected old case, scoped Clippy, actual Wasm, Chrome156/
+Firefox159 parser/DOM/native-control/rejection cases and Chrome390x844 touch PASS.
+Initial lint and two-browser fixture/base failures remain recorded; owned server/
+browsers/profiles cleaned. Independent Reviewer PASS0,0 issues/followups and16
+hashes matched with registered role/model/effective high verified; YT-220 Done.
+YT-221–224 Todo, new work uncommitted/unpushed and existing distribution/live
+site untouched. This is not89-element exhaustive browser or performance proof.

@@ -128,7 +128,9 @@ URL/images, define/implement finite static HTML build/CLI, then pilot this guide
 as an application-owned Yetlet consumer. Registration was planning only, with
 all six items Todo at its accepted checkpoint. The later
 [YT-219 contract](YT-219-HTML-DOM-CONTRACT.md) is Done at documentation scope
-after independent Reviewer PASS0; other items remain Todo. The proposed static mode is not an existing
+after independent Reviewer PASS0. YT-220's [unreleased source implementation](YT-220-HTML-DOM-IMPLEMENTATION.md)
+is now Done at its unreleased-source scope after independent Reviewer PASS0;
+YT-221–224 remain Todo. The proposed static mode is not an existing
 CLI command.
 
 Retain the current mdBook site/workflow and these eight source/excerpt/disclosure

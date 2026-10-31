@@ -7,6 +7,12 @@ renderer replaces a subtree; native SSR works without selecting it.
 selects `dom` by default; actual mounting requires the WASM target and browser
 host. The commands below run checkout examples at their documented scope.
 
+**Unreleased checkout change:** [YT-220](../../../docs/YT-220-HTML-DOM-IMPLEMENTATION.md)
+extends the source DOM vocabulary to89 elements with scoped attributes and
+canonical table/disclosure/control validation. These additions are not in the
+published SDK0.9.0-alpha.5's38-element baseline. No new package is published;
+use the selected source checkout to try this section's new capabilities.
+
 
 ## Prerequisites
 
@@ -42,7 +48,23 @@ validation alone does not mount anything or prove browser navigation acceptance.
 
 ### Supported subset and lifetime
 
-The finite [YT-110 vocabulary and contract](../../../docs/YT-110-DOM-CAPABILITIES.md#dom-vocabulary) supports 38 tags and 42 named attributes: ordinary semantic structure, explicit ARIA/data names, native form controls and bounded navigation. Unsupported names, duplicates, supported void-element children and invalid selected control structures fail before mutation. No arbitrary attribute-prefix expansion, inline style, inline handler or resource URL is admitted. Text uses nodes rather than `innerHTML`.
+The published [YT-110 baseline](../../../docs/YT-110-DOM-CAPABILITIES.md#dom-vocabulary)
+supports38 tags and42 named attributes. The unreleased YT-220 checkout adds all51
+ordinary elements selected by the [coverage contract](../../../docs/YT-219-HTML-DOM-CONTRACT.md):
+text semantics, explicit table sections, figure/caption, pre, classic controls,
+details/summary and canvas/dialog hosts. New scoped attributes and numeric/keyword
+checks coexist with old admission rules. Unsupported names, duplicates, void
+children and selected invalid shapes fail before mutation. No wildcard attributes,
+inline style/handler, resource URL, namespace or raw HTML escape is admitted.
+
+Build new structural families together in the supplied View: tables own explicit
+row sections, details owns its first summary, and figure owns its optional caption.
+This subset has no separate orphan-table-part/summary fragment context API. Native
+disclosure/control behavior remains browser-owned; imperative dialog methods and
+focus are explicitly application-owned. Pre's parsed initial newline and adjacent
+CR/LF stream now match direct DOM construction; affected serialized pre bytes may
+change. Published artifacts retain their old behavior. See the [implementation
+record and limits](../../../docs/YT-220-HTML-DOM-IMPLEMENTATION.md).
 
 Initial input/textarea/select/checkbox defaults are declarative; live values, chosen events, reset and submission remain browser/application-owned. Textarea text has LF normalization and preserves an initial newline across SSR and DOM. See the shared [native controls example](../../../examples/todo-ui/src/controls.rs), available at `/app` and the no-JS `/controls` route in Todo.
 

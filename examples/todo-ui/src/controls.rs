@@ -1,6 +1,8 @@
 //! A shared native-draft form: the browser owns edits and reset; GET only previews.
 use yetlet::view::{Element, View};
 
+mod content;
+
 #[derive(Debug, Clone)]
 pub struct NativeDraft {
     pub title: String,
@@ -74,6 +76,7 @@ pub fn native_controls(draft: &NativeDraft) -> View {
             .child(Element::new("a").attribute("id", "native-ssr-link").attribute("href", "/controls").child(View::text("Open the no-JS form")))
             .child(View::text(" | "))
             .child(Element::new("a").attribute("id", "native-anchor-link").attribute("href", "#native-controls").child(View::text("Jump to these controls"))))
+        .child(content::view())
         .into()
 }
 
