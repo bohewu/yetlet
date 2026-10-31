@@ -42,9 +42,10 @@ def record():
         'signer_commit': 'a' * 40, 'provenance': {'sha256': 'e' * 64, 'size': 123}, 'release_id': '15'}
 
 
-def fixture(directory, consolidated=False):
+def fixture(directory, consolidated=False, cli=False):
     r = record()
     if consolidated: r.update(schema=2, cohort="consolidated")
+    if cli: r.update(schema=3, cohort="cli", version="0.1.0")
     subjects = []
     for name in sorted(records.packages(r)):
         name += '-' + r['version'] + '.crate'
@@ -54,7 +55,7 @@ def fixture(directory, consolidated=False):
     statement = {'_type': 'https://in-toto.io/Statement/v1', 'predicateType': 'https://slsa.dev/provenance/v1',
         'subject': subjects, 'predicate': {'buildDefinition': {'externalParameters': {'cohort': r['cohort'],
         'workflow': {'repository': 'https://github.com/bohewu/yetlet', 'path': '.github/workflows/release.yml',
-        'ref': 'refs/tags/v' + r['version']}}, 'resolvedDependencies': [
+        'ref': 'refs/tags/' + records.tag(r)}}, 'resolvedDependencies': [
         {'uri': 'git+https://github.com/bohewu/yetlet', 'digest': {'gitCommit': r['source']}}]},
         'runDetails': {'metadata': {'invocationId': 'https://github.com/bohewu/yetlet/actions/runs/11/attempts/2'}}}}
     raw = records.canonical(statement)
@@ -125,6 +126,23 @@ class RecordTests(unittest.TestCase):
                 pub.s.bind_record(r)
                 with self.assertRaises(ValueError): pub.s.provenance(directory)
         pub.s.bind_record(record())
+
+    def test_cli_uses_its_own_version_tag_manifest_and_single_public_subject(self):
+        r = record(); r.update(schema=3, cohort='cli', version='0.1.0')
+        self.assertEqual(records.packages(r), {'yetlet-cli'})
+        self.assertEqual(records.tag(r), 'cli-v0.1.0')
+        records.source_version(r, ROOT)
+        for schema, cohort in ((1, 'cli'), (2, 'cli'), (3, 'sixteen'), (3, 'consolidated')):
+            with self.assertRaises(ValueError): records.validate(dict(r, schema=schema, cohort=cohort))
+        with self.assertRaises(ValueError): records.source_version(dict(r, version=records.CLI_SDK_VERSION), ROOT)
+        with tempfile.TemporaryDirectory() as temp:
+            directory = Path(temp); r = fixture(directory, cli=True)
+            try:
+                pub.s.bind_record(r)
+                self.assertEqual(pub.s.provenance(directory), r['provenance']['sha256'])
+                self.assertEqual(pub.names(), {'yetlet-cli-0.1.0.crate', 'PROVENANCE-UNSIGNED.json',
+                    'RELEASE-CHECKSUMS.json', 'provenance.sigstore.json', 'SIGNING-APPROVAL.json'})
+            finally: pub.s.bind_record(record())
 
     def test_stage_requirements_and_canonical_digest(self):
         r = record(); core = {k: r[k] for k in records.CORE}

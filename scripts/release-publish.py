@@ -188,8 +188,47 @@ def published_release(p, previous):
             'original_plan_sha256': s.records.digest(p), 'assets': previous['assets'], 'github_mutations': False}
 
 
+def cli_consumer(version, output):
+    """Install the exact published executable anonymously; do not compile it as an SDK."""
+    with tempfile.TemporaryDirectory(prefix='yetlet-cli-consumer-') as temporary:
+        root = Path(temporary)
+        env = {k: os.environ[k] for k in ('PATH', 'HOME', 'RUSTUP_HOME', 'SSL_CERT_FILE', 'SSL_CERT_DIR',
+               'HTTPS_PROXY', 'HTTP_PROXY', 'NO_PROXY') if k in os.environ}
+        env.update(CARGO_HOME=str(root / 'cargo-home'), RUSTUP_TOOLCHAIN='1.99.0',
+                   CARGO_BUILD_JOBS='2', CARGO_TERM_COLOR='never')
+        args = ['cargo', '+1.99.0', 'install', 'yetlet-cli', '--version', version,
+                '--locked', '--root', str(root / 'install'), '--bin', 'yetlet']
+        result = subprocess.run(args, cwd=root, env=env, capture_output=True, timeout=600)
+        (output / 'consumer-install.stdout').write_bytes(result.stdout)
+        (output / 'consumer-install.stderr').write_bytes(result.stderr)
+        s.require(result.returncode == 0)
+        executable = root / 'install/bin/yetlet'
+        for label, argv in [('version', ['--version']), ('help', ['--help']),
+                            ('new', ['new', 'consumerapp', '--parent', str(root)])]:
+            result = subprocess.run([str(executable), *argv], cwd=root, env=env,
+                                    capture_output=True, timeout=30)
+            (output / ('consumer-' + label + '.stdout')).write_bytes(result.stdout)
+            (output / ('consumer-' + label + '.stderr')).write_bytes(result.stderr)
+            s.require(result.returncode == 0)
+            if label == 'version': s.require(result.stdout.strip() == ('yetlet ' + version).encode())
+        import tomllib
+        manifest = tomllib.loads((root / 'consumerapp/Cargo.toml').read_text())
+        sdk = manifest['dependencies']['yetlet']
+        s.require(sdk['version'] == '=' + s.records.CLI_SDK_VERSION and 'path' not in sdk
+                  and not {'patch', 'replace'} & set(manifest))
+        installed = list((root / 'cargo-home/registry/src').glob('*/yetlet-cli-' + version + '/Cargo.lock'))
+        s.require(len(installed) == 1)
+        lock = installed[0].read_bytes()
+        (output / 'REGISTRY-CONSUMER.lock').write_bytes(lock)
+        return {'status': 'PASS', 'lock_sha256': s.sha(lock), 'cli_exact_version': version,
+                'sdk_version': s.records.CLI_SDK_VERSION, 'source_install': True,
+                'path_patches': False, 'credentials_forwarded': False}
+
+
 def consumer(version, output):
     """Fresh registry-only consumer; no publish token, path patch or source replacement."""
+    if s.RECORD['schema'] == 3:
+        return cli_consumer(version, output)
     with tempfile.TemporaryDirectory(prefix='yetlet-registry-consumer-') as temporary:
         root = Path(temporary)
         (root / 'src').mkdir()
@@ -245,6 +284,9 @@ def main():
                     'job_timeout_minutes': 210})
             else:
                 p, blobs, reg, bodies = distribution(r, Path(temporary))
+            if s.RECORD['schema'] == 3:
+                s.require(len(reg['packages']) == 1 and reg['packages'][0]['name'] == 'yetlet-cli')
+                registry.require_absent(reg['packages'][0], s.RECORD['version'])
             s.json_write(output / 'PUBLICATION-PLAN.json', p)
             s.json_write(output / 'REGISTRY-PLAN.json', reg)
             if not approved:
@@ -261,6 +303,8 @@ def main():
                 return
             phase = 'publication-recheck'
             gate(r, True)  # Recheck approval, source/CI and original artifact immediately before writes.
+            if s.RECORD['schema'] == 3:
+                registry.require_absent(reg['packages'][0], s.RECORD['version'])
             receipt['status'] = 'attempted'
             if selection is not None:
                 phase = 'published-release-recheck'

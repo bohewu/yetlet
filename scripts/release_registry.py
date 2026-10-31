@@ -92,6 +92,9 @@ def prepare(record, directory, subjects):
         raw = path.read_bytes()
         require(sha(raw) == subjects[filename])
         meta = metadata(raw, name, record['version'])
+        if record['schema'] == 3:
+            sdk = [d for d in meta['deps'] if d['name'] == 'yetlet' and d['kind'] == 'normal']
+            require(len(sdk) == 1 and sdk[0]['version_req'] == '=' + records.CLI_SDK_VERSION)
         dependencies = sorted({d['name'] for d in meta['deps'] if d['name'] in packages})
         for d in meta['deps']:
             if d['name'] in packages:
@@ -129,7 +132,7 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 def request(url, method='GET', body=None):
     require(method in ('GET', 'PUT'))
-    names = records.PACKAGES | records.CONSOLIDATED
+    names = records.PACKAGES | records.CONSOLIDATED | records.CLI
     allowed_read = url == OWNER_API or any(
         url == 'https://index.crates.io/ye/tl/' + name or (
             url.startswith('https://static.crates.io/crates/' + name + '/' + name + '-')

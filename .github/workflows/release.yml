@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       record:
-        description: Reviewed versioned release-record JSON (schema 1/sixteen or schema 2/consolidated)
+        description: Reviewed versioned release-record JSON (schema 1/sixteen, 2/consolidated or 3/cli)
         type: string
         required: true
 
@@ -50,7 +50,7 @@ jobs:
           r = json.loads(os.environ['RELEASE_RECORD'])
           assert re.fullmatch('[0-9a-f]{40}', r['source'])
           assert r['source'] == os.environ['GITHUB_SHA']
-          assert os.environ['GITHUB_REF'].startswith('refs/tags/v')
+          assert os.environ['GITHUB_REF'] == 'refs/tags/' + ('cli-v' if r.get('schema') == 3 else 'v') + r['version']
           assert os.environ['BUILD_WORKFLOW_REF'] == 'bohewu/yetlet/.github/workflows/release.yml@' + os.environ['GITHUB_REF']
           PYRECORD
           python3 scripts/release_record.py source release.yml

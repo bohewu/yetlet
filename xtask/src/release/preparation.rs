@@ -15,11 +15,14 @@ use std::{
 };
 
 const REPOSITORY: &str = "bohewu/yetlet";
-fn tag() -> String {
-    format!("refs/tags/v{}", private::package_version())
+fn tag(cohort: Cohort) -> String {
+    cohort.tag()
 }
-fn workflow() -> String {
-    format!("bohewu/yetlet/.github/workflows/release.yml@{}", tag())
+fn workflow(cohort: Cohort) -> String {
+    format!(
+        "bohewu/yetlet/.github/workflows/release.yml@{}",
+        tag(cohort)
+    )
 }
 const OPENSSL_SHA: &str = "603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a";
 const PROVENANCE: &str = "PROVENANCE-UNSIGNED.json";
@@ -41,12 +44,17 @@ fn git(root: &Path, args: &[&str]) -> Result<String> {
 }
 fn identity(root: &Path, expected: &str, env: &BTreeMap<String, String>) -> Result<()> {
     let get = |key: &str| env.get(key).map(String::as_str).unwrap_or("");
+    let cohort = env
+        .get("RELEASE_COHORT")
+        .map(|v| Cohort::from_label(v))
+        .transpose()?
+        .unwrap_or(Cohort::Consolidated);
     require(commit_token(expected), "explicit lowercase commit required")?;
     require(
         get("GITHUB_REPOSITORY") == REPOSITORY
             && get("GITHUB_EVENT_NAME") == "workflow_dispatch"
-            && get("GITHUB_REF") == tag()
-            && get("BUILD_WORKFLOW_REF") == workflow()
+            && get("GITHUB_REF") == tag(cohort)
+            && get("BUILD_WORKFLOW_REF") == workflow(cohort)
             && get("GITHUB_SHA") == expected
             && get("BUILD_WORKFLOW_SHA") == expected,
         "release preparation identity mismatch",
@@ -64,7 +72,11 @@ fn identity(root: &Path, expected: &str, env: &BTreeMap<String, String>) -> Resu
         git(root, &["rev-parse", "HEAD"])?.trim() == expected
             && git(
                 root,
-                &["rev-parse", "--verify", &format!("{}^{{commit}}", tag())],
+                &[
+                    "rev-parse",
+                    "--verify",
+                    &format!("{}^{{commit}}", tag(cohort)),
+                ],
             )?
             .trim()
                 == expected,
@@ -173,7 +185,7 @@ pub(super) fn finish(
             == cohort
                 .names()
                 .iter()
-                .map(|n| format!("{n}-{}.crate", private::package_version()))
+                .map(|n| format!("{n}-{}.crate", cohort.version()))
                 .collect(),
         "exact selected archive subjects required",
     )?;
@@ -256,7 +268,7 @@ pub(super) fn finish(
         "predicate":{
             "buildDefinition":{
                 "buildType":"urn:yetlet:build:cargo-source-package:v1",
-                "externalParameters":{"workflow":{"repository":"https://github.com/bohewu/yetlet","path":".github/workflows/release.yml","ref":tag()},"cohort":cohort.label()},
+                "externalParameters":{"workflow":{"repository":"https://github.com/bohewu/yetlet","path":".github/workflows/release.yml","ref":tag(cohort)},"cohort":cohort.label()},
                 "internalParameters":{"rust_release":"1.99.0","target":"x86_64-unknown-linux-gnu","default_package_features":true,"openssl":"3.5.9","source_date_epoch":record["source_date_epoch"]},
                 "resolvedDependencies":dependencies
             },
@@ -321,13 +333,19 @@ mod tests {
         git_fixture(root, &["add", "."]);
         git_fixture(root, &["commit", "-qm", "fixture"]);
         let commit = git_fixture(root, &["rev-parse", "HEAD"]);
-        git_fixture(root, &["tag", tag().trim_start_matches("refs/tags/")]);
+        git_fixture(
+            root,
+            &[
+                "tag",
+                tag(Cohort::Consolidated).trim_start_matches("refs/tags/"),
+            ],
+        );
         git_fixture(root, &["update-ref", "refs/remotes/origin/master", &commit]);
         let env = [
             ("GITHUB_REPOSITORY", REPOSITORY),
             ("GITHUB_EVENT_NAME", "workflow_dispatch"),
-            ("GITHUB_REF", &tag()),
-            ("BUILD_WORKFLOW_REF", &workflow()),
+            ("GITHUB_REF", &tag(Cohort::Consolidated)),
+            ("BUILD_WORKFLOW_REF", &workflow(Cohort::Consolidated)),
             ("GITHUB_SHA", &commit),
             ("BUILD_WORKFLOW_SHA", &commit),
             ("GITHUB_RUN_ID", "123"),
@@ -391,20 +409,48 @@ mod tests {
         git_fixture(root, &["checkout", "-q", &commit]);
         git_fixture(
             root,
-            &["tag", "-f", tag().trim_start_matches("refs/tags/"), &next],
+            &[
+                "tag",
+                "-f",
+                tag(Cohort::Consolidated).trim_start_matches("refs/tags/"),
+                &next,
+            ],
         );
         assert!(identity(root, &commit, &env).is_err()); // tag disagreement
         git_fixture(
             root,
-            &["tag", "-f", tag().trim_start_matches("refs/tags/"), &commit],
+            &[
+                "tag",
+                "-f",
+                tag(Cohort::Consolidated).trim_start_matches("refs/tags/"),
+                &commit,
+            ],
         );
-        git_fixture(root, &["tag", "-d", tag().trim_start_matches("refs/tags/")]);
+        git_fixture(
+            root,
+            &[
+                "tag",
+                "-d",
+                tag(Cohort::Consolidated).trim_start_matches("refs/tags/"),
+            ],
+        );
         assert!(identity(root, &commit, &env).is_err()); // missing tag
-        git_fixture(root, &["tag", tag().trim_start_matches("refs/tags/")]);
+        git_fixture(
+            root,
+            &[
+                "tag",
+                tag(Cohort::Consolidated).trim_start_matches("refs/tags/"),
+            ],
+        );
         git_fixture(root, &["checkout", "-q", &next]);
         git_fixture(
             root,
-            &["tag", "-f", tag().trim_start_matches("refs/tags/"), &next],
+            &[
+                "tag",
+                "-f",
+                tag(Cohort::Consolidated).trim_start_matches("refs/tags/"),
+                &next,
+            ],
         );
         let mut changed = env;
         changed.insert("GITHUB_SHA".into(), next.clone());
@@ -415,6 +461,23 @@ mod tests {
         fs::write(root.join("untracked"), "dirty").unwrap();
         assert!(identity(root, &next, &changed).is_err());
         assert!(!root.join("target").exists());
+    }
+
+    #[test]
+    fn cli_identity_requires_cli_namespace_and_keeps_colocated_source_guards() {
+        let temp = tempfile::tempdir().unwrap();
+        let root = temp.path();
+        let (commit, mut env) = fixture_identity(root);
+        git_fixture(
+            root,
+            &["tag", tag(Cohort::Cli).trim_start_matches("refs/tags/")],
+        );
+        env.insert("RELEASE_COHORT".into(), "cli".into());
+        env.insert("GITHUB_REF".into(), tag(Cohort::Cli));
+        env.insert("BUILD_WORKFLOW_REF".into(), workflow(Cohort::Cli));
+        identity(root, &commit, &env).unwrap();
+        env.insert("GITHUB_REF".into(), tag(Cohort::Consolidated));
+        assert!(identity(root, &commit, &env).is_err());
     }
 
     fn keys(v: &Value) -> BTreeSet<&str> {
@@ -428,6 +491,10 @@ mod tests {
         check_statement(Cohort::Sixteen);
         check_statement(Cohort::Consolidated);
     }
+    #[test]
+    fn cli_statement_has_one_subject_own_lock_and_cli_tag() {
+        check_statement(Cohort::Cli);
+    }
     fn check_statement(cohort: Cohort) {
         let temp = tempfile::tempdir().unwrap();
         let root = temp.path();
@@ -435,7 +502,7 @@ mod tests {
         fs::create_dir_all(&out).unwrap();
         let mut archives = BTreeMap::new();
         for name in cohort.names() {
-            let file = format!("{name}-{}.crate", private::package_version());
+            let file = format!("{name}-{}.crate", cohort.version());
             let bytes = file.as_bytes();
             archives.insert(
                 file.clone(),
@@ -487,7 +554,10 @@ mod tests {
             &definition["externalParameters"]["workflow"],
             &["repository", "path", "ref"],
         );
-        assert_eq!(definition["externalParameters"]["workflow"]["ref"], tag());
+        assert_eq!(
+            definition["externalParameters"]["workflow"]["ref"],
+            tag(cohort)
+        );
         exact_keys(
             &definition["internalParameters"],
             &[

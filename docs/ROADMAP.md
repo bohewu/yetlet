@@ -1,5 +1,16 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-215 first independent CLI release preparation (2026-10-31):**
+The owner selects [yetlet-cli0.1.0](YT-215-CLI-FIRST-RELEASE.md) preparation through
+the final owner gate, using the already-published SDK0.9.0-alpha.5. Closed
+schema3/cli uses its own manifest and cli-v0.1.0 namespace, one archive and five
+public files. Preserve SDK releases and existing identity/custody/protections;
+reuse accepted runtime/platform proof and supplement only missing CLI release
+boundaries. Contract and implementation independent Reviewer PASS0 after the preserved
+inherited-RSA-exception disclosure correction. Actual source/tag/build/readback/
+signature/result identities remain Pending. No registry
+upload or public CLI release yet.
+
 **Current alpha.5 publication and CLI installation (2026-10-31):**
 The [two-package alpha.5 release](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup)
 and both registry uploads complete at owner-approved run41104391525/1, with
