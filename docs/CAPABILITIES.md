@@ -6,6 +6,10 @@ The module map below describes capabilities, not additional installable crates.
 Base defaults select HTML; Browser defaults select DOM. Native capabilities and
 GPU/action integrations are additive opt-ins with explicit startup wiring.
 Earlier sixteen-package releases and qualification records keep their original
+sources. [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md) separately implements an
+unreleased opt-in CLI static HTML export and standalone consumer; it adds no SDK
+module/default and retains an explicit pending MSVC gate. Published CLI0.1.1
+does not contain that command. Earlier records keep their original
 source, API names and scope. See [the migration](YT-211-TWO-PACKAGE-MIGRATION.md).
 
 Start at [Current API reference](API-REFERENCE.md) for current entry points,

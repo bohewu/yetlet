@@ -136,8 +136,10 @@ evidence; final independent Reviewer PASS0 completes YT-221 at unreleased-source
 scope. [YT-222](YT-222-STATIC-HTML-CONTRACT.md) is Done at documentation-only
 static-export/CLI contract scope: finite public fragments/assets, bounded head,
 project-prefix paths, local CSP/islands and protected create-only output.
-Independent Reviewer PASS0; YT-223/224 remain Todo. The proposed static mode is
-not an existing CLI command.
+Independent Reviewer PASS0. [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md) now has
+an unreleased static-build implementation and explicit standalone consumer;
+local independent review PASS0 and pending MSVC gate are separate. YT-223
+is In progress and YT-224 Todo. Published CLI0.1.1 does not contain this mode.
 
 Retain the current mdBook site/workflow and these eight source/excerpt/disclosure
 boundaries during the pilot. The existing browser CLI already produces static-

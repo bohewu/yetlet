@@ -26,6 +26,14 @@ Existing consumers need no migration. Public View, SSR and package/dependency/
 feature/version identities are unchanged. Published artifacts do not contain
 these source APIs or inherit their new verification.
 
+[YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md) adds unreleased CLI build --static,
+an explicit native export protocol and Cli::BuildStatic/build_static support.
+Existing Build fields and ordinary commands/settings stay unchanged. Rust
+callers exhaustively matching Cli must handle the new variant; no old-name
+alias or silent settings migration is introduced. Public SDK View/HTML/server/
+browser APIs and published CLI0.1.1 are unchanged. New local evidence does not
+complete the pending current-source MSVC gate or select a release version.
+
 ## Historical two-package pre-publication source — 2026-10-30
 
 The unreleased development train is `0.9.0-alpha.5`, with exactly `yetlet` and

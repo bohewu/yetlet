@@ -38,7 +38,9 @@ evidence complete; final independent Reviewer PASS0,0 issues/followups and23 sta
 input hashes. [YT-222](YT-222-STATIC-HTML-CONTRACT.md) is Done at
 documentation-only finite static-export/CLI contract scope, independent Reviewer
 PASS0,0 issues/followups and21 stable input hashes;
-YT-223/224 remain Todo;
+the [YT-223 implementation](YT-223-STATIC-HTML-IMPLEMENTATION.md) is In progress
+with local independent followup PASS0, required MSVC gate policy-blocked and
+Not verified; YT-224 remains Todo;
 live site/releases unchanged.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
@@ -2396,7 +2398,7 @@ resource/event/keyed ownership remain the compatibility baseline.
 | YT-220 | [Unreleased89-tag implementation](YT-220-HTML-DOM-IMPLEMENTATION.md), scoped attributes/structures and pre parity; new native/Wasm/Chrome/Firefox checks PASS, independent Reviewer PASS0 | Done |
 | YT-221 | [Controlled link/image implementation](YT-221-DOM-URL-IMAGE-CONTRACT.md), contract PASS0, unchanged defaults/full resource preflight and new native/Wasm/Chrome/Firefox evidence; final independent Reviewer PASS0 | Done |
 | YT-222 | [Finite static export/CLI contract](YT-222-STATIC-HTML-CONTRACT.md): app-owned exporter, typed build --static request, bounded documents/assets/base/CSP, protected create-only publication and private receipts; docs only, independent Reviewer PASS0 | Done |
-| YT-223 | Implement minimal static build/CLI and standalone no-backend consumer, optional island separately selected | Todo |
+| YT-223 | [Minimal static build/CLI](YT-223-STATIC-HTML-IMPLEMENTATION.md), explicit no-backend consumer and optional island; local evidence/followup PASS0, required current-source MSVC gate policy-blocked/Not verified | In progress |
 | YT-224 | Pilot Yetlet-built docs from the same eight sources with static content and optional Wasm; no live replacement | Todo |
 
 Dependency paths are YT-219→YT-220→YT-221 and YT-219→YT-222→YT-223;
@@ -2455,3 +2457,18 @@ HTML-only applications require no server/browser/Settings loader or Node.
 Independent Reviewer PASS0,0 issues/followups,21 matching inputs and verified
 model/effective high; YT-222 Done at contract scope and YT-223/224 Todo. No new runtime,
 Git delivery, hosted job or public-site/package change.
+
+### YT-223 implementation checkpoint — 2026-11-01
+
+Following authorized strict/builtin15-path commit9b46c30 (no Push), the owner
+selects [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md). Unreleased source adds
+finite static export/CLI, bounded metadata/CSP, protected create-only output and
+private receipts. The standalone registry-SDK consumer supports root/project
+HTML-only pages and separately prepared local Wasm. New native, actual failure/
+cancellation and local browser/packaging evidence is retained without replaying
+old qualification. Three unchanged strict-lint warnings remain explicit.
+MSVC current-source execution is Not verified after official transfer policy
+refusal; no transport bypass or new Git action. Independent local followup PASS0
+closes the retained Cargo-directory P2,46 inputs matched and0 issues/followups;
+prepared Windows Runner readiness does not verify this source. YT-223 In progress,
+YT-224 Todo. Public versions/site unchanged.
