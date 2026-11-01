@@ -1,6 +1,7 @@
 //! Internal compile-time filesystem boundary; no public adapter API.
 #[cfg(target_os = "linux")]
 mod linux;
+pub(crate) mod static_output;
 #[cfg(not(any(target_os = "linux", windows)))]
 mod unsupported;
 #[cfg(windows)]

@@ -15,6 +15,7 @@ pub mod key;
 mod platform;
 pub mod scaffold;
 mod settings;
+mod static_export;
 
 #[cfg(test)]
 #[path = "../tests/fixtures/compose_app.rs"]
@@ -29,13 +30,13 @@ use std::{
 };
 
 pub const VERSION: &str = concat!("yetlet ", env!("CARGO_PKG_VERSION"));
-pub const HELP: &str = "Yetlet CLI preview\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet inspect [--manifest-path PATH] [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
+pub const HELP: &str = "Yetlet CLI preview\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet inspect [--manifest-path PATH] [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet build --static --export-bin NAME --output DIRECTORY [--base-path /] [--release] [--wasm-islands]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
 const NEW_HELP: &str = "Usage: yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n\nNAME may appear anywhere among options. --parent defaults to cwd and must exist.\nNAME: 1-64 lowercase ASCII letters/digits/-/_, starting with a letter; reserved names refused.\n--vite selects the complete frontend scaffold and implies --settings. Plain new keeps app-runtime settings opt-in.\n--tailwind selects standalone Tailwind or the official Vite plugin. --service adds bind/health/shutdown.\n--template native|browser selects a built-in starter (default native), independent of runtime settings.\nThe browser template persists cli.target=browser and includes Vite/public settings.\nBrowser creation refuses --service. Plain creation defaults to native.\nCreates one new tree without overwrite, dependency installation, lock generation or process startup.\n";
 const DOCTOR_HELP: &str = "Usage: yetlet doctor [--json]\n\nReports bounded local Rust/Cargo 1.99+ identity and compiled new-filesystem capability.\nEnvironment only; application, framework, settings, frontend and execution readiness are not checked.\n--json emits schema 1. No builds, installs, Node probes or listeners.\n";
 const INSPECT_HELP: &str = "Usage: yetlet inspect [--manifest-path PATH] [--json]\n\nExplains public-settings execution plans for build/run/watch without running tools.\nManifest defaults to exactly cwd/Cargo.toml; requires a protected standalone app and Cargo.lock.\n--json emits project-execution-plan schema 1, separate from environment-only doctor.\nNative watch plans select Rust rebuild/restart; browser watch plans select WASM rebuild/full-page reload\nonly when cli.vite.auto_start and cli.vite.auto_build are both true.\nNo writes, secret sources, frontend inspection or readiness verification.\n";
 const RUN_HELP: &str = "Usage: yetlet run [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; no ancestor or workspace search.\nRequires a protected standalone app and existing Cargo.lock; runs frozen Cargo.\nPublic settings select native Rust watch/Vite or cli.target=browser static preview.\nBrowser run starts only the prepared frontend, honoring cli.vite.auto_start. No implicit installs.\nOwned processes must retain their process group/Job; escaped daemons are unsupported.\n";
 const WATCH_HELP: &str = "Usage: yetlet watch [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; requires a protected standalone app and Cargo.lock.\nPublic settings are validated before selecting the target-specific pipeline.\nNative: forces cli.rust.watch for this invocation and requires Watchexec on PATH.\nRust rebuild/restart retains Vite; Vite enabled, auto_start and root settings still apply.\nBrowser: requires both cli.vite.auto_start and cli.vite.auto_build; otherwise skips without children.\nThe frontend owns serialized WASM rebuild/full-page reload; no native watcher or Rust state restoration.\nVite owns TS/CSS HMR. No implicit installs or settings-file changes; cancellation cleans up owned processes.\n";
-const BUILD_HELP: &str = "Usage: yetlet build [--manifest-path PATH] [--release]\n\nManifest defaults to exactly cwd/Cargo.toml. Requires a protected standalone app and existing Cargo.lock.\nSettings select native frontend-then-Cargo, or cli.target=browser frontend-only build.\nBrowser build honors cli.vite.auto_build; skipped stages exit 0 without children.\n--release selects the Cargo build profile; it does not change APP_ENVIRONMENT. No implicit installs.\n";
+const BUILD_HELP: &str = "Usage: yetlet build [--manifest-path PATH] [--release]\n\nManifest defaults to exactly cwd/Cargo.toml. Requires a protected standalone app and existing Cargo.lock.\nSettings select native frontend-then-Cargo, or cli.target=browser frontend-only build.\nBrowser build honors cli.vite.auto_build; skipped stages exit 0 without children.\n--release selects the Cargo build profile; it does not change APP_ENVIRONMENT. No implicit installs.\n\nStatic HTML: yetlet build --static --export-bin NAME --output DIRECTORY [--base-path /] [--release] [--wasm-islands]\nRequires cli.target=native; validates settings, then runs the trusted native exporter via frozen Cargo.\nNo implicit frontend build or watch. HTML-only requires no Node/WASM/server in the app.\nOutput is create-only under a protected existing parent, never overwritten; app-local output belongs below artifacts/.\n--base-path is an origin-root prefix such as /yetlet/. --wasm-islands permits separately prepared local assets.\nStatic HTML export differs from browser-only Wasm hosting. No deployment or sandbox; inspect does not plan static mode.\n";
 const GENERATE_HELP: &str = "Usage:\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nWrites configuration only for qualified source/lock representations, without overwrite.\nNo image build/pull, source export, credentials lookup or deployment.\n";
 const DOCKER_HELP: &str = "Usage: yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n\nManifest defaults to cwd/Cargo.toml. Output is a complete new directory under an existing protected parent.\nQualified source/lock inspection only; writes configuration without tools or source export.\n";
 const COMPOSE_HELP: &str = "Usage: yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nManifest defaults to cwd/Cargo.toml. Uses an explicit separately built Linux/amd64 image.\nIMAGE requires an explicit tag or sha256 digest. No build, pull or deployment.\n";
@@ -66,6 +67,14 @@ pub enum Cli {
         manifest: PathBuf,
         release: bool,
     },
+    BuildStatic {
+        manifest: PathBuf,
+        export_bin: String,
+        output: PathBuf,
+        base_path: String,
+        release: bool,
+        wasm_islands: bool,
+    },
     Run {
         manifest: PathBuf,
     },
@@ -89,6 +98,30 @@ pub enum Cli {
 }
 
 impl Cli {
+    /// Execute the explicitly parsed finite static-build mode.
+    pub fn build_static(&self) -> Result<app::Completion, app::Failure> {
+        match self {
+            Self::BuildStatic {
+                manifest,
+                export_bin,
+                output,
+                base_path,
+                release,
+                wasm_islands,
+            } => static_export::execute(
+                manifest,
+                export_bin,
+                output,
+                base_path,
+                *release,
+                *wasm_islands,
+            ),
+            _ => Err(app::Failure {
+                code: 2,
+                message: "expected build --static command".into(),
+            }),
+        }
+    }
     /// Execute only the parsed Kubernetes CLI command. No public generator API.
     pub fn generate_k8s(&self) -> Result<(), String> {
         match self {
@@ -170,6 +203,9 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
     let mut manifest = None;
     let mut output = None;
     let mut image = None;
+    let mut export_bin = None;
+    let mut base_path = None;
+    let (mut static_mode, mut wasm_islands) = (false, false);
     let (mut json, mut service, mut runtime_settings, mut tailwind, mut vite, mut release) =
         (false, false, false, false, false, false);
     let mut index = start;
@@ -192,8 +228,32 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
             {
                 manifest = Some(path_value(args, &mut index, inline)?)
             }
-            Some("--output") if generator.is_some() && output.is_none() => {
+            Some("--output") if (generator.is_some() || command == "build") && output.is_none() => {
                 output = Some(path_value(args, &mut index, inline)?)
+            }
+            Some("--static") if command == "build" && !static_mode && inline.is_none() => {
+                static_mode = true
+            }
+            Some("--wasm-islands") if command == "build" && !wasm_islands && inline.is_none() => {
+                wasm_islands = true
+            }
+            Some("--export-bin") if command == "build" && export_bin.is_none() => {
+                let value = argument_value(args, &mut index, inline)?
+                    .to_str()
+                    .ok_or("--export-bin requires an ASCII binary name")?;
+                if !static_export::valid_bin(value) {
+                    return Err("invalid --export-bin name");
+                }
+                export_bin = Some(value.to_owned());
+            }
+            Some("--base-path") if command == "build" && base_path.is_none() => {
+                let value = argument_value(args, &mut index, inline)?
+                    .to_str()
+                    .ok_or("--base-path requires a canonical public path")?;
+                if !static_export::valid_base(value) {
+                    return Err("invalid --base-path");
+                }
+                base_path = Some(value.to_owned());
             }
             Some("--image") if matches!(generator, Some("compose" | "k8s")) && image.is_none() => {
                 let value = argument_value(args, &mut index, inline)?
@@ -256,6 +316,22 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
         index += 1;
     }
     let manifest = manifest.unwrap_or_else(|| PathBuf::from("Cargo.toml"));
+    if command == "build"
+        && !static_mode
+        && (output.is_some() || export_bin.is_some() || base_path.is_some() || wasm_islands)
+    {
+        return Err("static export options require build --static");
+    }
+    if static_mode {
+        return Ok(Cli::BuildStatic {
+            manifest,
+            release,
+            export_bin: export_bin.ok_or("build --static requires --export-bin NAME")?,
+            output: output.ok_or("build --static requires --output DIRECTORY")?,
+            base_path: base_path.unwrap_or_else(|| "/".into()),
+            wasm_islands,
+        });
+    }
     let template = template.unwrap_or_default();
     if template == scaffold::Template::Browser && service {
         return Err("browser template does not select the native --service profile");

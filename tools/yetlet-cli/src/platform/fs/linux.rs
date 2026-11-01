@@ -4,6 +4,8 @@ pub(crate) mod key;
 #[path = "safe_dir.rs"]
 mod safe_dir;
 pub(crate) use safe_dir::create as create_project;
+#[path = "static_linux.rs"]
+pub(super) mod static_output;
 
 pub(crate) const NEW_SUPPORTED: bool = true;
 pub(crate) const NEW_DIAGNOSTIC: &str =

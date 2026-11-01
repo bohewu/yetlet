@@ -135,6 +135,17 @@ fn render_into(view: &View, output: &mut String, inside_form: bool) -> Result<()
                 }
                 output.push_str(&escape_text(&normalized));
             } else {
+                if tag == "pre" {
+                    // Parsing consumes one initial LF, after CR/CRLF normalization.
+                    // Empty text emits no token; an element ends this initial-text case.
+                    let first = element
+                        .child_views()
+                        .iter()
+                        .find(|v| !matches!(v, View::Text(s) if s.is_empty()));
+                    if matches!(first, Some(View::Text(s)) if s.starts_with(['\r', '\n'])) {
+                        output.push('\n');
+                    }
+                }
                 for child in element.child_views() {
                     render_into(child, output, inside_form || tag == "form")?;
                 }
@@ -313,5 +324,42 @@ mod tests {
             render_to_string(&invalid),
             Err(RenderError::VoidElementHasChildren(_))
         ));
+    }
+}
+
+#[cfg(test)]
+mod tests_yt220 {
+    use super::render_to_string;
+    use crate::view::{Element, View};
+
+    #[test]
+    fn yt220_pre_preserves_first_parsed_line_and_escapes_content() {
+        for (text, expected) in [
+            ("", "<pre></pre>"),
+            ("\ncode", "<pre>\n\ncode</pre>"),
+            ("\rcode", "<pre>\n\rcode</pre>"),
+            ("\r\ncode", "<pre>\n\r\ncode</pre>"),
+            ("<script>&", "<pre>&lt;script&gt;&amp;</pre>"),
+        ] {
+            assert_eq!(
+                render_to_string(&Element::new("pre").child(View::text(text)).into()).unwrap(),
+                expected
+            );
+        }
+        let split = Element::new("pre")
+            .child(View::text(""))
+            .child(View::text("\r"))
+            .child(View::text("\ncode"));
+        assert_eq!(
+            render_to_string(&split.into()).unwrap(),
+            "<pre>\n\r\ncode</pre>"
+        );
+        let code = Element::new("pre")
+            .child(View::text(""))
+            .child(Element::new("code").child(View::text("\ncode")));
+        assert_eq!(
+            render_to_string(&code.into()).unwrap(),
+            "<pre><code>\ncode</code></pre>"
+        );
     }
 }

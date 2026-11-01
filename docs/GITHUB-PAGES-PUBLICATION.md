@@ -1,9 +1,10 @@
 # GitHub Pages minimum publication plan — YT-218
 
-Date: 2026-10-31. Status: YT-218 In progress. The owner has accepted this plan
-and its reviewed delivery/initial-publication sequence. Workflow and public-label
-implementation pass the focused local checks below; independent review, Git
-delivery, settings and hosted execution remain pending at this checkpoint.
+Date: 2026-10-31. Status: YT-218 Done after final independent Reviewer PASS0.
+The owner-adopted delivery and first-publication sequence has completed:
+[the public guide](https://bohewu.github.io/yetlet/) is live at source
+`64d10742d62059c91dd2e46931aab1cb3b65d897`. The historical preparation checkpoints
+below remain intact; the final section records actual settings, CI and readback.
 
 ## Historical planning baseline and exact public scope
 
@@ -219,3 +220,73 @@ New local evidence under `target/yt218-pages-20261031/validation/`:
 These checks do not claim hosted Pages acceptance. Final clean-source public
 integration precedes Push; actual public URL/artifact/source readback follows
 the one authorized deployment. Mark YT-218 Done only after those outcomes exist.
+
+## Completed delivery and first publication — 2026-10-31
+
+Implementation review PASS0 accepted the ten changed inputs without required
+followups. Nine new tests, eight actual workflow-mode cases, actionlint, the
+clean public build and454 local references passed. The eight YT-217 guide body
+hashes were preserved; no accepted local SDK/platform suite was replayed.
+
+Strict/builtin staged and exact-outgoing checks, plus native hooks, passed
+before delivery. Three inherited generic Windows-drive path warnings were
+nonblocking; no Guard policy was weakened. [PR43](https://github.com/bohewu/yetlet/pull/43)
+squash-merged as `64d10742d62059c91dd2e46931aab1cb3b65d897`, tree
+`10223623f4fb67108dc08cf62a8756dc0d10dc20`, exactly matching the qualified
+`85cdadc37804e344a1beca164beb6a6c33a46008` source tree. Original local branches
+and a verified repo-external Git bundle preserve pre-merge history.
+
+The PR's required Rust CI41195957987, document build41195958007 and all four
+CodeQL analyses41195956270 passed. Merged-master Rust41197101236, document
+build41197101341 and all four CodeQL analyses41197100937 also passed before
+activation. Their preparation deploy jobs were intentionally skipped; no
+product release workflow was dispatched.
+
+Actual configured settings:
+
+- Pages uses GitHub Actions at **https://bohewu.github.io/yetlet/**, no CNAME,
+  `https_enforced:true`.
+- `github-pages` allows exactly the branch `master`, with no reviewer, tag
+  pattern or Secret. The four existing release Environment protections remain
+  unchanged.
+- Repository variable `PAGES_DEPLOY_ENABLED` is `true`. Future relevant protected-
+  master pushes build and deploy automatically; PRs only build previews.
+- No product version, release tag, signing identity or crates.io state changed.
+
+[First publication41198529190/1](https://github.com/bohewu/yetlet/actions/runs/41198529190)
+completed both build and deploy successfully, with no hosted retry. Its
+`github-pages` artifact13040884335 has ZIP SHA256
+`685ed585fe825b17b5970184dfd7f5a3b36bed67dd3b35bbc7afbbd8a9a51b07`.
+Inspection confirms42 generated files at the correct upload root, eight selected
+chapters and no raw Markdown/Rust/TOML, staging or export manifest. The logged
+manifest identifies clean public mode, SDK0.9.0-alpha.5, CLI0.1.1, the actual
+merged source and all eight matching source hashes.
+
+Anonymous HTTPS readback of home, First app, API and the actual hashed search
+index returned200 and matched their artifact bytes. Existing Chromium at
+1440x1000 verified the public source/edition, navigation and SessionConfig search.
+A390x844 touch-emulated journey verified the menu, Views navigation and menu
+closure. No captured page, console or HTTP errors occurred; all three screenshots
+were visually inspected. This adds actual Pages routing/assets acceptance to the
+reused local proof, not physical-mobile or broader browser qualification.
+
+Two operational/harness observations remain recorded, without deployment retry:
+
+1. A redundant HTTPS-enforcement write returned404 (`The certificate does not
+   exist yet`). Readback already showed the desired `https_enforced:true` on
+   the default github.io site; no second write or weaker setting was needed.
+2. An extra asset comparison assumed `searchindex.js` and returned404. The
+   canonical artifact instead contains `searchindex-071e7429.js`; one smallest
+   harness correction compared that file successfully, reusing the three
+   successful HTML readbacks. Browser search had already passed.
+
+Raw CI/settings/artifact/manifest/readback/browser/error receipts are retained
+under `target/yt218-pages-20261031/` and copied outside the repository to the
+`yt218-pages-20261031` release-evidence set. Browser contexts were closed; no
+preview server or temporary cloud resources were created for this readback.
+Final independent hosted-evidence/document Reviewer PASS0 accepts the five
+closeout document hashes, actual publication evidence and bounded completion.
+There are zero issues or required followups; registered reviewer model
+`gpt-6-astra` and effective high effort were verified. YT-218 is Done.
+Wiki, custom domain, generated-rustdoc hosting and further editions remain deferred choices,
+not incomplete first-publication criteria.

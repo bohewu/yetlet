@@ -1,0 +1,7 @@
+:root { font-family: system-ui, sans-serif; color: #202b36; background: #f7f9fc; }
+body { margin: 0; }
+main { max-width: 52rem; margin: 3rem auto; padding: 1.5rem; }
+nav { margin: 1.5rem 0; } a { color: #1758a0; }
+section { border-top: 1px solid #bac6d2; margin-top: 2rem; padding-top: 1rem; }
+button { font: inherit; padding: .5rem .8rem; margin: .5rem 1rem .5rem 0; }
+@media (max-width: 600px) { main { margin: 0; } }

@@ -43,6 +43,28 @@ pub(crate) fn run_cargo(
     imp::run(&mut command)
 }
 
+/// Static export is finite trusted native execution, with the existing owned
+/// group/Job and cancellation semantics plus a wall deadline.
+pub(crate) fn run_static(
+    app: &App,
+    command: &mut Command,
+    budget: std::time::Duration,
+) -> io::Result<Completion> {
+    imp::pin_cwd(app, command)?;
+    #[cfg(windows)]
+    return imp::run_bounded(app, command, budget);
+    #[cfg(target_os = "linux")]
+    return imp::run_bounded(command, budget);
+    #[cfg(not(any(target_os = "linux", windows)))]
+    {
+        let _ = (command, budget);
+        Err(io::Error::new(
+            io::ErrorKind::Unsupported,
+            "static export process ownership unavailable",
+        ))
+    }
+}
+
 fn frontend_command(app: &App, frontend: &App, dev: bool) -> io::Result<Command> {
     #[cfg(windows)]
     let mut command = imp::npm_command(dev)?;
@@ -217,4 +239,87 @@ pub(crate) fn finish(completion: Completion) -> ! {
         imp::reraise(signal);
     }
     std::process::exit(signal.map_or(125, |value| 128 + value));
+}
+
+#[cfg(all(test, any(target_os = "linux", windows)))]
+mod static_deadline_tests {
+    use super::*;
+    #[test]
+    #[ignore = "spawned only by the bounded static-export deadline test"]
+    fn yt223_sleep_helper() {
+        std::fs::write("child.pid", std::process::id().to_string()).unwrap();
+        std::thread::sleep(std::time::Duration::from_secs(20));
+    }
+    #[test]
+    fn yt223_bounded_deadline_reaps_its_owned_child() {
+        let temp = tempfile::tempdir().unwrap();
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(temp.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+        }
+        crate::platform::fs::create_project(temp.path(), "deadline", &[]).unwrap();
+        let app = crate::platform::fs::open_directory(&temp.path().join("deadline")).unwrap();
+        let executable = crate::platform::fs::app_root(&app).join(if cfg!(windows) {
+            "helper.exe"
+        } else {
+            "helper"
+        });
+        #[cfg(not(windows))]
+        std::fs::copy(std::env::current_exe().unwrap(), &executable).unwrap();
+        #[cfg(windows)]
+        {
+            // Inherit the private app DACL instead of copying the test binary's
+            // security metadata, as in the existing Windows native fixtures.
+            let mut source = std::fs::File::open(std::env::current_exe().unwrap()).unwrap();
+            let mut destination = std::fs::File::create_new(&executable).unwrap();
+            io::copy(&mut source, &mut destination).unwrap();
+        }
+        let mut command = Command::new(executable);
+        command.args([
+            "--exact",
+            "platform::process::static_deadline_tests::yt223_sleep_helper",
+            "--ignored",
+            "--nocapture",
+        ]);
+        let started = std::time::Instant::now();
+        #[cfg(not(windows))]
+        let result = run_static(&app, &mut command, std::time::Duration::from_secs(2));
+        #[cfg(windows)]
+        let result = {
+            // The product's pin_cwd admits Cargo build/run, not an absolute
+            // libtest fixture. Exercise the existing private native test seam.
+            command.current_dir(crate::platform::fs::app_root(&app));
+            imp::run_bounded(&app, &mut command, std::time::Duration::from_secs(2))
+        };
+        assert!(
+            matches!(result,Err(ref e) if e.kind()==io::ErrorKind::TimedOut),
+            "expected owned deadline, got {:?}",
+            result.as_ref().err()
+        );
+        assert!(started.elapsed() < std::time::Duration::from_secs(10));
+        let pid: u32 =
+            std::fs::read_to_string(crate::platform::fs::app_root(&app).join("child.pid"))
+                .unwrap()
+                .parse()
+                .unwrap();
+        #[cfg(target_os = "linux")]
+        assert!(!std::path::Path::new(&format!("/proc/{pid}")).exists());
+        #[cfg(windows)]
+        {
+            use windows_sys::Win32::{
+                Foundation::CloseHandle,
+                System::Threading::{
+                    GetExitCodeProcess, OpenProcess, PROCESS_QUERY_LIMITED_INFORMATION,
+                },
+            };
+            let handle = unsafe { OpenProcess(PROCESS_QUERY_LIMITED_INFORMATION, 0, pid) };
+            if !handle.is_null() {
+                let mut code = 0;
+                assert_ne!(unsafe { GetExitCodeProcess(handle, &mut code) }, 0);
+                unsafe { CloseHandle(handle) };
+                assert_ne!(code, 259);
+            }
+        }
+    }
 }

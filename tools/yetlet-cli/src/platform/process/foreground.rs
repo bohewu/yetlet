@@ -367,6 +367,15 @@ impl Drop for Owned {
 
 /// Exactly one invocation per CLI process; stdio is inherited, never wrapped.
 pub(crate) fn run(command: &mut Command) -> io::Result<Completion> {
+    run_inner(command, None)
+}
+
+pub(crate) fn run_bounded(command: &mut Command, budget: Duration) -> io::Result<Completion> {
+    run_inner(command, Some(budget))
+}
+
+fn run_inner(command: &mut Command, budget: Option<Duration>) -> io::Result<Completion> {
+    let deadline = budget.map(|value| Instant::now() + value);
     prepare(command)?;
     let terminal = if unsafe { libc::isatty(libc::STDIN_FILENO) } == 1 {
         let group = unsafe { libc::tcgetpgrp(libc::STDIN_FILENO) };
@@ -400,6 +409,14 @@ pub(crate) fn run(command: &mut Command) -> io::Result<Completion> {
             owned.signal(libc::SIGCONT)?; // resume a possible pre-handoff SIGTTIN
         }
         loop {
+            if deadline.is_some_and(|value| Instant::now() >= value) {
+                owned.signal(libc::SIGTERM)?;
+                owned.grace(&mut forwarded)?;
+                return Err(io::Error::new(
+                    io::ErrorKind::TimedOut,
+                    "static export deadline",
+                ));
+            }
             let signal = owned.cancellation()?;
             if signal != 0 {
                 owned.signal(signal)?;

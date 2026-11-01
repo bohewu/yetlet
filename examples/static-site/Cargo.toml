@@ -1,0 +1,27 @@
+[package]
+name = "yetlet-static-site-example"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+
+[workspace]
+resolver = "3"
+
+[[bin]]
+name = "site-export"
+path = "src/main.rs"
+
+[lib]
+name = "static_island"
+crate-type = ["cdylib", "rlib"]
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+yetlet = { version = "=0.9.0-alpha.5", default-features = false, features = ["html"] }
+serde_json = "=1.0.151"
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+yetlet = { version = "=0.9.0-alpha.5", default-features = false }
+yetlet-browser = { version = "=0.9.0-alpha.5", default-features = false, features = ["dom"] }
+wasm-bindgen = "=0.2.129"
+web-sys = { version = "=0.3.106", features = ["Window", "Document", "Element", "Event", "EventTarget", "Node"] }

@@ -3,6 +3,8 @@
 //! no mkdir/open substitution window exists, even in a writable parent.
 #[path = "key_windows.rs"]
 pub(crate) mod key;
+#[path = "static_windows.rs"]
+pub(super) mod static_output;
 use std::{
     cell::RefCell,
     ffi::OsStr,

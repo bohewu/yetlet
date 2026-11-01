@@ -688,15 +688,35 @@ fn exited(child: &Child) -> io::Result<bool> {
 
 pub(crate) fn run(app: &App, command: &mut Command) -> io::Result<Completion> {
     let dev = command.get_args().next() == Some(OsStr::new("run"));
-    run_owned(app, command, dev)
+    run_owned(app, command, dev, None)
 }
 
-fn run_owned(app: &App, command: &mut Command, dev: bool) -> io::Result<Completion> {
+pub(crate) fn run_bounded(
+    app: &App,
+    command: &mut Command,
+    budget: Duration,
+) -> io::Result<Completion> {
+    run_owned(app, command, true, Some(budget))
+}
+
+fn run_owned(
+    app: &App,
+    command: &mut Command,
+    dev: bool,
+    budget: Option<Duration>,
+) -> io::Result<Completion> {
+    let deadline = budget.map(|value| Instant::now() + value);
     let mut console = if dev { Some(Console::install()?) } else { None };
     let mut child = spawn_owned(app, command)?;
     let result = (|| {
         let cancelled = if dev {
             loop {
+                if deadline.is_some_and(|value| Instant::now() >= value) {
+                    return Err(io::Error::new(
+                        io::ErrorKind::TimedOut,
+                        "static export deadline",
+                    ));
+                }
                 if CONTROL.load(AtomicOrdering::SeqCst) != 0 {
                     break true;
                 }
