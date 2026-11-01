@@ -1,6 +1,7 @@
 # Local Yetlet documentation pilot
 
-Application-owned, unpublished YT-224 consumer of registry SDK0.9.0-alpha.5.
+Application-owned, unpublished YT-224 consumer of registry SDK0.9.0-alpha.5,
+with [YT-225 public-mode artifact preparation](../../docs/YT-225-DOCS-PUBLIC-BUILD.md).
 It renders the eight existing selections/excerpts in site/pages.toml with Yetlet
 HTML, plus separately selected browser search. It does not replace the current
 mdBook site, change Pages, or add an SDK/CLI API. Published CLI0.1.1 does not have
@@ -106,6 +107,38 @@ raw/unsupported Markdown, missing preparation or invalid output stops export;
 private target/yetlet-static receipts and inputs never enter public output.
 
 ## API reference and evidence
+
+### Formal artifact preparation (no deployment)
+
+After separately preparing the matching tools, locked dependencies and source
+CLI described above, run from the repository root with a fresh protected output
+parent. The example variables stay within a subshell:
+
+```bash
+(
+    umask 077
+    guide_artifact_root="$(mktemp -d)"
+    python3 tools/build_yetlet_docs.py --public \
+        --cli tools/yetlet-cli/target/debug/yetlet \
+        --output "$guide_artifact_root/yetlet"
+    echo "Guide artifact and private build record: $guide_artifact_root"
+)
+```
+
+--public requires a clean checkout and the reviewed SDK/CLI edition. It binds
+the source link to the full commit and omits local-preview footer copy. Omit the
+flag for a local build with edits. The command builds Wasm and exports all15
+selected site files; it neither installs tools nor deploys. Use only the yetlet
+subdirectory as a future upload root. EXPORT-MANIFEST.json and STATIC-RECEIPTS
+stay outside it. Output/record destinations are create-only. Remove the printed
+temporary root only when its artifact/evidence is no longer needed.
+
+The separate Yetlet guide preview workflow produces downloadable artifacts with
+no deployment permissions. Existing Pages continues to use mdBook. The owner
+chooses the directory URLs without old mdBook .html aliases; the early site's
+old bookmarks are not promised to survive a future replacement.
+
+### API and accepted evidence
 
 Use [HTML](../../crates/yetlet/guides/html.md), [DOM](../../crates/yetlet-browser/guides/dom.md),
 the [export contract](../../docs/YT-222-STATIC-HTML-CONTRACT.md) and

@@ -64,6 +64,9 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [Local Yetlet documentation pilot — YT-224](YT-224-DOCS-PILOT.md):
   application-owned eight-chapter static reader with optional Wasm search;
   independent Reviewer PASS0 at local scope; existing public Pages retained.
+- [Public-mode guide artifact preparation — YT-225](YT-225-DOCS-PUBLIC-BUILD.md):
+  clean source/edition labels, selected output and private receipts, separate
+  build-only CI; no legacy URL aliases or live Pages replacement.
 
 - [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
   dedicated workflow, master-only Environment, initial deployment/readback,

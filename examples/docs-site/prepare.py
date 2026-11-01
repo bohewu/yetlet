@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 """Stage the existing eight canonical excerpts; no fetch, build or deployment."""
+import argparse
 import hashlib
 import importlib.util
 import json
@@ -11,7 +12,7 @@ APP = Path(__file__).resolve().parent
 ROOT = APP.parents[1]
 
 
-def prepare():
+def prepare(public=False):
     selection = tomllib.loads((ROOT / "site/pages.toml").read_text())
     pages = selection["pages"]
     expected = ["index.md", "first-app.md", "views.md", "http.md", "browser.md",
@@ -22,6 +23,12 @@ def prepare():
     existing = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(existing)
     commit = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
+    dirty = bool(subprocess.check_output(
+        ["git", "status", "--porcelain", "--untracked-files=all"], cwd=ROOT, text=True))
+    sdk = tomllib.loads((ROOT / "Cargo.toml").read_text())["workspace"]["package"]["version"]
+    cli = tomllib.loads((ROOT / "tools/yetlet-cli/Cargo.toml").read_text())["package"]["version"]
+    # Reuse the live guide's clean-source and explicitly reviewed edition rules.
+    existing.page_label(commit, dirty, sdk, cli, selection.get("edition"), public)
     base = "/yetlet/"
     routes = {p["output"]: "/" if p["output"] == "index.md" else "/" + p["output"][:-3] + "/"
               for p in pages}
@@ -40,7 +47,7 @@ def prepare():
                          "source_sha256": hashlib.sha256(original.encode()).hexdigest(),
                          "excerpt_sha256": hashlib.sha256(excerpt.encode()).hexdigest(),
                          "markdown": existing.rewrite_links(excerpt, source, destinations, commit)})
-    prepared = {"commit": commit, "sdk": selection["edition"]["sdk"],
+    prepared = {"commit": commit, "public": public, "sdk": selection["edition"]["sdk"],
                 "cli": selection["edition"]["cli"], "base": base, "chapters": chapters}
     if prepared["sdk"] != "0.9.0-alpha.5" or prepared["cli"] != "0.1.1":
         raise ValueError("Pilot edition changed; review the consumer first")
@@ -48,7 +55,11 @@ def prepare():
     destination.mkdir(exist_ok=True)
     (destination / "chapters.json").write_text(json.dumps(prepared, ensure_ascii=True, indent=2) + "\n")
     print("Prepared eight canonical excerpts; parser/rendering remains a native build step.")
+    return prepared
 
 
 if __name__ == "__main__":
-    prepare()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--public", action="store_true",
+                        help="Require clean, version-matched sources; does not deploy")
+    prepare(parser.parse_args().public)

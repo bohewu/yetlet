@@ -10,6 +10,8 @@ use yetlet::{
 #[derive(Deserialize)]
 struct Site {
     commit: String,
+    #[serde(default)]
+    public: bool,
     sdk: String,
     cli: String,
     base: String,
@@ -92,22 +94,73 @@ fn shell(site: &Site, page: &Page, content: View, island: bool) -> View {
     if island {
         header = header.child(header_search());
     }
-    Element::new("div").attribute("class", "site")
-        .child(Element::new("a").attribute("class", "skip-link").attribute("href", "#site-main").child(View::text("Skip to content")))
+    let mut edition = Element::new("p")
+        .attribute("class", "edition")
+        .child(View::text(format!(
+            "Experimental SDK {} · CLI {} · source ",
+            site.sdk, site.cli
+        )));
+    let source_url = format!("https://github.com/bohewu/yetlet/tree/{}", site.commit);
+    edition = if site.public {
+        edition.child(
+            Element::new("a")
+                .attribute("href", &source_url)
+                .attribute("title", &site.commit)
+                .child(View::text(&site.commit[..7])),
+        )
+    } else {
+        edition.child(View::text(&site.commit[..7]))
+    };
+    let mut footer = Element::new("footer").child(Element::new("p").child(View::text(
+        if site.public {
+            format!("Canonical source: {}.", page.source)
+        } else {
+            format!("Canonical source: {}. Local, unpublished checkout; pinned repository links may be unavailable until its commit is pushed.", page.source)
+        },
+    )));
+    if !site.public {
+        footer = footer.child(Element::new("p").child(View::text(
+            "No live Pages replacement. Original validation and release records remain in the repository.",
+        )));
+    }
+    Element::new("div")
+        .attribute("class", "site")
+        .child(
+            Element::new("a")
+                .attribute("class", "skip-link")
+                .attribute("href", "#site-main")
+                .child(View::text("Skip to content")),
+        )
         .child(header)
-        .child(Element::new("details").attribute("class", "mobile-menu").attribute("id", "site-menu")
-            .child(Element::new("summary").child(View::text("Browse guide")))
-            .child(navigation(site, &page.route)))
-        .child(Element::new("div").attribute("class", "layout")
-            .child(Element::new("aside").attribute("class", "sidebar")
-                .child(Element::new("p").attribute("class", "eyebrow").child(View::text("IN THIS GUIDE")))
-                .child(navigation(site, &page.route)))
-            .child(Element::new("main").attribute("id", "site-main").attribute("tabindex", "-1")
-                .child(Element::new("p").attribute("class", "edition").child(View::text(format!("Experimental SDK {} · CLI {} · source {}", site.sdk, site.cli, &site.commit[..7]))))
-                .child(content)
-                .child(Element::new("footer")
-                    .child(Element::new("p").child(View::text(format!("Canonical source: {}. Local, unpublished checkout; pinned repository links may be unavailable until its commit is pushed.", page.source))))
-                    .child(Element::new("p").child(View::text("No live Pages replacement. Original validation and release records remain in the repository."))))))
+        .child(
+            Element::new("details")
+                .attribute("class", "mobile-menu")
+                .attribute("id", "site-menu")
+                .child(Element::new("summary").child(View::text("Browse guide")))
+                .child(navigation(site, &page.route)),
+        )
+        .child(
+            Element::new("div")
+                .attribute("class", "layout")
+                .child(
+                    Element::new("aside")
+                        .attribute("class", "sidebar")
+                        .child(
+                            Element::new("p")
+                                .attribute("class", "eyebrow")
+                                .child(View::text("IN THIS GUIDE")),
+                        )
+                        .child(navigation(site, &page.route)),
+                )
+                .child(
+                    Element::new("main")
+                        .attribute("id", "site-main")
+                        .attribute("tabindex", "-1")
+                        .child(edition)
+                        .child(content)
+                        .child(footer),
+                ),
+        )
         .into()
 }
 fn directory(path: &std::path::Path) -> std::io::Result<()> {
@@ -207,4 +260,39 @@ fn main() -> Result<(), Box<dyn Error>> {
         serde_json::to_vec_pretty(&json!({"schema_version":1,"pages":pages,"assets":assets}))?,
     )?;
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn public_edition_links_the_full_source_without_local_preview_copy() {
+        let mut site = Site {
+            commit: "a".repeat(40),
+            public: true,
+            sdk: "0.9.0-alpha.5".into(),
+            cli: "0.1.1".into(),
+            base: "/yetlet/".into(),
+            chapters: vec![],
+        };
+        let page = Page {
+            source: "README.md".into(),
+            title: "Overview".into(),
+            route: "/".into(),
+            markdown: String::new(),
+        };
+        let public = render_to_string(&shell(&site, &page, View::text("Guide"), true)).unwrap();
+        assert!(public.contains(&format!(
+            "https://github.com/bohewu/yetlet/tree/{}",
+            site.commit
+        )));
+        assert!(public.contains("Experimental SDK 0.9.0-alpha.5"));
+        assert!(!public.contains("Local, unpublished checkout"));
+        assert!(!public.contains("No live Pages replacement"));
+        site.public = false;
+        let preview = render_to_string(&shell(&site, &page, View::text("Guide"), true)).unwrap();
+        assert!(preview.contains("Local, unpublished checkout"));
+        assert!(preview.contains("No live Pages replacement"));
+    }
 }

@@ -583,7 +583,14 @@ The owner requested Rust-native repository tooling before a public CLI. The inde
 
 ## Ready queue
 
-**Current checkpoint (2026-11-01):** [YT-224](YT-224-DOCS-PILOT.md) is Done at
+**Current checkpoint (2026-11-01):** The owner commits the YT-224 pilot and header
+search as d707321/a306714 with strict/builtin Guard, without Push. The selected
+[YT-225 preparation](YT-225-DOCS-PUBLIC-BUILD.md) adds formal source/edition output
+and independent build-only CI; old .html compatibility is explicitly declined.
+Focused new checks and independent Reviewer PASS0 accept Done at preparation
+scope; no hosted execution or existing Pages replacement is authorized.
+
+**Retained YT-224 acceptance checkpoint (2026-11-01):** [YT-224](YT-224-DOCS-PILOT.md) is Done at
 local application-owned pilot scope after independent Reviewer PASS0, zero
 issues/followups,33 matching inputs and19 reviewed paths. The same eight canonical
 excerpts and mdBook evidence are retained; native/build/lint/static/browser/
@@ -977,6 +984,7 @@ boundaries and YT-218's live site retain their current scope.
 | YT-222 | P2 | M | M25 | Static HTML export and CLI contract | YT-219 | [Finite static-build contract](YT-222-STATIC-HTML-CONTRACT.md): proposed build --static/typed request, app-owned native fragment/asset protocol1, private bounded document writer, root/project-prefix/index/404 mapping, explicit local CSP/island assets, protected create-only output and private input/output receipts. Existing settings/CLI behavior and published SDK/CLI stay intact; no server/browser/Settings dependency for HTML-only app. Docs/links/structure/whitespace/DAG PASS; independent Reviewer PASS0,0 issues/followups,21 hashes matched and registered model/effective high verified. No implementation or old verification replay | Done |
 | YT-223 | P2 | L | M25 | Minimal opt-in static HTML build and CLI integration | YT-222 | [Implementation/evidence](YT-223-STATIC-HTML-IMPLEMENTATION.md): explicit typed static mode, native protocol1, bounded public documents/assets, protected create-only output/private receipts, registry-SDK standalone HTML and optional local island. New8 native cases, actual failure/cancellation/source/environment/supervision/cache-directory checks, Chrome no-JS/root/project/404/island, Firefox activation/disposal and normal packaging pass; retained fixture/lint failures. Independent local followup PASS0,0 issues/followups,46 hashes stable; first Cargo-directory P2 closed. Owner-authorized Git delivery removes the earlier artifact-policy blocker; current-source MSVC8 cases and actual static CLI runtime pass. Required current-head CI PASS; final independent platform Reviewer PASS0, zero issues/followups,49 matching inputs and56 reconciled Windows source hashes; ten closeout docs uncommitted, no Merge/publication authority | Done |
 | YT-224 | P2 | M | M25 | Yetlet-built documentation-site pilot | YT-218, YT-220, YT-221, YT-223 | [Pilot scope/evidence](YT-224-DOCS-PILOT.md): same eight canonical Markdown inputs/excerpts, build-time maintained parser with no raw-HTML bypass, static readable content and optional owned Wasm interactions; source/edition/exclusions/navigation/search/touch/keyboard and bounded load-size comparison. Native3 tests, native/wasm strict lint/build, protected static exports, all8 no-JS chapters, actual search/mobile/keyboard/failure/disposal and output/link/size proof pass; original failures retained. Final independent Reviewer PASS0,0 issues/followups,33 inputs matched; owned cleanup complete, no live replacement | Done |
+| YT-225 | P2 | M | M25 | Public-mode Yetlet guide artifact and build-only CI | YT-224 | [Preparation contract/evidence](YT-225-DOCS-PUBLIC-BUILD.md): clean source/edition binding, public disclosure, exact15-file output/private receipts and separate build-only workflow. Owner declines old .html aliases; existing Pages remains unchanged. New6 Python/1 native tests, strict native lint/format, actual preview integration/219 links and corrected actionlint pass; first syntax failure retained. Independent Reviewer PASS0, zero issues/followups,10 hashes stable and15 output/CLI receipt bindings match. Hosted clean-public source/artifact acceptance and deployment remain separate | Done |
 
 ## YT-096 hosted build, verifier and retention — 2026-10-28
 
