@@ -1,7 +1,8 @@
 # Yetlet Browser
 
 Opt-in browser integrations sharing the single View type from `yetlet`.
-Unreleased `0.9.0-alpha.5`; these package names are not yet registry-published.
+Version `0.9.0-alpha.6`; see [GitHub releases](https://github.com/bohewu/yetlet/releases)
+for published artifacts.
 Use Rust 1.99+, `wasm32-unknown-unknown`, and the matching wasm-bindgen toolchain
 when building actual browser assets.
 
@@ -9,8 +10,8 @@ when building actual browser assets.
 
 ```toml
 [dependencies]
-yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.5", default-features = false }
-yetlet-browser = { path = "/absolute/yetlet/crates/yetlet-browser", version = "=0.9.0-alpha.5" }
+yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.6", default-features = false }
+yetlet-browser = { path = "/absolute/yetlet/crates/yetlet-browser", version = "=0.9.0-alpha.6" }
 ```
 
 Construct a `yetlet::View` once and pass it to the selected renderer. Browser

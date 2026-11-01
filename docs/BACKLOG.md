@@ -1,5 +1,21 @@
 # Yetlet Backlog
 
+**Authorized SDKalpha.6 preparation (2026-11-01):**
+[YT-228](ALPHA6-RELEASE-PREPARATION.md) advances the reviewed release plan through
+the last owner publication gate. Local guide-edition tests, normal two-archive
+packaging, exact-version native/Wasm consumer and unchanged dependency/source
+correspondence PASS. Independent preparation review, actual Git/CI, MSVC and
+hosted/signing evidence remain Pending. OIDC is deferred; CLI0.2 follows the
+actual SDK publication. No GitHub/crates.io publication is authorized here.
+
+**Next delivery planning (2026-11-01):**
+[YT-227](YT-227-NEXT-RELEASE-PLAN.md) inventories unreleased DOM/options and
+static-build source, proposes SDKalpha.6 followed by CLI0.2.0, and records guide
+edition/CLI-SDK binding prerequisites plus optional registry OIDC evaluation.
+Independent planning Reviewer PASS0; versions/candidates/auth decisions are unselected.
+Published SDKalpha.5/CLI0.1.1, live Pages and all historical results remain intact.
+No version change, Git delivery, hosted execution, signing or publication here.
+
 **Current release closeout and documentation direction (2026-10-31):**
 The SDK `yetlet` / `yetlet-browser` `0.9.0-alpha.5` and independent
 `yetlet-cli` `0.1.1` are published. [YT-216's accepted outputs and actual consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
@@ -1018,6 +1034,10 @@ separate implementation authority.
 | YT-217 | P2 | M | M10 | Improve beginner API docs and preview a selected public guide site | YT-186, YT-191, YT-216 | [Progress/evidence](YT-217-DOCS-PREVIEW.md): accepted four doc-comment-only Rust files, four doctests, selected native/WASM rustdoc and eight-chapter explicit local build/static links retained without reruns. Owner authorizes correcting the stopped sidebar check: eight exact chapter URLs versus four extra heading fragments; desktop navigation, SessionConfig search,390x844 touch/menu journey and three screenshots PASS with no captured console/page/HTTP errors. Original two assertion failures and first reader-status P2 remain preserved. Evidence archived outside repo; owned server/browser cleanup complete. Final independent Reviewer PASS0 accepts all19 source hashes/eight evidence files and allows Done; registered role/model and effective high effort verified; no runtime/API/version, new Commit/Push or Pages/release activation | Done |
 
 | YT-218 | P2 | M | M10 | Publish the selected reader guide with GitHub Pages | YT-217 | [Plan and publication evidence](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31): implementation Reviewer PASS0,9 tests/8 actual mode cases/actionlint/clean public build454 links PASS; strict/builtin PR43 squash Merge64d1074 with matching qualified tree, PR/master required CI and four CodeQL analyses PASS. Pages workflow/HTTPS, exact-master Environment and deploy switch active; first run41198529190/1 SUCCESS.42-file artifact scope/digest,8 source hashes/edition, anonymous HTML/search-index byte readback and desktop/search/touch/screenshots PASS. Prior proof reused; settings/harness404 records retained, no hosted retry or release changes. Final independent Reviewer PASS0 accepts five doc hashes and actual hosted evidence;0 issues/followups, registered role/model/effective high verified; Done at bounded public-guide scope | Done |
+
+| YT-227 | P2 | M | M10 | Plan the next SDK/CLI release and registry authentication options | YT-216, YT-220, YT-221, YT-223, YT-226 | [Documentation-only plan](YT-227-NEXT-RELEASE-PLAN.md): actual published/source delta, proposed SDKalpha.6 then independent CLI0.2.0, guide-edition and version-specific CLI/SDK prerequisites, optional OIDC privilege/phase review, and bounded evidence reuse/missing qualification. Independent Reviewer PASS0, zero issues/followups,31 source hashes/six frozen documents/Git status match; registered model/effective high verified. Docs227-item/whitespace PASS. Done at planning scope only; versions, candidates and auth migration unselected. No runtime/version/workflow/external change, old validation replay or Git/release action | Done |
+
+| YT-228 | P1 | M | M10 | Prepare SDKalpha.6 through the final publication gate | YT-227 | [Selected scope/evidence](ALPHA6-RELEASE-PREPARATION.md): reviewed existing DOM/options/SSR delta, metadata-only version/path locks, published guide edition independent of workspace, normal archives/external consumers and bounded qualification reuse. Local affected checks PASS; independent review, delivery/MSVC and new hosted build/readback/prepare/sign/result remain Pending. Existing token policy; final publication still requires the owner. No old version/tag/signature rewrite | In progress |
 
 ## M25 — Broader HTML DOM support and static-site delivery
 

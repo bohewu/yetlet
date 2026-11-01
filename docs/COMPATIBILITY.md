@@ -1,5 +1,15 @@
 # Yetlet Experimental Compatibility Policy
 
+## SDKalpha.6 preparation — 2026-11-01
+
+The owner selects SDK `0.9.0-alpha.6` preparation under
+[YT-227](YT-227-NEXT-RELEASE-PLAN.md), stopping before publication. Workspace/path
+versions and locks advance without third-party upgrades; published registry-only
+consumers and CLI0.1.1 remain on alpha.5. The explicitly approved guide edition
+stays SDKalpha.5/CLI0.1.1 independently of development versions; a new edition
+still requires consumer review. This does not distribute new APIs or republish
+any previous version. YT-220/221's compatibility notes below remain applicable.
+
 ## Current distribution and unreleased DOM source — 2026-10-31
 
 SDK0.9.0-alpha.5 is [published](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup)

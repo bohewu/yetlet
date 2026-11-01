@@ -1,5 +1,20 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**Selected next delivery (2026-11-01):**
+[YT-228](ALPHA6-RELEASE-PREPARATION.md) starts SDKalpha.6 preparation through the
+final owner publication gate, preserving the published reader edition and
+existing token route. Local affected metadata/archive/consumer checks PASS;
+independent review, delivery/MSVC and fresh hosted evidence remain Pending.
+CLI0.2 preparation follows SDK publication; no publication is authorized yet.
+
+**Next SDK/CLI delivery planning (2026-11-01):**
+[YT-227](YT-227-NEXT-RELEASE-PLAN.md) proposes SDKalpha.6 then independent
+CLI0.2.0 for the already implemented DOM/options/static-build delta. Guide edition
+compatibility, CLI/SDK bindings, optional registry OIDC and only missing
+qualification are explicit. Independent Reviewer PASS0 accepts YT-227 Done at
+planning scope,31 source hashes/six frozen docs/Git status match; no new version, candidate,
+auth policy or execution is selected. Existing distribution and Pages stay intact.
+
 **Current distribution and next reader milestone (2026-10-31):**
 The two-package SDK `0.9.0-alpha.5` and independent CLI `0.1.1` are published.
 [YT-216's completed output and installed consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)

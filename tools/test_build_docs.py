@@ -30,6 +30,13 @@ class PublicationLabels(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "reviewed SDK/CLI"):
             self.label(edition={"sdk": "0.9.0-alpha.6", "cli": "0.1.1"})
 
+    def test_new_workspace_versions_preserve_the_published_reader_edition(self):
+        label = build_docs.page_label(self.commit, False, "0.9.0-alpha.6", "0.2.0",
+                                      self.edition, True)
+        self.assertIn("SDK `0.9.0-alpha.5` · CLI `0.1.1`", label)
+        self.assertNotIn("0.9.0-alpha.6", label)
+        self.assertNotIn("0.2.0", label)
+
     def test_preview_still_allows_local_edits(self):
         label = self.label(dirty=True, public=False)
         self.assertIn("Local documentation preview", label)

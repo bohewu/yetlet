@@ -13,13 +13,21 @@ for retained failures, their concrete prevention steps and the successful CLI
 
 ## Current two-package development boundary — YT-211
 
-Current unreleased source is `0.9.0-alpha.5`: exactly `yetlet` followed by
-`yetlet-browser`. Schema2/`consolidated` is the closed two-package record;
+The published SDK is `0.9.0-alpha.5`: exactly `yetlet` followed by
+`yetlet-browser`. The independent CLI is published at `0.1.1`.
+The workspace now prepares SDKalpha.6 while CLI remains0.1.1; later DOM/static-build
+changes remain undistributed. The owner selects
+[SDKalpha.6 preparation](ALPHA6-RELEASE-PREPARATION.md) through the final gate,
+followed by CLI0.2 after SDK publication. Existing token policy stays in force;
+the [OIDC option](YT-227-NEXT-RELEASE-PLAN.md#optional-cratesio-trusted-publishing)
+is deferred.
+Schema2/`consolidated` is the closed two-package record;
 schema1/`sixteen` remains for earlier artifacts at their matching source.
 The library count is derived only from that validated cohort throughout build,
 provenance, signing, result verification, public planning and registry promotion.
 There is no arbitrary package-list input. The [alpha.5 qualification record](ALPHA5-RELEASE-PLAN.md#actual-qualification-results--yt-212)
-records R and actual C selection; S/tag and release execution remain pending.
+and [completed hosted record](ALPHA5-HOSTED-RECORD.md) retain their actual
+candidate, execution and publication evidence.
 
 Normal packaging verifies the final base archive, stages its exact checksum,
 then verifies the Browser archive against it. No reverse development edge,
@@ -28,17 +36,22 @@ remain historical instructions for their own checkouts, not an instruction to
 publish removed crates from this tree. The old one-plus-fifteen alpha.4 registry
 continuation remains paused and is explicitly invalid for schema2.
 
-The final publication Environment still requires the owner's approval. This
-migration does not execute hosted jobs, signing, a Release or crates.io upload.
+The final publication Environment requires the owner's approval for each
+selected cohort. A new plan does not authorize hosted jobs, signing or upload.
 
 ## Read this before starting another version
 
-For the current two-package source and remaining gates, use the
-[alpha.5 plan](ALPHA5-RELEASE-PLAN.md). The
-[alpha.4 hosted record](ALPHA4-HOSTED-RECORD.md) is the latest recorded GitHub
-pre-release, with one of sixteen packages published to crates.io and its old
-continuation paused. It is not a two-package candidate. The alpha.3 account below
-is retained at its original scope.
+For the next SDK/CLI scope and remaining preparation gates, use
+[YT-227](YT-227-NEXT-RELEASE-PLAN.md): proposed SDKalpha.6 then CLI0.2.0,
+published-guide compatibility, version-specific CLI/SDK binding and optional
+registry OIDC evaluation. The [authorized continuation](ALPHA6-RELEASE-PREPARATION.md)
+selects the version/order and token route; new source candidates still require
+actual qualification and final publication remains the owner's gate.
+The current completed distribution is [SDKalpha.5](ALPHA5-HOSTED-RECORD.md) and
+[CLI0.1.1](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31).
+The [alpha.4 hosted record](ALPHA4-HOSTED-RECORD.md) remains historical: its
+one-of-sixteen registry publication and paused continuation do not describe the
+current two-package distribution. The alpha.3 account below retains its scope.
 
 The historical alpha.3 published baseline is the Experimental
 [v0.9.0-alpha.3 GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.3):

@@ -27,7 +27,7 @@ def prepare(public=False):
         ["git", "status", "--porcelain", "--untracked-files=all"], cwd=ROOT, text=True))
     sdk = tomllib.loads((ROOT / "Cargo.toml").read_text())["workspace"]["package"]["version"]
     cli = tomllib.loads((ROOT / "tools/yetlet-cli/Cargo.toml").read_text())["package"]["version"]
-    # Reuse the live guide's clean-source and explicitly reviewed edition rules.
+    # Preserve the published consumer edition while workspace versions advance.
     existing.page_label(commit, dirty, sdk, cli, selection.get("edition"), public)
     base = "/yetlet/"
     routes = {p["output"]: "/" if p["output"] == "index.md" else "/" + p["output"][:-3] + "/"
@@ -61,5 +61,5 @@ def prepare(public=False):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--public", action="store_true",
-                        help="Require clean, version-matched sources; does not deploy")
+                        help="Require clean sources and the reviewed published edition; does not deploy")
     prepare(parser.parse_args().public)
