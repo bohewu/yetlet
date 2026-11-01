@@ -318,3 +318,21 @@ Subsequent master MSRV/Stable, guide build and all four CodeQL analyses pass at
 99902bb on attempt1. Independent Reviewer PASS0 accepts the six YT-226 planning
 documents, with zero issues/followups and matching frozen hashes. That acceptance
 does not start implementation or re-enable publication; the hold remains false.
+
+## Local Yetlet workflow integration — 2026-11-01
+
+The owner subsequently selects the [YT-226 minimal integration](YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01),
+without Commit/Push or deployment. The checkout's single docs.yml now uses
+the accepted Yetlet builder; docs-preview.yml is removed. Build output is always
+clean/public-format HTML, independently of deployment eligibility. Only an
+eligible master event with the true repository switch and successful build's
+deploy output can publish. The repository switch remains false, unchanged.
+
+The Pages upload root contains only the15 selected site files, including
+.nojekyll via explicit include-hidden-files:true. Private manifest/CLI receipts
+remain a separate artifact. Existing Pages action pins, master-only Environment,
+permissions, project URL/base and deploy concurrency are retained. New4 focused
+workflow checks, actionlint and actual pinned Linux Pages tar packaging pass;
+the accepted app/SDK/platform/browser evidence is reused without replay.
+This is local integration evidence only. Hosted workflow/Merge/readback and
+actual activation remain separately authorized followups; current Pages stays live.

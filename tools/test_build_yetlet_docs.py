@@ -1,8 +1,11 @@
 """New public-mode and build-artifact boundaries; no renderer suite replay."""
 import importlib.util
 import json
+import os
 from pathlib import Path
+import subprocess
 import tempfile
+import textwrap
 import tomllib
 import unittest
 from unittest.mock import patch
@@ -86,6 +89,62 @@ class ArtifactBoundary(unittest.TestCase):
         page.write_text(page.read_text() + "Local, unpublished checkout")
         with self.assertRaisesRegex(ValueError, "source disclosure"):
             guide.validate_output(self.root, self.prepared)
+
+
+class PagesWorkflow(unittest.TestCase):
+    """Exercise only the new workflow/output connection, without build replay."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.workflow = (guide.ROOT / ".github/workflows/docs.yml").read_text()
+        cls.build, cls.deploy = cls.workflow.split("\n  deploy:\n", 1)
+        step = cls.workflow.split("      - name: Select deployment eligibility\n", 1)[1]
+        cls.mode = textwrap.dedent(step.split("        run: |\n", 1)[1].split("\n      - ", 1)[0])
+
+    def run_mode(self, ref, event, enabled):
+        with tempfile.TemporaryDirectory() as temp:
+            output = Path(temp) / "output"
+            result = subprocess.run(["bash", "-euo", "pipefail", "-c", self.mode],
+                                    env={"PATH": os.environ["PATH"], "GITHUB_REF": ref,
+                                         "GITHUB_EVENT_NAME": event, "DEPLOY_ENABLED": enabled,
+                                         "GITHUB_OUTPUT": str(output)}, capture_output=True, text=True)
+            self.assertEqual(result.returncode, 0, result.stderr)
+            return output.read_text()
+
+    def test_public_format_does_not_grant_deployment(self):
+        for ref, event, enabled in [("refs/heads/master", "push", "false"),
+                                    ("refs/pull/44/merge", "pull_request", "true")]:
+            with self.subTest(ref=ref):
+                self.assertEqual(self.run_mode(ref, event, enabled), "deploy=false\n")
+        self.assertIn("python3 tools/build_yetlet_docs.py --public", self.build)
+
+    def test_selected_master_emits_the_deploy_output(self):
+        self.assertEqual(self.run_mode("refs/heads/master", "workflow_dispatch", "true"),
+                         "deploy=true\n")
+        self.assertIn("deploy: ${{ steps.mode.outputs.deploy }}", self.build)
+        self.assertIn("needs.build.outputs.deploy == 'true'", self.deploy)
+        self.assertIn("vars.PAGES_DEPLOY_ENABLED == 'true'", self.deploy)
+        self.assertIn("github.ref == 'refs/heads/master'", self.deploy)
+
+    def test_one_site_upload_keeps_hidden_files_and_records_separate(self):
+        self.assertFalse((guide.ROOT / ".github/workflows/docs-preview.yml").exists())
+        site = self.build.split("      - name: Upload only the generated site root\n", 1)[1]
+        site, records = site.split("      - name: Retain source and export receipts separately\n", 1)
+        self.assertIn("path: ${{ runner.temp }}/yetlet-guide/public/yetlet\n", site)
+        self.assertIn("name: github-pages\n", site)
+        self.assertIn("include-hidden-files: true", site)
+        self.assertNotIn("EXPORT-MANIFEST", site)
+        self.assertIn("EXPORT-MANIFEST.json", records)
+        self.assertIn("STATIC-RECEIPTS/", records)
+        self.assertIn("artifact_name: github-pages", self.deploy)
+        self.assertIn("needs: build", self.deploy)
+
+    def test_build_permissions_stay_readonly(self):
+        permissions = self.workflow.split("\npermissions:\n", 1)[1].split("\njobs:\n", 1)[0]
+        self.assertEqual(permissions.strip(), "contents: read")
+        for privileged in ("pages: write", "id-token: write", "environment:", "secrets."):
+            self.assertNotIn(privileged, self.build)
+        self.assertIn("cancel-in-progress: false", self.deploy)
 
 
 if __name__ == "__main__":

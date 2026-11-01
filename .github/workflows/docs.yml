@@ -11,11 +11,13 @@ on:
       - docs/TROUBLESHOOTING.md
       - crates/yetlet/guides/server-axum.md
       - crates/yetlet-browser/guides/dom.md
-      - site/**
+      - examples/docs-site/**
+      - site/pages.toml
       - tools/build_docs.py
-      - tools/test_build_docs.py
+      - tools/build_yetlet_docs.py
+      - tools/test_build_yetlet_docs.py
       - Cargo.toml
-      - tools/yetlet-cli/Cargo.toml
+      - tools/yetlet-cli/**
       - .github/workflows/docs.yml
   push:
     branches: [master]
@@ -28,11 +30,13 @@ on:
       - docs/TROUBLESHOOTING.md
       - crates/yetlet/guides/server-axum.md
       - crates/yetlet-browser/guides/dom.md
-      - site/**
+      - examples/docs-site/**
+      - site/pages.toml
       - tools/build_docs.py
-      - tools/test_build_docs.py
+      - tools/build_yetlet_docs.py
+      - tools/test_build_yetlet_docs.py
       - Cargo.toml
-      - tools/yetlet-cli/Cargo.toml
+      - tools/yetlet-cli/**
       - .github/workflows/docs.yml
   workflow_dispatch:
 
@@ -43,15 +47,17 @@ jobs:
   build:
     name: Documentation build
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 30
+    env:
+      RUSTUP_TOOLCHAIN: 1.99.0
     outputs:
-      public: ${{ steps.mode.outputs.public }}
+      deploy: ${{ steps.mode.outputs.deploy }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           ref: ${{ github.sha }}
           persist-credentials: false
-      - name: Select preview or authorized public build
+      - name: Select deployment eligibility
         id: mode
         env:
           DEPLOY_ENABLED: ${{ vars.PAGES_DEPLOY_ENABLED }}
@@ -61,37 +67,57 @@ jobs:
             echo "Manual documentation publication requires master" >&2
             exit 1
           fi
-          public=false
+          deploy=false
           if [[ "$GITHUB_REF" == refs/heads/master && "$DEPLOY_ENABLED" == true ]] &&
              [[ "$GITHUB_EVENT_NAME" == push || "$GITHUB_EVENT_NAME" == workflow_dispatch ]]; then
-            public=true
+            deploy=true
           fi
-          echo "public=$public" >> "$GITHUB_OUTPUT"
-      - name: Prepare pinned mdBook
+          echo "deploy=$deploy" >> "$GITHUB_OUTPUT"
+      - name: Prepare the pinned toolchain
+        run: |
+          rustup toolchain install 1.99.0 --profile minimal
+          rustup target add --toolchain 1.99.0 wasm32-unknown-unknown
+          echo "WASM_BINDGEN=$RUNNER_TEMP/guide-tools/bin/wasm-bindgen" >> "$GITHUB_ENV"
+      - name: Cache the pinned Wasm generator
+        uses: actions/cache@caa296126883cff596d87d8935842f9db880ef25 # v5
+        with:
+          path: ${{ runner.temp }}/guide-tools
+          key: yetlet-guide-bindgen-${{ runner.os }}-${{ runner.arch }}-rust1.99.0-v0.2.129
+      - name: Prepare locked dependencies and source CLI
         run: |
           set -euo pipefail
-          mkdir -p "$RUNNER_TEMP/docs-tools"
-          curl --fail --location --silent --show-error \
-            https://github.com/rust-lang/mdBook/releases/download/v0.5.4/mdbook-v0.5.4-x86_64-unknown-linux-musl.tar.gz \
-            --output "$RUNNER_TEMP/docs-tools/mdbook.tar.gz"
-          echo "5222beabd3e37dc5be0d18ff99b79058469354db5c220153a1b92db5ba12be89  $RUNNER_TEMP/docs-tools/mdbook.tar.gz" | sha256sum --check
-          tar -xzf "$RUNNER_TEMP/docs-tools/mdbook.tar.gz" -C "$RUNNER_TEMP/docs-tools" mdbook
-      - name: Check publication labels and output boundaries
-        run: PYTHONPATH=tools python3 -m unittest test_build_docs
-      - name: Build and check the selected guide
-        env:
-          PUBLIC_BUILD: ${{ steps.mode.outputs.public }}
+          if [[ ! -x "$WASM_BINDGEN" ]]; then
+            cargo install wasm-bindgen-cli --version 0.2.129 --locked --root "$RUNNER_TEMP/guide-tools"
+          fi
+          [[ "$("$WASM_BINDGEN" --version)" == 'wasm-bindgen 0.2.129' ]]
+          cargo fetch --locked --manifest-path examples/docs-site/Cargo.toml
+          cargo fetch --locked --manifest-path tools/yetlet-cli/Cargo.toml
+          cargo build --frozen --manifest-path tools/yetlet-cli/Cargo.toml --bin yetlet
+      - name: Check the changed workflow wiring
+        run: PYTHONPATH=tools python3 -m unittest test_build_yetlet_docs.PagesWorkflow
+      - name: Build the clean, edition-bound guide artifact
         run: |
           set -euo pipefail
-          args=()
-          if [[ "$PUBLIC_BUILD" == true ]]; then args+=(--public); fi
-          python3 tools/build_docs.py --mdbook "$RUNNER_TEMP/docs-tools/mdbook" "${args[@]}"
-          tee -a "$GITHUB_STEP_SUMMARY" < target/docs-site/EXPORT-MANIFEST.json
+          python3 tools/build_yetlet_docs.py --public \
+            --cli tools/yetlet-cli/target/debug/yetlet \
+            --output "$RUNNER_TEMP/yetlet-guide/public/yetlet"
+          cat "$RUNNER_TEMP/yetlet-guide/public/EXPORT-MANIFEST.json" >> "$GITHUB_STEP_SUMMARY"
       - name: Upload only the generated site root
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
         with:
-          path: target/docs-site/yetlet
+          path: ${{ runner.temp }}/yetlet-guide/public/yetlet
           name: github-pages
+          include-hidden-files: true
+          retention-days: 7
+      - name: Retain source and export receipts separately
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: yetlet-guide-build-record
+          path: |
+            ${{ runner.temp }}/yetlet-guide/public/EXPORT-MANIFEST.json
+            ${{ runner.temp }}/yetlet-guide/public/STATIC-RECEIPTS/
+          if-no-files-found: ignore
           retention-days: 7
 
   deploy:
@@ -100,7 +126,7 @@ jobs:
     if: >-
       github.ref == 'refs/heads/master' &&
       (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-      vars.PAGES_DEPLOY_ENABLED == 'true' && needs.build.outputs.public == 'true'
+      vars.PAGES_DEPLOY_ENABLED == 'true' && needs.build.outputs.deploy == 'true'
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     permissions:

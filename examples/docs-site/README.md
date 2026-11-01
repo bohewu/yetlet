@@ -133,8 +133,12 @@ subdirectory as a future upload root. EXPORT-MANIFEST.json and STATIC-RECEIPTS
 stay outside it. Output/record destinations are create-only. Remove the printed
 temporary root only when its artifact/evidence is no longer needed.
 
-The separate Yetlet guide preview workflow produces downloadable artifacts with
-no deployment permissions. Existing Pages continues to use mdBook. The owner
+This checkout's [single documentation workflow](../../.github/workflows/docs.yml)
+builds the formal artifact through this same command; the duplicate docs-preview
+workflow is retired. The build has read-only repository access. A separate
+master-only deployment job remains gated by PAGES_DEPLOY_ENABLED and the build's
+deploy output. That switch stays false during [YT-226 integration](../../docs/YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01).
+Existing published Pages continues to use mdBook. The owner
 chooses the directory URLs without old mdBook .html aliases; the early site's
 old bookmarks are not promised to survive a future replacement.
 

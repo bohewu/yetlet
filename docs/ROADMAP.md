@@ -63,6 +63,13 @@ existing public website.
 Independent planning Reviewer PASS0 accepts all six YT-226 files with stable
 hashes and zero issues/followups after green master CI. Local strict/builtin
 Commit is selected; implementation/activation remain Todo, without Push/deploy.
+The subsequent owner-selected [local YT-226 integration](YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01)
+now absorbs the accepted Yetlet builder into docs.yml and retires docs-preview.
+Four new workflow tests, actionlint and actual pinned Pages tar packaging pass,
+with old evidence reused. Independent local Reviewer PASS0 accepts all11 paths,
+with zero issues/followups; Git delivery, hosted verification and activation
+remain open. No Commit/Push/deploy occurs,
+the switch stays false and YT-226 moves to In progress.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
@@ -2422,7 +2429,7 @@ resource/event/keyed ownership remain the compatibility baseline.
 | YT-223 | [Minimal static build/CLI](YT-223-STATIC-HTML-IMPLEMENTATION.md), explicit no-backend consumer and optional island; GNU/browser evidence/followup PASS0, MSVC8 cases and actual native static CLI pass; required current-head CI PASS; final independent Reviewer PASS0 | Done |
 | YT-224 | [Local Yetlet documentation pilot](YT-224-DOCS-PILOT.md): same8 canonical inputs, escaped View rendering, optional owned search, static/mobile/keyboard and bounded size/load proof; independent Reviewer PASS0 and cleanup complete, existing Pages retained | Done |
 | YT-225 | [Public-mode guide artifact preparation](YT-225-DOCS-PUBLIC-BUILD.md): clean edition/source-bound output, private receipts and independent build-only CI; old .html aliases explicitly declined. New focused checks and independent preparation Reviewer PASS0; first clean public hosted41265011134/1 and ZIP/15-file/source/receipt readback pass on authorized0544f4a. Independent hosted closeout Reviewer PASS0 with3 stable document hashes; no retry, Merge or live Pages change | Done |
-| YT-226 | [Controlled Pages cutover plan](YT-226-PAGES-CUTOVER-PLAN.md): reviewed single build/deploy workflow, same8 sources/15 public files and directory URLs, deployment hold, explicit activation/source/readback and bounded rollback authorization. Master CI passes; independent planning Reviewer PASS0 with6 stable hashes/zero issues. Planning only; implementation, its independent review and actual publication acceptance remain unstarted | Todo |
+| YT-226 | [Local controlled Pages integration](YT-226-PAGES-CUTOVER-PLAN.md): reviewed plan, one docs.yml with accepted Yetlet builder, duplicate preview retired, same8 sources/15 public files, explicit .nojekyll/private-record and eligibility boundaries. New4 workflow cases, actionlint and pinned tar transport pass; old proof reused, independent local Reviewer PASS0 with11 stable paths/zero issues. No Commit/Push/deploy; switch held false. Git/hosted and activation/readback gates remain open | In progress |
 
 Dependency paths are YT-219→YT-220→YT-221 and YT-219→YT-222→YT-223;
 YT-224 joins YT-220/221/223 and Done YT-218. Static HTML serialization does not

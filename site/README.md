@@ -1,9 +1,19 @@
-# Local reader documentation preview
+# Guide sources and legacy mdBook preview
+
+This checkout's [YT-226 integration](../docs/YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01)
+uses one .github/workflows/docs.yml to build the Yetlet reader from the exact
+selection in pages.toml. Follow the [Yetlet site build guide](../examples/docs-site/README.md#formal-artifact-preparation-no-deployment)
+for current Rust/Node/Wasm prerequisites and artifact commands. Build records stay
+outside the upload root. PAGES_DEPLOY_ENABLED remains false; the currently
+published website is still mdBook. Local workflow integration is not deployment.
+
+The mdBook command below remains an explicit reference/fallback preview and
+does not run in the new Pages build. Original YT-217/218 evidence is retained.
 
 YT-217 uses existing English Markdown as the sole guide source and Rust doc
 comments as the API source. This directory contains only build configuration
 and the explicit chapter selection; it contains no second copy of the guides.
-The separate Pages workflow builds previews without deployment by default.
+The original Pages workflow built this mdBook preview before the YT-226 change.
 Publication requires the owner-adopted [Pages settings and policy](../docs/GITHUB-PAGES-PUBLICATION.md).
 
 ## Prerequisites
@@ -30,7 +40,7 @@ The generated site lives under ignored `target/docs-site/yetlet`; no public
 hosting, keys or release services are used. Rebuilding replaces only this
 builder's generated staging/site directories.
 
-The CI publication build uses `--public` with the same command. This only builds
+The legacy builder also supports `--public` with the same command. This only builds
 files: it never enables Pages or deploys. It requires a clean checkout and the
 explicit SDK/CLI edition in `pages.toml` to match the workspace versions. Its
 public banner links the full source commit; local/PR builds retain preview labels.
@@ -53,7 +63,7 @@ For locally generated native/WASM API documentation, follow the separate
 [rustdoc commands](../docs/API-REFERENCE.md#local-rustdoc). Open their stated
 entry pages; the guide does not substitute native rustdoc for browser-only APIs.
 
-Navigation, search and assets use mdBook's built-in HTML renderer with project
+This reference preview's navigation, search and assets use mdBook's built-in HTML renderer with project
 base `/yetlet/`; Rust playground execution is disabled. Initial Pages enablement
 and public publication follow the separately owner-authorized sequence under the
 [publication scope](../docs/DOCUMENTATION-SCOPE.md) and

@@ -1,6 +1,6 @@
 # YT-226 — Controlled switch to the Yetlet-built Pages guide
 
-Date: 2026-11-01. Status: Reviewed plan; implementation and deployment not started.
+Date: 2026-11-01. Status: Local integration reviewed; hosted/publication acceptance pending.
 
 ## Current boundary
 
@@ -136,3 +136,71 @@ Documentation/internal-link/Markdown/whitespace/DAG checks pass:75 documents,
 six files after this PASS. This accepts the plan only: YT-226 implementation and
 activation stay Todo, the deployment switch stays false, and no Push or deployment
 is selected. Existing publication and failed-check history remain unchanged.
+
+## Owner-selected minimal workflow integration — 2026-11-01
+
+The owner commits the reviewed six-file plan as c5b8608 with strict/builtin
+Guard PASS0 and no Push. The next authorized scope is local integration and
+independent review only: no Commit/Push, hosted dispatch or deployment. The
+repository switch is read back false and is not changed.
+
+The checkout now has one documentation workflow, docs.yml. It absorbs the
+previously accepted docs-preview.yml's exact Rust1.99.0/wasm-bindgen0.2.129
+preparation and tools/build_yetlet_docs.py --public invocation. The duplicate
+workflow is removed. Source path filters cover the selected manuscripts, app,
+selection, shared helper, build/test tools and source CLI. Build timeout is30
+minutes; deployment remains10. Tool/dependency versions, action pins and
+SDK/browser/exporter/CLI runtime code are unchanged.
+
+Clean public-format output is independent of permission to publish. The private
+job output is now named deploy; the existing master/event/switch checks and
+deploy job otherwise remain identical. Build permissions stay contents:read;
+Pages/OIDC permissions and the github-pages Environment stay in the guarded
+deploy job. No global cancellation is added to the deployment path.
+
+The upload action receives only the generated15-file site root under
+RUNNER_TEMP/yetlet-guide/public/yetlet. Its explicit include-hidden-files:true
+preserves .nojekyll: the [pinned official action](https://github.com/actions/upload-pages-artifact/blob/fc324d3547104276b827a68afc52ff2a11cc49c9/action.yml)
+otherwise excludes hidden files by default. The same run's named github-pages
+artifact is the sole deployment input. Manifest/CLI receipts upload separately,
+including on failure, never as part of the site. Retention stays seven days.
+
+New focused verification:
+
+- Four PagesWorkflow tests PASS, executing the actual Bash deployment selector
+  and checking the new output connection, public-format/eligibility separation,
+  single workflow, upload root/hidden-file/private-record and permission gates.
+  Only this new class runs; prior publication/parser/product cases are reused.
+- Existing actionlint1.7.12 passes the changed docs.yml. Tool preparation is
+  byte-identical to the accepted preview workflow. The deploy job differs only
+  in the private output-key reference; existing branch/event/concurrency and
+  protected Environment/action behavior are reused.
+- The official pinned action's Linux tar script, with hidden-file inclusion,
+  packages the accepted YT-22515-file fixture. All15 file bytes match; .nojekyll
+  and root index.html remain present. Sentinel manifest/receipt files beside the
+  upload root are excluded. This is new archive-transport proof, not a rebuilt
+  app or a new public-source candidate. The archive is retained externally and
+  the owned temporary fixture removed; no upload/server/browser is started.
+
+Evidence is retained outside the repository in the implementation subdirectory
+of the YT-226 evidence set. No old application build, native/Wasm/browser/MSVC
+suite, benchmark or hosted job is rerun. Local Reviewer acceptance does not
+verify the unpushed workflow on GitHub or replace the public website. Git delivery,
+clean hosted workflow/build/skip evidence and explicit activation/public readback
+remain open; YT-226 stays In progress until its full acceptance boundary is met.
+The optional rollback path is not implemented by this minimal integration.
+
+## Independent local integration acceptance — 2026-11-01
+
+Independent Reviewer PASS0 has zero issues/required followups. All11 changed
+paths match the frozen sources, deleted-file baseline, diff and worktree status
+at c5b8608. The reviewer reconciles unchanged tool preparation/deployment policy,
+the four new workflow cases, actionlint/docs checks and the actual15-file Pages
+archive against its accepted fixture/manifest. No test/build/browser run,
+extraction, source mutation or external action is performed by the reviewer.
+Registered reviewer gpt-6-astra/effective high are verified.
+
+The repository switch is independently read back false after review, without a
+settings write. All11 paths remain unstaged/uncommitted; no Commit/Push, hosted
+dispatch, upload or deployment occurs. YT-226 remains In progress, with the
+clean hosted new workflow and actual authorized activation/readback still open.

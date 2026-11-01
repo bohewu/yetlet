@@ -68,8 +68,8 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   clean source/edition labels, selected output and private receipts, separate
   build-only CI; no legacy URL aliases or live Pages replacement.
 - [Controlled Pages cutover plan — YT-226](YT-226-PAGES-CUTOVER-PLAN.md):
-  independently reviewed single workflow plan, deployment hold, source/artifact
-  checks and one later activation/rollback decision; implementation and publication remain Todo.
+  reviewed plan and local single-workflow integration, deployment hold and
+  source/artifact boundaries; hosted delivery and activation/readback remain open.
 
 - [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
   dedicated workflow, master-only Environment, initial deployment/readback,
