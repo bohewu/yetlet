@@ -1787,7 +1787,7 @@ checksum = "550a2b930b62486a393c52d5c3b84bff264b28aa437ed64694d31e93b1757af7"
 
 [[package]]
 name = "yetlet"
-version = "0.9.0-alpha.5"
+version = "0.9.0-alpha.6"
 dependencies = [
  "axum",
  "getrandom",

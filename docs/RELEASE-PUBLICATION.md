@@ -1,10 +1,15 @@
 # Single-gate release automation and registry promotion
 
-YT-020 / YT-209 followup, 2026-10-30. **Worker rollout verified by alpha.4;
-first combined registry publication remains incomplete.** See the
-[actual hosted outcome and local repair](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair).
-[RELEASING.md](RELEASING.md) remains the general SOP; dated alpha.3 results and
-immutable tags/archives are preserved.
+Current distribution checkpoint, 2026-11-01: the two-package
+[SDKalpha.5](ALPHA5-HOSTED-RECORD.md) and independent
+[CLI0.1.1](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+completed GitHub/crates.io publication and their recorded installed-consumer
+checks. Alpha.4's [partial publication and repair](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair)
+remain historical, not the current distribution status.
+[RELEASING.md](RELEASING.md) is the general SOP;
+[YT-227](YT-227-NEXT-RELEASE-PLAN.md) inventories the next delivery and optional
+registry OIDC migration. That option is not adopted here: the current publisher
+permission/Secret contract below and ADR0009 remain unchanged.
 
 ## Independent CLI cohort — YT-215
 
@@ -16,8 +21,10 @@ separate verifier/custody and final owner gate apply. The final consumer install
 the executable with its packaged lock. Existing SDK schemas/outputs remain
 unchanged. [CLI0.1.0 is published](YT-215-CLI-FIRST-RELEASE.md#actual-first-publication-and-consumer-failure--2026-10-31),
 with successful installation but failed exact version-output validation.
-[CLI0.1.1 preparation](YT-216-CLI-011-PATCH-RELEASE.md) repairs that bounded
-interface without replacing0.1.0 or re-publishing SDK; its final owner gate remains.
+[CLI0.1.1's completed publication](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+repairs that bounded interface: install, exact version, help and scaffold pass.
+It does not replace0.1.0 or re-publish SDK; every future CLI cohort retains its
+own final owner gate.
 
 ## Historical cohort planning boundary — alpha.5
 

@@ -1,8 +1,9 @@
 # Yetlet
 
-HTML-first views and explicitly selected native capabilities. This checkout uses
-unreleased `0.9.0-alpha.5`; it is not yet available from crates.io. Earlier release
-tags retain their sixteen-package layout and original qualification evidence.
+HTML-first views and explicitly selected native capabilities, version
+`0.9.0-alpha.6`. See [GitHub releases](https://github.com/bohewu/yetlet/releases)
+for published artifacts. Earlier tags retain their original package layout and
+qualification evidence.
 
 ## Minimal integration
 
@@ -10,7 +11,7 @@ Use Rust 1.99+ and an explicit path to this checkout:
 
 ```toml
 [dependencies]
-yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.5" }
+yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.6" }
 ```
 
 ```rust

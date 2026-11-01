@@ -16,6 +16,9 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "target/docs-site"
 REPOSITORY = "https://github.com/bohewu/yetlet"
 LINK = re.compile(r"(!?\[[^\]\n]*\]\()([^\s)]+)(\))")
+# Explicit published reader edition, independent of development package versions.
+# Promote only after both distributions and the guide consumer are qualified.
+PUBLISHED_EDITION = {"sdk": "0.9.0-alpha.5", "cli": "0.1.1"}
 
 
 def rewrite_links(text, source, destinations, commit):
@@ -57,8 +60,9 @@ def page_label(commit, dirty, sdk, cli, edition, public):
     if public:
         if dirty:
             raise ValueError("Public documentation requires a clean checkout")
-        if edition != {"sdk": sdk, "cli": cli}:
+        if edition != PUBLISHED_EDITION:
             raise ValueError("Public guide edition must match the reviewed SDK/CLI versions")
+        sdk, cli = edition["sdk"], edition["cli"]
         return (f"> Yetlet documentation · SDK `{sdk}` · CLI `{cli}`. "
                 f'Source [{commit[:7]}]({REPOSITORY}/tree/{commit} "{commit}").\n\n')
     return (f"> Local documentation preview · SDK `{sdk}` · CLI `{cli}`. "
@@ -140,7 +144,9 @@ def build(mdbook, public=False):
     shutil.copyfile(ROOT / "site/book.toml", staging / "book.toml")
     manifest = {"mdbook": version, "source_base": commit, "local_changes": dirty,
                 "mode": "public" if public else "preview",
-                "sdk_version": sdk, "cli_version": cli, "pages": []}
+                "sdk_version": selection["edition"]["sdk"] if public else sdk,
+                "cli_version": selection["edition"]["cli"] if public else cli,
+                "pages": []}
     summary = ["# Summary\n\n"]
     for page in pages:
         source = ROOT / page["source"]

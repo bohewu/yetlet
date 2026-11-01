@@ -45,12 +45,23 @@ class PublicPreparation(unittest.TestCase):
                 prepare.prepare(public=True)
         self.assertFalse((self.app / "src/generated").exists())
 
-    def test_workspace_version_cannot_relabel_the_selected_edition(self):
+    def test_new_workspace_version_retains_the_published_consumer_edition(self):
         selection = tomllib.loads((guide.ROOT / "site/pages.toml").read_text())
         with patch.object(prepare.subprocess, "check_output", side_effect=[self.commit, ""]), \
              patch.object(prepare.tomllib, "loads", side_effect=[selection,
                           {"workspace": {"package": {"version": "0.9.0-alpha.6"}}},
                           {"package": {"version": "0.1.1"}}]):
+            result = prepare.prepare(public=True)
+        self.assertEqual((result["sdk"], result["cli"]), ("0.9.0-alpha.5", "0.1.1"))
+        self.assertTrue((self.app / "src/generated/chapters.json").is_file())
+
+    def test_unadmitted_candidate_edition_is_rejected_before_preparation(self):
+        selection = tomllib.loads((guide.ROOT / "site/pages.toml").read_text())
+        selection["edition"] = {"sdk": "0.9.0-alpha.6", "cli": "0.2.0"}
+        with patch.object(prepare.subprocess, "check_output", side_effect=[self.commit, ""]), \
+             patch.object(prepare.tomllib, "loads", side_effect=[selection,
+                          {"workspace": {"package": {"version": "0.9.0-alpha.6"}}},
+                          {"package": {"version": "0.2.0"}}]):
             with self.assertRaisesRegex(ValueError, "reviewed SDK/CLI"):
                 prepare.prepare(public=True)
         self.assertFalse((self.app / "src/generated").exists())

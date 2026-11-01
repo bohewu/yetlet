@@ -103,6 +103,12 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [New-version release workflow](RELEASING.md): one-time setup versus each version,
   immutable C/S, protected jobs, exact approvals, independent verification and
   publication; distinguishes installed tooling from Pending hosted qualification.
+- [Next SDK/CLI delivery plan](YT-227-NEXT-RELEASE-PLAN.md): proposed SDKalpha.6
+  then CLI0.2.0, unreleased feature scope, guide/version-binding prerequisites,
+  evidence reuse and optional registry OIDC; versions and execution unselected.
+- [Selected SDKalpha.6 preparation](ALPHA6-RELEASE-PREPARATION.md): affected
+  qualification and source-bound release stages through the final owner gate;
+  CLI0.2 follows the SDK's actual publication, registry OIDC deferred.
 - [Single-gate release automation and registry promotion](RELEASE-PUBLICATION.md):
   automated build/sign/verification, final owner-approved GitHub then crates.io
   publication, local implementation and one-time rollout limits.
