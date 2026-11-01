@@ -10,6 +10,14 @@ records green CI, source/artifact/edition matching and hosted reader acceptance,
 accepted by final independent Reviewer PASS0; YT-218 is Done. No product API/runtime/version change
 or expansion of signed release-candidate scope follows from website publication.
 
+**2026-11-01 checkout update:** [YT-226](YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01)
+locally integrates the accepted Yetlet-built reader into one Pages workflow.
+Use the [current site build guide](../examples/docs-site/README.md#formal-artifact-preparation-no-deployment)
+for that build path. The initial mdBook choice and execution records below
+remain historical; its builder is kept as an explicit reference. This local
+integration deploys nothing and keeps PAGES_DEPLOY_ENABLED false. The published
+site remains unchanged until separately authorized activation/readback.
+
 ## Recommended destinations
 
 Use **GitHub Pages** for the public guide site, the existing repository for

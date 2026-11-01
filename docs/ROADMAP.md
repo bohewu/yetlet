@@ -52,6 +52,34 @@ Subsequent authorized0544f4a delivery updates PR44: the first clean public
 artifact41265011134/1 and exact ZIP/15-file/source/receipt readback pass. This
 adds hosted build acceptance with independent closeout Reviewer PASS0, without
 Merge, retry or website replacement.
+[YT-226](YT-226-PAGES-CUTOVER-PLAN.md) proposes the later controlled Pages switch,
+with one authoritative build/deploy workflow and no old URL aliases. Only planning
+is selected now; implementation and activation remain Todo. Following green PR
+CI/all four CodeQL analyses, PR44 squash-merges as99902bb with the exact reviewed
+tree. The deployment variable is held false; master mdBook41277712999 passes
+with deploy skipped. Subsequent master readback confirms MSRV/Stable, guide and
+all four CodeQL analyses pass on attempt1 at99902bb. This does not replace the
+existing public website.
+Independent planning Reviewer PASS0 accepts all six YT-226 files with stable
+hashes and zero issues/followups after green master CI. Local strict/builtin
+Commit is selected; implementation/activation remain Todo, without Push/deploy.
+The subsequent owner-selected [local YT-226 integration](YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01)
+now absorbs the accepted Yetlet builder into docs.yml and retires docs-preview.
+Four new workflow tests, actionlint and actual pinned Pages tar packaging pass,
+with old evidence reused. Independent local Reviewer PASS0 accepts all11 paths,
+with zero issues/followups; Git delivery, hosted verification and activation
+remain open. No Commit/Push/deploy occurs,
+the switch stays false and YT-226 moves to In progress.
+The later authorized strict/builtin delivery commits5759585 and pushes both plan
+and integration into [PR45](https://github.com/bohewu/yetlet/pull/45), zero findings.
+The new documentation workflow41284853642/1 passes and deploy skips. Downloaded
+ZIP digests,15 output hashes,8 canonical excerpts,10 tracked inputs and CLI
+receipts reconcile with its exact PR merge-ref/tree. The switch remains false;
+PR45 is not merged and Pages is unchanged. YT-226 stays In progress until the
+merged-master and separately authorized activation/public-readback gates pass.
+Independent hosted closeout Reviewer PASS0 accepts three stable document hashes
+and22 retained evidence hashes with zero issues/followups; these three new
+closeout documents remain uncommitted and unpushed.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
@@ -2411,6 +2439,7 @@ resource/event/keyed ownership remain the compatibility baseline.
 | YT-223 | [Minimal static build/CLI](YT-223-STATIC-HTML-IMPLEMENTATION.md), explicit no-backend consumer and optional island; GNU/browser evidence/followup PASS0, MSVC8 cases and actual native static CLI pass; required current-head CI PASS; final independent Reviewer PASS0 | Done |
 | YT-224 | [Local Yetlet documentation pilot](YT-224-DOCS-PILOT.md): same8 canonical inputs, escaped View rendering, optional owned search, static/mobile/keyboard and bounded size/load proof; independent Reviewer PASS0 and cleanup complete, existing Pages retained | Done |
 | YT-225 | [Public-mode guide artifact preparation](YT-225-DOCS-PUBLIC-BUILD.md): clean edition/source-bound output, private receipts and independent build-only CI; old .html aliases explicitly declined. New focused checks and independent preparation Reviewer PASS0; first clean public hosted41265011134/1 and ZIP/15-file/source/receipt readback pass on authorized0544f4a. Independent hosted closeout Reviewer PASS0 with3 stable document hashes; no retry, Merge or live Pages change | Done |
+| YT-226 | [Controlled Pages integration/PR hosted proof](YT-226-PAGES-CUTOVER-PLAN.md#authorized-git-delivery-and-pr-hosted-build--2026-11-01): one docs.yml, retired duplicate, same8 sources/15 files and preserved deployment boundary. Local4 cases/actionlint/tar checks and Reviewer PASS0 retained. Strict/builtin5759585 and plan delivered in open PR45, zero findings; new41284853642/1 passes/deploy skips, archive/manifest/source/CLI bindings match. No retry/Merge/deploy; switch false. Merged-master and authorized activation/readback remain open | In progress |
 
 Dependency paths are YT-219→YT-220→YT-221 and YT-219→YT-222→YT-223;
 YT-224 joins YT-220/221/223 and Done YT-218. Static HTML serialization does not
