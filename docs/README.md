@@ -61,6 +61,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   explicit CLI/native exporter, bounded public documents/assets and optional
   island; bounded GNU/browser/MSVC evidence and retained failures are explicit.
 
+- [Local Yetlet documentation pilot — YT-224](YT-224-DOCS-PILOT.md):
+  application-owned eight-chapter static reader with optional Wasm search;
+  independent Reviewer PASS0 at local scope; existing public Pages retained.
+
 - [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
   dedicated workflow, master-only Environment, initial deployment/readback,
   retained observations and automatic relevant master document updates.

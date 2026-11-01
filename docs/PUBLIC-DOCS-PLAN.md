@@ -140,7 +140,8 @@ Independent Reviewer PASS0. [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md) now h
 an unreleased static-build implementation and explicit standalone consumer;
 GNU/browser, bounded MSVC and required current-head CI evidence are complete;
 final independent Reviewer PASS0 accepts YT-223 Done at bounded source scope.
-YT-224 remains Todo. Published CLI0.1.1 does not contain this mode.
+[YT-224](YT-224-DOCS-PILOT.md) is Done at local pilot scope after independent
+Reviewer PASS0 and owned cleanup. Existing Pages remains the accepted public site. Published CLI0.1.1 does not contain the static mode.
 
 Retain the current mdBook site/workflow and these eight source/excerpt/disclosure
 boundaries during the pilot. The existing browser CLI already produces static-

@@ -40,7 +40,9 @@ documentation-only finite static-export/CLI contract scope, independent Reviewer
 PASS0,0 issues/followups and21 stable input hashes;
 the [YT-223 implementation](YT-223-STATIC-HTML-IMPLEMENTATION.md) is Done at
 bounded source scope after local and final platform independent Reviewer PASS0;
-GNU/browser, MSVC and required current-head CI evidence are complete. YT-224 remains Todo;
+GNU/browser, MSVC and required current-head CI evidence are complete.
+[YT-224](YT-224-DOCS-PILOT.md) local pilot is Done after independent Reviewer PASS0
+and owned cleanup; existing Pages is retained;
 live site/releases unchanged.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
@@ -2399,7 +2401,7 @@ resource/event/keyed ownership remain the compatibility baseline.
 | YT-221 | [Controlled link/image implementation](YT-221-DOM-URL-IMAGE-CONTRACT.md), contract PASS0, unchanged defaults/full resource preflight and new native/Wasm/Chrome/Firefox evidence; final independent Reviewer PASS0 | Done |
 | YT-222 | [Finite static export/CLI contract](YT-222-STATIC-HTML-CONTRACT.md): app-owned exporter, typed build --static request, bounded documents/assets/base/CSP, protected create-only publication and private receipts; docs only, independent Reviewer PASS0 | Done |
 | YT-223 | [Minimal static build/CLI](YT-223-STATIC-HTML-IMPLEMENTATION.md), explicit no-backend consumer and optional island; GNU/browser evidence/followup PASS0, MSVC8 cases and actual native static CLI pass; required current-head CI PASS; final independent Reviewer PASS0 | Done |
-| YT-224 | Pilot Yetlet-built docs from the same eight sources with static content and optional Wasm; no live replacement | Todo |
+| YT-224 | [Local Yetlet documentation pilot](YT-224-DOCS-PILOT.md): same8 canonical inputs, escaped View rendering, optional owned search, static/mobile/keyboard and bounded size/load proof; independent Reviewer PASS0 and cleanup complete, existing Pages retained | Done |
 
 Dependency paths are YT-219→YT-220→YT-221 and YT-219→YT-222→YT-223;
 YT-224 joins YT-220/221/223 and Done YT-218. Static HTML serialization does not
@@ -2493,3 +2495,25 @@ optional Rust CodeQL remained in progress in the acceptance snapshot. Original
 failures and source/package/browser limits remain explicit. The ten closeout docs
 are uncommitted, PR44 stays open, no Merge/publication. YT-224 is Todo/unblocked,
 not started. No new support or release version is selected.
+
+### YT-224 local documentation pilot — 2026-11-01
+
+After strict/builtin ten-document closeout commit1802026 (no Push), the owner
+selects the [application-owned pilot](YT-224-DOCS-PILOT.md). It reuses the same
+eight source/excerpt hashes and prior mdBook artifact, renders parsed events
+through Yetlet Views and adds explicitly activated Wasm search. Native3 tests,
+new app compile/strict lint/exports and bounded Chromium no-JS/search/menu/touch/
+keyboard/failure/disposal/output correspondence pass, with first failures retained.
+Only missing cold-load/size comparison is added; old verification is not replayed.
+YT-224 In progress pending independent review. New changes uncommitted/unpushed;
+no SDK/CLI API/version change, Pages replacement, Merge or publication.
+
+### YT-224 final local acceptance — 2026-11-01
+
+Final independent Reviewer PASS0,0 issues/followups,33 stable inputs and19 reviewed
+paths accepts Done at local pilot scope. External evidence retention and owned
+consumer/browser/server cleanup are complete. Native/parser/strict lint/build,
+static content/output boundaries and Chromium desktop/emulated-touch reader
+proof retain their exact limits and first failures. New work stays uncommitted/
+unpushed; existing Pages/workflow and published packages remain unchanged. Next
+is owner evaluation before any separately authorized live-site replacement.

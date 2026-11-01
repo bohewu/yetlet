@@ -1,0 +1,31 @@
+[package]
+name = "yetlet-docs-pilot"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+
+[workspace]
+resolver = "3"
+
+[[bin]]
+name = "docs-export"
+path = "src/main.rs"
+
+[lib]
+name = "docs_search"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+yetlet = { version = "=0.9.0-alpha.5", default-features = false }
+serde = { version = "=1.0.229", features = ["derive"] }
+serde_json = "=1.0.151"
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+yetlet = { version = "=0.9.0-alpha.5", default-features = false, features = ["html"] }
+pulldown-cmark = { version = "=0.13.6", default-features = false }
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+yetlet-browser = { version = "=0.9.0-alpha.5", default-features = false, features = ["dom"] }
+wasm-bindgen = "=0.2.129"
+web-sys = { version = "=0.3.106", features = ["Window", "Document", "Element", "Event", "EventTarget", "HtmlInputElement", "Node"] }

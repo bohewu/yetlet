@@ -343,3 +343,25 @@ source hashes. Required CI and documentation CI pass on9099879; optional Rust
 CodeQL remained running in the acceptance snapshot. Original failures are retained
 and no accepted suite is replayed. Ten closeout docs remain uncommitted, PR44
 open, no Merge/publication. YT-224 is the next unblocked item, still Todo/not started.
+
+## Subsequent YT-224 local pilot checkpoint — 2026-11-01
+
+The owner authorizes strict/builtin1802026 of the ten YT-223 closeout docs without
+Push, then the [local application-owned pilot](YT-224-DOCS-PILOT.md). The existing
+eight selected sources/excerpts remain canonical and match the retained mdBook
+artifact. The standalone native-build Markdown parser feeds Yetlet Views with
+explicit raw/unsupported rejection; opt-in local Wasm owns only search. New
+focused native/build/lint/static output and Chromium reader/lifetime/size/load
+proof pass with original failures retained. Old suite evidence is reused.
+YT-224 is In progress pending independent Reviewer; new changes uncommitted/
+unpushed, no existing Pages/workflow replacement or SDK/CLI API/version change.
+
+## Final YT-224 local acceptance — 2026-11-01
+
+Independent Reviewer PASS0,0 issues/followups,33 matching review inputs and19-path
+status accepts Done at the local pilot scope after verified external retention
+and removal of the owned temporary consumer. Browser/server cleanup is complete.
+No accepted suite is replayed; original failures remain. New changes are
+uncommitted/unpushed and Pages is unchanged. The next decision is owner evaluation
+of the pilot before any separately authorized live-site replacement, not an
+automatic deployment or expansion of the documentation boundary.
