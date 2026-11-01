@@ -1,6 +1,6 @@
 [package]
 name = "yetlet-cli"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2024"
 rust-version = "1.99"
 description = "Source-installable Yetlet developer CLI preview"
@@ -19,7 +19,7 @@ path = "src/main.rs"
 
 [dependencies]
 serde = { version = "=1.0.229", features = ["derive"] }
-yetlet = { version = "=0.9.0-alpha.5", default-features = false, features = ["html", "config", "signing"] }
+yetlet = { version = "=0.9.0-alpha.6", default-features = false, features = ["html", "config", "signing"] }
 toml_edit = "=0.22.20"
 serde_json = "=1.0.151"
 toml = "=0.8.19"

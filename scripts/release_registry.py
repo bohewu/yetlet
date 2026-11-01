@@ -94,7 +94,7 @@ def prepare(record, directory, subjects):
         meta = metadata(raw, name, record['version'])
         if record['schema'] == 3:
             sdk = [d for d in meta['deps'] if d['name'] == 'yetlet' and d['kind'] == 'normal']
-            require(len(sdk) == 1 and sdk[0]['version_req'] == '=' + records.CLI_SDK_VERSION)
+            require(len(sdk) == 1 and sdk[0]['version_req'] == '=' + records.cli_sdk_version(record['version']))
         dependencies = sorted({d['name'] for d in meta['deps'] if d['name'] in packages})
         for d in meta['deps']:
             if d['name'] in packages:

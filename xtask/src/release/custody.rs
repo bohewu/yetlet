@@ -960,9 +960,10 @@ mod tests {
     }
     #[test]
     fn cli_custody_uses_record_context_and_rejects_sdk_or_wrong_source_bindings() {
-        let record = json!({"schema":3,"cohort":"cli","version":"0.1.1","source":"a".repeat(40)});
+        let version = super::super::private::Cohort::Cli.version();
+        let record = json!({"schema":3,"cohort":"cli","version":version,"source":"a".repeat(40)});
         let context = selected_context(Some(&record.to_string())).unwrap();
-        assert_eq!(context.git_ref, "refs/tags/yetlet-cli-v0.1.1");
+        assert_eq!(context.git_ref, format!("refs/tags/yetlet-cli-v{version}"));
         let mut binding = Binding {
             source: "a".repeat(40),
             workflow_sha: "a".repeat(40),

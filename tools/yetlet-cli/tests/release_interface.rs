@@ -48,7 +48,8 @@ fn real_binary_scaffold_keeps_the_published_sdk_dependency() {
         .parse()
         .unwrap();
     let sdk = &manifest["dependencies"]["yetlet"];
-    assert_eq!(sdk["version"].as_str(), Some("=0.9.0-alpha.5"));
+    let cli: toml::Value = include_str!("../Cargo.toml").parse().unwrap();
+    assert_eq!(sdk["version"], cli["dependencies"]["yetlet"]["version"]);
     assert!(sdk.get("path").is_none());
     assert!(manifest.get("patch").is_none());
     assert!(manifest.get("replace").is_none());

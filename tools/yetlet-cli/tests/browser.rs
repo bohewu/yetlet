@@ -19,6 +19,7 @@ fn new(
 
 #[test]
 fn browser_creation_is_explicit_finite_and_preserves_native_default() {
+    let cli: toml::Value = include_str!("../Cargo.toml").parse().unwrap();
     let temp = tempfile::tempdir().unwrap();
     #[cfg(unix)]
     {
@@ -41,6 +42,15 @@ fn browser_creation_is_explicit_finite_and_preserves_native_default() {
         let app = temp.path().join(name);
         let manifest = fs::read_to_string(app.join("Cargo.toml")).unwrap();
         assert!(manifest.contains("[lib]") && manifest.contains("wasm32"));
+        let parsed: toml::Value = manifest.parse().unwrap();
+        let dependencies = &parsed["target"]["cfg(target_arch = \"wasm32\")"]["dependencies"];
+        for name in ["yetlet", "yetlet-browser"] {
+            assert_eq!(
+                dependencies[name]["version"],
+                cli["dependencies"]["yetlet"]["version"]
+            );
+            assert!(dependencies[name].get("path").is_none());
+        }
         for native in ["tokio", "axum", "yetlet-config", "yetlet-secrets"] {
             assert!(!manifest.contains(native));
         }
