@@ -1,5 +1,34 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**CLI0.2.0 publication and registry consumer complete (2026-11-02):**
+[Owner-approved41319625709/1](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+PASS: five-file GitHub Experimental pre-release, exact crates.io archive and
+fresh registry installation/version/help/new. Anonymous assets, registry bytes
+and non-yanked index match the frozen checksum; generated SDKalpha.6 pin is
+exact, without path patches or forwarded credentials. Original preparation
+acceptance, failures and immutable C/S/tag remain; no retry, duplicate upload or
+SDK republishing. The dated Pending checkpoints below remain historical.
+
+**YT-229 accepted through the final owner gate (2026-11-01):**
+[Final preparation acceptance](CLI-020-RELEASE-PREPARATION.md#owner-publication-gate-ready--2026-11-01)
+PASS0,0 issues/followups; actual preflight41319625709/1 PASS and publish waits
+release-publish. Hosted public/registry plans match the reviewed five-file/oneCLI
+set. Fixed C7fb963a/SVP86e5da2 and five successful first-attempt stages retain
+one verified subject/all54 private entries. YT-229 Done at preparation scope;
+Draft private/empty, GitHub/registry/installed-registry-consumer unexecuted.
+Original failures remain, no release retry or SDK republishing. Three local
+closing docs are uncommitted; owner approval has not been performed.
+
+**CLI0.2 verified release preparation (2026-11-01):**
+[YT-229](CLI-020-RELEASE-PREPARATION.md#fixed-signer-and-verified-outputs--2026-11-01)
+retains fixed C7fb963a and PR50/S/V/P86e5da2 with actual required master CI PASS.
+Build/readback/prepare/sign/independent result each PASS attempt1; one CLI subject
+and all54 final private entries verified. Five prospective public files, notes
+and exact-byte registry plan are prepared; Draft remains private/empty. Final
+review/preflight/owner-gate observation Pending, YT-229 In progress. Original
+failures retained, no release retry, private-key access or publication locally.
+Three closing docs remain uncommitted; no SDK republishing or guide promotion.
+
 **CLI0.2 source and original custody accepted (2026-11-01):**
 [YT-229](CLI-020-RELEASE-PREPARATION.md#successful-original-build-and-custody--2026-11-01)
 uses PR49/C7fb963a with matching reviewed tree and actual master CI PASS. Current

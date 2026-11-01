@@ -1,5 +1,34 @@
 # Yetlet Backlog
 
+**Completed CLI0.2.0 publication (2026-11-02):**
+[Owner-approved41319625709/1](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+PASS: five-file GitHub Experimental pre-release, exact crates.io archive and
+fresh registry installation/version/help/new. Anonymous assets, registry bytes
+and non-yanked index match the frozen checksum; generated SDKalpha.6 pin is
+exact, without path patches or forwarded credentials. Original preparation
+acceptance, failures and immutable C/S/tag remain; no retry, duplicate upload or
+SDK republishing. The dated Pending checkpoints below remain historical.
+
+**YT-229 preparation Done; final owner publication gate waiting (2026-11-01):**
+[Final preparation acceptance](CLI-020-RELEASE-PREPARATION.md#owner-publication-gate-ready--2026-11-01)
+PASS0,0 issues/followups; actual preflight41319625709/1 PASS and publish waits
+release-publish. Hosted public/registry plans match the reviewed five-file/oneCLI
+set. Fixed C7fb963a/SVP86e5da2 and five successful first-attempt stages retain
+one verified subject/all54 private entries. YT-229 Done at preparation scope;
+Draft private/empty, GitHub/registry/installed-registry-consumer unexecuted.
+Original failures remain, no release retry or SDK republishing. Three local
+closing docs are uncommitted; owner approval has not been performed.
+
+**CLI0.2 signed and independently verified; owner publication held (2026-11-01):**
+[YT-229](CLI-020-RELEASE-PREPARATION.md#fixed-signer-and-verified-outputs--2026-11-01)
+retains fixed C7fb963a and PR50/S/V/P86e5da2 with actual required master CI PASS.
+Build/readback/prepare/sign/independent result each PASS attempt1; one CLI subject
+and all54 final private entries verified. Five prospective public files, notes
+and exact-byte registry plan are prepared; Draft remains private/empty. Final
+review/preflight/owner-gate observation Pending, YT-229 In progress. Original
+failures retained, no release retry, private-key access or publication locally.
+Three closing docs remain uncommitted; no SDK republishing or guide promotion.
+
 **CLI0.2 fixed source and original build/readback (2026-11-01):**
 [YT-229](CLI-020-RELEASE-PREPARATION.md#successful-original-build-and-custody--2026-11-01)
 uses PR49/C7fb963a with matching reviewed tree and actual master CI PASS. Current
@@ -1070,7 +1099,7 @@ separate implementation authority.
 
 | YT-228 | P1 | M | M10 | Prepare SDKalpha.6 through the final publication gate | YT-227 | [Accepted preparation and subsequent publication](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01): reviewed metadata/guide fix and GNU/Wasm/MSVC consumers; PR47/Cc7e6372, PR48/SVP6531001 and actual required CI PASS. Build/readback/prepare/sign/independent verification each PASS attempt1; two subjects/all44 private entries, frozen payloads and final Reviewer PASS0. Owner-approved41308935654/1 completes six-file GitHub prerelease then both registry uploads; anonymous bytes/checksums/index and fresh registry-only exact-version resolve/locked compile PASS. Initial P1/operator failures retained, no retry/re-sign/source or tag rewrite. Original preparation acceptance preserved; CLI0.2 not started, three closing docs local/uncommitted | Done |
 
-| YT-229 | P1 | M | M10 | Prepare independent CLI0.2.0 against published SDKalpha.6 | YT-216, YT-223, YT-228 | [Fixed source/build/custody](CLI-020-RELEASE-PREPARATION.md#successful-original-build-and-custody--2026-11-01): manifest-driven current expectations, canonical resources and trusted historical SDK bindings. GNU/archive/actual installed/generated/static consumers and MSVC7-pass/1-ignored; source/review and PR49/master CI PASS, C7fb963a/tag fixed. Build41315130983/1 and original readback41315597052/1 PASS, exact downloaded bytes retained. S/later stages/final owner gate Pending; no failed release-job retry, SDK republishing or final publication | In progress |
+| YT-229 | P1 | M | M10 | Prepare independent CLI0.2.0 against published SDKalpha.6 | YT-216, YT-223, YT-228 | [Accepted preparation and subsequent publication](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02): manifest-driven current expectations; reviewed GNU/archive/installed/generated/static and MSVC proof, immutable C7fb963a/SVP86e5da2 and actual required CI PASS. Five release stages PASS attempt1, one CLI subject/all54 private entries; final Reviewer PASS0 and actual owner gate followed by successful publisher41319625709/1. Exactly five public files and original registry archive/checksum verified; fresh anonymous install/exact version/help/new PASS, generated SDKalpha.6 pin exact with no path patches or forwarded credentials. Original failures and preparation scope retained; no retry, duplicate upload, SDK republishing or guide promotion | Done |
 
 ## M25 — Broader HTML DOM support and static-site delivery
 
