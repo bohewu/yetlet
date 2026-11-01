@@ -97,3 +97,21 @@ release-stage retry or repeated previously accepted product suite occurs.
 All local receipts and the review snapshot are retained outside the repository
 under the owner-host evidence run yt229-cli020-20261101. No formal age private key,
 publisher token, listener or cloud resource is used for these checks.
+
+### First delivered CI and prerequisite correction — 2026-11-01
+
+PR49/source1ff8b7d contains the accepted local preparation and SDK closeout.
+The first Stable job124864220610 in run41312030357 fails in xtask tests before
+later SDK/Chrome stages: two current-source CLI custody/private-rebuild fixtures
+still expect0.1.1. Their expected current CLI version/tag and fixture SDK pin are
+corrected to0.2.0/alpha.6; runtime custody/preparation guards are unchanged.
+The existing focused xtask cli_ filter passes4 tests,39 filtered out. Preserve
+the original CI failure; no failed hosted job is retried. The source correction
+requires independent review before strict/builtin delivery to the same PR.
+
+The first prepared-runner MSVC invocation stops in openssl-sys before any tests:
+the invocation omitted the existing documented OpenSSL environment. Reuse the
+already provisioned task-protected OpenSSL installation, changing only child
+process environment; no SDK feature/dependency change, installation or global
+configuration. The failed prerequisite log remains retained; no test had passed
+or executed at that checkpoint. Affected MSVC execution is still Pending.
