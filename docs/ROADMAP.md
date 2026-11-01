@@ -48,6 +48,10 @@ live site/releases unchanged.
 output and independent build-only CI. The owner explicitly declines old .html
 aliases. Focused new checks and independent Reviewer PASS0 accept preparation Done. Existing
 Pages, SDK/CLI versions and accepted product/platform evidence are unchanged.
+Subsequent authorized0544f4a delivery updates PR44: the first clean public
+artifact41265011134/1 and exact ZIP/15-file/source/receipt readback pass. This
+adds hosted build acceptance with independent closeout Reviewer PASS0, without
+Merge, retry or website replacement.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
@@ -2406,7 +2410,7 @@ resource/event/keyed ownership remain the compatibility baseline.
 | YT-222 | [Finite static export/CLI contract](YT-222-STATIC-HTML-CONTRACT.md): app-owned exporter, typed build --static request, bounded documents/assets/base/CSP, protected create-only publication and private receipts; docs only, independent Reviewer PASS0 | Done |
 | YT-223 | [Minimal static build/CLI](YT-223-STATIC-HTML-IMPLEMENTATION.md), explicit no-backend consumer and optional island; GNU/browser evidence/followup PASS0, MSVC8 cases and actual native static CLI pass; required current-head CI PASS; final independent Reviewer PASS0 | Done |
 | YT-224 | [Local Yetlet documentation pilot](YT-224-DOCS-PILOT.md): same8 canonical inputs, escaped View rendering, optional owned search, static/mobile/keyboard and bounded size/load proof; independent Reviewer PASS0 and cleanup complete, existing Pages retained | Done |
-| YT-225 | [Public-mode guide artifact preparation](YT-225-DOCS-PUBLIC-BUILD.md): clean edition/source-bound output, private receipts and independent build-only CI; old .html aliases explicitly declined, no live Pages change. New6 Python/1 native tests, preview integration/219 links, strict lint/format/docs and corrected actionlint pass; independent Reviewer PASS0 with10 stable hashes and15 output bindings. Hosted/deployment acceptance remains separate | Done |
+| YT-225 | [Public-mode guide artifact preparation](YT-225-DOCS-PUBLIC-BUILD.md): clean edition/source-bound output, private receipts and independent build-only CI; old .html aliases explicitly declined. New focused checks and independent preparation Reviewer PASS0; first clean public hosted41265011134/1 and ZIP/15-file/source/receipt readback pass on authorized0544f4a. Independent hosted closeout Reviewer PASS0 with3 stable document hashes; no retry, Merge or live Pages change | Done |
 
 Dependency paths are YT-219→YT-220→YT-221 and YT-219→YT-222→YT-223;
 YT-224 joins YT-220/221/223 and Done YT-218. Static HTML serialization does not

@@ -102,3 +102,52 @@ formatting and tracked/untracked whitespace checks pass. Registered reviewer
 gpt-6-astra/effective high are verified; review reruns no tests or browsers.
 All10 changed paths remain unstaged/uncommitted, HEAD remains a306714, and no
 Push, Merge, hosted execution, signing, publication or Pages change occurred.
+
+## Authorized delivery and hosted artifact — 2026-11-01
+
+The owner subsequently authorizes strict/builtin commit of the10 paths and Push
+to the existing [PR44](https://github.com/bohewu/yetlet/pull/44), followed by clean
+hosted artifact verification. Commit0544f4a096f31c76a352e99192d8e6baf3998272 has
+tree2b50a607db322c7503ec92008866960394220b2f. Staged Guard/native hook pass with
+zero findings; exact9099879→0544f4a outgoing/native-hook checks cover4 commits
+and45 file operations, with3 nonblocking generic Windows-drive path warnings
+from the earlier CLI guide. No Guard policy, hook or history is weakened.
+
+[Guide preview41265011134/1](https://github.com/bohewu/yetlet/actions/runs/41265011134)
+passes on its first attempt. The actual clean public-mode checkout is GitHub's
+PR merge-ref67ae378fa9238795a94e3768a0a064a1e577e824, whose parents are the
+unchanged master64d1074 and delivered head0544f4a; its tree exactly matches the
+reviewed head. This is a PR build source, not a merged master or deployed edition.
+The hosted build reports219 local references, unchanged SDK0.9.0-alpha.5 and
+CLI0.1.1, complete temporary-consumer cleanup and separate diagnostic receipts.
+
+Downloaded artifact readback PASS:
+
+| Artifact | Exact ZIP SHA256 | Observed contents |
+|---|---|---|
+| yetlet-guide-preview /13067016568 | b0bf10bef73ba81dbb114e042ef9fa221e933df401f82f03cc1dd105da77ae88 | Exactly15 selected site files, including .nojekyll; no build records or old aliases |
+| yetlet-guide-build-record /13066407992 | 50d2f9c2c3ec453a53d53f1ab944b5f85da7f0913c0987489bed29b3c300cfb1 | EXPORT-MANIFEST.json and two private CLI receipts, outside the site root |
+
+Both ZIP digests match GitHub metadata. All15 file hashes/sizes match the actual
+manifest and CLI receipt. All8 canonical sources/excerpts and10 tracked copied
+consumer inputs match delivered Git blobs; generated JS/Wasm and copied CSS/
+bootstrap assets bind to the same recorded inputs. Every HTML page has the full
+PR-source link and correct public edition without local-only footer copy.
+Receipts report process cleanup, temporary cleanup and completed create-only
+filesystem publication; this does not mean website deployment. Archives are
+inspected in memory, without extraction, browser/server startup or test replay.
+
+The unchanged mdBook PR build41265010880 passes and its deployment job skips.
+Both MSRV and Stable/native/samples/Chrome pass in source CI41265010842.
+No rerun or retry is requested. Original failed local checks remain retained.
+Public artifact, source/log/receipt readbacks and Guard/Git outcomes are saved
+outside the repository in the authorized-delivery subdirectory of the same
+YT-225 evidence set. PR44 remains open; no Merge, Pages replacement, settings
+change, release or signing occurs. These hosted closeout edits remain uncommitted.
+
+Final independent hosted closeout Reviewer PASS0 has zero issues/followups.
+All3 document/status hashes, both downloaded ZIP digests,15 output hashes/sizes,
+8 source/excerpt and10 tracked consumer bindings reconcile. The reviewer inspects
+actual artifacts, receipts and source CI without rerunning tests or extracting
+archives. Registered reviewer gpt-6-astra/effective high are verified. Only the
+three hosted closeout documents remain unstaged/uncommitted after acceptance.
