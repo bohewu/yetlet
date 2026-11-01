@@ -1,5 +1,14 @@
 # Yetlet Backlog
 
+**CLI0.2 fixed source and original build/readback (2026-11-01):**
+[YT-229](CLI-020-RELEASE-PREPARATION.md#successful-original-build-and-custody--2026-11-01)
+uses PR49/C7fb963a with matching reviewed tree and actual master CI PASS. Current
+version expectations derive from the CLI manifest; exact-source MSVC7-pass/1-ignored
+and final source review PASS0. Unsigned CLI tag is fixed after strict/builtin Guard;
+build41315130983/1 and original readback41315597052/1 PASS. One archive/SDKalpha.6
+pin, original failures and published SDK/guide boundaries remain intact. S and
+later release stages/final owner gate Pending; YT-229 remains In progress.
+
 **Authorized CLI0.2.0 preparation (2026-11-01):**
 [YT-229](CLI-020-RELEASE-PREPARATION.md) follows successful SDKalpha.6 publication.
 Prepare the independent CLI version, qualified bundled resources and trusted
@@ -1061,7 +1070,7 @@ separate implementation authority.
 
 | YT-228 | P1 | M | M10 | Prepare SDKalpha.6 through the final publication gate | YT-227 | [Accepted preparation and subsequent publication](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01): reviewed metadata/guide fix and GNU/Wasm/MSVC consumers; PR47/Cc7e6372, PR48/SVP6531001 and actual required CI PASS. Build/readback/prepare/sign/independent verification each PASS attempt1; two subjects/all44 private entries, frozen payloads and final Reviewer PASS0. Owner-approved41308935654/1 completes six-file GitHub prerelease then both registry uploads; anonymous bytes/checksums/index and fresh registry-only exact-version resolve/locked compile PASS. Initial P1/operator failures retained, no retry/re-sign/source or tag rewrite. Original preparation acceptance preserved; CLI0.2 not started, three closing docs local/uncommitted | Done |
 
-| YT-229 | P1 | M | M10 | Prepare independent CLI0.2.0 against published SDKalpha.6 | YT-216, YT-223, YT-228 | [Selected contract](CLI-020-RELEASE-PREPARATION.md): coherent registry pin/resources, trusted historical/current SDK binding, affected GNU/MSVC archive/binary/generated/static consumer checks and existing single-gate release flow. Independent review and immutable C/S Pending; no SDK republishing or final publication | In progress |
+| YT-229 | P1 | M | M10 | Prepare independent CLI0.2.0 against published SDKalpha.6 | YT-216, YT-223, YT-228 | [Fixed source/build/custody](CLI-020-RELEASE-PREPARATION.md#successful-original-build-and-custody--2026-11-01): manifest-driven current expectations, canonical resources and trusted historical SDK bindings. GNU/archive/actual installed/generated/static consumers and MSVC7-pass/1-ignored; source/review and PR49/master CI PASS, C7fb963a/tag fixed. Build41315130983/1 and original readback41315597052/1 PASS, exact downloaded bytes retained. S/later stages/final owner gate Pending; no failed release-job retry, SDK republishing or final publication | In progress |
 
 ## M25 — Broader HTML DOM support and static-site delivery
 

@@ -105,3 +105,16 @@ protected-master rules and the final owner publication approval.
 This retrospective adds no runtime, workflow, branch-protection or retry-policy
 change. It records the successful publication without changing Backlog verdicts
 or claiming a new independent review of the historical executions.
+
+## Later CLI preparation lesson — 2026-11-01
+
+[YT-229](CLI-020-RELEASE-PREPARATION.md#owner-requested-manifest-driven-expectations--2026-11-01)
+retains the first PR49 Stable failure: two current-source xtask fixtures still
+expected CLI0.1.1 after its manifest changed. Merely replacing those literals
+would repeat the defect at the next bump. The owner requires manifest-driven
+expectations; xtask/Python/native/browser/Windows current-source checks now read
+the canonical CLI manifest. Tags and generated SDK checks derive from that input.
+Explicit historical release/negative-policy fixtures retain their intentional
+fixed values. The generic SOP points to versioned records instead of duplicating
+an allegedly current published version. This is a preparation lesson, not a new
+CLI publication claim; all original failed and successful records remain intact.

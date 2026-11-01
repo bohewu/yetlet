@@ -13,14 +13,15 @@ for retained failures, their concrete prevention steps and the successful CLI
 
 ## Current two-package development boundary — YT-211
 
-The published SDK is `0.9.0-alpha.5`: exactly `yetlet` followed by
-`yetlet-browser`. The independent CLI is published at `0.1.1`.
-The workspace now prepares SDKalpha.6 while CLI remains0.1.1; later DOM/static-build
-changes remain undistributed. The owner selects
-[SDKalpha.6 preparation](ALPHA6-RELEASE-PREPARATION.md) through the final gate,
-followed by CLI0.2 after SDK publication. Existing token policy stays in force;
-the [OIDC option](YT-227-NEXT-RELEASE-PLAN.md#optional-cratesio-trusted-publishing)
-is deferred.
+The SDK cohort contains exactly `yetlet`, then `yetlet-browser`. The independent
+CLI is a separate schema3/`cli` cohort with exactly one `yetlet-cli` archive;
+its version and SDK dependency come from its own reviewed manifest. Use the
+selected versioned release record and actual GitHub/crates.io publication receipts
+for version/status, rather than a version copied into this SOP. A development
+manifest or proposed Roadmap version does not establish registry availability.
+Existing token policy stays in force; the
+[OIDC option](YT-227-NEXT-RELEASE-PLAN.md#optional-cratesio-trusted-publishing)
+remains a separate policy decision.
 Schema2/`consolidated` is the closed two-package record;
 schema1/`sixteen` remains for earlier artifacts at their matching source.
 The library count is derived only from that validated cohort throughout build,
@@ -41,17 +42,22 @@ selected cohort. A new plan does not authorize hosted jobs, signing or upload.
 
 ## Read this before starting another version
 
-For the next SDK/CLI scope and remaining preparation gates, use
-[YT-227](YT-227-NEXT-RELEASE-PLAN.md): proposed SDKalpha.6 then CLI0.2.0,
-published-guide compatibility, version-specific CLI/SDK binding and optional
-registry OIDC evaluation. The [authorized continuation](ALPHA6-RELEASE-PREPARATION.md)
-selects the version/order and token route; new source candidates still require
-actual qualification and final publication remains the owner's gate.
-The current completed distribution is [SDKalpha.5](ALPHA5-HOSTED-RECORD.md) and
-[CLI0.1.1](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31).
-The [alpha.4 hosted record](ALPHA4-HOSTED-RECORD.md) remains historical: its
-one-of-sixteen registry publication and paused continuation do not describe the
-current two-package distribution. The alpha.3 account below retains its scope.
+Select actual changes, cohort, version and missing qualification through the
+[Backlog](BACKLOG.md), [Roadmap](ROADMAP.md) and their versioned release records.
+The [delivery plan](YT-227-NEXT-RELEASE-PLAN.md) explains guide-edition separation,
+trusted CLI/SDK bindings and evidence reuse. Its planning checkpoints are not
+publication status. [SDKalpha.6's actual publication](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+and [CLI0.1.1's installed consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+are fixed reference executions, not fallback versions for a new release.
+The [alpha.4 record](ALPHA4-HOSTED-RECORD.md) retains its one-of-sixteen partial
+publication and paused continuation; it does not describe a new cohort.
+
+Current-source tests and fixtures must derive versions, tags and SDK expectations
+from the selected canonical manifest/record. Keep explicit literals only when
+representing a deliberate historical release, negative fixture or immutable
+policy binding. Do not fix a stale current-version assertion by replacing its
+number with another duplicated number. Preserve actual-binary checks and
+independent checks of identity, namespace, dependency and public/private scope.
 
 The historical alpha.3 published baseline is the Experimental
 [v0.9.0-alpha.3 GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.3):
