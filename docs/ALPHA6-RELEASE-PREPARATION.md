@@ -55,7 +55,9 @@ subdirectory `sdk-alpha6`.
 | Reused behavior | Eight selected SDK product-input hashes match accepted YT-220/221 records. Prior browser/native security evidence remains at its original scope; no browser matrix replay |
 | Reused upstream closure | Final Yetlet192 and Browser86 upstream lock entries exactly match their accepted alpha.5 archives; retain existing inventory/security/license decisions for those unchanged entries |
 | Independent preparation review | First P1 retained; followup PASS0,54 hashes/status/diff match, registered reviewer/model/effective high verified. Local preparation may be delivered |
-| Missing delivery proof | Exact-source PR/master CI, affected MSVC archive/consumer and fresh hosted bindings remain Pending |
+| Delivery/platform | PR47 all checks PASS, squash Merge Cc7e6372/treec3137b4 matches the reviewed tree. Actual master Rust CI41305920477/1 both jobs PASS. Real MSVC normal archives and changed-options/SSR native consumer PASS; both archive digests match GNU; owned checkout/cache/build cleaned |
+| Independent platform acceptance | PASS0,55 source/15 evidence hashes match, original P1 preserved and all28 inherited entries corrected; registered reviewer/model/effective high verified |
+| Missing execution proof | Fresh hosted build/readback/prepare/sign/result and final publication plan remain Pending |
 
 The first independent preparation review is FAIL with one P1: root and dashboard
 locks retained26/two sample versions inherited from the old workspace version.
@@ -107,3 +109,30 @@ C/S/V/P, new tag/run/artifact IDs, Draft and signing outputs are Pending until
 actual execution records establish them. Existing releases, signatures and
 failure records stay unchanged. YT-228 is not Done until its independent
 acceptance and stated pre-publication proof exist; publication remains separate.
+
+## Selected C and first hosted execution
+
+The owner-authorized PR47 delivery selects immutable C
+`c7e63724b2fc303abcf85ff503cc8f230794cb41`, tree
+`c3137b46001bdf41d5cff5138b9452f11457d18e`, after actual master CI and independent
+platform acceptance. The original planning/local-preparation branches remain
+preserved. Full required CI runs once on PR and once on the actual merged source;
+those are distinct source events, not a failed-job retry. Windows Rust1.99,
+VC14.44.35207 and SDK10.0.26100 proof covers the selected default/archive consumer;
+the existing xtask dead-code warning is retained without a new feature claim.
+
+The unsigned lightweight `v0.9.0-alpha.6` tag is pushed/read back at C through
+strict/builtin accepted-remote-history Guard and its native hook. The used binding
+is canonically retired without moving any tag or changing hooks. Exactly one
+[build41306591044/attempt1](https://github.com/bohewu/yetlet/actions/runs/41306591044)
+starts at that C/tag, with the committed45minute limit. It remains In progress at
+this checkpoint. Original readback will use only this build's actual encrypted
+artifact/digest and the exact selected-tag Environment. The first Environment
+policy update rejects an immutable type field with422 before mutation; the
+supported name-only update passes after unchanged-state readback. Both records
+are retained, with no hosted attempt consumed. No Secret/key rotation occurs.
+Prepare/sign/result, S/V/P and publication stay Pending.
+
+This tracking-only followup is intended to establish the later reviewed signer S
+distinct from C, with unchanged package/source inputs. Pending values above are
+historical stage boundaries; actual execution records supersede them individually.

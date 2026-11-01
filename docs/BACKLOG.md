@@ -3,9 +3,10 @@
 **Authorized SDKalpha.6 preparation (2026-11-01):**
 [YT-228](ALPHA6-RELEASE-PREPARATION.md) advances the reviewed release plan through
 the last owner publication gate. Local guide-edition tests, normal two-archive
-packaging, exact-version native/Wasm consumer and unchanged dependency/source
-correspondence PASS. Independent preparation review, actual Git/CI, MSVC and
-hosted/signing evidence remain Pending. OIDC is deferred; CLI0.2 follows the
+packaging, exact-version native/Wasm/MSVC consumers and unchanged dependency/source
+correspondence PASS. Preparation/platform independent reviews PASS0, PR47 and
+actual master CI pass; Cc7e6372 and unsigned tag are fixed. One hosted build is
+In progress; remaining custody/signing evidence is Pending. OIDC is deferred; CLI0.2 follows the
 actual SDK publication. No GitHub/crates.io publication is authorized here.
 
 **Next delivery planning (2026-11-01):**

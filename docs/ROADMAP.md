@@ -3,8 +3,9 @@
 **Selected next delivery (2026-11-01):**
 [YT-228](ALPHA6-RELEASE-PREPARATION.md) starts SDKalpha.6 preparation through the
 final owner publication gate, preserving the published reader edition and
-existing token route. Local affected metadata/archive/consumer checks PASS;
-independent review, delivery/MSVC and fresh hosted evidence remain Pending.
+existing token route. Local affected metadata/archive/native/Wasm/MSVC checks,
+independent preparation/platform reviews and PR47/master CI PASS. Cc7e6372/tag
+are fixed; one hosted build is In progress, remaining custody/signing Pending.
 CLI0.2 preparation follows SDK publication; no publication is authorized yet.
 
 **Next SDK/CLI delivery planning (2026-11-01):**
