@@ -19,6 +19,7 @@ fn new(
 
 #[test]
 fn browser_creation_is_explicit_finite_and_preserves_native_default() {
+    let cli: toml::Value = include_str!("../Cargo.toml").parse().unwrap();
     let temp = tempfile::tempdir().unwrap();
     #[cfg(unix)]
     {
@@ -45,8 +46,8 @@ fn browser_creation_is_explicit_finite_and_preserves_native_default() {
         let dependencies = &parsed["target"]["cfg(target_arch = \"wasm32\")"]["dependencies"];
         for name in ["yetlet", "yetlet-browser"] {
             assert_eq!(
-                dependencies[name]["version"].as_str(),
-                Some("=0.9.0-alpha.6")
+                dependencies[name]["version"],
+                cli["dependencies"]["yetlet"]["version"]
             );
             assert!(dependencies[name].get("path").is_none());
         }

@@ -115,3 +115,23 @@ already provisioned task-protected OpenSSL installation, changing only child
 process environment; no SDK feature/dependency change, installation or global
 configuration. The failed prerequisite log remains retained; no test had passed
 or executed at that checkpoint. Affected MSVC execution is still Pending.
+
+### Owner-requested manifest-driven expectations — 2026-11-01
+
+Before Merge, the owner asks to remove duplicated current-version literals rather
+than merely replace0.1.1 with0.2.0. Current-source xtask custody/private fixtures
+now derive the CLI version, tag and SDK pin from its manifest. The Python
+current-source check and Rust native/browser/scaffold/Windows expectations also
+read that manifest; actual binary version checks already use CARGO_PKG_VERSION.
+Future manifest bumps do not require editing these current-source expectations.
+The canonical Cargo pins and trusted historical CLI-to-SDK release bindings stay
+explicit; historical payloads/records never silently follow development HEAD.
+
+Only these changed expectations are checked again: two focused xtask tests, the
+one changed Python current-source test, five GNU CLI tests (two other tests stay
+ignored), and normal142-file packaging PASS. Earlier unchanged resource/runtime/
+SDK/browser evidence remains retained. Run41312478151/1 passes both required
+checks at f4cf9b8; the owner-requested expectation changes still need independent
+review and required new-source CI before Merge. No old failed job is retried.
+The earlier bounded MSVC success is retained with its exact old-source scope;
+new Windows expectation code is not yet claimed executed.

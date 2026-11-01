@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 import threading
+import tomllib
 import unittest
 from unittest.mock import patch
 import urllib.error
@@ -128,13 +129,14 @@ class RecordTests(unittest.TestCase):
         pub.s.bind_record(record())
 
     def test_cli_uses_its_own_version_tag_manifest_and_single_public_subject(self):
-        r = record(); r.update(schema=3, cohort='cli', version='0.2.0')
+        manifest = tomllib.loads((ROOT / 'tools/yetlet-cli/Cargo.toml').read_text())
+        r = record(); r.update(schema=3, cohort='cli', version=manifest['package']['version'])
         self.assertEqual(records.packages(r), {'yetlet-cli'})
-        self.assertEqual(records.tag(r), 'yetlet-cli-v0.2.0')
+        self.assertEqual(records.tag(r), 'yetlet-cli-v' + r['version'])
         records.source_version(r, ROOT)
         for schema, cohort in ((1, 'cli'), (2, 'cli'), (3, 'sixteen'), (3, 'consolidated')):
             with self.assertRaises(ValueError): records.validate(dict(r, schema=schema, cohort=cohort))
-        with self.assertRaises(ValueError): records.source_version(dict(r, version='0.9.0-alpha.6'), ROOT)
+        with self.assertRaises(ValueError): records.source_version(dict(r, version=r['version'] + '-wrong-source'), ROOT)
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp); r = fixture(directory, cli=True)
             try:

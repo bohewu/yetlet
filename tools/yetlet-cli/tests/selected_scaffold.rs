@@ -23,6 +23,7 @@ fn inventory(root: &Path) -> BTreeMap<String, Vec<u8>> {
 
 #[test]
 fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_tools() {
+    let cli: toml::Value = include_str!("../Cargo.toml").parse().unwrap();
     let root = tempfile::tempdir().unwrap();
     #[cfg(target_os = "linux")]
     {
@@ -69,8 +70,8 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                         .unwrap();
                     for krate in ["yetlet"] {
                         assert_eq!(
-                            manifest["dependencies"][krate]["version"].as_str(),
-                            Some("=0.9.0-alpha.6")
+                            manifest["dependencies"][krate]["version"],
+                            cli["dependencies"]["yetlet"]["version"]
                         );
                         assert!(manifest["dependencies"][krate].get("path").is_none());
                     }
