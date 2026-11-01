@@ -1,12 +1,25 @@
 # Yetlet Backlog
 
+**Completed SDKalpha.6 publication (2026-11-01):**
+[The owner-approved publisher41308935654/1](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+PASS: six-file GitHub Experimental pre-release and both exact crates.io versions,
+with matching anonymous downloaded bytes/checksums, index and registry consumer
+lock. Fresh exact-version resolve/locked compile PASS, no forwarded credentials
+or path overrides. Original failures remain, no retry/re-signing or source/tag
+change. YT-228 retains its accepted preparation scope; CLI0.2's SDK-publication
+prerequisite is satisfied, but its implementation has not started. No Commit/Push.
+
 **Authorized SDKalpha.6 preparation (2026-11-01):**
 [YT-228](ALPHA6-RELEASE-PREPARATION.md) advances the reviewed release plan through
 the last owner publication gate. Local guide-edition tests, normal two-archive
 packaging, exact-version native/Wasm/MSVC consumers and unchanged dependency/source
 correspondence PASS. Preparation/platform independent reviews PASS0, PR47 and
-actual master CI pass; Cc7e6372 and unsigned tag are fixed. One hosted build is
-In progress; remaining custody/signing evidence is Pending. OIDC is deferred; CLI0.2 follows the
+actual master CI pass; Cc7e6372 and unsigned tag are fixed, S/V/P6531001 selected.
+Build/readback/prepare/sign/independent verification each PASS attempt1, two
+subjects/all44 private entries verified; six public files and private Draft
+readback prepared. Final Reviewer PASS0 and publication preflight41308935654/1
+PASS; owner release-publish gate waiting, GitHub/registry not attempted.
+OIDC is deferred; CLI0.2 follows the
 actual SDK publication. No GitHub/crates.io publication is authorized here.
 
 **Next delivery planning (2026-11-01):**
@@ -1038,7 +1051,7 @@ separate implementation authority.
 
 | YT-227 | P2 | M | M10 | Plan the next SDK/CLI release and registry authentication options | YT-216, YT-220, YT-221, YT-223, YT-226 | [Documentation-only plan](YT-227-NEXT-RELEASE-PLAN.md): actual published/source delta, proposed SDKalpha.6 then independent CLI0.2.0, guide-edition and version-specific CLI/SDK prerequisites, optional OIDC privilege/phase review, and bounded evidence reuse/missing qualification. Independent Reviewer PASS0, zero issues/followups,31 source hashes/six frozen documents/Git status match; registered model/effective high verified. Docs227-item/whitespace PASS. Done at planning scope only; versions, candidates and auth migration unselected. No runtime/version/workflow/external change, old validation replay or Git/release action | Done |
 
-| YT-228 | P1 | M | M10 | Prepare SDKalpha.6 through the final publication gate | YT-227 | [Selected scope/evidence](ALPHA6-RELEASE-PREPARATION.md): reviewed existing DOM/options/SSR delta, metadata-only version/path locks, published guide edition independent of workspace, normal archives/external consumers and bounded qualification reuse. Local affected checks PASS; independent review, delivery/MSVC and new hosted build/readback/prepare/sign/result remain Pending. Existing token policy; final publication still requires the owner. No old version/tag/signature rewrite | In progress |
+| YT-228 | P1 | M | M10 | Prepare SDKalpha.6 through the final publication gate | YT-227 | [Accepted preparation and subsequent publication](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01): reviewed metadata/guide fix and GNU/Wasm/MSVC consumers; PR47/Cc7e6372, PR48/SVP6531001 and actual required CI PASS. Build/readback/prepare/sign/independent verification each PASS attempt1; two subjects/all44 private entries, frozen payloads and final Reviewer PASS0. Owner-approved41308935654/1 completes six-file GitHub prerelease then both registry uploads; anonymous bytes/checksums/index and fresh registry-only exact-version resolve/locked compile PASS. Initial P1/operator failures retained, no retry/re-sign/source or tag rewrite. Original preparation acceptance preserved; CLI0.2 not started, three closing docs local/uncommitted | Done |
 
 ## M25 — Broader HTML DOM support and static-site delivery
 

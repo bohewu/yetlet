@@ -1,6 +1,9 @@
 # SDKalpha.6 release preparation — YT-228
 
-Date: 2026-11-01. In progress; no publication yet.
+Date: 2026-11-01. YT-228 remains Done at preparation scope; the later owner-approved
+GitHub/crates.io publication and registry consumer also PASS.
+Earlier Pending/waiting statements below are dated stage checkpoints; the final
+section records the actual publication without replacing their history.
 
 ## Selected scope and authority
 
@@ -136,3 +139,130 @@ Prepare/sign/result, S/V/P and publication stay Pending.
 This tracking-only followup is intended to establish the later reviewed signer S
 distinct from C, with unchanged package/source inputs. Pending values above are
 historical stage boundaries; actual execution records supersede them individually.
+
+## Verified outputs and final publication stop
+
+Product C remains `c7e63724b2fc303abcf85ff503cc8f230794cb41`, with the immutable
+unsigned `v0.9.0-alpha.6` tag. Tracking PR48 passes both existing required light-CI
+jobs and squash-merges as S/V/P
+`65310013dab38dca2ffa82bd5cdb0fde1806f31c`. Only three maintainer documents differ
+from C; package inputs remain unchanged. Its actual required master CI
+41307133072/1 passes. Optional Rust CodeQL continues independently at Merge and
+subsequently passes for both PR48 and the merged master; it was not skipped or
+relabeled. No extra CI, failed-job or release-stage rerun occurs.
+
+| Stage | Actual run / attempt | Result |
+|---|---|---|
+| Normal source build at C | [41306591044/1](https://github.com/bohewu/yetlet/actions/runs/41306591044) | PASS; both archives equal the accepted GNU/MSVC bytes |
+| Original encrypted-evidence readback | [41307044066/1](https://github.com/bohewu/yetlet/actions/runs/41307044066) | PASS; complete original manifest/inventory and cleanup |
+| Intake and frozen preparation at S | [41307620413/1](https://github.com/bohewu/yetlet/actions/runs/41307620413) | PASS;25 bounded qualification entries; temporary Draft ciphertext asset removed after retained freeze |
+| Actual signing at S | [41307961476/1](https://github.com/bohewu/yetlet/actions/runs/41307961476) | PASS; two frozen payloads, real bundles and same-job checks |
+| Independent no-OIDC result verification at V | [41308106470/1](https://github.com/bohewu/yetlet/actions/runs/41308106470) | PASS; two package subjects and all44 private manifest entries; key/plaintext cleanup precedes safe receipt |
+
+Frozen provenance SHA-256:
+`e21e9144d67861e1109d2dfe2993fc85efd9f6d37f1af9123dd66c999da08379`.
+Frozen full-manifest SHA-256:
+`d37d38eed7dd38406b9357d9bdf95499aaa209c1fedae1062b5295151cf44f4e`.
+These hashes remain unchanged through actual signing and independent verification.
+Full ciphertext/artifact ZIPs, receipts, both bundles and23 selected retention
+bindings are in the repository-external evidence store. No formal private key or
+decrypted original evidence is accessed locally; this is owner-host retention,
+not an offsite recovery claim.
+
+Draft release430574118 stays unpublished and Experimental, with fixed C/tag,
+no Latest designation and zero assets before the owner gate. Final notes and
+prospective public/registry plans pass the existing closed-cohort helper checks
+and actual Draft metadata readback. The owner-approved publisher will upload and
+read back exactly six public files before making the GitHub pre-release public,
+then upload the same two archives to crates.io in dependency order. The preview
+acceptance summary is prospective; it is not a claim of owner approval.
+
+| Public file | Scope |
+|---|---|
+| `yetlet-0.9.0-alpha.6.crate` | Verified base archive, unchanged digest above |
+| `yetlet-browser-0.9.0-alpha.6.crate` | Verified matching Browser archive |
+| `PROVENANCE-UNSIGNED.json` | Original C/build provenance with both subjects |
+| `RELEASE-CHECKSUMS.json` | Closed three-entry public archive/provenance checksums |
+| `provenance.sigstore.json` | Actual public provenance signature/identity/log bundle |
+| `SIGNING-APPROVAL.json` | Reduced summary activated only in the owner-approved publishing job |
+
+Private manifest contents, encrypted private signature bundle, qualification
+files, temporary capabilities and credentials are excluded from public files.
+The actual registry-only post-publication consumer is not run before upload.
+CLI0.2.0 still waits for the SDK's actual registry publication.
+
+Retain all preparatory failures separately from successful hosted attempts:
+the initial inherited-lock P1,422 Environment type-field rejection, prefixed
+temporary-asset name rejected by local handoff, omitted local automation-mode
+context, and a notes/name-only private Draft update that returned an untagged
+metadata name. Corrections use the supported tag-policy name update, the same
+ciphertext asset renamed to the canonical name, the already committed automation
+mode and an explicit complete Draft identity update. The Git tag, C/S, archive
+bytes and signatures never change. No new PR/runtime fix, re-upload, re-sign or
+second hosted attempt is needed for these local/settings corrections.
+
+Final independent output review and one publication preflight remain Pending at
+this checkpoint. Stop at the owner's `release-publish` gate; no approval or
+GitHub/crates.io publication is inferred from these successful worker stages.
+New closeout documents remain local while the fixed P/master is held stable.
+
+## Independent final acceptance and observed owner gate
+
+Final independent Reviewer PASS0, zero issues/required followups, accepts all
+three closeout-document hashes,32 evidence hashes plus the supplementary CodeQL
+record, all23 retention bindings and the actual25/44-entry qualification/verification
+correspondence. Registered reviewer/model and effective high are verified. The
+acceptance permits Done only after actual preflight PASS and the observed gate.
+
+[Publication preflight41308935654/1](https://github.com/bohewu/yetlet/actions/runs/41308935654)
+then passes once. Its retained public and registry plans exactly match the
+reviewed local plans. The `publish` job is waiting for owner approval in
+`release-publish`; GitHub/registry receipt fields remain `not_attempted`.
+The assistant performs no approval. YT-228 is Done at preparation scope only;
+the owner may approve this exact run to publish the six-file GitHub Experimental
+pre-release (not Latest), then the two identical registry archives. Actual upload
+and the registry-only consumer remain unexecuted. CLI0.2 still follows successful
+SDK publication. The three new closing documents are not committed/pushed so
+that the fixed publisher source stays unchanged during this gate.
+
+## Owner-approved publication and registry consumer — 2026-11-01
+
+The owner approves `release-publish` and asks for publication monitoring, exact
+checksums and registry-consumer verification, preserving failures without retries.
+The same [publisher41308935654/attempt1](https://github.com/bohewu/yetlet/actions/runs/41308935654)
+completes successfully at fixed P `65310013dab38dca2ffa82bd5cdb0fde1806f31c`.
+The actual approval by owner `bohewu` for the selected Environment is retained.
+There is no second dispatch, retry, re-signing or tag/source change.
+
+[GitHub SDKalpha.6](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.6)
+is public as an Experimental pre-release, not Latest, with exactly the six reviewed
+files. Actual metadata and publisher receipts match the frozen public/registry
+plans, final notes and fixed C/tag. The two crates.io versions are available and
+not yanked:
+[yetlet](https://crates.io/crates/yetlet/0.9.0-alpha.6) and
+[yetlet-browser](https://crates.io/crates/yetlet-browser/0.9.0-alpha.6).
+Anonymous owner-host downloads from both GitHub and the registry CDN match each
+other and the exact archive SHA-256/size table above. Registry metadata, the
+publisher's index readback and the consumer lock agree on both checksums.
+
+The actual hosted consumer uses a fresh credential-free Cargo home, exact
+`=0.9.0-alpha.6` registry dependencies and no path/patch/source replacement.
+Version resolution and `cargo +1.99.0 check --locked` PASS. Its retained lock
+SHA-256 is `ac833fa4b0b7992a47861db005f94a4a4c944254d333c249988397825078b92e`;
+both SDK lock entries name the public registry, exact version and approved crate
+checksums. This is compile/resolve proof, not a new runtime or browser test.
+Passed consumer/signature/product checks are not replayed locally.
+
+Publisher result artifact13085121451 has ZIP SHA-256
+`dbd0e1ab8c04b51b1899fafdadccd6f5f6db64ce599e0834dbecc4ec8f65910b`.
+Its complete GitHub/registry receipts, both plans, consumer logs/lock, approval,
+anonymous release/version responses and downloaded archive bytes are retained
+outside the repository in the same evidence run's `publication-monitor` directory.
+Earlier review/settings/operator failures and immutable build/signature artifacts
+remain intact. Publication/registry receipt states are complete with automatic
+retry disabled; no new independent-review or broader platform claim is added.
+
+This monitoring followup changes only the three existing local closeout documents;
+it does not Commit/Push, change the live guide edition, republish SDK/CLI or start
+CLI0.2. The planned CLI0.2 SDK-publication prerequisite is now satisfied; its
+version/resource/binding preparation and affected checks remain separate work.

@@ -1,11 +1,22 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**SDKalpha.6 distribution complete (2026-11-01):**
+[Owner-approved41308935654/1](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+publishes six reviewed GitHub pre-release files and both crates.io packages.
+Anonymous download/checksum/index correspondence and the fresh exact-version
+registry-only locked consumer compile PASS. Fixed C/S/V/P, signatures and original
+failures remain; no retry or broader qualification. YT-228 preparation acceptance
+is preserved; CLI0.2's SDK-publication prerequisite is satisfied, not implemented.
+
 **Selected next delivery (2026-11-01):**
 [YT-228](ALPHA6-RELEASE-PREPARATION.md) starts SDKalpha.6 preparation through the
 final owner publication gate, preserving the published reader edition and
 existing token route. Local affected metadata/archive/native/Wasm/MSVC checks,
 independent preparation/platform reviews and PR47/master CI PASS. Cc7e6372/tag
-are fixed; one hosted build is In progress, remaining custody/signing Pending.
+are fixed; S/V/P6531001 has actual required CI. Build/readback/prepare/sign/result
+each PASS attempt1, two subjects/all44 private entries verified. Six public files
+and private Draft are prepared; final Reviewer PASS0 and preflight41308935654/1
+PASS. YT-228 Done at preparation scope; owner gate waiting, publication held.
 CLI0.2 preparation follows SDK publication; no publication is authorized yet.
 
 **Next SDK/CLI delivery planning (2026-11-01):**
