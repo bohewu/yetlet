@@ -109,6 +109,9 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [Selected SDKalpha.6 preparation](ALPHA6-RELEASE-PREPARATION.md): affected
   qualification and source-bound release stages through the final owner gate;
   CLI0.2 follows the SDK's actual publication, registry OIDC deferred.
+- [Selected CLI0.2.0 preparation](CLI-020-RELEASE-PREPARATION.md): published
+  SDKalpha.6 pin/resources, preserved historical bindings and affected qualification
+  through the final owner gate; no SDK republishing.
 - [Single-gate release automation and registry promotion](RELEASE-PUBLICATION.md):
   automated build/sign/verification, final owner-approved GitHub then crates.io
   publication, local implementation and one-time rollout limits.

@@ -30,17 +30,17 @@ def record():
         'signer_commit': 'b' * 40, 'provenance': {'sha256': 'e' * 64, 'size': 123}, 'release_id': '15'}
 
 
-def archives(directory, cycle=False, consolidated=False, cli=False):
+def archives(directory, cycle=False, consolidated=False, cli=False, cli_version="0.1.0", cli_sdk=None):
     r = record()
     if consolidated: r.update(schema=2, cohort="consolidated")
-    if cli: r.update(schema=3, cohort="cli", version="0.1.0")
+    if cli: r.update(schema=3, cohort="cli", version=cli_version)
     subjects = {}
     for name in records.packages(r):
         manifest = '[package]\nname=' + json.dumps(name) + '\nversion=' + json.dumps(r['version']) + '\n'
         manifest += 'readme="README.md"\nlicense="MIT"\ndescription="Fixture"\nrust-version="1.99"\n'
         dep = lambda n: n + ' = { version="' + r['version'] + '" }\n'
         if name == 'yetlet-cli':
-            manifest += '[dependencies]\nyetlet = { version="=' + records.CLI_SDK_VERSION + '" }\n'
+            manifest += '[dependencies]\nyetlet = { version="=' + (cli_sdk or records.cli_sdk_version(r['version'])) + '" }\n'
         if name == 'yetlet-browser':
             manifest += '[dependencies]\n' + dep('yetlet')
         if name == 'yetlet-config':
@@ -83,9 +83,20 @@ class RegistryTests(unittest.TestCase):
             self.assertEqual(set(bodies), {'yetlet-cli'})
             size = struct.unpack_from('<I', bodies['yetlet-cli'])[0]
             metadata = json.loads(bodies['yetlet-cli'][4:4+size])
-            self.assertEqual(metadata['deps'][0]['version_req'], '=' + records.CLI_SDK_VERSION)
+            self.assertEqual(metadata['deps'][0]['version_req'], '=' + records.cli_sdk_version(r['version']))
             bad = dict(r, schema=2, cohort='consolidated')
             with self.assertRaises(ValueError): registry.prepare(bad, temp, subjects)
+
+    def test_cli020_archive_requires_published_sdk6_and_leaves_sdk_out_of_subjects(self):
+        with tempfile.TemporaryDirectory() as temp:
+            r, subjects = archives(Path(temp), cli=True, cli_version='0.2.0')
+            plan, bodies = registry.prepare(r, temp, subjects)
+            self.assertEqual([row['name'] for row in plan['packages']], ['yetlet-cli'])
+            size = struct.unpack_from('<I', bodies['yetlet-cli'])[0]
+            metadata = json.loads(bodies['yetlet-cli'][4:4+size])
+            self.assertEqual(metadata['deps'][0]['version_req'], '=0.9.0-alpha.6')
+            r, subjects = archives(Path(temp), cli=True, cli_version='0.2.0', cli_sdk='0.9.0-alpha.5')
+            with self.assertRaises(ValueError): registry.prepare(r, temp, subjects)
 
     def test_publish_success_uses_official_optional_warnings_not_krate(self):
         for response in ({}, {'warnings': None}, {'warnings': {}},
@@ -205,35 +216,42 @@ class RegistryTests(unittest.TestCase):
 
 
 class CliConsumerTests(unittest.TestCase):
+    def test_unknown_cli_binding_is_rejected_before_install(self):
+        with tempfile.TemporaryDirectory() as temp, patch.object(publication.subprocess, 'run') as run:
+            with self.assertRaises(ValueError): publication.cli_consumer('0.2.1', Path(temp))
+            run.assert_not_called()
+
     def test_cli_consumer_installs_exact_binary_without_registry_token(self):
-        import subprocess
         from types import SimpleNamespace
-        commands = []
-        def run(args, **kwargs):
-            commands.append(args)
-            env = kwargs['env']
-            self.assertNotIn('CARGO_REGISTRY_TOKEN', env)
-            self.assertNotIn('CARGO_REGISTRIES_CRATES_IO_TOKEN', env)
-            root = Path(kwargs['cwd'])
-            stdout = b''
-            if args[0] == 'cargo':
-                self.assertEqual(args[:4], ['cargo', '+1.99.0', 'install', 'yetlet-cli'])
-                self.assertEqual(args[args.index('--version')+1], '0.1.0')
-                self.assertIn('--locked', args)
-                package = root / 'cargo-home/registry/src/fixture/yetlet-cli-0.1.0'
-                package.mkdir(parents=True); (package / 'Cargo.lock').write_text('version = 4\n')
-            elif args[1:] == ['--version']: stdout = b'yetlet 0.1.0\n'
-            elif args[1] == 'new':
-                app = root / 'consumerapp'; app.mkdir()
-                (app / 'Cargo.toml').write_text('[dependencies]\nyetlet = {version="=' + records.CLI_SDK_VERSION + '"}\n')
-            return SimpleNamespace(returncode=0, stdout=stdout, stderr=b'')
-        with tempfile.TemporaryDirectory() as temp, patch.dict(os.environ, {'CARGO_REGISTRY_TOKEN':'SYNTHETIC'}), \
-             patch.object(publication.subprocess, 'run', side_effect=run):
-            result = publication.cli_consumer('0.1.0', Path(temp))
-            self.assertTrue(result['source_install'])
-            self.assertEqual(result['sdk_version'], records.CLI_SDK_VERSION)
-            self.assertEqual(len(commands), 4)
-            self.assertTrue((Path(temp) / 'REGISTRY-CONSUMER.lock').is_file())
+        for version, sdk in [('0.1.0', '0.9.0-alpha.5'), ('0.1.1', '0.9.0-alpha.5'),
+                             ('0.2.0', '0.9.0-alpha.6')]:
+            commands = []
+            def run(args, **kwargs):
+                commands.append(args)
+                env = kwargs['env']
+                self.assertNotIn('CARGO_REGISTRY_TOKEN', env)
+                self.assertNotIn('CARGO_REGISTRIES_CRATES_IO_TOKEN', env)
+                root = Path(kwargs['cwd'])
+                stdout = b''
+                if args[0] == 'cargo':
+                    self.assertEqual(args[:4], ['cargo', '+1.99.0', 'install', 'yetlet-cli'])
+                    self.assertEqual(args[args.index('--version')+1], version)
+                    self.assertIn('--locked', args)
+                    package = root / ('cargo-home/registry/src/fixture/yetlet-cli-' + version)
+                    package.mkdir(parents=True); (package / 'Cargo.lock').write_text('version = 4\n')
+                elif args[1:] == ['--version']: stdout = ('yetlet ' + version + '\n').encode()
+                elif args[1] == 'new':
+                    app = root / 'consumerapp'; app.mkdir()
+                    (app / 'Cargo.toml').write_text('[dependencies]\nyetlet = {version="=' + sdk + '"}\n')
+                return SimpleNamespace(returncode=0, stdout=stdout, stderr=b'')
+            with self.subTest(version=version), tempfile.TemporaryDirectory() as temp, \
+                 patch.dict(os.environ, {'CARGO_REGISTRY_TOKEN':'SYNTHETIC'}), \
+                 patch.object(publication.subprocess, 'run', side_effect=run):
+                result = publication.cli_consumer(version, Path(temp))
+                self.assertTrue(result['source_install'])
+                self.assertEqual(result['sdk_version'], sdk)
+                self.assertEqual(len(commands), 4)
+                self.assertTrue((Path(temp) / 'REGISTRY-CONSUMER.lock').is_file())
 
 
 class RegistryContinuationTests(unittest.TestCase):

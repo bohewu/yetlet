@@ -70,7 +70,7 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                     for krate in ["yetlet"] {
                         assert_eq!(
                             manifest["dependencies"][krate]["version"].as_str(),
-                            Some("=0.9.0-alpha.5")
+                            Some("=0.9.0-alpha.6")
                         );
                         assert!(manifest["dependencies"][krate].get("path").is_none());
                     }

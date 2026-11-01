@@ -190,6 +190,7 @@ def published_release(p, previous):
 
 def cli_consumer(version, output):
     """Install the exact published executable anonymously; do not compile it as an SDK."""
+    sdk_version = s.records.cli_sdk_version(version)
     with tempfile.TemporaryDirectory(prefix='yetlet-cli-consumer-') as temporary:
         root = Path(temporary)
         env = {k: os.environ[k] for k in ('PATH', 'HOME', 'RUSTUP_HOME', 'SSL_CERT_FILE', 'SSL_CERT_DIR',
@@ -214,14 +215,14 @@ def cli_consumer(version, output):
         import tomllib
         manifest = tomllib.loads((root / 'consumerapp/Cargo.toml').read_text())
         sdk = manifest['dependencies']['yetlet']
-        s.require(sdk['version'] == '=' + s.records.CLI_SDK_VERSION and 'path' not in sdk
+        s.require(sdk['version'] == '=' + sdk_version and 'path' not in sdk
                   and not {'patch', 'replace'} & set(manifest))
         installed = list((root / 'cargo-home/registry/src').glob('*/yetlet-cli-' + version + '/Cargo.lock'))
         s.require(len(installed) == 1)
         lock = installed[0].read_bytes()
         (output / 'REGISTRY-CONSUMER.lock').write_bytes(lock)
         return {'status': 'PASS', 'lock_sha256': s.sha(lock), 'cli_exact_version': version,
-                'sdk_version': s.records.CLI_SDK_VERSION, 'source_install': True,
+                'sdk_version': sdk_version, 'source_install': True,
                 'path_patches': False, 'credentials_forwarded': False}
 
 

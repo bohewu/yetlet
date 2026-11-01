@@ -14,7 +14,17 @@ PACKAGES = frozenset('yetlet-' + n for n in (
     'reactive', 'request-id', 'secrets', 'server-axum', 'session', 'session-redis', 'signing', 'wgpu'))
 CONSOLIDATED = frozenset({'yetlet', 'yetlet-browser'})
 CLI = frozenset({'yetlet-cli'})
-CLI_SDK_VERSION = '0.9.0-alpha.5'
+CLI_SDK_VERSIONS = {
+    '0.1.0': '0.9.0-alpha.5',
+    '0.1.1': '0.9.0-alpha.5',
+    '0.2.0': '0.9.0-alpha.6',
+}
+
+
+def cli_sdk_version(version):
+    """Trusted release binding; never reinterpret a historical CLI record."""
+    require(type(version) is str and version in CLI_SDK_VERSIONS)
+    return CLI_SDK_VERSIONS[version]
 
 def packages(record):
     validate(record)
@@ -111,7 +121,7 @@ def source_version(record, root):
         p = manifest['package']
         require(p['name'] == 'yetlet-cli' and p['version'] == record['version'] and p['publish'] is True)
         dependency = manifest['dependencies']['yetlet']
-        require(dependency['version'] == '=' + CLI_SDK_VERSION and 'path' not in dependency)
+        require(dependency['version'] == '=' + cli_sdk_version(record['version']) and 'path' not in dependency)
         require(any(b['name'] == 'yetlet' for b in manifest['bin']))
         return
     workspace = tomllib.loads((root / 'Cargo.toml').read_text())['workspace']['package']['version']

@@ -31,11 +31,11 @@ fn new_uses_shared_standalone_templates_without_cargo_or_network() {
     assert_eq!(manifest["workspace"]["resolver"].as_str(), Some("3"));
     assert_eq!(
         manifest["dependencies"]["yetlet"]["version"].as_str(),
-        Some("=0.9.0-alpha.5")
+        Some("=0.9.0-alpha.6")
     );
     assert_eq!(
         manifest["dependencies"]["yetlet"]["version"].as_str(),
-        Some("=0.9.0-alpha.5")
+        Some("=0.9.0-alpha.6")
     );
     assert_eq!(
         fs::read(app.join("src/main.rs")).unwrap(),
@@ -46,6 +46,7 @@ fn new_uses_shared_standalone_templates_without_cargo_or_network() {
         include_str!("../templates/SELECTED-README.md")
             .replace("@NAME@", "demo")
             .replace("@VERSION@", env!("CARGO_PKG_VERSION"))
+            .replace("@SDK_VERSION@", "0.9.0-alpha.6")
     );
     assert!(!app.join("Cargo.lock").exists());
     assert!(!app.join("target").exists());
@@ -86,6 +87,7 @@ fn single_letter_name_publishes_complete_project_without_stage_residue() {
         include_str!("../templates/SELECTED-README.md")
             .replace("@NAME@", "a")
             .replace("@VERSION@", env!("CARGO_PKG_VERSION"))
+            .replace("@SDK_VERSION@", "0.9.0-alpha.6")
     );
     assert!(app.join(".gitignore").is_file());
     assert!(!app.join("Cargo.lock").exists());

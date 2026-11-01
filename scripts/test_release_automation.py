@@ -128,13 +128,13 @@ class RecordTests(unittest.TestCase):
         pub.s.bind_record(record())
 
     def test_cli_uses_its_own_version_tag_manifest_and_single_public_subject(self):
-        r = record(); r.update(schema=3, cohort='cli', version='0.1.1')
+        r = record(); r.update(schema=3, cohort='cli', version='0.2.0')
         self.assertEqual(records.packages(r), {'yetlet-cli'})
-        self.assertEqual(records.tag(r), 'yetlet-cli-v0.1.1')
+        self.assertEqual(records.tag(r), 'yetlet-cli-v0.2.0')
         records.source_version(r, ROOT)
         for schema, cohort in ((1, 'cli'), (2, 'cli'), (3, 'sixteen'), (3, 'consolidated')):
             with self.assertRaises(ValueError): records.validate(dict(r, schema=schema, cohort=cohort))
-        with self.assertRaises(ValueError): records.source_version(dict(r, version=records.CLI_SDK_VERSION), ROOT)
+        with self.assertRaises(ValueError): records.source_version(dict(r, version='0.9.0-alpha.6'), ROOT)
         with tempfile.TemporaryDirectory() as temp:
             directory = Path(temp); r = fixture(directory, cli=True)
             try:
@@ -143,6 +143,24 @@ class RecordTests(unittest.TestCase):
                 self.assertEqual(pub.names(), {'yetlet-cli-0.1.0.crate', 'PROVENANCE-UNSIGNED.json',
                     'RELEASE-CHECKSUMS.json', 'provenance.sigstore.json', 'SIGNING-APPROVAL.json'})
             finally: pub.s.bind_record(record())
+
+    def test_cli_sdk_binding_preserves_old_records_and_rejects_unknown_or_wrong_sdk(self):
+        for version, sdk in [('0.1.0', '0.9.0-alpha.5'), ('0.1.1', '0.9.0-alpha.5'),
+                             ('0.2.0', '0.9.0-alpha.6')]:
+            self.assertEqual(records.cli_sdk_version(version), sdk)
+            r = record(); r.update(schema=3, cohort='cli', version=version)
+            with tempfile.TemporaryDirectory() as temp:
+                root = Path(temp); manifest = root / 'tools/yetlet-cli/Cargo.toml'
+                manifest.parent.mkdir(parents=True)
+                raw = ('[package]\nname="yetlet-cli"\nversion="' + version +
+                       '"\npublish=true\n[[bin]]\nname="yetlet"\n[dependencies]\nyetlet={version="=' + sdk + '"}\n')
+                manifest.write_text(raw)
+                records.source_version(r, root)
+                other = '0.9.0-alpha.5' if version == '0.2.0' else '0.9.0-alpha.6'
+                manifest.write_text(raw.replace(sdk, other))
+                with self.assertRaises(ValueError): records.source_version(r, root)
+        for unknown in ('0.2.1', '1.0.0', None, ['0.2.0']):
+            with self.assertRaises(ValueError): records.cli_sdk_version(unknown)
 
     def test_stage_requirements_and_canonical_digest(self):
         r = record(); core = {k: r[k] for k in records.CORE}

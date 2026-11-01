@@ -1,5 +1,13 @@
 # Yetlet Backlog
 
+**Authorized CLI0.2.0 preparation (2026-11-01):**
+[YT-229](CLI-020-RELEASE-PREPARATION.md) follows successful SDKalpha.6 publication.
+Prepare the independent CLI version, qualified bundled resources and trusted
+version-specific SDK binding, then only affected native/archive/consumer checks.
+Retain CLI0.1.x historical bindings and the current public guide edition.
+Independent review and fixed C/S remain Pending; stop at the final owner
+publication gate. No SDK republishing, dependency upgrade or automatic retry.
+
 **Completed SDKalpha.6 publication (2026-11-01):**
 [The owner-approved publisher41308935654/1](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
 PASS: six-file GitHub Experimental pre-release and both exact crates.io versions,
@@ -1052,6 +1060,8 @@ separate implementation authority.
 | YT-227 | P2 | M | M10 | Plan the next SDK/CLI release and registry authentication options | YT-216, YT-220, YT-221, YT-223, YT-226 | [Documentation-only plan](YT-227-NEXT-RELEASE-PLAN.md): actual published/source delta, proposed SDKalpha.6 then independent CLI0.2.0, guide-edition and version-specific CLI/SDK prerequisites, optional OIDC privilege/phase review, and bounded evidence reuse/missing qualification. Independent Reviewer PASS0, zero issues/followups,31 source hashes/six frozen documents/Git status match; registered model/effective high verified. Docs227-item/whitespace PASS. Done at planning scope only; versions, candidates and auth migration unselected. No runtime/version/workflow/external change, old validation replay or Git/release action | Done |
 
 | YT-228 | P1 | M | M10 | Prepare SDKalpha.6 through the final publication gate | YT-227 | [Accepted preparation and subsequent publication](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01): reviewed metadata/guide fix and GNU/Wasm/MSVC consumers; PR47/Cc7e6372, PR48/SVP6531001 and actual required CI PASS. Build/readback/prepare/sign/independent verification each PASS attempt1; two subjects/all44 private entries, frozen payloads and final Reviewer PASS0. Owner-approved41308935654/1 completes six-file GitHub prerelease then both registry uploads; anonymous bytes/checksums/index and fresh registry-only exact-version resolve/locked compile PASS. Initial P1/operator failures retained, no retry/re-sign/source or tag rewrite. Original preparation acceptance preserved; CLI0.2 not started, three closing docs local/uncommitted | Done |
+
+| YT-229 | P1 | M | M10 | Prepare independent CLI0.2.0 against published SDKalpha.6 | YT-216, YT-223, YT-228 | [Selected contract](CLI-020-RELEASE-PREPARATION.md): coherent registry pin/resources, trusted historical/current SDK binding, affected GNU/MSVC archive/binary/generated/static consumer checks and existing single-gate release flow. Independent review and immutable C/S Pending; no SDK republishing or final publication | In progress |
 
 ## M25 — Broader HTML DOM support and static-site delivery
 

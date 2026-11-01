@@ -1,5 +1,13 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**CLI0.2.0 continuation (2026-11-01):**
+[YT-229](CLI-020-RELEASE-PREPARATION.md) follows successful SDKalpha.6 publication.
+Prepare the independent CLI version, qualified bundled resources and trusted
+version-specific SDK binding, then only affected native/archive/consumer checks.
+Retain CLI0.1.x historical bindings and the current public guide edition.
+Independent review and fixed C/S remain Pending; stop at the final owner
+publication gate. No SDK republishing, dependency upgrade or automatic retry.
+
 **SDKalpha.6 distribution complete (2026-11-01):**
 [Owner-approved41308935654/1](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
 publishes six reviewed GitHub pre-release files and both crates.io packages.
