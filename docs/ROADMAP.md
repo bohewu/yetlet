@@ -1,5 +1,14 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**CLI0.2 source and original custody accepted (2026-11-01):**
+[YT-229](CLI-020-RELEASE-PREPARATION.md#successful-original-build-and-custody--2026-11-01)
+uses PR49/C7fb963a with matching reviewed tree and actual master CI PASS. Current
+version expectations derive from the CLI manifest; exact-source MSVC7-pass/1-ignored
+and final source review PASS0. Unsigned CLI tag is fixed after strict/builtin Guard;
+build41315130983/1 and original readback41315597052/1 PASS. One archive/SDKalpha.6
+pin, original failures and published SDK/guide boundaries remain intact. S and
+later release stages/final owner gate Pending; YT-229 remains In progress.
+
 **CLI0.2.0 continuation (2026-11-01):**
 [YT-229](CLI-020-RELEASE-PREPARATION.md) follows successful SDKalpha.6 publication.
 Prepare the independent CLI version, qualified bundled resources and trusted

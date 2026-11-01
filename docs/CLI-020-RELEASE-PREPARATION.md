@@ -135,3 +135,63 @@ checks at f4cf9b8; the owner-requested expectation changes still need independen
 review and required new-source CI before Merge. No old failed job is retried.
 The earlier bounded MSVC success is retained with its exact old-source scope;
 new Windows expectation code is not yet claimed executed.
+
+
+## Accepted source and fixed candidate — 2026-11-01
+
+Final source independent Reviewer PASS0 accepts the manifest-driven preparation
+and exact-source Windows7-pass/1-ignored evidence at f8cc6be. Required PR CI
+41313701348/1 passes; PR49 squash Merge produces C
+7fb963a6195f6932f12a8b072f9bad05f85f4f4a, tree
+0e0bbd762a777e2555130c4f569832cec60d78dd, identical to reviewed source. Both
+required actual-master jobs in41314387731/1 PASS before C selection. Original
+41312030357 failure and intermediate green41312478151 remain preserved.
+
+Strict/builtin existing-remote tag Guard passes; the normal hook consumes its
+one-time binding when pushing unsigned yetlet-cli-v0.2.0 at C. Remote readback
+matches; canonical retirement archives the used binding without changing history.
+The existing custody-verifier policy selects exactly this tag; worker/owner gates
+and secrets are unchanged. One45-minute build41315130983/attempt1 is dispatched;
+its outcome and original custody readback remain Pending at this checkpoint.
+The generic release SOP now uses versioned records and manifest-driven test data.
+Candidate SDK pin, CLI runtime/templates and third-party closure remain unchanged.
+S/V/P and later signing/publication stages are not selected by this paragraph.
+
+
+## Successful original build and custody — 2026-11-01
+
+[Build41315130983/attempt1](https://github.com/bohewu/yetlet/actions/runs/41315130983)
+PASS at fixed C/tag. Public ZIP artifact13086907079 SHA-256 is
+894b561d0620212179dec89d253fdd589b11acca8674aa8768ecbb1e3103d617.
+Encrypted private ZIP artifact13086852267 SHA-256 is
+85eea4f18fcf1b48d5582642366912a040dbe65b670fa94df470b6c2478eacbd.
+Both actual downloaded ZIP digests/flat contents match metadata; no local formal
+key or decryption is used. The unsigned output has exactly one CLI subject:
+
+| Public build file | Size | SHA-256 |
+|---|---|---|
+| yetlet-cli-0.2.0.crate | 490696 | d712d9395faa56aa15f7376fad06ac4f86897cbcb1fd910c278d5b2fd02958af |
+| PROVENANCE-UNSIGNED.json | 5557 | 6b6c624c4a64d235d9de9450e9067104dc54dcb9d189097a0b58f718168a239c |
+
+The existing hosted staging is not a Git checkout, so its archive contains141
+files versus142 in the Git-aware local qualification archive. Every141 common
+file is byte-identical; only local .cargo_vcs_info.json is absent. The unchanged
+frozen provenance binds C/build. No archive is repacked or replaced.
+
+[Original protected readback41315597052/attempt1](https://github.com/bohewu/yetlet/actions/runs/41315597052)
+PASS: complete preparation, original exit0, decryption/inventory/private-manifest
+checks true, recipient and C/tag/build bindings match. The safe receipt's existing
+notice does not claim builder authentication, durable custody or release approval.
+Artifact13087640406 ZIP SHA-256 is
+99b3aec55a7a9bc0492b9eaf5d57f154fad303faf457a2e420c2f3716c8aaf03.
+Original encrypted bytes, safe receipts, qualification/CI/reviews and failures
+are retained outside the repository. A premature run-list observation happened
+before download/dispatch completion; its empty result is retained, not a second
+readback invocation. No failed release job is retried.
+
+This documents successful product/custody preparation. The next docs-only signer
+delivery must pass independent review, strict/builtin Guard and required actual
+master CI; select its actual distinct S afterward. Preparation/signing/final
+independent verification and owner publication gate remain Pending. Expected
+public scope stays five files/one CLI archive, Experimental pre-release, not
+Latest. SDK packages, existing releases/tags and the guide edition are preserved.
