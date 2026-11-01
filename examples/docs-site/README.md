@@ -68,8 +68,9 @@ private receipts or the Cargo target directory. Select an unused port first.
 Eight readable HTML chapters, local CSS and .nojekyll: ten public files. Direct
 nested chapter navigation, headings/anchors, code, tables and the native mobile
 menu work without JavaScript. Desktop navigation has eight entries; keyboard
-users can skip to the main content. The header Search link leads to the optional
-search panel. This initial pilot fixes /yetlet/ and does not add arbitrary routes,
+users can skip to the main content. The selected island build adds a native search
+field to the header; HTML-only output omits search. This initial pilot fixes
+/yetlet/ and does not add arbitrary routes,
 remote content ingestion, SPA rewriting or a web application server.
 
 ## Configuration and errors
@@ -86,10 +87,15 @@ wasm-bindgen0.2.129 explicitly, then build assets before copying the consumer:
 
 Append --wasm-islands to the shown static build. Use a new disposable root/output;
 the CLI never replaces an existing artifact. This mode exports fifteen files.
-Initial content is complete HTML; only the small external bootstrap loads
-automatically. Enable search explicitly downloads the prepared local Wasm/index,
-mounts its own input/results host and searches eight chapter texts. No request
-API, general hydration, remote search or mandatory search service is introduced.
+Initial content is complete HTML. In the selected island build, search starts
+automatically when the page loads; there is no Enable search button. Loading the
+prepared local Wasm/index updates only the owned results host. The header input
+is usable before Wasm is ready, and initialization preserves its value, native
+node and focus. Results appear below the field as chapter links with excerpts.
+Tab/Enter follow native links; Escape, leaving the search region or clearing the
+query closes the dropdown. On narrow screens the field occupies its own header
+row. The HTML-only build still has no Wasm. No request API,
+general hydration, remote search or mandatory search service is introduced.
 Failure preserves the article/navigation and offers explicit reload; no automatic
 retry. pagehide retires the listener except for a persisted bfcache page. No new
 bfcache qualification is claimed.

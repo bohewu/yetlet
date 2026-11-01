@@ -37,30 +37,6 @@ pub fn activate(index: &str) -> Result<(), JsValue> {
         let document = web_sys::window()
             .and_then(|w| w.document())
             .ok_or_else(|| JsValue::from_str("Document unavailable"))?;
-        let host = document
-            .get_element_by_id("site-search-host")
-            .ok_or_else(|| JsValue::from_str("Owned search host unavailable"))?;
-        let view: View = Element::new("div")
-            .child(
-                Element::new("label")
-                    .attribute("for", "site-search-input")
-                    .child(View::text("Search all eight chapters")),
-            )
-            .child(
-                Element::new("input")
-                    .attribute("id", "site-search-input")
-                    .attribute("type", "search")
-                    .attribute("maxlength", "100")
-                    .attribute("autocomplete", "off"),
-            )
-            .child(
-                Element::new("div")
-                    .attribute("id", "site-search-results")
-                    .attribute("aria-live", "polite")
-                    .child(Element::new("p").child(View::text("Type a word to find a chapter."))),
-            )
-            .into();
-        yetlet_browser::dom::mount(&host, &view)?;
         let input: web_sys::HtmlInputElement = document
             .get_element_by_id("site-search-input")
             .ok_or_else(|| JsValue::from_str("Search input unavailable"))?
@@ -68,57 +44,15 @@ pub fn activate(index: &str) -> Result<(), JsValue> {
         let results = document
             .get_element_by_id("site-search-results")
             .ok_or_else(|| JsValue::from_str("Search results unavailable"))?;
-        let observed = input.clone();
         let entries = Rc::new(entries);
+        let observed = input.clone();
+        let observed_results = results.clone();
+        let observed_entries = entries.clone();
         let listener = Closure::wrap(Box::new(move |_: web_sys::Event| {
-            let query = observed
-                .value()
-                .chars()
-                .take(100)
-                .collect::<String>()
-                .trim()
-                .to_lowercase();
-            let hits: Vec<_> = entries
-                .iter()
-                .filter(|e| {
-                    e.title.to_lowercase().contains(&query)
-                        || e.text.to_lowercase().contains(&query)
-                })
-                .collect();
-            let view: View =
-                if query.is_empty() {
-                    Element::new("p")
-                        .child(View::text("Type a word to find a chapter."))
-                        .into()
-                } else if hits.is_empty() {
-                    Element::new("p")
-                        .child(View::text(
-                            "No matching chapters. Try another word or browse the guide.",
-                        ))
-                        .into()
-                } else {
-                    Element::new("ul")
-                        .children(hits.into_iter().map(|e| {
-                            Element::new("li")
-                                .child(
-                                    Element::new("a")
-                                        .attribute("href", &e.href)
-                                        .child(View::text(&e.title)),
-                                )
-                                .child(Element::new("p").child(View::text(
-                                    e.text.chars().take(150).collect::<String>(),
-                                )))
-                                .into()
-                        }))
-                        .into()
-                };
-            if yetlet_browser::dom::mount(&results, &view).is_err() {
-                results
-                    .set_text_content(Some("Search unavailable. Chapter navigation still works."));
-            }
+            render_results(&observed, &observed_results, &observed_entries);
         }) as Box<dyn FnMut(web_sys::Event)>);
         input.add_event_listener_with_callback("input", listener.as_ref().unchecked_ref())?;
-        input.focus()?;
+        render_results(&input, &results, &entries);
         *owner.borrow_mut() = Some(Runtime { input, listener });
         Ok(())
     })
@@ -128,4 +62,65 @@ pub fn dispose() {
     OWNER.with(|owner| {
         owner.borrow_mut().take();
     });
+}
+
+fn render_results(
+    input: &web_sys::HtmlInputElement,
+    results: &web_sys::Element,
+    entries: &[Entry],
+) {
+    let query = input
+        .value()
+        .chars()
+        .take(100)
+        .collect::<String>()
+        .trim()
+        .to_lowercase();
+    if query.is_empty() {
+        results.set_text_content(None);
+        let _ = results.set_attribute("hidden", "");
+        return;
+    }
+    let hits: Vec<_> = entries
+        .iter()
+        .filter(|e| {
+            e.title.to_lowercase().contains(&query) || e.text.to_lowercase().contains(&query)
+        })
+        .collect();
+    let view: View = if hits.is_empty() {
+        Element::new("p")
+            .child(View::text("No matching chapters."))
+            .into()
+    } else {
+        Element::new("ul")
+            .children(hits.into_iter().map(|e| {
+                Element::new("li")
+                    .child(
+                        Element::new("a")
+                            .attribute("href", &e.href)
+                            .child(
+                                Element::new("span")
+                                    .attribute("class", "result-title")
+                                    .child(View::text(&e.title)),
+                            )
+                            .child(
+                                Element::new("span")
+                                    .attribute("class", "result-excerpt")
+                                    .child(View::text(
+                                        e.text.chars().take(150).collect::<String>(),
+                                    )),
+                            ),
+                    )
+                    .into()
+            }))
+            .into()
+    };
+    if yetlet_browser::dom::mount(results, &view).is_err() {
+        results.set_text_content(Some("Search unavailable. Reload to retry."));
+    }
+    if input.matches(":focus").unwrap_or(false) {
+        let _ = results.remove_attribute("hidden");
+    } else {
+        let _ = results.set_attribute("hidden", "");
+    }
 }

@@ -40,30 +40,61 @@ fn navigation(site: &Site, current: &str) -> Element {
         .attribute("aria-label", "Guide chapters")
         .child(Element::new("ol").children(links))
 }
+fn header_search() -> Element {
+    Element::new("div")
+        .attribute("class", "header-search")
+        .attribute("id", "site-search")
+        .attribute("role", "search")
+        .child(
+            Element::new("div")
+                .attribute("class", "search-field")
+                .child(
+                    Element::new("span")
+                        .attribute("class", "search-icon")
+                        .attribute("aria-hidden", "true"),
+                )
+                .child(
+                    Element::new("input")
+                        .attribute("id", "site-search-input")
+                        .attribute("type", "search")
+                        .attribute("aria-label", "Search this guide")
+                        .attribute("aria-controls", "site-search-results")
+                        .attribute("placeholder", "Search this guide…")
+                        .attribute("maxlength", "100")
+                        .attribute("autocomplete", "off"),
+                ),
+        )
+        .child(
+            Element::new("p")
+                .attribute("id", "site-search-status")
+                .attribute("class", "search-feedback")
+                .attribute("role", "status")
+                .child(View::text("Enable JavaScript to search.")),
+        )
+        .child(
+            Element::new("div")
+                .attribute("id", "site-search-results")
+                .attribute("class", "search-results")
+                .attribute("aria-live", "polite")
+                .attribute("hidden", ""),
+        )
+}
 fn shell(site: &Site, page: &Page, content: View, island: bool) -> View {
-    let mut search = Element::new("section").attribute("class", "search-panel").attribute("id", "site-search")
-        .child(Element::new("h2").child(View::text("Search this guide")))
-        .child(Element::new("p").attribute("id", "site-search-status").attribute("role", "status").child(View::text(if island {
-            "Optional search requires JavaScript and Wasm. Every chapter is already readable."
-        } else { "HTML-only export. Browse all eight chapters using the guide navigation." })));
+    let mut header = Element::new("header")
+        .attribute("class", "site-header")
+        .child(
+            Element::new("a")
+                .attribute("class", "brand")
+                .attribute("href", &site.base)
+                .child(View::text("Yetlet"))
+                .child(Element::new("span").child(View::text("Developer Guide"))),
+        );
     if island {
-        search = search
-            .child(
-                Element::new("button")
-                    .attribute("id", "site-search-enable")
-                    .attribute("type", "button")
-                    .attribute("disabled", "")
-                    .child(View::text("Enable search")),
-            )
-            .child(Element::new("div").attribute("id", "site-search-host"));
+        header = header.child(header_search());
     }
     Element::new("div").attribute("class", "site")
         .child(Element::new("a").attribute("class", "skip-link").attribute("href", "#site-main").child(View::text("Skip to content")))
-        .child(Element::new("header").attribute("class", "site-header")
-            .child(Element::new("a").attribute("class", "brand").attribute("href", &site.base).child(View::text("Yetlet")).child(Element::new("span").child(View::text("Developer Guide"))))
-            .child(Element::new("div").attribute("class", "header-actions")
-                .child(Element::new("a").attribute("href", "#site-search").child(View::text("Search")))
-                .child(Element::new("span").attribute("class", "preview-badge").child(View::text("Local pilot")))))
+        .child(header)
         .child(Element::new("details").attribute("class", "mobile-menu").attribute("id", "site-menu")
             .child(Element::new("summary").child(View::text("Browse guide")))
             .child(navigation(site, &page.route)))
@@ -74,7 +105,6 @@ fn shell(site: &Site, page: &Page, content: View, island: bool) -> View {
             .child(Element::new("main").attribute("id", "site-main").attribute("tabindex", "-1")
                 .child(Element::new("p").attribute("class", "edition").child(View::text(format!("Experimental SDK {} · CLI {} · source {}", site.sdk, site.cli, &site.commit[..7]))))
                 .child(content)
-                .child(search)
                 .child(Element::new("footer")
                     .child(Element::new("p").child(View::text(format!("Canonical source: {}. Local, unpublished checkout; pinned repository links may be unavailable until its commit is pushed.", page.source))))
                     .child(Element::new("p").child(View::text("No live Pages replacement. Original validation and release records remain in the repository."))))))

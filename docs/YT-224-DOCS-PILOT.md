@@ -39,7 +39,7 @@ unavailable until this local content commit is pushed; the page explicitly says
 so. This is separate from internal chapter/anchor correspondence. There is no
 hydration, general browser-only rendering mode or Pages promotion in this item.
 
-## Changed behavior and verification
+## Original acceptance verification (before the startup amendment)
 
 | Evidence | Actual scope/result |
 |---|---|
@@ -59,7 +59,7 @@ and owner disposal are verified separately. This is Chromium/viewport-emulation
 evidence, not Firefox, MSVC, physical-mobile, assistive-technology or new release
 qualification. No unchanged SDK/browser/CLI suite or old docs build is rerun.
 
-## Bounded load comparison
+## Historical activation-only load comparison
 
 The already-built mdBook artifact has matching eight source hashes and is reused.
 A single previously unmeasured cold navigation captures the two local generated
@@ -114,3 +114,85 @@ existing service is changed. All19 new paths stay unstaged/uncommitted; HEAD
 remains1802026 and that ten-document commit is not pushed. YT-224 is Done only at
 local pilot scope. Inspect this local result before any separately authorized
 Pages-replacement decision; no promotion is implied by acceptance.
+
+## Owner-selected automatic search startup — 2026-11-01
+
+The owner requests search ON by default for this reader. Build-time selection
+remains explicit through --wasm-islands; within that selected documentation site,
+search now initializes automatically on page load. The Enable search button is
+removed. The current app loads its Wasm/index as part of startup, so the earlier
+activation-only initial-load figures above remain historical and are not current
+performance claims. No new timing campaign or old suite replay is performed.
+
+The owned search runtime no longer focuses the input during initialization; it
+therefore leaves the reader at the article instead of jumping to the footer.
+Loading/error guidance, complete no-JS content, no automatic retry and the
+pagehide/late-completion guard remain. The framework defaults, CLI flags, CSP,
+settings, dependencies, canonical content and existing Pages are unchanged.
+
+Only affected native export, Wasm build/strict lint/format and startup browser
+flows are checked. Original parser, chapter-correspondence and menu/keyboard proof
+is reused. A formatting-only check failure is retained and corrected without
+changing the already-exported semantics. Current local preview replacement and
+independent review of this amendment are recorded after its focused checks.
+No Commit/Push or public Pages update is authorized for this amendment.
+
+Focused automatic-startup amendment verification and independent Reviewer PASS0
+are complete: zero issues/required followups, five matching review inputs and
+fifteen matching public files. Native/Wasm strict lint/build, corrected formatting
+and docs pass. Chromium verifies automatic loading/ready without a button, one
+Wasm request, unchanged initial focus/scroll, actual search, failed-load static
+fallback/no retry, no-JS guidance and disposal during initialization. Original
+evidence is reused. Temporary browser/test server/consumer are cleaned up after
+verified external retention. The user-requested loopback preview is updated to
+this new artifact, while original artifacts and public Pages remain unchanged.
+These five UX-amendment paths remain uncommitted/unpushed.
+
+The owner's subsequent compact-search copy request removes visible ready text,
+the duplicate field label and the empty-query prompt. The idle panel shows only
+Search and its placeholder; the field retains its explicit aria-label. Loading,
+failure/reload and no-results messages appear only when relevant. New native/
+Wasm builds and focused browser checks pass for visible copy, accessible name,
+results/clear/no-hit and failure fallback. Previous artifacts remain retained;
+the user-requested loopback preview is updated, with no Commit/Push or Pages
+change. Temporary build consumer and test browsers are removed/closed.
+
+## Owner-selected header search — 2026-11-01
+
+The selected island build now places the search field directly in the header.
+The native HTML input accepts typing before Wasm finishes loading; activation
+preserves the same node, query and focus, then renders only the owned results
+container. Matching chapters appear as whole-row links with concise excerpts.
+Native Tab/Enter navigation, Escape, outside/blur dismissal and clearing the
+query are supported. Mobile layout gives the field its own header row. The
+Local pilot badge is removed; source/version disclosure remains in the edition
+line. The HTML-only build omits search and keeps all eight readable chapters.
+
+New native export, native/Wasm strict Clippy and the Wasm build pass. Focused
+Chromium checks pass at1440x1000 and390x844 for early input preservation,
+keyboard/native-link navigation, dropdown dismissal, viewport bounds and the
+mobile chapter menu. Failed-load and no-JS guidance preserve readable content.
+Desktop and touch-emulated screenshots are inspected. The first browser wrapper
+incorrectly expects a result link's accessible name to contain only its title,
+although its visible excerpt is also part of the name. That retained harness
+failure receives one title-within-link correction; no product change is needed.
+Earlier accepted chapter/parser/platform tests and timing evidence are reused.
+
+Independent review and a focused first-Tab observation catch the sticky header
+covering the skip link. Raising only the skip link's stacking level restores its
+existing keyboard path. The initial Wasm strict Clippy failure for an unnecessary
+borrow is retained; removing that borrow passes the same focused check. No SDK
+API or search behavior changes as part of these corrections.
+
+Evidence is retained outside the repository in run
+yt224-header-search-20261101. This is a local UX amendment; it does not replace
+Pages, add dependencies or authorize Commit/Push.
+
+Final independent Reviewer PASS0 confirms both corrections, six source/status
+bindings and the focused browser evidence. The final15-file preview is an asset
+update of the successful header-search export: rebuilt JS/Wasm are byte-identical,
+and only the corrected CSS differs. Two subsequent CLI export attempts stopped
+at an absent output-parent admission check; both failures remain retained, with
+no third attempt or new export-success claim. The temporary consumer is retained
+externally before removal; test browsers are closed. Only the owner-requested
+loopback preview remains running. All six UX-amendment paths remain uncommitted.
