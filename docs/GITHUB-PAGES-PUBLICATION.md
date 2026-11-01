@@ -290,3 +290,31 @@ There are zero issues or required followups; registered reviewer model
 `gpt-6-astra` and effective high effort were verified. YT-218 is Done.
 Wiki, custom domain, generated-rustdoc hosting and further editions remain deferred choices,
 not incomplete first-publication criteria.
+
+## Temporary automatic-update hold — 2026-11-01
+
+The owner subsequently authorizes PR44 Push and squash Merge after green CI,
+then a [Yetlet-built guide cutover plan](YT-226-PAGES-CUTOVER-PLAN.md), without
+deployment. Readback finds PAGES_DEPLOY_ENABLED true. To enforce that instruction,
+the repository CI variable is set false and read back before Merge. This stops
+new automatic publication; it neither unpublishes nor replaces the existing
+website. It changes no Pages source/domain/Environment/Secret or release policy.
+
+The false value supersedes the historical true activation checkpoint above
+until a later explicit website activation. Do not restore it as Merge cleanup:
+doing so could publish a new source. YT-226 proposes the future workflow change,
+selected source/artifact, activation/readback and rollback authorization boundary.
+The initial mdBook deployment and its retained failures remain accepted history.
+
+The authorized PR44 squash Merge is now99902bbb0ecaa07a14c1133f5d863d211632135c,
+tree6015c8d8c3ee4a412924b72c8c1ef278dfe00585, matching qualified headf73439b.
+All selected PR checks pass before Merge. The resulting master documentation
+run41277712999 succeeds with its deployment job skipped, confirming the hold.
+No manual dispatch or retry occurs; other automatic master checks remain a
+separate source-CI observation. The [cutover proposal](YT-226-PAGES-CUTOVER-PLAN.md)
+does not implement a new deployment flow or re-enable this variable.
+
+Subsequent master MSRV/Stable, guide build and all four CodeQL analyses pass at
+99902bb on attempt1. Independent Reviewer PASS0 accepts the six YT-226 planning
+documents, with zero issues/followups and matching frozen hashes. That acceptance
+does not start implementation or re-enable publication; the hold remains false.

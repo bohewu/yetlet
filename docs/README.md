@@ -67,6 +67,9 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [Public-mode guide artifact preparation — YT-225](YT-225-DOCS-PUBLIC-BUILD.md):
   clean source/edition labels, selected output and private receipts, separate
   build-only CI; no legacy URL aliases or live Pages replacement.
+- [Controlled Pages cutover plan — YT-226](YT-226-PAGES-CUTOVER-PLAN.md):
+  independently reviewed single workflow plan, deployment hold, source/artifact
+  checks and one later activation/rollback decision; implementation and publication remain Todo.
 
 - [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
   dedicated workflow, master-only Environment, initial deployment/readback,

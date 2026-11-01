@@ -151,3 +151,31 @@ All3 document/status hashes, both downloaded ZIP digests,15 output hashes/sizes,
 actual artifacts, receipts and source CI without rerunning tests or extracting
 archives. Registered reviewer gpt-6-astra/effective high are verified. Only the
 three hosted closeout documents remain unstaged/uncommitted after acceptance.
+
+## Subsequent closeout delivery and cutover preparation — 2026-11-01
+
+The owner authorizes strict/builtin Push of closeout commitf73439b, then PR44
+squash Merge after green CI. Exact0544f4a→f73439b Guard and native push hook pass:
+one commit, three files, zero findings. New guide build41276891123/1 and mdBook
+build41276891125/1 pass; MSRV/Stable source CI41276891089/1 and all four CodeQL
+analyses41276888703/1 pass. No retry or early Merge occurs.
+
+Because the existing master workflow would automatically deploy on Merge, the
+owner's no-deployment condition is enforced by setting PAGES_DEPLOY_ENABLED
+false before Merge, with readback. The existing public site is retained. Only
+the [YT-226 plan](YT-226-PAGES-CUTOVER-PLAN.md) is prepared; no replacement
+workflow or deployment is implemented. Original PR-source history is preserved
+in the source branch and a verified repository-external Git bundle.
+
+PR44 subsequently squash-merges as99902bbb0ecaa07a14c1133f5d863d211632135c,
+tree6015c8d8c3ee4a412924b72c8c1ef278dfe00585, identical to the reviewed head.
+The resulting master mdBook build41277712999 passes and deploy skips under the
+held switch. Original local master and PR-source branches remain intact; the
+new named planning branch starts at the merged commit without reset. YT-225
+is still Done at accepted build/artifact scope; the separate YT-226 implementation
+and actual public-site replacement remain Todo.
+
+Subsequent master CI readback completes successfully at99902bb, with no retry
+and Pages deployment skipped. Independent planning Reviewer PASS0 accepts the
+six YT-226 documents only; implementation and activation remain Todo and the
+deployment hold is unchanged. No YT-225 product verification is replayed.

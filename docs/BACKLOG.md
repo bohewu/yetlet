@@ -583,7 +583,19 @@ The owner requested Rust-native repository tooling before a public CLI. The inde
 
 ## Ready queue
 
-**Current checkpoint (2026-11-01):** The owner commits the YT-224 pilot and header
+**Current checkpoint (2026-11-01):** Authorized strict/builtin Push of f73439b
+updates PR44 with0 findings. Green PR Rust/document CI and all four CodeQL
+analyses precede squash Merge99902bb, whose tree matches the reviewed head.
+PAGES_DEPLOY_ENABLED is held false; merged-master mdBook41277712999 passes and
+deploy skips. All merged-master Rust/guide/CodeQL checks also pass at99902bb,
+without retries. Existing published Pages remains in place. The
+[YT-226 cutover plan](YT-226-PAGES-CUTOVER-PLAN.md) is prepared only; implementation
+and website activation are Todo. Original local source histories remain intact;
+independent planning Reviewer PASS0 accepts the six files with stable hashes and
+zero issues/followups. The owner authorizes local strict/builtin Commit only;
+no Push, deployment or workflow retry is selected.
+
+**Retained YT-225 preparation checkpoint (2026-11-01):** The owner commits the YT-224 pilot and header
 search as d707321/a306714 with strict/builtin Guard, without Push. The selected
 [YT-225 preparation](YT-225-DOCS-PUBLIC-BUILD.md) adds formal source/edition output
 and independent build-only CI; old .html compatibility is explicitly declined.
@@ -592,6 +604,10 @@ scope. The later authorized strict/builtin0544f4a delivery updates PR44; the
 first clean public-mode hosted artifact41265011134/1 and exact15-file/source/
 receipt readback pass, followed by independent hosted closeout Reviewer PASS0.
 Existing Pages is unchanged and Merge remains unauthorized.
+
+The subsequent authorization and Merge above supersede that checkpoint's
+no-Merge wording. The original artifact acceptance and failures remain retained;
+current-site replacement and YT-226 implementation remain Todo.
 
 **Retained YT-224 acceptance checkpoint (2026-11-01):** [YT-224](YT-224-DOCS-PILOT.md) is Done at
 local application-owned pilot scope after independent Reviewer PASS0, zero
@@ -988,6 +1004,7 @@ boundaries and YT-218's live site retain their current scope.
 | YT-223 | P2 | L | M25 | Minimal opt-in static HTML build and CLI integration | YT-222 | [Implementation/evidence](YT-223-STATIC-HTML-IMPLEMENTATION.md): explicit typed static mode, native protocol1, bounded public documents/assets, protected create-only output/private receipts, registry-SDK standalone HTML and optional local island. New8 native cases, actual failure/cancellation/source/environment/supervision/cache-directory checks, Chrome no-JS/root/project/404/island, Firefox activation/disposal and normal packaging pass; retained fixture/lint failures. Independent local followup PASS0,0 issues/followups,46 hashes stable; first Cargo-directory P2 closed. Owner-authorized Git delivery removes the earlier artifact-policy blocker; current-source MSVC8 cases and actual static CLI runtime pass. Required current-head CI PASS; final independent platform Reviewer PASS0, zero issues/followups,49 matching inputs and56 reconciled Windows source hashes; ten closeout docs uncommitted, no Merge/publication authority | Done |
 | YT-224 | P2 | M | M25 | Yetlet-built documentation-site pilot | YT-218, YT-220, YT-221, YT-223 | [Pilot scope/evidence](YT-224-DOCS-PILOT.md): same eight canonical Markdown inputs/excerpts, build-time maintained parser with no raw-HTML bypass, static readable content and optional owned Wasm interactions; source/edition/exclusions/navigation/search/touch/keyboard and bounded load-size comparison. Native3 tests, native/wasm strict lint/build, protected static exports, all8 no-JS chapters, actual search/mobile/keyboard/failure/disposal and output/link/size proof pass; original failures retained. Final independent Reviewer PASS0,0 issues/followups,33 inputs matched; owned cleanup complete, no live replacement | Done |
 | YT-225 | P2 | M | M25 | Public-mode Yetlet guide artifact and build-only CI | YT-224 | [Preparation contract/evidence](YT-225-DOCS-PUBLIC-BUILD.md): clean source/edition binding, public disclosure, exact15-file output/private receipts and separate build-only workflow. Owner declines old .html aliases; existing Pages remains unchanged. New6 Python/1 native tests, strict native lint/format, actual preview integration/219 links and corrected actionlint pass; first syntax failure retained. Independent preparation Reviewer PASS0, zero issues/followups,10 hashes stable. Authorized0544f4a Push updates PR44; clean public hosted41265011134/1 passes, ZIP/15-file hashes,8 canonical excerpts,10 tracked consumer inputs and CLI receipts match. Independent hosted closeout Reviewer PASS0,0 issues/followups and3 stable document hashes; no Merge/deployment | Done |
+| YT-226 | P2 | M | M25 | Controlled switch to the Yetlet-built Pages guide | YT-225 | [Reviewed cutover plan](YT-226-PAGES-CUTOVER-PLAN.md): one builder/Pages workflow, unchanged8-page selection and project URL, explicit no old .html aliases, source/artifact boundaries, new delivery readback and an explicitly authorized rollback option. Master CI99902bb passes on attempt1; independent planning Reviewer PASS0,0 issues/followups and6 stable source hashes. Current work is planning only; deployment switch held false, existing site retained. Implementation/review and owner-authorized activation/readback required before Done | Todo |
 
 ## YT-096 hosted build, verifier and retention — 2026-10-28
 

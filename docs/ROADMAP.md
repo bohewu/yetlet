@@ -52,6 +52,17 @@ Subsequent authorized0544f4a delivery updates PR44: the first clean public
 artifact41265011134/1 and exact ZIP/15-file/source/receipt readback pass. This
 adds hosted build acceptance with independent closeout Reviewer PASS0, without
 Merge, retry or website replacement.
+[YT-226](YT-226-PAGES-CUTOVER-PLAN.md) proposes the later controlled Pages switch,
+with one authoritative build/deploy workflow and no old URL aliases. Only planning
+is selected now; implementation and activation remain Todo. Following green PR
+CI/all four CodeQL analyses, PR44 squash-merges as99902bb with the exact reviewed
+tree. The deployment variable is held false; master mdBook41277712999 passes
+with deploy skipped. Subsequent master readback confirms MSRV/Stable, guide and
+all four CodeQL analyses pass on attempt1 at99902bb. This does not replace the
+existing public website.
+Independent planning Reviewer PASS0 accepts all six YT-226 files with stable
+hashes and zero issues/followups after green master CI. Local strict/builtin
+Commit is selected; implementation/activation remain Todo, without Push/deploy.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
@@ -2411,6 +2422,7 @@ resource/event/keyed ownership remain the compatibility baseline.
 | YT-223 | [Minimal static build/CLI](YT-223-STATIC-HTML-IMPLEMENTATION.md), explicit no-backend consumer and optional island; GNU/browser evidence/followup PASS0, MSVC8 cases and actual native static CLI pass; required current-head CI PASS; final independent Reviewer PASS0 | Done |
 | YT-224 | [Local Yetlet documentation pilot](YT-224-DOCS-PILOT.md): same8 canonical inputs, escaped View rendering, optional owned search, static/mobile/keyboard and bounded size/load proof; independent Reviewer PASS0 and cleanup complete, existing Pages retained | Done |
 | YT-225 | [Public-mode guide artifact preparation](YT-225-DOCS-PUBLIC-BUILD.md): clean edition/source-bound output, private receipts and independent build-only CI; old .html aliases explicitly declined. New focused checks and independent preparation Reviewer PASS0; first clean public hosted41265011134/1 and ZIP/15-file/source/receipt readback pass on authorized0544f4a. Independent hosted closeout Reviewer PASS0 with3 stable document hashes; no retry, Merge or live Pages change | Done |
+| YT-226 | [Controlled Pages cutover plan](YT-226-PAGES-CUTOVER-PLAN.md): reviewed single build/deploy workflow, same8 sources/15 public files and directory URLs, deployment hold, explicit activation/source/readback and bounded rollback authorization. Master CI passes; independent planning Reviewer PASS0 with6 stable hashes/zero issues. Planning only; implementation, its independent review and actual publication acceptance remain unstarted | Todo |
 
 Dependency paths are YT-219→YT-220→YT-221 and YT-219→YT-222→YT-223;
 YT-224 joins YT-220/221/223 and Done YT-218. Static HTML serialization does not
