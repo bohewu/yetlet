@@ -1,10 +1,12 @@
-# Local Yetlet documentation pilot
+# Yetlet documentation site
 
-Application-owned, unpublished YT-224 consumer of registry SDK0.9.0-alpha.5,
+Application-owned, nonpublishable YT-224 package using registry SDK0.9.0-alpha.5,
 with [YT-225 public-mode artifact preparation](../../docs/YT-225-DOCS-PUBLIC-BUILD.md).
 It renders the eight existing selections/excerpts in site/pages.toml with Yetlet
-HTML, plus separately selected browser search. It does not replace the current
-mdBook site, change Pages, or add an SDK/CLI API. Published CLI0.1.1 does not have
+HTML, plus separately selected browser search. The later owner-authorized
+[YT-226 cutover](../../docs/YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
+publishes this reader at https://bohewu.github.io/yetlet/ without adding an SDK/CLI
+API. Local export commands do not change Pages. Published CLI0.1.1 does not have
 build --static; use the reviewed source CLI from this checkout.
 
 ## Prerequisites
@@ -137,16 +139,20 @@ This checkout's [single documentation workflow](../../.github/workflows/docs.yml
 builds the formal artifact through this same command; the duplicate docs-preview
 workflow is retired. The build has read-only repository access. A separate
 master-only deployment job remains gated by PAGES_DEPLOY_ENABLED and the build's
-deploy output. That switch stays false during [YT-226 integration](../../docs/YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01).
-Existing published Pages continues to use mdBook. The owner
+deploy output. That switch was held false during integration and is now true
+under the separately authorized YT-226 publication, source0ae6b93/run41289520993/1.
+The owner
 chooses the directory URLs without old mdBook .html aliases; the early site's
-old bookmarks are not promised to survive a future replacement.
+old bookmarks are not preserved by the cutover.
 
 ### API and accepted evidence
 
 Use [HTML](../../crates/yetlet/guides/html.md), [DOM](../../crates/yetlet-browser/guides/dom.md),
 the [export contract](../../docs/YT-222-STATIC-HTML-CONTRACT.md) and
 [pilot evidence/limits](../../docs/YT-224-DOCS-PILOT.md). SDK/CLI versions, provider
-defaults and renderer APIs are unchanged. New evidence is Linux/Chromium with
-desktop and emulated touch; it is not Windows, Firefox, physical-mobile,
-general Markdown conformance or production deployment qualification.
+defaults and renderer APIs are unchanged. The initial local evidence is
+Linux/Chromium with desktop and emulated touch. The cutover adds exact public
+HTTPS bytes/MIME, directory navigation, real search and a narrow Firefox
+reader observation; temporary-check failures remain explicit. This does not
+extend the SDK platform matrix or claim physical-mobile, general Markdown
+conformance or application production-deployment qualification.

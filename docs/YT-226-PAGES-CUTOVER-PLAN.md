@@ -1,6 +1,11 @@
 # YT-226 — Controlled switch to the Yetlet-built Pages guide
 
-Date: 2026-11-01. Status: PR hosted build reviewed; merged-master/publication acceptance pending.
+Date: 2026-11-01. Status: Done after final independent Reviewer PASS0.
+
+The current guide is the Yetlet-built reader at source0ae6b93. The deployment
+switch is true under the owner's later activation authorization. Earlier
+hold/unmerged checkpoints below retain their original scope and results; the
+[public cutover record](#authorized-public-cutover--2026-11-01) supersedes them.
 
 ## Current boundary
 
@@ -247,3 +252,77 @@ gpt-6-astra/effective high are verified. Review is read-only: no tests, builds,
 browser runs, extraction, Git mutation or external action is repeated. Only
 this acceptance/status note follows the frozen review; all three closeout
 documents remain unstaged/uncommitted and unpushed.
+
+## Authorized public cutover — 2026-11-01
+
+The owner subsequently authorizes strict/builtin Push of56b9262 and squash Merge
+of PR45 after green CI. Actual master is
+0ae6b93905af20811f5963097f06134a338f3ae8, tree
+71379c357badc6e44a53e6632e273fa1c0a513a8, identical to the qualified PR head.
+All PR and master Rust/documentation/four-language CodeQL checks pass on attempt1;
+the first master document run41287831289 skips deployment. Original branches,
+local master and source histories remain intact. The retained local pre-Merge
+aggregate-status assertion misclassified CodeQL success; saved metadata proves
+that all actual owner-required head/base/CI/hold conditions were met at Merge.
+It caused no workflow, Merge or CI retry.
+
+Under the next explicit activation authorization, the live old home is first
+matched byte-for-byte to the accepted64d1074/run41198529190 mdBook archive. All42
+fallback files and the original archive digest are retained outside expiring
+Actions storage. This preserves fallback bytes, not an implemented or authorized
+automatic rollback path.
+
+PAGES_DEPLOY_ENABLED is enabled and read back true. Exactly one docs.yml manual
+dispatch runs on master0ae6b93:
+[41289520993/1](https://github.com/bohewu/yetlet/actions/runs/41289520993).
+Build and deployment both succeed. GitHub deployment7470678482 records success
+at https://bohewu.github.io/yetlet/, with the same run's named artifact. HTTPS,
+the exact-master Environment restriction and release protections are unchanged.
+
+The two downloaded artifact ZIP digests match GitHub metadata. All15 deployed
+output hashes, manifest, source/edition/inputs and CLI receipts equal the already
+accepted master build. Anonymous HTTPS readback of all8 directory-route chapters
+and6 selected CSS/JS/Wasm assets returns200 with exact artifact bytes and correct
+MIME types. The archive preserves .nojekyll; private records stay outside it.
+Strict CSP is delivered by the matching HTML meta policy, not a custom Pages
+response-header claim. Old .html aliases remain deliberately unsupported.
+
+Chrome observations cover source/title, First app navigation/nested refresh,
+real hosted Wasm200/search results and390x844 touch-menu navigation to Views.
+The Firefox execution reaches real SessionConfig results, Tab/Escape focus
+handling and native API URL navigation. Its final temporary script still records
+FAIL because it expected a historical H1 phrase; the current canonical H1 is
+Current API reference, independently verified by the exact public HTML hash.
+That script is not relabeled PASS or replayed after the final assertion.
+
+Retain all temporary-check failures: the initial Chrome relative-href selector,
+response-url field/function error, initial Firefox JS quoting error and final
+stale-heading assertion. Actual passed steps are recorded separately and reused;
+remaining journeys are bounded rather than replaying the old browser matrix.
+The unavailable CUA host is recorded; existing Playwright/Chrome and the existing
+Firefox adapter require no new dependencies. Chrome guide/runtime/selected-asset
+errors are absent. Its incidental unselected root favicon.ico404 remains a
+recorded limitation; no icon or product change is added. All owned browsers,
+Firefox profiles and driver processes are closed/removed.
+
+No SDK/native/platform suite, benchmark, release/signing/registry workflow or
+hosted deployment is retried. Relevant protected-master document updates now
+follow the accepted automatic-update policy while the switch stays true.
+New closeout documents are unstaged/uncommitted and unpushed. At the frozen
+review checkpoint YT-226 remains In progress, pending the acceptance below.
+
+## Independent final acceptance — 2026-11-01
+
+Independent Reviewer PASS0 has zero issues/required followups and explicitly
+permits marking YT-226 Done at this bounded public-guide cutover scope. All8
+document hashes,83 evidence hashes, diff/status and published-master/local-head
+tree correspondence match. Registered reviewer gpt-6-astra/effective high are
+verified. Review is read-only and replays no browser, test, build or deployment.
+
+The reviewer accepts the retained actual navigation, refresh, search, keyboard
+and touch observations together with the exact public-byte/MIME/source proof.
+The Firefox stale-heading assertion remains FAIL; no complete Firefox-script or
+new platform qualification is inferred. All earlier failures, incidental favicon
+limitation and cleanup records remain intact. Only acceptance/status notes follow
+the frozen review. The switch stays true under the approved update policy;
+all8 closeout documents remain unstaged/uncommitted and unpushed.

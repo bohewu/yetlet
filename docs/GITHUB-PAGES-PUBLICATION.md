@@ -1,10 +1,12 @@
 # GitHub Pages minimum publication plan — YT-218
 
 Date: 2026-10-31. Status: YT-218 Done after final independent Reviewer PASS0.
-The owner-adopted delivery and first-publication sequence has completed:
-[the public guide](https://bohewu.github.io/yetlet/) is live at source
-`64d10742d62059c91dd2e46931aab1cb3b65d897`. The historical preparation checkpoints
-below remain intact; the final section records actual settings, CI and readback.
+The owner-adopted first-publication sequence completed at source
+`64d10742d62059c91dd2e46931aab1cb3b65d897`. That mdBook result remains accepted
+history. [The current public guide](https://bohewu.github.io/yetlet/) uses the
+Yetlet-built reader at source0ae6b93 under the later
+[YT-226 cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01).
+The historical preparation checkpoints below remain intact.
 
 ## Historical planning baseline and exact public scope
 
@@ -336,3 +338,26 @@ workflow checks, actionlint and actual pinned Linux Pages tar packaging pass;
 the accepted app/SDK/platform/browser evidence is reused without replay.
 This is local integration evidence only. Hosted workflow/Merge/readback and
 actual activation remain separately authorized followups; current Pages stays live.
+
+## Authorized Yetlet publication — 2026-11-01
+
+After green PR45/master CI, squash Merge0ae6b93 has exactly the qualified PR tree.
+The owner then authorizes enabling PAGES_DEPLOY_ENABLED and one docs.yml dispatch.
+Run41289520993/attempt1 builds and deploys successfully; deployment7470678482
+serves the same HTTPS project URL. This supersedes the temporary false hold;
+relevant protected-master document updates can publish automatically again.
+
+The15-file archive/manifest/CLI receipts match the accepted master build.
+All8 public chapters and6 selected assets return200, exact bytes and correct
+MIME; native directory URLs, header search and touch navigation have retained
+observations. Browser checker mistakes, its final stale-H1 FAIL and the
+incidental root favicon404 are explicit in the YT-226 record, not erased or
+relabeled as clean script exits. Final independent Reviewer PASS0 accepts this
+bounded cutover, all8 document/83 evidence hashes and stated limits, with zero
+issues/followups; YT-226 is Done.
+
+The old42-file mdBook archive and pre-cutover live-home correspondence remain
+retained externally. No automatic rollback is implemented or executed. The
+master-only Environment, HTTPS, source scope, private-record exclusion and
+release protections are unchanged. No workflow/deployment retry or new
+Commit/Push accompanies these closeout documents.

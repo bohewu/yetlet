@@ -4,19 +4,21 @@ Date: 2026-10-31. YT-217 is Done at selected API-doc/local reader-preview
 scope after independent final Reviewer PASS0. Its [execution record](YT-217-DOCS-PREVIEW.md)
 retains the original passing proof, stopped harness and authorized correction.
 YT-218 subsequently delivered the separate Pages workflow/settings and first
-publication; [the guide](https://bohewu.github.io/yetlet/) is live at source
-64d1074. [Actual publication evidence](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31)
+publication at source64d1074. [Actual first-publication evidence](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31)
 records green CI, source/artifact/edition matching and hosted reader acceptance,
 accepted by final independent Reviewer PASS0; YT-218 is Done. No product API/runtime/version change
 or expansion of signed release-candidate scope follows from website publication.
 
-**2026-11-01 checkout update:** [YT-226](YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01)
-locally integrates the accepted Yetlet-built reader into one Pages workflow.
+**2026-11-01 public update:** [YT-226](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
+publishes the Yetlet-built reader at https://bohewu.github.io/yetlet/, source0ae6b93,
+through the single Pages workflow and successful run41289520993/1.
 Use the [current site build guide](../examples/docs-site/README.md#formal-artifact-preparation-no-deployment)
 for that build path. The initial mdBook choice and execution records below
 remain historical; its builder is kept as an explicit reference. This local
-integration deploys nothing and keeps PAGES_DEPLOY_ENABLED false. The published
-site remains unchanged until separately authorized activation/readback.
+integration was separately reviewed before the owner-authorized cutover.
+PAGES_DEPLOY_ENABLED is now true; public-byte/MIME and reader observations are
+retained. Final independent Reviewer PASS0 accepts the bounded cutover; YT-226
+is Done with original failures and qualification limits intact.
 
 ## Recommended destinations
 
@@ -26,12 +28,12 @@ GitHub Pages serves static HTML/CSS/JavaScript and is available for public
 repositories on GitHub Free; the published project URL is
 [bohewu.github.io/yetlet](https://bohewu.github.io/yetlet/). See [GitHub Pages documentation](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages).
 
-Recommend [mdBook](https://rust-lang.github.io/mdBook/) for a small Markdown-based
-guide with navigation and search. Keep one repository and existing guide
-sources; the installed site build stages explicitly selected files into its book
-input. Do not copy the guides into a second manually edited source tree.
-YT-217 pins mdBook0.5.4 as local ignored tooling; the checked-in builder validates
-that version. No site tooling becomes a Yetlet runtime dependency.
+The current guide uses the application-owned Yetlet static reader and optional
+Wasm search. Keep one repository and the selected canonical Markdown sources;
+generated projections are not a second manually edited guide tree. The earlier
+[mdBook](https://rust-lang.github.io/mdBook/)0.5.4 builder remains an explicit
+historical/reference preview and is not the current Pages build. No site tooling
+becomes a mandatory Yetlet application dependency.
 
 Defer GitHub Wiki. It can host long-form documentation, but a second editable
 API reference would duplicate the repository contract. If a community need
