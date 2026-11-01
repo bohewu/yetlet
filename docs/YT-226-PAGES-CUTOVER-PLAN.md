@@ -1,6 +1,6 @@
 # YT-226 — Controlled switch to the Yetlet-built Pages guide
 
-Date: 2026-11-01. Status: Local integration reviewed; hosted/publication acceptance pending.
+Date: 2026-11-01. Status: PR hosted build reviewed; merged-master/publication acceptance pending.
 
 ## Current boundary
 
@@ -204,3 +204,46 @@ The repository switch is independently read back false after review, without a
 settings write. All11 paths remain unstaged/uncommitted; no Commit/Push, hosted
 dispatch, upload or deployment occurs. YT-226 remains In progress, with the
 clean hosted new workflow and actual authorized activation/readback still open.
+
+## Authorized Git delivery and PR hosted build — 2026-11-01
+
+The owner authorizes strict/builtin Commit of the11 reviewed paths, Push with
+the prior planning commit and a new PR, plus new hosted workflow verification.
+Merge and deployment remain unauthorized. Commit5759585 has tree
+35b5c7c78293a26f34d75f499f68a087eaeb460f. Staged Guard and normal pre-commit pass
+with zero findings; the accepted99902bb..5759585 outgoing range and native
+pre-push also pass strict/builtin with zero findings across both commits.
+The new remote branch is first created at the already-existing accepted master
+99902bb, then receives c5b8608/5759585; no history is rewritten.
+[PR45](https://github.com/bohewu/yetlet/pull/45) stays open and unmerged.
+
+The new [documentation run41284853642/1](https://github.com/bohewu/yetlet/actions/runs/41284853642)
+succeeds on its first attempt, including the four workflow cases, clean guide
+build and both uploads. Deploy documentation is skipped. Its checkout is the
+PR merge-ref f6eeea3e29a526c085b3aaf7c9052c316d314a9a, whose tree is identical
+to5759585; parents are99902bb and5759585. This is PR-source acceptance, not a
+merged-master build or promotion of the artifact into the public website.
+
+Both downloaded ZIP digests/sizes match GitHub metadata. The github-pages ZIP
+contains only artifact.tar, with exactly15 regular public files, root index.html
+and .nojekyll. All output hashes/sizes match EXPORT-MANIFEST and both native CLI
+receipts; eight canonical source/excerpt bindings, ten tracked consumer inputs,
+source/SDK0.9.0-alpha.5/CLI0.1.1 disclosures and selected assets reconcile.
+The separate build-record ZIP contains only the manifest and two receipts;
+none are in the Pages archive. CLI process/temporary cleanup flags pass;
+its published receipt means filesystem export, not website deployment.
+Archives, logs and source/Guard/readback records are retained outside the repo;
+inspection requires no archive extraction or old validation replay.
+
+PAGES_DEPLOY_ENABLED remains false. No workflow dispatch, retry, Merge,
+deployment, release or setting change is performed. YT-226 remains In progress:
+the eventual merged-master build/skip and separately authorized activation/public
+readback are still open. These hosted closeout edits are uncommitted.
+
+Independent hosted closeout Reviewer PASS0 accepts the three document hashes,
+22 retained evidence hashes and actual Git/source/archive/manifest/receipt
+correspondence, with zero issues/required followups. Registered reviewer
+gpt-6-astra/effective high are verified. Review is read-only: no tests, builds,
+browser runs, extraction, Git mutation or external action is repeated. Only
+this acceptance/status note follows the frozen review; all three closeout
+documents remain unstaged/uncommitted and unpushed.
