@@ -67,9 +67,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [Public-mode guide artifact preparation — YT-225](YT-225-DOCS-PUBLIC-BUILD.md):
   clean source/edition labels, selected output and private receipts, separate
   build-only CI; no legacy URL aliases or live Pages replacement.
-- [Controlled Pages cutover plan — YT-226](YT-226-PAGES-CUTOVER-PLAN.md):
-  reviewed plan and local single-workflow integration, deployment hold and
-  source/artifact boundaries; hosted delivery and activation/readback remain open.
+- [Controlled Pages cutover — YT-226](YT-226-PAGES-CUTOVER-PLAN.md):
+  source0ae6b93 public guide, one successful build/deploy, exact HTTPS/artifact
+  readback and retained reader observations/failures; independent final Reviewer
+  PASS0, Done at bounded public-guide scope.
 
 - [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
   dedicated workflow, master-only Environment, initial deployment/readback,

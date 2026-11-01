@@ -80,6 +80,16 @@ merged-master and separately authorized activation/public-readback gates pass.
 Independent hosted closeout Reviewer PASS0 accepts three stable document hashes
 and22 retained evidence hashes with zero issues/followups; these three new
 closeout documents remain uncommitted and unpushed.
+The later strict/builtin56b9262 delivery squash-merges PR45 as master0ae6b93,
+with the exact qualified tree and all PR/master checks passing. An explicitly
+authorized single docs.yml dispatch41289520993/1 then builds and deploys this
+Yetlet guide successfully. PAGES_DEPLOY_ENABLED is true;15 artifact outputs and
+14 public HTTPS chapter/asset readbacks match accepted master bytes/MIME.
+Native navigation, search and mobile observations, cleanup and browser-checker
+failures are retained; the final Firefox script is not relabeled PASS after
+its stale-heading assertion. Independent final Reviewer PASS0 accepts8 document/
+83 evidence hashes, zero issues/followups, and permits YT-226 Done at the bounded
+[actual cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01) scope.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
@@ -2439,7 +2449,7 @@ resource/event/keyed ownership remain the compatibility baseline.
 | YT-223 | [Minimal static build/CLI](YT-223-STATIC-HTML-IMPLEMENTATION.md), explicit no-backend consumer and optional island; GNU/browser evidence/followup PASS0, MSVC8 cases and actual native static CLI pass; required current-head CI PASS; final independent Reviewer PASS0 | Done |
 | YT-224 | [Local Yetlet documentation pilot](YT-224-DOCS-PILOT.md): same8 canonical inputs, escaped View rendering, optional owned search, static/mobile/keyboard and bounded size/load proof; independent Reviewer PASS0 and cleanup complete, existing Pages retained | Done |
 | YT-225 | [Public-mode guide artifact preparation](YT-225-DOCS-PUBLIC-BUILD.md): clean edition/source-bound output, private receipts and independent build-only CI; old .html aliases explicitly declined. New focused checks and independent preparation Reviewer PASS0; first clean public hosted41265011134/1 and ZIP/15-file/source/receipt readback pass on authorized0544f4a. Independent hosted closeout Reviewer PASS0 with3 stable document hashes; no retry, Merge or live Pages change | Done |
-| YT-226 | [Controlled Pages integration/PR hosted proof](YT-226-PAGES-CUTOVER-PLAN.md#authorized-git-delivery-and-pr-hosted-build--2026-11-01): one docs.yml, retired duplicate, same8 sources/15 files and preserved deployment boundary. Local4 cases/actionlint/tar checks and Reviewer PASS0 retained. Strict/builtin5759585 and plan delivered in open PR45, zero findings; new41284853642/1 passes/deploy skips, archive/manifest/source/CLI bindings match. No retry/Merge/deploy; switch false. Merged-master and authorized activation/readback remain open | In progress |
+| YT-226 | [Controlled public cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01): PR45 Merge0ae6b93/qualified tree, green PR/master CI; one owner-authorized41289520993/1 build/deploy, switch true.15 artifact/14 HTTPS byte/MIME bindings and scoped reader observations/cleanup retained. Browser-checker failures stay explicit; no old suite/deployment retry. Independent final Reviewer PASS0 accepts8 document/83 evidence hashes,0 issues/followups | Done |
 
 Dependency paths are YT-219→YT-220→YT-221 and YT-219→YT-222→YT-223;
 YT-224 joins YT-220/221/223 and Done YT-218. Static HTML serialization does not
