@@ -31,8 +31,9 @@ an explicit native export protocol and Cli::BuildStatic/build_static support.
 Existing Build fields and ordinary commands/settings stay unchanged. Rust
 callers exhaustively matching Cli must handle the new variant; no old-name
 alias or silent settings migration is introduced. Public SDK View/HTML/server/
-browser APIs and published CLI0.1.1 are unchanged. New local evidence does not
-complete the pending current-source MSVC gate or select a release version.
+browser APIs and published CLI0.1.1 are unchanged. Bounded new GNU/browser/MSVC
+evidence is recorded separately; it does not select a release version or extend
+the qualification of already-published artifacts.
 
 ## Historical two-package pre-publication source — 2026-10-30
 

@@ -1,8 +1,8 @@
 # YT-223 — Minimal static export and CLI integration
 
-Date: 2026-11-01 (run started2026-10-31). Status: In progress; implementation and
-local affected evidence complete, independent local implementation review PASS0;
-required MSVC execution is blocked by WebCodex artifact policy.
+Date: 2026-11-01 (run started2026-10-31). Status: Done at bounded static-export/
+source scope. GNU/browser and MSVC evidence complete, required current-head CI
+PASS; local implementation and final independent platform Reviewer PASS0.
 Baseline:9b46c306193e29bb4692df7db9f0c588d0f75824, the owner-authorized strict/
 builtin commit of15 accepted YT-221/222 paths, no Push. Guard checked15 files,
 tree56320e6df8c4bc5131ca3bf9271dc6998e5aa211,0 blocking findings; two PATH_UNC
@@ -122,7 +122,7 @@ Existing published SDK/CLI/tag/signature identities remain unchanged.
   call-site argument-order compile failure and correction are retained. Earlier
   runtime/browser cases were not replayed; independent followup PASS0 closes it.
 
-## Required Windows gate and authority
+## Historical initial Windows gate and authority
 
 WebCodex sees the connected Windows Yetlet Project, but its listed default was
 GNU1.88 and installed GNU1.99. A cargo +1.99.0-x86_64-pc-windows-msvc version
@@ -206,3 +206,66 @@ existing private Windows native test seam and inherited-DACL byte-copy pattern.
 The product admission policy and GNU execution stay unchanged. Source review
 passes with zero findings; only that unpassed Windows case remains to execute,
 followed by the previously unstarted binary/static CLI runtime checks.
+
+## Actual MSVC source continuation — 2026-11-01
+
+Source90998794d50deb37fbe36270331439a002df9e3b/tree binding is delivered through
+the same PR44. On the prepared Rust1.99 MSVC/VC2022/SDK Runner, the seven static
+parser/protocol/filesystem cases pass on23fb5bc. Their product inputs are unchanged
+by the Windows-only deadline fixture correction in9099879. That sole unpassed case
+then passes in2.05 seconds, verifies child termination, and does not replay the
+seven successes. The native CLI binary builds with SHA256
+70986e0f4398e92b2ef4776f11aee5506330374e440bb862e9d9abd18a73140b.
+
+The copied standalone registry-SDK0.9.0-alpha.5 consumer passes native project-path
+export, exact six-public-file inventory, PNG identity and HTML/CSP/no-JavaScript
+checks. Existing output refuses with exit1 and keeps every hash. Missing exporter
+returns the native Cargo101 without output. An actual NTFS junction output path
+is refused without output. Both known-outcome private receipts verify process
+and temporary cleanup; no public stage remains. No browser suite or earlier
+Windows pass is replayed. The prepared static OpenSSL library reports missing
+PDB linker warnings; successful native linking/execution does not claim that
+those debug symbols are present.
+
+The protected Runner evidence root retains full original logs, source hashes,
+public output, private receipts and the binary. All four owned disposable clone/
+consumer/build directories are removed after hash verification; no task process
+or server remains, and global tools/permissions are unchanged. Local receipts
+and exact scripts are under target/yt223-20261101-delivery/. Required latest-head
+CI and final independent Reviewer acceptance remain pending; YT-223 stays
+In progress. No Merge, tag, signing, release or Pages change is performed.
+
+## Current-head CI and source correspondence — 2026-11-01
+
+Delivered HEAD90998794d50deb37fbe36270331439a002df9e3b passes required
+[MSRV and Stable native/samples/Chrome CI](https://github.com/bohewu/yetlet/actions/runs/41224302077)
+and [documentation CI](https://github.com/bohewu/yetlet/actions/runs/41224302100).
+The earlier first MSRV success and failed documentation/Stable runs remain
+separate historical results; no rerun API or failed-source retry is used. New
+reviewed sources receive their required CI through the same PR. No Merge occurs.
+
+The Runner's56 retained source hashes reconcile with the delivered Git tree:
+54 are exact blob hashes; two changed Rust files have proven LF-to-CRLF checkout
+hashes. The initial raw-byte-only assertion and corrected correspondence record
+are retained. The checkout was clean; this is not a byte-identical-files claim.
+Later closeout edits affect documentation only. CLI README/package-input changes
+receive a new normal offline package verification; unchanged browser, GNU suites
+and the seven passed MSVC cases are reused. Final independent acceptance remains
+pending; completion does not authorize Merge or publication.
+
+## Final independent acceptance — 2026-11-01
+
+Independent platform Reviewer PASS0, zero issues/required followups, accepts
+YT-223 Done at this bounded source scope. All49 review hashes match and the
+working status contains exactly ten closeout documentation files. The56 Windows
+inputs reconcile as54 exact plus two proven checkout CRLF conversions. Reviewed
+normal package verification passes and its CLI README matches the working file.
+Registered reviewer gpt-6-astra and effective high effort are verified; the
+reviewer ran no tests or mutation. Original local/Windows/CI failures stay retained.
+
+Only status/acceptance substitutions follow the review. These ten docs remain
+uncommitted; delivered implementation HEAD9099879 and PR44 are unchanged/open.
+Required MSRV and Stable native/samples/Chrome plus documentation CI pass; optional
+Rust CodeQL was still running in the acceptance snapshot, not a failed check or
+an all-checks-complete claim. No Merge, signing, release, Pages deployment or
+version selection occurs. YT-224 is Todo/unblocked and is not started here.

@@ -325,3 +325,21 @@ retained; no old suite replay. Required MSVC current-source execution remains
 Not verified after official artifact policy rejection; local independent followup
 PASS0 closes the retained Cargo-directory P2 with46 stable inputs and no issues.
 YT-223 In progress, YT-224 Todo, new work uncommitted/unpushed, no site/release change.
+
+## Authorized YT-223 platform continuation — 2026-11-01
+
+The owner authorizes strict/builtin Commit/Push with the five previous commits,
+PR44 and the missing MSVC/required CI. On delivered9099879, MSVC native compilation,
+seven static cases, the corrected owned deadline and actual static CLI output/
+refusal/cleanup cases pass. Accepted GNU/browser evidence is reused and original
+compile/fixture/CI failures remain retained. Final CI/independent acceptance is
+pending; YT-223 remains In progress and YT-224 Todo. No Merge or publication.
+
+## Final YT-223 platform acceptance — 2026-11-01
+
+Final independent Reviewer PASS0 accepts Done at bounded static-export/source
+scope: zero issues/followups,49 matching review inputs and56 reconciled Windows
+source hashes. Required CI and documentation CI pass on9099879; optional Rust
+CodeQL remained running in the acceptance snapshot. Original failures are retained
+and no accepted suite is replayed. Ten closeout docs remain uncommitted, PR44
+open, no Merge/publication. YT-224 is the next unblocked item, still Todo/not started.

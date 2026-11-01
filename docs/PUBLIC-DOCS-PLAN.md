@@ -138,8 +138,9 @@ static-export/CLI contract scope: finite public fragments/assets, bounded head,
 project-prefix paths, local CSP/islands and protected create-only output.
 Independent Reviewer PASS0. [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md) now has
 an unreleased static-build implementation and explicit standalone consumer;
-local independent review PASS0 and pending MSVC gate are separate. YT-223
-is In progress and YT-224 Todo. Published CLI0.1.1 does not contain this mode.
+GNU/browser, bounded MSVC and required current-head CI evidence are complete;
+final independent Reviewer PASS0 accepts YT-223 Done at bounded source scope.
+YT-224 remains Todo. Published CLI0.1.1 does not contain this mode.
 
 Retain the current mdBook site/workflow and these eight source/excerpt/disclosure
 boundaries during the pilot. The existing browser CLI already produces static-

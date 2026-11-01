@@ -4,7 +4,7 @@
 implement build --static. This application uses registry SDK0.9.0-alpha.5 and
 can be copied outside the repository without SDK source/path overrides.
 See the [static export contract](../../docs/YT-222-STATIC-HTML-CONTRACT.md) and
-[actual evidence and remaining platform gate](../../docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
+[actual evidence and validation limits](../../docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
 
 ## Prerequisites
 
@@ -119,5 +119,5 @@ and the [protocol/CLI contract](../../docs/YT-222-STATIC-HTML-CONTRACT.md).
 New Cli::BuildStatic and build_static are Experimental support APIs; exhaustive
 Rust enum matches may need another arm. Existing Build fields and commands stay
 unchanged. No SDK version is republished by this sample. GNU/local-browser
-evidence and the pending MSVC gate are reported separately in the implementation
-record; current source is not a new platform/release qualification.
+and bounded MSVC source checks are reported separately in the implementation
+record; they do not qualify a new release or every Windows/browser configuration.

@@ -38,9 +38,9 @@ evidence complete; final independent Reviewer PASS0,0 issues/followups and23 sta
 input hashes. [YT-222](YT-222-STATIC-HTML-CONTRACT.md) is Done at
 documentation-only finite static-export/CLI contract scope, independent Reviewer
 PASS0,0 issues/followups and21 stable input hashes;
-the [YT-223 implementation](YT-223-STATIC-HTML-IMPLEMENTATION.md) is In progress
-with local independent followup PASS0, required MSVC gate policy-blocked and
-Not verified; YT-224 remains Todo;
+the [YT-223 implementation](YT-223-STATIC-HTML-IMPLEMENTATION.md) is Done at
+bounded source scope after local and final platform independent Reviewer PASS0;
+GNU/browser, MSVC and required current-head CI evidence are complete. YT-224 remains Todo;
 live site/releases unchanged.
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
@@ -2398,7 +2398,7 @@ resource/event/keyed ownership remain the compatibility baseline.
 | YT-220 | [Unreleased89-tag implementation](YT-220-HTML-DOM-IMPLEMENTATION.md), scoped attributes/structures and pre parity; new native/Wasm/Chrome/Firefox checks PASS, independent Reviewer PASS0 | Done |
 | YT-221 | [Controlled link/image implementation](YT-221-DOM-URL-IMAGE-CONTRACT.md), contract PASS0, unchanged defaults/full resource preflight and new native/Wasm/Chrome/Firefox evidence; final independent Reviewer PASS0 | Done |
 | YT-222 | [Finite static export/CLI contract](YT-222-STATIC-HTML-CONTRACT.md): app-owned exporter, typed build --static request, bounded documents/assets/base/CSP, protected create-only publication and private receipts; docs only, independent Reviewer PASS0 | Done |
-| YT-223 | [Minimal static build/CLI](YT-223-STATIC-HTML-IMPLEMENTATION.md), explicit no-backend consumer and optional island; local evidence/followup PASS0, required current-source MSVC gate policy-blocked/Not verified | In progress |
+| YT-223 | [Minimal static build/CLI](YT-223-STATIC-HTML-IMPLEMENTATION.md), explicit no-backend consumer and optional island; GNU/browser evidence/followup PASS0, MSVC8 cases and actual native static CLI pass; required current-head CI PASS; final independent Reviewer PASS0 | Done |
 | YT-224 | Pilot Yetlet-built docs from the same eight sources with static content and optional Wasm; no live replacement | Todo |
 
 Dependency paths are YT-219→YT-220→YT-221 and YT-219→YT-222→YT-223;
@@ -2472,3 +2472,24 @@ refusal; no transport bypass or new Git action. Independent local followup PASS0
 closes the retained Cargo-directory P2,46 inputs matched and0 issues/followups;
 prepared Windows Runner readiness does not verify this source. YT-223 In progress,
 YT-224 Todo. Public versions/site unchanged.
+
+### YT-223 authorized platform continuation — 2026-11-01
+
+[PR44](https://github.com/bohewu/yetlet/pull/44) preserves five earlier accepted
+commits plus implementation and reviewed material corrections. The Git source
+9099879 passes bounded MSVC compilation, seven static tests and the corrected
+owned deadline; previously unstarted native CLI exports/refusals/cleanup also pass.
+Earlier failures and local GNU/browser evidence remain retained. Required current
+CI and final independent acceptance remain pending; no Merge, release or Pages
+change. Historical artifact-policy/Not-verified checkpoints above remain dated
+records, superseded for this bounded source by the actual continuation.
+
+### YT-223 final platform acceptance — 2026-11-01
+
+Independent Reviewer PASS0, zero issues/required followups,49 matching review
+inputs and56 reconciled Windows source hashes accept YT-223 Done at bounded
+static-export/source scope. Required CI and documentation CI pass at9099879;
+optional Rust CodeQL remained in progress in the acceptance snapshot. Original
+failures and source/package/browser limits remain explicit. The ten closeout docs
+are uncommitted, PR44 stays open, no Merge/publication. YT-224 is Todo/unblocked,
+not started. No new support or release version is selected.

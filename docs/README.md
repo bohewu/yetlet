@@ -59,7 +59,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   PASS0, Done at documentation-only contract scope.
 - [Unreleased static HTML export implementation — YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md):
   explicit CLI/native exporter, bounded public documents/assets and optional
-  island; local evidence and the required pending MSVC gate are separate.
+  island; bounded GNU/browser/MSVC evidence and retained failures are explicit.
 
 - [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
   dedicated workflow, master-only Environment, initial deployment/readback,

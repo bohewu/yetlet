@@ -96,7 +96,7 @@ evidence and does not claim child cleanup or success. No automatic retry.
 
 Cli::BuildStatic and build_static are unreleased Experimental CLI support APIs;
 downstream exhaustive Rust matches may need a new arm. Current-source evidence
-and pending MSVC validation are explicit in [YT-223](../../docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
+and bounded GNU/browser/MSVC validation are explicit in [YT-223](../../docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
 No SDK/CLI version is republished by this source change.
 
 ## First-use prerequisites
