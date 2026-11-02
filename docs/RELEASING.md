@@ -83,6 +83,52 @@ interfaces; never pass invented new inputs to those old sources. Local tooling
 acceptance does not qualify a new candidate or grant key/signing/publication
 permission.
 
+## Release documentation gate
+
+Before selecting C or packaging, run:
+
+```sh
+python3 scripts/release_docs.py check
+```
+
+The expected CLI version and generated SDK pin come from the CLI manifest; SDK
+versions come from the workspace manifest. The checker contains no selected
+release number. Update the package README reference, installation command and
+expected binary output together; SDK README example pins must match their
+manifest. Affected current guides, capability/API maps, examples and the index
+also need semantic review. Unchanged documents need no cosmetic edit.
+
+The bounded current-reader inventory is `CURRENT_DOCS` in
+[release_docs.py](../scripts/release_docs.py). It rejects known stale availability
+wording and selected-version pending/unreleased paragraphs. Explicit
+`## Historical` sections and dated task/evidence records retain their meaning.
+The root quickstart and first-app commands must match the separately selected
+`site/pages.toml` edition; a new product version does not promote that edition.
+
+Package READMEs use release-neutral wording such as "This release includes…".
+Registry recipes state the version they install and require its availability;
+they must not assert a future upload succeeded. Historical "since version…"
+feature notes can remain at their original versions. Document review must verify
+other prose, feature scope and current distribution claims; regex checks cannot
+establish arbitrary sentence truth or prove every guide is complete.
+
+Enforcement for current CLI/schema3 and two-package SDK/schema2 releases:
+
+- Required PR/master CI runs the source check in both the full and bounded lanes.
+- The existing source/record gate runs it before hosted packaging, before tool
+  installation or native compilation. A failure stops that build.
+- Registry planning, used by publication preflight and the approved publisher,
+  checks the README parsed from each exact hash-bound `.crate` before creating
+  upload envelopes or changing GitHub/crates.io. A later repo-only README fix
+  cannot repair already frozen package bytes.
+
+Historical schema1/sixteen execution retains its original contract; this gate
+does not claim new coverage for old tagged workflows or authorize a continuation.
+No tag, signature, archive, version or publication is rewritten by these checks.
+After verified publication, update current distribution/reader status using the
+actual receipts before closing the item; retain dated failures and preparation
+checkpoints. Those post-publication corrections do not alter C or its archives.
+
 ## Separate one-time setup from each release
 
 | When | Required work |

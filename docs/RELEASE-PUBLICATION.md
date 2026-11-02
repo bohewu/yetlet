@@ -1,13 +1,13 @@
 # Single-gate release automation and registry promotion
 
-Current distribution checkpoint, 2026-11-01: the two-package
-[SDKalpha.5](ALPHA5-HOSTED-RECORD.md) and independent
-[CLI0.1.1](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+Current distribution checkpoint, 2026-11-02: the two-package
+[SDKalpha.6](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01) and independent
+[CLI0.2.0](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
 completed GitHub/crates.io publication and their recorded installed-consumer
 checks. Alpha.4's [partial publication and repair](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair)
 remain historical, not the current distribution status.
 [RELEASING.md](RELEASING.md) is the general SOP;
-[YT-227](YT-227-NEXT-RELEASE-PLAN.md) inventories the next delivery and optional
+[YT-227](YT-227-NEXT-RELEASE-PLAN.md) retains that delivery's original plan and optional
 registry OIDC migration. That option is not adopted here: the current publisher
 permission/Secret contract below and ADR0009 remain unchanged.
 
@@ -112,7 +112,11 @@ needed for local protocol tests.
 ## Each version
 
 1. Select version/scope and complete only affected qualification; reconcile
-   existing evidence. Merge the reviewed source and confirm master CI. Select
+   existing evidence. Complete the [release documentation gate](RELEASING.md#release-documentation-gate)
+   and semantic reader-document review before freezing C or packaging. Package
+   READMEs describe the release without premature upload claims or stale pending
+   text; actual status is reconciled from receipts after publication.
+   Merge the reviewed source and confirm master CI. Select
    immutable C, then use strict/builtin Guard and the existing authorized tag
    procedure. Never move a tag or reuse an accepted version for changed bytes.
 2. Dispatch one bounded unsigned build and original readback using the existing

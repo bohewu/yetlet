@@ -147,6 +147,9 @@ def source_identity(record, root, workflow):
     git('merge-base', '--is-ancestor', record['source'], 'refs/remotes/origin/master')
     require(not git('status', '--porcelain'))
     source_version(record, root)
+    if record['schema'] in (2, 3):
+        import release_docs
+        release_docs.check_source(root, record['cohort'])
 
 
 def main():

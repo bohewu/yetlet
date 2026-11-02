@@ -6,8 +6,10 @@ It renders the eight existing selections/excerpts in site/pages.toml with Yetlet
 HTML, plus separately selected browser search. The later owner-authorized
 [YT-226 cutover](../../docs/YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
 publishes this reader at https://bohewu.github.io/yetlet/ without adding an SDK/CLI
-API. Local export commands do not change Pages. Published CLI0.1.1 does not have
-build --static; use the reviewed source CLI from this checkout.
+API. Local export commands do not change Pages. Static export is available in
+published CLI `0.2.0`; the reproducible source-bound build below continues to use
+the reviewed CLI from this checkout. The reader edition/consumer stays pinned to
+SDKalpha.5/CLI0.1.1 independently of the builder's version.
 
 ## Prerequisites
 

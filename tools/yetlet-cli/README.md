@@ -3,10 +3,15 @@
 The CLI creates applications and executes selected tasks. Persistent behavior uses
 Yetlet's existing public base/profile settings and scoped environment overrides.
 This standalone Cargo binary package installs the `yetlet` command. Generated
-apps from this CLI0.2.0 source use the published `yetlet` / `yetlet-browser` SDK
-`0.9.0-alpha.6`; normal build/run needs no SDK checkout or Cargo path override.
-CLI and SDK versions are independent. CLI0.2.0 publication is pending; the current
-registry installation remains CLI0.1.1 with SDKalpha.5. This is an Experimental developer tool, with
+apps use the exact `yetlet` / `yetlet-browser` SDK pin below; normal build/run
+needs no SDK checkout or Cargo path override. CLI and SDK versions are independent.
+
+**CLI release:** `0.2.0`. **Generated SDK:** `=0.9.0-alpha.6`.
+
+This release includes the commands described below. Check
+[GitHub releases](https://github.com/bohewu/yetlet/releases) and
+[crates.io](https://crates.io/crates/yetlet-cli) for actual registry availability.
+This is an Experimental developer tool, with
 platform evidence limited to the documented qualification scopes.
 See the [CLI contract](../../docs/CLI-CONTRACT.md) and
 [implementation evidence](../../docs/YT-102-CLI-IMPLEMENTATION.md).
@@ -34,7 +39,7 @@ Independent implementation Reviewer PASS has zero issues or required followups.
 | `yetlet run [--manifest-path PATH]` | Native frozen Cargo/watch/Vite, or settings-selected browser-only static preview |
 | `yetlet watch [--manifest-path PATH]` | Native Rust watch, or explicitly selected browser WASM rebuild/full reload; Vite still uses settings |
 | `yetlet build [--manifest-path PATH] [--release]` | Native frontend-then-Cargo, or settings-selected browser-only production build |
-| `yetlet build --static --export-bin NAME --output DIRECTORY [--base-path /] [--release] [--wasm-islands]` | **CLI0.2.0 source; publication pending:** finite public HTML export; explicit native entry, create-only output and private receipts |
+| `yetlet build --static --export-bin NAME --output DIRECTORY [--base-path /] [--release] [--wasm-islands]` | Available since CLI `0.2.0`: finite public HTML export; explicit native entry, create-only output and private receipts |
 | `yetlet generate docker [--manifest-path PATH] --output DIRECTORY` | Qualified-source configuration/inventory only |
 | `yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE` | Configuration for a separately built Linux/amd64 image |
 | `yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE` | Deployment/Service configuration; replicas use settings, default 1, range 1–100 |
@@ -54,10 +59,11 @@ code before returning exit 125. Prepare a protected tool installation and select
 its physical directory on PATH; tool permissions are managed separately from the CLI.
 See the [native Windows diagnosis and verification](../../docs/WINDOWS-CLI-125-VERIFICATION.md).
 
-## Unreleased static HTML build
+## Static HTML build
 
-This mode is selected for CLI0.2.0, whose publication is pending; published
-CLI0.1.1 does not implement it. Build the checkout CLI and follow the
+This release includes static mode, introduced in CLI `0.2.0` and absent from
+CLI `0.1.1`. Install the selected CLI version from the registry or build it from
+source, then follow the
 [standalone static example](../../examples/static-site/README.md). The historical
 example remains pinned to registry SDKalpha.5; CLI0.2 qualification separately
 checks the same minimal consumer with published SDKalpha.6, without a path override.
@@ -97,7 +103,7 @@ under target/yetlet-static/RUN_ID/ bind selected inputs/output hashes and outcom
 keep them outside uploaded content. A supervision error retains private export
 evidence and does not claim child cleanup or success. No automatic retry.
 
-Cli::BuildStatic and build_static are unreleased Experimental CLI support APIs;
+Cli::BuildStatic and build_static are Experimental CLI support APIs available since `0.2.0`;
 downstream exhaustive Rust matches may need a new arm. Current-source evidence
 and bounded GNU/browser/MSVC validation are explicit in [YT-223](../../docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
 No SDK/CLI version is republished by this source change.
@@ -148,17 +154,19 @@ see [native tool preparation](../../docs/WINDOWS-CLI-125-VERIFICATION.md#reuse-t
 
 ## Build locally and create an application
 
-The current published installation interface remains (CLI0.2.0 is not yet available):
+Registry installation for this release needs no repository clone. The selected
+version must exist on crates.io:
 
 ```sh
-cargo +1.99.0 install yetlet-cli --version 0.1.1 --locked
+cargo +1.99.0 install yetlet-cli --version 0.2.0 --locked
 yetlet new myapp
 ```
 
 Cargo downloads and compiles the selected published CLI package; no manual
 repository clone or npm is needed. `yetlet --version` reports exactly
-`yetlet 0.1.1`. [Release status and scope](https://github.com/bohewu/yetlet/blob/master/docs/YT-216-CLI-011-PATCH-RELEASE.md)
-are tracked separately from this installation reference. Prebuilt executables
+`yetlet 0.2.0`. Actual publication status and scope belong to the
+[versioned release records](https://github.com/bohewu/yetlet/blob/master/docs/RELEASING.md#read-this-before-starting-another-version),
+separately from this installation reference. Prebuilt executables
 and `cargo binstall` support are later distribution options.
 
 For maintainer source evaluation, install from a trusted physical

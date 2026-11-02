@@ -75,10 +75,12 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: python3 scripts/release_ci.py
+      - name: Check release documentation before package or release promotion
+        run: python3 scripts/release_docs.py check
       - name: Validate changed release tools and documentation
         if: steps.scope.outputs.release_only == 'true'
         run: |
-          PYTHONPATH=scripts python3 -m unittest test_release_publication test_release_automation.PublicTests test_release_sign
+          PYTHONPATH=scripts python3 -m unittest test_release_docs test_release_publication test_release_automation.PublicTests test_release_sign
           rustup toolchain install 1.99.0 --profile minimal
           cargo +1.99.0 xtask check docs
       - name: Rust tools
@@ -112,7 +114,7 @@ jobs:
         run: cargo fmt --all -- --check
       - name: Changed release publication and compatibility boundaries
         if: steps.scope.outputs.release_only != 'true'
-        run: PYTHONPATH=scripts python3 -m unittest test_release_publication test_release_automation.PublicTests test_release_sign
+        run: PYTHONPATH=scripts python3 -m unittest test_release_docs test_release_publication test_release_automation.PublicTests test_release_sign
       - name: Clippy
         if: steps.scope.outputs.release_only != 'true'
         run: cargo clippy --workspace --all-targets --locked -- -D warnings

@@ -1,5 +1,15 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-230 release-document gate (2026-11-02):** Done at local implementation scope.
+[Contract](RELEASING.md#release-documentation-gate) requires manifest-derived
+README/install references and current-reader review before C/packaging, plus
+actual frozen README checks before publication. History and the pinned guide
+edition remain separate. Affected60-test baseline and corrected boundary/history
+checks PASS; first failure retained. Source/YAML/docs/whitespace PASS and
+independent Reviewer PASS0,24 unchanged hashes, zero issues/followups. No hosted
+qualification, Commit/Push, signing, publication or Pages change; remote gate
+activation follows separately authorized delivery.
+
 **CLI0.2.0 publication and registry consumer complete (2026-11-02):**
 [Owner-approved41319625709/1](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
 PASS: five-file GitHub Experimental pre-release, exact crates.io archive and

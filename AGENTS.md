@@ -24,6 +24,24 @@ Write **all repository documentation in English**, including the README, ADRs, a
 
 Before committing or pushing, use Commit Guard with the explicit `strict` profile and `builtin` engine: scan the staged index before a commit and the exact outgoing commit range before a push. Any nonzero result stops the operation; do not fall back to audit, bypass hooks, or weaken the guard. A passing scan does not grant authorization to commit or push; preserve the user's explicit authorization requirement.
 
+## Release documentation gate
+
+Before selecting candidate C or packaging a release, follow
+`docs/RELEASING.md#release-documentation-gate` and run
+`python3 scripts/release_docs.py check`. Review the package READMEs, installation
+and expected-version output, CLI/API guides, capability map and documentation
+index against the selected manifests and release scope. Update affected content;
+a touched file alone is not proof of correctness. Any failed check stops source
+freezing or release execution. Never replace version-derived checks with literals.
+
+Package READMEs must describe what the selected release includes without claiming
+an upload already happened or retaining current-version pending/unreleased text.
+Preserve explicitly historical checkpoints and the separately pinned public guide
+edition. After verified publication, reconcile current reader status with actual
+receipts before closing the release item. Independent review covers semantic
+claims outside the automated check's documented scope. No check grants Git,
+hosted, signing, publication or Pages authority.
+
 ## Technical guardrails
 
 - Default SSR must work without JS/WASM and without a persistent server-side event circuit.

@@ -16,6 +16,7 @@ import release_policy as policy
 import release_record as records
 import release_registry as registry
 import release_ci
+import release_docs
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location('publication_tests', HERE / 'release-publish.py')
@@ -30,7 +31,8 @@ def record():
         'signer_commit': 'b' * 40, 'provenance': {'sha256': 'e' * 64, 'size': 123}, 'release_id': '15'}
 
 
-def archives(directory, cycle=False, consolidated=False, cli=False, cli_version="0.1.0", cli_sdk=None):
+def archives(directory, cycle=False, consolidated=False, cli=False, cli_version="0.1.0", cli_sdk=None,
+             readme_suffix=''):
     r = record()
     if consolidated: r.update(schema=2, cohort="consolidated")
     if cli: r.update(schema=3, cohort="cli", version=cli_version)
@@ -52,8 +54,14 @@ def archives(directory, cycle=False, consolidated=False, cli=False, cli_version=
         if name == 'yetlet-auth':
             manifest += '[target.\'cfg(unix)\'.dev-dependencies]\nrenamed = {package="upstream",version="1.0",optional=false,default-features=false,features=["feature"]}\n'
         raw = io.BytesIO()
+        readme = 'Version `' + r['version'] + '`.\n'
+        if name == 'yetlet-cli':
+            readme = ('**CLI release:** `' + r['version'] + '`. **Generated SDK:** `=' +
+                      (cli_sdk or records.cli_sdk_version(r['version'])) + '`.\n\n'
+                      'cargo install yetlet-cli --version ' + r['version'] + ' --locked\n\n'
+                      'Expected output: `yetlet ' + r['version'] + '`.\n')
         with tarfile.open(fileobj=raw, mode='w:gz') as archive:
-            for path, data in [('Cargo.toml', manifest.encode()), ('README.md', b'Fixture')]:
+            for path, data in [('Cargo.toml', manifest.encode()), ('README.md', (readme + readme_suffix).encode())]:
                 info = tarfile.TarInfo(name + '-' + r['version'] + '/' + path)
                 info.size = len(data)
                 archive.addfile(info, io.BytesIO(data))

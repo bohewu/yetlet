@@ -13,6 +13,7 @@ import urllib.error
 import urllib.request
 
 import release_record as records
+import release_docs
 
 API = 'https://crates.io/api/v1/crates/new'
 OWNER_API = 'https://crates.io/api/v1/crates/yetlet-actions/owners'
@@ -92,6 +93,9 @@ def prepare(record, directory, subjects):
         raw = path.read_bytes()
         require(sha(raw) == subjects[filename])
         meta = metadata(raw, name, record['version'])
+        if record['schema'] in (2, 3):
+            sdk_pin = '=' + records.cli_sdk_version(record['version']) if record['schema'] == 3 else None
+            release_docs.check_readme(name, record['version'], meta['readme'], sdk_pin)
         if record['schema'] == 3:
             sdk = [d for d in meta['deps'] if d['name'] == 'yetlet' and d['kind'] == 'normal']
             require(len(sdk) == 1 and sdk[0]['version_req'] == '=' + records.cli_sdk_version(record['version']))
