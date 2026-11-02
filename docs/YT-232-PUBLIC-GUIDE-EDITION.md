@@ -1,6 +1,49 @@
 # YT-232 — Public guide edition and static-export introduction
 
-Date: 2026-11-02. Status: Done at local guide-source update scope.
+Date: 2026-11-02. Status: Done at bounded guide-source and public-delivery scope.
+
+## Subsequent delivery and public Pages update — 2026-11-02
+
+After the local acceptance below, the owner authorizes strict/builtin delivery,
+a clean-source PR build, then Merge and Pages deployment. The original local
+contract and failed tool/browser observations retain their dated scope.
+
+[PR54](https://github.com/bohewu/yetlet/pull/54) delivers exactly24 reviewed paths
+at head185d408, based on existing masterf8cde6a. The original branch/commitb932627
+is preserved. Direct strict/builtin commit/range checks and native hooks exit0,
+zero blocking findings; three unchanged Windows tutorial drive-path warnings
+remain. No hook, policy, runtime, package version or workflow is changed.
+
+| Actual new evidence | Result and scope |
+|---|---|
+| PR CI/build | [Rust41380894805/1](https://github.com/bohewu/yetlet/actions/runs/41380894805) and [docs41380894803/1](https://github.com/bohewu/yetlet/actions/runs/41380894803) PASS; PR deployment skipped. Both artifact ZIP digests,15 public file hashes/sizes,8 chapter-source hashes, consumer inputs/edition and219 local links match clean PR merge-source5c741e9 |
+| Squash Merge | Actual master993ce562c80f209388f892397aaf455580a54f31 has tree04e96ce28e278ab31babcbf1b627431768e3c952, identical to the reviewed head/PR artifact tree |
+| Master necessary CI | [Rust41382427417/1](https://github.com/bohewu/yetlet/actions/runs/41382427417) PASS, both MSRV and Stable/native/samples/Chrome; no rerun |
+| Actual publication | [Docs41382427400/1](https://github.com/bohewu/yetlet/actions/runs/41382427400) build and deploy PASS through the existing master workflow/PAGES_DEPLOY_ENABLED=true; no manual dispatch or setting change |
+| Deployed artifact readback | Artifact13113767370 and separate build-record13114190754 ZIP digests match metadata. Public-mode manifest binds master993ce56 and SDKalpha.6/CLI0.2.0;15 files/all sizes and SHA-256 values,8 source inputs and219 local links pass. Private receipts stay separate |
+| Anonymous HTTPS | [Public guide](https://bohewu.github.io/yetlet/) returns200 for all15 selected files, with byte/size equality to this master artifact and expected HTML/CSS/JS/Wasm MIME types. Eight chapter URLs, first-app version/static introduction and search assets/index match; no HTTP retry |
+
+The later in-app browser observation again stops before a tab is created because
+the browser access host is unavailable. Preserve that operational failure;
+there is no alternate-browser recovery or new interactive search, keyboard,
+touch, bfcache or screenshot qualification. Existing browser results keep their
+original scope. Source/artifact correspondence, HTTPS/navigation links and
+search-resource delivery do not claim a fresh interaction result.
+
+Extra master Rust CodeQL was running at the initial closeout checkpoint;
+[final run41382427860/1](https://github.com/bohewu/yetlet/actions/runs/41382427860)
+subsequently completes with all four analyses PASS at the same master. The
+earlier pending snapshot is preserved separately from necessary CI and Pages
+workflow evidence. Raw metadata,
+job logs, both PR/master ZIPs and manifests, public response bodies/headers,
+failure notes and digests are retained outside the repo in the same YT-232 run,
+under hosted-readback and published-master. No failed hosted job is retried;
+no package, tag, signature or registry publication occurs. Independent closeout
+Reviewer PASS, zero issues/required followups, verifies three frozen document
+hashes, all24 accepted source identities, both PR/master artifact sets and the
+saved public responses. Only acceptance/status text and required docs/whitespace
+checks follow. The three closing documents remain uncommitted pending later Git
+authorization; the deployed source stays fixed at993ce56.
 
 ## Scope and acceptance contract
 
