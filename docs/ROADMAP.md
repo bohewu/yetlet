@@ -1,5 +1,16 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-232 next public guide edition (2026-11-02):** Done at local guide-source update scope.
+[Selected source update](YT-232-PUBLIC-GUIDE-EDITION.md) aligns introductory
+instructions, eight-page reader and static reference with published
+SDKalpha.6/CLI0.2.0. Reuse distribution/browser proof; verify only changed
+edition/registry-consumer/content inputs. Independent review precedes Done;
+local sources/output do not replace live Pages. No Commit/Push or deployment.
+Affected11-test/registry-lock proof, eight-chapter local native/Wasm build and
+static reference PASS; no fresh browser interaction or hosted qualification is
+claimed. Operational tool/browser failures retained; independent Reviewer PASS0
+verifies24 unchanged sources, artifacts and both lock deltas. Live promotion is separate.
+
 **YT-231 Lab SQLite test stability (2026-11-02):** Done at local test-correction scope.
 [Bounded correction](YT-231-LAB-SQLITE-CONCURRENCY.md) separates the existing
 finite Busy outcome from version conflict. Keep runtime/security/limits and the

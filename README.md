@@ -22,26 +22,22 @@ explicit browser enhancements in one language.
 
 ## Start with native SSR
 
-**Experimental alpha.** This quickstart and the public first-app guide use the
-explicitly pinned SDK `0.9.0-alpha.5` / CLI `0.1.1` edition. Newer
-[SDKalpha.6](docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
-and [CLI0.2.0](docs/CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
-are also published; the [CLI guide](tools/yetlet-cli/README.md) covers that
-installation and static HTML export. The documented quickstart SDK is available
+**Experimental alpha.** This quickstart uses SDK `0.9.0-alpha.6` and the
+independently versioned CLI `0.2.0`. The SDK is available
 on crates.io:
-[`yetlet`](https://crates.io/crates/yetlet/0.9.0-alpha.5) and
-[`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.5), version
-`0.9.0-alpha.5`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.5)
+[`yetlet`](https://crates.io/crates/yetlet/0.9.0-alpha.6) and
+[`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.6), version
+`0.9.0-alpha.6`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.6)
 contains the archives and verification material. To create a standalone app,
 follow [Build your first Yetlet app](docs/FIRST-APP.md). The independently
-published CLI `0.1.1` creates apps without a repository clone:
+published CLI `0.2.0` creates apps without a repository clone:
 
 ```sh
-cargo +1.99.0 install yetlet-cli --version 0.1.1 --locked
+cargo +1.99.0 install yetlet-cli --version 0.2.0 --locked
 yetlet --version
 ```
 
-Expected output: `yetlet 0.1.1`. Cargo builds the CLI from source; see the
+Expected output: `yetlet 0.2.0`. Cargo builds the CLI from source; see the
 [native build prerequisites](tools/yetlet-cli/README.md#first-use-prerequisites),
 including its OpenSSL dependency, before installing.
 

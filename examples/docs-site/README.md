@@ -1,6 +1,6 @@
 # Yetlet documentation site
 
-Application-owned, nonpublishable YT-224 package using registry SDK0.9.0-alpha.5,
+Application-owned, nonpublishable YT-224 package using registry SDK0.9.0-alpha.6,
 with [YT-225 public-mode artifact preparation](../../docs/YT-225-DOCS-PUBLIC-BUILD.md).
 It renders the eight existing selections/excerpts in site/pages.toml with Yetlet
 HTML, plus separately selected browser search. The later owner-authorized
@@ -8,8 +8,10 @@ HTML, plus separately selected browser search. The later owner-authorized
 publishes this reader at https://bohewu.github.io/yetlet/ without adding an SDK/CLI
 API. Local export commands do not change Pages. Static export is available in
 published CLI `0.2.0`; the reproducible source-bound build below continues to use
-the reviewed CLI from this checkout. The reader edition/consumer stays pinned to
-SDKalpha.5/CLI0.1.1 independently of the builder's version.
+the reviewed CLI from this checkout. The next reader source edition/consumer is
+explicitly pinned to SDKalpha.6/CLI0.2.0 independently of future builder versions.
+[YT-232](../../docs/YT-232-PUBLIC-GUIDE-EDITION.md) records this local update;
+the live Pages edition stays unchanged until separately authorized deployment.
 
 ## Prerequisites
 

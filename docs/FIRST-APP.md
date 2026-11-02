@@ -1,9 +1,9 @@
 # Build your first Yetlet app
 
 Create a standalone native SSR app with the published source-installed CLI and
-`yetlet` SDK `0.9.0-alpha.5`. This Linux/POSIX walkthrough uses the existing
+`yetlet` SDK `0.9.0-alpha.6`. This Linux/POSIX walkthrough uses the existing
 scaffold; the app needs no local SDK source or Cargo path overrides. APIs remain
-Experimental. CLI `0.1.1` and SDK `0.9.0-alpha.5` have independent versions.
+Experimental. CLI `0.2.0` and SDK `0.9.0-alpha.6` have independent versions.
 
 ## Prerequisites
 
@@ -37,12 +37,12 @@ in Cargo's user install directory.
 Install the independently published CLI from crates.io:
 
 ```sh
-cargo +1.99.0 install yetlet-cli --version 0.1.1 --locked
+cargo +1.99.0 install yetlet-cli --version 0.2.0 --locked
 yetlet --version
 ```
 
 This downloads the CLI source archive from crates.io and compiles the `yetlet`
-executable. Expected version output is exactly `yetlet 0.1.1`. This is a native
+executable. Expected version output is exactly `yetlet 0.2.0`. This is a native
 source installation, so the prerequisites above apply. Maintainers evaluating a
 checkout can use the separate [source-install instructions](../tools/yetlet-cli/README.md#build-locally-and-create-an-application).
 
@@ -58,7 +58,7 @@ env PATH="$yetlet_rust_bin:$PATH" yetlet doctor --json
 
 For an isolated prefix, add `--root /absolute/owned/cli-prefix` to the install
 command and invoke `/absolute/owned/cli-prefix/bin/yetlet`. The CLI version is
-independent of SDK `0.9.0-alpha.5`.
+independent of SDK `0.9.0-alpha.6`.
 `--locked` allows downloading locked dependencies. A version or doctor result
 identifies a tool/environment, not application readiness. For a Rustup setup,
 `rustup which` selects the actual already-installed toolchain directory. The
@@ -92,7 +92,7 @@ the optional runtime Settings loader. This path needs no `--settings`,
 
 ### 3. Prepare the app lock/cache, then build and run
 
-The generated manifest already selects `yetlet = "=0.9.0-alpha.5"` from crates.io
+The generated manifest already selects `yetlet = "=0.9.0-alpha.6"` from crates.io
 with `server-axum`; keep that dependency and its selected features. No manifest
 editing, SDK checkout, `[patch]` or path override is required. Work in the new
 app directory, outside the Yetlet checkout:
@@ -174,6 +174,48 @@ provide those capabilities automatically.
 For the next edit, follow [Write Views and reusable components](VIEW-COMPONENTS.md)
 to pass data and compose the existing home handler. Use the
 [opt-in quick reference](OPT-IN-QUICK-REFERENCE.md) when choosing later capabilities.
+
+## Next: export a static site
+
+Choose static export when the content can be built ahead of time and served as
+HTML files. Keep the native SSR app above for request-time handlers. CLI `0.2.0`
+supports static export; it does not crawl those handlers or turn the plain
+scaffold into an exporter. There is no `yetlet new --static` option.
+
+Start with the [standalone static-site example](../examples/static-site/README.md)
+and its explicit `site-export` binary, using the same published SDK
+`0.9.0-alpha.6`. Its [exporter source](../examples/static-site/src/main.rs)
+shows finite public pages/assets and escaped Views. After preparing that
+application's own lock/cache, run from its protected directory with the
+installed CLI and selected physical Rust toolchain:
+
+```sh
+(
+    export PATH="$yetlet_rust_bin:$PATH"
+    mkdir -m 700 artifacts
+    yetlet build --static --export-bin site-export \
+        --output artifacts/site-v1 --base-path /yetlet/
+)
+```
+
+Use this command in the static example, not in the first app without an
+exporter. If `artifacts` already exists, select an owned protected parent and
+an absent output name. The CLI refuses overwrite; a later build needs a new
+output directory. Export executes trusted native application code, not a sandbox.
+
+The result is complete HTML with CSS/assets, readable without JavaScript or an
+application backend. Upload only `artifacts/site-v1/` when separately choosing a
+static host; private `target/yetlet-static/` receipts stay outside it. The host
+owns the `/yetlet/` prefix, directory indexes, MIME types and real 404 responses.
+Use `--base-path /` for an origin-root site. This command neither serves nor
+deploys the output.
+
+HTML-only export needs no Node/Wasm tools. Add `--wasm-islands` only after the
+example's separate asset preparation when local browser interaction is wanted;
+initial HTML remains readable. Follow the
+[static CLI reference](../tools/yetlet-cli/README.md#static-html-build) for the
+bounded protocol, errors and optional island workflow. Keep secrets, Session
+state and private business data out of exported Views and assets.
 
 ## API reference
 

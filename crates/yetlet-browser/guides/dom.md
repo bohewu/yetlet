@@ -15,8 +15,8 @@ older SDKalpha.5's38-element baseline.
 **Opt-in since SDKalpha.6:** [YT-221](../../../docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
 adds per-mount navigation/image options. Existing entry points retain89 tags,
 same-origin navigation and no images; explicitly selected images add img only.
-These APIs are distributed in SDKalpha.6; the independently pinned public guide
-edition still selects SDKalpha.5. See the [actual publication record](../../../docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+These APIs are distributed in SDKalpha.6 and selected by the next guide source
+edition. See the [actual publication record](../../../docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
 for source/consumer scope; no new browser qualification follows from this label.
 
 ## Prerequisites
@@ -145,7 +145,7 @@ and the linked supported-vocabulary/navigation contract below.
 ### License and compatibility
 
 Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE).
-SDK `0.9.0-alpha.5` is published; APIs remain Experimental. Read
+SDK `0.9.0-alpha.6` is published; APIs remain Experimental. Read
 [compatibility](../../../docs/COMPATIBILITY.md) and the
 [current API reference](../../../docs/API-REFERENCE.md) at the matching revision.
 The historical evidence below retains its original candidate and scope; it does

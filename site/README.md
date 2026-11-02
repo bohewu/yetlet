@@ -45,7 +45,9 @@ builder's generated staging/site directories.
 
 The legacy builder also supports `--public` with the same command. This only builds
 files: it never enables Pages or deploys. It requires a clean checkout and the
-explicit SDK/CLI edition in `pages.toml` to match the workspace versions. Its
+explicit SDK/CLI edition in `pages.toml` to match the reviewed published edition,
+independently of future workspace versions. The selected source edition is
+SDKalpha.6/CLI0.2.0; this local update does not replace the live reader. Its
 public banner links the full source commit; local/PR builds retain preview labels.
 Both modes check the rendered upload root, selected chapters and local links.
 

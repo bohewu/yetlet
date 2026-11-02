@@ -5,8 +5,9 @@ choose a [runnable sample](SAMPLES.md). The two-package
 [SDK `0.9.0-alpha.6`](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
 and independent [CLI `0.2.0`](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
 are published on crates.io with matching Experimental GitHub pre-releases.
-The public reader and first-app instructions retain their explicitly pinned
-SDKalpha.5/CLI0.1.1 edition; see the CLI guide for the newer installation.
+The first-app instructions and selected reader sources use the explicitly pinned
+SDKalpha.6/CLI0.2.0 edition. The live reader labels its own deployed edition and
+source; local guide changes do not deploy it.
 Earlier release layouts and registry outcomes remain historical. Current task
 status belongs to [Backlog](BACKLOG.md), milestone gates to [Roadmap](ROADMAP.md),
 and distribution versus qualification to [Release readiness](RELEASE-READINESS.md).
@@ -14,7 +15,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 ## Reader entry points
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
-- [Build your first Yetlet app](FIRST-APP.md): pinned guide edition, CLI0.1.1 → protected standalone project → SDK0.9.0-alpha.5 → app lock/cache → first build/run.
+- [Build your first Yetlet app](FIRST-APP.md): CLI0.2.0 → protected standalone project → SDK0.9.0-alpha.6 → app lock/cache → first build/run, then an optional [static-export path](FIRST-APP.md#next-export-a-static-site).
 - [Write Views and reusable components](VIEW-COMPONENTS.md): typed data → functions → lists/conditions → existing SSR handler.
 - [Opt-in integration quick reference](OPT-IN-QUICK-REFERENCE.md): package/feature → startup API/options → consumer settings/defaults.
 - [Settings, options and logging](SETTINGS-OPTIONS-LOGGING.md): startup loading → validation → typed options → native state and application-owned diagnostics, using existing examples.
@@ -40,6 +41,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   doc-comment gaps and deferred Wiki.
 
 ## Maintainer entry points
+
+- [Next public guide edition — YT-232](YT-232-PUBLIC-GUIDE-EDITION.md): selected
+  SDKalpha.6/CLI0.2.0 sources, registry consumers, static introduction and bounded
+  local verification; live Pages promotion remains separate.
 
 - [DOM coverage and static-site plan — YT-219–224](YT-219-224-DOM-STATIC-SITE-PLAN.md):
   broader standard HTML, explicit URL/image policy, proposed static build and
