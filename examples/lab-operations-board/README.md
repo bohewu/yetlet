@@ -25,6 +25,15 @@ Title is 1–160 characters, description at most 4,000, with a separate 64 KiB e
 
 The application bounds active SQL workers to four, admission waiting to one second and SQLite busy waiting to 250 ms. Started blocking work owns its permit even after its caller is cancelled. Shutdown closes stream/worker admission and drains admitted work; cancellation does not undo a committed transaction. The local demo caps business records at 10,000 and history rows at 100,000; reaching those caps rejects new changes. Qualification started at 10,000 items/90,000 history rows to leave write headroom; separate native tests verify exact-cap rejection. No history is deleted automatically.
 
+Two independent writers submitting the same version can produce one success and
+either a version conflict or a bounded Busy response. A writer that cannot acquire
+the SQLite write lock within the existing budget returns 503; it does not wait
+indefinitely for a 409. After the winning request completes and the lock is free,
+a new submission of the old version returns 409 with its escaped unsaved draft.
+These are distinct outcomes, with no automatic mutation retry. The
+[focused concurrency-test correction](../../docs/YT-231-LAB-SQLITE-CONCURRENCY.md)
+preserves the runtime, limits and atomic item/history semantics.
+
 ## HTML, assets and optional live status
 
 Default lists/forms require no JavaScript or WASM. `?live=true` explicitly adds one external application-owned module and a bounded native SSE endpoint. Every connection obtains a complete project-authorized count/revision snapshot, so reconnect does not depend on replaying an in-memory queue. Later changes update counts and mark the displayed record list stale with an explicit authoritative-refresh link. A connection lasts at most five minutes, checks Session on each iteration and occupies one of sixteen stream slots. No client command or raw UI event is sent to the server.
