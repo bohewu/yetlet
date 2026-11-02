@@ -1,5 +1,17 @@
 # Yetlet Backlog
 
+**YT-232 public delivery (2026-11-02):**
+[PR54/master993ce56 and Pages evidence](YT-232-PUBLIC-GUIDE-EDITION.md#subsequent-delivery-and-public-pages-update--2026-11-02)
+records matching reviewed tree04e96ce, first-attempt PR/master necessary CI,
+clean guide builds and actual master publication. All15 HTTPS files match the
+deployed artifact by bytes/size/MIME; SDKalpha.6/CLI0.2.0,8 chapters,219 links and
+static introduction pass. Final master CodeQL41382427860/1 passes all four
+analyses; the earlier pending snapshot remains. Browser host unavailable;
+no fresh interaction qualification.
+Failures remain, no retry/package release; independent closeout Reviewer PASS0
+verifies three stable documents, accepted sources, artifacts and public responses.
+The three closing documents remain uncommitted. Earlier local-only notes keep scope.
+
 **YT-232 public guide edition (2026-11-02):** Done at local guide-source update scope.
 [Bounded contract](YT-232-PUBLIC-GUIDE-EDITION.md) selects published
 SDKalpha.6/CLI0.2.0 for introductory sources and their registry-only reader,
@@ -1136,7 +1148,7 @@ separate implementation authority.
 | YT-230 | P1 | S | M10 | Enforce release documentation before packaging and publication | YT-229 | [Release-document gate](RELEASING.md#release-documentation-gate): repository/SOP rule, manifest-derived README/install/output/SDK references, bounded current-reader status and pinned-edition checks in required CI/source gate, actual frozen README check before publication writes. Affected60-test baseline PASS; added punctuation-boundary failure preserved and corrected, focused boundary/history2 PASS, actual retained CLI020 README rejected without relabeling its release. Source check/YAML/docs75/230/whitespace PASS. Independent Reviewer PASS0,24 unchanged hashes and zero issues/followups; semantic review limits, historical schema1 and prior14-file stale-doc corrections preserved. Done locally; remote activation/Git delivery separate, no hosted/signing/publication/Pages action | Done |
 
 | YT-231 | P1 | S | M10 | Stabilize Lab SQLite concurrent-write verification without changing Busy/conflict semantics | YT-094, YT-230 | [Cause/contract/evidence](YT-231-LAB-SQLITE-CONCURRENCY.md): controlled real writer proves specific Busy503/no effect then post-commit stale409; independent concurrent requests require one303 and only409 or503 with the exact safe Busy message for the loser, exact winning item/history and strict later stale409. Runtime,250ms/four-worker/one-second limits, safety and historical failures preserved; focused native/format/lint/docs checks PASS, independent Reviewer PASS0 with five stable source hashes. Local test-correction scope; no hosted qualification or Commit/Push | Done |
-| YT-232 | P2 | S | M10 | Promote introductory guide sources to published SDKalpha.6/CLI0.2.0 and introduce static export | YT-226, YT-228, YT-229 | [Contract/delta](YT-232-PUBLIC-GUIDE-EDITION.md): coherent eight-chapter source edition, registry-only reader/reference consumers and static next step; explicit edition/clean-source admission, runtime/security, private receipts and historical evidence preserved. Eleven affected checks, SDK-only locks, native/Wasm guide and static reference PASS; independent Reviewer PASS0 verifies24 stable source hashes and artifacts. Local source-update scope, no fresh browser/live qualification or Commit/Push/Pages deployment | Done |
+| YT-232 | P2 | S | M10 | Promote introductory guide sources to published SDKalpha.6/CLI0.2.0 and introduce static export | YT-226, YT-228, YT-229 | [Contract/delivery](YT-232-PUBLIC-GUIDE-EDITION.md): coherent eight-chapter source edition, registry-only reader/reference consumers and static next step; explicit edition/clean-source admission, runtime/security, private receipts and historical evidence preserved. Eleven affected checks, SDK-only locks, native/Wasm guide and static reference PASS; source Reviewer PASS0 verifies24 hashes. PR54 squash master993ce56, PR/master necessary CI and Pages build/deploy PASS attempt1; all15 HTTPS files match deployed artifact sizes/SHA/MIME,219 links pass. Closeout Reviewer PASS0 verifies three stable documents and actual proof. No fresh browser interaction or package release; closing docs uncommitted | Done |
 
 ## M25 — Broader HTML DOM support and static-site delivery
 

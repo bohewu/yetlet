@@ -1,5 +1,17 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-232 authorized public guide update (2026-11-02):**
+[Delivered source/HTTPS proof](YT-232-PUBLIC-GUIDE-EDITION.md#subsequent-delivery-and-public-pages-update--2026-11-02)
+binds PR54 squash master993ce56 to the unchanged reviewed tree; PR/master
+necessary CI and master Pages build/deploy PASS attempt1. Public SDKalpha.6/
+CLI0.2.0 guide has8 chapters/15 exact HTTPS files/219 checked links and static
+next step. Final master CodeQL41382427860/1 passes all four analyses; the
+initial pending observation remains historical.
+Browser availability failure retained, without a fresh interaction claim or
+retry. Independent closeout Reviewer PASS0 verifies three unchanged documents,
+accepted sources, artifacts and public responses. Three closing documents remain
+uncommitted; no package publication or additional deployment.
+
 **YT-232 next public guide edition (2026-11-02):** Done at local guide-source update scope.
 [Selected source update](YT-232-PUBLIC-GUIDE-EDITION.md) aligns introductory
 instructions, eight-page reader and static reference with published
