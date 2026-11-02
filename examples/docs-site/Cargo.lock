@@ -243,15 +243,15 @@ dependencies = [
 
 [[package]]
 name = "yetlet"
-version = "0.9.0-alpha.5"
+version = "0.9.0-alpha.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "662d67180cec2fd6e50c3757bdc910d057cd37428785ab695b0d275a9e4e5091"
+checksum = "0726e0fbe8f9ed0fcf9163fd64f88859c0a5e69a34ea73f4cd531e4820df09cc"
 
 [[package]]
 name = "yetlet-browser"
-version = "0.9.0-alpha.5"
+version = "0.9.0-alpha.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2fbeec5d4324367cf682d722fc25a35f851fc5293fc6e353aedc35ca6771c9a6"
+checksum = "8bb3dd2c8481a9ef405a41e5a28cee33b55042f1921bfe874568f1d8509cc482"
 dependencies = [
  "wasm-bindgen",
  "web-sys",

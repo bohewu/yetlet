@@ -3,7 +3,7 @@
 Build native HTML pages and JSON endpoints with a small facade over Axum/Tower.
 The server adapter does not install browser, Session or configuration capabilities.
 
-**Experimental SDK `0.9.0-alpha.5`, published on crates.io.** Select the
+**Experimental SDK `0.9.0-alpha.6`, published on crates.io.** Select the
 `server-axum` feature. The commands below run checkout examples; application
 authors can start without cloning using the [first-app guide](../../../docs/FIRST-APP.md).
 
@@ -77,7 +77,7 @@ Native upstream routing and extraction contracts remain Axum/Tower-owned.
 ### License and compatibility
 
 Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE).
-SDK `0.9.0-alpha.5` is published; APIs remain Experimental. Read
+SDK `0.9.0-alpha.6` is published; APIs remain Experimental. Read
 [compatibility](../../../docs/COMPATIBILITY.md) and the
 [current API reference](../../../docs/API-REFERENCE.md) at the matching revision.
 The historical evidence below retains its original candidate and scope; it does

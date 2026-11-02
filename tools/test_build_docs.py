@@ -9,7 +9,7 @@ import build_docs
 
 class PublicationLabels(unittest.TestCase):
     commit = "a" * 40
-    edition = {"sdk": "0.9.0-alpha.5", "cli": "0.1.1"}
+    edition = {"sdk": "0.9.0-alpha.6", "cli": "0.2.0"}
 
     def label(self, *, dirty=False, edition=None, public=True):
         return build_docs.page_label(self.commit, dirty, self.edition["sdk"],
@@ -18,8 +18,8 @@ class PublicationLabels(unittest.TestCase):
     def test_public_labels_bind_full_commit_and_explicit_edition(self):
         label = self.label()
         self.assertIn(f"/tree/{self.commit}", label)
-        self.assertIn("0.9.0-alpha.5", label)
-        self.assertIn("0.1.1", label)
+        self.assertIn("0.9.0-alpha.6", label)
+        self.assertIn("0.2.0", label)
         self.assertNotIn("Local documentation preview", label)
 
     def test_dirty_public_input_is_refused(self):
@@ -28,14 +28,14 @@ class PublicationLabels(unittest.TestCase):
 
     def test_workspace_version_does_not_silently_change_public_edition(self):
         with self.assertRaisesRegex(ValueError, "reviewed SDK/CLI"):
-            self.label(edition={"sdk": "0.9.0-alpha.6", "cli": "0.1.1"})
+            self.label(edition={"sdk": "0.9.0-alpha.7", "cli": "0.2.0"})
 
     def test_new_workspace_versions_preserve_the_published_reader_edition(self):
-        label = build_docs.page_label(self.commit, False, "0.9.0-alpha.6", "0.2.0",
+        label = build_docs.page_label(self.commit, False, "0.9.0-alpha.7", "0.3.0",
                                       self.edition, True)
-        self.assertIn("SDK `0.9.0-alpha.5` · CLI `0.1.1`", label)
-        self.assertNotIn("0.9.0-alpha.6", label)
-        self.assertNotIn("0.2.0", label)
+        self.assertIn("SDK `0.9.0-alpha.6` · CLI `0.2.0`", label)
+        self.assertNotIn("0.9.0-alpha.7", label)
+        self.assertNotIn("0.3.0", label)
 
     def test_preview_still_allows_local_edits(self):
         label = self.label(dirty=True, public=False)

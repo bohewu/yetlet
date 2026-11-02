@@ -3,7 +3,7 @@
 Continue [your first native application](FIRST-APP.md) by expanding its initial
 heading into a small page. Use ordinary Rust functions and the existing
 `View`/`Element` API to pass data, compose components and render a list.
-**Experimental SDK `0.9.0-alpha.5`, published on crates.io.** This guide
+**Experimental SDK `0.9.0-alpha.6`, published on crates.io.** This guide
 continues the registry-first application from the linked walkthrough.
 
 ## Prerequisites

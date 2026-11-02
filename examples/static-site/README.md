@@ -1,8 +1,8 @@
 # Static HTML site with an optional Wasm island
 
 **Static export is available in published CLI `0.2.0` (YT-223/YT-229).**
-CLI `0.1.1` does not implement build --static. This reference application remains
-explicitly pinned to registry SDK0.9.0-alpha.5 and
+CLI `0.1.1` does not implement build --static. This reference application is
+explicitly pinned to registry SDK0.9.0-alpha.6 alongside the introductory guide and
 can be copied outside the repository without SDK source/path overrides.
 See the [static export contract](../../docs/YT-222-STATIC-HTML-CONTRACT.md) and
 [actual evidence and validation limits](../../docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).

@@ -18,7 +18,7 @@ REPOSITORY = "https://github.com/bohewu/yetlet"
 LINK = re.compile(r"(!?\[[^\]\n]*\]\()([^\s)]+)(\))")
 # Explicit published reader edition, independent of development package versions.
 # Promote only after both distributions and the guide consumer are qualified.
-PUBLISHED_EDITION = {"sdk": "0.9.0-alpha.5", "cli": "0.1.1"}
+PUBLISHED_EDITION = {"sdk": "0.9.0-alpha.6", "cli": "0.2.0"}
 
 
 def rewrite_links(text, source, destinations, commit):

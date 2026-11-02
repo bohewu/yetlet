@@ -25,6 +25,7 @@ class PublicPreparation(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.app = Path(self.temp.name)
         (self.app / "src").mkdir()
+        (self.app / "Cargo.toml").write_text((guide.APP / "Cargo.toml").read_text())
         self.addCleanup(patch.stopall)
         patch.object(prepare, "APP", self.app).start()
 
@@ -35,7 +36,7 @@ class PublicPreparation(unittest.TestCase):
         self.assertEqual(stored, result)
         self.assertTrue(result["public"])
         self.assertEqual(result["commit"], self.commit)
-        self.assertEqual((result["sdk"], result["cli"]), ("0.9.0-alpha.5", "0.1.1"))
+        self.assertEqual((result["sdk"], result["cli"]), ("0.9.0-alpha.6", "0.2.0"))
         self.assertIn("/blob/" + self.commit + "/", result["chapters"][0]["markdown"])
         self.assertEqual(result["chapters"][1]["route"], "/first-app/")
 
@@ -47,21 +48,22 @@ class PublicPreparation(unittest.TestCase):
 
     def test_new_workspace_version_retains_the_published_consumer_edition(self):
         selection = tomllib.loads((guide.ROOT / "site/pages.toml").read_text())
+        consumer = tomllib.loads((self.app / "Cargo.toml").read_text())
         with patch.object(prepare.subprocess, "check_output", side_effect=[self.commit, ""]), \
              patch.object(prepare.tomllib, "loads", side_effect=[selection,
-                          {"workspace": {"package": {"version": "0.9.0-alpha.6"}}},
-                          {"package": {"version": "0.1.1"}}]):
+                          {"workspace": {"package": {"version": "0.9.0-alpha.7"}}},
+                          {"package": {"version": "0.3.0"}}, consumer]):
             result = prepare.prepare(public=True)
-        self.assertEqual((result["sdk"], result["cli"]), ("0.9.0-alpha.5", "0.1.1"))
+        self.assertEqual((result["sdk"], result["cli"]), ("0.9.0-alpha.6", "0.2.0"))
         self.assertTrue((self.app / "src/generated/chapters.json").is_file())
 
     def test_unadmitted_candidate_edition_is_rejected_before_preparation(self):
         selection = tomllib.loads((guide.ROOT / "site/pages.toml").read_text())
-        selection["edition"] = {"sdk": "0.9.0-alpha.6", "cli": "0.2.0"}
+        selection["edition"] = {"sdk": "0.9.0-alpha.7", "cli": "0.3.0"}
         with patch.object(prepare.subprocess, "check_output", side_effect=[self.commit, ""]), \
              patch.object(prepare.tomllib, "loads", side_effect=[selection,
-                          {"workspace": {"package": {"version": "0.9.0-alpha.6"}}},
-                          {"package": {"version": "0.2.0"}}]):
+                          {"workspace": {"package": {"version": "0.9.0-alpha.7"}}},
+                          {"package": {"version": "0.3.0"}}]):
             with self.assertRaisesRegex(ValueError, "reviewed SDK/CLI"):
                 prepare.prepare(public=True)
         self.assertFalse((self.app / "src/generated").exists())
@@ -69,6 +71,14 @@ class PublicPreparation(unittest.TestCase):
     def test_local_preparation_stays_preview_with_edits(self):
         with patch.object(prepare.subprocess, "check_output", side_effect=[self.commit, " M README.md\n"]):
             self.assertFalse(prepare.prepare()["public"])
+
+    def test_mismatched_consumer_sdk_is_rejected_before_preparation(self):
+        manifest = self.app / "Cargo.toml"
+        manifest.write_text(manifest.read_text().replace("=0.9.0-alpha.6", "=0.9.0-alpha.5", 1))
+        with patch.object(prepare.subprocess, "check_output", side_effect=[self.commit, ""]):
+            with self.assertRaisesRegex(ValueError, "selected registry SDK exactly"):
+                prepare.prepare(public=True)
+        self.assertFalse((self.app / "src/generated").exists())
 
 
 class ArtifactBoundary(unittest.TestCase):

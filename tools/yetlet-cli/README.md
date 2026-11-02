@@ -64,9 +64,9 @@ See the [native Windows diagnosis and verification](../../docs/WINDOWS-CLI-125-V
 This release includes static mode, introduced in CLI `0.2.0` and absent from
 CLI `0.1.1`. Install the selected CLI version from the registry or build it from
 source, then follow the
-[standalone static example](../../examples/static-site/README.md). The historical
-example remains pinned to registry SDKalpha.5; CLI0.2 qualification separately
-checks the same minimal consumer with published SDKalpha.6, without a path override.
+[standalone static example](../../examples/static-site/README.md), now pinned to
+registry SDKalpha.6 alongside the introductory guide. CLI0.2 qualification
+already checks the minimal consumer with that published SDK, without a path override.
 
 The canonical invocation is build --static --export-bin NAME --output DIRECTORY,
 with optional --base-path /yetlet/, --release and --wasm-islands. It runs one
