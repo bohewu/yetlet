@@ -1,5 +1,13 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-231 Lab SQLite test stability (2026-11-02):** Done at local test-correction scope.
+[Bounded correction](YT-231-LAB-SQLITE-CONCURRENCY.md) separates the existing
+finite Busy outcome from version conflict. Keep runtime/security/limits and the
+original CI failure; prove one committed effect and strict stale409 after the
+race. Controlled real-lock and changed-race checks, Clippy/format/docs/whitespace
+PASS; independent Reviewer PASS0 verifies five frozen source hashes and unchanged
+runtime. No hosted/stress qualification or Git/deployment/release action.
+
 **YT-230 release-document gate (2026-11-02):** Done at local implementation scope.
 [Contract](RELEASING.md#release-documentation-gate) requires manifest-derived
 README/install references and current-reader review before C/packaging, plus

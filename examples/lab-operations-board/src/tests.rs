@@ -9,6 +9,64 @@ use tower::ServiceExt;
 const HOST: &str = "127.0.0.1:3012";
 
 #[tokio::test]
+async fn sqlite_writer_contention_is_busy_then_stale_version_conflicts_after_commit() {
+    let (dir, board, ids) = setup().await;
+    let mut client = Client::login(&board, &ids, "alice").await;
+    board
+        .database
+        .save(alice(), None, 0, fields("Original"))
+        .await
+        .unwrap();
+    let path = dir.path().join("board.sqlite");
+    let other = Database::open(&path).await.unwrap();
+    let mut blocker = rusqlite::Connection::open(&path).unwrap();
+    let held = blocker
+        .transaction_with_behavior(rusqlite::TransactionBehavior::Immediate)
+        .unwrap();
+    let detail = "/board/projects/1/items/1";
+    let busy = client
+        .call(
+            &board.router,
+            Method::POST,
+            detail,
+            Some(client.form("Unsaved <draft>", "active", 1, "")),
+        )
+        .await;
+    assert_eq!(busy.status, StatusCode::SERVICE_UNAVAILABLE);
+    assert!(busy.body.contains(Failure::Busy.message()));
+    let (item, history) = board.database.get(1, 1).await.unwrap();
+    assert_eq!(item.version, 1);
+    assert_eq!(item.fields.title, "Original");
+    assert_eq!(history.len(), 1);
+    held.rollback().unwrap();
+    drop(blocker);
+
+    other
+        .save(alice(), Some(1), 1, fields("Other writer"))
+        .await
+        .unwrap();
+    // A new, explicit stale submission after the lock is gone is a conflict,
+    // not an automatic retry of the rejected request.
+    let stale = client
+        .call(
+            &board.router,
+            Method::POST,
+            detail,
+            Some(client.form("Unsaved <draft>", "active", 1, "")),
+        )
+        .await;
+    assert_eq!(stale.status, StatusCode::CONFLICT);
+    assert!(stale.body.contains("Unsaved &lt;draft&gt;"));
+    assert!(!stale.body.contains("Unsaved <draft>"));
+    let (item, history) = board.database.get(1, 1).await.unwrap();
+    assert_eq!(item.version, 2);
+    assert_eq!(item.fields.title, "Other writer");
+    assert_eq!(history.len(), 2);
+    other.drain().await.unwrap();
+    board.drain().await.unwrap();
+}
+
+#[tokio::test]
 async fn independent_boards_share_sqlite_records_conflicts_busy_errors_and_restart() {
     let dir = tempfile::tempdir().unwrap();
     let path = dir.path().join("shared.sqlite");
@@ -73,11 +131,53 @@ async fn independent_boards_share_sqlite_records_conflicts_busy_errors_and_resta
         ca.call(&a.router, Method::POST, &detail, Some(fa)),
         cb.call(&b.router, Method::POST, &detail, Some(fb)),
     );
-    let mut statuses = [ra.status.as_u16(), rb.status.as_u16()];
-    statuses.sort();
-    assert_eq!(statuses, [303, 409]);
+    // BEGIN IMMEDIATE uses the configured finite busy budget. The loser
+    // observes either the committed version or a specific Busy, not any 503.
+    let a_won = ra.status == StatusCode::SEE_OTHER;
+    let (winner, loser, draft) = if a_won {
+        ("Concurrent A", &rb, "Concurrent B")
+    } else {
+        assert_eq!(rb.status, StatusCode::SEE_OTHER);
+        ("Concurrent B", &ra, "Concurrent A")
+    };
+    match loser.status {
+        StatusCode::CONFLICT => assert!(loser.body.contains(draft)),
+        StatusCode::SERVICE_UNAVAILABLE => {
+            assert!(loser.body.contains(Failure::Busy.message()));
+        }
+        other => panic!("unexpected concurrent-write status: {other}"),
+    }
     let (item, history) = b.database.get(1, 1).await.unwrap();
     assert_eq!(item.version, 3);
+    assert_eq!(item.fields.title, winner);
+    assert_eq!(history.len(), 3);
+    assert_eq!(history[0].version, 3);
+    assert_eq!(history[0].title, winner);
+
+    // Both original requests have finished. A new explicit stale submission
+    // must now be 409, without changing the single winning item/history effect.
+    let stale = if a_won {
+        cb.call(
+            &b.router,
+            Method::POST,
+            &detail,
+            Some(cb.form(draft, "active", 2, "")),
+        )
+        .await
+    } else {
+        ca.call(
+            &a.router,
+            Method::POST,
+            &detail,
+            Some(ca.form(draft, "active", 2, "")),
+        )
+        .await
+    };
+    assert_eq!(stale.status, StatusCode::CONFLICT);
+    assert!(stale.body.contains(draft));
+    let (item, history) = b.database.get(1, 1).await.unwrap();
+    assert_eq!(item.version, 3);
+    assert_eq!(item.fields.title, winner);
     assert_eq!(history.len(), 3);
 
     // Hold a real external writer only to check the application's existing
