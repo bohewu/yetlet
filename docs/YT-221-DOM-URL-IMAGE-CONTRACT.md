@@ -162,7 +162,7 @@ The implementation is in [DOM mounting](../crates/yetlet-browser/src/dom/mod.rs)
 The existing [Todo View source](../examples/todo-ui/src/controls.rs) adds
 controlled_links_and_image as an explicit helper, not a default route installation.
 Its native rendering/validation and actual Wasm consumer use the same helper.
-The [DOM guide](../crates/yetlet-browser/guides/dom.md#explicit-links-and-images-unreleased-source)
+The [DOM guide](../crates/yetlet-browser/guides/dom.md#explicit-links-and-images)
 and [compatibility note](COMPATIBILITY.md) distinguish these unreleased APIs
 from the published SDK0.9.0-alpha.5.
 

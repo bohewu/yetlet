@@ -1,5 +1,13 @@
 # Public documentation and rustdoc plan
 
+**Distribution update (2026-11-02):**
+[SDKalpha.6](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+and [CLI0.2.0](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+are published, including the DOM/options and static-export features described
+as unreleased at the dated implementation checkpoints below. The live guide and
+first-app edition remain pinned to SDKalpha.5/CLI0.1.1; this status correction
+does not promote their consumer, alter Pages settings or rerun qualification.
+
 Date: 2026-10-31. YT-217 is Done at selected API-doc/local reader-preview
 scope after independent final Reviewer PASS0. Its [execution record](YT-217-DOCS-PREVIEW.md)
 retains the original passing proof, stopped harness and authorized correction.
@@ -130,7 +138,7 @@ The later YT-218 publication adds actual public routing/assets/reader evidence
 at its recorded source and Chromium/emulated-mobile scope. Physical mobile,
 additional browsers and hosted generated rustdoc are not newly qualified.
 
-## Proposed Yetlet-built consumer — M25
+## Historical Yetlet-built consumer proposal — M25
 
 [YT-219–YT-224](YT-219-224-DOM-STATIC-SITE-PLAN.md) registers a separate path:
 review broad HTML/DOM coverage, implement selected vocabulary and controlled

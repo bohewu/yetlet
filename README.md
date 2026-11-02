@@ -22,7 +22,13 @@ explicit browser enhancements in one language.
 
 ## Start with native SSR
 
-**Experimental alpha.** The two-package SDK is available on crates.io:
+**Experimental alpha.** This quickstart and the public first-app guide use the
+explicitly pinned SDK `0.9.0-alpha.5` / CLI `0.1.1` edition. Newer
+[SDKalpha.6](docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+and [CLI0.2.0](docs/CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+are also published; the [CLI guide](tools/yetlet-cli/README.md) covers that
+installation and static HTML export. The documented quickstart SDK is available
+on crates.io:
 [`yetlet`](https://crates.io/crates/yetlet/0.9.0-alpha.5) and
 [`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.5), version
 `0.9.0-alpha.5`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.5)

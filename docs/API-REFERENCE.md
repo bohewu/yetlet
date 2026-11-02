@@ -1,7 +1,7 @@
 # Current API reference
 
-Date: 2026-10-31. This map describes the published Experimental two-package SDK
-(`0.9.0-alpha.5`) in this checkout. `yetlet` contains the shared View and opt-in
+Updated: 2026-11-02. This map describes the published Experimental two-package SDK
+(`0.9.0-alpha.6`) in this checkout. `yetlet` contains the shared View and opt-in
 native capabilities; `yetlet-browser` contains browser integrations and depends
 one-way on the same View. Both packages are available from crates.io at this version.
 Earlier release tags retain their original layouts and evidence.
@@ -10,12 +10,14 @@ Use guides for behavior and rustdoc from the same revision for signatures.
 [The migration contract](YT-211-TWO-PACKAGE-MIGRATION.md) records the complete
 source break, feature names and preserved boundaries.
 
-**Unreleased checkout additions:** YT-220 expands the DOM vocabulary;
+**Available since SDK `0.9.0-alpha.6`:** YT-220 expands the DOM vocabulary;
 [YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md) adds DomOptions, NavigationPolicy,
 ImagePolicy, validate_with_options and Wasm mount_with_options. The
-[DOM guide](../crates/yetlet-browser/guides/dom.md#explicit-links-and-images-unreleased-source)
-shows their per-mount selection and provisional native validation. The published
-SDK table below retains its baseline; these additions are not yet distributed.
+[DOM guide](../crates/yetlet-browser/guides/dom.md#explicit-links-and-images)
+shows their per-mount selection and provisional native validation.
+[SDK publication and consumer evidence](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+records their distribution. These additions are absent from SDKalpha.5; the
+separately pinned public guide edition does not select a newer SDK automatically.
 
 For first authoring, follow [Views/components](VIEW-COMPONENTS.md). For package
 features, startup wiring and consumer settings/defaults in one place, use the
@@ -36,7 +38,7 @@ and native Axum/Tower semantics remain separate responsibilities.
 | [`yetlet::view`](../crates/yetlet/guides/core.md) | `View`, `Element`, `binding` validated vocabulary | Owned renderer-neutral values; construction does not sanitize HTML. Binding validation can return `BindingContractError`; the renderer owns output policy |
 | [`yetlet::html`](../crates/yetlet/guides/html.md) | `render_to_string`, `escape_text`, `RenderError` | Borrow a View, return an owned escaped fragment or policy error. Complete buffering; no raw HTML escape hatch or HTTP-header ownership |
 | [`yetlet::server_axum`](../crates/yetlet/guides/server-axum.md) | `App`, `Page`, `RequestContext`, `DocumentMetadata`, `LanguageTag`, `middleware` | Native routing/extractors/State/Extensions; fallible rendering maps to generic HTTP 500. Metadata and strict CSP stay bounded; no mandatory Session, configuration, MVC or DI |
-| [`yetlet_browser::dom`](../crates/yetlet-browser/guides/dom.md) | `validate`; WASM `mount` | Optional browser subtree replacement, finite DOM policy. Static validation returns `DomPolicyError`; browser failures use `JsValue`. No general identity preservation; mount can reject navigation that static validation accepted |
+| [`yetlet_browser::dom`](../crates/yetlet-browser/guides/dom.md) | `validate`, `validate_with_options`, `DomOptions`, `NavigationPolicy`, `ImagePolicy`; WASM `mount`, `mount_with_options` | Optional browser subtree replacement, finite DOM policy with explicit per-mount options. Static validation returns `DomPolicyError`; browser failures use `JsValue`. No general identity preservation; mount can reject navigation that static validation accepted |
 | [`yetlet_browser::dom_keyed`](../crates/yetlet-browser/guides/dom-keyed.md) | `validate_keyed_order`; WASM `KeyedChildren`, `KeyedEntry`, `DomEventListener` | Explicit keyed/listener lifetime; duplicate-key preflight and browser failures. Callbacks and DOM failures do not provide transactional rollback or a generic sanitizer |
 | [`yetlet::reactive`](../crates/yetlet/guides/reactive.md) | `LocalGraph`, `GraphHandle`, `Subscription`, `ReactiveError` | Synchronous thread-local reducer/commit ownership; weak handles and explicit disposal. Snapshot clones published state; faults and queued re-entrant work retain their documented semantics |
 | [`yetlet::actions`](../crates/yetlet/guides/actions.md) | `Command`, `ActionExecutor`, `LocalExecutor`, `ActionError`; browser `yetlet_browser::actions::HttpExecutor` | Explicit local versus typed HTTP actions; native HTTP-executor construction is not native fetch execution. WASM executes HTTP; no implicit Auth/CSRF, retries or remote DOM-event circuit |
@@ -72,7 +74,7 @@ builds are not the default dependency graph of a small SSR application.
 |---|---|---|
 | [Board](../examples/lab-operations-board/README.md) / [Admin](../examples/admin-dashboard/README.md) | `BoardOptions`; `Board::open_with_options` and `open_with_oidc_and_options` | Independent default-false `write_authorization` / `request_tracing`, plus frontend/Session inputs. Uncompiled selections fail before storage; existing simpler constructors stay off. Admin maps its existing typed Settings; Board loads no ambient settings or global subscriber |
 | [Shop](../examples/modular-shop/README.md) | `DatabaseOptions`; `Database::open_with_options` | Default-false `catalog_cache`; the binary maps its existing environment key. Display freshness is bounded; Session, authorization and checkout SQL stay authoritative. No mandatory Settings loader or framework cache crate |
-| [CLI](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) | Existing parser, commands and configured generators | Independently published `yetlet-cli` `0.1.1`, executable `yetlet`; settings, supported source layouts and platform limits belong to its current guide. Generators do not silently install or deploy services |
+| [CLI](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) | Existing parser, commands, static HTML export and configured generators | Independently published `yetlet-cli` `0.2.0`, executable `yetlet`; generated apps pin SDKalpha.6. Settings, supported source layouts and platform limits belong to its current guide. Generators do not silently install or deploy services |
 
 These options are public Rust interfaces of example applications, not methods
 on a framework-wide capability builder. Their public fields do not grant trust

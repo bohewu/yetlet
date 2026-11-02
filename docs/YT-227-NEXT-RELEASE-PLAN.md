@@ -1,5 +1,13 @@
 # Next SDK and CLI release plan — YT-227
 
+**Subsequent completion (2026-11-02):**
+[SDKalpha.6](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+and [CLI0.2.0](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+are published with verified registry consumers. The original planning-time
+manifests, proposed decisions and Pending gates below remain historical; they
+do not describe current publication status. The live guide edition stays pinned
+and registry OIDC remains deferred.
+
 **Authorized continuation (2026-11-01):** the owner selects preparation through
 the final publication gate. [YT-228](ALPHA6-RELEASE-PREPARATION.md) records the
 selected SDKalpha.6-first/CLI0.2.0-later sequence and the retained token route.

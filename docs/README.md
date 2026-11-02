@@ -1,9 +1,12 @@
 # Developer Documentation
 
 Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
-choose a [runnable sample](SAMPLES.md). The two-package SDK `0.9.0-alpha.5`
-is published on crates.io with a matching
-[Experimental GitHub pre-release](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup).
+choose a [runnable sample](SAMPLES.md). The two-package
+[SDK `0.9.0-alpha.6`](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+and independent [CLI `0.2.0`](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+are published on crates.io with matching Experimental GitHub pre-releases.
+The public reader and first-app instructions retain their explicitly pinned
+SDKalpha.5/CLI0.1.1 edition; see the CLI guide for the newer installation.
 Earlier release layouts and registry outcomes remain historical. Current task
 status belongs to [Backlog](BACKLOG.md), milestone gates to [Roadmap](ROADMAP.md),
 and distribution versus qualification to [Release readiness](RELEASE-READINESS.md).
@@ -11,7 +14,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 ## Reader entry points
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
-- [Build your first Yetlet app](FIRST-APP.md): published CLI0.1.1 → protected standalone project → published SDK0.9.0-alpha.5 → app lock/cache → first build/run.
+- [Build your first Yetlet app](FIRST-APP.md): pinned guide edition, CLI0.1.1 → protected standalone project → SDK0.9.0-alpha.5 → app lock/cache → first build/run.
 - [Write Views and reusable components](VIEW-COMPONENTS.md): typed data → functions → lists/conditions → existing SSR handler.
 - [Opt-in integration quick reference](OPT-IN-QUICK-REFERENCE.md): package/feature → startup API/options → consumer settings/defaults.
 - [Settings, options and logging](SETTINGS-OPTIONS-LOGGING.md): startup loading → validation → typed options → native state and application-owned diagnostics, using existing examples.
@@ -46,20 +49,20 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   [complete standards inventory](YT-219-HTML-INVENTORY.md): current versus selected
   elements/attributes, explicit exceptions, parser parity and opt-in defaults;
   documentation-only, not implemented capability claims.
-- [Unreleased ordinary HTML DOM implementation — YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md):
+- [Ordinary HTML DOM implementation — YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md):
   89-tag checkout, scoped attributes/structures, pre consistency, shared consumer
-  and focused native/Chrome/Firefox evidence; published SDK baseline stays separate.
-- [Unreleased controlled DOM navigation/images — YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md):
+  and focused native/Chrome/Firefox evidence; distributed in SDKalpha.6.
+- [Controlled DOM navigation/images — YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md):
   typed opt-in options, strict defaults, finite URL/image attributes and browser
   preflight, explicit sample and new Chrome/Firefox evidence; independent Reviewer
-  PASS0, Done at unreleased-source scope.
+  PASS0 at its original source scope, subsequently distributed in SDKalpha.6.
 - [Static HTML export and CLI contract — YT-222](YT-222-STATIC-HTML-CONTRACT.md):
   proposed build --static, finite public pages/assets, project prefixes, local
   CSP/islands, create-only output and private receipts; independent Reviewer
   PASS0, Done at documentation-only contract scope.
-- [Unreleased static HTML export implementation — YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md):
+- [Static HTML export implementation — YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md):
   explicit CLI/native exporter, bounded public documents/assets and optional
-  island; bounded GNU/browser/MSVC evidence and retained failures are explicit.
+  island, now distributed in CLI0.2.0; bounded GNU/browser/MSVC evidence and retained failures are explicit.
 
 - [Local Yetlet documentation pilot — YT-224](YT-224-DOCS-PILOT.md):
   application-owned eight-chapter static reader with optional Wasm search;
@@ -76,8 +79,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   dedicated workflow, master-only Environment, initial deployment/readback,
   retained observations and automatic relevant master document updates.
 
-- [Local reader preview](../site/README.md): pinned mdBook builder, exact chapter
-  selection and loopback-only usage. [YT-217 completion](YT-217-DOCS-PREVIEW.md)
+- [Historical mdBook reader preview](../site/README.md): pinned reference builder,
+  exact chapter selection and loopback-only usage; use the
+  [Yetlet reader](../examples/docs-site/README.md) for the current build path.
+  [YT-217 completion](YT-217-DOCS-PREVIEW.md)
   records API comments and independently accepted local reader checks with retained
   failures; the separate YT-218 record covers actual public hosting.
 
@@ -103,15 +108,15 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [New-version release workflow](RELEASING.md): one-time setup versus each version,
   immutable C/S, protected jobs, exact approvals, independent verification and
   publication; distinguishes installed tooling from Pending hosted qualification.
-- [Next SDK/CLI delivery plan](YT-227-NEXT-RELEASE-PLAN.md): proposed SDKalpha.6
-  then CLI0.2.0, unreleased feature scope, guide/version-binding prerequisites,
-  evidence reuse and optional registry OIDC; versions and execution unselected.
-- [Selected SDKalpha.6 preparation](ALPHA6-RELEASE-PREPARATION.md): affected
-  qualification and source-bound release stages through the final owner gate;
-  CLI0.2 follows the SDK's actual publication, registry OIDC deferred.
-- [Selected CLI0.2.0 preparation](CLI-020-RELEASE-PREPARATION.md): published
-  SDKalpha.6 pin/resources, preserved historical bindings and affected qualification
-  through the final owner gate; no SDK republishing.
+- [Original SDK/CLI delivery plan](YT-227-NEXT-RELEASE-PLAN.md): reviewed
+  SDKalpha.6-first/CLI0.2.0-second sequence, guide/version-binding prerequisites,
+  evidence reuse and optional registry OIDC; planning checkpoints remain historical.
+- [Completed SDKalpha.6 release](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01):
+  qualification, source-bound release stages, owner-approved GitHub/crates.io
+  publication and registry consumer; registry OIDC deferred.
+- [Completed CLI0.2.0 release](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02):
+  SDKalpha.6 pin/resources, preserved historical bindings and actual registry
+  install/version/help/new; no SDK republishing.
 - [Single-gate release automation and registry promotion](RELEASE-PUBLICATION.md):
   automated build/sign/verification, final owner-approved GitHub then crates.io
   publication, local implementation and one-time rollout limits.

@@ -1,6 +1,23 @@
 # Yetlet Experimental Compatibility Policy
 
-## SDKalpha.6 preparation — 2026-11-01
+## Current distribution — 2026-11-02
+
+The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.6`; the independently
+published CLI is `yetlet-cli` `0.2.0`, generating apps pinned to SDKalpha.6.
+See the [SDK publication](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+and [CLI publication](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+for the actual artifacts and consumers. YT-220/221's DOM vocabulary, pre handling
+and opt-in navigation/images are available in SDKalpha.6; YT-223's static export
+is available in CLI0.2.0. Existing defaults and Experimental API limits remain.
+
+The public reader/first-app edition remains explicitly pinned to
+SDKalpha.5/CLI0.1.1; registry-only reference examples also retain their own SDKalpha.5
+pins, independently of the selected builder CLI. Publication does not promote
+those consumers or replay their qualification. Dated preparation and source-only
+checkpoints below retain their historical status; they are not current pending
+release gates.
+
+## Historical SDKalpha.6 preparation — 2026-11-01
 
 The owner selects SDK `0.9.0-alpha.6` preparation under
 [YT-227](YT-227-NEXT-RELEASE-PLAN.md), stopping before publication. Workspace/path
@@ -10,7 +27,7 @@ stays SDKalpha.5/CLI0.1.1 independently of development versions; a new edition
 still requires consumer review. This does not distribute new APIs or republish
 any previous version. YT-220/221's compatibility notes below remain applicable.
 
-## Current distribution and unreleased DOM source — 2026-10-31
+## Historical distribution and unreleased DOM source — 2026-10-31
 
 SDK0.9.0-alpha.5 is [published](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup)
 as yetlet/yetlet-browser; CLI0.1.1 is independently distributed. Historical

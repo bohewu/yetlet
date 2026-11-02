@@ -1,16 +1,15 @@
 # Current capability and API carrier map
 
-Date: 2026-10-31. The published Experimental SDK has two implementation packages:
-`yetlet` and `yetlet-browser`, version `0.9.0-alpha.5`, available from crates.io.
+Updated: 2026-11-02. The published Experimental SDK has two implementation packages:
+`yetlet` and `yetlet-browser`, version `0.9.0-alpha.6`, available from crates.io.
 The module map below describes capabilities, not additional installable crates.
 Base defaults select HTML; Browser defaults select DOM. Native capabilities and
 GPU/action integrations are additive opt-ins with explicit startup wiring.
 Earlier sixteen-package releases and qualification records keep their original
-sources. [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md) separately implements an
-unreleased opt-in CLI static HTML export and standalone consumer; it adds no SDK
-module/default. Bounded GNU/browser and MSVC source checks are complete; final
-CI/review acceptance is tracked in that record. Published CLI0.1.1
-does not contain that command. Earlier records keep their original
+sources. Opt-in static HTML export from [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md)
+is distributed in [CLI `0.2.0`](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02);
+it adds no SDK module/default. SDKalpha.6 includes the YT-220/221 DOM vocabulary
+and options, absent from SDKalpha.5. Earlier records keep their original
 source, API names and scope. See [the migration](YT-211-TWO-PACKAGE-MIGRATION.md).
 
 Start at [Current API reference](API-REFERENCE.md) for current entry points,
@@ -24,7 +23,7 @@ publication of its linked execution records.
 |---|---|---|---|
 | `yetlet::view` | Renderer-neutral Views/components and bounded binding vocabulary; M9 classification applies | Yes | [Core guide](../crates/yetlet/guides/core.md) |
 | `yetlet::html` | Escaped HTML serialization and allowlisted elements/attributes; M9 classification applies | Yes | [HTML guide](../crates/yetlet/guides/html.md) |
-| `yetlet_browser::dom` | Native validation/Wasm-only owned mount. Published SDK baseline:38 tags; unreleased source:89 default,90 with explicit ImagePolicy. YT-221 adds independent per-mount HTTPS link/image policies; strict defaults and same-origin forms remain. Not full HTML conformance | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md), [vocabulary](YT-220-HTML-DOM-IMPLEMENTATION.md), [URL/image contract](YT-221-DOM-URL-IMAGE-CONTRACT.md) |
+| `yetlet_browser::dom` | Native validation/Wasm-only owned mount. Since SDKalpha.6:89 default tags,90 with explicit ImagePolicy; SDKalpha.5 has38. Independent per-mount HTTPS link/image policies retain strict defaults and same-origin forms. Not full HTML conformance | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md), [vocabulary](YT-220-HTML-DOM-IMPLEMENTATION.md), [URL/image contract](YT-221-DOM-URL-IMAGE-CONTRACT.md) |
 | `yetlet_browser::dom_keyed` | Optional keyed children and disposable listener/entry ownership | Yes | [Keyed DOM guide](../crates/yetlet-browser/guides/dom-keyed.md) |
 | `yetlet::reactive` | Optional synchronous local reducer/commit graph with explicit lifetime | Yes | [Reactive guide](../crates/yetlet/guides/reactive.md) |
 | `yetlet::actions` | Typed commands and explicit local/HTTP execution boundaries | Yes | [Actions guide](../crates/yetlet/guides/actions.md) |
@@ -56,7 +55,7 @@ trusted request extensions stay out of browser builds and hydration state.
 | Admin Valkey/Auth adoption | YT-126 Done after focused verification and independent review; explicit feature/runtime selection, fresh policy and documented pre-SQL race limit. No generic crate bridge or cross-store commit fencing | [YT-126](YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md), [contract study](YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md) |
 | Shop optional catalog display cache | YT-183 Done after independent Reviewer PASS, zero issues/followups: app-only default-off `catalog-cache`, bounded age/admission and generation invalidation; Session/checkout remain authoritative, no framework cache crate or output cache | [Contract](YT-183-CATALOG-CACHE-CONTRACT.md), [implementation/new proof](YT-183-CATALOG-CACHE-IMPLEMENTATION.md) |
 | Opaque Bearer capabilities | Existing File Server/Production Starter app-owned route guards; no generic identity-aware JWT/introspection provider | [Bearer study](YT-119-BEARER-STUDY.md) |
-| Yetlet CLI | Independently published `yetlet-cli` `0.1.1`, executable `yetlet`, with typed parser/support API, explicit scaffolding and configuration-only generators; per-command/source/platform limits apply | [Current CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) |
+| Yetlet CLI | Independently published `yetlet-cli` `0.2.0`, executable `yetlet`, with typed parser/support API, explicit scaffolding, static HTML export and configuration-only generators; generated apps pin SDKalpha.6 and per-command/source/platform limits apply | [Current CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) |
 
 Application accounts, permissions, project policy, sensitive-write rechecks and
 deployment durability/HA remain application responsibilities. Authentication

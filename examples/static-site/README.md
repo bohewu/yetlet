@@ -1,7 +1,8 @@
 # Static HTML site with an optional Wasm island
 
-**Unreleased CLI source capability (YT-223).** Published CLI0.1.1 does not
-implement build --static. This application uses registry SDK0.9.0-alpha.5 and
+**Static export is available in published CLI `0.2.0` (YT-223/YT-229).**
+CLI `0.1.1` does not implement build --static. This reference application remains
+explicitly pinned to registry SDK0.9.0-alpha.5 and
 can be copied outside the repository without SDK source/path overrides.
 See the [static export contract](../../docs/YT-222-STATIC-HTML-CONTRACT.md) and
 [actual evidence and validation limits](../../docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
@@ -12,8 +13,10 @@ Prepare Rust/Cargo1.99, a native linker and the app's explicit Cargo.lock/cache.
 The provided lock is for this standalone [workspace]. Fetch missing dependencies
 as a separate operation; the CLI itself uses frozen/offline Cargo and never
 installs tools. HTML-only needs neither a server dependency nor Node/Wasm tools.
-Build the unreleased CLI from this checkout using its existing native/OpenSSL
-prerequisites:
+The commands below use a checkout-built CLI with the existing native/OpenSSL
+prerequisites. A [registry installation](../../tools/yetlet-cli/README.md#build-locally-and-create-an-application)
+also provides static mode; when using it, substitute the installed yetlet command
+for the checkout executable path below. To prepare the checkout executable:
 
 ```bash
 cargo build --offline --locked --manifest-path tools/yetlet-cli/Cargo.toml --bin yetlet
@@ -66,7 +69,7 @@ Existing public CLI settings validate first and cli.target must remain native;
 this app needs no settings files or runtime Settings loader. Explicit --static
 does not consult watch/Vite auto flags to select or skip its export stage.
 --release selects Cargo's profile, not APP_ENVIRONMENT. No new settings keys are
-introduced. See the [CLI guide](../../tools/yetlet-cli/README.md#unreleased-static-html-build).
+introduced. See the [CLI guide](../../tools/yetlet-cli/README.md#static-html-build).
 
 Exit/error handling preserves owned child exit/cancellation after cleanup.
 Invalid descriptors, unsafe paths/resources, source changes or an existing

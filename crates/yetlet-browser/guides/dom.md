@@ -3,20 +3,21 @@
 Mount a shared Rust View into an explicitly owned browser surface. This optional
 renderer replaces a subtree; native SSR works without selecting it.
 
-**Experimental SDK `0.9.0-alpha.5`, published on crates.io.** `yetlet-browser`
+**Experimental SDK `0.9.0-alpha.6`, published on crates.io.** `yetlet-browser`
 selects `dom` by default; actual mounting requires the WASM target and browser
 host. The commands below run checkout examples at their documented scope.
 
-**Unreleased checkout change:** [YT-220](../../../docs/YT-220-HTML-DOM-IMPLEMENTATION.md)
-extends the source DOM vocabulary to89 elements with scoped attributes and
-canonical table/disclosure/control validation. These additions are not in the
-published SDK0.9.0-alpha.5's38-element baseline. No new package is published;
-use the selected source checkout to try this section's new capabilities.
+**Since SDKalpha.6:** [YT-220](../../../docs/YT-220-HTML-DOM-IMPLEMENTATION.md)
+extends the DOM vocabulary to89 elements with scoped attributes and canonical
+table/disclosure/control validation. These additions are absent from the
+older SDKalpha.5's38-element baseline.
 
-**Unreleased opt-in:** [YT-221](../../../docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
+**Opt-in since SDKalpha.6:** [YT-221](../../../docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
 adds per-mount navigation/image options. Existing entry points retain89 tags,
 same-origin navigation and no images; explicitly selected images add img only.
-These APIs also require the source checkout and are not in SDK0.9.0-alpha.5.
+These APIs are distributed in SDKalpha.6; the independently pinned public guide
+edition still selects SDKalpha.5. See the [actual publication record](../../../docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+for source/consumer scope; no new browser qualification follows from this label.
 
 ## Prerequisites
 
@@ -52,8 +53,8 @@ validation alone does not mount anything or prove browser navigation acceptance.
 
 ### Supported subset and lifetime
 
-The published [YT-110 baseline](../../../docs/YT-110-DOM-CAPABILITIES.md#dom-vocabulary)
-supports38 tags and42 named attributes. The unreleased YT-220 checkout adds all51
+The older SDKalpha.5 [YT-110 baseline](../../../docs/YT-110-DOM-CAPABILITIES.md#dom-vocabulary)
+supports38 tags and42 named attributes. SDKalpha.6 includes all51 additional
 ordinary elements selected by the [coverage contract](../../../docs/YT-219-HTML-DOM-CONTRACT.md):
 text semantics, explicit table sections, figure/caption, pre, classic controls,
 details/summary and canvas/dialog hosts. New scoped attributes and numeric/keyword
@@ -68,7 +69,7 @@ This subset has no separate orphan-table-part/summary fragment context API. Nati
 disclosure/control behavior remains browser-owned; imperative dialog methods and
 focus are explicitly application-owned. Pre's parsed initial newline and adjacent
 CR/LF stream now match direct DOM construction; affected serialized pre bytes may
-change. Published artifacts retain their old behavior.
+change starting in SDKalpha.6. Older published artifacts retain their old behavior.
 See the [implementation record and limits](../../../docs/YT-220-HTML-DOM-IMPLEMENTATION.md).
 
 Initial input/textarea/select/checkbox defaults are declarative; live values, chosen events, reset and submission remain browser/application-owned. Textarea text has LF normalization and preserves an initial newline across SSR and DOM. See the shared [native controls example](../../../examples/todo-ui/src/controls.rs), available at `/app` and the no-JS `/controls` route in Todo.
@@ -77,7 +78,7 @@ Initial input/textarea/select/checkbox defaults are declarative; live values, ch
 
 The caller owns the target and event listener lifetime. Keep listeners outside the replaced subtree or explicitly release/rebind them. Subtree replacement does not preserve child identity, focus or selection as a general contract, and unexpected DOM API failures are not transactional rollback. Choose the opt-in `dom-keyed` feature for proven identity-sensitive collections. There is no general VDOM, hydration, resumability or GPU acceleration.
 
-### Explicit links and images (unreleased source)
+### Explicit links and images
 
 Pass typed options to one owned surface; neither policy enables the other.
 This example allows a named HTTPS link and local images, without permitting

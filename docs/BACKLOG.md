@@ -1,5 +1,16 @@
 # Yetlet Backlog
 
+**YT-230 release-document enforcement (2026-11-02):** Done at local implementation scope.
+The owner requests a repository rule and CI gate following stale CLI publication
+labels. [Contract](RELEASING.md#release-documentation-gate): manifest-derived
+README/install/SDK references, bounded current-reader status checks, preserved
+history/pinned editions and exact archived-README checks before publication.
+Affected60-test baseline PASS; new punctuation-boundary failure retained and
+corrected, with both focused boundary/history cases PASS. Source/YAML and
+docs75/230/whitespace checks PASS. Independent Reviewer PASS0,24 stable hashes,
+zero issues/followups. Delivery/remote activation remains separate; no Commit,
+Push, hosted, signing, publication or Pages action occurs.
+
 **Completed CLI0.2.0 publication (2026-11-02):**
 [Owner-approved41319625709/1](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
 PASS: five-file GitHub Experimental pre-release, exact crates.io archive and
@@ -1100,6 +1111,8 @@ separate implementation authority.
 | YT-228 | P1 | M | M10 | Prepare SDKalpha.6 through the final publication gate | YT-227 | [Accepted preparation and subsequent publication](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01): reviewed metadata/guide fix and GNU/Wasm/MSVC consumers; PR47/Cc7e6372, PR48/SVP6531001 and actual required CI PASS. Build/readback/prepare/sign/independent verification each PASS attempt1; two subjects/all44 private entries, frozen payloads and final Reviewer PASS0. Owner-approved41308935654/1 completes six-file GitHub prerelease then both registry uploads; anonymous bytes/checksums/index and fresh registry-only exact-version resolve/locked compile PASS. Initial P1/operator failures retained, no retry/re-sign/source or tag rewrite. Original preparation acceptance preserved; CLI0.2 not started, three closing docs local/uncommitted | Done |
 
 | YT-229 | P1 | M | M10 | Prepare independent CLI0.2.0 against published SDKalpha.6 | YT-216, YT-223, YT-228 | [Accepted preparation and subsequent publication](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02): manifest-driven current expectations; reviewed GNU/archive/installed/generated/static and MSVC proof, immutable C7fb963a/SVP86e5da2 and actual required CI PASS. Five release stages PASS attempt1, one CLI subject/all54 private entries; final Reviewer PASS0 and actual owner gate followed by successful publisher41319625709/1. Exactly five public files and original registry archive/checksum verified; fresh anonymous install/exact version/help/new PASS, generated SDKalpha.6 pin exact with no path patches or forwarded credentials. Original failures and preparation scope retained; no retry, duplicate upload, SDK republishing or guide promotion | Done |
+
+| YT-230 | P1 | S | M10 | Enforce release documentation before packaging and publication | YT-229 | [Release-document gate](RELEASING.md#release-documentation-gate): repository/SOP rule, manifest-derived README/install/output/SDK references, bounded current-reader status and pinned-edition checks in required CI/source gate, actual frozen README check before publication writes. Affected60-test baseline PASS; added punctuation-boundary failure preserved and corrected, focused boundary/history2 PASS, actual retained CLI020 README rejected without relabeling its release. Source check/YAML/docs75/230/whitespace PASS. Independent Reviewer PASS0,24 unchanged hashes and zero issues/followups; semantic review limits, historical schema1 and prior14-file stale-doc corrections preserved. Done locally; remote activation/Git delivery separate, no hosted/signing/publication/Pages action | Done |
 
 ## M25 — Broader HTML DOM support and static-site delivery
 

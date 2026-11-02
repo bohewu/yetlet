@@ -1,15 +1,18 @@
 # Documentation sources and publication scope
 
-Date: 2026-10-26 classification, updated 2026-10-31 for current distribution.
+Date: 2026-10-26 classification, updated 2026-11-02 for current distribution.
 The published Experimental SDK is `yetlet` and `yetlet-browser`
-`0.9.0-alpha.5`; the independently published CLI is `yetlet-cli` `0.1.1`.
+`0.9.0-alpha.6`; the independently published CLI is `yetlet-cli` `0.2.0`.
 Use module guides and rustdoc from the version/revision you consume. The
-[alpha.5 record](ALPHA5-HOSTED-RECORD.md) and
-[CLI0.1.1 record](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+[SDK publication record](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01) and
+[CLI publication record](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
 retain their actual distribution/consumer evidence. Older previews retain their
 own package layouts, partial registry results and failure histories. This documentation
 classification activates no website/Wiki or additional publication, support or
 repository-visibility change. Historical candidate decisions retain their scope.
+The public reader/first-app edition remains the explicitly selected
+SDKalpha.5/CLI0.1.1 pair; current-release references do not silently repin its
+consumer or promote the live site.
 
 ## Canonical sources
 
@@ -25,10 +28,12 @@ revision and feature/target selection of any generated rustdoc. Existing tests
 and qualification records remain bound to their own source identities; publishing
 documentation does not renew that evidence or make an API stable.
 
-[The public documentation plan](PUBLIC-DOCS-PLAN.md) proposes GitHub Pages as
+[The public documentation plan](PUBLIC-DOCS-PLAN.md) records GitHub Pages as
 the reader entry point, with selected repository guides and version-matched API
-documentation. A separate Wiki contract is not recommended. The plan activates
-no site; source doc-comment gaps and the minimum implementation order are explicit.
+documentation. The [completed cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
+records the actual Yetlet-built public reader. A separate Wiki contract remains
+deferred. The plan's original setup order and doc-comment findings retain their
+historical scope; a plan alone does not authorize another deployment.
 
 ## Classification and selected reader sources
 
