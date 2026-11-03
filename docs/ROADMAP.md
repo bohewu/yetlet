@@ -1,5 +1,30 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-233 development artifact management (2026-11-03):**
+[Bounded contract and checkpoint](DEV-ARTIFACTS.md) separates new isolated
+rebuildable caches from retained evidence, adds read-only space inventory/cleanup
+preview and keeps legacy failure records at their original locations. Nine new
+focused cases pass on GNU and Windows after a retained Windows test-path failure
+and affected-case-only correction. Main inventories cover local Linux and both
+selected Windows locations; mint-game report readback/hash PASS. Initial
+independent implementation and first delta Reviewer PASS0 retain an unavailable
+model/effort trace. Extra names-only listing terminates lost/not_started after a
+connection failure, with no accepted output or retry; original main inventories
+remain valid. Final completion-record delta Reviewer PASS0 accepts YT-233 Done
+at the non-destructive tooling and scoped inventory boundary. At that initial
+checkpoint, no actual cache deletion, runtime/Cargo configuration change, old
+qualification replay, Commit, Push or deployment was authorized.
+
+**YT-233 owner-authorized cleanup followup (2026-11-03):** The owner subsequently
+authorizes actual scoped cache deletion. [Completed operations](DEV-ARTIFACTS.md#owner-authorized-cleanup--2026-11-03)
+remove only confirmed Cargo compiler internals on local Linux and mint-game;
+observed free-space increases total53.20GiB, all selected paths are absent and
+retained-file/source/HEAD/status checks pass. Other Windows locations have no
+selected Yetlet cache. Original evidence/failures/final artifacts remain;
+post-operation remote full-file readback timeout stays explicit, without a
+cleanup retry. Operational independent Reviewer PASS0 accepts completion. This is not automatic
+retention or Git/runtime/global configuration authority.
+
 **YT-232 authorized public guide update (2026-11-02):**
 [Delivered source/HTTPS proof](YT-232-PUBLIC-GUIDE-EDITION.md#subsequent-delivery-and-public-pages-update--2026-11-02)
 binds PR54 squash master993ce56 to the unchanged reviewed tree; PR/master

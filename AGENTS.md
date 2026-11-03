@@ -20,6 +20,15 @@ Write **all repository documentation in English**, including the README, ADRs, a
 6. Do not commit, push, deploy or alter external environments without explicit instruction. Preserve unrelated work.
 7. When changing a fundamental architectural decision, update the relevant ADR and explain tradeoffs.
 
+## Development artifacts
+
+Follow `docs/DEV-ARTIFACTS.md` for new isolated verification runs, including
+WebCodex runners. Separate rebuildable Cargo output from logs, original failures,
+manifests and accepted artifacts; retain existing historical evidence in place.
+Reuse stable daily caches. Use `scripts/dev_artifacts.py` for layout, space
+inventory and cleanup preview only. Actual deletion requires separate authority;
+never run wholesale cleanup on a mixed historical `target/` tree.
+
 ## Version-control guard
 
 Before committing or pushing, use Commit Guard with the explicit `strict` profile and `builtin` engine: scan the staged index before a commit and the exact outgoing commit range before a push. Any nonzero result stops the operation; do not fall back to audit, bypass hooks, or weaken the guard. A passing scan does not grant authorization to commit or push; preserve the user's explicit authorization requirement.

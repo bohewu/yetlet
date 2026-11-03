@@ -32,6 +32,11 @@ needs the authority appropriate to that operation.
 
 ## Local checks and CI
 
+Keep new verification logs, original failures and accepted artifacts outside
+rebuildable Cargo caches. Use the [artifact layout and read-only space preview](DEV-ARTIFACTS.md)
+for isolated runs and WebCodex runners; existing mixed historical `target/` trees
+must not be cleaned wholesale. Ordinary daily builds reuse stable caches.
+
 Release-tool/document-only changes use a bounded CI lane when the complete Git
 delta matches an explicit allowlist and both required checks have already passed
 on the exact protected-master base. Both required job names still execute and
