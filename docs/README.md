@@ -42,6 +42,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Maintainer entry points
 
+- [Development caches and verification evidence — YT-233](DEV-ARTIFACTS.md):
+  separate new cache/evidence roots, inventory logical sizes and preview cleanup;
+  preserve failures and unknown legacy output, with no deletion operation.
+
 - [Next public guide edition — YT-232](YT-232-PUBLIC-GUIDE-EDITION.md): selected
   SDKalpha.6/CLI0.2.0 sources, registry consumers, static introduction and bounded
   local verification; live Pages promotion remains separate.
