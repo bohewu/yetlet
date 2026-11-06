@@ -1,16 +1,19 @@
 # Yetlet
 
-**Rust UI, HTML first.**
+**A small, composable, extensible Rust web framework.**
+
+Yetlet is a small, composable Rust web framework built around explicit capabilities
+and clear separation of concerns. HTML rendering is a first-class feature,
+including server-side rendering that works without JavaScript. Browser
+interactivity and additional capabilities are opt-in.
 
 Build server-rendered pages and HTTP APIs with ordinary Axum handlers. Share
 Rust Views with optional browser WASM when a screen needs local interaction.
-Yetlet is for Rust teams that want to keep UI composition, server behavior and
-explicit browser enhancements in one language.
 
 ## Why Yetlet
 
-- **Start with HTML.** Serve useful pages and native forms without JavaScript
-  or a persistent server-side UI connection.
+- **First-class HTML rendering.** Serve useful pages and native forms without
+  JavaScript or a persistent server-side UI connection.
 - **Keep native Rust HTTP.** Use Axum extractors, Tower middleware and typed state
   alongside a small `App`/`Page` facade.
 - **Share Views across targets.** Reuse Rust UI values for SSR and opt-in browser
