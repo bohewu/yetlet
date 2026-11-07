@@ -3,21 +3,19 @@
 
 use axum::{Router, extract::Path};
 use yetlet::server_axum::{App, Page};
-use yetlet::view::{Element, View};
-
+use yetlet::view::{
+    View,
+    tags::{h1, main},
+};
 async fn home() -> View {
-    Element::new("main")
-        .child(Element::new("h1").child(View::text("Hello, world!")))
-        .into()
+    main().child(h1().text("Hello, world!")).into()
 }
-
 async fn hello(Path(name): Path<String>) -> Page {
     Page::new(
         "Yetlet Hello",
-        Element::new("main").child(Element::new("h1").child(View::text(format!("Hello, {name}!")))),
+        main().child(h1().text(format!("Hello, {name}!"))),
     )
 }
-
 /// The same router can be served by native Axum, without a Yetlet runner.
 pub fn app() -> Router {
     App::new()

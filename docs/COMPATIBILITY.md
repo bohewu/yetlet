@@ -1,5 +1,35 @@
 # Yetlet Experimental Compatibility Policy
 
+## Unreleased YT-234 typed authoring helpers — 2026-11-07
+
+The feature branch `feature/view-authoring-api` adds
+`yetlet::view::tags` with typed fluent constructors and additive convenience
+methods. This is **source-only**, not shipped in SDK `0.9.0-alpha.6`; the
+published first-app contract and CLI pins do not change. The existing owned
+`Element`/`View` representation, append-only `Element::attribute`, renderer
+policies, native/browser feature boundaries and Rust 1.99 MSRV remain intact.
+Convenience `.id`/`.class` set or replace, `.add_class` merges distinct
+class tokens, and `.placeholder` is only on typed input/textarea. General raw
+`.attribute` still follows append-only duplicate validation. No JSX,
+inline-style API, browser runtime or WASM renderer change is introduced.
+
+
+## Unreleased YT-235 full ordinary tag authoring — 2026-11-07
+
+On top of YT-234, the local feature branch includes 101 constructor names
+corresponding to the dated YT-219 standard HTML ordinary View inventory
+(89 default Browser DOM tags, opt-in `img`, and 11 SSR-only/DOM-deferred tags).
+Document/head elements, forbidden executable/embedded tags, foreign namespace
+roots and custom elements do not receive convenience constructors. This is
+an authoring API change, **not** a change to SSR's broad tag grammar or Browser
+DOM's existing admission/URL/image policy. Selected typed attribute setters
+(`href`, `src`, `alt`, `type_`, `for_`, `name`, `value`) upsert on
+the typed builder; generic `attribute` retains append-only semantics.
+The shared `View` representation and renderer behavior are unchanged, as are
+the published SDK alpha.6 and CLI 0.2.0 packages. See
+[YT-235 follow-up](YT-235-TAG-COVERAGE-PLAN.md) for exact inclusion/exclusion
+and verification.
+
 ## Current distribution — 2026-11-02
 
 The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.6`; the independently

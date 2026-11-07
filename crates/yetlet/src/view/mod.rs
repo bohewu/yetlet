@@ -9,6 +9,9 @@
 /// Validated renderer-neutral identity, key, and dynamic-slot vocabulary.
 pub mod binding;
 
+/// Typed, fluent HTML tag constructors lowering to the existing View tree.
+pub mod tags;
+
 /// A UI tree that can be consumed by either a native HTML or a browser renderer.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum View {

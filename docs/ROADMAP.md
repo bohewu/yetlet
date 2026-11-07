@@ -1,4 +1,16 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
+**YT-234/235 View authoring expansion (2026-11-07):** Done at
+local source and scoped verification only.
+[YT-235 coverage record](YT-235-TAG-COVERAGE-PLAN.md) builds on
+[YT-234 typed Builder](YT-234-VIEW-AUTHORING-API-PLAN.md): 101 standard
+View constructors, scoped attribute helpers, and typed void-element guards
+lower to the existing tree without changes to SSR/DOM runtime, Image Policy
+or any published SDK. Native and wasm32 validation plus both independent
+design/implementation Reviewer gates PASS with zero material findings.
+The branch is uncommitted; PR CI, Git delivery, browser interaction and
+publication have not been authorized or performed.
+
+
 
 **YT-233 development artifact management (2026-11-03):**
 [Bounded contract and checkpoint](DEV-ARTIFACTS.md) separates new isolated

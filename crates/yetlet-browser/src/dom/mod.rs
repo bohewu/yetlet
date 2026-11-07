@@ -313,7 +313,46 @@ pub use browser::{mount, mount_with_options};
 mod tests {
     use super::{DomPolicyError, validate};
     use yetlet::view::{Element, View};
+    #[test]
+    fn typed_authoring_tree_is_admitted_by_existing_dom_policy() {
+        use yetlet::view::tags::{div, h1, input, textarea};
 
+        let view: View = div()
+            .id("app")
+            .class("container")
+            .child(h1().text("Search"))
+            .child(input().placeholder("Query"))
+            .child(textarea().placeholder("Notes").text("Draft"))
+            .into();
+
+        assert_eq!(validate(&view), Ok(()));
+    }
+
+    #[test]
+    fn typed_link_image_and_deferred_tags_obey_existing_dom_policies() {
+        use super::{DomOptions, ImagePolicy, validate_with_options};
+        use yetlet::view::tags::{a, div, img, table, tbody, td, tr, video};
+
+        let ordinary: View = div()
+            .child(a().href("/about").text("About"))
+            .child(table().child(tbody().child(tr().child(td().text("Cell")))))
+            .into();
+        assert_eq!(validate(&ordinary), Ok(()));
+
+        let image: View = img().src("/images/logo.png").alt("Logo").into();
+        assert_eq!(
+            validate(&image),
+            Err(DomPolicyError::UnsupportedTag("img".into()))
+        );
+        let options = DomOptions::default().with_image_policy(ImagePolicy::SameOrigin);
+        assert_eq!(validate_with_options(&image, &options), Ok(()));
+
+        let deferred: View = video().src("/media.webm").into();
+        assert_eq!(
+            validate_with_options(&deferred, &options),
+            Err(DomPolicyError::UnsupportedTag("video".into()))
+        );
+    }
     #[test]
     fn rejects_duplicate_names_and_void_children() {
         let duplicate = Element::new("div")
