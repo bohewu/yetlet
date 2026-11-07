@@ -1,5 +1,31 @@
 # Yetlet Backlog
 
+**YT-235 ordinary View tag authoring coverage (2026-11-07):** Done at
+local source and bounded validation scope. The [YT-234 follow-up plan](YT-235-TAG-COVERAGE-PLAN.md)
+covers 101 standard constructors from the fixed YT-219 inventory, nine typed
+void elements and seven selected scoped attribute setters, while preserving
+SSR, DOM, Image Policy, existing append-only generic attributes and published
+SDK boundaries. Two independent Reviewer Jobs (design and implementation) both
+return PASS with zero issues/followups. Native unit tests (23), doctests
+(3 pass + 4 compile-fail), Browser DOM unit tests (20), both wasm32 checks,
+Clippy, rustfmt, docs and whitespace checks pass. This is source-only:
+no Commit, Push, PR, Merge, release, deployment or cache deletion.
+
+
+
+
+**YT-234 typed View authoring (2026-11-07):** Done at local source and verification scope.
+[Scoped API plan](YT-234-VIEW-AUTHORING-API-PLAN.md) received independent
+ad hoc design and implementation Reviewer PASS, both with zero blocking issues
+and required followups. The additive typed tag constructors, class/set
+semantics, input/textarea placeholder and compile-time void-child guards
+lower to the existing owned `Element`/`View`; renderer/runtime/package
+boundaries and append-only `Element::attribute` are unchanged. Exact native
+View/DOM tests, rustdoc compile-fail checks, wasm32 compile, Clippy,
+formatting, documentation and whitespace checks pass on the feature branch.
+No Commit, Push, PR, Merge, release, browser interaction qualification or
+deployment was performed or authorized.
+
 **YT-232 public delivery (2026-11-02):**
 [PR54/master993ce56 and Pages evidence](YT-232-PUBLIC-GUIDE-EDITION.md#subsequent-delivery-and-public-pages-update--2026-11-02)
 records matching reviewed tree04e96ce, first-attempt PR/master necessary CI,

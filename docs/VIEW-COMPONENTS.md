@@ -107,6 +107,92 @@ It adds no task mutation, persistent state, browser event listener or automatic
 DOM update. The existing `/hello/Ada` route remains as described in the first-app
 walkthrough. A no-JS page needs none of those optional browser capabilities.
 
+## Optional typed tag builders (unreleased source-only YT-234)
+
+The current repository source, on the YT-234 feature branch, additionally offers
+`yetlet::view::tags` as a lightweight authoring alternative. **This is not part
+of the published SDK 0.9.0-alpha.6** or the registry-first scaffold above;
+that introductory example deliberately continues using the published API.
+
+```rust
+use yetlet::view::{View, tags::{div, h1, input, textarea}};
+
+let panel: View = div()
+    .id("app")
+    .class("container")
+    .add_class("active")
+    .child(h1().text("Hello <Yetlet>"))
+    .child(input().placeholder("Search..."))
+    .child(textarea().placeholder("Notes..."))
+    .into();
+```
+
+These constructors produce the exact same owned `Element` / `View` tree as
+`Element::new`. They do not invoke a template compiler or alter the HTML/DOM
+renderers. `.id()` replaces an existing id, `.class()` replaces the class
+tokens, and `.add_class()` appends distinct HTML ASCII-whitespace-separated
+tokens in first-seen order, leaving just one class attribute. An empty addition
+on a tag without classes does nothing.
+
+`.placeholder()` is exposed on typed `input()` and `textarea()`, not on
+`div()`. Child/text methods are not exposed on typed void elements such as
+`input()`. Generic `.attribute(name, value)` remains append-only, just like
+`Element::attribute`, so a duplicate appended *after* a convenience setter
+can still be rejected by the renderer. A following dedicated setter
+consolidates its own attribute name. There is no `.style()` helper: inline
+style remains forbidden by the existing HTML and DOM output policies.
+
+The existing constructors and mixed child composition remain valid. Typed
+authoring is only an ergonomic, partial compile-time aid; renderer policies
+still validate the complete tree and can differ between native HTML and DOM.
+See [the source-only plan](YT-234-VIEW-AUTHORING-API-PLAN.md) and
+[implementation](../crates/yetlet/src/view/tags.rs) for the exact contract.
+
+
+### Complete standard tag authoring — YT-235 (unreleased)
+
+The source-only YT-235 follow-up expands the module to **101 standard HTML
+constructors** from the dated [YT-219 inventory](YT-219-HTML-INVENTORY.md):
+89 currently admitted Browser DOM elements, `img()` (admitted in Browser only
+when the caller selects an `ImagePolicy`) and 11 native SSR-only/deferred
+elements. The same owned `View` tree reaches the existing HTML and DOM
+renderers; these constructors do not add browser DOM support.
+
+```rust
+use yetlet::view::{View, tags::{a, div, img, table, tbody, td, tr}};
+
+let page: View = div()
+    .child(a().href("/about").text("About"))
+    .child(img().src("/logo.png").alt("Logo"))
+    .child(table().child(tbody().child(tr().child(td().text("Hello")))))
+    .into();
+```
+
+Frequently used attributes have optional typed setters: `.href()` for
+`a`/`area`, `.src()` for `img` and selected media/source tags,
+`.alt()` for `img`/`area`, `.type_()` for supported type-bearing
+tags, `.for_()` for `label`/`output`, and `.name()`/`.value()` for
+selected form-associated elements. All these methods **set/replace** their
+own attribute. The general `.attribute()` remains append-only. URL and
+other value checks still belong to the selected renderer.
+
+The nine ordinary View void tags (`area`, `br`, `col`, `hr`, `img`,
+`input`, `source`, `track`, `wbr`) have no typed `.child()` or
+`.text()` method. `video`, `audio`, `source`, `track`, `picture`,
+`area`, `map`, `noscript`, `template`, `slot`, and
+`selectedcontent` are currently SSR-only/deferred for Browser DOM.
+A Browser `img` needs `DomOptions::with_image_policy`. Its constructor
+does not opt the application into image loading.
+
+Document/head-owned tags (`html`, `head`, `body`, `base`, `link`,
+`meta`, `title`) are intentionally not ordinary View conveniences; use
+the separate document writer. The five forbidden executable/embedded tags
+remain rejected. Foreign namespaces and custom elements are outside this
+API. This is **not** full HTML conformance or an enlargement of either
+renderer policy.
+
+See [YT-235's scope and evidence](YT-235-TAG-COVERAGE-PLAN.md) and
+[the typed constructors](../crates/yetlet/src/view/tags.rs).
 ## Configuration and errors
 
 `Element` and `View::text` store values; construction does not sanitize them.
