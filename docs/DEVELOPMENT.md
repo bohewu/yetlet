@@ -114,6 +114,14 @@ path filters or the release-only CI classifier: their file limits or broader
 allowlists must not suppress security analysis. Required Rust and documentation
 checks remain unchanged, including checks of executable examples in Markdown.
 
+YT-236 adds workflow-level concurrency to cancel superseded scans **only for
+the same pull request**. Different PRs remain independent, and unique run IDs
+preserve all default-branch, weekly, and manually requested CodeQL runs,
+including pending jobs. The four-language matrix, triggers, and documented
+Markdown-only admission are unchanged. The observed Rust CodeQL PR execution
+was diff-informed but did not use an overlay-base cache; Rust overlay support
+is not presumed or forced. See [YT-236 diagnostics](YT-236-CODEQL-PR-CONCURRENCY.md).
+
 Activation is a separate delivery step. After the workflow is merged and its
 local checks pass, record the current default-setup settings, disable default
 setup, set `CODEQL_ADVANCED_ENABLED=true`, and run one manual analysis to verify
