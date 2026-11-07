@@ -8,6 +8,12 @@ on:
     - cron: '31 5 * * 2'
   workflow_dispatch:
 
+# Supersede outdated CodeQL runs for the same PR only. A unique run ID
+# for non-PR events also prevents GitHub from discarding queued master,
+# scheduled, or manually requested scans.
+concurrency:
+  group: yetlet-codeql-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 permissions:
   contents: read
 

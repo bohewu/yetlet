@@ -1,5 +1,16 @@
 # Yetlet Backlog
 
+**YT-236 CodeQL PR concurrency (2026-11-07):** Done at local source
+and static verification scope. The [diagnosis and acceptance record](YT-236-CODEQL-PR-CONCURRENCY.md)
+retains all four language scans and protected-master, weekly, and manual
+analysis while canceling superseded scans for the same PR only. GitHub job logs
+confirm PR diff-informed Rust analysis but no usable overlay database cache;
+no unsupported Rust overlay or custom caching is introduced. YAML parsing,
+nine event-isolation cases, documentation and whitespace checks PASS; an
+independent Reviewer returned PASS, zero issues/followups. The owner
+subsequently authorized Git PR delivery subject to strict Guard and CI;
+hosted concurrency cancellation behavior remains unverified until a later
+superseded PR run actually occurs.
 **YT-235 ordinary View tag authoring coverage (2026-11-07):** Done at
 local source and bounded validation scope. The [YT-234 follow-up plan](YT-235-TAG-COVERAGE-PLAN.md)
 covers 101 standard constructors from the fixed YT-219 inventory, nine typed
