@@ -96,6 +96,37 @@ GitHub documents that skipping a required workflow with path filters or
 See [GitHub's explanation](https://docs.github.com/en/actions/how-tos/manage-workflow-runs/skip-workflow-runs)
 and the [release retrospective](RELEASE-RETROSPECTIVE.md).
 
+## CodeQL scope and activation
+
+[codeql.yml](../.github/workflows/codeql.yml) prepares advanced setup with the
+same four language families as the current GitHub default setup: Actions,
+JavaScript/TypeScript, Python and Rust, using the default query suite. Its jobs
+remain disabled until the repository variable `CODEQL_ADVANCED_ENABLED` is
+`true`; preparing this file does not change the active remote configuration.
+
+For PR and protected `master` push events, a quick scope job reads the complete
+Git diff. Analysis is skipped only when every changed path ends in `.md`.
+Mixed changes, source doc comments, dependency/lockfiles, scripts, templates and
+workflow changes still select all four analyses. Renames include both paths;
+missing history, an unknown base or an empty diff select analysis. Scheduled
+weekly and manual runs always analyze. The scope job does not use GitHub event
+path filters or the release-only CI classifier: their file limits or broader
+allowlists must not suppress security analysis. Required Rust and documentation
+checks remain unchanged, including checks of executable examples in Markdown.
+
+Activation is a separate delivery step. After the workflow is merged and its
+local checks pass, record the current default-setup settings, disable default
+setup, set `CODEQL_ADVANCED_ENABLED=true`, and run one manual analysis to verify
+all four uploads. Active default setup rejects advanced analysis uploads, so do
+not run both configurations together. If activation fails, retain the failure,
+disable the advanced variable and restore the recorded default setup without
+automatically retrying. Do not remove the existing alert dismissals, change
+branch protection or add vulnerability ignores. Include any additional protected
+development branch in the push trigger if the branch model changes.
+
+See GitHub's [advanced workflow configuration](https://docs.github.com/en/code-security/reference/code-scanning/workflow-configuration-options)
+and [default/advanced setup interaction](https://docs.github.com/en/code-security/reference/code-scanning/troubleshoot-analysis-errors/results-different-than-expected).
+
 ## Git authority and strict Commit Guard
 
 For agents, implementation authority is not Commit, Push, Merge, tag or release

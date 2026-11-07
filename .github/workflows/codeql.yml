@@ -1,0 +1,91 @@
+name: Yetlet CodeQL
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+  schedule:
+    - cron: '31 5 * * 2'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scope:
+    name: CodeQL change scope
+    if: vars.CODEQL_ADVANCED_ENABLED == 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      docs_only: ${{ steps.scope.outputs.docs_only }}
+    steps:
+      - name: Checkout complete history
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: Identify a complete Markdown-only change
+        id: scope
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          HEAD_SHA: ${{ github.sha }}
+        shell: python
+        run: |
+          import os
+          import re
+          import subprocess
+
+          docs_only = False
+          reason = "scheduled, manual or uncertain scope requires analysis"
+          base = os.environ.get("BASE_SHA", "")
+          head = os.environ.get("HEAD_SHA", "")
+          if (
+              os.environ["GITHUB_EVENT_NAME"] in {"push", "pull_request"}
+              and re.fullmatch(r"[0-9a-f]{40}", base)
+              and re.fullmatch(r"[0-9a-f]{40}", head)
+              and base != "0" * 40
+          ):
+              try:
+                  result = subprocess.run(
+                      ["git", "diff", "--name-only", "--no-renames", "-z", base, head, "--"],
+                      check=True, capture_output=True,
+                  )
+                  paths = result.stdout.split(b"\0")[:-1]
+                  docs_only = bool(paths) and all(path.endswith(b".md") for path in paths)
+                  reason = "Markdown-only change" if docs_only else "code, other inputs or empty diff"
+              except (OSError, subprocess.CalledProcessError):
+                  reason = "unavailable Git history requires analysis"
+          value = str(docs_only).lower()
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"docs_only={value}\n")
+          print(f"docs_only={value}: {reason}")
+
+  analyze:
+    name: CodeQL (${{ matrix.language }})
+    needs: scope
+    if: needs.scope.outputs.docs_only != 'true'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    permissions:
+      contents: read
+      actions: read
+      security-events: write
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [actions, javascript-typescript, python, rust]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          persist-credentials: false
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
+        with:
+          languages: ${{ matrix.language }}
+          build-mode: none
+      - name: Analyze
+        uses: github/codeql-action/analyze@33d7b85da1a04171e211befe2c739303b9a4c066 # v4
+        with:
+          category: /language:${{ matrix.language }}
