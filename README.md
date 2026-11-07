@@ -89,6 +89,7 @@ handlers, use ordinary extractors and `Page` or `Result<Page, E>`; see the
 | I want to… | Start here |
 |---|---|
 | Create my own standalone app | [Build your first Yetlet app](docs/FIRST-APP.md) |
+| Create a browser-only WASM app | [Browser first-app walkthrough](docs/BROWSER-APP.md) |
 | Write Views and reusable components | [View/component guide](docs/VIEW-COMPONENTS.md) |
 | Build an SSR page or JSON API | [Hello World](examples/hello-world/README.md) · [REST API](examples/rest-api/README.md) |
 | Add browser interaction | [Todo and Search Island](examples/todo-server/README.md) · [browser DOM guide](crates/yetlet-browser/guides/dom.md) |

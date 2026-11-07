@@ -16,6 +16,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
 - [Build your first Yetlet app](FIRST-APP.md): CLI0.2.0 → protected standalone project → SDK0.9.0-alpha.6 → app lock/cache → first build/run, then an optional [static-export path](FIRST-APP.md#next-export-a-static-site).
+- [Build a browser-only Yetlet app](BROWSER-APP.md): published CLI/SDK → explicit tool and lock preparation → local state/events → build/preview/watch → static ship directory.
 - [Write Views and reusable components](VIEW-COMPONENTS.md): typed data → functions → lists/conditions → existing SSR handler.
 - [Opt-in integration quick reference](OPT-IN-QUICK-REFERENCE.md): package/feature → startup API/options → consumer settings/defaults.
 - [Settings, options and logging](SETTINGS-OPTIONS-LOGGING.md): startup loading → validation → typed options → native state and application-owned diagnostics, using existing examples.
@@ -41,6 +42,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   doc-comment gaps and deferred Wiki.
 
 ## Maintainer entry points
+
+- [Browser application DX research](BROWSER-DX-RESEARCH.md): selected
+  documentation gaps, reuse of the browser starter and event ownership, and
+  source-bound Yetlet evidence without new runtime or API changes.
 
 - [Development caches and verification evidence — YT-233](DEV-ARTIFACTS.md):
   separate new cache/evidence roots, inventory logical sizes and preview cleanup;
