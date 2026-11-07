@@ -43,6 +43,10 @@ share credentials, cookies, CSRF tokens or complete environment/settings dumps.
 
 ## Browser builds and interaction
 
+For one complete setup and execution path, follow the
+[browser-only WASM walkthrough](BROWSER-APP.md). It also explains which generated
+files own state, listeners, loading and deployable assets.
+
 | Symptom | Possible cause | Correction | Corresponding guide |
 |---|---|---|---|
 | Browser build reports a missing tool or wasm-bindgen identity/version mismatch | The WASM target or matching CLI is missing, or another executable is selected from PATH | Prepare `wasm32-unknown-unknown` and the wasm-bindgen CLI matching the applicable lock (currently 0.2.129), with the documented installation root/PATH. Use the selected app's guide for its Node/npm requirements; native SSR needs neither | [Browser tool setup](../README.md#choose-your-next-step) · [Todo build](../examples/todo-server/README.md#run) |

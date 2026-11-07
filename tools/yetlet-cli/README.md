@@ -111,6 +111,7 @@ No SDK/CLI version is republished by this source change.
 ## First-use prerequisites
 
 For one guided plain-native path, follow [Build your first Yetlet app](../../docs/FIRST-APP.md).
+For the existing browser target, follow [Build a browser-only Yetlet app](../../docs/BROWSER-APP.md).
 This reference retains the broader target, settings and execution choices.
 
 Prepare tools and dependency caches explicitly before running the examples.

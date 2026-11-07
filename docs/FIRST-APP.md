@@ -5,6 +5,9 @@ Create a standalone native SSR app with the published source-installed CLI and
 scaffold; the app needs no local SDK source or Cargo path overrides. APIs remain
 Experimental. CLI `0.2.0` and SDK `0.9.0-alpha.6` have independent versions.
 
+For an app whose UI and state run in the browser without a native HTTP backend,
+choose the separate [browser-only WASM walkthrough](BROWSER-APP.md).
+
 ## Prerequisites
 
 - Use the same POSIX terminal for all stages; no repository clone is needed.

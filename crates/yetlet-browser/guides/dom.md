@@ -15,7 +15,7 @@ older SDKalpha.5's38-element baseline.
 **Opt-in since SDKalpha.6:** [YT-221](../../../docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
 adds per-mount navigation/image options. Existing entry points retain89 tags,
 same-origin navigation and no images; explicitly selected images add img only.
-These APIs are distributed in SDKalpha.6 and selected by the next guide source
+These APIs are distributed in SDKalpha.6 and described by the selected guide
 edition. See the [actual publication record](../../../docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
 for source/consumer scope; no new browser qualification follows from this label.
 
@@ -29,6 +29,11 @@ including tool installation location/PATH. Run commands from the repository root
 stop another server using port 3000 first.
 
 ## Minimal integration
+
+To create your own standalone browser app with the published CLI/SDK, follow
+[Build a browser-only Yetlet app](../../../docs/BROWSER-APP.md). It connects
+tool preparation, local state/events, build/run/watch and static deployment.
+The Todo/Search commands below are repository examples with their own setup.
 
 ### Mount an owned surface
 
