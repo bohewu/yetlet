@@ -125,9 +125,12 @@ done
             }
             if mode == "leaf" || mode == "resistant-leaf" {
                 fs::write(root.join("leaf.pid"), std::process::id().to_string()).unwrap();
+                let mut signal_recorded = false;
                 loop {
-                    if OBSERVED.load(Ordering::Relaxed) != 0 {
+                    if !signal_recorded && OBSERVED.load(Ordering::Relaxed) != 0 {
+                        // Keep the observation intact when the supervisor later kills us.
                         fs::write(root.join("leaf-int"), "SIGINT").unwrap();
+                        signal_recorded = true;
                     }
                     thread::sleep(POLL);
                 }
