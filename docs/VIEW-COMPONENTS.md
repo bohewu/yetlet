@@ -109,10 +109,12 @@ walkthrough. A no-JS page needs none of those optional browser capabilities.
 
 ## Optional typed tag builders (unreleased source-only YT-234)
 
-The current repository source additionally offers
+The locally selected SDK `0.9.0-alpha.7` includes
 `yetlet::view::tags` as a lightweight authoring alternative. **This is not part
 of the published SDK 0.9.0-alpha.6** or the registry-first scaffold above;
 that introductory example deliberately continues using the published API.
+[YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md) records local preparation;
+using the new constructors requires the matching reviewed source or archive.
 
 ```rust
 use yetlet::view::{View, tags::{div, h1, input, textarea}};
@@ -149,9 +151,9 @@ See [the source-only plan](YT-234-VIEW-AUTHORING-API-PLAN.md) and
 [implementation](../crates/yetlet/src/view/tags.rs) for the exact contract.
 
 
-### Complete standard tag authoring — YT-235 (unreleased)
+### Complete standard tag authoring — YT-235
 
-The source-only YT-235 follow-up expands the module to **101 standard HTML
+The YT-235 follow-up included in the selected local SDK expands the module to **101 standard HTML
 constructors** from the dated [YT-219 inventory](YT-219-HTML-INVENTORY.md):
 89 currently admitted Browser DOM elements, `img()` (admitted in Browser only
 when the caller selects an `ImagePolicy`) and 11 native SSR-only/deferred

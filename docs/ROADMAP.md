@@ -1,5 +1,17 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-245 SDK alpha.7 local preparation (2026-11-08): Done at bounded preparation scope.**
+[Preparation record](YT-245-ALPHA7-RELEASE-PREPARATION.md) selects exactly
+`yetlet` then `yetlet-browser`, SDK `0.9.0-alpha.7`, with coherent path locks
+and package-carried docs. Independent CLI0.3.0 Style preparation waits for actual
+SDK publication; CLI0.2.0 and the public SDKalpha.6/CLI0.2.0 guide stay pinned.
+Independent corrective Reviewer `wc_job_138KD3ElAAfaxxap` PASS closes one
+premature distribution claim after exact Browser archive/consumer reconciliation.
+Local archive checks do not select immutable C or authorize hosted release,
+signing or publication. The owner-selected next order is PR/exact-head CI/Merge,
+then Windows Runner pull/verification of the actual merged source. Windows remains paused before merge; actual publication remains
+blocked until that gate passes and the final release request is approved.
+
 **YT-244 publication surface and API consistency (2026-11-08): Done at local documentation scope.**
 The [source/package audit](YT-244-PUBLICATION-SURFACE-API-AUDIT.md) corrects the
 three Cargo package READMEs, their links and carried module-guide boundaries,

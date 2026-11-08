@@ -3,7 +3,7 @@
 Apply native endpoint/group rate limits using explicit per-process memory
 budgets. Configuration reuse and shared accounting are separate choices.
 
-**Experimental SDK module.** Distributed in `yetlet` SDK `0.9.0-alpha.6`;
+**Experimental SDK module.** Included in `yetlet` SDK `0.9.0-alpha.7`;
 use the documented feature/target and source matching the version you consume.
 
 

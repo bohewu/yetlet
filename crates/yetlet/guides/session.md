@@ -3,7 +3,7 @@
 Add bounded, process-local Memory Session state, cookie lifecycle and explicit
 CSRF checks to a native application. Session can be anonymous and is not authentication.
 
-**Experimental SDK module.** Distributed in `yetlet` SDK `0.9.0-alpha.6`;
+**Experimental SDK module.** Included in `yetlet` SDK `0.9.0-alpha.7`;
 use the documented feature/target and source matching the version you consume.
 
 
@@ -48,7 +48,7 @@ Invalid configuration returns `SessionConfigError`; TTL is 1 second–30 days an
 Session is not authentication or durable storage. Restart loses Memory state; multiple independent processes do not share it. Logout/cookie response reordering requires application-aware handling, and CSRF tokens must be checked on unsafe actions. Avoid serializing identities, tokens or server capabilities into browser state.
 
 The [separate experimental Redis-protocol provider](session-redis.md)
-is distributed as the optional `session-redis` feature/module of `yetlet`. Its async, single-primary semantics and
+is included as the optional `session-redis` feature/module of `yetlet`. Its async, single-primary semantics and
 separately recorded Valkey evidence do not broaden Memory guarantees or imply
 generic HA/failover/restore support. See [provider operations](https://github.com/bohewu/yetlet/blob/master/docs/PROVIDER-OPERATIONS.md)
 and the provider guide for its current limits; [M8c evidence](https://github.com/bohewu/yetlet/blob/master/docs/M8C-VERIFICATION.md)

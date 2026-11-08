@@ -51,6 +51,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Maintainer entry points
 
+- [YT-245 SDK alpha.7 local preparation](YT-245-ALPHA7-RELEASE-PREPARATION.md):
+  two-package metadata/docs, exact local archive verification and release-note
+  drafts; CLI0.3.0 migration waits for SDK publication. Published guide pins stay fixed.
+
 - [YT-242 documentation truth audit](YT-242-DOCUMENTATION-TRUTH.md): bounded
   current-entry audit, inventory classification, corrections and remaining coverage;
   independent acceptance pending. YT-243 remains ordered and unstarted.

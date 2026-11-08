@@ -1,25 +1,24 @@
 # Yetlet
 
 HTML-first views and explicitly selected native capabilities, version
-`0.9.0-alpha.6`. See [GitHub releases](https://github.com/bohewu/yetlet/releases)
+`0.9.0-alpha.7`. See [GitHub releases](https://github.com/bohewu/yetlet/releases)
 for published artifacts. Earlier tags retain their original package layout and
 qualification evidence.
 
 ## Minimal integration
 
-Use Rust 1.99+ and the exact published registry dependency:
+Use Rust 1.99+ and this exact registry dependency once this version is available:
 
 ```toml
 [dependencies]
-yetlet = "=0.9.0-alpha.6"
+yetlet = "=0.9.0-alpha.7"
 ```
 
-For checkout-only APIs, use an explicitly reviewed local revision instead of
-mistaking development code for the existing registry archive:
+For local preparation, use an explicitly reviewed checkout at the matching version:
 
 ```toml
 [dependencies]
-yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.6" }
+yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.7" }
 ```
 
 ```rust
@@ -31,6 +30,22 @@ assert_eq!(yetlet::html::render_to_string(&view).unwrap(), "<p>Hello &lt;Yetlet&
 Defaults select `html`. With `default-features = false`, the shared View model
 has no external normal dependencies. Browser integrations are separately owned
 by [yetlet-browser](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/README.md), using this same View type.
+
+## Typed Tag Builder API
+
+This release includes `yetlet::view::tags` with 101 ordinary HTML constructors
+and `TagElement<T>` builders, producing the same owned `Element` / `View` tree.
+Typed void tags have no child/text methods; selected setters are scoped to
+applicable tags. `.id` and `.class` replace, `.add_class` merges distinct tokens,
+and dedicated attribute setters upsert; generic `.attribute` remains append-only.
+Renderer validation still applies. No inline-style API or template compiler is added.
+
+```rust
+use yetlet::view::{View, tags::{div, h1, input}};
+let view: View = div().id("app").child(h1().text("Hello <Yetlet>"))
+    .child(input().placeholder("Search")).into();
+assert!(yetlet::html::render_to_string(&view).unwrap().contains("Hello &lt;Yetlet&gt;"));
+```
 
 ## Features and guides
 
@@ -55,3 +70,7 @@ options decide activation. Settings loading remains optional. Native modules
 and their networking/storage/crypto dependencies are absent on wasm32, even with
 all features selected; shared serialization may still compile. No provider,
 subscriber, cache, DI container or automatic retry is installed by importing it.
+
+APIs remain Experimental; this release does not establish production qualification
+or stable API compatibility. Ordinary CSS is application-owned; there is no public
+Style crate or required CSS generator.

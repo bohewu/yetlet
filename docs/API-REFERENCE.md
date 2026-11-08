@@ -30,12 +30,14 @@ diagnostics together, follow [Settings, options and logging](SETTINGS-OPTIONS-LO
 ## Source-only checkout additions
 
 These additions are implemented in this checkout, beyond the distributed
-SDKalpha.6/CLI0.2.0 artifacts. Development manifests retaining those version
-numbers do not make later source part of an already published archive.
+SDKalpha.6/CLI0.2.0 artifacts. [YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md)
+selects SDK `0.9.0-alpha.7` locally, including typed tags. CLI remains at its
+published manifest and registry binding until SDK publication permits migration.
+Local version selection does not establish registry availability.
 
 | Source surface | Entry point and contract | Availability and limits |
 |---|---|---|
-| Typed View tags | `yetlet::view::tags`; [View guide](VIEW-COMPONENTS.md#optional-typed-tag-builders-unreleased-source-only-yt-234), [source](../crates/yetlet/src/view/tags.rs), [YT-235](YT-235-TAG-COVERAGE-PLAN.md) | Source-only SDK addition: 101 ordinary tag constructors, scoped setters and the same owned View. Renderer validation still applies; published first-app `Element::new` examples remain valid |
+| Typed View tags | `yetlet::view::tags`; [View guide](VIEW-COMPONENTS.md#optional-typed-tag-builders-unreleased-source-only-yt-234), [source](../crates/yetlet/src/view/tags.rs), [YT-235](YT-235-TAG-COVERAGE-PLAN.md) | Included in the selected local alpha.7 SDK: 101 ordinary tag constructors, scoped setters and the same owned View. Renderer validation still applies; published first-app `Element::new` examples remain valid |
 | Optional Style authoring | [CLI Style integration](../tools/yetlet-cli/README.md#optional-application-owned-rust-css-yt-239-working-tree), [contract](YT-237-STYLE-REGISTRATION-CONTRACT.md), [implementation](YT-239-STYLE-INTEGRATION.md) | Source-only CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
 | Style Showcase | [Native-first gallery](../examples/style-showcase/README.md) | Checkout sample with actual View/Style/CSS disclosures and optional local WASM class switching; bounded Linux evidence, no new published package or platform qualification |
 
