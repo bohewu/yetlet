@@ -256,3 +256,22 @@ browser_packages = ["yetlet-dashboard-counter-island", "yetlet-dashboard-filter-
 browser_build = "cargo xtask build multi-island-dashboard"
 optional_dependencies = []
 evidence = "docs/M9G-VERIFICATION.md"
+
+[[sample]]
+id = "style-showcase"
+title = "Native-first Style Showcase"
+package = "yetlet-style-showcase"
+path = "examples/style-showcase"
+kind = "server-rendered"
+status = "verified"
+command = "cargo run -p yetlet-style-showcase --locked"
+companion_packages = []
+routes = [
+  { path = "/showcase", source = "examples/style-showcase/src/native.rs", markers = ['.route("/showcase", get(native))'] },
+  { path = "/showcase/interactive", source = "examples/style-showcase/src/native.rs", markers = ['.route("/showcase/interactive", get(interactive))'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = ["yetlet"]
+evidence = "examples/style-showcase/README.md"

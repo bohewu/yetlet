@@ -13,6 +13,7 @@ use std::{
 pub enum Build {
     Browser,
     TodoCss,
+    ShowcaseBrowser,
     KeyedBindings,
     MultiIslandDashboard,
     RenderBench,
@@ -25,6 +26,7 @@ impl Build {
         Some(match s {
             "browser" => Self::Browser,
             "todo-css" => Self::TodoCss,
+            "showcase-browser" => Self::ShowcaseBrowser,
             "keyed-bindings" => Self::KeyedBindings,
             "multi-island-dashboard" => Self::MultiIslandDashboard,
             "render-bench" => Self::RenderBench,
@@ -231,6 +233,55 @@ pub fn run(root: &Path, kind: Build, options: Options) -> Result<()> {
     };
     let profile = if options.release { "release" } else { "debug" };
     match kind {
+        Build::ShowcaseBrowser => {
+            let identity: Value = serde_json::from_slice(&execute(
+                root,
+                &cargo,
+                &[
+                    "run",
+                    "--quiet",
+                    "--locked",
+                    "-p",
+                    "yetlet-style-showcase",
+                    "--bin",
+                    "showcase-assets",
+                ]
+                .into_iter()
+                .map(Into::into)
+                .collect::<Vec<_>>(),
+                true,
+            )?)
+            .map_err(|_| fail("Style Showcase build identity JSON"))?;
+            cargo_build(
+                root,
+                &cargo,
+                "yetlet-style-showcase-browser",
+                options.release,
+                false,
+            )?;
+            let mut files = bind(
+                root,
+                &bindgen,
+                &format!(
+                    "target/wasm32-unknown-unknown/{profile}/yetlet_style_showcase_browser.wasm"
+                ),
+                "showcase",
+            )?;
+            files.insert(
+                "loader.js".into(),
+                read(root, "examples/style-showcase-browser/loader.js")?,
+            );
+            let output = "target/style-showcase-dist";
+            let d = assets(root, output, b"yetlet-showcase-v1\0", &files)?;
+            write(
+                root,
+                format!("{output}/manifest.json"),
+                &json_bytes(&json!({
+                    "digest": d, "css_sha256": identity["css_sha256"], "source_sha256": identity["source_sha256"]
+                })),
+            )?;
+            println!("PASS optional Style Showcase browser assets: {d}");
+        }
         Build::Browser => {
             for package in ["yetlet-todo-browser", "yetlet-search-island"] {
                 cargo_build(root, &cargo, package, options.release, false)?;

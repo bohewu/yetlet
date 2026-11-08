@@ -1,5 +1,20 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-241 Style Showcase (2026-11-08): Done at source and bounded Linux
+sample qualification scope.** The owner-approved four-category
+[standalone gallery](../examples/style-showcase/README.md) shares View and CSS
+sources between complete native SSR and explicit optional browser enhancement.
+Native build/tests, strict native/browser Clippy and required Chrome/Firefox
+gallery smoke pass at their measured Linux viewport scopes. Independent
+implementation Reviewer `wc_job_SjBc9esAHAREdWS7` PASS, zero material issues
+or required followups. The parent subsequently selected promotion as the
+thirteenth native-first [catalog sample](SAMPLES.md). Chrome covers observed
+390/768/1280px; Firefox covers observed 500/768/1280px. Firefox 390px, its
+additional explicit listener-disposal probe and full console/CSP-log auditing
+remain unverified. This is not production, other-platform or public-release
+qualification; Git delivery remains separate.
+
+
 **YT-237–YT-240 optional CSS authoring roadmap (2026-11-08):**
 **YT-237 Done at contract-research scope; YT-238 Done at prototype scope;
 YT-239 Done at source/Linux integration scope; YT-240 Done at bounded
@@ -11,7 +26,7 @@ experiment completed under the owner's follow-up authorization. The recorded
 **SIMPLIFY** recommendation is now owner-approved for **YT-239**
 (opt-in build/watch/asset integration). **YT-240** now validates the existing
 Todo sample's native SSR and browser CSS path after owner selection and Reviewer
-PASS; the separate Style Showcase is not yet started.
+PASS; the separately authorized Style Showcase is now YT-241 Done at bounded Linux scope.
 Original CSS and Tailwind/Vite workflows remain available. The earlier
 independent planning Reviewer PASS remains accepted. The new
 [YT-237 reviewed Contract](YT-237-STYLE-REGISTRATION-CONTRACT.md) compares
@@ -38,7 +53,7 @@ CSS with source-only Tag Builders, native no-WASM SSR, Chrome computed styles
 at 390/1280px, Firefox desktop and asset/CSP boundaries. Independent Reviewer
 PASS, Job `wc_job_7bfgn4kA_CNHLN22`, zero issues/followups. Firefox narrow
 viewport, Windows and production claims remain unverified. A dedicated Style
-Showcase, Git delivery and public release remain separate and unstarted.
+Showcase is tracked as YT-241 Done at bounded Linux scope; Git delivery and public release remain separate.
 
 **YT-234/235 View authoring expansion (2026-11-07):** Done at
 local source and scoped verification only.

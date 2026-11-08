@@ -4065,6 +4065,29 @@ dependencies = [
 ]
 
 [[package]]
+name = "yetlet-style-showcase"
+version = "0.9.0-alpha.6"
+dependencies = [
+ "axum",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tokio",
+ "tower",
+ "yetlet",
+]
+
+[[package]]
+name = "yetlet-style-showcase-browser"
+version = "0.9.0-alpha.6"
+dependencies = [
+ "wasm-bindgen",
+ "web-sys",
+ "yetlet-browser",
+ "yetlet-style-showcase",
+]
+
+[[package]]
 name = "yetlet-todo-browser"
 version = "0.9.0-alpha.6"
 dependencies = [

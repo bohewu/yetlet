@@ -13,6 +13,7 @@ pub mod scene;
 mod scene_candidate;
 mod scene_lifecycle;
 mod scene_picking;
+pub mod showcase;
 pub mod static_server;
 pub mod todo;
 pub mod websocket;
@@ -70,7 +71,11 @@ pub fn profile(args: &[std::ffi::OsString], default: &str) -> Result<String> {
 }
 /// Fresh evidence directory per invocation; never writes historical M11 paths.
 pub fn evidence(root: &Path, suite: &str) -> Result<PathBuf> {
-    let base = root.join("target/m12/yt085");
+    let base = if suite.starts_with("style-showcase-") {
+        root.join("artifacts/verification/yt241-style-showcase-20261108")
+    } else {
+        root.join("target/m12/yt085")
+    };
     fs::create_dir_all(&base)?;
     let dir = tempfile::Builder::new()
         .prefix(&format!("{suite}-"))
@@ -312,6 +317,8 @@ pub fn remove_tree_with(
 }
 
 pub const BROWSER_SUITES: &[&str] = &[
+    "style-showcase-chrome",
+    "style-showcase-firefox",
     "browser-chrome",
     "browser-firefox",
     "keyed-bindings-chrome",
@@ -351,6 +358,9 @@ pub fn run(root: &Path, suite: &str, args: &[std::ffi::OsString], out: &Path) ->
     }
     let profile = profile(args, default_profile(suite))?;
     match suite {
+        "style-showcase-chrome" | "style-showcase-firefox" => {
+            showcase::run(root, out, &profile, suite.ends_with("firefox"))
+        }
         "browser-chrome" | "browser-firefox" => {
             todo::run(root, out, &profile, suite.ends_with("firefox"))
         }

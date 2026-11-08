@@ -1,12 +1,12 @@
 # Sample Applications
 
-**Status:** M8a–M8e and M9p–M9j have independent reviewer PASS. All twelve catalog applications and the final compatibility/evidence freeze are locally complete at prototype scope.
+**Status:** Thirteen catalog applications are locally verified at bounded prototype scope. The original twelve-application M8/M9 compatibility/evidence freeze remains historical; YT-241 Style Showcase was independently reviewed and then promoted separately.
 
 Yetlet samples exist to validate application ergonomics, dependency isolation and security boundaries. They are not a parallel tutorial framework and do not authorize new core abstractions merely to make a demo look shorter.
 
 ## Choose a starting point
 
-Begin with [Hello World](../examples/hello-world/README.md) for native SSR or [REST API](../examples/rest-api/README.md) for HTTP-only development. Use [Todo](../examples/todo-server/README.md) for shared SSR/WASM Views and [Session cart](../examples/cart-server/README.md) for an explicit server capability. Each sample-local README provides exact commands and limitations. The [documentation index](README.md) separates current guidance from historical qualification.
+Begin with [Hello World](../examples/hello-world/README.md) for native SSR or [REST API](../examples/rest-api/README.md) for HTTP-only development. Use [Todo](../examples/todo-server/README.md) for shared SSR/WASM Views and [Session cart](../examples/cart-server/README.md) for an explicit server capability. Use [Style Showcase](../examples/style-showcase/README.md) to compare native previews with real Rust View, Style and generated CSS sources. Each sample-local README provides exact commands and limitations. The [documentation index](README.md) separates current guidance from historical qualification.
 
 ## Catalog contract
 
@@ -50,10 +50,13 @@ Catalog paths, route sources, build scripts and evidence must resolve inside the
 | `forms-validation` | `yetlet-forms-validation` | Server rendered | No | Stateless SSR forms, escaped accessible errors and no-side-effect 303 PRG |
 | `sqlite-crud` | `yetlet-sqlite-crud` | API | No | Direct parameterized SQLite, explicit transactions, restart persistence and optimistic versions |
 | `multi-island-dashboard` | `yetlet-multi-island-dashboard` | Full stack | Yes | Complete SSR plus independently built/lazy Counter and Filter islands |
+| `style-showcase` | `yetlet-style-showcase` | Server rendered | No; optional WASM | Four-category style gallery, actual Rust/CSS disclosures and optional local class switching |
+
+YT-241 Style Showcase passed independent implementation Reviewer `wc_job_SjBc9esAHAREdWS7` before its separate parent-owned catalog promotion. Its catalog command and routes work with native Rust/Cargo only. The optional `yetlet-style-showcase-browser` package and exact build command are documented in its README; they are not prerequisites of the native catalog entry. The measured Chrome/Firefox scope and Firefox limitations remain explicit there.
 
 ## Research fixtures
 
-The five [completed research studies](README.md#completed-research-prototypes) are bounded application-owned prototypes, separate from this twelve-application catalog. Use their fixture READMEs and retained measurements to understand the decisions and limitations; they do not select additional supported core APIs or change application qualification.
+The five [completed research studies](README.md#completed-research-prototypes) are bounded application-owned prototypes, separate from this thirteen-application catalog. Use their fixture READMEs and retained measurements to understand the decisions and limitations; they do not select additional supported core APIs or change application qualification.
 
 Run the existing navigation checks:
 
@@ -64,7 +67,7 @@ cargo xtask check docs
 
 ## Retained sample delivery history
 
-The expandable record below preserves intermediate M8/M9 planning and promotion claims, reviewer identities and evidence links. Its references to remaining planned work describe those earlier stages; the current catalog above has all twelve applications verified at bounded prototype scope.
+The expandable record below preserves intermediate M8/M9 planning and promotion claims, reviewer identities and evidence links. Its references to remaining planned work describe those earlier stages; the current catalog above has thirteen applications verified at bounded prototype scope, including the separately reviewed YT-241 addition.
 
 <details>
 <summary>M8/M9 delivery sequence and promotion evidence</summary>

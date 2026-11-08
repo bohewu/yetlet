@@ -1,5 +1,25 @@
 # Yetlet Backlog
 
+## YT-241 — Owner-approved Style Showcase
+
+- Priority: P2; size: M; scope: one bounded application slice.
+- State: Done at source and bounded Linux sample qualification scope.
+- Dependencies: YT-240, accepted at bounded Todo/Linux scope.
+- Deliverable: [Standalone Style Showcase](../examples/style-showcase/README.md),
+  four native SSR gallery categories, real compiled View/Style/CSS disclosures,
+  and explicit optional WASM class switching with targeted browser evidence.
+- Acceptance: native Rust-only build, shared View/CSS, strict CSP, source escaping,
+  Chrome responsive/state checks, Firefox smoke and owned-resource teardown PASS.
+  Independent implementation Reviewer `wc_job_SjBc9esAHAREdWS7` PASS,
+  zero material issues or required followups; the parent subsequently selected
+  promotion as the thirteenth native-first [catalog sample](SAMPLES.md).
+- Targeted result: native tests/build and native/browser strict Clippy pass;
+  Chrome observed 390/768/1280 and Firefox observed 500/768/1280 required gallery
+  smoke pass, with screenshots inspected and owned resources reaped. Firefox
+  390px, its additional module-import disposal probe and full console/CSP-log
+  auditing remain unverified. No Git delivery or public release is authorized.
+
+
 **YT-237–YT-240 opt-in Style/CSS authoring and project stylesheet generation
 (2026-11-08):** **YT-237 Done at contract-research scope; YT-238 Done at
 prototype scope; YT-239 Done at source/Linux integration scope; YT-240 Done
@@ -51,8 +71,9 @@ contract research. Implementation authority for YT-238 comes from the subsequent
 owner instruction; reviews do not grant Git delivery or product release.
 The owner subsequently authorized YT-239 under SIMPLIFY and selected the
 existing Todo for YT-240, using the source-only Tag Builder before a separate
-Style Showcase. YT-240's Todo/Linux gate is reviewed PASS; a dedicated Showcase,
-Git delivery and public release remain separate and unstarted.
+Style Showcase. YT-240's Todo/Linux gate is reviewed PASS; the separately
+authorized Showcase is now YT-241 Done at bounded Linux scope. Git delivery and public release
+remain separate.
 
 
 **YT-236 CodeQL PR concurrency (2026-11-07):** Done at local source
