@@ -2,7 +2,7 @@
 
 `yetlet_browser::wgpu` is **Experimental and opt-in**, distributed as a module
 of `yetlet-browser` SDK `0.9.0-alpha.6`. The earlier separate-package metadata
-preparation is retained in [YT-201](../../../docs/YT-201-PACKAGE-PREPARATION.md).
+preparation is retained in [YT-201](https://github.com/bohewu/yetlet/blob/master/docs/YT-201-PACKAGE-PREPARATION.md).
 There is no performance, speedup, FPS, stable API, production-readiness or broad
 browser guarantee. The measured YT-077 comparison did not demonstrate a useful
 WebGPU speedup; experimental promotion was separately approved for an optional
@@ -96,9 +96,9 @@ queue completion is not physical presentation or FPS.
 
 ## Qualification and release
 
-[YT-079](../../../docs/YT-079-VERIFICATION.md) and its
-[independent review](../../../docs/YT-079-INDEPENDENT-REVIEW.md) bind the actual
-candidate and consumer evidence. [YT-080](../../../docs/YT-080-VERIFICATION.md)
+[YT-079](https://github.com/bohewu/yetlet/blob/master/docs/YT-079-VERIFICATION.md) and its
+[independent review](https://github.com/bohewu/yetlet/blob/master/docs/YT-079-INDEPENDENT-REVIEW.md) bind the actual
+candidate and consumer evidence. [YT-080](https://github.com/bohewu/yetlet/blob/master/docs/YT-080-VERIFICATION.md)
 records final source/artifact correspondence, default-profile observation,
 CPU/API/dependency checks and the separate final independent-review verdict.
 Consult that source-bound record rather than inferring support from a version
@@ -106,4 +106,4 @@ number or from a different browser configuration.
 
 No release, registry installation, publication, source push, API stability or
 production support is authorized by this document. Historical release candidates retain their own scope; current
-distribution is recorded in [Release readiness](../../../docs/RELEASE-READINESS.md).
+distribution is recorded in [Release readiness](https://github.com/bohewu/yetlet/blob/master/docs/RELEASE-READINESS.md).

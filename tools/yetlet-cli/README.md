@@ -8,30 +8,33 @@ needs no SDK checkout or Cargo path override. CLI and SDK versions are independe
 
 **CLI release:** `0.2.0`. **Generated SDK:** `=0.9.0-alpha.6`.
 
-This release includes the commands described below. Check
+The command inventory below describes the published CLI release selected above.
+Later checkout-only Style template choices are described separately and are not
+part of the published command inventory. Check
 [GitHub releases](https://github.com/bohewu/yetlet/releases) and
 [crates.io](https://crates.io/crates/yetlet-cli) for actual registry availability.
 This is an Experimental developer tool, with
 platform evidence limited to the documented qualification scopes.
-See the [CLI contract](../../docs/CLI-CONTRACT.md) and
-[implementation evidence](../../docs/YT-102-CLI-IMPLEMENTATION.md).
-The subsequent [DX audit](../../docs/YT-102-DX-AUDIT.md) compares actual setup,
+See the [CLI contract](https://github.com/bohewu/yetlet/blob/master/docs/CLI-CONTRACT.md) and
+[implementation evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-CLI-IMPLEMENTATION.md).
+The subsequent [DX audit](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-DX-AUDIT.md) compares actual setup,
 build/run/watch, diagnostics, testing and deployment-preview journeys and records
 bounded costs and proposed improvements. Independent Reviewer PASS completes
 YT-102 at research-only scope, with zero issues or required followups. CLI
 behavior and wider qualification remain unchanged.
-The separately selected [Linux completion-latency slice](../../docs/YT-102-COMPLETION-LATENCY.md)
+The separately selected [Linux completion-latency slice](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md)
 avoids the natural-exit grace only after a conservative single-thread/pinned-child
 check; cancellation and descendant cleanup retain their existing behavior.
 Independent implementation Reviewer PASS has zero issues or required followups.
 
-## Current command and capability inventory
+<a id="current-command-and-capability-inventory"></a>
+## Published CLI command and capability inventory
 
 | Command | Implemented behavior |
 |---|---|
 | `yetlet --help` / `-h` | Root help; every complete command path also has exclusive scoped help |
 | `yetlet --version` / `-V` | Build-time CLI version; no project, tools or settings required |
-| `yetlet new NAME [--parent DIRECTORY] [--template native\|browser\|native-style\|browser-style] [--vite] [--tailwind] [--service] [--settings]` | Publish a new scaffold; no tools, installs, builds or lock generation |
+| `yetlet new NAME [--parent DIRECTORY] [--template native\|browser] [--vite] [--tailwind] [--service] [--settings]` | Publish a new scaffold; no tools, installs, builds or lock generation |
 | `yetlet doctor [--json]` | Bounded environment-only Rust/Cargo identity and compiled filesystem capability; schema 1 JSON |
 | `yetlet inspect [--manifest-path PATH] [--json]` | Read-only public-settings plan for build/run/watch; separate project-execution-plan schema 1; no readiness checks |
 | `yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]` | Read-only selected key/version, certificate pins and dates; no password or generation |
@@ -57,14 +60,14 @@ traversal, a trusted executable owner and no untrusted write access. A refusal
 prints `CLI_PROCESS stage=executable` with the error kind and optional numeric OS
 code before returning exit 125. Prepare a protected tool installation and select
 its physical directory on PATH; tool permissions are managed separately from the CLI.
-See the [native Windows diagnosis and verification](../../docs/WINDOWS-CLI-125-VERIFICATION.md).
+See the [native Windows diagnosis and verification](https://github.com/bohewu/yetlet/blob/master/docs/WINDOWS-CLI-125-VERIFICATION.md).
 
 ## Static HTML build
 
 This release includes static mode, introduced in CLI `0.2.0` and absent from
 CLI `0.1.1`. Install the selected CLI version from the registry or build it from
 source, then follow the
-[standalone static example](../../examples/static-site/README.md), now pinned to
+[standalone static example](https://github.com/bohewu/yetlet/blob/master/examples/static-site/README.md), now pinned to
 registry SDKalpha.6 alongside the introductory guide. CLI0.2 qualification
 already checks the minimal consumer with that published SDK, without a path override.
 
@@ -105,13 +108,13 @@ evidence and does not claim child cleanup or success. No automatic retry.
 
 Cli::BuildStatic and build_static are Experimental CLI support APIs available since `0.2.0`;
 downstream exhaustive Rust matches may need a new arm. Current-source evidence
-and bounded GNU/browser/MSVC validation are explicit in [YT-223](../../docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
+and bounded GNU/browser/MSVC validation are explicit in [YT-223](https://github.com/bohewu/yetlet/blob/master/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
 No SDK/CLI version is republished by this source change.
 
 ## First-use prerequisites
 
-For one guided plain-native path, follow [Build your first Yetlet app](../../docs/FIRST-APP.md).
-For the existing browser target, follow [Build a browser-only Yetlet app](../../docs/BROWSER-APP.md).
+For one guided plain-native path, follow [Build your first Yetlet app](https://github.com/bohewu/yetlet/blob/master/docs/FIRST-APP.md).
+For the existing browser target, follow [Build a browser-only Yetlet app](https://github.com/bohewu/yetlet/blob/master/docs/BROWSER-APP.md).
 This reference retains the broader target, settings and execution choices.
 
 Prepare tools and dependency caches explicitly before running the examples.
@@ -124,16 +127,16 @@ Building the CLI and building an app are separate steps.
 |---|---|---|
 | Build this CLI from the checkout | Rust/Cargo 1.99+, a native C/link toolchain, OpenSSL development files (reference: 3.5 LTS) and cached locked dependencies | [Build the CLI](#build-locally-and-create-an-application), then inspect help/doctor |
 | Native `new NAME` | Native Rust toolchain, the published SDK and a separately prepared app Cargo.lock | `yetlet build`, then `yetlet run`; no Node or frontend tool is required |
-| Native `new NAME --vite`, optionally `--tailwind` | Native prerequisites plus Node `^20.19.0` or `>=22.12.0`, npm and the generated frontend dependencies | [Vite preparation](templates/vite/SELECTED-README.md), initial `yetlet build` with auto_build enabled, then `yetlet run` |
-| `new NAME --template browser`, optionally `--tailwind` | Rust/Cargo 1.99+, `wasm32-unknown-unknown`, wasm-bindgen-cli 0.2.129, the same Node/npm prerequisites and the generated dependencies | [Browser preparation](templates/browser/README.md), `yetlet build`, then `yetlet run` to preview the existing dist |
-| Native `new NAME --tailwind` without Vite | Native prerequisites plus the separately provisioned standalone Tailwind 4.3.3 CLI | [Build `dist/tailwind.css` explicitly](templates/tailwind/SELECTED-README.md) before running Rust |
+| Native `new NAME --vite`, optionally `--tailwind` | Native prerequisites plus Node `^20.19.0` or `>=22.12.0`, npm and the generated frontend dependencies | [Vite preparation](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/vite/SELECTED-README.md), initial `yetlet build` with auto_build enabled, then `yetlet run` |
+| `new NAME --template browser`, optionally `--tailwind` | Rust/Cargo 1.99+, `wasm32-unknown-unknown`, wasm-bindgen-cli 0.2.129, the same Node/npm prerequisites and the generated dependencies | [Browser preparation](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/browser/README.md), `yetlet build`, then `yetlet run` to preview the existing dist |
+| Native `new NAME --tailwind` without Vite | Native prerequisites plus the separately provisioned standalone Tailwind 4.3.3 CLI | [Build `dist/tailwind.css` explicitly](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/tailwind/SELECTED-README.md) before running Rust |
 
 The Vite Tailwind selection uses the official npm plugin, without a standalone
 CSS compiler. Native Rust watch additionally needs separately prepared
 [Watchexec](#rust-watch); development HTTPS needs separately prepared
-[mkcert and certificates](templates/config/SELECTED-README.md#development-https).
+[mkcert and certificates](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/config/SELECTED-README.md#development-https).
 Settings-enabled native apps, including `--vite`, need their own service token
-before startup; use the existing [settings/Development-secret mechanism](templates/config/SELECTED-README.md),
+before startup; use the existing [settings/Development-secret mechanism](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/config/SELECTED-README.md),
 keeping credentials out of public TOMLs and frontend files.
 
 Use this order: prepare tools/cache, build the CLI, create the selected app,
@@ -151,7 +154,7 @@ files for a CLI rebuild, app dependencies/settings/secrets, Node/npm, WASM tools
 frontend dist or whether `run` will work. Use the selected setup instructions
 and actual build/run for those checks. On Windows, also prepare protected
 physical tool paths and an attached processed-input console for native run;
-see [native tool preparation](../../docs/WINDOWS-CLI-125-VERIFICATION.md#reuse-the-prepared-runner-tools).
+see [native tool preparation](https://github.com/bohewu/yetlet/blob/master/docs/WINDOWS-CLI-125-VERIFICATION.md#reuse-the-prepared-runner-tools).
 
 ## Build locally and create an application
 
@@ -230,7 +233,7 @@ prepare the app's lock/cache; CLI build/run then use frozen Cargo. Offline
 preparation requires a populated cache. `--release` changes the Cargo profile,
 not APP_ENVIRONMENT. Frozen execution is not a sandbox for package scripts,
 build scripts or app code. For the complete walkthrough and expected HTTP
-result, see [Build your first Yetlet app](../../docs/FIRST-APP.md).
+result, see [Build your first Yetlet app](https://github.com/bohewu/yetlet/blob/master/docs/FIRST-APP.md).
 
 ### Maintainer resource updates
 
@@ -254,7 +257,7 @@ commands retain their explicit compatible local-source requirements below.
 
 ## Creation choices and settings
 
-YT-104 adds an explicitly selected [browser-only Rust/WASM task starter](../../docs/YT-104-BROWSER-STARTER.md):
+YT-104 adds an explicitly selected [browser-only Rust/WASM task starter](https://github.com/bohewu/yetlet/blob/master/docs/YT-104-BROWSER-STARTER.md):
 `yetlet new tasks --template browser --tailwind`. This persists
 `cli.target = "browser"` and includes Vite/public settings, with no native
 server or app-runtime settings/secret crate. Existing `build`/`run` then manage
@@ -308,13 +311,13 @@ App runtime settings retain APP_SERVER__HOST/PORT, APP_SERVICE__TOKEN and the
 existing explicit Development-only YETLET_DEV_SECRETS mechanism. No usable token
 is generated; settings-enabled applications require an operator-provided token
 before startup. CLI tool decisions never open that secret file. Backend `.env`
-auto-discovery is disabled. See [configuration](../../docs/CONFIGURATION.md).
+auto-discovery is disabled. See [configuration](https://github.com/bohewu/yetlet/blob/master/docs/CONFIGURATION.md).
 
 ### Settings selection decision table
 
 For `run`, `watch` and `build`, resolve these choices in order using the
-existing [CLI settings projection](src/settings.rs) and
-[shared Loader](../../crates/yetlet/src/config/mod.rs):
+existing [CLI settings projection](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/src/settings.rs) and
+[shared Loader](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/src/config/mod.rs):
 
 | Decision | Existing rule | Practical effect |
 |---|---|---|
@@ -342,7 +345,7 @@ tool-policy reload inside an already running watch process.
 
 ### Execution decision table
 
-After successful [application preflight and settings selection](src/app.rs):
+After successful [application preflight and settings selection](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/src/app.rs):
 
 | Target / command | Settings decision | Result |
 |---|---|---|
@@ -363,7 +366,7 @@ follow the [first-use preparation order](#first-use-prerequisites).
 
 ## Local signing keys
 
-See the [signing example](../../examples/signing/README.md) for the complete
+See the [signing example](https://github.com/bohewu/yetlet/blob/master/examples/signing/README.md) for the complete
 public settings schema and disposable setup. Provider and key names are configured
 snake_case aliases. Omitted names require explicit `signing.default_provider`
 and `signing.default_key`; there is no guessed provider or key.
@@ -493,7 +496,7 @@ explicit compatible local Cargo path overrides and separately prepared locks:
 | `new NAME --service --vite` | Settings implied; accepted with the validated Production Vite asset graph |
 | `new NAME --service --vite --tailwind` | Accepted with the pinned official plugin and validated Production Vite asset graph |
 
-The separate [2026-10-22 source-closure repair](../../docs/YT-102-GENERATOR-SOURCE-CLOSURE.md)
+The separate [2026-10-22 source-closure repair](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-GENERATOR-SOURCE-CLOSURE.md)
 adds only six exact reviewed Config/Secrets source files, including Config's
 explicitly declared example. Settings profiles declare 20 framework-context
 files; plain service retains 14. These public source files are distinct from
@@ -515,7 +518,7 @@ Watch, auto_start and auto_build never execute during generation. Docker's
 inventory adds `app-src-source-paths` so a configured `frontend/dist` or custom
 root can be explicitly exported to canonical `dist/`. Follow the generated
 Docker README's physical allowlist/hash instructions. See the
-[compatibility evidence](../../docs/YT-102-GENERATOR-COMPATIBILITY.md).
+[compatibility evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-GENERATOR-COMPATIBILITY.md).
 
 Generators retain their separately qualified, **unedited legacy local-source**
 representation, consistent app lock and source revalidation. Retained internal
@@ -532,7 +535,7 @@ runtime/deployment evidence does not transfer automatically to this checkout.
 | Service with production Vite, optional settings/plugin Tailwind | Explicitly prebuilt and validated flat dist |
 
 The retained legacy matrix is separately qualified by
-[YT-101 evidence](../../docs/YT-101-VERIFICATION.md). Standalone Tailwind,
+[YT-101 evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-101-VERIFICATION.md). Standalone Tailwind,
 legacy dev bridge, edited/general apps and unknown dependencies/layouts remain
 refused; adding a marker or CLI namespace alone cannot qualify arbitrary code.
 
@@ -556,8 +559,8 @@ security defaults and operator-owned drain/retention limits remain unchanged.
 
 Use `new NAME --tailwind`; add `--vite` for the official Vite plugin. Without
 Vite, prepare the pinned standalone tool and CSS build explicitly using the
-[generated Tailwind instructions](templates/tailwind/SELECTED-README.md).
-[YT-091 evidence](../../docs/YT-091-VERIFICATION.md) retains the historical
+[generated Tailwind instructions](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/tailwind/SELECTED-README.md).
+[YT-091 evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-091-VERIFICATION.md) retains the historical
 source-bound native/browser acceptance; it does not qualify the new settings
 representation.
 
@@ -567,7 +570,7 @@ The CLI owns configured startup, stop/cleanup and build orchestration. Vite owns
 module compilation, dependency tracking and HMR. Frontend JS/TS files may use
 custom names and subdirectories without registration; physical root confinement
 still refuses private/tooling files and outside links. The default entry remains
-`app.ts`. [Integration evidence](../../docs/YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
+`app.ts`. [Integration evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
 separates the earlier Windows browser checks from the current Linux follow-up.
 
 ```powershell
@@ -581,9 +584,9 @@ $Yetlet = Join-Path (Get-Location) "tools\yetlet-cli\target\debug\yetlet.exe"
 ```
 
 Choose an existing owner-protected local fixed NTFS parent. Do not disable ACL,
-reparse or executable checks. The [native Windows GNU pair record](../../docs/YT-102-WINDOWS-VITE-VERIFICATION.md)
+reparse or executable checks. The [native Windows GNU pair record](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-WINDOWS-VITE-VERIFICATION.md)
 covers six selected real Rust/Vite lifecycle cases; MSVC pair evidence remains
-compile-only. Separately, [native MSVC single-Cargo evidence](../../docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20)
+compile-only. Separately, [native MSVC single-Cargo evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20)
 covers build/run, native console cancellation and descendant cleanup, with a
 bounded warm-build baseline in the same record.
 
@@ -608,7 +611,7 @@ with `schema_version: 1`, `scope: "project-execution-plan"`, `environment`,
 `target`, `rust_watch`, `vite`, `commands` and `limitations`. Each command has
 `supported` and `rust`, `rust_watch`, `vite` stages with `selected`/`reason`.
 This schema is separate from the unchanged environment-only doctor schema 1.
-See the [selected contract](../../docs/CLI-CONTRACT.md#read-only-project-inspection--yt-111).
+See the [selected contract](https://github.com/bohewu/yetlet/blob/master/docs/CLI-CONTRACT.md#read-only-project-inspection--yt-111).
 
 Exit 0 means settings-derived intentions were explained; unsupported/skipped
 stages do not make inspection fail. No tools, frontend directories/assets,
@@ -619,9 +622,9 @@ ENV, tokens or resolved absolute roots. Invalid selection/settings uses exit 1,
 empty stdout and safe stderr, including existing source/profile/values hints;
 `--json` does not alter error formatting. Usage failures use exit 2.
 
-The [inspection record](../../docs/YT-111-IMPLEMENTATION.md) retains its
+The [inspection record](https://github.com/bohewu/yetlet/blob/master/docs/YT-111-IMPLEMENTATION.md) retains its
 source-bound acceptance evidence. The separate
-[browser-loop record](../../docs/YT-112-IMPLEMENTATION.md) records completed Linux
+[browser-loop record](https://github.com/bohewu/yetlet/blob/master/docs/YT-112-IMPLEMENTATION.md) records completed Linux
 edit/error/recovery and lifecycle acceptance. New Windows browser-watch execution
 remains Not verified; the separate earlier Windows CLI evidence does not cover it.
 
@@ -647,7 +650,7 @@ parser/IO/Serde errors. The existing Loader, validation order, exit 1/stderr and
 caller wrappers remain intact, including generator rejection before output.
 Unexpected Loader errors retain the generic hint; existing browser-capability
 refusals and later TLS-file checks retain their messages. See the
-[research and bounded implementation evidence](../../docs/YT-102-SETTINGS-ERROR-RESEARCH.md#selected-cli-implementation-2026-10-20).
+[research and bounded implementation evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-SETTINGS-ERROR-RESEARCH.md#selected-cli-implementation-2026-10-20).
 
 Doctor reports schema 1 environment checks only, never application, asset,
 frontend, console, generator or release readiness. Fixed local Rust/Cargo probes
@@ -656,10 +659,10 @@ unavailable executables fail; group-writable toolchain paths are refused on
 Linux. No installation/update, shell, app settings or Node probes occur.
 
 Linux has current native process/PTY/cleanup tests. Current Windows GNU
-[doctor and CLI evidence](../../docs/YT-102-DOCTOR-VERIFICATION.md) and
-[Rust/Vite pair evidence](../../docs/YT-102-WINDOWS-VITE-VERIFICATION.md) supplement
+[doctor and CLI evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-DOCTOR-VERIFICATION.md) and
+[Rust/Vite pair evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-WINDOWS-VITE-VERIFICATION.md) supplement
 the separate MSVC compile-only pair checks and
-[native single-Cargo followup](../../docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20).
+[native single-Cargo followup](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20).
 Windows run still requires an attached console
 with processed Ctrl-C input and protected app/tool paths; npm uses vetted native
 node.exe plus its same-install npm CLI script, without a .cmd shell fallback.
@@ -685,16 +688,17 @@ backend-environment filtering remain enforced. A fresh document nonce permits
 Vite CSS styles without weakening production CSP. Ctrl-C stops the owned tree
 and removes private generations. Browser `run` stays static preview; `build`
 packages production `dist/`, with no watch artifacts. External path dependencies
-are not automatically watched. The [selected amendment](../../docs/YT-112-IMPLEMENTATION.md)
+are not automatically watched. The [selected amendment](https://github.com/bohewu/yetlet/blob/master/docs/YT-112-IMPLEMENTATION.md)
 records completed Linux browser/lifecycle acceptance and retains the original
 failed attempts. New Windows browser-watch execution remains Not verified;
 historical YT-104 qualification describes the earlier static starter scope.
 
-## Optional application-owned Rust CSS (YT-239 working tree)
+<a id="optional-application-owned-rust-css-yt-239-working-tree"></a>
+## Source-only application-owned Rust CSS (YT-239/243)
 
 This section describes source-only checkout additions, absent from published
-CLI `0.2.0`. See [the source-only map](../../docs/API-REFERENCE.md#source-only-checkout-additions)
-and [Style Showcase](../../examples/style-showcase/README.md).
+CLI `0.2.0`. See [the source-only map](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md#source-only-checkout-additions)
+and [Style Showcase](https://github.com/bohewu/yetlet/blob/master/examples/style-showcase/README.md).
 
 `new --template native-style` and `new --template browser-style` opt into a private
 std-only Cargo generator with a complete lock, useful layout/dialog composition,
@@ -730,5 +734,7 @@ initially unknown temporaries remain untouched. No automatic install, retention,
 asset cleanup or deployment is supplied.
 The selected Cargo cache must satisfy protected filesystem ownership/write policy;
 host output uses its own `yetlet-styles/<app-root-sha256>` subtree. See the
-[implementation evidence and limitations](../../docs/YT-239-STYLE-INTEGRATION.md).
-Independent review is pending; Windows compilation/runtime is not qualified here.
+[implementation evidence and limitations](https://github.com/bohewu/yetlet/blob/master/docs/YT-239-STYLE-INTEGRATION.md).
+The [YT-243 source qualification](https://github.com/bohewu/yetlet/blob/master/docs/YT-243-RELEASE-QUALIFICATION.md)
+records independent review and bounded Linux/local Windows MSVC validation.
+Hosted CI, a new CLI release version and registry publication remain separate.

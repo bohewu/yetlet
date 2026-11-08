@@ -7,16 +7,16 @@ renderer replaces a subtree; native SSR works without selecting it.
 selects `dom` by default; actual mounting requires the WASM target and browser
 host. The commands below run checkout examples at their documented scope.
 
-**Since SDKalpha.6:** [YT-220](../../../docs/YT-220-HTML-DOM-IMPLEMENTATION.md)
+**Since SDKalpha.6:** [YT-220](https://github.com/bohewu/yetlet/blob/master/docs/YT-220-HTML-DOM-IMPLEMENTATION.md)
 extends the DOM vocabulary to89 elements with scoped attributes and canonical
 table/disclosure/control validation. These additions are absent from the
 older SDKalpha.5's38-element baseline.
 
-**Opt-in since SDKalpha.6:** [YT-221](../../../docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
+**Opt-in since SDKalpha.6:** [YT-221](https://github.com/bohewu/yetlet/blob/master/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
 adds per-mount navigation/image options. Existing entry points retain89 tags,
 same-origin navigation and no images; explicitly selected images add img only.
 These APIs are distributed in SDKalpha.6 and described by the selected guide
-edition. See the [actual publication record](../../../docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+edition. See the [actual publication record](https://github.com/bohewu/yetlet/blob/master/docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
 for source/consumer scope; no new browser qualification follows from this label.
 
 ## Prerequisites
@@ -24,14 +24,14 @@ for source/consumer scope; no new browser qualification follows from this label.
 Use this checkout with the pinned Rust/Cargo toolchain. Native `validate` is
 available without a browser. Actual mounting requires WASM and a browser host.
 Before the commands below, prepare `wasm32-unknown-unknown` and the Cargo.lock-
-matching wasm-bindgen CLI (0.2.129): follow the [root browser setup](../../../README.md#choose-your-next-step),
+matching wasm-bindgen CLI (0.2.129): follow the [root browser setup](https://github.com/bohewu/yetlet/blob/master/README.md#choose-your-next-step),
 including tool installation location/PATH. Run commands from the repository root;
 stop another server using port 3000 first.
 
 ## Minimal integration
 
 To create your own standalone browser app with the published CLI/SDK, follow
-[Build a browser-only Yetlet app](../../../docs/BROWSER-APP.md). It connects
+[Build a browser-only Yetlet app](https://github.com/bohewu/yetlet/blob/master/docs/BROWSER-APP.md). It connects
 tool preparation, local state/events, build/run/watch and static deployment.
 The Todo/Search commands below are repository examples with their own setup.
 
@@ -39,7 +39,7 @@ The Todo/Search commands below are repository examples with their own setup.
 
 `validate(&view)` is available on native and WASM targets and returns `Result<(), DomPolicyError>`. On WASM, `mount(&web_sys::Element, &view)` validates and constructs the replacement before clearing the old subtree; browser API failures return `JsValue`. There is no native `mount` implementation.
 
-The [Search Island caller](../../../examples/search-island/src/lib.rs) keeps complete SSR readable and replaces only its results host after activation. Follow [Todo setup](../../../examples/todo-server/README.md), or run from the repository root after installing the documented WASM build prerequisites:
+The [Search Island caller](https://github.com/bohewu/yetlet/blob/master/examples/search-island/src/lib.rs) keeps complete SSR readable and replaces only its results host after activation. Follow [Todo setup](https://github.com/bohewu/yetlet/blob/master/examples/todo-server/README.md), or run from the repository root after installing the documented WASM build prerequisites:
 
 ```bash
 cargo xtask build browser
@@ -58,9 +58,9 @@ validation alone does not mount anything or prove browser navigation acceptance.
 
 ### Supported subset and lifetime
 
-The older SDKalpha.5 [YT-110 baseline](../../../docs/YT-110-DOM-CAPABILITIES.md#dom-vocabulary)
+The older SDKalpha.5 [YT-110 baseline](https://github.com/bohewu/yetlet/blob/master/docs/YT-110-DOM-CAPABILITIES.md#dom-vocabulary)
 supports38 tags and42 named attributes. SDKalpha.6 includes all51 additional
-ordinary elements selected by the [coverage contract](../../../docs/YT-219-HTML-DOM-CONTRACT.md):
+ordinary elements selected by the [coverage contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-219-HTML-DOM-CONTRACT.md):
 text semantics, explicit table sections, figure/caption, pre, classic controls,
 details/summary and canvas/dialog hosts. New scoped attributes and numeric/keyword
 checks coexist with old admission rules. Unsupported names, duplicates, void
@@ -75,11 +75,11 @@ disclosure/control behavior remains browser-owned; imperative dialog methods and
 focus are explicitly application-owned. Pre's parsed initial newline and adjacent
 CR/LF stream now match direct DOM construction; affected serialized pre bytes may
 change starting in SDKalpha.6. Older published artifacts retain their old behavior.
-See the [implementation record and limits](../../../docs/YT-220-HTML-DOM-IMPLEMENTATION.md).
+See the [implementation record and limits](https://github.com/bohewu/yetlet/blob/master/docs/YT-220-HTML-DOM-IMPLEMENTATION.md).
 
-Initial input/textarea/select/checkbox defaults are declarative; live values, chosen events, reset and submission remain browser/application-owned. Textarea text has LF normalization and preserves an initial newline across SSR and DOM. See the shared [native controls example](../../../examples/todo-ui/src/controls.rs), available at `/app` and the no-JS `/controls` route in Todo.
+Initial input/textarea/select/checkbox defaults are declarative; live values, chosen events, reset and submission remain browser/application-owned. Textarea text has LF normalization and preserves an initial newline across SSR and DOM. See the shared [native controls example](https://github.com/bohewu/yetlet/blob/master/examples/todo-ui/src/controls.rs), available at `/app` and the no-JS `/controls` route in Todo.
 
-`href` accepts a root-relative path or fragment; form `action` accepts a root-relative path. Static `validate` checks the narrow spelling. WASM mount additionally uses the browser URL parser and effective document base, rejects non-HTTP(S), cross-origin or credential-bearing destinations, and stores absolute URLs before touching the target. Therefore mount can reject a View that passed static validation. Later base changes do not retarget accepted attributes. The broader SSR URL policy remains separate; see [navigation limits](../../../docs/YT-110-DOM-CAPABILITIES.md#navigation-and-submission-boundary).
+`href` accepts a root-relative path or fragment; form `action` accepts a root-relative path. Static `validate` checks the narrow spelling. WASM mount additionally uses the browser URL parser and effective document base, rejects non-HTTP(S), cross-origin or credential-bearing destinations, and stores absolute URLs before touching the target. Therefore mount can reject a View that passed static validation. Later base changes do not retarget accepted attributes. The broader SSR URL policy remains separate; see [navigation limits](https://github.com/bohewu/yetlet/blob/master/docs/YT-110-DOM-CAPABILITIES.md#navigation-and-submission-boundary).
 
 The caller owns the target and event listener lifetime. Keep listeners outside the replaced subtree or explicitly release/rebind them. Subtree replacement does not preserve child identity, focus or selection as a general contract, and unexpected DOM API failures are not transactional rollback. Choose the opt-in `dom-keyed` feature for proven identity-sensitive collections. There is no general VDOM, hydration, resumability or GPU acceleration.
 
@@ -115,7 +115,7 @@ validate_with_options(&view, &options)?;
 # Ok::<(), yetlet_browser::dom::DomPolicyError>(())
 ```
 
-The shared [Todo consumer](../../../examples/todo-ui/src/controls.rs) exposes
+The shared [Todo consumer](https://github.com/bohewu/yetlet/blob/master/examples/todo-ui/src/controls.rs) exposes
 `controlled_links_and_image` separately; the existing Todo routes do not install
 this policy automatically. Applications own activation and the host CSP.
 
@@ -140,19 +140,19 @@ browser-owned; the policy checks initial assigned origins, not redirect chains.
 Loads may start before insertion and are not rolled back. Failed images keep
 native error/alt behavior; there is no framework retry or display guarantee.
 Accepted resources can send browser-managed credentials/referrers. This is not
-authentication or privacy isolation. See the [full policy and evidence](../../../docs/YT-221-DOM-URL-IMAGE-CONTRACT.md).
+authentication or privacy isolation. See the [full policy and evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md).
 
 ## API reference
 
-See [DOM source/rustdoc](../src/dom/mod.rs), the [current API reference](../../../docs/API-REFERENCE.md)
+See [DOM source/rustdoc](../src/dom/mod.rs), the [current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md)
 and the linked supported-vocabulary/navigation contract below.
 
 ### License and compatibility
 
-Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE).
+Dual-licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/LICENSE-MIT) or [Apache-2.0](https://github.com/bohewu/yetlet/blob/master/LICENSE-APACHE).
 SDK `0.9.0-alpha.6` is published; APIs remain Experimental. Read
-[compatibility](../../../docs/COMPATIBILITY.md) and the
-[current API reference](../../../docs/API-REFERENCE.md) at the matching revision.
+[compatibility](https://github.com/bohewu/yetlet/blob/master/docs/COMPATIBILITY.md) and the
+[current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md) at the matching revision.
 The historical evidence below retains its original candidate and scope; it does
 not qualify every later checkout or promise production support.
 

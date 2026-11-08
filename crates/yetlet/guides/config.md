@@ -64,4 +64,4 @@ The repository [configuration guide](https://github.com/bohewu/yetlet/blob/maste
 and [protected-field guide](https://github.com/bohewu/yetlet/blob/master/docs/SETTINGS-SECRET-PROVIDER.md)
 provide fuller integration context when repository access is available; those
 branch links are navigation, not version-pinned qualification evidence.
-Dual licensed under [MIT](../../yetlet-config/LICENSE-MIT) or [Apache-2.0](../../yetlet-config/LICENSE-APACHE).
+Dual licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-config/LICENSE-MIT) or [Apache-2.0](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-config/LICENSE-APACHE).

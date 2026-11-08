@@ -104,7 +104,7 @@ refund after errors/cancellation. SSE is charged at connection admission.
 
 ### Opt-in Settings loader in the native example
 
-The example explicitly selects the existing [yetlet-config loader](../../../docs/CONFIGURATION.md)
+The example explicitly selects the existing [yetlet-config loader](https://github.com/bohewu/yetlet/blob/master/docs/CONFIGURATION.md)
 as a **development/example dependency**. Configuration is not a Core service or
 limiter runtime dependency. The application calls `Loader::load` once at startup,
 deserializes its own `Settings` type, and composes the native routes. No framework
@@ -192,14 +192,14 @@ recommendations.
 ## API reference
 
 Use [limiter source/rustdoc](../src/rate_limit/mod.rs), the [native example](../examples/rate_limit/native.rs)
-and the [current API reference](../../../docs/API-REFERENCE.md). The `# Ok` line is
+and the [current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md). The `# Ok` line is
 rustdoc context; place wiring in your own fallible setup function.
 
 <details>
 <summary>Historical delivery context and evidence</summary>
 
 An experimental, unpublished, native-only Tower/Axum admission layer for
-[YT-117](../../../docs/YT-117-RATE-LIMIT.md). Explicit installation is required;
+[YT-117](https://github.com/bohewu/yetlet/blob/master/docs/YT-117-RATE-LIMIT.md). Explicit installation is required;
 Core, the server facade, Auth and browser applications do not enable it.
 
 </details>

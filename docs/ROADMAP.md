@@ -1,5 +1,17 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-244 publication surface and API consistency (2026-11-08): Done at local documentation scope.**
+The [source/package audit](YT-244-PUBLICATION-SURFACE-API-AUDIT.md) corrects the
+three Cargo package READMEs, their links and carried module-guide boundaries,
+and keeps the published CLI distinct from later source-only Style templates.
+Existing release-document regression gates are extended without changing
+product API or selecting a release version. First review found two broken
+legacy CLI headings; both fragments were restored and independent corrective
+Reviewer `wc_job_qL8yujng6i4r08m9` PASS closed the P2. Windows qualification
+is deferred by the owner; no Git delivery, hosted execution or publication is
+implied.
+
+
 **YT-242 documentation truth audit (2026-11-08): Done at bounded documentation scope.**
 [Audit and corrections](YT-242-DOCUMENTATION-TRUTH.md) separate published SDK/CLI,
 the selected guide edition and later checkout authoring/tools. The 516-file role

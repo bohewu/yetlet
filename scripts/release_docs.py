@@ -82,8 +82,50 @@ def check_installs(text, version, location):
                 'installation must select the exact documented version with --locked')
 
 
+def markdown_links(text):
+    """Inline Markdown links in package-carried documents (not prose or code URLs)."""
+    for match in re.finditer(r'!?\[[^\]\n]*\]\(([^)\n]+)\)', text):
+        value = match.group(1).strip().split(maxsplit=1)[0].strip('<>')
+        if value:
+            yield value
+
+
+def check_public_readme_links(text, location):
+    """crates.io renders package README outside its original repository tree."""
+    for url in markdown_links(text):
+        require(url.startswith('#') or re.match(r'^(?:https?://|mailto:)', url, re.I),
+                location, 'package README links need public URLs or local anchors')
+
+
+def check_guide_links(root, relative, package_root):
+    """Package guide relatives may refer only to files carried by that package."""
+    package = (root / package_root).resolve()
+    for url in markdown_links(read(root, relative)):
+        if url.startswith('#') or re.match(r'^(?:https?://|mailto:)', url, re.I):
+            continue
+        require(not re.match(r'^(?:[a-z][a-z0-9+.-]*:|//)', url, re.I),
+                relative, 'unsupported guide link scheme')
+        target_ref = url.split('#', 1)[0].split('?', 1)[0]
+        target = ((root / relative).parent / target_ref).resolve()
+        require(bool(target_ref) and target.is_relative_to(package) and target.is_file(),
+                relative, 'relative guide link escapes the package or names a missing file')
+
+
+def check_cli_published_commands(text, selected, published):
+    """Do not attribute later source-only Style selectors to an already shipped CLI."""
+    if selected != published:
+        return
+    heading = '## Published CLI command and capability inventory'
+    sections = text.split(heading)
+    require(len(sections) == 2, 'yetlet-cli', 'one published CLI inventory required')
+    inventory = sections[1].split('\n## ', 1)[0]
+    require('native-style' not in inventory and 'browser-style' not in inventory,
+            'yetlet-cli', 'source-only Style templates attributed to published CLI')
+
+
 def check_readme(name, version, text, sdk=None):
     """Same checks for source README and the actual hash-bound archive README."""
+    check_public_readme_links(text, name)
     text = current_text(text)
     check_status(text, {'CLI' if name == 'yetlet-cli' else 'SDK': version}, name)
     if name == 'yetlet-cli':
@@ -185,6 +227,9 @@ def check_source(root, cohort='all'):
         require('feature/view-authoring-api' not in current_text(read(root, relative)),
                 relative, 'obsolete typed-authoring branch guidance')
     published = published_versions(root)
+    if cohort in ('all', 'cli'):
+        check_cli_published_commands(read(root, 'tools/yetlet-cli/README.md'),
+                                     version, published['CLI'])
     for relative in ('docs/ARCHITECTURE.md', 'docs/RELEASE-READINESS.md'):
         check_distribution(read(root, relative), published, relative)
     for relative in ('AGENTS.md', 'docs/ARCHITECTURE.md'):
@@ -197,6 +242,7 @@ def check_source(root, cohort='all'):
     for path in module_guides:
         relative = path.relative_to(root).as_posix()
         check_current_module(read(root, relative), relative)
+        check_guide_links(root, relative, '/'.join(relative.split('/')[:2]))
     edition = tomllib.loads(read(root, 'site/pages.toml'))['edition']
     for relative in PINNED_GUIDES:
         check_installs(read(root, relative), edition['cli'], relative)

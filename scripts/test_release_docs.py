@@ -151,6 +151,55 @@ class ReleaseDocsTests(unittest.TestCase):
         # as well as historical publication-pending sections.
         docs.check_source(root)
 
+    def test_package_readme_links_are_publicly_resolvable_not_workspace_relative(self):
+        valid = ('[Docs](https://docs.rs/yetlet) [Source](https://github.com/bohewu/yetlet)'
+                 ' [Mail](mailto:maintainer@example.invalid) [Local](#features)')
+        docs.check_public_readme_links(valid, 'README')
+        for broken in ['[App](../../docs/FIRST-APP.md)',
+                       '[Guide](guides/core.md)', '[Sibling](../yetlet-browser/README.md)',
+                       '[Bad](javascript:alert)', '[Root](/docs/guide.md)']:
+            with self.subTest(link=broken), self.assertRaises(ValueError):
+                docs.check_public_readme_links(broken, 'README')
+        with self.assertRaises(ValueError):
+            docs.check_readme('yetlet', '8.0.0',
+                              'Version '+chr(96)+'8.0.0'+chr(96)+'.\n[Guide](guides/core.md)\n')
+
+    def test_packaged_guide_links_are_self_contained_or_public_urls(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            base = root / 'crates/yetlet'
+            (base / 'guides').mkdir(parents=True)
+            (base / 'README.md').write_text('# Package\n', encoding='utf-8')
+            guide = base / 'guides/entry.md'
+            guide.write_text('[Package](../README.md) '
+                             '[Source](https://github.com/bohewu/yetlet)\n', encoding='utf-8')
+            docs.check_guide_links(root, 'crates/yetlet/guides/entry.md', 'crates/yetlet')
+            for broken in ['[Outside](../../../docs/README.md)',
+                           '[Missing](missing.md)', '[Invalid](javascript:example)']:
+                with self.subTest(link=broken), self.assertRaises(ValueError):
+                    guide.write_text(broken, encoding='utf-8')
+                    docs.check_guide_links(root, 'crates/yetlet/guides/entry.md',
+                                           'crates/yetlet')
+
+
+    def test_published_cli_inventory_excludes_later_source_only_style_templates(self):
+        text = ('## Published CLI command and capability inventory\n'
+                'new --template native|browser\n\n'
+                '## Source-only application-owned Rust CSS\n'
+                'native-style and browser-style are checkout-only.\n')
+        docs.check_cli_published_commands(text, '2.1.0', '2.1.0')
+        with self.assertRaises(ValueError):
+            docs.check_cli_published_commands(
+                text.replace('native|browser', 'native|browser|native-style'),
+                '2.1.0', '2.1.0')
+        with self.assertRaises(ValueError):
+            docs.check_cli_published_commands(
+                text.replace('native|browser', 'native|browser|browser-style'),
+                '2.1.0', '2.1.0')
+        # A later source version has a separate selected packaging decision.
+        docs.check_cli_published_commands(text, '2.2.0', '2.1.0')
+
+
     def test_source_identity_invokes_gate_before_current_release_build(self):
         version = '8.0.0-alpha.1'
         record = {'schema': 2, 'version': version, 'source': 'a' * 40, 'cohort': 'consolidated'}

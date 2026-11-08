@@ -118,6 +118,15 @@ feature notes can remain at their original versions. Document review must verify
 other prose, feature scope and current distribution claims; regex checks cannot
 establish arbitrary sentence truth or prove every guide is complete.
 
+The three package READMEs are rendered by crates.io; their Markdown links must
+use public URLs or local heading anchors, not repository-relative file links.
+Package-carried library guides may use relative links only within the same crate;
+links to another crate, repository documents or examples must use public URLs.
+Links to `blob/master` identify the moving maintainer source, **not** the immutable
+versioned package; consumers needing exact release code should use the selected
+tag or its `.crate` contents. The existing release documentation gate checks these
+local link boundaries, while live HTTP link availability needs separate evidence.
+
 Enforcement for current CLI/schema3 and two-package SDK/schema2 releases:
 
 - Required PR/master CI runs the source check in both the full and bounded lanes.

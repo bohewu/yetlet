@@ -39,7 +39,7 @@ assert_eq!(pick_records(batch.bytes(), viewport, 300., 200.).unwrap(), Some(1));
 With `wgpu-browser` and `wasm32-unknown-unknown`, create
 `browser::SceneOwner::new(generation, batch, fault_sink)` explicitly. The sink is
 an injected Rust function `fn(u32, &str)`; a Wasm application may bridge it to JS.
-See the real [application binding](../../../examples/webgpu-scene-island/src/browser.rs).
+See the real [application binding](https://github.com/bohewu/yetlet/blob/master/examples/webgpu-scene-island/src/browser.rs).
 Call `initialize(HtmlCanvasElement).await`, `resize(css_width, css_height, dpr,
 connected)`, then `draw()` on demand. `completion().await` waits for submitted
 work, not presentation. Methods take Yetlet-owned CPU types or browser
@@ -96,13 +96,13 @@ or FPS. Peak transition buffer bytes include old and replacement allocations.
 
 ## Selected Experimental support
 
-The actual extracted candidate passed [YT-079 verification](../../../docs/YT-079-VERIFICATION.md)
-and [independent review](../../../docs/YT-079-INDEPENDENT-REVIEW.md) on selected
+The actual extracted candidate passed [YT-079 verification](https://github.com/bohewu/yetlet/blob/master/docs/YT-079-VERIFICATION.md)
+and [independent review](https://github.com/bohewu/yetlet/blob/master/docs/YT-079-INDEPENDENT-REVIEW.md) on selected
 Firefox 158 / Ubuntu X11 / Intel Vulkan with disposable WebGPU opt-in. See the
 [source-bound support matrix](wgpu-support.md) and final YT-080 qualification record.
 Windows JS baseline and failed Chrome configurations are not candidate PASS.
 No broad browser, physical mobile, native backend, stable API, production or 3D
-support is claimed. See [YT-079 verification](../../../docs/YT-079-VERIFICATION.md).
+support is claimed. See [YT-079 verification](https://github.com/bohewu/yetlet/blob/master/docs/YT-079-VERIFICATION.md).
 
 The renderer is now a module of the browser SDK in the root workspace; the
 consumer retains its separate workspace/lock. Use the explicit commands:

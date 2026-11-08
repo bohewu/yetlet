@@ -1,6 +1,6 @@
 # Yetlet Backlog
 
-## YT-237–YT-243 — Style delivery, documentation truth and ordered follow-up
+## YT-237–YT-244 — Style delivery, publication surface and ordered follow-up
 
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
@@ -11,6 +11,7 @@
 | YT-241 | P2 | M | M10 | Native-first Style Showcase | YT-240 | [Sample and limits](../examples/style-showcase/README.md); independently accepted source, bounded Linux/browser proof and thirteenth catalog entry, as recorded below | Done |
 | YT-242 | P2 | M | M10 | Documentation truth audit and bounded corrections | YT-241 | [Audit report](YT-242-DOCUMENTATION-TRUTH.md): 516-file role inventory and bounded 54-entry semantic audit; current/published/guide identity corrections and existing gate regressions. Python 14/39/35, docs/DAG, samples and whitespace PASS. Independent review finding closed by Reviewer `wc_job_m2SOL6psGzaIGPjm` PASS, no issues/followups; local delivery follows strict Guard, no release qualification | Done |
 | YT-243 | P2 | M | M10 | Source release qualification and existing CI coverage | YT-242 | [Qualification report](YT-243-RELEASE-QUALIFICATION.md): integrate Showcase/Style into existing CI, Linux release Chrome/Firefox (including page-realm disposal), CLI107 plus affected integrations, normal two-SDK/CLI packaging and exact archive consumers PASS. Nested Style-template manifest packaging defect corrected; original failures retained. Local Windows MSVC/wasm32, exact packages, generated native Style HTTP/CSS and final CI setup plus 7 Style tests PASS. Missing Windows OpenSSL CI configuration found by first review and corrected. Final independent Reviewer `wc_job_ukE1zeoMQlt3wLvu` PASS, zero issues/followups; source/Linux/local Windows MSVC scope accepted. Hosted CI, untested platforms and release selection remain separate | Done |
+| YT-244 | P1 | M | M10 | Package publication surface and recent API consistency | YT-243 | [Audit](YT-244-PUBLICATION-SURFACE-API-AUDIT.md): package README/guide cross-boundary links, registry-first examples and CLI published/source-only contract; release-doc regressions and local package inventory. Independent corrective Reviewer `wc_job_qL8yujng6i4r08m9` PASS (zero issues/followups) after preserving two CLI fragment anchors; source docs/link and release regression gates PASS. Version selection, hosted CI and Windows follow-up excluded; no Git delivery | Done |
 
 ## YT-241 — Owner-approved Style Showcase
 

@@ -1,14 +1,14 @@
 # Experimental Valkey / Redis-protocol Session provider — YT-066b2
 
-**Status: focused integration tests and independent implementation review passed at bounded YT-066b2 scope. Do not treat this crate as production-qualified.** See [provider implementation verification](../../../docs/YT-066B2-VERIFICATION.md) and the later [three-application qualification](../../../docs/YT-066B3-VERIFICATION.md). It is distributed as the optional `session-redis` module/feature of `yetlet` SDK `0.9.0-alpha.6`, outside default application dependency graphs. The existing synchronous Memory provider is unchanged.
+**Status: focused integration tests and independent implementation review passed at bounded YT-066b2 scope. Do not treat this crate as production-qualified.** See [provider implementation verification](https://github.com/bohewu/yetlet/blob/master/docs/YT-066B2-VERIFICATION.md) and the later [three-application qualification](https://github.com/bohewu/yetlet/blob/master/docs/YT-066B3-VERIFICATION.md). It is distributed as the optional `session-redis` module/feature of `yetlet` SDK `0.9.0-alpha.6`, outside default application dependency graphs. The existing synchronous Memory provider is unchanged.
 
-This is a separate, explicitly selected async Session implementation, not an authentication system. It uses the reviewed single-primary Lua semantics and [selected pure-SSR Cookie contract](../../../docs/YT-066B-COOKIE-ORDERING.md). No JavaScript, plugin registry, DI container, implicit Memory fallback or synchronous Redis facade is added.
+This is a separate, explicitly selected async Session implementation, not an authentication system. It uses the reviewed single-primary Lua semantics and [selected pure-SSR Cookie contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-066B-COOKIE-ORDERING.md). No JavaScript, plugin registry, DI container, implicit Memory fallback or synchronous Redis facade is added.
 
 The earlier separate-package preparation is historical; the
-[two-package migration](../../../docs/YT-211-TWO-PACKAGE-MIGRATION.md) changed
+[two-package migration](https://github.com/bohewu/yetlet/blob/master/docs/YT-211-TWO-PACKAGE-MIGRATION.md) changed
 the carrier without expanding provider qualification.
 
-The later [YT-094 Valkey reference](../../../docs/YT-094-VALKEY-SESSIONS.md) selects
+The later [YT-094 Valkey reference](https://github.com/bohewu/yetlet/blob/master/docs/YT-094-VALKEY-SESSIONS.md) selects
 Valkey 9.1.2 for actual two-app shared-session verification. It reuses this
 implementation and existing protocol/key schema. Its later TTL correction
 accepts up to 30 days, matching the Memory provider's upper bound; the other
@@ -42,7 +42,7 @@ Configuration accepts a 1–64 character isolated namespace, a 1–20 character 
 
 The fixed experimental bounds are: 400 ms shared caller deadline across request-lock/queue/Redis phases, 80 ms operation queue wait, 200 ms connect timeout, one reconnect retry with 10–20 ms backoff, immutable one-second server dispatch window, five-second operation-result retention, 64 result records per namespace, 400 ms tombstones and two-second shutdown drain. A synchronous callback cannot be interrupted; if it exhausts the caller deadline, the next phase refuses dispatch. Caller timeout does not cancel a dispatched Redis write; owned work retains its permits until a reply/disconnect or shutdown.
 
-Lua script isolation is not rollback on runtime/OOM failure. Later [YT-066b3 qualification](../../../docs/YT-066B3-VERIFICATION.md) passed actual three-application execution, owned cleanup and independent review at single-host/single-primary/no-persistence scope. YT-066 is Done at that recorded scope; this isolated provider remains outside the historical nine-package immutable candidate. The later TLS/ACL and cross-host/persistent-restart evidence below has its own bounded inputs; neither record qualifies arbitrary restore, HA/Cluster or application SLO/RPO/RTO. YT-020 remains Blocked and no registry upload is authorized. Never restore an older namespace and assume revoked credentials remain invalid.
+Lua script isolation is not rollback on runtime/OOM failure. Later [YT-066b3 qualification](https://github.com/bohewu/yetlet/blob/master/docs/YT-066B3-VERIFICATION.md) passed actual three-application execution, owned cleanup and independent review at single-host/single-primary/no-persistence scope. YT-066 is Done at that recorded scope; this isolated provider remains outside the historical nine-package immutable candidate. The later TLS/ACL and cross-host/persistent-restart evidence below has its own bounded inputs; neither record qualifies arbitrary restore, HA/Cluster or application SLO/RPO/RTO. YT-020 remains Blocked and no registry upload is authorized. Never restore an older namespace and assume revoked credentials remain invalid.
 
 ## Local checks
 
@@ -53,12 +53,12 @@ CARGO_TARGET_DIR="$PWD/target/yt066b2-build" cargo +1.99.0 test -p yetlet --feat
 CARGO_TARGET_DIR="$PWD/target/yt066b2-build" cargo clippy -p yetlet --features session-redis --locked --all-targets -- -D warnings
 ```
 
-Remote-service tests are ignored unless explicitly selected; the configuration test needs no service. Use only a disposable [Redis fixture](../../../qualification/yt066b/compose.yaml) or the [Valkey fixture](../../../qualification/yt094-valkey/README.md), random loopback listener and exact-project cleanup. They deliberately pause writes and corrupt synthetic records. Do not run against a shared store. The CAS test uses `block_in_place` for its synchronous callback barrier. Historical provider tests passed after that test-only correction; the separate cancellation/drain test retains its earlier PASS. The verification record preserves both prior stalled attempts and the explicitly authorized correction. The added TTL integration checks a 30-minute store TTL/cookie, non-sliding reads/updates and cross-manager rotation/logout.
+Remote-service tests are ignored unless explicitly selected; the configuration test needs no service. Use only a disposable [Redis fixture](https://github.com/bohewu/yetlet/blob/master/qualification/yt066b/compose.yaml) or the [Valkey fixture](https://github.com/bohewu/yetlet/blob/master/qualification/yt094-valkey/README.md), random loopback listener and exact-project cleanup. They deliberately pause writes and corrupt synthetic records. Do not run against a shared store. The CAS test uses `block_in_place` for its synchronous callback barrier. Historical provider tests passed after that test-only correction; the separate cancellation/drain test retains its earlier PASS. The verification record preserves both prior stalled attempts and the explicitly authorized correction. The added TTL integration checks a 30-minute store TTL/cookie, non-sliding reads/updates and cross-manager rotation/logout.
 
 
 ## Separate admission-burst research
 
-[YT-172](../../../docs/YT-172-SESSION-ADMISSION-BURSTS.md) adds one ignored,
+[YT-172](https://github.com/bohewu/yetlet/blob/master/docs/YT-172-SESSION-ADMISSION-BURSTS.md) adds one ignored,
 `cfg(test)`-only provider-read study. Normal builds contain no probe, timer,
 capture or public API. It retains the existing four active/eight total slots
 and all deadlines/security semantics; it is not an HTTP capacity qualification.
@@ -77,7 +77,7 @@ issues/required followups; YT-172 is Done at bounded provider-research scope.
 
 ## Separate full-HTTP timeline research
 
-[YT-173](../../../docs/YT-173-HTTP-SESSION-TIMELINE.md) uses the explicit private
+[YT-173](https://github.com/bohewu/yetlet/blob/master/docs/YT-173-HTTP-SESSION-TIMELINE.md) uses the explicit private
 compiler cfg `yetlet_session_admission_probe` to link fixture HTTP scopes and
 provider/worker timing on one process-local clock. The hidden linkage module
 is an unsupported research-build interface; ordinary builds have no export,
@@ -112,7 +112,7 @@ separate from pending Azure Auth/restart qualification.
 Endpoints/passwords must not be printed or serialized. No custom crypto, parser,
 public factory or automatic upgrade of a plaintext endpoint is added.
 
-The [YT-184 isolated cross-host contract](../../../docs/YT-184-AZURE-AUTH-SESSION-RESTART.md)
+The [YT-184 isolated cross-host contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-184-AZURE-AUTH-SESSION-RESTART.md)
 selects task-CA roots only in fresh owned guests, private authenticated Valkey
 and SQL, Secure cookies and explicit new-epoch re-login after authority restart.
 Its first cloud bootstrap fails at a Path expression; authorized generation2

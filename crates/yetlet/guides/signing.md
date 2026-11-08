@@ -46,5 +46,5 @@ diagnostics. Provider adapters and actual production custody are separate choice
 Read source/rustdoc at the selected revision for signatures and ownership. The
 repository's [signing contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-093-SIGNING-CONTRACT.md)
 provides additional context when repository access is available; its branch URL
-does not pin the package's evidence. Dual licensed under [MIT](../../yetlet-signing/LICENSE-MIT) or
-[Apache-2.0](../../yetlet-signing/LICENSE-APACHE).
+does not pin the package's evidence. Dual licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-signing/LICENSE-MIT) or
+[Apache-2.0](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-signing/LICENSE-APACHE).

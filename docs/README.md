@@ -14,6 +14,9 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Reader entry points
 
+- [Package publication surface and API consistency](YT-244-PUBLICATION-SURFACE-API-AUDIT.md):
+  shipped README/guide link boundaries, registry-first install text and
+  published-versus-source-only CLI/API claims; release approval remains separate.
 - [Source-only checkout additions](API-REFERENCE.md#source-only-checkout-additions):
   typed tags, optional private app Style generation and
   [Style Showcase](../examples/style-showcase/README.md); external build-time CSS,
