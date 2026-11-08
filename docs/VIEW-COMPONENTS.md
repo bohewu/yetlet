@@ -107,9 +107,7 @@ It adds no task mutation, persistent state, browser event listener or automatic
 DOM update. The existing `/hello/Ada` route remains as described in the first-app
 walkthrough. A no-JS page needs none of those optional browser capabilities.
 
-<a id="optional-typed-tag-builders-unreleased-source-only-yt-234"></a>
-
-## Optional typed tag builders (SDK alpha.7; YT-234)
+## Optional typed tag builders (unreleased source-only YT-234)
 
 The locally selected SDK `0.9.0-alpha.7` includes
 `yetlet::view::tags` as a lightweight authoring alternative. **This is not part
