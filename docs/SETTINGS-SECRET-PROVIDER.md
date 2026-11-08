@@ -3,12 +3,15 @@
 Resolve an explicitly injected SecretProvider into selected protected startup
 settings fields. Ordinary settings loading remains independent and unchanged.
 
-**Experimental, unpublished.** Use this source checkout and the documented target scope.
+**Experimental SDK integration.** These modules are distributed in SDK
+`0.9.0-alpha.6`; use the documented features/target and source matching the
+version you consume. [Release readiness](RELEASE-READINESS.md) records distribution
+and its qualification limits.
 
 
 ## Prerequisites
 
-Use the pinned Rust/Cargo toolchain and the isolated config workspace. Explicitly
+Use the pinned Rust/Cargo toolchain and the SDK `config` feature. Explicitly
 enable `secret-provider`; construct the provider before resolving settings to
 avoid circular bootstrap. The runnable example uses bundled settings and a local
 synthetic provider. The wiring fragment assumes application-owned `Settings`,
@@ -58,7 +61,7 @@ retains its accepted historical compatibility evidence.
 Enable the feature and inject an already-constructed read-only provider:
 
 ```toml
-yetlet = { version = "=0.9.0-alpha.5", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["config"] }
+yetlet = { version = "=0.9.0-alpha.6", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["config"] }
 ```
 
 ```rust

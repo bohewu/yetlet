@@ -8,6 +8,17 @@ when building actual browser assets.
 
 ## Minimal integration
 
+Use exact published registry dependencies for the current released API:
+
+```toml
+[dependencies]
+yetlet = { version = "=0.9.0-alpha.6", default-features = false }
+yetlet-browser = "=0.9.0-alpha.6"
+```
+
+For checkout-only experiments, select matching local source revisions for both
+crates rather than assuming a package with the same version has new source APIs:
+
 ```toml
 [dependencies]
 yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.6", default-features = false }
@@ -22,11 +33,11 @@ is one-way; native applications need only `yetlet`.
 
 | Capability | Feature | Guide |
 |---|---|---|
-| Subtree DOM mount | `dom` (default) | [DOM](guides/dom.md) |
-| Keyed children/listeners | `dom-keyed` | [Keyed DOM](guides/dom-keyed.md) |
-| HTTP Action executor | `actions` | [Portable contracts and browser transport](../yetlet/guides/actions.md) |
-| CPU scene model/validation | `wgpu` | [Scene](guides/wgpu.md) |
-| Actual WebGPU backend | `wgpu-browser` | [Support](guides/wgpu-support.md) |
+| Subtree DOM mount | `dom` (default) | [DOM](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/guides/dom.md) |
+| Keyed children/listeners | `dom-keyed` | [Keyed DOM](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/guides/dom-keyed.md) |
+| HTTP Action executor | `actions` | [Portable contracts and browser transport](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
+| CPU scene model/validation | `wgpu` | [Scene](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/guides/wgpu.md) |
+| Actual WebGPU backend | `wgpu-browser` | [Support](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/guides/wgpu-support.md) |
 
 DOM bindings, HTTP execution and the GPU backend require wasm32. Native static
 validation is separate from actual browser qualification. Linking the package

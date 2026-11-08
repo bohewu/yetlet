@@ -102,6 +102,12 @@ The bounded current-reader inventory is `CURRENT_DOCS` in
 [release_docs.py](../scripts/release_docs.py). It rejects known stale availability
 wording and selected-version pending/unreleased paragraphs. Explicit
 `## Historical` sections and dated task/evidence records retain their meaning.
+Architecture and Release Readiness distribution fields are checked against the
+explicit accepted SDK/CLI publication sections, independently of development
+versions. Current module-guide availability boilerplate is checked before its
+explicit historical heading or historical delivery disclosure. The Compatibility
+and Documentation Scope reader-edition paragraphs must match `site/pages.toml`.
+These are bounded checks of known drift, not a semantic audit of all Markdown.
 The root quickstart and first-app commands must match the separately selected
 `site/pages.toml` edition; a new product version does not promote that edition.
 
@@ -111,6 +117,15 @@ they must not assert a future upload succeeded. Historical "since version…"
 feature notes can remain at their original versions. Document review must verify
 other prose, feature scope and current distribution claims; regex checks cannot
 establish arbitrary sentence truth or prove every guide is complete.
+
+The three package READMEs are rendered by crates.io; their Markdown links must
+use public URLs or local heading anchors, not repository-relative file links.
+Package-carried library guides may use relative links only within the same crate;
+links to another crate, repository documents or examples must use public URLs.
+Links to `blob/master` identify the moving maintainer source, **not** the immutable
+versioned package; consumers needing exact release code should use the selected
+tag or its `.crate` contents. The existing release documentation gate checks these
+local link boundaries, while live HTTP link availability needs separate evidence.
 
 Enforcement for current CLI/schema3 and two-package SDK/schema2 releases:
 

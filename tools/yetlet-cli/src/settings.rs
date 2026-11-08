@@ -11,12 +11,50 @@ use std::{
 pub(crate) struct Settings {
     #[serde(default)]
     pub(crate) target: Target,
+    #[serde(default)]
+    pub(crate) styles: Option<Styles>,
     #[serde(skip)]
     pub(crate) tls: Tls,
     #[serde(default)]
     pub(crate) rust: Rust,
     pub(crate) vite: Vite,
     pub(crate) generate: Generate,
+}
+
+#[derive(Clone, Debug, Deserialize, serde::Serialize)]
+#[serde(deny_unknown_fields)]
+pub(crate) struct Styles {
+    pub(crate) enabled: bool,
+    pub(crate) manifest: String,
+    pub(crate) bin: String,
+    pub(crate) output: String,
+}
+
+impl Styles {
+    pub(crate) fn validate(&self, vite: &Vite) -> bool {
+        // Deliberately finite private-package and dedicated-output contract.
+        self.manifest == "stylegen/Cargo.toml"
+            && !self.bin.is_empty()
+            && self.bin.len() <= 64
+            && self.bin.as_bytes()[0].is_ascii_alphabetic()
+            && self
+                .bin
+                .bytes()
+                .all(|b| b.is_ascii_alphanumeric() || matches!(b, b'-' | b'_'))
+            && !["stylegen", ".yetlet", "src"].iter().any(|private| {
+                let frontend = Path::new(vite.root.trim_end_matches('/'));
+                frontend.starts_with(private) || Path::new(private).starts_with(frontend)
+            })
+            && if vite.enabled {
+                self.output
+                    == format!(
+                        "{}/style-output/app.generated.css",
+                        vite.root.trim_end_matches('/')
+                    )
+            } else {
+                self.output == "assets/generated/app.generated.css"
+            }
+    }
 }
 
 #[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq, Eq)]
@@ -117,6 +155,7 @@ impl Default for Settings {
     fn default() -> Self {
         Self {
             target: Target::Native,
+            styles: None,
             tls: Tls::default(),
             rust: Rust::default(),
             vite: Vite {
@@ -254,6 +293,13 @@ pub(crate) fn load_selected(
     }
     if !(1..=100).contains(&settings.generate.k8s.replicas)
         || !valid_frontend_root(&settings.vite.root)
+    {
+        return Err(VALUES.into());
+    }
+    if settings
+        .styles
+        .as_ref()
+        .is_some_and(|styles| !styles.validate(&settings.vite))
     {
         return Err(VALUES.into());
     }
@@ -561,5 +607,57 @@ mod tests {
         for root in ["", "/root", "..", "a/../b", "../a", "a\\b", "."] {
             assert!(!valid_frontend_root(root));
         }
+    }
+}
+
+#[cfg(test)]
+mod style_tests {
+    use super::*;
+    #[test]
+    fn styles_are_optional_strict_and_app_relative_across_profiles() {
+        let base = serde_json::json!({"vite":{"enabled":false,"root":"frontend/","auto_start":false,"auto_build":false},"generate":{"k8s":{"replicas":1}}});
+        assert!(
+            serde_json::from_value::<Settings>(base.clone())
+                .unwrap()
+                .styles
+                .is_none()
+        );
+        let valid = serde_json::json!({"enabled":false,"manifest":"stylegen/Cargo.toml","bin":"app-stylegen","output":"assets/generated/app.generated.css"});
+        let mut value = base.clone();
+        value["styles"] = valid.clone();
+        let settings: Settings = serde_json::from_value(value.clone()).unwrap();
+        assert!(settings.styles.as_ref().unwrap().validate(&settings.vite));
+        for (key, replacement) in [
+            ("manifest", "../Cargo.toml"),
+            ("bin", "x --help"),
+            ("output", "src/main.rs"),
+            ("output", "assets/generated/../app.generated.css"),
+            ("output", "/tmp/app.generated.css"),
+        ] {
+            let mut value = value.clone();
+            value["styles"][key] = replacement.into();
+            let settings: Settings = serde_json::from_value(value).unwrap();
+            assert!(!settings.styles.as_ref().unwrap().validate(&settings.vite));
+        }
+        for wrong in [
+            serde_json::json!({"enabled":false}),
+            serde_json::json!({"enabled":false,"manifest":"stylegen/Cargo.toml","bin":"app-stylegen","output":"assets/generated/app.generated.css","extra":true}),
+        ] {
+            let mut value = base.clone();
+            value["styles"] = wrong;
+            assert!(serde_json::from_value::<Settings>(value).is_err());
+        }
+        let mut settings: Settings = serde_json::from_value(base).unwrap();
+        settings.vite.enabled = true;
+        settings.vite.root = "stylegen/".into();
+        assert!(
+            !serde_json::from_value::<Styles>(valid.clone())
+                .unwrap()
+                .validate(&settings.vite)
+        );
+        settings.vite.root = "ui/".into();
+        let mut styles: Styles = serde_json::from_value(valid).unwrap();
+        styles.output = "ui/style-output/app.generated.css".into();
+        assert!(styles.validate(&settings.vite));
     }
 }

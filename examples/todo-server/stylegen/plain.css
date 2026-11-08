@@ -1,0 +1,22 @@
+:root { color-scheme: light; font-family: system-ui, sans-serif; background: #f4f6f8; }
+* { box-sizing: border-box; }
+body { margin: 0; line-height: 1.6; }
+.todo-shell { max-width: 72rem; margin: 0 auto; }
+h1 { font-size: 1.85rem; line-height: 1.25; margin: 1rem 0 .5rem; }
+h2 { font-size: 1.15rem; line-height: 1.4; margin: 0 0 .75rem; }
+.todo-content { margin: 1.5rem 0; }
+.todo-content > * { min-width: 0; }
+.todo-panel { background: #fff; border: 1px solid #d4dce4; border-radius: .4rem; }
+.todo-toolbar { flex-wrap: wrap; }
+.todo-list { list-style: none; margin: 0 0 1.25rem; }
+.todo-list li { padding: .85rem 0; border-bottom: 1px solid #d4dce4; overflow-wrap: anywhere; }
+.is-complete { text-decoration: line-through; background: #edf5ef; }
+button, input, textarea, select { font: inherit; max-width: 100%; }
+button { min-height: 44px; padding: .5rem .9rem; cursor: pointer; background: #edf2f7; color: #243247; border: 1px solid #9aabba; border-radius: .25rem; }
+button:disabled { cursor: default; opacity: .65; }
+button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, a:focus-visible { outline: 3px solid #2765ad; outline-offset: 3px; }
+.todo-remote label { display: block; margin-bottom: .35rem; }
+.todo-remote input { display: block; width: 100%; min-height: 44px; padding: .5rem; margin-bottom: .75rem; border: 1px solid #9aabba; }
+#create-remote { background: #244d7a; color: white; border-color: #244d7a; }
+#remote-title-error { color: #9b2525; }
+#native-controls { border-top: 1px solid #d4dce4; padding-top: 1.5rem; }

@@ -1,6 +1,7 @@
 # Experimental native secret providers
 
-`yetlet::secrets` is an unpublished, explicit native module of the shared SDK. Its only runtime dependency is `secrecy`. It does not register with
+`yetlet::secrets` is an explicit native module distributed in `yetlet` SDK
+`0.9.0-alpha.6`, selected through the `secrets` feature. Its only runtime dependency is `secrecy`. It does not register with
 Yetlet Core, App, configuration, the CLI, or browser code. Browser WASM is rejected.
 
 `SecretProvider: Send + Sync` exposes object-safe asynchronous
@@ -108,11 +109,11 @@ cargo clippy --offline --locked -p yetlet --features secrets --all-targets -- -D
 ```
 
 The original read-contract evidence was local native only. The separately
-selected [rotation, Windows and Azure record](../../../docs/SECRET-ROTATION-VERIFICATION.md)
+selected [rotation, Windows and Azure record](https://github.com/bohewu/yetlet/blob/master/docs/SECRET-ROTATION-VERIFICATION.md)
 covers explicit replacement and the read-only Azure CLI experiment in
 `examples/azure_cli.rs`. It does not establish production cloud-provider or
 secret-management guarantees.
 
-See the [local inputs and administration contract](../../../docs/SECRET-PROVIDERS.md)
+See the [local inputs and administration contract](https://github.com/bohewu/yetlet/blob/master/docs/SECRET-PROVIDERS.md)
 for the existing settings sources and the separation between application reads,
 operator/automation rotation, signing and TLS certificate renewal.

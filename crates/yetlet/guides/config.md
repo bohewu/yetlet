@@ -1,13 +1,13 @@
 # yetlet::config
 
-Experimental, unpublished `0.9.0-alpha.5` release preparation. Requires Rust 1.99+.
-This native-only package is an explicit opt-in; it is not a global Settings
-service and is rejected in browser Wasm. Publication eligibility does not
-authorize a registry upload or establish a supported public release.
+Experimental module distributed in `yetlet` SDK `0.9.0-alpha.6`. Requires Rust 1.99+.
+This native-only module requires the `config` feature; it is not a global
+Settings service. Native APIs are absent from browser Wasm. Publication does
+not establish production qualification.
 
 ## Prerequisites
 
-Use this source checkout until a release is explicitly published. Select a
+Use source/rustdoc matching your selected SDK version. Select a
 trusted application-owned configuration directory and environment prefix.
 The package remains a module of the shared SDK; Settings loading is optional
 for Yetlet applications.
@@ -64,4 +64,4 @@ The repository [configuration guide](https://github.com/bohewu/yetlet/blob/maste
 and [protected-field guide](https://github.com/bohewu/yetlet/blob/master/docs/SETTINGS-SECRET-PROVIDER.md)
 provide fuller integration context when repository access is available; those
 branch links are navigation, not version-pinned qualification evidence.
-Dual licensed under [MIT](../../yetlet-config/LICENSE-MIT) or [Apache-2.0](../../yetlet-config/LICENSE-APACHE).
+Dual licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-config/LICENSE-MIT) or [Apache-2.0](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-config/LICENSE-APACHE).

@@ -1,21 +1,22 @@
 # Yetlet Prototype Release Readiness
 
-**Current distribution (2026-10-31):** The Experimental
-[v0.9.0-alpha.5 GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.5)
-is public with six checked attachments. The matching `yetlet` and
-`yetlet-browser` versions are published on crates.io; registry download/checksum
-and a fresh external consumer PASS. Exact C/S/V/P, source/feature/platform limits
-and original failures are in the [actual record](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup).
-D6/YT-096 acceptance retains its original signing/integrity scope. This is not
-Stable API, production, SLSA or universal platform qualification. The owner
-subsequently deletes the obsolete actions crate and PR29 is closed unmerged;
-old tags, signed artifacts and failure evidence remain unchanged.
+**Current distribution (2026-11-08):** **Published SDK:** `0.9.0-alpha.6` (`yetlet` / `yetlet-browser`).
+**Published CLI:** `0.2.0` (`yetlet-cli`). The accepted
+[SDK publication and registry consumer](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+and [CLI publication and installed consumer](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+record actual GitHub/crates.io delivery, exact artifacts and consumer limits.
+Later typed tags, private Style generation and Showcase are
+[source-only checkout additions](API-REFERENCE.md#source-only-checkout-additions).
+Development version equality does not establish archive/source equality.
+This is not Stable API, production, SLSA or universal platform qualification.
 
 For a new release, use [RELEASING.md](RELEASING.md), including its current
 version-binding/tooling gaps. This page retains historical readiness decisions,
 not a runnable release sequence. The dated Pending/FAIL/unpublished states below
 remain true for their original checkpoints; they do not describe current
 distribution or transfer qualification to another source.
+
+## Historical readiness checkpoints
 
 **Owner-selected version update (2026-10-28):** The next sixteen-package
 Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md).

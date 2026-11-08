@@ -4,13 +4,16 @@ Compose explicitly selected capabilities through ordinary setup functions, nativ
 Axum/Tower middleware, typed State and request Extensions. No capability registry
 or mandatory Settings/Auth/Session installation is involved.
 
-**Experimental, unpublished.** Use this source checkout and the documented target scope.
+**Experimental SDK integration.** These modules are distributed in SDK
+`0.9.0-alpha.6`; use the documented features/target and source matching the
+version you consume. [Release readiness](RELEASE-READINESS.md) records distribution
+and its qualification limits.
 
 
 ## Prerequisites
 
 Use the pinned Rust/Cargo toolchain and a native Axum/Yetlet application. Select
-each optional crate explicitly. Examples below are setup fragments; keep resource
+each optional module feature explicitly. Examples below are setup fragments; keep resource
 handles in typed state and register routes before applying the intended scope.
 For an existing complete app, use the [REST guide](../examples/rest-api/README.md).
 
@@ -26,11 +29,11 @@ async fn home() -> View { View::text("Hello") }
 let app: axum::Router = App::new().page("/", "Home", home).into_router();
 ```
 
-This requires no `yetlet::request_id`, Session, Cookie Auth or Cache dependency. The runnable `crates/yetlet-server-axum/examples/minimal.rs` example uses only the server adapter and existing core. Cargo's normal dependency graph for the server adapter excludes the optional provider. Building `--workspace` intentionally tests all workspace members; that is different from application dependencies.
+This requires no `yetlet::request_id`, Session, Cookie Auth or Cache dependency. The runnable `crates/yetlet/examples/server_axum/minimal.rs` example uses only the server adapter and existing core. Cargo's normal dependency graph for the server adapter excludes the optional provider. Building `--workspace` intentionally tests all workspace members; that is different from application dependencies.
 
 ### The independent opt-in proof: request correlation
 
-`yetlet::request_id` is an optional crate, depending on the server adapter, **not the reverse**. It extracts the old Todo demo's numeric ID behavior into an explicitly selected provider.
+`yetlet::request_id` is an optional native module selected by the `request-id` feature. It uses the server adapter; selecting the adapter alone does not select request correlation. It extracts the old Todo demo's numeric ID behavior into an explicitly selected provider.
 
 ```rust
 use yetlet::request_id::{RequestId, RequestIds};
@@ -79,7 +82,7 @@ A module can register routes, call `route_layer`, customize its native Router th
 
 ### Bounded opt-in Session provider
 
-`yetlet::session` is another optional crate, depending on the server adapter rather than the reverse. An application supplies a validated `SessionConfig` and installs `SessionManager<T>` only on the routes that need anonymous server-side state:
+`yetlet::session` is another optional native module, selected by the `session` feature; selecting the server adapter alone does not enable it. An application supplies a validated `SessionConfig` and installs `SessionManager<T>` only on the routes that need anonymous server-side state:
 
 ```rust
 use std::time::Duration;
@@ -103,7 +106,7 @@ The Session lock is never held across downstream `await`. `try_update` mutates a
 
 ### Separately selected experimental Redis Session
 
-M10g qualifies the opt-in `yetlet::session_redis` nested workspace at single-host
+M10g qualified the then-separate provider at single-host
 Docker multi-instance, single-primary and no-persistence scope. It uses explicit
 async operations and native scoped Axum middleware; the synchronous Memory API
 and Core/default-server/browser graphs remain unchanged. See the [provider
@@ -117,8 +120,8 @@ authentication system, production durability/HA result or mandatory dependency.
 
 `yetlet_browser::wgpu` is a first-party **Experimental opt-in** module, not a
 runtime plugin registry or automatic DOM/CSS accelerator. Its
-[nested crate](../crates/yetlet-browser/guides/wgpu.md) has dependency-free,
-CPU-only defaults and an explicit wasm32 `browser` feature. Consumers
+[module guide](../crates/yetlet-browser/guides/wgpu.md) describes CPU-only
+`wgpu` selection and the explicit wasm32 `wgpu-browser` feature. Consumers
 select it as a local path dependency and explicitly create a per-canvas
 owner; device initialization is never caused by default SSR, HTTP,
 HTML or ordinary DOM usage. The application retains the scheduler,

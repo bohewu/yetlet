@@ -1,6 +1,6 @@
 # Current capability and API carrier map
 
-Updated: 2026-11-02. The published Experimental SDK has two implementation packages:
+Updated: 2026-11-08. The published Experimental SDK has two implementation packages:
 `yetlet` and `yetlet-browser`, version `0.9.0-alpha.6`, available from crates.io.
 The module map below describes capabilities, not additional installable crates.
 Base defaults select HTML; Browser defaults select DOM. Native capabilities and
@@ -16,6 +16,19 @@ Start at [Current API reference](API-REFERENCE.md) for current entry points,
 ownership/error boundaries and local rustdoc. [Documentation scope](DOCUMENTATION-SCOPE.md)
 classifies reader inputs and retained evidence; this inventory does not select
 publication of its linked execution records.
+
+## Source-only authoring and sample additions
+
+The checkout additionally includes `yetlet::view::tags` (101 typed ordinary tag
+constructors), optional private app Style generation through the CLI, and the
+[Style Showcase](../examples/style-showcase/README.md). These are absent from
+the published SDKalpha.6/CLI0.2.0 artifacts. See the
+[API source-only map](API-REFERENCE.md#source-only-checkout-additions),
+[typed View guide](VIEW-COMPONENTS.md)
+and [Style contract](YT-237-STYLE-REGISTRATION-CONTRACT.md).
+Style authoring has a finite private app vocabulary, explicit registration and
+external build-time CSS; ordinary CSS remains the default and supplies unsupported
+syntax. There is no public style crate, renderer change or runtime style injection.
 
 ## Framework packages and selected features
 

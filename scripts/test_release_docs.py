@@ -85,6 +85,121 @@ class ReleaseDocsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temp, self.assertRaises(ValueError):
             docs.check_source(temp)
 
+    def test_distribution_is_bound_to_accepted_records_not_development_versions(self):
+        root = Path(__file__).resolve().parent.parent
+        published = docs.published_versions(root)
+        text = '\n'.join(f'**Published {subject}:** `{version}`.'
+                         for subject, version in published.items())
+        docs.check_distribution(text, published, 'status')
+        for bad in [text.replace(published['SDK'], '0.1.0'),
+                    text.replace(published['CLI'], '0.1.1'), 'Unpublished 0.1.0']:
+            with self.subTest(text=bad), self.assertRaises(ValueError):
+                docs.check_distribution(bad, published, 'status')
+        # The record parser is not another list of selected-version literals.
+        with tempfile.TemporaryDirectory() as temp:
+            temp = Path(temp)
+            for subject, (relative, consumer) in docs.PUBLICATION_RECORDS.items():
+                path = temp / relative
+                path.parent.mkdir(parents=True, exist_ok=True)
+                prefix = 'yetlet-cli-v' if subject == 'CLI' else 'v'
+                path.write_text(f'Historical preparation: unpublished 1.0.0\n\n'
+                                f'## Owner-approved publication and {consumer} — 2030-01-01\n'
+                                f'[Accepted](https://github.com/bohewu/yetlet/releases/tag/{prefix}7.8.9)\n')
+            self.assertEqual(docs.published_versions(temp), {'SDK': '7.8.9', 'CLI': '7.8.9'})
+
+    def test_guide_edition_prose_matches_site_manifest_but_history_keeps_old_pins(self):
+        edition = {'sdk': '7.8.9-alpha.2', 'cli': '6.5.4'}
+        text = ('The public reader/first-app edition remains pinned to\n'
+                'SDKalpha.2/CLI6.5.4.\n\n## Historical preparation\n'
+                'The public reader/first-app edition was SDKalpha.1/CLI1.0.0.')
+        docs.check_edition(text, edition, 'compatibility')
+        docs.check_edition(text.replace('SDKalpha.2/CLI6.5.4.',
+                                        'SDK `7.8.9-alpha.2` / CLI `6.5.4`.'), edition, 'compatibility')
+        for bad in [text.replace('SDKalpha.2', 'SDKalpha.1'),
+                    text.replace('CLI6.5.4', 'CLI1.0.0'), 'No edition paragraph']:
+            with self.subTest(text=bad), self.assertRaises(ValueError):
+                docs.check_edition(bad, edition, 'compatibility')
+        with self.assertRaises(ValueError):
+            docs.check_edition(text, {'sdk': '7.8.9-alpha.3', 'cli': '6.5.4'}, 'compatibility')
+
+    def test_current_module_claims_reject_old_packaging_and_preserve_history(self):
+        for old in ['Experimental, unpublished.', 'One of sixteen library candidates.',
+                    'public activation remains blocked']:
+            with self.subTest(text=old), self.assertRaises(ValueError):
+                docs.check_current_module(old, 'module')
+            docs.check_current_module('Experimental SDK module.\n\n## Historical delivery\n' + old, 'module')
+            docs.check_current_module('Experimental SDK module.\n\n<details>\n'
+                                      '<summary>Historical delivery context and evidence</summary>\n' + old,
+                                      'module')
+        docs.check_current_module('Source-only typed tags are absent from the published SDK.', 'module')
+
+    def test_source_gate_catches_original_entry_drift_and_allows_source_only_additions(self):
+        root = Path(__file__).resolve().parent.parent
+        original = docs.read
+        for relative, bad in [
+                ('docs/ARCHITECTURE.md', 'Experimental, unpublished 0.1.0; nine library guides.'),
+                ('docs/RELEASE-READINESS.md', 'Current distribution: SDKalpha.5'),
+                ('AGENTS.md', 'Public release and production qualification remain open.'),
+                ('docs/COMPATIBILITY.md', 'The public reader/first-app edition is SDKalpha.5/CLI0.1.1.'),
+                ('docs/VIEW-COMPONENTS.md', 'Use feature/view-authoring-api for typed tags.'),
+                ('crates/yetlet/guides/core.md', 'Experimental alpha.5, unpublished.')]:
+            with (self.subTest(path=relative),
+                  patch.object(docs, 'read', side_effect=lambda r, p: bad if p == relative else original(r, p)),
+                  self.assertRaises(ValueError)):
+                docs.check_source(root)
+        # Existing current docs contain explicitly source-only tags and Style,
+        # as well as historical publication-pending sections.
+        docs.check_source(root)
+
+    def test_package_readme_links_are_publicly_resolvable_not_workspace_relative(self):
+        valid = ('[Docs](https://docs.rs/yetlet) [Source](https://github.com/bohewu/yetlet)'
+                 ' [Mail](mailto:maintainer@example.invalid) [Local](#features)')
+        docs.check_public_readme_links(valid, 'README')
+        for broken in ['[App](../../docs/FIRST-APP.md)',
+                       '[Guide](guides/core.md)', '[Sibling](../yetlet-browser/README.md)',
+                       '[Bad](javascript:alert)', '[Root](/docs/guide.md)']:
+            with self.subTest(link=broken), self.assertRaises(ValueError):
+                docs.check_public_readme_links(broken, 'README')
+        with self.assertRaises(ValueError):
+            docs.check_readme('yetlet', '8.0.0',
+                              'Version '+chr(96)+'8.0.0'+chr(96)+'.\n[Guide](guides/core.md)\n')
+
+    def test_packaged_guide_links_are_self_contained_or_public_urls(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            base = root / 'crates/yetlet'
+            (base / 'guides').mkdir(parents=True)
+            (base / 'README.md').write_text('# Package\n', encoding='utf-8')
+            guide = base / 'guides/entry.md'
+            guide.write_text('[Package](../README.md) '
+                             '[Source](https://github.com/bohewu/yetlet)\n', encoding='utf-8')
+            docs.check_guide_links(root, 'crates/yetlet/guides/entry.md', 'crates/yetlet')
+            for broken in ['[Outside](../../../docs/README.md)',
+                           '[Missing](missing.md)', '[Invalid](javascript:example)']:
+                with self.subTest(link=broken), self.assertRaises(ValueError):
+                    guide.write_text(broken, encoding='utf-8')
+                    docs.check_guide_links(root, 'crates/yetlet/guides/entry.md',
+                                           'crates/yetlet')
+
+
+    def test_published_cli_inventory_excludes_later_source_only_style_templates(self):
+        text = ('## Published CLI command and capability inventory\n'
+                'new --template native|browser\n\n'
+                '## Source-only application-owned Rust CSS\n'
+                'native-style and browser-style are checkout-only.\n')
+        docs.check_cli_published_commands(text, '2.1.0', '2.1.0')
+        with self.assertRaises(ValueError):
+            docs.check_cli_published_commands(
+                text.replace('native|browser', 'native|browser|native-style'),
+                '2.1.0', '2.1.0')
+        with self.assertRaises(ValueError):
+            docs.check_cli_published_commands(
+                text.replace('native|browser', 'native|browser|browser-style'),
+                '2.1.0', '2.1.0')
+        # A later source version has a separate selected packaging decision.
+        docs.check_cli_published_commands(text, '2.2.0', '2.1.0')
+
+
     def test_source_identity_invokes_gate_before_current_release_build(self):
         version = '8.0.0-alpha.1'
         record = {'schema': 2, 'version': version, 'source': 'a' * 40, 'cohort': 'consolidated'}

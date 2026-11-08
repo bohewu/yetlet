@@ -30,7 +30,7 @@ Implemented working-tree command syntax:
 ```text
 yetlet --help | -h
 yetlet --version | -V
-yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]
+yetlet new NAME [--parent DIRECTORY] [--template native|browser|native-style|browser-style] [--vite] [--tailwind] [--service] [--settings]
 yetlet doctor [--json]
 yetlet inspect [--manifest-path PATH] [--json]
 yetlet run [--manifest-path PATH]
@@ -412,3 +412,32 @@ Rows describe the intentional migration. Current evidence and uncovered qualific
 The user explicitly authorized this CLI implementation and independent review. This authorization supersedes the former documentation-only next-step proposal. Current source-matched evidence is in [YT-102 implementation](YT-102-CLI-IMPLEMENTATION.md); prior design reviews remain historical evidence.
 
 Selected native Windows GNU startup/cancellation/cleanup has [direct bounded evidence](YT-102-WINDOWS-VITE-VERIFICATION.md). The current generator local-source extension has its own [compatibility evidence](YT-102-GENERATOR-COMPATIBILITY.md) and [native Windows GNU verification](YT-102-WINDOWS-GENERATOR-VERIFICATION.md) for the four current service profiles; additional platform/runtime qualification, registry-only source/export representations, usable registry templates and release qualification remain open. Rust watch/recompile/restart is an explicit settings-controlled mode with the boundaries above; arbitrary proxy/auth/actions/multi-page bridging and alternative provider registries stay deferred. YT-102's subsequent [journey audit](YT-102-DX-AUDIT.md) records measured empty-target/warm/change-feedback costs, a prioritized DX roadmap and extension boundaries. Independent Reviewer PASS completes YT-102 at research-only scope; no proposed improvement is implemented by that report. YT-103 rolling asset retention and M20/YT-020 release remain separate. No commit, publication or deployment is implied.
+
+## Optional application-owned CSS integration — YT-239 working tree
+
+The style variants extend the existing `--template` selection with `native-style`
+and `browser-style`; ordinary native/browser choices retain their behavior.
+There is no styles flag. The optional strict `[cli.styles]` section contains
+`enabled`, `manifest`, `bin`, `output` and uses the existing Loader, profile and
+APP_CLI precedence. Absent/disabled style configuration performs no generator work.
+The generated native runtime projection remains strict. Inspect adds a nullable
+public `styles` selection and a selected/skipped style stage per command.
+
+The finite std-only private package is `stylegen/Cargo.toml` with its own lock and
+one explicit `main.rs` bin. Dedicated outputs are standalone
+`assets/generated/app.generated.css` or Vite
+`<cli.vite.root>/style-output/app.generated.css`, anchored to the selected app.
+The host compiler/toolchain, frozen bounded execution, owned cancellation,
+protected publication and app-owned consumer contract are described in the
+[YT-239 implementation record](YT-239-STYLE-INTEGRATION.md). That record includes
+lifecycle gates, source/production ownership, Python-free official paths, exact
+local verification and unresolved platform/regression limitations. Independent
+review is pending; no Core/server/renderer API or public style crate is added.
+
+Private `owner.pending.json` and `production.pending.json` retain prior accepted
+metadata during publication. Producers and the generated native loader refuse
+unfinished intents on ordinary retry/startup, including matching record/CSS hashes.
+All fallible writes/checks precede the marker-removal acceptance commit point.
+Prepublication failures can recover without replacing accepted data; uncertainty
+after replacement requires preserved evidence and explicit operator rollback or
+verified rollforward before clearing the marker. Unknown temporaries are preserved.

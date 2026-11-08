@@ -4,7 +4,7 @@
 
 Build a **small, HTML-first Rust universal UI framework**. The guiding contract is in `README.md` and `docs/MVP.md`; architecture, proposal status, milestone gates and task dependencies are in `docs/ARCHITECTURE.md`, `docs/adr/`, `docs/ROADMAP.md` and `docs/BACKLOG.md`.
 
-This repository is an experimental, locally verified M0–M9 prototype. Public release and production qualification remain open. Do not assume undocumented or deferred crate interfaces exist.
+This repository contains an Experimental SDK and independent CLI with accepted public releases. Use the publication records linked from `docs/RELEASE-READINESS.md` for distribution identity and `site/pages.toml` for the selected guide edition. Later checkout additions can be source-only even when development manifests retain a published version. Production qualification remains open. Do not assume undocumented or deferred interfaces exist.
 
 ## Documentation language
 

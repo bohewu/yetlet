@@ -7,7 +7,15 @@ qualification evidence.
 
 ## Minimal integration
 
-Use Rust 1.99+ and an explicit path to this checkout:
+Use Rust 1.99+ and the exact published registry dependency:
+
+```toml
+[dependencies]
+yetlet = "=0.9.0-alpha.6"
+```
+
+For checkout-only APIs, use an explicitly reviewed local revision instead of
+mistaking development code for the existing registry archive:
 
 ```toml
 [dependencies]
@@ -22,25 +30,25 @@ assert_eq!(yetlet::html::render_to_string(&view).unwrap(), "<p>Hello &lt;Yetlet&
 
 Defaults select `html`. With `default-features = false`, the shared View model
 has no external normal dependencies. Browser integrations are separately owned
-by [yetlet-browser](../yetlet-browser/README.md), using this same View type.
+by [yetlet-browser](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/README.md), using this same View type.
 
 ## Features and guides
 
 | Capability | Feature | Guide |
 |---|---|---|
-| Shared values | Always available | [View](guides/core.md) |
-| HTML serializer | `html` (default) | [HTML](guides/html.md) |
-| Portable command contracts | `actions` | [Actions](guides/actions.md) |
-| Local reactive graph | `reactive` | [Reactive](guides/reactive.md) |
-| Native Axum integration | `server-axum` | [Server](guides/server-axum.md) |
-| Request correlation | `request-id` | [Request ID](guides/request-id.md) |
-| Memory Session | `session` | [Session](guides/session.md) |
-| Authentication / Memory bridge | `auth` / `auth-session` | [Auth](guides/auth.md) |
-| Async Redis/Valkey protocol Session / TLS | `session-redis` / `session-redis-tls` | [Provider](guides/session-redis.md) |
-| Typed settings / provider injection | `config` / `secret-provider` | [Config](guides/config.md) |
-| Secret lookup | `secrets` | [Secrets](guides/secrets.md) |
-| Application signing | `signing` | [Signing](guides/signing.md) |
-| Per-process rate limiting | `rate-limit` | [Rate limiting](guides/rate-limit.md) |
+| Shared values | Always available | [View](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/core.md) |
+| HTML serializer | `html` (default) | [HTML](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/html.md) |
+| Portable command contracts | `actions` | [Actions](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
+| Local reactive graph | `reactive` | [Reactive](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/reactive.md) |
+| Native Axum integration | `server-axum` | [Server](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/server-axum.md) |
+| Request correlation | `request-id` | [Request ID](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/request-id.md) |
+| Memory Session | `session` | [Session](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/session.md) |
+| Authentication / Memory bridge | `auth` / `auth-session` | [Auth](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/auth.md) |
+| Async Redis/Valkey protocol Session / TLS | `session-redis` / `session-redis-tls` | [Provider](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/session-redis.md) |
+| Typed settings / provider injection | `config` / `secret-provider` | [Config](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/config.md) |
+| Secret lookup | `secrets` | [Secrets](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/secrets.md) |
+| Application signing | `signing` | [Signing](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/signing.md) |
+| Per-process rate limiting | `rate-limit` | [Rate limiting](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/rate-limit.md) |
 
 Feature selection compiles an API; startup registration and typed application
 options decide activation. Settings loading remains optional. Native modules

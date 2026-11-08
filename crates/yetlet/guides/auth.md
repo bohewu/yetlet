@@ -3,12 +3,13 @@
 Install native identity resolution only on selected routes. Authentication
 establishes a verified identity; business authorization remains application-owned.
 
-**Experimental, unpublished.** Use this source checkout and the documented target scope.
+**Experimental SDK module.** Distributed in `yetlet` SDK `0.9.0-alpha.6`;
+use the documented feature/target and source matching the version you consume.
 
 
 ## Prerequisites
 
-Use Rust 1.99+ and this unpublished source checkout. Select `yetlet::auth`
+Use Rust 1.99+ and the selected SDK source. Select `yetlet::auth`
 explicitly in a native Axum application. Supply a resolver, its typed state,
 an anonymous-response closure and resource authorization. The wiring below
 assumes a fallible setup function; it is not a listener or a real login provider.
@@ -136,10 +137,10 @@ access. An uncertain/failed policy lookup must not turn into an allow.
 YT-114 tests a synthetic resolver, not a production login protocol. Distributed Session
 bridging, real OIDC, cookie changes, account storage, refresh/revocation services
 and provider-specific operational qualification are outside this crate's
-current scope. [YT-115](../../../docs/YT-113-123-OPT-IN-CAPABILITIES.md#yt-115--optional-session-and-cookie-authentication-bridge)
+current scope. [YT-115](https://github.com/bohewu/yetlet/blob/master/docs/YT-113-123-OPT-IN-CAPABILITIES.md#yt-115--optional-session-and-cookie-authentication-bridge)
 was separately selected at the Memory bridge scope. Existing Session APIs and
-no-JS form support are preserved; asynchronous Redis bridging remains unselected. The release candidate's original supported package set is unchanged;
-this crate remains unpublished with publication-prepared metadata and intentionally refuses wasm32 compilation.
+no-JS form support are preserved; asynchronous Redis bridging remains unselected. The `auth` feature exposes this native module in the consolidated SDK;
+native APIs remain absent on wasm32.
 Baseline apps do not depend on it, initialize its state or execute its layer.
 
 ### Optional Memory Session bridge
@@ -186,7 +187,7 @@ No async rewrite or Redis dependency is added to the foundation.
 ## API reference
 
 See [Auth source/rustdoc](../src/auth/mod.rs), the [Memory helper](../src/auth/session.rs) and
-the [current API reference](../../../docs/API-REFERENCE.md). Rustdoc setup context
+the [current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md). Rustdoc setup context
 lines beginning with `# ` support example compilation; embed the actual wiring
 in your own fallible setup function instead of copying them as Rust statements.
 
@@ -194,10 +195,10 @@ in your own fallible setup function instead of copying them as Rust statements.
 <summary>Historical delivery context and evidence</summary>
 
 Unpublished, experimental, explicitly selected **native** identity foundation.
-It implements the [YT-113 contract](../../../docs/YT-113-AUTHENTICATION-CONTRACT.md)
-at the bounded [YT-114 scope](../../../docs/YT-114-IMPLEMENTATION.md). It verifies no
+It implements the [YT-113 contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-113-AUTHENTICATION-CONTRACT.md)
+at the bounded [YT-114 scope](https://github.com/bohewu/yetlet/blob/master/docs/YT-114-IMPLEMENTATION.md). It verifies no
 credentials itself and installs no default Session, Cookie, OIDC or Bearer provider.
 The separately enabled `auth-session` feature adds a bridge to existing Memory Session;
-see [YT-115 evidence](../../../docs/YT-115-SESSION-AUTH.md).
+see [YT-115 evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-115-SESSION-AUTH.md).
 
 </details>

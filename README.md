@@ -91,6 +91,7 @@ handlers, use ordinary extractors and `Page` or `Result<Page, E>`; see the
 | Create my own standalone app | [Build your first Yetlet app](docs/FIRST-APP.md) |
 | Create a browser-only WASM app | [Browser first-app walkthrough](docs/BROWSER-APP.md) |
 | Write Views and reusable components | [View/component guide](docs/VIEW-COMPONENTS.md) |
+| Explore checkout-only typed tags and optional Style authoring | [Source-only API map](docs/API-REFERENCE.md#source-only-checkout-additions) · [Style Showcase](examples/style-showcase/README.md) (absent from published SDK/CLI) |
 | Build an SSR page or JSON API | [Hello World](examples/hello-world/README.md) · [REST API](examples/rest-api/README.md) |
 | Add browser interaction | [Todo and Search Island](examples/todo-server/README.md) · [browser DOM guide](crates/yetlet-browser/guides/dom.md) |
 | Handle forms and Session state | [Forms](examples/forms-validation/README.md) · [Session cart](examples/cart-server/README.md) |

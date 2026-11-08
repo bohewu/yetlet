@@ -4,6 +4,7 @@
 
 mod api;
 mod pipeline;
+mod styles;
 
 use axum::{
     Json, Router,
@@ -18,7 +19,10 @@ use yetlet::request_id::{RequestId, RequestIds};
 use yetlet::server_axum::{App, DEFAULT_CSP, Page, middleware::from_fn, render_document};
 use yetlet_todo_ui::{home_page, search_page};
 
-async fn root(request_id: Option<Extension<RequestId>>) -> Page {
+async fn root(
+    request_id: Option<Extension<RequestId>>,
+    Extension(styles): Extension<styles::NativeCss>,
+) -> Response {
     let mut view = home_page();
     // Select only this numeric extension; never serialize the request/context.
     if let Some(Extension(RequestId(id))) = request_id {
@@ -27,7 +31,7 @@ async fn root(request_id: Option<Extension<RequestId>>) -> Page {
             .child(view)
             .into();
     }
-    Page::new("Yetlet | Todo", view)
+    styles.page(Page::new("Yetlet | Todo", view)).await
 }
 
 async fn api_ping() -> Json<Value> {
@@ -141,6 +145,8 @@ async fn controls_route(Query(values): Query<std::collections::HashMap<String, S
 }
 
 pub fn app() -> Router {
+    let styles = styles::NativeCss::load(std::path::Path::new("dist"));
+    let css_routes = styles.router();
     let app = App::new()
         .get("/", root)
         .get("/app", browser_shell)
@@ -158,7 +164,13 @@ pub fn app() -> Router {
                 )
                 .configure(pipeline::with_api_scope)
         })
-        .map_router(|router| router.nest_service("/assets", ServeDir::new("dist/assets")))
+        .map_router(|router| {
+            router
+                .merge(css_routes)
+                .nest_service("/assets", ServeDir::new("dist/assets"))
+                .layer(axum::middleware::from_fn(styles::asset_headers))
+                .layer(Extension(styles))
+        })
         .with_state(api::TodoApiState::default());
     // Correlation is explicitly selected by this app, not enabled in core.
     RequestIds::new().global(app)
@@ -213,7 +225,7 @@ mod tests {
         let body = to_bytes(response.into_body(), 1024 * 1024).await.unwrap();
         let document = std::str::from_utf8(&body).unwrap();
 
-        assert!(document.contains("<main id=\"app\">"));
+        assert!(document.contains("<main id=\"app\" class=\"todo-shell\">"));
         assert!(document.contains("Share one Rust View across renderers"));
         assert!(!document.contains("<script"));
         assert!(!document.contains(".wasm"));

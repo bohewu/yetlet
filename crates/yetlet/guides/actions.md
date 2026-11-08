@@ -1,6 +1,9 @@
 # yetlet::actions
 
-**Experimental `0.9.0-alpha.5`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
+**Experimental SDK module.** Requires Rust 1.99 or newer. Distributed in
+`yetlet` SDK `0.9.0-alpha.6`; see the [accepted publication record](https://github.com/bohewu/yetlet/blob/master/docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01).
+Read source/rustdoc at the revision you consume; later checkout additions do not
+inherit published availability or qualification.
 
 `yetlet::actions` defines typed semantic commands and explicitly selected executors. It does not forward DOM events or create a persistent remote event circuit. The portable contracts select serde. Browser HTTP execution is separately selected by `yetlet-browser` feature `actions`; import `yetlet_browser::actions::HttpExecutor`.
 
@@ -8,7 +11,7 @@
 
 Implement `Command` with an associated `Response`, then select an `ActionExecutor<C>`. `LocalExecutor::new(handler)` accepts a synchronous `Fn(C) -> Result<C::Response, ActionError>` and exposes it through async `execute`. Local commands and results need no serialization; the caller owns the handler's captured state. Futures intentionally have no `Send` requirement.
 
-`HttpExecutor::new(path)` validates an explicit same-origin absolute path. Construction and `endpoint()` are available natively, but HTTP execution is implemented only on WASM. That implementation requires serde input and a deserializable response, sends a JSON POST, and decodes the result. The [shared Todo commands](../../../examples/todo-ui/src/lib.rs) and [browser dispatch caller](../../../examples/todo-browser/src/lib.rs) demonstrate both paths. Follow [Todo setup](../../../examples/todo-server/README.md), or run from the repository root with its browser prerequisites:
+`HttpExecutor::new(path)` validates an explicit same-origin absolute path. Construction and `endpoint()` are available natively, but HTTP execution is implemented only on WASM. That implementation requires serde input and a deserializable response, sends a JSON POST, and decodes the result. The [shared Todo commands](https://github.com/bohewu/yetlet/blob/master/examples/todo-ui/src/lib.rs) and [browser dispatch caller](https://github.com/bohewu/yetlet/blob/master/examples/todo-browser/src/lib.rs) demonstrate both paths. Follow [Todo setup](https://github.com/bohewu/yetlet/blob/master/examples/todo-server/README.md), or run from the repository root with its browser prerequisites:
 
 ```bash
 cargo xtask build browser
@@ -23,8 +26,8 @@ Invalid endpoints fail with `ActionError::InvalidEndpoint`. Query/fragment synta
 
 No automatic retry, application timeout, cancellation protocol, authentication or CSRF token attachment is provided. The server must validate inputs, authentication, authorization and CSRF policy; serialization alone provides none of those guarantees. A retired UI lifetime must suppress late results explicitly, as the Todo caller does.
 
-[Custom transport research](../../../docs/YT-024-CUSTOM-TRANSPORT-RESEARCH.md) proves one app-owned typed TCP adapter over this existing trait. It does not select a supported transport/plugin framework or change the default browser HTTP path.
+[Custom transport research](https://github.com/bohewu/yetlet/blob/master/docs/YT-024-CUSTOM-TRANSPORT-RESEARCH.md) proves one app-owned typed TCP adapter over this existing trait. It does not select a supported transport/plugin framework or change the default browser HTTP path.
 
 ## License and compatibility
 
-Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE). The privately prepared `0.1.x` policy preserves documented behavior and Rust 1.99 in patches; public activation remains blocked. See [compatibility](../../../docs/COMPATIBILITY.md), [API classifications](../../../docs/API-CONTRACTS.md) and [developer guides](../../../docs/README.md). Links to companion packages and records assume this checkout; they do not imply public hosting or distribution.
+Dual-licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/LICENSE-MIT) or [Apache-2.0](https://github.com/bohewu/yetlet/blob/master/LICENSE-APACHE). APIs remain Experimental; publication does not establish production qualification or API stability. See [compatibility](https://github.com/bohewu/yetlet/blob/master/docs/COMPATIBILITY.md), [API classifications](https://github.com/bohewu/yetlet/blob/master/docs/API-CONTRACTS.md) and [developer guides](https://github.com/bohewu/yetlet/blob/master/docs/README.md). Links to companion packages and records assume this checkout; they do not imply public hosting or distribution.

@@ -1,0 +1,11 @@
+[package]
+name = "todo-stylegen"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[[bin]]
+name = "todo-stylegen"
+path = "main.rs"

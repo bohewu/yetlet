@@ -15,8 +15,17 @@ CURRENT_DOCS = (
     'crates/yetlet/README.md', 'crates/yetlet-browser/README.md',
     'crates/yetlet-browser/guides/dom.md', 'examples/static-site/README.md',
     'examples/docs-site/README.md',
+    'docs/ARCHITECTURE.md', 'docs/RELEASE-READINESS.md',
+    'docs/VIEW-COMPONENTS.md', 'docs/EXTENSIONS.md', 'docs/HTTP-PIPELINE.md',
+    'docs/CONFIGURATION.md', 'docs/SECRET-PROVIDERS.md',
+    'docs/SETTINGS-SECRET-PROVIDER.md', 'docs/SETTINGS-OPTIONS-LOGGING.md',
 )
 PINNED_GUIDES = ('README.md', 'docs/FIRST-APP.md')
+# Existing accepted records, not development manifests, establish distribution.
+PUBLICATION_RECORDS = {
+    'SDK': ('docs/ALPHA6-RELEASE-PREPARATION.md', 'registry consumer'),
+    'CLI': ('docs/CLI-020-RELEASE-PREPARATION.md', 'installed consumer'),
+}
 STALE = re.compile(
     r'publication\s+(?:is\s+)?pending|'
     r'unreleased\s+(?:checkout|opt-in|static\s+HTML|ordinary\s+HTML|controlled\s+DOM)|'
@@ -73,8 +82,50 @@ def check_installs(text, version, location):
                 'installation must select the exact documented version with --locked')
 
 
+def markdown_links(text):
+    """Inline Markdown links in package-carried documents (not prose or code URLs)."""
+    for match in re.finditer(r'!?\[[^\]\n]*\]\(([^)\n]+)\)', text):
+        value = match.group(1).strip().split(maxsplit=1)[0].strip('<>')
+        if value:
+            yield value
+
+
+def check_public_readme_links(text, location):
+    """crates.io renders package README outside its original repository tree."""
+    for url in markdown_links(text):
+        require(url.startswith('#') or re.match(r'^(?:https?://|mailto:)', url, re.I),
+                location, 'package README links need public URLs or local anchors')
+
+
+def check_guide_links(root, relative, package_root):
+    """Package guide relatives may refer only to files carried by that package."""
+    package = (root / package_root).resolve()
+    for url in markdown_links(read(root, relative)):
+        if url.startswith('#') or re.match(r'^(?:https?://|mailto:)', url, re.I):
+            continue
+        require(not re.match(r'^(?:[a-z][a-z0-9+.-]*:|//)', url, re.I),
+                relative, 'unsupported guide link scheme')
+        target_ref = url.split('#', 1)[0].split('?', 1)[0]
+        target = ((root / relative).parent / target_ref).resolve()
+        require(bool(target_ref) and target.is_relative_to(package) and target.is_file(),
+                relative, 'relative guide link escapes the package or names a missing file')
+
+
+def check_cli_published_commands(text, selected, published):
+    """Do not attribute later source-only Style selectors to an already shipped CLI."""
+    if selected != published:
+        return
+    heading = '## Published CLI command and capability inventory'
+    sections = text.split(heading)
+    require(len(sections) == 2, 'yetlet-cli', 'one published CLI inventory required')
+    inventory = sections[1].split('\n## ', 1)[0]
+    require('native-style' not in inventory and 'browser-style' not in inventory,
+            'yetlet-cli', 'source-only Style templates attributed to published CLI')
+
+
 def check_readme(name, version, text, sdk=None):
     """Same checks for source README and the actual hash-bound archive README."""
+    check_public_readme_links(text, name)
     text = current_text(text)
     check_status(text, {'CLI' if name == 'yetlet-cli' else 'SDK': version}, name)
     if name == 'yetlet-cli':
@@ -108,6 +159,51 @@ def read(root, relative):
     return path.read_text(encoding='utf-8')
 
 
+def published_versions(root):
+    versions = {}
+    for subject, (relative, consumer) in PUBLICATION_RECORDS.items():
+        text = read(root, relative)
+        sections = re.split(r'(?m)^## Owner-approved publication and ' + consumer + r'[^\n]*\n', text)
+        require(len(sections) == 2, relative, 'accepted publication section required')
+        section = re.split(r'(?m)^## ', sections[1], maxsplit=1)[0]
+        prefix = 'yetlet-cli-v' if subject == 'CLI' else 'v'
+        values = re.findall(r'https://github\.com/bohewu/yetlet/releases/tag/' + prefix +
+                            r'([0-9][0-9A-Za-z.+-]*)\)', section)
+        require(len(values) == 1, relative, 'one accepted release tag reference required')
+        versions[subject] = values[0]
+    return versions
+
+
+def check_distribution(text, versions, location):
+    for subject, version in versions.items():
+        require(field(current_text(text), 'Published ' + subject, location) == version,
+                location, 'current distribution differs from accepted publication record')
+
+
+def check_edition(text, edition, location):
+    paragraphs = [p for p in re.split(r'\n\s*\n', current_text(text))
+                  if 'public reader/first-app edition' in ' '.join(p.split())]
+    require(len(paragraphs) == 1, location, 'one current reader-edition paragraph required')
+    labels = re.findall(r'\b(SDK|CLI)\s*([0-9][0-9A-Za-z.+-]*|alpha\.[0-9]+)',
+                        paragraphs[0].replace('`', ''))
+    expected = {'SDK': edition['sdk'], 'CLI': edition['cli']}
+    require({subject for subject, _ in labels} == set(expected), location,
+            'reader edition must identify SDK and CLI')
+    for subject, value in labels:
+        version = expected[subject]
+        require(value.rstrip('.') in (version, version.split('-', 1)[-1]), location,
+                'reader edition differs from site/pages.toml')
+
+
+def check_current_module(text, location):
+    # Only maintained module guides/current composition prose; old package
+    # READMEs and explicit historical sections remain valid evidence.
+    text = re.split(r'(?m)^<details>\n<summary>Historical\b', current_text(text), maxsplit=1)[0]
+    require(not re.search(r'\bunpublished\b|sixteen library candidates|'
+                          r'public activation remains blocked', text, re.I),
+            location, 'stale current module distribution wording')
+
+
 def check_source(root, cohort='all'):
     root = Path(root)
     require(cohort in ('all', 'cli', 'consolidated'), 'cohort', 'unsupported current cohort')
@@ -127,9 +223,31 @@ def check_source(root, cohort='all'):
         versions['SDK'] = workspace
     for relative in CURRENT_DOCS:
         check_status(read(root, relative), versions, relative)
+    for relative in ('docs/COMPATIBILITY.md', 'docs/VIEW-COMPONENTS.md'):
+        require('feature/view-authoring-api' not in current_text(read(root, relative)),
+                relative, 'obsolete typed-authoring branch guidance')
+    published = published_versions(root)
+    if cohort in ('all', 'cli'):
+        check_cli_published_commands(read(root, 'tools/yetlet-cli/README.md'),
+                                     version, published['CLI'])
+    for relative in ('docs/ARCHITECTURE.md', 'docs/RELEASE-READINESS.md'):
+        check_distribution(read(root, relative), published, relative)
+    for relative in ('AGENTS.md', 'docs/ARCHITECTURE.md'):
+        introduction = read(root, relative).split('## ', 1)[0] if relative != 'AGENTS.md' else read(root, relative).split('## Documentation language', 1)[0]
+        require(not re.search(r'\bunpublished\b|nine library guides|'
+                              r'Public release and production qualification remain open', introduction),
+                relative, 'stale project entry status')
+    module_guides = sorted((root / 'crates/yetlet/guides').glob('*.md'))
+    module_guides += sorted((root / 'crates/yetlet-browser/guides').glob('*.md'))
+    for path in module_guides:
+        relative = path.relative_to(root).as_posix()
+        check_current_module(read(root, relative), relative)
+        check_guide_links(root, relative, '/'.join(relative.split('/')[:2]))
     edition = tomllib.loads(read(root, 'site/pages.toml'))['edition']
     for relative in PINNED_GUIDES:
         check_installs(read(root, relative), edition['cli'], relative)
+    for relative in ('docs/COMPATIBILITY.md', 'docs/DOCUMENTATION-SCOPE.md'):
+        check_edition(read(root, relative), edition, relative)
 
 
 def main():

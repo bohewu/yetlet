@@ -473,3 +473,117 @@ mod selected_frontend_root_tests {
         );
     }
 }
+
+#[test]
+fn style_variants_create_complete_private_packages_without_executing_tools() {
+    let temp = tempfile::tempdir().unwrap();
+    #[cfg(unix)]
+    {
+        use std::os::unix::fs::PermissionsExt;
+        std::fs::set_permissions(temp.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+    }
+    for template in ["native-style", "browser-style"] {
+        for options in [
+            vec![],
+            vec!["--tailwind"],
+            vec!["--vite"],
+            vec!["--settings"],
+            vec!["--service", "--settings"],
+            vec!["--tailwind", "--settings"],
+            vec!["--tailwind", "--vite"],
+        ] {
+            if template == "browser-style" && options.contains(&"--service") {
+                continue;
+            }
+            let name = format!("style-{}-{}", template, options.join("-").replace("--", ""));
+            let output = Command::new(env!("CARGO_BIN_EXE_yetlet"))
+                .args(["new", &name, "--parent"])
+                .arg(temp.path())
+                .args(["--template", template])
+                .args(&options)
+                .env("PATH", temp.path().join("no-tools"))
+                .output()
+                .unwrap();
+            assert!(
+                output.status.success(),
+                "{template} {options:?}: {}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+            let app = temp.path().join(name);
+            let files = inventory(&app);
+            for (path, bytes) in &files {
+                if path.ends_with(".rs") {
+                    syn::parse_file(std::str::from_utf8(bytes).unwrap())
+                        .unwrap_or_else(|error| panic!("{template} {options:?} {path}: {error}"));
+                }
+            }
+            let manifest: toml::Value = std::str::from_utf8(&files["Cargo.toml"])
+                .unwrap()
+                .parse()
+                .unwrap();
+            assert!(manifest.get("package").is_some());
+            assert!(!app.join(".yetlet").exists());
+            assert!(!app.join("assets").exists());
+            assert!(!app.join("Cargo.lock").exists());
+            assert!(!app.join("stylegen/target").exists());
+            for path in [
+                "stylegen/Cargo.toml",
+                "stylegen/Cargo.lock",
+                "stylegen/main.rs",
+                "stylegen/styles.rs",
+                "stylegen/layout.rs",
+                "stylegen/dialog.rs",
+                "stylegen/builder.rs",
+                "src/style_names.rs",
+            ] {
+                assert!(files.contains_key(path), "{path}");
+            }
+            let root = std::str::from_utf8(&files["stylegen/styles.rs"]).unwrap();
+            assert!(root.contains("layout::styles()") && root.contains("dialog::styles()"));
+            let base: toml::Value = std::str::from_utf8(&files["base.toml"])
+                .unwrap()
+                .parse()
+                .unwrap();
+            assert_eq!(base["cli"]["styles"]["enabled"].as_bool(), Some(true));
+            let vite = template == "browser-style" || options.contains(&"--vite");
+            if vite {
+                let entry = std::str::from_utf8(&files["frontend/app.ts"]).unwrap();
+                assert!(
+                    entry.find("import './app.css'").unwrap()
+                        < entry
+                            .find("import './style-output/app.generated.css'")
+                            .unwrap()
+                );
+                assert!(!files.contains_key("src/styles_asset.rs"));
+            } else {
+                assert!(files.contains_key("src/styles_asset.rs"));
+                let main = std::str::from_utf8(&files["src/main.rs"]).unwrap();
+                assert!(main.contains(if options.contains(&"--tailwind") {
+                    "tailwind::install"
+                } else {
+                    "styles_asset::install"
+                }));
+                if options.contains(&"--tailwind") {
+                    for main_element in main.split("Element::new(\"main\")").skip(1) {
+                        let attributes = main_element.split(".child(").next().unwrap();
+                        assert_eq!(attributes.matches(".attribute(\"class\"").count(), 1);
+                        assert!(
+                            attributes
+                                .contains("mx-auto max-w-3xl p-8 font-sans text-slate-900 {}")
+                        );
+                        assert!(attributes.contains("style_names::SHELL"));
+                    }
+                }
+            }
+            if template == "native-style"
+                && (options.contains(&"--settings") || options.contains(&"--vite"))
+            {
+                assert!(
+                    std::str::from_utf8(&files["src/config.rs"])
+                        .unwrap()
+                        .contains("pub styles: Option<Styles>")
+                );
+            }
+        }
+    }
+}

@@ -1,6 +1,6 @@
 # Documentation sources and publication scope
 
-Date: 2026-10-26 classification, updated 2026-11-07 for current reader guidance.
+Date: 2026-10-26 classification, updated 2026-11-08 for the bounded YT-242 truth audit.
 The published Experimental SDK is `yetlet` and `yetlet-browser`
 `0.9.0-alpha.6`; the independently published CLI is `yetlet-cli` `0.2.0`.
 Use module guides and rustdoc from the version/revision you consume. The
@@ -96,6 +96,47 @@ configured Gmail route and is closed without publication. Historical failures an
 earlier Not verified results are retained; independent completion Reviewer PASS,
 zero issues/followups, marks YT-206 Done at this selected scope. Public source access does not publish a reader site,
 sign artifacts, publish packages or resolve formal D1–D6/registry decisions.
+
+## YT-242 inventory and semantic audit boundary — 2026-11-08
+
+[The audit report](YT-242-DOCUMENTATION-TRUTH.md) records corrections and remaining
+coverage. The baseline tracked inventory has **516 Markdown files**, including
+**413 under `docs/`** (ADRs and screenshot indexes included). Each path has one
+primary navigation role: **101 current-guidance**, **315 historical-evidence**,
+and **100 proposal-decision**. A role does not make every sentence in a mixed
+file current; completed proposals remain decisions, and current guides can retain
+explicit historical disclosures. The new YT-242 report is additional maintainer
+evidence, outside that baseline count. No role selects a site export.
+
+| Role | Inventory boundary and disposition |
+|---|---|
+| Current guidance | Root reader/policy entries, current module guides, application/tool/template usage, and the explicitly selected current guides/SOPs above. Correct evidenced current availability/navigation claims; preserve embedded historical records |
+| Historical evidence | Dated implementation, qualification, review and release records, milestone checkpoints, screenshot/qualification indexes, old package README redirects and vendored upstream provenance. Preserve original prose, source IDs, failures and verdicts |
+| Proposal / decision | ADRs, MVP/API classifications, research/study/design/contract/plan documents, including completed or rejected proposals and their fixtures. Done research is not a published API; follow current source and distribution maps |
+
+Semantic inspection covers **54 current entry surfaces**, specifically their
+availability, navigation, guide edition and published-versus-checkout meaning:
+
+- Root `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `SECURITY.md`;
+  `examples/README.md`, the Showcase README, `xtask/README.md`, the CLI README
+  and its `templates/styles/README.md`.
+- The two current SDK package READMEs and all 18 current module-guide pages in
+  `crates/yetlet/guides/` and `crates/yetlet-browser/guides/`.
+- This scope/index, API reference, Architecture, Backlog/Roadmap, Capabilities,
+  Compatibility, MVP, Naming, Release Readiness and release SOP; First App,
+  Browser App, Views/components, opt-in quick reference, Troubleshooting,
+  Guide Template and sample catalog; HTTP/composition, configuration, secret
+  provider, injected settings, unified settings/logging and threat-model entries.
+
+The accepted SDK/CLI publication sections, site edition manifest, relevant ADRs,
+typed-tag source, CLI Style coordinator/template builder and Showcase build source
+supply the comparison facts. A full line-by-line semantic review of all 516
+files, all module signatures/examples, remaining application/template READMEs,
+older release procedures and historical qualification is **not claimed**.
+The retained per-path inventory and section-level scope accompany the local
+YT-242 implementation handoff. Classification/counting alone is not semantic
+acceptance; independent review is pending. Later public guide promotion and
+YT-243 remain separate.
 
 ## Retained evidence and maintainer material
 

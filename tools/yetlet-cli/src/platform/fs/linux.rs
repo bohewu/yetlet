@@ -517,3 +517,6 @@ mod tests {
         }
     }
 }
+
+#[path = "styles_linux.rs"]
+pub(crate) mod styles_output;

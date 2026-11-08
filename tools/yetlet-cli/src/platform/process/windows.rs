@@ -141,7 +141,7 @@ pub(super) fn terminated(value: &OsStr) -> io::Result<Vec<u16>> {
 pub(crate) fn pin_cwd(app: &App, command: &mut Command) -> io::Result<()> {
     if !matches!(
         command.get_program().to_str(),
-        Some("node" | "watchexec" | "watchexec.exe")
+        Some("node" | "watchexec" | "watchexec.exe" | "rustc")
     ) && !matches!(command.get_args().next(), Some(arg) if arg == "build" || arg == "run")
     {
         return Err(io::ErrorKind::Unsupported.into());
@@ -547,6 +547,16 @@ pub(crate) fn run_watch(
     watcher: &mut Command,
     frontend: Option<(&App, &mut Command)>,
 ) -> io::Result<Completion> {
+    run_watch_styles(app, rust, watcher, frontend, &mut |_| Ok((true, false)))
+}
+
+pub(crate) fn run_watch_styles(
+    app: &App,
+    rust: &mut Command,
+    watcher: &mut Command,
+    frontend: Option<(&App, &mut Command)>,
+    before: &mut dyn FnMut(&mut super::watch::Events) -> io::Result<(bool, bool)>,
+) -> io::Result<Completion> {
     let mut console = Console::install()?;
     let address = std::net::SocketAddr::from(([127, 0, 0, 1], 5173));
     if frontend.is_some() {
@@ -575,7 +585,7 @@ pub(crate) fn run_watch(
             }
         }
         // Initial compilation is independent of --postpone's event stream.
-        back = Some(spawn_owned(app, rust)?);
+        let mut restart = true;
         loop {
             if let Some(completion) = watch_session_end(&watch, front.as_ref())? {
                 return Ok(completion);
@@ -599,7 +609,8 @@ pub(crate) fn run_watch(
                     return Err(error);
                 }
             };
-            if changed {
+            restart |= changed;
+            if restart {
                 if let Some(mut child) = back.take() {
                     stop_generation(&mut child)?;
                 }
@@ -608,7 +619,11 @@ pub(crate) fn run_watch(
                     return Ok(completion);
                 }
                 eprintln!("CLI_RUST_RESTART: source changed; starting Cargo");
-                back = Some(spawn_owned(app, rust)?);
+                let (start, pending) = before(&mut events)?;
+                restart = pending;
+                if start && watch_session_end(&watch, front.as_ref())?.is_none() {
+                    back = Some(spawn_owned(app, rust)?);
+                }
             }
             std::thread::sleep(POLL);
         }
@@ -916,3 +931,75 @@ pub(crate) fn reraise(_: i32) {}
 #[cfg(test)]
 #[path = "windows_tests.rs"]
 mod tests;
+
+pub(crate) fn capture(app: &App, command: &mut Command, limit: usize) -> io::Result<Vec<u8>> {
+    use std::io::Read;
+    let mut console = if CONSOLE_OWNED.load(AtomicOrdering::SeqCst) {
+        None
+    } else {
+        Some(Console::install()?)
+    };
+    let mut child = spawn_with_output(app, command, true)?;
+    let reader = child.stdout.take().unwrap();
+    let (sender, receiver) = std::sync::mpsc::sync_channel(1);
+    let thread = std::thread::spawn(move || {
+        let mut bytes = Vec::new();
+        let result = reader
+            .take(limit as u64 + 1)
+            .read_to_end(&mut bytes)
+            .map(|_| bytes);
+        let _ = sender.send(result);
+    });
+    let result = (|| {
+        let deadline = Instant::now() + Duration::from_secs(120);
+        let mut bytes = None;
+        loop {
+            if bytes.is_none() {
+                match receiver.try_recv() {
+                    Ok(value) => {
+                        let value = value?;
+                        if value.len() > limit {
+                            return Err(io::Error::other("style stdout exceeded its bound"));
+                        }
+                        bytes = Some(value);
+                    }
+                    Err(std::sync::mpsc::TryRecvError::Empty) => (),
+                    Err(_) => return Err(io::Error::other("style stdout reader failed")),
+                }
+            }
+            if CONTROL.load(AtomicOrdering::SeqCst) != 0 {
+                return Err(io::ErrorKind::Interrupted.into());
+            }
+            if Instant::now() >= deadline {
+                return Err(io::ErrorKind::TimedOut.into());
+            }
+            if exited(&child)? {
+                break;
+            }
+            std::thread::sleep(POLL);
+        }
+        let status = exit_status(&child)?;
+        Ok((status, bytes))
+    })();
+    let cleanup = child.cleanup(125);
+    thread
+        .join()
+        .map_err(|_| io::Error::other("style stdout thread failed"))?;
+    cleanup?;
+    if let Some(console) = console.as_mut() {
+        console.restore()?;
+    }
+    let (status, bytes) = result?;
+    let bytes = bytes.map(Ok).unwrap_or_else(|| {
+        receiver
+            .recv()
+            .map_err(io::Error::other)
+            .and_then(|value| value)
+    })?;
+    if !status.success() || bytes.len() > limit {
+        return Err(io::Error::other(
+            "style producer failed or exceeded its bound",
+        ));
+    }
+    Ok(bytes)
+}

@@ -4,13 +4,6 @@ await init();
 globalThis.__yetletTodoRuntime = Object.freeze({ dispose, mount });
 mount();
 "#####;
-pub const BROWSER_CSS: &str = r#####"
-:root { color-scheme: light dark; font-family: system-ui, sans-serif; }
-body { max-width: 48rem; margin: 0 auto; padding: 1.5rem; line-height: 1.6; }
-.is-complete { text-decoration: line-through; opacity: .65; }
-button { font: inherit; padding: .5rem .9rem; cursor: pointer; }
-button:focus-visible { outline: 3px solid Highlight; outline-offset: 2px; }
-"#####;
 pub const BROWSER_ICON: &str = r#####"<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16"><rect width="16" height="16" fill="#263238"/><path d="M3 4l5 8 5-8" stroke="white" stroke-width="2" fill="none"/></svg>
 "#####;
 pub const BROWSER_PAGE: &str = r#####"<!doctype html>

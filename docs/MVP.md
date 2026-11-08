@@ -1,6 +1,8 @@
 # Yetlet MVP — Vertical-Slice Specification
 
-**Status:** Draft; M0–M5 A01–A10 locally verified at prototype scope; public release remains blocked by licensing and production-support decisions.
+**Status:** Original MVP specification; M0–M5 A01–A10 locally verified at their
+recorded prototype scope. Current Experimental distribution is recorded in
+[Release readiness](RELEASE-READINESS.md); production qualification remains open.
 **Product goal:** Demonstrate that the same Rust component source can serve native SSR and browser WASM without mandatory client JavaScript on SSR-only routes or a persistent server-side event circuit.
 
 This remains the acceptance contract for the **complete MVP**. M1 native SSR, M2 browser/WASM DOM, M3 lazy Search Island/state v1, M4 typed actions/API and M4.1 RequestContext/middleware passed local prototype tests. M5 provides a bounded [A01–A10 acceptance and performance baseline](M5-VERIFICATION.md) using Chrome 155 and Firefox 157. This does not establish generic resumability, production authentication/CSRF, complete IME/accessibility compatibility, or release approval. Consult [Release readiness](RELEASE-READINESS.md) before publishing.

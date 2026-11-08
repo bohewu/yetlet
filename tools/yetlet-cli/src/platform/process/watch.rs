@@ -27,8 +27,17 @@ pub(super) fn command(app: &App, frontend_root: &str) -> Command {
         "Cargo.toml",
         "--filter",
         "Cargo.lock",
+        "--filter",
+        "stylegen/Cargo.toml",
+        "--filter",
+        "stylegen/Cargo.lock",
     ]);
-    for ignore in ["**/target/**", "**/node_modules/**", "**/dist/**"] {
+    for ignore in [
+        "**/target/**",
+        "**/node_modules/**",
+        "**/dist/**",
+        ".yetlet/**",
+    ] {
         command.args(["--ignore", ignore]);
     }
     command.arg("--ignore").arg(format!(

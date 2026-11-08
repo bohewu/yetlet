@@ -1,14 +1,14 @@
 # yetlet::signing
 
-Experimental, unpublished `0.9.0-alpha.5` release preparation. Requires Rust 1.99+ and
+Experimental module distributed in `yetlet` SDK `0.9.0-alpha.6`. Requires Rust 1.99+ and
 a native OpenSSL development/runtime configuration compatible with the pinned
-Rust bindings. Select this package explicitly; Core/HTML/browser consumers do
+Rust bindings. Select the `signing` feature explicitly; Core/HTML/browser consumers do
 not acquire it automatically. Publication eligibility does not activate release
 signing, certificates, public logs or a registry upload.
 
 ## Prerequisites
 
-Use this checkout until a public release is separately approved. The selected
+Use source/rustdoc matching your selected SDK version. The selected
 reference is GNU/Linux; Windows, macOS and browser Wasm are not qualified by
 this package preparation. YT-093's native evidence uses an isolated static
 OpenSSL 3.5.9 build with `openssl 0.10.81` / `openssl-sys 0.9.117`; that is a
@@ -46,5 +46,5 @@ diagnostics. Provider adapters and actual production custody are separate choice
 Read source/rustdoc at the selected revision for signatures and ownership. The
 repository's [signing contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-093-SIGNING-CONTRACT.md)
 provides additional context when repository access is available; its branch URL
-does not pin the package's evidence. Dual licensed under [MIT](../../yetlet-signing/LICENSE-MIT) or
-[Apache-2.0](../../yetlet-signing/LICENSE-APACHE).
+does not pin the package's evidence. Dual licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-signing/LICENSE-MIT) or
+[Apache-2.0](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-signing/LICENSE-APACHE).

@@ -51,7 +51,7 @@ jobs:
         if: steps.scope.outputs.release_only != 'true'
         run: |
           cargo +1.99.0 check --locked --target wasm32-unknown-unknown \
-            -p yetlet-todo-browser -p yetlet-search-island \
+            -p yetlet-todo-browser -p yetlet-search-island -p yetlet-style-showcase-browser \
             -p yetlet -p yetlet-browser \
             -p yetlet-render-bench -p yetlet-keyed-bindings \
             -p yetlet-dashboard-counter-island -p yetlet-dashboard-filter-island
@@ -123,6 +123,12 @@ jobs:
         run: |
           cargo test --workspace --all-targets --locked
           cargo test --workspace --doc --locked
+      - name: Independent CLI Style regression tests
+        if: steps.scope.outputs.release_only != 'true'
+        run: |
+          cargo fmt --manifest-path tools/yetlet-cli/Cargo.toml -- --check
+          cargo test --locked --manifest-path tools/yetlet-cli/Cargo.toml --lib
+          cargo test --locked --manifest-path tools/yetlet-cli/Cargo.toml --test selected_scaffold --test frontend_process --test release_interface
       - name: RustSec dependency audit
         if: steps.scope.outputs.release_only != 'true'
         run: |
@@ -149,7 +155,7 @@ jobs:
         if: steps.scope.outputs.release_only != 'true'
         run: |
           cargo check --locked --target wasm32-unknown-unknown \
-            -p yetlet-todo-browser -p yetlet-search-island \
+            -p yetlet-todo-browser -p yetlet-search-island -p yetlet-style-showcase-browser \
             -p yetlet -p yetlet-browser \
             -p yetlet-render-bench -p yetlet-keyed-bindings \
             -p yetlet-dashboard-counter-island -p yetlet-dashboard-filter-island
@@ -163,8 +169,9 @@ jobs:
           cargo xtask build browser --release
           cargo xtask build keyed-bindings --release
           cargo xtask build multi-island-dashboard --release
+          cargo xtask build showcase-browser --release
           cargo build --release --locked \
-            -p yetlet-todo-server -p yetlet-multi-island-dashboard
+            -p yetlet-todo-server -p yetlet-multi-island-dashboard -p yetlet-style-showcase
       - name: Chrome version
         if: steps.scope.outputs.release_only != 'true'
         run: google-chrome --version
@@ -174,6 +181,7 @@ jobs:
           cargo xtask smoke browser-chrome --profile release
           cargo xtask smoke keyed-bindings-chrome --profile release
           cargo xtask smoke multi-island-dashboard-chrome --profile release
+          cargo xtask smoke style-showcase-chrome --profile release
       - name: M5 local-style baseline (informational only)
         if: steps.scope.outputs.release_only != 'true'
         run: cargo xtask measure baseline --profile release --samples 15 --browser-runs 3 --out target/m5-baseline-ci.json
@@ -186,6 +194,7 @@ jobs:
             target/m12/yt085/browser-chrome-*/
             target/m12/yt085/keyed-bindings-chrome-*/
             target/m12/yt085/multi-island-dashboard-chrome-*/
+            artifacts/verification/style-showcase-chrome-*/
           if-no-files-found: ignore
           retention-days: 7
       - name: Retain M5 baseline artifact

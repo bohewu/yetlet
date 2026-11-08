@@ -16,7 +16,7 @@ root=os.environ['YT_FRONTEND_TEST_ROOT']
 role=os.path.basename(sys.argv[0])
 mode=os.environ['YT_FRONTEND_TEST_MODE']
 with open(root+'/trace', 'a') as out:
- out.write(json.dumps({'role':role, 'args':sys.argv[1:], 'cwd':os.getcwd(), 'secret':any(k.startswith('APP_') or k in ['YETLET_DEV_SECRETS','YETLET_CONFIG_ROOT'] for k in os.environ), 'public':os.environ.get('VITE_PUBLIC'), 'projectRoot':os.environ.get('YETLET_PROJECT_ROOT'), 'tlsCert':os.environ.get('YETLET_DEV_TLS_CERT'), 'tlsKey':os.environ.get('YETLET_DEV_TLS_KEY'), 'backendTls':os.environ.get('APP_SERVER__TLS__ENABLED'), 'backendHost':os.environ.get('APP_SERVER__HOST'), 'backendPort':os.environ.get('APP_SERVER__PORT'), 'browserWatch':os.environ.get('YETLET_BROWSER_WATCH')})+'\n')
+ out.write(json.dumps({'role':role, 'args':sys.argv[1:], 'cwd':os.getcwd(), 'secret':any(k.startswith('APP_') or k in ['YETLET_DEV_SECRETS','YETLET_CONFIG_ROOT'] for k in os.environ), 'public':os.environ.get('VITE_PUBLIC'), 'projectRoot':os.environ.get('YETLET_PROJECT_ROOT'), 'tlsCert':os.environ.get('YETLET_DEV_TLS_CERT'), 'tlsKey':os.environ.get('YETLET_DEV_TLS_KEY'), 'backendTls':os.environ.get('APP_SERVER__TLS__ENABLED'), 'backendHost':os.environ.get('APP_SERVER__HOST'), 'backendPort':os.environ.get('APP_SERVER__PORT'), 'browserWatch':os.environ.get('YETLET_BROWSER_WATCH'), 'styleSelection':os.environ.get('YETLET_INTERNAL_STYLE'), 'styleCli':os.environ.get('YETLET_STYLE_CLI')})+'\n')
 if sys.argv[1:]==['run','build']:
  sys.exit(23 if mode=='build-fail' else 0)
 if role=='cargo' and sys.argv[1]=='build': sys.exit(0)
@@ -859,5 +859,228 @@ fn development_tls_build_selects_feature_without_certificate_reads_and_filters_p
     assert!(
         fixture.trace().is_empty(),
         "missing keys must refuse before any child"
+    );
+}
+
+#[test]
+fn browser_styles_skip_and_private_watch_selection_preserve_filtered_environment() {
+    let _port = PORT.lock().unwrap();
+    let fixture = Fixture::new();
+    let root = fixture.root.path();
+    let base = fs::read_to_string(root.join("base.toml")).unwrap();
+    fs::write(root.join("base.toml"),format!("[cli]\ntarget='browser'\n{base}\n[cli.styles]\nenabled=false\nmanifest='stylegen/Cargo.toml'\nbin='app-stylegen'\noutput='frontend/style-output/app.generated.css'\n")).unwrap();
+    let skipped = fixture
+        .command("build", "build-ok")
+        .env("APP_CLI__VITE__AUTO_BUILD", "false")
+        .env("APP_CLI__STYLES__ENABLED", "true")
+        .output()
+        .unwrap();
+    assert!(skipped.status.success());
+    assert!(fixture.trace().is_empty());
+    assert!(!root.join(".yetlet").exists());
+    fs::write(
+        root.join("development.toml"),
+        "[cli.styles]\nenabled=true\n",
+    )
+    .unwrap();
+    let running = Running::start(
+        fixture
+            .command("watch", "build-ok")
+            .env("APP_ENVIRONMENT", "Development"),
+    );
+    fixture.ready("npm.pid");
+    running.signal(libc::SIGTERM);
+    let output = running.wait();
+    assert_eq!(output.status.signal(), Some(libc::SIGTERM));
+    let trace = fixture.trace();
+    assert_eq!(trace.len(), 1);
+    assert_eq!(trace[0]["secret"], false);
+    let selection: serde_json::Value =
+        serde_json::from_str(trace[0]["styleSelection"].as_str().unwrap()).unwrap();
+    assert_eq!(selection["styles"]["enabled"], true);
+    assert_eq!(selection["styles"]["bin"], "app-stylegen");
+    assert_eq!(selection["root"], root.to_str().unwrap());
+    assert!(trace[0]["styleCli"].as_str().unwrap().ends_with("yetlet"));
+    for name in ["npm.pid", "npm-leaf.pid"] {
+        let pid: i32 = fs::read_to_string(root.join(name))
+            .unwrap()
+            .parse()
+            .unwrap();
+        assert_eq!(unsafe { libc::kill(pid, 0) }, -1);
+    }
+    assert!(!root.join(".yetlet/styles/target").exists());
+}
+
+#[test]
+fn browser_style_sequence_discards_queued_wasm_suppresses_failure_and_cleans_worker() {
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path();
+    fs::set_permissions(root, fs::Permissions::from_mode(0o700)).unwrap();
+    let cli = env!("CARGO_BIN_EXE_yetlet");
+    let output = Command::new(cli)
+        .args([
+            "new",
+            "browser-sequence",
+            "--template",
+            "browser-style",
+            "--parent",
+        ])
+        .arg(root)
+        .output()
+        .unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+    let app = root.join("browser-sequence");
+    let frontend = app.join("frontend");
+    fs::write(
+        app.join("Cargo.lock"),
+        "version=4\n[[package]]\nname='browser-sequence'\nversion='0.1.0'\n",
+    )
+    .unwrap();
+    let modules = frontend.join("node_modules/vite");
+    fs::create_dir_all(&modules).unwrap();
+    fs::write(
+        modules.join("package.json"),
+        r#"{"type":"module","exports":"./index.mjs"}"#,
+    )
+    .unwrap();
+    fs::write(modules.join("index.mjs"),r#"
+import {readFile,unlink} from 'node:fs/promises';
+import {join} from 'node:path';
+export const defineConfig=x=>x, normalizePath=x=>x.replaceAll('\\','/');
+export async function preview(){throw Error('unexpected preview');}
+export async function createServer(config){
+ let event, timer;
+ const server={watcher:{add(){},on(_event,callback){event=callback;}},httpServer:{prependListener(){}},middlewares:{use(){}},environments:{client:{moduleGraph:{invalidateAll(){}}}},ws:{send(){}},printUrls(){},async listen(){timer=setInterval(async()=>{try{const path=await readFile(join(process.env.YETLET_PROJECT_ROOT,'event'),'utf8');await unlink(join(process.env.YETLET_PROJECT_ROOT,'event'));event('change',path.trim());}catch{}},20);},async close(){clearInterval(timer);}};
+ for(const plugin of config.plugins)plugin.configureServer?.(server);
+ return server;
+}
+"#).unwrap();
+    let bin = root.join("bin");
+    fs::create_dir(&bin).unwrap();
+    let cargo = Command::new("sh")
+        .args(["-c", "command -v cargo"])
+        .output()
+        .unwrap();
+    let cargo = String::from_utf8(cargo.stdout).unwrap();
+    let node = Command::new("sh")
+        .args(["-c", "command -v node"])
+        .output()
+        .unwrap();
+    let node = String::from_utf8(node.stdout).unwrap();
+    let script = r#"#!/usr/bin/python3
+import os,sys,json,time,pathlib
+root=pathlib.Path(os.environ['YETLET_PROJECT_ROOT']);role=pathlib.Path(sys.argv[0]).name
+if role=='npm': os.execv(os.environ['YT_STYLE_NODE'],[os.environ['YT_STYLE_NODE'],str(root/'frontend/serve.mjs')])
+if role=='wasm-bindgen':
+ if sys.argv[1:]==['--version']: print('wasm-bindgen 0.2.129');sys.exit(0)
+ out=pathlib.Path(sys.argv[sys.argv.index('--out-dir')+1]);out.mkdir(parents=True,exist_ok=True);(out/'tasks.js').write_text('export default function init(){}');(out/'tasks_bg.wasm').write_bytes(b'wasm');sys.exit(0)
+if sys.argv[1]=='run': os.execv(os.environ['YT_STYLE_CARGO'],[os.environ['YT_STYLE_CARGO']]+sys.argv[1:])
+if sys.argv[1]=='metadata': print(json.dumps({'target_directory':str(root/'wasm-target')}));sys.exit(0)
+if sys.argv[1]=='build':
+ with (root/'wasm.trace').open('a') as out:out.write('wasm started\n')
+ while (root/'hold').exists(): time.sleep(.02)
+ sys.exit(0)
+sys.exit(99)
+"#;
+    for name in ["npm", "cargo", "wasm-bindgen"] {
+        let path = bin.join(name);
+        fs::write(&path, script).unwrap();
+        fs::set_permissions(path, fs::Permissions::from_mode(0o700)).unwrap();
+    }
+    let log = root.join("sequence.log");
+    let out = fs::File::create(&log).unwrap();
+    let mut command = Command::new(cli);
+    command
+        .args(["watch", "--manifest-path"])
+        .arg(app.join("Cargo.toml"))
+        .env(
+            "PATH",
+            format!("{}:{}", bin.display(), std::env::var("PATH").unwrap()),
+        )
+        .env("CARGO_TARGET_DIR", app.join("target"))
+        .env("YT_STYLE_NODE", node.trim())
+        .env("YT_STYLE_CARGO", cargo.trim())
+        .env("APP_ENVIRONMENT", "Production")
+        .env("APP_BACKEND_SECRET", "never-forward")
+        .stdin(Stdio::null())
+        .stdout(out.try_clone().unwrap())
+        .stderr(out);
+    let running = Running::start(&mut command);
+    let wait = |test: &dyn Fn() -> bool| {
+        let deadline = Instant::now() + Duration::from_secs(20);
+        while !test() {
+            assert!(
+                Instant::now() < deadline,
+                "{}",
+                fs::read_to_string(&log).unwrap_or_default()
+            );
+            thread::sleep(Duration::from_millis(20));
+        }
+    };
+    let text = || fs::read_to_string(&log).unwrap_or_default();
+    wait(&|| text().contains("YT_BROWSER_BUILD 1 published"));
+    let first = text();
+    assert!(
+        first.find("generating host CSS").unwrap() < first.find("complete CSS published").unwrap()
+    );
+    let layout = app.join("stylegen/layout.rs");
+    let original = fs::read_to_string(&layout).unwrap();
+    let output = frontend.join("style-output/app.generated.css");
+    let first_css = fs::read(&output).unwrap();
+    fs::write(app.join("hold"), "").unwrap();
+    fs::write(&layout, original.replace("Rem(0.75)", "Rem(0.85)")).unwrap();
+    fs::write(app.join("event"), layout.to_str().unwrap()).unwrap();
+    wait(&|| {
+        fs::read_to_string(app.join("wasm.trace"))
+            .unwrap()
+            .lines()
+            .count()
+            == 2
+    });
+    fs::write(&layout, original.replace("Rem(0.75)", "Rem(0.95)")).unwrap();
+    fs::write(app.join("event"), layout.to_str().unwrap()).unwrap();
+    thread::sleep(Duration::from_millis(160));
+    fs::remove_file(app.join("hold")).unwrap();
+    wait(&|| text().contains("YT_BROWSER_BUILD 3 published"));
+    assert!(!text().contains("YT_BROWSER_BUILD 2 published"));
+    assert_ne!(fs::read(&output).unwrap(), first_css);
+    let good = fs::read(&output).unwrap();
+    let wasm_count = fs::read_to_string(app.join("wasm.trace"))
+        .unwrap()
+        .lines()
+        .count();
+    fs::write(&layout, "invalid rust").unwrap();
+    fs::write(app.join("event"), layout.to_str().unwrap()).unwrap();
+    wait(&|| text().contains("YT_BROWSER_BUILD 4 failed"));
+    assert_eq!(fs::read(&output).unwrap(), good);
+    assert_eq!(
+        fs::read_to_string(app.join("wasm.trace"))
+            .unwrap()
+            .lines()
+            .count(),
+        wasm_count
+    );
+    fs::write(&layout, original).unwrap();
+    fs::write(app.join("event"), layout.to_str().unwrap()).unwrap();
+    wait(&|| text().contains("YT_BROWSER_BUILD 5 published"));
+    // Cancel while the actual Rust generator is active, including its nested owned group.
+    let main = app.join("stylegen/main.rs");
+    let source = fs::read_to_string(&main).unwrap();
+    let pidfile = app.join("generator.pid");
+    fs::write(&main,source.replace("fn main() {",&format!("fn main() {{ std::fs::write({:?},std::process::id().to_string()).unwrap(); std::thread::sleep(std::time::Duration::from_secs(30));",pidfile.to_str().unwrap()))).unwrap();
+    fs::write(app.join("event"), main.to_str().unwrap()).unwrap();
+    wait(&|| pidfile.exists());
+    let pid: i32 = fs::read_to_string(&pidfile).unwrap().parse().unwrap();
+    running.signal(libc::SIGTERM);
+    let result = running.wait();
+    assert_eq!(result.status.signal(), Some(libc::SIGTERM));
+    assert_eq!(
+        unsafe { libc::kill(pid, 0) },
+        -1,
+        "owned generator survived cancellation"
     );
 }

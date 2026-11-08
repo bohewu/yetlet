@@ -384,6 +384,25 @@ fn delivery_fixture(config: bool, assets: bool, plugin: bool) -> crate::cloud_fi
     let manifest = parse(&disk::read(f.manifest()).unwrap()).unwrap();
     let mut lock = parse(&disk::read(f.app.join("Cargo.lock")).unwrap()).unwrap();
     let packages = lock["package"].as_array_mut().unwrap();
+    // The base cloud fixture activates server-axum only. These generated
+    // config profiles also activate config, so retain that exact SDK closure.
+    let framework_lock = parse(include_bytes!("../../resources/framework.lock")).unwrap();
+    let sdk = packages
+        .iter_mut()
+        .find(|p| p["name"].as_str() == Some("yetlet"))
+        .unwrap();
+    sdk["dependencies"] = framework_lock["package"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|p| p["name"].as_str() == Some("yetlet"))
+        .unwrap()["dependencies"]
+        .clone();
+    let normal = fixture::normal_dependencies(config);
+    sdk["dependencies"]
+        .as_array_mut()
+        .unwrap()
+        .retain(|v| normal.contains(v.as_str().unwrap().split_whitespace().next().unwrap()));
     let app = packages
         .iter_mut()
         .find(|p| p["name"].as_str() == Some("composeapp"))

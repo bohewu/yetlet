@@ -28,6 +28,8 @@ members = [
     "examples/auth-notes",
     "examples/modular-shop",
     "examples/todo-server",
+    "examples/style-showcase",
+    "examples/style-showcase-browser",
 ]
 resolver = "3"
 exclude = [

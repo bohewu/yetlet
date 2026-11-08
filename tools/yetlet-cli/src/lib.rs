@@ -16,6 +16,7 @@ mod platform;
 pub mod scaffold;
 mod settings;
 mod static_export;
+mod styles;
 
 #[cfg(test)]
 #[path = "../tests/fixtures/compose_app.rs"]
@@ -30,8 +31,8 @@ use std::{
 };
 
 pub const VERSION: &str = concat!("yetlet ", env!("CARGO_PKG_VERSION"));
-pub const HELP: &str = "Yetlet CLI preview\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet inspect [--manifest-path PATH] [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet build --static --export-bin NAME --output DIRECTORY [--base-path /] [--release] [--wasm-islands]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
-const NEW_HELP: &str = "Usage: yetlet new NAME [--parent DIRECTORY] [--template native|browser] [--vite] [--tailwind] [--service] [--settings]\n\nNAME may appear anywhere among options. --parent defaults to cwd and must exist.\nNAME: 1-64 lowercase ASCII letters/digits/-/_, starting with a letter; reserved names refused.\n--vite selects the complete frontend scaffold and implies --settings. Plain new keeps app-runtime settings opt-in.\n--tailwind selects standalone Tailwind or the official Vite plugin. --service adds bind/health/shutdown.\n--template native|browser selects a built-in starter (default native), independent of runtime settings.\nThe browser template persists cli.target=browser and includes Vite/public settings.\nBrowser creation refuses --service. Plain creation defaults to native.\nCreates one new tree without overwrite, dependency installation, lock generation or process startup.\n";
+pub const HELP: &str = "Yetlet CLI preview\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--template native|browser|native-style|browser-style] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet inspect [--manifest-path PATH] [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet build --static --export-bin NAME --output DIRECTORY [--base-path /] [--release] [--wasm-islands]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
+const NEW_HELP: &str = "Usage: yetlet new NAME [--parent DIRECTORY] [--template native|browser|native-style|browser-style] [--vite] [--tailwind] [--service] [--settings]\n\nNAME may appear anywhere among options. --parent defaults to cwd and must exist.\nNAME: 1-64 lowercase ASCII letters/digits/-/_, starting with a letter; reserved names refused.\n--vite selects the complete frontend scaffold and implies --settings. Plain new keeps app-runtime settings opt-in.\n--tailwind selects standalone Tailwind or the official Vite plugin. --service adds bind/health/shutdown.\n--template native|browser|native-style|browser-style selects a built-in starter (default native), independent of runtime settings.\nThe browser template persists cli.target=browser and includes Vite/public settings.\nBrowser creation refuses --service. Plain creation defaults to native.\nCreates one new tree without overwrite, dependency installation, lock generation or process startup.\n";
 const DOCTOR_HELP: &str = "Usage: yetlet doctor [--json]\n\nReports bounded local Rust/Cargo 1.99+ identity and compiled new-filesystem capability.\nEnvironment only; application, framework, settings, frontend and execution readiness are not checked.\n--json emits schema 1. No builds, installs, Node probes or listeners.\n";
 const INSPECT_HELP: &str = "Usage: yetlet inspect [--manifest-path PATH] [--json]\n\nExplains public-settings execution plans for build/run/watch without running tools.\nManifest defaults to exactly cwd/Cargo.toml; requires a protected standalone app and Cargo.lock.\n--json emits project-execution-plan schema 1, separate from environment-only doctor.\nNative watch plans select Rust rebuild/restart; browser watch plans select WASM rebuild/full-page reload\nonly when cli.vite.auto_start and cli.vite.auto_build are both true.\nNo writes, secret sources, frontend inspection or readiness verification.\n";
 const RUN_HELP: &str = "Usage: yetlet run [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; no ancestor or workspace search.\nRequires a protected standalone app and existing Cargo.lock; runs frozen Cargo.\nPublic settings select native Rust watch/Vite or cli.target=browser static preview.\nBrowser run starts only the prepared frontend, honoring cli.vite.auto_start. No implicit installs.\nOwned processes must retain their process group/Job; escaped daemons are unsupported.\n";
@@ -219,6 +220,8 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
                 template = Some(match argument_value(args, &mut index, inline)?.to_str() {
                     Some("native") => scaffold::Template::Native,
                     Some("browser") => scaffold::Template::Browser,
+                    Some("native-style") => scaffold::Template::NativeStyle,
+                    Some("browser-style") => scaffold::Template::BrowserStyle,
                     _ => return Err("--template requires native or browser"),
                 });
             }
@@ -333,7 +336,11 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
         });
     }
     let template = template.unwrap_or_default();
-    if template == scaffold::Template::Browser && service {
+    if matches!(
+        template,
+        scaffold::Template::Browser | scaffold::Template::BrowserStyle
+    ) && service
+    {
         return Err("browser template does not select the native --service profile");
     }
     match command {
@@ -564,7 +571,7 @@ mod tests {
             parse(&argv(&["new", "tasks", "--template=native"])),
             parse(&argv(&["new", "tasks"]))
         );
-        assert!(NEW_HELP.contains("--template native|browser"));
+        assert!(NEW_HELP.contains("--template native|browser|native-style|browser-style"));
         assert!(!NEW_HELP.contains("APP_CLI__TARGET"));
         for args in [
             vec!["new", "tasks", "--template"],

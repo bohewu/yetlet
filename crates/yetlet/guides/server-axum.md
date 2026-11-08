@@ -5,7 +5,7 @@ The server adapter does not install browser, Session or configuration capabiliti
 
 **Experimental SDK `0.9.0-alpha.6`, published on crates.io.** Select the
 `server-axum` feature. The commands below run checkout examples; application
-authors can start without cloning using the [first-app guide](../../../docs/FIRST-APP.md).
+authors can start without cloning using the [first-app guide](https://github.com/bohewu/yetlet/blob/master/docs/FIRST-APP.md).
 
 
 ## Prerequisites
@@ -61,25 +61,25 @@ stops the foreground listener; a Router setup alone does not bind a listener.
 
 `App<S>` is a thin facade; `into_router()` returns a native Axum Router. `.page(path, title, handler)` accepts a no-argument async View handler. Parameterized/fallible handlers use `.get`, native `Path`, `Query`, `State` or `Json`, and return `Page` or `Result<Page, E>`. Native JSON, redirects, statuses and headers retain Axum semantics. `configure`/`try_configure` execute ordinary typed setup functions during construction, without Controllers, DI, plugin discovery or a second model binder.
 
-`RequestContext<S>` owns request parts/body and typed request extensions separately from application state. Native middleware remains usable directly; `with_global` wraps a fully assembled Router before routing. Follow [HTTP pipeline ordering/body semantics](../../../docs/HTTP-PIPELINE.md) when composing layers. SQL/storage remain application-owned choices.
+`RequestContext<S>` owns request parts/body and typed request extensions separately from application state. Native middleware remains usable directly; `with_global` wraps a fully assembled Router before routing. Follow [HTTP pipeline ordering/body semantics](https://github.com/bohewu/yetlet/blob/master/docs/HTTP-PIPELINE.md) when composing layers. SQL/storage remain application-owned choices.
 
 ### Documents and errors
 
 `Page::new`, `render_document` and `render_page` use the legacy `zh-Hant` root language. For another language, validate `LanguageTag` and select `DocumentMetadata` with `Page::with_metadata` or the metadata-aware render functions. The contract is title/language plus fixed charset/viewport; no arbitrary head DSL is installed. Language validation is conservative ASCII shape validation, not a complete BCP 47 registry.
 
-Views are escaped through `yetlet::html`. Rendering errors become a generic HTTP 500 through `Page`/`HtmlPageError`; HTML responses carry the strict default CSP. Full SSR buffers the document and needs no JS/WASM. Browser assets/loaders are explicitly application-owned build outputs. [Streaming](../../../docs/YT-021-STREAMING-SSR-RESEARCH.md) and [deadline](../../../docs/YT-029-HTTP-DEADLINE-RESEARCH.md) research remain app-owned opt-ins, without a core streaming/suspense/deadline API.
+Views are escaped through `yetlet::html`. Rendering errors become a generic HTTP 500 through `Page`/`HtmlPageError`; HTML responses carry the strict default CSP. Full SSR buffers the document and needs no JS/WASM. Browser assets/loaders are explicitly application-owned build outputs. [Streaming](https://github.com/bohewu/yetlet/blob/master/docs/YT-021-STREAMING-SSR-RESEARCH.md) and [deadline](https://github.com/bohewu/yetlet/blob/master/docs/YT-029-HTTP-DEADLINE-RESEARCH.md) research remain app-owned opt-ins, without a core streaming/suspense/deadline API.
 
 ## API reference
 
-Use the [source/rustdoc entry](../src/server_axum/mod.rs) and [current API reference](../../../docs/API-REFERENCE.md).
+Use the [source/rustdoc entry](../src/server_axum/mod.rs) and [current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md).
 Native upstream routing and extraction contracts remain Axum/Tower-owned.
 
 ### License and compatibility
 
-Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE).
+Dual-licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/LICENSE-MIT) or [Apache-2.0](https://github.com/bohewu/yetlet/blob/master/LICENSE-APACHE).
 SDK `0.9.0-alpha.6` is published; APIs remain Experimental. Read
-[compatibility](../../../docs/COMPATIBILITY.md) and the
-[current API reference](../../../docs/API-REFERENCE.md) at the matching revision.
+[compatibility](https://github.com/bohewu/yetlet/blob/master/docs/COMPATIBILITY.md) and the
+[current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md) at the matching revision.
 The historical evidence below retains its original candidate and scope; it does
 not qualify every later checkout or promise production support.
 

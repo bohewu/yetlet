@@ -1,11 +1,22 @@
 # yetlet::view
 
-**Experimental `0.9.0-alpha.5`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
+**Experimental SDK module.** Requires Rust 1.99 or newer. Distributed in
+`yetlet` SDK `0.9.0-alpha.6`; see the [accepted publication record](https://github.com/bohewu/yetlet/blob/master/docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01).
+Read source/rustdoc at the revision you consume; later checkout additions do not
+inherit published availability or qualification.
 
 `yetlet::view` describes UI as owned Rust values shared by the native HTML and browser DOM renderers. With `yetlet` default features disabled it has no external normal dependencies, browser runtime, server transport or implicit state scheduler.
 
 For a first-app continuation covering typed data, reusable functions, lists and
-conditions, follow [Write Views and reusable components](../../../docs/VIEW-COMPONENTS.md).
+conditions, follow [Write Views and reusable components](https://github.com/bohewu/yetlet/blob/master/docs/VIEW-COMPONENTS.md).
+
+## Source-only typed tags
+
+The current checkout additionally exposes `yetlet::view::tags` and convenience
+setters. These are absent from published SDKalpha.6. See the
+[typed tag guide](https://github.com/bohewu/yetlet/blob/master/docs/VIEW-COMPONENTS.md#optional-typed-tag-builders-unreleased-source-only-yt-234)
+for the finite constructors, void/scoped setter rules and renderer boundary.
+The published `Element::new` example below remains valid.
 
 ## Build a View
 
@@ -18,7 +29,7 @@ let tree: View = Element::new("ul")
     .into();
 ```
 
-Import `yetlet::view::{Element, View}` in the caller. To see the shared component in an application, read [Todo UI](../../../examples/todo-ui/src/lib.rs) and run native SSR from the repository root:
+Import `yetlet::view::{Element, View}` in the caller. To see the shared component in an application, read [Todo UI](https://github.com/bohewu/yetlet/blob/master/examples/todo-ui/src/lib.rs) and run native SSR from the repository root:
 
 ```bash
 cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
@@ -28,8 +39,8 @@ cargo run --locked -p yetlet --features server-axum --example server-axum-minima
 
 `Element` stores tag/attribute names and values without validating or escaping them. `View::text` also stores untrusted text as-is: the selected renderer must enforce its own policy. Select `yetlet::html` for HTML serialization or explicitly select a browser renderer for WASM; core alone does not render. Tags and attribute names have static string lifetimes, while dynamic values and children are owned.
 
-The `binding` module supplies `ComponentIdentity`, `BindingKey`, `SlotName`, `InertAttributeName` and `SlotDescriptor`. Validated identity/key/slot types reject values outside their bounded syntax through `BindingContractError`; this vocabulary does not implement event handlers, a template compiler, hydration or resumability. See [the binding source](../src/view/binding.rs) and [ADR 0007](../../../docs/adr/0007-bounded-keyed-dom-and-local-graph.md).
+The `binding` module supplies `ComponentIdentity`, `BindingKey`, `SlotName`, `InertAttributeName` and `SlotDescriptor`. Validated identity/key/slot types reject values outside their bounded syntax through `BindingContractError`; this vocabulary does not implement event handlers, a template compiler, hydration or resumability. See [the binding source](../src/view/binding.rs) and [ADR 0007](https://github.com/bohewu/yetlet/blob/master/docs/adr/0007-bounded-keyed-dom-and-local-graph.md).
 
 ## License and compatibility
 
-Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE). The privately prepared `0.1.x` policy preserves documented behavior and Rust 1.99 in patches; public activation remains blocked. See [compatibility](../../../docs/COMPATIBILITY.md), [API classifications](../../../docs/API-CONTRACTS.md) and [developer guides](../../../docs/README.md). Links to companion packages and records assume this checkout; they do not imply public hosting or distribution.
+Dual-licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/LICENSE-MIT) or [Apache-2.0](https://github.com/bohewu/yetlet/blob/master/LICENSE-APACHE). APIs remain Experimental; publication does not establish production qualification or API stability. See [compatibility](https://github.com/bohewu/yetlet/blob/master/docs/COMPATIBILITY.md), [API classifications](https://github.com/bohewu/yetlet/blob/master/docs/API-CONTRACTS.md) and [developer guides](https://github.com/bohewu/yetlet/blob/master/docs/README.md). Links to companion packages and records assume this checkout; they do not imply public hosting or distribution.

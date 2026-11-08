@@ -9,7 +9,9 @@
 
 This document defines the smallest security topology in which a Yetlet application could be qualified for production. It separates framework behavior, application policy and platform controls.
 
-Public-release task YT-020 remains **Blocked**. Completing or reviewing this requirements document cannot close it.
+The original YT-020 Blocked checkpoint remains historical. Current Experimental
+distribution is recorded in [Release readiness](RELEASE-READINESS.md); completing
+or reviewing this model does not certify production deployment.
 
 It does **not**:
 

@@ -1,4 +1,90 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
+
+**YT-244 publication surface and API consistency (2026-11-08): Done at local documentation scope.**
+The [source/package audit](YT-244-PUBLICATION-SURFACE-API-AUDIT.md) corrects the
+three Cargo package READMEs, their links and carried module-guide boundaries,
+and keeps the published CLI distinct from later source-only Style templates.
+Existing release-document regression gates are extended without changing
+product API or selecting a release version. First review found two broken
+legacy CLI headings; both fragments were restored and independent corrective
+Reviewer `wc_job_qL8yujng6i4r08m9` PASS closed the P2. Windows qualification
+is deferred by the owner; no Git delivery, hosted execution or publication is
+implied.
+
+
+**YT-242 documentation truth audit (2026-11-08): Done at bounded documentation scope.**
+[Audit and corrections](YT-242-DOCUMENTATION-TRUTH.md) separate published SDK/CLI,
+the selected guide edition and later checkout authoring/tools. The 516-file role
+inventory includes bounded semantic inspection of 54 entries, not every document.
+Python suites (14/39/35), release-doc, docs/DAG, samples and whitespace pass.
+Independent corrective Reviewer `wc_job_m2SOL6psGzaIGPjm` PASS closes the original
+one-P2 review; original failures remain retained. Local delivery follows strict
+Guard. [YT-243 source qualification and existing CI coverage](YT-243-RELEASE-QUALIFICATION.md)
+is Done at source/Linux/local Windows MSVC scope after the YT-242 local commit.
+Final independent Reviewer `wc_job_ukE1zeoMQlt3wLvu` PASS, zero issues/followups.
+Local Linux release
+Chrome/Firefox, affected CLI and exact local-package consumers pass. Windows
+MSVC/wasm32, exact packages, generated native Style HTTP/CSS and the corrected
+CI setup with seven Style tests also pass at their recorded local scopes.
+The first independent review's Windows OpenSSL prerequisite finding is closed;
+parent acceptance preserves every recorded limit. Hosted image/CI execution and
+unverified platforms remain separate. No release or source freeze is implied.
+
+**YT-241 Style Showcase (2026-11-08): Done at source and bounded Linux
+sample qualification scope.** The owner-approved four-category
+[standalone gallery](../examples/style-showcase/README.md) shares View and CSS
+sources between complete native SSR and explicit optional browser enhancement.
+Native build/tests, strict native/browser Clippy and required Chrome/Firefox
+gallery smoke pass at their measured Linux viewport scopes. Independent
+implementation Reviewer `wc_job_SjBc9esAHAREdWS7` PASS, zero material issues
+or required followups. The parent subsequently selected promotion as the
+thirteenth native-first [catalog sample](SAMPLES.md). Chrome covers observed
+390/768/1280px; Firefox covers observed 500/768/1280px. Firefox 390px, its
+additional explicit listener-disposal probe and full console/CSP-log auditing
+remain unverified. This is not production, other-platform or public-release
+qualification; Git delivery remains separate.
+
+
+**YT-237–YT-240 optional CSS authoring roadmap (2026-11-08):**
+**YT-237 Done at contract-research scope; YT-238 Done at prototype scope;
+YT-239 Done at source/Linux integration scope; YT-240 Done at bounded
+Todo/Linux sample qualification scope.**
+[Dependency and acceptance plan](YT-237-240-STYLE-CSS-ROADMAP.md)
+prioritizes **YT-237** (explicit style registration and build-time CSS
+contract) before CSS method syntax. **YT-238** is a bounded Rust builder
+experiment completed under the owner's follow-up authorization. The recorded
+**SIMPLIFY** recommendation is now owner-approved for **YT-239**
+(opt-in build/watch/asset integration). **YT-240** now validates the existing
+Todo sample's native SSR and browser CSS path after owner selection and Reviewer
+PASS; the separately authorized Style Showcase is now YT-241 Done at bounded Linux scope.
+Original CSS and Tailwind/Vite workflows remain available. The earlier
+independent planning Reviewer PASS remains accepted. The new
+[YT-237 reviewed Contract](YT-237-STYLE-REGISTRATION-CONTRACT.md) compares
+alternatives and defines registration, conditional coverage, host execution,
+ordering and publication. Independent design Reviewer PASS, Job
+`wc_job_hrrQG-bXFiMCgGQ3`, zero issues/followups; docs/source checks PASS.
+The owner also requires default registration for suitable Rust-style templates:
+YT-238 demonstrates the pre-wired fixture; actual `yetlet new` output and
+build/watch/asset integration belong to the now-authorized YT-239 slice.
+The [YT-238 proof](YT-238-STYLE-BUILDER-PROOF.md) records 674 identical CSS bytes,
+19 focused tests PASS, formatting/docs/source checks PASS, and independent
+Reviewer PASS, Job `wc_job_hfecy9ZrNUTO61BZ`, zero issues/followups. Keep the
+builder application/tooling-local: measured setup cost does not establish a
+reusable SDK advantage. Plain CSS remains the default; no public renderer/API
+change or automatic rollout is claimed. The [YT-239 implementation](YT-239-STYLE-INTEGRATION.md)
+is Done at source and bounded Linux integration scope: default-wired optional
+style templates, Rust generation/publication, coordinated watch and external
+CSS assets, without a generated-app Python dependency. Independent Reviewer
+PASS, Job `wc_job_3s_tnZYc7hUssjK5`, zero issues/followups. Focused tests and real
+native/Vite/Tailwind/WASM build evidence passed; two cloud-lock failures remain
+recorded and Windows compile/runtime remains unverified. The
+[YT-240 Todo qualification](YT-240-TODO-STYLE-QUALIFICATION.md) proves generated
+CSS with source-only Tag Builders, native no-WASM SSR, Chrome computed styles
+at 390/1280px, Firefox desktop and asset/CSP boundaries. Independent Reviewer
+PASS, Job `wc_job_7bfgn4kA_CNHLN22`, zero issues/followups. Firefox narrow
+viewport, Windows and production claims remain unverified. A dedicated Style
+Showcase is tracked as YT-241 Done at bounded Linux scope; Git delivery and public release remain separate.
+
 **YT-234/235 View authoring expansion (2026-11-07):** Done at
 local source and scoped verification only.
 [YT-235 coverage record](YT-235-TAG-COVERAGE-PLAN.md) builds on
