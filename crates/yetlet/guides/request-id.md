@@ -1,9 +1,9 @@
 # yetlet::request_id
 
-**Experimental SDK module.** Requires Rust 1.99 or newer. Distributed in
-`yetlet` SDK `0.9.0-alpha.6`; see the [accepted publication record](https://github.com/bohewu/yetlet/blob/master/docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01).
-Read source/rustdoc at the revision you consume; later checkout additions do not
-inherit published availability or qualification.
+**Experimental SDK module.** Requires Rust 1.99 or newer. Included in
+`yetlet` SDK `0.9.0-alpha.7`; this guide describes the selected package contents.
+Read source/rustdoc at the revision you consume; package selection does not
+establish registry availability or production qualification.
 
 `yetlet::request_id` adds explicitly installed process-local numeric request correlation to an Axum/Yetlet app. It depends on Axum and `yetlet::server_axum` and has no browser dependency. An app that does not select it allocates no provider counter.
 

@@ -1,22 +1,22 @@
 # yetlet::view
 
-**Experimental SDK module.** Requires Rust 1.99 or newer. Distributed in
-`yetlet` SDK `0.9.0-alpha.6`; see the [accepted publication record](https://github.com/bohewu/yetlet/blob/master/docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01).
-Read source/rustdoc at the revision you consume; later checkout additions do not
-inherit published availability or qualification.
+**Experimental SDK module.** Requires Rust 1.99 or newer. Included in
+`yetlet` SDK `0.9.0-alpha.7`; this guide describes the selected package contents.
+Read source/rustdoc at the revision you consume; package selection does not
+establish registry availability or production qualification.
 
 `yetlet::view` describes UI as owned Rust values shared by the native HTML and browser DOM renderers. With `yetlet` default features disabled it has no external normal dependencies, browser runtime, server transport or implicit state scheduler.
 
 For a first-app continuation covering typed data, reusable functions, lists and
 conditions, follow [Write Views and reusable components](https://github.com/bohewu/yetlet/blob/master/docs/VIEW-COMPONENTS.md).
 
-## Source-only typed tags
+## Typed Tag Builder API
 
-The current checkout additionally exposes `yetlet::view::tags` and convenience
-setters. These are absent from published SDKalpha.6. See the
+This release includes `yetlet::view::tags`, 101 ordinary HTML constructors and
+convenience setters. These are absent from published SDKalpha.6. See the
 [typed tag guide](https://github.com/bohewu/yetlet/blob/master/docs/VIEW-COMPONENTS.md#optional-typed-tag-builders-unreleased-source-only-yt-234)
 for the finite constructors, void/scoped setter rules and renderer boundary.
-The published `Element::new` example below remains valid.
+The existing `Element::new` example below remains valid.
 
 ## Build a View
 

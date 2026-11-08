@@ -3744,7 +3744,7 @@ checksum = "550a2b930b62486a393c52d5c3b84bff264b28aa437ed64694d31e93b1757af7"
 
 [[package]]
 name = "yetlet"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "cookie",
@@ -3774,7 +3774,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-auth-notes"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "getrandom 0.3.4",
@@ -3787,7 +3787,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-board-triage"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "serde",
  "serde_json",
@@ -3800,7 +3800,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-browser"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "serde",
  "serde_json",
@@ -3814,7 +3814,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-cart-server"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "serde",
@@ -3825,7 +3825,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-custom-action-transport"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "futures-util",
  "serde",
@@ -3837,7 +3837,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-dashboard-counter-island"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "serde",
  "serde_json",
@@ -3847,7 +3847,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-dashboard-filter-island"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "serde",
  "serde_json",
@@ -3857,7 +3857,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-file-server"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "futures-util",
@@ -3873,7 +3873,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-form-css-proof"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "serde",
@@ -3885,7 +3885,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-forms-validation"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "serde",
@@ -3896,7 +3896,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-hello-world"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "tokio",
@@ -3906,7 +3906,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-keyed-bindings"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "wasm-bindgen",
  "web-sys",
@@ -3916,7 +3916,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-lab-operations-board"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "futures-util",
@@ -3939,7 +3939,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-middleware-lab"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "futures-util",
@@ -3952,7 +3952,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-modular-shop"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "getrandom 0.3.4",
@@ -3969,7 +3969,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-multi-island-dashboard"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "serde_json",
@@ -3982,7 +3982,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-render-bench"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "js-sys",
  "serde",
@@ -3995,7 +3995,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-rest-api"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "serde",
@@ -4007,7 +4007,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-resumability-research"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "serde",
  "serde_json",
@@ -4015,7 +4015,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-search-island"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "wasm-bindgen",
  "web-sys",
@@ -4025,7 +4025,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-sqlite-crud"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "rusqlite",
@@ -4039,7 +4039,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-sse-notifications"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "futures-util",
@@ -4052,7 +4052,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-streaming-ssr-research"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "futures-util",
@@ -4066,7 +4066,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-style-showcase"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "serde",
@@ -4079,7 +4079,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-style-showcase-browser"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "wasm-bindgen",
  "web-sys",
@@ -4089,7 +4089,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-todo-browser"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "serde_json",
  "wasm-bindgen",
@@ -4102,7 +4102,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-todo-server"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "axum",
  "serde",
@@ -4117,7 +4117,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-todo-ui"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "serde",
  "serde_json",
@@ -4126,7 +4126,7 @@ dependencies = [
 
 [[package]]
 name = "yetlet-webgpu-scene-research"
-version = "0.9.0-alpha.6"
+version = "0.9.0-alpha.7"
 dependencies = [
  "pollster",
  "wgpu",

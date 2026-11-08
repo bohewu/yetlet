@@ -1,8 +1,9 @@
 # Yetlet Experimental Compatibility Policy
 
-## Unreleased YT-234 typed authoring helpers — 2026-11-07
+## Selected local SDK alpha.7 typed authoring helpers — YT-234/245
 
-The current checkout includes
+[YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md) selects SDK
+`0.9.0-alpha.7` locally, including
 `yetlet::view::tags` with typed fluent constructors and additive convenience
 methods. This is **source-only**, not shipped in SDK `0.9.0-alpha.6`; the
 published first-app contract and CLI pins do not change. The existing owned
@@ -14,7 +15,7 @@ class tokens, and `.placeholder` is only on typed input/textarea. General raw
 inline-style API, browser runtime or WASM renderer change is introduced.
 
 
-## Unreleased YT-235 full ordinary tag authoring — 2026-11-07
+## Selected local SDK alpha.7 full ordinary tag authoring — YT-235/245
 
 On top of YT-234, the current checkout includes 101 constructor names
 corresponding to the dated YT-219 standard HTML ordinary View inventory

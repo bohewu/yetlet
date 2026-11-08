@@ -26,6 +26,9 @@ the published SDKalpha.6/CLI0.2.0 artifacts. See the
 [API source-only map](API-REFERENCE.md#source-only-checkout-additions),
 [typed View guide](VIEW-COMPONENTS.md)
 and [Style contract](YT-237-STYLE-REGISTRATION-CONTRACT.md).
+[YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md) selects local SDK
+`0.9.0-alpha.7` contents including typed tags; this does not change the published
+distribution or the CLI/public guide pins.
 Style authoring has a finite private app vocabulary, explicit registration and
 external build-time CSS; ordinary CSS remains the default and supplies unsupported
 syntax. There is no public style crate, renderer change or runtime style injection.

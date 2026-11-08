@@ -3,7 +3,7 @@
 Mount a shared Rust View into an explicitly owned browser surface. This optional
 renderer replaces a subtree; native SSR works without selecting it.
 
-**Experimental SDK `0.9.0-alpha.6`, published on crates.io.** `yetlet-browser`
+**Experimental SDK `0.9.0-alpha.7` package contents.** `yetlet-browser`
 selects `dom` by default; actual mounting requires the WASM target and browser
 host. The commands below run checkout examples at their documented scope.
 
@@ -150,7 +150,7 @@ and the linked supported-vocabulary/navigation contract below.
 ### License and compatibility
 
 Dual-licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/LICENSE-MIT) or [Apache-2.0](https://github.com/bohewu/yetlet/blob/master/LICENSE-APACHE).
-SDK `0.9.0-alpha.6` is published; APIs remain Experimental. Read
+This guide describes SDK `0.9.0-alpha.7` contents; APIs remain Experimental. Read
 [compatibility](https://github.com/bohewu/yetlet/blob/master/docs/COMPATIBILITY.md) and the
 [current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md) at the matching revision.
 The historical evidence below retains its original candidate and scope; it does
