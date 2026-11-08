@@ -102,6 +102,12 @@ The bounded current-reader inventory is `CURRENT_DOCS` in
 [release_docs.py](../scripts/release_docs.py). It rejects known stale availability
 wording and selected-version pending/unreleased paragraphs. Explicit
 `## Historical` sections and dated task/evidence records retain their meaning.
+Architecture and Release Readiness distribution fields are checked against the
+explicit accepted SDK/CLI publication sections, independently of development
+versions. Current module-guide availability boilerplate is checked before its
+explicit historical heading or historical delivery disclosure. The Compatibility
+and Documentation Scope reader-edition paragraphs must match `site/pages.toml`.
+These are bounded checks of known drift, not a semantic audit of all Markdown.
 The root quickstart and first-app commands must match the separately selected
 `site/pages.toml` edition; a new product version does not promote that edition.
 

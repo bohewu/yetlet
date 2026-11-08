@@ -1,6 +1,6 @@
 # Yetlet naming guide
 
-Date: 2026-10-22. Scope: current pre-public Rust APIs, CLI support vocabulary and
+Date: 2026-10-22. Scope: Experimental Rust APIs, CLI support vocabulary and
 application settings. This guide records the owner's single-canonical-name
 decision; [the audit response](NAMING-AUDIT-20261022.md) records its implementation.
 

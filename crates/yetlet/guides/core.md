@@ -1,11 +1,22 @@
 # yetlet::view
 
-**Experimental `0.9.0-alpha.5`, unpublished.** Requires Rust 1.99 or newer. This is one of Yetlet's sixteen library candidates; use the local checkout rather than assuming a registry release. APIs are pre-public, and bounded prototype verification is not production qualification.
+**Experimental SDK module.** Requires Rust 1.99 or newer. Distributed in
+`yetlet` SDK `0.9.0-alpha.6`; see the [accepted publication record](../../../docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01).
+Read source/rustdoc at the revision you consume; later checkout additions do not
+inherit published availability or qualification.
 
 `yetlet::view` describes UI as owned Rust values shared by the native HTML and browser DOM renderers. With `yetlet` default features disabled it has no external normal dependencies, browser runtime, server transport or implicit state scheduler.
 
 For a first-app continuation covering typed data, reusable functions, lists and
 conditions, follow [Write Views and reusable components](../../../docs/VIEW-COMPONENTS.md).
+
+## Source-only typed tags
+
+The current checkout additionally exposes `yetlet::view::tags` and convenience
+setters. These are absent from published SDKalpha.6. See the
+[typed tag guide](../../../docs/VIEW-COMPONENTS.md#optional-typed-tag-builders-unreleased-source-only-yt-234)
+for the finite constructors, void/scoped setter rules and renderer boundary.
+The published `Element::new` example below remains valid.
 
 ## Build a View
 
@@ -32,4 +43,4 @@ The `binding` module supplies `ComponentIdentity`, `BindingKey`, `SlotName`, `In
 
 ## License and compatibility
 
-Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE). The privately prepared `0.1.x` policy preserves documented behavior and Rust 1.99 in patches; public activation remains blocked. See [compatibility](../../../docs/COMPATIBILITY.md), [API classifications](../../../docs/API-CONTRACTS.md) and [developer guides](../../../docs/README.md). Links to companion packages and records assume this checkout; they do not imply public hosting or distribution.
+Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE). APIs remain Experimental; publication does not establish production qualification or API stability. See [compatibility](../../../docs/COMPATIBILITY.md), [API classifications](../../../docs/API-CONTRACTS.md) and [developer guides](../../../docs/README.md). Links to companion packages and records assume this checkout; they do not imply public hosting or distribution.

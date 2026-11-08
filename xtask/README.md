@@ -39,8 +39,9 @@ Rust/Cargo identity and minimum 1.99, and the root's selected 1.99.0 policy. It
 never installs tools, changes the host, runs tests or opens browsers.
 Only the `foundation` doctor capability exists. Unknown commands, capabilities,
 repeated options and unsupported flags return usage errors. Builder/check
-commands are listed below; browser suites, qualification, release and a public
-Yetlet CLI remain unimplemented.
+commands are listed below. This foundation checkpoint predates later browser
+and release tooling; the separate [public CLI](../tools/yetlet-cli/README.md)
+has its own version, commands and qualification records.
 
 Human summaries and schema-version-1 doctor JSON go to stdout; failures also emit
 a short stderr diagnostic. JSON reports `status`, `exit_code` and per-check

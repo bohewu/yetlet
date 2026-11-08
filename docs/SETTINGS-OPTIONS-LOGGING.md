@@ -5,7 +5,8 @@ Choose a settings source at native startup, deserialize application-owned
 construct services and native state. Logging follows the same ownership rule:
 the application chooses and initializes its subscriber.
 
-These are existing experimental, unpublished source-checkout integrations.
+These are existing Experimental integrations in the published SDK; application
+examples and later checkout changes retain their own source-bound limits.
 They add no required DI container, settings service or new runtime.
 
 ## Prerequisites

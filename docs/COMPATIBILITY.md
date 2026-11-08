@@ -2,7 +2,7 @@
 
 ## Unreleased YT-234 typed authoring helpers — 2026-11-07
 
-The feature branch `feature/view-authoring-api` adds
+The current checkout includes
 `yetlet::view::tags` with typed fluent constructors and additive convenience
 methods. This is **source-only**, not shipped in SDK `0.9.0-alpha.6`; the
 published first-app contract and CLI pins do not change. The existing owned
@@ -16,7 +16,7 @@ inline-style API, browser runtime or WASM renderer change is introduced.
 
 ## Unreleased YT-235 full ordinary tag authoring — 2026-11-07
 
-On top of YT-234, the local feature branch includes 101 constructor names
+On top of YT-234, the current checkout includes 101 constructor names
 corresponding to the dated YT-219 standard HTML ordinary View inventory
 (89 default Browser DOM tags, opt-in `img`, and 11 SSR-only/DOM-deferred tags).
 Document/head elements, forbidden executable/embedded tags, foreign namespace
@@ -41,11 +41,24 @@ and opt-in navigation/images are available in SDKalpha.6; YT-223's static export
 is available in CLI0.2.0. Existing defaults and Experimental API limits remain.
 
 The public reader/first-app edition remains explicitly pinned to
-SDKalpha.5/CLI0.1.1; registry-only reference examples also retain their own SDKalpha.5
-pins, independently of the selected builder CLI. Publication does not promote
-those consumers or replay their qualification. Dated preparation and source-only
+SDKalpha.6/CLI0.2.0 in [the site manifest](../site/pages.toml).
+
+Some registry-only
+reference examples retain their own SDKalpha.5 pins, independently of the
+selected builder CLI. Publication does not promote
+those consumers or replay their qualification.
+
+Dated preparation and source-only
 checkpoints below retain their historical status; they are not current pending
 release gates.
+
+## Source-only Style authoring and Showcase — 2026-11-08
+
+[YT-239](YT-239-STYLE-INTEGRATION.md) adds optional private app CSS generation
+and build/watch integration; it is absent from published CLI0.2.0.
+[Showcase](../examples/style-showcase/README.md) demonstrates the current typed
+Views and finite app-owned Style vocabulary with external build-time CSS.
+Neither is a public style crate or renderer change. Ordinary CSS stays default.
 
 ## Historical SDKalpha.6 preparation — 2026-11-01
 
@@ -171,7 +184,7 @@ dependency requirements and unchanged independent workspaces/default features.
 They remain unpublished. This extends preparation, not the immutable ce56e08
 candidate, support classifications, final source C or release authorization.
 
-## Release train
+## Historical release train
 
 Yetlet-owned libraries share one coordinated release version and release train.
 Their manifests may inherit the root version or declare it in an isolated
@@ -201,7 +214,7 @@ The current `0.y` version remains experimental under SemVer. The classifications
 
 For the selected `0.1.x` train, patches preserve documented API behavior and MSRV. An incompatible change requires the next coordinated minor release with rationale, migration notes and the gates below. Publication alone does not promote an Experimental API to Stable Candidate or promise 1.0 stability.
 
-### Isolated optional workspaces
+### Historical isolated optional workspaces
 
 The optional Redis Session provider and `yetlet_browser::wgpu` use **isolated nested
 Cargo workspaces/locks** and Experimental contracts. Both belong to the current
@@ -250,7 +263,7 @@ The maintainer selected Rust 1.99 as the minimum on 2026-10-12, before any `0.1.
 
 The selected experimental `0.1.x` policy preserves Rust 1.99 in patches. After release, an MSRV increase requires a coordinated minor release, a documented technical/security reason, migration notes and CI evidence; no silent increase is permitted. Downstream preparation using 1.88 must install 1.99 or newer. [Integrity preparation](YT-020-INTEGRITY-PREPARATION.md) retains the original local checks. Maintainer PR #6's first candidate `9ec9b7b` passed both jobs in run `38193149046`, actual tree-equal synthetic checkout `cdc67bb6`. Remote protection was then atomically migrated to `Rust 1.99 MSRV` and `Stable native, samples, and Chrome`, with every other protection unchanged. Later candidate updates still require their own actual CI PASS; this first-head result is not relabeled as their execution.
 
-## Prepared maintenance and qualification scope
+## Historical prepared maintenance and qualification scope
 
 After separate public activation, the latest approved `0.1.x` patch is the maintained experimental line on a best-effort basis; older patches are upgrade targets rather than separate maintenance branches. No production support, security response deadline or SLA is promised. Until publication, reports target private `master` and there is no released supported version.
 
@@ -258,8 +271,8 @@ The [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md) selects the bounded na
 
 ## Compile fixtures
 
-`crates/yetlet-server-axum/tests/public_api_compat.rs` compiles and exercises both the legacy and explicit-metadata server entry points. It is a focused source-compatibility fixture, not an ABI promise or a substitute for a future API-diff tool.
+`crates/yetlet/tests/server_axum_public_api_compat.rs` compiles and exercises both the legacy and explicit-metadata server entry points. It is a focused source-compatibility fixture, not an ABI promise or a substitute for a future API-diff tool.
 
-## Still pending
+## Historical activation blockers
 
 Licensing/security policy (YT-060) and private-state maintainer-only governance (YT-061) are complete and independently reviewed. Release design/preflight (YT-064) is complete at that scope, not signed publication. YT-065 is complete at its bounded automated desktop/native/browser scope; real-device/IME/assistive-technology/WebKit/mobile/zoom evidence remains optional and Not verified. YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability/HA/TLS/recovery remains Not verified. The selected experimental policy is prepared privately, with [remaining activation gates](YT-020-PRIVATE-RELEASE-PREP.md#remaining-yt-020-blockers) for immutable source, registry resolution, release integrity, public reporting/scanner controls and explicit approval. The completed YT-067 scan/fix retains its source boundary; no external certification or post-patch whole-repository scan is claimed. Public release YT-020 remains Blocked.

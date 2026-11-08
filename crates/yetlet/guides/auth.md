@@ -3,12 +3,13 @@
 Install native identity resolution only on selected routes. Authentication
 establishes a verified identity; business authorization remains application-owned.
 
-**Experimental, unpublished.** Use this source checkout and the documented target scope.
+**Experimental SDK module.** Distributed in `yetlet` SDK `0.9.0-alpha.6`;
+use the documented feature/target and source matching the version you consume.
 
 
 ## Prerequisites
 
-Use Rust 1.99+ and this unpublished source checkout. Select `yetlet::auth`
+Use Rust 1.99+ and the selected SDK source. Select `yetlet::auth`
 explicitly in a native Axum application. Supply a resolver, its typed state,
 an anonymous-response closure and resource authorization. The wiring below
 assumes a fallible setup function; it is not a listener or a real login provider.
@@ -138,8 +139,8 @@ bridging, real OIDC, cookie changes, account storage, refresh/revocation service
 and provider-specific operational qualification are outside this crate's
 current scope. [YT-115](../../../docs/YT-113-123-OPT-IN-CAPABILITIES.md#yt-115--optional-session-and-cookie-authentication-bridge)
 was separately selected at the Memory bridge scope. Existing Session APIs and
-no-JS form support are preserved; asynchronous Redis bridging remains unselected. The release candidate's original supported package set is unchanged;
-this crate remains unpublished with publication-prepared metadata and intentionally refuses wasm32 compilation.
+no-JS form support are preserved; asynchronous Redis bridging remains unselected. The `auth` feature exposes this native module in the consolidated SDK;
+native APIs remain absent on wasm32.
 Baseline apps do not depend on it, initialize its state or execute its layer.
 
 ### Optional Memory Session bridge

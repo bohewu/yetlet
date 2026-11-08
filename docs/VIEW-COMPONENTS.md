@@ -109,7 +109,7 @@ walkthrough. A no-JS page needs none of those optional browser capabilities.
 
 ## Optional typed tag builders (unreleased source-only YT-234)
 
-The current repository source, on the YT-234 feature branch, additionally offers
+The current repository source additionally offers
 `yetlet::view::tags` as a lightweight authoring alternative. **This is not part
 of the published SDK 0.9.0-alpha.6** or the registry-first scaffold above;
 that introductory example deliberately continues using the published API.

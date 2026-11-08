@@ -1,14 +1,14 @@
 # yetlet::signing
 
-Experimental, unpublished `0.9.0-alpha.5` release preparation. Requires Rust 1.99+ and
+Experimental module distributed in `yetlet` SDK `0.9.0-alpha.6`. Requires Rust 1.99+ and
 a native OpenSSL development/runtime configuration compatible with the pinned
-Rust bindings. Select this package explicitly; Core/HTML/browser consumers do
+Rust bindings. Select the `signing` feature explicitly; Core/HTML/browser consumers do
 not acquire it automatically. Publication eligibility does not activate release
 signing, certificates, public logs or a registry upload.
 
 ## Prerequisites
 
-Use this checkout until a public release is separately approved. The selected
+Use source/rustdoc matching your selected SDK version. The selected
 reference is GNU/Linux; Windows, macOS and browser Wasm are not qualified by
 this package preparation. YT-093's native evidence uses an isolated static
 OpenSSL 3.5.9 build with `openssl 0.10.81` / `openssl-sys 0.9.117`; that is a

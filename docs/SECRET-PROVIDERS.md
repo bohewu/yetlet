@@ -4,7 +4,10 @@ Inject read-only native secret lookup into application constructors or typed
 state. Lookup is asynchronous; loading settings and rotating credentials remain
 separate, explicitly selected operations.
 
-**Experimental, unpublished.** Use this source checkout and the documented target scope.
+**Experimental SDK integration.** These modules are distributed in SDK
+`0.9.0-alpha.6`; use the documented features/target and source matching the
+version you consume. [Release readiness](RELEASE-READINESS.md) records distribution
+and its qualification limits.
 
 
 ## Prerequisites
@@ -248,7 +251,7 @@ required followups. The separately authorized
 slice; its current results and review are recorded separately. Local commit is
 owner-authorized; publication and production qualification remain separate.
 
-The unpublished, Experimental `yetlet::secrets` nested workspace supplies a
+The Experimental `yetlet::secrets` module supplies a
 small native string-secret contract. Applications explicitly select its path
 dependency and construct a provider. Core, browser, the default configuration loader,
 signing, CLI scaffolds and existing applications do not acquire a dependency

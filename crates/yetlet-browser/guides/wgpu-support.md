@@ -1,7 +1,8 @@
 # Experimental Support Boundary
 
-`yetlet_browser::wgpu` is **Experimental, opt-in and unpublished**, with publication
-metadata prepared under [YT-201](../../../docs/YT-201-PACKAGE-PREPARATION.md).
+`yetlet_browser::wgpu` is **Experimental and opt-in**, distributed as a module
+of `yetlet-browser` SDK `0.9.0-alpha.6`. The earlier separate-package metadata
+preparation is retained in [YT-201](../../../docs/YT-201-PACKAGE-PREPARATION.md).
 There is no performance, speedup, FPS, stable API, production-readiness or broad
 browser guarantee. The measured YT-077 comparison did not demonstrate a useful
 WebGPU speedup; experimental promotion was separately approved for an optional
@@ -27,9 +28,9 @@ bounded explicit retry. Default linking does not create a device or load assets.
 | --- | --- |
 | Selected Firefox 158 X11 + Intel Vulkan + explicit WebGPU preference | Actual extracted Rust/wgpu Wasm drawing, updates, picking, controlled loss/recovery, stale completion and cleanup PASS; YT-079 receipt and independent review |
 | Firefox 158 default WebDriver profile without WebGPU preference override | YT-080 actual observation: secure context but `navigator.gpu` absent, named unavailable state; HTML/counter/keyboard/detail navigation PASS. This is fallback evidence, not GPU support |
-| Native CPU-only default feature set | CPU contract tests, doctest and package verification; no GPU dependencies or initialization |
-| wasm32 CPU-only default feature set | Compile/dependency graph only; no browser GPU runtime claim |
-| wasm32 explicit `browser` feature | Current-source build and actual selected consumer evidence |
+| Native CPU-only `wgpu` selection | CPU contract tests, doctest and package verification; no GPU dependencies or initialization |
+| wasm32 CPU-only `wgpu` selection | Compile/dependency graph only; no browser GPU runtime claim |
+| wasm32 explicit `wgpu-browser` feature | Current-source build and actual selected consumer evidence |
 | Linux Chrome / NVIDIA or Intel, X11 or nested Weston | Earlier application configurations failed; current extracted candidate not qualified on these combinations |
 | Windows Chrome / Edge | Standalone JavaScript shader baseline only; not the current candidate's Wasm/SSR integration |
 | macOS/Safari, Android/iOS, physical mobile, other browsers/GPUs | Not qualified |
@@ -39,12 +40,12 @@ bounded explicit retry. Default linking does not create a device or load assets.
 ## Explicit opt-in
 
 Use a local path dependency, keeping the crate outside default application
-features. The consumer and this crate have isolated nested Cargo workspaces;
-this is not a detached Git worktree and does not replace the root release set.
+features. The browser SDK belongs to the root workspace; the consumer has
+its own workspace/lock. Workspace membership does not enable GPU features.
 
 ```toml
 [dependencies]
-yetlet-browser = { version = "=0.9.0-alpha.5", path = "/absolute/yetlet/crates/yetlet-browser", default-features = false, features = ["wgpu", "wgpu-browser"] }
+yetlet-browser = { version = "=0.9.0-alpha.6", path = "/absolute/yetlet/crates/yetlet-browser", default-features = false, features = ["wgpu", "wgpu-browser"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 
@@ -104,5 +105,5 @@ Consult that source-bound record rather than inferring support from a version
 number or from a different browser configuration.
 
 No release, registry installation, publication, source push, API stability or
-production support is authorized by this document. The original nine release
-candidates and YT-020's blocked release policy are unchanged.
+production support is authorized by this document. Historical release candidates retain their own scope; current
+distribution is recorded in [Release readiness](../../../docs/RELEASE-READINESS.md).

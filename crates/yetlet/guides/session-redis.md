@@ -1,12 +1,12 @@
 # Experimental Valkey / Redis-protocol Session provider — YT-066b2
 
-**Status: focused integration tests and independent implementation review passed at bounded YT-066b2 scope. Do not treat this crate as production-qualified.** See [provider implementation verification](../../../docs/YT-066B2-VERIFICATION.md) and the later [three-application qualification](../../../docs/YT-066B3-VERIFICATION.md). It is unpublished and has its own workspace/lockfile, outside the default framework build and dependency graphs. The existing synchronous Memory provider is unchanged.
+**Status: focused integration tests and independent implementation review passed at bounded YT-066b2 scope. Do not treat this crate as production-qualified.** See [provider implementation verification](../../../docs/YT-066B2-VERIFICATION.md) and the later [three-application qualification](../../../docs/YT-066B3-VERIFICATION.md). It is distributed as the optional `session-redis` module/feature of `yetlet` SDK `0.9.0-alpha.6`, outside default application dependency graphs. The existing synchronous Memory provider is unchanged.
 
 This is a separate, explicitly selected async Session implementation, not an authentication system. It uses the reviewed single-primary Lua semantics and [selected pure-SSR Cookie contract](../../../docs/YT-066B-COOKIE-ORDERING.md). No JavaScript, plugin registry, DI container, implicit Memory fallback or synchronous Redis facade is added.
 
-This package is included in the selected sixteen-package experimental 0.9.0-alpha.5
-candidate. It remains unpublished; candidate selection and publication-prepared
-metadata do not establish registry availability or expand the support scope.
+The earlier separate-package preparation is historical; the
+[two-package migration](../../../docs/YT-211-TWO-PACKAGE-MIGRATION.md) changed
+the carrier without expanding provider qualification.
 
 The later [YT-094 Valkey reference](../../../docs/YT-094-VALKEY-SESSIONS.md) selects
 Valkey 9.1.2 for actual two-app shared-session verification. It reuses this

@@ -1,5 +1,15 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-242 documentation truth audit (2026-11-08): Done at bounded documentation scope.**
+[Audit and corrections](YT-242-DOCUMENTATION-TRUTH.md) separate published SDK/CLI,
+the selected guide edition and later checkout authoring/tools. The 516-file role
+inventory includes bounded semantic inspection of 54 entries, not every document.
+Python suites (14/39/35), release-doc, docs/DAG, samples and whitespace pass.
+Independent corrective Reviewer `wc_job_m2SOL6psGzaIGPjm` PASS closes the original
+one-P2 review; original failures remain retained. Local delivery follows strict
+Guard. YT-243 remains Todo, ordered after the successful YT-242 local commit;
+no release, source freeze or new platform qualification is implied.
+
 **YT-241 Style Showcase (2026-11-08): Done at source and bounded Linux
 sample qualification scope.** The owner-approved four-category
 [standalone gallery](../examples/style-showcase/README.md) shares View and CSS

@@ -1,25 +1,28 @@
 # yetlet-browser::wgpu — Experimental opt-in flat rectangles
 
-First-party Experimental `0.9.0-alpha.5`, unpublished and prepared for packaging. No performance, speedup,
+First-party Experimental module distributed in `yetlet-browser` SDK `0.9.0-alpha.6`. No performance, speedup,
 FPS, stable API, production readiness or publication guarantee. This is the
 bounded flat renderer extracted from the current `webgpu-scene-island` consumer.
 Future 3D is a motivation only; there is no 3D API, scene graph or engine.
 
-Default features are CPU-only and have no dependencies. Linking does not acquire
-a device or initialize anything. Core, HTML, ordinary DOM and default server
-packages have no dependency on this crate. The root workspace already contains
+Selecting only the `wgpu` feature exposes CPU-only contracts without GPU
+dependencies. The browser SDK defaults to DOM, not GPU. Linking does not acquire
+a device or initialize anything; ordinary HTML/DOM/server use does not enable
+`wgpu-browser`. The root workspace already contains
 an older optional native wgpu research example; that is a separate graph.
 
 ## Local quickstart
 
-Use a local path dependency; publication has not been authorized:
+For this repository-local example, use the checkout through a path dependency.
+The published SDK is available separately; this example does not imply that
+later checkout changes are included in its registry archive:
 
 ```toml
 [dependencies]
-yetlet-browser = { path = "../../crates/yetlet-browser", version = "0.9.0-alpha.5", default-features = false, features = ["wgpu"] }
+yetlet-browser = { path = "../../crates/yetlet-browser", version = "=0.9.0-alpha.6", default-features = false, features = ["wgpu"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-yetlet-browser = { path = "../../crates/yetlet-browser", version = "0.9.0-alpha.5", default-features = false, features = ["wgpu-browser"] }
+yetlet-browser = { path = "../../crates/yetlet-browser", version = "=0.9.0-alpha.6", default-features = false, features = ["wgpu-browser"] }
 ```
 
 The crate-level rustdoc example is compile-checked by `cargo test --doc`:
@@ -101,8 +104,8 @@ Windows JS baseline and failed Chrome configurations are not candidate PASS.
 No broad browser, physical mobile, native backend, stable API, production or 3D
 support is claimed. See [YT-079 verification](../../../docs/YT-079-VERIFICATION.md).
 
-The crate has its own nested workspace and lockfile, as does the consumer. This
-preserves the root lock and unrelated bundles. Use explicit manifest commands:
+The renderer is now a module of the browser SDK in the root workspace; the
+consumer retains its separate workspace/lock. Use the explicit commands:
 
 ```sh
 cargo test --offline --locked -p yetlet-browser --features wgpu

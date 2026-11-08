@@ -692,6 +692,10 @@ historical YT-104 qualification describes the earlier static starter scope.
 
 ## Optional application-owned Rust CSS (YT-239 working tree)
 
+This section describes source-only checkout additions, absent from published
+CLI `0.2.0`. See [the source-only map](../../docs/API-REFERENCE.md#source-only-checkout-additions)
+and [Style Showcase](../../examples/style-showcase/README.md).
+
 `new --template native-style` and `new --template browser-style` opt into a private
 std-only Cargo generator with a complete lock, useful layout/dialog composition,
 shared View class names and stylesheet connection. Ordinary templates keep ordinary

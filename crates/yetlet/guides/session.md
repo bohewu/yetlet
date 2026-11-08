@@ -3,7 +3,8 @@
 Add bounded, process-local Memory Session state, cookie lifecycle and explicit
 CSRF checks to a native application. Session can be anonymous and is not authentication.
 
-**Experimental, unpublished.** Use this source checkout and the documented target scope.
+**Experimental SDK module.** Distributed in `yetlet` SDK `0.9.0-alpha.6`;
+use the documented feature/target and source matching the version you consume.
 
 
 ## Prerequisites
@@ -47,8 +48,7 @@ Invalid configuration returns `SessionConfigError`; TTL is 1 second–30 days an
 Session is not authentication or durable storage. Restart loses Memory state; multiple independent processes do not share it. Logout/cookie response reordering requires application-aware handling, and CSRF tokens must be checked on unsafe actions. Avoid serializing identities, tokens or server capabilities into browser state.
 
 The [separate experimental Redis-protocol provider](session-redis.md)
-has publication-prepared metadata and is included in the selected sixteen-package
-candidate, but remains unpublished. Its async, single-primary semantics and
+is distributed as the optional `session-redis` feature/module of `yetlet`. Its async, single-primary semantics and
 separately recorded Valkey evidence do not broaden Memory guarantees or imply
 generic HA/failover/restore support. See [provider operations](../../../docs/PROVIDER-OPERATIONS.md)
 and the provider guide for its current limits; [M8c evidence](../../../docs/M8C-VERIFICATION.md)
@@ -61,7 +61,7 @@ the [current API reference](../../../docs/API-REFERENCE.md).
 
 ### License and compatibility
 
-Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE). The privately prepared `0.1.x` policy preserves documented behavior and Rust 1.99 in patches; public activation remains blocked. See [compatibility](../../../docs/COMPATIBILITY.md), [API classifications](../../../docs/API-CONTRACTS.md) and [developer guides](../../../docs/README.md). Links to companion packages and records assume this checkout; they do not imply public hosting or distribution.
+Dual-licensed under [MIT](../../../LICENSE-MIT) or [Apache-2.0](../../../LICENSE-APACHE). APIs remain Experimental; publication does not establish production qualification or API stability. See [compatibility](../../../docs/COMPATIBILITY.md), [API classifications](../../../docs/API-CONTRACTS.md) and [developer guides](../../../docs/README.md). Links to companion packages and records assume this checkout; they do not imply public hosting or distribution.
 
 <details>
 <summary>Historical delivery context and evidence</summary>

@@ -1,5 +1,17 @@
 # Yetlet Backlog
 
+## YT-237–YT-243 — Style delivery, documentation truth and ordered follow-up
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-237 | P2 | M | M10 | Style registration contract | — | [Registration contract](YT-237-STYLE-REGISTRATION-CONTRACT.md); independent design PASS at contract-research scope, as recorded below | Done |
+| YT-238 | P2 | M | M10 | Finite app-owned CSS builder proof | YT-237 | [Prototype evidence](YT-238-STYLE-BUILDER-PROOF.md); independent implementation PASS and SIMPLIFY decision, not a public style crate | Done |
+| YT-239 | P2 | M | M10 | Optional Style CLI and asset integration | YT-238 | [Integration record](YT-239-STYLE-INTEGRATION.md); independent implementation PASS at source/bounded Linux scope | Done |
+| YT-240 | P2 | M | M10 | Todo shared Style qualification | YT-239 | [Todo qualification](YT-240-TODO-STYLE-QUALIFICATION.md); independent PASS at bounded Linux/browser sample scope | Done |
+| YT-241 | P2 | M | M10 | Native-first Style Showcase | YT-240 | [Sample and limits](../examples/style-showcase/README.md); independently accepted source, bounded Linux/browser proof and thirteenth catalog entry, as recorded below | Done |
+| YT-242 | P2 | M | M10 | Documentation truth audit and bounded corrections | YT-241 | [Audit report](YT-242-DOCUMENTATION-TRUTH.md): 516-file role inventory and bounded 54-entry semantic audit; current/published/guide identity corrections and existing gate regressions. Python 14/39/35, docs/DAG, samples and whitespace PASS. Independent review finding closed by Reviewer `wc_job_m2SOL6psGzaIGPjm` PASS, no issues/followups; local delivery follows strict Guard, no release qualification | Done |
+| YT-243 | P2 | M | M10 | Ordered follow-up after YT-242 | YT-242 | Pending the parent's concrete follow-up scope, YT-242 independent PASS and local strict commit attempt; not started by this executor | Todo |
+
 ## YT-241 — Owner-approved Style Showcase
 
 - Priority: P2; size: M; scope: one bounded application slice.

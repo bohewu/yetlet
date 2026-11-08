@@ -14,6 +14,11 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Reader entry points
 
+- [Source-only checkout additions](API-REFERENCE.md#source-only-checkout-additions):
+  typed tags, optional private app Style generation and
+  [Style Showcase](../examples/style-showcase/README.md); external build-time CSS,
+  absent from the published SDK/CLI. The first-app examples keep the published API.
+
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
 - [Build your first Yetlet app](FIRST-APP.md): CLI0.2.0 → protected standalone project → SDK0.9.0-alpha.6 → app lock/cache → first build/run, then an optional [static-export path](FIRST-APP.md#next-export-a-static-site).
 - [Build a browser-only Yetlet app](BROWSER-APP.md): published CLI/SDK → explicit tool and lock preparation → local state/events → build/preview/watch → static ship directory.
@@ -42,6 +47,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   doc-comment gaps and deferred Wiki.
 
 ## Maintainer entry points
+
+- [YT-242 documentation truth audit](YT-242-DOCUMENTATION-TRUTH.md): bounded
+  current-entry audit, inventory classification, corrections and remaining coverage;
+  independent acceptance pending. YT-243 remains ordered and unstarted.
 
 - [Browser application DX research](BROWSER-DX-RESEARCH.md): selected
   documentation gaps, reuse of the browser starter and event ownership, and
@@ -492,25 +501,28 @@ implements one separately selected improvement with targeted process/CLI tests
 and bounded warm-build/PTY observations. Independent implementation Reviewer
 PASS has zero issues or required followups.
 
-These nine unpublished candidate pages describe the implemented APIs and their practical limits. Use the checkout's Rust 1.99 toolchain; native SSR needs no browser build.
+These module guides describe the consolidated SDK and its practical limits.
+Use source/rustdoc matching the version you consume and Rust 1.99 or newer;
+native SSR needs no browser build. The [API reference](API-REFERENCE.md) covers
+additional modules and explicitly labels later source-only additions.
 
 | Area | Package guide |
 |---|---|
-| Shared View and binding vocabulary | [yetlet-core](../crates/yetlet/guides/core.md) |
-| Native escaped HTML | [yetlet-html](../crates/yetlet/guides/html.md) |
-| Browser subtree mount | [yetlet-dom](../crates/yetlet-browser/guides/dom.md) |
-| Optional keyed children/listeners | [yetlet-dom-keyed](../crates/yetlet-browser/guides/dom-keyed.md) |
-| Optional owned local update graph | [yetlet-reactive](../crates/yetlet/guides/reactive.md) |
-| Explicit typed actions | [yetlet-actions](../crates/yetlet/guides/actions.md) |
-| Native handlers, routing and Page responses | [yetlet-server-axum](../crates/yetlet/guides/server-axum.md) |
-| Optional request correlation | [yetlet-request-id](../crates/yetlet/guides/request-id.md) |
-| Optional Memory Session | [yetlet-session](../crates/yetlet/guides/session.md) |
+| Shared View and binding vocabulary | [yetlet::view](../crates/yetlet/guides/core.md) |
+| Native escaped HTML | [yetlet::html](../crates/yetlet/guides/html.md) |
+| Browser subtree mount | [yetlet_browser::dom](../crates/yetlet-browser/guides/dom.md) |
+| Optional keyed children/listeners | [yetlet_browser::dom_keyed](../crates/yetlet-browser/guides/dom-keyed.md) |
+| Optional owned local update graph | [yetlet::reactive](../crates/yetlet/guides/reactive.md) |
+| Explicit typed actions | [yetlet::actions](../crates/yetlet/guides/actions.md) |
+| Native handlers, routing and Page responses | [yetlet::server_axum](../crates/yetlet/guides/server-axum.md) |
+| Optional request correlation | [yetlet::request_id](../crates/yetlet/guides/request-id.md) |
+| Optional Memory Session | [yetlet::session](../crates/yetlet/guides/session.md) |
 
-The isolated [Redis provider](../crates/yetlet/guides/session-redis.md) is outside the nine candidates and remains nonpublishable. Its bounded qualification does not confer durable or production Session guarantees.
+The optional [Redis provider module](../crates/yetlet/guides/session-redis.md) is distributed in the consolidated SDK. Its bounded qualification does not confer durable or production Session guarantees.
 
 ## Completed research prototypes
 
-All five authorized studies are Done at their recorded bounded scopes. Their fixtures are outside the twelve-application catalog and do not establish supported core APIs, public release qualification or a benchmark winner. The linked records retain actual commands, raw observations, source identities and unverified environment coverage.
+All five authorized studies are Done at their recorded bounded scopes. Their fixtures are outside the thirteen-application catalog and do not establish supported core APIs, public release qualification or a benchmark winner. The linked records retain actual commands, raw observations, source identities and unverified environment coverage.
 
 | Study | Record and bounded decision | Existing fixture |
 |---|---|---|
@@ -522,13 +534,13 @@ All five authorized studies are Done at their recorded bounded scopes. Their fix
 
 Generic hydration/resumability, a template macro, dependency-tracked signals/forms and a stable general-purpose GPU renderer remain unselected. The separately approved Experimental opt-in candidate is documented above and does not change those stable/core boundaries. Default SSR, local browser events, typed remote boundaries and the existing ADR decisions remain intact.
 
-## Qualification and Private preparation
+## Historical qualification and Private preparation
 
 [Qualification matrix](QUALIFICATION-MATRIX.md), [provider operations](PROVIDER-OPERATIONS.md) and [threat model](THREAT-MODEL.md) distinguish implemented behavior, retained evidence and unverified coverage. YT-030, YT-065, YT-066 and YT-067 retain their established bounded Done status; YT-020 remains Blocked.
 
 The [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [integrity preparation](YT-020-INTEGRITY-PREPARATION.md), [hosted rebuilding](YT-020-HOSTED-REBUILD.md), [trust policy](YT-020-PRIVATE-TRUST-POLICY.md), [signing verification](YT-020-PRIVATE-SIGNING-VERIFICATION.md) and [supply-chain design](RELEASE-SUPPLY-CHAIN.md) preserve their exact evidence identities. Signed source `8e557e760407a3d4b3f5a8b8f833748946be1387` differs from policy HEAD `abb2cce1253afe1d87a97e0a50f3f47efffe7280` and subsequent changes; historical signatures do not attest changed package contents. Formal release activation remains open.
 
-## Documentation delivery status — YT-068
+## Historical documentation delivery status — YT-068
 
 The entry refresh, nine package guides and current/history navigation are reconciled after the five completed research studies. T08 has reconciled the [final Private source/package boundary](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12). YT-068 is **Done** at documentation scope; the independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate. YT-020 remains **Blocked**. At that pre-M11 checkpoint, all 68 backlog items were accounted for: 67 Done, one Blocked and zero In progress or Deferred, each at its stated scope. M11 adds separately filed planning/implementation proposals above; consult Backlog/Kanban for current counts. Established YT-030/YT-065/YT-066/YT-067 completion limits and optional unverified IME, speech, WebKit/mobile and zoom coverage remain unchanged.
 

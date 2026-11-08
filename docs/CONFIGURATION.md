@@ -3,7 +3,10 @@
 Load application-owned typed settings explicitly at native startup. The optional
 loader preserves finite source precedence and keeps secrets out of browser state.
 
-**Experimental, unpublished.** Use this source checkout and the documented target scope.
+**Experimental SDK integration.** These modules are distributed in SDK
+`0.9.0-alpha.6`; use the documented features/target and source matching the
+version you consume. [Release readiness](RELEASE-READINESS.md) records distribution
+and its qualification limits.
 
 For the complete startup flow, see
 [Settings, typed options and application logging](SETTINGS-OPTIONS-LOGGING.md):

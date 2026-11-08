@@ -1,7 +1,7 @@
 # Current API reference
 
-Updated: 2026-11-02. This map describes the published Experimental two-package SDK
-(`0.9.0-alpha.6`) in this checkout. `yetlet` contains the shared View and opt-in
+Updated: 2026-11-08. This map distinguishes the published Experimental two-package
+SDK (`0.9.0-alpha.6`) from later checkout additions. `yetlet` contains the shared View and opt-in
 native capabilities; `yetlet-browser` contains browser integrations and depends
 one-way on the same View. Both packages are available from crates.io at this version.
 Earlier release tags retain their original layouts and evidence.
@@ -26,6 +26,18 @@ API-carrier map, with full contracts in their linked guides.
 
 For source loading, startup validation, typed options and application-owned
 diagnostics together, follow [Settings, options and logging](SETTINGS-OPTIONS-LOGGING.md).
+
+## Source-only checkout additions
+
+These additions are implemented in this checkout, beyond the distributed
+SDKalpha.6/CLI0.2.0 artifacts. Development manifests retaining those version
+numbers do not make later source part of an already published archive.
+
+| Source surface | Entry point and contract | Availability and limits |
+|---|---|---|
+| Typed View tags | `yetlet::view::tags`; [View guide](VIEW-COMPONENTS.md#optional-typed-tag-builders-unreleased-source-only-yt-234), [source](../crates/yetlet/src/view/tags.rs), [YT-235](YT-235-TAG-COVERAGE-PLAN.md) | Source-only SDK addition: 101 ordinary tag constructors, scoped setters and the same owned View. Renderer validation still applies; published first-app `Element::new` examples remain valid |
+| Optional Style authoring | [CLI Style integration](../tools/yetlet-cli/README.md#optional-application-owned-rust-css-yt-239-working-tree), [contract](YT-237-STYLE-REGISTRATION-CONTRACT.md), [implementation](YT-239-STYLE-INTEGRATION.md) | Source-only CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
+| Style Showcase | [Native-first gallery](../examples/style-showcase/README.md) | Checkout sample with actual View/Style/CSS disclosures and optional local WASM class switching; bounded Linux evidence, no new published package or platform qualification |
 
 ## HTML, HTTP and browser modules
 

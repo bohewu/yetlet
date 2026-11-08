@@ -1,10 +1,15 @@
 # Yetlet Architecture
 
-**Status:** Experimental, unpublished `0.1.0`: M0–M9 implementation and selected M10 qualification are complete at their recorded scopes. Five application-owned research prototypes are complete; none promotes a supported core streaming, resumability, transport-framework or GPU API. YT-020 remains Blocked.
+**Status:** Experimental. **Published SDK:** `0.9.0-alpha.6` (`yetlet` / `yetlet-browser`).
+**Published CLI:** `0.2.0` (`yetlet-cli`).
+[Release readiness](RELEASE-READINESS.md) links the accepted publication records.
+M0–M9 implementation, selected M10 qualification and five application-owned
+research prototypes retain their recorded scopes. Later source-only authoring
+changes do not renew release or production qualification.
 **Scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
 **Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md).
 
-Current usage is documented in the [nine library guides](README.md#library-guides), [HTTP pipeline](HTTP-PIPELINE.md) and [sample guide](SAMPLES.md). Shared owned Views feed escaped native HTML or explicitly built browser DOM/WASM. App/Page preserve native Axum/Tower handlers; local graph, keyed children, request correlation and Memory Session are explicit opt-ins. SQL/storage stay application-owned. No Controller, DI, plugin registry or ORM is required.
+Current usage is documented in the [current module guides](API-REFERENCE.md), [HTTP pipeline](HTTP-PIPELINE.md) and [sample guide](SAMPLES.md). Shared owned Views feed escaped native HTML or explicitly built browser DOM/WASM. App/Page preserve native Axum/Tower handlers; local graph, keyed children, request correlation and Memory Session are explicit opt-ins. SQL/storage stay application-owned. No Controller, DI, plugin registry or ORM is required.
 
 The design rationale and dated evidence below retain the original proposal and M7 decision history. Diagram references to compiler/macros and candidate IR are exploratory, not implemented authoring APIs. Current research decisions are in the [completed studies index](README.md#completed-research-prototypes); historical execution is not transferred to today's dirty source.
 
