@@ -54,6 +54,94 @@ jobs:
           cargo +stable check --locked --all-targets "${packages[@]}" "${features[@]}" 2>&1 | tee target/qualification/native-check.log
           cargo +stable test --locked --all-targets "${packages[@]}" "${features[@]}" 2>&1 | tee target/qualification/native-test.log
           cargo +stable test --locked --doc "${packages[@]}" "${features[@]}" 2>&1 | tee target/qualification/native-doc.log
+      - name: Style Showcase native tests
+        run: |
+          set -euo pipefail
+          cargo +stable test --locked -p yetlet-style-showcase --all-targets 2>&1 | tee target/qualification/native-showcase.log
+      - name: Select image OpenSSL for Windows CLI tests
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $ErrorActionPreference = 'Stop'
+          & {
+            $triple = 'x86_64-pc-windows-msvc'
+            $rust = & rustc +stable -vV
+            if ($LASTEXITCODE -ne 0 -or $rust -notcontains "host: $triple") {
+              throw 'Windows CLI qualification requires the x64 MSVC Rust host'
+            }
+            # Hosted default uses the image's dynamic MSVC installation. An explicit
+            # prepared static prefix lets local qualification reuse installed tools.
+            $openssl = if ($env:YETLET_QUALIFICATION_OPENSSL_ROOT) { $env:YETLET_QUALIFICATION_OPENSSL_ROOT } else { Join-Path $env:ProgramFiles 'OpenSSL' }
+            $static = if ($env:YETLET_QUALIFICATION_OPENSSL_STATIC) { $env:YETLET_QUALIFICATION_OPENSSL_STATIC } else { '0' }
+            if ($static -notin @('0', '1') -or ![IO.Path]::IsPathFullyQualified($openssl)) { throw 'Invalid explicit OpenSSL selection' }
+            $include = Join-Path $openssl 'include'
+            $lib = Join-Path $openssl $(if ($static -eq '1') { 'lib' } else { 'lib\VC\x64\MD' })
+            foreach ($header in @('ssl.h', 'crypto.h', 'opensslv.h', 'configuration.h')) {
+              if (!(Test-Path -LiteralPath (Join-Path $include "openssl\$header") -PathType Leaf)) {
+                throw "Missing image OpenSSL header: $header"
+              }
+            }
+            if ((Get-Content -LiteralPath (Join-Path $include 'openssl\opensslv.h') -Raw) -notmatch '(?m)^\s*#\s*define\s+OPENSSL_VERSION_MAJOR\s+3\b') {
+              throw 'Expected the image OpenSSL 3 headers'
+            }
+            $vswhere = Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio\Installer\vswhere.exe'
+            $vs = @(& $vswhere -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath)
+            if ($LASTEXITCODE -ne 0 -or $vs.Count -ne 1) { throw 'Cannot select the image MSVC installation' }
+            $vcVersion = (Get-Content -LiteralPath (Join-Path $vs[0] 'VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt') -Raw).Trim()
+            $dumpbin = Join-Path $vs[0] "VC\Tools\MSVC\$vcVersion\bin\Hostx64\x64\dumpbin.exe"
+            if (!(Test-Path -LiteralPath $dumpbin -PathType Leaf)) { throw 'Missing image MSVC dumpbin' }
+            $target = Join-Path $env:RUNNER_TEMP 'yetlet-qualification-cli'
+            $destinations = @("$target\$triple\debug", "$target\$triple\debug\deps")
+            foreach ($destination in $destinations) { New-Item -ItemType Directory -Force -Path $destination | Out-Null }
+            foreach ($name in @('libcrypto', 'libssl')) {
+              $archive = Join-Path $lib "$name.lib"
+              $dllName = "$name-3-x64.dll"
+              $dll = Join-Path $openssl "bin\$dllName"
+              $files = if ($static -eq '1') { @($archive) } else { @($archive, $dll) }
+              foreach ($file in $files) {
+                if (!(Test-Path -LiteralPath $file -PathType Leaf)) { throw "Missing image OpenSSL file: $file" }
+                $headers = (& $dumpbin /nologo /headers $file) -join "`n"
+                if ($LASTEXITCODE -ne 0) { throw "Cannot inspect image OpenSSL file: $file" }
+                $machines = @([regex]::Matches($headers, '(?im)^\s*(?:Machine\s*:\s*([0-9a-f]+)\b|([0-9a-f]+)\s+machine\b)') | ForEach-Object {
+                  ($_.Groups[1].Value + $_.Groups[2].Value).ToUpperInvariant()
+                } | Sort-Object -Unique)
+                if ($machines.Count -ne 1 -or $machines[0] -ne '8664') { throw "Not an x64 MSVC library/image: $file" }
+                if ($file -eq $archive) {
+                  $imports = @([regex]::Matches($headers, '(?im)^\s*DLL name\s*:\s*(\S+)\s*$') | ForEach-Object { $_.Groups[1].Value } | Sort-Object -Unique)
+                  if ($static -eq '1') {
+                    if ($imports.Count -ne 0) { throw "Static selection cannot use an import library: $file" }
+                  } elseif ($imports.Count -ne 1 -or $imports[0] -ne $dllName) { throw "Not the expected OpenSSL import library: $file" }
+                }
+                Get-FileHash -Algorithm SHA256 -LiteralPath $file | Format-List
+              }
+              # selected_scaffold replaces PATH: the executable directory remains a DLL search location.
+              if ($static -eq '0') {
+                foreach ($destination in $destinations) { Copy-Item -LiteralPath $dll -Destination $destination -Force }
+              }
+            }
+            $settings = [ordered]@{
+              OPENSSL_DIR = $openssl
+              OPENSSL_INCLUDE_DIR = $include
+              OPENSSL_LIB_DIR = $lib
+              OPENSSL_LIBS = 'libssl:libcrypto'
+              OPENSSL_STATIC = $static
+              CARGO_BUILD_TARGET = $triple
+              CARGO_TARGET_DIR = $target
+            }
+            foreach ($setting in $settings.GetEnumerator()) {
+              "$($setting.Key)=$($setting.Value)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+              if ($setting.Key.StartsWith('OPENSSL_')) {
+                "X86_64_PC_WINDOWS_MSVC_$($setting.Key)=$($setting.Value)" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+              }
+              Write-Output "$($setting.Key)=$($setting.Value)"
+            }
+          } *>&1 | Tee-Object -FilePath target/qualification/native-windows-openssl.log
+      - name: Independent CLI Style units on supported creator platforms
+        if: runner.os != 'macOS'
+        run: |
+          set -euo pipefail
+          cargo +stable test --locked --manifest-path tools/yetlet-cli/Cargo.toml --lib styles::tests 2>&1 | tee target/qualification/native-cli-style.log
+          cargo +stable test --locked --manifest-path tools/yetlet-cli/Cargo.toml --test selected_scaffold style 2>&1 | tee target/qualification/native-cli-style-scaffold.log
       - name: Retain native qualification logs
         if: always()
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
@@ -100,14 +188,15 @@ jobs:
             cargo install wasm-bindgen-cli --version 0.2.129 --locked
             wasm-bindgen --version
           } 2>&1 | tee target/qualification/firefox-toolchain.log
-      - name: Build three release asset sets and native sample binaries
+      - name: Build four release asset sets and native sample binaries
         run: |
           set -euo pipefail
           {
             cargo xtask build browser --release
             cargo xtask build keyed-bindings --release
             cargo xtask build multi-island-dashboard --release
-            cargo build --release --locked -p yetlet-todo-server -p yetlet-multi-island-dashboard -p yetlet-forms-validation
+            cargo xtask build showcase-browser --release
+            cargo build --release --locked -p yetlet-todo-server -p yetlet-multi-island-dashboard -p yetlet-forms-validation -p yetlet-style-showcase
           } 2>&1 | tee target/qualification/firefox-build.log
       - name: Todo and Search Firefox release suite
         run: |
@@ -121,6 +210,10 @@ jobs:
         run: |
           set -euo pipefail
           cargo xtask smoke multi-island-dashboard-firefox --profile release 2>&1 | tee target/qualification/firefox-dashboard.log
+      - name: Style Showcase Firefox release suite
+        run: |
+          set -euo pipefail
+          cargo xtask smoke style-showcase-firefox --profile release 2>&1 | tee target/qualification/firefox-showcase.log
       - name: Forms keyboard and semantic accessibility checks
         run: |
           set -euo pipefail
@@ -133,5 +226,6 @@ jobs:
           path: |
             target/qualification/firefox-*.log
             target/m12/yt085/forms-accessibility-firefox-*/forms-accessibility-firefox.json
+            artifacts/verification/style-showcase-firefox-*/
           if-no-files-found: warn
           retention-days: 7

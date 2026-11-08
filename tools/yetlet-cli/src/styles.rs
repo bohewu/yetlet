@@ -439,7 +439,7 @@ pub(crate) fn scaffold(
     entries.extend([
         (
             "stylegen/Cargo.toml",
-            include_str!("../templates/styles/Cargo.toml").into(),
+            include_str!("../templates/styles/manifest.toml").into(),
         ),
         (
             "stylegen/Cargo.lock",

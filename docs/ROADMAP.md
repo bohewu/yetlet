@@ -7,8 +7,16 @@ inventory includes bounded semantic inspection of 54 entries, not every document
 Python suites (14/39/35), release-doc, docs/DAG, samples and whitespace pass.
 Independent corrective Reviewer `wc_job_m2SOL6psGzaIGPjm` PASS closes the original
 one-P2 review; original failures remain retained. Local delivery follows strict
-Guard. YT-243 remains Todo, ordered after the successful YT-242 local commit;
-no release, source freeze or new platform qualification is implied.
+Guard. [YT-243 source qualification and existing CI coverage](YT-243-RELEASE-QUALIFICATION.md)
+is Done at source/Linux/local Windows MSVC scope after the YT-242 local commit.
+Final independent Reviewer `wc_job_ukE1zeoMQlt3wLvu` PASS, zero issues/followups.
+Local Linux release
+Chrome/Firefox, affected CLI and exact local-package consumers pass. Windows
+MSVC/wasm32, exact packages, generated native Style HTTP/CSS and the corrected
+CI setup with seven Style tests also pass at their recorded local scopes.
+The first independent review's Windows OpenSSL prerequisite finding is closed;
+parent acceptance preserves every recorded limit. Hosted image/CI execution and
+unverified platforms remain separate. No release or source freeze is implied.
 
 **YT-241 Style Showcase (2026-11-08): Done at source and bounded Linux
 sample qualification scope.** The owner-approved four-category

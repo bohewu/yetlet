@@ -72,7 +72,7 @@ pub fn profile(args: &[std::ffi::OsString], default: &str) -> Result<String> {
 /// Fresh evidence directory per invocation; never writes historical M11 paths.
 pub fn evidence(root: &Path, suite: &str) -> Result<PathBuf> {
     let base = if suite.starts_with("style-showcase-") {
-        root.join("artifacts/verification/yt241-style-showcase-20261108")
+        root.join("artifacts/verification")
     } else {
         root.join("target/m12/yt085")
     };

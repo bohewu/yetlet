@@ -1,7 +1,7 @@
 //! Direct YT-241 checks, reusing the existing HTTP/browser/process transports.
 use super::{
     Server,
-    browser::{Browser, Client},
+    browser::{Bidi, Browser, Client, Launch},
     http, require,
 };
 use crate::tooling::{self, Result};
@@ -64,7 +64,7 @@ fn keyboard(c: &mut Client, key: &str) -> Result<()> {
 }
 
 pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> {
-    let mut report = json!({"task_id":"YT-241","status":"fail","viewports":[],"cleanup":"pending"});
+    let mut report = json!({"suite":"style-showcase","profile":profile,"status":"fail","viewports":[],"cleanup":"pending"});
     // First prove no-browser-output HTTP behavior with the actual executable.
     let missing = out.join("absent-browser-output");
     let mut native = Server::start(
@@ -111,7 +111,15 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
     )?;
     report["server"] = json!({"pid":server.process.id(),"port":server.port});
     let result = (|| {
-        let mut browser = Browser::start(root, out, firefox)?;
+        let mut browser = Browser::start_config(
+            root,
+            out,
+            firefox,
+            Launch {
+                bidi: firefox,
+                ..Launch::default()
+            },
+        )?;
         report["browser"] =
             json!({"version":browser.version,"pid":browser.pid(),"port":browser.port()});
         let checks = (|| {
@@ -262,17 +270,39 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
                     d.call("Runtime.evaluate", json!({"expression":format!("import({}).then(m=>m.dispose())", module),"awaitPromise":true}))?;
                 }
                 Client::Firefox(f) => {
-                    report["optional_firefox_disposal_probe"] = f.async_script(&format!("const done=arguments[arguments.length-1];import({}).then(m=>{{m.dispose();done(true)}}).catch(e=>done(String(e)))", module))?;
+                    // Classic WebDriver imports into a sandbox with a separate,
+                    // uninitialized module. Use the existing BiDi page realm so
+                    // dispose addresses the instance initialized by loader.js.
+                    let mut bidi = Bidi::connect(
+                        f.capabilities["webSocketUrl"]
+                            .as_str()
+                            .ok_or_else(|| tooling::fail("Showcase BiDi URL"))?,
+                    )?;
+                    let tree = bidi.call("browsingContext.getTree", json!({"maxDepth":0}))?;
+                    let url = f.evaluate("location.href")?;
+                    let contexts = tree["contexts"]
+                        .as_array()
+                        .ok_or_else(|| tooling::fail("Showcase BiDi contexts"))?;
+                    let matches: Vec<_> = contexts.iter().filter(|v| v["url"] == url).collect();
+                    require(matches.len() == 1, "one owned Showcase BiDi page")?;
+                    let result = bidi.call("script.evaluate", json!({
+                        "expression":format!("import({}).then(m=>{{m.dispose();return true}})", module),
+                        "target":{"context":matches[0]["context"]}, "awaitPromise":true
+                    }))?;
+                    require(
+                        result["type"] == "success" && result["result"]["value"] == true,
+                        "Firefox page-realm disposal",
+                    )?;
+                    report["firefox_disposal_probe"] = result;
                 }
             }
-            if !firefox {
-                c.check("!document.getElementById('showcase').hasAttribute('data-enhanced')")?;
-                report["listener_disposal"] = json!("Chrome explicit disposal verified");
-            } else {
-                report["listener_disposal"] = json!(
-                    "Firefox explicit disposal unverified: WebDriver module-import probe is outside required page smoke; owned browser teardown is verified separately"
-                );
-            }
+            c.check("!document.getElementById('showcase').hasAttribute('data-enhanced')")?;
+            // Dispatch without navigation: a disposed listener must no longer
+            // prevent the native link's default action or mutate selection.
+            c.check("(()=>{const root=document.getElementById('showcase');const before=root.className;const event=new MouseEvent('click',{bubbles:true,cancelable:true,ctrlKey:false});const link=document.querySelector('[data-choice=theme][data-value=dark]');let prevented;link.addEventListener('click',e=>{prevented=e.defaultPrevented;e.preventDefault()},{once:true});link.dispatchEvent(event);return prevented===false && root.className===before})()")?;
+            report["listener_disposal"] = json!(
+                "explicit disposal removes enhancement and leaves native link default unclaimed; selection unchanged"
+            );
             if let Client::Chrome(d) = c {
                 require(
                     d.exceptions.is_empty()
