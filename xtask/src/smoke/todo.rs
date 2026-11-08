@@ -5,6 +5,7 @@ use super::{
     http, require,
 };
 use crate::tooling::{Result, fail};
+use base64::{Engine, engine::general_purpose::STANDARD};
 use serde_json::{Value, json};
 use std::{path::Path, time::Duration};
 fn pause(ms: u64) -> Result<()> {
@@ -97,6 +98,78 @@ fn snapshot(base: &str, revision: u64, title: Option<&str>) -> Result<()> {
     }
     Ok(())
 }
+// Focused YT-240 assertions in the existing Todo journey, with native JS
+// disabled in Chrome and the same computed CSS checks on both browser engines.
+fn style_layout(c: &mut Client, out: &Path, native: bool) -> Result<()> {
+    c.until(
+        "document.readyState==='complete' && document.styleSheets.length===1",
+        "Todo stylesheet",
+    )?;
+    c.equal(
+        "document.querySelectorAll('link[rel=stylesheet]').length",
+        json!(1),
+    )?;
+    c.equal("performance.getEntriesByType('resource').filter(e=>new URL(e.name).pathname.endsWith('/styles.css')).length", json!(1))?;
+    c.check("!document.querySelector('[style],style')")?;
+    c.equal(
+        "getComputedStyle(document.querySelector('.todo-toolbar')).display",
+        json!("flex"),
+    )?;
+    c.equal("document.querySelectorAll('.is-complete').length", json!(0))?;
+    let mut observations = vec![];
+    for width in [390, 1280] {
+        match c {
+            Client::Chrome(d) => {
+                d.call(
+                    "Emulation.setDeviceMetricsOverride",
+                    json!({"width":width,"height":900,"deviceScaleFactor":1,"mobile":false}),
+                )?;
+            }
+            Client::Firefox(f) => {
+                f.command(
+                    "/window/rect",
+                    "POST",
+                    Some(&json!({"width":width,"height":1000})),
+                )?;
+            }
+        }
+        let actual_width = c.evaluate("innerWidth")?;
+        if matches!(c, Client::Firefox(_)) && actual_width != json!(width) {
+            observations.push(json!({"requested_width":width,"actual_width":actual_width,"status":"unsupported-window-width"}));
+            continue;
+        }
+        c.equal("innerWidth", json!(width))?;
+        let columns = if width < 768 { 1 } else { 2 };
+        c.equal("getComputedStyle(document.querySelector('.todo-content')).gridTemplateColumns.split(' ').length", json!(columns))?;
+        c.check("document.documentElement.scrollWidth <= innerWidth")?;
+        let computed = c.evaluate("(()=>{const grid=getComputedStyle(document.querySelector('.todo-content'));return {width:innerWidth,columns:grid.gridTemplateColumns,gap:grid.gap,ink:grid.color};})()")?;
+        observations.push(computed);
+        let png = match c {
+            Client::Chrome(d) => d.call("Page.captureScreenshot", json!({}))?,
+            Client::Firefox(f) => json!({"data": f.command("/screenshot", "GET", None)?}),
+        };
+        let data = STANDARD
+            .decode(png["data"].as_str().unwrap_or(""))
+            .map_err(|_| fail("Todo screenshot base64"))?;
+        std::fs::write(
+            out.join(format!(
+                "todo-{}-{width}.png",
+                if native { "native" } else { "browser" }
+            )),
+            data,
+        )?;
+    }
+    std::fs::write(
+        out.join(if native {
+            "native-layout.json"
+        } else {
+            "browser-layout.json"
+        }),
+        crate::tooling::json_bytes(&json!(observations)),
+    )?;
+    Ok(())
+}
+
 pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> {
     let mut server = Server::start(
         root,
@@ -120,6 +193,45 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
             "native no-JS SSR/CSP",
         )?;
         let ssr = list(html)?;
+        let record: Value =
+            serde_json::from_slice(&std::fs::read(root.join("dist/todo-css.json"))?)
+                .map_err(|_| fail("Todo CSS record"))?;
+        let css_url = record["stylesheet"]
+            .as_str()
+            .ok_or_else(|| fail("Todo CSS URL"))?;
+        require(
+            html.matches("rel=\"stylesheet\"").count() == 1 && html.contains(css_url),
+            "one native stylesheet",
+        )?;
+        let css = http::get(&server.base, css_url)?;
+        require(
+            css.status == 200
+                && css.header("content-type")?.starts_with("text/css")
+                && css.header("x-content-type-options")? == "nosniff"
+                && css.header("cache-control")? == "no-store"
+                && css.header("content-security-policy")? == r.header("content-security-policy")?
+                && crate::tooling::sha(css.text()?.as_bytes()) == record["sha256"],
+            "CSS bytes/digest/headers",
+        )?;
+        let manifest: Value =
+            serde_json::from_slice(&std::fs::read(root.join("dist/manifest.json"))?)
+                .map_err(|_| fail("browser manifest"))?;
+        require(
+            manifest["stylesheet"] == css_url,
+            "shared native/browser stylesheet URL",
+        )?;
+        for private in [
+            "/todo-css.json",
+            "/manifest.json",
+            "/stylegen/main.rs",
+            "/assets/todo-css.json",
+            "/assets/stylegen/main.rs",
+        ] {
+            require(
+                http::get(&server.base, private)?.status == 404,
+                "private source/record not served",
+            )?;
+        }
         let r = http::get(&server.base, "/app")?;
         require(
             r.status == 200
@@ -134,8 +246,24 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
         let mut browser = Browser::start(root, out, firefox)?;
         let checks = (|| {
             let c = browser.client()?;
+            if let Client::Chrome(d) = c {
+                d.call(
+                    "Emulation.setScriptExecutionDisabled",
+                    json!({"value":true}),
+                )?;
+            }
+            c.navigate(&format!("{}/", server.base))?;
+            style_layout(c, out, true)?;
+            c.check("document.querySelectorAll('script').length===0 && document.querySelectorAll('.todo-list li').length===2")?;
+            if let Client::Chrome(d) = c {
+                d.call(
+                    "Emulation.setScriptExecutionDisabled",
+                    json!({"value":false}),
+                )?;
+            }
             c.navigate(&format!("{}/app", server.base))?;
             ready(c)?;
+            style_layout(c, out, false)?;
             c.check("(()=>{const error=document.getElementById('remote-title-error');return error.getAttribute('hidden')==='' && error.getClientRects().length===0;})()")?;
             c.equal(
                 "document.querySelector('#todo-list-host ul.todo-list').outerHTML",
@@ -163,6 +291,7 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
                         json!("is-complete"),
                     )?;
                     text(c, "todo-status", "First task: completed")?;
+                    c.check("(()=>{const s=getComputedStyle(document.querySelector('#todo-list-host [data-id=\"1\"]'));return s.color==='rgb(49, 95, 74)' && s.backgroundColor==='rgb(237, 245, 239)' && s.textDecorationLine==='line-through';})()")?;
                 }
             }
             if firefox {
@@ -176,7 +305,10 @@ pub fn run(root: &Path, out: &Path, profile: &str, firefox: bool) -> Result<()> 
                     d.websockets.is_empty()
                         && d.failed_responses.is_empty()
                         && d.exceptions.is_empty(),
-                    "local browser resource/protocol errors",
+                    &format!(
+                        "local browser resource/protocol errors: responses={:?}; exceptions={:?}; websockets={:?}",
+                        d.failed_responses, d.exceptions, d.websockets
+                    ),
                 )?;
             }
             if !firefox {

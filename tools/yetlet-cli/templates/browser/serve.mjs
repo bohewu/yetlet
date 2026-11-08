@@ -6,7 +6,7 @@ import { realpathSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative, isAbsolute, sep } from 'node:path';
 import production from './vite.config.mjs';
-import { buildWasm, projectRoot } from './build-wasm.mjs';
+import { buildWasm, styleStage, projectRoot } from './build-wasm.mjs';
 
 const root = realpathSync(production.root);
 const port = 5173, origin = `http://127.0.0.1:${port}`;
@@ -42,20 +42,24 @@ async function watch() {
   const generations = new Map();
   const controller = new AbortController();
   let current = 0, sequence = 0, pending = false, active, timer, stopping = false, server;
-  const watched = [join(projectRoot, 'src'), ...['Cargo.toml', 'Cargo.lock', 'build.rs'].map((name) => join(projectRoot, name))].map(normalizePath);
-  const rustInput = (path) => watched.some((item) => normalizePath(path) === item || normalizePath(path).startsWith(item + '/'));
+  const styleSelected = Boolean(process.env.YETLET_INTERNAL_STYLE);
+  const styleOutput = normalizePath(join(root, 'style-output/app.generated.css'));
+  const watched = [join(projectRoot, 'src'), ...(styleSelected ? [join(projectRoot, 'stylegen')] : []), ...['Cargo.toml', 'Cargo.lock', 'build.rs'].map((name) => join(projectRoot, name))].map(normalizePath);
+  const rustInput = (path) => !normalizePath(path).split('/').some((part) => ['target', '.yetlet'].includes(part)) && watched.some((item) => normalizePath(path) === item || normalizePath(path).startsWith(item + '/'));
   async function build() {
     while (pending && !stopping) {
       pending = false;
       const number = ++sequence, directory = join(temporary, String(number));
       console.log(`YT_BROWSER_BUILD ${number} started`);
       try {
-        await buildWasm(directory, controller.signal);
+        const css = await buildWasm(directory, controller.signal);
         // Read the complete pair before publishing; HTTP never sees bindgen writes.
         const js = await readFile(join(directory, 'tasks.js'));
         const wasm = await readFile(join(directory, 'tasks_bg.wasm'));
-        if (!stopping) {
-          generations.set(number, { js, wasm });
+        if (!stopping && (!styleSelected || !pending)) {
+          await styleStage('publish', css, controller.signal);
+          if (stopping || (styleSelected && pending)) continue;
+          generations.set(number, { js, wasm, css: css?.css });
           current = number;
           server.environments.client.moduleGraph.invalidateAll();
           server.ws.send({ type: 'full-reload', path: '*' });
@@ -78,6 +82,9 @@ async function watch() {
   }
   const plugin = {
     name: 'yetlet-browser-watch',
+    load(id) {
+      if (styleSelected && id.split('?')[0] === styleOutput) return generations.get(current)?.css ?? '';
+    },
     // Rewrite the scaffold entry before Vite's TypeScript transform normalizes imports.
     enforce: 'pre',
     transform(code, id) {
@@ -86,7 +93,7 @@ async function watch() {
         .replace("await import('./generated/tasks_bg.wasm?url')", `await Promise.resolve({ default: '/__yetlet_wasm/${current}/tasks_bg.wasm' })`);
     },
     // Rust events belong to our serialized build loop, never Vite's reload path.
-    handleHotUpdate(context) { if (rustInput(context.file)) return []; },
+    handleHotUpdate(context) { if (rustInput(context.file) || (styleSelected && normalizePath(context.file) === styleOutput)) return []; },
     configureServer(vite) {
       vite.watcher.add(watched);
       vite.watcher.on('all', (_event, path) => { if (rustInput(path)) schedule(); });

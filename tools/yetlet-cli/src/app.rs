@@ -45,6 +45,7 @@ fn execute(
     if force_watch && settings.target != crate::settings::Target::Browser {
         settings.rust.watch = true;
     }
+    let styles = crate::styles::enabled(&settings);
     if settings.target == crate::settings::Target::Browser {
         let selected = if force_watch {
             settings.vite.auto_start && settings.vite.auto_build
@@ -66,6 +67,27 @@ fn execute(
             );
             return Ok(Completion::Skipped);
         }
+        let _style_lock = if !dev || force_watch {
+            styles
+                .map(|_| crate::platform::fs::styles_output::lock(&app))
+                .transpose()
+                .map_err(|message| Failure { code: 1, message })?
+        } else {
+            None
+        };
+        let candidate = if !dev {
+            styles
+                .map(|s| {
+                    crate::styles::prepare(&app, s).and_then(|candidate| {
+                        crate::styles::publish(&app, s, &candidate)?;
+                        Ok(candidate)
+                    })
+                })
+                .transpose()
+                .map_err(|message| Failure { code: 1, message })?
+        } else {
+            None
+        };
         let frontend =
             crate::platform::fs::frontend_directory(&app, Path::new(&settings.vite.root))
                 .map_err(|message| Failure { code: 1, message })?;
@@ -83,9 +105,39 @@ fn execute(
                             .into(),
                 })?;
         }
-        return crate::platform::process::run_browser_frontend(&app, &frontend, dev, force_watch)
-            .map_err(process_failure);
+        let completion = crate::platform::process::run_browser_frontend(
+            &app,
+            &frontend,
+            dev,
+            force_watch,
+            &settings,
+        )
+        .map_err(process_failure)?;
+        if succeeded(&completion) {
+            if let Some(candidate) = candidate.as_ref() {
+                crate::styles::accept(&app, styles.unwrap(), candidate, true)
+                    .map_err(|message| Failure { code: 1, message })?;
+            }
+        }
+        return Ok(completion);
     }
+    let _style_lock = styles
+        .map(|_| crate::platform::fs::styles_output::lock(&app))
+        .transpose()
+        .map_err(|message| Failure { code: 1, message })?;
+    let candidate = if !(dev && settings.rust.watch) {
+        styles
+            .map(|s| {
+                crate::styles::prepare(&app, s).and_then(|candidate| {
+                    crate::styles::publish(&app, s, &candidate)?;
+                    Ok(candidate)
+                })
+            })
+            .transpose()
+            .map_err(|message| Failure { code: 1, message })?
+    } else {
+        None
+    };
     let selected = settings.vite.enabled
         && if dev {
             settings.vite.auto_start
@@ -138,6 +190,7 @@ fn execute(
                     Some(&frontend),
                     &settings.vite.root,
                     &settings.tls,
+                    &settings,
                 )
             } else {
                 crate::platform::process::run_with_frontend(
@@ -162,11 +215,30 @@ fn execute(
         println!("Frontend build skipped by public CLI settings");
     }
     if dev && settings.rust.watch {
-        crate::platform::process::run_watch(&app, None, &settings.vite.root, &settings.tls)
-            .map_err(process_failure)
+        crate::platform::process::run_watch(
+            &app,
+            None,
+            &settings.vite.root,
+            &settings.tls,
+            &settings,
+        )
+        .map_err(process_failure)
     } else {
-        crate::platform::process::run_cargo(&app, dev, release, &settings.tls)
-            .map_err(process_failure)
+        let completion = crate::platform::process::run_cargo(&app, dev, release, &settings.tls)
+            .map_err(process_failure)?;
+        if !dev && succeeded(&completion) {
+            if let Some(candidate) = candidate.as_ref() {
+                if settings.vite.enabled && !settings.vite.auto_build {
+                    eprintln!(
+                        "CLI_STYLES: Vite build skipped; bundled CSS freshness is not accepted"
+                    );
+                } else {
+                    crate::styles::accept(&app, styles.unwrap(), candidate, settings.vite.enabled)
+                        .map_err(|message| Failure { code: 1, message })?;
+                }
+            }
+        }
+        Ok(completion)
     }
 }
 
@@ -249,4 +321,13 @@ pub(crate) fn command(dev: bool, release: bool) -> std::process::Command {
         .env("RUSTUP_SKIP_UPDATE_CHECK", "1")
         .env("CARGO_NET_OFFLINE", "true");
     command
+}
+
+fn succeeded(completion: &Completion) -> bool {
+    matches!(completion,Completion::Exited(status)|Completion::FrontendExited(status) if status.success())
+}
+/// Private finite child protocol used by the selected browser coordinator.
+#[doc(hidden)]
+pub fn internal_style_worker(operation: &str) -> Result<(), String> {
+    crate::styles::worker(operation)
 }

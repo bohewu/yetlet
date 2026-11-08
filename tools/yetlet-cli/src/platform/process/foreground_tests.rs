@@ -445,3 +445,28 @@ fn terminal_ctrl_c_cleans_resistant_group_and_restores_tty() {
     sentinel.0.kill().unwrap();
     sentinel.0.wait().unwrap();
 }
+
+#[test]
+fn style_capture_bounds_success_failure_and_owned_descendants() {
+    if std::env::var_os("YT_STYLE_CAPTURE_HELPER").is_some() {
+        let mut success = Command::new("sh");
+        success.args(["-c", "printf 'a{}\\n'; printf diagnostic >&2"]);
+        assert_eq!(capture(&mut success, 32).unwrap(), b"a{}\n");
+        let mut failure = Command::new("sh");
+        failure.args(["-c", "printf partial; exit 7"]);
+        assert!(capture(&mut failure, 32).is_err());
+        let mut overflow = Command::new("sh");
+        overflow.args(["-c", "yes x"]);
+        assert!(capture(&mut overflow, 32).is_err());
+        let mut invalid = Command::new("sh");
+        invalid.args(["-c", "printf '\\377'"]);
+        assert!(String::from_utf8(capture(&mut invalid, 32).unwrap()).is_err());
+        return;
+    }
+    let output=Command::new(std::env::current_exe().unwrap()).args(["--exact","platform::process::linux::foreground::tests::style_capture_bounds_success_failure_and_owned_descendants","--nocapture"]).env("YT_STYLE_CAPTURE_HELPER","1").output().unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+}

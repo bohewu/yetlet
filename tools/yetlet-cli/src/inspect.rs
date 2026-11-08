@@ -17,6 +17,7 @@ struct Plan {
     rust: Stage,
     rust_watch: Stage,
     vite: Stage,
+    styles: Stage,
 }
 
 fn plan(settings: &settings::Settings, command: &str) -> Plan {
@@ -96,6 +97,23 @@ fn plan(settings: &settings::Settings, command: &str) -> Plan {
                 "cli.rust.watch is false"
             },
         },
+        styles: Stage {
+            selected: crate::styles::enabled(settings).is_some()
+                && (!browser
+                    || build && settings.vite.auto_build
+                    || browser_watch && settings.vite.auto_start && settings.vite.auto_build),
+            reason: if crate::styles::enabled(settings).is_none() {
+                "cli.styles is absent or disabled; no generator effects"
+            } else if browser && command == "run" {
+                "browser run previews prepared dist; styles are not regenerated"
+            } else if browser && !vite.selected {
+                "browser frontend stage skipped; styles are skipped"
+            } else if build && settings.vite.enabled && !settings.vite.auto_build {
+                "generate source CSS; Vite build skipped so bundle freshness is not accepted"
+            } else {
+                "host CSS generation precedes selected dependent stages; watch discards obsolete candidates"
+            },
+        },
         vite,
     }
 }
@@ -123,6 +141,7 @@ pub fn explain(manifest: &Path, json: bool) -> Result<String, String> {
                 "auto_build": settings.vite.auto_build,
                 "auto_start": settings.vite.auto_start,
             },
+            "styles": settings.styles,
             "commands": commands.iter().map(|(name, plan)| ((*name).to_owned(), serde_json::json!(plan))).collect::<serde_json::Map<_, _>>(),
             "limitations": LIMITATIONS,
         });
@@ -154,6 +173,7 @@ pub fn explain(manifest: &Path, json: bool) -> Result<String, String> {
                 ("Rust", plan.rust),
                 ("Rust watch", plan.rust_watch),
                 ("Vite", plan.vite),
+                ("Styles", plan.styles),
             ] {
                 writeln!(
                     output,

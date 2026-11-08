@@ -578,6 +578,17 @@ pub(crate) fn run_watch(
     watcher: &mut Command,
     frontend: Option<&mut Command>,
 ) -> io::Result<Completion> {
+    run_watch_styles(rust, watcher, frontend, &mut |_| Ok((true, false)))
+}
+
+pub(crate) fn run_watch_styles(
+    rust: &mut Command,
+    watcher: &mut Command,
+    frontend: Option<&mut Command>,
+    before: &mut dyn FnMut(
+        &mut crate::platform::process::watch::Events,
+    ) -> io::Result<(bool, bool)>,
+) -> io::Result<Completion> {
     let address = std::net::SocketAddr::from(([127, 0, 0, 1], 5173));
     if frontend.is_some() {
         drop(std::net::TcpListener::bind(address)?);
@@ -676,8 +687,11 @@ pub(crate) fn run_watch(
                 continue;
             }
             if restart {
-                backend = Some(Owned::spawn(rust, terminal)?);
-                restart = false;
+                let (start, pending) = before(&mut events)?;
+                restart = pending;
+                if start && watch.cancellation()? == 0 {
+                    backend = Some(Owned::spawn(rust, terminal)?);
+                }
             }
             thread::sleep(POLL);
         }
@@ -731,3 +745,69 @@ pub(crate) fn run_watch(
 #[cfg(test)]
 #[path = "foreground_tests.rs"]
 mod tests;
+
+/// Bounded stdout with the same exact owned group/reaping contract as Cargo.
+pub(super) fn capture(command: &mut Command, limit: usize) -> io::Result<Vec<u8>> {
+    prepare(command)?;
+    command
+        .stdin(std::process::Stdio::null())
+        .stdout(std::process::Stdio::piped());
+    let mut owned = Owned::spawn(command, None)?;
+    let reader = owned.child.stdout.take().unwrap();
+    let (sender, receiver) = std::sync::mpsc::sync_channel(1);
+    let thread = thread::spawn(move || {
+        let mut bytes = Vec::new();
+        let result = reader
+            .take(limit as u64 + 1)
+            .read_to_end(&mut bytes)
+            .map(|_| bytes);
+        let _ = sender.send(result);
+    });
+    let deadline = Instant::now() + Duration::from_secs(120);
+    let result = (|| {
+        let mut bytes = None;
+        loop {
+            if bytes.is_none() {
+                match receiver.try_recv() {
+                    Ok(value) => {
+                        let value = value?;
+                        if value.len() > limit {
+                            return Err(io::Error::other("style stdout exceeded its bound"));
+                        }
+                        bytes = Some(value);
+                    }
+                    Err(std::sync::mpsc::TryRecvError::Empty) => (),
+                    Err(_) => return Err(io::Error::other("style stdout reader failed")),
+                }
+            }
+            if owned.cancellation()? != 0 {
+                return Err(io::ErrorKind::Interrupted.into());
+            }
+            if Instant::now() >= deadline {
+                return Err(io::ErrorKind::TimedOut.into());
+            }
+            if owned.exited()? {
+                break;
+            }
+            thread::sleep(POLL);
+        }
+        Ok(bytes)
+    })();
+    let cleanup = owned.kill_reap();
+    thread
+        .join()
+        .map_err(|_| io::Error::other("style stdout thread failed"))?;
+    let status = cleanup?;
+    let bytes = result?.map(Ok).unwrap_or_else(|| {
+        receiver
+            .recv()
+            .map_err(io::Error::other)
+            .and_then(|value| value)
+    })?;
+    if !status.success() || bytes.len() > limit {
+        return Err(io::Error::other(
+            "style producer failed or exceeded its bound",
+        ));
+    }
+    Ok(bytes)
+}

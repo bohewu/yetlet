@@ -3,6 +3,25 @@ use yetlet_cli::{Cli, VERSION, app, compose, docker, doctor, inspect, parse, sca
 
 fn main() -> ExitCode {
     let args = std::env::args_os().skip(1).collect::<Vec<_>>();
+    if args
+        .first()
+        .is_some_and(|arg| arg == "__yetlet_style_worker")
+    {
+        return match args.as_slice() {
+            [_, operation] => match operation
+                .to_str()
+                .ok_or_else(|| "invalid private style stage".to_owned())
+                .and_then(app::internal_style_worker)
+            {
+                Ok(()) => ExitCode::SUCCESS,
+                Err(error) => {
+                    eprintln!("{error}");
+                    ExitCode::FAILURE
+                }
+            },
+            _ => ExitCode::FAILURE,
+        };
+    }
     match parse(&args) {
         Ok(Cli::Help(help)) => {
             print!("{help}");

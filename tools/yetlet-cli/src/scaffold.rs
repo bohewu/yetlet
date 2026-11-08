@@ -604,6 +604,8 @@ pub enum Template {
     #[default]
     Native,
     Browser,
+    NativeStyle,
+    BrowserStyle,
 }
 
 /// Publish the explicitly selected built-in template, independent of runtime settings.
@@ -618,7 +620,9 @@ pub fn create_selected(
 ) -> Result<(), String> {
     validate_name(name).map_err(str::to_owned)?;
     crate::platform::fs::ensure_create_supported()?;
-    let entries = if template == Template::Browser {
+    let browser = matches!(template, Template::Browser | Template::BrowserStyle);
+    let styles = matches!(template, Template::NativeStyle | Template::BrowserStyle);
+    let mut entries = if browser {
         if service {
             return Err("browser target does not select the native --service profile".into());
         }
@@ -626,6 +630,9 @@ pub fn create_selected(
     } else {
         selected_files(name, service, runtime_settings, tailwind, vite)?
     };
+    if styles {
+        crate::styles::scaffold(&mut entries, browser, tailwind, vite || browser)?;
+    }
     crate::platform::fs::create_project(dir, name, &entries)
 }
 

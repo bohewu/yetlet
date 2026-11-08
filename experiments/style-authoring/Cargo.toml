@@ -1,0 +1,10 @@
+[package]
+name = "style-authoring-view-fixture"
+version = "0.0.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[dependencies]
+yetlet = { path = "../../crates/yetlet", default-features = false }

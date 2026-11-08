@@ -1,4 +1,45 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
+
+**YT-237–YT-240 optional CSS authoring roadmap (2026-11-08):**
+**YT-237 Done at contract-research scope; YT-238 Done at prototype scope;
+YT-239 Done at source/Linux integration scope; YT-240 Done at bounded
+Todo/Linux sample qualification scope.**
+[Dependency and acceptance plan](YT-237-240-STYLE-CSS-ROADMAP.md)
+prioritizes **YT-237** (explicit style registration and build-time CSS
+contract) before CSS method syntax. **YT-238** is a bounded Rust builder
+experiment completed under the owner's follow-up authorization. The recorded
+**SIMPLIFY** recommendation is now owner-approved for **YT-239**
+(opt-in build/watch/asset integration). **YT-240** now validates the existing
+Todo sample's native SSR and browser CSS path after owner selection and Reviewer
+PASS; the separate Style Showcase is not yet started.
+Original CSS and Tailwind/Vite workflows remain available. The earlier
+independent planning Reviewer PASS remains accepted. The new
+[YT-237 reviewed Contract](YT-237-STYLE-REGISTRATION-CONTRACT.md) compares
+alternatives and defines registration, conditional coverage, host execution,
+ordering and publication. Independent design Reviewer PASS, Job
+`wc_job_hrrQG-bXFiMCgGQ3`, zero issues/followups; docs/source checks PASS.
+The owner also requires default registration for suitable Rust-style templates:
+YT-238 demonstrates the pre-wired fixture; actual `yetlet new` output and
+build/watch/asset integration belong to the now-authorized YT-239 slice.
+The [YT-238 proof](YT-238-STYLE-BUILDER-PROOF.md) records 674 identical CSS bytes,
+19 focused tests PASS, formatting/docs/source checks PASS, and independent
+Reviewer PASS, Job `wc_job_hfecy9ZrNUTO61BZ`, zero issues/followups. Keep the
+builder application/tooling-local: measured setup cost does not establish a
+reusable SDK advantage. Plain CSS remains the default; no public renderer/API
+change or automatic rollout is claimed. The [YT-239 implementation](YT-239-STYLE-INTEGRATION.md)
+is Done at source and bounded Linux integration scope: default-wired optional
+style templates, Rust generation/publication, coordinated watch and external
+CSS assets, without a generated-app Python dependency. Independent Reviewer
+PASS, Job `wc_job_3s_tnZYc7hUssjK5`, zero issues/followups. Focused tests and real
+native/Vite/Tailwind/WASM build evidence passed; two cloud-lock failures remain
+recorded and Windows compile/runtime remains unverified. The
+[YT-240 Todo qualification](YT-240-TODO-STYLE-QUALIFICATION.md) proves generated
+CSS with source-only Tag Builders, native no-WASM SSR, Chrome computed styles
+at 390/1280px, Firefox desktop and asset/CSP boundaries. Independent Reviewer
+PASS, Job `wc_job_7bfgn4kA_CNHLN22`, zero issues/followups. Firefox narrow
+viewport, Windows and production claims remain unverified. A dedicated Style
+Showcase, Git delivery and public release remain separate and unstarted.
+
 **YT-234/235 View authoring expansion (2026-11-07):** Done at
 local source and scoped verification only.
 [YT-235 coverage record](YT-235-TAG-COVERAGE-PLAN.md) builds on

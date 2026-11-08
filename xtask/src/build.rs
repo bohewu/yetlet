@@ -12,6 +12,7 @@ use std::{
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Build {
     Browser,
+    TodoCss,
     KeyedBindings,
     MultiIslandDashboard,
     RenderBench,
@@ -23,6 +24,7 @@ impl Build {
     pub fn parse(s: &str) -> Option<Self> {
         Some(match s {
             "browser" => Self::Browser,
+            "todo-css" => Self::TodoCss,
             "keyed-bindings" => Self::KeyedBindings,
             "multi-island-dashboard" => Self::MultiIslandDashboard,
             "render-bench" => Self::RenderBench,
@@ -166,11 +168,67 @@ fn page(template: &str, digest: &str, absolute: bool, ssr: &str) -> String {
     }
     output
 }
+// App-owned, host-only generation precedes publication. A failure leaves the
+// previously accepted CSS/manifest intact and never starts a WASM build.
+fn todo_css(root: &Path) -> Result<Vec<u8>> {
+    let cargo = tool("cargo", ".cargo/bin")?;
+    let host_info = execute(root, &tool("rustc", ".cargo/bin")?, &["-vV".into()], true)?;
+    let host = std::str::from_utf8(&host_info)
+        .ok()
+        .and_then(|s| s.lines().find_map(|line| line.strip_prefix("host: ")))
+        .ok_or_else(|| fail("missing Rust host target"))?;
+    let css = execute(
+        root,
+        &cargo,
+        &[
+            "run".into(),
+            "--frozen".into(),
+            "--quiet".into(),
+            "--manifest-path".into(),
+            "examples/todo-server/stylegen/Cargo.toml".into(),
+            "--target".into(),
+            host.into(),
+            "--target-dir".into(),
+            root.join("xtask/target").into_os_string(),
+        ],
+        true,
+    )?;
+    if css.is_empty() || css.len() > 2 * 1024 * 1024 || std::str::from_utf8(&css).is_err() {
+        return Err(fail("Todo stylesheet must be nonempty bounded UTF-8"));
+    }
+    Ok(css)
+}
+fn native_css_record(root: &Path, digest: &str, css: &[u8]) -> Result<()> {
+    write(
+        root,
+        "dist/todo-css.json",
+        &json_bytes(&json!({
+            "stylesheet": format!("/assets/{digest}/styles.css"), "sha256": sha(css)
+        })),
+    )
+}
+
 pub fn run(root: &Path, kind: Build, options: Options) -> Result<()> {
     if kind.css() {
         return crate::css::run(root, kind, options);
     }
+    if kind == Build::TodoCss {
+        let css = todo_css(root)?;
+        let files = BTreeMap::from([
+            ("styles.css".into(), css.clone()),
+            ("favicon.svg".into(), BROWSER_ICON.as_bytes().to_vec()),
+        ]);
+        let d = assets(root, "dist", b"yetlet-todo-css-v1\0", &files)?;
+        native_css_record(root, &d, &css)?;
+        println!("PASS native Todo CSS (no WASM): {d}");
+        return Ok(());
+    }
     let (cargo, bindgen) = preflight(root, kind)?;
+    let css = if kind == Build::Browser {
+        Some(todo_css(root)?)
+    } else {
+        None
+    };
     let profile = if options.release { "release" } else { "debug" };
     match kind {
         Build::Browser => {
@@ -191,7 +249,7 @@ pub fn run(root: &Path, kind: Build, options: Options) -> Result<()> {
             )?);
             for (name, data) in [
                 ("app.js", BROWSER_JS.as_bytes()),
-                ("styles.css", BROWSER_CSS.as_bytes()),
+                ("styles.css", css.as_deref().expect("Todo CSS generated")),
                 ("favicon.svg", BROWSER_ICON.as_bytes()),
             ] {
                 files.insert(name.into(), data.into());
@@ -209,6 +267,7 @@ pub fn run(root: &Path, kind: Build, options: Options) -> Result<()> {
                 page(BROWSER_PAGE, &d, true, "").as_bytes(),
             )?;
             write(root, "dist/manifest.json", &json_bytes(&manifest))?;
+            native_css_record(root, &d, &files["styles.css"])?;
             println!(
                 "PASS browser assets: {d} Wasm bytes: {}",
                 files["yetlet_browser_bg.wasm"].len()

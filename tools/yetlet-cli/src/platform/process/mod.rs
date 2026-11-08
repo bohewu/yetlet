@@ -23,6 +23,10 @@ use std::{io, process::Command};
 
 pub(crate) fn command(app: &App, dev: bool, release: bool) -> io::Result<Command> {
     let mut command = app::command(dev, release);
+    command.env_remove("YETLET_STYLE_DEV");
+    if dev {
+        command.env("YETLET_STYLE_DEV", "1");
+    }
     imp::pin_cwd(app, &mut command)?;
     Ok(command)
 }
@@ -94,7 +98,9 @@ fn frontend_command(app: &App, frontend: &App, dev: bool) -> io::Result<Command>
     command
         .env_remove("YETLET_DEV_TLS_CERT")
         .env_remove("YETLET_DEV_TLS_KEY")
-        .env_remove("YETLET_BROWSER_WATCH");
+        .env_remove("YETLET_BROWSER_WATCH")
+        .env_remove("YETLET_STYLE_CLI")
+        .env_remove("YETLET_INTERNAL_STYLE");
     command
         .env("YETLET_PROJECT_ROOT", crate::platform::fs::app_root(app))
         .env("npm_config_offline", "true")
@@ -124,10 +130,12 @@ pub(crate) fn run_browser_frontend(
     frontend: &App,
     dev: bool,
     watch: bool,
+    settings: &crate::settings::Settings,
 ) -> io::Result<Completion> {
     let mut command = frontend_command(app, frontend, dev)?;
     if watch {
         command.env("YETLET_BROWSER_WATCH", "1");
+        crate::styles::frontend_environment(app, settings, &mut command)?;
     }
     #[cfg(windows)]
     let completion = imp::run(frontend, &mut command)?;
@@ -164,6 +172,7 @@ pub(crate) fn run_watch(
     frontend: Option<&App>,
     frontend_root: &str,
     tls: &crate::settings::Tls,
+    settings: &crate::settings::Settings,
 ) -> io::Result<Completion> {
     let mut rust = command(app, true, false)?;
     if tls.enabled && frontend.is_none() {
@@ -179,9 +188,35 @@ pub(crate) fn run_watch(
         bridge_environment(app, &mut rust, front, tls, frontend_root)?;
     }
     println!("Rust watch enabled by cli.rust.watch; Watchexec supplies file events");
+    let mut before = |events: &mut watch::Events| -> io::Result<(bool, bool)> {
+        let Some(styles) = crate::styles::enabled(settings) else {
+            return Ok((true, false));
+        };
+        let candidate = crate::styles::prepare(app, styles);
+        let pending = events.changed()?;
+        if pending {
+            eprintln!("CLI_STYLES: queued edit; obsolete candidate discarded");
+            return Ok((false, true));
+        }
+        match candidate.and_then(|candidate| crate::styles::publish(app, styles, &candidate)) {
+            Ok(()) => Ok((true, false)),
+            Err(error) => {
+                eprintln!("{error}; waiting for source edits");
+                Ok((false, false))
+            }
+        }
+    };
     #[cfg(windows)]
-    return imp::run_watch(app, &mut rust, &mut watcher, frontend.zip(front.as_mut()));
-    #[cfg(not(windows))]
+    return imp::run_watch_styles(
+        app,
+        &mut rust,
+        &mut watcher,
+        frontend.zip(front.as_mut()),
+        &mut before,
+    );
+    #[cfg(target_os = "linux")]
+    return imp::run_watch_styles(&mut rust, &mut watcher, front.as_mut(), &mut before);
+    #[cfg(not(any(target_os = "linux", windows)))]
     imp::run_watch(&mut rust, &mut watcher, front.as_mut())
 }
 
@@ -321,5 +356,18 @@ mod static_deadline_tests {
                 assert_ne!(code, 259);
             }
         }
+    }
+}
+
+pub(crate) fn capture(app: &App, command: &mut Command, limit: usize) -> io::Result<Vec<u8>> {
+    #[cfg(any(target_os = "linux", windows))]
+    {
+        imp::pin_cwd(app, command)?;
+        imp::capture(app, command, limit)
+    }
+    #[cfg(not(any(target_os = "linux", windows)))]
+    {
+        let _ = (app, command, limit);
+        Err(io::ErrorKind::Unsupported.into())
     }
 }

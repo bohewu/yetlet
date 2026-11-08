@@ -31,7 +31,7 @@ Independent implementation Reviewer PASS has zero issues or required followups.
 |---|---|
 | `yetlet --help` / `-h` | Root help; every complete command path also has exclusive scoped help |
 | `yetlet --version` / `-V` | Build-time CLI version; no project, tools or settings required |
-| `yetlet new NAME [--parent DIRECTORY] [--template native\|browser] [--vite] [--tailwind] [--service] [--settings]` | Publish a new scaffold; no tools, installs, builds or lock generation |
+| `yetlet new NAME [--parent DIRECTORY] [--template native\|browser\|native-style\|browser-style] [--vite] [--tailwind] [--service] [--settings]` | Publish a new scaffold; no tools, installs, builds or lock generation |
 | `yetlet doctor [--json]` | Bounded environment-only Rust/Cargo identity and compiled filesystem capability; schema 1 JSON |
 | `yetlet inspect [--manifest-path PATH] [--json]` | Read-only public-settings plan for build/run/watch; separate project-execution-plan schema 1; no readiness checks |
 | `yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]` | Read-only selected key/version, certificate pins and dates; no password or generation |
@@ -689,3 +689,42 @@ are not automatically watched. The [selected amendment](../../docs/YT-112-IMPLEM
 records completed Linux browser/lifecycle acceptance and retains the original
 failed attempts. New Windows browser-watch execution remains Not verified;
 historical YT-104 qualification describes the earlier static starter scope.
+
+## Optional application-owned Rust CSS (YT-239 working tree)
+
+`new --template native-style` and `new --template browser-style` opt into a private
+std-only Cargo generator with a complete lock, useful layout/dialog composition,
+shared View class names and stylesheet connection. Ordinary templates keep ordinary
+CSS. Applicable Tailwind/Vite options compose with these choices. Creation executes
+no generator and leaves normal app dependency/lock preparation explicit.
+
+The optional strict `[cli.styles]` section has `enabled`, `manifest`, `bin` and
+`output`; absence means no style effects. The finite manifest is
+`stylegen/Cargo.toml`, with a single explicit `main.rs` bin. Standalone output is
+`assets/generated/app.generated.css`; Vite output is
+`<cli.vite.root>/style-output/app.generated.css`. The existing Loader owns
+base/profile/APP_CLI overrides; paths stay app-relative. Generated runtime settings
+validate the same optional section. Inspect reports the style stages without tools.
+
+Native build generates before frontend/app stages and accepts a full SHA-256 CSS
+asset only after their success. Run generates before startup. Native watch repeats
+the serialized CSS/app sequence and discards obsolete candidates. Browser run only
+previews prepared dist; browser watch uses the existing gated Node loop and Rust
+CSS stages before WASM. Vite owns its normal CSS graph/HMR and bundle hashes.
+Standalone Tailwind links precede generated CSS; layers/specificity still govern
+cascade precedence. Source/policy edits require the documented watch/restart rules.
+
+The official path adds no Python dependency, public style crate or renderer/CSP API.
+Output ownership conflicts and post-CSS metadata failures require explicit operator
+reconciliation. Private `owner.pending.json`/`production.pending.json` intents retain
+prior accepted metadata; producers and the generated native loader refuse unfinished
+state even when hashes match. Marker removal commits acceptance after all fallible
+writes/checks. Preserve evidence and explicitly verify rollback or rollforward
+before clearing a retained marker; ordinary retry never performs reconciliation.
+Prepublication failures preserve accepted data and owned temporaries are cleaned;
+initially unknown temporaries remain untouched. No automatic install, retention,
+asset cleanup or deployment is supplied.
+The selected Cargo cache must satisfy protected filesystem ownership/write policy;
+host output uses its own `yetlet-styles/<app-root-sha256>` subtree. See the
+[implementation evidence and limitations](../../docs/YT-239-STYLE-INTEGRATION.md).
+Independent review is pending; Windows compilation/runtime is not qualified here.

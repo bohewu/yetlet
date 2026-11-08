@@ -3,10 +3,12 @@
 //! Both native HTML SSR and browser DOM rendering consume these same Views.
 
 pub mod controls;
+pub mod style_names;
 
 use serde::{Deserialize, Serialize};
+use style_names::*;
 use yetlet::actions::{ActionError, Command};
-use yetlet::view::{Element, View};
+use yetlet::view::{Element, View, tags};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -126,117 +128,125 @@ pub fn toggle_first(items: &mut [Todo]) -> bool {
 pub fn todo_list(items: &[Todo]) -> View {
     let children = items.iter().map(|item| {
         View::from(
-            Element::new("li")
+            tags::li()
                 .attribute("data-id", item.id.to_string())
                 .attribute("data-completed", item.completed.to_string())
-                .attribute(
-                    "class",
-                    if item.completed {
-                        "is-complete"
-                    } else {
-                        "is-open"
-                    },
-                )
+                .class(if item.completed { COMPLETE } else { OPEN })
                 .child(View::text(&item.title)),
         )
     });
-    Element::new("ul")
-        .attribute("class", "todo-list")
-        .children(children)
-        .into()
+    tags::ul().class(LIST).children(children).into()
 }
 
 /// Native route: complete HTML, zero browser JS/WASM.
 pub fn home_page() -> View {
-    Element::new("main")
-        .attribute("id", "app")
-        .child(Element::new("h1").child(View::text("Yetlet Todo")))
-        .child(Element::new("p").child(View::text(
+    tags::main()
+        .id("app")
+        .class(SHELL)
+        .child(tags::header().class(TOOLBAR).child(tags::h1().text("Yetlet Todo")))
+        .child(tags::p().child(View::text(
             "Native SSR; no browser runtime or remote UI circuit.",
         )))
-        .child(todo_list(&initial_todos()))
+        .child(tags::section().class(CONTENT).child(
+            tags::section().class(PANEL).child(tags::h2().text("Shared tasks")).child(todo_list(&initial_todos()))
+        ).child(tags::section().class(PANEL).child(tags::h2().text("HTML first")).child(tags::p().text("These tasks are rendered by Rust on the server. No JavaScript or WebAssembly is needed to read them."))))
         .into()
 }
 
 /// Browser route: this *same* TodoList is mounted by the WASM DOM renderer.
 pub fn browser_page(items: &[Todo]) -> View {
-    Element::new("main")
-        .attribute("id", "todo-app")
-        .child(Element::new("h1").child(View::text("Yetlet Browser Todo")))
-        .child(Element::new("p").child(View::text(
+    tags::main()
+        .id("todo-app")
+        .class(SHELL)
+        .child(tags::h1().child(View::text("Yetlet Browser Todo")))
+        .child(tags::p().child(View::text(
             "Rust/WASM mounts the shared component; clicks stay local.",
         )))
         .child(
-            Element::new("section")
-                .attribute("id", "todo-list-host")
-                .child(todo_list(items)),
-        )
-        .child(
-            Element::new("button")
-                .attribute("type", "button")
-                .attribute("id", "toggle-first")
-                .child(View::text("Toggle first task")),
-        )
-        .child(
-            Element::new("section")
-                .attribute("id", "remote-actions")
-                .child(Element::new("h2").child(View::text("Explicit HTTP action")))
+            tags::div()
+                .class(CONTENT)
                 .child(
-                    Element::new("label")
-                        .attribute("for", "remote-title")
-                        .child(View::text("Task title")),
-                )
-                .child(
-                    Element::new("input")
-                        .attribute("id", "remote-title")
-                        .attribute("type", "text")
-                        .attribute("maxlength", "100")
-                        .attribute("placeholder", "New server task")
-                        .attribute("autocomplete", "off"),
-                )
-                .child(
-                    Element::new("p")
-                        .attribute("id", "remote-title-error")
-                        .attribute("hidden", ""),
-                )
-                .child(
-                    Element::new("button")
-                        .attribute("id", "create-remote")
-                        .attribute("type", "button")
-                        .child(View::text("Create on server")),
-                )
-                .child(
-                    Element::new("p")
-                        .attribute("id", "remote-status")
-                        .attribute("aria-live", "polite")
-                        .child(View::text("No remote action sent")),
-                )
-                .child(
-                    Element::new("button")
-                        .attribute("id", "remote-review")
-                        .attribute("type", "button")
-                        .child(View::text("Review server list")),
-                )
-                .child(
-                    Element::new("button")
-                        .attribute("id", "remote-resume")
-                        .attribute("type", "button")
-                        .child(View::text("Start another create")),
-                )
-                .child(
-                    Element::new("div")
-                        .attribute("id", "remote-list-host")
+                    tags::section()
+                        .class(PANEL)
+                        .attribute("aria-labelledby", "local-heading")
                         .child(
-                            Element::new("p")
-                                .child(View::text("Server data appears after a remote action")),
+                            tags::div()
+                                .class(TOOLBAR)
+                                .child(tags::h2().id("local-heading").text("Local tasks")),
+                        )
+                        .child(tags::section().id("todo-list-host").child(todo_list(items)))
+                        .child(
+                            tags::div().class(TOOLBAR).child(
+                                tags::button()
+                                    .attribute("type", "button")
+                                    .id("toggle-first")
+                                    .child(View::text("Toggle first task")),
+                            ),
+                        )
+                        .child(
+                            tags::p()
+                                .id("todo-status")
+                                .attribute("aria-live", "polite")
+                                .text("First task: active"),
+                        ),
+                )
+                .child(
+                    tags::section()
+                        .id("remote-actions")
+                        .class(PANEL)
+                        .add_class(REMOTE)
+                        .attribute("aria-labelledby", "remote-heading")
+                        .child(
+                            tags::h2()
+                                .id("remote-heading")
+                                .child(View::text("Explicit HTTP action")),
+                        )
+                        .child(
+                            tags::label()
+                                .attribute("for", "remote-title")
+                                .child(View::text("Task title")),
+                        )
+                        .child(
+                            tags::input()
+                                .id("remote-title")
+                                .attribute("type", "text")
+                                .attribute("maxlength", "100")
+                                .placeholder("New server task")
+                                .attribute("autocomplete", "off"),
+                        )
+                        .child(tags::p().id("remote-title-error").attribute("hidden", ""))
+                        .child(
+                            tags::button()
+                                .id("create-remote")
+                                .attribute("type", "button")
+                                .child(View::text("Create on server")),
+                        )
+                        .child(
+                            tags::p()
+                                .id("remote-status")
+                                .attribute("aria-live", "polite")
+                                .child(View::text("No remote action sent")),
+                        )
+                        .child(
+                            tags::button()
+                                .id("remote-review")
+                                .attribute("type", "button")
+                                .child(View::text("Review server list")),
+                        )
+                        .child(
+                            tags::button()
+                                .id("remote-resume")
+                                .attribute("type", "button")
+                                .child(View::text("Start another create")),
+                        )
+                        .child(
+                            tags::div()
+                                .id("remote-list-host")
+                                .child(tags::p().child(View::text(
+                                    "Server data appears after a remote action",
+                                ))),
                         ),
                 ),
-        )
-        .child(
-            Element::new("p")
-                .attribute("id", "todo-status")
-                .attribute("aria-live", "polite")
-                .child(View::text("First task: active")),
         )
         .child(controls::native_controls(&controls::NativeDraft::default()))
         .into()

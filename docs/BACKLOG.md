@@ -1,5 +1,60 @@
 # Yetlet Backlog
 
+**YT-237–YT-240 opt-in Style/CSS authoring and project stylesheet generation
+(2026-11-08):** **YT-237 Done at contract-research scope; YT-238 Done at
+prototype scope; YT-239 Done at source/Linux integration scope; YT-240 Done
+at bounded Todo/Linux sample qualification scope.**
+[Ordered goals, hard dependencies and acceptance gates](YT-237-240-STYLE-CSS-ROADMAP.md).
+The sequence is **YT-237 -> YT-238 -> explicit go/no-go -> YT-239 ->
+YT-240**, not one bulk feature:
+
+- **YT-237 — Style discovery/registration contract (Done; research only):**
+  [Reviewed Contract](YT-237-STYLE-REGISTRATION-CONTRACT.md) compares discovery
+  alternatives and selects ordinary function composition, shared class strings,
+  an isolated host generator, deterministic ownership/order, and explicit
+  build/watch/asset boundaries. Independent design Reviewer PASS, Job
+  `wc_job_hrrQG-bXFiMCgGQ3`, zero issues/followups; docs/source checks PASS.
+  This historical review does not itself authorize implementation; the owner
+  subsequently authorized YT-238 and requested default template registration.
+- **YT-238 — Rust CSS Builder proof (Done; prototype only):**
+  [Implementation and DX evidence](YT-238-STYLE-BUILDER-PROOF.md) demonstrate
+  pre-wired layout/dialog registration, a separate host generator, conditional
+  class coverage and bounded publication. Generated CSS equals the 674-byte
+  plain-CSS fixture. Eight generator, one View and ten publisher tests PASS;
+  formatting/docs/source checks PASS. Independent implementation Reviewer PASS,
+  Job `wc_job_hfecy9ZrNUTO61BZ`, zero issues/followups. Recommendation:
+  **SIMPLIFY**, keeping support application/tooling-local; no public API or
+  YT-239 promotion is implied.
+- **YT-239 — Opt-in CSS build/watch and Asset integration (Done;
+  source/Linux integration):** [implemented contract and evidence](YT-239-STYLE-INTEGRATION.md)
+  deliver default-wired `native-style`/`browser-style` templates, optional strict
+  settings, Rust host generation/publication, coordinated watch and app-owned
+  external CSS. Native/Tailwind and Vite/browser evidence, failure/recovery,
+  pending reconciliation and owned-process cleanup PASS. Independent Reviewer
+  PASS, Job `wc_job_3s_tnZYc7hUssjK5`, zero issues/followups. Ordinary CSS stays
+  default; generated applications need no Python. Windows qualification and two
+  recorded cloud-lock failures remain unresolved; no public release is implied.
+- **YT-240 — Native SSR/browser Todo sample and qualification (Done;
+  bounded Linux):** [Todo source and evidence](YT-240-TODO-STYLE-QUALIFICATION.md)
+  demonstrate source-only Tag Builders, private registered Rust CSS, native
+  no-WASM stylesheet build, CSS/Asset digest integration and Chrome 390/1280px
+  computed responsive/completion styles. Firefox desktop and existing Todo
+  interactions PASS. Independent Reviewer PASS, Job `wc_job_7bfgn4kA_CNHLN22`,
+  zero issues/followups. Firefox 390px, Windows and other platforms remain
+  unverified; no public package or dedicated Showcase is delivered.
+
+Ordinary CSS remains the default; no mandatory Node, WASM, new renderer,
+large CSS framework or published API. Independent **planning Reviewer PASS**
+(Job `wc_job_zVhJeQacmnaDxXdW`, zero issues/follow-ups) records the original TODO
+structure acceptance. The separate YT-237 design review above completes only
+contract research. Implementation authority for YT-238 comes from the subsequent
+owner instruction; reviews do not grant Git delivery or product release.
+The owner subsequently authorized YT-239 under SIMPLIFY and selected the
+existing Todo for YT-240, using the source-only Tag Builder before a separate
+Style Showcase. YT-240's Todo/Linux gate is reviewed PASS; a dedicated Showcase,
+Git delivery and public release remain separate and unstarted.
+
+
 **YT-236 CodeQL PR concurrency (2026-11-07):** Done at local source
 and static verification scope. The [diagnosis and acceptance record](YT-236-CODEQL-PR-CONCURRENCY.md)
 retains all four language scans and protected-master, weekly, and manual

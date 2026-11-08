@@ -67,3 +67,16 @@ pub(crate) fn reraise(signal: i32) {
         libc::raise(signal);
     }
 }
+
+pub(crate) fn capture(_app: &App, command: &mut Command, limit: usize) -> io::Result<Vec<u8>> {
+    foreground::capture(command, limit)
+}
+
+pub(crate) fn run_watch_styles(
+    rust: &mut Command,
+    watcher: &mut Command,
+    frontend: Option<&mut Command>,
+    before: &mut dyn FnMut(&mut super::watch::Events) -> io::Result<(bool, bool)>,
+) -> io::Result<Completion> {
+    foreground::run_watch_styles(rust, watcher, frontend, before)
+}

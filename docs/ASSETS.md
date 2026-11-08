@@ -137,3 +137,28 @@ item is YT-099, optional production Vite CLI/profile integration, under separate
 implementation authorization. HMR, Windows Vite
 qualification, cloud delivery/retention, default/browser changes and public
 release are not implemented here. YT-092 through YT-096 remain untouched Todo.
+
+## Optional generated application CSS — YT-239 working tree
+
+The [YT-239 integration](YT-239-STYLE-INTEGRATION.md) supplies a separate small
+application-owned CSS consumer in selected CLI templates. It does not publish or
+change the experimental shared asset API above. Development uses a stable selected
+CSS URL. Successful standalone builds accept a private logical `app-css` record
+and `app.<full-lowercase-sha256>.css`; the consumer verifies that digest against
+its exact immutable startup snapshot before linking/serving. Only the selected
+same-origin CSS route is exposed, with CSS MIME, nosniff, no-store and unchanged
+`DEFAULT_CSP`. Source, private records and generators are never static routes.
+
+Standalone Tailwind composes its document link before generated CSS. Vite imports
+the generated stable source after app.css in its normal graph, retaining Vite's
+manifest/hash/link ownership with no duplicate standalone link. Cascade layers,
+importance and specificity still precede source order. Prior production acceptance
+survives failed dependent builds; a post-CSS-replacement metadata failure is
+explicitly unaccepted and requires operator reconciliation. Private owner/production
+pending intents retain previous accepted metadata; producers and the generated
+native loader refuse either unfinished intent even when current hashes match.
+Acceptance commits only at marker removal after all fallible writes/checks.
+Preserve evidence and explicitly verify rollback or rollforward before clearing a
+retained marker; ordinary startup/retry never reconciles it. This supplies no
+retention, HA, cleanup or deployment guarantee. Local implementation review is
+pending; real-browser/Windows rendering qualification remains YT-240.

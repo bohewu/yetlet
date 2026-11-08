@@ -2,6 +2,7 @@
 #[cfg(target_os = "linux")]
 mod linux;
 pub(crate) mod static_output;
+pub(crate) mod styles_output;
 #[cfg(not(any(target_os = "linux", windows)))]
 mod unsupported;
 #[cfg(windows)]
@@ -103,8 +104,22 @@ fn generated_subdirectories(files: &[(&str, String)]) -> Result<Vec<&'static str
     let mut children = Vec::new();
     for (path, _) in files {
         let directory = match *path {
-            "src/main.rs" | "src/lib.rs" | "src/model.rs" | "src/config.rs" | "src/tailwind.rs"
-            | "src/vite.rs" | "src/tls.rs" => Some("src"),
+            "src/main.rs"
+            | "src/lib.rs"
+            | "src/model.rs"
+            | "src/config.rs"
+            | "src/tailwind.rs"
+            | "src/vite.rs"
+            | "src/tls.rs"
+            | "src/style_names.rs"
+            | "src/styles_asset.rs" => Some("src"),
+            "stylegen/main.rs"
+            | "stylegen/styles.rs"
+            | "stylegen/layout.rs"
+            | "stylegen/dialog.rs"
+            | "stylegen/builder.rs"
+            | "stylegen/Cargo.toml"
+            | "stylegen/Cargo.lock" => Some("stylegen"),
             "cargo-overlay/Cargo.toml" => Some("cargo-overlay"),
             "frontend/package.json"
             | "frontend/index.html"

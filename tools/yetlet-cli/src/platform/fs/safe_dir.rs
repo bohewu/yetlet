@@ -218,6 +218,7 @@ impl Temp {
                     let child = match child {
                         "src" => "src",
                         "frontend" => "frontend",
+                        "stylegen" => "stylegen",
                         "cargo-overlay" => "cargo-overlay",
                         _ => return Err(io::Error::other("unsupported generated child")),
                     };
