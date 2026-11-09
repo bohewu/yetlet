@@ -18,7 +18,7 @@ tokio = { workspace = true, features = ["signal", "sync"] }
 serde = { version = "1", features = ["derive"] }
 getrandom = "0.3"
 subtle = "2"
-rusqlite = { version = "0.40.2", default-features = false, features = ["bundled"] }
+rusqlite = { version = "0.41.1", default-features = false, features = ["bundled"] }
 yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.7", default-features = false, features = ["server-axum", "session"] }
 
 [dev-dependencies]

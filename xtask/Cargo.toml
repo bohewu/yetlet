@@ -23,7 +23,7 @@ getrandom = "=0.4.3"
 flate2 = "=1.1.10"
 tiny_http = "=0.12.0"
 ureq = { version = "=3.4.2", default-features = false, features = ["rustls"] }
-rusqlite = { version = "=0.40.2", default-features = false, features = ["bundled", "backup"] }
+rusqlite = { version = "=0.41.1", default-features = false, features = ["bundled", "backup"] }
 
 [target.'cfg(unix)'.dependencies]
 libc = "=0.2.183"
