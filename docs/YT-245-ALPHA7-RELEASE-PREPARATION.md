@@ -1,6 +1,6 @@
 # YT-245 — SDK alpha.7 local release preparation
 
-Date: 2026-11-09. Status: **Done at bounded prepublication acceptance scope; not released**.
+Date: 2026-11-09. Status: **C/tag/hosted build and original-evidence readback PASS; signing and publication pending**.
 Accepted baseline: `14e40614ab723a8a5b6f2de0cf85a8db762b331f`, branch
 `feature/sdk-alpha7-preparation`. PR62 is squash merged; its reviewed tree
 `d099f3e54ae427aadc00de257935371d768a5554` equals the original preparation
@@ -11,7 +11,7 @@ three post-merge master workflows passed. The Windows Runner pulled that exact
 merged source and passed the accepted MSVC native SDK/tests/SSR and wasm32 compile
 gate; its scope and unverified limits are recorded in
 [Windows gate acceptance](../artifacts/verification/yt245-alpha7-preparation-20261108/WINDOWS-GATE-ACCEPTANCE.md).
-No immutable C/S/V/P, release tag, signature, upload or publication was selected.
+C and the immutable unsigned tag are now selected and hosted build/readback have passed; S/V/P, signing, independent signing-result verification and publication remain pending.
 No mint-game or unrelated project was modified.
 ## Selected SDK and compatibility boundary
 
@@ -66,13 +66,16 @@ its exact digest before Browser verification. No `--no-verify`, dirty-source
 hosted guard bypass or new validation framework is permitted.
 
 Reuse accepted YT-234/235 semantics and [YT-243](YT-243-RELEASE-QUALIFICATION.md)
-Linux browser/CSP and local Windows evidence only at identical relevant product
-source hashes and their original declared scope. [YT-244](YT-244-PUBLICATION-SURFACE-API-AUDIT.md)
-retains package link/API audit evidence. New version/docs/archive checks are fresh
-and separate; old signatures, candidate PASS or registry receipts do not cover
-new bytes. Firefox390, macOS/runtime, Safari/mobile, hosted Windows/OpenSSL image
-and other previously unqualified claims are not promoted. No browser GUI replay
-or new Windows work occurs here.
+Linux browser/CSP and Windows evidence only at identical relevant product source
+hashes and their original declared scope. The accepted YT-245 Windows Runner gate
+passed MSVC native SDK/tests/SSR and wasm32 compilation for the exact PR #63 merge;
+that bounded result is not a Windows browser-runtime or GNU claim.
+[YT-244](YT-244-PUBLICATION-SURFACE-API-AUDIT.md) retains package link/API audit
+evidence. New version/docs/archive checks are fresh and separate; old signatures,
+candidate PASS or registry receipts do not cover new bytes. Firefox390,
+macOS/runtime, Safari/mobile, hosted Windows/OpenSSL image and other previously
+unqualified claims are not promoted. No browser GUI replay or additional Windows
+work is performed for alpha.7.
 
 ## Remaining release gates
 
@@ -84,24 +87,25 @@ or new Windows work occurs here.
    and all three post-merge master workflows passed. The Windows Runner pulled
    that exact source and passed the accepted MSVC native SDK/tests/SSR and wasm32
    compile gate (see the Windows gate acceptance above). Do not rerun this accepted
-   YT-245 Windows verification. The remaining current-source delivery step is
-   YT-246's guarded PR, exact-head CI, merge and post-merge master CI. After that
-   delivery, rerun the release documentation gate below against final `master`
-   and reconcile exact C/package inputs before selecting a candidate. No local
-   result substitutes for YT-246 PR/master CI or the final-source release-doc check.
-3. Follow the [release documentation gate](RELEASING.md#release-documentation-gate)
-   again at final source; select immutable C and unsigned version tag only with
-   authority. Bind exact tree and package inputs to normal schema2 build/readback
-   and actual artifacts. Preserve original failures and version-specific hashes.
-4. Select reviewed distinct S and explicit V/P identities. Follow existing
-   protected preparation/signing/independent verification, frozen payloads,
-   complete private-manifest and two-subject verification, authenticated
+   YT-245 Windows verification. YT-246 PR #64 is also merged as `a9ec562`; all
+   exact-head PR checks and all three post-merge master workflows passed. The final
+   release-document gate at C passed with zero sync changes.
+3. Immutable C `a9ec562eed5a0a08ab894a76a04fe859416a8ba1`, tree
+   `7df26e82cd2fe00e7f92902dac8b5f834877012c`, and lightweight tag
+   `v0.9.0-alpha.7` are selected. Hosted schema2/consolidated build run
+   `42589716426/1` and protected original-evidence readback run `42591012250/1`
+   passed; exact artifact/archive identities and the Environment tag-policy
+   rollover are recorded in [the hosted record](ALPHA7-HOSTED-RECORD.md).
+4. Select a reviewed signer commit S, distinct from C, via a normal PR with
+   independent Reviewer, Strict Commit Guard, exact-head CI, Merge and post-merge
+   master CI. V and P may equal S if the reviewed source and exact policy remain
+   unchanged. Follow protected preparation/signing/independent verification, frozen
+   payloads, complete private-manifest and two-subject verification, authenticated
    signatures and cleanup requirements. No historical signature is reusable.
-5. Bind exact English SDK notes to accepted C/evidence and derive the existing
-   six-file SDK public allowlist and joined registry plan. Obtain final actual
-   output review and owner publication approval; publish/read back GitHub then
-   both exact registry archives, checksums/index and fresh registry-only native/
-   wasm consumers. Reconcile distribution docs using actual receipts.
+5. Bind final English SDK notes to accepted C/evidence and derive the existing
+   six-file SDK public allowlist and joined two-crate registry plan. Retain actual
+   verified output hashes and the publication plan. Stop before the owner-protected
+   publication workflow; GitHub/crates.io publication requires explicit owner approval.
 6. Only after SDK availability, implement/review CLI0.3.0 manifest/pin/resources
    and current command inventory, installation/version expectations and generated
    native/browser Style consumers. Run its separate schema3/`cli` package,
@@ -169,11 +173,10 @@ all three post-merge master workflows passed, and the Windows Runner verified
 that exact merged source at the bounded scope above. The durable CI and Windows
 receipts are retained in the ignored verification directory.
 
-The next stage is the separate actual-release process: select immutable C,
-produce and read back the exact package archives, prepare distinct S/V/P
-identities, complete protected signing and independent verification, review the
-final notes/registry plan, and obtain explicit owner approval before any hosted
-release, signing or publication action. YT-245 itself did not create a release
-tag or publish packages. The later CLI migration remains blocked until SDK
-alpha.7 is actually published; the public reader edition remains pinned to the
-previously accepted SDK/CLI pair.
+The current hosted source/build/readback checkpoint is recorded in
+[ALPHA7-HOSTED-RECORD.md](ALPHA7-HOSTED-RECORD.md). C and tag are immutable; both
+unsigned archives and the original encrypted evidence have been read back and
+verified. No S/V/P, signature or independent signing-result verification exists
+yet. The later CLI migration remains blocked until SDK alpha.7 is actually
+published; the public reader edition remains pinned to the previously accepted
+SDK/CLI pair.
