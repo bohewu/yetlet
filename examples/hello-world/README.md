@@ -17,7 +17,7 @@ The default listener is `127.0.0.1:3003`; override with `YETLET_HELLO_LISTEN` fo
 
 Both routes return complete native SSR with strict CSP and no browser runtime. Unknown routes return native 404; unsupported methods return native 405. The sample is intentionally anonymous and has no persistence, authorization or production deployment hardening.
 
-## View authoring sample (unreleased source)
+## View authoring sample (typed tags in published SDK alpha.7)
 
 This sample uses `yetlet::view::tags::{main, h1}` to construct the same
 renderer-neutral `View` tree as the original `Element::new(...)` API.
@@ -26,10 +26,11 @@ while `/hello/{name}` uses `text(format!(...))` and the existing HTML
 renderer escapes untrusted path input. These are Rust helpers, not JSX, CSS
 generation or browser/WASM requirements.
 
-The typed tag helpers are **source-only in this feature branch**, not part of
-the published SDK `0.9.0-alpha.6`. Build this sample against the repository
-path dependency shown in its `Cargo.toml`; do not copy it unchanged into an
-alpha.6 registry-only application. The [View guide](../../docs/VIEW-COMPONENTS.md)
+The typed tag helpers are **included in the published SDK `0.9.0-alpha.7`**.
+This repository sample still builds against the existing path dependency in
+its `Cargo.toml`; a registry-only application using SDK alpha.6 must not copy
+the typed constructor calls unchanged. Registry consumers choosing SDK alpha.7
+can use the same typed Tag Builder. The [View guide](../../docs/VIEW-COMPONENTS.md)
 shows class helpers and broader tag coverage.
 
 ## Verify

@@ -132,7 +132,7 @@ class ReleaseDocsTests(unittest.TestCase):
             docs.check_current_module('Experimental SDK module.\n\n<details>\n'
                                       '<summary>Historical delivery context and evidence</summary>\n' + old,
                                       'module')
-        docs.check_current_module('Source-only typed tags are absent from the published SDK.', 'module')
+        docs.check_current_module('Source-only Style generation is absent from published CLI.', 'module')
 
     def test_source_gate_catches_original_entry_drift_and_allows_source_only_additions(self):
         root = Path(__file__).resolve().parent.parent
@@ -148,7 +148,7 @@ class ReleaseDocsTests(unittest.TestCase):
                   patch.object(docs, 'read', side_effect=lambda r, p: bad if p == relative else original(r, p)),
                   self.assertRaises(ValueError)):
                 docs.check_source(root)
-        # Existing current docs contain explicitly source-only tags and Style,
+        # Current docs now include published typed tags and source-only Style,
         # as well as historical publication-pending sections.
         docs.check_source(root)
 

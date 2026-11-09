@@ -1,11 +1,12 @@
 # Yetlet Architecture
 
-**Status:** Experimental. **Published SDK:** `0.9.0-alpha.6` (`yetlet` / `yetlet-browser`).
+**Status:** Experimental. **Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
 **Published CLI:** `0.2.0` (`yetlet-cli`).
 [Release readiness](RELEASE-READINESS.md) links the accepted publication records.
 M0–M9 implementation, selected M10 qualification and five application-owned
-research prototypes retain their recorded scopes. Later source-only authoring
-changes do not renew release or production qualification.
+research prototypes retain their recorded scopes. The typed Tag Builder is part of
+the published alpha.7 SDK; private Style tooling and Showcase remain checkout-only.
+Publication does not establish production or universal platform qualification.
 **Scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
 **Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md).
 

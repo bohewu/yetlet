@@ -1,7 +1,7 @@
 # Current capability and API carrier map
 
-Updated: 2026-11-08. The published Experimental SDK has two implementation packages:
-`yetlet` and `yetlet-browser`, version `0.9.0-alpha.6`, available from crates.io.
+Updated: 2026-11-09. The published Experimental SDK has two implementation packages:
+`yetlet` and `yetlet-browser`, version `0.9.0-alpha.7`, available from crates.io.
 The module map below describes capabilities, not additional installable crates.
 Base defaults select HTML; Browser defaults select DOM. Native capabilities and
 GPU/action integrations are additive opt-ins with explicit startup wiring.
@@ -17,18 +17,22 @@ ownership/error boundaries and local rustdoc. [Documentation scope](DOCUMENTATIO
 classifies reader inputs and retained evidence; this inventory does not select
 publication of its linked execution records.
 
-## Source-only authoring and sample additions
+## Published typed authoring and source-only Style additions
 
-The checkout additionally includes `yetlet::view::tags` (101 typed ordinary tag
-constructors), optional private app Style generation through the CLI, and the
-[Style Showcase](../examples/style-showcase/README.md). These are absent from
-the published SDKalpha.6/CLI0.2.0 artifacts. See the
-[API source-only map](API-REFERENCE.md#source-only-checkout-additions),
-[typed View guide](VIEW-COMPONENTS.md)
+SDK alpha.7 **includes** `yetlet::view::tags` with 101 typed ordinary tag
+constructors, the same owned View and existing renderer restrictions. See the
+[typed View guide](VIEW-COMPONENTS.md#optional-typed-tag-builders-yt-234)
+and the [SDK alpha.7 release record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09).
+The original YT-245 preparation selects local SDK `0.9.0-alpha.7` contents;
+these typed constructors are now distributed rather than checkout-only.
+
+
+The checkout also contains optional private app Style generation through CLI
+sources and the [Style Showcase](../examples/style-showcase/README.md). These
+Style surfaces remain **source-only** and absent from
+published SDKalpha.7/CLI0.2.0 artifacts, not a public SDK Style crate. See the
+[API source-only map](API-REFERENCE.md#source-only-checkout-additions)
 and [Style contract](YT-237-STYLE-REGISTRATION-CONTRACT.md).
-[YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md) selects local SDK
-`0.9.0-alpha.7` contents including typed tags; this does not change the published
-distribution or the CLI/public guide pins.
 Style authoring has a finite private app vocabulary, explicit registration and
 external build-time CSS; ordinary CSS remains the default and supplies unsupported
 syntax. There is no public style crate, renderer change or runtime style injection.

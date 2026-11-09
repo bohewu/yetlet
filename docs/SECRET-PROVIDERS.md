@@ -5,7 +5,7 @@ state. Lookup is asynchronous; loading settings and rotating credentials remain
 separate, explicitly selected operations.
 
 **Experimental SDK integration.** These modules are distributed in SDK
-`0.9.0-alpha.6`; use the documented features/target and source matching the
+`0.9.0-alpha.7`; use the documented features/target and source matching the
 version you consume. [Release readiness](RELEASE-READINESS.md) records distribution
 and its qualification limits.
 

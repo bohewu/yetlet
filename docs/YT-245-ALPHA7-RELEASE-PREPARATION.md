@@ -1,6 +1,6 @@
 # YT-245 — SDK alpha.7 local release preparation
 
-Date: 2026-11-09. Status: **C/tag/hosted build and original-evidence readback PASS; signing and publication pending**.
+Date: 2026-11-09. Status: **Original preparation and C/build/readback PASS; later owner-approved SDK alpha.7 publication and registry-only consumer PASS** (see [final release record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)).
 Accepted baseline: `14e40614ab723a8a5b6f2de0cf85a8db762b331f`, branch
 `feature/sdk-alpha7-preparation`. PR62 is squash merged; its reviewed tree
 `d099f3e54ae427aadc00de257935371d768a5554` equals the original preparation
@@ -11,7 +11,7 @@ three post-merge master workflows passed. The Windows Runner pulled that exact
 merged source and passed the accepted MSVC native SDK/tests/SSR and wasm32 compile
 gate; its scope and unverified limits are recorded in
 [Windows gate acceptance](../artifacts/verification/yt245-alpha7-preparation-20261108/WINDOWS-GATE-ACCEPTANCE.md).
-C and the immutable unsigned tag are now selected and hosted build/readback have passed; S/V/P, signing, independent signing-result verification and publication remain pending.
+At the original C/readback checkpoint, S/V/P and signature/publication were still pending. They were subsequently completed in the linked owner-approved release record; this preparation result retains its original bounded scope.
 No mint-game or unrelated project was modified.
 ## Selected SDK and compatibility boundary
 
@@ -173,10 +173,11 @@ all three post-merge master workflows passed, and the Windows Runner verified
 that exact merged source at the bounded scope above. The durable CI and Windows
 receipts are retained in the ignored verification directory.
 
-The current hosted source/build/readback checkpoint is recorded in
-[ALPHA7-HOSTED-RECORD.md](ALPHA7-HOSTED-RECORD.md). C and tag are immutable; both
-unsigned archives and the original encrypted evidence have been read back and
-verified. No S/V/P, signature or independent signing-result verification exists
-yet. The later CLI migration remains blocked until SDK alpha.7 is actually
-published; the public reader edition remains pinned to the previously accepted
-SDK/CLI pair.
+The original hosted source/build/readback checkpoint is recorded in
+[ALPHA7-HOSTED-RECORD.md](ALPHA7-HOSTED-RECORD.md). C and tag were immutable,
+with both unsigned archives and encrypted evidence read back successfully.
+At that checkpoint, S/V/P, signatures and independent result verification were
+pending; those gates and the owner-approved GitHub/crates.io distribution are now
+completed in [the final alpha.7 receipt](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09).
+CLI 0.3.0 remains a separate unimplemented release; the public reader edition
+continues to use SDK alpha.6 / CLI 0.2.0 until separately promoted.

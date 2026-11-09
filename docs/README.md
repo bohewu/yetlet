@@ -2,7 +2,7 @@
 
 Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 choose a [runnable sample](SAMPLES.md). The two-package
-[SDK `0.9.0-alpha.6`](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+[SDK `0.9.0-alpha.7`](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
 and independent [CLI `0.2.0`](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
 are published on crates.io with matching Experimental GitHub pre-releases.
 The first-app instructions and selected reader sources use the explicitly pinned
@@ -18,9 +18,9 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   shipped README/guide link boundaries, registry-first install text and
   published-versus-source-only CLI/API claims; release approval remains separate.
 - [Source-only checkout additions](API-REFERENCE.md#source-only-checkout-additions):
-  typed tags, optional private app Style generation and
-  [Style Showcase](../examples/style-showcase/README.md); external build-time CSS,
-  absent from the published SDK/CLI. The first-app examples keep the published API.
+  optional private app Style generation and
+  [Style Showcase](../examples/style-showcase/README.md), absent from the
+  published CLI/SDK packages. Typed tags are now in the published SDK alpha.7.
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
 - [Build your first Yetlet app](FIRST-APP.md): CLI0.2.0 → protected standalone project → SDK0.9.0-alpha.6 → app lock/cache → first build/run, then an optional [static-export path](FIRST-APP.md#next-export-a-static-site).

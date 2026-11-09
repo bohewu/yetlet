@@ -1,7 +1,7 @@
 # Current API reference
 
-Updated: 2026-11-08. This map distinguishes the published Experimental two-package
-SDK (`0.9.0-alpha.6`) from later checkout additions. `yetlet` contains the shared View and opt-in
+Updated: 2026-11-09. This map distinguishes the published Experimental two-package
+SDK (`0.9.0-alpha.7`) from later checkout additions. `yetlet` contains the shared View and opt-in
 native capabilities; `yetlet-browser` contains browser integrations and depends
 one-way on the same View. Both packages are available from crates.io at this version.
 Earlier release tags retain their original layouts and evidence.
@@ -27,17 +27,29 @@ API-carrier map, with full contracts in their linked guides.
 For source loading, startup validation, typed options and application-owned
 diagnostics together, follow [Settings, options and logging](SETTINGS-OPTIONS-LOGGING.md).
 
+## Published typed Tag Builder — SDK alpha.7
+
+The published SDK now includes `yetlet::view::tags` with **101 typed ordinary tag
+constructors**, element-scoped attribute setters and the existing owned `View`.
+See the [typed View guide](VIEW-COMPONENTS.md#optional-typed-tag-builders-yt-234),
+[source](../crates/yetlet/src/view/tags.rs) and
+[YT-235](YT-235-TAG-COVERAGE-PLAN.md) for constructor and renderer restrictions.
+The registry-first `Element::new` tutorial remains valid and intentionally uses
+the separately pinned SDK alpha.6 / CLI 0.2.0 reader edition.
+The historical YT-245 source preparation selects SDK `0.9.0-alpha.7` locally;
+the reviewed packages are now publicly available from crates.io.
+
+
 ## Source-only checkout additions
 
-These additions are implemented in this checkout, beyond the distributed
-SDKalpha.6/CLI0.2.0 artifacts. [YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md)
-selects SDK `0.9.0-alpha.7` locally, including typed tags. CLI remains at its
-published manifest and registry binding until SDK publication permits migration.
-Local version selection does not establish registry availability.
+These application-owned Style surfaces remain beyond the distributed
+SDKalpha.7/CLI0.2.0 artifacts. The Style generator and native/browser Style
+templates are absent from independent published CLI 0.2.0; CLI 0.3.0 is a
+separate later release. No public Style crate or implicit runtime CSS is
+introduced by SDK alpha.7.
 
 | Source surface | Entry point and contract | Availability and limits |
 |---|---|---|
-| Typed View tags | `yetlet::view::tags`; [View guide](VIEW-COMPONENTS.md#optional-typed-tag-builders-unreleased-source-only-yt-234), [source](../crates/yetlet/src/view/tags.rs), [YT-235](YT-235-TAG-COVERAGE-PLAN.md) | Included in the selected local alpha.7 SDK: 101 ordinary tag constructors, scoped setters and the same owned View. Renderer validation still applies; published first-app `Element::new` examples remain valid |
 | Optional Style authoring | [CLI Style integration](../tools/yetlet-cli/README.md#optional-application-owned-rust-css-yt-239-working-tree), [contract](YT-237-STYLE-REGISTRATION-CONTRACT.md), [implementation](YT-239-STYLE-INTEGRATION.md) | Source-only CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
 | Style Showcase | [Native-first gallery](../examples/style-showcase/README.md) | Checkout sample with actual View/Style/CSS disclosures and optional local WASM class switching; bounded Linux evidence, no new published package or platform qualification |
 

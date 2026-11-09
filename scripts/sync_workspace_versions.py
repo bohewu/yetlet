@@ -653,8 +653,8 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
              sdk_short, cli, "published SDK/CLI source-only boundary"),
     ])
     apply("docs/COMPATIBILITY.md", [
-        one(r"(not shipped in SDK " + tick + ")" + VERSION_PATTERN + r"(" + tick + r";)",
-            sdk, "source-only package boundary"),
+        one(r"(now \*\*published in SDK " + tick + ")" + VERSION_PATTERN + r"(" + tick + r"\*\*)",
+            sdk, "typed-tag published SDK"),
         pair(r"(published SDK )" + VERSION_SHORT_PATTERN + r"( and CLI )" + VERSION_PATTERN + r"( packages)",
              sdk_short, cli, "published SDK/CLI packages"),
         one(r"(The published SDK is " + tick + "yetlet" + tick + " / " +
@@ -672,8 +672,8 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
     apply("docs/VIEW-COMPONENTS.md", [
         one(r"(Experimental SDK " + tick + ")" + VERSION_PATTERN +
             r"(" + tick + r", published on crates\.io\.)", sdk, "published SDK"),
-        one(r"(not part\s+of the published SDK )" + VERSION_PATTERN + r"(\*\* or the registry-first)",
-            sdk, "typed-tag publication boundary"),
+        one(r"(available from published SDK\s*" + tick + ")" + VERSION_PATTERN + r"(" + tick + r")",
+            sdk, "typed-tag published SDK"),
     ])
     apply("docs/DOCUMENTATION-SCOPE.md", [
         pair(r"(\n" + tick + ")" + VERSION_PATTERN +
@@ -726,7 +726,7 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
         one(r"(\[CLI " + tick + ")" + VERSION_PATTERN + r"(" + tick + r"\]\()",
             cli, "CLI release index"),
         pair(r"(CLI)" + VERSION_PATTERN + r"( → protected standalone project → SDK)" + VERSION_PATTERN + r"( → app lock/cache)",
-             cli, sdk, "first-app reader index"),
+             edition["cli"], edition["sdk"], "first-app reader edition index"),
     ])
 
     relative = "README.md"
@@ -798,8 +798,8 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
         changes[relative] = updated
 
     apply("examples/hello-world/README.md", [
-        one(r"(the published SDK " + tick + ")" + VERSION_PATTERN + r"(" + tick + r"\.)",
-            sdk, "hello-world published SDK boundary"),
+        one(r"(included in the published SDK " + tick + ")" + VERSION_PATTERN + r"(" + tick + r")",
+            sdk, "hello-world published typed tags"),
     ])
     return changes
 

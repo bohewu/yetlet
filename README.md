@@ -23,6 +23,16 @@ Rust Views with optional browser WASM when a screen needs local interaction.
 - **Use bounded output policies.** HTML escaping and strict page CSP are built
   into the server rendering path; application authorization stays explicit.
 
+## Current published SDK
+
+The latest published Experimental SDK is [`yetlet` 0.9.0-alpha.7](https://crates.io/crates/yetlet/0.9.0-alpha.7)
+and [`yetlet-browser` 0.9.0-alpha.7](https://crates.io/crates/yetlet-browser/0.9.0-alpha.7),
+with [signed GitHub release assets](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.7)
+and a registry-verified consumer. It includes the typed Tag Builder API. The
+**independent CLI remains 0.2.0**, and the first-app/quickstart below deliberately
+follows the separately pinned **SDK alpha.6 / CLI 0.2.0** reader edition; publication
+of a newer SDK alone does not upgrade that tutorial or the CLI's generated pin.
+
 ## Start with native SSR
 
 **Experimental alpha.** This quickstart uses SDK `0.9.0-alpha.6` and the
