@@ -1,17 +1,25 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**YT-245 SDK alpha.7 local preparation (2026-11-08): Done at bounded preparation scope.**
+**YT-246 canonical version authorities and release-document synchronization (2026-11-09): Implementation and independent Reviewer PASS; guarded Git delivery follows.**
+[Version source audit](YT-246-VERSION-SOURCE-AUDIT.md) separates SDK source,
+accepted published SDK/CLI versions, the CLI-generated SDK pin and the explicit
+public reader edition. Sync/check, 49 regression tests, documentation DAG and
+sample catalog pass. Final independent Reviewer Job `wc_job_iTtOZOllaZ8sBEMf`
+completed at terminal exit 0 with JSON PASS and zero issues/followups. Native ACP
+is unavailable; the saved role-directed WebCodex `codex exec` route was used, not
+native managed-role dispatch. Package publication remains a separate owner-approved
+step.
+
+**YT-245 SDK alpha.7 local preparation (2026-11-09): Done at prepublication scope.**
 [Preparation record](YT-245-ALPHA7-RELEASE-PREPARATION.md) selects exactly
 `yetlet` then `yetlet-browser`, SDK `0.9.0-alpha.7`, with coherent path locks
-and package-carried docs. Independent CLI0.3.0 Style preparation waits for actual
-SDK publication; CLI0.2.0 and the public SDKalpha.6/CLI0.2.0 guide stay pinned.
-Independent corrective Reviewer `wc_job_138KD3ElAAfaxxap` PASS closes one
-premature distribution claim after exact Browser archive/consumer reconciliation.
-Local archive checks do not select immutable C or authorize hosted release,
-signing or publication. The owner-selected next order is PR/exact-head CI/Merge,
-then Windows Runner pull/verification of the actual merged source. Windows remains paused before merge; actual publication remains
-blocked until that gate passes and the final release request is approved.
-
+and package-carried docs. PR #63 merged to `master` as
+`1beb4d3cf2aea76b0cb29ca634a52e55bc55f088`; all PR exact-head and post-merge
+master workflows passed. The Windows Runner pulled that exact commit and passed
+the accepted MSVC native SDK/tests/SSR and wasm32 compile gate. Windows browser
+runtime, GNU, Safari/macOS/mobile and production qualification remain unverified.
+CLI0.2.0 and the public SDKalpha.6/CLI0.2.0 reader edition stay pinned. No
+immutable release candidate, tag, signature or registry publication is selected.
 **YT-244 publication surface and API consistency (2026-11-08): Done at local documentation scope.**
 The [source/package audit](YT-244-PUBLICATION-SURFACE-API-AUDIT.md) corrects the
 three Cargo package READMEs, their links and carried module-guide boundaries,
