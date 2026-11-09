@@ -1,6 +1,6 @@
 # Yetlet Experimental Compatibility Policy
 
-## Selected local SDK alpha.7 typed authoring helpers — YT-234/245
+## Selected local SDK 0.9.0-alpha.7 typed authoring helpers — YT-234/245
 
 [YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md) selects SDK
 `0.9.0-alpha.7` locally, including
@@ -15,7 +15,7 @@ class tokens, and `.placeholder` is only on typed input/textarea. General raw
 inline-style API, browser runtime or WASM renderer change is introduced.
 
 
-## Selected local SDK alpha.7 full ordinary tag authoring — YT-235/245
+## Selected local SDK 0.9.0-alpha.7 full ordinary tag authoring — YT-235/245
 
 On top of YT-234, the current checkout includes 101 constructor names
 corresponding to the dated YT-219 standard HTML ordinary View inventory

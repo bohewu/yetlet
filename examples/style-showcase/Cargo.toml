@@ -10,10 +10,10 @@ publish = false
 default-run = "yetlet-style-showcase"
 
 [dependencies]
-yetlet = { path = "../../crates/yetlet", default-features = false }
+yetlet = { version = "0.9.0-alpha.7", path = "../../crates/yetlet", default-features = false }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
-yetlet = { path = "../../crates/yetlet", default-features = false, features = ["server-axum"] }
+yetlet = { version = "0.9.0-alpha.7", path = "../../crates/yetlet", default-features = false, features = ["server-axum"] }
 axum.workspace = true
 tokio.workspace = true
 serde = { version = "1", features = ["derive"] }

@@ -16,10 +16,6 @@ ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "target/docs-site"
 REPOSITORY = "https://github.com/bohewu/yetlet"
 LINK = re.compile(r"(!?\[[^\]\n]*\]\()([^\s)]+)(\))")
-# Explicit published reader edition, independent of development package versions.
-# Promote only after both distributions and the guide consumer are qualified.
-PUBLISHED_EDITION = {"sdk": "0.9.0-alpha.6", "cli": "0.2.0"}
-
 
 def rewrite_links(text, source, destinations, commit):
     """Use local chapters for selected inputs and pinned GitHub links otherwise."""
@@ -60,8 +56,9 @@ def page_label(commit, dirty, sdk, cli, edition, public):
     if public:
         if dirty:
             raise ValueError("Public documentation requires a clean checkout")
-        if edition != PUBLISHED_EDITION:
-            raise ValueError("Public guide edition must match the reviewed SDK/CLI versions")
+        if (not isinstance(edition, dict) or set(edition) != {"sdk", "cli"}
+                or not all(isinstance(value, str) and value for value in edition.values())):
+            raise ValueError("Public guide edition must be explicitly selected in site/pages.toml")
         sdk, cli = edition["sdk"], edition["cli"]
         return (f"> Yetlet documentation · SDK `{sdk}` · CLI `{cli}`. "
                 f'Source [{commit[:7]}]({REPOSITORY}/tree/{commit} "{commit}").\n\n')

@@ -5,6 +5,8 @@ import re
 import shlex
 import sys
 import tomllib
+import sync_workspace_versions as sdk_versions
+from release_version_authority import PUBLICATION_RECORDS, published_versions
 
 
 # Current reader entry points only. Dated task/evidence records retain history.
@@ -21,11 +23,6 @@ CURRENT_DOCS = (
     'docs/SETTINGS-SECRET-PROVIDER.md', 'docs/SETTINGS-OPTIONS-LOGGING.md',
 )
 PINNED_GUIDES = ('README.md', 'docs/FIRST-APP.md')
-# Existing accepted records, not development manifests, establish distribution.
-PUBLICATION_RECORDS = {
-    'SDK': ('docs/ALPHA6-RELEASE-PREPARATION.md', 'registry consumer'),
-    'CLI': ('docs/CLI-020-RELEASE-PREPARATION.md', 'installed consumer'),
-}
 STALE = re.compile(
     r'publication\s+(?:is\s+)?pending|'
     r'unreleased\s+(?:checkout|opt-in|static\s+HTML|ordinary\s+HTML|controlled\s+DOM)|'
@@ -159,19 +156,6 @@ def read(root, relative):
     return path.read_text(encoding='utf-8')
 
 
-def published_versions(root):
-    versions = {}
-    for subject, (relative, consumer) in PUBLICATION_RECORDS.items():
-        text = read(root, relative)
-        sections = re.split(r'(?m)^## Owner-approved publication and ' + consumer + r'[^\n]*\n', text)
-        require(len(sections) == 2, relative, 'accepted publication section required')
-        section = re.split(r'(?m)^## ', sections[1], maxsplit=1)[0]
-        prefix = 'yetlet-cli-v' if subject == 'CLI' else 'v'
-        values = re.findall(r'https://github\.com/bohewu/yetlet/releases/tag/' + prefix +
-                            r'([0-9][0-9A-Za-z.+-]*)\)', section)
-        require(len(values) == 1, relative, 'one accepted release tag reference required')
-        versions[subject] = values[0]
-    return versions
 
 
 def check_distribution(text, versions, location):
@@ -248,12 +232,22 @@ def check_source(root, cohort='all'):
         check_installs(read(root, relative), edition['cli'], relative)
     for relative in ('docs/COMPATIBILITY.md', 'docs/DOCUMENTATION-SCOPE.md'):
         check_edition(read(root, relative), edition, relative)
+    if root.resolve() == Path(__file__).resolve().parent.parent:
+        sdk_versions.check(root)
 
 
 def main():
-    require(sys.argv[1:] == ['check'], 'arguments', 'use check')
-    check_source(Path(__file__).resolve().parent.parent)
-    print('release documentation: PASS (manifest references, installation, status and pinned edition)')
+    root = Path(__file__).resolve().parent.parent
+    if sys.argv[1:] == ['sync']:
+        changed = sdk_versions.sync(root)
+        check_source(root)
+        print(f'release documentation: synchronized {len(changed)} version-derived file(s)')
+        for relative in changed:
+            print(f'  {relative}')
+        return
+    require(sys.argv[1:] == ['check'], 'arguments', 'use sync or check')
+    check_source(root)
+    print('release documentation: PASS (manifest-derived package versions, publication records, reader edition, SDK path consumers and module guides)')
 
 
 if __name__ == '__main__':

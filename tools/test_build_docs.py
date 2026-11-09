@@ -1,47 +1,48 @@
 """Focused publication-label and actual site-root checks; no product suite replay."""
 
 import tempfile
+import tomllib
 import unittest
 from pathlib import Path
 
 import build_docs
 
+ROOT = Path(__file__).resolve().parents[1]
+SITE_EDITION = tomllib.loads((ROOT / "site/pages.toml").read_text())["edition"]
+
 
 class PublicationLabels(unittest.TestCase):
     commit = "a" * 40
-    edition = {"sdk": "0.9.0-alpha.6", "cli": "0.2.0"}
+    edition = SITE_EDITION
 
     def label(self, *, dirty=False, edition=None, public=True):
-        return build_docs.page_label(self.commit, dirty, self.edition["sdk"],
-                                     self.edition["cli"], edition or self.edition, public)
+        return build_docs.page_label(self.commit, dirty, "9.9.9-alpha.1", "9.9.9",
+                                     self.edition if edition is None else edition, public)
 
-    def test_public_labels_bind_full_commit_and_explicit_edition(self):
+    def test_public_labels_bind_full_commit_and_explicit_site_edition(self):
         label = self.label()
         self.assertIn(f"/tree/{self.commit}", label)
-        self.assertIn("0.9.0-alpha.6", label)
-        self.assertIn("0.2.0", label)
+        self.assertIn(f"SDK `{self.edition['sdk']}`", label)
+        self.assertIn(f"CLI `{self.edition['cli']}`", label)
         self.assertNotIn("Local documentation preview", label)
+
+    def test_workspace_versions_do_not_implicitly_promote_the_reader_edition(self):
+        label = self.label()
+        self.assertNotIn("9.9.9-alpha.1", label)
+        self.assertNotIn("9.9.9", label)
+
+    def test_missing_public_edition_is_refused(self):
+        with self.assertRaisesRegex(ValueError, "site/pages.toml"):
+            build_docs.page_label(self.commit, False, "9.9.9-alpha.1", "9.9.9", None, True)
 
     def test_dirty_public_input_is_refused(self):
         with self.assertRaisesRegex(ValueError, "clean checkout"):
             self.label(dirty=True)
 
-    def test_workspace_version_does_not_silently_change_public_edition(self):
-        with self.assertRaisesRegex(ValueError, "reviewed SDK/CLI"):
-            self.label(edition={"sdk": "0.9.0-alpha.7", "cli": "0.2.0"})
-
-    def test_new_workspace_versions_preserve_the_published_reader_edition(self):
-        label = build_docs.page_label(self.commit, False, "0.9.0-alpha.7", "0.3.0",
-                                      self.edition, True)
-        self.assertIn("SDK `0.9.0-alpha.6` · CLI `0.2.0`", label)
-        self.assertNotIn("0.9.0-alpha.7", label)
-        self.assertNotIn("0.3.0", label)
-
     def test_preview_still_allows_local_edits(self):
         label = self.label(dirty=True, public=False)
         self.assertIn("Local documentation preview", label)
         self.assertIn("with local edits", label)
-
 
 class SiteOutput(unittest.TestCase):
     pages = [{"output": "index.md"}, {"output": "next.md"}]

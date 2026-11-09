@@ -75,6 +75,7 @@ class ReleaseDocsTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             docs.check_readme('yetlet', '8.0.0', snippet.replace('=8.0.0', '=7.0.0'))
 
+
     def test_current_checkout_and_explicit_pinned_edition(self):
         root = Path(__file__).resolve().parent.parent
         docs.check_source(root)

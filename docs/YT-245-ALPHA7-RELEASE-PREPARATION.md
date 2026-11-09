@@ -1,21 +1,18 @@
 # YT-245 — SDK alpha.7 local release preparation
 
-Date: 2026-11-08. Status: **Done at bounded local SDK preparation scope after independent corrective PASS; not released**.
+Date: 2026-11-09. Status: **Done at bounded prepublication acceptance scope; not released**.
 Accepted baseline: `14e40614ab723a8a5b6f2de0cf85a8db762b331f`, branch
 `feature/sdk-alpha7-preparation`. PR62 is squash merged; its reviewed tree
 `d099f3e54ae427aadc00de257935371d768a5554` equals the original preparation
-baseline tree. The original PR and post-merge master workflows passed; their
-receipts remain in the ignored `yt244-pr-delivery-20261108/FINAL-HANDOFF.md`.
-The owner authorizes this local continuation from the once-restored preparation
-stash after that merge. The original snapshot and stopped-job logs are retained;
-new execution receipts use `resume-*` names. This task selects no immutable C/S/V/P,
-release tag, hosted release run, signature, upload or public GitHub Draft.
-The owner requires this preparation to pass independent review, normal PR/CI and
-Merge first; then the Windows Runner must pull the exact merged source and pass
-focused validation before any actual release. Windows remains on hold before
-that merge. The local implementation has not contacted Windows or mint-game;
-Git delivery and the post-merge Windows gate are parent-owned follow-up stages.
-
+baseline tree. PR #63 delivered the alpha.7 preparation and was squash merged to
+`master` as `1beb4d3cf2aea76b0cb29ca634a52e55bc55f088` (tree
+`9e710eff0a7b1ce70b6b0778a354654fdabd16dc`). All PR exact-head checks and all
+three post-merge master workflows passed. The Windows Runner pulled that exact
+merged source and passed the accepted MSVC native SDK/tests/SSR and wasm32 compile
+gate; its scope and unverified limits are recorded in
+[Windows gate acceptance](../artifacts/verification/yt245-alpha7-preparation-20261108/WINDOWS-GATE-ACCEPTANCE.md).
+No immutable C/S/V/P, release tag, signature, upload or publication was selected.
+No mint-game or unrelated project was modified.
 ## Selected SDK and compatibility boundary
 
 Exactly `yetlet`, then `yetlet-browser`, schema2/`consolidated`, locally selected
@@ -82,15 +79,16 @@ or new Windows work occurs here.
 1. Retain the accepted independent preparation review and original finding below.
    Later changes require source/evidence reconciliation and review of their
    affected scope; this local acceptance is not final release approval.
-2. Obtain separate Git delivery authority, strict/builtin Commit Guard, normal
-   PR, exact-head CI, Merge, then final merged-source/CI reconciliation for this
-   alpha.7 preparation before any candidate selection or publication. PR62's
-   accepted baseline does not deliver these new version bytes. Reconcile reviewed
-   source and accepted reused/new platform scope. The owner-selected next gate is
-   a Windows Runner Git pull and focused verification of that exact merged source;
-   no mint-game checkout or unrelated environment may be changed. A failed or
-   unverified Windows result blocks actual release. No local result substitutes
-   for either PR/master CI or this post-merge platform gate.
+2. YT-245 Git delivery and its platform gate are complete: PR #63 merged to
+   `master` as `1beb4d3cf2aea76b0cb29ca634a52e55bc55f088`; PR exact-head checks
+   and all three post-merge master workflows passed. The Windows Runner pulled
+   that exact source and passed the accepted MSVC native SDK/tests/SSR and wasm32
+   compile gate (see the Windows gate acceptance above). Do not rerun this accepted
+   YT-245 Windows verification. The remaining current-source delivery step is
+   YT-246's guarded PR, exact-head CI, merge and post-merge master CI. After that
+   delivery, rerun the release documentation gate below against final `master`
+   and reconcile exact C/package inputs before selecting a candidate. No local
+   result substitutes for YT-246 PR/master CI or the final-source release-doc check.
 3. Follow the [release documentation gate](RELEASING.md#release-documentation-gate)
    again at final source; select immutable C and unsigned version tag only with
    authority. Bind exact tree and package inputs to normal schema2 build/readback
@@ -165,9 +163,17 @@ source, actual archive and checksum-bound consumer. The parent accepts YT-245
 only at bounded local SDK preparation scope; all 67 other reviewed paths and
 58 product inputs remain unchanged.
 
-Next delivery gates are the owner-authorized strict Git delivery, new
-PR/exact-head CI/Merge, final source/CI reconciliation and Windows pull/verification.
-Their actual receipts are retained separately from this local checkpoint. This continuation
-stops before actual publication even if those checks pass. Later CLI migration
-remains blocked by actual SDK publication; local preparation alone is not a
-release candidate, platform expansion or publication acceptance.
+The requested prepublication sequence is now complete: PR #63 exact-head CI
+passed, the PR was squash merged as `1beb4d3cf2aea76b0cb29ca634a52e55bc55f088`,
+all three post-merge master workflows passed, and the Windows Runner verified
+that exact merged source at the bounded scope above. The durable CI and Windows
+receipts are retained in the ignored verification directory.
+
+The next stage is the separate actual-release process: select immutable C,
+produce and read back the exact package archives, prepare distinct S/V/P
+identities, complete protected signing and independent verification, review the
+final notes/registry plan, and obtain explicit owner approval before any hosted
+release, signing or publication action. YT-245 itself did not create a release
+tag or publish packages. The later CLI migration remains blocked until SDK
+alpha.7 is actually published; the public reader edition remains pinned to the
+previously accepted SDK/CLI pair.

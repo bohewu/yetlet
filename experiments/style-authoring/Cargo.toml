@@ -7,4 +7,4 @@ publish = false
 [workspace]
 
 [dependencies]
-yetlet = { path = "../../crates/yetlet", default-features = false }
+yetlet = { version = "0.9.0-alpha.7", path = "../../crates/yetlet", default-features = false }

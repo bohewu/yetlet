@@ -49,15 +49,14 @@ def prepare(public=False):
                          "markdown": existing.rewrite_links(excerpt, source, destinations, commit)})
     prepared = {"commit": commit, "public": public, "sdk": selection["edition"]["sdk"],
                 "cli": selection["edition"]["cli"], "base": base, "chapters": chapters}
-    if selection["edition"] != existing.PUBLISHED_EDITION:
-        raise ValueError("Pilot edition changed; review the consumer first")
     consumer = tomllib.loads((APP / "Cargo.toml").read_text())
     dependencies = [consumer["dependencies"],
                     *(target.get("dependencies", {}) for target in consumer.get("target", {}).values())]
-    requirements = [table[name]["version"] for table in dependencies
-                    for name in ("yetlet", "yetlet-browser") if name in table]
-    if not requirements or any(version != "=" + prepared["sdk"] for version in requirements):
-        raise ValueError("Guide consumer must pin the selected registry SDK exactly")
+    requirements = {name: [table[name]["version"] for table in dependencies if name in table]
+                    for name in ("yetlet", "yetlet-browser")}
+    if any(not versions or any(version != "=" + prepared["sdk"] for version in versions)
+           for versions in requirements.values()):
+        raise ValueError("Guide consumer must pin both selected registry SDK packages exactly")
     destination = APP / "src/generated"
     destination.mkdir(exist_ok=True)
     (destination / "chapters.json").write_text(json.dumps(prepared, ensure_ascii=True, indent=2) + "\n")
