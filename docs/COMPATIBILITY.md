@@ -6,8 +6,9 @@
 `0.9.0-alpha.7`, including
 `yetlet::view::tags` with typed fluent constructors and additive convenience
 methods. These are now **published in SDK `0.9.0-alpha.7`**, but were absent from alpha.6.
-The deliberately pinned first-app reader edition and the independent CLI 0.2.0
-registry SDK pin do not change automatically. The existing owned
+The historical CLI0.2.0 registry pin remains immutable. The current reader
+edition follows the verified publication pair through the required release
+closeout; a development manifest change alone does not promote it. The existing owned
 `Element`/`View` representation, append-only `Element::attribute`, renderer
 policies, native/browser feature boundaries and Rust 1.99 MSRV remain intact.
 Convenience `.id`/`.class` set or replace, `.add_class` merges distinct
@@ -46,7 +47,7 @@ and opt-in navigation/images are available in SDKalpha.6; YT-223's static export
 is available in CLI0.2.0. Existing defaults and Experimental API limits remain.
 
 The public reader/first-app edition remains explicitly pinned to
-SDKalpha.6/CLI0.2.0 in [the site manifest](../site/pages.toml).
+SDKalpha.7/CLI0.3.0 in [the site manifest](../site/pages.toml).
 
 Some registry-only
 reference examples retain their own SDKalpha.5 pins, independently of the

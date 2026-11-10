@@ -1,17 +1,18 @@
 # Yetlet documentation site
 
-Application-owned, nonpublishable YT-224 package using registry SDK0.9.0-alpha.6,
+Application-owned, nonpublishable YT-224 package using registry SDK0.9.0-alpha.7,
 with [YT-225 public-mode artifact preparation](../../docs/YT-225-DOCS-PUBLIC-BUILD.md).
 It renders the eight existing selections/excerpts in site/pages.toml with Yetlet
 HTML, plus separately selected browser search. The later owner-authorized
 [YT-226 cutover](../../docs/YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
 publishes this reader at https://bohewu.github.io/yetlet/ without adding an SDK/CLI
 API. Local export commands do not change Pages. Static export is available in
-published CLI `0.2.0`; the reproducible source-bound build below continues to use
-the reviewed CLI from this checkout. The next reader source edition/consumer is
-explicitly pinned to SDKalpha.6/CLI0.2.0 independently of future builder versions.
-[YT-232](../../docs/YT-232-PUBLIC-GUIDE-EDITION.md) records this local update;
-the live Pages edition stays unchanged until separately authorized deployment.
+published CLI `0.2.0` and remains available in later releases; the reproducible
+source-bound build below uses the reviewed CLI from this checkout. The reader
+source edition/consumer is explicitly pinned to SDKalpha.7/CLI0.3.0 independently
+of future builder versions. [YT-249](../../docs/YT-249-READER-RELEASE-ROLLOVER.md)
+records this promotion and the mandatory update after each verified publication;
+[YT-232](../../docs/YT-232-PUBLIC-GUIDE-EDITION.md) retains the prior edition's proof.
 
 ## Prerequisites
 

@@ -91,7 +91,7 @@ class PublicPreparation(unittest.TestCase):
 
     def test_mismatched_consumer_sdk_is_rejected_before_preparation(self):
         manifest = self.app / "Cargo.toml"
-        manifest.write_text(manifest.read_text().replace("=0.9.0-alpha.6", "=0.0.0", 1))
+        manifest.write_text(manifest.read_text().replace("=" + SITE_EDITION["sdk"], "=0.0.0", 1))
         with patch.object(prepare.subprocess, "check_output", side_effect=[self.commit, ""]):
             with self.assertRaisesRegex(ValueError, "both selected registry SDK packages exactly"):
                 prepare.prepare(public=True)

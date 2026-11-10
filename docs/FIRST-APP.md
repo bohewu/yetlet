@@ -1,9 +1,9 @@
 # Build your first Yetlet app
 
 Create a standalone native SSR app with the published source-installed CLI and
-`yetlet` SDK `0.9.0-alpha.6`. This Linux/POSIX walkthrough uses the existing
+`yetlet` SDK `0.9.0-alpha.7`. This Linux/POSIX walkthrough uses the existing
 scaffold; the app needs no local SDK source or Cargo path overrides. APIs remain
-Experimental. CLI `0.2.0` and SDK `0.9.0-alpha.6` have independent versions.
+Experimental. CLI `0.3.0` and SDK `0.9.0-alpha.7` have independent versions.
 
 For an app whose UI and state run in the browser without a native HTTP backend,
 choose the separate [browser-only WASM walkthrough](BROWSER-APP.md).
@@ -19,9 +19,10 @@ choose the separate [browser-only WASM walkthrough](BROWSER-APP.md).
 - Use an owned local application parent with
   no group/world write access. Choose unused directory/application names. The
   CLI refuses overwrite and unsafe paths; do not disable those checks.
-- Prepare network access for explicit Cargo dependency preparation, or an
-  already populated cache. The CLI does not install tools, refresh locks or
-  fetch missing dependencies for frozen execution. No Node.js, WASM target,
+- Prepare network access for SDK metadata and initial Cargo lock resolution,
+  then explicitly fetch app dependencies. `new` resolves the requested SDK and
+  creates the app lock; later build/run use frozen inputs. The CLI does not
+  install tools. No Node.js, WASM target,
   browser build, database, service token or cloud account is needed here.
 - Use a terminal without unrelated `APP_CLI__*`, settings-root or port overrides.
   The plain native scaffold defaults to Production CLI settings, Vite off and
@@ -40,12 +41,12 @@ in Cargo's user install directory.
 Install the independently published CLI from crates.io:
 
 ```sh
-cargo +1.99.0 install yetlet-cli --version 0.2.0 --locked
+cargo +1.99.0 install yetlet-cli --version 0.3.0 --locked
 yetlet --version
 ```
 
 This downloads the CLI source archive from crates.io and compiles the `yetlet`
-executable. Expected version output is exactly `yetlet 0.2.0`. This is a native
+executable. Expected version output is exactly `yetlet 0.3.0`. This is a native
 source installation, so the prerequisites above apply. Maintainers evaluating a
 checkout can use the separate [source-install instructions](../tools/yetlet-cli/README.md#build-locally-and-create-an-application).
 
@@ -61,7 +62,7 @@ env PATH="$yetlet_rust_bin:$PATH" yetlet doctor --json
 
 For an isolated prefix, add `--root /absolute/owned/cli-prefix` to the install
 command and invoke `/absolute/owned/cli-prefix/bin/yetlet`. The CLI version is
-independent of SDK `0.9.0-alpha.6`.
+independent of SDK `0.9.0-alpha.7`.
 `--locked` allows downloading locked dependencies. A version or doctor result
 identifies a tool/environment, not application readiness. For a Rustup setup,
 `rustup which` selects the actual already-installed toolchain directory. The
@@ -80,14 +81,21 @@ parent and skip its creation.
 ```sh
 yetlet_parent="$HOME/yetlet-first-apps"
 mkdir -m 700 "$yetlet_parent"
-yetlet new firstapp --parent "$yetlet_parent"
+env PATH="$yetlet_rust_bin:$PATH" yetlet new firstapp --parent "$yetlet_parent" --sdk-version 0.9.0-alpha.7
 yetlet_app="$yetlet_parent/firstapp"
 ```
 
 Plain `new` selects the existing native template. It writes `Cargo.toml`,
-`src/main.rs`, README, gitignore and public base/profile TOMLs, but creates no
-Cargo.lock, installs nothing and starts no process. The app declares its own
+`src/main.rs`, README, gitignore, public base/profile TOMLs, Cargo.lock and
+`.yetlet/sdk-resolution.json`. It installs no tools and starts no application
+server. The app declares its own
 standalone `[workspace]`; it is not added to Yetlet's workspace.
+
+The explicit SDK selection keeps this walkthrough on its reviewed reader
+edition even after another compatible SDK is published. Omitting it resolves
+the latest compatible SDK under the installed CLI's policy. `--offline` uses
+only local resolver metadata and Cargo index/cache; missing inputs fail clearly
+without contacting the registry. See the [resolver CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md).
 
 The public TOMLs configure CLI behavior. They do not mean the app has selected
 the optional runtime Settings loader. This path needs no `--settings`,
@@ -95,7 +103,7 @@ the optional runtime Settings loader. This path needs no `--settings`,
 
 ### 3. Prepare the app lock/cache, then build and run
 
-The generated manifest already selects `yetlet = "=0.9.0-alpha.6"` from crates.io
+The generated manifest already selects `yetlet = "=0.9.0-alpha.7"` from crates.io
 with `server-axum`; keep that dependency and its selected features. No manifest
 editing, SDK checkout, `[patch]` or path override is required. Work in the new
 app directory, outside the Yetlet checkout:
@@ -104,15 +112,15 @@ app directory, outside the Yetlet checkout:
 cd "$yetlet_app"
 (
     export PATH="$yetlet_rust_bin:$PATH"
-    cargo generate-lockfile
     cargo fetch --locked
     yetlet build
     yetlet run
 )
 ```
 
-The first two commands explicitly prepare this app's dependency graph and cache.
-Keep its own Cargo.lock; do not copy Yetlet's, the CLI's or xtask's lock. CLI
+The fetch command prepares dependencies using the lock already created by `new`.
+Keep that Cargo.lock and the resolution receipt; do not regenerate the lock or
+copy Yetlet's, the CLI's or xtask's lock for this walkthrough. CLI
 build/run use frozen Cargo: they cannot repair a stale lock or download a missing
 dependency. Frozen execution is not a sandbox for build scripts or application
 code. Node/npm is unnecessary for this plain native app.
@@ -181,13 +189,13 @@ to pass data and compose the existing home handler. Use the
 ## Next: export a static site
 
 Choose static export when the content can be built ahead of time and served as
-HTML files. Keep the native SSR app above for request-time handlers. CLI `0.2.0`
+HTML files. Keep the native SSR app above for request-time handlers. CLI `0.3.0`
 supports static export; it does not crawl those handlers or turn the plain
 scaffold into an exporter. There is no `yetlet new --static` option.
 
 Start with the [standalone static-site example](../examples/static-site/README.md)
 and its explicit `site-export` binary, using the same published SDK
-`0.9.0-alpha.6`. Its [exporter source](../examples/static-site/src/main.rs)
+`0.9.0-alpha.7`. Its [exporter source](../examples/static-site/src/main.rs)
 shows finite public pages/assets and escaped Views. After preparing that
 application's own lock/cache, run from its protected directory with the
 installed CLI and selected physical Rust toolchain:

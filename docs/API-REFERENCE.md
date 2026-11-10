@@ -35,7 +35,7 @@ See the [typed View guide](VIEW-COMPONENTS.md#optional-typed-tag-builders-yt-234
 [source](../crates/yetlet/src/view/tags.rs) and
 [YT-235](YT-235-TAG-COVERAGE-PLAN.md) for constructor and renderer restrictions.
 The registry-first `Element::new` tutorial remains valid and intentionally uses
-the separately pinned SDK alpha.6 / CLI 0.2.0 reader edition.
+the reviewed Reader Edition selected in [the site manifest](../site/pages.toml).
 The historical YT-245 source preparation selects SDK `0.9.0-alpha.7` locally;
 the reviewed packages are now publicly available from crates.io.
 
@@ -106,7 +106,7 @@ builds are not the default dependency graph of a small SSR application.
 |---|---|---|
 | [Board](../examples/lab-operations-board/README.md) / [Admin](../examples/admin-dashboard/README.md) | `BoardOptions`; `Board::open_with_options` and `open_with_oidc_and_options` | Independent default-false `write_authorization` / `request_tracing`, plus frontend/Session inputs. Uncompiled selections fail before storage; existing simpler constructors stay off. Admin maps its existing typed Settings; Board loads no ambient settings or global subscriber |
 | [Shop](../examples/modular-shop/README.md) | `DatabaseOptions`; `Database::open_with_options` | Default-false `catalog_cache`; the binary maps its existing environment key. Display freshness is bounded; Session, authorization and checkout SQL stay authoritative. No mandatory Settings loader or framework cache crate |
-| [CLI](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) | Existing parser, commands, static HTML export and configured generators | Independently published `yetlet-cli` `0.2.0`, executable `yetlet`; generated apps pin SDKalpha.6. Settings, supported source layouts and platform limits belong to its current guide. Generators do not silently install or deploy services |
+| [CLI](../tools/yetlet-cli/README.md#cli-command-and-capability-inventory) | Existing parser, commands, static HTML export and configured generators | Independently published `yetlet-cli`, executable `yetlet`; the resolver selects a compatible registry SDK and preserves exact app pins/locks. Settings, supported source layouts and platform limits belong to its current guide. Generators do not silently install or deploy services |
 
 These options are public Rust interfaces of example applications, not methods
 on a framework-wide capability builder. Their public fields do not grant trust

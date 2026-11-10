@@ -1,7 +1,7 @@
 # Build a browser-only Yetlet app
 
-Create a standalone interactive app with published CLI `0.2.0` and SDK
-`0.9.0-alpha.6`, without cloning Yetlet. Rust owns local state and interaction;
+Create a standalone interactive app with published CLI `0.3.0` and SDK
+`0.9.0-alpha.7`, without cloning Yetlet. Rust owns local state and interaction;
 JavaScript starts the WASM module. The finished app needs an HTTP(S) static host.
 These instructions use the pinned reader edition and existing APIs; commands
 below are a walkthrough, not evidence of a new execution.
@@ -34,7 +34,7 @@ Install the two native tools once and add the WASM target:
 ```sh
 (
     set -eu
-    cargo +1.99.0 install yetlet-cli --version 0.2.0 --locked
+    cargo +1.99.0 install yetlet-cli --version 0.3.0 --locked
     rustup target add --toolchain 1.99.0 wasm32-unknown-unknown
     cargo +1.99.0 install wasm-bindgen-cli --version 0.2.129 --locked \
         --root "$HOME/.local/share/yetlet-tools"
@@ -44,7 +44,7 @@ Install the two native tools once and add the WASM target:
 )
 ```
 
-Expected identities are `yetlet 0.2.0` and `wasm-bindgen 0.2.129`. The latter
+Expected identities are `yetlet 0.3.0` and `wasm-bindgen 0.2.129`. The latter
 matches the generated app's exact bindgen dependency. With a custom Cargo install
 root or tool installation, select its actual protected executable directory on
 PATH; do not weaken the CLI's filesystem checks.
@@ -63,9 +63,8 @@ deliberately use an existing protected parent and omit only its creation.
     export PATH="$(dirname "$(rustup which --toolchain 1.99.0 cargo)"):$HOME/.cargo/bin:$HOME/.local/share/yetlet-tools/bin:$PATH"
     yetlet_parent="$HOME/yetlet-browser-apps"
     mkdir -m 700 "$yetlet_parent"
-    yetlet new firstbrowser --template browser --parent "$yetlet_parent"
+    yetlet new firstbrowser --template browser --parent "$yetlet_parent" --sdk-version 0.9.0-alpha.7
     cd "$yetlet_parent/firstbrowser"
-    cargo generate-lockfile
     cargo fetch --locked
     npm ci --prefix frontend --ignore-scripts --no-audit --no-fund
     yetlet build
@@ -74,13 +73,17 @@ deliberately use an existing protected parent and omit only its creation.
 )
 ```
 
-`new` writes the app and its public CLI settings; it installs nothing, creates no
-Cargo.lock, and starts no process. It selects `cli.target = "browser"`, Vite and
-the published SDK pins. Tailwind is optional through the existing `--tailwind`
+`new` resolves the explicitly selected reader SDK, writes exact pins for both SDK
+packages, Cargo.lock, `.yetlet/sdk-resolution.json` and the public CLI settings.
+It installs no tools and starts no application server. Initial metadata/lock
+resolution requires registry access, or `--offline` with populated resolver and
+Cargo metadata caches. It selects `cli.target = "browser"` and Vite.
+Tailwind is optional through the existing `--tailwind`
 creation flag; it is not needed for this path.
 
-The app owns its Cargo.lock and the generated frontend package lock. Do not copy
-Yetlet's workspace lock. `build` uses frozen Cargo/WASM inputs and creates the
+The app owns its generated Cargo.lock, resolution receipt and frontend package
+lock. Preserve them; do not regenerate or copy Yetlet's workspace lock.
+`build` uses frozen Cargo/WASM inputs and creates the
 production frontend; it does not prepare missing dependencies. `run` previews
 that existing output at `http://127.0.0.1:5173/`, without building it or starting
 a native Yetlet HTTP backend. Ctrl+C stops the owned preview process tree.

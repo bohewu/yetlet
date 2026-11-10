@@ -572,8 +572,7 @@ def sync_package_readmes(root, sdk, cli_version, cli_sdk):
     return updates
 
 
-def check_reader_manifest(root, edition):
-    relative = "examples/docs-site/Cargo.toml"
+def check_reader_manifest(root, edition, relative="examples/docs-site/Cargo.toml"):
     parsed = tomllib.loads((root / relative).read_text(encoding="utf-8"))
     expected = "=" + edition["sdk"]
     found = {package: [] for package in SDK_PACKAGES}
@@ -696,6 +695,9 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
              r"(" + tick + r"; the independently published CLI is " + tick + "yetlet-cli" + tick + " " + tick + ")" +
              VERSION_PATTERN + r"(" + tick + r"\.)",
              sdk, cli, "published SDK/CLI scope"),
+        pair(r"(public reader/first-app edition is the explicitly selected SDK)" +
+             VERSION_SHORT_PATTERN + r"(/CLI)" + VERSION_PATTERN + r"(\s)",
+             reader_sdk_short, edition["cli"], "reader edition scope"),
     ])
 
     for relative in (
@@ -736,6 +738,11 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
              VERSION_PATTERN + r"(" + tick + r")",
              edition["cli"], edition["sdk"], "reader CLI/SDK pair"),
     ])
+    relative = "docs/BROWSER-APP.md"
+    text = changes.get(relative, (root / relative).read_text(encoding="utf-8"))
+    updated = sync_reader_commands(text, edition)
+    if updated != text:
+        changes[relative] = updated
     apply("docs/README.md", [
         (r"(\[SDK " + tick + ")" + VERSION_PATTERN + r"(" + tick + r"\]\()[^)]+(\))",
          lambda m: m[1] + sdk + m[2] + links['SDK'].removeprefix('docs/') + m[3], 'SDK release index'),
@@ -764,6 +771,7 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
     section = re.sub(
         r"(Expected output: " + tick + "yetlet )" + VERSION_PATTERN + r"(" + tick + ")",
         lambda m: m.group(1) + edition["cli"] + m.group(2), section)
+    section = sync_reader_commands(section, edition)
     if section != text[start:end]:
         changes[relative] = text[:start] + section + text[end:]
 
@@ -794,6 +802,11 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
         r"(cargo(?:\s+\+[^ \t\n]+)?\s+install\s+yetlet-cli\b[^\n]*?\s--version(?:=|\s+))([^\s]+)",
         lambda m: m.group(1) + edition["cli"], remainder)
     updated = intro + remainder
+    updated = sync_reader_commands(updated, edition)
+    updated = re.sub(r"(SDK\s*" + tick + r")" + VERSION_PATTERN + r"(" + tick + r")",
+                     lambda m: m[1] + edition["sdk"] + m[2], updated)
+    updated = re.sub(r"(CLI " + tick + r")" + VERSION_PATTERN + r"(" + tick + r")",
+                     lambda m: m[1] + edition["cli"] + m[2], updated)
     if updated != text:
         changes[relative] = updated
 
@@ -818,6 +831,15 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
             sdk, "hello-world published typed tags"),
     ])
     return changes
+
+
+def sync_reader_commands(text, edition):
+    text = re.sub(r"(cargo(?:\s+\+[^ \t\n]+)?\s+install\s+yetlet-cli\b[^\n]*?\s--version(?:=|\s+))" +
+                  VERSION_PATTERN, lambda m: m[1] + edition["cli"], text)
+    text = re.sub(r"(\byetlet )" + VERSION_PATTERN,
+                  lambda m: m[1] + edition["cli"], text)
+    return re.sub(r"(--sdk-version\s+)" + VERSION_PATTERN,
+                  lambda m: m[1] + edition["sdk"], text)
 
 
 
