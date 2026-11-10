@@ -1,15 +1,18 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**YT-250 CLI 0.3.1 Registry latest correction (2026-11-10): In progress.**
+**YT-250 CLI 0.3.1 Registry latest correction (2026-11-10): Done at prepublication scope.**
 [Preparation and gates](CLI-031-RELEASE-PREPARATION.md) align source and release
 consumers with `sdk-latest-v2`: maximum available non-yanked SemVer, including
 future prereleases and required same-version Browser availability, followed by
 selected-version feature/dependency checks without fallback. Cargo owns actual
 toolchain/dependency feasibility. Exact app pins/locks/receipts, alpha.7 build
 SDK/snapshot and historical release bindings remain intact. Independent
-semantic/source-freeze review, candidate/local consumers and original hosted
-build/custody passed; the [hosted dossier](CLI-031-HOSTED-RECORD.md) awaits separate
-S review/delivery/CI before prepare/sign/V and final prepublication plans. Formal publication is excluded; accepted publication
+semantic/source-freeze review, candidate/local consumers, original hosted
+build/custody, separate S review/CI, frozen prepare/sign and independent V passed.
+The [hosted dossier](CLI-031-HOSTED-RECORD.md) retains five-file public and
+single-package registry plans at the completed prepublication endpoint. Final
+Pipeline acceptance passed; guarded result-document delivery is recorded separately.
+Formal publication is excluded; accepted publication
 and Reader stay SDK alpha.7 / CLI 0.3.0.
 
 **YT-249 Reader Edition publication follow-through (2026-11-10): Source/consumer review PASS.**

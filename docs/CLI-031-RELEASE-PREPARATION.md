@@ -1,10 +1,11 @@
 # Yetlet CLI 0.3.1 — Release preparation (YT-250)
 
-**State (2026-11-10): Local candidate and original hosted build/custody PASS.**
-Resolver, release-consumer integration and documentation passed independent
-semantic/source-freeze review. Clean-source packaging, archive installation and
-local native/browser consumers passed. The separate S review/delivery/CI gate,
-prepare/signing and independent V remain pending. Formal GitHub/crates.io publication is excluded
+**State (2026-11-10): Prepublication preparation PASS.** Source review,
+clean-source candidate and native/browser consumers, original hosted build/custody,
+separate S review/delivery/CI, frozen preparation/signing and independent V passed.
+Read-only five-file public and single-package registry plans passed. Independent
+whole-run Pipeline acceptance passed. Guarded result-document delivery and formal
+publication remain separate stages. Formal GitHub/crates.io publication is excluded
 from this preparation. Published SDK alpha.7 / CLI 0.3.0 and the same Reader
 Edition remain authoritative; `site/pages.toml` is unchanged.
 
@@ -191,3 +192,30 @@ This phase prepares a concrete docs-only S dossier. Separate independent review,
 guarded S delivery and its PR/master CI are the next external gate. No S is
 selected here; no prepare/sign/independent V or formal publication ran. T5 stays
 In progress. Published SDK alpha.7 / CLI 0.3.0 and Reader remain unchanged.
+
+
+## T5 completion — frozen signing, V and publication hold
+
+The [hosted record](CLI-031-HOSTED-RECORD.md#phase-2--fixed-s-signing-and-independent-v)
+records actual S=V `40e2c9cd4dda831e60fca145a04e4ef748d0c048`, distinct from C,
+private Draft `440475335`, successful prepare `42835822093/1`, signing
+`42836461667/1` and independent V `42836870230/1`. V verifies the one unchanged
+hosted CLI subject and all 52 final private-manifest entries. Actual records,
+payload hashes, signatures, safe receipts and cleanup are retained. The complete
+record is fixed; no new S/V is selected for the later result documentation.
+
+The five-file public preview and one-package registry plan pass existing read-only
+gates. One successful notes PATCH changed private Draft tag metadata; parent
+bounded artifact repair and readback restore exact031tag/C, private/pre-release
+metadata and zero assets. Original failure is retained, with no hosted stage,
+signature, publication or failed write retried. No `release-publish` workflow,
+formal GitHub publication or crates.io upload ran. Future actual P may be the
+later reviewed docs-only final commit after CI; derive a new request/joined plan
+while preserving C/S/V and original preview inputs.
+
+T5 and YT-250 are complete at the requested prepublication endpoint following
+independent whole-run Pipeline acceptance. Guarded documentation delivery is
+recorded separately. Published authority
+and Reader remain SDK alpha.7 / CLI 0.3.0. The Owner's `AGENTS.md` merge-branch
+cleanup rule and accumulated merged-remote-branch cleanup remain deferred until
+formal publication; no branch deletion or `AGENTS.md` change is part of T5.
