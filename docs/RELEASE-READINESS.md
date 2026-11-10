@@ -24,8 +24,10 @@ distribution or transfer qualification to another source.
 [preparation record](CLI-031-RELEASE-PREPARATION.md) tracks the Owner-corrected
 `sdk-latest-v2` default and retained exact pins/locks/provenance.
 
-Candidate
-selection, packaging, hosted execution, signing and independent V remain pending.
+Independent semantic/source-freeze review and local candidate consumers passed.
+The [hosted preparation record](CLI-031-HOSTED-RECORD.md) retains successful
+original unsigned build and protected custody readback. Separately reviewed S,
+prepare/signing, independent V and final prepublication plans remain pending.
 Formal publication is excluded; source version does not change the accepted
 publication authority or Reader Edition.
 

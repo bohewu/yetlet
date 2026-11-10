@@ -7,8 +7,9 @@ future prereleases and required same-version Browser availability, followed by
 selected-version feature/dependency checks without fallback. Cargo owns actual
 toolchain/dependency feasibility. Exact app pins/locks/receipts, alpha.7 build
 SDK/snapshot and historical release bindings remain intact. Independent
-semantic/source-freeze review, candidate/local consumer and hosted build/custody/
-sign/V work remain pending. Formal publication is excluded; accepted publication
+semantic/source-freeze review, candidate/local consumers and original hosted
+build/custody passed; the [hosted dossier](CLI-031-HOSTED-RECORD.md) awaits separate
+S review/delivery/CI before prepare/sign/V and final prepublication plans. Formal publication is excluded; accepted publication
 and Reader stay SDK alpha.7 / CLI 0.3.0.
 
 **YT-249 Reader Edition publication follow-through (2026-11-10): Source/consumer review PASS.**
