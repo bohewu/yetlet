@@ -67,9 +67,19 @@ pub(crate) fn reraise(signal: i32) {
         libc::raise(signal);
     }
 }
+pub(crate) fn cancellation_signal() -> i32 {
+    foreground::cancellation_signal()
+}
 
 pub(crate) fn capture(_app: &App, command: &mut Command, limit: usize) -> io::Result<Vec<u8>> {
     foreground::capture(command, limit)
+}
+pub(crate) fn capture_combined(
+    _app: &App,
+    command: &mut Command,
+    limit: usize,
+) -> io::Result<Vec<u8>> {
+    foreground::capture_combined(command, limit)
 }
 
 pub(crate) fn run_watch_styles(

@@ -21,6 +21,17 @@ use crate::{
 };
 use std::{io, process::Command};
 
+pub(crate) fn cancellation_signal() -> i32 {
+    #[cfg(target_os = "linux")]
+    {
+        imp::cancellation_signal()
+    }
+    #[cfg(not(target_os = "linux"))]
+    {
+        2
+    }
+}
+
 pub(crate) fn command(app: &App, dev: bool, release: bool) -> io::Result<Command> {
     let mut command = app::command(dev, release);
     command.env_remove("YETLET_STYLE_DEV");
@@ -368,6 +379,19 @@ pub(crate) fn capture(app: &App, command: &mut Command, limit: usize) -> io::Res
     #[cfg(not(any(target_os = "linux", windows)))]
     {
         let _ = (app, command, limit);
+        Err(io::ErrorKind::Unsupported.into())
+    }
+}
+
+pub(crate) fn capture_cargo(app: &App, command: &mut Command) -> io::Result<Vec<u8>> {
+    #[cfg(any(target_os = "linux", windows))]
+    {
+        imp::pin_cwd(app, command)?;
+        imp::capture_combined(app, command, 64 * 1024)
+    }
+    #[cfg(not(any(target_os = "linux", windows)))]
+    {
+        let _ = (app, command);
         Err(io::ErrorKind::Unsupported.into())
     }
 }

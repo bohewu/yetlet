@@ -1,6 +1,6 @@
 # Yetlet CLI 0.3.0 — Release preparation (YT-248)
 
-**State (2026-11-10): Preserved Style plan independently reviewed PASS; release work blocked on YT-247 Phase B. No CLI 0.3.0 candidate, tag, hosted run, signature, Draft release or publication exists yet.**
+**State (2026-11-10): Preserved Style plan independently reviewed PASS; YT-247 source implementation independently reviewed PASS. Release work not started; awaits separate Owner instruction after YT-247 Git delivery. No CLI 0.3.0 candidate, tag, hosted run, signature, Draft release or publication exists yet.**
 
 ## YT-247 / YT-248 sequencing amendment
 
@@ -8,7 +8,10 @@ The Owner redefines [YT-247](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) as
 Dynamic SDK Version Resolution. Phase A produces the proposed CLI contract and
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md), independent review and
 Git delivery, then stops for Owner acceptance. Phase B implements the accepted
-resolver. This release plan moves to **YT-248** and depends on that implementation.
+resolver. The Owner has accepted that design and authorized the
+[Phase B implementation](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md).
+This release plan moves to **YT-248** and depends on that implementation.
+Completion of YT-247 does not authorize starting this release plan.
 
 The original Style acceptance below remains required. Its corrective independent
 Reviewer result reports JSON PASS, zero issues/followups in

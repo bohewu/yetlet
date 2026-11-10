@@ -1,4 +1,6 @@
 #![cfg(any(target_os = "linux", windows))]
+#[path = "fixtures/source_scaffold.rs"]
+mod source_scaffold;
 use std::{collections::BTreeMap, fs, path::Path, process::Command};
 
 fn inventory(root: &Path) -> BTreeMap<String, Vec<u8>> {
@@ -35,14 +37,7 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
             for vite in [false, true] {
                 for tailwind in [false, true] {
                     let name = format!("app-{service}-{settings}-{vite}-{tailwind}");
-                    let mut command = Command::new(env!("CARGO_BIN_EXE_yetlet"));
-                    command
-                        .args(["new", "--parent"])
-                        .arg(root.path())
-                        .arg(&name)
-                        .env("PATH", root.path().join("no-tools"))
-                        .env("CARGO_HOME", root.path().join("no-cache"))
-                        .env("APP_SERVICE__TOKEN", "private-sentinel-do-not-copy");
+                    let mut flags = Vec::new();
                     for (enabled, flag) in [
                         (service, "--service"),
                         (settings, "--settings"),
@@ -50,15 +45,10 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                         (tailwind, "--tailwind"),
                     ] {
                         if enabled {
-                            command.arg(flag);
+                            flags.push(flag);
                         }
                     }
-                    let output = command.output().unwrap();
-                    assert!(
-                        output.status.success(),
-                        "{name}: {}",
-                        String::from_utf8_lossy(&output.stderr)
-                    );
+                    source_scaffold::create(root.path(), &name, "native", &flags).unwrap();
                     let app = root.path().join(&name);
                     let before = inventory(&app);
                     assert!(before.values().all(|s| {
@@ -187,7 +177,7 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                         assert_eq!(before.contains_key("tailwind.css"), tailwind);
                         assert_eq!(before.contains_key("src/tailwind.rs"), tailwind);
                     }
-                    assert_eq!(command.output().unwrap().status.code(), Some(1));
+                    assert!(source_scaffold::create(root.path(), &name, "native", &flags).is_err());
                     assert_eq!(inventory(&app), before);
                 }
             }
@@ -496,19 +486,7 @@ fn style_variants_create_complete_private_packages_without_executing_tools() {
                 continue;
             }
             let name = format!("style-{}-{}", template, options.join("-").replace("--", ""));
-            let output = Command::new(env!("CARGO_BIN_EXE_yetlet"))
-                .args(["new", &name, "--parent"])
-                .arg(temp.path())
-                .args(["--template", template])
-                .args(&options)
-                .env("PATH", temp.path().join("no-tools"))
-                .output()
-                .unwrap();
-            assert!(
-                output.status.success(),
-                "{template} {options:?}: {}",
-                String::from_utf8_lossy(&output.stderr)
-            );
+            source_scaffold::create(temp.path(), &name, template, &options).unwrap();
             let app = temp.path().join(name);
             let files = inventory(&app);
             for (path, bytes) in &files {

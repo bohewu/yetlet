@@ -7,6 +7,18 @@ use std::{
 };
 
 pub(crate) const NEW_SUPPORTED: bool = false;
+
+pub(crate) fn preflight_new(_: &Path, _: &str) -> Result<(), String> {
+    Err("new is unsupported on this platform".into())
+}
+pub(crate) fn create_prepared(
+    _: &Path,
+    _: &str,
+    _: &[(&str, String)],
+    _: impl FnOnce(&Path) -> Result<Vec<(&'static str, String)>, String>,
+) -> Result<(), String> {
+    Err("new is unsupported on this platform".into())
+}
 pub(crate) const NEW_DIAGNOSTIC: &str =
     "new is unsupported on this platform and fails closed; no Windows guarantee is claimed";
 const UNSUPPORTED_APP: &str = "build/dev are unsupported on this platform: native cwd/process ownership Not verified; no child started";

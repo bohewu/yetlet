@@ -19,7 +19,8 @@ pub(in crate::platform) use windows::Executable;
 use crate::app;
 pub(crate) use imp::key;
 pub(crate) use imp::{
-    App, NEW_DIAGNOSTIC, NEW_SUPPORTED, app_root, create_project, open_directory, read_framework,
+    App, NEW_DIAGNOSTIC, NEW_SUPPORTED, app_root, create_prepared, create_project, open_directory,
+    preflight_new, read_framework,
 };
 pub(crate) use imp::{app_directory_entries, app_entries, read_app_file, read_app_input};
 use std::path::{Component, Path};
@@ -121,6 +122,7 @@ fn generated_subdirectories(files: &[(&str, String)]) -> Result<Vec<&'static str
             | "stylegen/Cargo.toml"
             | "stylegen/Cargo.lock" => Some("stylegen"),
             "cargo-overlay/Cargo.toml" => Some("cargo-overlay"),
+            ".yetlet/sdk-resolution.json" => Some(".yetlet"),
             "frontend/package.json"
             | "frontend/index.html"
             | "frontend/build-wasm.mjs"

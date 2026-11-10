@@ -261,6 +261,24 @@ class CliConsumerTests(unittest.TestCase):
                 self.assertEqual(len(commands), 4)
                 self.assertTrue((Path(temp) / 'REGISTRY-CONSUMER.lock').is_file())
 
+    def test_dynamic_cli_receipt_binds_app_lock_separately_from_installed_cli(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / '.yetlet').mkdir()
+            lock = b'version=4\n[[package]]\nname="yetlet"\nversion="0.9.0-alpha.7"\nsource="registry+https://github.com/rust-lang/crates.io-index"\nchecksum="' + b'f'*64 + b'"\n'
+            (root / 'Cargo.lock').write_bytes(lock)
+            receipt = {'schema':1, 'cli_version':'0.3.0', 'cargo_lock_sha256':publication.s.sha(lock),
+                       'sdk':{'requested':'0.9.0-alpha.7','version':'0.9.0-alpha.7','source':'registry-refresh',
+                              'registry':'https://index.crates.io/','template':'native',
+                              'packages':[{'name':'yetlet','checksum':'f'*64,'metadata_sha256':'a'*64,'validated_at':100}]}}
+            (root / '.yetlet/sdk-resolution.json').write_text(json.dumps(receipt))
+            self.assertEqual(publication.resolved_cli_project(root, '0.3.0', '0.9.0-alpha.7')[1], lock)
+            with self.assertRaises(ValueError):
+                publication.resolved_cli_project(root, '0.3.0', '0.9.0-alpha.6')
+            (root / 'Cargo.lock').write_bytes(lock + b'\n')
+            with self.assertRaises(ValueError):
+                publication.resolved_cli_project(root, '0.3.0', '0.9.0-alpha.7')
+
 
 class RegistryContinuationTests(unittest.TestCase):
     def fixture(self, root):

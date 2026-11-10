@@ -188,6 +188,31 @@ def published_release(p, previous):
             'original_plan_sha256': s.records.digest(p), 'assets': previous['assets'], 'github_mutations': False}
 
 
+LEGACY_CLI_BINDINGS = frozenset({'0.1.0', '0.1.1', '0.2.0'})
+
+
+def resolved_cli_project(project, cli_version, explicit_sdk):
+    """New-CLI explicit consumer proof; never reinterpret a legacy default pin."""
+    import tomllib
+    receipt = s.records.loads((project / '.yetlet/sdk-resolution.json').read_bytes())
+    lock = (project / 'Cargo.lock').read_bytes()
+    sdk = receipt['sdk']
+    s.require(receipt['schema'] == 1 and receipt['cli_version'] == cli_version
+              and receipt['cargo_lock_sha256'] == s.sha(lock)
+              and sdk['requested'] == sdk['version'] == explicit_sdk
+              and sdk['source'] == 'registry-refresh' and sdk['registry'] == 'https://index.crates.io/'
+              and sdk['template'] == 'native' and len(sdk['packages']) == 1)
+    package = sdk['packages'][0]
+    s.require(package['name'] == 'yetlet' and s.records.token(package['checksum'], s.records.SHA)
+              and s.records.token(package['metadata_sha256'], s.records.SHA)
+              and type(package['validated_at']) is int and package['validated_at'] > 0)
+    entries = [p for p in tomllib.loads(lock.decode())['package'] if p['name'] == 'yetlet']
+    s.require(len(entries) == 1 and entries[0]['version'] == explicit_sdk
+              and entries[0].get('source') == 'registry+https://github.com/rust-lang/crates.io-index'
+              and entries[0].get('checksum') == package['checksum'])
+    return receipt, lock
+
+
 def cli_consumer(version, output):
     """Install the exact published executable anonymously; do not compile it as an SDK."""
     sdk_version = s.records.cli_sdk_version(version)
@@ -204,10 +229,15 @@ def cli_consumer(version, output):
         (output / 'consumer-install.stderr').write_bytes(result.stderr)
         s.require(result.returncode == 0)
         executable = root / 'install/bin/yetlet'
+        new_args = ['new', 'consumerapp', '--parent', str(root)]
+        if version not in LEGACY_CLI_BINDINGS:
+            # This is a fixed explicit consumer case, not an assertion that a
+            # dynamic default must always equal the CLI's build dependency.
+            new_args += ['--sdk-version', sdk_version]
         for label, argv in [('version', ['--version']), ('help', ['--help']),
-                            ('new', ['new', 'consumerapp', '--parent', str(root)])]:
+                            ('new', new_args)]:
             result = subprocess.run([str(executable), *argv], cwd=root, env=env,
-                                    capture_output=True, timeout=30)
+                                    capture_output=True, timeout=30 if version in LEGACY_CLI_BINDINGS else 180)
             (output / ('consumer-' + label + '.stdout')).write_bytes(result.stdout)
             (output / ('consumer-' + label + '.stderr')).write_bytes(result.stderr)
             s.require(result.returncode == 0)
@@ -221,9 +251,15 @@ def cli_consumer(version, output):
         s.require(len(installed) == 1)
         lock = installed[0].read_bytes()
         (output / 'REGISTRY-CONSUMER.lock').write_bytes(lock)
-        return {'status': 'PASS', 'lock_sha256': s.sha(lock), 'cli_exact_version': version,
+        result = {'status': 'PASS', 'lock_sha256': s.sha(lock), 'cli_exact_version': version,
                 'sdk_version': sdk_version, 'source_install': True,
                 'path_patches': False, 'credentials_forwarded': False}
+        if version not in LEGACY_CLI_BINDINGS:
+            receipt, app_lock = resolved_cli_project(root / 'consumerapp', version, sdk_version)
+            (output / 'REGISTRY-CONSUMER-APP.lock').write_bytes(app_lock)
+            result.update(app_sdk_version=receipt['sdk']['version'], app_lock_sha256=s.sha(app_lock),
+                          resolution_source=receipt['sdk']['source'], explicit_sdk_selection=True)
+        return result
 
 
 def consumer(version, output):

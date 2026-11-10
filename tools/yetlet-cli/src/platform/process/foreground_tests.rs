@@ -3,6 +3,41 @@ use super::*;
 use std::{fs, io::Write, path::Path, process::Stdio};
 
 static OBSERVED: AtomicI32 = AtomicI32::new(0);
+
+#[test]
+fn cargo_capture_combines_streams_bounds_output_and_preserves_cancellation() {
+    if std::env::var_os("YT247_CAPTURE_HELPER").is_some() {
+        let mut success = Command::new("/bin/sh");
+        success.args(["-c", "printf out; printf err >&2"]);
+        assert_eq!(capture_combined(&mut success, 32).unwrap(), b"outerr");
+        let mut failure = Command::new("/bin/sh");
+        failure.args(["-c", "printf diagnostic >&2; exit 7"]);
+        assert!(
+            capture_combined(&mut failure, 32)
+                .unwrap_err()
+                .to_string()
+                .contains("diagnostic")
+        );
+        let mut overflow = Command::new("/bin/sh");
+        overflow.args(["-c", "while :; do printf overflow >&2; done"]);
+        assert!(capture_combined(&mut overflow, 32).is_err());
+        let mut cancelled = Command::new("/bin/sh");
+        cancelled.args(["-c", "kill -TERM $PPID; sleep 5"]);
+        assert_eq!(
+            capture_combined(&mut cancelled, 32).unwrap_err().kind(),
+            io::ErrorKind::Interrupted
+        );
+        assert_eq!(cancellation_signal(), libc::SIGTERM);
+        return;
+    }
+    let output = Command::new(std::env::current_exe().unwrap()).args(["--exact", "platform::process::linux::foreground::tests::cargo_capture_combines_streams_bounds_output_and_preserves_cancellation", "--nocapture"])
+        .env("YT247_CAPTURE_HELPER", "1").output().unwrap();
+    assert!(
+        output.status.success(),
+        "{}",
+        String::from_utf8_lossy(&output.stderr)
+    );
+}
 extern "C" fn observe(signal: i32) {
     if signal == libc::SIGINT {
         OBSERVED.store(signal, Ordering::Relaxed);

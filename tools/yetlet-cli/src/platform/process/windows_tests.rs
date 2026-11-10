@@ -57,6 +57,25 @@ fn wait_file(path: &std::path::Path) {
 }
 
 #[test]
+fn cargo_lock_can_pin_cwd_without_widening_command_policy() {
+    let root = tempfile::tempdir().unwrap();
+    let app = app(root.path());
+    let mut command = Command::new("cargo");
+    command.args(["generate-lockfile", "--offline"]);
+    pin_cwd(&app, &mut command).unwrap();
+    assert_eq!(command.get_current_dir(), Some(app.cwd.as_path()));
+    for (program, action) in [("cargo", "update"), ("unknown", "generate-lockfile")] {
+        let mut denied = Command::new(program);
+        denied.arg(action);
+        assert_eq!(
+            pin_cwd(&app, &mut denied).unwrap_err().kind(),
+            io::ErrorKind::Unsupported
+        );
+        assert!(denied.get_current_dir().is_none());
+    }
+}
+
+#[test]
 fn frozen_build_and_dev_commands_are_explicit() {
     let root = tempfile::tempdir().unwrap();
     let app = app(root.path());

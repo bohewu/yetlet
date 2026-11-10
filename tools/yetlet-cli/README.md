@@ -3,13 +3,16 @@
 The CLI creates applications and executes selected tasks. Persistent behavior uses
 Yetlet's existing public base/profile settings and scoped environment overrides.
 This standalone Cargo binary package installs the `yetlet` command. Generated
-apps use the exact `yetlet` / `yetlet-browser` SDK pin below; normal build/run
-needs no SDK checkout or Cargo path override. CLI and SDK versions are independent.
+apps use exact `yetlet` / `yetlet-browser` registry pins; normal build/run needs
+no SDK checkout or Cargo path override. CLI build SDK, embedded source snapshot
+and generated app SDK have separate responsibilities.
 
-**CLI release:** `0.2.0`. **Generated SDK:** `=0.9.0-alpha.6`.
+**CLI release:** `0.2.0`. **Build SDK:** `=0.9.0-alpha.6`.
+
+**SDK policy:** `sdk-compat-v1`.
 
 The command inventory below describes the published CLI release selected above.
-Later checkout-only Style template choices are described separately and are not
+Later checkout-only SDK resolution and Style template choices are described separately and are not
 part of the published command inventory. Check
 [GitHub releases](https://github.com/bohewu/yetlet/releases) and
 [crates.io](https://crates.io/crates/yetlet-cli) for actual registry availability.
@@ -28,6 +31,51 @@ check; cancellation and descendant cleanup retain their existing behavior.
 Independent implementation Reviewer PASS has zero issues or required followups.
 
 <a id="current-command-and-capability-inventory"></a>
+## Source SDK resolution (YT-247)
+
+The source checkout implements the accepted
+[SDK resolution contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md).
+These commands describe source behavior; the published CLI 0.2.0 inventory below
+retains its fixed alpha.6 pin and separate manual lock preparation.
+
+```sh
+yetlet new demo --sdk-version 0.9.0-alpha.7
+yetlet new cached-demo --offline
+```
+
+`--sdk-version` accepts one exact canonical SemVer (no ranges, prefix or build
+metadata). Without it, select latest compatible stable, then only an exact
+reviewed prerelease. The shipped policy admits alpha.6/alpha.7 for ordinary
+native/browser and alpha.7 for Style. The stable set is empty today. Unknown
+alpha/beta/rc/stable versions do not become compatible merely by appearing in
+the registry. Required package features, same-version Browser pair, yank status
+and declared MSRV at most Rust 1.99 are checked before creation.
+
+Online refreshes required public index metadata; a network failure stops with
+no stale fallback. `--offline` or `CARGO_NET_OFFLINE=true` forbids resolver and
+Cargo network access. It uses CLI-owned metadata under Cargo home's
+`yetlet/sdk-index-v1`, reports validation time/age and cache-limited latest, and
+requires Cargo's separate dependency cache for lock generation. Missing/corrupt
+metadata or missing Cargo cache fails with no published project. Cargo's own
+net.offline configuration can further restrict the lock step; select CLI
+`--offline` as well when relying on config to forbid resolver HTTP.
+
+Successful source `new` now runs bounded Cargo lock generation in private staging,
+then publishes one tree with exact SDK pins, Cargo.lock and a creation receipt at
+`.yetlet/sdk-resolution.json`. No SDK source snapshot is copied. Browser pins both
+SDK packages equally. Retain the app lock and receipt; later build/run/watch stay
+frozen and never invoke the resolver. SDK pins fix SDK identity; different creation
+dates/caches may produce different transitive locks. Existing destinations are
+refused before tool probes, metadata access or lock generation. No tools, packages
+or frontend dependencies are installed by new. The dependency-free nested Style
+generator lock remains separate and unchanged.
+
+The Build SDK field describes the CLI's own exact dependency. The embedded
+snapshot remains alpha.6 at its recorded SDK source/digests for the existing
+qualified native source exporter; app SDK resolution does not expand Docker or
+Compose source support. Policy and snapshot identity resources ship in the CLI
+archive and remain bound to that archive's checksum and immutable source.
+
 ## Published CLI command and capability inventory
 
 | Command | Implemented behavior |
@@ -206,7 +254,6 @@ After installation, work outside the Yetlet checkout:
     mkdir -m 700 "$HOME/yetlet-apps"
     yetlet new sampleapp --parent "$HOME/yetlet-apps"
     cd "$HOME/yetlet-apps/sampleapp"
-    cargo generate-lockfile
     cargo fetch --locked
     yetlet build
     yetlet run

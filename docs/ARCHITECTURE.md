@@ -14,15 +14,17 @@ Current usage is documented in the [current module guides](API-REFERENCE.md), [H
 
 The design rationale and dated evidence below retain the original proposal and M7 decision history. Diagram references to compiler/macros and candidate IR are exploratory, not implemented authoring APIs. Current research decisions are in the [completed studies index](README.md#completed-research-prototypes); historical execution is not transferred to today's dirty source.
 
-## Proposed developer tooling boundary — YT-247
+## Developer tooling boundary — YT-247
 
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and the
-[CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) propose an internal
+[CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) define an internal
 CLI SDK resolver with separate metadata/cache, compatibility and scaffold
 responsibilities. CLI build SDK and qualified embedded source-export snapshot
 remain fixed release inputs; generated app SDK selection is a separate registry
-consumer decision with exact pins and its own lock. This is Phase A design only,
-pending Owner acceptance and Phase B implementation. It changes none of the
+consumer decision with exact pins and its own lock. The
+[Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md) describes its
+source implementation and bounded verification. Published CLI 0.2.0 retains its
+historical behavior. This changes none of the
 framework execution/rendering/transport boundaries below.
 
 ## 1. Problem statement

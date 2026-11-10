@@ -64,6 +64,8 @@ def metadata(raw, name, version):
                     'explicit_name_in_toml': alias if 'package' in d else None})
     readme = p.get('readme')
     require(type(readme) is str and readme in files)
+    if name == 'yetlet-cli' and ('resources/sdk-identity.json' in files or '**SDK policy:**' in files[readme].decode()):
+        release_docs.check_sdk_resources(files, manifest['dependencies']['yetlet']['version'], files[readme].decode())
     return {'name': name, 'vers': version, 'deps': dependencies,
         'features': manifest.get('features', {}), 'authors': p.get('authors', []),
         'description': p.get('description'), 'documentation': p.get('documentation'),

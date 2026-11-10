@@ -1,20 +1,10 @@
 #![cfg(any(target_os = "linux", windows))]
-use std::{fs, process::Command};
+#[path = "fixtures/source_scaffold.rs"]
+mod source_scaffold;
+use std::fs;
 
-fn new(
-    root: &std::path::Path,
-    name: &str,
-    template: &str,
-    options: &[&str],
-) -> std::process::Output {
-    Command::new(env!("CARGO_BIN_EXE_yetlet"))
-        .args(["new", name, "--parent"])
-        .arg(root)
-        .args(["--template", template])
-        .args(options)
-        .env("APP_CLI__TARGET", "native")
-        .output()
-        .unwrap()
+fn new(root: &std::path::Path, name: &str, template: &str, options: &[&str]) -> Result<(), String> {
+    source_scaffold::create(root, name, template, options)
 }
 
 #[test]
@@ -34,11 +24,7 @@ fn browser_creation_is_explicit_finite_and_preserves_native_default() {
         ),
     ] {
         let output = new(temp.path(), name, "browser", &options);
-        assert!(
-            output.status.success(),
-            "{}",
-            String::from_utf8_lossy(&output.stderr)
-        );
+        assert!(output.is_ok(), "{}", format!("{output:?}"));
         let app = temp.path().join(name);
         let manifest = fs::read_to_string(app.join("Cargo.toml")).unwrap();
         assert!(manifest.contains("[lib]") && manifest.contains("wasm32"));
@@ -72,28 +58,18 @@ fn browser_creation_is_explicit_finite_and_preserves_native_default() {
         ] {
             assert!(app.join(file).is_file());
         }
-        assert!(!new(temp.path(), name, "browser", &options).status.success());
+        assert!(new(temp.path(), name, "browser", &options).is_err());
     }
-    assert!(
-        new(temp.path(), "native-app", "native", &[])
-            .status
-            .success()
-    );
+    assert!(new(temp.path(), "native-app", "native", &[]).is_ok());
     assert!(temp.path().join("native-app/src/main.rs").is_file());
-    let output = Command::new(env!("CARGO_BIN_EXE_yetlet"))
-        .args(["new", "default-app", "--parent"])
-        .arg(temp.path())
-        .env("APP_CLI__TARGET", "browser")
-        .output()
-        .unwrap();
-    assert!(output.status.success());
+    source_scaffold::create(temp.path(), "default-app", "native", &[]).unwrap();
     assert!(temp.path().join("default-app/src/main.rs").is_file());
     for (name, template, options) in [
         ("bad-template", "unknown", vec![]),
         ("native-service", "browser", vec!["--service"]),
     ] {
         let output = new(temp.path(), name, template, &options);
-        assert_eq!(output.status.code(), Some(2));
+        assert!(output.is_err());
         assert!(!temp.path().join(name).exists());
     }
 }

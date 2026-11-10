@@ -1,5 +1,5 @@
 //! Package-owned resources and their deliberately selected public SDK closure.
-use std::{collections::BTreeSet, path::Path, process::Command};
+use std::{path::Path, process::Command};
 
 #[path = "../src/framework_files.rs"]
 mod framework_files;
@@ -30,48 +30,79 @@ fn package_resources_have_a_pinned_sdk_and_closed_relative_names() {
 }
 
 #[test]
-fn repository_snapshot_matches_reviewed_sources_when_checkout_is_present() {
+fn snapshot_digests_and_recorded_source_are_independent_of_current_sdk_checkout() {
+    use sha2::{Digest, Sha256};
     let cli = Path::new(env!("CARGO_MANIFEST_DIR"));
-    let root = cli.parent().unwrap().parent().unwrap();
-    if !root.join(".git").is_dir() || !root.join("crates/yetlet/src/lib.rs").is_file() {
-        return; // An installed archive intentionally has no framework checkout.
-    }
-    let output = Command::new("git")
-        .args(["ls-files", "-z", "--", "crates/yetlet"])
-        .current_dir(root)
-        .output()
-        .unwrap();
-    assert!(output.status.success());
-    let tracked: BTreeSet<_> = std::str::from_utf8(&output.stdout)
-        .unwrap()
-        .split('\0')
-        .filter(|p| !p.is_empty() && *p != "crates/yetlet/Cargo.lock")
-        .map(str::to_owned)
-        .collect();
-    assert_eq!(tracked, framework_files::FILES.keys().cloned().collect());
-    for (name, expected) in framework_files::FILES.iter() {
+    let identity: serde_json::Value =
+        serde_json::from_str(include_str!("../resources/sdk-identity.json")).unwrap();
+    let manifest: toml::Value = include_str!("../Cargo.toml").parse().unwrap();
+    assert_eq!(
+        manifest["dependencies"]["yetlet"]["version"].as_str(),
+        Some(format!("={}", identity["build_sdk"].as_str().unwrap()).as_str())
+    );
+    for (path, sha) in identity["files"].as_object().unwrap() {
+        let bytes = std::fs::read(cli.join(path)).unwrap();
         assert_eq!(
-            std::fs::read_to_string(root.join(name))
-                .unwrap()
-                .replace("\r\n", "\n"),
-            *expected,
-            "{name}"
+            format!("{:x}", Sha256::digest(bytes)),
+            sha.as_str().unwrap(),
+            "{path}"
         );
     }
     assert_eq!(
-        std::fs::read_to_string(root.join("Cargo.toml"))
-            .unwrap()
-            .replace("\r\n", "\n"),
-        include_str!("../resources/workspace.toml")
+        format!(
+            "{:x}",
+            Sha256::digest(include_bytes!("../resources/sdk-compatibility.json"))
+        ),
+        identity["policy_sha256"].as_str().unwrap()
     );
-    assert_eq!(
-        std::fs::read(root.join("Cargo.lock")).unwrap(),
-        include_bytes!("../resources/framework.lock")
-    );
-    for name in ["wasm-startup.mjs", "wasm-startup.css"] {
+    let source = identity["snapshot_source"].as_str().unwrap();
+    assert!(source.len() == 40 && source.bytes().all(|b| b.is_ascii_hexdigit()));
+    let root = cli.parent().unwrap().parent().unwrap();
+    if !root.join(".git").is_dir() {
+        return;
+    }
+    // An installed crate has no Git source. A source checkout verifies the exact
+    // recorded SDK commit, even when today's workspace is on a different SDK.
+    for (path, expected) in framework_files::FILES.iter() {
+        let output = Command::new("git")
+            .args(["show", &format!("{source}:{path}")])
+            .current_dir(root)
+            .output()
+            .unwrap();
+        assert!(
+            output.status.success(),
+            "recorded SDK source must be present in source validation"
+        );
         assert_eq!(
-            std::fs::read(root.join("assets").join(name)).unwrap(),
-            std::fs::read(cli.join("templates/browser").join(name)).unwrap()
+            String::from_utf8(output.stdout)
+                .unwrap()
+                .replace("\r\n", "\n"),
+            *expected,
+            "{path}"
+        );
+    }
+    for (resource, path) in [
+        ("resources/workspace.toml", "Cargo.toml"),
+        ("resources/framework.lock", "Cargo.lock"),
+        (
+            "templates/browser/wasm-startup.mjs",
+            "assets/wasm-startup.mjs",
+        ),
+        (
+            "templates/browser/wasm-startup.css",
+            "assets/wasm-startup.css",
+        ),
+    ] {
+        let output = Command::new("git")
+            .args(["show", &format!("{source}:{path}")])
+            .current_dir(root)
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        assert_eq!(
+            std::fs::read(cli.join(resource)).unwrap(),
+            output.stdout,
+            "{resource}"
         );
     }
 }

@@ -139,10 +139,16 @@ pub(super) fn terminated(value: &OsStr) -> io::Result<Vec<u16>> {
 }
 
 pub(crate) fn pin_cwd(app: &App, command: &mut Command) -> io::Result<()> {
+    let cargo_lock = command.get_program() == "cargo"
+        && command
+            .get_args()
+            .next()
+            .is_some_and(|arg| arg == "generate-lockfile");
     if !matches!(
         command.get_program().to_str(),
         Some("node" | "watchexec" | "watchexec.exe" | "rustc")
     ) && !matches!(command.get_args().next(), Some(arg) if arg == "build" || arg == "run")
+        && !cargo_lock
     {
         return Err(io::ErrorKind::Unsupported.into());
     }
@@ -783,6 +789,14 @@ fn spawn_owned(app: &App, command: &mut Command) -> io::Result<Child> {
 }
 
 fn spawn_with_output(app: &App, command: &mut Command, capture: bool) -> io::Result<Child> {
+    spawn_output(app, command, capture, false)
+}
+fn spawn_output(
+    app: &App,
+    command: &mut Command,
+    capture: bool,
+    combined: bool,
+) -> io::Result<Child> {
     let program = executable(command.get_program()).inspect_err(|error| {
         // Fixed policy guidance and numeric OS evidence only: never print the
         // selected path, command arguments, environment or arbitrary error text.
@@ -841,8 +855,11 @@ fn spawn_with_output(app: &App, command: &mut Command, capture: bool) -> io::Res
         output,
         stdio(STD_ERROR_HANDLE)?,
     ];
-    let handles = stdio.each_ref().map(|h| h.as_raw_handle());
-    let mut attributes = Attributes::new(&handles)?;
+    let mut handles = stdio.each_ref().map(|h| h.as_raw_handle());
+    if combined {
+        handles[2] = handles[1];
+    }
+    let mut attributes = Attributes::new(if combined { &handles[..2] } else { &handles })?;
     let mut startup = STARTUPINFOEXW::default();
     startup.StartupInfo.cb = size_of::<STARTUPINFOEXW>() as u32;
     startup.StartupInfo.dwFlags = STARTF_USESTDHANDLES;
@@ -933,13 +950,28 @@ pub(crate) fn reraise(_: i32) {}
 mod tests;
 
 pub(crate) fn capture(app: &App, command: &mut Command, limit: usize) -> io::Result<Vec<u8>> {
+    capture_inner(app, command, limit, false)
+}
+pub(crate) fn capture_combined(
+    app: &App,
+    command: &mut Command,
+    limit: usize,
+) -> io::Result<Vec<u8>> {
+    capture_inner(app, command, limit, true)
+}
+fn capture_inner(
+    app: &App,
+    command: &mut Command,
+    limit: usize,
+    combined: bool,
+) -> io::Result<Vec<u8>> {
     use std::io::Read;
     let mut console = if CONSOLE_OWNED.load(AtomicOrdering::SeqCst) {
         None
     } else {
         Some(Console::install()?)
     };
-    let mut child = spawn_with_output(app, command, true)?;
+    let mut child = spawn_output(app, command, true, combined)?;
     let reader = child.stdout.take().unwrap();
     let (sender, receiver) = std::sync::mpsc::sync_channel(1);
     let thread = std::thread::spawn(move || {
@@ -997,6 +1029,12 @@ pub(crate) fn capture(app: &App, command: &mut Command, limit: usize) -> io::Res
             .and_then(|value| value)
     })?;
     if !status.success() || bytes.len() > limit {
+        if combined {
+            return Err(io::Error::other(format!(
+                "Cargo lock process failed: {}",
+                String::from_utf8_lossy(&bytes[..bytes.len().min(limit)])
+            )));
+        }
         return Err(io::Error::other(
             "style producer failed or exceeded its bound",
         ));

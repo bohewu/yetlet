@@ -2,6 +2,14 @@
 use crate::scaffold;
 
 pub(crate) fn files(name: &str, tailwind: bool) -> Result<Vec<(&'static str, String)>, String> {
+    files_version(name, tailwind, &crate::framework::package_version())
+}
+
+pub(crate) fn files_version(
+    name: &str,
+    tailwind: bool,
+    version: &str,
+) -> Result<Vec<(&'static str, String)>, String> {
     scaffold::validate_name(name).map_err(str::to_owned)?;
     let mut package: serde_json::Value = serde_json::from_str(if tailwind {
         include_str!("../templates/vite/tailwind-package.json")
@@ -22,7 +30,6 @@ pub(crate) fn files(name: &str, tailwind: bool) -> Result<Vec<(&'static str, Str
     } else {
         vite.into()
     };
-    let version = crate::framework::package_version();
     Ok(vec![
         ("Cargo.toml", format!("[package]\nname = \"{name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\nrust-version = \"1.99\"\npublish = false\n\n[workspace]\nresolver = \"3\"\n\n[lib]\nname = \"tasks\"\ncrate-type = [\"cdylib\", \"rlib\"]\n\n[target.'cfg(target_arch = \"wasm32\")'.dependencies]\nyetlet = {{ version = \"={version}\", default-features = false, features = [\"reactive\"] }}\nyetlet-browser = {{ version = \"={version}\", default-features = false, features = [\"dom\", \"dom-keyed\"] }}\nwasm-bindgen = \"=0.2.129\"\nweb-sys = {{ version = \"0.3\", features = [\"Document\", \"Element\", \"Event\", \"EventTarget\", \"HtmlElement\", \"HtmlInputElement\", \"Node\", \"Window\"] }}\n")),
         ("README.md", include_str!("../templates/browser/README.md").replace("@NAME@", name).replace("@SDK_VERSION@", &version)),

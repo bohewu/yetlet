@@ -5,6 +5,8 @@ import re
 import shlex
 import sys
 import tomllib
+import json
+import hashlib
 import sync_workspace_versions as sdk_versions
 from release_version_authority import PUBLICATION_RECORDS, published_versions
 
@@ -108,6 +110,42 @@ def check_guide_links(root, relative, package_root):
                 relative, 'relative guide link escapes the package or names a missing file')
 
 
+SDK_SNAPSHOT_PATHS = (
+    'resources/framework.json', 'resources/framework.lock', 'resources/workspace.toml',
+    'templates/browser/wasm-startup.mjs', 'templates/browser/wasm-startup.css',
+)
+SDK_RESOURCE_PATHS = SDK_SNAPSHOT_PATHS + ('resources/sdk-identity.json', 'resources/sdk-compatibility.json')
+
+
+def check_sdk_resources(files, build_sdk, readme):
+    """Check the same immutable policy/snapshot closure in source and CLI archives."""
+    location = 'CLI SDK identity'
+    require(all(p in files for p in SDK_RESOURCE_PATHS), location, 'resource closure incomplete')
+    identity = json.loads(files['resources/sdk-identity.json'])
+    policy = json.loads(files['resources/sdk-compatibility.json'])
+    require(identity['schema'] == 1 and '=' + identity['build_sdk'] == build_sdk, location,
+            'build SDK identity differs from exact manifest dependency')
+    workspace = tomllib.loads(files['resources/workspace.toml'].decode())
+    require(workspace['workspace']['package']['version'] == identity['snapshot_sdk'], location,
+            'snapshot identity differs from embedded workspace')
+    require(re.fullmatch(r'[0-9a-f]{40}', identity['snapshot_source']), location,
+            'snapshot source must be an immutable Git identity')
+    require(set(identity['files']) == set(SDK_SNAPSHOT_PATHS), location, 'snapshot path set differs')
+    for path in SDK_SNAPSHOT_PATHS:
+        require(hashlib.sha256(files[path]).hexdigest() == identity['files'][path], location,
+                'snapshot resource digest differs')
+    require(hashlib.sha256(files['resources/sdk-compatibility.json']).hexdigest() == identity['policy_sha256'],
+            location, 'policy digest differs')
+    require(policy['msrv'] == '1.99' and set(policy['templates']) ==
+            {'native', 'browser', 'native-style', 'browser-style'}, location, 'unsupported template/MSRV policy')
+    require(field(readme, 'SDK policy', location) == policy['revision'], location,
+            'README policy differs from packaged authority')
+    require(all(type(versions) is list and versions and len(versions) == len(set(versions))
+                and all(re.fullmatch(r'(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?', v)
+                        for v in versions) for versions in policy['templates'].values()),
+            location, 'invalid supported version set')
+
+
 def check_cli_published_commands(text, selected, published):
     """Do not attribute later source-only Style selectors to an already shipped CLI."""
     if selected != published:
@@ -127,7 +165,11 @@ def check_readme(name, version, text, sdk=None):
     check_status(text, {'CLI' if name == 'yetlet-cli' else 'SDK': version}, name)
     if name == 'yetlet-cli':
         require(field(text, 'CLI release', name) == version, name, 'CLI version differs from manifest')
-        require(field(text, 'Generated SDK', name) == sdk, name, 'SDK pin differs from dependency')
+        label = 'Build SDK' if '**SDK policy:**' in text else 'Generated SDK'
+        require(field(text, label, name) == sdk, name, 'build SDK pin differs from dependency')
+        if label == 'Build SDK':
+            require(re.fullmatch(r'sdk-compat-v[1-9][0-9]*', field(text, 'SDK policy', name)), name,
+                    'versioned SDK compatibility policy required')
         check_installs(text, version, name)
         outputs = re.findall(r'`yetlet ([0-9][0-9A-Za-z.+-]*)`', text)
         require(bool(outputs) and all(value == version for value in outputs), name,
@@ -197,6 +239,10 @@ def check_source(root, cohort='all'):
     sdk = cli['dependencies']['yetlet']['version']
     if cohort in ('all', 'cli'):
         check_readme('yetlet-cli', version, read(root, 'tools/yetlet-cli/README.md'), sdk)
+        resources = root / 'tools/yetlet-cli/resources'
+        if (resources / 'sdk-identity.json').is_file():
+            check_sdk_resources({p: (root / 'tools/yetlet-cli' / p).read_bytes() for p in SDK_RESOURCE_PATHS},
+                                sdk, read(root, 'tools/yetlet-cli/README.md'))
     if cohort in ('all', 'consolidated'):
         for name in ('yetlet', 'yetlet-browser'):
             check_readme(name, workspace, read(root, f'crates/{name}/README.md'))

@@ -1,5 +1,5 @@
 use std::process::ExitCode;
-use yetlet_cli::{Cli, VERSION, app, compose, docker, doctor, inspect, parse, scaffold, usage};
+use yetlet_cli::{Cli, VERSION, app, compose, docker, doctor, inspect, parse, usage};
 
 fn main() -> ExitCode {
     let args = std::env::args_os().skip(1).collect::<Vec<_>>();
@@ -105,32 +105,19 @@ fn main() -> ExitCode {
                 }
             }
         }
-        Ok(Cli::New {
-            name,
-            dir,
-            template,
-            service,
-            runtime_settings,
-            tailwind,
-            vite,
-        }) => match scaffold::create_selected(
-            &name,
-            &dir,
-            template,
-            service,
-            runtime_settings,
-            tailwind,
-            vite,
-        ) {
+        Ok(command @ Cli::New { .. }) => match command.create_new() {
             Ok(()) => {
                 println!(
-                    "Created {name}. Follow its README for explicit dependency and lockfile preparation."
+                    "Created project with exact SDK and Cargo.lock. Follow its README for build prerequisites."
                 );
                 ExitCode::SUCCESS
             }
             Err(error) => {
-                eprintln!("CLI_PUBLISH new: {error}");
-                ExitCode::FAILURE
+                eprintln!("CLI_NEW: {}", error.message);
+                if error.code >= 128 {
+                    app::Completion::Cancelled(error.code - 128).finish();
+                }
+                ExitCode::from(error.code as u8)
             }
         },
         Err(error) => {

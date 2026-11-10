@@ -4,6 +4,7 @@ pub(crate) mod key;
 #[path = "safe_dir.rs"]
 mod safe_dir;
 pub(crate) use safe_dir::create as create_project;
+pub(crate) use safe_dir::{create_prepared, preflight_new};
 #[path = "static_linux.rs"]
 pub(super) mod static_output;
 
