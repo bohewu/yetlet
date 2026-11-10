@@ -1,4 +1,6 @@
 #![cfg(any(target_os = "linux", windows))]
+#[path = "fixtures/source_scaffold.rs"]
+mod source_scaffold;
 use sha2::{Digest, Sha256};
 use std::{ffi::OsString, fs, path::Path, process::Command};
 use yetlet_cli::{Cli, parse};
@@ -126,23 +128,14 @@ fn selected_cli_keeps_runtime_settings_opt_in_and_adds_public_tool_settings() {
     for service in [false, true] {
         for config in [false, true] {
             let name = format!("plain-{service}-{config}");
-            let mut command = Command::new(env!("CARGO_BIN_EXE_yetlet"));
-            command
-                .args(["new", &name, "--parent"])
-                .arg(root.path())
-                .env("PATH", root.path().join("no-executables"));
+            let mut flags = Vec::new();
             if service {
-                command.arg("--service");
+                flags.push("--service");
             }
             if config {
-                command.arg("--settings");
+                flags.push("--settings");
             }
-            let output = command.output().unwrap();
-            assert!(
-                output.status.success(),
-                "{}",
-                String::from_utf8_lossy(&output.stderr)
-            );
+            source_scaffold::create(root.path(), &name, "native", &flags).unwrap();
             let app = root.path().join(&name);
             assert_eq!(app.join("src/config.rs").exists(), config);
             let manifest = fs::read_to_string(app.join("Cargo.toml")).unwrap();

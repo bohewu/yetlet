@@ -1,9 +1,10 @@
 # YT-247 — Dynamic SDK Version Resolution CLI Contract
 
-Date: 2026-11-10 (Asia/Taipei). Phase A: **Proposed design; Owner acceptance pending**.
+Date: 2026-11-10 (Asia/Taipei). **Owner accepted Contract and ADR 0010; Phase B source implemented, independent Reviewer PASS**.
 Independent review and Git delivery are recorded in the [Phase A handoff](YT-247-PHASE-A-HANDOFF.md).
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) records the decision and tradeoffs.
-Nothing in this document claims that the resolver or new command behavior exists.
+The [Phase B implementation record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
+separates checkout behavior and verification from the unchanged published CLI 0.2.0.
 
 ## Scope and gates
 
@@ -67,7 +68,7 @@ support. Registry app creation must not enter the local-source exporter.
 
 ## Command and error contract
 
-Proposed additions apply only to `new`:
+The accepted additions apply only to `new`:
 
 ```text
 yetlet new NAME [existing options] [--sdk-version VERSION] [--offline]
@@ -160,7 +161,7 @@ untrusted endpoints. Fixture providers use no production URL override flag.
 
 Policy `sdk-compat-v1` is shipped and reviewed with the CLI/template sources.
 It describes app compatibility, not a promise that every prerelease with the
-same numeric core has compatible APIs. Initial proposed supported sets are:
+same numeric core has compatible APIs. Initial accepted supported sets are:
 
 | Template | Accepted SDK versions | Required SDK packages/features |
 |---|---|---|
@@ -173,8 +174,8 @@ All require declared SDK MSRV at most Rust 1.99 and supported template API/targe
 shape; missing rust_version is incompatible, not inferred from CLI's build SDK.
 The generated app declares Rust 1.99. An installed newer compiler does not widen
 the policy. Browser creation needs no installed WASM target/Node to generate a
-lock; actual build needs the existing documented tools. Phase B must validate
-these proposed combinations; this table is not compile/browser evidence.
+lock; actual build needs the existing documented tools. The Phase B record
+contains compile results for these combinations; this table is not browser evidence.
 
 First intersect the applicable policy set with available package versions,
 remove a version if **any required package** is yanked, then check feature

@@ -1,5 +1,7 @@
 //! Real local Linux child trees; fixtures execute without Cargo/npm/network work.
 #![cfg(target_os = "linux")]
+#[path = "fixtures/source_scaffold.rs"]
+mod source_scaffold;
 use std::{
     fs,
     os::unix::{fs::PermissionsExt, process::ExitStatusExt},
@@ -917,22 +919,7 @@ fn browser_style_sequence_discards_queued_wasm_suppresses_failure_and_cleans_wor
     let root = temp.path();
     fs::set_permissions(root, fs::Permissions::from_mode(0o700)).unwrap();
     let cli = env!("CARGO_BIN_EXE_yetlet");
-    let output = Command::new(cli)
-        .args([
-            "new",
-            "browser-sequence",
-            "--template",
-            "browser-style",
-            "--parent",
-        ])
-        .arg(root)
-        .output()
-        .unwrap();
-    assert!(
-        output.status.success(),
-        "{}",
-        String::from_utf8_lossy(&output.stderr)
-    );
+    source_scaffold::create(root, "browser-sequence", "browser-style", &[]).unwrap();
     let app = root.join("browser-sequence");
     let frontend = app.join("frontend");
     fs::write(

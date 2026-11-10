@@ -266,10 +266,8 @@ fn real_generated_cloud_app_with_explicit_offline_cargo_lock_is_supported() {
     use std::os::unix::fs::{PermissionsExt, symlink};
     let root = tempfile::tempdir().unwrap();
     fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
-    let framework = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../..")
-        .canonicalize()
-        .unwrap();
+    let framework = root.path().join("framework");
+    docker_fixture::create(&framework);
     scaffold::create_service("k8sproof", &framework, root.path()).unwrap();
     let app = root.path().join("k8sproof");
     // Explicit test-fixture preparation; the generator must never run Cargo.

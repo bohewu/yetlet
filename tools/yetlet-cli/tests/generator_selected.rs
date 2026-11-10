@@ -1,4 +1,8 @@
 #![cfg(any(target_os = "linux", windows))]
+#[path = "fixtures/docker_framework.rs"]
+mod docker_fixture;
+#[path = "fixtures/source_scaffold.rs"]
+mod source_scaffold;
 use sha2::{Digest, Sha256};
 use std::{
     fs,
@@ -66,14 +70,11 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
         use std::os::unix::fs::PermissionsExt;
         fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     }
-    let framework = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .to_path_buf();
+    // The exporter accepts its recorded SDK snapshot, not the later root SDK.
+    let framework = root.path().join("framework");
+    docker_fixture::create(&framework);
     // Deployment output requires an owner-protected parent on Windows too.
-    success(cli(root.path(), root.path(), &["new", "output-parent"]));
+    source_scaffold::create(root.path(), "output-parent", "native", &[]).unwrap();
     let output_parent = root.path().join("output-parent");
     for (index, options) in [
         vec!["--service"],
@@ -85,9 +86,7 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
     .enumerate()
     {
         let name = format!("selected-gen-{index}");
-        let mut new = vec!["new", &name];
-        new.extend(options.iter().copied());
-        success(cli(root.path(), root.path(), &new));
+        source_scaffold::create(root.path(), &name, "native", options).unwrap();
         let app = root.path().join(&name);
         let path = app.join("Cargo.toml");
         let mut manifest: toml::Value = fs::read_to_string(&path).unwrap().parse().unwrap();

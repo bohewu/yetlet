@@ -3,6 +3,7 @@
 pub mod app;
 mod browser;
 pub mod compose;
+mod creation;
 pub mod docker;
 pub mod doctor;
 mod framework;
@@ -14,6 +15,8 @@ mod k8s;
 pub mod key;
 mod platform;
 pub mod scaffold;
+mod sdk_registry;
+mod sdk_version;
 mod settings;
 mod static_export;
 mod styles;
@@ -31,8 +34,8 @@ use std::{
 };
 
 pub const VERSION: &str = concat!("yetlet ", env!("CARGO_PKG_VERSION"));
-pub const HELP: &str = "Yetlet CLI preview\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--template native|browser|native-style|browser-style] [--vite] [--tailwind] [--service] [--settings]\n  yetlet doctor [--json]\n  yetlet inspect [--manifest-path PATH] [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet build --static --export-bin NAME --output DIRECTORY [--base-path /] [--release] [--wasm-islands]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
-const NEW_HELP: &str = "Usage: yetlet new NAME [--parent DIRECTORY] [--template native|browser|native-style|browser-style] [--vite] [--tailwind] [--service] [--settings]\n\nNAME may appear anywhere among options. --parent defaults to cwd and must exist.\nNAME: 1-64 lowercase ASCII letters/digits/-/_, starting with a letter; reserved names refused.\n--vite selects the complete frontend scaffold and implies --settings. Plain new keeps app-runtime settings opt-in.\n--tailwind selects standalone Tailwind or the official Vite plugin. --service adds bind/health/shutdown.\n--template native|browser|native-style|browser-style selects a built-in starter (default native), independent of runtime settings.\nThe browser template persists cli.target=browser and includes Vite/public settings.\nBrowser creation refuses --service. Plain creation defaults to native.\nCreates one new tree without overwrite, dependency installation, lock generation or process startup.\n";
+pub const HELP: &str = "Yetlet CLI preview\n\nUsage:\n  yetlet --help | -h\n  yetlet --version | -V\n  yetlet new NAME [--parent DIRECTORY] [--template native|browser|native-style|browser-style] [--vite] [--tailwind] [--service] [--settings] [--sdk-version VERSION] [--offline]\n  yetlet doctor [--json]\n  yetlet inspect [--manifest-path PATH] [--json]\n  yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]\n  yetlet key rotate [KEY] [--provider NAME] [--manifest-path PATH] [--yes] [--from PATH]\n  yetlet run [--manifest-path PATH]\n  yetlet watch [--manifest-path PATH]\n  yetlet build [--manifest-path PATH] [--release]\n  yetlet build --static --export-bin NAME --output DIRECTORY [--base-path /] [--release] [--wasm-islands]\n  yetlet generate docker [--manifest-path PATH] --output DIRECTORY\n  yetlet generate compose [--manifest-path PATH] --output DIRECTORY --image IMAGE\n  yetlet generate k8s [--manifest-path PATH] --output DIRECTORY --image IMAGE\n\nUse --help after a complete command path for scoped help. Paths remain literal.\nRequires Rust/Cargo 1.99+. No implicit installation, lock refresh or deployment.\nExit: 0 success/help, 1 preflight/report, 2 usage, 125 spawn/cleanup; native child exits/signals are preserved after cleanup.\n";
+const NEW_HELP: &str = "Usage: yetlet new NAME [--parent DIRECTORY] [--template native|browser|native-style|browser-style] [--vite] [--tailwind] [--service] [--settings] [--sdk-version VERSION] [--offline]\n\nNAME may appear anywhere among options. --parent defaults to cwd and must exist.\nNAME: 1-64 lowercase ASCII letters/digits/-/_, starting with a letter; reserved names refused.\n--vite selects the complete frontend scaffold and implies --settings. Plain new keeps app-runtime settings opt-in.\n--tailwind selects standalone Tailwind or the official Vite plugin. --service adds bind/health/shutdown.\n--template native|browser|native-style|browser-style selects a built-in starter (default native), independent of runtime settings.\nThe browser template persists cli.target=browser and includes Vite/public settings.\nBrowser creation refuses --service. Plain creation defaults to native.\nCreates one protected tree with exact registry SDK pins and Cargo.lock.\n--sdk-version selects exact canonical SemVer; default selects latest compatible stable or reviewed Experimental prerelease.\n--offline (also CARGO_NET_OFFLINE=true) uses CLI metadata cache without network and requires Cargo dependency cache.\nOnline refresh failure stops; no silent stale fallback. Reports SDK, source and cache age.\nRuns bounded Cargo lock generation; no builds, dependency/tool installation or existing lock refresh.\n";
 const DOCTOR_HELP: &str = "Usage: yetlet doctor [--json]\n\nReports bounded local Rust/Cargo 1.99+ identity and compiled new-filesystem capability.\nEnvironment only; application, framework, settings, frontend and execution readiness are not checked.\n--json emits schema 1. No builds, installs, Node probes or listeners.\n";
 const INSPECT_HELP: &str = "Usage: yetlet inspect [--manifest-path PATH] [--json]\n\nExplains public-settings execution plans for build/run/watch without running tools.\nManifest defaults to exactly cwd/Cargo.toml; requires a protected standalone app and Cargo.lock.\n--json emits project-execution-plan schema 1, separate from environment-only doctor.\nNative watch plans select Rust rebuild/restart; browser watch plans select WASM rebuild/full-page reload\nonly when cli.vite.auto_start and cli.vite.auto_build are both true.\nNo writes, secret sources, frontend inspection or readiness verification.\n";
 const RUN_HELP: &str = "Usage: yetlet run [--manifest-path PATH]\n\nManifest defaults to exactly cwd/Cargo.toml; no ancestor or workspace search.\nRequires a protected standalone app and existing Cargo.lock; runs frozen Cargo.\nPublic settings select native Rust watch/Vite or cli.target=browser static preview.\nBrowser run starts only the prepared frontend, honoring cli.vite.auto_start. No implicit installs.\nOwned processes must retain their process group/Job; escaped daemons are unsupported.\n";
@@ -63,6 +66,8 @@ pub enum Cli {
         runtime_settings: bool,
         tailwind: bool,
         vite: bool,
+        sdk_version: Option<String>,
+        offline: bool,
     },
     Build {
         manifest: PathBuf,
@@ -99,6 +104,39 @@ pub enum Cli {
 }
 
 impl Cli {
+    pub fn create_new(&self) -> Result<(), app::Failure> {
+        let Self::New {
+            name,
+            dir,
+            template,
+            service,
+            runtime_settings,
+            tailwind,
+            vite,
+            sdk_version,
+            offline,
+        } = self
+        else {
+            return Err(app::Failure {
+                code: 2,
+                message: "new command required".into(),
+            });
+        };
+        creation::execute(
+            name,
+            dir,
+            creation::Options {
+                template: *template,
+                service: *service,
+                settings: *runtime_settings,
+                tailwind: *tailwind,
+                vite: *vite,
+            },
+            sdk_version.as_deref(),
+            *offline,
+        )
+        .map(|_| ())
+    }
     /// Execute the explicitly parsed finite static-build mode.
     pub fn build_static(&self) -> Result<app::Completion, app::Failure> {
         match self {
@@ -201,6 +239,8 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
     let mut name = None;
     let mut parent = None;
     let mut template = None;
+    let mut sdk_version = None;
+    let mut offline = false;
     let mut manifest = None;
     let mut output = None;
     let mut image = None;
@@ -213,6 +253,14 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
     while index < args.len() {
         let (option, inline) = split_option(&args[index]);
         match option {
+            Some("--sdk-version") if command == "new" && sdk_version.is_none() => {
+                let value = argument_value(args, &mut index, inline)?
+                    .to_str()
+                    .ok_or("--sdk-version must be ASCII SemVer")?;
+                sdk_version::exact(value)?;
+                sdk_version = Some(value.to_owned());
+            }
+            Some("--offline") if command == "new" && !offline && inline.is_none() => offline = true,
             Some("--parent") if command == "new" && parent.is_none() => {
                 parent = Some(path_value(args, &mut index, inline)?)
             }
@@ -352,6 +400,8 @@ pub fn parse(args: &[OsString]) -> Result<Cli, &'static str> {
             runtime_settings: runtime_settings || vite,
             tailwind,
             vite,
+            sdk_version,
+            offline,
         }),
         "doctor" => Ok(Cli::Doctor { json }),
         "inspect" => Ok(Cli::Inspect { manifest, json }),
@@ -462,7 +512,9 @@ mod tests {
                     service: true,
                     runtime_settings: true,
                     tailwind: true,
-                    vite: true
+                    vite: true,
+                    sdk_version: None,
+                    offline: false,
                 })
             );
         }
@@ -475,7 +527,9 @@ mod tests {
                 service: false,
                 runtime_settings: true,
                 tailwind: false,
-                vite: true
+                vite: true,
+                sdk_version: None,
+                offline: false,
             })
         );
         assert_eq!(
@@ -487,7 +541,9 @@ mod tests {
                 service: false,
                 runtime_settings: false,
                 tailwind: false,
-                vite: false
+                vite: false,
+                sdk_version: None,
+                offline: false,
             })
         );
         assert_eq!(
@@ -564,6 +620,8 @@ mod tests {
                     runtime_settings: false,
                     tailwind: true,
                     vite: false,
+                    sdk_version: None,
+                    offline: false,
                 })
             );
         }

@@ -220,6 +220,7 @@ impl Temp {
                         "frontend" => "frontend",
                         "stylegen" => "stylegen",
                         "cargo-overlay" => "cargo-overlay",
+                        ".yetlet" => ".yetlet",
                         _ => return Err(io::Error::other("unsupported generated child")),
                     };
                     let name = cstr(child.as_ref())?;
@@ -301,11 +302,50 @@ pub(crate) fn create(parent: &Path, name: &str, files: &[(&str, String)]) -> Res
     create_inner(parent, name, files, |_, _| Ok(()))
 }
 
+pub(crate) fn preflight_new(parent: &Path, name: &str) -> Result<(), String> {
+    let anchor = Anchor::open(parent).map_err(|_| "destination parent is unavailable or unsafe")?;
+    anchor
+        .require_protected_create_parent()
+        .map_err(|_| "destination parent permits untrusted replacement")?;
+    let name = cstr(name.as_ref()).map_err(|_| "invalid destination")?;
+    match open_at(anchor.fd(), &name, libc::O_PATH, 0) {
+        Err(e) if e.raw_os_error() == Some(libc::ENOENT) => Ok(()),
+        _ => Err(
+            "destination already exists or cannot be safely inspected; nothing overwritten".into(),
+        ),
+    }
+}
+
+pub(crate) fn create_prepared(
+    parent: &Path,
+    name: &str,
+    files: &[(&str, String)],
+    prepare: impl FnOnce(&Path) -> Result<Vec<(&'static str, String)>, String>,
+) -> Result<(), String> {
+    create_prepared_inner(parent, name, files, |_, _| Ok(()), Some(prepare))
+}
+
 fn create_inner(
     parent: &Path,
     name: &str,
     files: &[(&str, String)],
+    hook: impl FnMut(Step, &Path) -> io::Result<()>,
+) -> Result<(), String> {
+    create_prepared_inner(
+        parent,
+        name,
+        files,
+        hook,
+        None::<fn(&Path) -> Result<Vec<(&'static str, String)>, String>>,
+    )
+}
+
+fn create_prepared_inner(
+    parent: &Path,
+    name: &str,
+    files: &[(&str, String)],
     mut hook: impl FnMut(Step, &Path) -> io::Result<()>,
+    prepare_new: Option<impl FnOnce(&Path) -> Result<Vec<(&'static str, String)>, String>>,
 ) -> Result<(), String> {
     super::super::generated_subdirectories(files)?;
     if name.is_empty() || matches!(name, "." | "..") || name.contains(['/', '\\', '\0']) {
@@ -337,6 +377,36 @@ fn create_inner(
             temp.write(path, contents)?;
             hook(Step::FileWritten(index), &temp_path)?;
         }
+        if let Some(prepare_new) = prepare_new {
+            let result = prepare_new(&temp_path);
+            // Cargo may leave a lock even on failure. Adopt exactly that regular
+            // owned entry before validation/rollback, never unknown paths.
+            match open_at(
+                &temp.dir,
+                c"Cargo.lock",
+                libc::O_RDONLY | libc::O_NONBLOCK,
+                0,
+            ) {
+                Ok(file) => {
+                    let meta = file.metadata()?;
+                    if !meta.is_file() || meta.uid() != unsafe { libc::geteuid() } {
+                        return Err(io::Error::other("Cargo lock ownership uncertain"));
+                    }
+                    temp.files.push(OwnedFile {
+                        name: CString::new("Cargo.lock").unwrap(),
+                        file,
+                        child: None,
+                    });
+                }
+                Err(e) if e.kind() == io::ErrorKind::NotFound => (),
+                Err(e) => return Err(e),
+            }
+            let additions = result.map_err(io::Error::other)?;
+            super::super::generated_subdirectories(&additions).map_err(io::Error::other)?;
+            for (path, data) in additions {
+                temp.write(path, &data)?;
+            }
+        }
         temp.dir.sync_all()?;
         hook(Step::BeforePublish, &temp_path)?;
         temp.verify(&parent)?;
@@ -345,11 +415,15 @@ fn create_inner(
         hook(Step::ParentChecked, &temp_path)?;
         Ok(())
     })();
-    if prepare.is_err() {
+    if let Err(error) = prepare {
         return Err(if temp.cleanup(&parent).is_ok() {
-            "pre-publication failure; owned temporary files cleaned; destination untouched".into()
+            format!(
+                "{error}; pre-publication failure; owned temporary files cleaned; destination untouched"
+            )
         } else {
-            "pre-publication failure; cleanup identity uncertain or foreign entries present; inspect temporary sibling; destination untouched".into()
+            format!(
+                "CLI_INFRASTRUCTURE: {error}; pre-publication failure; cleanup identity uncertain or foreign entries present; inspect temporary sibling; destination untouched"
+            )
         });
     }
     // SAFETY: held parent FD anchors both names, flags prohibit replacement.

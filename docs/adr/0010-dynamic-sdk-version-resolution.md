@@ -1,16 +1,17 @@
 # ADR 0010 — Separate SDK Resolution from CLI Build and Source Delivery
 
-- **Status:** Proposed; Phase A independent Reviewer PASS. Owner acceptance and Phase B implementation pending.
+- **Status:** Accepted by Owner on 2026-11-10; Phase B implemented in source, independent implementation Reviewer PASS.
 - **Date:** 2026-11-10 (Asia/Taipei).
 - **Task:** YT-247, Dynamic SDK Version Resolution; YT-248 release depends on Phase B.
 - **Related:** [CLI contract](../YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md),
   [Phase A handoff](../YT-247-PHASE-A-HANDOFF.md),
+  [Phase B implementation](../YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md),
   [version authorities](../YT-246-VERSION-SOURCE-AUDIT.md),
   [CLI 0.3.0 preparation](../CLI-030-RELEASE-PREPARATION.md),
   [ADR 0001](0001-separation-of-concerns.md),
   [ADR 0009](0009-release-build-and-signer-identities.md).
 
-## Context
+## Context at design time
 
 The independent CLI currently compiles with exact SDK alpha.6. Its embedded
 workspace also supplies alpha.6 to registry-facing native/browser scaffolds.
@@ -25,10 +26,10 @@ registry discovery, compatibility, offline behavior or safe application locking.
 Unconditionally coupling runtime app selection to the snapshot would also risk
 mislabeling alpha.6 source as an alpha.7 app.
 
-## Proposed decision
+## Decision
 
-Adopt the normative [YT-247 CLI contract](../YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md)
-only after Owner acceptance. Keep resolution inside the independent Rust CLI:
+Adopt the Owner-accepted normative [YT-247 CLI contract](../YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md).
+Keep resolution inside the independent Rust CLI:
 
 1. A small resolver composes a registry/index provider, local public-metadata
    cache and pure template compatibility predicate. Only the provider performs
@@ -102,9 +103,10 @@ transitive graph identity. Neither is a reproducible-binary certification.
 
 ## Acceptance boundary
 
-This ADR reserves the next unused number after 0009 and records a proposal.
-Independent design PASS plus Git delivery completes Phase A only. Stop for Owner
-acceptance before changing resolver, parser, scaffold, resource, manifest,
-release script or workflow code. YT-247 stays open until Phase B acceptance;
-YT-248 is blocked on that implementation. No SDK/tag/archive/Reader Edition,
-Runner permissions, release record, signing or publication is changed here.
+Phase A was delivered in PR #68, merge `1c98a50432e3d90e0bf6e481c0682737b9cc94e3`.
+The Owner then accepted the Contract and ADR and authorized Phase B implementation,
+independent review and guarded Git delivery. The implementation record reports
+the source boundary, verification and platform limitations. Independent review
+passes at that bounded scope; YT-248 requires a separate instruction afterward.
+No SDK/tag/archive/Reader Edition, Runner permissions, historical release record,
+signing or publication changes are authorized by this decision.

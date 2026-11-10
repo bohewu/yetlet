@@ -1,6 +1,13 @@
 # YT-247 — Phase A Review and Implementation Handoff
 
-Date: 2026-11-10 (Asia/Taipei). **Independent design review PASS; guarded Git delivery follows; Owner acceptance pending.**
+Date: 2026-11-10 (Asia/Taipei). **Historical Phase A freeze: independent design review PASS.**
+
+Subsequent delivery: [PR #68](https://github.com/bohewu/yetlet/pull/68), merge
+`1c98a50432e3d90e0bf6e481c0682737b9cc94e3`, exact-head and master CI PASS.
+The Owner accepted the Contract and ADR 0010 and explicitly authorized Phase B.
+See the [implementation record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
+for that continuation. The pending/stop language below preserves the original
+Phase A checkpoint, not the current authorization state.
 
 ## Deliverables and preserved work
 
@@ -92,7 +99,7 @@ Phase B, in this order:
    registry consumer lane. Report compile/MSRV, native, browser/CSP and cleanup
    results separately. Obtain independent review before marking YT-247 Done.
 
-Do not bump/release CLI merely to implement the resolver. Then resume YT-248's
+Do not bump/release CLI merely to implement the resolver. A separate Owner instruction may resume YT-248's
 existing reviewed release plan, select CLI build SDK/snapshot alpha.7 separately,
 and adapt its installed consumer checks to exact and default resolution.
 YT-248 retains the registry-only Style native HTTP/CSS, browser Vite/WASM/runtime,

@@ -19,17 +19,17 @@ synchronization/check path.
 | Actually published SDK/CLI versions | Accepted publication sections in the versioned SDK and CLI release records | Distribution truth; development manifests do not prove publication |
 | Public reader edition | `site/pages.toml` → `[edition]` | Explicit consumer decision; does not automatically follow source or publication changes |
 
-## Proposed YT-247 authority amendment — 2026-11-10
+## Accepted YT-247 authority amendment — 2026-11-10
 
 The [Dynamic SDK Version Resolution contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md)
-and [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) propose separating
-future generated-app SDK selection from the CLI build dependency. Runtime
-selection would follow shipped template compatibility policy plus refreshed or
+and [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) separate
+generated-app SDK selection from the CLI build dependency. Runtime
+selection follows shipped template compatibility policy plus refreshed or
 explicitly offline metadata, then exact app manifest pins and its own Cargo.lock.
 The build dependency and immutable embedded snapshot keep separate purposes and
-release provenance. Phase B must update the synchronization/check assumptions
-that currently describe one generated pin; no source/checker behavior changes in
-Phase A. The authority table and evidence below retain their historical meaning
+release provenance. The [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
+documents synchronized build-SDK checks, policy validation and immutable snapshot
+source/digests. The authority table and evidence below retain their historical meaning
 for CLI0.2.0. Accepted publication and independently pinned Reader Edition remain
 separate authorities. [YT-248](CLI-030-RELEASE-PREPARATION.md) follows resolver
 implementation and retains its original Style release acceptance.

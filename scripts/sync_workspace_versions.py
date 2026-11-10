@@ -552,7 +552,7 @@ def sync_package_readmes(root, sdk, cli_version, cli_sdk):
     relative = "tools/yetlet-cli/README.md"
     text = (root / relative).read_text(encoding="utf-8")
     updated, count = re.subn(
-        r"(?m)^(\*\*CLI release:\*\* \x60)[^\x60]+(\x60\. \*\*Generated SDK:\*\* \x60)[^\x60]+(\x60\.)$",
+        r"(?m)^(\*\*CLI release:\*\* \x60)[^\x60]+(\x60\. \*\*(?:Generated|Build) SDK:\*\* \x60)[^\x60]+(\x60\.)$",
         lambda m: m.group(1) + cli_version + m.group(2) + cli_sdk + m.group(3),
         text, count=1)
     if count != 1:

@@ -6,14 +6,17 @@ Date: 2026-10-18 (Asia/Taipei). Task: YT-102, accepted CLI contract and authoriz
 - **Accepted revised design:** implementation was explicitly authorized after independent design review. The latest user direction makes `new --vite` imply `--settings`; plain new retains the runtime module opt-in. The [design verification record](YT-102-CLI-CONTRACT-VERIFICATION.md) preserves prior revisions.
 - **Remaining qualification:** [selected native Windows GNU lifecycle cases](YT-102-WINDOWS-VITE-VERIFICATION.md) now have direct evidence; [current generator compatibility](YT-102-GENERATOR-COMPATIBILITY.md) records the separately extended local-source representation, with [native Windows GNU generator verification](YT-102-WINDOWS-GENERATOR-VERIFICATION.md) for the four current service profiles. Additional platform/runtime and registry release qualification remain open. The subsequent [DX audit](YT-102-DX-AUDIT.md) reconciles the broader research deliverables; independent Reviewer PASS completes YT-102 at research-only scope. Public release stays blocked.
 
-## Proposed SDK resolution extension — 2026-11-10
+## Accepted SDK resolution extension — 2026-11-10
 
 The [YT-247 contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
-[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) define a proposed separate
+[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) define a separate
 SDK resolver, exact version/offline options and successful-new app lock creation.
-They are not implemented by this Phase A documentation delivery. Their explicit
-Owner acceptance/Phase B gate precedes changing the existing source-only new
-behavior described below. Published CLI0.2.0 and Reader Edition remain unchanged.
+The Owner authorized the [Phase B source implementation](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md).
+It supersedes source-only new and deferred app-lock descriptions below for this
+checkout: successful new resolves a compatible registry SDK, writes exact pins,
+generates an app Cargo.lock and records provenance before publication. Build,
+run and watch retain their frozen lock behavior. Published CLI0.2.0 and Reader
+Edition remain unchanged; this is not a CLI release.
 
 ## 1. Historical starting implementation and authority
 

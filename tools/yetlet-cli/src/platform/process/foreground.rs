@@ -14,6 +14,9 @@ use std::{
 };
 
 static CANCEL: AtomicI32 = AtomicI32::new(0);
+pub(super) fn cancellation_signal() -> i32 {
+    CANCEL.load(Ordering::Relaxed)
+}
 static NOTIFY_FD: AtomicI32 = AtomicI32::new(-1);
 const POLL: Duration = Duration::from_millis(5);
 const GRACE: Duration = Duration::from_millis(500);
@@ -748,12 +751,31 @@ mod tests;
 
 /// Bounded stdout with the same exact owned group/reaping contract as Cargo.
 pub(super) fn capture(command: &mut Command, limit: usize) -> io::Result<Vec<u8>> {
+    capture_inner(command, limit, false)
+}
+
+pub(super) fn capture_combined(command: &mut Command, limit: usize) -> io::Result<Vec<u8>> {
+    capture_inner(command, limit, true)
+}
+
+fn capture_inner(command: &mut Command, limit: usize, combined: bool) -> io::Result<Vec<u8>> {
     prepare(command)?;
+    let (reader, writer) = std::io::pipe()?;
     command
         .stdin(std::process::Stdio::null())
-        .stdout(std::process::Stdio::piped());
+        .stdout(writer.try_clone()?);
+    if combined {
+        command.stderr(writer);
+    } else {
+        drop(writer);
+    }
     let mut owned = Owned::spawn(command, None)?;
-    let reader = owned.child.stdout.take().unwrap();
+    // Command owns its pipe writers too. Replace them after spawn so EOF does
+    // not wait for the command builder itself to be dropped.
+    command.stdout(std::process::Stdio::null());
+    if combined {
+        command.stderr(std::process::Stdio::null());
+    }
     let (sender, receiver) = std::sync::mpsc::sync_channel(1);
     let thread = thread::spawn(move || {
         let mut bytes = Vec::new();
@@ -805,6 +827,12 @@ pub(super) fn capture(command: &mut Command, limit: usize) -> io::Result<Vec<u8>
             .and_then(|value| value)
     })?;
     if !status.success() || bytes.len() > limit {
+        if combined {
+            return Err(io::Error::other(format!(
+                "Cargo lock process failed: {}",
+                String::from_utf8_lossy(&bytes[..bytes.len().min(limit)])
+            )));
+        }
         return Err(io::Error::other(
             "style producer failed or exceeded its bound",
         ));

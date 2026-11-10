@@ -643,6 +643,24 @@ pub(crate) fn selected_files(
     tailwind: bool,
     vite: bool,
 ) -> Result<Vec<(&'static str, String)>, String> {
+    selected_files_version(
+        name,
+        service,
+        runtime_settings,
+        tailwind,
+        vite,
+        &crate::framework::package_version(),
+    )
+}
+
+pub(crate) fn selected_files_version(
+    name: &str,
+    service: bool,
+    runtime_settings: bool,
+    tailwind: bool,
+    vite: bool,
+    sdk_version: &str,
+) -> Result<Vec<(&'static str, String)>, String> {
     // Vite needs the same typed runtime settings as the CLI. Plain SSR stays opt-in.
     let runtime_settings = runtime_settings || vite;
     // These paths only seed the established template assembly; no filesystem lookup.
@@ -666,7 +684,7 @@ pub(crate) fn selected_files(
     dependency.remove("path");
     dependency.insert(
         "version".into(),
-        toml::Value::String(format!("={}", crate::framework::package_version())),
+        toml::Value::String(format!("={sdk_version}")),
     );
     entries[0].1 = toml::to_string(&manifest).map_err(|_| "cannot render generated manifest")?;
     let cli = format!(
@@ -762,7 +780,7 @@ pub(crate) fn selected_files(
     entries[1].1 = include_str!("../templates/SELECTED-README.md")
         .replace("@NAME@", name)
         .replace("@VERSION@", env!("CARGO_PKG_VERSION"))
-        .replace("@SDK_VERSION@", &crate::framework::package_version());
+        .replace("@SDK_VERSION@", sdk_version);
     if runtime_settings {
         entries[1]
             .1

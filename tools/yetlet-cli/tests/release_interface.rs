@@ -31,26 +31,39 @@ fn real_binary_help_describes_the_published_preview() {
 
 #[cfg(target_os = "linux")]
 #[test]
-fn real_binary_scaffold_keeps_the_published_sdk_dependency() {
+fn real_binary_offline_preflight_publishes_no_project() {
     use std::os::unix::fs::PermissionsExt;
-
     let root = tempfile::tempdir().unwrap();
     std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
     let output = Command::new(env!("CARGO_BIN_EXE_yetlet"))
-        .args(["new", "consumerapp", "--parent"])
+        .args([
+            "new",
+            "consumerapp",
+            "--offline",
+            "--sdk-version",
+            "0.9.0-alpha.7",
+            "--parent",
+        ])
         .arg(root.path())
+        .env("CARGO_HOME", root.path().join("empty-cargo-home"))
         .current_dir(root.path())
         .output()
         .unwrap();
-    assert!(output.status.success(), "{output:?}");
-    let manifest: toml::Value = std::fs::read_to_string(root.path().join("consumerapp/Cargo.toml"))
-        .unwrap()
-        .parse()
+    let doctor = Command::new(env!("CARGO_BIN_EXE_yetlet"))
+        .args(["doctor", "--json"])
+        .output()
         .unwrap();
-    let sdk = &manifest["dependencies"]["yetlet"];
-    let cli: toml::Value = include_str!("../Cargo.toml").parse().unwrap();
-    assert_eq!(sdk["version"], cli["dependencies"]["yetlet"]["version"]);
-    assert!(sdk.get("path").is_none());
-    assert!(manifest.get("patch").is_none());
-    assert!(manifest.get("replace").is_none());
+    let report: serde_json::Value = serde_json::from_slice(&doctor.stdout).unwrap();
+    if report["ok"] == true {
+        assert_eq!(output.status.code(), Some(1), "{output:?}");
+        assert!(String::from_utf8_lossy(&output.stderr).contains("SDK_OFFLINE_CACHE_MISS"));
+    } else {
+        // Existing doctor policy refuses unsafe/missing local tool installs.
+        // Metadata hit/miss behavior is independently tested with an injected
+        // tool preflight in sdk_version tests; never weaken executable policy.
+        assert_eq!(output.status.code(), Some(125), "{output:?}");
+        assert!(String::from_utf8_lossy(&output.stderr).contains("CLI_INFRASTRUCTURE"));
+    }
+    assert!(!root.path().join("consumerapp").exists());
+    assert!(!root.path().join("empty-cargo-home").exists());
 }

@@ -834,7 +834,7 @@ fn open_delete(parent: &File, name: &str, dir: bool) -> io::Result<File> {
     nt(unsafe {
         NtCreateFile(
             &mut raw,
-            DELETE | FILE_READ_ATTRIBUTES | SYNCHRONIZE,
+            DELETE | READ_CONTROL | FILE_READ_ATTRIBUTES | SYNCHRONIZE,
             &attrs,
             &mut status,
             null(),
@@ -1026,6 +1026,135 @@ pub(crate) fn create_project(
 ) -> Result<(), String> {
     create(parent, name, entries, || Ok(()))
         .map_err(|error| format!("cannot safely create project; destination preserved: {error}"))
+}
+
+pub(crate) fn preflight_new(parent: &Path, name: &str) -> Result<(), String> {
+    component(name.as_ref()).map_err(|_| "invalid destination")?;
+    let anchor = Anchor::open(parent).map_err(|_| "destination parent unavailable or unsafe")?;
+    let security = anchor
+        .security_directory()
+        .map_err(|_| "destination parent unavailable")?;
+    protected(&security, true).map_err(|_| "destination parent must be owner-protected")?;
+    match relative(anchor.directory(), name.as_ref(), true, false, None) {
+        Err(e) if e.kind() == io::ErrorKind::NotFound => Ok(()),
+        _ => Err(
+            "destination already exists or cannot be safely inspected; nothing overwritten".into(),
+        ),
+    }
+}
+
+pub(crate) fn create_prepared(
+    parent_path: &Path,
+    name: &str,
+    entries: &[(&str, String)],
+    prepare: impl FnOnce(&Path) -> Result<Vec<(&'static str, String)>, String>,
+) -> Result<(), String> {
+    preflight_new(parent_path, name)?;
+    super::generated_subdirectories(entries)?;
+    let parent = Anchor::open(parent_path).map_err(|_| "destination parent unavailable")?;
+    let sd = private_security().map_err(|_| "cannot protect staging")?;
+    let mut stage = Stage::make(&parent, &sd).map_err(|_| "cannot establish private staging")?;
+    let stage_path = parent_path.join(&stage.root.as_ref().unwrap().name);
+    let result = (|| -> io::Result<()> {
+        stage.populate(entries, &sd)?;
+        // Creation handles request DELETE/write access, which conflicts with
+        // Cargo's ordinary directory/file opens. The private DACL remains in
+        // force while a normal no-delete-sharing App pins the preparation cwd.
+        for (_, entry) in &mut stage.files {
+            entry.file.take();
+        }
+        for child in &mut stage.children {
+            child.file.take();
+        }
+        stage.root.as_mut().unwrap().file.take();
+        let prepared = match open_directory(&stage_path) {
+            Ok(pin) => {
+                let result = prepare(&stage_path);
+                drop(pin);
+                result
+            }
+            Err(error) => Err(error),
+        };
+        // Reacquire exact owned identities before cleanup or publication. A
+        // replaced root is retained, never adopted as our staging directory.
+        let root = stage.root.as_ref().unwrap();
+        let reopened = open_delete(parent.directory(), &root.name, true).and_then(|file| {
+            if inspect(&file, true)? != root.id {
+                return Err(io::Error::other("staging root identity changed"));
+            }
+            protected(&file, true)?;
+            Ok(file)
+        });
+        match reopened {
+            Ok(file) => stage.root.as_mut().unwrap().file = Some(file),
+            Err(_) => {
+                // Disarm Drop: no owned root handle remains for safe rollback.
+                stage.root.take();
+                return Err(io::Error::other(
+                    "CLI_INFRASTRUCTURE: cannot reacquire exact staging root; retained for inspection",
+                ));
+            }
+        }
+        for child in &mut stage.children {
+            let file = open_delete(
+                stage.root.as_ref().unwrap().file.as_ref().unwrap(),
+                &child.name,
+                true,
+            )?;
+            if inspect(&file, true)? != child.id {
+                return Err(io::Error::other("owned child identity changed"));
+            }
+            protected(&file, true)?;
+            child.file = Some(file);
+        }
+        for (child, entry) in &mut stage.files {
+            let parent = child.map_or_else(
+                || stage.root.as_ref().unwrap().file.as_ref().unwrap(),
+                |index| stage.children[index].file.as_ref().unwrap(),
+            );
+            let file = open_delete(parent, &entry.name, false)?;
+            if inspect(&file, false)? != entry.id {
+                return Err(io::Error::other("owned input identity changed"));
+            }
+            protected(&file, true)?;
+            entry.file = Some(file);
+        }
+        match open_delete(stage.root(), "Cargo.lock", false) {
+            Ok(file) => {
+                let id = inspect(&file, false)?;
+                stage.files.push((
+                    None,
+                    Entry {
+                        name: "Cargo.lock".into(),
+                        file: Some(file),
+                        id,
+                        dir: false,
+                    },
+                ));
+                protected(stage.files.last().unwrap().1.file.as_ref().unwrap(), true)?;
+            }
+            Err(e) if e.kind() == io::ErrorKind::NotFound => (),
+            Err(e) => return Err(e),
+        }
+        let additions = prepared.map_err(io::Error::other)?;
+        super::generated_subdirectories(&additions).map_err(io::Error::other)?;
+        stage.populate(&additions, &sd)?;
+        stage.publish(&parent, name)
+    })();
+    if let Err(error) = result {
+        if stage.root.is_none() {
+            return Err(error.to_string());
+        }
+        return match stage.rollback() {
+            Ok(()) => Err(format!(
+                "{error}; owned staging cleaned; destination untouched"
+            )),
+            Err(_) => Err(format!(
+                "CLI_INFRASTRUCTURE: {error}; exact-owned staging cleanup failed; inspect retained sibling"
+            )),
+        };
+    }
+    Ok(())
 }
 fn create(
     parent: &Path,

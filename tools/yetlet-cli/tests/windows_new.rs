@@ -1,4 +1,6 @@
 #![cfg(windows)]
+#[path = "fixtures/source_scaffold.rs"]
+mod source_scaffold;
 use std::{fs, process::Command};
 
 fn sdk_requirement() -> String {
@@ -16,20 +18,7 @@ fn new_uses_shared_standalone_templates_without_cargo_or_network() {
     let empty_path = root.path().join("no-executables");
     fs::create_dir(&parent).unwrap();
     fs::create_dir(&empty_path).unwrap();
-    let output = Command::new(env!("CARGO_BIN_EXE_yetlet"))
-        .args(["new", "demo", "--parent"])
-        .arg(&parent)
-        .env("PATH", &empty_path)
-        .env("CARGO_HOME", root.path().join("must-not-exist"))
-        .env("RUSTUP_AUTO_INSTALL", "0")
-        .env("CARGO_NET_OFFLINE", "true")
-        .output()
-        .unwrap();
-    assert!(
-        output.status.success(),
-        "{}",
-        String::from_utf8_lossy(&output.stderr)
-    );
+    source_scaffold::create(&parent, "demo", "native", &[]).unwrap();
     let app = parent.join("demo");
     let manifest: toml::Value = fs::read_to_string(app.join("Cargo.toml"))
         .unwrap()
@@ -71,18 +60,7 @@ fn single_letter_name_publishes_complete_project_without_stage_residue() {
     let root = tempfile::tempdir().unwrap();
     let parent = root.path().join("projects");
     fs::create_dir(&parent).unwrap();
-    let output = Command::new(env!("CARGO_BIN_EXE_yetlet"))
-        .args(["new", "a", "--parent"])
-        .arg(&parent)
-        .env("RUSTUP_AUTO_INSTALL", "0")
-        .env("CARGO_NET_OFFLINE", "true")
-        .output()
-        .unwrap();
-    assert!(
-        output.status.success(),
-        "{}",
-        String::from_utf8_lossy(&output.stderr)
-    );
+    source_scaffold::create(&parent, "a", "native", &[]).unwrap();
     let app = parent.join("a");
     assert_eq!(
         fs::read_to_string(app.join("src/main.rs")).unwrap(),

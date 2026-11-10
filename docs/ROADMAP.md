@@ -1,14 +1,16 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**YT-247 Dynamic SDK Version Resolution (2026-11-10): Phase A independent design review PASS; implementation pending Owner acceptance.**
+**YT-247 Dynamic SDK Version Resolution (2026-11-10): Done at source implementation scope; independent Reviewer PASS.**
 [CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) separate CLI build SDK,
 immutable source snapshot and template identity from the generated app's selected
-registry SDK. Phase A ends after independent review PASS and guarded documentation
-Git delivery; [handoff](YT-247-PHASE-A-HANDOFF.md) records checks and next steps.
-YT-247 remains open for Phase B resolver implementation; no new command is shipped.
+registry SDK. [Phase A handoff](YT-247-PHASE-A-HANDOFF.md) retains the design review
+and PR #68 delivery; the [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
+reports resolver/cache/locking tests and six real registry compile combinations.
+Published CLI0.2.0 is unchanged. Windows compilation remains unverified because
+the available Windows environments lack native toolchain prerequisites.
 
-**YT-248 CLI 0.3.0 Style release (2026-11-10): Blocked on YT-247 Phase B.**
+**YT-248 CLI 0.3.0 Style release (2026-11-10): Not started; awaits separate Owner instruction after YT-247 Git delivery.**
 The [preserved preparation plan](CLI-030-RELEASE-PREPARATION.md) retains its prior
 independent Style plan PASS, one schema3/cli package, alpha.7 build SDK/qualified
 snapshot, native/browser Style acceptance, installed registry-only consumers and

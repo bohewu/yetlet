@@ -17,6 +17,24 @@ def cli_readme(version='7.8.9-beta.2', sdk='=6.5.4-alpha.3'):
 
 
 class ReleaseDocsTests(unittest.TestCase):
+    def test_build_sdk_and_policy_are_distinct_from_generated_selection(self):
+        text = cli_readme().replace('Generated SDK', 'Build SDK') + '\n**SDK policy:** `sdk-compat-v1`.\n'
+        docs.check_readme('yetlet-cli', '7.8.9-beta.2', text, '=6.5.4-alpha.3')
+        with self.assertRaises(ValueError):
+            docs.check_readme('yetlet-cli', '7.8.9-beta.2', text, '=9.9.9')
+
+    def test_packaged_policy_and_snapshot_digest_mismatch_are_rejected(self):
+        root = Path(__file__).resolve().parents[1] / 'tools/yetlet-cli'
+        files = {p: (root / p).read_bytes() for p in docs.SDK_RESOURCE_PATHS}
+        readme = (root / 'README.md').read_text()
+        sdk = __import__('tomllib').loads((root / 'Cargo.toml').read_text())['dependencies']['yetlet']['version']
+        docs.check_sdk_resources(files, sdk, readme)
+        for name in ['resources/framework.json', 'resources/sdk-compatibility.json']:
+            with self.subTest(path=name), self.assertRaises(ValueError):
+                docs.check_sdk_resources({**files, name: files[name] + b' '}, sdk, readme)
+        with self.assertRaises(ValueError):
+            docs.check_sdk_resources({p: v for p, v in files.items() if p != 'resources/sdk-identity.json'}, sdk, readme)
+
     def test_cli_versions_and_sdk_pins_are_selected_values_not_current_release_literals(self):
         for version, sdk in [('7.8.9-beta.2', '=6.5.4-alpha.3'), ('12.0.0', '=11.0.0')]:
             docs.check_readme('yetlet-cli', version, cli_readme(version, sdk), sdk)

@@ -90,6 +90,45 @@ fn frontend_entries() -> Vec<(&'static str, String)> {
 }
 
 #[test]
+fn prepared_stage_reopens_inputs_adopts_lock_and_cleans_failed_lock() {
+    let root = tempfile::tempdir().unwrap();
+    let inputs = entries();
+    create_prepared(root.path(), "prepared", &inputs, |stage| {
+        let app = open_directory(stage)?;
+        for (path, bytes) in &inputs {
+            assert_eq!(read_framework(&stage.join(path)).unwrap(), bytes.as_bytes());
+        }
+        fs::write(stage.join("Cargo.lock"), "generated lock").unwrap();
+        assert_eq!(
+            read_framework(&stage.join("Cargo.lock")).unwrap(),
+            b"generated lock"
+        );
+        drop(app);
+        Ok(vec![(".yetlet/sdk-resolution.json", "{}\n".into())])
+    })
+    .unwrap();
+    assert_eq!(
+        fs::read(root.path().join("prepared/Cargo.lock")).unwrap(),
+        b"generated lock"
+    );
+    assert!(
+        create_prepared(root.path(), "prepared", &inputs, |_| panic!(
+            "must not prepare existing app"
+        ))
+        .is_err()
+    );
+    let error = create_prepared(root.path(), "failed", &inputs, |stage| {
+        let app = open_directory(stage)?;
+        fs::write(stage.join("Cargo.lock"), "partial lock").unwrap();
+        drop(app);
+        Err("SDK_LOCK_FAILED: injected failure".into())
+    })
+    .unwrap_err();
+    assert!(error.contains("owned staging cleaned"), "{error}");
+    assert_eq!(names(root.path()), ["prepared"]);
+}
+
+#[test]
 fn frontend_and_src_are_one_no_replace_publication_with_owned_cleanup() {
     let root = tempfile::tempdir().unwrap();
     let files = frontend_entries();
