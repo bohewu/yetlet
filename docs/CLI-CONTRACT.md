@@ -6,6 +6,15 @@ Date: 2026-10-18 (Asia/Taipei). Task: YT-102, accepted CLI contract and authoriz
 - **Accepted revised design:** implementation was explicitly authorized after independent design review. The latest user direction makes `new --vite` imply `--settings`; plain new retains the runtime module opt-in. The [design verification record](YT-102-CLI-CONTRACT-VERIFICATION.md) preserves prior revisions.
 - **Remaining qualification:** [selected native Windows GNU lifecycle cases](YT-102-WINDOWS-VITE-VERIFICATION.md) now have direct evidence; [current generator compatibility](YT-102-GENERATOR-COMPATIBILITY.md) records the separately extended local-source representation, with [native Windows GNU generator verification](YT-102-WINDOWS-GENERATOR-VERIFICATION.md) for the four current service profiles. Additional platform/runtime and registry release qualification remain open. The subsequent [DX audit](YT-102-DX-AUDIT.md) reconciles the broader research deliverables; independent Reviewer PASS completes YT-102 at research-only scope. Public release stays blocked.
 
+## Proposed SDK resolution extension — 2026-11-10
+
+The [YT-247 contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
+[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) define a proposed separate
+SDK resolver, exact version/offline options and successful-new app lock creation.
+They are not implemented by this Phase A documentation delivery. Their explicit
+Owner acceptance/Phase B gate precedes changing the existing source-only new
+behavior described below. Published CLI0.2.0 and Reader Edition remain unchanged.
+
 ## 1. Historical starting implementation and authority
 
 Inspected checkout: `$REPO`, branch `feat/yt090-configuration`, HEAD `a883469862c5be3d88b7fe22262e10be8b53b92a` plus its dirty tree. HEAD alone is not the source identity; preserved hashes are recorded separately.

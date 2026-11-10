@@ -14,6 +14,17 @@ Current usage is documented in the [current module guides](API-REFERENCE.md), [H
 
 The design rationale and dated evidence below retain the original proposal and M7 decision history. Diagram references to compiler/macros and candidate IR are exploratory, not implemented authoring APIs. Current research decisions are in the [completed studies index](README.md#completed-research-prototypes); historical execution is not transferred to today's dirty source.
 
+## Proposed developer tooling boundary — YT-247
+
+[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and the
+[CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) propose an internal
+CLI SDK resolver with separate metadata/cache, compatibility and scaffold
+responsibilities. CLI build SDK and qualified embedded source-export snapshot
+remain fixed release inputs; generated app SDK selection is a separate registry
+consumer decision with exact pins and its own lock. This is Phase A design only,
+pending Owner acceptance and Phase B implementation. It changes none of the
+framework execution/rendering/transport boundaries below.
+
 ## 1. Problem statement
 
 Yetlet aims to reduce the conceptual and runtime costs of fat web frameworks. Static SSR pages should not require an entire client framework, and routine browser input/click events should not travel to a backend via a persistent event circuit. Rust component code may be shared between native server and browser targets, while renderers, interactivity policies, and action execution locations remain independently selectable.

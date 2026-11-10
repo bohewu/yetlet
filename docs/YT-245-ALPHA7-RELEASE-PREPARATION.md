@@ -46,8 +46,14 @@ pin stays `=0.9.0-alpha.6`, and current publication bindings/resources stay inta
 Do not invoke `sync_resources.py` before the SDK is actually available. Normal
 registry dependency preparation requires that publication; arbitrary registry
 patches/overrides or fabricated CLI0.3 packages cannot substitute for it. This
-preserves [YT-227 G2](YT-227-NEXT-RELEASE-PLAN.md#guide-and-version-binding-prerequisites)
+preserves [YT-227 G2](YT-227-NEXT-RELEASE-PLAN.md#g2-bind-each-cli-version-to-its-actual-published-sdk)
 and the SDK-first/CLI-later sequence in [alpha.6 preparation](ALPHA6-RELEASE-PREPARATION.md).
+
+The SDK alpha.7 has since been owner-approved and published. The independent
+CLI 0.3.0 Style release is now tracked under [YT-248](CLI-030-RELEASE-PREPARATION.md),
+after [YT-247 Dynamic SDK Version Resolution](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md)
+Phase B. Phase A delivers only the proposed contract/ADR and independent review;
+this original SDK preparation remains historical and does not include that CLI release.
 
 ## Evidence and local drafts
 
