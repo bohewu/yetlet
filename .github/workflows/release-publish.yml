@@ -96,7 +96,7 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y pkg-config libssl-dev
       - name: Prepare resolver CLI browser consumer tools before publication
-        if: fromJSON(inputs.record).schema == 3 && fromJSON(inputs.record).version == '0.3.0'
+        if: fromJSON(inputs.record).schema == 3 && (fromJSON(inputs.record).version == '0.3.0' || fromJSON(inputs.record).version == '0.3.1')
         run: |
           node --input-type=module -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 22 || (major === 22 && minor < 12)) process.exit(1)'
           npm --version

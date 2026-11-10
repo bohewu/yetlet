@@ -16,6 +16,7 @@ import tomllib
 from urllib.parse import urljoin
 
 import smoke_browser as smoke
+import release_record as records
 
 
 def require(value, message):
@@ -44,14 +45,42 @@ def protected_rust_env(root, env):
 
 
 def version_key(version):
+    """Canonical exact SDK SemVer precedence, including numeric prereleases."""
+    require(type(version) is str and len(version) <= 128
+            and re.fullmatch(records.VERSION, version), 'noncanonical SDK version')
     core, _, pre = version.partition('-')
-    return (not pre, tuple(map(int, core.split('.'))),
-            tuple((0, int(p)) if p.isdigit() else (1, p) for p in pre.split('.')))
+    parts = pre.split('.') if pre else []
+    require(all(not p.isdigit() or p == '0' or not p.startswith('0') for p in parts),
+            'noncanonical SDK prerelease')
+    return (tuple(map(int, core.split('.'))), not pre,
+            tuple((0, int(p)) if p.isdigit() else (1, p) for p in parts))
+
+
+def feature_available(row, name, seen=None):
+    """Check the selected template's feature closure in captured index metadata."""
+    seen = set() if seen is None else seen
+    if name in seen:
+        return True
+    seen.add(name)
+    dependencies = row['deps']
+    values = row.get('features2', {}).get(name, row['features'].get(name))
+    if values is None:
+        return any(d['name'] == name and d.get('optional', False) for d in dependencies)
+    for value in values:
+        if value.startswith('dep:'):
+            valid = any(d['name'] == value[4:] and d.get('optional', False) for d in dependencies)
+        elif '/' in value:
+            valid = any(d['name'] == value.split('/', 1)[0].removesuffix('?') for d in dependencies)
+        else:
+            valid = feature_available(row, value, seen)
+        if not valid:
+            return False
+    return True
 
 
 def inspect_project(project, cli_version, template, requested, source, cache, policy):
     policy_bytes = policy
-    policy = json.loads(policy_bytes)
+    policy = records.sdk_policy(policy_bytes, cli_version)
     receipt = json.loads((project / '.yetlet/sdk-resolution.json').read_bytes())
     lock = (project / 'Cargo.lock').read_bytes()
     sdk = receipt['sdk']
@@ -63,19 +92,34 @@ def inspect_project(project, cli_version, template, requested, source, cache, po
             and sdk['registry'] == 'https://index.crates.io/', 'resolution authority')
     names = {'yetlet', 'yetlet-browser'} if template.startswith('browser') else {'yetlet'}
     require({p['name'] for p in sdk['packages']} == names, 'SDK package set')
-    records = {r['name']: r for r in cache['records']}
-    require(set(records) == names, 'complete captured metadata set')
-    rows = {name: {r['vers']: r for r in map(json.loads, records[name]['body'].splitlines())}
+    captured = {r['name']: r for r in cache['records']}
+    require(set(captured) == names, 'complete captured metadata set')
+    rows = {name: {r['vers']: r for r in map(json.loads, captured[name]['body'].splitlines())}
             for name in names}
+    historical = policy['revision'] == 'sdk-compat-v1'
+    versions = policy['templates'][template] if historical else rows['yetlet']
     eligible = []
-    for version in policy['templates'][template]:
+    for version in versions:
+        try:
+            version_key(version)
+        except ValueError:
+            continue  # Index build metadata is not a canonical exact SDK request.
         selected = [rows[n].get(version) for n in names]
-        if all(r and not r['yanked'] and r.get('rust_version')
-               and (tuple(map(int, r['rust_version'].split('.'))) + (0, 0))[:3] <= (1, 99, 0)
-               for r in selected):
-            eligible.append(version)
-    require(sdk['version'] in eligible and sdk['version'] == (requested or max(eligible, key=version_key)),
-            'selection differs from captured approved metadata')
+        if not all(r and not r['yanked'] for r in selected):
+            continue
+        if historical and not all(r.get('rust_version') and
+                (tuple(map(int, r['rust_version'].split('.'))) + (0, 0))[:3] <= (1, 99, 0)
+                for r in selected):
+            continue
+        eligible.append(version)
+    if requested is not None:
+        version_key(requested)
+    def selection_key(version):
+        core, stable, pre = version_key(version)
+        return (stable, core, pre) if historical else (core, stable, pre)
+    require(eligible and sdk['version'] in eligible
+            and sdk['version'] == (requested if requested is not None else max(eligible, key=selection_key)),
+            'selection differs from captured metadata and policy')
     manifest = tomllib.loads((project / 'Cargo.toml').read_text())
     require(not {'patch', 'replace'} & manifest.keys(), 'SDK source override')
     dependencies = dict(manifest.get('dependencies', {}))
@@ -84,11 +128,15 @@ def inspect_project(project, cli_version, template, requested, source, cache, po
     packages = tomllib.loads(lock.decode())['package']
     for package in sdk['packages']:
         name = package['name']
-        record = records[name]
+        record = captured[name]
         require(record['sha256'] == sha(record['body'].encode()) == package['metadata_sha256']
                 and record['validated_at'] == package['validated_at'], 'metadata provenance')
         row = rows[name][sdk['version']]
         dependency = dependencies[name]
+        required = ('dom', 'dom-keyed') if name == 'yetlet-browser' else (
+            ('reactive',) if template.startswith('browser') else ('server-axum',))
+        require(all(feature_available(row, f) for f in set(required) | set(dependency.get('features', []))),
+                'selected SDK required feature missing or invalid')
         require(dependency['version'] == '=' + sdk['version']
                 and not {'path', 'git', 'registry', 'registry-index'} & dependency.keys(), 'exact registry pin')
         locked = [p for p in packages if p['name'] == name]
@@ -96,6 +144,14 @@ def inspect_project(project, cli_version, template, requested, source, cache, po
                 and locked[0]['checksum'] == row['cksum'] == package['checksum']
                 and locked[0]['source'] == 'registry+https://github.com/rust-lang/crates.io-index',
                 'registry lock checksum')
+        if name == 'yetlet-browser':
+            # Cargo already solved VersionReq during creation. Verify its actual
+            # dependency edge as well as the two independently checked SDK pins.
+            require(any((d.get('package') or d['name']) == 'yetlet' for d in row['deps']),
+                    'browser metadata lacks Yetlet dependency')
+            require(any(edge in ('yetlet', 'yetlet ' + sdk['version'],
+                                 'yetlet ' + sdk['version'] + ' (registry+https://github.com/rust-lang/crates.io-index)')
+                        for edge in locked[0].get('dependencies', [])), 'browser lock dependency differs')
     return receipt
 
 

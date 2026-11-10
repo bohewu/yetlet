@@ -123,7 +123,7 @@ def check_sdk_resources(files, build_sdk, readme):
     location = 'CLI SDK identity'
     require(all(p in files for p in SDK_RESOURCE_PATHS), location, 'resource closure incomplete')
     identity = json.loads(files['resources/sdk-identity.json'])
-    policy = json.loads(files['resources/sdk-compatibility.json'])
+    policy = records.sdk_policy(files['resources/sdk-compatibility.json'])
     require(identity['schema'] == 1 and '=' + identity['build_sdk'] == build_sdk, location,
             'build SDK identity differs from exact manifest dependency')
     workspace = tomllib.loads(files['resources/workspace.toml'].decode())
@@ -137,14 +137,10 @@ def check_sdk_resources(files, build_sdk, readme):
                 'snapshot resource digest differs')
     require(hashlib.sha256(files['resources/sdk-compatibility.json']).hexdigest() == identity['policy_sha256'],
             location, 'policy digest differs')
-    require(policy['msrv'] == '1.99' and set(policy['templates']) ==
-            {'native', 'browser', 'native-style', 'browser-style'}, location, 'unsupported template/MSRV policy')
     require(field(readme, 'SDK policy', location) == policy['revision'], location,
             'README policy differs from packaged authority')
-    require(all(type(versions) is list and versions and len(versions) == len(set(versions))
-                and all(re.fullmatch(r'(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)\.(?:0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?', v)
-                        for v in versions) for versions in policy['templates'].values()),
-            location, 'invalid supported version set')
+    require(records.CLI_SDK_POLICIES.get(field(readme, 'CLI release', location)) == policy['revision'],
+            location, 'policy differs from selected CLI release')
 
 
 def check_cli_published_commands(text, selected, published):
@@ -180,8 +176,12 @@ def check_readme(name, version, text, sdk=None):
             require(label == 'Build SDK', name, 'resolver CLI requires separate build SDK/policy identity')
         require(field(text, label, name) == sdk, name, 'build SDK pin differs from dependency')
         if label == 'Build SDK':
-            require(re.fullmatch(r'sdk-compat-v[1-9][0-9]*', field(text, 'SDK policy', name)), name,
-                    'versioned SDK compatibility policy required')
+            revision = field(text, 'SDK policy', name)
+            require(revision in ('sdk-compat-v1', 'sdk-latest-v2'), name,
+                    'supported SDK policy required')
+            if version in records.CLI_SDK_POLICIES:
+                require(revision == records.CLI_SDK_POLICIES[version], name,
+                        'SDK policy differs from selected CLI release')
         check_installs(text, version, name)
         if version in records.CLI_SDK_VERSIONS and version not in records.LEGACY_CLI_VERSIONS:
             check_cli_published_commands(text, version, None)

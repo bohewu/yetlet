@@ -1,6 +1,6 @@
 # Yetlet Backlog
 
-## YT-237–YT-248 — Style delivery, SDK resolution and release preparation
+## YT-237–YT-250 — Style delivery, SDK resolution and release preparation
 
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
@@ -18,6 +18,8 @@
 | YT-248 | P1 | M | M10 | Independent CLI 0.3.0 release with Style templates | YT-239, YT-243, YT-245, YT-246, YT-247 | [Preserved plan](CLI-030-RELEASE-PREPARATION.md), [candidate](YT-248-CLI030-CANDIDATE.md) and [actual hosted publication](CLI-030-HOSTED-RECORD.md): fixed C/tag/S/V/P, independent source/signer/packet reviews, strict Guard and exact PR/master CI; original build/custody/sign/V PASS; exact GitHub five-file and crates.io single-CLI archive/readback verified. Original publisher remains FAIL at consumer tool preflight; failures retained without reupload. Owner-authorized private-tool/private-target supplement PASS: fresh registry install, six resolver/lock cases, Native SSR/CSS and Browser Vite/WASM/Chrome, owned-process/cache cleanup. Current versions and record links derive from the accepted publication; initial Reader Edition hold superseded by YT-249; new Windows Style revalidation paused/unverified. Closeout Git delivery follows review | Done |
 
 | YT-249 | P1 | S | M10 | Promote the Reader Edition and require publication follow-through | YT-232, YT-246, YT-248 | [Contract and evidence](YT-249-READER-RELEASE-ROLLOVER.md): select the accepted SDK/CLI pair, update exact registry consumers/locks and tutorials, enforce reader/publication agreement, verify native/Wasm/static output and live Pages through independent review and guarded Git delivery; 14 sync/21 release-doc/23 reader-build tests, native/Wasm reader/static reference and first-app SSR PASS; independent Reviewer PASS0 verifies26 source identities. Done at source/local consumer scope; guarded public delivery requires exact-head PR/master CI and live readback. Preserve immutable distributions and historical editions | Done |
+
+| YT-250 | P1 | M | M10 | Correct Registry latest SDK selection and prepare CLI 0.3.1 | YT-247, YT-248, YT-249 | [Preparation](CLI-031-RELEASE-PREPARATION.md): source resolver and release-consumer integration use sdk-latest-v2 maximum available non-yanked SemVer including future prereleases, required same-version Browser availability, selected-version feature/dependency failures without fallback and Cargo-owned feasibility; retain exact overrides/pins/locks/receipts, alpha.7 build/snapshot and historical bindings. Documentation and local gates precede independent semantic/source-freeze review; candidate/local consumers and hosted build/custody/sign/V pending. Published SDKalpha.7/CLI0.3.0 and Reader unchanged; formal publication excluded | In progress |
 
 ## YT-241 — Owner-approved Style Showcase
 

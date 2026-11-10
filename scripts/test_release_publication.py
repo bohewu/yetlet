@@ -17,6 +17,7 @@ import release_record as records
 import release_registry as registry
 import release_ci
 import release_docs
+from test_release_cli_consumer import HISTORICAL_POLICY
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location('publication_tests', HERE / 'release-publish.py')
@@ -63,8 +64,20 @@ def archives(directory, cycle=False, consolidated=False, cli=False, cli_version=
         extra_files = []
         if name == 'yetlet-cli' and r['version'] not in records.LEGACY_CLI_VERSIONS:
             package = HERE.parent / 'tools/yetlet-cli'
-            readme = (package / 'README.md').read_text()
-            extra_files = [(p, (package / p).read_bytes()) for p in release_docs.SDK_RESOURCE_PATHS]
+            files = {p: (package / p).read_bytes() for p in release_docs.SDK_RESOURCE_PATHS}
+            if r['version'] == '0.3.0':
+                # Published v1 authority must not follow the candidate checkout.
+                readme = readme.replace('Generated SDK', 'Build SDK') + (
+                    '\n**SDK policy:** `sdk-compat-v1`.\n'
+                    '## CLI command and capability inventory\n'
+                    'native-style browser-style --sdk-version --offline Cargo.lock\n')
+                files['resources/sdk-compatibility.json'] = HISTORICAL_POLICY
+                identity = json.loads(files['resources/sdk-identity.json'])
+                identity['policy_sha256'] = registry.sha(HISTORICAL_POLICY)
+                files['resources/sdk-identity.json'] = json.dumps(identity).encode()
+            else:
+                readme = (package / 'README.md').read_text()
+            extra_files = list(files.items())
         with tarfile.open(fileobj=raw, mode='w:gz') as archive:
             for path, data in [('Cargo.toml', manifest.encode()), ('README.md', (readme + readme_suffix).encode()), *extra_files]:
                 info = tarfile.TarInfo(name + '-' + r['version'] + '/' + path)
@@ -78,16 +91,25 @@ def archives(directory, cycle=False, consolidated=False, cli=False, cli_version=
 
 class RegistryTests(unittest.TestCase):
     def test_cli030_binds_one_archive_sdk7_and_shipped_policy_snapshot(self):
-        with tempfile.TemporaryDirectory() as temp:
-            r, subjects = archives(Path(temp), cli=True, cli_version='0.3.0')
-            plan, bodies = registry.prepare(r, temp, subjects)
-            self.assertEqual([row['name'] for row in plan['packages']], ['yetlet-cli'])
-            size = struct.unpack_from('<I', bodies['yetlet-cli'])[0]
-            meta = json.loads(bodies['yetlet-cli'][4:4+size])
-            self.assertEqual(meta['deps'][0]['version_req'], '=0.9.0-alpha.7')
-            self.assertIn('browser-style', meta['readme'])
-            r, subjects = archives(Path(temp), cli=True, cli_version='0.3.0', cli_sdk='0.9.0-alpha.6')
-            with self.assertRaises(ValueError): registry.prepare(r, temp, subjects)
+        for version in ('0.3.0', '0.3.1'):
+            with self.subTest(version=version), tempfile.TemporaryDirectory() as temp:
+                r, subjects = archives(Path(temp), cli=True, cli_version=version)
+                plan, bodies = registry.prepare(r, temp, subjects)
+                self.assertEqual([row['name'] for row in plan['packages']], ['yetlet-cli'])
+                size = struct.unpack_from('<I', bodies['yetlet-cli'])[0]
+                meta = json.loads(bodies['yetlet-cli'][4:4+size])
+                self.assertEqual(meta['deps'][0]['version_req'], '=0.9.0-alpha.7')
+                self.assertIn('browser-style', meta['readme'])
+                self.assertIn(records.CLI_SDK_POLICIES[version], meta['readme'])
+                package = HERE.parent / 'tools/yetlet-cli'
+                with tarfile.open(Path(temp) / f'yetlet-cli-{version}.crate') as archive:
+                    policy_bytes = archive.extractfile(f'yetlet-cli-{version}/resources/sdk-compatibility.json').read()
+                self.assertEqual(policy_bytes, HISTORICAL_POLICY if version == '0.3.0' else
+                                 (package / 'resources/sdk-compatibility.json').read_bytes())
+                if version == '0.3.1':
+                    self.assertEqual(meta['readme'], (package / 'README.md').read_text())
+                r, subjects = archives(Path(temp), cli=True, cli_version=version, cli_sdk='0.9.0-alpha.6')
+                with self.assertRaises(ValueError): registry.prepare(r, temp, subjects)
 
     def test_consolidated_archives_bind_exact_two_subjects_and_predecessor(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -264,6 +286,21 @@ class CliConsumerTests(unittest.TestCase):
             self.assertIn('CARGO_TARGET_DIR', args[5])
             tools.assert_called_once()
             self.assertEqual(args[3].parent, Path.home())
+
+    def test_publication_prepares_browser_tools_for_both_resolver_clis_before_upload(self):
+        import yaml
+        workflow = yaml.load((HERE.parent / '.github/workflows/release-publish.yml').read_text(),
+                             Loader=yaml.BaseLoader)
+        steps = workflow['jobs']['publish']['steps']
+        setup = next(step for step in steps if step.get('name') ==
+                     'Prepare resolver CLI browser consumer tools before publication')
+        self.assertEqual(setup['if'], "fromJSON(inputs.record).schema == 3 && "
+                         "(fromJSON(inputs.record).version == '0.3.0' || "
+                         "fromJSON(inputs.record).version == '0.3.1')")
+        publish = next(step for step in steps if step.get('run') == 'python3 scripts/release-publish.py publish')
+        self.assertLess(steps.index(setup), steps.index(publish))
+        self.assertIn('rustup target add wasm32-unknown-unknown --toolchain 1.99.0', setup['run'])
+        self.assertIn('cargo +1.99.0 install wasm-bindgen-cli --version 0.2.129 --locked', setup['run'])
 
     def test_unknown_cli_binding_is_rejected_before_install(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(publication.subprocess, 'run') as run:

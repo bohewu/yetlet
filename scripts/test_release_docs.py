@@ -1,4 +1,5 @@
 """Bounded offline checks for current references and frozen package README gates."""
+import json
 from pathlib import Path
 import tempfile
 import unittest
@@ -8,6 +9,7 @@ import release_docs as docs
 import release_record as records
 import release_registry as registry
 from test_release_publication import archives
+from test_release_cli_consumer import HISTORICAL_POLICY
 
 
 def cli_readme(version='7.8.9-beta.2', sdk='=6.5.4-alpha.3'):
@@ -18,7 +20,9 @@ def cli_readme(version='7.8.9-beta.2', sdk='=6.5.4-alpha.3'):
 
 class ReleaseDocsTests(unittest.TestCase):
     def test_cli030_requires_style_resolver_inventory_and_separate_build_identity(self):
-        text = (Path(__file__).resolve().parents[1] / 'tools/yetlet-cli/README.md').read_text()
+        text = cli_readme('0.3.0', '=0.9.0-alpha.7').replace('Generated SDK', 'Build SDK') + \
+            '\n**SDK policy:** `sdk-compat-v1`.\n## CLI command and capability inventory\n' \
+            'native-style browser-style --sdk-version --offline Cargo.lock\n'
         docs.check_readme('yetlet-cli', '0.3.0', text, '=0.9.0-alpha.7')
         for option in ('native-style', 'browser-style', '--sdk-version', '--offline', 'Cargo.lock'):
             with self.subTest(option=option), self.assertRaises(ValueError):
@@ -37,7 +41,9 @@ class ReleaseDocsTests(unittest.TestCase):
     def test_packaged_policy_and_snapshot_digest_mismatch_are_rejected(self):
         root = Path(__file__).resolve().parents[1] / 'tools/yetlet-cli'
         files = {p: (root / p).read_bytes() for p in docs.SDK_RESOURCE_PATHS}
-        readme = (root / 'README.md').read_text()
+        manifest = __import__('tomllib').loads((root / 'Cargo.toml').read_text())
+        readme = (f"**CLI release:** `{manifest['package']['version']}`.\n"
+                  '**SDK policy:** `sdk-latest-v2`.\n')
         sdk = __import__('tomllib').loads((root / 'Cargo.toml').read_text())['dependencies']['yetlet']['version']
         docs.check_sdk_resources(files, sdk, readme)
         for name in ['resources/framework.json', 'resources/sdk-compatibility.json']:
@@ -45,6 +51,38 @@ class ReleaseDocsTests(unittest.TestCase):
                 docs.check_sdk_resources({**files, name: files[name] + b' '}, sdk, readme)
         with self.assertRaises(ValueError):
             docs.check_sdk_resources({p: v for p, v in files.items() if p != 'resources/sdk-identity.json'}, sdk, readme)
+
+    def test_latest_policy_shape_and_historical_resource_hash_are_closed(self):
+        root = Path(__file__).resolve().parents[1] / 'tools/yetlet-cli'
+        files = {p: (root / p).read_bytes() for p in docs.SDK_RESOURCE_PATHS}
+        sdk = '=0.9.0-alpha.7'
+        for version, policy in [('0.3.0', HISTORICAL_POLICY),
+                                ('0.3.1', files['resources/sdk-compatibility.json'])]:
+            readme = (f'**CLI release:** `{version}`.\n'
+                      f"**SDK policy:** `{json.loads(policy)['revision']}`.\n")
+            identity = json.loads(files['resources/sdk-identity.json'])
+            identity['policy_sha256'] = docs.hashlib.sha256(policy).hexdigest()
+            selected = dict(files, **{'resources/sdk-compatibility.json':policy,
+                                     'resources/sdk-identity.json':json.dumps(identity).encode()})
+            docs.check_sdk_resources(selected, sdk, readme)
+            for mutation in ({'selection':'stable-first'}, {'templates':{'native':['12.0.0']}},
+                             {'msrv':'999.0'}, {'revision':'sdk-latest-v3'}):
+                bad = json.dumps(dict(json.loads(policy), **mutation)).encode()
+                identity['policy_sha256'] = docs.hashlib.sha256(bad).hexdigest()
+                with self.subTest(version=version, mutation=mutation), self.assertRaises(ValueError):
+                    docs.check_sdk_resources(dict(selected, **{'resources/sdk-compatibility.json':bad,
+                        'resources/sdk-identity.json':json.dumps(identity).encode()}), sdk, readme)
+
+    def test_resolver_readme_policy_is_bound_to_cli_release(self):
+        for version, revision in records.CLI_SDK_POLICIES.items():
+            text = cli_readme(version, '=0.9.0-alpha.7').replace('Generated SDK', 'Build SDK') + \
+                f'\n**SDK policy:** `{revision}`.\n## CLI command and capability inventory\n' \
+                'native-style browser-style --sdk-version --offline Cargo.lock\n'
+            docs.check_readme('yetlet-cli', version, text, '=0.9.0-alpha.7')
+            for wrong in ('sdk-latest-v99', 'sdk-compat-v2',
+                          'sdk-latest-v2' if revision == 'sdk-compat-v1' else 'sdk-compat-v1'):
+                with self.subTest(version=version, policy=wrong), self.assertRaises(ValueError):
+                    docs.check_readme('yetlet-cli', version, text.replace(revision, wrong), '=0.9.0-alpha.7')
 
     def test_cli_versions_and_sdk_pins_are_selected_values_not_current_release_literals(self):
         for version, sdk in [('7.8.9-beta.2', '=6.5.4-alpha.3'), ('12.0.0', '=11.0.0')]:

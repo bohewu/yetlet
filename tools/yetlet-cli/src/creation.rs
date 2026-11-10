@@ -137,7 +137,8 @@ pub(crate) fn create(
         }
     }
     fs::create_prepared(&parent, name, &entries, |stage| {
-        lock(stage, request.offline)?;
+        lock(stage, request.offline)
+            .map_err(|error| format!("{error}; selected SDK {}", sdk.version))?;
         // Lock setup is not permitted to rewrite template inputs or the nested
         // Style workspace lock. Revalidate all original emitted bytes.
         for (path, data) in &entries {

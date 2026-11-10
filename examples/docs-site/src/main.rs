@@ -96,18 +96,26 @@ fn shell(site: &Site, page: &Page, content: View, island: bool) -> View {
     if island {
         header = header.child(header_search());
     }
-    let published = Element::new("p")
-        .attribute("class", "edition")
-        .child(View::text(format!(
-            "Published: Experimental SDK {} · CLI {}",
-            site.published_sdk, site.published_cli
-        )));
+    let versions_match = site.sdk == site.published_sdk && site.cli == site.published_cli;
+    let mut version_labels: Vec<View> = Vec::new();
+    if !versions_match {
+        version_labels.push(
+            Element::new("p")
+                .attribute("class", "edition")
+                .child(View::text(format!(
+                    "Published: Experimental SDK {} · CLI {}",
+                    site.published_sdk, site.published_cli
+                )))
+                .into(),
+        );
+    }
     let mut edition = Element::new("p")
         .attribute("class", "edition")
-        .child(View::text(format!(
-            "Reader Edition: SDK {} · CLI {} · source ",
-            site.sdk, site.cli
-        )));
+        .child(View::text(if versions_match {
+            format!("Experimental SDK {} · CLI {} · source ", site.sdk, site.cli)
+        } else {
+            format!("Reader Edition: SDK {} · CLI {} · source ", site.sdk, site.cli)
+        }));
     let source_url = format!("https://github.com/bohewu/yetlet/tree/{}", site.commit);
     edition = if site.public {
         edition.child(
@@ -119,6 +127,7 @@ fn shell(site: &Site, page: &Page, content: View, island: bool) -> View {
     } else {
         edition.child(View::text(&site.commit[..7]))
     };
+    version_labels.push(edition.into());
     let mut footer = Element::new("footer").child(Element::new("p").child(View::text(
         if site.public {
             format!("Canonical source: {}.", page.source)
@@ -164,8 +173,7 @@ fn shell(site: &Site, page: &Page, content: View, island: bool) -> View {
                     Element::new("main")
                         .attribute("id", "site-main")
                         .attribute("tabindex", "-1")
-                        .child(published)
-                        .child(edition)
+                        .children(version_labels)
                         .child(content)
                         .child(footer),
                 ),
@@ -306,5 +314,29 @@ mod tests {
         let preview = render_to_string(&shell(&site, &page, View::text("Guide"), true)).unwrap();
         assert!(preview.contains("Local, unpublished checkout"));
         assert!(preview.contains("No live Pages replacement"));
+
+        site.public = true;
+        for (sdk, cli, rows) in [
+            ("0.9.0-alpha.7", "0.3.0", 1),
+            ("0.9.0-alpha.6", "0.3.0", 2),
+            ("0.9.0-alpha.7", "0.2.0", 2),
+        ] {
+            site.sdk = sdk.into();
+            site.cli = cli.into();
+            let html = render_to_string(&shell(&site, &page, View::text("Guide"), true)).unwrap();
+            assert_eq!(html.matches("<p class=\"edition\">").count(), rows);
+            assert!(html.contains(&format!(
+                "https://github.com/bohewu/yetlet/tree/{}",
+                site.commit
+            )));
+            if rows == 1 {
+                assert!(html.contains("Experimental SDK 0.9.0-alpha.7 · CLI 0.3.0 · source "));
+                assert!(!html.contains("Published:"));
+                assert!(!html.contains("Reader Edition:"));
+            } else {
+                assert!(html.contains("Published: Experimental SDK 0.9.0-alpha.7 · CLI 0.3.0"));
+                assert!(html.contains(&format!("Reader Edition: SDK {sdk} · CLI {cli} · source ")));
+            }
+        }
     }
 }

@@ -7,9 +7,9 @@ apps use exact `yetlet` / `yetlet-browser` registry pins; normal build/run needs
 no SDK checkout or Cargo path override. CLI build SDK, embedded source snapshot
 and generated app SDK have separate responsibilities.
 
-**CLI release:** `0.3.0`. **Build SDK:** `=0.9.0-alpha.7`.
+**CLI release:** `0.3.1`. **Build SDK:** `=0.9.0-alpha.7`.
 
-**SDK policy:** `sdk-compat-v1`.
+**SDK policy:** `sdk-latest-v2`.
 
 The command inventory below describes the selected CLI release, including SDK
 resolution and opt-in Style templates. Check
@@ -43,12 +43,15 @@ yetlet new cached-demo --offline
 ```
 
 `--sdk-version` accepts one exact canonical SemVer (no ranges, prefix or build
-metadata). Without it, select latest compatible stable, then only an exact
-reviewed prerelease. The shipped policy admits alpha.6/alpha.7 for ordinary
-native/browser and alpha.7 for Style. The stable set is empty today. Unknown
-alpha/beta/rc/stable versions do not become compatible merely by appearing in
-the registry. Required package features, same-version Browser pair, yank status
-and declared MSRV at most Rust 1.99 are checked before creation.
+metadata). Without it, select the highest available non-yanked SemVer, including
+future releases and prereleases. Browser templates require both SDK packages at
+the same version. Policy `sdk-latest-v2` uses `selection: latest-semver`; it has
+no SDK approval list, stable-first preference, CLI build-SDK bound or frozen
+MSRV ceiling. After selecting latest, required-feature and Browser dependency
+checks fail that selected version without falling back to an older SDK.
+Cargo owns actual toolchain and dependency feasibility. Successful lock creation
+does not prove that a future SDK will compile or retain the template's APIs;
+a later compiler, build or API failure remains a failure of the selected version.
 
 Online refreshes required public index metadata; a network failure stops with
 no stale fallback. `--offline` or `CARGO_NET_OFFLINE=true` forbids resolver and
@@ -81,7 +84,7 @@ archive and remain bound to that archive's checksum and immutable source.
 |---|---|
 | `yetlet --help` / `-h` | Root help; every complete command path also has exclusive scoped help |
 | `yetlet --version` / `-V` | Build-time CLI version; no project, tools or settings required |
-| `yetlet new NAME [--parent DIRECTORY] [--template native\|browser\|native-style\|browser-style] [--sdk-version VERSION] [--offline] [--vite] [--tailwind] [--service] [--settings]` | Resolve a compatible registry SDK, write exact pins and generate Cargo.lock with a creation receipt before protected publication; no dependency installation or app build |
+| `yetlet new NAME [--parent DIRECTORY] [--template native\|browser\|native-style\|browser-style] [--sdk-version VERSION] [--offline] [--vite] [--tailwind] [--service] [--settings]` | Resolve Registry latest SemVer or an explicit exact SDK, write exact pins and generate Cargo.lock with a creation receipt before protected publication; no dependency installation or app build |
 | `yetlet doctor [--json]` | Bounded environment-only Rust/Cargo identity and compiled filesystem capability; schema 1 JSON |
 | `yetlet inspect [--manifest-path PATH] [--json]` | Read-only public-settings plan for build/run/watch; separate project-execution-plan schema 1; no readiness checks |
 | `yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]` | Read-only selected key/version, certificate pins and dates; no password or generation |
@@ -209,13 +212,13 @@ Registry installation for this release needs no repository clone. The selected
 version must exist on crates.io:
 
 ```sh
-cargo +1.99.0 install yetlet-cli --version 0.3.0 --locked
+cargo +1.99.0 install yetlet-cli --version 0.3.1 --locked
 yetlet new myapp
 ```
 
 Cargo downloads and compiles the selected published CLI package; no manual
 repository clone or npm is needed. `yetlet --version` reports exactly
-`yetlet 0.3.0`. Actual publication status and scope belong to the
+`yetlet 0.3.1`. Actual publication status and scope belong to the
 [versioned release records](https://github.com/bohewu/yetlet/blob/master/docs/RELEASING.md#read-this-before-starting-another-version),
 separately from this installation reference. Prebuilt executables
 and `cargo binstall` support are later distribution options.

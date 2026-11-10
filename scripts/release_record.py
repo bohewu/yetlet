@@ -19,7 +19,26 @@ CLI_SDK_VERSIONS = {
     '0.1.1': '0.9.0-alpha.5',
     '0.2.0': '0.9.0-alpha.6',
     '0.3.0': '0.9.0-alpha.7',
+    '0.3.1': '0.9.0-alpha.7',
 }
+
+# Resolver policy is separate from the immutable CLI build-SDK binding.
+CLI_SDK_POLICIES = {'0.3.0': 'sdk-compat-v1', '0.3.1': 'sdk-latest-v2'}
+
+
+def sdk_policy(raw, cli_version=None):
+    """Validate current selection authority or the exact published v1 policy."""
+    policy = loads(raw)
+    if policy.get('revision') == 'sdk-compat-v1':
+        # Historical bytes, including its finite template sets and MSRV, are immutable.
+        require(hashlib.sha256(raw).hexdigest() ==
+                '8bddcb15647fd21a755df38f38b6308cad6e8e4f29c4838849923122aefdbbc7')
+    else:
+        require(policy == {'revision': 'sdk-latest-v2', 'selection': 'latest-semver'})
+    if cli_version is not None:
+        require(CLI_SDK_POLICIES.get(cli_version) == policy['revision'])
+    return policy
+
 
 # Immutable scaffold behavior of already published pre-resolver CLI releases.
 LEGACY_CLI_VERSIONS = frozenset({'0.1.0', '0.1.1', '0.2.0'})

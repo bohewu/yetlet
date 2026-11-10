@@ -1,10 +1,4 @@
 {
-  "revision": "sdk-compat-v1",
-  "msrv": "1.99",
-  "templates": {
-    "native": ["0.9.0-alpha.6", "0.9.0-alpha.7"],
-    "browser": ["0.9.0-alpha.6", "0.9.0-alpha.7"],
-    "native-style": ["0.9.0-alpha.7"],
-    "browser-style": ["0.9.0-alpha.7"]
-  }
+  "revision": "sdk-latest-v2",
+  "selection": "latest-semver"
 }

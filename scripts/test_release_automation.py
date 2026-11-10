@@ -148,7 +148,8 @@ class RecordTests(unittest.TestCase):
 
     def test_cli_sdk_binding_preserves_old_records_and_rejects_unknown_or_wrong_sdk(self):
         for version, sdk in [('0.1.0', '0.9.0-alpha.5'), ('0.1.1', '0.9.0-alpha.5'),
-                             ('0.2.0', '0.9.0-alpha.6')]:
+                             ('0.2.0', '0.9.0-alpha.6'), ('0.3.0', '0.9.0-alpha.7'),
+                             ('0.3.1', '0.9.0-alpha.7')]:
             self.assertEqual(records.cli_sdk_version(version), sdk)
             r = record(); r.update(schema=3, cohort='cli', version=version)
             with tempfile.TemporaryDirectory() as temp:

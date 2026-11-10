@@ -10,7 +10,7 @@ ships private app Style generation/templates and SDK resolution with exact app
 pins/locks. [Showcase](API-REFERENCE.md#source-only-checkout-additions) remains a
 checkout sample. The original publisher consumer failure and successful bounded
 registry supplement are recorded without relabeling that workflow PASS. The
-independently selected public Reader Edition remains SDK alpha.6 / CLI 0.2.0. Development version equality
+independently selected public Reader Edition is SDK alpha.7 / CLI 0.3.0. Development version equality
 does not establish archive/source equality. This is not Stable API, production,
 SLSA level or universal platform qualification.
 
@@ -19,6 +19,15 @@ version-binding/tooling gaps. This page retains historical readiness decisions,
 not a runnable release sequence. The dated Pending/FAIL/unpublished states below
 remain true for their original checkpoints; they do not describe current
 distribution or transfer qualification to another source.
+
+**CLI 0.3.1 source preparation (YT-250):** The
+[preparation record](CLI-031-RELEASE-PREPARATION.md) tracks the Owner-corrected
+`sdk-latest-v2` default and retained exact pins/locks/provenance.
+
+Candidate
+selection, packaging, hosted execution, signing and independent V remain pending.
+Formal publication is excluded; source version does not change the accepted
+publication authority or Reader Edition.
 
 ## Historical readiness checkpoints
 

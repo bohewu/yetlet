@@ -1,28 +1,25 @@
 # YT-247 — Dynamic SDK Version Resolution CLI Contract
 
-Date: 2026-11-10 (Asia/Taipei). **Owner accepted Contract and ADR 0010; Phase B source implemented, independent Reviewer PASS**.
-Independent review and Git delivery are recorded in the [Phase A handoff](YT-247-PHASE-A-HANDOFF.md).
-[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) records the decision and tradeoffs.
-The [Phase B implementation record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
-separates checkout behavior and verification from the unchanged published CLI 0.2.0.
+Date: 2026-11-10 (Asia/Taipei). **Current normative contract: Owner-corrected
+Registry latest policy for CLI 0.3.1 source (YT-250).** The initial accepted
+`sdk-compat-v1` policy shipped in CLI 0.3.0 and remains historical below.
+[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) records the amendment;
+[CLI 0.3.1 preparation](CLI-031-RELEASE-PREPARATION.md) records the source and
+pre-publication gates. The [Phase A handoff](YT-247-PHASE-A-HANDOFF.md) and
+[Phase B implementation record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
+retain their original design, implementation and review evidence.
 
 ## Scope and gates
 
-YT-247 is an independent Developer Experience item with two phases:
+YT-247 delivered the original resolver; YT-248 published CLI 0.3.0 with that
+policy. YT-250 corrects default selection for CLI 0.3.1, preserving provider,
+cache, exact override, lock and receipt boundaries. Source implementation does
+not establish candidate, hosted, signing or publication acceptance. The accepted
+SDK alpha.7 archives/tags and all historical CLI records remain immutable.
+Current publication and Reader Edition stay SDK alpha.7 / CLI 0.3.0 until a
+verified publication and its required reader follow-through.
 
-- Phase A delivers this contract, ADR, task split and independent read-only review.
-  After review PASS, deliver the documentation through Strict/Builtin Commit Guard,
-  commit, PR, exact-head CI, merge and master CI; then stop for Owner acceptance.
-- Phase B implements only the accepted resolver contract, with focused tests and
-  independent review. It requires a new Owner instruction after Phase A delivery.
-- [YT-248](CLI-030-RELEASE-PREPARATION.md) retains the reviewed CLI 0.3.0 Style
-  template release plan and depends on completed YT-247 Phase B. Neither item
-  authorizes a release, SDK republication or a public reader-edition upgrade.
-
-The accepted SDK alpha.7 archives/tags and historical CLI records remain immutable.
-The public Reader Edition stays SDK alpha.6 / CLI 0.2.0.
-
-## Observed starting behavior
+## Historical observed starting behavior before Phase B
 
 Inspection baseline: branch `feat/cli-030-style-templates`, HEAD
 `54c1e4436ad15ece4e1fad74fbc26c98884a98c4`, plus the four preserved planning files.
@@ -49,7 +46,7 @@ Changing only the CLI compile dependency to alpha.7 cannot implement this contra
 |---|---|---|
 | CLI build SDK | Exact dependency in CLI Cargo.toml and CLI Cargo.lock, fixed in immutable CLI source C/archive | Runs CLI configuration/signing/HTML code. Never chosen by the user's resolver request. |
 | Embedded SDK snapshot | Reviewed SDK source identity, SDK version and resource digests, fixed in CLI archive | Existing bounded native source delivery only. No dynamic substitution, relabeling or fallback. |
-| Generated app SDK | One `ResolvedSdk` value from registry/cache plus the shipped template compatibility policy | Writes exact registry dependencies and generates that new app's own lock. Independent of the other two identities. |
+| Generated app SDK | One `ResolvedSdk` value from registry/cache using the shipped selection policy | Writes exact registry dependencies and generates that new app's own lock. Independent of the other two identities. |
 
 Template identity is also explicit: CLI package version plus built-in selector
 (`native`, `browser`, `native-style`, `browser-style`) and policy revision. It
@@ -87,7 +84,7 @@ VERSION is a complete canonical SemVer `major.minor.patch[-prerelease]`, at most
 Reject `v` prefixes, whitespace, `=`, ranges, wildcards, partial versions, URLs,
 Git refs and `+build` metadata. Rejecting build metadata aligns identity with the
 repository release-record version contract and avoids precedence ties.
-An explicit prerelease is a version request, not permission to bypass policy.
+An explicit prerelease is an exact version request; availability and required-package checks still apply.
 
 Preflight validates syntax, template/parent/destination and installed Rust/Cargo
 before network work. Help/version and an already-existing destination perform
@@ -102,9 +99,9 @@ All resolution/setup failures exit 1, with no success message or published targe
 |---|---|
 | `SDK_VERSION_NOT_FOUND` | Explicit version absent from complete refreshed metadata, or absent from the selected cache (say which). Refresh online when cache may be incomplete. |
 | `SDK_VERSION_YANKED` | Any required package at the explicit version is yanked; choose another version. No override. |
-| `SDK_INCOMPATIBLE` | Outside shipped policy, wrong/missing required features or MSRV too high/unknown; report the failing predicate. |
+| `SDK_INCOMPATIBLE` | Selected version has wrong/missing required features or an unsuitable Browser dependency; report the failing predicate without older-version fallback. |
 | `SDK_PACKAGE_UNAVAILABLE` | Explicit version exists for `yetlet` but matching `yetlet-browser` is missing. Never mix versions. |
-| `SDK_NO_COMPATIBLE_VERSION` | No candidate survives all default filters; display the policy revision and supported choices. |
+| `SDK_NO_COMPATIBLE_VERSION` | No available non-yanked candidate has the required same-version package set; display the policy revision and bounded reasons. |
 | `SDK_OFFLINE_CACHE_MISS` | Required cache package/set is absent. Explicit version is not enough to skip metadata validation. |
 | `SDK_METADATA_INVALID` | Malformed/unsupported/incomplete metadata or corrupt cache; do not treat it as an empty registry or use stale data. |
 | `SDK_REGISTRY_UNAVAILABLE` | DNS/TLS/HTTP/rate-limit/deadline failure; fail online, suggest an explicit offline retry. |
@@ -113,8 +110,10 @@ All resolution/setup failures exit 1, with no success message or published targe
 
 Usage validation precedes existence/policy checks. For explicit resolution after
 valid metadata: `yetlet` existence, required companion existence, any yank,
-policy/features/MSRV, then lock setup. Default resolution instead filters all
-candidates and reports no compatible version with bounded rejection reasons.
+required-feature/dependency checks, then lock setup. Default resolution filters
+availability/yanks and required same-version packages, chooses the maximum
+SemVer, then checks required features/dependencies. Failure after selection does
+not select an older SDK.
 Existing spawn/cancellation/cleanup exit conventions (including 125 for process
 infrastructure failure) still apply; never mask uncertain cleanup as exit 1/0.
 
@@ -157,7 +156,41 @@ Use HTTPS, bounded response size/time (initial limits: 8 MiB per package,
 30 seconds total metadata deadline), and no automatic retries or redirects to
 untrusted endpoints. Fixture providers use no production URL override flag.
 
-## Compatibility and prerelease policy
+## Current selection policy — sdk-latest-v2 (YT-250)
+
+The packaged policy is exactly:
+
+```json
+{"revision":"sdk-latest-v2","selection":"latest-semver"}
+```
+
+For default selection, retain available versions with all required packages,
+remove any version with a yanked required package, and choose the greatest
+canonical SemVer. Browser templates require `yetlet-browser` at the same version
+as `yetlet`. Future releases and prereleases participate automatically; a higher
+prerelease can outrank a lower stable release under SemVer. There is no shipped
+per-SDK approval list, stable-first preference, CLI build-SDK admission bound or
+frozen numeric MSRV ceiling.
+
+After choosing latest, validate required features and the Browser dependency on
+the selected SDK. Fail that selected version if these checks fail; never retry
+with an older SDK. Native requires `server-axum` and `config` when settings/Vite
+is selected; Browser requires `yetlet: reactive` and `yetlet-browser: dom,
+dom-keyed`. Style preserves its app-owned generator and lock. An explicit
+`--sdk-version` remains exact and uses the same required-package checks.
+
+Cargo owns actual toolchain and dependency feasibility. Its lock/build failures
+remain failures of the chosen version, without fallback. Registry metadata and a
+successful lock do not certify future compiler, template API or runtime
+compatibility. The CLI build SDK and immutable source snapshot both remain
+alpha.7; their identities do not select the generated app SDK.
+
+## Historical compatibility policy — superseded sdk-compat-v1
+
+The following policy describes the original accepted YT-247 implementation and
+published CLI 0.3.0. It is retained as history and does not govern CLI 0.3.1.
+
+### Original compatibility and prerelease policy
 
 Policy `sdk-compat-v1` is shipped and reviewed with the CLI/template sources.
 It describes app compatibility, not a promise that every prerelease with the
@@ -209,7 +242,7 @@ provider/scaffold boundaries; initial code need not implement unused intervals.
 |---|---|---|---|
 | Default online, exact or latest | Refresh every required package; conditional GET/304 counts as revalidation. Result source `registry-refresh`. | Any refresh failure stops; no stale fallback and no selection from a partially refreshed set. | Normal Cargo resolution, allowed to access registry metadata. |
 | Explicit `--offline`, exact | Valid complete local metadata; verify exact version/policy/yank as last observed. Result `offline-cache`. | Missing package cache fails; absent cached version reports cache-scoped not-found. | Cargo `generate-lockfile --offline`; missing Cargo cache fails. |
-| Explicit `--offline`, latest | Greatest compatible candidate known to complete local metadata, using the same policy/ordering. | Cache miss/corruption/no compatible candidate fails. Do not claim global latest. | Same offline-only command. |
+| Explicit `--offline`, latest | Greatest available non-yanked SemVer known to complete local metadata with required same-version packages; then validate features/dependencies without fallback. | Cache miss/corruption/no compatible candidate fails. Do not claim global latest. | Same offline-only command. |
 | Online network failure with usable old cache | No successful resolution. Print an explicit offline retry remedy. | Never silently reuse stale metadata. | Not started. |
 
 `CARGO_NET_OFFLINE=true` also selects effective offline mode; `--offline` wins
@@ -253,7 +286,7 @@ flowchart TD
     D --> E
     E --> F{"explicit VERSION?"}
     F -->|yes| G["validate exact candidate"]
-    F -->|no| H["filter compatibility, yanks, MSRV; order stable then reviewed prerelease"]
+    F -->|no| H["filter availability/yanks/package pair; maximum SemVer; validate features/dependencies"]
     G --> I["ResolvedSdk and source notice"]
     H --> I
     I --> J["private protected staging: exact registry manifests"]
@@ -324,7 +357,9 @@ bit-for-bit reproducible binaries.
 
 ## Release automation and historical compatibility
 
-This is a design inventory, not authorization to edit/execute the scripts.
+This historical Phase A design inventory records the inspected surfaces and
+planned changes. YT-250 preserves these release boundaries; it does not grant
+execution authority.
 
 | Inspected surface | Existing coupling and required later change |
 |---|---|
@@ -373,7 +408,7 @@ Release-package tests use a fixed explicit compatible SDK to prove installation;
 separate opt-in online integration checks compare default output to captured
 metadata. Never assert that dynamic default must forever equal alpha.7.
 
-## Reproducible testing and evidence contract
+## Current reproducible testing and evidence contract
 
 Normal unit/integration tests use injected fixture index records, cache roots,
 clock and transport outcomes. No live crates.io, secret, sleep-based race or
@@ -382,13 +417,13 @@ external state is needed. Reuse the existing CLI test and OS adapter patterns.
 | Test group | Required deterministic acceptance |
 |---|---|
 | Parsing and ordering | Canonical exact versions, rejected ranges/build metadata/duplicates; numeric SemVer ordering (alpha.10 after alpha.9), stable/prerelease precedence and tie rejection. |
-| Policy filtering | Unknown alpha/beta/rc/stable/minor rejected; fixture policy with allowed stable candidates proves stable-first; per-template sets, missing features/MSRV, too-new MSRV, required browser pair and any-package yank. |
-| Explicit/latest | Exact found/not-found/yanked/incompatible/companion-missing; latest filters before ordering; no compatible candidate and no snapshot fallback. |
+| Policy filtering | Future alpha/beta/rc/stable/minor versions participate; SemVer maximum can be prerelease; required Browser pair and any-package yank filter availability. Missing features or unsuitable Browser dependency fail selected latest without fallback; no frozen MSRV ceiling. |
+| Explicit/latest | Exact found/not-found/yanked/incompatible/companion-missing; latest filters availability before ordering, validates features/dependencies after selection; no eligible candidate and no snapshot fallback. |
 | Cache and transport | Online refresh/304; offline explicit/latest hit; absent version/cache, corruption/incomplete set, age notice; zero transport calls offline; timeout/TLS/HTTP failure never stale fallback; concurrent/failed cache publication retains complete old set. |
 | Scaffold and locking | Native/browser exact equal pins and README values passed from result; fake Cargo process for lock success/failure/checksum mismatch; real Cargo with local fixture registry/cache for app lock creation; nested Style lock preserved. |
 | Repetition | Same fixtures/request/template/toolchain produce identical manifest/lock except recorded time; second new on an existing destination has zero resolver/Cargo calls and preserves all files. |
 | Post-creation | Build/run/watch retain SDK pins, receipt and both lock bytes; registry changes do not call resolver; missing/stale lock stays a frozen-build error. |
-| Release regression | Historical three CLI bindings/records unchanged; new build-SDK pin remains exact; snapshot source/digest mismatch rejected; package policy included; installed CLI lock and app lock treated separately. |
+| Release regression | Historical CLI 0.1.0/0.1.1/0.2.0/0.3.0 bindings/records unchanged; new build-SDK pin remains exact; snapshot source/digest mismatch rejected; package policy included; installed CLI lock and app lock treated separately. |
 | Failure ownership | Network/lock/cancel/publication failures publish no target, retain diagnostics and clean only owned staging/children through existing platform adapters. |
 
 An opt-in real registry integration lane remains separate: capture refreshed
@@ -405,8 +440,8 @@ none of it. Windows Style revalidation remains paused/unverified.
 
 The index schema and checksum fields follow the Cargo Book's
 [registry index format](https://doc.rust-lang.org/cargo/reference/registry-index.html).
-Version ordering follows [SemVer 2.0](https://semver.org/); the CLI's admitted
-version set is an additional Yetlet decision. Cargo owns
+Version ordering follows [SemVer 2.0](https://semver.org/); current selection
+uses the maximum after availability/yank/package-pair filtering. Cargo owns
 [dependency resolution](https://doc.rust-lang.org/cargo/reference/resolver.html)
 and [lock generation/offline/frozen semantics](https://doc.rust-lang.org/cargo/commands/cargo-generate-lockfile.html).
 These references informed the contract; they are not evidence that Phase B is implemented.
