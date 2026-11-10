@@ -56,6 +56,9 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   [Phase A handoff](YT-247-PHASE-A-HANDOFF.md): Owner-accepted version/cache/locking
   boundary. The [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
   reports the source implementation, tests and platform limitations.
+- [YT-247 Windows supplement](YT-247-WINDOWS-VERIFICATION.md): actual MSVC
+  Resolver/new/lock/offline verification, scoped test correction and retained
+  evidence with Owner-authorized temporary build/cache cleanup.
 - [YT-248 CLI 0.3.0 Style release](CLI-030-RELEASE-PREPARATION.md): preserved
   reviewed release plan; awaits separate Owner instruction after YT-247 Git delivery.
 
