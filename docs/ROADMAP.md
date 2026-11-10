@@ -1,14 +1,30 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**YT-246 canonical version authorities and release-document synchronization (2026-11-09): Implementation and independent Reviewer PASS; guarded Git delivery follows.**
+**YT-247 Dynamic SDK Version Resolution (2026-11-10): Phase A independent design review PASS; implementation pending Owner acceptance.**
+[CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
+[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) separate CLI build SDK,
+immutable source snapshot and template identity from the generated app's selected
+registry SDK. Phase A ends after independent review PASS and guarded documentation
+Git delivery; [handoff](YT-247-PHASE-A-HANDOFF.md) records checks and next steps.
+YT-247 remains open for Phase B resolver implementation; no new command is shipped.
+
+**YT-248 CLI 0.3.0 Style release (2026-11-10): Blocked on YT-247 Phase B.**
+The [preserved preparation plan](CLI-030-RELEASE-PREPARATION.md) retains its prior
+independent Style plan PASS, one schema3/cli package, alpha.7 build SDK/qualified
+snapshot, native/browser Style acceptance, installed registry-only consumers and
+Owner-gated release. Consumers must distinguish build SDK from dynamically
+resolved app SDK. SDK alpha.7 is already published; CLI0.2.0 and the public
+alpha.6/CLI0.2.0 Reader Edition stay fixed. No candidate/release is selected.
+Windows Style revalidation remains paused/unverified.
+
+**YT-246 canonical version authorities and release-document synchronization (2026-11-10): Done.**
 [Version source audit](YT-246-VERSION-SOURCE-AUDIT.md) separates SDK source,
 accepted published SDK/CLI versions, the CLI-generated SDK pin and the explicit
 public reader edition. Sync/check, 49 regression tests, documentation DAG and
 sample catalog pass. Final independent Reviewer Job `wc_job_iTtOZOllaZ8sBEMf`
-completed at terminal exit 0 with JSON PASS and zero issues/followups. Native ACP
-is unavailable; the saved role-directed WebCodex `codex exec` route was used, not
-native managed-role dispatch. Package publication remains a separate owner-approved
-step.
+completed at terminal exit 0 with JSON PASS and zero issues/followups. PR #66
+merged as `54c1e4436ad15ece4e1fad74fbc26c98884a98c4`; its exact-head Documentation,
+Rust baseline and CodeQL CI all PASS. Post-merge master CI PASS was confirmed in the Owner handoff.
 
 **YT-245 SDK alpha.7 local preparation (2026-11-09): Done at prepublication scope.**
 [Preparation record](YT-245-ALPHA7-RELEASE-PREPARATION.md) selects exactly

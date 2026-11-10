@@ -51,9 +51,18 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Maintainer entry points
 
+- [YT-247 SDK resolution contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md),
+  [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and
+  [Phase A handoff](YT-247-PHASE-A-HANDOFF.md): proposed version/cache/locking
+  boundary, independent review and Owner-gated implementation.
+- [YT-248 CLI 0.3.0 Style release](CLI-030-RELEASE-PREPARATION.md): preserved
+  reviewed release plan, blocked on YT-247 resolver implementation.
+
+
 - [YT-245 SDK alpha.7 local preparation](YT-245-ALPHA7-RELEASE-PREPARATION.md):
   two-package metadata/docs, exact local archive verification and release-note
-  drafts; CLI0.3.0 migration waits for SDK publication. Published guide pins stay fixed.
+  drafts; SDK alpha.7 is now published. YT-248 CLI0.3.0 waits for YT-247
+  resolver implementation. Published guide pins stay fixed.
 
 - [YT-242 documentation truth audit](YT-242-DOCUMENTATION-TRUTH.md): bounded
   current-entry audit, inventory classification, corrections and remaining coverage;
