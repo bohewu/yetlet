@@ -27,6 +27,22 @@ def sha(raw):
     return hashlib.sha256(raw).hexdigest()
 
 
+def protected_rust_env(root, env):
+    """Copy the installed toolchain; never change shared Runner permissions."""
+    rustc = Path(subprocess.check_output(
+        ['rustup', 'which', '--toolchain', '1.99.0', 'rustc'], env=env,
+        stderr=subprocess.PIPE, timeout=30).decode().strip())
+    source = rustc.parent.parent
+    target = root / 'rust'
+    shutil.copytree(source, target, ignore=shutil.ignore_patterns('share'))
+    # Rustup installations may be group-writable. CLI probes reject every
+    # writable ancestor, so use physical binaries in an owned private tree.
+    for path in [target, *target.rglob('*')]:
+        path.chmod(path.stat().st_mode & ~0o022)
+    return dict(env, PATH=str(target / 'bin') + os.pathsep + env['PATH'],
+                RUSTUP_TOOLCHAIN=str(target))
+
+
 def version_key(version):
     core, _, pre = version.partition('-')
     return (not pre, tuple(map(int, core.split('.'))),
@@ -199,7 +215,8 @@ def qualify(executable, version, sdk_version, root, output, env, policy, install
     commands = []
     def run(label, args, cwd=root, expected=0, extra_env=None):
         process = subprocess.Popen(list(map(str, args)), cwd=cwd, env=extra_env or env,
-                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, start_new_session=True)
+                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                                   start_new_session=True, umask=0o077)
         try:
             stdout, stderr = process.communicate(timeout=900)
         except subprocess.TimeoutExpired:

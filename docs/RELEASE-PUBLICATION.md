@@ -1,17 +1,17 @@
 # Single-gate release automation and registry promotion
 
-Current distribution checkpoint, 2026-11-09: the two-package
-[SDK alpha.7](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09) and independent
-[CLI 0.2.0](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
-completed their separate GitHub/crates.io publication and recorded consumers.
-The published CLI still generates apps pinned to SDK alpha.6; the public reader
-edition also remains SDK alpha.6 / CLI 0.2.0 by explicit selection. Earlier
-[SDK alpha.6](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
-and alpha.4's [partial publication and repair](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair)
-remain historical, not current SDK distribution.[RELEASING.md](RELEASING.md) is the general SOP;
-[YT-227](YT-227-NEXT-RELEASE-PLAN.md) retains that delivery's original plan and optional
-registry OIDC migration. That option is not adopted here: the current publisher
-permission/Secret contract below and ADR0009 remain unchanged.
+Current distribution checkpoint, 2026-11-10:
+**Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
+**Published CLI:** `0.3.0` (`yetlet-cli`).
+The [SDK publication record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+and [CLI publication record](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10)
+retain separate GitHub/crates.io archives, actual signatures and consumers. The
+CLI resolves a reviewed compatible SDK per project and writes exact pins/locks;
+its build SDK/snapshot remain separate fixed release inputs. The public Reader
+Edition stays SDK alpha.6 / CLI 0.2.0. Earlier release records retain their
+original bindings and failures. [RELEASING.md](RELEASING.md) is the general SOP;
+[YT-227](YT-227-NEXT-RELEASE-PLAN.md) retains the optional registry OIDC migration,
+which remains unadopted. Permissions, Secret policy and ADR0009 are unchanged.
 
 ## Independent CLI cohort — YT-215
 

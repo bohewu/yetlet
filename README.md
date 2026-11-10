@@ -23,15 +23,20 @@ Rust Views with optional browser WASM when a screen needs local interaction.
 - **Use bounded output policies.** HTML escaping and strict page CSP are built
   into the server rendering path; application authorization stays explicit.
 
-## Current published SDK
+## Current published releases
 
-The latest published Experimental SDK is [`yetlet` 0.9.0-alpha.7](https://crates.io/crates/yetlet/0.9.0-alpha.7)
-and [`yetlet-browser` 0.9.0-alpha.7](https://crates.io/crates/yetlet-browser/0.9.0-alpha.7),
-with [signed GitHub release assets](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.7)
-and a registry-verified consumer. It includes the typed Tag Builder API. The
-**independent CLI remains 0.2.0**, and the first-app/quickstart below deliberately
-follows the separately pinned **SDK alpha.6 / CLI 0.2.0** reader edition; publication
-of a newer SDK alone does not upgrade that tutorial or the CLI's generated pin.
+**Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
+**Published CLI:** `0.3.0` (`yetlet-cli`).
+The [SDK publication record](docs/ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+and [CLI publication record](docs/CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10)
+retain exact GitHub/crates.io archives, signatures and consumer evidence. The SDK
+includes typed Tag Builders. The independent CLI includes SDK version resolution,
+exact generated app pins/locks and opt-in native/browser Style templates with a
+private app CSS generator. Style requires alpha.7 under the reviewed SDK policy.
+
+The quickstart below deliberately follows the separately selected **SDK alpha.6 /
+CLI 0.2.0** Reader Edition. Its installation and app pins stay fixed until an
+explicit guide promotion; publishing a new SDK or CLI does not advance that edition.
 
 ## Start with native SSR
 
@@ -101,7 +106,7 @@ handlers, use ordinary extractors and `Page` or `Result<Page, E>`; see the
 | Create my own standalone app | [Build your first Yetlet app](docs/FIRST-APP.md) |
 | Create a browser-only WASM app | [Browser first-app walkthrough](docs/BROWSER-APP.md) |
 | Write Views and reusable components | [View/component guide](docs/VIEW-COMPONENTS.md) |
-| Explore checkout-only typed tags and optional Style authoring | [Source-only API map](docs/API-REFERENCE.md#source-only-checkout-additions) · [Style Showcase](examples/style-showcase/README.md) (absent from published SDK/CLI) |
+| Use typed tags and optional Style authoring | [SDK/CLI API map](docs/API-REFERENCE.md#source-only-checkout-additions) · [Style Showcase](examples/style-showcase/README.md) (checkout sample) |
 | Build an SSR page or JSON API | [Hello World](examples/hello-world/README.md) · [REST API](examples/rest-api/README.md) |
 | Add browser interaction | [Todo and Search Island](examples/todo-server/README.md) · [browser DOM guide](crates/yetlet-browser/guides/dom.md) |
 | Handle forms and Session state | [Forms](examples/forms-validation/README.md) · [Session cart](examples/cart-server/README.md) |

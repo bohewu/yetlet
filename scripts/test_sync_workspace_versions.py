@@ -6,6 +6,7 @@ import unittest
 from unittest.mock import patch
 import tomllib
 import sync_workspace_versions as sync
+from release_version_authority import PUBLICATION_RECORDS
 
 TICK = chr(96)
 FENCE = TICK * 3
@@ -26,20 +27,25 @@ def put_sdk_package_manifests(root):
 
 def populate_current_docs(root):
     tick = TICK
-    put(root, "docs/ALPHA7-HOSTED-RECORD.md",
+    status = '**Published SDK:** `0.1.0`.\n**Published CLI:** `0.1.0`.\n'
+    references = ('[SDK publication record](old-sdk.md#old)\n'
+                  '[CLI publication record](old-cli.md#old)\n')
+    for name in ['ARCHITECTURE', 'RELEASE-READINESS', 'RELEASE-PUBLICATION']:
+        put(root, 'docs/'+name+'.md', status + (references if name != 'ARCHITECTURE' else ''))
+    put(root, PUBLICATION_RECORDS['SDK'][0],
         "## Owner-approved publication and registry consumer — fixture\n"
         "https://github.com/bohewu/yetlet/releases/tag/v6.5.4-alpha.3)\n")
-    put(root, "docs/CLI-020-RELEASE-PREPARATION.md",
+    put(root, PUBLICATION_RECORDS['CLI'][0],
         "## Owner-approved publication and installed consumer — fixture\n"
         "https://github.com/bohewu/yetlet/releases/tag/yetlet-cli-v2.2.0)\n")
     put(root, "docs/API-REFERENCE.md",
-        "SDK (" + tick + "0.1.0" + tick + ") from later checkout additions.\n"
+        "SDK (" + tick + "0.1.0" + tick + ") from independent CLI tooling and checkout samples.\n"
         "Available since SDK " + tick + "0.9.0-alpha.6" + tick + ".\n"
-        "beyond the distributed\nSDKalpha.6/CLI0.2.0 artifacts.\n"
+        "Published SDKalpha.6/CLI0.2.0 artifacts serve separate roles.\n"
         "YT-245 selects SDK " + tick + "0.1.0" + tick + " locally.\n")
     put(root, "docs/CAPABILITIES.md",
         "version " + tick + "0.1.0" + tick + ", available from crates.io.\n"
-        "published SDKalpha.6/CLI0.2.0 artifacts.\n"
+        "Published SDKalpha.6/CLI0.2.0 artifacts serve separate roles.\n"
         "YT-245 selects local SDK\n" + tick + "0.1.0" + tick + " contents.\n")
     put(root, "docs/COMPATIBILITY.md",
         "## Selected local SDK 0.1.0 typed helpers\n"
@@ -50,7 +56,7 @@ def populate_current_docs(root):
         "the independently published CLI is " + tick + "yetlet-cli" + tick + " " +
         tick + "0.1.0" + tick + ", generating apps pinned to SDKalpha.6.\n"
         "SDKalpha.6/CLI0.2.0 in [the site manifest]\n"
-        "absent from published CLI0.2.0.\n")
+        "Style templates are distributed in CLI 0.2.0.\n" + references)
     put(root, "docs/VIEW-COMPONENTS.md",
         "Experimental SDK " + tick + "0.1.0" + tick + ", published on crates.io.\n"
         "The locally selected SDK " + tick + "0.1.0" + tick + " includes typed tags.\n"
@@ -58,7 +64,7 @@ def populate_current_docs(root):
     put(root, "docs/DOCUMENTATION-SCOPE.md",
         "The published Experimental SDK is yetlet and yetlet-browser\n"
         + tick + "0.1.0" + tick + "; the independently published CLI is "
-        + tick + "yetlet-cli" + tick + " " + tick + "0.1.0" + tick + ".\n")
+        + tick + "yetlet-cli" + tick + " " + tick + "0.1.0" + tick + ".\n" + references)
     for name in ("CONFIGURATION", "EXTENSIONS", "HTTP-PIPELINE",
                  "SECRET-PROVIDERS", "SETTINGS-SECRET-PROVIDER"):
         text = "Experimental SDK integration. These modules are distributed in SDK\n"
@@ -79,7 +85,7 @@ def populate_current_docs(root):
         "[CLI " + tick + "0.1.0" + tick + "](CLI-020-RELEASE-PREPARATION.md)\n"
         "CLI0.1.0 → protected standalone project → SDK0.9.0-alpha.6 → app lock/cache\n")
     put(root, "README.md",
-        "## Start with native SSR\n"
+        status + references + "## Start with native SSR\n"
         "This quickstart uses SDK " + tick + "0.9.0-alpha.6" + tick +
         " and independently versioned CLI " + tick + "0.1.0" + tick + ".\n"
         "https://crates.io/crates/yetlet/0.9.0-alpha.6\n"
@@ -366,6 +372,27 @@ class WorkspaceManifestTests(unittest.TestCase):
             self.assertIn('yetlet = "=0.9.0-alpha.6"', changes['docs/FIRST-APP.md'])
             self.assertIn('with release build SDKalpha.6.', changes['docs/COMPATIBILITY.md'])
             self.assertNotIn('with release build SDKalpha.7.', changes['docs/COMPATIBILITY.md'])
+
+    def test_style_publication_sync_preserves_historical_absence_and_reader_pin(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            populate_current_docs(root)
+            path = root / 'docs/COMPATIBILITY.md'
+            path.write_text(path.read_text() + '\n## Historical Style checkpoint\n'
+                            'Style was absent from published CLI0.2.0.\n')
+            changes = sync.sync_published_docs(
+                root, {'SDK':'0.9.0-alpha.7', 'CLI':'0.3.0'}, '=0.9.0-alpha.7',
+                {'sdk':'0.9.0-alpha.6', 'cli':'0.2.0'})
+            for name in ['API-REFERENCE', 'CAPABILITIES']:
+                self.assertIn('Published SDKalpha.7/CLI0.3.0 artifacts', changes['docs/'+name+'.md'])
+            self.assertIn('Style templates are distributed in CLI 0.3.0.', changes['docs/COMPATIBILITY.md'])
+            self.assertIn('Style was absent from published CLI0.2.0.', changes['docs/COMPATIBILITY.md'])
+            self.assertIn('SDKalpha.6/CLI0.2.0 in [the site manifest]', changes['docs/COMPATIBILITY.md'])
+            self.assertIn('**Published CLI:** `0.3.0`', changes['README.md'])
+            self.assertIn('[CLI publication record](' + PUBLICATION_RECORDS['CLI'][0] +
+                          '#owner-approved-publication-and-installed-consumer--fixture)', changes['README.md'])
+            self.assertIn(PUBLICATION_RECORDS['CLI'][0].removeprefix('docs/') +
+                          '#owner-approved-publication-and-installed-consumer--fixture)', changes['docs/README.md'])
 
 
 class ReaderManifestTests(unittest.TestCase):

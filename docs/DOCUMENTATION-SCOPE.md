@@ -1,11 +1,11 @@
 # Documentation sources and publication scope
 
-Date: 2026-10-26 classification, updated 2026-11-09 for published SDK alpha.7 and separate reader edition.
+Date: 2026-10-26 classification, updated 2026-11-10 for published SDK/CLI and the separate reader edition.
 The published Experimental SDK is `yetlet` and `yetlet-browser`
-`0.9.0-alpha.7`; the independently published CLI is `yetlet-cli` `0.2.0`.
+`0.9.0-alpha.7`; the independently published CLI is `yetlet-cli` `0.3.0`.
 Use module guides and rustdoc from the version/revision you consume. The
 [SDK publication record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09) and
-[CLI publication record](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+[CLI publication record](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10)
 retain their actual distribution/consumer evidence. Older previews retain their
 own package layouts, partial registry results and failure histories. This documentation
 classification activates no website/Wiki or additional publication, support or

@@ -1,6 +1,6 @@
 # Yetlet CLI 0.3.0 — Release preparation (YT-248)
 
-**State (2026-11-10): Candidate qualification, independent implementation Reviewer and PR #71/master CI PASS. The Owner subsequently authorized formal CLI 0.3.0 release execution. Immutable C/tag, successful original hosted build and custody/sign/publication gates are tracked in the [hosted record](CLI-030-HOSTED-RECORD.md). Publication remains behind the exact Owner Environment gate; Reader Edition stays fixed.**
+**State (2026-11-10): CLI 0.3.0 is published as the independent GitHub/crates.io cohort. The [hosted record](CLI-030-HOSTED-RECORD.md) retains immutable C/S/V/P, actual signatures, the original failed publisher consumer preflight and the Owner-authorized standalone registry consumer PASS. Candidate/source review and Git/CI evidence remain preserved; Reader Edition stays fixed.**
 
 ## YT-247 / YT-248 sequencing amendment
 
@@ -40,7 +40,7 @@ Deliver one independent source-installable CLI package that makes the existing a
 
 The SDK prerequisite is satisfied: [Yetlet SDK 0.9.0-alpha.7](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.7) is already owner-approved and published as the two crates `yetlet` and `yetlet-browser`. Its immutable source C/tag and package bytes are not to be modified or republished.
 
-The currently published CLI remains **0.2.0**, deliberately pinned to SDK `=0.9.0-alpha.6`. Historical CLI 0.1.0/0.1.1/0.2.0 bindings and their records must remain unchanged. The public Reader Edition remains SDK alpha.6 / CLI 0.2.0; CLI 0.3.0 does not promote the site, first-app guide, docs-site registry manifest or existing tutorial pins.
+At the original planning checkpoint, published CLI **0.2.0** was deliberately pinned to SDK `=0.9.0-alpha.6`. The later CLI 0.3.0 publication and consumer are recorded separately in the hosted record. Historical CLI 0.1.0/0.1.1/0.2.0 bindings and their records must remain unchanged. The public Reader Edition remains SDK alpha.6 / CLI 0.2.0; CLI 0.3.0 does not promote the site, first-app guide, docs-site registry manifest or existing tutorial pins.
 
 ## Selected CLI 0.3.0 contract
 
@@ -50,7 +50,7 @@ The currently published CLI remains **0.2.0**, deliberately pinned to SDK `=0.9.
 - Include the already implemented finite app-owned Style generator, explicit style registration, external build-time CSS output and native/browser build/watch sequencing. Tailwind/Vite composition and existing ownership/recovery behavior remain intact.
 - Do not add a public Style crate, implicit runtime CSS, inline styles, renderer/CSP API, automatic package installation, new runtime API or Python dependency.
 - Refresh the CLI's closed package-owned SDK snapshot only after verifying the SDK alpha.7 registry package is available. Run the canonical `tools/yetlet-cli/scripts/sync_resources.py` from the trusted reviewed checkout to regenerate `resources/framework.json`, `resources/workspace.toml`, `resources/framework.lock` and the existing browser startup assets. Its exact source correspondence and package inclusion must be tested.
-- Update the CLI package README, release-neutral installation/version instructions, command inventory and style-template section for CLI 0.3.0. Do not describe Style templates as absent from the 0.3.0 package. Current-publication documentation remains CLI 0.2.0 until actual owner-approved publication receipts exist.
+- Update the CLI package README, release-neutral installation/version instructions, command inventory and style-template section for CLI 0.3.0. Do not describe Style templates as absent from the 0.3.0 package. Current-publication documentation now follows the accepted CLI 0.3.0 publication record; the original 0.2.0 record and Reader Edition remain fixed.
 
 ## Trusted version and resource bindings
 
@@ -60,7 +60,7 @@ Update release documentation checks and their tests so:
 - CLI 0.2.0's published command inventory continues to exclude `native-style` / `browser-style`.
 - The selected CLI 0.3.0 candidate and its eventual published inventory include both style selectors and accurately describe the supported output/build/watch behavior.
 - The package README, exact CLI build dependency, release binding, source snapshot and package archive agree on build/source provenance. Generated-app exact/default choices, manifests, own Cargo.lock and resolution receipts agree with the shipped compatibility policy rather than being forced to the CLI build dependency.
-- The source-only checkout map and current-publication status distinguish the candidate source from the still-published CLI 0.2.0. After actual publication, reconcile current documentation from the accepted CLI 0.3.0 record and keep the separate Reader Edition unchanged.
+- The API carrier map and current-publication status follow the accepted CLI 0.3.0 record. The standalone private generator is CLI tooling, not a new SDK package; the separate Reader Edition stays unchanged.
 
 The existing `release.yml`, schema3/cli signing, independent verification and publication automation is the intended pipeline. Correct any stale workflow input descriptions that omit schema3/cli, and add focused regression coverage for the existing schema3 path; do not create a second publisher or weaken its closed cohort, source, tag, Environment, checksum, signing or owner-approval gates.
 

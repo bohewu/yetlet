@@ -56,7 +56,9 @@ Phase B. Phase A delivers only the proposed contract/ADR and independent review;
 this original SDK preparation remains historical and does not include that CLI release.
 The later Owner-authorized [YT-248 candidate preparation](YT-248-CLI030-CANDIDATE.md)
 qualifies the separate CLI archive and consumes the immutable registry SDK. It
-does not republish SDK alpha.7 or upgrade the public Reader Edition.
+does not republish SDK alpha.7 or upgrade the public Reader Edition. The later
+[CLI publication and standalone consumer](CLI-030-HOSTED-RECORD.md) complete the
+independent distribution while preserving the original preparation evidence.
 
 ## Evidence and local drafts
 
@@ -188,5 +190,6 @@ with both unsigned archives and encrypted evidence read back successfully.
 At that checkpoint, S/V/P, signatures and independent result verification were
 pending; those gates and the owner-approved GitHub/crates.io distribution are now
 completed in [the final alpha.7 receipt](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09).
-CLI 0.3.0 remains a separate unimplemented release; the public reader edition
-continues to use SDK alpha.6 / CLI 0.2.0 until separately promoted.
+At the SDK publication checkpoint CLI 0.3.0 was a separate future release; it is
+now [independently published and verified](CLI-030-HOSTED-RECORD.md). The public
+Reader Edition continues to use SDK alpha.6 / CLI 0.2.0 until separately promoted.

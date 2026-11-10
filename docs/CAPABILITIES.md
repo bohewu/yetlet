@@ -1,6 +1,6 @@
 # Current capability and API carrier map
 
-Updated: 2026-11-09. The published Experimental SDK has two implementation packages:
+Updated: 2026-11-10. The published Experimental SDK has two implementation packages:
 `yetlet` and `yetlet-browser`, version `0.9.0-alpha.7`, available from crates.io.
 The module map below describes capabilities, not additional installable crates.
 Base defaults select HTML; Browser defaults select DOM. Native capabilities and
@@ -17,7 +17,7 @@ ownership/error boundaries and local rustdoc. [Documentation scope](DOCUMENTATIO
 classifies reader inputs and retained evidence; this inventory does not select
 publication of its linked execution records.
 
-## Published typed authoring and source-only Style additions
+## Published typed authoring and CLI Style tooling
 
 SDK alpha.7 **includes** `yetlet::view::tags` with 101 typed ordinary tag
 constructors, the same owned View and existing renderer restrictions. See the
@@ -27,11 +27,11 @@ The original YT-245 preparation selects local SDK `0.9.0-alpha.7` contents;
 these typed constructors are now distributed rather than checkout-only.
 
 
-The checkout also contains optional private app Style generation through CLI
-sources and the [Style Showcase](../examples/style-showcase/README.md). These
-Style surfaces remain **source-only** and absent from
-published SDKalpha.7/CLI0.2.0 artifacts, not a public SDK Style crate. See the
-[API source-only map](API-REFERENCE.md#source-only-checkout-additions)
+Published SDKalpha.7/CLI0.3.0 artifacts serve separate roles. The independent CLI
+ships native/browser Style templates and a private app generator; Style requires
+SDK alpha.7 and follows exact app SDK pins and locks. The
+[Style Showcase](../examples/style-showcase/README.md) remains a checkout sample.
+See the [API carrier map](API-REFERENCE.md#source-only-checkout-additions)
 and [Style contract](YT-237-STYLE-REGISTRATION-CONTRACT.md).
 Style authoring has a finite private app vocabulary, explicit registration and
 external build-time CSS; ordinary CSS remains the default and supplies unsupported

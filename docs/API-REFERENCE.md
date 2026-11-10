@@ -1,7 +1,7 @@
 # Current API reference
 
-Updated: 2026-11-09. This map distinguishes the published Experimental two-package
-SDK (`0.9.0-alpha.7`) from later checkout additions. `yetlet` contains the shared View and opt-in
+Updated: 2026-11-10. This map distinguishes the published Experimental two-package
+SDK (`0.9.0-alpha.7`) from independent CLI tooling and checkout samples. `yetlet` contains the shared View and opt-in
 native capabilities; `yetlet-browser` contains browser integrations and depends
 one-way on the same View. Both packages are available from crates.io at this version.
 Earlier release tags retain their original layouts and evidence.
@@ -42,15 +42,21 @@ the reviewed packages are now publicly available from crates.io.
 
 ## Source-only checkout additions
 
-These application-owned Style surfaces remain beyond the distributed
-SDKalpha.7/CLI0.2.0 artifacts. The Style generator and native/browser Style
-templates are absent from independent published CLI 0.2.0; CLI 0.3.0 is a
-separate later release. No public Style crate or implicit runtime CSS is
-introduced by SDK alpha.7.
+The [Style Showcase](../examples/style-showcase/README.md) remains a checkout
+sample. This existing fragment also leads to the current CLI Style availability
+below; the generator and templates are now distributed in the CLI.
+
+## CLI Style authoring and checkout Showcase
+
+Published SDKalpha.7/CLI0.3.0 artifacts serve separate roles. The CLI ships the
+private app Style generator and native/browser Style templates, with build/watch
+integration and exact SDK resolution/locking. Style templates require SDK
+alpha.7; ordinary native/browser selection also admits alpha.6 under the reviewed
+policy. No public SDK Style crate or implicit runtime CSS is introduced.
 
 | Source surface | Entry point and contract | Availability and limits |
 |---|---|---|
-| Optional Style authoring | [CLI Style integration](../tools/yetlet-cli/README.md#optional-application-owned-rust-css-yt-239-working-tree), [contract](YT-237-STYLE-REGISTRATION-CONTRACT.md), [implementation](YT-239-STYLE-INTEGRATION.md) | Source-only CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
+| Optional Style authoring | [CLI Style integration](../tools/yetlet-cli/README.md#optional-application-owned-rust-css-yt-239-working-tree), [contract](YT-237-STYLE-REGISTRATION-CONTRACT.md), [implementation](YT-239-STYLE-INTEGRATION.md) | Published CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
 | Style Showcase | [Native-first gallery](../examples/style-showcase/README.md) | Checkout sample with actual View/Style/CSS disclosures and optional local WASM class switching; bounded Linux evidence, no new published package or platform qualification |
 
 ## HTML, HTTP and browser modules

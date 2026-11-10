@@ -79,7 +79,9 @@ versions; the CLI README and generated SDK pin; module-guide SDK labels/examples
 and reader-facing first-app text from `site/pages.toml`. Docs-site SDK registry
 pins are read-only inputs checked against that edition; a mismatch fails the gate
 rather than rewriting `examples/docs-site/Cargo.toml`. It also updates current
-published-version claims from accepted release records.
+published-version labels and publication-record links from accepted release
+records, including README and the selected Pages input chapters. The Reader
+Edition banner/install pins still derive independently from `site/pages.toml`.
 
 The sync leaves the CLI's independently selected SDK dependency, the docs-site
 registry manifest, accepted publication records, `site/pages.toml`, historical

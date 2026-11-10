@@ -1,15 +1,16 @@
 # CodeQL CI input scope and performance
 
-**Status (2026-11-10): minimal change implemented in an independent worktree;
-local tests and workflow lint PASS. Keep this change out of the CLI release
-checkout/branch and do not merge it until the current release is complete. No
-hosted run was cancelled, restarted or changed for this investigation.**
+**Status (2026-11-10): independently reviewed PR #72 merged after the Owner
+explicitly superseded the original hold with merge-and-publish authority. Exact
+PR and master CI PASS; required checks and full-scan fallback remain intact. No
+existing hosted run was cancelled or restarted for the investigation.**
 
 ## Observed cost
 
 The current workflow pins `github/codeql-action` to
-`33d7b85da1a04171e211befe2c739303b9a4c066`, uses `build-mode: none` and runs
-Actions, JavaScript/TypeScript, Python and Rust for every non-Markdown diff.
+`33d7b85da1a04171e211befe2c739303b9a4c066` and uses `build-mode: none`. At the
+investigation baseline it ran Actions, JavaScript/TypeScript, Python and Rust for
+every non-Markdown diff; the merged selector below now chooses relevant languages.
 Evidence is retained in
 `artifacts/verification/codeql-input-scopes-20261110/`, separate from Cargo output.
 The investigation starts from `5dc8a9a990ac083e07081ea3be008748239c8a58`;
@@ -137,18 +138,25 @@ weekly/manual full coverage. No cache key or cross-ref trust protocol is added.
 
 For unaffected Rust inputs the new schedule removes one Rust job per event, whose
 observed cost above was 777–1046 seconds. This is a scheduling replay/projection,
-**not measured hosted post-change wall time**. No new workflow was pushed or
-executed while the current release CI runs; actual before/after hosted totals
-remain to be measured after the release gate. Rust-relevant input changes are not
+**not measured hosted post-change wall time**. This was the original pre-delivery projection. After the Owner-authorized
+merge, policy-changing PR #72 and actual master run `42767459099` correctly
+execute all four languages. Docs-only signer PR #73 and master CodeQL run
+`42771178527` select no languages; the scope job takes seven seconds and the
+analysis matrix is explicitly skipped. Ordinary Markdown already skipped under
+the old rule, so this observation is not a new speedup claim. A controlled
+hosted non-Markdown before/after comparison remains unmeasured. Rust-relevant input changes are not
 expected to get faster, and PR/master duplicate Rust work is deliberately retained.
 
 ## Delivery boundary
 
 The review diff consists only of `.github/workflows/codeql.yml`,
 `.github/scripts/codeql_scope.py`, `.github/scripts/test_codeql_scope.py` and this
-record. Preserve the independent worktree for review; do not apply it to the
-release checkout or merge before the Owner's release-completion condition.
-SDK/CLI historical bindings, Reader Edition, signing/publication, Runner
+record. Independent Reviewer PASS and strict/builtin Guard precede PR #72;
+exact-head PR runs `42765533659` / `42765533770` and actual master
+`42767459099` / `42767458815` PASS. The Owner subsequently selects that master
+as CLI 0.3.0 product C, as recorded in the [release dossier](CLI-030-HOSTED-RECORD.md);
+the original hold is historical, not an outstanding merge restriction.
+SDK/CLI historical bindings, Reader Edition, release workflow permissions, Runner
 permissions and branch protection remain unchanged. Future hosted timing and any
 safe Rust database-reuse proposal require separate evidence, not a claimed cache
 hit or a skipped required scan.

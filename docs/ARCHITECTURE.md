@@ -1,11 +1,12 @@
 # Yetlet Architecture
 
 **Status:** Experimental. **Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
-**Published CLI:** `0.2.0` (`yetlet-cli`).
+**Published CLI:** `0.3.0` (`yetlet-cli`).
 [Release readiness](RELEASE-READINESS.md) links the accepted publication records.
 M0–M9 implementation, selected M10 qualification and five application-owned
 research prototypes retain their recorded scopes. The typed Tag Builder is part of
-the published alpha.7 SDK; private Style tooling and Showcase remain checkout-only.
+the published alpha.7 SDK; private app Style tooling ships in CLI 0.3.0,
+while Showcase remains a checkout sample.
 Publication does not establish production or universal platform qualification.
 **Scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
 **Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md).
@@ -23,8 +24,8 @@ responsibilities. CLI build SDK and qualified embedded source-export snapshot
 remain fixed release inputs; generated app SDK selection is a separate registry
 consumer decision with exact pins and its own lock. The
 [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md) describes its
-source implementation and bounded verification. Published CLI 0.2.0 retains its
-historical behavior. This changes none of the
+implementation and bounded verification, now distributed in CLI 0.3.0.
+Earlier CLI releases retain their historical behavior. This changes none of the
 framework execution/rendering/transport boundaries below.
 
 ## 1. Problem statement
