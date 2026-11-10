@@ -26,8 +26,10 @@ distribution or transfer qualification to another source.
 
 Independent semantic/source-freeze review and local candidate consumers passed.
 The [hosted preparation record](CLI-031-HOSTED-RECORD.md) retains successful
-original unsigned build and protected custody readback. Separately reviewed S,
-prepare/signing, independent V and final prepublication plans remain pending.
+original build/custody, separately reviewed S, frozen preparation/signing,
+independent V and read-only public/registry plans. The prepublication endpoint and
+final whole-run Pipeline acceptance passed; guarded result-document delivery is
+recorded separately.
 Formal publication is excluded; source version does not change the accepted
 publication authority or Reader Edition.
 
