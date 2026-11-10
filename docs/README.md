@@ -3,7 +3,7 @@
 Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 choose a [runnable sample](SAMPLES.md). The two-package
 [SDK `0.9.0-alpha.7`](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
-and independent [CLI `0.2.0`](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+and independent [CLI `0.3.0`](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10)
 are published on crates.io with matching Experimental GitHub pre-releases.
 The first-app instructions and selected reader sources use the explicitly pinned
 SDKalpha.6/CLI0.2.0 edition. The live reader labels its own deployed edition and
@@ -17,10 +17,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [Package publication surface and API consistency](YT-244-PUBLICATION-SURFACE-API-AUDIT.md):
   shipped README/guide link boundaries, registry-first install text and
   published-versus-source-only CLI/API claims; release approval remains separate.
-- [Source-only checkout additions](API-REFERENCE.md#source-only-checkout-additions):
-  optional private app Style generation and
-  [Style Showcase](../examples/style-showcase/README.md), absent from the
-  published CLI/SDK packages. Typed tags are now in the published SDK alpha.7.
+- [SDK/CLI Style carrier map](API-REFERENCE.md#source-only-checkout-additions):
+  private app Style generation/templates ship in the CLI;
+  [Style Showcase](../examples/style-showcase/README.md) remains a checkout sample.
+  Typed tags are included in the published SDK alpha.7.
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
 - [Build your first Yetlet app](FIRST-APP.md): CLI0.2.0 → protected standalone project → SDK0.9.0-alpha.6 → app lock/cache → first build/run, then an optional [static-export path](FIRST-APP.md#next-export-a-static-site).
@@ -60,13 +60,15 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   Resolver/new/lock/offline verification, scoped test correction and retained
   evidence with Owner-authorized temporary build/cache cleanup.
 - [YT-248 CLI 0.3.0 Style release](CLI-030-RELEASE-PREPARATION.md): preserved
-  reviewed release plan; awaits separate Owner instruction after YT-247 Git delivery.
+  reviewed release plan and [actual publication](CLI-030-HOSTED-RECORD.md), including
+  the original failed publisher and successful standalone registry consumer.
 
 
 - [YT-245 SDK alpha.7 local preparation](YT-245-ALPHA7-RELEASE-PREPARATION.md):
   two-package metadata/docs, exact local archive verification and release-note
-  drafts; SDK alpha.7 is now published. YT-248 CLI0.3.0 awaits a separate Owner
-  instruction after YT-247 delivery. Published guide pins stay fixed.
+  drafts; SDK alpha.7 and the separate YT-248 CLI are now published. The
+  [CLI record](CLI-030-HOSTED-RECORD.md) retains actual outputs and setup failures.
+  Published guide pins stay fixed.
 
 - [YT-242 documentation truth audit](YT-242-DOCUMENTATION-TRUTH.md): bounded
   current-entry audit, inventory classification, corrections and remaining coverage;

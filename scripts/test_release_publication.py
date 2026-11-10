@@ -245,12 +245,16 @@ class CliConsumerTests(unittest.TestCase):
         import release_cli_consumer
         from types import SimpleNamespace
         def install(args, **kwargs):
+            target = Path(kwargs['env']['CARGO_TARGET_DIR'])
+            self.assertEqual(target, Path(kwargs['cwd']) / 'target')
+            self.assertEqual(target.stat().st_mode & 0o777, 0o700)
             root = Path(kwargs['cwd']) / 'cargo-home/registry/src/fixture/yetlet-cli-0.3.0'
             (root / 'resources').mkdir(parents=True)
             (root / 'Cargo.lock').write_text('version=4\n')
             (root / 'resources/sdk-compatibility.json').write_text('{"revision":"fixture"}')
             return SimpleNamespace(returncode=0, stdout=b'', stderr=b'')
         with tempfile.TemporaryDirectory() as temp, patch.object(publication.subprocess, 'run', side_effect=install), \
+                patch.object(release_cli_consumer, 'protected_rust_env', side_effect=lambda root, env: env) as tools, \
                 patch.object(release_cli_consumer, 'qualify', return_value={'status':'PASS'}) as qualify:
             result = publication.cli_consumer('0.3.0', Path(temp))
             self.assertEqual(result['sdk_version'], '0.9.0-alpha.7')
@@ -258,6 +262,8 @@ class CliConsumerTests(unittest.TestCase):
             self.assertEqual(args[-1], 'crates.io')
             self.assertFalse(any('TOKEN' in key for key in args[5]))
             self.assertIn('CARGO_TARGET_DIR', args[5])
+            tools.assert_called_once()
+            self.assertEqual(args[3].parent, Path.home())
 
     def test_unknown_cli_binding_is_rejected_before_install(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(publication.subprocess, 'run') as run:

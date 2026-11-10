@@ -15,8 +15,9 @@ The Owner authorized the [Phase B source implementation](YT-247-SDK-VERSION-RESO
 It supersedes source-only new and deferred app-lock descriptions below for this
 checkout: successful new resolves a compatible registry SDK, writes exact pins,
 generates an app Cargo.lock and records provenance before publication. Build,
-run and watch retain their frozen lock behavior. Published CLI0.2.0 and Reader
-Edition remain unchanged; this is not a CLI release.
+run and watch retain their frozen lock behavior. These additions are now
+distributed in [CLI 0.3.0](CLI-030-HOSTED-RECORD.md); the separately pinned Reader
+Edition remains SDK alpha.6 / CLI 0.2.0. Earlier releases retain their own behavior.
 
 ## 1. Historical starting implementation and authority
 

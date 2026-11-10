@@ -5,7 +5,7 @@ import argparse
 import re
 import subprocess
 import tomllib
-from release_version_authority import published_versions
+from release_version_authority import published_versions, publication_links
 from release_record import cli_sdk_version
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -641,17 +641,32 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
         return (pattern, lambda m: m.group(1) + first + m.group(2) +
                 second + m.group(3), label)
 
+    links = publication_links(root)
+    for relative in ('README.md', 'docs/ARCHITECTURE.md',
+                     'docs/RELEASE-READINESS.md', 'docs/RELEASE-PUBLICATION.md'):
+        for subject, version in published.items():
+            apply(relative, [one(r'(\*\*Published ' + subject + r':\*\* ' + tick + ')' +
+                                 VERSION_PATTERN + '(' + tick + ')', version,
+                                 'published ' + subject)])
+    for relative in ('README.md', 'docs/COMPATIBILITY.md', 'docs/RELEASE-READINESS.md',
+                     'docs/RELEASE-PUBLICATION.md', 'docs/DOCUMENTATION-SCOPE.md'):
+        for subject, link in links.items():
+            destination = link if relative == 'README.md' else link.removeprefix('docs/')
+            apply(relative, [(r'(\[' + subject + r' publication record\]\()[^)]+(\))',
+                              lambda m, destination=destination: m[1] + destination + m[2],
+                              subject + ' publication record link')])
+
     apply("docs/API-REFERENCE.md", [
         one(r"(SDK \(" + tick + ")" + VERSION_PATTERN + r"(" + tick +
-            r"\) from later checkout additions)", sdk, "published SDK"),
-        pair(r"(beyond the distributed\nSDK)" + VERSION_SHORT_PATTERN + r"(/CLI)" + VERSION_PATTERN + r"(\s+artifacts)",
-             sdk_short, cli, "published SDK/CLI source-only boundary"),
+            r"\) from independent CLI tooling and checkout samples)", sdk, "published SDK"),
+        pair(r"(Published SDK)" + VERSION_SHORT_PATTERN + r"(/CLI)" + VERSION_PATTERN + r"(\s+artifacts)",
+             sdk_short, cli, "published SDK/CLI Style boundary"),
     ])
     apply("docs/CAPABILITIES.md", [
         one(r"(version " + tick + ")" + VERSION_PATTERN + r"(" + tick +
             r", available from crates\.io)", sdk, "published SDK"),
-        pair(r"(published SDK)" + VERSION_SHORT_PATTERN + r"(/CLI)" + VERSION_PATTERN + r"(\s+artifacts)",
-             sdk_short, cli, "published SDK/CLI source-only boundary"),
+        pair(r"(Published SDK)" + VERSION_SHORT_PATTERN + r"(/CLI)" + VERSION_PATTERN + r"(\s+artifacts)",
+             sdk_short, cli, "published SDK/CLI Style boundary"),
     ])
     apply("docs/COMPATIBILITY.md", [
         one(r"(now \*\*published in SDK " + tick + ")" + VERSION_PATTERN + r"(" + tick + r"\*\*)",
@@ -667,8 +682,8 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
          "current published CLI and immutable build SDK"),
         pair(r"(SDK)" + VERSION_SHORT_PATTERN + r"(/CLI)" + VERSION_PATTERN + r"( in \[the site manifest\])",
              reader_sdk_short, edition["cli"], "public reader edition"),
-        one(r"(absent from published CLI)" + VERSION_PATTERN + r"(\.)",
-            cli, "source-only CLI boundary"),
+        one(r"(Style templates are distributed in CLI )" + VERSION_PATTERN + r"(\.)",
+            cli, "published Style CLI"),
     ])
     apply("docs/VIEW-COMPONENTS.md", [
         one(r"(Experimental SDK " + tick + ")" + VERSION_PATTERN +
@@ -722,10 +737,10 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
              edition["cli"], edition["sdk"], "reader CLI/SDK pair"),
     ])
     apply("docs/README.md", [
-        one(r"(\[SDK " + tick + ")" + VERSION_PATTERN + r"(" + tick + r"\]\()",
-            sdk, "SDK release index"),
-        one(r"(\[CLI " + tick + ")" + VERSION_PATTERN + r"(" + tick + r"\]\()",
-            cli, "CLI release index"),
+        (r"(\[SDK " + tick + ")" + VERSION_PATTERN + r"(" + tick + r"\]\()[^)]+(\))",
+         lambda m: m[1] + sdk + m[2] + links['SDK'].removeprefix('docs/') + m[3], 'SDK release index'),
+        (r"(\[CLI " + tick + ")" + VERSION_PATTERN + r"(" + tick + r"\]\()[^)]+(\))",
+         lambda m: m[1] + cli + m[2] + links['CLI'].removeprefix('docs/') + m[3], 'CLI release index'),
         pair(r"(CLI)" + VERSION_PATTERN + r"( → protected standalone project → SDK)" + VERSION_PATTERN + r"( → app lock/cache)",
              edition["cli"], edition["sdk"], "first-app reader edition index"),
     ])

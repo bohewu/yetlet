@@ -7,24 +7,25 @@ immutable source snapshot and template identity from the generated app's selecte
 registry SDK. [Phase A handoff](YT-247-PHASE-A-HANDOFF.md) retains the design review
 and PR #68 delivery; the [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
 reports resolver/cache/locking tests and six real registry compile combinations.
-Published CLI0.2.0 is unchanged. The later [Windows supplement](YT-247-WINDOWS-VERIFICATION.md)
+These additions are now distributed in CLI0.3.0. The later [Windows supplement](YT-247-WINDOWS-VERIFICATION.md)
 verifies MSVC CLI compilation and actual resolver/new/locking execution on the
 existing prepared Runner; failed attempts, scoped test correction and cleanup
 are retained. Windows Style/browser runtime qualification remains separate.
 
-**YT-248 CLI 0.3.0 Style release (2026-11-10): Candidate/Git delivery PASS; formal release execution authorized and unsigned hosted build PASS.**
-The [preserved preparation plan](CLI-030-RELEASE-PREPARATION.md) retains its prior
-independent Style plan PASS. The [candidate record](YT-248-CLI030-CANDIDATE.md)
-tracks CLI0.3.0, alpha.7 build SDK/qualified snapshot, separate resolver app
-choices, archive installation and registry SDK consumers, native HTTP/CSS and
-browser Vite/WASM/Chrome proof. A real keyed-update class defect was corrected;
-original failures and process cleanup remain recorded. Corrective independent
-implementation Reviewer PASS has zero issues/followups; PR #71 exact-head/master
-CI PASS. The [hosted release record](CLI-030-HOSTED-RECORD.md) binds immutable
-C/tag, the original build and remaining custody/sign/V/publication gates.
-Published CLI0.2.0 remains current until successful Owner-approved publication;
-the alpha.6/CLI0.2.0 Reader Edition stays fixed; new Windows Style
-revalidation remains paused/unverified.
+**YT-248 CLI 0.3.0 Style release (2026-11-10): Published; standalone registry consumer PASS.**
+The [preserved plan](CLI-030-RELEASE-PREPARATION.md) and
+[candidate](YT-248-CLI030-CANDIDATE.md) retain their source/runtime/review proof.
+The [hosted record](CLI-030-HOSTED-RECORD.md) binds immutable C/tag, distinct S,
+original build/custody/sign/V, Owner approval and exact GitHub/crates.io bytes.
+The original publisher remains FAIL during consumer preflight; two local setup
+failures are retained. After the required stop and explicit bounded Owner
+continuation, private Rust tools and target preparation allow the existing
+credential-free registry consumer to PASS all six resolver/lock cases and
+Native/Browser Style build/runtime/Chrome checks. No publication retry or SDK
+republishing occurs. Current distribution labels/links derive from accepted
+records; the Reader Edition stays SDK alpha.6 / CLI0.2.0 and new Windows Style
+revalidation remains paused/unverified. Closeout review/Git delivery follows this
+receipt-backed source update.
 
 **YT-246 canonical version authorities and release-document synchronization (2026-11-10): Done.**
 [Version source audit](YT-246-VERSION-SOURCE-AUDIT.md) separates SDK source,

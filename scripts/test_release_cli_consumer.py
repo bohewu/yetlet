@@ -10,6 +10,37 @@ import release_cli_consumer as consumer
 
 
 class ResolutionEvidenceTests(unittest.TestCase):
+    def test_consumer_commands_use_private_umask_without_changing_parent(self):
+        with tempfile.TemporaryDirectory() as temp, \
+                patch.object(consumer.subprocess, 'Popen', side_effect=RuntimeError('stop at launch')) as launch:
+            root = Path(temp)
+            with self.assertRaisesRegex(RuntimeError, 'stop at launch'):
+                consumer.qualify(root/'yetlet', '0.3.0', '0.9.0-alpha.7', root,
+                                 root/'evidence', {'PATH':'/usr/bin:/bin'}, b'{}', 'crates.io')
+            self.assertEqual(launch.call_args.kwargs['umask'], 0o077)
+
+    def test_owned_rust_copy_removes_writable_modes_without_changing_source(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            source = root / 'installed'
+            (source / 'bin').mkdir(parents=True)
+            (source / 'lib').mkdir()
+            for name in ['rustc', 'cargo']:
+                (source / 'bin' / name).write_bytes(b'fixture')
+                (source / 'bin' / name).chmod(0o775)
+            (source / 'lib' / 'runtime').write_bytes(b'library')
+            source.chmod(0o775)
+            with patch.object(consumer.subprocess, 'check_output',
+                              return_value=str(source / 'bin/rustc').encode()):
+                env = consumer.protected_rust_env(root, {'PATH':'/usr/bin:/bin'})
+            self.assertEqual(env['PATH'].split(os.pathsep)[0], str(root / 'rust/bin'))
+            self.assertEqual(env['RUSTUP_TOOLCHAIN'], str(root / 'rust'))
+            self.assertEqual((root / 'rust/lib/runtime').read_bytes(), b'library')
+            self.assertEqual(source.stat().st_mode & 0o777, 0o775)
+            self.assertEqual((source / 'bin/rustc').stat().st_mode & 0o777, 0o775)
+            self.assertTrue(all(p.stat().st_mode & 0o022 == 0 for p in
+                                [root / 'rust', *(root / 'rust').rglob('*')]))
+
     def test_chrome_uses_consumer_environment_and_path_without_publisher_credentials(self):
         safe = {'PATH':'/usr/bin:/bin', 'HOME':'/tmp/consumer-home'}
         with tempfile.TemporaryDirectory() as temp, \

@@ -29,18 +29,18 @@ DOM's existing admission/URL/image policy. Selected typed attribute setters
 the typed builder; generic `attribute` retains append-only semantics.
 The shared `View` representation and renderer behavior are unchanged.
 Published SDK alpha.7 includes these builders; CLI 0.2.0 stays independently pinned.
-The published SDK alpha.7 and CLI 0.2.0 packages are independently versioned;
+The published SDK alpha.7 and CLI 0.3.0 packages are independently versioned;
 only the SDK includes the typed Tag Builder.
 
 See [YT-235 follow-up](YT-235-TAG-COVERAGE-PLAN.md) for exact inclusion/exclusion
 and verification.
 
-## Current distribution — 2026-11-09
+## Current distribution — 2026-11-10
 
 The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.7`; the independently
-published CLI is `yetlet-cli` `0.2.0`, with release build SDKalpha.6.
-See the [SDK publication](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
-and [CLI publication](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+published CLI is `yetlet-cli` `0.3.0`, with release build SDKalpha.7.
+See the [SDK publication record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+and [CLI publication record](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10)
 for the actual artifacts and consumers. YT-220/221's DOM vocabulary, pre handling
 and opt-in navigation/images are available in SDKalpha.6; YT-223's static export
 is available in CLI0.2.0. Existing defaults and Experimental API limits remain.
@@ -57,10 +57,12 @@ Dated preparation and source-only
 checkpoints below retain their historical status; they are not current pending
 release gates.
 
-## Source-only Style authoring and Showcase — 2026-11-08
+## Published CLI Style authoring and checkout Showcase — 2026-11-10
 
 [YT-239](YT-239-STYLE-INTEGRATION.md) adds optional private app CSS generation
-and build/watch integration; it is absent from published CLI0.2.0.
+and build/watch integration. Style templates are distributed in CLI 0.3.0.
+The build SDK and embedded source snapshot are alpha.7; app SDK selection follows
+the separate reviewed resolver policy, exact pins and project Cargo.lock.
 [Showcase](../examples/style-showcase/README.md) demonstrates the current typed
 Views and finite app-owned Style vocabulary with external build-time CSS.
 Neither is a public style crate or renderer change. Ordinary CSS stays default.

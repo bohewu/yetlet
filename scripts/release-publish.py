@@ -216,13 +216,24 @@ def resolved_cli_project(project, cli_version, explicit_sdk):
 def cli_consumer(version, output):
     """Install the exact published executable anonymously; do not compile it as an SDK."""
     sdk_version = s.records.cli_sdk_version(version)
-    with tempfile.TemporaryDirectory(prefix='yetlet-cli-consumer-') as temporary:
+    modern = version not in LEGACY_CLI_BINDINGS
+    # /tmp and group-writable Rustup ancestors fail the installed CLI's probes.
+    # Only owned temporary copies change mode; shared tools/Runner policy stay fixed.
+    with tempfile.TemporaryDirectory(prefix='yetlet-cli-consumer-',
+                                     dir=Path.home() if modern else None) as temporary:
         root = Path(temporary)
         env = {k: os.environ[k] for k in ('PATH', 'HOME', 'RUSTUP_HOME', 'SSL_CERT_FILE', 'SSL_CERT_DIR',
                'HTTPS_PROXY', 'HTTP_PROXY', 'NO_PROXY') if k in os.environ}
         env.update(CARGO_HOME=str(root / 'cargo-home'), RUSTUP_TOOLCHAIN='1.99.0',
                    CARGO_BUILD_JOBS='2', CARGO_TERM_COLOR='never')
-        args = ['cargo', '+1.99.0', 'install', 'yetlet-cli', '--version', version,
+        cargo = ['cargo', '+1.99.0']
+        if modern:
+            import release_cli_consumer
+            env = release_cli_consumer.protected_rust_env(root, env)
+            (root / 'target').mkdir(mode=0o700)
+            env['CARGO_TARGET_DIR'] = str(root / 'target')
+            cargo = [str(root / 'rust/bin/cargo')]
+        args = [*cargo, 'install', 'yetlet-cli', '--version', version,
                 '--locked', '--root', str(root / 'install'), '--bin', 'yetlet']
         result = subprocess.run(args, cwd=root, env=env, capture_output=True, timeout=600)
         (output / 'consumer-install.stdout').write_bytes(result.stdout)
@@ -237,7 +248,6 @@ def cli_consumer(version, output):
             lock = (package / 'Cargo.lock').read_bytes()
             (output / 'REGISTRY-CONSUMER.lock').write_bytes(lock)
             # Its own package lock/build identity remains separate from every app.
-            env['CARGO_TARGET_DIR'] = str(root / 'target')
             result = release_cli_consumer.qualify(executable, version, sdk_version, root, output, env,
                 (package / 'resources/sdk-compatibility.json').read_bytes(), 'crates.io')
             result.update(lock_sha256=s.sha(lock), sdk_version=sdk_version, source_install=True)
