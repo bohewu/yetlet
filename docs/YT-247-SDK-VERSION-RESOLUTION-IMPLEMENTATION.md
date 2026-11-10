@@ -98,7 +98,12 @@ Two existing Windows environments were observed through WebCodex without editing
 their checkouts. One lacks `link.exe`; the other has MSVC but lacks the required
 native OpenSSL installation. Both stopped at prerequisites, with original logs
 transferred and no active jobs at closeout. The changed Windows staging/process
-code has **not** completed compile or runtime verification. The first independent
+code had **not** completed compile or runtime verification at the original Phase B
+freeze. The [Owner-requested Windows supplement](YT-247-WINDOWS-VERIFICATION.md)
+subsequently locates the existing qualified MSVC/OpenSSL inputs, compiles the
+merged production source and verifies Resolver/new execution, exact locks,
+offline hit/miss and repeated-destination preservation. Its original failures,
+one test-only expectation correction and cleanup remain explicit. The first independent
 review found incompatible staging handle sharing and a missing READ_CONTROL
 right during lock adoption. The correction releases creation handles while a
 normal directory pin protects Cargo preparation, then reacquires and verifies
@@ -112,8 +117,8 @@ Windows process caller still refused `cargo generate-lockfile`. The cwd-pinning
 allowlist now admits that literal Cargo action while retaining all executable
 and directory checks; an assertion in the existing Windows process tests checks
 admission and refusal of unrelated commands without spawning Cargo.
-Existing historical
-Windows evidence does not qualify this new code. Windows Style revalidation
+Earlier historical Windows evidence alone does not qualify this new code.
+Windows Style revalidation
 remains paused/unverified as in the accepted plan.
 
 ## Independent review and Git boundary

@@ -12,6 +12,9 @@ resolver. The Owner has accepted that design and authorized the
 [Phase B implementation](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md).
 This release plan moves to **YT-248** and depends on that implementation.
 Completion of YT-247 does not authorize starting this release plan.
+The [later Windows supplement](YT-247-WINDOWS-VERIFICATION.md) qualifies the
+Resolver/new/lock path only; the separate Windows Style runtime pause below
+retains its original scope.
 
 The original Style acceptance below remains required. Its corrective independent
 Reviewer result reports JSON PASS, zero issues/followups in

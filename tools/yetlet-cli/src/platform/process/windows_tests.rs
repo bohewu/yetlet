@@ -112,9 +112,11 @@ fn frozen_build_and_dev_commands_are_explicit() {
         ["run", "--frozen", "--manifest-path", "Cargo.toml"]
     );
     assert_eq!(dev.get_current_dir(), Some(app.cwd.as_path()));
+    let mut expected_dev = crate::app::command(true, false);
+    expected_dev.env("YETLET_STYLE_DEV", "1");
     assert_eq!(
         dev.get_envs().collect::<std::collections::BTreeMap<_, _>>(),
-        crate::app::command(true, false).get_envs().collect()
+        expected_dev.get_envs().collect()
     );
 }
 

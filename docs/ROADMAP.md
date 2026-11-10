@@ -7,8 +7,10 @@ immutable source snapshot and template identity from the generated app's selecte
 registry SDK. [Phase A handoff](YT-247-PHASE-A-HANDOFF.md) retains the design review
 and PR #68 delivery; the [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
 reports resolver/cache/locking tests and six real registry compile combinations.
-Published CLI0.2.0 is unchanged. Windows compilation remains unverified because
-the available Windows environments lack native toolchain prerequisites.
+Published CLI0.2.0 is unchanged. The later [Windows supplement](YT-247-WINDOWS-VERIFICATION.md)
+verifies MSVC CLI compilation and actual resolver/new/locking execution on the
+existing prepared Runner; failed attempts, scoped test correction and cleanup
+are retained. Windows Style/browser runtime qualification remains separate.
 
 **YT-248 CLI 0.3.0 Style release (2026-11-10): Not started; awaits separate Owner instruction after YT-247 Git delivery.**
 The [preserved preparation plan](CLI-030-RELEASE-PREPARATION.md) retains its prior
