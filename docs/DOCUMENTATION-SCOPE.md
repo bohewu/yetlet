@@ -11,7 +11,7 @@ own package layouts, partial registry results and failure histories. This docume
 classification activates no website/Wiki or additional publication, support or
 repository-visibility change. Historical candidate decisions retain their scope.
 
-The public reader/first-app edition is the explicitly selected SDKalpha.6/CLI0.2.0
+The public reader/first-app edition is the explicitly selected SDKalpha.7/CLI0.3.0
 pair in [the site manifest](../site/pages.toml). The new
 [browser-only walkthrough](BROWSER-APP.md) is repository guidance; it does not add
 a selected site chapter or promote the live site. The existing link rewriter

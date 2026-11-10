@@ -8,7 +8,8 @@ and [CLI publication record](CLI-030-HOSTED-RECORD.md#owner-approved-publication
 retain separate GitHub/crates.io archives, actual signatures and consumers. The
 CLI resolves a reviewed compatible SDK per project and writes exact pins/locks;
 its build SDK/snapshot remain separate fixed release inputs. The public Reader
-Edition stays SDK alpha.6 / CLI 0.2.0. Earlier release records retain their
+Edition follows the verified published pair selected in `site/pages.toml`; its
+reviewed update and Pages readback are required for each publication closeout. Earlier release records retain their
 original bindings and failures. [RELEASING.md](RELEASING.md) is the general SOP;
 [YT-227](YT-227-NEXT-RELEASE-PLAN.md) retains the optional registry OIDC migration,
 which remains unadopted. Permissions, Secret policy and ADR0009 are unchanged.

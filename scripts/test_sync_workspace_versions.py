@@ -64,7 +64,9 @@ def populate_current_docs(root):
     put(root, "docs/DOCUMENTATION-SCOPE.md",
         "The published Experimental SDK is yetlet and yetlet-browser\n"
         + tick + "0.1.0" + tick + "; the independently published CLI is "
-        + tick + "yetlet-cli" + tick + " " + tick + "0.1.0" + tick + ".\n" + references)
+        + tick + "yetlet-cli" + tick + " " + tick + "0.1.0" + tick + ".\n"
+        "The public reader/first-app edition is the explicitly selected SDKalpha.6/CLI0.2.0\n"
+        + references)
     for name in ("CONFIGURATION", "EXTENSIONS", "HTTP-PIPELINE",
                  "SECRET-PROVIDERS", "SETTINGS-SECRET-PROVIDER"):
         text = "Experimental SDK integration. These modules are distributed in SDK\n"
@@ -91,6 +93,8 @@ def populate_current_docs(root):
         "https://crates.io/crates/yetlet/0.9.0-alpha.6\n"
         "https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.6\n"
         "cargo +1.99.0 install yetlet-cli --version 0.1.0 --locked\n"
+        "Expected version output: `yetlet 0.1.0`.\n"
+        "yetlet new firstapp --sdk-version 0.9.0-alpha.6\n"
         "Expected output: " + tick + "yetlet 0.1.0" + tick + ".\n"
         "The server listens on 127.0.0.1:3000.\n"
         "\n## Next section\nDo not change this section.\n")
@@ -406,13 +410,20 @@ class ReaderManifestTests(unittest.TestCase):
                 "[target.wasm32.dependencies]\n"
                 'yetlet-browser = "=0.9.0-alpha.6"\n'
             )
-            put(root, relative, source)
-            with self.assertRaisesRegex(ValueError, "does not match site/pages.toml"):
-                sync.check_reader_manifest(root, {"sdk": "0.9.0-alpha.7"})
-            self.assertEqual((root / relative).read_text(encoding="utf-8"), source)
+            for relative in (relative, "examples/static-site/Cargo.toml"):
+                put(root, relative, source)
+                with self.assertRaisesRegex(ValueError, "does not match site/pages.toml"):
+                    sync.check_reader_manifest(root, {"sdk": "0.9.0-alpha.7"}, relative)
+                self.assertEqual((root / relative).read_text(encoding="utf-8"), source)
 
 
 class GuideVersionSyncTests(unittest.TestCase):
+    def test_reader_commands_follow_the_selected_edition(self):
+        text = ('cargo +1.99.0 install yetlet-cli --version 0.2.0 --locked\n'
+                '`yetlet 0.2.0`\nyetlet new app --sdk-version 0.9.0-alpha.6\n')
+        self.assertEqual(sync.sync_reader_commands(text, {'sdk': '1.2.3', 'cli': '4.5.6'}),
+                         'cargo +1.99.0 install yetlet-cli --version 4.5.6 --locked\n'
+                         '`yetlet 4.5.6`\nyetlet new app --sdk-version 1.2.3\n')
     def test_current_package_labels_update_but_feature_introduction_versions_are_preserved(self):
         text = (
             "Current package: " + TICK + "yetlet" + TICK + " SDK " + TICK + "0.9.0-alpha.6" + TICK + ".\n"

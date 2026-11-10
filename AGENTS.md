@@ -46,8 +46,11 @@ freezing or release execution. Never replace version-derived checks with literal
 Package READMEs must describe what the selected release includes without claiming
 an upload already happened or retaining current-version pending/unreleased text.
 Preserve explicitly historical checkpoints and the separately pinned public guide
-edition. After verified publication, reconcile current reader status with actual
-receipts before closing the release item. Independent review covers semantic
+edition. After every verified SDK or CLI publication, update the Reader Edition, README
+and Pages to the accepted published pair before closing the release item. Follow
+`docs/RELEASING.md#required-reader-update-after-every-sdk-or-cli-publication`;
+require consumer/native/Wasm verification and live Pages readback. Development
+versions alone never promote the reader. Independent review covers semantic
 claims outside the automated check's documented scope. No check grants Git,
 hosted, signing, publication or Pages authority.
 

@@ -113,7 +113,7 @@ The locally selected SDK `0.9.0-alpha.7` includes
 `yetlet::view::tags`, now also published on crates.io, as an alternative to
 `Element::new`. These typed constructors are available from published SDK
 `0.9.0-alpha.7`; the introductory first-app example above intentionally continues
-using the separately selected SDK alpha.6 / CLI 0.2.0 reader edition. See the actual
+using the reviewed Reader Edition selected in [the site manifest](../site/pages.toml). See the actual
 [SDK alpha.7 publication](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
 and [YT-245 preparation](YT-245-ALPHA7-RELEASE-PREPARATION.md).
 

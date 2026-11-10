@@ -137,6 +137,14 @@ class ReleaseDocsTests(unittest.TestCase):
                                 f'[Accepted](https://github.com/bohewu/yetlet/releases/tag/{prefix}7.8.9)\n')
             self.assertEqual(docs.published_versions(temp), {'SDK': '7.8.9', 'CLI': '7.8.9'})
 
+    def test_each_publication_requires_its_reader_followup(self):
+        published = {'SDK': '7.8.9-alpha.2', 'CLI': '6.5.4'}
+        edition = {'sdk': published['SDK'], 'cli': published['CLI']}
+        docs.check_reader_publication(edition, published)
+        for subject in ('SDK', 'CLI'):
+            with self.subTest(subject=subject), self.assertRaisesRegex(ValueError, 'accepted publication'):
+                docs.check_reader_publication(edition, dict(published, **{subject: '8.0.0'}))
+
     def test_guide_edition_prose_matches_site_manifest_but_history_keeps_old_pins(self):
         edition = {'sdk': '7.8.9-alpha.2', 'cli': '6.5.4'}
         text = ('The public reader/first-app edition remains pinned to\n'

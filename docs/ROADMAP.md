@@ -1,5 +1,13 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+**YT-249 Reader Edition publication follow-through (2026-11-10): Source/consumer review PASS.**
+[Contract and evidence](YT-249-READER-RELEASE-ROLLOVER.md) promote the reader to
+the verified published SDK/CLI pair and require the same reviewed README/Pages
+update after each future SDK or CLI publication. Development versions do not
+promote the reader; immutable archives and historical release bindings remain.
+Local native/Wasm/static/first-app proof and independent review PASS; exact-head
+CI and live readback remain the public-delivery gates.
+
 **YT-247 Dynamic SDK Version Resolution (2026-11-10): Done at source implementation scope; independent Reviewer PASS.**
 [CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) separate CLI build SDK,
@@ -23,8 +31,8 @@ continuation, private Rust tools and target preparation allow the existing
 credential-free registry consumer to PASS all six resolver/lock cases and
 Native/Browser Style build/runtime/Chrome checks. No publication retry or SDK
 republishing occurs. Current distribution labels/links derive from accepted
-records; the Reader Edition stays SDK alpha.6 / CLI0.2.0 and new Windows Style
-revalidation remains paused/unverified. Closeout review/Git delivery follows this
+records; the initial alpha.6/CLI0.2 Reader Edition hold is superseded by YT-249.
+New Windows Style revalidation remains paused/unverified. Closeout review/Git delivery follows this
 receipt-backed source update.
 
 **YT-246 canonical version authorities and release-document synchronization (2026-11-10): Done.**

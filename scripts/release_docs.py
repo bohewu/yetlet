@@ -235,6 +235,12 @@ def check_edition(text, edition, location):
                 'reader edition differs from site/pages.toml')
 
 
+def check_reader_publication(edition, published):
+    for subject in ('SDK', 'CLI'):
+        require(edition[subject.lower()] == published[subject], 'site/pages.toml',
+                f'reader {subject} must match its accepted publication; complete the reviewed reader update')
+
+
 def check_current_module(text, location):
     # Only maintained module guides/current composition prose; old package
     # READMEs and explicit historical sections remain valid evidence.
@@ -288,6 +294,8 @@ def check_source(root, cohort='all'):
         check_current_module(read(root, relative), relative)
         check_guide_links(root, relative, '/'.join(relative.split('/')[:2]))
     edition = tomllib.loads(read(root, 'site/pages.toml'))['edition']
+    check_reader_publication(edition, published)
+    sdk_versions.check_reader_manifest(root, edition, 'examples/static-site/Cargo.toml')
     for relative in PINNED_GUIDES:
         check_installs(read(root, relative), edition['cli'], relative)
     for relative in ('docs/COMPATIBILITY.md', 'docs/DOCUMENTATION-SCOPE.md'):
