@@ -10,6 +10,10 @@ import tomllib
 
 APP = Path(__file__).resolve().parent
 ROOT = APP.parents[1]
+spec = importlib.util.spec_from_file_location(
+    "release_version_authority", ROOT / "scripts/release_version_authority.py")
+authority = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(authority)
 
 
 def prepare(public=False):
@@ -29,6 +33,7 @@ def prepare(public=False):
     cli = tomllib.loads((ROOT / "tools/yetlet-cli/Cargo.toml").read_text())["package"]["version"]
     # Preserve the published consumer edition while workspace versions advance.
     existing.page_label(commit, dirty, sdk, cli, selection.get("edition"), public)
+    published = authority.published_versions(ROOT)
     base = "/yetlet/"
     routes = {p["output"]: "/" if p["output"] == "index.md" else "/" + p["output"][:-3] + "/"
               for p in pages}
@@ -48,7 +53,8 @@ def prepare(public=False):
                          "excerpt_sha256": hashlib.sha256(excerpt.encode()).hexdigest(),
                          "markdown": existing.rewrite_links(excerpt, source, destinations, commit)})
     prepared = {"commit": commit, "public": public, "sdk": selection["edition"]["sdk"],
-                "cli": selection["edition"]["cli"], "base": base, "chapters": chapters}
+                "cli": selection["edition"]["cli"], "published_sdk": published["SDK"],
+                "published_cli": published["CLI"], "base": base, "chapters": chapters}
     consumer = tomllib.loads((APP / "Cargo.toml").read_text())
     dependencies = [consumer["dependencies"],
                     *(target.get("dependencies", {}) for target in consumer.get("target", {}).values())]

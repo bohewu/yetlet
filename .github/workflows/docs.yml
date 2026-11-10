@@ -9,10 +9,12 @@ on:
       - docs/OPT-IN-QUICK-REFERENCE.md
       - docs/API-REFERENCE.md
       - docs/TROUBLESHOOTING.md
+      - docs/*-HOSTED-RECORD.md
       - crates/yetlet/guides/server-axum.md
       - crates/yetlet-browser/guides/dom.md
       - examples/docs-site/**
       - site/pages.toml
+      - scripts/release_version_authority.py
       - tools/build_docs.py
       - tools/build_yetlet_docs.py
       - tools/test_build_yetlet_docs.py
@@ -28,10 +30,12 @@ on:
       - docs/OPT-IN-QUICK-REFERENCE.md
       - docs/API-REFERENCE.md
       - docs/TROUBLESHOOTING.md
+      - docs/*-HOSTED-RECORD.md
       - crates/yetlet/guides/server-axum.md
       - crates/yetlet-browser/guides/dom.md
       - examples/docs-site/**
       - site/pages.toml
+      - scripts/release_version_authority.py
       - tools/build_docs.py
       - tools/build_yetlet_docs.py
       - tools/test_build_yetlet_docs.py

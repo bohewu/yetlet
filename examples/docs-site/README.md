@@ -44,6 +44,14 @@ generated copy. External repository links use the recorded content commit; an
 unpublished local commit can be unavailable remotely. The page labels this
 local-preview limitation; it is not a public edition selection.
 
+The masthead shows two independent version labels. `Published` reads the accepted
+publication records through `scripts/release_version_authority.py`, shared with
+the root README's published status. `Reader Edition` reads `site/pages.toml` and
+keeps the guide's exact consumer pins and content source visible. A new published
+release updates the first label on the next site build without promoting the
+reader edition or republishing a CLI archive. The private export manifest records
+both version pairs.
+
 Use a disposable private consumer so group-writable checkout ancestors do not
 weaken CLI protection. The following demonstration variables stay in a subshell.
 Only the generated public directory is hosted:

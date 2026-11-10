@@ -75,6 +75,7 @@ def build(cli, output, public=False):
             raise ValueError("Public source changed during the build; artifact is not accepted")
     record = {"mode": "public" if public else "preview", "source": prepared["commit"],
               "sdk": prepared["sdk"], "cli": prepared["cli"], "base": prepared["base"],
+              "published_sdk": prepared["published_sdk"], "published_cli": prepared["published_cli"],
               "local_links_checked": checked, "consumer_inputs": inputs,
               "chapters": [{k: p[k] for k in ("source", "route", "source_sha256", "excerpt_sha256")}
                            for p in prepared["chapters"]],
