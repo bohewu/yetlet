@@ -40,8 +40,20 @@ class PublicPreparation(unittest.TestCase):
         self.assertEqual(result["commit"], self.commit)
         self.assertEqual((result["sdk"], result["cli"]),
                          (SITE_EDITION["sdk"], SITE_EDITION["cli"]))
+        published = prepare.authority.published_versions(guide.ROOT)
+        self.assertEqual((result["published_sdk"], result["published_cli"]),
+                         (published["SDK"], published["CLI"]))
         self.assertIn("/blob/" + self.commit + "/", result["chapters"][0]["markdown"])
         self.assertEqual(result["chapters"][1]["route"], "/first-app/")
+
+    def test_new_publication_updates_labels_without_changing_reader_edition(self):
+        with patch.object(prepare.subprocess, "check_output", side_effect=[self.commit, ""]), \
+             patch.object(prepare.authority, "published_versions",
+                          return_value={"SDK": "1.2.3", "CLI": "4.5.6"}):
+            result = prepare.prepare(public=True)
+        self.assertEqual((result["published_sdk"], result["published_cli"]), ("1.2.3", "4.5.6"))
+        self.assertEqual((result["sdk"], result["cli"]),
+                         (SITE_EDITION["sdk"], SITE_EDITION["cli"]))
 
     def test_dirty_public_source_is_rejected_before_preparation(self):
         with patch.object(prepare.subprocess, "check_output", side_effect=[self.commit, " M README.md\n"]):

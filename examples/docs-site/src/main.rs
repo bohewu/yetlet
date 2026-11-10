@@ -14,6 +14,8 @@ struct Site {
     public: bool,
     sdk: String,
     cli: String,
+    published_sdk: String,
+    published_cli: String,
     base: String,
     chapters: Vec<Page>,
 }
@@ -94,10 +96,16 @@ fn shell(site: &Site, page: &Page, content: View, island: bool) -> View {
     if island {
         header = header.child(header_search());
     }
+    let published = Element::new("p")
+        .attribute("class", "edition")
+        .child(View::text(format!(
+            "Published: Experimental SDK {} · CLI {}",
+            site.published_sdk, site.published_cli
+        )));
     let mut edition = Element::new("p")
         .attribute("class", "edition")
         .child(View::text(format!(
-            "Experimental SDK {} · CLI {} · source ",
+            "Reader Edition: SDK {} · CLI {} · source ",
             site.sdk, site.cli
         )));
     let source_url = format!("https://github.com/bohewu/yetlet/tree/{}", site.commit);
@@ -156,6 +164,7 @@ fn shell(site: &Site, page: &Page, content: View, island: bool) -> View {
                     Element::new("main")
                         .attribute("id", "site-main")
                         .attribute("tabindex", "-1")
+                        .child(published)
                         .child(edition)
                         .child(content)
                         .child(footer),
@@ -273,6 +282,8 @@ mod tests {
             public: true,
             sdk: "0.9.0-alpha.5".into(),
             cli: "0.1.1".into(),
+            published_sdk: "0.9.0-alpha.7".into(),
+            published_cli: "0.3.0".into(),
             base: "/yetlet/".into(),
             chapters: vec![],
         };
@@ -287,7 +298,8 @@ mod tests {
             "https://github.com/bohewu/yetlet/tree/{}",
             site.commit
         )));
-        assert!(public.contains("Experimental SDK 0.9.0-alpha.5"));
+        assert!(public.contains("Published: Experimental SDK 0.9.0-alpha.7 · CLI 0.3.0"));
+        assert!(public.contains("Reader Edition: SDK 0.9.0-alpha.5 · CLI 0.1.1 · source "));
         assert!(!public.contains("Local, unpublished checkout"));
         assert!(!public.contains("No live Pages replacement"));
         site.public = false;
