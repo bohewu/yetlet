@@ -67,7 +67,7 @@ independent checks of identity, namespace, dependency and public/private scope.
 | Browser's base SDK path dependency | Same root workspace version | The `yetlet-browser` path dependency must match the workspace SDK version |
 | CLI source/package version | `tools/yetlet-cli/Cargo.toml` → `[package].version` | Independent CLI release version |
 | CLI build SDK | `tools/yetlet-cli/Cargo.toml` → `[dependencies].yetlet.version` | Fixed SDK used to compile this CLI release, separate from generated apps |
-| Generated app SDK | Installed CLI resolver, packaged compatibility policy and selected registry metadata | Explicit `--sdk-version` or latest compatible resolution; exact manifest pins, app Cargo.lock and resolution receipt |
+| Generated app SDK | Installed CLI resolver, packaged compatibility policy and selected registry metadata | Explicit `--sdk-version` or the packaged default selection policy (CLI 0.3.1: highest available non-yanked SemVer including prereleases, then selected-version checks without fallback); exact manifest pins, app Cargo.lock and resolution receipt |
 | Actually published SDK/CLI versions | Accepted publication sections in the versioned SDK and CLI release records | Distribution truth; never infer publication from a development manifest |
 | Public reader edition | `site/pages.toml` → `[edition]` | Verified published pair selected during each publication closeout; development manifests alone do not promote it |
 

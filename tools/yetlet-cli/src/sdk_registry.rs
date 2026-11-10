@@ -273,7 +273,7 @@ pub(crate) fn resolve(
             "{e}; mode={} template={} request={}",
             if request.offline { "offline" } else { "online" },
             request.template.selector(),
-            request.exact.unwrap_or("latest-compatible")
+            request.exact.unwrap_or("latest-semver")
         )
     })
 }

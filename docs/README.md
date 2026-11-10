@@ -51,6 +51,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Maintainer entry points
 
+- [YT-250 CLI 0.3.1 preparation](CLI-031-RELEASE-PREPARATION.md): current-source
+  Registry latest SemVer correction, retained exact app locking/provenance and
+  candidate/hosted preparation gates. Published CLI and Reader remain 0.3.0.
+
 - [YT-247 SDK resolution contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md),
   [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and
   [Phase A handoff](YT-247-PHASE-A-HANDOFF.md): Owner-accepted version/cache/locking

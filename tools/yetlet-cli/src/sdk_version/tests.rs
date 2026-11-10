@@ -141,13 +141,13 @@ fn exact_semver_and_new_parser_are_bounded() {
 }
 
 #[test]
-fn selection_filters_before_ordering_and_explicit_errors_are_distinct() {
+fn selection_filters_availability_and_explicit_errors_are_distinct() {
     let req = request(Template::Native, None, false);
     assert_eq!(
         select(req, &[native()], "registry-refresh", &policy())
             .unwrap()
             .version,
-        A7
+        "1.0.0"
     );
     let mut rows = vec![row("yetlet", A6), row("yetlet", A7)];
     rows[1]["yanked"] = true.into();
@@ -168,15 +168,16 @@ fn selection_filters_before_ordering_and_explicit_errors_are_distinct() {
         .unwrap_err()
         .starts_with("SDK_VERSION_YANKED")
     );
-    assert!(
+    assert_eq!(
         select(
             request(Template::Native, Some("0.9.0-alpha.8"), false),
             &[native()],
             "registry-refresh",
             &policy()
         )
-        .unwrap_err()
-        .starts_with("SDK_INCOMPATIBLE")
+        .unwrap()
+        .version,
+        "0.9.0-alpha.8"
     );
     assert!(
         select(
@@ -188,10 +189,11 @@ fn selection_filters_before_ordering_and_explicit_errors_are_distinct() {
         .unwrap_err()
         .contains("SDK_VERSION_NOT_FOUND")
     );
+    rows[0]["yanked"] = true.into();
     assert!(
         select(
             request(Template::NativeStyle, None, false),
-            &records,
+            &[record("yetlet", &rows)],
             "registry-refresh",
             &policy()
         )
@@ -201,48 +203,153 @@ fn selection_filters_before_ordering_and_explicit_errors_are_distinct() {
 }
 
 #[test]
-fn semver_numeric_prereleases_and_stable_priority_use_policy() {
-    let mut policy = policy();
-    policy.templates.insert(
-        "native".into(),
-        vec!["0.9.0-alpha.9".into(), "0.9.0-alpha.10".into()],
+fn unchanged_policy_selects_future_semver_for_every_template() {
+    let policy = policy();
+    for template in [
+        Template::Native,
+        Template::Browser,
+        Template::NativeStyle,
+        Template::BrowserStyle,
+    ] {
+        let mut core = vec![row("yetlet", A7), row("yetlet", "0.8.0")];
+        let mut companion = vec![row("yetlet-browser", A7), row("yetlet-browser", "0.8.0")];
+        for latest in [
+            "0.9.0-alpha.9",
+            "0.9.0-alpha.10",
+            "1.0.0",
+            "2.0.0-rc.1",
+            "2.0.0",
+        ] {
+            core.insert(0, row("yetlet", latest));
+            companion.insert(0, row("yetlet-browser", latest));
+            let records = [
+                record("yetlet", &core),
+                record("yetlet-browser", &companion),
+            ];
+            let sdk = select(
+                request(template, None, false),
+                &records,
+                "registry-refresh",
+                &policy,
+            )
+            .unwrap();
+            assert_eq!(sdk.version, latest);
+            assert_eq!(sdk.policy_sha256, digest(POLICY.as_bytes()));
+            assert_eq!(sdk.prerelease, !exact(latest).unwrap().pre.is_empty());
+            assert!(!sdk.notice(100).contains("reviewed"));
+            assert_eq!(
+                select(
+                    request(template, Some(A7), false),
+                    &records,
+                    "registry-refresh",
+                    &policy
+                )
+                .unwrap()
+                .version,
+                A7
+            );
+        }
+    }
+}
+
+#[test]
+fn rust_metadata_does_not_impose_a_cli_admission_ceiling() {
+    for rust_version in [
+        serde_json::json!("1.100"),
+        serde_json::json!("2.5"),
+        serde_json::Value::Null,
+    ] {
+        let mut core = row("yetlet", "2.0.0");
+        let mut companion = row("yetlet-browser", "2.0.0");
+        core["rust_version"] = rust_version.clone();
+        companion["rust_version"] = rust_version;
+        let records = [
+            record("yetlet", &[row("yetlet", A7), core]),
+            record("yetlet-browser", &[row("yetlet-browser", A7), companion]),
+        ];
+        for template in [Template::Native, Template::Browser] {
+            assert_eq!(
+                select(
+                    request(template, None, false),
+                    &records,
+                    "registry-refresh",
+                    &policy()
+                )
+                .unwrap()
+                .version,
+                "2.0.0"
+            );
+        }
+    }
+}
+
+#[test]
+fn latest_feature_or_dependency_failure_does_not_select_an_older_sdk() {
+    for (template, problem) in [
+        (Template::Native, "server-axum"),
+        (Template::Browser, "dom"),
+        (Template::Browser, "dependency"),
+    ] {
+        let mut core = row("yetlet", "2.0.0");
+        let mut companion = row("yetlet-browser", "2.0.0");
+        match problem {
+            "server-axum" => {
+                core["features"].as_object_mut().unwrap().remove(problem);
+            }
+            "dom" => {
+                companion["features"]["dom"] = serde_json::json!(["missing"]);
+            }
+            _ => companion["deps"][0]["req"] = "=0.8.0".into(),
+        }
+        let records = [
+            record("yetlet", &[row("yetlet", A7), core]),
+            record("yetlet-browser", &[row("yetlet-browser", A7), companion]),
+        ];
+        for exact in [None, Some("2.0.0")] {
+            let error = select(
+                request(template, exact, false),
+                &records,
+                "registry-refresh",
+                &policy(),
+            )
+            .unwrap_err();
+            assert!(error.starts_with("SDK_INCOMPATIBLE: 2.0.0"), "{error}");
+            assert!(error.contains(problem), "{error}");
+        }
+    }
+}
+
+#[test]
+fn browser_default_skips_only_missing_or_yanked_pairs() {
+    let core = record(
+        "yetlet",
+        &[
+            row("yetlet", A7),
+            row("yetlet", "1.0.0"),
+            row("yetlet", "2.0.0"),
+        ],
     );
-    let mut rows = vec![
-        row("yetlet", "0.9.0-alpha.9"),
-        row("yetlet", "0.9.0-alpha.10"),
+    let mut yanked = row("yetlet-browser", "1.0.0");
+    yanked["yanked"] = true.into();
+    let records = [
+        core,
+        record("yetlet-browser", &[row("yetlet-browser", A7), yanked]),
     ];
     assert_eq!(
         select(
-            request(Template::Native, None, false),
-            &[record("yetlet", &rows)],
+            request(Template::Browser, None, false),
+            &records,
             "registry-refresh",
-            &policy
+            &policy()
         )
         .unwrap()
         .version,
-        "0.9.0-alpha.10"
-    );
-    policy
-        .templates
-        .get_mut("native")
-        .unwrap()
-        .push("0.8.0".into());
-    rows.push(row("yetlet", "0.8.0"));
-    assert_eq!(
-        select(
-            request(Template::Native, None, false),
-            &[record("yetlet", &rows)],
-            "registry-refresh",
-            &policy
-        )
-        .unwrap()
-        .version,
-        "0.8.0"
+        A7
     );
 }
 
 #[test]
-fn browser_pair_yank_features_and_msrv_are_required() {
+fn browser_pair_yank_features_and_dependency_are_required() {
     let core = native();
     assert!(
         select(
@@ -266,11 +373,9 @@ fn browser_pair_yank_features_and_msrv_are_required() {
         .unwrap_err()
         .starts_with("SDK_VERSION_YANKED")
     );
-    for change in ["msrv", "unknown-msrv", "feature", "dependency"] {
+    for change in ["feature", "dependency"] {
         let mut companion = row("yetlet-browser", A7);
         match change {
-            "msrv" => companion["rust_version"] = "1.100".into(),
-            "unknown-msrv" => companion["rust_version"] = serde_json::Value::Null,
             "feature" => companion["features"]["dom"] = serde_json::json!(["missing"]),
             _ => companion["deps"][0]["req"] = "=0.8.0".into(),
         };
@@ -366,6 +471,35 @@ fn offline_hit_miss_age_and_online_304_are_explicit() {
             .unwrap_err()
             .starts_with("SDK_METADATA_INVALID")
     );
+}
+
+#[test]
+fn refreshed_metadata_advances_default_while_offline_reports_cache_age() {
+    let root = temporary();
+    let req = request(Template::Native, None, false);
+    let first = registry::resolve(req, &mut Fake::records(&[native()]), root.path(), 100).unwrap();
+    assert_eq!(first.version, "1.0.0");
+    let records = [record(
+        "yetlet",
+        &[row("yetlet", "1.0.0"), row("yetlet", "2.0.0-rc.10")],
+    )];
+    let next = registry::resolve(req, &mut Fake::records(&records), root.path(), 200).unwrap();
+    assert_eq!(next.version, "2.0.0-rc.10");
+    assert_eq!(next.source, "registry-refresh");
+    let cached = registry::resolve(
+        Request {
+            offline: true,
+            ..req
+        },
+        &mut Fake::never(),
+        root.path(),
+        300,
+    )
+    .unwrap();
+    assert_eq!(cached.version, next.version);
+    assert_eq!(cached.source, "offline-cache");
+    assert!(cached.notice(300).contains("latest known to this cache"));
+    assert!(cached.notice(300).contains("age=100s"));
 }
 
 #[test]
@@ -480,6 +614,7 @@ fn scaffold_pin_receipt_style_lock_repeated_destination_and_failure_cleanup() {
         assert!(!readme.contains("no Cargo lock"));
         let lock = std::fs::read(app.join("Cargo.lock")).unwrap();
         creation::validate_lock(&lock, &sdk).unwrap();
+        assert_eq!(receipt["cargo_lock_sha256"], digest(&lock));
         if matches!(template, Template::NativeStyle | Template::BrowserStyle) {
             assert_eq!(
                 std::fs::read(app.join("stylegen/Cargo.lock")).unwrap(),
@@ -531,6 +666,46 @@ fn scaffold_pin_receipt_style_lock_repeated_destination_and_failure_cleanup() {
 }
 
 #[test]
+fn latest_cargo_failures_preserve_diagnostics_and_never_retry_an_older_sdk() {
+    for diagnostic in [
+        "rustc is too old for selected SDK",
+        "no matching transitive dependency found",
+    ] {
+        let root = temporary();
+        let mut locks = 0;
+        let mut registry = Fake::records(&[native()]);
+        let error = creation::create(
+            "demo",
+            root.path(),
+            options(Template::Native),
+            request(Template::Native, None, false),
+            &mut registry,
+            &root.path().join("cache"),
+            100,
+            || Ok(()),
+            |stage, _| {
+                locks += 1;
+                let manifest = std::fs::read_to_string(stage.join("Cargo.toml")).unwrap();
+                assert!(manifest.contains("=1.0.0"));
+                Err(format!("SDK_LOCK_FAILED: {diagnostic}"))
+            },
+        )
+        .unwrap_err();
+        assert!(error.contains(diagnostic), "{error}");
+        assert!(error.contains("selected SDK 1.0.0"), "{error}");
+        assert_eq!(locks, 1);
+        assert_eq!(registry.calls, 1);
+        assert!(!root.path().join("demo").exists());
+        assert!(!std::fs::read_dir(root.path()).unwrap().any(|p| {
+            p.unwrap()
+                .file_name()
+                .to_string_lossy()
+                .starts_with(".yetlet-")
+        }));
+    }
+}
+
+#[test]
 fn lock_mismatch_rejects_wrong_version_source_and_checksum() {
     let req = request(Template::Native, Some(A7), false);
     let sdk = select(req, &[native()], "registry-refresh", &policy()).unwrap();
@@ -548,12 +723,16 @@ fn lock_mismatch_rejects_wrong_version_source_and_checksum() {
 
 #[test]
 fn post_creation_skipped_browser_build_preserves_manifest_locks_and_receipt() {
+    let latest = "2.0.0-rc.10";
     let root = temporary();
     let records = [
-        native(),
-        record("yetlet-browser", &[row("yetlet-browser", A7)]),
+        record("yetlet", &[row("yetlet", A7), row("yetlet", latest)]),
+        record(
+            "yetlet-browser",
+            &[row("yetlet-browser", A7), row("yetlet-browser", latest)],
+        ),
     ];
-    let req = request(Template::Browser, Some(A7), false);
+    let req = request(Template::Browser, None, false);
     let sdk = select(req, &records, "registry-refresh", &policy()).unwrap();
     creation::create(
         "demo",
@@ -570,6 +749,7 @@ fn post_creation_skipped_browser_build_preserves_manifest_locks_and_receipt() {
         },
     )
     .unwrap();
+    assert_eq!(sdk.version, latest);
     let app = root.path().join("demo");
     let base = app.join("base.toml");
     std::fs::write(
@@ -612,7 +792,9 @@ fn live_registry_native_browser_and_default_locks() {
             super::super::creation::generate_lock,
         )
         .unwrap();
-        assert!(policy().templates[template.selector()].contains(&sdk.version));
+        if let Some(version) = version {
+            assert_eq!(sdk.version, version);
+        }
         creation::validate_lock(
             &std::fs::read(root.path().join(name).join("Cargo.lock")).unwrap(),
             &sdk,
@@ -695,10 +877,11 @@ fn vendor_package(root: &Path, name: &str, version: &str, features: &[&str]) {
 
 #[test]
 fn real_cargo_fixture_source_creates_reproducible_native_and_browser_locks() {
+    let latest = "2.0.0-rc.10";
     let root = temporary();
     let vendor = root.path().join("vendor");
-    vendor_package(&vendor, "yetlet", A7, &["server-axum", "reactive"]);
-    vendor_package(&vendor, "yetlet-browser", A7, &["dom", "dom-keyed"]);
+    vendor_package(&vendor, "yetlet", latest, &["server-axum", "reactive"]);
+    vendor_package(&vendor, "yetlet-browser", latest, &["dom", "dom-keyed"]);
     vendor_package(&vendor, "axum", "0.8.9", &[]);
     vendor_package(
         &vendor,
@@ -728,17 +911,20 @@ fn real_cargo_fixture_source_creates_reproducible_native_and_browser_locks() {
             let destination = temporary();
             let records = if template.browser() {
                 vec![
-                    native(),
-                    record("yetlet-browser", &[row("yetlet-browser", A7)]),
+                    record("yetlet", &[row("yetlet", A7), row("yetlet", latest)]),
+                    record("yetlet-browser", &[row("yetlet-browser", latest)]),
                 ]
             } else {
-                vec![native()]
+                vec![record(
+                    "yetlet",
+                    &[row("yetlet", A7), row("yetlet", latest)],
+                )]
             };
             let sdk = creation::create(
                 "demo",
                 destination.path(),
                 options(template),
-                request(template, Some(A7), false),
+                request(template, None, false),
                 &mut Fake::records(&records),
                 &root.path().join("metadata"),
                 100,
@@ -773,6 +959,7 @@ fn real_cargo_fixture_source_creates_reproducible_native_and_browser_locks() {
                 },
             )
             .unwrap();
+            assert_eq!(sdk.version, latest);
             let app = destination.path().join("demo");
             let bytes = std::fs::read(app.join("Cargo.lock")).unwrap();
             creation::validate_lock(&bytes, &sdk).unwrap();

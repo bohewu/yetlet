@@ -61,7 +61,7 @@ impl ResolvedSdk {
             self.version, self.source, self.template, self.policy
         );
         if self.prerelease {
-            value.push_str("; Experimental reviewed prerelease (no compatible stable selected)");
+            value.push_str("; Experimental prerelease");
         }
         if self.source == "offline-cache" {
             value.push_str(
@@ -81,10 +81,10 @@ impl ResolvedSdk {
 }
 
 #[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
 pub(crate) struct Policy {
     pub revision: String,
-    pub msrv: String,
-    pub templates: BTreeMap<String, Vec<String>>,
+    pub selection: String,
 }
 
 #[derive(Clone, Deserialize)]
@@ -93,7 +93,6 @@ pub(crate) struct IndexVersion {
     pub vers: String,
     pub cksum: String,
     pub yanked: bool,
-    pub rust_version: Option<String>,
     pub features: BTreeMap<String, Vec<String>>,
     #[serde(default)]
     pub features2: BTreeMap<String, Vec<String>>,
@@ -169,35 +168,11 @@ fn feature(row: &IndexVersion, name: &str, seen: &mut BTreeSet<String>) -> bool 
     })
 }
 
-fn compatible(
-    request: Request<'_>,
-    version: &str,
-    rows: &[&IndexVersion],
-    policy: &Policy,
-) -> Result<(), String> {
-    if !policy
-        .templates
-        .get(request.template.selector())
-        .is_some_and(|v| v.iter().any(|v| v == version))
-    {
-        return Err("version outside the reviewed template set".into());
-    }
-    let baseline = Version::parse(&format!("{}.0", policy.msrv)).ok();
+// Validate the selected version, never use these checks to choose an older SDK.
+// Cargo owns toolchain and transitive dependency feasibility; the CLI build SDK
+// and its Rust minimum do not bound application SDK selection.
+fn compatible(request: Request<'_>, version: &str, rows: &[&IndexVersion]) -> Result<(), String> {
     for row in rows {
-        let msrv = row.rust_version.as_ref().and_then(|v| {
-            Version::parse(&if v.matches('.').count() == 1 {
-                format!("{v}.0")
-            } else {
-                v.clone()
-            })
-            .ok()
-        });
-        if baseline.is_none() || msrv.is_none() || msrv > baseline {
-            return Err(format!(
-                "{} has missing, invalid or too-high rust_version (maximum {})",
-                row.name, policy.msrv
-            ));
-        }
         let required: &[&str] = if row.name == "yetlet-browser" {
             &["dom", "dom-keyed"]
         } else if request.template.browser() {
@@ -234,6 +209,9 @@ pub(crate) fn select(
     source: &'static str,
     policy: &Policy,
 ) -> Result<ResolvedSdk, String> {
+    if policy.revision != "sdk-latest-v2" || policy.selection != "latest-semver" {
+        return Err("SDK_METADATA_INVALID: unsupported compiled SDK selection policy".into());
+    }
     let core = records
         .iter()
         .find(|r| r.name == "yetlet")
@@ -243,7 +221,7 @@ pub(crate) fn select(
     let browser_rows = companion
         .map(|r| index("yetlet-browser", &r.body))
         .transpose()?;
-    let candidate = |version: &str| -> Result<Vec<&IndexVersion>, String> {
+    let available = |version: &str| -> Result<Vec<&IndexVersion>, String> {
         let row = core_rows.iter().find(|r| r.vers == version).ok_or_else(|| format!("SDK_VERSION_NOT_FOUND: {version} in {source}; refresh online or select a known version"))?;
         let mut rows = vec![row];
         if request.template.browser() {
@@ -261,35 +239,36 @@ pub(crate) fn select(
                 "SDK_VERSION_YANKED: {version} in {source}; choose another SDK"
             ));
         }
-        compatible(request, version, &rows, policy).map_err(|reason| {
-            format!(
-                "SDK_INCOMPATIBLE: {version} template={} policy={}: {reason}",
-                request.template.selector(),
-                policy.revision
-            )
-        })?;
         Ok(rows)
     };
     let version = match request.exact {
         Some(v) => {
-            candidate(v)?;
+            exact(v).map_err(str::to_owned)?;
+            available(v)?;
             v.to_owned()
         }
         None => core_rows
             .iter()
-            .filter(|r| candidate(&r.vers).is_ok())
+            .filter(|r| available(&r.vers).is_ok())
             .filter_map(|r| exact(&r.vers).ok())
-            .max_by_key(|v| (v.pre.is_empty(), v.clone()))
+            .max()
             .ok_or_else(|| {
                 format!(
-                    "SDK_NO_COMPATIBLE_VERSION: template={} policy={}; select an approved SDK",
+                    "SDK_NO_COMPATIBLE_VERSION: template={} policy={}; no non-yanked SDK with all required packages in {source}",
                     request.template.selector(),
                     policy.revision
                 )
             })?
             .to_string(),
     };
-    let rows = candidate(&version)?;
+    let rows = available(&version)?;
+    compatible(request, &version, &rows).map_err(|reason| {
+        format!(
+            "SDK_INCOMPATIBLE: {version} template={} policy={}: {reason}",
+            request.template.selector(),
+            policy.revision
+        )
+    })?;
     let packages = rows
         .iter()
         .map(|row| {
