@@ -1,6 +1,6 @@
 # Yetlet CLI 0.3.0 — Release preparation (YT-248)
 
-**State (2026-11-10): Owner authorized YT-248 candidate preparation and Git delivery. Local CLI 0.3.0 archive installation, resolver/Style consumers and Chrome verification PASS; corrective independent implementation Reviewer PASS has zero issues/followups; Git/CI delivery follows the [candidate record](YT-248-CLI030-CANDIDATE.md). Formal release execution and publication remain separate.**
+**State (2026-11-10): Candidate qualification, independent implementation Reviewer and PR #71/master CI PASS. The Owner subsequently authorized formal CLI 0.3.0 release execution. Immutable C/tag, successful original hosted build and custody/sign/publication gates are tracked in the [hosted record](CLI-030-HOSTED-RECORD.md). Publication remains behind the exact Owner Environment gate; Reader Edition stays fixed.**
 
 ## YT-247 / YT-248 sequencing amendment
 
