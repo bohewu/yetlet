@@ -3,6 +3,7 @@ from pathlib import Path
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 import tomllib
 import sync_workspace_versions as sync
 
@@ -232,7 +233,8 @@ class WorkspaceManifestTests(unittest.TestCase):
                 sync.sync_manifests(root, [relative], "7.8.9-alpha.2")
             self.assertEqual((root / relative).read_text(encoding="utf-8"), source)
 
-    def test_plan_is_idempotent_and_preserves_historical_and_published_versions(self):
+    @patch.object(sync, 'cli_sdk_version', return_value='6.5.4-alpha.3')
+    def test_plan_is_idempotent_and_preserves_historical_and_published_versions(self, binding):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             put(root, "Cargo.toml", '[workspace.package]\nversion = "7.8.9-alpha.2"\n')
@@ -326,7 +328,8 @@ class WorkspaceManifestTests(unittest.TestCase):
             compatibility = (root / "docs/COMPATIBILITY.md").read_text()
             self.assertIn('The published SDK is ' + TICK + 'yetlet' + TICK + ' / ' + TICK + 'yetlet-browser' + TICK + ' ' + TICK + '6.5.4-alpha.3' + TICK + ';', compatibility)
             self.assertIn('published CLI is ' + TICK + 'yetlet-cli' + TICK + ' ' + TICK + '2.2.0' + TICK, compatibility)
-            self.assertIn('generating apps pinned to SDKalpha.3.', compatibility)
+            self.assertIn('with release build SDKalpha.3.', compatibility)
+            binding.assert_called_with('2.2.0')
             guide = (root / "crates/yetlet/guides/core.md").read_text()
             self.assertIn('Experimental ' + TICK + '0.9.0-alpha.5' + TICK + ', unpublished.', guide)
             self.assertIn('Rust 1.99.0', guide)
@@ -339,7 +342,8 @@ class WorkspaceManifestTests(unittest.TestCase):
                           (root / "examples/docs-site/Cargo.toml").read_text())
 
 
-    def test_published_sdk_does_not_advance_pinned_reader_index(self):
+    @patch.object(sync, 'cli_sdk_version', return_value='6.5.4-alpha.3')
+    def test_published_sdk_does_not_advance_pinned_reader_index(self, binding):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
             populate_current_docs(root)
@@ -351,6 +355,17 @@ class WorkspaceManifestTests(unittest.TestCase):
             self.assertIn('[SDK ' + TICK + '8.0.0-alpha.7' + TICK + ']', index)
             self.assertIn('CLI2.2.0 → protected standalone project → SDK6.5.4-alpha.3 → app lock/cache', index)
             self.assertNotIn('CLI2.2.0 → protected standalone project → SDK8.0.0-alpha.7', index)
+
+    def test_new_cli_build_sdk_cannot_change_published_binding_or_reader_manifest_text(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            populate_current_docs(root)
+            changes = sync.sync_published_docs(
+                root, {'SDK': '0.9.0-alpha.7', 'CLI': '0.2.0'}, '=0.9.0-alpha.7',
+                {'sdk': '0.9.0-alpha.6', 'cli': '0.2.0'})
+            self.assertIn('yetlet = "=0.9.0-alpha.6"', changes['docs/FIRST-APP.md'])
+            self.assertIn('with release build SDKalpha.6.', changes['docs/COMPATIBILITY.md'])
+            self.assertNotIn('with release build SDKalpha.7.', changes['docs/COMPATIBILITY.md'])
 
 
 class ReaderManifestTests(unittest.TestCase):

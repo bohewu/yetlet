@@ -8,6 +8,7 @@ import tomllib
 import json
 import hashlib
 import sync_workspace_versions as sdk_versions
+import release_record as records
 from release_version_authority import PUBLICATION_RECORDS, published_versions
 
 
@@ -148,6 +149,15 @@ def check_sdk_resources(files, build_sdk, readme):
 
 def check_cli_published_commands(text, selected, published):
     """Do not attribute later source-only Style selectors to an already shipped CLI."""
+    if selected in records.CLI_SDK_VERSIONS and selected not in records.LEGACY_CLI_VERSIONS:
+        heading = '## CLI command and capability inventory'
+        sections = text.split(heading)
+        require(len(sections) == 2, 'yetlet-cli', 'one selected CLI inventory required')
+        inventory = sections[1].split('\n## ', 1)[0]
+        require(all(option in inventory for option in
+                    ('native-style', 'browser-style', '--sdk-version', '--offline', 'Cargo.lock')),
+                'yetlet-cli', 'selected CLI inventory omits resolver/Style/lock behavior')
+        return
     if selected != published:
         return
     heading = '## Published CLI command and capability inventory'
@@ -166,11 +176,15 @@ def check_readme(name, version, text, sdk=None):
     if name == 'yetlet-cli':
         require(field(text, 'CLI release', name) == version, name, 'CLI version differs from manifest')
         label = 'Build SDK' if '**SDK policy:**' in text else 'Generated SDK'
+        if version in records.CLI_SDK_VERSIONS and version not in records.LEGACY_CLI_VERSIONS:
+            require(label == 'Build SDK', name, 'resolver CLI requires separate build SDK/policy identity')
         require(field(text, label, name) == sdk, name, 'build SDK pin differs from dependency')
         if label == 'Build SDK':
             require(re.fullmatch(r'sdk-compat-v[1-9][0-9]*', field(text, 'SDK policy', name)), name,
                     'versioned SDK compatibility policy required')
         check_installs(text, version, name)
+        if version in records.CLI_SDK_VERSIONS and version not in records.LEGACY_CLI_VERSIONS:
+            check_cli_published_commands(text, version, None)
         outputs = re.findall(r'`yetlet ([0-9][0-9A-Za-z.+-]*)`', text)
         require(bool(outputs) and all(value == version for value in outputs), name,
                 'expected binary version differs from manifest')

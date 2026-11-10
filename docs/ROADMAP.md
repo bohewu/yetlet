@@ -12,14 +12,18 @@ verifies MSVC CLI compilation and actual resolver/new/locking execution on the
 existing prepared Runner; failed attempts, scoped test correction and cleanup
 are retained. Windows Style/browser runtime qualification remains separate.
 
-**YT-248 CLI 0.3.0 Style release (2026-11-10): Not started; awaits separate Owner instruction after YT-247 Git delivery.**
+**YT-248 CLI 0.3.0 Style release (2026-11-10): Candidate preparation authorized; local qualification PASS.**
 The [preserved preparation plan](CLI-030-RELEASE-PREPARATION.md) retains its prior
-independent Style plan PASS, one schema3/cli package, alpha.7 build SDK/qualified
-snapshot, native/browser Style acceptance, installed registry-only consumers and
-Owner-gated release. Consumers must distinguish build SDK from dynamically
-resolved app SDK. SDK alpha.7 is already published; CLI0.2.0 and the public
-alpha.6/CLI0.2.0 Reader Edition stay fixed. No candidate/release is selected.
-Windows Style revalidation remains paused/unverified.
+independent Style plan PASS. The [candidate record](YT-248-CLI030-CANDIDATE.md)
+tracks CLI0.3.0, alpha.7 build SDK/qualified snapshot, separate resolver app
+choices, archive installation and registry SDK consumers, native HTTP/CSS and
+browser Vite/WASM/Chrome proof. A real keyed-update class defect was corrected;
+original failures and process cleanup remain recorded. Corrective independent
+implementation Reviewer PASS has zero issues/followups; Strict Guard/Git/CI
+delivery precedes the stop. Hosted release/sign/V,
+formal release source selection and Owner-gated publication remain separate.
+CLI0.2.0 and the alpha.6/CLI0.2.0 Reader Edition stay fixed; new Windows Style
+revalidation remains paused/unverified.
 
 **YT-246 canonical version authorities and release-document synchronization (2026-11-10): Done.**
 [Version source audit](YT-246-VERSION-SOURCE-AUDIT.md) separates SDK source,

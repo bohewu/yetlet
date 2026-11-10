@@ -7,13 +7,12 @@ apps use exact `yetlet` / `yetlet-browser` registry pins; normal build/run needs
 no SDK checkout or Cargo path override. CLI build SDK, embedded source snapshot
 and generated app SDK have separate responsibilities.
 
-**CLI release:** `0.2.0`. **Build SDK:** `=0.9.0-alpha.6`.
+**CLI release:** `0.3.0`. **Build SDK:** `=0.9.0-alpha.7`.
 
 **SDK policy:** `sdk-compat-v1`.
 
-The command inventory below describes the published CLI release selected above.
-Later checkout-only SDK resolution and Style template choices are described separately and are not
-part of the published command inventory. Check
+The command inventory below describes the selected CLI release, including SDK
+resolution and opt-in Style templates. Check
 [GitHub releases](https://github.com/bohewu/yetlet/releases) and
 [crates.io](https://crates.io/crates/yetlet-cli) for actual registry availability.
 This is an Experimental developer tool, with
@@ -31,12 +30,12 @@ check; cancellation and descendant cleanup retain their existing behavior.
 Independent implementation Reviewer PASS has zero issues or required followups.
 
 <a id="current-command-and-capability-inventory"></a>
-## Source SDK resolution (YT-247)
+## SDK resolution (YT-247)
 
-The source checkout implements the accepted
+This release implements the accepted
 [SDK resolution contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md).
-These commands describe source behavior; the published CLI 0.2.0 inventory below
-retains its fixed alpha.6 pin and separate manual lock preparation.
+The CLI's build dependency and embedded snapshot are independent of the SDK
+chosen for each new project.
 
 ```sh
 yetlet new demo --sdk-version 0.9.0-alpha.7
@@ -60,7 +59,7 @@ metadata or missing Cargo cache fails with no published project. Cargo's own
 net.offline configuration can further restrict the lock step; select CLI
 `--offline` as well when relying on config to forbid resolver HTTP.
 
-Successful source `new` now runs bounded Cargo lock generation in private staging,
+Successful `new` runs bounded Cargo lock generation in private staging,
 then publishes one tree with exact SDK pins, Cargo.lock and a creation receipt at
 `.yetlet/sdk-resolution.json`. No SDK source snapshot is copied. Browser pins both
 SDK packages equally. Retain the app lock and receipt; later build/run/watch stay
@@ -71,18 +70,18 @@ or frontend dependencies are installed by new. The dependency-free nested Style
 generator lock remains separate and unchanged.
 
 The Build SDK field describes the CLI's own exact dependency. The embedded
-snapshot remains alpha.6 at its recorded SDK source/digests for the existing
+snapshot is alpha.7 at its recorded SDK source/digests for the existing
 qualified native source exporter; app SDK resolution does not expand Docker or
 Compose source support. Policy and snapshot identity resources ship in the CLI
 archive and remain bound to that archive's checksum and immutable source.
 
-## Published CLI command and capability inventory
+## CLI command and capability inventory
 
 | Command | Implemented behavior |
 |---|---|
 | `yetlet --help` / `-h` | Root help; every complete command path also has exclusive scoped help |
 | `yetlet --version` / `-V` | Build-time CLI version; no project, tools or settings required |
-| `yetlet new NAME [--parent DIRECTORY] [--template native\|browser] [--vite] [--tailwind] [--service] [--settings]` | Publish a new scaffold; no tools, installs, builds or lock generation |
+| `yetlet new NAME [--parent DIRECTORY] [--template native\|browser\|native-style\|browser-style] [--sdk-version VERSION] [--offline] [--vite] [--tailwind] [--service] [--settings]` | Resolve a compatible registry SDK, write exact pins and generate Cargo.lock with a creation receipt before protected publication; no dependency installation or app build |
 | `yetlet doctor [--json]` | Bounded environment-only Rust/Cargo identity and compiled filesystem capability; schema 1 JSON |
 | `yetlet inspect [--manifest-path PATH] [--json]` | Read-only public-settings plan for build/run/watch; separate project-execution-plan schema 1; no readiness checks |
 | `yetlet key status [KEY] [--provider NAME] [--manifest-path PATH]` | Read-only selected key/version, certificate pins and dates; no password or generation |
@@ -174,7 +173,7 @@ Building the CLI and building an app are separate steps.
 | Selection | Tools and inputs to prepare | Initial workflow |
 |---|---|---|
 | Build this CLI from the checkout | Rust/Cargo 1.99+, a native C/link toolchain, OpenSSL development files (reference: 3.5 LTS) and cached locked dependencies | [Build the CLI](#build-locally-and-create-an-application), then inspect help/doctor |
-| Native `new NAME` | Native Rust toolchain, the published SDK and a separately prepared app Cargo.lock | `yetlet build`, then `yetlet run`; no Node or frontend tool is required |
+| Native `new NAME` | Protected Rust/Cargo 1.99+ and registry access, or prepared resolver/Cargo metadata caches with `--offline` | Retain the generated Cargo.lock, prepare dependency caches explicitly, then `yetlet build` and `yetlet run`; no Node or frontend tool is required |
 | Native `new NAME --vite`, optionally `--tailwind` | Native prerequisites plus Node `^20.19.0` or `>=22.12.0`, npm and the generated frontend dependencies | [Vite preparation](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/vite/SELECTED-README.md), initial `yetlet build` with auto_build enabled, then `yetlet run` |
 | `new NAME --template browser`, optionally `--tailwind` | Rust/Cargo 1.99+, `wasm32-unknown-unknown`, wasm-bindgen-cli 0.2.129, the same Node/npm prerequisites and the generated dependencies | [Browser preparation](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/browser/README.md), `yetlet build`, then `yetlet run` to preview the existing dist |
 | Native `new NAME --tailwind` without Vite | Native prerequisites plus the separately provisioned standalone Tailwind 4.3.3 CLI | [Build `dist/tailwind.css` explicitly](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/tailwind/SELECTED-README.md) before running Rust |
@@ -210,13 +209,13 @@ Registry installation for this release needs no repository clone. The selected
 version must exist on crates.io:
 
 ```sh
-cargo +1.99.0 install yetlet-cli --version 0.2.0 --locked
+cargo +1.99.0 install yetlet-cli --version 0.3.0 --locked
 yetlet new myapp
 ```
 
 Cargo downloads and compiles the selected published CLI package; no manual
 repository clone or npm is needed. `yetlet --version` reports exactly
-`yetlet 0.2.0`. Actual publication status and scope belong to the
+`yetlet 0.3.0`. Actual publication status and scope belong to the
 [versioned release records](https://github.com/bohewu/yetlet/blob/master/docs/RELEASING.md#read-this-before-starting-another-version),
 separately from this installation reference. Prebuilt executables
 and `cargo binstall` support are later distribution options.
@@ -275,8 +274,9 @@ toolchain. Do not disable the checks. The subshell keeps this PATH selection
 local to the walkthrough.
 
 The CLI and each app have separate workspaces/locks. New apps declare exact
-registry SDK versions and create no Cargo.lock. The two explicit Cargo commands
-prepare the app's lock/cache; CLI build/run then use frozen Cargo. Offline
+registry SDK versions and include Cargo.lock and `.yetlet/sdk-resolution.json`.
+Prepare the dependency cache explicitly with `cargo fetch --locked`; CLI
+build/run then use frozen Cargo. Offline
 preparation requires a populated cache. `--release` changes the Cargo profile,
 not APP_ENVIRONMENT. Frozen execution is not a sandbox for package scripts,
 build scripts or app code. For the complete walkthrough and expected HTTP
@@ -741,17 +741,18 @@ failed attempts. New Windows browser-watch execution remains Not verified;
 historical YT-104 qualification describes the earlier static starter scope.
 
 <a id="optional-application-owned-rust-css-yt-239-working-tree"></a>
-## Source-only application-owned Rust CSS (YT-239/243)
+## Application-owned Rust CSS (YT-239/243)
 
-This section describes source-only checkout additions, absent from published
-CLI `0.2.0`. See [the source-only map](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md#source-only-checkout-additions)
-and [Style Showcase](https://github.com/bohewu/yetlet/blob/master/examples/style-showcase/README.md).
+This release includes the opt-in Style templates and their existing build/watch
+integration. See [Style Showcase](https://github.com/bohewu/yetlet/blob/master/examples/style-showcase/README.md)
+for a separate framework sample; its publication and the public guide edition
+have their own version boundaries.
 
 `new --template native-style` and `new --template browser-style` opt into a private
 std-only Cargo generator with a complete lock, useful layout/dialog composition,
 shared View class names and stylesheet connection. Ordinary templates keep ordinary
-CSS. Applicable Tailwind/Vite options compose with these choices. Creation executes
-no generator and leaves normal app dependency/lock preparation explicit.
+CSS. Applicable Tailwind/Vite options compose with these choices. Creation runs
+Cargo lock generation, preserves the separate Style lock and executes no generator.
 
 The optional strict `[cli.styles]` section has `enabled`, `manifest`, `bin` and
 `output`; absence means no style effects. The finite manifest is
@@ -784,4 +785,4 @@ host output uses its own `yetlet-styles/<app-root-sha256>` subtree. See the
 [implementation evidence and limitations](https://github.com/bohewu/yetlet/blob/master/docs/YT-239-STYLE-INTEGRATION.md).
 The [YT-243 source qualification](https://github.com/bohewu/yetlet/blob/master/docs/YT-243-RELEASE-QUALIFICATION.md)
 records independent review and bounded Linux/local Windows MSVC validation.
-Hosted CI, a new CLI release version and registry publication remain separate.
+Hosted release/signing/publication and wider platform qualification remain separate.

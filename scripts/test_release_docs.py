@@ -17,6 +17,17 @@ def cli_readme(version='7.8.9-beta.2', sdk='=6.5.4-alpha.3'):
 
 
 class ReleaseDocsTests(unittest.TestCase):
+    def test_cli030_requires_style_resolver_inventory_and_separate_build_identity(self):
+        text = (Path(__file__).resolve().parents[1] / 'tools/yetlet-cli/README.md').read_text()
+        docs.check_readme('yetlet-cli', '0.3.0', text, '=0.9.0-alpha.7')
+        for option in ('native-style', 'browser-style', '--sdk-version', '--offline', 'Cargo.lock'):
+            with self.subTest(option=option), self.assertRaises(ValueError):
+                docs.check_readme('yetlet-cli', '0.3.0', text.replace(option, 'omitted'), '=0.9.0-alpha.7')
+        legacy = cli_readme('0.3.0', '=0.9.0-alpha.7') + '\n## CLI command and capability inventory\n' \
+            'native-style browser-style --sdk-version --offline Cargo.lock\n'
+        with self.assertRaises(ValueError):
+            docs.check_readme('yetlet-cli', '0.3.0', legacy, '=0.9.0-alpha.7')
+
     def test_build_sdk_and_policy_are_distinct_from_generated_selection(self):
         text = cli_readme().replace('Generated SDK', 'Build SDK') + '\n**SDK policy:** `sdk-compat-v1`.\n'
         docs.check_readme('yetlet-cli', '7.8.9-beta.2', text, '=6.5.4-alpha.3')

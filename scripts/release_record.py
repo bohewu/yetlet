@@ -18,7 +18,11 @@ CLI_SDK_VERSIONS = {
     '0.1.0': '0.9.0-alpha.5',
     '0.1.1': '0.9.0-alpha.5',
     '0.2.0': '0.9.0-alpha.6',
+    '0.3.0': '0.9.0-alpha.7',
 }
+
+# Immutable scaffold behavior of already published pre-resolver CLI releases.
+LEGACY_CLI_VERSIONS = frozenset({'0.1.0', '0.1.1', '0.2.0'})
 
 
 def cli_sdk_version(version):

@@ -488,6 +488,12 @@ pub(crate) fn scaffold(
             "src/lib.rs" if browser => {
                 *content = content.replacen("pub mod model;", "mod style_names;\npub mod model;",1);
                 *content = content.replace(".attribute(\"class\", \"task-row\")", ".attribute(\"class\", format!(\"task-row {}\", crate::style_names::TOOLBAR))");
+                // Keyed updates replace the complete class attribute, including
+                // the initial mount. Preserve the selected Style class there.
+                *content = content.replace(
+                    "element.set_class_name(if task.completed {\n            \"task-row completed\"\n        } else {\n            \"task-row\"\n        });",
+                    "element.set_class_name(&format!(\"{} {}\", crate::style_names::TOOLBAR, if task.completed {\n            \"task-row completed\"\n        } else {\n            \"task-row\"\n        }));",
+                );
             }
             "src/main.rs" => {
                 *content = format!("mod style_names;\n{content}");
@@ -683,6 +689,18 @@ thread_local! { static FAIL_OWNER: std::cell::Cell<bool> = const { std::cell::Ce
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn browser_style_preserves_class_in_initial_view_and_keyed_updates() {
+        let mut entries = crate::browser::files("styled-tasks", false).unwrap();
+        scaffold(&mut entries, true, false, true).unwrap();
+        let source = &entries.iter().find(|(p, _)| *p == "src/lib.rs").unwrap().1;
+        assert!(source.contains("format!(\"task-row {}\", crate::style_names::TOOLBAR)"));
+        assert!(
+            source
+                .contains("element.set_class_name(&format!(\"{} {}\", crate::style_names::TOOLBAR")
+        );
+        assert!(!source.contains("element.set_class_name(if task.completed"));
+    }
     fn fixture() -> (tempfile::TempDir, App, Styles) {
         let temp = tempfile::tempdir().unwrap();
         #[cfg(unix)]
