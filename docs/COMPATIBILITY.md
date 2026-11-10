@@ -2,11 +2,12 @@
 
 ## Selected local SDK 0.9.0-alpha.7 typed authoring helpers — YT-234/245
 
-[YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md) selects SDK
-`0.9.0-alpha.7` locally, including
+[YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md) originally selects SDK
+`0.9.0-alpha.7`, including
 `yetlet::view::tags` with typed fluent constructors and additive convenience
-methods. This is **source-only**, not shipped in SDK `0.9.0-alpha.6`; the
-published first-app contract and CLI pins do not change. The existing owned
+methods. These are now **published in SDK `0.9.0-alpha.7`**, but were absent from alpha.6.
+The deliberately pinned first-app reader edition and the independent CLI 0.2.0
+registry SDK pin do not change automatically. The existing owned
 `Element`/`View` representation, append-only `Element::attribute`, renderer
 policies, native/browser feature boundaries and Rust 1.99 MSRV remain intact.
 Convenience `.id`/`.class` set or replace, `.add_class` merges distinct
@@ -26,16 +27,19 @@ an authoring API change, **not** a change to SSR's broad tag grammar or Browser
 DOM's existing admission/URL/image policy. Selected typed attribute setters
 (`href`, `src`, `alt`, `type_`, `for_`, `name`, `value`) upsert on
 the typed builder; generic `attribute` retains append-only semantics.
-The shared `View` representation and renderer behavior are unchanged, as are
-the published SDK alpha.6 and CLI 0.2.0 packages. See
-[YT-235 follow-up](YT-235-TAG-COVERAGE-PLAN.md) for exact inclusion/exclusion
+The shared `View` representation and renderer behavior are unchanged.
+Published SDK alpha.7 includes these builders; CLI 0.2.0 stays independently pinned.
+The published SDK alpha.7 and CLI 0.2.0 packages are independently versioned;
+only the SDK includes the typed Tag Builder.
+
+See [YT-235 follow-up](YT-235-TAG-COVERAGE-PLAN.md) for exact inclusion/exclusion
 and verification.
 
-## Current distribution — 2026-11-02
+## Current distribution — 2026-11-09
 
-The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.6`; the independently
+The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.7`; the independently
 published CLI is `yetlet-cli` `0.2.0`, generating apps pinned to SDKalpha.6.
-See the [SDK publication](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+See the [SDK publication](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
 and [CLI publication](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
 for the actual artifacts and consumers. YT-220/221's DOM vocabulary, pre handling
 and opt-in navigation/images are available in SDKalpha.6; YT-223's static export

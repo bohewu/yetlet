@@ -1,12 +1,14 @@
 # Single-gate release automation and registry promotion
 
-Current distribution checkpoint, 2026-11-02: the two-package
-[SDKalpha.6](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01) and independent
-[CLI0.2.0](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
-completed GitHub/crates.io publication and their recorded installed-consumer
-checks. Alpha.4's [partial publication and repair](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair)
-remain historical, not the current distribution status.
-[RELEASING.md](RELEASING.md) is the general SOP;
+Current distribution checkpoint, 2026-11-09: the two-package
+[SDK alpha.7](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09) and independent
+[CLI 0.2.0](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+completed their separate GitHub/crates.io publication and recorded consumers.
+The published CLI still generates apps pinned to SDK alpha.6; the public reader
+edition also remains SDK alpha.6 / CLI 0.2.0 by explicit selection. Earlier
+[SDK alpha.6](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+and alpha.4's [partial publication and repair](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair)
+remain historical, not current SDK distribution.[RELEASING.md](RELEASING.md) is the general SOP;
 [YT-227](YT-227-NEXT-RELEASE-PLAN.md) retains that delivery's original plan and optional
 registry OIDC migration. That option is not adopted here: the current publisher
 permission/Secret contract below and ADR0009 remain unchanged.

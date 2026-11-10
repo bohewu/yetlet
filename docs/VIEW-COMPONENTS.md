@@ -3,7 +3,7 @@
 Continue [your first native application](FIRST-APP.md) by expanding its initial
 heading into a small page. Use ordinary Rust functions and the existing
 `View`/`Element` API to pass data, compose components and render a list.
-**Experimental SDK `0.9.0-alpha.6`, published on crates.io.** This guide
+**Experimental SDK `0.9.0-alpha.7`, published on crates.io.** This guide
 continues the registry-first application from the linked walkthrough.
 
 ## Prerequisites
@@ -107,14 +107,15 @@ It adds no task mutation, persistent state, browser event listener or automatic
 DOM update. The existing `/hello/Ada` route remains as described in the first-app
 walkthrough. A no-JS page needs none of those optional browser capabilities.
 
-## Optional typed tag builders (unreleased source-only YT-234)
+## Optional typed tag builders (YT-234)
 
 The locally selected SDK `0.9.0-alpha.7` includes
-`yetlet::view::tags` as a lightweight authoring alternative. **This is not part
-of the published SDK 0.9.0-alpha.6** or the registry-first scaffold above;
-that introductory example deliberately continues using the published API.
-[YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md) records local preparation;
-using the new constructors requires the matching reviewed source or archive.
+`yetlet::view::tags`, now also published on crates.io, as an alternative to
+`Element::new`. These typed constructors are available from published SDK
+`0.9.0-alpha.7`; the introductory first-app example above intentionally continues
+using the separately selected SDK alpha.6 / CLI 0.2.0 reader edition. See the actual
+[SDK alpha.7 publication](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+and [YT-245 preparation](YT-245-ALPHA7-RELEASE-PREPARATION.md).
 
 ```rust
 use yetlet::view::{View, tags::{div, h1, input, textarea}};
@@ -147,13 +148,13 @@ style remains forbidden by the existing HTML and DOM output policies.
 The existing constructors and mixed child composition remain valid. Typed
 authoring is only an ergonomic, partial compile-time aid; renderer policies
 still validate the complete tree and can differ between native HTML and DOM.
-See [the source-only plan](YT-234-VIEW-AUTHORING-API-PLAN.md) and
+See the [typed authoring design](YT-234-VIEW-AUTHORING-API-PLAN.md) and
 [implementation](../crates/yetlet/src/view/tags.rs) for the exact contract.
 
 
 ### Complete standard tag authoring — YT-235
 
-The YT-235 follow-up included in the selected local SDK expands the module to **101 standard HTML
+The YT-235 follow-up included in published SDK alpha.7 expands the module to **101 standard HTML
 constructors** from the dated [YT-219 inventory](YT-219-HTML-INVENTORY.md):
 89 currently admitted Browser DOM elements, `img()` (admitted in Browser only
 when the caller selects an `ImagePolicy`) and 11 native SSR-only/deferred

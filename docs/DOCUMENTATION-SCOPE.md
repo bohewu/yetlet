@@ -1,15 +1,16 @@
 # Documentation sources and publication scope
 
-Date: 2026-10-26 classification, updated 2026-11-08 for the bounded YT-242 truth audit.
+Date: 2026-10-26 classification, updated 2026-11-09 for published SDK alpha.7 and separate reader edition.
 The published Experimental SDK is `yetlet` and `yetlet-browser`
-`0.9.0-alpha.6`; the independently published CLI is `yetlet-cli` `0.2.0`.
+`0.9.0-alpha.7`; the independently published CLI is `yetlet-cli` `0.2.0`.
 Use module guides and rustdoc from the version/revision you consume. The
-[SDK publication record](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01) and
+[SDK publication record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09) and
 [CLI publication record](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
 retain their actual distribution/consumer evidence. Older previews retain their
 own package layouts, partial registry results and failure histories. This documentation
 classification activates no website/Wiki or additional publication, support or
 repository-visibility change. Historical candidate decisions retain their scope.
+
 The public reader/first-app edition is the explicitly selected SDKalpha.6/CLI0.2.0
 pair in [the site manifest](../site/pages.toml). The new
 [browser-only walkthrough](BROWSER-APP.md) is repository guidance; it does not add

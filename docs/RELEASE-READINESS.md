@@ -1,14 +1,17 @@
 # Yetlet Prototype Release Readiness
 
-**Current distribution (2026-11-08):** **Published SDK:** `0.9.0-alpha.6` (`yetlet` / `yetlet-browser`).
+**Current distribution (2026-11-09):** **Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
 **Published CLI:** `0.2.0` (`yetlet-cli`). The accepted
-[SDK publication and registry consumer](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+[SDK publication and registry consumer](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
 and [CLI publication and installed consumer](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
-record actual GitHub/crates.io delivery, exact artifacts and consumer limits.
-Later typed tags, private Style generation and Showcase are
+record actual GitHub/crates.io delivery, exact archives, signatures and consumer limits.
+The typed Tag Builder is included in published SDK alpha.7; private app-owned Style
+generation, CLI Style templates and Showcase remain
 [source-only checkout additions](API-REFERENCE.md#source-only-checkout-additions).
-Development version equality does not establish archive/source equality.
-This is not Stable API, production, SLSA or universal platform qualification.
+The CLI still generates apps pinned to SDK alpha.6, and the independently selected
+public reader edition remains SDK alpha.6 / CLI 0.2.0. Development version equality
+does not establish archive/source equality. This is not Stable API, production,
+SLSA level or universal platform qualification.
 
 For a new release, use [RELEASING.md](RELEASING.md), including its current
 version-binding/tooling gaps. This page retains historical readiness decisions,

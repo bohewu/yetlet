@@ -25,7 +25,7 @@ def put_sdk_package_manifests(root):
 
 def populate_current_docs(root):
     tick = TICK
-    put(root, "docs/ALPHA6-RELEASE-PREPARATION.md",
+    put(root, "docs/ALPHA7-HOSTED-RECORD.md",
         "## Owner-approved publication and registry consumer — fixture\n"
         "https://github.com/bohewu/yetlet/releases/tag/v6.5.4-alpha.3)\n")
     put(root, "docs/CLI-020-RELEASE-PREPARATION.md",
@@ -43,7 +43,7 @@ def populate_current_docs(root):
     put(root, "docs/COMPATIBILITY.md",
         "## Selected local SDK 0.1.0 typed helpers\n"
         "YT-245 selects SDK\n" + tick + "0.1.0" + tick + " locally.\n"
-        "This is source-only, not shipped in SDK " + tick + "0.1.0" + tick + ";\n"
+        "The methods are now **published in SDK " + tick + "0.1.0" + tick + "**;\n"
         "The published SDK alpha.6 and CLI 0.2.0 packages.\n"
         "The published SDK is " + tick + "yetlet" + tick + " / " +        tick + "yetlet-browser" + tick + " " + tick + "0.1.0" + tick + ";\n"
         "the independently published CLI is " + tick + "yetlet-cli" + tick + " " +
@@ -53,7 +53,7 @@ def populate_current_docs(root):
     put(root, "docs/VIEW-COMPONENTS.md",
         "Experimental SDK " + tick + "0.1.0" + tick + ", published on crates.io.\n"
         "The locally selected SDK " + tick + "0.1.0" + tick + " includes typed tags.\n"
-        "not part of the published SDK 0.1.0** or the registry-first scaffold above;\n")
+        "available from published SDK " + tick + "0.1.0" + tick + ".\n")
     put(root, "docs/DOCUMENTATION-SCOPE.md",
         "The published Experimental SDK is yetlet and yetlet-browser\n"
         + tick + "0.1.0" + tick + "; the independently published CLI is "
@@ -74,7 +74,7 @@ def populate_current_docs(root):
         "published CLI " + tick + "0.1.0" + tick + " and SDK\n"
         + tick + "0.9.0-alpha.6" + tick + ".\n")
     put(root, "docs/README.md",
-        "[SDK " + tick + "0.1.0" + tick + "](ALPHA6-RELEASE-PREPARATION.md)\n"
+        "[SDK " + tick + "0.1.0" + tick + "](ALPHA7-HOSTED-RECORD.md)\n"
         "[CLI " + tick + "0.1.0" + tick + "](CLI-020-RELEASE-PREPARATION.md)\n"
         "CLI0.1.0 → protected standalone project → SDK0.9.0-alpha.6 → app lock/cache\n")
     put(root, "README.md",
@@ -99,7 +99,7 @@ def populate_current_docs(root):
     put(root, "examples/docs-site/README.md",
         "registry SDK0.9.0-alpha.6, reader edition pinned to SDKalpha.6/CLI0.1.0.\\n")
     put(root, "examples/hello-world/README.md",
-        "The typed helpers are not part of the published SDK " + tick + "0.1.0" + tick + ".\n")
+        "The typed helpers are included in the published SDK " + tick + "0.1.0" + tick + ".\n")
 
 
 class WorkspaceManifestTests(unittest.TestCase):
@@ -320,7 +320,9 @@ class WorkspaceManifestTests(unittest.TestCase):
             self.assertIn("yetlet = \"=6.5.4-alpha.3\"", first_app)
             self.assertIn("--version 2.2.0 --locked", first_app)
             self.assertIn("registry SDK6.5.4-alpha.3", (root / "examples/docs-site/README.md").read_text())
-            self.assertIn("not part of the published SDK 6.5.4-alpha.3", (root / "docs/VIEW-COMPONENTS.md").read_text())
+            self.assertIn("available from published SDK " + TICK + "6.5.4-alpha.3" + TICK, (root / "docs/VIEW-COMPONENTS.md").read_text())
+            self.assertIn("included in the published SDK " + TICK + "6.5.4-alpha.3" + TICK, (root / "examples/hello-world/README.md").read_text())
+
             compatibility = (root / "docs/COMPATIBILITY.md").read_text()
             self.assertIn('The published SDK is ' + TICK + 'yetlet' + TICK + ' / ' + TICK + 'yetlet-browser' + TICK + ' ' + TICK + '6.5.4-alpha.3' + TICK + ';', compatibility)
             self.assertIn('published CLI is ' + TICK + 'yetlet-cli' + TICK + ' ' + TICK + '2.2.0' + TICK, compatibility)
@@ -335,6 +337,20 @@ class WorkspaceManifestTests(unittest.TestCase):
                           (root / "examples/sample/Cargo.toml").read_text())
             self.assertIn('yetlet-browser = "=6.5.4-alpha.3"',
                           (root / "examples/docs-site/Cargo.toml").read_text())
+
+
+    def test_published_sdk_does_not_advance_pinned_reader_index(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            populate_current_docs(root)
+            published = {'SDK': '8.0.0-alpha.7', 'CLI': '2.2.0'}
+            edition = {'sdk': '6.5.4-alpha.3', 'cli': '2.2.0'}
+            changes = sync.sync_published_docs(root, published,
+                                               '=6.5.4-alpha.3', edition)
+            index = changes['docs/README.md']
+            self.assertIn('[SDK ' + TICK + '8.0.0-alpha.7' + TICK + ']', index)
+            self.assertIn('CLI2.2.0 → protected standalone project → SDK6.5.4-alpha.3 → app lock/cache', index)
+            self.assertNotIn('CLI2.2.0 → protected standalone project → SDK8.0.0-alpha.7', index)
 
 
 class ReaderManifestTests(unittest.TestCase):
