@@ -38,7 +38,7 @@ and verification.
 ## Current distribution — 2026-11-09
 
 The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.7`; the independently
-published CLI is `yetlet-cli` `0.2.0`, generating apps pinned to SDKalpha.6.
+published CLI is `yetlet-cli` `0.2.0`, with release build SDKalpha.6.
 See the [SDK publication](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
 and [CLI publication](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
 for the actual artifacts and consumers. YT-220/221's DOM vocabulary, pre handling

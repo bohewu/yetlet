@@ -95,6 +95,14 @@ jobs:
           rustup toolchain install 1.99.0 --profile minimal
           sudo apt-get update
           sudo apt-get install -y pkg-config libssl-dev
+      - name: Prepare resolver CLI browser consumer tools before publication
+        if: fromJSON(inputs.record).schema == 3 && fromJSON(inputs.record).version == '0.3.0'
+        run: |
+          node --input-type=module -e 'const [major, minor] = process.versions.node.split(".").map(Number); if (major < 22 || (major === 22 && minor < 12)) process.exit(1)'
+          npm --version
+          google-chrome --version
+          rustup target add wasm32-unknown-unknown --toolchain 1.99.0
+          cargo +1.99.0 install wasm-bindgen-cli --version 0.2.129 --locked
       - name: Recheck owner approval, publish GitHub first, then exact registry bytes and consumer
         env:
           GH_TOKEN: ${{ github.token }}

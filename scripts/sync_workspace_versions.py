@@ -6,6 +6,7 @@ import re
 import subprocess
 import tomllib
 from release_version_authority import published_versions
+from release_record import cli_sdk_version
 
 ROOT = Path(__file__).resolve().parents[1]
 SDK_PACKAGES = ("yetlet", "yetlet-browser")
@@ -617,7 +618,7 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
     sdk = published["SDK"]
     cli = published["CLI"]
     sdk_short = re.sub(r"^[0-9]+\.[0-9]+\.[0-9]+-", "", sdk)
-    cli_sdk_value = cli_sdk.removeprefix("=")
+    cli_sdk_value = cli_sdk_version(cli)
     cli_sdk_short = re.sub(r"^[0-9]+\.[0-9]+\.[0-9]+-", "", cli_sdk_value)
     reader_sdk_short = re.sub(r"^[0-9]+\.[0-9]+\.[0-9]+-", "", edition["sdk"])
     tick = re.escape(chr(96))
@@ -661,9 +662,9 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
             tick + "yetlet-browser" + tick + " " + tick + ")" + VERSION_PATTERN +
             r"(" + tick + r";\s*the independently)", sdk, "current published SDK"),
         (r"(published CLI is " + tick + "yetlet-cli" + tick + " " + tick + ")" +
-         VERSION_PATTERN + tick + r"(, generating apps pinned to SDK)" + VERSION_SHORT_PATTERN + r"(\.)",
-         lambda m: m.group(1) + cli + tick + m.group(2) + cli_sdk_short + m.group(3),
-         "current published CLI and generated SDK pin"),
+         VERSION_PATTERN + tick + r"(?:, generating apps pinned to SDK|, with release build SDK)" + VERSION_SHORT_PATTERN + r"(\.)",
+         lambda m: m.group(1) + cli + tick + ', with release build SDK' + cli_sdk_short + m.group(2),
+         "current published CLI and immutable build SDK"),
         pair(r"(SDK)" + VERSION_SHORT_PATTERN + r"(/CLI)" + VERSION_PATTERN + r"( in \[the site manifest\])",
              reader_sdk_short, edition["cli"], "public reader edition"),
         one(r"(absent from published CLI)" + VERSION_PATTERN + r"(\.)",
@@ -771,7 +772,7 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
         raise ValueError(f"{relative}: reader SDK independence field missing")
     remainder, count = re.subn(
         r'(yetlet\s*=\s*")=?' + VERSION_PATTERN + r'("' + tick + r' from crates\.io)',
-        lambda m: m.group(1) + "=" + cli_sdk_value + m.group(2), remainder, count=1)
+        lambda m: m.group(1) + "=" + edition["sdk"] + m.group(2), remainder, count=1)
     if count != 1:
         raise ValueError(f"{relative}: generated SDK pin field missing")
     remainder = re.sub(

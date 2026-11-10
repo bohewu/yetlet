@@ -1,6 +1,6 @@
 # Yetlet CLI 0.3.0 — Release preparation (YT-248)
 
-**State (2026-11-10): Preserved Style plan independently reviewed PASS; YT-247 source implementation independently reviewed PASS. Release work not started; awaits separate Owner instruction after YT-247 Git delivery. No CLI 0.3.0 candidate, tag, hosted run, signature, Draft release or publication exists yet.**
+**State (2026-11-10): Owner authorized YT-248 candidate preparation and Git delivery. Local CLI 0.3.0 archive installation, resolver/Style consumers and Chrome verification PASS; corrective independent implementation Reviewer PASS has zero issues/followups; Git/CI delivery follows the [candidate record](YT-248-CLI030-CANDIDATE.md). Formal release execution and publication remain separate.**
 
 ## YT-247 / YT-248 sequencing amendment
 
@@ -11,7 +11,8 @@ Git delivery, then stops for Owner acceptance. Phase B implements the accepted
 resolver. The Owner has accepted that design and authorized the
 [Phase B implementation](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md).
 This release plan moves to **YT-248** and depends on that implementation.
-Completion of YT-247 does not authorize starting this release plan.
+The later Owner instruction authorizes this candidate-preparation slice and its
+reviewed Git delivery, with no publication or Reader Edition upgrade.
 The [later Windows supplement](YT-247-WINDOWS-VERIFICATION.md) qualifies the
 Resolver/new/lock path only; the separate Windows Style runtime pause below
 retains its original scope.

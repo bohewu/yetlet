@@ -60,8 +60,13 @@ def archives(directory, cycle=False, consolidated=False, cli=False, cli_version=
                       (cli_sdk or records.cli_sdk_version(r['version'])) + '`.\n\n'
                       'cargo install yetlet-cli --version ' + r['version'] + ' --locked\n\n'
                       'Expected output: `yetlet ' + r['version'] + '`.\n')
+        extra_files = []
+        if name == 'yetlet-cli' and r['version'] not in records.LEGACY_CLI_VERSIONS:
+            package = HERE.parent / 'tools/yetlet-cli'
+            readme = (package / 'README.md').read_text()
+            extra_files = [(p, (package / p).read_bytes()) for p in release_docs.SDK_RESOURCE_PATHS]
         with tarfile.open(fileobj=raw, mode='w:gz') as archive:
-            for path, data in [('Cargo.toml', manifest.encode()), ('README.md', (readme + readme_suffix).encode())]:
+            for path, data in [('Cargo.toml', manifest.encode()), ('README.md', (readme + readme_suffix).encode()), *extra_files]:
                 info = tarfile.TarInfo(name + '-' + r['version'] + '/' + path)
                 info.size = len(data)
                 archive.addfile(info, io.BytesIO(data))
@@ -72,6 +77,18 @@ def archives(directory, cycle=False, consolidated=False, cli=False, cli_version=
 
 
 class RegistryTests(unittest.TestCase):
+    def test_cli030_binds_one_archive_sdk7_and_shipped_policy_snapshot(self):
+        with tempfile.TemporaryDirectory() as temp:
+            r, subjects = archives(Path(temp), cli=True, cli_version='0.3.0')
+            plan, bodies = registry.prepare(r, temp, subjects)
+            self.assertEqual([row['name'] for row in plan['packages']], ['yetlet-cli'])
+            size = struct.unpack_from('<I', bodies['yetlet-cli'])[0]
+            meta = json.loads(bodies['yetlet-cli'][4:4+size])
+            self.assertEqual(meta['deps'][0]['version_req'], '=0.9.0-alpha.7')
+            self.assertIn('browser-style', meta['readme'])
+            r, subjects = archives(Path(temp), cli=True, cli_version='0.3.0', cli_sdk='0.9.0-alpha.6')
+            with self.assertRaises(ValueError): registry.prepare(r, temp, subjects)
+
     def test_consolidated_archives_bind_exact_two_subjects_and_predecessor(self):
         with tempfile.TemporaryDirectory() as temp:
             r, subjects = archives(Path(temp), consolidated=True)
@@ -224,6 +241,24 @@ class RegistryTests(unittest.TestCase):
 
 
 class CliConsumerTests(unittest.TestCase):
+    def test_new_cli_uses_extended_consumer_with_separate_install_identity(self):
+        import release_cli_consumer
+        from types import SimpleNamespace
+        def install(args, **kwargs):
+            root = Path(kwargs['cwd']) / 'cargo-home/registry/src/fixture/yetlet-cli-0.3.0'
+            (root / 'resources').mkdir(parents=True)
+            (root / 'Cargo.lock').write_text('version=4\n')
+            (root / 'resources/sdk-compatibility.json').write_text('{"revision":"fixture"}')
+            return SimpleNamespace(returncode=0, stdout=b'', stderr=b'')
+        with tempfile.TemporaryDirectory() as temp, patch.object(publication.subprocess, 'run', side_effect=install), \
+                patch.object(release_cli_consumer, 'qualify', return_value={'status':'PASS'}) as qualify:
+            result = publication.cli_consumer('0.3.0', Path(temp))
+            self.assertEqual(result['sdk_version'], '0.9.0-alpha.7')
+            args = qualify.call_args.args
+            self.assertEqual(args[-1], 'crates.io')
+            self.assertFalse(any('TOKEN' in key for key in args[5]))
+            self.assertIn('CARGO_TARGET_DIR', args[5])
+
     def test_unknown_cli_binding_is_rejected_before_install(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(publication.subprocess, 'run') as run:
             with self.assertRaises(ValueError): publication.cli_consumer('0.2.1', Path(temp))

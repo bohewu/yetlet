@@ -54,6 +54,9 @@ CLI 0.3.0 Style release is now tracked under [YT-248](CLI-030-RELEASE-PREPARATIO
 after [YT-247 Dynamic SDK Version Resolution](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md)
 Phase B. Phase A delivers only the proposed contract/ADR and independent review;
 this original SDK preparation remains historical and does not include that CLI release.
+The later Owner-authorized [YT-248 candidate preparation](YT-248-CLI030-CANDIDATE.md)
+qualifies the separate CLI archive and consumes the immutable registry SDK. It
+does not republish SDK alpha.7 or upgrade the public Reader Edition.
 
 ## Evidence and local drafts
 

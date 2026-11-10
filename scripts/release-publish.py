@@ -188,7 +188,7 @@ def published_release(p, previous):
             'original_plan_sha256': s.records.digest(p), 'assets': previous['assets'], 'github_mutations': False}
 
 
-LEGACY_CLI_BINDINGS = frozenset({'0.1.0', '0.1.1', '0.2.0'})
+LEGACY_CLI_BINDINGS = s.records.LEGACY_CLI_VERSIONS
 
 
 def resolved_cli_project(project, cli_version, explicit_sdk):
@@ -229,6 +229,19 @@ def cli_consumer(version, output):
         (output / 'consumer-install.stderr').write_bytes(result.stderr)
         s.require(result.returncode == 0)
         executable = root / 'install/bin/yetlet'
+        if version not in LEGACY_CLI_BINDINGS:
+            import release_cli_consumer
+            installed = list((root / 'cargo-home/registry/src').glob('*/yetlet-cli-' + version))
+            s.require(len(installed) == 1)
+            package = installed[0]
+            lock = (package / 'Cargo.lock').read_bytes()
+            (output / 'REGISTRY-CONSUMER.lock').write_bytes(lock)
+            # Its own package lock/build identity remains separate from every app.
+            env['CARGO_TARGET_DIR'] = str(root / 'target')
+            result = release_cli_consumer.qualify(executable, version, sdk_version, root, output, env,
+                (package / 'resources/sdk-compatibility.json').read_bytes(), 'crates.io')
+            result.update(lock_sha256=s.sha(lock), sdk_version=sdk_version, source_install=True)
+            return result
         new_args = ['new', 'consumerapp', '--parent', str(root)]
         if version not in LEGACY_CLI_BINDINGS:
             # This is a fixed explicit consumer case, not an assertion that a

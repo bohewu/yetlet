@@ -189,7 +189,13 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
                 )
                 .unwrap();
                 let mapping = contexts["app-src-source-paths"].as_object().unwrap();
-                assert_eq!(contexts["yetlet-src"].as_object().unwrap().len(), 82);
+                let snapshot: serde_json::Map<String, serde_json::Value> =
+                    serde_json::from_str(include_str!("../resources/framework.json")).unwrap();
+                // The closed SDK map plus the generated workspace and ignore file.
+                assert_eq!(
+                    contexts["yetlet-src"].as_object().unwrap().len(),
+                    snapshot.len() + 2
+                );
                 for source in [
                     "crates/yetlet/Cargo.toml",
                     "crates/yetlet/src/config/mod.rs",
