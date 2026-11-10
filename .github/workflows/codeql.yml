@@ -24,53 +24,26 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
-      docs_only: ${{ steps.scope.outputs.docs_only }}
+      languages: ${{ steps.scope.outputs.languages }}
     steps:
       - name: Checkout complete history
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Identify a complete Markdown-only change
+      - name: Test conservative language input selection
+        run: python3 .github/scripts/test_codeql_scope.py
+      - name: Identify complete language inputs
         id: scope
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           HEAD_SHA: ${{ github.sha }}
-        shell: python
-        run: |
-          import os
-          import re
-          import subprocess
-
-          docs_only = False
-          reason = "scheduled, manual or uncertain scope requires analysis"
-          base = os.environ.get("BASE_SHA", "")
-          head = os.environ.get("HEAD_SHA", "")
-          if (
-              os.environ["GITHUB_EVENT_NAME"] in {"push", "pull_request"}
-              and re.fullmatch(r"[0-9a-f]{40}", base)
-              and re.fullmatch(r"[0-9a-f]{40}", head)
-              and base != "0" * 40
-          ):
-              try:
-                  result = subprocess.run(
-                      ["git", "diff", "--name-only", "--no-renames", "-z", base, head, "--"],
-                      check=True, capture_output=True,
-                  )
-                  paths = result.stdout.split(b"\0")[:-1]
-                  docs_only = bool(paths) and all(path.endswith(b".md") for path in paths)
-                  reason = "Markdown-only change" if docs_only else "code, other inputs or empty diff"
-              except (OSError, subprocess.CalledProcessError):
-                  reason = "unavailable Git history requires analysis"
-          value = str(docs_only).lower()
-          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
-              output.write(f"docs_only={value}\n")
-          print(f"docs_only={value}: {reason}")
+        run: python3 .github/scripts/codeql_scope.py
 
   analyze:
     name: CodeQL (${{ matrix.language }})
     needs: scope
-    if: needs.scope.outputs.docs_only != 'true'
+    if: needs.scope.outputs.languages != '[]'
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     permissions:
@@ -80,7 +53,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        language: [actions, javascript-typescript, python, rust]
+        language: ${{ fromJSON(needs.scope.outputs.languages || '["actions","javascript-typescript","python","rust"]') }}
     steps:
       - name: Checkout
         uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
