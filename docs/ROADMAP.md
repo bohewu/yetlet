@@ -12,17 +12,18 @@ verifies MSVC CLI compilation and actual resolver/new/locking execution on the
 existing prepared Runner; failed attempts, scoped test correction and cleanup
 are retained. Windows Style/browser runtime qualification remains separate.
 
-**YT-248 CLI 0.3.0 Style release (2026-11-10): Candidate preparation authorized; local qualification PASS.**
+**YT-248 CLI 0.3.0 Style release (2026-11-10): Candidate/Git delivery PASS; formal release execution authorized and unsigned hosted build PASS.**
 The [preserved preparation plan](CLI-030-RELEASE-PREPARATION.md) retains its prior
 independent Style plan PASS. The [candidate record](YT-248-CLI030-CANDIDATE.md)
 tracks CLI0.3.0, alpha.7 build SDK/qualified snapshot, separate resolver app
 choices, archive installation and registry SDK consumers, native HTTP/CSS and
 browser Vite/WASM/Chrome proof. A real keyed-update class defect was corrected;
 original failures and process cleanup remain recorded. Corrective independent
-implementation Reviewer PASS has zero issues/followups; Strict Guard/Git/CI
-delivery precedes the stop. Hosted release/sign/V,
-formal release source selection and Owner-gated publication remain separate.
-CLI0.2.0 and the alpha.6/CLI0.2.0 Reader Edition stay fixed; new Windows Style
+implementation Reviewer PASS has zero issues/followups; PR #71 exact-head/master
+CI PASS. The [hosted release record](CLI-030-HOSTED-RECORD.md) binds immutable
+C/tag, the original build and remaining custody/sign/V/publication gates.
+Published CLI0.2.0 remains current until successful Owner-approved publication;
+the alpha.6/CLI0.2.0 Reader Edition stays fixed; new Windows Style
 revalidation remains paused/unverified.
 
 **YT-246 canonical version authorities and release-document synchronization (2026-11-10): Done.**
