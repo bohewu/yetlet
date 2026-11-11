@@ -1,6 +1,6 @@
 # Yetlet CLI 0.3.1 — Release preparation (YT-250)
 
-**Current state (2026-11-11): Windows shutdown repair verified. Hosted preparation for the replacement is pending.**
+**Current state (2026-11-11): Windows shutdown repair and replacement prepublication preparation PASS.**
 The initial Windows MSVC check reproduced a Browser Style defect: after a
 targeted Ctrl-Break, the CLI had exited while its preview port still accepted
 connections. The Windows process wrapper now receives the interactive mode from
@@ -15,11 +15,11 @@ exit found each preview port closed. The default SDK selection, exact registry
 pins, locks and offline checks also passed. The run used the previous hosted
 archive plus the exact reviewed code delta, checked by file digests.
 
-The original remote `yetlet-cli-v0.3.1` tag and the signed artifacts in the
-[original hosted record](CLI-031-HOSTED-RECORD.md) identify the previous source.
-The replacement requires a release identity decision and fresh hosted
-build/custody, signing and independent verification. The previous publication
-plan applies only to its original inputs.
+The [hosted record](CLI-031-HOSTED-RECORD.md) retains the original candidate and
+records the Owner-authorized historical/canonical tag transition. The corrected
+candidate passed fresh build, custody, frozen preparation, signing and
+independent verification. Its read-only public and registry plans passed.
+Formal publication remains held.
 
 ### Windows correction evidence and replacement authority
 

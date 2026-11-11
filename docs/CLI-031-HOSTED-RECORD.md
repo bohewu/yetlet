@@ -4,8 +4,8 @@
 
 The Owner-authorized [replacement preparation](CLI-031-RELEASE-PREPARATION.md)
 preserves the first candidate and repeats the hosted stages for the corrected
-source. Signing and independent result verification remain pending at this
-checkpoint. Formal publication remains held.
+source. The replacement's build, custody, frozen preparation, signing and
+independent verification passed. Formal publication remains held.
 
 | Binding | Observed replacement input |
 |---|---|
@@ -38,13 +38,43 @@ private-manifest verification. The protected Environment and exact tag policy
 were read back and retained without changes. Both raw downloaded artifact ZIPs
 match their actual GitHub digests.
 
-The next signer source S must be a distinct reviewed commit with successful
-master CI. Complete the existing record using this C/build/custody and original
-provenance identity, then bind the new S and existing Draft. Assemble a bounded
-qualification closure from retained original evidence, record the old candidate
-and original failures explicitly, and use fresh prepare/sign/result requests.
-The earlier signed payloads and publication preview remain retained at their
-original identities.
+### Replacement signing and independent result verification
+
+PR #82 delivered the independently reviewed signer dossier. S and V are
+`4337979ca7a2d5db40618f8016188624561ed74f`, distinct from C. Exact-S master
+[Rust](https://github.com/bohewu/yetlet/actions/runs/42942364972),
+[documentation](https://github.com/bohewu/yetlet/actions/runs/42942365004)
+and [CodeQL workflow](https://github.com/bohewu/yetlet/actions/runs/42942365063)
+passed. The complete record SHA256 is
+`3f83adbc1995feae2c0cd8e43f598fed55b9fcac38a47f5e54fc8b577dec8a46`.
+
+| Stage | Observed result |
+|---|---|
+| Qualification | Independent review accepted all 26 retained originals and six evidence roles. The temporary encrypted Draft handoff was removed after successful intake and frozen retention. |
+| Frozen prepare | [42942758473 / 1](https://github.com/bohewu/yetlet/actions/runs/42942758473), SUCCESS. Artifact `13821930698` ZIP SHA256 `b88e44318ecc2f108d0a6c8d73f0e141977d1a62ae7cef77f26e0aa554e64175`. Raw `SIGNING-INPUTS.json` SHA256 `9e8612d2648535eccc139b12f1ecb18896d4303493dd654293fcb282dd34a573`. |
+| Signing | [42943947813 / 1](https://github.com/bohewu/yetlet/actions/runs/42943947813), SUCCESS under `reviewed-automation`. Artifact `13821433946` ZIP SHA256 `6446fd0873239740d5819590328859a28e28ddfa4446528443f42a86d79c4744`. |
+| Independent V | [42944208809 / 1](https://github.com/bohewu/yetlet/actions/runs/42944208809), SUCCESS. Both bundles, one source-package subject and 43 private-manifest entries verified. Artifact `13821847880` ZIP SHA256 `ffefd98fee71a99e380cd1cf76726d94911e5c006f23993226dd86e20f8cf7e1`. |
+| Verified receipt | Raw `RESULT-VERIFICATION.json` SHA256 `ccadbbd861be095783e0678e6c8258754cd9ed631a7e8099d08cadb1fc380240`. The separately exported receipt matches these bytes. |
+
+The signed raw provenance SHA256 is
+`4e65e5156257aeec898585ee54bfd9915971ac9c5659e4f870beb120d122255e`.
+The signed raw private manifest SHA256 is
+`a7524c91fa1d8f93a6b6665484abfbf218169881f9f2c8fec3484f51cae87b87`.
+The independently verified export contains the exact original hosted `.crate`.
+The original candidate's signed inputs and publication preview remain retained
+at their historical identities.
+
+The read-only preview at S passed the five-file GitHub plan, single-CLI registry
+plan, and crates.io absence check. The registry plan digest is
+`e4d238a803d4a4a6cd9de0731b9265536ce6af8a4a8a5ef3736a886d8384bc03`.
+The S preview request digest is
+`9c2f929595f9cb6c2afa342ce8ed9c5eff597b60b64ea02965030d3900e1658f`.
+The private Draft retains exact tag/C, the reviewed release notes, and zero
+assets. The notes SHA256 is
+`a4a1497d2e1fc2e32b8e3356a4e66f68ac14a128f9b1c5e174b078f3bc22a45c`.
+After guarded delivery of this record and master CI, derive the publication
+preview for that exact P from the same verified export. Owner authorization
+for the formal publication run remains a separate gate.
 
 ## Original candidate — 2026-11-10
 
