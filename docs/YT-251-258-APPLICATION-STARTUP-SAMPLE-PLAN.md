@@ -1,6 +1,6 @@
 # M26 — Application Startup & Sample Experience
 
-**Status:** Planning review PASS; YT-251 contract accepted; product implementation not started
+**Status:** Planning review PASS; YT-251 and YT-252 contracts accepted; product implementation not started
 **Date:** 2026-11-11
 **Repository:** `bohewu/yetlet`
 **Base:** `master` at `83d10df6c2a219c1f7271419ad4b1b04c78741bb` (PR #85, CLI package README follow-up)
@@ -139,13 +139,15 @@ Proposed exports, subject to YT-252's source/API audit:
 | Core View values | `Attribute`, `Element`, `View` |
 | Application | `App`, `Page`, `RequestContext` |
 | Document metadata | `DocumentMetadata`, `LanguageTag`, `LanguageTagError` |
-| Page errors | `HtmlPageError` |
-| Common extractors | `DefaultBodyLimit`, `Extension`, `Path`, `Query`, `State` |
+| Page errors and server policy | `HtmlPageError`, `DEFAULT_CSP` |
+| Common extractors | `DefaultBodyLimit`, `Extension`, `Form`, `Path`, `Query`, `State` |
+| Common HTTP values | `HeaderMap`, `HeaderValue`, `StatusCode` |
 | Common responses | `Json`, `IntoResponse`, `Redirect`, `Response` |
 | Rendering helpers | `render_document`, `render_document_with_metadata`, `render_page`, `render_page_with_metadata` |
 
-Export `Json` from the existing `response` module only; do not import the same name through both `extract` and `response`. Do not re-export `Router`, `axum::serve`, `TcpListener`, Tokio, Tower middleware, or the entire Axum namespace. Advanced infrastructure imports remain explicit.
+`Form` is an additive re-export from Axum's existing `axum::extract::Form` into `server_axum::extract`; Axum 0.8.9's default `form` feature already supplies it. `HeaderMap`, `HeaderValue` and `StatusCode` are selected individual exports from the existing `server_axum::http` namespace. Do not re-export the entire `http` namespace.
 
+Export `Json` from the existing `response` module only; do not import the same name through both `extract` and `response`. Do not re-export `Router`, `axum::serve`, `TcpListener`, Tokio, Tower middleware, `FormRejection`, `Multipart`, or the entire Axum namespace. Advanced infrastructure and feature-specific extractors remain explicit.
 Prelude rules:
 
 - It exists only when `server-axum` is enabled and remains unavailable in Core-only/browser builds.
@@ -195,11 +197,13 @@ Deliverable: `docs/adr/0012-server-axum-prelude.md` plus a source-verified expor
 Acceptance:
 
 - Explain why the initial scope adds `server_axum::prelude` but not a redundant Core prelude.
-- List every export and its existing source path; check names against the actual public modules.
+- List every export and its exact source path; check names against the actual public modules and locked Axum 0.8.9 feature gates.
+- Decide the additive `Form` re-export in `server_axum::extract` and verify Axum's `form` feature is selected without adding a new dependency.
+- Include only selected common HTTP types (`HeaderMap`, `HeaderValue`, `StatusCode`), not the whole `http` namespace.
 - Avoid duplicate/ambiguous `Json` exports and broad upstream namespace re-exports.
 - Preserve all explicit import paths and the optional `server-axum` feature boundary.
 - Include simple and advanced import examples.
-- Independent Reviewer PASS before YT-254 implementation begins.
+- Independent Reviewer PASS before YT-254 implementation begins. **PASS:** `wc_job_leT3lB8xD2KJSSZS` (terminal exit 0; saved `reviewer` role, `gpt-6-astra`/high; zero issues and required followups).
 
 ### YT-253 — Implement `App::serve()` and `App::serve_on()`
 
@@ -229,14 +233,16 @@ Acceptance and validation:
 Scope:
 
 - Add the curated `pub mod prelude` under the existing `server_axum` feature gate.
+- Add `Form` to the existing `server_axum::extract` re-export module and include it in the prelude.
 - Add compile/doctest coverage for the approved exports and a minimal server application.
 - Keep explicit imports supported and document that the prelude is optional.
 
 Acceptance:
 
 - A minimal application compiles using `use yetlet::server_axum::prelude::*;`.
-- Each export resolves to an existing public API and no unintended dependency is introduced.
-- `Json` is exported once; no broad Axum/Tower/Tokio re-export is added.
+- Each export resolves to an existing Yetlet or Axum public API; `Form` is an additive re-export backed by Axum's already selected `form` feature, with no new dependency.
+- `StatusCode`, `HeaderMap`, `HeaderValue` and `DEFAULT_CSP` resolve from their existing public paths.
+- `Json` is exported once; no broad Axum/HTTP/Tower/Tokio re-export is added.
 - Core-only and browser/WASM builds do not gain server-only symbols.
 - Existing explicit import compatibility tests remain green.
 - Independent implementation Reviewer PASS before sample migration.
@@ -395,11 +401,14 @@ Do not modify as part of M26:
 - Review scope is the M26 plan, Backlog rows, Roadmap summary and the source/compatibility surfaces listed in the review instruction. No product code was changed.
 - YT-251 initial contract Reviewer Job `wc_job_zaxfmBinaf26QRTV`: terminal exit `0`, result `FAIL` with one P2 on Axum post-bind accept-error behavior.
 - YT-251 corrective follow-up Reviewer Job `wc_job_Nad2HOpWhHREJOty`: terminal exit `0`, result `PASS`, zero issues and required followups.
-- Follow-up trace: saved `reviewer` role, model `gpt-6-astra`, effective effort `high`; model/role/effort and parent inheritance checks all `true`.
+- YT-251 follow-up trace: saved `reviewer` role, model `gpt-6-astra`, effective effort `high`; model/role/effort and parent inheritance checks all `true`.
 - Ignored YT-251 evidence: `.pipeline-output/yt251-application-startup-contract-review-20261111/reviewer-output.json`, `reviewer-output-v2.json`, `reviewer-trace-v1.json`, and `reviewer-trace-v2.json`.
+- YT-252 independent Reviewer Job `wc_job_leT3lB8xD2KJSSZS`: terminal exit `0`, result `PASS`, zero issues and required followups.
+- YT-252 Reviewer trace: saved `reviewer` role, model `gpt-6-astra`, effective effort `high`; model/role/effort and parent inheritance checks all `true`.
+- Ignored YT-252 evidence: `.pipeline-output/yt252-application-prelude-contract-review-20261111/reviewer-output.json` and `reviewer-trace.json`.
 
 ## 10. Next handoff
 
-With ADR-0011 accepted at contract-only scope, the next task is **YT-252 — Axum Adapter Prelude Contract**. Read this plan, `AGENTS.md`, the current public `server_axum` exports, `docs/adr/0001-separation-of-concerns.md`, `docs/adr/0005-opt-in-capability-modules.md`, `docs/adr/0006-handler-first-mvc-optional.md`, and the existing M26 backlog. Produce ADR-0012 and a source-verified export inventory; do not implement the prelude in the contract task.
+With ADR-0011 and ADR-0012 accepted at contract-only scope, the next task is **YT-253 — Implement `App::serve()` and `App::serve_on()`**. Read this plan, `AGENTS.md`, `docs/adr/0011-application-startup-api.md`, `crates/yetlet/src/server_axum/app.rs`, `crates/yetlet/src/server_axum/mod.rs`, `crates/yetlet/Cargo.toml`, and the YT-253 acceptance section. Implement only the approved startup methods, preserve the current Router/state and feature boundaries, and obtain an independent implementation Reviewer PASS before starting sample migrations. YT-254 is independently unblocked by ADR-0012 and may follow as a separate implementation item.
 
 Current planning branch: `codex/m26-application-startup-dx`, based on `83d10df6c2a219c1f7271419ad4b1b04c78741bb`. This planning delivery is documentation-only. Commit/Push/PR/Merge and SDK/CLI release remain separate and unauthorized.

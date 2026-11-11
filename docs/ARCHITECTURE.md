@@ -9,7 +9,7 @@ the published alpha.7 SDK; private app Style tooling ships in CLI 0.3.0,
 while Showcase remains a checkout sample.
 Publication does not establish production or universal platform qualification.
 **Scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
-**Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md), [application startup contract — ADR 0011](adr/0011-application-startup-api.md).
+**Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md), [application startup contract — ADR 0011](adr/0011-application-startup-api.md), [Axum adapter prelude — ADR 0012](adr/0012-server-axum-prelude.md).
 
 Current usage is documented in the [current module guides](API-REFERENCE.md), [HTTP pipeline](HTTP-PIPELINE.md) and [sample guide](SAMPLES.md). Shared owned Views feed escaped native HTML or explicitly built browser DOM/WASM. App/Page preserve native Axum/Tower handlers; local graph, keyed children, request correlation and Memory Session are explicit opt-ins. SQL/storage stay application-owned. No Controller, DI, plugin registry or ORM is required.
 
