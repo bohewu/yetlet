@@ -1,6 +1,6 @@
 # M26 — Application Startup & Sample Experience
 
-**Status:** Planning review PASS; YT-251/252 contracts accepted; YT-253 implementation Reviewer PASS (Linux/cross-target scope); YT-254 next; sample migrations not started
+**Status:** Planning review PASS; YT-251/252 contracts accepted; YT-253/254 implementations independent Reviewer PASS; YT-255 sample migration next
 **Date:** 2026-11-11
 **Repository:** `bohewu/yetlet`
 **Base:** `master` at `83d10df6c2a219c1f7271419ad4b1b04c78741bb` (PR #85, CLI package README follow-up)
@@ -246,7 +246,7 @@ Acceptance:
 - `Json` is exported once; no broad Axum/HTTP/Tower/Tokio re-export is added.
 - Core-only and browser/WASM builds do not gain server-only symbols.
 - Existing explicit import compatibility tests remain green.
-- Independent implementation Reviewer PASS before sample migration.
+- Independent implementation Reviewer PASS before sample migration. **YT-254 PASS:** `wc_job_t0nfWyjaZtjOd5Gx` (terminal exit 0; saved Reviewer `gpt-6-astra`/high; 0 issues/required followups). [Verification record](YT-254-PRELUDE-VERIFICATION-20261111.md) contains 12 retained commands and source/test hashes. Native Windows runtime remains unverified.
 
 ### YT-255 — Migrate minimal and basic HTTP samples
 
@@ -419,8 +419,12 @@ The initial YT-253 Reviewer `wc_job_CdqciKQzlAcfXH-o` completed with exit code `
 
 Owner-amended YT-251 port review `wc_job_eJ9LTvWN2G-Yt7Oh` PASS and YT-253 implementation follow-up `wc_job_vX_D7m0O9q5on1hg` PASS (both terminal exit 0; saved `gpt-6-astra`/high). Both Reviewer JSON outputs, role traces, and the original YT-253 evidence-only FAIL remain intact. The YT-253 Reviewer inspected all 15 retained command logs and both source/test SHA-256 hashes independently. Native Windows runtime remains unverified; Windows MSVC cross-target checking is documented accurately.
 
+### YT-254 source verification evidence
+
+[YT-254 verification record](YT-254-PRELUDE-VERIFICATION-20261111.md) points to `artifacts/verification/yt254-prelude-20261111-a/`: 12 exact argv manifests, complete logs, exit codes, SHA-256 checksums and source/test identity. All 12 checks exited `0`; the two new Prelude tests and two explicit-path compatibility tests passed, as did the complete Axum adapter, Clippy, Core/WASM feature boundaries, and Windows MSVC **cross-target** build. Native Windows runtime is unverified. Independent YT-254 implementation Reviewer Job `wc_job_t0nfWyjaZtjOd5Gx` completed exit 0, saved `gpt-6-astra`/high, JSON PASS with zero issues/followups; role/model/effort trace PASS. The accepted source and evidence are tracked in the YT-254 verification record.
+
 ## 10. Next handoff
 
-YT-253 implementation and independent Reviewer gate are complete at the documented source-checkout scope. The next item is **YT-254 — Implement `server_axum::prelude`** under accepted ADR-0012. Read this plan, `AGENTS.md`, `docs/adr/0012-server-axum-prelude.md`, and `crates/yetlet/src/server_axum/mod.rs`/`response.rs`; implement only the approved curated exports and additive `Form` extractor alias, add focused tests, and secure a separate independent Reviewer PASS before YT-255–257 sample migration. Preserve historical tests and keep native Windows execution identified as unverified rather than claiming it has passed.
+YT-253 startup and YT-254 Prelude are both implemented and independently Reviewer PASS at the documented source-checkout scope. **Next: YT-255 — Migrate minimal and basic HTTP samples** (`hello-world`, `rest-api`, `session-cart`/`cart-server`, `middleware-lab`, `forms-validation`, and the SDK's non-catalog minimal example). Keep every existing environment-configured bind address, route/security behavior, command and catalog ID; use `App::from_router(...).serve_on(configured_address)` where a sample factory returns a Router, and let the SDK minimal example demonstrate `App::serve()` at `127.0.0.1:7878`. Run bounded package and HTTP checks, secure a distinct independent Reviewer PASS, and preserve any advanced native Axum lifecycle cases for YT-256/257. Native Windows runtime remains unverified.
 
 Current planning branch: `codex/m26-application-startup-dx`, based on `83d10df6c2a219c1f7271419ad4b1b04c78741bb`. This planning delivery is documentation-only. Commit/Push/PR/Merge and SDK/CLI release remain separate and unauthorized.

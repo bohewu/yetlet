@@ -88,6 +88,10 @@ name = "server_axum_app_serve"
 required-features = ["server-axum"]
 
 [[test]]
+name = "server_axum_prelude"
+required-features = ["server-axum"]
+
+[[test]]
 name = "server_axum_public_api_compat"
 required-features = ["server-axum"]
 

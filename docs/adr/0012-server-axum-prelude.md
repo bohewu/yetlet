@@ -1,6 +1,6 @@
 # ADR 0012 — Curated Native Axum Application Prelude
 
-- **Status:** Accepted (contract only; YT-254 implementation pending).
+- **Status:** Accepted; YT-254 source implementation Reviewer PASS (published alpha.7 unchanged).
 - **Date:** 2026-11-11.
 - **Task:** YT-252, M26 Application Startup & Sample Experience.
 - **Related:** [M26 plan](../YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md),
@@ -89,6 +89,8 @@ The prelude is intentionally curated, not exhaustive. Adding another name later 
 - Reviewer trace: role `reviewer`, model `gpt-6-astra`, effective effort `high`; model/role/effort matches and parent inheritance consistency all `true`.
 - Reviewer result: `overall_status = pass`; `issues = []`; `required_followups = []`; `optional_notes = []`.
 - Ignored evidence: `.pipeline-output/yt252-application-prelude-contract-review-20261111/reviewer-output.json` and `reviewer-trace.json`.
+
+- YT-254 independent implementation Reviewer `wc_job_t0nfWyjaZtjOd5Gx` completed exit `0`, JSON PASS with zero issues/required followups; saved role `reviewer`, model `gpt-6-astra`, effective effort `high`, and parent trace all matched. The source-only verification and evidence are documented in [YT-254 verification](../YT-254-PRELUDE-VERIFICATION-20261111.md).
 
 ## Acceptance boundary
 
