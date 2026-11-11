@@ -53,7 +53,7 @@ pub(crate) fn run_cargo(
         command.args(["--features", "yetlet-dev-tls"]);
     }
     #[cfg(windows)]
-    return imp::run(app, &mut command);
+    return imp::run(app, &mut command, dev);
     #[cfg(not(windows))]
     imp::run(&mut command)
 }
@@ -129,7 +129,7 @@ pub(crate) fn run_frontend_build(app: &App, frontend: &App) -> io::Result<Comple
 pub(crate) fn run_frontend(app: &App, frontend: &App, dev: bool) -> io::Result<Completion> {
     let mut command = frontend_command(app, frontend, dev)?;
     #[cfg(windows)]
-    let completion = imp::run(frontend, &mut command)?;
+    let completion = imp::run(frontend, &mut command, dev)?;
     #[cfg(not(windows))]
     let completion = imp::run(&mut command)?;
     Ok(frontend_completion(completion))
@@ -149,7 +149,7 @@ pub(crate) fn run_browser_frontend(
         crate::styles::frontend_environment(app, settings, &mut command)?;
     }
     #[cfg(windows)]
-    let completion = imp::run(frontend, &mut command)?;
+    let completion = imp::run(frontend, &mut command, dev)?;
     #[cfg(not(windows))]
     let completion = imp::run(&mut command)?;
     Ok(frontend_completion(completion))
