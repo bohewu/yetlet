@@ -5,6 +5,10 @@ separate reviewed S, frozen-input signing and independent V completed. The
 five-file public allowlist and single-package registry plan pass read-only gates.
 Formal GitHub/crates.io publication remains held.**
 
+The [Windows shutdown repair](CLI-031-RELEASE-PREPARATION.md) requires a
+replacement candidate. This record preserves the first candidate's exact
+source, artifacts and approvals as historical evidence.
+
 The phase-1 checkpoint below retains its original pending S/signing state; the
 later phase-2 section records actual completion without changing C or its bytes.
 

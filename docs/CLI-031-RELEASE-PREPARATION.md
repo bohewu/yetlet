@@ -1,6 +1,27 @@
 # Yetlet CLI 0.3.1 — Release preparation (YT-250)
 
-**State (2026-11-10): Prepublication preparation PASS.** Source review,
+**Current state (2026-11-11): Windows shutdown repair verified. Hosted preparation for the replacement is pending.**
+The initial Windows MSVC check reproduced a Browser Style defect: after a
+targeted Ctrl-Break, the CLI had exited while its preview port still accepted
+connections. The Windows process wrapper now receives the interactive mode from
+the CLI caller. This lets it supervise npm even when the script path occupies
+the first argument, and wait for its owned Job to finish before returning.
+
+On the same NCUT-BOHE runner, the corrected CLI passed actual Native and Browser
+Style build and runtime checks. Chrome mounted the browser Wasm, preserved
+computed Style after a keyed update, and recorded no console errors or failed
+responses. After targeted Ctrl-Break, the first connection probe following CLI
+exit found each preview port closed. The default SDK selection, exact registry
+pins, locks and offline checks also passed. The run used the previous hosted
+archive plus the exact reviewed code delta, checked by file digests.
+
+The existing remote `yetlet-cli-v0.3.1` tag and the signed artifacts in the
+[original hosted record](CLI-031-HOSTED-RECORD.md) identify the previous source.
+The replacement requires a release identity decision and fresh hosted
+build/custody, signing and independent verification. The previous publication
+plan applies only to its original inputs.
+
+**Historical state (2026-11-10): Original prepublication preparation PASS.** Source review,
 clean-source candidate and native/browser consumers, original hosted build/custody,
 separate S review/delivery/CI, frozen preparation/signing and independent V passed.
 Read-only five-file public and single-package registry plans passed. Independent
@@ -75,9 +96,9 @@ closure, explicit alpha.7 and refreshed-metadata default selection, exact app
 pins/lock/checksums/receipt source, native Style SSR/fetchable CSS, browser Style
 production assets and runtime, and bounded Chrome computed-style/CSP smoke.
 Retain process ownership, bounded readiness/termination and original failures.
-Compilation, browser/CSP and cleanup results are separate claims. New Windows
-Style revalidation remains paused/unverified; historical Windows proof does
-not qualify these changed paths.
+Compilation, browser/CSP and cleanup results are separate claims. The original
+candidate checkpoint below precedes the separate Windows verification described
+in the current state above.
 
 After independent source/release-automation review and required Git/CI gates,
 use existing hosted build, protected evidence readback/custody, signing and

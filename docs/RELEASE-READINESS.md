@@ -24,7 +24,10 @@ distribution or transfer qualification to another source.
 [preparation record](CLI-031-RELEASE-PREPARATION.md) tracks the Owner-corrected
 `sdk-latest-v2` default and retained exact pins/locks/provenance.
 
-Independent semantic/source-freeze review and local candidate consumers passed.
+Independent semantic/source-freeze review and local consumers passed for the
+original candidate. Windows Browser Style shutdown has since been corrected and
+verified on the same MSVC runner. The replacement awaits a release identity and
+fresh hosted preparation.
 The [hosted preparation record](CLI-031-HOSTED-RECORD.md) retains successful
 original build/custody, separately reviewed S, frozen preparation/signing,
 independent V and read-only public/registry plans. The prepublication endpoint and

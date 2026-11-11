@@ -64,7 +64,7 @@ impl Console {
         // This also works when standard streams are redirected but a console
         // remains attached. Never attach/detach or change console modes here.
         if unsafe { GetConsoleProcessList(&mut pid, 1) } == 0 {
-            eprintln!("Windows dev requires an attached console; no Cargo child was started");
+            eprintln!("Windows dev requires an attached console; no child was started");
             return Err(io::ErrorKind::Unsupported.into());
         }
         let name = terminated(OsStr::new("CONIN$"))?;
@@ -86,9 +86,7 @@ impl Console {
         let mut mode = 0;
         win(unsafe { GetConsoleMode(input.as_raw_handle(), &mut mode) })?;
         if mode & ENABLE_PROCESSED_INPUT == 0 {
-            eprintln!(
-                "Windows dev requires processed console Ctrl-C input; no Cargo child was started"
-            );
+            eprintln!("Windows dev requires processed console Ctrl-C input; no child was started");
             return Err(io::ErrorKind::Unsupported.into());
         }
         CONSOLE_OWNED
@@ -707,8 +705,7 @@ fn exited(child: &Child) -> io::Result<bool> {
     }
 }
 
-pub(crate) fn run(app: &App, command: &mut Command) -> io::Result<Completion> {
-    let dev = command.get_args().next() == Some(OsStr::new("run"));
+pub(crate) fn run(app: &App, command: &mut Command, dev: bool) -> io::Result<Completion> {
     run_owned(app, command, dev, None)
 }
 
@@ -772,7 +769,7 @@ fn run_owned(
         win(unsafe { GetExitCodeProcess(child.process.as_raw_handle(), &mut code) })?;
         Ok(Completion::Exited(ExitStatus::from_raw(code)))
     })();
-    // Even a successful Cargo exit must not leave owned descendants behind.
+    // Even a successful child exit must not leave owned descendants behind.
     let cleanup = if child.done {
         Ok(())
     } else {

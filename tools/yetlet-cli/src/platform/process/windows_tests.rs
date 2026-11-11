@@ -137,7 +137,7 @@ fn owned_native_child_preserves_exit_bits_unicode_argv_cwd_and_environment() {
             .args(["--skip", "空 間;\"literal\\"])
             .env("CARGO_NET_OFFLINE", "true")
             .env("RUSTUP_AUTO_INSTALL", "0");
-        let Completion::Exited(status) = run(&app, &mut command).unwrap() else {
+        let Completion::Exited(status) = run(&app, &mut command, false).unwrap() else {
             panic!("expected native status")
         };
         assert_eq!(status.code().unwrap() as u32, code);
@@ -153,7 +153,7 @@ fn job_reaps_descendant_and_leaves_unrelated_native_child_running() {
     let pid_file = app.cwd.join("descendant-pid");
     let mut command = fixture(&executable, "descendant");
     command.env("YT088C_PID", &pid_file);
-    let result = run(&app, &mut command);
+    let result = run(&app, &mut command, false);
     let sentinel_alive = sentinel.try_wait().unwrap().is_none();
     sentinel.kill().unwrap();
     sentinel.wait().unwrap();
@@ -193,7 +193,7 @@ fn pinned_app_parent_and_files_cannot_be_replaced_during_native_execution() {
         .env("YT088C_RUNNING", &marker)
         .env("YT088C_RELEASE", &release);
     std::thread::scope(|scope| {
-        let child = scope.spawn(|| run(&app, &mut command));
+        let child = scope.spawn(|| run(&app, &mut command, false));
         wait_file(&marker);
         let rename_parent = fs::rename(root.path(), root.path().with_extension("moved"));
         let rename_app = fs::rename(&app.cwd, root.path().join("substitute"));
@@ -242,18 +242,20 @@ fn native_fixture() {
                 assert_eq!(status.code().unwrap() as u32, code);
                 assert_previous_restored();
             }
-            // Real C and BREAK, including graceful exit 23, before escalation.
+            // Real C and BREAK for an interactive command whose first argument
+            // is not `run`, as with the Windows Node/npm command.
             for event in [CTRL_C_EVENT, CTRL_BREAK_EVENT] {
                 PREVIOUS.store(0, AtomicOrdering::SeqCst);
                 let marker = app.cwd.join(format!("grace-{event}"));
                 let mut command = fixture(&std::env::current_exe().unwrap(), "grace");
+                assert_ne!(command.get_args().next(), Some(OsStr::new("run")));
                 command.env("YT088D_READY", &marker);
                 let sender = std::thread::spawn(move || {
                     wait_file(&marker);
                     // Only this fixture's new private console is in scope.
                     assert_ne!(unsafe { GenerateConsoleCtrlEvent(event, 0) }, 0);
                 });
-                let result = run_owned(&app, &mut command, true, None);
+                let result = run(&app, &mut command, true);
                 sender.join().unwrap();
                 let Completion::Exited(status) = result.unwrap() else {
                     panic!("native exit required")
