@@ -21,6 +21,19 @@
 
 | YT-250 | P1 | M | M10 | Correct Registry latest SDK selection and prepare CLI 0.3.1 | YT-247, YT-248, YT-249 | [Preparation](CLI-031-RELEASE-PREPARATION.md) records latest SemVer selection, exact registry pins and locking, and Windows Browser Style preview port closure at CLI exit. The [hosted dossier](CLI-031-HOSTED-RECORD.md) preserves the first candidate and records the replacement's guarded tag transition, verified GitHub and crates.io publication, and installed registry consumer PASS. The Reader Edition selects SDK alpha.7 / CLI 0.3.1 | Done |
 
+## M26 — Application Startup & Sample Experience
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-251 | P1 | M | M26 | Axum Application Startup Contract | — | [M26 plan](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md): ADR-0011 defines `App::serve()` default `127.0.0.1:3000` HTTP and explicit `App::serve_on(address)`, `App<()>` state boundary, HTTP/HTTPS/TLS boundary, error/runtime/listener ownership, minimal Tokio feature boundary and `into_router()` escape hatch. Independent contract Reviewer PASS required | Todo |
+| YT-252 | P1 | S | M26 | Axum Adapter Prelude Contract | — | [M26 plan](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md): ADR-0012 defines a curated optional `server_axum::prelude`, preserves explicit paths, avoids redundant Core prelude and broad Axum/Tower/Tokio exports. Independent contract Reviewer PASS required | Todo |
+| YT-253 | P1 | M | M26 | Implement `App::serve()` and `App::serve_on()` | YT-251 | [M26 plan](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md): real HTTP/default-bind/bind-error/state tests, `App::from_router` support, HTTP-only default, unchanged `into_router`, minimal native Tokio feature graph and default/browser dependency isolation. Independent implementation Reviewer PASS required | Todo |
+| YT-254 | P1 | S | M26 | Implement `server_axum::prelude` | YT-252 | [M26 plan](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md): compile/doctest coverage for the curated export list, no duplicate `Json`, no server dependency leakage and preserved explicit imports. Independent implementation Reviewer PASS required | Todo |
+| YT-255 | P1 | M | M26 | Migrate minimal and basic HTTP samples | YT-253, YT-254 | [M26 plan](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md): Hello World, REST API, Session Cart, Middleware Lab, Forms Validation and SDK minimal example use the simple path where appropriate; preserve routes/security/commands. Independent sample Reviewer PASS required | Todo |
+| YT-256 | P1 | M | M26 | Migrate lifecycle-sensitive capability samples | YT-253, YT-254 | [M26 plan](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md): File Server, Auth Notes, Modular Shop, SSE Notifications and SQLite CRUD retain intentional native Axum graceful-shutdown lifecycle. Independent sample Reviewer PASS required | Todo |
+| YT-257 | P1 | M | M26 | Migrate browser and visual samples | YT-253, YT-254 | [M26 plan](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md): Todo and Style Showcase adopt simple startup; Multi-Island Dashboard retains native graceful shutdown; preserve SSR/WASM/assets and optional Style behavior. Independent sample Reviewer PASS required | Todo |
+| YT-258 | P1 | S | M26 | Synchronize sample catalog and source documentation | YT-255, YT-256, YT-257 | [M26 plan](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md): update sample index and source-only API map, retain exactly 13 stable catalog entries, keep published alpha.7/CLI 0.3.1 Reader Edition untouched. `cargo xtask check docs`, `cargo xtask check samples`, formatting and whitespace PASS; independent final Reviewer PASS required | Todo |
+
 ## YT-241 — Owner-approved Style Showcase
 
 - Priority: P2; size: M; scope: one bounded application slice.

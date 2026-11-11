@@ -1,5 +1,14 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+## M26 — Application Startup & Sample Experience (planning review PASS; owner clarification amendment reviewed; implementation not started)
+
+[M26 plan and YT-251–YT-258 dependency map](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md) adopts **Simple first, customizable when needed**. It proposes `App::serve()` with a loopback-only `127.0.0.1:3000` HTTP development default, `App::serve_on(address)` for explicit binding, and a curated optional `server_axum::prelude`. HTTPS/TLS is never inferred or enabled implicitly; production TLS normally terminates at an explicit edge proxy, while direct TLS remains an advanced native Axum integration. `into_router()` and native Axum/Tower lifecycle control remain first-class; samples that require graceful shutdown keep their explicit listener and `axum::serve` path.
+
+The planning-only delivery and its owner-clarification amendment both received independent saved Reviewer subagent PASS: original Job `wc_job_aW6Lqgq5TYz6DWi0` and amendment Job `wc_job_IguwE8skhKa3EkkU` (both terminal exit 0; model `gpt-6-astra`; effective effort `high`; zero issues and required followups). YT-251/252 define and independently review the startup and prelude contracts; YT-253/254 implement them after their respective contract PASS; YT-255–257 migrate the basic, lifecycle-sensitive, and browser/visual sample groups; YT-258 synchronizes the catalog and source documentation. Every item has its own independent Reviewer gate. No product implementation has started.
+
+Published SDK `0.9.0-alpha.7`, CLI `0.3.1`, their release records, and the selected Reader Edition remain unchanged. New APIs are source-only until a later separately authorized SDK release; CLI templates, the published First App guide, and the Reader Edition snapshot are outside M26.
+
+
 **YT-250 CLI 0.3.1 release (2026-11-11): Published with registry consumer PASS.**
 [Preparation and gates](CLI-031-RELEASE-PREPARATION.md) align source and release
 consumers with `sdk-latest-v2`: maximum available non-yanked SemVer, including
