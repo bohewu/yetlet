@@ -27,9 +27,9 @@ The original YT-245 preparation selects local SDK `0.9.0-alpha.7` contents;
 these typed constructors are now distributed rather than checkout-only.
 
 
-Published SDKalpha.7/CLI0.3.0 artifacts serve separate roles. The independent CLI
-ships native/browser Style templates and a private app generator; Style requires
-SDK alpha.7 and follows exact app SDK pins and locks. The
+Published SDKalpha.7/CLI0.3.1 artifacts serve separate roles. The independent CLI
+ships native/browser Style templates and a private app generator. The Style
+walkthroughs verify SDK alpha.7 with exact app pins and locks. The
 [Style Showcase](../examples/style-showcase/README.md) remains a checkout sample.
 See the [API carrier map](API-REFERENCE.md#source-only-checkout-additions)
 and [Style contract](YT-237-STYLE-REGISTRATION-CONTRACT.md).
@@ -75,7 +75,7 @@ trusted request extensions stay out of browser builds and hydration state.
 | Admin Valkey/Auth adoption | YT-126 Done after focused verification and independent review; explicit feature/runtime selection, fresh policy and documented pre-SQL race limit. No generic crate bridge or cross-store commit fencing | [YT-126](YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md), [contract study](YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md) |
 | Shop optional catalog display cache | YT-183 Done after independent Reviewer PASS, zero issues/followups: app-only default-off `catalog-cache`, bounded age/admission and generation invalidation; Session/checkout remain authoritative, no framework cache crate or output cache | [Contract](YT-183-CATALOG-CACHE-CONTRACT.md), [implementation/new proof](YT-183-CATALOG-CACHE-IMPLEMENTATION.md) |
 | Opaque Bearer capabilities | Existing File Server/Production Starter app-owned route guards; no generic identity-aware JWT/introspection provider | [Bearer study](YT-119-BEARER-STUDY.md) |
-| Yetlet CLI | Independently published `yetlet-cli` `0.2.0`, executable `yetlet`, with typed parser/support API, explicit scaffolding, static HTML export and configuration-only generators; generated apps pin SDKalpha.6 and per-command/source/platform limits apply | [Current CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) |
+| Yetlet CLI | Independently published `yetlet-cli`, executable `yetlet`, with typed parser/support API, explicit scaffolding, static HTML export and configuration-only generators. Scaffolding pins the SDK selected by the resolver exactly and writes the app lock and receipt. Per-command and platform limits apply. | [Current CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) |
 
 Application accounts, permissions, project policy, sensitive-write rechecks and
 deployment durability/HA remain application responsibilities. Authentication

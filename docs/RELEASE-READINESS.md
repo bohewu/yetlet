@@ -1,16 +1,15 @@
 # Yetlet Prototype Release Readiness
 
-**Current distribution (2026-11-10):** **Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
-**Published CLI:** `0.3.0` (`yetlet-cli`). The accepted
+**Current distribution (2026-11-11):** **Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
+**Published CLI:** `0.3.1` (`yetlet-cli`). The accepted
 [SDK publication record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
-and [CLI publication record](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10)
+and [CLI publication record](CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11)
 record actual GitHub/crates.io delivery, exact archives, signatures and consumer limits.
 The typed Tag Builder is included in published SDK alpha.7; the independent CLI
 ships private app Style generation/templates and SDK resolution with exact app
 pins/locks. [Showcase](API-REFERENCE.md#source-only-checkout-additions) remains a
-checkout sample. The original publisher consumer failure and successful bounded
-registry supplement are recorded without relabeling that workflow PASS. The
-independently selected public Reader Edition is SDK alpha.7 / CLI 0.3.0. Development version equality
+checkout sample. The CLI 0.3.1 publication workflow and registry consumer passed.
+The selected public Reader Edition is SDK alpha.7 / CLI 0.3.1. Development version equality
 does not establish archive/source equality. This is not Stable API, production,
 SLSA level or universal platform qualification.
 
@@ -20,7 +19,7 @@ not a runnable release sequence. The dated Pending/FAIL/unpublished states below
 remain true for their original checkpoints; they do not describe current
 distribution or transfer qualification to another source.
 
-**CLI 0.3.1 source preparation (YT-250):** The
+**CLI 0.3.1 release (YT-250):** The
 [preparation record](CLI-031-RELEASE-PREPARATION.md) tracks the Owner-corrected
 `sdk-latest-v2` default and retained exact pins/locks/provenance.
 
@@ -29,13 +28,10 @@ original candidate. Windows Browser Style shutdown has since been corrected and
 verified on the same MSVC runner. The replacement completed fresh hosted build,
 custody, frozen preparation, signing and independent verification under the
 approved unpublished-candidate tag transition.
-The [hosted preparation record](CLI-031-HOSTED-RECORD.md) retains successful
-original build/custody, separately reviewed S, frozen preparation/signing,
-independent V and read-only public/registry plans. The prepublication endpoint and
-final whole-run Pipeline acceptance passed; guarded result-document delivery is
-recorded separately.
-Formal publication is excluded; source version does not change the accepted
-publication authority or Reader Edition.
+The [hosted record](CLI-031-HOSTED-RECORD.md) retains both candidates and the
+Owner-approved publication of the replacement. Anonymous GitHub and crates.io
+readback confirmed the same archive, and the installed consumer passed Native
+and Browser Style runtime checks.
 
 ## Historical readiness checkpoints
 

@@ -1,6 +1,6 @@
 # Yetlet CLI 0.3.1 — Release preparation (YT-250)
 
-**Current state (2026-11-11): Windows shutdown repair and replacement prepublication preparation PASS.**
+**Current state (2026-11-11): Published on GitHub and crates.io. Registry consumer PASS.**
 The initial Windows MSVC check reproduced a Browser Style defect: after a
 targeted Ctrl-Break, the CLI had exited while its preview port still accepted
 connections. The Windows process wrapper now receives the interactive mode from
@@ -18,8 +18,9 @@ archive plus the exact reviewed code delta, checked by file digests.
 The [hosted record](CLI-031-HOSTED-RECORD.md) retains the original candidate and
 records the Owner-authorized historical/canonical tag transition. The corrected
 candidate passed fresh build, custody, frozen preparation, signing and
-independent verification. Its read-only public and registry plans passed.
-Formal publication remains held.
+independent verification. The
+[publication and installed consumer record](CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11)
+records the approved publication run and verified public archive.
 
 ### Windows correction evidence and replacement authority
 
@@ -63,8 +64,8 @@ source `f489a089ec2b814e830942318f84b0e45b0a67bd` under a new historical tag.
 Use the exact original ref value to protect the canonical replacement, retain
 the original signed payloads and approvals, update only the private Draft,
 and perform fresh build/custody/signing/verification for the corrected source.
-Formal publication remains held. This exception is specific to this
-unpublished candidate.
+At this checkpoint, formal publication was still held. The exception applied
+only to this candidate before publication.
 
 **Historical state (2026-11-10): Original prepublication preparation PASS.** Source review,
 clean-source candidate and native/browser consumers, original hosted build/custody,

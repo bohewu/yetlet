@@ -48,11 +48,12 @@ below; the generator and templates are now distributed in the CLI.
 
 ## CLI Style authoring and checkout Showcase
 
-Published SDKalpha.7/CLI0.3.0 artifacts serve separate roles. The CLI ships the
+Published SDKalpha.7/CLI0.3.1 artifacts serve separate roles. The CLI ships the
 private app Style generator and native/browser Style templates, with build/watch
-integration and exact SDK resolution/locking. Style templates require SDK
-alpha.7; ordinary native/browser selection also admits alpha.6 under the reviewed
-policy. No public SDK Style crate or implicit runtime CSS is introduced.
+integration and exact SDK resolution/locking. The Style walkthroughs verify
+SDK alpha.7. By default, `new` selects the highest available non-yanked SemVer
+and checks the selected SDK for the template's required packages and features.
+Style CSS is generated at build time by the private app generator.
 
 | Source surface | Entry point and contract | Availability and limits |
 |---|---|---|

@@ -26,13 +26,13 @@ Rust Views with optional browser WASM when a screen needs local interaction.
 ## Current published releases
 
 **Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
-**Published CLI:** `0.3.0` (`yetlet-cli`).
+**Published CLI:** `0.3.1` (`yetlet-cli`).
 The [SDK publication record](docs/ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
-and [CLI publication record](docs/CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10)
+and [CLI publication record](docs/CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11)
 retain exact GitHub/crates.io archives, signatures and consumer evidence. The SDK
 includes typed Tag Builders. The independent CLI includes SDK version resolution,
 exact generated app pins/locks and opt-in native/browser Style templates with a
-private app CSS generator. Style requires alpha.7 under the reviewed SDK policy.
+private app CSS generator. The Style walkthroughs select SDK alpha.7 explicitly.
 
 The quickstart follows the verified Reader Edition in [site/pages.toml](site/pages.toml).
 Each SDK or CLI publication includes a reviewed reader, README and Pages update
@@ -41,21 +41,21 @@ before release closeout. Development manifest changes alone do not promote it.
 ## Start with native SSR
 
 **Experimental alpha.** This quickstart uses SDK `0.9.0-alpha.7` and the
-independently versioned CLI `0.3.0`. The SDK is available
+independently versioned CLI `0.3.1`. The SDK is available
 on crates.io:
 [`yetlet`](https://crates.io/crates/yetlet/0.9.0-alpha.7) and
 [`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.7), version
 `0.9.0-alpha.7`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.7)
 contains the archives and verification material. To create a standalone app,
 follow [Build your first Yetlet app](docs/FIRST-APP.md). The independently
-published CLI `0.3.0` creates apps without a repository clone:
+published CLI `0.3.1` creates apps without a repository clone:
 
 ```sh
-cargo +1.99.0 install yetlet-cli --version 0.3.0 --locked
+cargo +1.99.0 install yetlet-cli --version 0.3.1 --locked
 yetlet --version
 ```
 
-Expected output: `yetlet 0.3.0`. Cargo builds the CLI from source; see the
+Expected output: `yetlet 0.3.1`. Cargo builds the CLI from source; see the
 [native build prerequisites](tools/yetlet-cli/README.md#first-use-prerequisites),
 including its OpenSSL dependency, before installing.
 

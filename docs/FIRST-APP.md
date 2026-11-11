@@ -3,7 +3,7 @@
 Create a standalone native SSR app with the published source-installed CLI and
 `yetlet` SDK `0.9.0-alpha.7`. This Linux/POSIX walkthrough uses the existing
 scaffold; the app needs no local SDK source or Cargo path overrides. APIs remain
-Experimental. CLI `0.3.0` and SDK `0.9.0-alpha.7` have independent versions.
+Experimental. CLI `0.3.1` and SDK `0.9.0-alpha.7` have independent versions.
 
 For an app whose UI and state run in the browser without a native HTTP backend,
 choose the separate [browser-only WASM walkthrough](BROWSER-APP.md).
@@ -41,12 +41,12 @@ in Cargo's user install directory.
 Install the independently published CLI from crates.io:
 
 ```sh
-cargo +1.99.0 install yetlet-cli --version 0.3.0 --locked
+cargo +1.99.0 install yetlet-cli --version 0.3.1 --locked
 yetlet --version
 ```
 
 This downloads the CLI source archive from crates.io and compiles the `yetlet`
-executable. Expected version output is exactly `yetlet 0.3.0`. This is a native
+executable. Expected version output is exactly `yetlet 0.3.1`. This is a native
 source installation, so the prerequisites above apply. Maintainers evaluating a
 checkout can use the separate [source-install instructions](../tools/yetlet-cli/README.md#build-locally-and-create-an-application).
 
@@ -92,8 +92,8 @@ server. The app declares its own
 standalone `[workspace]`; it is not added to Yetlet's workspace.
 
 The explicit SDK selection keeps this walkthrough on its reviewed reader
-edition even after another compatible SDK is published. Omitting it resolves
-the latest compatible SDK under the installed CLI's policy. `--offline` uses
+edition as newer SDK releases arrive. Omitting it selects the latest available
+non-yanked SDK by SemVer, including prereleases. `--offline` uses
 only local resolver metadata and Cargo index/cache; missing inputs fail clearly
 without contacting the registry. See the [resolver CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md).
 
@@ -189,7 +189,7 @@ to pass data and compose the existing home handler. Use the
 ## Next: export a static site
 
 Choose static export when the content can be built ahead of time and served as
-HTML files. Keep the native SSR app above for request-time handlers. CLI `0.3.0`
+HTML files. Keep the native SSR app above for request-time handlers. CLI `0.3.1`
 supports static export; it does not crawl those handlers or turn the plain
 scaffold into an exporter. There is no `yetlet new --static` option.
 

@@ -1,6 +1,6 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-**YT-250 CLI 0.3.1 preparation (2026-11-11): Windows repair verified and replacement prepublication preparation PASS.**
+**YT-250 CLI 0.3.1 release (2026-11-11): Published with registry consumer PASS.**
 [Preparation and gates](CLI-031-RELEASE-PREPARATION.md) align source and release
 consumers with `sdk-latest-v2`: maximum available non-yanked SemVer, including
 future prereleases and required same-version Browser availability, followed by
@@ -13,8 +13,8 @@ The [hosted dossier](CLI-031-HOSTED-RECORD.md) retains the original candidate's
 five-file public and single-package registry plans. The replacement addresses
 Browser Style shutdown on Windows and has fresh build/custody, frozen prepare,
 signing, independent V and read-only publication plan evidence.
-Formal publication is excluded; accepted publication
-and Reader stay SDK alpha.7 / CLI 0.3.0.
+The approved publication run verified GitHub, crates.io and the installed
+registry consumer. The Reader Edition selects SDK alpha.7 / CLI 0.3.1.
 
 **YT-249 Reader Edition publication follow-through (2026-11-10): Source/consumer review PASS.**
 [Contract and evidence](YT-249-READER-RELEASE-ROLLOVER.md) promote the reader to

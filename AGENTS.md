@@ -33,6 +33,11 @@ never run wholesale cleanup on a mixed historical `target/` tree.
 
 Before committing or pushing, use Commit Guard with the explicit `strict` profile and `builtin` engine: scan the staged index before a commit and the exact outgoing commit range before a push. Any nonzero result stops the operation; do not fall back to audit, bypass hooks, or weaken the guard. A passing scan does not grant authorization to commit or push; preserve the user's explicit authorization requirement.
 
+After a successful merge, delete the same-repository remote PR head branch once
+its live tip matches the merged PR head. Preserve protected branches, branches
+used by an open PR or active worktree, and archival or research refs. Use an
+exact-tip lease for deletion and verify that the remote ref is gone.
+
 ## Release documentation gate
 
 Before selecting candidate C or packaging a release, follow
