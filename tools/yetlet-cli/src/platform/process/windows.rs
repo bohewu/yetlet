@@ -86,9 +86,7 @@ impl Console {
         let mut mode = 0;
         win(unsafe { GetConsoleMode(input.as_raw_handle(), &mut mode) })?;
         if mode & ENABLE_PROCESSED_INPUT == 0 {
-            eprintln!(
-                "Windows dev requires processed console Ctrl-C input; no child was started"
-            );
+            eprintln!("Windows dev requires processed console Ctrl-C input; no child was started");
             return Err(io::ErrorKind::Unsupported.into());
         }
         CONSOLE_OWNED
