@@ -1,6 +1,6 @@
 # M26 — Application Startup & Sample Experience
 
-**Status:** Planning review PASS (including owner clarification amendment); implementation not started
+**Status:** Planning review PASS; YT-251 contract accepted; product implementation not started
 **Date:** 2026-11-11
 **Repository:** `bohewu/yetlet`
 **Base:** `master` at `83d10df6c2a219c1f7271419ad4b1b04c78741bb` (PR #85, CLI package README follow-up)
@@ -91,7 +91,7 @@ Intended semantics:
 2. `serve()` binds the fixed default loopback address and delegates to `serve_on`.
 3. `serve_on(address)` binds the caller-supplied TCP socket address, accepting normal Tokio `ToSocketAddrs` inputs such as `&str` and `SocketAddr`.
 4. Both reuse the existing `into_router()` conversion and call native `axum::serve`.
-5. Both await the server and return bind/server I/O errors unchanged.
+5. Address-resolution and listener-bind errors are returned unchanged. After a successful bind, Axum 0.8.9's serving future is non-returning; its TCP listener handles accept errors internally rather than returning them to the application.
 
 Contract constraints:
 
@@ -103,7 +103,7 @@ Contract constraints:
 - HTTPS is not the default because useful TLS requires explicit certificate/private-key provisioning, renewal and trust decisions. For common production deployments, terminate TLS at a reverse proxy/load balancer (for example Nginx or BunkerWeb) and connect to the app over a protected internal HTTP path. Direct TLS termination remains possible through an explicitly configured native Axum/Tower accept loop; it is outside these convenience methods and M26.
 - Applications must not treat the loopback HTTP default as production deployment guidance. Do not expose plain HTTP on an untrusted network; configure an HTTPS edge or an explicit direct-TLS integration.
 - Both methods are async and do not create, own, or hide a Tokio runtime. The application still declares its own Tokio dependency and runtime features (for example `#[tokio::main]`).
-- Both methods consume the App, do not spawn a detached task, do not swallow errors, and add no implicit logging or output.
+- Both methods consume the App and do not spawn a detached task. Address-resolution and bind errors propagate; after binding, Axum 0.8.9 handles accept errors internally (connection errors retry; non-connection errors are logged by Axum and followed by a one-second delay). Yetlet adds no startup output or custom post-bind error policy.
 - `App::from_router(router).serve()` and `App::from_router(router).serve_on(address)` are supported when the supplied Router has no unresolved state.
 - Neither method returns the bound listener or its actual local address. Port `0`, querying `local_addr()`, custom socket options, multiple listeners, graceful shutdown, TLS, and other listener ownership require `into_router()` plus native Tokio/Axum.
 - No `serve_with_shutdown` convenience method is added in M26. Applications requiring graceful shutdown keep the native `TcpListener` + `axum::serve(...).with_graceful_shutdown(...)` path.
@@ -159,7 +159,7 @@ Prelude rules:
 |---|---|---|---|
 | YT-251 | P1 / M | Axum Application Startup Contract (ADR-0011) | — |
 | YT-252 | P1 / S | Axum Adapter Prelude Contract (ADR-0012) | — |
-| YT-253 | P1 / M | Implement `App::serve` | YT-251 |
+| YT-253 | P1 / M | Implement `App::serve()` and `App::serve_on()` | YT-251 |
 | YT-254 | P1 / S | Implement `server_axum::prelude` | YT-252 |
 | YT-255 | P1 / M | Migrate minimal and basic HTTP samples | YT-253, YT-254 |
 | YT-256 | P1 / M | Migrate lifecycle-sensitive capability samples | YT-253, YT-254 |
@@ -181,7 +181,7 @@ Deliverable: `docs/adr/0011-application-startup-api.md` plus this plan's source-
 
 Acceptance:
 
-- Decide and document the exact `App::serve()` default and `App::serve_on(address)` signatures, `App<()>` state boundary, return type, bind/server error propagation, and listener ownership.
+- Decide and document the exact `App::serve()` default and `App::serve_on(address)` signatures, `App<()>` state boundary, return type, address-resolution/bind error propagation, native Axum post-bind accept-error behavior, and listener ownership.
 - Define the default loopback IP/port, explicit all-interface binding, port-zero behavior, HTTP-only/HTTPS/TLS boundary, and the no-hidden-runtime rule.
 - Explicitly preserve `into_router()` and identify advanced cases that must continue using native Axum.
 - Define the minimum Tokio feature/dependency boundary and a targeted test plan.
@@ -359,7 +359,7 @@ Do not modify as part of M26:
 
 - No changes to Yetlet Core's dependency boundary or default feature set.
 - No new runtime, controller hierarchy, MVC requirement, DI container, service locator, plugin registry, or second router.
-- No hidden Tokio runtime, environment-dependent bind address, detached task, automatic logging, or implicit shutdown behavior; the documented loopback default remains explicit and fixed.
+- No hidden Tokio runtime, environment-dependent bind address, detached task, Yetlet-added startup logging, or implicit shutdown behavior; the documented loopback default remains explicit and fixed, while Axum retains its native accept-error logging policy.
 - No removal or renaming of existing public module paths or `into_router()`.
 - No mandatory prelude use; explicit imports remain first-class.
 - No route/business-logic, persistence, security-policy, browser-rendering or asset-lifecycle redesign during sample migration.
@@ -393,9 +393,13 @@ Do not modify as part of M26:
 - `cargo xtask check samples`: PASS (13 samples).
 - `git diff --check`: PASS.
 - Review scope is the M26 plan, Backlog rows, Roadmap summary and the source/compatibility surfaces listed in the review instruction. No product code was changed.
+- YT-251 initial contract Reviewer Job `wc_job_zaxfmBinaf26QRTV`: terminal exit `0`, result `FAIL` with one P2 on Axum post-bind accept-error behavior.
+- YT-251 corrective follow-up Reviewer Job `wc_job_Nad2HOpWhHREJOty`: terminal exit `0`, result `PASS`, zero issues and required followups.
+- Follow-up trace: saved `reviewer` role, model `gpt-6-astra`, effective effort `high`; model/role/effort and parent inheritance checks all `true`.
+- Ignored YT-251 evidence: `.pipeline-output/yt251-application-startup-contract-review-20261111/reviewer-output.json`, `reviewer-output-v2.json`, `reviewer-trace-v1.json`, and `reviewer-trace-v2.json`.
 
 ## 10. Next handoff
 
-With the planning Reviewer PASS recorded, the next implementation task is **YT-251 — Axum Application Startup Contract**. Start by reading this plan, `AGENTS.md`, `docs/adr/0001-separation-of-concerns.md`, `docs/adr/0005-opt-in-capability-modules.md`, `docs/adr/0006-handler-first-mvc-optional.md`, the current `App` implementation, and the existing M25/M26 backlog context. Produce ADR-0011 and the exact contract; do not implement `App::serve` in the contract task.
+With ADR-0011 accepted at contract-only scope, the next task is **YT-252 — Axum Adapter Prelude Contract**. Read this plan, `AGENTS.md`, the current public `server_axum` exports, `docs/adr/0001-separation-of-concerns.md`, `docs/adr/0005-opt-in-capability-modules.md`, `docs/adr/0006-handler-first-mvc-optional.md`, and the existing M26 backlog. Produce ADR-0012 and a source-verified export inventory; do not implement the prelude in the contract task.
 
 Current planning branch: `codex/m26-application-startup-dx`, based on `83d10df6c2a219c1f7271419ad4b1b04c78741bb`. This planning delivery is documentation-only. Commit/Push/PR/Merge and SDK/CLI release remain separate and unauthorized.
