@@ -1,5 +1,53 @@
 # Yetlet CLI 0.3.1 — hosted preparation record (YT-250)
 
+## Windows-corrected replacement — 2026-11-11
+
+The Owner-authorized [replacement preparation](CLI-031-RELEASE-PREPARATION.md)
+preserves the first candidate and repeats the hosted stages for the corrected
+source. Signing and independent result verification remain pending at this
+checkpoint. Formal publication remains held.
+
+| Binding | Observed replacement input |
+|---|---|
+| Product source C | `aa96c34797aad92a9de486ecd096ad3fb82ff9a5` |
+| Source delivery | PR #80 Windows shutdown repair, then PR #81 factual qualification and one-time replacement authority |
+| Source master CI | [Rust 42939675365](https://github.com/bohewu/yetlet/actions/runs/42939675365) and [CodeQL workflow 42939675666](https://github.com/bohewu/yetlet/actions/runs/42939675666), PASS at C. The docs-only scope skipped analysis at C. Rust analysis passed on PR #80's corrected code. |
+| Original source retained | `yetlet-cli-v0.3.1-pre-windows-f489a08` points to `f489a089ec2b814e830942318f84b0e45b0a67bd` |
+| Canonical tag | `yetlet-cli-v0.3.1` now points to C under the Owner's unpublished-candidate exception. The guarded push used an exact-old-value lease. |
+| Unsigned build | [42940670739 / 1](https://github.com/bohewu/yetlet/actions/runs/42940670739), SUCCESS |
+| Public artifact | `13820995878`, 547724 bytes, ZIP SHA256 `a11702fb43e9915384998679c27fb913a3b37d4c0c93f345590affa03cb892e6` |
+| Encrypted private artifact | `13819779154`, 56505551 bytes, ZIP SHA256 `02b59b81e176714731606fbbd162972845e5000a2c090dc9cd5975e4b8711bc0` |
+| Hosted CLI archive | 545390 bytes, SHA256 `c03da45da176fb29f5b0e10260b26307f4609a2427e4fe41dbb1e16f812d4913` |
+| Unsigned provenance | 5557 bytes, SHA256 `4e65e5156257aeec898585ee54bfd9915971ac9c5659e4f870beb120d122255e` |
+| Original custody/readback | [42941293932 / 1](https://github.com/bohewu/yetlet/actions/runs/42941293932), SUCCESS under existing Environment `25525950662` |
+| Safe receipt artifact | `13820088330`, ZIP SHA256 `9aafcbe3106e14285124f2cc534a904e3b565d1c685c992d1451b56df07707e9` |
+| Private Draft | Existing Release ID `440475335`, exact canonical tag/C, private, prerelease, zero assets at replacement readback |
+
+Normal locked local packaging at C produced archive SHA256
+`79379c248dafdf476c19ef5fbd13fcee5e5aac53c7514b7cee36de2fc3bebcfb`.
+All 162 non-VCS package members match the hosted archive byte-for-byte. Only
+the local Cargo VCS record is absent from the hosted staging representation.
+The Windows-tested source and reviewed formatting-only delta, normal Linux
+archive consumers, exact pins/locks and runtime cleanup are recorded in the
+preparation document. The SDK build dependency/snapshot and Reader remain
+unchanged.
+
+The safe receipt binds C/tag and the original build run, with original exit 0,
+`PREPARATION_SUCCESS`, complete local decryption/inventory verification and
+private-manifest verification. The protected Environment and exact tag policy
+were read back and retained without changes. Both raw downloaded artifact ZIPs
+match their actual GitHub digests.
+
+The next signer source S must be a distinct reviewed commit with successful
+master CI. Complete the existing record using this C/build/custody and original
+provenance identity, then bind the new S and existing Draft. Assemble a bounded
+qualification closure from retained original evidence, record the old candidate
+and original failures explicitly, and use fresh prepare/sign/result requests.
+The earlier signed payloads and publication preview remain retained at their
+original identities.
+
+## Original candidate — 2026-11-10
+
 Date: 2026-11-10. **Prepublication preparation PASS: original build/custody,
 separate reviewed S, frozen-input signing and independent V completed. The
 five-file public allowlist and single-package registry plan pass read-only gates.
