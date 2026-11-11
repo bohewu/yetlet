@@ -1,11 +1,37 @@
 # Yetlet CLI 0.3.1 — hosted preparation record (YT-250)
 
+## Owner-approved publication and installed consumer — 2026-11-11
+
+The Owner approved the `release-publish` Environment on
+[run 42947558248, attempt 1](https://github.com/bohewu/yetlet/actions/runs/42947558248)
+after its read-only preflight passed. The workflow published the existing
+[Experimental GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/yetlet-cli-v0.3.1)
+and then uploaded the same `yetlet-cli` archive to crates.io. The run completed
+successfully, including the installed registry consumer.
+
+| Binding | Verified result |
+|---|---|
+| Product source | `aa96c34797aad92a9de486ecd096ad3fb82ff9a5` |
+| Publication workflow source | `4b31d77b53bb947180e6337691fdc99859b2c566` |
+| GitHub Release | ID `440475335`, published `2026-11-11T02:42:57Z`. All five public assets match the approved names, sizes and SHA256 digests, including anonymous downloads. |
+| crates.io | `yetlet-cli` `0.3.1`, available and not yanked. The version API, sparse index and anonymous archive agree with GitHub and the frozen package. |
+| Published archive | 545390 bytes, SHA256 `c03da45da176fb29f5b0e10260b26307f4609a2427e4fe41dbb1e16f812d4913` |
+| Hosted result | Artifact `13823551928`, ZIP SHA256 `758a9fcb5eda431c7dbcb0ebd2a08871b7699d2e9199f505674f3bce029bd2db` |
+
+The fresh registry install reported `yetlet 0.3.1`. All six consumer cases
+passed. Refreshed metadata selected SDK `0.9.0-alpha.7` in the default case.
+Explicit selections, exact pins, lock and receipt preservation, and the offline
+hit and miss behaved as expected. Native Style served SSR and generated CSS.
+Browser Style built Vite/Wasm and mounted in Chrome with expected computed
+styles and no console or request errors. Both preview ports closed on exit.
+The SDK distribution remains `0.9.0-alpha.7`.
+
 ## Windows-corrected replacement — 2026-11-11
 
 The Owner-authorized [replacement preparation](CLI-031-RELEASE-PREPARATION.md)
 preserves the first candidate and repeats the hosted stages for the corrected
 source. The replacement's build, custody, frozen preparation, signing and
-independent verification passed. Formal publication remains held.
+independent verification passed before the Owner approved publication.
 
 | Binding | Observed replacement input |
 |---|---|

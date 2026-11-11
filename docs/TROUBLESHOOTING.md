@@ -2,7 +2,7 @@
 
 Find the symptom below, check the possible cause, then follow the linked guide
 for the complete correction. Read guides and API source from the same checkout.
-The SDK `0.9.0-alpha.7` and independent source-installed CLI `0.3.0` are published
+The SDK `0.9.0-alpha.7` and independent source-installed CLI `0.3.1` are published
 Experimental versions. These are source-backed explanations of
 existing behavior, not new execution or platform qualification results.
 
