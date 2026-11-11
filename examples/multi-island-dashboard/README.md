@@ -12,6 +12,11 @@ cargo xtask build multi-island-dashboard && cargo run -p yetlet-multi-island-das
 
 The anonymous prototype listens on `127.0.0.1:3009` by default and rejects non-loopback listeners. Override local test paths with `YETLET_DASHBOARD_LISTEN` and `YETLET_DASHBOARD_ASSET_ROOT`.
 
+This advanced lifecycle example keeps explicit Tokio `TcpListener` ownership
+and `axum::serve(...).with_graceful_shutdown(...)` to drain connections on
+Ctrl-C and report the actual bound address. The optional island assets retain
+their existing `target/multi-island-dashboard-dist` root.
+
 Routes:
 
 - `/healthz` — native health endpoint.

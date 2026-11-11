@@ -31,6 +31,10 @@ Restart the server after rebuilding CSS: native SSR snapshots accepted CSS at
 startup. The native-only command leaves any previously built browser output
 intact; it does not create browser output on a clean checkout.
 
+Startup wraps the existing Router with `App::from_router(...).serve_on(...)`.
+`YETLET_LISTEN` retains the default `127.0.0.1:3000`. Port `0` uses a native
+listener so the startup banner reports the actual OS-selected address.
+
 Open:
 
 - `http://127.0.0.1:3000/` for pure SSR;
