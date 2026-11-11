@@ -53,6 +53,10 @@ Downloads use `application/octet-stream`, `Content-Disposition: attachment`, `no
 - Each download securely reopens the owned `NamedTempFile`, preserving identity rather than opening a name that might have been replaced with a symlink. It retains file/storage ownership and a concurrency permit until completion or body cancellation. The deliberate same-user symlink-swap regression reads the original file or fails, never reads the replacement.
 - `Ctrl-C` drains the server then drops owned files/root. A forced crash/SIGKILL may leave the private temporary directory; crash recovery, external temporary-file cleaners, hostile processes with the same OS identity, deployment-grade HTTP timeouts/TLS and multi-user authorization are outside this sample's assurance. Never deploy it publicly as-is. No persistence across restarts is promised.
 
+## Advanced lifecycle
+
+This advanced lifecycle example keeps a native Tokio `TcpListener` and `axum::serve(...).with_graceful_shutdown(...)` so Ctrl-C drains requests before dropping owned uploads and their temporary root. These listener and shutdown controls require native Axum integration beyond simple `App::serve()` / `App::serve_on()` startup.
+
 ## Verify
 
 ```bash

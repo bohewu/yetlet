@@ -38,6 +38,10 @@ The one-second `: heartbeat` comment keeps idle local demonstrations observable.
 
 Publishing accepts exactly one `application/json` Content-Type, rejects all browser `Origin` headers, limits JSON to 2 KiB, and accepts 1–200 non-control characters. There is no CORS or authentication. Loopback-only admission is the safety boundary, so this is not a production notification service or multi-process broker.
 
+## Advanced lifecycle
+
+This advanced lifecycle example keeps a native Tokio `TcpListener` and `axum::serve(...).with_graceful_shutdown(...)` for explicit Ctrl-C shutdown and connection draining. SSE clients must disconnect to let active streams finish draining. These listener and shutdown controls require native Axum integration beyond simple `App::serve()` / `App::serve_on()` startup.
+
 ## Verify
 
 ```bash
