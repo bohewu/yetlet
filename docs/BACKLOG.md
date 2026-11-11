@@ -943,7 +943,7 @@ implementation or deployment item is started.
 
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
-| YT-091 | P1 | M | M17 | Opt-in Tailwind CSS 4 application scaffolding (`new --with-tailwind`) | YT-097, YT-088 | [Guide](../tools/yetlet-cli/README.md#opt-in-tailwind-css-4-yt-091-independently-reviewed) and [implementation evidence](YT-091-VERIFICATION.md): explicit offline developer-selected pinned standalone compiler, native/cloud/config combinations, literal Rust scanning, bounded startup CSS snapshot, same-origin digest URL, strict CSP and unchanged no-flag templates. Linux actual HTTP/CSS/CSP/digest/health/SIGTERM/SIGINT and native Windows GNU/MSVC source-bound Tailwind CLI/generated-app checks PASS; independent changed-source Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS (zero issues/followups, 13/13 SHA-256 verified); no release activation | Done |
+| YT-091 | P1 | M | M17 | Opt-in Tailwind CSS 4 application scaffolding (`new --with-tailwind`) | YT-097, YT-088 | [Guide](CLI-GUIDE.md#opt-in-tailwind-css-4-yt-091-independently-reviewed) and [implementation evidence](YT-091-VERIFICATION.md): explicit offline developer-selected pinned standalone compiler, native/cloud/config combinations, literal Rust scanning, bounded startup CSS snapshot, same-origin digest URL, strict CSP and unchanged no-flag templates. Linux actual HTTP/CSS/CSP/digest/health/SIGTERM/SIGINT and native Windows GNU/MSVC source-bound Tailwind CLI/generated-app checks PASS; independent changed-source Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS (zero issues/followups, 13/13 SHA-256 verified); no release activation | Done |
 
 ## M18 — Asset contract and Vite integration (Done at bounded scopes)
 

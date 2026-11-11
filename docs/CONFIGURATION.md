@@ -269,7 +269,7 @@ independent Reviewer PASS. This is an explicitly selected application dependency
 the original nine public candidates. Its runtime APIs do not change core, default SSR or browser dependencies.
 The separate YT-097 CLI opt-in is Done at its recorded scope; current CLI
 settings/template and generator limits are maintained in the
-[CLI guide](../tools/yetlet-cli/README.md#current-generator-source-matrix). See the
+[CLI guide](CLI-GUIDE.md#current-generator-source-matrix). See the
 [scope and verification record](YT-090-VERIFICATION.md).
 
 </details>

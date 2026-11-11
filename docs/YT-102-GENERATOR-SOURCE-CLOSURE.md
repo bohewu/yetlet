@@ -63,7 +63,7 @@ repo-external `yetlet-generator-source-closure-20261022-w1c3hrbw` evidence direc
 This repair does not rerun or transfer historical browser/CSP, native Windows,
 OCI image, Kubernetes/Valkey/IdP, Auth or release qualification. Registry-only
 delivery, arbitrary app layouts and publication remain outside the source
-selection. The [current source matrix](../tools/yetlet-cli/README.md#current-generator-source-matrix)
+selection. The [current source matrix](CLI-GUIDE.md#current-generator-source-matrix)
 must reflect the actual focused result before acceptance. The
 [2026-10-18 verification](YT-102-GENERATOR-COMPATIBILITY.md) keeps its original
 source identity, PASS, failures and operational limits.

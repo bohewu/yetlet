@@ -17,7 +17,7 @@ records this promotion and the mandatory update after each verified publication;
 ## Prerequisites
 
 Use Rust/Cargo1.99 and the existing native CLI/link/OpenSSL prerequisites in the
-[CLI guide](../../tools/yetlet-cli/README.md#first-use-prerequisites). Prepare the
+[CLI guide](../../docs/CLI-GUIDE.md#first-use-prerequisites). Prepare the
 source CLI and dependencies explicitly; export itself uses frozen/offline Cargo.
 Python3.11+ stages canonical excerpts. HTML-only export needs no Node, Wasm,
 browser or server dependency. The sample's publish=false workspace and lockfile

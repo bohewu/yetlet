@@ -32,7 +32,7 @@ consequences of accepting this planning review.
 | [HTML renderer](../crates/yetlet/src/html/mod.rs) | Escaped serialization, forbidden executable tags/attributes, URL/void/control checks | Broader than DOM; not a full HTML validator or arbitrary-markup sanitizer |
 | [DOM renderer](../crates/yetlet-browser/src/dom/mod.rs) |38 explicit tags/42 attribute names; owned subtree replacement; prevalidation; same-origin root-relative/fragment navigation with frozen browser-resolved URLs | Missing normal content/table elements and controlled external links/images |
 | [Browser CLI starter](../tools/yetlet-cli/templates/browser/README.md) | `new --template browser`, settings-selected `build`/`run`/`watch`; ship only `frontend/dist/` | Already supports static hosting of a browser-only Wasm app; not build-time HTML generation |
-| [CLI command inventory](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) | `generate docker/compose/k8s` writes deployment configuration | No `generate static`, SSG mode or finite multi-page export contract |
+| [CLI command inventory](CLI-GUIDE.md#current-command-and-capability-inventory) | `generate docker/compose/k8s` writes deployment configuration | No `generate static`, SSG mode or finite multi-page export contract |
 | [Guide selection](../site/pages.toml) and [builder](../tools/build_docs.py) | Eight selected Markdown sources/excerpts; mdBook navigation/search; source/version labels | Reuse content/disclosure boundaries; a Yetlet replacement is not implemented |
 
 Do not confuse static hosting with static HTML generation: the existing browser

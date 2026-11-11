@@ -158,7 +158,7 @@ SSH/loopback Nginx. It is one optional delivery example; consumer delivery remai
 unselected by Yetlet. Fixture configuration and source identities must be
 recorded with the focused integration proof.
 
-The [CLI source matrix](../tools/yetlet-cli/README.md#current-generator-source-matrix)
+The [CLI source matrix](CLI-GUIDE.md#current-generator-source-matrix)
 accepts exact unedited generated profiles and constrained manifests/layouts.
 The custom Starter differs. Historical [YT-089](YT-089-VERIFICATION.md) and
 [YT-101](YT-101-VERIFICATION.md) Docker/Compose/Kubernetes PASS do not qualify

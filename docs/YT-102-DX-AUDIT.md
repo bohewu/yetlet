@@ -241,7 +241,7 @@ issues or required followups.
 After committing the reviewed research, completion-latency implementation and
 Windows verification at `ec31c63`, the owner selected the next compact
 documentation candidate. The CLI guide now places a
-[first-use prerequisite table](../tools/yetlet-cli/README.md#first-use-prerequisites)
+[first-use prerequisite table](CLI-GUIDE.md#first-use-prerequisites)
 before its first build command: native/Vite/browser tools, the CLI's own
 OpenSSL requirement, separately prepared dependencies/locks/assets, optional
 watch/HTTPS tools, settings-enabled startup secrets and the limited doctor
@@ -268,7 +268,7 @@ this slice does not select a new report command or error schema.
 
 After the first-use guide commit `6e46455`, the owner selected a practical
 decision table using the existing settings mechanism. The CLI guide now records
-[selection order and execution decisions](../tools/yetlet-cli/README.md#settings-selection-decision-table):
+[selection order and execution decisions](CLI-GUIDE.md#settings-selection-decision-table):
 manifest/app root, public settings root, finite profile, declared-key merge and
 ENV precedence, native/browser target, command-only watch/release choices,
 legacy defaults and independent Vite startup/build gates.

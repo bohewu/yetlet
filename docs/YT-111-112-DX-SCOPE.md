@@ -16,7 +16,7 @@ below remains historical.
 
 ## Existing contract (do not reimplement)
 
-- [YT-102 DX audit](YT-102-DX-AUDIT.md), [CLI contract](CLI-CONTRACT.md), and the [current CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) already establish settings-first `new`/`build`/`run`/`watch`, owned Rust watch/restart, optional Vite/HMR, environment-only `doctor [--json]`, and source/profile/values error hints.
+- [YT-102 DX audit](YT-102-DX-AUDIT.md), [CLI contract](CLI-CONTRACT.md), and the [current CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory) already establish settings-first `new`/`build`/`run`/`watch`, owned Rust watch/restart, optional Vite/HMR, environment-only `doctor [--json]`, and source/profile/values error hints.
 - [YT-102 completion latency](YT-102-COMPLETION-LATENCY.md) already improves the bounded Linux natural-exit path. No second supervisor, HMR framework, dependency installer, diagnostic registry, or new generic `dev` command is selected.
 - [YT-104 browser starter](YT-104-BROWSER-STARTER.md) builds a browser-only Rust/WASM static application and previews built assets. At this baseline browser `watch` is deliberately refused; source changes require an explicit rebuild.
 - [YT-110 DOM capabilities](YT-110-DOM-CAPABILITIES.md) are already accepted. Neither follow-up is a reason to reopen DOM, keyed, reactive, SSR hydration, or native-control APIs.

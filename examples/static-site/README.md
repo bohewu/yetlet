@@ -14,7 +14,7 @@ The provided lock is for this standalone [workspace]. Fetch missing dependencies
 as a separate operation; the CLI itself uses frozen/offline Cargo and never
 installs tools. HTML-only needs neither a server dependency nor Node/Wasm tools.
 The commands below use a checkout-built CLI with the existing native/OpenSSL
-prerequisites. A [registry installation](../../tools/yetlet-cli/README.md#build-locally-and-create-an-application)
+prerequisites. A [registry installation](../../tools/yetlet-cli/README.md#install)
 also provides static mode; when using it, substitute the installed yetlet command
 for the checkout executable path below. To prepare the checkout executable:
 
@@ -69,7 +69,7 @@ Existing public CLI settings validate first and cli.target must remain native;
 this app needs no settings files or runtime Settings loader. Explicit --static
 does not consult watch/Vite auto flags to select or skip its export stage.
 --release selects Cargo's profile, not APP_ENVIRONMENT. No new settings keys are
-introduced. See the [CLI guide](../../tools/yetlet-cli/README.md#static-html-build).
+introduced. See the [CLI guide](../../docs/CLI-GUIDE.md#static-html-build).
 
 Exit/error handling preserves owned child exit/cancellation after cleanup.
 Invalid descriptors, unsafe paths/resources, source changes or an existing
