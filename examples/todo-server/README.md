@@ -18,7 +18,7 @@ For the Browser/WASM and lazy Search routes, build the browser assets instead:
 cargo xtask build browser
 cargo run --locked -p yetlet-todo-server
 ```
-The existing twelve-sample catalog retains its exact one-line Todo command:
+The existing thirteen-sample catalog retains its exact one-line Todo command:
 
 ```sh
 cargo xtask build browser && cargo run -p yetlet-todo-server
@@ -31,6 +31,10 @@ Restart the server after rebuilding CSS: native SSR snapshots accepted CSS at
 startup. The native-only command leaves any previously built browser output
 intact; it does not create browser output on a clean checkout.
 
+Startup wraps the existing Router with `App::from_router(...).serve_on(...)`.
+`YETLET_LISTEN` retains the default `127.0.0.1:3000`. Port `0` uses a native
+listener so the startup banner reports the actual OS-selected address.
+
 Open:
 
 - `http://127.0.0.1:3000/` for pure SSR;
@@ -41,11 +45,11 @@ Open:
 
 The server never compiles WASM on request. Browser artifacts are built ahead of time into the ignored `dist/` directory. This sample is anonymous and in-memory; it is not a production authentication, persistence or CSRF reference.
 
-## App-owned Rust styles and source-only Tag Builders
+## App-owned Rust styles and typed Tag Builders
 
 The Todo list, shell and interactive layout use `yetlet::view::tags` from this
-checkout's YT-234/235 source. These helpers lower into the same `View` tree and
-are **not included in the published SDK alpha.6**. Existing keyed list classes,
+checkout's YT-234/235 source and are included in published SDK alpha.7. These
+helpers lower into the same `View` tree. Existing keyed list classes,
 DOM identity, local events and explicit remote HTTP actions are preserved.
 
 The private, host-only `stylegen/` package copies the finite YT-239 builder.
@@ -88,5 +92,5 @@ cargo xtask check docs
 ```
 
 Historical behavior evidence remains in [M7j verification](../../docs/M7J-VERIFICATION.md).
-YT-240 adds bounded Linux source qualification; independent acceptance and public
-release remain separate gates. No Style Showcase is registered.
+YT-240 retains its bounded Linux source qualification. Style Showcase is now a
+separately reviewed native-first catalog entry with an optional WASM companion.

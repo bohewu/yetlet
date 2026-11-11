@@ -23,9 +23,8 @@ use axum::{
 };
 use serde::Deserialize;
 use subtle::ConstantTimeEq;
-use yetlet::server_axum::{App, Page};
+use yetlet::server_axum::prelude::{App, Element, Page, View};
 use yetlet::session::{Session, SessionConfig, SessionConfigError, SessionError, SessionManager};
-use yetlet::view::{Element, View};
 
 const LOGIN_CODE_BYTES: usize = 32;
 const LOGIN_CODE_HEX: usize = LOGIN_CODE_BYTES * 2;

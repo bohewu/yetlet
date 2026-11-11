@@ -56,6 +56,101 @@ where
     }
 }
 
+const DEFAULT_LISTEN_ADDRESS: &str = "127.0.0.1:7878";
+
+impl App<()> {
+    /// Serve this application over HTTP on the loopback development default.
+    ///
+    /// The listener binds exactly `127.0.0.1:7878`; it is not reachable from
+    /// other machines on the LAN. A port conflict is returned rather than
+    /// silently selecting another port. This is a local-development default,
+    /// not production deployment guidance. These helpers do not enable HTTPS.
+    ///
+    /// The application must already have resolved Axum state to `App<()>`.
+    /// This method does not create a Tokio runtime; call it from the runtime
+    /// owned by your application.
+    ///
+    /// ```no_run
+    /// use yetlet::server_axum::App;
+    ///
+    /// async fn home() -> &'static str { "Hello from Yetlet" }
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> std::io::Result<()> {
+    ///     App::new().get("/", home).serve().await
+    /// }
+    /// ```
+    ///
+    /// An application with unresolved state cannot call this method:
+    ///
+    /// ```compile_fail
+    /// use yetlet::server_axum::App;
+    ///
+    /// #[derive(Clone)]
+    /// struct AppState;
+    ///
+    /// let app = App::<AppState>::new();
+    /// let _server = app.serve();
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns an address-resolution or bind error if `127.0.0.1:7878`
+    /// cannot be bound. After binding, Axum owns the serving loop and its
+    /// native accept-error behavior.
+    pub async fn serve(self) -> std::io::Result<()> {
+        self.serve_on(DEFAULT_LISTEN_ADDRESS).await
+    }
+
+    /// Serve this application over plain HTTP on an explicit TCP address.
+    ///
+    /// Use this when the address is supplied by application configuration or
+    /// when a non-default port/interface is required. Binding to `0.0.0.0` or
+    /// `::` explicitly exposes the listener on all corresponding interfaces;
+    /// do not use that on an untrusted network without a secure network edge.
+    /// These helpers do not infer HTTPS, load certificates, or enable TLS.
+    /// The caller owns and starts the Tokio runtime; this method does not create one.
+    ///
+    /// ```no_run
+    /// use yetlet::server_axum::App;
+    ///
+    /// async fn home() -> &'static str { "Hello from Yetlet" }
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> std::io::Result<()> {
+    ///     App::new().get("/", home).serve_on("127.0.0.1:8080").await
+    /// }
+    /// ```
+    ///
+    /// The method also works with an existing resolved-state Axum router:
+    ///
+    /// ```no_run
+    /// use axum::{Router, routing::get};
+    /// use yetlet::server_axum::App;
+    ///
+    /// async fn home() -> &'static str { "Hello from Yetlet" }
+    ///
+    /// #[tokio::main]
+    /// async fn main() -> std::io::Result<()> {
+    ///     let router: Router = Router::new().route("/", get(home));
+    ///     App::from_router(router).serve_on("127.0.0.1:8080").await
+    /// }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns address-resolution or listener-bind errors unchanged.
+    /// After binding, Axum handles TCP accept errors internally; this
+    /// convenience method does not add another post-bind error policy.
+    pub async fn serve_on<A>(self, address: A) -> std::io::Result<()>
+    where
+        A: tokio::net::ToSocketAddrs,
+    {
+        let listener = tokio::net::TcpListener::bind(address).await?;
+        axum::serve(listener, self.into_router()).await
+    }
+}
+
 impl<S> App<S>
 where
     S: Clone + Send + Sync + 'static,

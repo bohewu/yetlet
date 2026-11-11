@@ -41,6 +41,10 @@ Unauthenticated protected requests return **401**. A real note owned by the othe
 
 Notes are bounded to 16 per user, 128 total, 80 title characters and 2,000 body characters. Ownership is never accepted from form input. HTML rendering escapes titles/bodies. Notes and sessions are process-local and disappear at restart. The sample provides no persistence, encryption at rest, distributed revocation, audit log, brute-force defense or proxy/TLS configuration.
 
+## Advanced lifecycle
+
+This advanced lifecycle example keeps a native Tokio `TcpListener` and `axum::serve(...).with_graceful_shutdown(...)` so Ctrl-C drains requests before dropping process-local notes and Session state. These listener and shutdown controls require native Axum integration beyond simple `App::serve()` / `App::serve_on()` startup.
+
 ## Verify
 
 ```bash

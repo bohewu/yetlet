@@ -23,6 +23,10 @@ recursively, probe browser tools, use Python/Node/Vite, or compile on requests.
 Restart the server after rebuilding. `YETLET_SHOWCASE_LISTEN` overrides loopback
 port 3011; `YETLET_SHOWCASE_DIST` selects optional browser output at startup.
 
+Native startup wraps the existing Router with
+`App::from_router(...).serve_on(...)`. Port `0` uses a native listener so the
+startup banner reports the actual OS-selected address with the `/showcase` path.
+
 The four areas demonstrate Layout (Flex, responsive Grid, spacing), Tokens
 (complete light/dark colors and comfortable/compact density), Components (button,
 card, badge and labeled native controls), and States (keyboard focus, native

@@ -56,6 +56,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   Windows Browser Style shutdown verification. The published CLI and selected
   Reader Edition both use 0.3.1.
 
+- [M26 Application Startup & Sample Experience](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md), [ADR 0011 — Application startup](adr/0011-application-startup-api.md) and [ADR 0012 — Axum adapter prelude](adr/0012-server-axum-prelude.md): loopback-only HTTP default, explicit bind override, curated native import surface and native Axum escape hatch; contract-only until YT-253/254 implementation.
 - [YT-247 SDK resolution contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md),
   [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and
   [Phase A handoff](YT-247-PHASE-A-HANDOFF.md): Owner-accepted version/cache/locking
@@ -934,6 +935,7 @@ M10 release-supply-chain design/preflight is independently reviewed. Four local 
 - [ADR 0005 — Optional capability modules](adr/0005-opt-in-capability-modules.md)
 - [ADR 0006 — Handler-first and optional MVC](adr/0006-handler-first-mvc-optional.md)
 - [ADR 0007 — Bounded keyed DOM and local graph](adr/0007-bounded-keyed-dom-and-local-graph.md)
+- [ADR 0011 — Simple application startup and explicit native control](adr/0011-application-startup-api.md)
 
 M0–M9 are locally complete at prototype scope. M8 freezes the runnable sample contract; M9 adds twelve independently reviewed applications, a 170-export compatibility classification and complete native/browser/provider evidence freeze. The post-M9 CI/security round patches `RUSTSEC-2026-0009`, raises and verifies the Rust 1.88 MSRV, and hardens hosted CI. GitHub Actions run `38024582602` completed successfully for commit `86c30a42114ca74f4197f0389707861308a844a7`, including both the Rust 1.88 job and the stable native/samples/Chrome job. M10 adds the bounded document contract, threat model, dual-license/security policy and maintainer-only governance configuration. Repeat reviewers and green CI do not make Yetlet SemVer-stable or production-ready. SQL access remains application opt-in and Yetlet has no built-in ORM or mandatory DB layer. Public-release readiness (`YT-020`) is **Blocked** for actual immutable-source/registry, trusted release integrity, public reporting/scanner activation and concrete maintainer approval. Private preparation selects experimental `0.1.0`, the original nine libraries and bounded maintenance/qualification policy; completed framework documentation/qualification is not an open blocker. Application deployment policy, backups, business RPO/RTO and on-call ownership are not framework qualification prerequisites. The Codex Security Standard source scan reviewed 227/227 regular tracked files and found one Low issue; its tiny local correction passed comprehensive regressions and independent reviewer. No external audit, production certification or post-patch complete rescan is claimed. Paid external assessment is not a current requirement. Current code is not a production release.
 

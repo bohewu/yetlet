@@ -38,6 +38,10 @@ New database files are created with owner-only mode `0600` on Unix before SQLite
 
 See [M9e data-access comparison](../../docs/M9E-DATA-ACCESS-COMPARISON.md) for the bounded `rusqlite` versus `sqlx` spike and [M9e verification](../../docs/M9E-VERIFICATION.md) for retained test/reviewer evidence.
 
+## Advanced lifecycle
+
+This advanced lifecycle example keeps a native Tokio `TcpListener` and `axum::serve(...).with_graceful_shutdown(...)` so Ctrl-C drains requests and their SQLite operations before application teardown. These listener and shutdown controls require native Axum integration beyond simple `App::serve()` / `App::serve_on()` startup.
+
 ## Verify
 
 ```bash

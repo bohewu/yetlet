@@ -15,10 +15,33 @@ pub use response::Page;
 pub mod extract {
     pub use axum::{
         Extension, Json,
-        extract::{DefaultBodyLimit, Path, Query, State},
+        extract::{DefaultBodyLimit, Form, Path, Query, State},
     };
 }
 
+/// Common native server imports for small Yetlet applications.
+///
+/// The prelude is an opt-in convenience; the original explicit paths remain
+/// available, and advanced Axum/Tower APIs should be imported explicitly.
+///
+/// ```
+/// use yetlet::server_axum::prelude::*;
+///
+/// async fn home() -> View { View::text("Hello") }
+///
+/// let _app: App = App::new().page("/", "Home", home);
+/// ```
+pub mod prelude {
+    pub use super::extract::{DefaultBodyLimit, Extension, Form, Path, Query, State};
+    pub use super::http::{HeaderMap, HeaderValue, StatusCode};
+    pub use super::response::{IntoResponse, Json, Redirect, Response};
+    pub use super::{
+        App, DEFAULT_CSP, DocumentMetadata, HtmlPageError, LanguageTag, LanguageTagError, Page,
+        RequestContext, render_document, render_document_with_metadata, render_page,
+        render_page_with_metadata,
+    };
+    pub use crate::{Attribute, Element, View};
+}
 use crate::html::{RenderError, escape_text, render_to_string};
 use crate::view::View;
 use axum::{

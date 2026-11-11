@@ -34,6 +34,10 @@ Every order read/list derives the user from server-side Session state. Order IDs
 
 This is **not** a payment gateway, financial ledger, production identity provider, tax/shipping system, encrypted-at-rest store, backup design or multi-process inventory service. “Place order” is a local mock transaction only.
 
+## Advanced lifecycle
+
+This advanced lifecycle example keeps a native Tokio `TcpListener` and `axum::serve(...).with_graceful_shutdown(...)` so Ctrl-C drains requests and their transactional work before application teardown. These listener and shutdown controls require native Axum integration beyond simple `App::serve()` / `App::serve_on()` startup.
+
 ## Verify
 
 ```bash

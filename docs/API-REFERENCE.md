@@ -1,6 +1,6 @@
 # Current API reference
 
-Updated: 2026-11-10. This map distinguishes the published Experimental two-package
+Updated: 2026-11-11. This map distinguishes the published Experimental two-package
 SDK (`0.9.0-alpha.7`) from independent CLI tooling and checkout samples. `yetlet` contains the shared View and opt-in
 native capabilities; `yetlet-browser` contains browser integrations and depends
 one-way on the same View. Both packages are available from crates.io at this version.
@@ -41,6 +41,52 @@ the reviewed packages are now publicly available from crates.io.
 
 
 ## Source-only checkout additions
+
+### Application startup and optional Prelude — YT-258
+
+**Simple first, customizable when needed.** These startup methods and the
+optional native `server_axum::prelude` are checkout additions after published
+SDK `0.9.0-alpha.7`. Select `server-axum` and declare the application's Tokio
+runtime explicitly.
+
+```rust
+use yetlet::server_axum::prelude::*;
+
+async fn home() -> View {
+    View::text("Hello from Yetlet")
+}
+
+#[tokio::main]
+async fn main() -> std::io::Result<()> {
+    App::new().page("/", "Yetlet", home).serve().await
+}
+```
+
+`serve()` consumes a resolved `App<()>` and binds plain HTTP at
+`127.0.0.1:7878`. Address-resolution and bind failures propagate as I/O errors.
+Axum handles post-bind accept errors internally. The application owns its Tokio
+runtime. The default is fixed, with no environment lookup or port fallback.
+For an existing resolved-state Axum Router and an explicit nondefault address,
+use the following inside the application's async entry point.
+
+```rust
+let router: axum::Router = App::new().page("/", "Yetlet", home).into_router();
+let address = "127.0.0.1:8080";
+App::from_router(router).serve_on(address).await?;
+```
+
+The prelude is optional. Explicit imports such as `yetlet::View` and
+`yetlet::server_axum::App` remain supported. Native `into_router()`,
+`tokio::net::TcpListener` and `axum::serve(...).with_graceful_shutdown(...)`
+remain first-class for listener ownership, actual ephemeral-port reporting and
+shutdown coordination. The capability samples and Dashboard demonstrate this
+native lifecycle.
+
+Both convenience methods accept TCP addresses and provide HTTP only. TLS and
+HTTPS require an explicitly configured secure edge or native TLS integration.
+They never infer TLS from ports, hostnames or environment, provision certificates,
+or create a hidden runtime. Binding all interfaces with `0.0.0.0` or `::`
+explicitly exposes the listener beyond loopback.
 
 The [Style Showcase](../examples/style-showcase/README.md) remains a checkout
 sample. This existing fragment also leads to the current CLI Style availability
