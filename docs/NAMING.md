@@ -72,7 +72,7 @@ precise than an unqualified `settings` flag inside the support enum. Existing
 removed-option diagnostics may name `--cloud` and `--with-config` to explain
 migration. Historical fixture directories and the existing `cloud-profile`
 metadata contract are distinct from Rust field names and remain explicit.
-The [CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory)
+The [CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory)
 owns current execution and generator limits.
 
 External settings are a separate compatibility boundary. Rust

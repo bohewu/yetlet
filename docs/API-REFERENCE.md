@@ -57,7 +57,7 @@ Style CSS is generated at build time by the private app generator.
 
 | Source surface | Entry point and contract | Availability and limits |
 |---|---|---|
-| Optional Style authoring | [CLI Style integration](../tools/yetlet-cli/README.md#optional-application-owned-rust-css-yt-239-working-tree), [contract](YT-237-STYLE-REGISTRATION-CONTRACT.md), [implementation](YT-239-STYLE-INTEGRATION.md) | Published CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
+| Optional Style authoring | [CLI Style integration](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree), [contract](YT-237-STYLE-REGISTRATION-CONTRACT.md), [implementation](YT-239-STYLE-INTEGRATION.md) | Published CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
 | Style Showcase | [Native-first gallery](../examples/style-showcase/README.md) | Checkout sample with actual View/Style/CSS disclosures and optional local WASM class switching; bounded Linux evidence, no new published package or platform qualification |
 
 ## HTML, HTTP and browser modules
@@ -107,7 +107,7 @@ builds are not the default dependency graph of a small SSR application.
 |---|---|---|
 | [Board](../examples/lab-operations-board/README.md) / [Admin](../examples/admin-dashboard/README.md) | `BoardOptions`; `Board::open_with_options` and `open_with_oidc_and_options` | Independent default-false `write_authorization` / `request_tracing`, plus frontend/Session inputs. Uncompiled selections fail before storage; existing simpler constructors stay off. Admin maps its existing typed Settings; Board loads no ambient settings or global subscriber |
 | [Shop](../examples/modular-shop/README.md) | `DatabaseOptions`; `Database::open_with_options` | Default-false `catalog_cache`; the binary maps its existing environment key. Display freshness is bounded; Session, authorization and checkout SQL stay authoritative. No mandatory Settings loader or framework cache crate |
-| [CLI](../tools/yetlet-cli/README.md#cli-command-and-capability-inventory) | Existing parser, commands, static HTML export and configured generators | Independently published `yetlet-cli`, executable `yetlet`; the resolver selects a compatible registry SDK and preserves exact app pins/locks. Settings, supported source layouts and platform limits belong to its current guide. Generators do not silently install or deploy services |
+| [CLI](CLI-GUIDE.md#cli-command-and-capability-inventory) | Existing parser, commands, static HTML export and configured generators | Independently published `yetlet-cli`, executable `yetlet`; the resolver selects a compatible registry SDK and preserves exact app pins/locks. Settings, supported source layouts and platform limits belong to its current guide. Generators do not silently install or deploy services |
 
 These options are public Rust interfaces of example applications, not methods
 on a framework-wide capability builder. Their public fields do not grant trust

@@ -13,7 +13,7 @@ choose the separate [browser-only WASM walkthrough](BROWSER-APP.md).
 - Use the same POSIX terminal for all stages; no repository clone is needed.
   Have Rust/Cargo 1.99.0 installed, a native C/link toolchain and the
   OpenSSL development headers/libraries needed to build the CLI's signing
-  dependency. The [CLI prerequisite table](../tools/yetlet-cli/README.md#first-use-prerequisites)
+  dependency. The [CLI prerequisite table](CLI-GUIDE.md#first-use-prerequisites)
   owns tool details and custom OpenSSL setup. This first app does not select
   signing or inherit the CLI's OpenSSL dependency.
 - Use an owned local application parent with
@@ -27,7 +27,7 @@ choose the separate [browser-only WASM walkthrough](BROWSER-APP.md).
 - Use a terminal without unrelated `APP_CLI__*`, settings-root or port overrides.
   The plain native scaffold defaults to Production CLI settings, Vite off and
   Rust watch off. Stop another owned server using port 3000 before running it.
-  Windows has [separate native setup](../tools/yetlet-cli/README.md#windows-powershell-native-gnumsvc);
+  Windows has [separate native setup](CLI-GUIDE.md#windows-powershell-native-gnumsvc);
   these POSIX commands are not a Windows walkthrough.
 
 Stop at the first error. All paths below are explicit; no ancestor search,
@@ -48,7 +48,7 @@ yetlet --version
 This downloads the CLI source archive from crates.io and compiles the `yetlet`
 executable. Expected version output is exactly `yetlet 0.3.1`. This is a native
 source installation, so the prerequisites above apply. Maintainers evaluating a
-checkout can use the separate [source-install instructions](../tools/yetlet-cli/README.md#build-locally-and-create-an-application).
+checkout can use the separate [source-install instructions](CLI-GUIDE.md#build-locally-and-create-an-application).
 
 Cargo places `yetlet` under its install root's `bin` directory (normally
 `~/.cargo/bin`). Ensure it is on PATH, then check the installed command:
@@ -177,7 +177,7 @@ own declared variables and validation; follow their guide when you select them.
 For broader CLI, browser, settings and opt-in HTTP failures, use the
 [common-error troubleshooting guide](TROUBLESHOOTING.md).
 
-The [CLI execution table](../tools/yetlet-cli/README.md#execution-decision-table)
+The [CLI execution table](CLI-GUIDE.md#execution-decision-table)
 owns build/run/watch choices. Keep Auth, Session, CSRF, persistence and deployment
 policy explicit when expanding the app; this first native scaffold does not
 provide those capabilities automatically.
@@ -224,13 +224,13 @@ deploys the output.
 HTML-only export needs no Node/Wasm tools. Add `--wasm-islands` only after the
 example's separate asset preparation when local browser interaction is wanted;
 initial HTML remains readable. Follow the
-[static CLI reference](../tools/yetlet-cli/README.md#static-html-build) for the
+[static CLI reference](CLI-GUIDE.md#static-html-build) for the
 bounded protocol, errors and optional island workflow. Keep secrets, Session
 state and private business data out of exported Views and assets.
 
 ## API reference
 
-- [Current CLI prerequisites and creation](../tools/yetlet-cli/README.md#first-use-prerequisites)
+- [Current CLI prerequisites and creation](CLI-GUIDE.md#first-use-prerequisites)
   and [selected scaffold source](../tools/yetlet-cli/src/scaffold.rs).
 - [Server guide](../crates/yetlet/guides/server-axum.md),
   [HTTP pipeline](HTTP-PIPELINE.md) and [current API reference](API-REFERENCE.md).

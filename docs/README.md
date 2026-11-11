@@ -40,7 +40,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [HTTP pipeline](HTTP-PIPELINE.md), [opt-in composition](EXTENSIONS.md),
   [configuration](CONFIGURATION.md), [naming](NAMING.md) and
   [current capabilities](CAPABILITIES.md).
-- [Current CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory).
+- [Current CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory).
 
 - [WebAssembly startup and loading UI](WASM-STARTUP.md): optional shared JS/CSS shell, customization, full-page/SSR-region integration and caller-owned lifetime.
 
@@ -282,7 +282,7 @@ costs that remain app-owned.
 - [Naming guide](NAMING.md): current Rust/CLI/settings vocabulary, one canonical pre-public Rust API and explicit source migrations. [Audit response](NAMING-AUDIT-20261022.md) records N01–N08 and focused evidence; [the earlier compatibility checkpoint](NAMING-COMPATIBILITY.md) retains its original accepted results and superseded alias decision.
 - [Current capability and API carrier map](CAPABILITIES.md): implemented packages/features, application integrations, research decisions and release inclusion.
 - [M9 API classification and historical supplements](API-CONTRACTS.md) and [Compatibility](COMPATIBILITY.md): the original classification and pre-public stability limits; later packages have separate contracts in the current map.
-- [CLI contract](CLI-CONTRACT.md): accepted settings-first CLI naming, grammar, execution boundaries and intentional migration; see [current implementation evidence](YT-102-CLI-IMPLEMENTATION.md). The [current CLI guide](../tools/yetlet-cli/README.md#current-command-and-capability-inventory) remains the executable reference; [YT-102 baseline verification](YT-102-CLI-CONTRACT-VERIFICATION.md) records this documentation slice without completing DX research.
+- [CLI contract](CLI-CONTRACT.md): accepted settings-first CLI naming, grammar, execution boundaries and intentional migration; see [current implementation evidence](YT-102-CLI-IMPLEMENTATION.md). The [current CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory) remains the executable reference; [YT-102 baseline verification](YT-102-CLI-CONTRACT-VERIFICATION.md) records this documentation slice without completing DX research.
 - [YT-111 and YT-112 DX follow-ups](YT-111-112-DX-SCOPE.md): [read-only project inspection](YT-111-IMPLEMENTATION.md) and [browser-only Rust edit/build/reload](YT-112-IMPLEMENTATION.md) are Done at their selected scopes, with independent reviews and focused Linux runtime proof. Historical registration, failures and unverified Windows browser-watch scope remain explicit.
 
 - [YT-115 optional Memory Session/Auth bridge](YT-115-SESSION-AUTH.md): explicit feature, current account mapping, native-form CSRF and real loopback HTTP lifecycle evidence; independent Reviewer PASS.
@@ -363,7 +363,7 @@ costs that remain app-owned.
 - [Rust watch/restart experiment](YT-102-RUST-WATCH-POC.md): separately authorized Linux Watchexec trial of Rust edit, compile-error recovery and owned process cleanup; no native CLI integration.
 - [Windows Rust watch/restart verification](YT-102-WINDOWS-RUST-WATCH-VERIFICATION.md): source-matched WebCodex trial with compilation-error recovery, actual console keyboard Ctrl-C and owned process cleanup.
 - [Integrated Rust watch](YT-102-RUST-WATCH-IMPLEMENTATION.md): settings-controlled `run`, Watchexec file events, persistent Vite and Linux/Windows lifecycle verification.
-- [Historical CLI generator compatibility — 2026-10-18](YT-102-GENERATOR-COMPATIBILITY.md): source-bound service/settings/frontend verification; see the [current generator source matrix](../tools/yetlet-cli/README.md#current-generator-source-matrix) for present acceptance and required source closure.
+- [Historical CLI generator compatibility — 2026-10-18](YT-102-GENERATOR-COMPATIBILITY.md): source-bound service/settings/frontend verification; see the [current generator source matrix](CLI-GUIDE.md#current-generator-source-matrix) for present acceptance and required source closure.
 - [Generator source-closure repair — 2026-10-22](YT-102-GENERATOR-SOURCE-CLOSURE.md): exact opt-in Config/Secrets export, current profile outputs, negative-source tests and sanitized offline Cargo verification; separate from historical deployment qualification.
 - [YT-103 rolling deployment and retained assets](YT-103-ROLLING-ASSET-PLAN.md): provider comparison, application/deployment-owned retention, rollback and draining assumptions; [local qualification](YT-103-ROLLING-ASSET-VERIFICATION.md) records actual build/runtime evidence and its limits.
 - ADRs [0001](adr/0001-separation-of-concerns.md), [0002](adr/0002-events-and-actions.md), [0003](adr/0003-renderers-and-loading.md), [0004](adr/0004-request-context-and-middleware.md), [0005](adr/0005-opt-in-capability-modules.md), [0006](adr/0006-handler-first-mvc-optional.md) and [0007](adr/0007-bounded-keyed-dom-and-local-graph.md): retained decisions and tradeoffs.

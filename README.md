@@ -56,7 +56,7 @@ yetlet --version
 ```
 
 Expected output: `yetlet 0.3.1`. Cargo builds the CLI from source; see the
-[native build prerequisites](tools/yetlet-cli/README.md#first-use-prerequisites),
+[native build prerequisites](docs/CLI-GUIDE.md#first-use-prerequisites),
 including its OpenSSL dependency, before installing.
 
 Use the pinned Rust/Cargo 1.99.0 toolchain. Native SSR needs no Node.js or WASM
@@ -138,7 +138,7 @@ export PATH="$HOME/.local/share/yetlet-tools/bin:$PATH"
 - [Opt-in quick reference](docs/OPT-IN-QUICK-REFERENCE.md): features, startup wiring,
   application settings and defaults.
 - [HTTP pipeline](docs/HTTP-PIPELINE.md) and [opt-in composition](docs/EXTENSIONS.md).
-- [CLI guide](tools/yetlet-cli/README.md): scaffolding, build/run/watch and selected
+- [CLI guide](docs/CLI-GUIDE.md): scaffolding, build/run/watch and selected
   configuration generators.
 - [Documentation index](docs/README.md): further guides and retained history.
 

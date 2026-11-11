@@ -16,9 +16,9 @@ below are a walkthrough, not evidence of a new execution.
 
 - Use a POSIX terminal with Rust/Cargo `1.99.0`, its native linker/C tools,
   Node.js `22.12` or newer and npm. The source-installed CLI also needs the
-  [native OpenSSL prerequisites](../tools/yetlet-cli/README.md#first-use-prerequisites);
+  [native OpenSSL prerequisites](CLI-GUIDE.md#first-use-prerequisites);
   this is separate from the browser application's dependencies. The CLI guide
-  owns [Windows setup](../tools/yetlet-cli/README.md#windows-powershell-native-gnumsvc);
+  owns [Windows setup](CLI-GUIDE.md#windows-powershell-native-gnumsvc);
   the commands here are not a PowerShell walkthrough.
 - Prepare registry/network access, or the corresponding populated Cargo/npm
   caches. Install tools and prepare dependencies explicitly before frozen builds.
@@ -104,7 +104,7 @@ the same tool PATH, and repeat `yetlet build` and `yetlet run`.
 For the already implemented edit/rebuild loop, run `yetlet watch` instead of
 `run`. It requires both `cli.vite.auto_build` and `auto_start` to be true. A Rust
 edit rebuilds WASM and fully reloads the page, resetting tab-local state; CSS HMR
-is Vite-owned. See the [watch contract](../tools/yetlet-cli/README.md#browser-rust-development-loop--yt-112).
+is Vite-owned. See the [watch contract](CLI-GUIDE.md#browser-rust-development-loop--yt-112).
 
 ### 3. Understand the existing local interaction path
 
@@ -158,7 +158,7 @@ only selected public `VITE_*` values belong in frontend dotenv files.
 | A control loses its listener or focus after a render | Check replaced versus keyed ownership and application-owned input/focus handling. Follow the DOM/keyed guides rather than relying on generic state preservation. |
 | Port 5173 is occupied | Stop the owned conflicting process; the existing preview uses a strict loopback port. |
 
-Use [read-only inspection](../tools/yetlet-cli/README.md#read-only-project-inspection-yt-111)
+Use [read-only inspection](CLI-GUIDE.md#read-only-project-inspection-yt-111)
 to understand settings-selected plans. It does not install dependencies or prove
 app readiness. The [startup guide](WASM-STARTUP.md) owns shell customization and
 lifetime details; [troubleshooting](TROUBLESHOOTING.md#browser-builds-and-interaction)

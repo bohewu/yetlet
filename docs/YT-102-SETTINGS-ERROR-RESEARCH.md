@@ -1,7 +1,7 @@
 # YT-102 — Safe settings-error classification research
 
 Date: 2026-10-20. Source HEAD: `e691dca`. Research only, following the
-[settings decision table](../tools/yetlet-cli/README.md#settings-selection-decision-table).
+[settings decision table](CLI-GUIDE.md#settings-selection-decision-table).
 The owner requested a practical minimum using the existing mechanism, with
 no implementation. Independent Reviewer
 `/root/yt102_settings_error_research_review_oct20` PASS has zero issues or
@@ -133,7 +133,7 @@ authorized the recommended minimum: three private literal hints and one mapping
 helper in [settings.rs](../tools/yetlet-cli/src/settings.rs). Only the previously
 generic `load_from_env` failures change. The shared Loader, String boundary,
 filesystem protections, validation order and consumers remain unchanged.
-The [CLI guide](../tools/yetlet-cli/README.md#diagnostics-and-platform-evidence)
+The [CLI guide](CLI-GUIDE.md#diagnostics-and-platform-evidence)
 describes the actual groups; they are human guidance, not machine codes.
 
 Every changed error branch selects literal text, discarding its input/error.

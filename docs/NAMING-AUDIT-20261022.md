@@ -93,7 +93,7 @@ retained as `cli-generator-matrix.*`; it is not presented as a passing test.
 N02 is resolved by truthful current documentation. Extending the generator
 source closure is a separate implementation decision, not an incidental rename
 or a new qualification claim. Registry-only source remains unqualified.
-The [current CLI source matrix](../tools/yetlet-cli/README.md#current-generator-source-matrix)
+The [current CLI source matrix](CLI-GUIDE.md#current-generator-source-matrix)
 records both recognized shapes and current acceptance.
 
 ## Independent review and delivery state
