@@ -24,7 +24,15 @@ From the repository root, run the existing complete example:
 cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
 ```
 
-Open `http://127.0.0.1:3000/` and `/api/status`. The code below is copied verbatim from [minimal.rs](../examples/server_axum/minimal.rs):
+The checkout example now uses the source-only `App::serve()` and optional
+Prelude, serving `http://127.0.0.1:7878/` and `/api/status`. These additions follow
+published SDK alpha.7. See the [source-only startup examples](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md#source-only-checkout-additions)
+for the default path and `from_router(...).serve_on(address)` at an explicit
+nondefault address. The application continues to own its Tokio runtime.
+
+The following explicit-listener integration is compatible with published SDK
+alpha.7. It remains available in this checkout through `into_router()` and native
+Tokio/Axum, including `with_graceful_shutdown` for application-owned shutdown.
 
 ```rust
 use yetlet::view::View;
@@ -51,7 +59,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
 ## Expected result
 
-The example serves HTML at `http://127.0.0.1:3000/` and JSON at `/api/status`.
+The explicit-listener code above serves HTML at `http://127.0.0.1:3000/` and JSON
+at `/api/status`. The checkout command uses `http://127.0.0.1:7878/`.
 `Page` produces escaped complete documents with the default strict CSP. Ctrl+C
 stops the foreground listener; a Router setup alone does not bind a listener.
 

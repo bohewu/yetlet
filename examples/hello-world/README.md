@@ -1,6 +1,6 @@
 # Hello World — Native SSR
 
-This is the smallest independently runnable Yetlet application: two ordinary Rust handlers, the minimal `App` builder, `View` and `Page`. It uses Axum's server directly and needs **no JavaScript, WASM, browser build, Session, Request ID, ORM or database**.
+This is the smallest independently runnable Yetlet application: two ordinary Rust handlers, the minimal `App` builder, `View` and `Page`. Its entry point wraps the existing Router with `App::from_router(...).serve_on(address)` and needs **no JavaScript, WASM, browser build, Session, Request ID, ORM or database**.
 
 ## Run
 
@@ -16,6 +16,12 @@ The default listener is `127.0.0.1:3003`; override with `YETLET_HELLO_LISTEN` fo
 - `/hello/{name}` — dynamic untrusted route text escaped by the shared HTML renderer. Try `http://127.0.0.1:3003/hello/Yetlet`.
 
 Both routes return complete native SSR with strict CSP and no browser runtime. Unknown routes return native 404; unsupported methods return native 405. The sample is intentionally anonymous and has no persistence, authorization or production deployment hardening.
+
+The entry point uses the optional native Prelude from this checkout. Explicit
+imports remain supported. Startup methods and Prelude are source-only additions
+after published SDK alpha.7. Port `0` keeps a native `TcpListener` so the banner
+reports the actual bound address. The non-catalog SDK minimal example demonstrates
+`App::new().page(...).serve()` at `127.0.0.1:7878`; this sample retains port `3003`.
 
 ## View authoring sample (typed tags in published SDK alpha.7)
 

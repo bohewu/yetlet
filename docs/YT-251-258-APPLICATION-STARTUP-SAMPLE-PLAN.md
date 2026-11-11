@@ -1,6 +1,6 @@
 # M26 — Application Startup & Sample Experience
 
-**Status:** Planning review PASS; YT-251/252 contracts accepted; YT-253/254 implementations independent Reviewer PASS; YT-255 sample migration next
+**Status:** Planning review PASS; YT-251/252 contracts accepted; YT-253/254 implementations independent Reviewer PASS; YT-255–258 independent Reviewer PASS; Git integration and native Windows MSVC pending
 **Date:** 2026-11-11
 **Repository:** `bohewu/yetlet`
 **Base:** `master` at `83d10df6c2a219c1f7271419ad4b1b04c78741bb` (PR #85, CLI package README follow-up)
@@ -39,7 +39,7 @@ All new backlog items are initially `Todo`. A plan review is not an implementati
 
 ### 3.1 Simple startup
 
-The current minimal SDK example manually converts the App to a Router, binds a Tokio listener, and calls `axum::serve`. The ordinary local-development path should require no address knowledge:
+Before YT-255, the minimal SDK example manually converted the App to a Router, bound a Tokio listener, and called `axum::serve`. The accepted checkout example now uses the following local-development path:
 
 ~~~rust
 use yetlet::server_axum::prelude::*;
@@ -425,6 +425,25 @@ Owner-amended YT-251 port review `wc_job_eJ9LTvWN2G-Yt7Oh` PASS and YT-253 imple
 
 ## 10. Next handoff
 
-YT-253 startup and YT-254 Prelude are both implemented and independently Reviewer PASS at the documented source-checkout scope. **Next: YT-255 — Migrate minimal and basic HTTP samples** (`hello-world`, `rest-api`, `session-cart`/`cart-server`, `middleware-lab`, `forms-validation`, and the SDK's non-catalog minimal example). Keep every existing environment-configured bind address, route/security behavior, command and catalog ID; use `App::from_router(...).serve_on(configured_address)` where a sample factory returns a Router, and let the SDK minimal example demonstrate `App::serve()` at `127.0.0.1:7878`. Run bounded package and HTTP checks, secure a distinct independent Reviewer PASS, and preserve any advanced native Axum lifecycle cases for YT-256/257. Native Windows runtime remains unverified.
+YT-251–254 retain their independent acceptance. YT-255–257 are now Done after
+separate independent role-directed Reviewer Jobs, each terminal exit 0 and JSON
+PASS. Their accepted commits are recorded below.
 
-Current planning branch: `codex/m26-application-startup-dx`, based on `83d10df6c2a219c1f7271419ad4b1b04c78741bb`. This planning delivery is documentation-only. Commit/Push/PR/Merge and SDK/CLI release remain separate and unauthorized.
+| Task | Reviewer Job | Commit |
+|---|---|---|
+| YT-255 | `wc_job_BZbrOzBZvM6IlT-B` | `40ca677887e30c4895112bd003963aa31329b70c` |
+| YT-256 | `wc_job_DFU2zIIEJzJBYxkF` | `083804c17217f3f65c79d1368def531f9e55ef81` |
+| YT-257 | `wc_job_Xsa68FvOKhLXEQJD` | `caa3758c94b47d09f273cb3d3743398210c78da6` |
+
+YT-258 source documentation/catalog synchronization passed independent Reviewer
+`wc_job_BujoBeCZVwUl_ZGG`, terminal exit 0, JSON `overall_status=pass`, zero
+issues/followups. The catalog retains thirteen stable IDs, package/command
+identities and browser metadata, including Style Showcase's optional companion.
+The next phase is guarded Git integration, PR, exact-head CI, merge and
+post-merge master CI. Native Windows MSVC qualification remains postponed until
+the complete branch is merged and exact-master CI passes, using a separate clean
+clone that preserves the old Windows checkout and evidence.
+
+The branch is `codex/m26-application-startup-dx`. Published SDK alpha.7, CLI
+0.3.1, CLI templates, release records, Reader Edition and published First App
+remain at their accepted release boundaries.

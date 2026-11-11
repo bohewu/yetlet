@@ -8,6 +8,58 @@ Yetlet samples exist to validate application ergonomics, dependency isolation an
 
 Begin with [Hello World](../examples/hello-world/README.md) for native SSR or [REST API](../examples/rest-api/README.md) for HTTP-only development. Use [Todo](../examples/todo-server/README.md) for shared SSR/WASM Views and [Session cart](../examples/cart-server/README.md) for an explicit server capability. Use [Style Showcase](../examples/style-showcase/README.md) to compare native previews with real Rust View, Style and generated CSS sources. Each sample-local README provides exact commands and limitations. The [documentation index](README.md) separates current guidance from historical qualification.
 
+## Startup paths in this checkout
+
+The source API follows **Simple first, customizable when needed**. The
+[API reference](API-REFERENCE.md#source-only-checkout-additions) shows a minimal
+`App::new().page(...).serve()` and an explicit
+`App::from_router(router).serve_on(address)` example. These methods and the
+optional Prelude are source-only additions after SDK `0.9.0-alpha.7`.
+
+The non-catalog SDK minimal example uses the fixed `127.0.0.1:7878` HTTP default.
+Run it from the repository root with the following command.
+
+```bash
+cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
+```
+
+The thirteen catalog applications preserve their own environment/port contracts.
+
+| Sample | Environment variable | Default HTTP address | Startup |
+|---|---|---|---|
+| Hello World | `YETLET_HELLO_LISTEN` | `127.0.0.1:3003` | `from_router(...).serve_on(address)` |
+| REST API | `YETLET_REST_LISTEN` | `127.0.0.1:3001` | `from_router(...).serve_on(address)` |
+| Session Cart | `YETLET_CART_LISTEN` | `127.0.0.1:3002` | `from_router(...).serve_on(address)` |
+| Middleware Lab | `YETLET_MW_LISTEN` | `127.0.0.1:3004` | `from_router(...).serve_on(address)` |
+| Forms Validation | `YETLET_FORMS_LISTEN` | `127.0.0.1:3005` | `from_router(...).serve_on(address)` |
+| File Server | `YETLET_FILES_LISTEN` | `127.0.0.1:3006` | Native listener and graceful shutdown |
+| Auth Notes | `YETLET_AUTH_LISTEN` | `127.0.0.1:3010` | Native listener and graceful shutdown |
+| Modular Shop | `YETLET_SHOP_LISTEN` | `127.0.0.1:3008` | Native listener and graceful shutdown |
+| SSE Notifications | `YETLET_SSE_LISTEN` | `127.0.0.1:3008` | Native listener and graceful shutdown |
+| SQLite CRUD | `YETLET_SQLITE_LISTEN` | `127.0.0.1:3007` | Native listener and graceful shutdown |
+| Todo | `YETLET_LISTEN` | `127.0.0.1:3000` | `from_router(...).serve_on(address)` |
+| Multi-Island Dashboard | `YETLET_DASHBOARD_LISTEN` | `127.0.0.1:3009` | Native listener and graceful shutdown |
+| Style Showcase | `YETLET_SHOWCASE_LISTEN` | `127.0.0.1:3011` | `from_router(...).serve_on(address)` |
+
+The five basic HTTP samples, Todo and Style Showcase retain a native listener
+branch for port `0`, allowing the banner to print `local_addr()` after binding.
+The five lifecycle-sensitive capability samples and Dashboard keep native
+`TcpListener`, `axum::serve` and `with_graceful_shutdown` visible. `into_router()`
+and direct Axum/Tower composition remain first-class. Prelude imports are optional.
+Modular Shop and SSE share port `3008`, so concurrent runs require explicit
+separate addresses. Each local README retains its exact root-level catalog command.
+
+Todo and Dashboard use explicit browser build commands for their WASM journeys.
+Todo also supports native-only SSR with `cargo xtask build todo-css` before
+`cargo run --locked -p yetlet-todo-server`. Style Showcase's catalog command is
+native-only, with `browser_runtime = false`; its optional companion is built
+separately with `cargo xtask build showcase-browser`.
+
+`serve()` and `serve_on()` use plain HTTP with caller-owned Tokio runtime and
+explicit TCP addresses. HTTPS/TLS requires an explicit secure edge or native TLS
+integration. The methods never infer TLS, create certificates or start a hidden
+runtime. The minimal default uses a fixed port and returns bind errors.
+
 ## Catalog contract
 
 `examples/samples.toml` is the machine-readable catalog for user-facing runnable applications. `cargo xtask check samples` validates the catalog with the isolated Rust tool. The browser build field names an exact supported Rust command; package identity, repository source, companions and README commands remain checked.
