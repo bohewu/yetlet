@@ -14,12 +14,12 @@ default = ["html"]
 html = []
 actions = ["dep:serde"]
 reactive = []
-server-axum = ["html", "dep:axum", "dep:serde", "dep:tower"]
+server-axum = ["html", "dep:axum", "dep:serde", "dep:tower", "dep:tokio"]
 request-id = ["server-axum"]
 session = ["server-axum", "dep:cookie", "dep:getrandom", "dep:subtle"]
 auth = ["dep:axum"]
 auth-session = ["auth", "session"]
-session-redis = ["server-axum", "dep:tokio", "dep:redis", "dep:serde", "dep:serde_json", "dep:getrandom", "dep:sha2", "dep:subtle"]
+session-redis = ["server-axum", "tokio/macros", "tokio/rt-multi-thread", "tokio/sync", "tokio/time", "dep:redis", "dep:serde", "dep:serde_json", "dep:getrandom", "dep:sha2", "dep:subtle"]
 session-redis-tls = ["session-redis", "redis/tokio-rustls-comp", "dep:rustls"]
 config = ["dep:serde", "dep:toml", "dep:dotenvy", "dep:libc"]
 secrets = ["dep:secrecy"]
@@ -36,7 +36,7 @@ tower = { version = "=0.5.3", optional = true }
 cookie = { version = "0.18", optional = true }
 getrandom = { version = "0.2", optional = true }
 subtle = { version = "2.6", optional = true }
-tokio = { version = "=1.53.3", features = ["macros", "rt-multi-thread", "sync", "time", "net"], optional = true }
+tokio = { version = "=1.53.3", features = ["net", "rt"], optional = true }
 redis = { version = "=1.7.1", default-features = false, features = ["tokio-comp", "connection-manager", "script"], optional = true }
 rustls = { version = "0.23", default-features = false, features = ["std", "ring", "tls12"], optional = true }
 serde_json = { version = "=1.0.151", optional = true }
@@ -81,6 +81,10 @@ required-features = ["server-axum"]
 
 [[test]]
 name = "server_axum_app_builder"
+required-features = ["server-axum"]
+
+[[test]]
+name = "server_axum_app_serve"
 required-features = ["server-axum"]
 
 [[test]]

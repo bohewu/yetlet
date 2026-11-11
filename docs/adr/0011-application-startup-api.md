@@ -1,8 +1,9 @@
 # ADR 0011 — Simple Application Startup with Explicit Native Control
 
-- **Status:** Accepted (contract only; YT-253 implementation pending).
+- **Status:** Accepted; YT-253 source implementation Reviewer PASS (published alpha.7 unchanged).
 - **Date:** 2026-11-11.
 - **Task:** YT-251, M26 Application Startup & Sample Experience.
+- **Owner amendment (2026-11-11):** Changed the fixed loopback HTTP development port from `3000` to `7878` to avoid a pre-existing service on port `3000`. The bind-address policy, security boundary, `serve_on` override and transport behavior remain unchanged. This owner amendment was independently reviewed in Job `wc_job_eJ9LTvWN2G-Yt7Oh` (terminal exit 0, saved Reviewer `gpt-6-astra`/high, JSON PASS with zero issues). The earlier YT-251 PASS remains evidence of the preceding contract revision.
 - **Related:** [M26 plan](../YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md),
   [ADR 0001 — Separation of concerns](0001-separation-of-concerns.md),
   [ADR 0005 — Opt-in capability modules](0005-opt-in-capability-modules.md),
@@ -35,7 +36,7 @@ impl App<()> {
 The intended implementation is equivalent to:
 
 ~~~rust
-const DEFAULT_LISTEN_ADDRESS: &str = "127.0.0.1:3000";
+const DEFAULT_LISTEN_ADDRESS: &str = "127.0.0.1:7878";
 
 impl App<()> {
     pub async fn serve(self) -> std::io::Result<()> {
@@ -56,7 +57,7 @@ impl App<()> {
 
 ### Default address and exposure
 
-- `App::serve()` binds exactly `127.0.0.1:3000`.
+- `App::serve()` binds exactly `127.0.0.1:7878`.
 - The default is loopback-only. It is a safe local-development convenience and does not expose the listener to other machines on the LAN.
 - The port is fixed. If another process already owns it, the bind error is returned; Yetlet does not silently choose another port.
 - `serve()` does not read environment variables, config files, DNS names or deployment metadata. This avoids hidden precedence and keeps the default deterministic.
@@ -136,6 +137,8 @@ The fixed port can conflict with another local process; this is reported rather 
 - Follow-up Reviewer trace: saved `reviewer` role, model `gpt-6-astra`, effective effort `high`; role/model/effort matches and parent inheritance all `true`.
 - The P2 was closed by documenting that only address-resolution/bind errors propagate; Axum 0.8.9 handles post-bind accept errors internally and its serve loop does not return during normal operation.
 - Ignored review evidence is retained under `.pipeline-output/yt251-application-startup-contract-review-20261111/` (`reviewer-output.json`, `reviewer-output-v2.json`, `reviewer-trace-v1.json`, `reviewer-trace-v2.json`).
+
+- Owner port amendment `127.0.0.1:3000` → `127.0.0.1:7878`: independent Reviewer Job `wc_job_eJ9LTvWN2G-Yt7Oh`, terminal exit `0`, `overall_status = pass`, zero issues/required followups. Saved `reviewer` model `gpt-6-astra`, effective effort `high`, role/model/effort trace matches. Evidence retained at `.pipeline-output/yt251-port7878-amendment-review-20261111/reviewer-output.json` and `reviewer-trace.json`.
 
 ## Acceptance boundary
 

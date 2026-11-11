@@ -1,11 +1,12 @@
 # M26 — Application Startup & Sample Experience
 
-**Status:** Planning review PASS; YT-251 and YT-252 contracts accepted; product implementation not started
+**Status:** Planning review PASS; YT-251/252 contracts accepted; YT-253 implementation Reviewer PASS (Linux/cross-target scope); YT-254 next; sample migrations not started
 **Date:** 2026-11-11
 **Repository:** `bohewu/yetlet`
 **Base:** `master` at `83d10df6c2a219c1f7271419ad4b1b04c78741bb` (PR #85, CLI package README follow-up)
 **Working branch:** `codex/m26-application-startup-dx`
 **Release baseline:** SDK `0.9.0-alpha.7`; CLI `0.3.1`; Reader Edition selects the same published pair
+**Owner revision (2026-11-11):** Local HTTP startup port changed from `3000` to `7878` because another service already occupies `127.0.0.1:3000` on the Ubuntu Runner. All original reviewed contract decisions besides the port stay intact. The port amendment received independent Reviewer PASS in Job `wc_job_eJ9LTvWN2G-Yt7Oh` (terminal exit 0, `gpt-6-astra`/high, zero issues), separate from the earlier YT-251 contract review. Preserve both sets of evidence.
 
 ## 1. Purpose
 
@@ -69,7 +70,7 @@ YT-251 must confirm the exact contract. The current proposal is:
 
 ~~~rust
 const DEFAULT_LISTEN_ADDRESS: std::net::SocketAddr =
-    std::net::SocketAddr::from(([127, 0, 0, 1], 3000));
+    std::net::SocketAddr::from(([127, 0, 0, 1], 7878));
 
 impl App<()> {
     pub async fn serve(self) -> std::io::Result<()> {
@@ -83,7 +84,7 @@ impl App<()> {
 }
 ~~~
 
-The default is deliberately a loopback-only development listener at `127.0.0.1:3000`. The implementation constant need not become another public API unless a real consumer demonstrates that it needs to inspect it.
+The default is deliberately a loopback-only development listener at `127.0.0.1:7878`. The implementation constant need not become another public API unless a real consumer demonstrates that it needs to inspect it.
 
 Intended semantics:
 
@@ -96,7 +97,7 @@ Intended semantics:
 Contract constraints:
 
 - `serve()` and `serve_on()` are available only when Axum Router state is fully resolved (`App<()>`). An unresolved `App<S>` must not be served accidentally.
-- The default is exactly `127.0.0.1:3000` over plain HTTP. It is intentionally loopback-only so a first run does not expose a development server to the LAN.
+- The default is exactly `127.0.0.1:7878` over plain HTTP. It is intentionally loopback-only so a first run does not expose a development server to the LAN.
 - `serve()` does not inspect environment variables, configuration files, hostnames, certificates or deployment mode. A port conflict is returned as an ordinary bind error; there is no silent fallback to another port.
 - `serve_on` requires an explicit socket address including a port. `0.0.0.0` is an explicit request to listen on all IPv4 interfaces and must be documented as network exposure, not a safe default.
 - These convenience methods provide HTTP only. They do not accept URL schemes, infer HTTPS from a port/host/environment, create self-signed certificates, load private keys, or enable TLS implicitly.
@@ -226,7 +227,7 @@ Acceptance and validation:
 - `cargo tree -e features` confirms no unrelated Tokio feature leakage; `session-redis` still receives the features it needs.
 - The default/Core-only dependency graph remains free of Axum/Tokio.
 - Run the relevant native compile/test scope on Linux and the existing Windows MSVC Runner when available; report each platform separately.
-- Independent implementation Reviewer PASS before sample migration.
+- Independent implementation Reviewer PASS before sample migration. **YT-253 PASS:** `wc_job_vX_D7m0O9q5on1hg` (terminal exit 0; saved Reviewer `gpt-6-astra`/high; zero blocking issues and required followups). Actual verification: [YT-253 record](YT-253-STARTUP-VERIFICATION-20261111.md). Native Windows execution remains pending.
 
 ### YT-254 — Implement `server_axum::prelude`
 
@@ -262,7 +263,7 @@ Also migrate the SDK's non-catalog minimal example: `crates/yetlet/examples/serv
 Scope and acceptance:
 
 - Use the prelude in the primary examples where it improves readability.
-- Use `.serve()` only when a sample intentionally adopts the default `127.0.0.1:3000`; use `.serve_on(configured_address)` when preserving an existing environment/configuration-controlled address, including through `App::from_router(...)`.
+- Use `.serve()` only when a sample intentionally adopts the default `127.0.0.1:7878`; use `.serve_on(configured_address)` when preserving an existing environment/configuration-controlled address, including through `App::from_router(...)`.
 - Keep the existing Tokio runtime declaration explicit in application manifests and code.
 - Preserve environment variable names, configured bind addresses, routes, HTTP methods, response bodies, CSP, middleware ordering, Session/CSRF policy and sample commands.
 - Preserve the 13 stable catalog IDs and README command lines.
@@ -407,8 +408,19 @@ Do not modify as part of M26:
 - YT-252 Reviewer trace: saved `reviewer` role, model `gpt-6-astra`, effective effort `high`; model/role/effort and parent inheritance checks all `true`.
 - Ignored YT-252 evidence: `.pipeline-output/yt252-application-prelude-contract-review-20261111/reviewer-output.json` and `reviewer-trace.json`.
 
+- YT-251 owner port-amendment Reviewer Job `wc_job_eJ9LTvWN2G-Yt7Oh`: terminal exit `0`, independent saved `reviewer` model `gpt-6-astra`, effective effort `high`, `overall_status = pass`, zero issues/required followups; trace matches role/model/effort.
+- Ignored port-amendment evidence: `.pipeline-output/yt251-port7878-amendment-review-20261111/reviewer-output.json` and `reviewer-trace.json`.
+
+### YT-253 implementation evidence (owner default-port revision)
+
+The initial YT-253 Reviewer `wc_job_CdqciKQzlAcfXH-o` completed with exit code `0` but returned **FAIL** with one evidence-only P2 because prior Cargo command summaries lacked retained raw outputs. The original JSON remains at `.pipeline-output/yt253-application-startup-implementation-review-20261111/reviewer-output.json`.
+
+[YT-253 verification record](YT-253-STARTUP-VERIFICATION-20261111.md) now points to `artifacts/verification/yt253-port7878-20261111-a/`: 15 exact argv manifests, full stdout/stderr logs, command exit-code table, SHA-256 checksums and source identity. All 15 checks exited `0`. Live HTTP on the **new** `127.0.0.1:7878` default passed (4/4 startup tests; **no skip**). The original `127.0.0.1:3000` port remains occupied by an unrelated service and was not modified. Windows MSVC was cross-compiled on Linux, not executed on a native Windows Runner.
+
+Owner-amended YT-251 port review `wc_job_eJ9LTvWN2G-Yt7Oh` PASS and YT-253 implementation follow-up `wc_job_vX_D7m0O9q5on1hg` PASS (both terminal exit 0; saved `gpt-6-astra`/high). Both Reviewer JSON outputs, role traces, and the original YT-253 evidence-only FAIL remain intact. The YT-253 Reviewer inspected all 15 retained command logs and both source/test SHA-256 hashes independently. Native Windows runtime remains unverified; Windows MSVC cross-target checking is documented accurately.
+
 ## 10. Next handoff
 
-With ADR-0011 and ADR-0012 accepted at contract-only scope, the next task is **YT-253 — Implement `App::serve()` and `App::serve_on()`**. Read this plan, `AGENTS.md`, `docs/adr/0011-application-startup-api.md`, `crates/yetlet/src/server_axum/app.rs`, `crates/yetlet/src/server_axum/mod.rs`, `crates/yetlet/Cargo.toml`, and the YT-253 acceptance section. Implement only the approved startup methods, preserve the current Router/state and feature boundaries, and obtain an independent implementation Reviewer PASS before starting sample migrations. YT-254 is independently unblocked by ADR-0012 and may follow as a separate implementation item.
+YT-253 implementation and independent Reviewer gate are complete at the documented source-checkout scope. The next item is **YT-254 — Implement `server_axum::prelude`** under accepted ADR-0012. Read this plan, `AGENTS.md`, `docs/adr/0012-server-axum-prelude.md`, and `crates/yetlet/src/server_axum/mod.rs`/`response.rs`; implement only the approved curated exports and additive `Form` extractor alias, add focused tests, and secure a separate independent Reviewer PASS before YT-255–257 sample migration. Preserve historical tests and keep native Windows execution identified as unverified rather than claiming it has passed.
 
 Current planning branch: `codex/m26-application-startup-dx`, based on `83d10df6c2a219c1f7271419ad4b1b04c78741bb`. This planning delivery is documentation-only. Commit/Push/PR/Merge and SDK/CLI release remain separate and unauthorized.
