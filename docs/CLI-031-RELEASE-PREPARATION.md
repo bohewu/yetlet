@@ -15,11 +15,56 @@ exit found each preview port closed. The default SDK selection, exact registry
 pins, locks and offline checks also passed. The run used the previous hosted
 archive plus the exact reviewed code delta, checked by file digests.
 
-The existing remote `yetlet-cli-v0.3.1` tag and the signed artifacts in the
+The original remote `yetlet-cli-v0.3.1` tag and the signed artifacts in the
 [original hosted record](CLI-031-HOSTED-RECORD.md) identify the previous source.
 The replacement requires a release identity decision and fresh hosted
 build/custody, signing and independent verification. The previous publication
 plan applies only to its original inputs.
+
+### Windows correction evidence and replacement authority
+
+PR #80 merged as `957d476d9d4a77abce01272ae4cfd8389ce0f55b` after independent
+review and exact-head Rust, documentation and CodeQL workflows passed. The
+Windows library and affected integration suites passed 125 top-level cases,
+with five opt-in cases ignored. The Linux CI-aligned CLI selection passed
+149 cases, with five ignored. The first CI formatting rejection and the first
+review's three corrected batch-test call sites remain recorded.
+
+On NCUT-BOHE, the native and browser runtime ports were 42230 and 42288. Each
+first connection probe immediately after the CLI exited with Windows status
+`0xc000013a` found its port closed. Chrome also mounted the served Wasm and
+retained toolbar flex layout, 12px padding and weight 700 after a keyed update.
+The Windows evidence ZIP SHA256 is
+`4b0305309642ed0e97fecd432620ca63a6f8be900696bafac2c50fad02d5560c`.
+It includes command logs, original intake failure, fixture/source hashes,
+runtime receipts, screenshot and cleanup. The final one-line rustfmt change
+has identical tokens and was independently reviewed as a formatting-only
+delta from the Windows-tested source.
+
+Normal locked packaging at the merged source produced a local 545482-byte
+archive with SHA256
+`10dd45cbc2621779870206cf286829ca0f4762eae219db80c5613c4f7b45953d`.
+All 162 package members other than Cargo's VCS record match the Windows-tested
+input after accounting for that formatting-only delta. A normal archive-path
+Linux install and the existing six-case resolver/Style consumer passed on the
+reviewed, identical product tree. A later source selection must retain its own
+VCS identity. The original candidate and both local archive identities remain
+retained separately.
+
+Cleanup preserved logs, archives and executables while removing 1969986863
+logical bytes of Windows task files, 2332119781 bytes from the Linux private
+consumer tree and 2115245915 bytes from the Linux task build cache. The
+application/debugger ports were closed and no task runtime process remained.
+Evidence is retained under `artifacts/verification/cli031-win-fix-20261111/`.
+
+On 2026-11-11 the Owner explicitly authorized one exception for the unpublished
+CLI 0.3.1 candidate. Before replacing the canonical tag, preserve its original
+source `f489a089ec2b814e830942318f84b0e45b0a67bd` under a new historical tag.
+Use the exact original ref value to protect the canonical replacement, retain
+the original signed payloads and approvals, update only the private Draft,
+and perform fresh build/custody/signing/verification for the corrected source.
+Formal publication remains held. This exception is specific to this
+unpublished candidate.
 
 **Historical state (2026-11-10): Original prepublication preparation PASS.** Source review,
 clean-source candidate and native/browser consumers, original hosted build/custody,
