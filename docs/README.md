@@ -57,7 +57,11 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   Windows Browser Style shutdown verification. The Reader Edition adopted
   CLI 0.3.1 at that release.
 
-- [M26 Application Startup & Sample Experience](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md), [ADR 0011 — Application startup](adr/0011-application-startup-api.md) and [ADR 0012 — Axum adapter prelude](adr/0012-server-axum-prelude.md): loopback-only HTTP default, explicit bind override, curated native import surface and native Axum escape hatch; contract-only until YT-253/254 implementation.
+- [M26 Application Startup & Sample Experience](ROADMAP.md#m26--application-startup--sample-experience)
+  delivered the [SDK alpha.8 startup API and prelude](API-REFERENCE.md#published-application-startup--sdk-alpha8) and
+  [CLI 0.4.0 SDK-aware scaffolding](CLI-GUIDE.md#generated-startup-profiles).
+  The accepted API decisions are in [ADR 0011](adr/0011-application-startup-api.md)
+  and [ADR 0012](adr/0012-server-axum-prelude.md).
 - [YT-247 SDK resolution contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md),
   [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and
   [Phase A handoff](YT-247-PHASE-A-HANDOFF.md): Owner-accepted version/cache/locking

@@ -17,7 +17,7 @@ workspace before the next phase. M26 merged in PR #86, passed exact merged-maste
 Rust, Docs and CodeQL CI and passed 148 native Windows MSVC tests across the SDK
 adapter and 13 official samples. Retain the final M26 record at
 `.pipeline-output/handoffs/M26-WINDOWS-MSVC-QUALIFICATION-PASS-20261111.md`
-as source qualification at that scope. [M26 plan](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md)
+as source qualification at that scope. [Historical M26 plan](https://github.com/bohewu/yetlet/blob/1508b6910add4e74c9e2311a3f3eb4666539afce/docs/YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md)
 
 | Authority | Baseline |
 |---|---|

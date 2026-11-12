@@ -65,13 +65,39 @@ qualified native source exporter; app SDK resolution does not expand Docker or
 Compose source support. Policy and snapshot identity resources ship in the CLI
 archive and remain bound to that archive's checksum and immutable source.
 
-CLI `0.4.0` records `startup_profile` in the creation receipt. For the
-verified SDK `0.9.0-alpha.8` archive, Native and Native Style use
-`m26-app-serve` and call `App::serve()` on `127.0.0.1:7878` when the selected
-options allow simple startup, including Tailwind without Settings, Vite or
-Service. SDK alpha.7 uses the legacy native listener. Settings, Vite and
-Service select their own native startup profiles, and Browser templates
-keep Wasm startup. [Scaffold policy and migration matrix](YT-259-CLI-NEW-STARTUP-CONTRACT.md)
+### Generated startup profiles
+
+CLI `0.4.0` checks the selected exact SDK version against its packaged startup
+capability policy. A matching row must also match the registry index SHA-256 of
+the core `yetlet` archive. The packaged policy lists SDK `0.9.0-alpha.8`.
+An unlisted version, including `0.9.0-alpha.7`, uses the legacy listener for
+simple Native and Native Style scaffolds on that same version. A checksum
+contradiction for a listed version stops creation with
+`SDK_INCOMPATIBLE` and `template-capability`. The check applies to all templates
+and also runs offline. If a matched simple template cannot be composed, creation
+fails with the same error category. Both failures leave the destination absent.
+[Packaged policy](../tools/yetlet-cli/resources/sdk-compatibility.json)
+
+| Generated selection | Unlisted SDK | Exact capability match | Generated startup |
+|---|---|---|---|
+| Plain Native | `legacy-axum` | `m26-app-serve` | Legacy uses an explicit listener. M26 uses the curated prelude and `App::new().page(...).serve()`. |
+| Native Style or standalone Tailwind on Native or Native Style | `legacy-axum` | `m26-app-serve` | Compose the selected asset routes before serving. M26 uses `App::from_router(router).serve()`. |
+| Native or Native Style with Settings or Vite, without Service | `configured-axum` | `configured-axum` | Explicit listener and `config::serve` preserve typed configuration, actual bound-address logging and optional development TLS. Vite implies Settings. |
+| Native or Native Style with Service | `service-axum` | `service-axum` | Explicit listener, health and readiness routes, and graceful shutdown, with `config::serve` when Settings or Vite is selected. Service takes precedence over those options. |
+| Browser or Browser Style | `browser-wasm` | `browser-wasm` | The existing frontend and Wasm startup uses the exact SDK package pair. Browser templates reject Service. |
+
+The first two rows apply when Settings, Vite and Service are absent. Simple M26
+scaffolds use fixed HTTP at `127.0.0.1:7878`. The legacy simple listener reads
+`YETLET_PORT`. To choose a different address in M26 app code, use
+`App::serve_on(address)`. To inspect the actual address after binding port
+`0`, coordinate graceful shutdown, or terminate TLS directly, own the native
+listener. [SDK startup API](API-REFERENCE.md#published-application-startup--sdk-alpha8)
+
+The top-level `startup_profile` in the schema 1 creation receipt at
+`.yetlet/sdk-resolution.json` records the branch that emitted the source.
+`sdk.policy_sha256` identifies the packaged policy bytes used at creation, and
+`cargo_lock_sha256` identifies the generated lockfile bytes. The receipt records
+creation provenance. The manifest and lockfile govern subsequent builds.
 
 ## CLI command and capability inventory
 

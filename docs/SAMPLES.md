@@ -10,11 +10,9 @@ Begin with [Hello World](../examples/hello-world/README.md) for native SSR or [R
 
 ## Startup paths in this checkout
 
-The source API follows **Simple first, customizable when needed**. The
-[API reference](API-REFERENCE.md#source-only-checkout-additions) shows a minimal
-`App::new().page(...).serve()` and an explicit
-`App::from_router(router).serve_on(address)` example. These methods and the
-optional Prelude are source-only additions after SDK `0.9.0-alpha.7`.
+The [SDK `0.9.0-alpha.8` startup API](API-REFERENCE.md#published-application-startup--sdk-alpha8) includes
+`App::new().page(...).serve()`, `App::from_router(router).serve_on(address)`
+and the optional Axum adapter prelude.
 
 The non-catalog SDK minimal example uses the fixed `127.0.0.1:7878` HTTP default.
 Run it from the repository root with the following command.
