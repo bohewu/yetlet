@@ -48,6 +48,10 @@ the reviewed packages are now publicly available from crates.io.
 optional native `server_axum::prelude` ship in SDK `0.9.0-alpha.8`.
 Select `server-axum` and declare the application's Tokio runtime explicitly.
 
+The published CLI `0.3.1` continues to generate its explicit listener. The
+[CLI 0.4.0 source candidate](CLI-040-RELEASE-PREPARATION.md) selects the simple
+startup template from the exact verified SDK archive and requested options.
+
 ```rust
 use yetlet::server_axum::prelude::*;
 

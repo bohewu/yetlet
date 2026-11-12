@@ -68,6 +68,8 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [YT-248 CLI 0.3.0 Style release](CLI-030-RELEASE-PREPARATION.md): preserved
   reviewed release plan and [actual publication](CLI-030-HOSTED-RECORD.md), including
   the original failed publisher and successful standalone registry consumer.
+- [CLI 0.4.0 release preparation](CLI-040-RELEASE-PREPARATION.md): YT-259
+  registry-only capability proof, candidate archive and verification scope.
 
 
 - [YT-245 SDK alpha.7 local preparation](YT-245-ALPHA7-RELEASE-PREPARATION.md):

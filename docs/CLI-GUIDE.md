@@ -65,6 +65,13 @@ qualified native source exporter; app SDK resolution does not expand Docker or
 Compose source support. Policy and snapshot identity resources ship in the CLI
 archive and remain bound to that archive's checksum and immutable source.
 
+The CLI `0.4.0` source candidate records a generated startup profile in the
+creation receipt. It selects simple M26 startup for verified SDK alpha.8
+Native and Native Style projects, including the standalone Tailwind option.
+Settings, Vite and Service select their explicit native startup paths. Browser
+templates keep Wasm startup. The published CLI `0.3.1` still generates its
+existing explicit listener. [Scaffold policy and migration matrix](YT-259-CLI-NEW-STARTUP-CONTRACT.md)
+
 ## CLI command and capability inventory
 
 | Command | Implemented behavior |

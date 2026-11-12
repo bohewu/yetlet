@@ -2,6 +2,11 @@
   "revision": "sdk-latest-v2",
   "selection": "latest-semver",
   "scaffold_capabilities": {
-    "m26_startup": []
+    "m26_startup": [
+      {
+        "sdk_version": "0.9.0-alpha.8",
+        "yetlet_sha256": "3e850fe4320f3511121b37cfa25bb2ce3ef422d5fe11ccbea59908687912fd59"
+      }
+    ]
   }
 }

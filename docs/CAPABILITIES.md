@@ -20,6 +20,8 @@ publication of its linked execution records.
 SDK alpha.8 includes [simple application startup and the optional Axum Prelude](API-REFERENCE.md#published-application-startup--sdk-alpha8)
 with the opt-in `server-axum` feature. The published CLI `0.3.1` continues to
 generate its existing explicit-listener native scaffold.
+The [CLI 0.4.0 source candidate](CLI-040-RELEASE-PREPARATION.md) records
+capability-aware startup in the scaffold receipt.
 
 ## Published typed authoring and CLI Style tooling
 

@@ -39,8 +39,9 @@ independent review of locked alpha.7 and local M26 generated consumers, HTTP,
 CSP and browser checks. D passed independent review of native Ubuntu and
 Windows x64 MSVC CLI and generator checks, including actual Native Style and
 Service launch and private-console shutdown on Windows. SDK alpha.8 is now
-published. Production M26 capability activation still requires a fresh
-registry-only generated-app consumer check with the exact published package.
+published. The [CLI 0.4.0 source candidate](CLI-040-RELEASE-PREPARATION.md)
+binds the M26 capability to the exact published SDK and checks both startup
+branches with fresh registry-only generated apps.
 
 **YT-250 CLI 0.3.1 release (2026-11-11): Published with registry consumer PASS.**
 [Preparation and gates](CLI-031-RELEASE-PREPARATION.md) align source and release

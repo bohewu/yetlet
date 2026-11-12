@@ -399,14 +399,14 @@ fn selection_filters_availability_and_explicit_errors_are_distinct() {
     );
     assert_eq!(
         select(
-            request(Template::Native, Some("0.9.0-alpha.8"), false),
+            request(Template::Native, Some(A7), false),
             &[native()],
             "registry-refresh",
             &policy()
         )
         .unwrap()
         .version,
-        "0.9.0-alpha.8"
+        A7
     );
     assert!(
         select(
