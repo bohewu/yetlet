@@ -7,7 +7,7 @@
     "templates/browser/wasm-startup.css": "e9a68f1d67d4b5daa12db7e99d220aaee0be8d3f909dc165189ee211cb7ab4a2",
     "templates/browser/wasm-startup.mjs": "9f5fff4f9cccf0ef99588cdf50a38a99997156315c8ba0b17f36f7aea9ca96c1"
   },
-  "policy_sha256": "e91ba9a27c998ab2ba6aa3b6f75b54585eb7978d2bea7d66a1aad2e47f794f27",
+  "policy_sha256": "08272fe5d144b470799e9e4407793dd7637b5d50e6621718b4173b4cac667689",
   "schema": 1,
   "snapshot_sdk": "0.9.0-alpha.7",
   "snapshot_source": "5dc8a9a990ac083e07081ea3be008748239c8a58"

@@ -69,13 +69,12 @@ From the repository root:
 cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
 ```
 
-Open `http://127.0.0.1:3000/` for HTML and
-`http://127.0.0.1:3000/api/status` for JSON. Stop the server with Ctrl+C.
+Open `http://127.0.0.1:7878/` for HTML and
+`http://127.0.0.1:7878/api/status` for JSON. Stop the server with Ctrl+C.
 The complete [running example](crates/yetlet/examples/server_axum/minimal.rs) is:
 
 ```rust
-use yetlet::view::View;
-use yetlet::server_axum::{App, response::Json};
+use yetlet::server_axum::prelude::*;
 
 async fn home() -> View {
     View::text("Hello from Yetlet")
@@ -86,19 +85,19 @@ async fn status() -> Json<&'static str> {
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let app: axum::Router = App::new()
+    App::new()
         .page("/", "Yetlet", home)
         .group("/api", |api| api.get("/status", status))
-        .into_router();
-    let listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await?;
-    axum::serve(listener, app).await?;
+        .serve()
+        .await?;
     Ok(())
 }
 ```
 
-`App::into_router()` returns a native Axum Router. For parameters or fallible
-handlers, use ordinary extractors and `Page` or `Result<Page, E>`; see the
-[server guide](crates/yetlet/guides/server-axum.md).
+Use `App::serve_on(address)` to choose a different bind address.
+`App::into_router()` returns a native Axum Router for custom listeners or
+graceful shutdown. For parameters or fallible handlers, use ordinary extractors
+and `Page` or `Result<Page, E>`. See the [server guide](crates/yetlet/guides/server-axum.md).
 
 ## Choose your next step
 

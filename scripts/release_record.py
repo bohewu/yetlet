@@ -20,10 +20,11 @@ CLI_SDK_VERSIONS = {
     '0.2.0': '0.9.0-alpha.6',
     '0.3.0': '0.9.0-alpha.7',
     '0.3.1': '0.9.0-alpha.7',
+    '0.4.0': '0.9.0-alpha.7',
 }
 
 # Resolver policy is separate from the immutable CLI build-SDK binding.
-CLI_SDK_POLICIES = {'0.3.0': 'sdk-compat-v1', '0.3.1': 'sdk-latest-v2'}
+CLI_SDK_POLICIES = {'0.3.0': 'sdk-compat-v1', '0.3.1': 'sdk-latest-v2', '0.4.0': 'sdk-latest-v2'}
 
 
 def sdk_version_key(version):
