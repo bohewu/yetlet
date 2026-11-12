@@ -185,7 +185,7 @@ fn missing_stale_or_inconsistent_locks_are_refused_without_output() {
         } else {
             let packages = lock["package"].as_array_mut().unwrap();
             let name = match mutation {
-                1 | 2 | 3 => "composeapp",
+                1..=3 => "composeapp",
                 4 | 12 => "yetlet",
                 5 => "axum",
                 6 | 7 | 11 => "tokio",

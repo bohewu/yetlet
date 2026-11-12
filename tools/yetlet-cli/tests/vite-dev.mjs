@@ -62,6 +62,40 @@ test('HTTPS and WSS require the selected HTTPS origin and retain exact host chec
     assert(!allowedOrigin({ host, origin }, 5173, true, true));
   }
   assert(!allowedOrigin({ host: 'localhost:5173', origin: `https://${host}` }, 5173, false, true));
+  assert(!allowedOrigin({ ':authority': host, origin: `https://${host}` }, 5173, true, true, true));
+});
+
+test('only HTTPS HTTP/2 middleware accepts the exact loopback authority', () => {
+  const httpServer = new EventEmitter();
+  const host = '127.0.0.1:5173';
+  const headers = { ':authority': host };
+  let middleware;
+  devBridge(5173, {}).configureServer({
+    config: { root }, httpServer,
+    middlewares: { use(callback) { middleware = callback; } },
+  });
+  try {
+    for (const [httpVersionMajor, requestHeaders, status] of [
+      [2, headers, null],
+      [2, { ...headers, host, origin: `https://${host}` }, null],
+      [2, { host }, null],
+      [2, { ...headers, host: 'localhost:5173' }, 403],
+      [2, { host, ':authority': 'localhost:5173' }, 403],
+      [2, { ...headers, host: [host, host] }, 403],
+      [2, { ':authority': [host, host] }, 403],
+      [2, { ...headers, origin: `http://${host}` }, 403],
+      [1, headers, 403],
+    ]) {
+      const response = { status: null, setHeader() {}, writeHead(code) { this.status = code; }, end() {} };
+      let forwarded = false;
+      middleware({ headers: requestHeaders, httpVersionMajor, url: '/app.js', method: 'GET' }, response, () => { forwarded = true; });
+      assert.equal(response.status, status);
+      assert.equal(forwarded, status === null);
+    }
+    assert(!allowedOrigin(headers, 5173, false, false, true));
+  } finally {
+    httpServer.emit('close');
+  }
 });
 
 test('development TLS requires two absolute external paths and redacts invalid material', () => {

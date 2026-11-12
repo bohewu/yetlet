@@ -26,17 +26,45 @@ CLI_SDK_VERSIONS = {
 CLI_SDK_POLICIES = {'0.3.0': 'sdk-compat-v1', '0.3.1': 'sdk-latest-v2'}
 
 
-def sdk_policy(raw, cli_version=None):
-    """Validate current selection authority or the exact published v1 policy."""
-    policy = loads(raw)
-    if policy.get('revision') == 'sdk-compat-v1':
-        # Historical bytes, including its finite template sets and MSRV, are immutable.
-        require(hashlib.sha256(raw).hexdigest() ==
-                '8bddcb15647fd21a755df38f38b6308cad6e8e4f29c4838849923122aefdbbc7')
-    else:
-        require(policy == {'revision': 'sdk-latest-v2', 'selection': 'latest-semver'})
-    if cli_version is not None:
-        require(CLI_SDK_POLICIES.get(cli_version) == policy['revision'])
+def sdk_version_key(version):
+    """The CLI's canonical exact SemVer, including Rust's u64 core limit."""
+    require(type(version) is str and len(version) <= 128 and token(version, VERSION))
+    core, _, pre = version.partition('-')
+    numbers = tuple(map(int, core.split('.')))
+    require(all(n <= 18446744073709551615 for n in numbers))
+    parts = pre.split('.') if pre else []
+    require(all(not p.isdigit() or p == '0' or not p.startswith('0') for p in parts))
+    return (numbers, not pre, tuple((0, int(p)) if p.isdigit() else (1, p) for p in parts))
+
+
+def sdk_policy(raw, cli_version=None, *, context):
+    """Validate checkout authority or the policy bound to an archive identity."""
+    require(type(raw) is bytes and len(raw) <= 16384 and context in ('source', 'archive'))
+    policy = loads(raw.decode('utf-8'))
+    require(type(policy) is dict)
+    if context == 'archive':
+        sdk_version_key(cli_version)
+        historical = {
+            '0.3.0': '8bddcb15647fd21a755df38f38b6308cad6e8e4f29c4838849923122aefdbbc7',
+            '0.3.1': 'de1d1a1f32c3b5013ca48e9f5931e437802fe40474dbf14208826c5805d2a70b',
+        }
+        if cli_version in historical:
+            require(hashlib.sha256(raw).hexdigest() == historical[cli_version])
+            require(policy['revision'] == CLI_SDK_POLICIES[cli_version])
+            return policy
+        require(cli_version not in LEGACY_CLI_VERSIONS)
+    require(set(policy) == {'revision', 'selection', 'scaffold_capabilities'}
+            and policy['revision'] == 'sdk-latest-v2' and policy['selection'] == 'latest-semver')
+    capabilities = policy['scaffold_capabilities']
+    require(type(capabilities) is dict and set(capabilities) == {'m26_startup'})
+    rows = capabilities['m26_startup']
+    require(type(rows) is list)
+    versions = set()
+    for row in rows:
+        require(type(row) is dict and set(row) == {'sdk_version', 'yetlet_sha256'})
+        sdk_version_key(row['sdk_version'])
+        require(row['sdk_version'] not in versions and token(row['yetlet_sha256'], SHA))
+        versions.add(row['sdk_version'])
     return policy
 
 

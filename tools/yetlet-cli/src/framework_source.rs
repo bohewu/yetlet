@@ -42,7 +42,7 @@ pub(crate) fn collect(root: &Path) -> Result<BTreeMap<String, Vec<u8>>, String> 
     }
     let mut found = BTreeSet::new();
     walk(root, Path::new("crates/yetlet"), &mut found)?;
-    if found != FILES.iter().map(|(p, _)| p.to_owned()).collect() {
+    if found != FILES.keys().map(|p| p.to_owned()).collect() {
         return Err("unsupported framework source layout".into());
     }
     let mut files = BTreeMap::new();

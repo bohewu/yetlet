@@ -1,10 +1,10 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
-## M26 — Application Startup & Sample Experience (planning PASS; YT-251/252 contracts accepted; YT-253/254 implementation Reviewer PASS; YT-255–258 independent Reviewer PASS; PR/CI pending)
+## M26 — Application Startup & Sample Experience (merged, CI PASS, native MSVC PASS)
 
 [M26 plan and YT-251–YT-258 dependency map](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md) adopts **Simple first, customizable when needed**. It implements source-only `App::serve()` with a loopback-only `127.0.0.1:7878` HTTP development default, `App::serve_on(address)` for explicit binding, and a curated optional `server_axum::prelude`. HTTPS/TLS is never inferred or enabled implicitly; production TLS normally terminates at an explicit edge proxy, while direct TLS remains an advanced native Axum integration. `into_router()` and native Axum/Tower lifecycle control remain first-class; samples that require graceful shutdown keep their explicit listener and `axum::serve` path.
 
-The M26 plan and its owner-clarification amendment both received independent saved Reviewer subagent PASS. **YT-251 and YT-252 are Done at contract-only scope:** ADR-0011 and ADR-0012 both received independent saved Reviewer PASS. YT-251's initial P2 on Axum post-bind accept-error semantics was corrected against Axum 0.8.9 source; its follow-up Job `wc_job_Nad2HOpWhHREJOty` passed. YT-252 Job `wc_job_leT3lB8xD2KJSSZS` passed (terminal exit 0; model `gpt-6-astra`; effective effort `high`; zero issues and required followups). **YT-253 implementation is Done at Linux and Windows cross-target scope, after independent Reviewer PASS.** The Linux test suite, Clippy, session-redis compile, Windows MSVC cross-target compile and WASM feature-boundary compile pass. Explicit `serve_on` real HTTP and bind errors pass; the earlier default live HTTP assertion was skipped due to an unrelated service on `127.0.0.1:3000`. The owner revised the default to `127.0.0.1:7878`: [YT-253 verification](YT-253-STARTUP-VERIFICATION-20261111.md) now records a successful live default-port HTTP test, all 15 targeted validation commands exiting `0`, and the source/feature evidence. The initial YT-253 Reviewer `wc_job_CdqciKQzlAcfXH-o` found one P2 evidence gap, preserved as FAIL; owner port amendment Reviewer `wc_job_eJ9LTvWN2G-Yt7Oh` PASS (exit 0; `gpt-6-astra`/high; zero issues), and YT-253 implementation Reviewer `wc_job_vX_D7m0O9q5on1hg` PASS (exit 0; saved `gpt-6-astra`/high; zero blocking issues); the previous evidence-only FAIL remains preserved, with 15 original command logs verified. Native Windows Runner execution remains unverified. YT-254 source implementation is Done: [12 retained commands](YT-254-PRELUDE-VERIFICATION-20261111.md) all exit 0, including curated Prelude 2/2 tests, full Axum adapter, Clippy and Core/WASM/Windows cross-target checks; its independent Reviewer Job `wc_job_t0nfWyjaZtjOd5Gx` PASS (terminal exit 0; `gpt-6-astra`/high; zero issues/followups). YT-253–257 have each passed independent implementation review at their documented Ubuntu/source scope. YT-255 migrated the SDK minimal example and five basic HTTP samples, YT-256 preserved native lifecycle in five capability samples, and YT-257 migrated Todo/Style startup while preserving Dashboard shutdown and browser behavior. Their distinct role-directed Reviewer Jobs all completed with exit 0 and JSON PASS.
+The M26 plan and its owner-clarification amendment both received independent saved Reviewer subagent PASS. **YT-251 and YT-252 are Done at contract-only scope:** ADR-0011 and ADR-0012 both received independent saved Reviewer PASS. YT-251's initial P2 on Axum post-bind accept-error semantics was corrected against Axum 0.8.9 source; its follow-up Job `wc_job_Nad2HOpWhHREJOty` passed. YT-252 Job `wc_job_leT3lB8xD2KJSSZS` passed (terminal exit 0; model `gpt-6-astra`; effective effort `high`; zero issues and required followups). **YT-253 implementation is Done at Linux and Windows cross-target scope, after independent Reviewer PASS.** The Linux test suite, Clippy, session-redis compile, Windows MSVC cross-target compile and WASM feature-boundary compile pass. Explicit `serve_on` real HTTP and bind errors pass; the earlier default live HTTP assertion was skipped due to an unrelated service on `127.0.0.1:3000`. The owner revised the default to `127.0.0.1:7878`: [YT-253 verification](YT-253-STARTUP-VERIFICATION-20261111.md) now records a successful live default-port HTTP test, all 15 targeted validation commands exiting `0`, and the source/feature evidence. The initial YT-253 Reviewer `wc_job_CdqciKQzlAcfXH-o` found one P2 evidence gap, preserved as FAIL; owner port amendment Reviewer `wc_job_eJ9LTvWN2G-Yt7Oh` PASS (exit 0; `gpt-6-astra`/high; zero issues), and YT-253 implementation Reviewer `wc_job_vX_D7m0O9q5on1hg` PASS (exit 0; saved `gpt-6-astra`/high; zero blocking issues); the previous evidence-only FAIL remains preserved, with 15 original command logs verified. At that checkpoint, native Windows Runner execution remained unverified. YT-254 source implementation is Done: [12 retained commands](YT-254-PRELUDE-VERIFICATION-20261111.md) all exit 0, including curated Prelude 2/2 tests, full Axum adapter, Clippy and Core/WASM/Windows cross-target checks; its independent Reviewer Job `wc_job_t0nfWyjaZtjOd5Gx` PASS (terminal exit 0; `gpt-6-astra`/high; zero issues/followups). YT-253–257 have each passed independent implementation review at their documented Ubuntu/source scope. YT-255 migrated the SDK minimal example and five basic HTTP samples, YT-256 preserved native lifecycle in five capability samples, and YT-257 migrated Todo/Style startup while preserving Dashboard shutdown and browser behavior. Their distinct role-directed Reviewer Jobs all completed with exit 0 and JSON PASS.
 
 | Task | Independent Reviewer Job | Accepted commit |
 |---|---|---|
@@ -15,15 +15,28 @@ The M26 plan and its owner-clarification amendment both received independent sav
 YT-258 synchronized the source API map, sample indexes, local documentation and
 catalog audit. Independent Reviewer `wc_job_BujoBeCZVwUl_ZGG` completed terminal,
 exit 0, JSON PASS with zero issues/followups. All YT-251–258 item Reviewer gates
-are accepted at their documented source/platform scope; M26 Git integration
-(PR, exact-head CI, merge and post-merge master CI) is still pending. Native
-Windows MSVC qualification remains postponed until the complete branch is
-merged and exact-master CI succeeds. Existing cross-target results retain their
-original scope.
+are accepted at their documented source/platform scope. PR #86 passed
+exact-head CI and merged at `9d1075ab6442a9d8cb58606c170327aa32799bf7`.
+Rust, Docs and CodeQL passed on that exact master commit. The second Windows
+Runner passed 148 native MSVC tests across the SDK Axum adapter and all 13
+official samples. This qualification covers the tested M26 source and samples.
+[PR #86](https://github.com/bohewu/yetlet/pull/86)
 
 
 Published SDK `0.9.0-alpha.7`, CLI `0.3.1`, their release records, and the selected Reader Edition remain unchanged. New APIs are source-only until a later separately authorized SDK release; CLI templates, the published First App guide, and the Reader Edition snapshot are outside M26.
 
+
+**YT-259 SDK-aware CLI startup scaffolds (source complete).**
+
+The [YT-259 contract](YT-259-CLI-NEW-STARTUP-CONTRACT.md) ties the simple M26
+startup template to a verified exact SDK archive and preserves published
+alpha.7 generation. Settings, Vite and Service retain native startup. C passed
+independent review of locked alpha.7 and local M26 generated consumers, HTTP,
+CSP and browser checks. D passed independent review of native Ubuntu and
+Windows x64 MSVC CLI and generator checks, including actual Native Style and
+Service launch and private-console shutdown on Windows. Production M26
+capability rows remain empty pending approved SDK publication and a fresh
+registry-only consumer check.
 
 **YT-250 CLI 0.3.1 release (2026-11-11): Published with registry consumer PASS.**
 [Preparation and gates](CLI-031-RELEASE-PREPARATION.md) align source and release

@@ -10,7 +10,7 @@ import release_cli_consumer as consumer
 
 
 HISTORICAL_POLICY = b'{\n  "revision": "sdk-compat-v1",\n  "msrv": "1.99",\n  "templates": {\n    "native": ["0.9.0-alpha.6", "0.9.0-alpha.7"],\n    "browser": ["0.9.0-alpha.6", "0.9.0-alpha.7"],\n    "native-style": ["0.9.0-alpha.7"],\n    "browser-style": ["0.9.0-alpha.7"]\n  }\n}\n'
-LATEST_POLICY = b'{"revision":"sdk-latest-v2","selection":"latest-semver"}'
+LATEST_POLICY = b'{\n  "revision": "sdk-latest-v2",\n  "selection": "latest-semver"\n}\n'
 
 
 class ResolutionEvidenceTests(unittest.TestCase):
@@ -91,6 +91,70 @@ class ResolutionEvidenceTests(unittest.TestCase):
         (project / '.yetlet').mkdir()
         (project / '.yetlet/sdk-resolution.json').write_text(json.dumps(receipt))
         return cache, policy, receipt
+
+    def extended_fixture(self, root, template='native', capable=True, **options):
+        cache, _, receipt = self.fixture(root, template=template, requested='0.9.0-alpha.7')
+        row = {'sdk_version': receipt['sdk']['version'], 'yetlet_sha256': 'f'*64}
+        policy = json.dumps({'revision': 'sdk-latest-v2', 'selection': 'latest-semver',
+                             'scaffold_capabilities': {'m26_startup': [row] if capable else []}}).encode()
+        receipt['sdk']['policy_sha256'] = consumer.sha(policy)
+        browser = template.startswith('browser')
+        configured = options.get('settings') or options.get('vite')
+        service = options.get('service', False)
+        profile = ('browser-wasm' if browser else 'service-axum' if service else
+                   'configured-axum' if configured else 'm26-app-serve' if capable else 'legacy-axum')
+        receipt['startup_profile'] = profile
+        source = ''
+        if browser:
+            source = '#[wasm_bindgen] pub fn mount_tasks() {}'
+        else:
+            if configured: source += 'mod config;\n'
+            if options.get('vite'): source += 'mod vite;\n'
+            if options.get('tailwind') and not options.get('vite'): source += 'mod tailwind;\n'
+            if profile == 'm26-app-serve':
+                source += ('App::from_router(app)' if template == 'native-style' or options.get('tailwind')
+                           else 'App::new()') + '.serve().await?;'
+            else:
+                source += 'let listener = TcpListener::bind(address).await?;\n'
+                if service: source += 'let shutdown = shutdown_signal(readiness)?;\n'
+                source += 'config::serve(listener, app, tls, shutdown).await?;' if configured else 'axum::serve(listener, app).await?;'
+        (root / 'src').mkdir()
+        (root / ('src/lib.rs' if browser else 'src/main.rs')).write_text(source)
+        (root / '.yetlet/sdk-resolution.json').write_text(json.dumps(receipt))
+        return cache, policy, receipt
+
+    def test_extended_receipts_match_policy_options_and_emitted_startup(self):
+        for template, options in [('native', {}), ('native-style', {}),
+                ('native', {'tailwind': True}), ('native-style', {'settings': True}),
+                ('native', {'service': True}), ('native-style', {'service': True, 'settings': True}),
+                ('native-style', {'vite': True, 'tailwind': True}),
+                ('native', {'service': True, 'vite': True, 'tailwind': True}),
+                ('browser', {'settings': True, 'vite': True}), ('browser-style', {'tailwind': True})]:
+            for capable in (False, True):
+                with self.subTest(template=template, options=options, capable=capable), tempfile.TemporaryDirectory() as temp:
+                    root = Path(temp)
+                    cache, policy, receipt = self.extended_fixture(root, template, capable, **options)
+                    self.assertEqual(consumer.inspect_project(root, '0.3.1', template, '0.9.0-alpha.7',
+                        'registry-refresh', cache, policy, context='source', **options), receipt)
+
+    def test_extended_receipt_rejects_profile_policy_checksum_render_and_option_drift(self):
+        for defect in ('missing', 'profile', 'checksum', 'render', 'options', 'digest', 'schema'):
+            with self.subTest(defect=defect), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                cache, policy, receipt = self.extended_fixture(root)
+                if defect == 'missing': receipt.pop('startup_profile')
+                if defect == 'profile': receipt['startup_profile'] = 'legacy-axum'
+                if defect == 'checksum':
+                    policy = policy.replace(b'f'*64, b'e'*64)
+                    receipt['sdk']['policy_sha256'] = consumer.sha(policy)
+                if defect == 'render': (root / 'src/main.rs').write_text('axum::serve(listener, app).await?;')
+                if defect == 'options': (root / 'src/main.rs').write_text('mod config; App::new().serve().await?;')
+                if defect == 'digest': policy += b'\n'
+                if defect == 'schema': receipt['schema'] = True
+                (root / '.yetlet/sdk-resolution.json').write_text(json.dumps(receipt))
+                with self.assertRaises(ValueError):
+                    consumer.inspect_project(root, '0.3.1', 'native', '0.9.0-alpha.7',
+                        'registry-refresh', cache, policy, context='source')
 
     def test_default_and_offline_use_captured_metadata_not_cli_build_version(self):
         for source in ('registry-refresh', 'offline-cache'):

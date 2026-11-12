@@ -33,20 +33,19 @@ pub(crate) fn validate(path: &Path) -> Result<PathBuf, &'static str> {
     {
         return Err("framework must declare the expected Rust 1.99 baseline");
     }
-    for name in ["yetlet"] {
-        let crate_dir = path.join("crates").join(name);
-        let value = manifest(&crate_dir.join("Cargo.toml"))?;
-        if value
-            .get("package")
-            .and_then(|p| p.get("name"))
-            .and_then(toml::Value::as_str)
-            != Some(name)
-        {
-            return Err("framework crate package identity is invalid");
-        }
-        read(&crate_dir.join("src/lib.rs"))
-            .map_err(|_| "framework crate source is unavailable or unsafe")?;
+    let name = "yetlet";
+    let crate_dir = path.join("crates").join(name);
+    let value = manifest(&crate_dir.join("Cargo.toml"))?;
+    if value
+        .get("package")
+        .and_then(|p| p.get("name"))
+        .and_then(toml::Value::as_str)
+        != Some(name)
+    {
+        return Err("framework crate package identity is invalid");
     }
+    read(&crate_dir.join("src/lib.rs"))
+        .map_err(|_| "framework crate source is unavailable or unsafe")?;
     Ok(path)
 }
 

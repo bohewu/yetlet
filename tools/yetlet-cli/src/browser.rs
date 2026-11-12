@@ -32,7 +32,7 @@ pub(crate) fn files_version(
     };
     Ok(vec![
         ("Cargo.toml", format!("[package]\nname = \"{name}\"\nversion = \"0.1.0\"\nedition = \"2024\"\nrust-version = \"1.99\"\npublish = false\n\n[workspace]\nresolver = \"3\"\n\n[lib]\nname = \"tasks\"\ncrate-type = [\"cdylib\", \"rlib\"]\n\n[target.'cfg(target_arch = \"wasm32\")'.dependencies]\nyetlet = {{ version = \"={version}\", default-features = false, features = [\"reactive\"] }}\nyetlet-browser = {{ version = \"={version}\", default-features = false, features = [\"dom\", \"dom-keyed\"] }}\nwasm-bindgen = \"=0.2.129\"\nweb-sys = {{ version = \"0.3\", features = [\"Document\", \"Element\", \"Event\", \"EventTarget\", \"HtmlElement\", \"HtmlInputElement\", \"Node\", \"Window\"] }}\n")),
-        ("README.md", include_str!("../templates/browser/README.md").replace("@NAME@", name).replace("@SDK_VERSION@", &version)),
+        ("README.md", include_str!("../templates/browser/README.md").replace("@NAME@", name).replace("@SDK_VERSION@", version)),
         (".gitignore", "/target/\n/frontend/node_modules/\n/frontend/dist/\n/frontend/generated/\n/frontend/.env*\n!/frontend/.env.example\n".into()),
         ("base.toml", "[cli]\ntarget = \"browser\"\n\n[cli.rust]\nwatch = false\n\n[cli.vite]\nenabled = true\nroot = \"frontend/\"\nauto_start = true\nauto_build = true\n\n[cli.generate.k8s]\nreplicas = 1\n".into()),
         ("development.toml", "# Public CLI overrides inherit base.toml.\n".into()),

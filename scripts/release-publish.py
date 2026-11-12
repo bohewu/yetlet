@@ -191,13 +191,15 @@ def published_release(p, previous):
 LEGACY_CLI_BINDINGS = s.records.LEGACY_CLI_VERSIONS
 
 
-def resolved_cli_project(project, cli_version, explicit_sdk):
+def resolved_cli_project(project, cli_version, explicit_sdk, policy_bytes, *, context='archive'):
     """New-CLI explicit consumer proof; never reinterpret a legacy default pin."""
     import tomllib
     receipt = s.records.loads((project / '.yetlet/sdk-resolution.json').read_bytes())
     lock = (project / 'Cargo.lock').read_bytes()
     sdk = receipt['sdk']
-    s.require(receipt['schema'] == 1 and receipt['cli_version'] == cli_version
+    policy = s.records.sdk_policy(policy_bytes, cli_version, context=context)
+    s.require(type(receipt['schema']) is int and receipt['schema'] == 1 and receipt['cli_version'] == cli_version
+              and sdk['policy'] == policy['revision'] and sdk['policy_sha256'] == s.sha(policy_bytes)
               and receipt['cargo_lock_sha256'] == s.sha(lock)
               and sdk['requested'] == sdk['version'] == explicit_sdk
               and sdk['source'] == 'registry-refresh' and sdk['registry'] == 'https://index.crates.io/'
@@ -210,6 +212,8 @@ def resolved_cli_project(project, cli_version, explicit_sdk):
     s.require(len(entries) == 1 and entries[0]['version'] == explicit_sdk
               and entries[0].get('source') == 'registry+https://github.com/rust-lang/crates.io-index'
               and entries[0].get('checksum') == package['checksum'])
+    import release_cli_consumer
+    release_cli_consumer.check_startup(project, receipt, policy, 'native')
     return receipt, lock
 
 
@@ -278,7 +282,8 @@ def cli_consumer(version, output):
                 'sdk_version': sdk_version, 'source_install': True,
                 'path_patches': False, 'credentials_forwarded': False}
         if version not in LEGACY_CLI_BINDINGS:
-            receipt, app_lock = resolved_cli_project(root / 'consumerapp', version, sdk_version)
+            receipt, app_lock = resolved_cli_project(root / 'consumerapp', version, sdk_version,
+                (installed[0].parent / 'resources/sdk-compatibility.json').read_bytes())
             (output / 'REGISTRY-CONSUMER-APP.lock').write_bytes(app_lock)
             result.update(app_sdk_version=receipt['sdk']['version'], app_lock_sha256=s.sha(app_lock),
                           resolution_source=receipt['sdk']['source'], explicit_sdk_selection=True)

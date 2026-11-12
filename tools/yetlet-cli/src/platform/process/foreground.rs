@@ -576,6 +576,7 @@ pub(crate) fn run_pair(rust: &mut Command, frontend: &mut Command) -> io::Result
 
 // Watchexec emits events only. Each Rust generation, the watcher and the
 // persistent frontend remain separate groups owned by this supervisor.
+#[cfg(test)]
 pub(crate) fn run_watch(
     rust: &mut Command,
     watcher: &mut Command,

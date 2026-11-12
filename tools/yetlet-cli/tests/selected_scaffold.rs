@@ -58,13 +58,12 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                         .unwrap()
                         .parse()
                         .unwrap();
-                    for krate in ["yetlet"] {
-                        assert_eq!(
-                            manifest["dependencies"][krate]["version"],
-                            cli["dependencies"]["yetlet"]["version"]
-                        );
-                        assert!(manifest["dependencies"][krate].get("path").is_none());
-                    }
+                    let krate = "yetlet";
+                    assert_eq!(
+                        manifest["dependencies"][krate]["version"],
+                        cli["dependencies"]["yetlet"]["version"]
+                    );
+                    assert!(manifest["dependencies"][krate].get("path").is_none());
                     assert_eq!(
                         manifest["dependencies"]["yetlet"]["features"]
                             .as_array()
@@ -333,20 +332,19 @@ fn selected_vite_runtime_settings_and_custom_root_compile_with_explicit_cargo_ov
         .unwrap();
     let manifest_path = app.join("Cargo.toml");
     let mut manifest: toml::Value = fs::read_to_string(&manifest_path).unwrap().parse().unwrap();
-    for krate in ["yetlet"] {
-        manifest["dependencies"][krate]
-            .as_table_mut()
-            .unwrap()
-            .insert(
-                "path".into(),
-                framework
-                    .join("crates")
-                    .join(krate)
-                    .to_str()
-                    .unwrap()
-                    .into(),
-            );
-    }
+    let krate = "yetlet";
+    manifest["dependencies"][krate]
+        .as_table_mut()
+        .unwrap()
+        .insert(
+            "path".into(),
+            framework
+                .join("crates")
+                .join(krate)
+                .to_str()
+                .unwrap()
+                .into(),
+        );
     fs::write(&manifest_path, toml::to_string(&manifest).unwrap()).unwrap();
     let mut config = fs::read_to_string(app.join("src/config.rs")).unwrap();
     config.push_str(

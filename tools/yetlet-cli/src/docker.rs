@@ -179,25 +179,24 @@ fn inspect(app: &fs::App) -> Result<Snapshot, String> {
     if selected {
         // Only normal explicit path overrides of the pinned declarations qualify.
         // Every other manifest key, version, feature and dependency stays exact.
-        for package in ["yetlet"] {
-            if expected_manifest["dependencies"].get(package).is_some() {
-                let path = dependencies
-                    .get(package)
-                    .and_then(|d| d.get("path"))
-                    .and_then(Value::as_str)
-                    .ok_or("generated framework path dependency is required")?;
-                if !Path::new(path).is_absolute()
-                    || framework::absolute(Path::new(path))
-                        .map_err(|_| "unsafe framework dependency path")?
-                        != roots[0].join("crates").join(package)
-                {
-                    return Err("framework dependency must match the qualified workspace".into());
-                }
-                expected_manifest["dependencies"][package]
-                    .as_table_mut()
-                    .unwrap()
-                    .insert("path".into(), Value::String(path.into()));
+        let package = "yetlet";
+        if expected_manifest["dependencies"].get(package).is_some() {
+            let path = dependencies
+                .get(package)
+                .and_then(|d| d.get("path"))
+                .and_then(Value::as_str)
+                .ok_or("generated framework path dependency is required")?;
+            if !Path::new(path).is_absolute()
+                || framework::absolute(Path::new(path))
+                    .map_err(|_| "unsafe framework dependency path")?
+                    != roots[0].join("crates").join(package)
+            {
+                return Err("framework dependency must match the qualified workspace".into());
             }
+            expected_manifest["dependencies"][package]
+                .as_table_mut()
+                .unwrap()
+                .insert("path".into(), Value::String(path.into()));
         }
     }
     if manifest != expected_manifest {

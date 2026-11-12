@@ -1,11 +1,21 @@
 //! Package-owned resources and their deliberately selected public SDK closure.
 use std::{path::Path, process::Command};
 
-#[path = "../src/framework_files.rs"]
-mod framework_files;
+fn framework_files() -> std::collections::BTreeMap<String, String> {
+    serde_json::from_str(include_str!("../resources/framework.json")).unwrap()
+}
 
 #[test]
 fn package_resources_have_a_pinned_sdk_and_closed_relative_names() {
+    let policy: serde_json::Value =
+        serde_json::from_str(include_str!("../resources/sdk-compatibility.json")).unwrap();
+    assert_eq!(policy.as_object().unwrap().len(), 3);
+    assert_eq!(policy["revision"], "sdk-latest-v2");
+    assert_eq!(policy["selection"], "latest-semver");
+    let capabilities = policy["scaffold_capabilities"].as_object().unwrap();
+    assert_eq!(capabilities.len(), 1);
+    let rows = capabilities["m26_startup"].as_array().unwrap();
+    assert!(rows.iter().all(|row| row["sdk_version"] != "0.9.0-alpha.7"));
     let workspace: toml::Value = include_str!("../resources/workspace.toml").parse().unwrap();
     let cli: toml::Value = include_str!("../Cargo.toml").parse().unwrap();
     let version = workspace["workspace"]["package"]["version"]
@@ -16,7 +26,7 @@ fn package_resources_have_a_pinned_sdk_and_closed_relative_names() {
         Some(format!("={version}").as_str())
     );
     assert!(cli["dependencies"]["yetlet"].get("path").is_none());
-    let files = &*framework_files::FILES;
+    let files = framework_files();
     assert!(files.contains_key("crates/yetlet/src/lib.rs"));
     assert!(files.contains_key("crates/yetlet/LICENSE-MIT"));
     for name in files.keys() {
@@ -63,7 +73,7 @@ fn snapshot_digests_and_recorded_source_are_independent_of_current_sdk_checkout(
     }
     // An installed crate has no Git source. A source checkout verifies the exact
     // recorded SDK commit, even when today's workspace is on a different SDK.
-    for (path, expected) in framework_files::FILES.iter() {
+    for (path, expected) in framework_files().iter() {
         let output = Command::new("git")
             .args(["show", &format!("{source}:{path}")])
             .current_dir(root)

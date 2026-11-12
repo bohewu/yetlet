@@ -118,12 +118,13 @@ SDK_SNAPSHOT_PATHS = (
 SDK_RESOURCE_PATHS = SDK_SNAPSHOT_PATHS + ('resources/sdk-identity.json', 'resources/sdk-compatibility.json')
 
 
-def check_sdk_resources(files, build_sdk, readme):
+def check_sdk_resources(files, build_sdk, readme, *, context, cli_version):
     """Check the same immutable policy/snapshot closure in source and CLI archives."""
     location = 'CLI SDK identity'
     require(all(p in files for p in SDK_RESOURCE_PATHS), location, 'resource closure incomplete')
     identity = json.loads(files['resources/sdk-identity.json'])
-    policy = records.sdk_policy(files['resources/sdk-compatibility.json'])
+    require(field(readme, 'CLI release', location) == cli_version, location, 'CLI package identity differs')
+    policy = records.sdk_policy(files['resources/sdk-compatibility.json'], cli_version, context=context)
     require(identity['schema'] == 1 and '=' + identity['build_sdk'] == build_sdk, location,
             'build SDK identity differs from exact manifest dependency')
     workspace = tomllib.loads(files['resources/workspace.toml'].decode())
@@ -139,8 +140,7 @@ def check_sdk_resources(files, build_sdk, readme):
             location, 'policy digest differs')
     require(field(readme, 'SDK policy', location) == policy['revision'], location,
             'README policy differs from packaged authority')
-    require(records.CLI_SDK_POLICIES.get(field(readme, 'CLI release', location)) == policy['revision'],
-            location, 'policy differs from selected CLI release')
+
 
 
 def check_cli_published_commands(text, selected, published):
@@ -262,7 +262,7 @@ def check_source(root, cohort='all'):
         resources = root / 'tools/yetlet-cli/resources'
         if (resources / 'sdk-identity.json').is_file():
             check_sdk_resources({p: (root / 'tools/yetlet-cli' / p).read_bytes() for p in SDK_RESOURCE_PATHS},
-                                sdk, read(root, 'tools/yetlet-cli/README.md'))
+                                sdk, read(root, 'tools/yetlet-cli/README.md'), context='source', cli_version=version)
     if cohort in ('all', 'consolidated'):
         for name in ('yetlet', 'yetlet-browser'):
             check_readme(name, workspace, read(root, f'crates/{name}/README.md'))

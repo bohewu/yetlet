@@ -17,7 +17,8 @@ import release_record as records
 import release_registry as registry
 import release_ci
 import release_docs
-from test_release_cli_consumer import HISTORICAL_POLICY
+from test_release_cli_consumer import HISTORICAL_POLICY, LATEST_POLICY
+import test_release_cli_consumer as consumer_tests
 
 HERE = Path(__file__).resolve().parent
 spec = importlib.util.spec_from_file_location('publication_tests', HERE / 'release-publish.py')
@@ -77,6 +78,10 @@ def archives(directory, cycle=False, consolidated=False, cli=False, cli_version=
                 files['resources/sdk-identity.json'] = json.dumps(identity).encode()
             else:
                 readme = (package / 'README.md').read_text()
+                files['resources/sdk-compatibility.json'] = LATEST_POLICY
+                identity = json.loads(files['resources/sdk-identity.json'])
+                identity['policy_sha256'] = registry.sha(LATEST_POLICY)
+                files['resources/sdk-identity.json'] = json.dumps(identity).encode()
             extra_files = list(files.items())
         with tarfile.open(fileobj=raw, mode='w:gz') as archive:
             for path, data in [('Cargo.toml', manifest.encode()), ('README.md', (readme + readme_suffix).encode()), *extra_files]:
@@ -105,11 +110,34 @@ class RegistryTests(unittest.TestCase):
                 with tarfile.open(Path(temp) / f'yetlet-cli-{version}.crate') as archive:
                     policy_bytes = archive.extractfile(f'yetlet-cli-{version}/resources/sdk-compatibility.json').read()
                 self.assertEqual(policy_bytes, HISTORICAL_POLICY if version == '0.3.0' else
-                                 (package / 'resources/sdk-compatibility.json').read_bytes())
+                                 LATEST_POLICY)
                 if version == '0.3.1':
                     self.assertEqual(meta['readme'], (package / 'README.md').read_text())
                 r, subjects = archives(Path(temp), cli=True, cli_version=version, cli_sdk='0.9.0-alpha.6')
                 with self.assertRaises(ValueError): registry.prepare(r, temp, subjects)
+
+    def test_historical_cli031_archive_cannot_claim_checkout_policy(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            r, subjects = archives(root, cli=True, cli_version='0.3.1')
+            path = root / 'yetlet-cli-0.3.1.crate'
+            with tarfile.open(path) as archive:
+                files = {item.name: archive.extractfile(item).read() for item in archive}
+            prefix = 'yetlet-cli-0.3.1/resources/'
+            raw = json.dumps({'revision': 'sdk-latest-v2', 'selection': 'latest-semver',
+                              'scaffold_capabilities': {'m26_startup': []}}).encode()
+            files[prefix + 'sdk-compatibility.json'] = raw
+            identity = json.loads(files[prefix + 'sdk-identity.json'])
+            identity['policy_sha256'] = registry.sha(raw)
+            files[prefix + 'sdk-identity.json'] = json.dumps(identity).encode()
+            with tarfile.open(path, 'w:gz') as archive:
+                for name, data in files.items():
+                    info = tarfile.TarInfo(name)
+                    info.size = len(data)
+                    archive.addfile(info, io.BytesIO(data))
+            subjects[path.name] = registry.sha(path.read_bytes())
+            with self.assertRaises(ValueError):
+                registry.prepare(r, root, subjects)
 
     def test_consolidated_archives_bind_exact_two_subjects_and_predecessor(self):
         with tempfile.TemporaryDirectory() as temp:
@@ -348,14 +376,34 @@ class CliConsumerTests(unittest.TestCase):
             receipt = {'schema':1, 'cli_version':'0.3.0', 'cargo_lock_sha256':publication.s.sha(lock),
                        'sdk':{'requested':'0.9.0-alpha.7','version':'0.9.0-alpha.7','source':'registry-refresh',
                               'registry':'https://index.crates.io/','template':'native',
+                              'policy':'sdk-compat-v1', 'policy_sha256':registry.sha(HISTORICAL_POLICY),
                               'packages':[{'name':'yetlet','checksum':'f'*64,'metadata_sha256':'a'*64,'validated_at':100}]}}
             (root / '.yetlet/sdk-resolution.json').write_text(json.dumps(receipt))
-            self.assertEqual(publication.resolved_cli_project(root, '0.3.0', '0.9.0-alpha.7')[1], lock)
+            self.assertEqual(publication.resolved_cli_project(root, '0.3.0', '0.9.0-alpha.7', HISTORICAL_POLICY)[1], lock)
             with self.assertRaises(ValueError):
-                publication.resolved_cli_project(root, '0.3.0', '0.9.0-alpha.6')
+                publication.resolved_cli_project(root, '0.3.0', '0.9.0-alpha.6', HISTORICAL_POLICY)
             (root / 'Cargo.lock').write_bytes(lock + b'\n')
             with self.assertRaises(ValueError):
-                publication.resolved_cli_project(root, '0.3.0', '0.9.0-alpha.7')
+                publication.resolved_cli_project(root, '0.3.0', '0.9.0-alpha.7', HISTORICAL_POLICY)
+
+    def test_extended_publication_receipt_requires_policy_and_rendered_profile(self):
+        for defect in (None, 'profile', 'render', 'digest', 'checksum'):
+            with self.subTest(defect=defect), tempfile.TemporaryDirectory() as temp:
+                root = Path(temp)
+                _, policy_bytes, receipt = consumer_tests.ResolutionEvidenceTests().extended_fixture(root)
+                if defect == 'profile': receipt.pop('startup_profile')
+                if defect == 'render': (root / 'src/main.rs').write_text('axum::serve(listener, app).await?;')
+                if defect == 'digest': policy_bytes += b'\n'
+                if defect == 'checksum':
+                    policy_bytes = policy_bytes.replace(b'f'*64, b'e'*64)
+                    receipt['sdk']['policy_sha256'] = registry.sha(policy_bytes)
+                (root / '.yetlet/sdk-resolution.json').write_text(json.dumps(receipt))
+                if defect:
+                    with self.assertRaises(ValueError):
+                        publication.resolved_cli_project(root, '0.3.1', '0.9.0-alpha.7', policy_bytes, context='source')
+                else:
+                    self.assertEqual(publication.resolved_cli_project(root, '0.3.1', '0.9.0-alpha.7',
+                        policy_bytes, context='source')[0], receipt)
 
 
 class RegistryContinuationTests(unittest.TestCase):
