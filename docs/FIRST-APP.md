@@ -3,7 +3,7 @@
 Create a standalone native SSR app with the published source-installed CLI and
 `yetlet` SDK `0.9.0-alpha.8`. This Linux/POSIX walkthrough uses the existing
 scaffold; the app needs no local SDK source or Cargo path overrides. APIs remain
-Experimental. CLI `0.3.1` and SDK `0.9.0-alpha.8` have independent versions.
+Experimental. CLI `0.4.0` and SDK `0.9.0-alpha.8` have independent versions.
 
 For an app whose UI and state run in the browser without a native HTTP backend,
 choose the separate [browser-only WASM walkthrough](BROWSER-APP.md).
@@ -24,9 +24,9 @@ choose the separate [browser-only WASM walkthrough](BROWSER-APP.md).
   creates the app lock; later build/run use frozen inputs. The CLI does not
   install tools. No Node.js, WASM target,
   browser build, database, service token or cloud account is needed here.
-- Use a terminal without unrelated `APP_CLI__*`, settings-root or port overrides.
+- Use a terminal without unrelated `APP_CLI__*` or settings-root overrides.
   The plain native scaffold defaults to Production CLI settings, Vite off and
-  Rust watch off. Stop another owned server using port 3000 before running it.
+  Rust watch off. Keep loopback port 7878 available for the app.
   Windows has [separate native setup](CLI-GUIDE.md#windows-powershell-native-gnumsvc);
   these POSIX commands are not a Windows walkthrough.
 
@@ -41,12 +41,12 @@ in Cargo's user install directory.
 Install the independently published CLI from crates.io:
 
 ```sh
-cargo +1.99.0 install yetlet-cli --version 0.3.1 --locked
+cargo +1.99.0 install yetlet-cli --version 0.4.0 --locked
 yetlet --version
 ```
 
 This downloads the CLI source archive from crates.io and compiles the `yetlet`
-executable. Expected version output is exactly `yetlet 0.3.1`. This is a native
+executable. Expected version output is exactly `yetlet 0.4.0`. This is a native
 source installation, so the prerequisites above apply. Maintainers evaluating a
 checkout can use the separate [source-install instructions](CLI-GUIDE.md#build-locally-and-create-an-application).
 
@@ -91,9 +91,10 @@ Plain `new` selects the existing native template. It writes `Cargo.toml`,
 server. The app declares its own
 standalone `[workspace]`; it is not added to Yetlet's workspace.
 
-CLI `0.3.1` generates an explicit listener even with SDK alpha.8. Applications
-that choose the SDK's simple startup methods can follow the
-[published application startup guide](API-REFERENCE.md#published-application-startup--sdk-alpha8).
+With SDK `0.9.0-alpha.8`, the generated `src/main.rs` registers both routes
+and calls `.serve().await`. The receipt records
+`"startup_profile": "m26-app-serve"`.
+[Application startup API](API-REFERENCE.md#published-application-startup--sdk-alpha8)
 
 The explicit SDK selection keeps this walkthrough on its reviewed reader
 edition as newer SDK releases arrive. Omitting it selects the latest available
@@ -131,17 +132,17 @@ code. Node/npm is unnecessary for this plain native app.
 
 ## Expected result
 
-The foreground app prints its selected loopback address, normally
-`Listening on http://127.0.0.1:3000`. Open the printed address:
+Open `http://127.0.0.1:7878/` in your browser. The app binds this fixed
+loopback address without printing a startup address.
 
 | Route | Existing scaffold behavior |
 |---|---|
 | `/` | An HTML page displaying `Hello <Yetlet> & Rust!` as escaped text |
 | `/hello/Ada` | A complete page displaying `Hello, Ada!` through the native Path extractor |
 
-These routes come from the existing [native main template](../tools/yetlet-cli/templates/main.rs).
-Pages use Yetlet's escaped rendering and default strict CSP; this first path
-loads no JS/WASM. It installs no authentication or business authorization.
+Both routes return HTTP 200 with Yetlet's escaped rendering and default strict
+CSP. This first path loads no JS/WASM. It installs no authentication or business
+authorization.
 
 Press Ctrl+C to stop the foreground CLI. To make the app yours, edit the text
 passed to `View::text` in its existing `home` handler in `src/main.rs`, then
@@ -151,16 +152,8 @@ not a binary-only launch or a state-preserving reload promise.
 
 ## Configuration and errors
 
-The plain native template reads `YETLET_PORT`, defaulting to 3000, and always
-binds IPv4 loopback. For another unused port, use the same explicit app manifest:
-
-```sh
-(
-    export PATH="$yetlet_rust_bin:$PATH"
-    export YETLET_PORT=3001
-    yetlet run --manifest-path "$yetlet_app/Cargo.toml"
-)
-```
+To choose a different loopback port, replace `.serve()` in `src/main.rs` with
+`.serve_on("127.0.0.1:8080")` and open that address after restarting.
 
 CLI profile selection is separate: `APP_ENVIRONMENT` accepts `Development`,
 `Staging` or `Production`, default Production. `--release` changes Cargo's build
@@ -174,7 +167,7 @@ own declared variables and validation; follow their guide when you select them.
 | Cargo cannot resolve the SDK or download a dependency | Confirm the exact published version and registry/network access; explicitly prepare the app lock/cache before frozen CLI commands |
 | CLI refuses a missing/stale lock or missing offline dependency | After an intentional dependency edit, explicitly regenerate this app's lock and fetch its locked dependencies before frozen execution; do not copy another workspace's lock |
 | Unsafe application/tool path or permissions are rejected | Use owned local protected inputs and the documented CLI filesystem setup; do not weaken checks or change unrelated system directories |
-| Port 3000 is occupied | Stop the owned conflicting listener or select an unused `YETLET_PORT`; keep the loopback boundary |
+| Port 7878 is occupied | Stop the owned conflicting listener or choose an unused loopback port with `.serve_on(address)` |
 | Source edit does not appear while the process keeps running | Stop and build/run again; opt into the separate Watchexec path only after its documented setup |
 | `doctor` or `inspect` succeeds but startup fails | Those are bounded environment/plan reports, not dependency, secret, asset or execution qualification; inspect the actual failing stage |
 
@@ -193,7 +186,7 @@ to pass data and compose the existing home handler. Use the
 ## Next: export a static site
 
 Choose static export when the content can be built ahead of time and served as
-HTML files. Keep the native SSR app above for request-time handlers. CLI `0.3.1`
+HTML files. Keep the native SSR app above for request-time handlers. CLI `0.4.0`
 supports static export; it does not crawl those handlers or turn the plain
 scaffold into an exporter. There is no `yetlet new --static` option.
 
@@ -243,6 +236,5 @@ state and private business data out of exported Views and assets.
 - [Existing sample catalog](SAMPLES.md), [Todo browser setup](../README.md#choose-your-next-step)
   and [Admin reference](../examples/admin-dashboard/README.md) for later paths.
 
-The isolated GNU source-package install and registry-only first-app path are
-recorded in [YT-214](YT-214-CLI-INSTALLATION.md). That evidence does not extend
-Windows, browser/GPU or production qualification.
+The isolated Linux registry install and first-app checks are recorded in the
+[CLI 0.4.0 publication record](CLI-040-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-12).

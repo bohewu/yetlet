@@ -1,6 +1,6 @@
 # Build a browser-only Yetlet app
 
-Create a standalone interactive app with published CLI `0.3.1` and SDK
+Create a standalone interactive app with published CLI `0.4.0` and SDK
 `0.9.0-alpha.8`, without cloning Yetlet. Rust owns local state and interaction;
 JavaScript starts the WASM module. The finished app needs an HTTP(S) static host.
 These instructions use the pinned reader edition and existing APIs; commands
@@ -34,7 +34,7 @@ Install the two native tools once and add the WASM target:
 ```sh
 (
     set -eu
-    cargo +1.99.0 install yetlet-cli --version 0.3.1 --locked
+    cargo +1.99.0 install yetlet-cli --version 0.4.0 --locked
     rustup target add --toolchain 1.99.0 wasm32-unknown-unknown
     cargo +1.99.0 install wasm-bindgen-cli --version 0.2.129 --locked \
         --root "$HOME/.local/share/yetlet-tools"
@@ -44,7 +44,7 @@ Install the two native tools once and add the WASM target:
 )
 ```
 
-Expected identities are `yetlet 0.3.1` and `wasm-bindgen 0.2.129`. The latter
+Expected identities are `yetlet 0.4.0` and `wasm-bindgen 0.2.129`. The latter
 matches the generated app's exact bindgen dependency. With a custom Cargo install
 root or tool installation, select its actual protected executable directory on
 PATH; do not weaken the CLI's filesystem checks.

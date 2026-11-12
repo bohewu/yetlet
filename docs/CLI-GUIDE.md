@@ -25,7 +25,7 @@ The CLI's build dependency and embedded snapshot are independent of the SDK
 chosen for each new project.
 
 ```sh
-yetlet new demo --sdk-version 0.9.0-alpha.7
+yetlet new demo --sdk-version 0.9.0-alpha.8
 yetlet new cached-demo --offline
 ```
 
@@ -65,12 +65,13 @@ qualified native source exporter; app SDK resolution does not expand Docker or
 Compose source support. Policy and snapshot identity resources ship in the CLI
 archive and remain bound to that archive's checksum and immutable source.
 
-The CLI `0.4.0` source candidate records a generated startup profile in the
-creation receipt. It selects simple M26 startup for verified SDK alpha.8
-Native and Native Style projects, including the standalone Tailwind option.
-Settings, Vite and Service select their explicit native startup paths. Browser
-templates keep Wasm startup. The published CLI `0.3.1` still generates its
-existing explicit listener. [Scaffold policy and migration matrix](YT-259-CLI-NEW-STARTUP-CONTRACT.md)
+CLI `0.4.0` records `startup_profile` in the creation receipt. For the
+verified SDK `0.9.0-alpha.8` archive, Native and Native Style use
+`m26-app-serve` and call `App::serve()` on `127.0.0.1:7878` when the selected
+options allow simple startup, including Tailwind without Settings, Vite or
+Service. SDK alpha.7 uses the legacy native listener. Settings, Vite and
+Service select their own native startup profiles, and Browser templates
+keep Wasm startup. [Scaffold policy and migration matrix](YT-259-CLI-NEW-STARTUP-CONTRACT.md)
 
 ## CLI command and capability inventory
 

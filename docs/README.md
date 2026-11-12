@@ -3,7 +3,7 @@
 Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 choose a [runnable sample](SAMPLES.md). The two-package
 [SDK `0.9.0-alpha.8`](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
-and independent [CLI `0.3.1`](CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11)
+and independent [CLI `0.4.0`](CLI-040-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-12)
 are published on crates.io with matching Experimental GitHub pre-releases.
 The first-app instructions and selected reader sources use the edition pinned
 in [the site manifest](../site/pages.toml). The live reader labels its deployed edition and
@@ -23,7 +23,8 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   Typed tags are included in the published SDK alpha.7.
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
-- [Build your first Yetlet app](FIRST-APP.md): CLI0.3.1 → protected standalone project → SDK0.9.0-alpha.8 → app lock/cache → first build/run, then an optional [static-export path](FIRST-APP.md#next-export-a-static-site).
+- [Build your first Yetlet app](FIRST-APP.md): CLI0.4.0 → protected standalone project → SDK0.9.0-alpha.8 → app lock/cache → first build/run with `App::serve()`. The optional
+  [static-export path](FIRST-APP.md#next-export-a-static-site) uses a separate example.
 - [Build a browser-only Yetlet app](BROWSER-APP.md): published CLI/SDK → explicit tool and lock preparation → local state/events → build/preview/watch → static ship directory.
 - [Write Views and reusable components](VIEW-COMPONENTS.md): typed data → functions → lists/conditions → existing SSR handler.
 - [Opt-in integration quick reference](OPT-IN-QUICK-REFERENCE.md): package/feature → startup API/options → consumer settings/defaults.
@@ -53,8 +54,8 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 - [YT-250 CLI 0.3.1 release](CLI-031-RELEASE-PREPARATION.md): published
   Registry latest SemVer correction, retained exact app locking/provenance and
-  Windows Browser Style shutdown verification. The published CLI and selected
-  Reader Edition both use 0.3.1.
+  Windows Browser Style shutdown verification. The Reader Edition adopted
+  CLI 0.3.1 at that release.
 
 - [M26 Application Startup & Sample Experience](YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md), [ADR 0011 — Application startup](adr/0011-application-startup-api.md) and [ADR 0012 — Axum adapter prelude](adr/0012-server-axum-prelude.md): loopback-only HTTP default, explicit bind override, curated native import surface and native Axum escape hatch; contract-only until YT-253/254 implementation.
 - [YT-247 SDK resolution contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md),
@@ -68,8 +69,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [YT-248 CLI 0.3.0 Style release](CLI-030-RELEASE-PREPARATION.md): preserved
   reviewed release plan and [actual publication](CLI-030-HOSTED-RECORD.md), including
   the original failed publisher and successful standalone registry consumer.
-- [CLI 0.4.0 release preparation](CLI-040-RELEASE-PREPARATION.md): YT-259
-  registry-only capability proof, candidate archive and verification scope.
+- [CLI 0.4.0 publication](CLI-040-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-12)
+  records the YT-259 release archive, six hosted generation cases and installed
+  first-app verification. The [candidate preparation](CLI-040-RELEASE-PREPARATION.md)
+  retains the prepublication qualification scope.
 
 
 - [YT-245 SDK alpha.7 local preparation](YT-245-ALPHA7-RELEASE-PREPARATION.md):

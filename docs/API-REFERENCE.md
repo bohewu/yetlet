@@ -1,6 +1,6 @@
 # Current API reference
 
-Updated: 2026-11-11. This map distinguishes the published Experimental two-package
+Updated: 2026-11-12. This map distinguishes the published Experimental two-package
 SDK (`0.9.0-alpha.8`) from independent CLI tooling and checkout samples. `yetlet` contains the shared View and opt-in
 native capabilities; `yetlet-browser` contains browser integrations and depends
 one-way on the same View. Both packages are available from crates.io at this version.
@@ -48,9 +48,10 @@ the reviewed packages are now publicly available from crates.io.
 optional native `server_axum::prelude` ship in SDK `0.9.0-alpha.8`.
 Select `server-axum` and declare the application's Tokio runtime explicitly.
 
-The published CLI `0.3.1` continues to generate its explicit listener. The
-[CLI 0.4.0 source candidate](CLI-040-RELEASE-PREPARATION.md) selects the simple
-startup template from the exact verified SDK archive and requested options.
+Published CLI `0.4.0` generates this simple startup for Native and Native
+Style with verified SDK alpha.8 and compatible options. The creation receipt
+records `startup_profile` as `m26-app-serve`. SDK alpha.7 still uses the legacy
+native listener. [CLI startup profiles](CLI-GUIDE.md#sdk-resolution-yt-247)
 
 ```rust
 use yetlet::server_axum::prelude::*;
@@ -99,7 +100,7 @@ below; the generator and templates are now distributed in the CLI.
 
 ## CLI Style authoring and checkout Showcase
 
-Published SDKalpha.8/CLI0.3.1 artifacts serve separate roles. The CLI ships the
+Published SDKalpha.8/CLI0.4.0 artifacts serve separate roles. The CLI ships the
 private app Style generator and native/browser Style templates, with build/watch
 integration and exact SDK resolution/locking. The Style walkthroughs verify
 SDK alpha.7. By default, `new` selects the highest available non-yanked SemVer
