@@ -2,7 +2,7 @@
 
 Find the symptom below, check the possible cause, then follow the linked guide
 for the complete correction. Read guides and API source from the same checkout.
-The SDK `0.9.0-alpha.8` and independent source-installed CLI `0.3.1` are published
+The SDK `0.9.0-alpha.8` and independent source-installed CLI `0.4.0` are published
 Experimental versions. These are source-backed explanations of
 existing behavior, not new execution or platform qualification results.
 
@@ -29,7 +29,7 @@ share credentials, cookies, CSRF tokens or complete environment/settings dumps.
 | Cargo cannot resolve the generated Yetlet package versions | Registry/network/cache preparation is missing, or the manifest was changed to an incompatible version | Keep the generated exact published SDK version and selected features. Explicitly generate this app's lock and fetch dependencies before frozen execution; normal build/run needs no local SDK path | [Registry dependency preparation](FIRST-APP.md#3-prepare-the-app-lockcache-then-build-and-run) |
 | Frozen build/run refuses a lock or cannot find a cached dependency | This standalone app has no lock, the dependency graph changed, or its locked dependencies were not prepared | After an intentional dependency change, explicitly generate this app's lock and fetch its locked dependencies. Use the same prepared Cargo cache; do not copy another workspace's lock or expect frozen execution to repair it | [App lock and cache](FIRST-APP.md#3-prepare-the-app-lockcache-then-build-and-run) |
 | `doctor` or `inspect` succeeds, but build/run still fails | Doctor covers the local Rust/Cargo environment; inspect explains settings-derived plans. Neither establishes app readiness | Follow the actual failing stage's setup. Prepare app dependencies, required secrets and selected assets separately; a skipped stage is not execution evidence | [CLI inspection](CLI-GUIDE.md#read-only-project-inspection-yt-111) · [Diagnostics](CLI-GUIDE.md#diagnostics-and-platform-evidence) |
-| The plain first app cannot bind port 3000 | Another listener owns the port | Stop the owned conflicting process or choose an unused `YETLET_PORT` as shown in the walkthrough. The plain scaffold remains loopback-only; other samples have their own bind settings | [First-app configuration](FIRST-APP.md#configuration-and-errors) |
+| The plain first app cannot bind port 7878 | Another listener owns the port | Stop the owned conflicting process or choose an unused loopback port with `.serve_on(address)` | [First-app configuration](FIRST-APP.md#configuration-and-errors) |
 | A source edit is absent from an already running plain app | Ordinary native `run` does not watch by default | Stop, build and run again, or deliberately prepare/select the separate Rust watch path. Native frozen `cargo run` may compile changed source once; it is not a live reload promise | [First-app expected result](FIRST-APP.md#expected-result) · [Rust watch](CLI-GUIDE.md#rust-watch) |
 
 ## CLI settings and execution

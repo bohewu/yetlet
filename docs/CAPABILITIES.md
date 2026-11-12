@@ -18,10 +18,10 @@ classifies reader inputs and retained evidence; this inventory does not select
 publication of its linked execution records.
 
 SDK alpha.8 includes [simple application startup and the optional Axum Prelude](API-REFERENCE.md#published-application-startup--sdk-alpha8)
-with the opt-in `server-axum` feature. The published CLI `0.3.1` continues to
-generate its existing explicit-listener native scaffold.
-The [CLI 0.4.0 source candidate](CLI-040-RELEASE-PREPARATION.md) records
-capability-aware startup in the scaffold receipt.
+with the opt-in `server-axum` feature. Published CLI `0.4.0` generates
+`App::serve()` for Native and Native Style with verified SDK alpha.8 and
+compatible options. It records the selected startup profile in the scaffold
+receipt. [CLI startup profiles](CLI-GUIDE.md#sdk-resolution-yt-247)
 
 ## Published typed authoring and CLI Style tooling
 
@@ -33,7 +33,7 @@ The original YT-245 preparation selects local SDK `0.9.0-alpha.7` contents;
 these typed constructors are now distributed rather than checkout-only.
 
 
-Published SDKalpha.8/CLI0.3.1 artifacts serve separate roles. The independent CLI
+Published SDKalpha.8/CLI0.4.0 artifacts serve separate roles. The independent CLI
 ships native/browser Style templates and a private app generator. The Style
 walkthroughs verify SDK alpha.7 with exact app pins and locks. The
 [Style Showcase](../examples/style-showcase/README.md) remains a checkout sample.

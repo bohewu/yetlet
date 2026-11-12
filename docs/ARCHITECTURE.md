@@ -1,7 +1,7 @@
 # Yetlet Architecture
 
 **Status:** Experimental. **Published SDK:** `0.9.0-alpha.8` (`yetlet` / `yetlet-browser`).
-**Published CLI:** `0.3.1` (`yetlet-cli`).
+**Published CLI:** `0.4.0` (`yetlet-cli`).
 [Release readiness](RELEASE-READINESS.md) links the accepted publication records.
 M0–M9 implementation, selected M10 qualification and five application-owned
 research prototypes retain their recorded scopes. The typed Tag Builder is part of

@@ -136,3 +136,29 @@ Signer S, the Draft ID and the freeze, signing, independent verification and
 preflight results are pending at this checkpoint. After a later verified
 publication, the release SOP requires the Reader Edition update and live Pages
 readback. [Reader rollover](RELEASING.md#required-reader-update-after-every-sdk-or-cli-publication)
+
+## Owner-approved publication and installed consumer — 2026-11-12
+
+The owner-approved [publication run 43212574155/1](https://github.com/bohewu/yetlet/actions/runs/43212574155/attempts/1)
+published [yetlet-cli-v0.4.0](https://github.com/bohewu/yetlet/releases/tag/yetlet-cli-v0.4.0)
+as Experimental GitHub release `442869277` at `2026-11-12T12:15:31Z` from
+product source C `ac03ed1c76c4867c13a47240b1fc93058eed0b65`. The publisher
+verified GitHub and crates.io delivery. Anonymous readback matched all five
+GitHub assets and the original single, non-yanked crates.io archive
+(`yetlet-cli 0.4.0`, 535525 bytes, SHA-256
+`f4c7244d23087b44a7e70260842f16e21162cb9da5c1f7bbe224e8c67417efa8`).
+
+The hosted Linux consumer installed exact CLI `0.4.0` from crates.io and
+passed six locked generation cases. The default online and offline-cache
+cases selected SDK `0.9.0-alpha.8`. Exact SDK `0.9.0-alpha.7` covered
+Native, Native Style, Browser and Browser Style. Native Style passed
+HTTP and stylesheet checks. Browser Style passed the Vite/Wasm preview and
+Chrome checks, with no console errors, failed responses or inline styles.
+Both preview ports closed and the Chrome profile was removed.
+
+A separate clean local crates.io install of CLI `0.4.0` generated and ran the
+first app with exact SDK `0.9.0-alpha.8`, no path overrides and receipt
+`startup_profile` set to `m26-app-serve`. At `http://127.0.0.1:7878`,
+`/` and `/hello/Ada` returned HTTP 200 with the default strict CSP and
+scriptless HTML. The generated `Cargo.lock` and `.yetlet/sdk-resolution.json`
+were byte-identical after the run, and the listener closed.
