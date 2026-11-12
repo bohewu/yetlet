@@ -7,17 +7,20 @@ renderer replaces a subtree; native SSR works without selecting it.
 selects `dom` by default; actual mounting requires the WASM target and browser
 host. The commands below run checkout examples at their documented scope.
 
-**Since SDKalpha.6:** [YT-220](https://github.com/bohewu/yetlet/blob/master/docs/YT-220-HTML-DOM-IMPLEMENTATION.md)
-extends the DOM vocabulary to89 elements with scoped attributes and canonical
-table/disclosure/control validation. These additions are absent from the
-older SDKalpha.5's38-element baseline.
+**Available since SDK `0.9.0-alpha.6`:** the DOM renderer admits 89 ordinary
+HTML elements with scoped attributes and canonical table/disclosure/control
+validation. Default entry points keep same-origin navigation and no images;
+per-mount options can admit `img`, bringing the selected DOM scope to 90 elements.
+These additions are absent from SDK alpha.5's 38-element baseline.
 
-**Opt-in since SDKalpha.6:** [YT-221](https://github.com/bohewu/yetlet/blob/master/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
-adds per-mount navigation/image options. Existing entry points retain89 tags,
-same-origin navigation and no images; explicitly selected images add img only.
-These APIs are distributed in SDKalpha.6 and described by the selected guide
-edition. See the [actual publication record](https://github.com/bohewu/yetlet/blob/master/docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
-for source/consumer scope; no new browser qualification follows from this label.
+Use [the coverage contract and dated inventory](https://github.com/bohewu/yetlet/blob/master/docs/YT-219-HTML-DOM-CONTRACT.md#decision-and-inventory)
+for supported and deferred families. Typed View constructors do not imply DOM
+admission or complete browser API support. The original [DOM expansion](https://github.com/bohewu/yetlet/blob/master/docs/YT-220-HTML-DOM-IMPLEMENTATION.md)
+and [link/image policy](https://github.com/bohewu/yetlet/blob/master/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
+retain their focused native/Wasm/Chrome/Firefox evidence and failures. The
+[publication record](https://github.com/bohewu/yetlet/blob/master/docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+separately establishes distribution and registry resolve/compile; it does not
+expand browser or platform qualification.
 
 ## Prerequisites
 

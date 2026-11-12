@@ -10,14 +10,18 @@ Use guides for behavior and rustdoc from the same revision for signatures.
 [The migration contract](YT-211-TWO-PACKAGE-MIGRATION.md) records the complete
 source break, feature names and preserved boundaries.
 
-**Available since SDK `0.9.0-alpha.6`:** YT-220 expands the DOM vocabulary;
-[YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md) adds DomOptions, NavigationPolicy,
-ImagePolicy, validate_with_options and Wasm mount_with_options. The
-[DOM guide](../crates/yetlet-browser/guides/dom.md#explicit-links-and-images)
-shows their per-mount selection and provisional native validation.
-[SDK publication and consumer evidence](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
-records their distribution. These additions are absent from SDKalpha.5; the
-separately pinned public guide edition does not select a newer SDK automatically.
+| Capability | First published version | Current usage and original release evidence |
+|---|---|---|
+| Broader DOM coverage and per-mount link/image policies | SDK `0.9.0-alpha.6` | [DOM guide](../crates/yetlet-browser/guides/dom.md#explicit-links-and-images); [SDK publication and registry consumer](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01) |
+| Static HTML export with `yetlet build --static` | Independent CLI `0.2.0` | [Static build guide](CLI-GUIDE.md#static-html-build); [CLI publication and installed consumer](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02) |
+
+The DOM APIs include `DomOptions`, `NavigationPolicy`, `ImagePolicy`,
+`validate_with_options` and Wasm `mount_with_options`. Native validation is
+provisional; actual mounting enforces browser URL policy. Static export is CLI
+orchestration around an application-owned exporter, not an SDK static-site module.
+Source/browser qualification and later registry-consumer checks retain their
+separate scopes in the linked records. The [Reader Edition](../site/pages.toml)
+selects its SDK/CLI pair independently of these first-release versions.
 
 For first authoring, follow [Views/components](VIEW-COMPONENTS.md). For package
 features, startup wiring and consumer settings/defaults in one place, use the

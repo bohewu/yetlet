@@ -103,28 +103,23 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   SDKalpha.6/CLI0.2.0 sources, registry consumers, static introduction and bounded
   local verification; live Pages promotion remains separate.
 
-- [DOM coverage and static-site plan — YT-219–224](YT-219-224-DOM-STATIC-SITE-PLAN.md):
-  broader standard HTML, explicit URL/image policy, proposed static build and
-  isolated Yetlet documentation pilot; original reviewed registration and later
-  execution status, no live replacement.
-- [HTML/DOM compatibility contract — YT-219](YT-219-HTML-DOM-CONTRACT.md) and
-  [complete standards inventory](YT-219-HTML-INVENTORY.md): current versus selected
-  elements/attributes, explicit exceptions, parser parity and opt-in defaults;
-  documentation-only, not implemented capability claims.
-- [Ordinary HTML DOM implementation — YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md):
-  89-tag checkout, scoped attributes/structures, pre consistency, shared consumer
-  and focused native/Chrome/Firefox evidence; distributed in SDKalpha.6.
-- [Controlled DOM navigation/images — YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md):
-  typed opt-in options, strict defaults, finite URL/image attributes and browser
-  preflight, explicit sample and new Chrome/Firefox evidence; independent Reviewer
-  PASS0 at its original source scope, subsequently distributed in SDKalpha.6.
-- [Static HTML export and CLI contract — YT-222](YT-222-STATIC-HTML-CONTRACT.md):
-  proposed build --static, finite public pages/assets, project prefixes, local
-  CSP/islands, create-only output and private receipts; independent Reviewer
-  PASS0, Done at documentation-only contract scope.
-- [Static HTML export implementation — YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md):
-  explicit CLI/native exporter, bounded public documents/assets and optional
-  island, now distributed in CLI0.2.0; bounded GNU/browser/MSVC evidence and retained failures are explicit.
+- [HTML DOM coverage and optional link/image policies](../crates/yetlet-browser/guides/dom.md):
+  available since SDK `0.9.0-alpha.6`; 89 default elements and explicit image
+  admission, with per-mount URL policy and browser-owned behavior. The
+  [compatibility contract](YT-219-HTML-DOM-CONTRACT.md) and [dated standards inventory](YT-219-HTML-INVENTORY.md)
+  preserve coverage decisions and Typed Tag Builder selection. Original
+  [DOM expansion](YT-220-HTML-DOM-IMPLEMENTATION.md) and [policy evidence](YT-221-DOM-URL-IMAGE-CONTRACT.md)
+  retain their bounded native/Wasm/browser checks and failures.
+- [Static HTML export](CLI-GUIDE.md#static-html-build): available since independent
+  CLI `0.2.0`; finite pages/assets, explicit prefixes/CSP/islands, create-only
+  output and private receipts. Use the [standalone example](../examples/static-site/README.md)
+  for setup, the [static export contract](YT-222-STATIC-HTML-CONTRACT.md) for the
+  protocol and the [implementation record](YT-223-STATIC-HTML-IMPLEMENTATION.md)
+  for original GNU/browser/MSVC evidence. This is CLI tooling, with no new SDK
+  static-export module.
+- [M25 delivery and history](ROADMAP.md#m25--broader-html-dom-support-and-static-site-delivery):
+  completed feature outcomes, first publication records and the fixed Git copy of
+  the superseded shared plan.
 
 - [Local Yetlet documentation pilot — YT-224](YT-224-DOCS-PILOT.md):
   application-owned eight-chapter static reader with optional Wasm search;

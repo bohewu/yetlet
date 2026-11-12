@@ -140,7 +140,7 @@ additional browsers and hosted generated rustdoc are not newly qualified.
 
 ## Historical Yetlet-built consumer proposal — M25
 
-[YT-219–YT-224](YT-219-224-DOM-STATIC-SITE-PLAN.md) registers a separate path:
+[YT-219–YT-224](https://github.com/bohewu/yetlet/blob/1508b6910add4e74c9e2311a3f3eb4666539afce/docs/YT-219-224-DOM-STATIC-SITE-PLAN.md) registers a separate path:
 review broad HTML/DOM coverage, implement selected vocabulary and controlled
 URL/images, define/implement finite static HTML build/CLI, then pilot this guide
 as an application-owned Yetlet consumer. Registration was planning only, with

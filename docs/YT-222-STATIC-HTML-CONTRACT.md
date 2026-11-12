@@ -1,5 +1,10 @@
 # YT-222 — Static HTML export and CLI contract
 
+This dated design contract remains the protocol reference. Static export shipped
+in independent CLI `0.2.0`; use the [current static build guide](CLI-GUIDE.md#static-html-build)
+for usage and release/validation scope. Proposed or not-yet-executable wording
+below describes the original contract checkpoint, not current availability.
+
 Date: 2026-10-31. Status: Done at documentation-only contract scope; independent
 Reviewer PASS0, zero issues/required followups. Implementation belongs to YT-223. No command, protocol or new
 API described as selected below exists in the published CLI0.1.1 or SDK0.9.0-alpha.5.
@@ -9,7 +14,7 @@ evidence; it does not authorize Git delivery, hosted execution or deployment.
 
 ## Purpose and existing seams
 
-Implement the [M25 static-build boundary](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-222--static-html-build-contract)
+Implement the [M25 static-build boundary](https://github.com/bohewu/yetlet/blob/1508b6910add4e74c9e2311a3f3eb4666539afce/docs/YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-222--static-html-build-contract)
 in a later slice: finite public pages readable before/without JavaScript, with
 separately selected local Wasm islands. Static hosting of the existing browser
 starter waits for Wasm to mount; it is a different output mode.

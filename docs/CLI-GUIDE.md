@@ -176,10 +176,21 @@ under target/yetlet-static/RUN_ID/ bind selected inputs/output hashes and outcom
 keep them outside uploaded content. A supervision error retains private export
 evidence and does not claim child cleanup or success. No automatic retry.
 
-Cli::BuildStatic and build_static are Experimental CLI support APIs available since `0.2.0`;
-downstream exhaustive Rust matches may need a new arm. Current-source evidence
-and bounded GNU/browser/MSVC validation are explicit in [YT-223](https://github.com/bohewu/yetlet/blob/master/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
-No SDK/CLI version is republished by this source change.
+### Static export release and validation scope
+
+`Cli::BuildStatic` and `build_static` are Experimental support APIs of the
+independent `yetlet-cli` package, available since `0.2.0`; downstream exhaustive
+Rust matches may need a new arm. Static export does not add an SDK module or
+require the optional DOM renderer for HTML-only output.
+
+The [original implementation record](https://github.com/bohewu/yetlet/blob/master/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md)
+retains GNU/MSVC native CLI execution, bounded Chrome/Firefox static/island
+checks and their failures. [CLI 0.2.0 release qualification](https://github.com/bohewu/yetlet/blob/master/docs/CLI-020-RELEASE-PREPARATION.md#local-affected-evidence--2026-11-01)
+separately verifies the packaged CLI, a generated registry-SDK alpha.6 app and a
+six-file static export. The [actual publication and installed consumer](https://github.com/bohewu/yetlet/blob/master/docs/CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+prove registry installation, exact version, help and scaffolding; they do not
+rerun or broaden the earlier static/browser qualification. SDK registry
+resolve/compile evidence alone does not qualify CLI execution or browser behavior.
 
 ## First-use prerequisites
 

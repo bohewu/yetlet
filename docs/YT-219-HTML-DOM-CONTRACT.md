@@ -1,9 +1,15 @@
 # YT-219 — HTML/DOM coverage and compatibility contract
 
+This dated contract and its inventory preserve the design baseline. The selected
+DOM expansion and link/image policies shipped in SDK `0.9.0-alpha.6`; use the
+[current DOM guide](../crates/yetlet-browser/guides/dom.md) for supported behavior.
+References below to current or planned capabilities describe the original
+contract checkpoint, not the availability of later releases.
+
 Date: 2026-10-31. Status: Done at documentation/source-contract scope; independent Reviewer PASS0.
 Source: `d1b8ac596888a6fface30e93a84a076f67b7b2e2`.
 Scope: documentation/source inspection only. The owner authorizes this contract
-after [the reviewed M25 plan](YT-219-224-DOM-STATIC-SITE-PLAN.md); no runtime,
+after [the reviewed M25 plan](https://github.com/bohewu/yetlet/blob/1508b6910add4e74c9e2311a3f3eb4666539afce/docs/YT-219-224-DOM-STATIC-SITE-PLAN.md); no runtime,
 package/dependency/version, browser execution or Git/publication change follows.
 
 ## Decision and inventory

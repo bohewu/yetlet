@@ -8,7 +8,7 @@ uncommitted/unpushed; no Merge, release, tag, hosted job or Pages replacement.
 
 ## Selected contract and implementation
 
-The owner selects the [reviewed M25 pilot](YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-224--application-owned-documentation-pilot).
+The owner selects the [reviewed M25 pilot](https://github.com/bohewu/yetlet/blob/1508b6910add4e74c9e2311a3f3eb4666539afce/docs/YT-219-224-DOM-STATIC-SITE-PLAN.md#yt-224--application-owned-documentation-pilot).
 [examples/docs-site](../examples/docs-site/README.md) is a publish=false standalone
 application using registry SDK0.9.0-alpha.5 and the accepted source static-export
 CLI. No framework, CLI, root dependency/lock, version, site selection or workflow
