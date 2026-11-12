@@ -226,13 +226,12 @@ fn execute(
     } else {
         let completion = crate::platform::process::run_cargo(&app, dev, release, &settings.tls)
             .map_err(process_failure)?;
-        if !dev && succeeded(&completion)
+        if !dev
+            && succeeded(&completion)
             && let Some(candidate) = candidate.as_ref()
         {
             if settings.vite.enabled && !settings.vite.auto_build {
-                eprintln!(
-                    "CLI_STYLES: Vite build skipped; bundled CSS freshness is not accepted"
-                );
+                eprintln!("CLI_STYLES: Vite build skipped; bundled CSS freshness is not accepted");
             } else {
                 crate::styles::accept(&app, styles.unwrap(), candidate, settings.vite.enabled)
                     .map_err(|message| Failure { code: 1, message })?;

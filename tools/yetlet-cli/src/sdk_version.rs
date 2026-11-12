@@ -341,7 +341,9 @@ pub(crate) fn select(
     {
         return Err(format!(
             "SDK_INCOMPATIBLE: {version} template={} policy={} policy_sha256={}: template-capability m26_startup core checksum contradicts selected package identity",
-            request.template.selector(), policy.revision, policy.sha256
+            request.template.selector(),
+            policy.revision,
+            policy.sha256
         ));
     }
     compatible(request, &version, &rows).map_err(|reason| {
