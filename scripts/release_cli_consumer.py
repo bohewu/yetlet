@@ -46,14 +46,7 @@ def protected_rust_env(root, env):
 
 def version_key(version):
     """Canonical exact SDK SemVer precedence, including numeric prereleases."""
-    require(type(version) is str and len(version) <= 128
-            and re.fullmatch(records.VERSION, version), 'noncanonical SDK version')
-    core, _, pre = version.partition('-')
-    parts = pre.split('.') if pre else []
-    require(all(not p.isdigit() or p == '0' or not p.startswith('0') for p in parts),
-            'noncanonical SDK prerelease')
-    return (tuple(map(int, core.split('.'))), not pre,
-            tuple((0, int(p)) if p.isdigit() else (1, p) for p in parts))
+    return records.sdk_version_key(version)
 
 
 def feature_available(row, name, seen=None):
@@ -78,13 +71,60 @@ def feature_available(row, name, seen=None):
     return True
 
 
-def inspect_project(project, cli_version, template, requested, source, cache, policy):
+def check_startup(project, receipt, policy, template, *, settings=False, service=False,
+                  vite=False, tailwind=False):
+    """Independently bind the additive receipt to request, policy and emitted startup."""
+    if 'scaffold_capabilities' not in policy:
+        return  # Published receipts retain their historical shape.
+    require(template in ('native', 'native-style', 'browser', 'browser-style'), 'startup template')
+    sdk = receipt['sdk']
+    rows = policy['scaffold_capabilities']['m26_startup']
+    match = next((row for row in rows if row['sdk_version'] == sdk['version']), None)
+    if match:
+        core = [p for p in sdk['packages'] if p['name'] == 'yetlet']
+        require(len(core) == 1 and core[0]['checksum'] == match['yetlet_sha256'],
+                'startup capability checksum differs')
+    browser = template.startswith('browser')
+    configured = settings or vite
+    require(not browser or not service, 'unsupported Browser startup options')
+    expected = ('browser-wasm' if browser else 'service-axum' if service else
+                'configured-axum' if configured else 'm26-app-serve' if match else 'legacy-axum')
+    require(receipt.get('startup_profile') == expected, 'startup profile differs from selected SDK/options')
+    path = project / ('src/lib.rs' if browser else 'src/main.rs')
+    require(path.is_file(), 'generated startup source missing')
+    source = path.read_text()
+    # These are the existing generator's startup anchors, not an arbitrary Rust parser.
+    compact = re.sub(r'\s+', '', source)
+    m26 = '.serve().await?' in compact
+    listener = 'TcpListener::bind(' in compact
+    configured_call = 'config::serve(' in compact
+    axum_call = 'axum::serve(' in compact
+    if browser:
+        require('pubfnmount_tasks(' in compact and 'wasm_bindgen' in source
+                and not (m26 or listener or configured_call or axum_call), 'Browser startup differs')
+    elif expected == 'm26-app-serve':
+        assets = template == 'native-style' or tailwind
+        require(m26 and not (listener or configured_call or axum_call)
+                and ('App::from_router(' if assets else 'App::new()') in compact,
+                'M26 generated startup differs')
+    else:
+        require(listener and not m26 and (configured_call if configured else axum_call)
+                and not (axum_call if configured else configured_call), 'native generated startup differs')
+        require(('shutdown_signal(' in compact) == service, 'Service startup differs')
+    if not browser:
+        require(('modconfig;' in compact) == configured and ('modvite;' in compact) == vite
+                and ('modtailwind;' in compact) == (tailwind and not vite), 'generated options differ')
+    return expected
+
+
+def inspect_project(project, cli_version, template, requested, source, cache, policy, *,
+                    context='archive', settings=False, service=False, vite=False, tailwind=False):
     policy_bytes = policy
-    policy = records.sdk_policy(policy_bytes, cli_version)
-    receipt = json.loads((project / '.yetlet/sdk-resolution.json').read_bytes())
+    policy = records.sdk_policy(policy_bytes, cli_version, context=context)
+    receipt = records.loads((project / '.yetlet/sdk-resolution.json').read_bytes())
     lock = (project / 'Cargo.lock').read_bytes()
     sdk = receipt['sdk']
-    require(receipt['schema'] == 1 and receipt['cli_version'] == cli_version
+    require(type(receipt['schema']) is int and receipt['schema'] == 1 and receipt['cli_version'] == cli_version
             and receipt['cargo_lock_sha256'] == sha(lock), 'receipt/lock identity')
     require(sdk['requested'] == requested and sdk['source'] == source
             and sdk['template'] == template and sdk['policy'] == policy['revision']
@@ -152,6 +192,8 @@ def inspect_project(project, cli_version, template, requested, source, cache, po
             require(any(edge in ('yetlet', 'yetlet ' + sdk['version'],
                                  'yetlet ' + sdk['version'] + ' (registry+https://github.com/rust-lang/crates.io-index)')
                         for edge in locked[0].get('dependencies', [])), 'browser lock dependency differs')
+    check_startup(project, receipt, policy, template, settings=settings, service=service,
+                  vite=vite, tailwind=tailwind)
     return receipt
 
 
@@ -207,10 +249,14 @@ def chrome_smoke(base, root, output, env):
     return result
 
 
-def runtime(executable, project, env, output, browser):
+def runtime(executable, project, env, output, browser, startup_profile=None):
     label = 'browser' if browser else 'native'
-    port = smoke.port_number()
+    port = 7878 if startup_profile == 'm26-app-serve' else smoke.port_number()
     base = f'http://127.0.0.1:{port}/'
+    if startup_profile == 'm26-app-serve':
+        # A fixed-port consumer must not observe or stop someone else's app.
+        with socket.socket() as probe:
+            probe.bind(('127.0.0.1', port))
     # Preview port is an app-owned Vite setting; retain the exact customization.
     if browser:
         config = project / 'frontend/vite.config.mjs'
@@ -338,7 +384,9 @@ def qualify(executable, version, sdk_version, root, output, env, policy, install
             if template.startswith('browser'):
                 run(label + '-npm-ci', ['npm', 'ci', '--ignore-scripts', '--no-audit', '--no-fund'], cwd=project / 'frontend')
             run(label + '-build', [executable, 'build', '--manifest-path', project / 'Cargo.toml'], cwd=project)
-            runtimes[label] = runtime(executable, project, env, output, template.startswith('browser'))
+            runtimes[label] = runtime(executable, project, env, output, template.startswith('browser'),
+                                      receipt.get('startup_profile')
+                                      if 'scaffold_capabilities' in records.loads(policy) else None)
             require((project / 'Cargo.lock').read_bytes() == lock
                     and (project / 'stylegen/Cargo.lock').read_bytes() == style_lock, 'build/run changed locks')
     result = {'status': 'PASS', 'cli_exact_version': version, 'cli_install_source': install_source,

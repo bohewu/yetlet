@@ -1,6 +1,6 @@
 # M26 — Application Startup & Sample Experience
 
-**Status:** Planning review PASS; YT-251/252 contracts accepted; YT-253/254 implementations independent Reviewer PASS; YT-255–258 independent Reviewer PASS; Git integration and native Windows MSVC pending
+**Status:** YT-251–258 independently accepted. PR #86 merged, exact-master Rust, Docs and CodeQL passed, and native Windows MSVC passed 148 tests.
 **Date:** 2026-11-11
 **Repository:** `bohewu/yetlet`
 **Base:** `master` at `83d10df6c2a219c1f7271419ad4b1b04c78741bb` (PR #85, CLI package README follow-up)
@@ -439,11 +439,14 @@ YT-258 source documentation/catalog synchronization passed independent Reviewer
 `wc_job_BujoBeCZVwUl_ZGG`, terminal exit 0, JSON `overall_status=pass`, zero
 issues/followups. The catalog retains thirteen stable IDs, package/command
 identities and browser metadata, including Style Showcase's optional companion.
-The next phase is guarded Git integration, PR, exact-head CI, merge and
-post-merge master CI. Native Windows MSVC qualification remains postponed until
-the complete branch is merged and exact-master CI passes, using a separate clean
-clone that preserves the old Windows checkout and evidence.
+PR #86 passed exact-head CI and merged at
+`9d1075ab6442a9d8cb58606c170327aa32799bf7`. Rust, Docs and CodeQL passed
+on that exact master commit. Native Windows MSVC qualification ran on the second
+Windows Runner in a separate clean checkout and passed 148 tests across the
+SDK Axum adapter and all 13 official samples. The final 2026-11-11 M26 handoff
+records the test scope and preserves the original Windows failure evidence.
+[PR #86](https://github.com/bohewu/yetlet/pull/86)
 
-The branch is `codex/m26-application-startup-dx`. Published SDK alpha.7, CLI
+The work used branch `codex/m26-application-startup-dx`. Published SDK alpha.7, CLI
 0.3.1, CLI templates, release records, Reader Edition and published First App
 remain at their accepted release boundaries.

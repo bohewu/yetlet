@@ -2,7 +2,7 @@
 
 Derived from [`todo-ledger.json`](todo-ledger.json). The project backlog source is [`docs/BACKLOG.md`](docs/BACKLOG.md).
 
-**Items:** 81 — 73 Done, 1 Blocked, 7 Todo.
+**Items:** 82 — 74 Done, 1 Blocked, 7 Todo.
 
 Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing IME, repaired Firefox/Orca speech and final Chrome/Firefox PASS. The owner-amended full 62-minute mixed-load run passed with 45,000 measured requests and zero errors, followed by fresh independent review PASS. The original synchronized-burst failure remains a limitation. GPU is unactivated. See [qualification](docs/YT-074-QUALIFICATION.md), [desktop acceptance](docs/YT-074-DESKTOP-ACCEPTANCE.md) and [handoff](docs/M11-P-IMPLEMENTATION-HANDOFF.md).
 
@@ -29,6 +29,7 @@ Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing
 | ID | Priority | Work item | Depends on | Evidence |
 |---|---|---|---|---|
 | `YT-074` | medium | Owner-amended full mixed load, IME, spoken AT, Chrome/Firefox and independent review PASS | YT-073 | [Current results and retained failures](docs/YT-074-QUALIFICATION.md) |
+| `YT-259` | high | CLI new scaffolds aligned with M26 startup at tested platform scope | YT-250, YT-253, YT-254 | [Contract and qualification](docs/YT-259-CLI-NEW-STARTUP-CONTRACT.md) |
 | `YT-073` | medium | Persisted Board, repaired native login and Chrome/Firefox journeys | YT-071, YT-072 | [Current evidence](docs/M11-P-BOARD-VERIFICATION.md), [screenshots](docs/screenshots/m11-board/README.md) |
 | `YT-070` | medium | Native form and existing-CSS proof | YT-069 | [Native and Chrome proof](docs/M11-P-FORM-ASSET-VERIFICATION.md) |
 | `YT-071` | medium | Selected native/application-owned form contract | YT-070 | [Bounded decision and limits](docs/M11-P-FORM-ASSET-VERIFICATION.md) |

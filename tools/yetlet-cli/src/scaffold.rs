@@ -861,3 +861,124 @@ pub(crate) fn selected_files_version(
 
     Ok(entries)
 }
+
+/// Finish only the version-aware simple Native branch, after asset composition.
+/// Exact built-in anchors deliberately fail closed if a template changes shape.
+pub(crate) fn m26_startup(
+    entries: &mut [(&'static str, String)],
+    styles: bool,
+    tailwind: bool,
+) -> Result<(), String> {
+    fn replace_once(text: &mut String, old: &str, new: &str) -> Result<(), String> {
+        if text.matches(old).count() != 1 {
+            return Err("M26 startup requires exactly one built-in composition anchor".into());
+        }
+        *text = text.replacen(old, new, 1);
+        Ok(())
+    }
+    // With both assets, Style installs inside Tailwind before Tailwind routing.
+    if styles && tailwind {
+        let module = entries
+            .iter()
+            .find(|(path, _)| *path == "src/tailwind.rs")
+            .ok_or("missing composed Tailwind module")?;
+        for anchor in [
+            "crate::styles_asset::Stylesheet::load()?",
+            "crate::styles_asset::install(",
+            "self.path, self.generated.path",
+        ] {
+            if module.1.matches(anchor).count() != 1 {
+                return Err("M26 startup requires exactly one composed Style asset".into());
+            }
+        }
+    }
+    let main = &mut entries
+        .iter_mut()
+        .find(|(path, _)| *path == "src/main.rs")
+        .ok_or("missing built-in main")?
+        .1;
+    let imports = if tailwind {
+        "use axum::extract::Path;\nuse yetlet::view::{Element, View};\nuse yetlet::server_axum::App;"
+    } else {
+        "use axum::extract::Path;\nuse yetlet::view::{Element, View};\nuse yetlet::server_axum::{App, Page};"
+    };
+    replace_once(main, imports, "use yetlet::server_axum::prelude::*;")?;
+    let port = if tailwind {
+        "    let port: u16 = std::env::var(\"YETLET_PORT\")\n        .unwrap_or_else(|_| \"3000\".into())\n        .parse()?;\n"
+    } else {
+        "    let port: u16 = std::env::var(\"YETLET_PORT\").unwrap_or_else(|_| \"3000\".into()).parse()?;\n"
+    };
+    replace_once(main, port, "")?;
+    replace_once(
+        main,
+        "    let listener = tokio::net::TcpListener::bind((std::net::Ipv4Addr::LOCALHOST, port)).await?;\n",
+        "",
+    )?;
+    replace_once(
+        main,
+        "    println!(\"Listening on http://{}\", listener.local_addr()?);\n",
+        "",
+    )?;
+    if styles || tailwind {
+        let asset = if tailwind { "tailwind" } else { "styles_asset" };
+        let runtime = main.split("#[cfg(test)]").next().unwrap();
+        if runtime
+            .matches(&format!("{asset}::Stylesheet::load()?;"))
+            .count()
+            != 1
+            || runtime.matches(&format!("{asset}::install(")).count() != 1
+        {
+            return Err("M26 startup requires exactly one asset snapshot".into());
+        }
+        replace_once(
+            main,
+            &format!("    axum::serve(listener, {asset}::install(app, stylesheet)).await?;"),
+            &format!(
+                "    let app: axum::Router = {asset}::install(app, stylesheet);\n    App::from_router(app).serve().await?;"
+            ),
+        )?;
+    } else {
+        replace_once(
+            main,
+            "    let app: axum::Router = App::new()\n        .page(\"/\", \"Yetlet\", home)\n        .get(\"/hello/{name}\", hello)\n        .into_router();\n    axum::serve(listener, app).await?;",
+            "    App::new()\n        .page(\"/\", \"Yetlet\", home)\n        .get(\"/hello/{name}\", hello)\n        .serve()\n        .await?;",
+        )?;
+    }
+    let manifest = &mut entries
+        .iter_mut()
+        .find(|(path, _)| *path == "Cargo.toml")
+        .ok_or("missing built-in manifest")?
+        .1;
+    let mut parsed: toml::Value = manifest.parse().map_err(|_| "invalid M26 manifest")?;
+    let dependencies = parsed
+        .get_mut("dependencies")
+        .and_then(toml::Value::as_table_mut)
+        .ok_or("missing M26 dependencies")?;
+    if !styles && !tailwind {
+        dependencies
+            .remove("axum")
+            .ok_or("missing built-in Axum dependency")?;
+    }
+    let features = dependencies
+        .get_mut("tokio")
+        .and_then(|value| value.get_mut("features"))
+        .and_then(toml::Value::as_array_mut)
+        .ok_or("missing Tokio features")?;
+    if features
+        .iter()
+        .filter(|value| value.as_str() == Some("net"))
+        .count()
+        != 1
+    {
+        return Err("missing built-in Tokio net feature".into());
+    }
+    features.retain(|value| value.as_str() != Some("net"));
+    *manifest = toml::to_string(&parsed).map_err(|_| "cannot render M26 manifest")?;
+    let readme = &mut entries
+        .iter_mut()
+        .find(|(path, _)| *path == "README.md")
+        .ok_or("missing built-in README")?
+        .1;
+    readme.push_str(include_str!("../templates/M26-STARTUP-README.md"));
+    Ok(())
+}

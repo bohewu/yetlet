@@ -195,13 +195,25 @@ fn save(path: &Path, cache: &Cache) -> Result<(), String> {
     Ok(())
 }
 
+#[cfg(test)]
 pub(crate) fn resolve(
     request: Request<'_>,
     registry: &mut impl Registry,
     root: &Path,
     now: u64,
 ) -> Result<ResolvedSdk, String> {
+    resolve_with_policy(request, registry, root, now, sdk::POLICY)
+}
+
+pub(crate) fn resolve_with_policy(
+    request: Request<'_>,
+    registry: &mut impl Registry,
+    root: &Path,
+    now: u64,
+    raw_policy: &str,
+) -> Result<ResolvedSdk, String> {
     let result = (|| {
+        let policy = sdk::Policy::parse(raw_policy)?;
         if let Some(version) = request.exact {
             sdk::exact(version).map_err(str::to_owned)?;
         }
@@ -255,8 +267,6 @@ pub(crate) fn resolve(
             save(&path, &cache)?;
             cache
         };
-        let policy = serde_json::from_str(sdk::POLICY)
-            .map_err(|_| "SDK_METADATA_INVALID: compiled compatibility policy")?;
         sdk::select(
             request,
             &cache.records,

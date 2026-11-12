@@ -66,7 +66,8 @@ def metadata(raw, name, version):
     require(type(readme) is str and readme in files)
     if name == 'yetlet-cli' and (version not in records.LEGACY_CLI_VERSIONS
             or 'resources/sdk-identity.json' in files or '**SDK policy:**' in files[readme].decode()):
-        release_docs.check_sdk_resources(files, manifest['dependencies']['yetlet']['version'], files[readme].decode())
+        release_docs.check_sdk_resources(files, manifest['dependencies']['yetlet']['version'],
+            files[readme].decode(), context='archive', cli_version=version)
     return {'name': name, 'vers': version, 'deps': dependencies,
         'features': manifest.get('features', {}), 'authors': p.get('authors', []),
         'description': p.get('description'), 'documentation': p.get('documentation'),

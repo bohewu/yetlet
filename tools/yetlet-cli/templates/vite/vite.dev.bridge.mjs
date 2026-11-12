@@ -48,9 +48,13 @@ export function devTls(root, env = process.env) {
   }
 }
 
-export function allowedOrigin(headers, port, websocket = false, https = false) {
-  return headers.host === `127.0.0.1:${port}`
-    && (headers.origin === `${https ? 'https' : 'http'}://127.0.0.1:${port}` || (!websocket && headers.origin === undefined));
+export function allowedOrigin(headers, port, websocket = false, https = false, http2 = false) {
+  const { host, origin, ':authority': authority } = headers;
+  if (authority !== undefined && (!https || websocket || !http2 || (host !== undefined && host !== authority))) {
+    return false;
+  }
+  return (authority ?? host) === `127.0.0.1:${port}`
+    && (origin === `${https ? 'https' : 'http'}://127.0.0.1:${port}` || (!websocket && origin === undefined));
 }
 
 export function allowedPath(raw) {
@@ -138,7 +142,7 @@ export function devBridge(port, https) {
         for (const request of pending) request.destroy();
       });
       server.middlewares.use((req, res, next) => {
-        if (!allowedOrigin(req.headers, port, false, Boolean(https)) || !allowedPath(req.url)) {
+        if (!allowedOrigin(req.headers, port, false, Boolean(https), req.httpVersionMajor === 2) || !allowedPath(req.url)) {
           reply(res, 403, 'Development request refused\n');
           return;
         }

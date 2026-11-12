@@ -298,7 +298,9 @@ fn pending(
     }
     Ok(bytes)
 }
-fn ownership(app: &App, styles: &Styles) -> Result<(Option<Vec<u8>>, Option<Vec<u8>>), String> {
+type Ownership = (Option<Vec<u8>>, Option<Vec<u8>>);
+
+fn ownership(app: &App, styles: &Styles) -> Result<Ownership, String> {
     let root = fs::app_root(app);
     no_pending(root)?;
     let owner = optional(root, OWNER, 65536)?;

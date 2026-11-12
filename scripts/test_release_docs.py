@@ -9,7 +9,7 @@ import release_docs as docs
 import release_record as records
 import release_registry as registry
 from test_release_publication import archives
-from test_release_cli_consumer import HISTORICAL_POLICY
+from test_release_cli_consumer import HISTORICAL_POLICY, LATEST_POLICY
 
 
 def cli_readme(version='7.8.9-beta.2', sdk='=6.5.4-alpha.3'):
@@ -45,33 +45,69 @@ class ReleaseDocsTests(unittest.TestCase):
         readme = (f"**CLI release:** `{manifest['package']['version']}`.\n"
                   '**SDK policy:** `sdk-latest-v2`.\n')
         sdk = __import__('tomllib').loads((root / 'Cargo.toml').read_text())['dependencies']['yetlet']['version']
-        docs.check_sdk_resources(files, sdk, readme)
+        docs.check_sdk_resources(files, sdk, readme, context='source', cli_version=manifest['package']['version'])
         for name in ['resources/framework.json', 'resources/sdk-compatibility.json']:
             with self.subTest(path=name), self.assertRaises(ValueError):
-                docs.check_sdk_resources({**files, name: files[name] + b' '}, sdk, readme)
+                docs.check_sdk_resources({**files, name: files[name] + b' '}, sdk, readme, context='source', cli_version=manifest['package']['version'])
         with self.assertRaises(ValueError):
-            docs.check_sdk_resources({p: v for p, v in files.items() if p != 'resources/sdk-identity.json'}, sdk, readme)
+            docs.check_sdk_resources({p: v for p, v in files.items() if p != 'resources/sdk-identity.json'}, sdk, readme, context='source', cli_version=manifest['package']['version'])
 
     def test_latest_policy_shape_and_historical_resource_hash_are_closed(self):
         root = Path(__file__).resolve().parents[1] / 'tools/yetlet-cli'
         files = {p: (root / p).read_bytes() for p in docs.SDK_RESOURCE_PATHS}
         sdk = '=0.9.0-alpha.7'
         for version, policy in [('0.3.0', HISTORICAL_POLICY),
-                                ('0.3.1', files['resources/sdk-compatibility.json'])]:
+                                ('0.3.1', LATEST_POLICY)]:
             readme = (f'**CLI release:** `{version}`.\n'
                       f"**SDK policy:** `{json.loads(policy)['revision']}`.\n")
             identity = json.loads(files['resources/sdk-identity.json'])
             identity['policy_sha256'] = docs.hashlib.sha256(policy).hexdigest()
             selected = dict(files, **{'resources/sdk-compatibility.json':policy,
                                      'resources/sdk-identity.json':json.dumps(identity).encode()})
-            docs.check_sdk_resources(selected, sdk, readme)
+            docs.check_sdk_resources(selected, sdk, readme, context='archive', cli_version=version)
             for mutation in ({'selection':'stable-first'}, {'templates':{'native':['12.0.0']}},
                              {'msrv':'999.0'}, {'revision':'sdk-latest-v3'}):
                 bad = json.dumps(dict(json.loads(policy), **mutation)).encode()
                 identity['policy_sha256'] = docs.hashlib.sha256(bad).hexdigest()
                 with self.subTest(version=version, mutation=mutation), self.assertRaises(ValueError):
                     docs.check_sdk_resources(dict(selected, **{'resources/sdk-compatibility.json':bad,
-                        'resources/sdk-identity.json':json.dumps(identity).encode()}), sdk, readme)
+                        'resources/sdk-identity.json':json.dumps(identity).encode()}), sdk, readme,
+                        context='archive', cli_version=version)
+
+    def test_extended_policy_is_closed_utf8_and_canonical_exact_semver(self):
+        row = {'sdk_version': '1.2.3-alpha.7', 'yetlet_sha256': 'f' * 64}
+        value = {'revision': 'sdk-latest-v2', 'selection': 'latest-semver',
+                 'scaffold_capabilities': {'m26_startup': [row]}}
+        raw = json.dumps(value).encode()
+        self.assertEqual(records.sdk_policy(raw, context='source'), value)
+        self.assertEqual(records.sdk_policy(raw, '9.8.7', context='archive'), value)
+        invalid = [b'null', LATEST_POLICY, raw + b' ' * 16384,
+                   json.dumps(value).encode('utf-16'),
+                   raw.replace(b'"revision":', b'"revision":"sdk-latest-v2","revision":'),
+                   raw.replace(b'"m26_startup":', b'"m26_startup":[],"m26_startup":'),
+                   raw.replace(b'"sdk_version":', b'"sdk_version":"1.0.0","sdk_version":'),
+                   raw.replace(b'"yetlet_sha256":', b'"yetlet_sha256":"' + b'f'*64 + b'","yetlet_sha256":')]
+        for mutation in ({'extra': 1}, {'scaffold_capabilities': {}},
+                         {'scaffold_capabilities': {'m26_startup': [], 'extra': []}},
+                         {'scaffold_capabilities': {'m26_startup': {}}},
+                         {'scaffold_capabilities': {'m26_startup': [row, row]}},
+                         {'scaffold_capabilities': {'m26_startup': [dict(row, extra=True)]}},
+                         {'scaffold_capabilities': {'m26_startup': [{'sdk_version': '1.2.3'}]}}):
+            invalid.append(json.dumps(dict(value, **mutation)).encode())
+        for version in ('01.2.3', '1.2.3-01', '1.2.3+build', '=1.2.3', '1.2',
+                        '18446744073709551616.0.0', '1.2.3-ä', '1.2.3-' + 'a'*123):
+            invalid.append(raw.replace(row['sdk_version'].encode(), version.encode()))
+        for digest in ('F'*64, 'f'*63, 'g'*64):
+            invalid.append(raw.replace(b'f'*64, digest.encode()))
+        for bad in invalid:
+            with self.subTest(raw=bad[:120]), self.assertRaises(ValueError):
+                records.sdk_policy(bad, context='source')
+        records.sdk_policy(raw.replace(b'1.2.3-alpha.7', b'18446744073709551615.0.0-0'), context='source')
+        for version, shipped in [('0.3.0', HISTORICAL_POLICY), ('0.3.1', LATEST_POLICY)]:
+            records.sdk_policy(shipped, version, context='archive')
+            for bad in (raw, shipped + b' '):
+                with self.subTest(version=version), self.assertRaises(ValueError):
+                    records.sdk_policy(bad, version, context='archive')
 
     def test_resolver_readme_policy_is_bound_to_cli_release(self):
         for version, revision in records.CLI_SDK_POLICIES.items():

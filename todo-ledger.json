@@ -1058,6 +1058,20 @@
       "source": "docs/BACKLOG.md",
       "artifact_paths": ["docs/M11-PLAN.md"],
       "notes": "M11 proposed closeout; actual evidence and review, explicit amendments for deferred lines, retain unmet gates and YT-020 status."
+    },
+    {
+      "id": "YT-259",
+      "summary": "Align CLI new scaffolds with M26 startup",
+      "status": "done",
+      "priority": "high",
+      "related_task_ids": ["YT-250", "YT-253", "YT-254"],
+      "source": "docs/BACKLOG.md",
+      "artifact_paths": [
+        "docs/YT-259-CLI-NEW-STARTUP-CONTRACT.md",
+        ".pipeline-output/yt259-d-platform-qualification-20261112/flow/review-report.json"
+      ],
+      "notes": "Priority P1; size M; milestone M26. Source implementation and tested platform scope complete: Native Linux 196 pass/8 ignored; Windows x64 MSVC 138 distinct pass/6 ignored; generated alpha.7 Native Style and Service private-console live HTTP/CSS/health/cancel PASS. Phase C independent verification passed; Phase D independent review PASS with zero issues/followups. Production qualification remains pending SDK publication and a fresh registry consumer; later release scope remains separate.",
+      "completed_at": "2026-11-12"
     }
   ]
 }

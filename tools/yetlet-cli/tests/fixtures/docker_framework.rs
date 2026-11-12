@@ -1,7 +1,5 @@
 //! Closed published SDK fixture using the compiled source closure.
 use std::{collections::BTreeSet, fs, path::Path};
-#[path = "../../src/framework_files.rs"]
-mod files;
 pub fn create(root: &Path) {
     fs::create_dir_all(root).unwrap();
     let mut value = include_str!("../../resources/workspace.toml")
@@ -11,7 +9,9 @@ pub fn create(root: &Path) {
         toml::Value::Array(vec![toml::Value::String("crates/yetlet".into())]);
     value["workspace"].as_table_mut().unwrap().remove("exclude");
     fs::write(root.join("Cargo.toml"), toml::to_string(&value).unwrap()).unwrap();
-    for (path, bytes) in files::FILES.iter() {
+    let files: std::collections::BTreeMap<String, String> =
+        serde_json::from_str(include_str!("../../resources/framework.json")).unwrap();
+    for (path, bytes) in files.iter() {
         let dest = root.join(path);
         fs::create_dir_all(dest.parent().unwrap()).unwrap();
         fs::write(dest, bytes).unwrap();

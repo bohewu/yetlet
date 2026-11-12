@@ -43,7 +43,236 @@ fn request(template: Template, exact: Option<&str>, offline: bool) -> Request<'_
     }
 }
 fn policy() -> Policy {
-    serde_json::from_str(POLICY).unwrap()
+    Policy::parse(POLICY).unwrap()
+}
+fn capability_policy(version: &str, checksum: &str) -> String {
+    serde_json::json!({
+        "revision": "sdk-latest-v2",
+        "selection": "latest-semver",
+        "scaffold_capabilities": {
+            "m26_startup": [{"sdk_version": version, "yetlet_sha256": checksum}]
+        }
+    })
+    .to_string()
+}
+
+#[test]
+fn capability_policy_rejects_malformed_and_ambiguous_documents() {
+    let good = capability_policy("1.0.0", &"f".repeat(64));
+    let document: serde_json::Value = serde_json::from_str(&good).unwrap();
+    let mut invalid = vec![
+        String::new(),
+        "null".into(),
+        "[]".into(),
+        format!("{good} false"),
+    ];
+    invalid.push(r#"["sdk-latest-v2","latest-semver",{"m26_startup":[]}]"#.into());
+    let mut positional_capabilities = document.clone();
+    positional_capabilities["scaffold_capabilities"] = serde_json::json!([[]]);
+    invalid.push(positional_capabilities.to_string());
+    let mut positional_row = document.clone();
+    positional_row["scaffold_capabilities"]["m26_startup"][0] =
+        serde_json::json!(["1.0.0", "f".repeat(64)]);
+    invalid.push(positional_row.to_string());
+    // Each typed object is closed and requires every member with its exact type.
+    for pointer in [
+        "",
+        "/scaffold_capabilities",
+        "/scaffold_capabilities/m26_startup/0",
+    ] {
+        let object = document.pointer(pointer).unwrap().as_object().unwrap();
+        for key in object.keys() {
+            let mut missing = document.clone();
+            missing
+                .pointer_mut(pointer)
+                .unwrap()
+                .as_object_mut()
+                .unwrap()
+                .remove(key);
+            invalid.push(missing.to_string());
+            for value in [
+                serde_json::Value::Null,
+                serde_json::json!(42),
+                serde_json::json!(false),
+            ] {
+                let mut wrong_type = document.clone();
+                wrong_type.pointer_mut(pointer).unwrap()[key] = value;
+                invalid.push(wrong_type.to_string());
+            }
+            let key_text = format!("\"{key}\":");
+            invalid.push(good.replacen(
+                &key_text,
+                &format!("{key_text}{},{key_text}", object[key]),
+                1,
+            ));
+        }
+        let mut unknown = document.clone();
+        unknown.pointer_mut(pointer).unwrap()["unknown"] = true.into();
+        invalid.push(unknown.to_string());
+    }
+    for version in [
+        "v1.0.0",
+        "=1.0.0",
+        "01.0.0",
+        "1.0",
+        "1.0.0+build",
+        "1.0.0-rc.01",
+        " 1.0.0",
+    ] {
+        invalid.push(capability_policy(version, &"f".repeat(64)));
+    }
+    for checksum in [
+        "F".repeat(64),
+        "f".repeat(63),
+        "f".repeat(65),
+        "g".repeat(64),
+    ] {
+        invalid.push(capability_policy("1.0.0", &checksum));
+    }
+    for checksum in ["f", "e"] {
+        let mut duplicate = document.clone();
+        duplicate["scaffold_capabilities"]["m26_startup"]
+            .as_array_mut()
+            .unwrap()
+            .push(serde_json::json!({"sdk_version":"1.0.0", "yetlet_sha256":checksum.repeat(64)}));
+        invalid.push(duplicate.to_string());
+    }
+    invalid.push(good.replace("sdk-latest-v2", "sdk-compat-v1"));
+    invalid.push(good.replace("latest-semver", "stable-first"));
+    invalid.push(format!("{good}{}", " ".repeat(16_384)));
+    for raw in invalid {
+        assert!(
+            Policy::parse(&raw)
+                .err()
+                .unwrap()
+                .starts_with("SDK_METADATA_INVALID"),
+            "{raw}"
+        );
+        let root = temporary();
+        let error = registry::resolve_with_policy(
+            request(Template::Native, None, false),
+            &mut Fake::never(),
+            root.path(),
+            100,
+            &raw,
+        )
+        .unwrap_err();
+        assert!(error.starts_with("SDK_METADATA_INVALID"), "{error}");
+        assert_eq!(std::fs::read_dir(root.path()).unwrap().count(), 0);
+    }
+}
+
+#[test]
+fn capability_is_exact_digest_bound_and_does_not_filter_latest() {
+    let raw = format!(" \n{}\n", capability_policy(A7, &"f".repeat(64)));
+    let policy = Policy::parse(&raw).unwrap();
+    let selected = select(
+        request(Template::Native, Some(A7), false),
+        &[native()],
+        "registry-refresh",
+        &policy,
+    )
+    .unwrap();
+    assert!(selected.m26_startup);
+    assert_eq!(selected.policy_sha256, digest(raw.as_bytes()));
+    assert_ne!(selected.policy_sha256, digest(raw.trim().as_bytes()));
+    assert!(
+        serde_json::to_value(&selected)
+            .unwrap()
+            .get("m26_startup")
+            .is_none()
+    );
+    let latest = select(
+        request(Template::Native, None, false),
+        &[native()],
+        "registry-refresh",
+        &policy,
+    )
+    .unwrap();
+    assert_eq!(latest.version, "1.0.0");
+    assert!(!latest.m26_startup);
+    assert!(
+        !select(
+            request(Template::Native, Some(A7), false),
+            &[native()],
+            "registry-refresh",
+            &self::policy()
+        )
+        .unwrap()
+        .m26_startup
+    );
+}
+
+#[test]
+fn capability_checksum_is_checked_for_every_selector_and_offline_without_fallback() {
+    let matching = capability_policy("1.0.0", &"f".repeat(64));
+    let conflicting = capability_policy("1.0.0", &"e".repeat(64));
+    for template in [
+        Template::Native,
+        Template::NativeStyle,
+        Template::Browser,
+        Template::BrowserStyle,
+    ] {
+        for settings in [false, true] {
+            let root = temporary();
+            let records = if template.browser() {
+                vec![
+                    native(),
+                    record(
+                        "yetlet-browser",
+                        &[row("yetlet-browser", A7), row("yetlet-browser", "1.0.0")],
+                    ),
+                ]
+            } else {
+                vec![native()]
+            };
+            let req = Request {
+                settings,
+                ..request(template, None, false)
+            };
+            let selected = registry::resolve_with_policy(
+                req,
+                &mut Fake::records(&records),
+                root.path(),
+                100,
+                &matching,
+            )
+            .unwrap();
+            assert!(selected.m26_startup);
+            assert_eq!(selected.policy_sha256, digest(matching.as_bytes()));
+            for offline in [false, true] {
+                for exact in [None, Some("1.0.0")] {
+                    let req = Request {
+                        offline,
+                        exact,
+                        ..req
+                    };
+                    let mut registry = if offline {
+                        Fake::never()
+                    } else {
+                        Fake::records(&records)
+                    };
+                    let error = registry::resolve_with_policy(
+                        req,
+                        &mut registry,
+                        root.path(),
+                        100,
+                        &conflicting,
+                    )
+                    .unwrap_err();
+                    for expected in [
+                        "SDK_INCOMPATIBLE: 1.0.0",
+                        "template-capability",
+                        template.selector(),
+                        "sdk-latest-v2",
+                        &digest(conflicting.as_bytes()),
+                    ] {
+                        assert!(error.contains(expected), "{error}");
+                    }
+                }
+            }
+        }
+    }
 }
 fn native() -> Record {
     record(
@@ -354,7 +583,7 @@ fn browser_pair_yank_features_and_dependency_are_required() {
     assert!(
         select(
             request(Template::Browser, Some(A7), false),
-            &[core.clone()],
+            std::slice::from_ref(&core),
             "registry-refresh",
             &policy()
         )
@@ -806,26 +1035,76 @@ fn live_registry_native_browser_and_default_locks() {
 #[test]
 #[ignore = "opt-in registry SDK/template compile compatibility; no browser runtime qualification"]
 fn registry_template_compile_compatibility() {
-    let root = temporary();
-    let cache = root.path().join("cache");
+    let temporary = temporary();
+    let retained = std::env::var_os("YETLET_TEST_REGISTRY_APPS");
+    let root = retained.as_deref().map_or(temporary.path(), Path::new);
+    let cache = temporary.path().join("cache");
     let now = registry::now().unwrap();
-    for (index, (template, version)) in [
-        (Template::Native, A6),
-        (Template::Native, A7),
-        (Template::Browser, A6),
-        (Template::Browser, A7),
-        (Template::NativeStyle, A7),
-        (Template::BrowserStyle, A7),
-    ]
-    .into_iter()
-    .enumerate()
-    {
-        let name = format!("compat-{index}");
+    let cases = [
+        ("native-alpha6", options(Template::Native), A6),
+        ("browser-alpha6", options(Template::Browser), A6),
+        ("native", options(Template::Native), A7),
+        ("native-style", options(Template::NativeStyle), A7),
+        ("browser", options(Template::Browser), A7),
+        ("browser-style", options(Template::BrowserStyle), A7),
+        (
+            "settings",
+            Options {
+                settings: true,
+                ..options(Template::Native)
+            },
+            A7,
+        ),
+        (
+            "tailwind",
+            Options {
+                tailwind: true,
+                ..options(Template::Native)
+            },
+            A7,
+        ),
+        (
+            "service",
+            Options {
+                service: true,
+                ..options(Template::Native)
+            },
+            A7,
+        ),
+        (
+            "vite",
+            Options {
+                vite: true,
+                ..options(Template::Native)
+            },
+            A7,
+        ),
+        (
+            "service-settings-style",
+            Options {
+                settings: true,
+                service: true,
+                ..options(Template::NativeStyle)
+            },
+            A7,
+        ),
+        (
+            "service-vite-style-tailwind",
+            Options {
+                service: true,
+                vite: true,
+                tailwind: true,
+                ..options(Template::NativeStyle)
+            },
+            A7,
+        ),
+    ];
+    for (name, options, version) in cases {
         creation::create(
-            &name,
-            root.path(),
-            options(template),
-            request(template, Some(version), false),
+            name,
+            root,
+            options,
+            request(options.template, Some(version), false),
             &mut registry::CratesIo,
             &cache,
             now,
@@ -833,32 +1112,35 @@ fn registry_template_compile_compatibility() {
             creation::generate_lock,
         )
         .unwrap();
-        let app = root.path().join(&name);
+        eprintln!(
+            "CREATED {name} exact SDK {version} at {}",
+            root.join(name).display()
+        );
+    }
+    for (name, options, version) in cases {
+        let app = root.join(name);
+        if !options.template.browser() {
+            let source = std::fs::read_to_string(app.join("src/main.rs")).unwrap();
+            for token in ["server_axum::prelude", ".serve()", ".serve_on("] {
+                assert!(
+                    !source.contains(token),
+                    "{name} SDK {version} emitted {token}"
+                );
+            }
+        }
         let mut command = std::process::Command::new("cargo");
         command
-            .args(["check", "--locked", "--manifest-path"])
+            .args(["build", "--locked", "--manifest-path"])
             .arg(app.join("Cargo.toml"))
             .env("RUSTUP_AUTO_INSTALL", "0")
             .env("RUSTUP_SKIP_UPDATE_CHECK", "1");
-        if template.browser() {
+        if options.template.browser() {
             command.args(["--target", "wasm32-unknown-unknown"]);
         }
-        let output = command.output().unwrap();
-        assert!(
-            output.status.success(),
-            "{} SDK {version}: {}",
-            template.selector(),
-            String::from_utf8_lossy(&output.stderr)
-        );
-        eprintln!(
-            "COMPILE PASS {} SDK {version} ({})",
-            template.selector(),
-            if template.browser() {
-                "wasm32"
-            } else {
-                "native"
-            }
-        );
+        eprintln!("RUN {command:?}");
+        let status = command.status().unwrap();
+        eprintln!("BUILD {name} SDK {version}: {status}");
+        assert!(status.success(), "{name} SDK {version}: {status}");
     }
 }
 

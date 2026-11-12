@@ -78,13 +78,11 @@ pub(crate) fn replace(
         // Only our exclusive temporary, never the destination.
         if let (Ok(current), Ok(owned)) =
             (app.parent.read_file(temporary.as_ref()), file.metadata())
-        {
-            if current
+            && current
                 .metadata()
                 .is_ok_and(|m| (m.dev(), m.ino()) == (owned.dev(), owned.ino()))
-            {
-                let _ = static_output::remove_file(app, temporary.as_ref());
-            }
+        {
+            let _ = static_output::remove_file(app, temporary.as_ref());
         }
     }
     result

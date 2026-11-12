@@ -90,22 +90,21 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
         let app = root.path().join(&name);
         let path = app.join("Cargo.toml");
         let mut manifest: toml::Value = fs::read_to_string(&path).unwrap().parse().unwrap();
-        for krate in ["yetlet"] {
-            if let Some(dependency) = manifest["dependencies"].get_mut(krate) {
-                // Explicit Cargo-owned preparation retains the selected version.
-                let dependency_path = framework.join("crates").join(krate);
-                let dependency_path = dependency_path.to_str().unwrap();
-                // Exercise native and Cargo-style separators across the profiles.
-                let dependency_path = if index % 2 == 0 {
-                    dependency_path.to_owned()
-                } else {
-                    dependency_path.replace('\\', "/")
-                };
-                dependency
-                    .as_table_mut()
-                    .unwrap()
-                    .insert("path".into(), dependency_path.into());
-            }
+        let krate = "yetlet";
+        if let Some(dependency) = manifest["dependencies"].get_mut(krate) {
+            // Explicit Cargo-owned preparation retains the selected version.
+            let dependency_path = framework.join("crates").join(krate);
+            let dependency_path = dependency_path.to_str().unwrap();
+            // Exercise native and Cargo-style separators across the profiles.
+            let dependency_path = if index % 2 == 0 {
+                dependency_path.to_owned()
+            } else {
+                dependency_path.replace('\\', "/")
+            };
+            dependency
+                .as_table_mut()
+                .unwrap()
+                .insert("path".into(), dependency_path.into());
         }
         fs::write(&path, toml::to_string(&manifest).unwrap()).unwrap();
         let mut base: toml::Value = fs::read_to_string(app.join("base.toml"))
@@ -278,14 +277,13 @@ fn current_service_profiles_generate_all_outputs_with_explicit_offline_locks() {
                     // Model the Docker overlay's fixed /work/yetlet mount at
                     // this temporary native location, changing paths only.
                     let mut exported_overlay = overlay.clone();
-                    for name in ["yetlet"] {
-                        exported_overlay["dependencies"][name]["path"] = exported_framework
-                            .join("crates")
-                            .join(name)
-                            .to_str()
-                            .unwrap()
-                            .into();
-                    }
+                    let dependency_name = "yetlet";
+                    exported_overlay["dependencies"][dependency_name]["path"] = exported_framework
+                        .join("crates")
+                        .join(dependency_name)
+                        .to_str()
+                        .unwrap()
+                        .into();
                     fs::write(
                         exported_app.join("Cargo.toml"),
                         toml::to_string(&exported_overlay).unwrap(),

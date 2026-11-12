@@ -150,13 +150,12 @@ fn deterministic_selected_files_exact_overlay_and_minimal_workspace_without_leak
     let values: BTreeMap<_, _> = first.iter().map(|(p, v)| (*p, v)).collect();
     let original: Value = parse(&before).unwrap();
     let mut overlay: Value = values["cargo-overlay/Cargo.toml"].parse().unwrap();
-    for name in ["yetlet"] {
-        assert_eq!(
-            overlay["dependencies"][name]["path"].as_str(),
-            Some(format!("/work/yetlet/crates/{name}").as_str())
-        );
-        overlay["dependencies"][name]["path"] = original["dependencies"][name]["path"].clone();
-    }
+    let name = "yetlet";
+    assert_eq!(
+        overlay["dependencies"][name]["path"].as_str(),
+        Some(format!("/work/yetlet/crates/{name}").as_str())
+    );
+    overlay["dependencies"][name]["path"] = original["dependencies"][name]["path"].clone();
     assert_eq!(overlay, original);
     let minimal: Value = values["framework-workspace.toml"].parse().unwrap();
     let root = parse(&disk::read(f.framework.join("Cargo.toml")).unwrap()).unwrap();
@@ -838,22 +837,21 @@ fn selected_fixture(config: bool, assets: bool, plugin: bool) -> crate::cloud_fi
         disk::write(destination, content).unwrap();
     }
     let mut manifest = parse(&disk::read(f.manifest()).unwrap()).unwrap();
-    for name in ["yetlet"] {
-        if manifest["dependencies"].get(name).is_some() {
-            manifest["dependencies"][name]
-                .as_table_mut()
-                .unwrap()
-                .insert(
-                    "path".into(),
-                    Value::String(
-                        f.framework
-                            .join(format!("crates/{name}"))
-                            .to_str()
-                            .unwrap()
-                            .into(),
-                    ),
-                );
-        }
+    let name = "yetlet";
+    if manifest["dependencies"].get(name).is_some() {
+        manifest["dependencies"][name]
+            .as_table_mut()
+            .unwrap()
+            .insert(
+                "path".into(),
+                Value::String(
+                    f.framework
+                        .join(format!("crates/{name}"))
+                        .to_str()
+                        .unwrap()
+                        .into(),
+                ),
+            );
     }
     disk::write(f.manifest(), toml::to_string(&manifest).unwrap()).unwrap();
     if config {

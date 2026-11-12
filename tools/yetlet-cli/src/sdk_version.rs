@@ -52,6 +52,8 @@ pub(crate) struct ResolvedSdk {
     pub template: &'static str,
     pub requested: Option<String>,
     pub prerelease: bool,
+    #[serde(skip)]
+    pub(crate) m26_startup: bool,
 }
 
 impl ResolvedSdk {
@@ -80,11 +82,78 @@ impl ResolvedSdk {
     }
 }
 
-#[derive(Deserialize)]
-#[serde(deny_unknown_fields)]
 pub(crate) struct Policy {
     pub revision: String,
     pub selection: String,
+    scaffold_capabilities: ScaffoldCapabilities,
+    sha256: String,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct PolicyDocument {
+    revision: String,
+    selection: String,
+    scaffold_capabilities: ScaffoldCapabilities,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct ScaffoldCapabilities {
+    m26_startup: Vec<StartupCapability>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct StartupCapability {
+    sdk_version: String,
+    yetlet_sha256: String,
+}
+
+impl Policy {
+    pub(crate) fn parse(raw: &str) -> Result<Self, String> {
+        if raw.len() > 16_384 {
+            return Err(
+                "SDK_METADATA_INVALID: compiled compatibility policy exceeds byte limit".into(),
+            );
+        }
+        let document: PolicyDocument = serde_json::from_str(raw)
+            .map_err(|e| format!("SDK_METADATA_INVALID: compiled compatibility policy: {e}"))?;
+        // Serde structs also accept positional sequences. Require JSON objects,
+        // while the typed parse above detects duplicate and unknown raw keys.
+        let shape: serde_json::Value = serde_json::from_str(raw)
+            .map_err(|e| format!("SDK_METADATA_INVALID: compiled compatibility policy: {e}"))?;
+        if !shape.is_object()
+            || !shape["scaffold_capabilities"].is_object()
+            || !shape["scaffold_capabilities"]["m26_startup"]
+                .as_array()
+                .is_some_and(|rows| rows.iter().all(serde_json::Value::is_object))
+        {
+            return Err("SDK_METADATA_INVALID: compatibility policy requires JSON objects".into());
+        }
+        if document.revision != "sdk-latest-v2" || document.selection != "latest-semver" {
+            return Err("SDK_METADATA_INVALID: unsupported compiled SDK selection policy".into());
+        }
+        let mut versions = BTreeSet::new();
+        for row in &document.scaffold_capabilities.m26_startup {
+            if exact(&row.sdk_version).is_err()
+                || !versions.insert(&row.sdk_version)
+                || row.yetlet_sha256.len() != 64
+                || !row
+                    .yetlet_sha256
+                    .bytes()
+                    .all(|c| c.is_ascii_digit() || (b'a'..=b'f').contains(&c))
+            {
+                return Err("SDK_METADATA_INVALID: m26_startup version, duplicate version or checksum rejected".into());
+            }
+        }
+        Ok(Self {
+            revision: document.revision,
+            selection: document.selection,
+            scaffold_capabilities: document.scaffold_capabilities,
+            sha256: digest(raw.as_bytes()),
+        })
+    }
 }
 
 #[derive(Clone, Deserialize)]
@@ -262,6 +331,19 @@ pub(crate) fn select(
             .to_string(),
     };
     let rows = available(&version)?;
+    let capability = policy
+        .scaffold_capabilities
+        .m26_startup
+        .iter()
+        .find(|row| row.sdk_version == version);
+    if let Some(capability) = capability
+        && capability.yetlet_sha256 != rows[0].cksum
+    {
+        return Err(format!(
+            "SDK_INCOMPATIBLE: {version} template={} policy={} policy_sha256={}: template-capability m26_startup core checksum contradicts selected package identity",
+            request.template.selector(), policy.revision, policy.sha256
+        ));
+    }
     compatible(request, &version, &rows).map_err(|reason| {
         format!(
             "SDK_INCOMPATIBLE: {version} template={} policy={}: {reason}",
@@ -288,9 +370,10 @@ pub(crate) fn select(
         registry: REGISTRY,
         source,
         policy: policy.revision.clone(),
-        policy_sha256: digest(POLICY.as_bytes()),
+        policy_sha256: policy.sha256.clone(),
         template: request.template.selector(),
         requested: request.exact.map(str::to_owned),
+        m26_startup: capability.is_some(),
     })
 }
 

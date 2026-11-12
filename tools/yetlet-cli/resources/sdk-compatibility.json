@@ -1,4 +1,7 @@
 {
   "revision": "sdk-latest-v2",
-  "selection": "latest-semver"
+  "selection": "latest-semver",
+  "scaffold_capabilities": {
+    "m26_startup": []
+  }
 }
