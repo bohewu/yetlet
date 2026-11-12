@@ -377,55 +377,7 @@ PASS0,0 issues/followups and21 stable input hashes;
 the [YT-223 implementation](YT-223-STATIC-HTML-IMPLEMENTATION.md) is Done at
 bounded source scope after local and final platform independent Reviewer PASS0;
 GNU/browser, MSVC and required current-head CI evidence are complete.
-[YT-224](YT-224-DOCS-PILOT.md) local pilot is Done after independent Reviewer PASS0
-and owned cleanup; existing Pages is retained;
-live site/releases unchanged.
-[YT-225](YT-225-DOCS-PUBLIC-BUILD.md) now prepares formal source/edition-bound
-output and independent build-only CI. The owner explicitly declines old .html
-aliases. Focused new checks and independent Reviewer PASS0 accept preparation Done. Existing
-Pages, SDK/CLI versions and accepted product/platform evidence are unchanged.
-Subsequent authorized0544f4a delivery updates PR44: the first clean public
-artifact41265011134/1 and exact ZIP/15-file/source/receipt readback pass. This
-adds hosted build acceptance with independent closeout Reviewer PASS0, without
-Merge, retry or website replacement.
-[YT-226](YT-226-PAGES-CUTOVER-PLAN.md) proposes the later controlled Pages switch,
-with one authoritative build/deploy workflow and no old URL aliases. Only planning
-is selected now; implementation and activation remain Todo. Following green PR
-CI/all four CodeQL analyses, PR44 squash-merges as99902bb with the exact reviewed
-tree. The deployment variable is held false; master mdBook41277712999 passes
-with deploy skipped. Subsequent master readback confirms MSRV/Stable, guide and
-all four CodeQL analyses pass on attempt1 at99902bb. This does not replace the
-existing public website.
-Independent planning Reviewer PASS0 accepts all six YT-226 files with stable
-hashes and zero issues/followups after green master CI. Local strict/builtin
-Commit is selected; implementation/activation remain Todo, without Push/deploy.
-The subsequent owner-selected [local YT-226 integration](YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01)
-now absorbs the accepted Yetlet builder into docs.yml and retires docs-preview.
-Four new workflow tests, actionlint and actual pinned Pages tar packaging pass,
-with old evidence reused. Independent local Reviewer PASS0 accepts all11 paths,
-with zero issues/followups; Git delivery, hosted verification and activation
-remain open. No Commit/Push/deploy occurs,
-the switch stays false and YT-226 moves to In progress.
-The later authorized strict/builtin delivery commits5759585 and pushes both plan
-and integration into [PR45](https://github.com/bohewu/yetlet/pull/45), zero findings.
-The new documentation workflow41284853642/1 passes and deploy skips. Downloaded
-ZIP digests,15 output hashes,8 canonical excerpts,10 tracked inputs and CLI
-receipts reconcile with its exact PR merge-ref/tree. The switch remains false;
-PR45 is not merged and Pages is unchanged. YT-226 stays In progress until the
-merged-master and separately authorized activation/public-readback gates pass.
-Independent hosted closeout Reviewer PASS0 accepts three stable document hashes
-and22 retained evidence hashes with zero issues/followups; these three new
-closeout documents remain uncommitted and unpushed.
-The later strict/builtin56b9262 delivery squash-merges PR45 as master0ae6b93,
-with the exact qualified tree and all PR/master checks passing. An explicitly
-authorized single docs.yml dispatch41289520993/1 then builds and deploys this
-Yetlet guide successfully. PAGES_DEPLOY_ENABLED is true;15 artifact outputs and
-14 public HTTPS chapter/asset readbacks match accepted master bytes/MIME.
-Native navigation, search and mobile observations, cleanup and browser-checker
-failures are retained; the final Firefox script is not relabeled PASS after
-its stale-heading assertion. Independent final Reviewer PASS0 accepts8 document/
-83 evidence hashes, zero issues/followups, and permits YT-226 Done at the bounded
-[actual cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01) scope.
+The Reader Edition delivery is recorded in [M25](#m25--broader-html-dom-support-and-static-site-delivery).
 Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
@@ -2783,9 +2735,20 @@ resource/event/keyed ownership remain the compatibility baseline.
 | YT-221 | [Controlled link/image implementation](YT-221-DOM-URL-IMAGE-CONTRACT.md), contract PASS0, unchanged defaults/full resource preflight and new native/Wasm/Chrome/Firefox evidence; final independent Reviewer PASS0 | Done |
 | YT-222 | [Finite static export/CLI contract](YT-222-STATIC-HTML-CONTRACT.md): app-owned exporter, typed build --static request, bounded documents/assets/base/CSP, protected create-only publication and private receipts; docs only, independent Reviewer PASS0 | Done |
 | YT-223 | [Minimal static build/CLI](YT-223-STATIC-HTML-IMPLEMENTATION.md), explicit no-backend consumer and optional island; GNU/browser evidence/followup PASS0, MSVC8 cases and actual native static CLI pass; required current-head CI PASS; final independent Reviewer PASS0 | Done |
-| YT-224 | [Local Yetlet documentation pilot](YT-224-DOCS-PILOT.md): same8 canonical inputs, escaped View rendering, optional owned search, static/mobile/keyboard and bounded size/load proof; independent Reviewer PASS0 and cleanup complete, existing Pages retained | Done |
-| YT-225 | [Public-mode guide artifact preparation](YT-225-DOCS-PUBLIC-BUILD.md): clean edition/source-bound output, private receipts and independent build-only CI; old .html aliases explicitly declined. New focused checks and independent preparation Reviewer PASS0; first clean public hosted41265011134/1 and ZIP/15-file/source/receipt readback pass on authorized0544f4a. Independent hosted closeout Reviewer PASS0 with3 stable document hashes; no retry, Merge or live Pages change | Done |
-| YT-226 | [Controlled public cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01): PR45 Merge0ae6b93/qualified tree, green PR/master CI; one owner-authorized41289520993/1 build/deploy, switch true.15 artifact/14 HTTPS byte/MIME bindings and scoped reader observations/cleanup retained. Browser-checker failures stay explicit; no old suite/deployment retry. Independent final Reviewer PASS0 accepts8 document/83 evidence hashes,0 issues/followups | Done |
+
+- [x] **Yetlet builds and deploys the public Reader Edition** (YT-224–226).
+  Yetlet renders the canonical guide sources as static HTML, and GitHub Pages
+  deploys the resulting artifact. On November 1, 2026, the authorized YT-226
+  cutover replaced the mdBook site using run `41289520993/1` from master
+  `0ae6b93`. All 15 artifact outputs matched the accepted build, and HTTPS
+  readback of eight chapters and six assets matched the artifact bytes and MIME
+  types. The independent final review accepted the cutover with the recorded
+  Firefox checker failure retained. See the [authorized cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
+  and [independent final acceptance](YT-226-PAGES-CUTOVER-PLAN.md#independent-final-acceptance--2026-11-01).
+  The [YT-224 pilot](YT-224-DOCS-PILOT.md) and [YT-225 hosted artifact](YT-225-DOCS-PUBLIC-BUILD.md#authorized-delivery-and-hosted-artifact--2026-11-01)
+  retain the preceding evidence. The cutover evidence applies to the original
+  deployment. [The Reader Edition manifest](../site/pages.toml) selects the
+  current SDK and CLI pair.
 
 Dependency paths are YT-219→YT-220→YT-221 and YT-219→YT-222→YT-223;
 YT-224 joins YT-220/221/223 and Done YT-218. Static HTML serialization does not
@@ -2796,7 +2759,7 @@ unchanged evidence and retain failures; only changed behavior needs new checks.
 Planning review PASS0 has zero issues/required followups, with registered reviewer
 model/effective high effort verified. At planning acceptance all six items were
 Todo. The later owner-authorized YT-219 contract/source inventory is now Done
-at documentation scope after independent Reviewer PASS0; YT-220–224 remain Todo. The planning commit
+at documentation scope after independent Reviewer PASS0; YT-220–223 remain Todo. The planning commit
 d1b8ac5 passed strict/builtin and was not pushed. No runtime/API, package/version/
 dependency, sample, CLI command, hosted job or Pages/release change is performed.
 YT-218's accepted live guide remains in place. Next unblockable item: YT-220 under later implementation
@@ -2814,7 +2777,7 @@ Firefox159 parser/DOM/native-control/rejection cases and Chrome390x844 touch PAS
 Initial lint and two-browser fixture/base failures remain recorded; owned server/
 browsers/profiles cleaned. Independent Reviewer PASS0,0 issues/followups and16
 hashes matched with registered role/model/effective high verified; YT-220 Done.
-YT-221–224 Todo, new work uncommitted/unpushed and existing distribution/live
+YT-221–223 Todo, new work uncommitted/unpushed and existing distribution/live
 site untouched. This is not89-element exhaustive browser or performance proof.
 
 ### YT-221 implementation checkpoint — 2026-10-31
@@ -2829,7 +2792,7 @@ consumer and new native/Wasm/Chrome/Firefox policy/resource evidence PASS; first
 contract P2 and Firefox navigation-wait harness failure retained. Final independent
 Reviewer PASS0,0 issues/followups,23 stable inputs and verified model/effective
 high; owned cleanup complete. No old verification replay or new Git/publication step.
-YT-222–224 remain Todo. Current checkpoint supersedes earlier next-item wording.
+YT-222–223 remain Todo. Current checkpoint supersedes earlier next-item wording.
 
 ### YT-222 contract checkpoint — 2026-10-31
 
@@ -2841,7 +2804,7 @@ Views/assets, bounded private document writer, root/project paths and create-onl
 output. Optional prepared islands reuse the current startup/build boundary;
 HTML-only applications require no server/browser/Settings loader or Node.
 Independent Reviewer PASS0,0 issues/followups,21 matching inputs and verified
-model/effective high; YT-222 Done at contract scope and YT-223/224 Todo. No new runtime,
+model/effective high; YT-222 Done at contract scope and YT-223 Todo. No new runtime,
 Git delivery, hosted job or public-site/package change.
 
 ### YT-223 implementation checkpoint — 2026-11-01
@@ -2856,8 +2819,8 @@ old qualification. Three unchanged strict-lint warnings remain explicit.
 MSVC current-source execution is Not verified after official transfer policy
 refusal; no transport bypass or new Git action. Independent local followup PASS0
 closes the retained Cargo-directory P2,46 inputs matched and0 issues/followups;
-prepared Windows Runner readiness does not verify this source. YT-223 In progress,
-YT-224 Todo. Public versions/site unchanged.
+prepared Windows Runner readiness does not verify this source. YT-223 In progress.
+Public versions/site unchanged.
 
 ### YT-223 authorized platform continuation — 2026-11-01
 
@@ -2877,27 +2840,4 @@ inputs and56 reconciled Windows source hashes accept YT-223 Done at bounded
 static-export/source scope. Required CI and documentation CI pass at9099879;
 optional Rust CodeQL remained in progress in the acceptance snapshot. Original
 failures and source/package/browser limits remain explicit. The ten closeout docs
-are uncommitted, PR44 stays open, no Merge/publication. YT-224 is Todo/unblocked,
-not started. No new support or release version is selected.
-
-### YT-224 local documentation pilot — 2026-11-01
-
-After strict/builtin ten-document closeout commit1802026 (no Push), the owner
-selects the [application-owned pilot](YT-224-DOCS-PILOT.md). It reuses the same
-eight source/excerpt hashes and prior mdBook artifact, renders parsed events
-through Yetlet Views and adds explicitly activated Wasm search. Native3 tests,
-new app compile/strict lint/exports and bounded Chromium no-JS/search/menu/touch/
-keyboard/failure/disposal/output correspondence pass, with first failures retained.
-Only missing cold-load/size comparison is added; old verification is not replayed.
-YT-224 In progress pending independent review. New changes uncommitted/unpushed;
-no SDK/CLI API/version change, Pages replacement, Merge or publication.
-
-### YT-224 final local acceptance — 2026-11-01
-
-Final independent Reviewer PASS0,0 issues/followups,33 stable inputs and19 reviewed
-paths accepts Done at local pilot scope. External evidence retention and owned
-consumer/browser/server cleanup are complete. Native/parser/strict lint/build,
-static content/output boundaries and Chromium desktop/emulated-touch reader
-proof retain their exact limits and first failures. New work stays uncommitted/
-unpushed; existing Pages/workflow and published packages remain unchanged. Next
-is owner evaluation before any separately authorized live-site replacement.
+are uncommitted, PR44 stays open, no Merge/publication. No new support or release version is selected.
