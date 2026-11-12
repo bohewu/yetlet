@@ -32,7 +32,7 @@ while `/hello/{name}` uses `text(format!(...))` and the existing HTML
 renderer escapes untrusted path input. These are Rust helpers, not JSX, CSS
 generation or browser/WASM requirements.
 
-The typed tag helpers are **included in the published SDK `0.9.0-alpha.7`**.
+The typed tag helpers are **included in the published SDK `0.9.0-alpha.8`**.
 This repository sample still builds against the existing path dependency in
 its `Cargo.toml`; a registry-only application using SDK alpha.6 must not copy
 the typed constructor calls unchanged. Registry consumers choosing SDK alpha.7

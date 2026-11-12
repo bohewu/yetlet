@@ -3,7 +3,7 @@
 Continue [your first native application](FIRST-APP.md) by expanding its initial
 heading into a small page. Use ordinary Rust functions and the existing
 `View`/`Element` API to pass data, compose components and render a list.
-**Experimental SDK `0.9.0-alpha.7`, published on crates.io.** This guide
+**Experimental SDK `0.9.0-alpha.8`, published on crates.io.** This guide
 continues the registry-first application from the linked walkthrough.
 
 ## Prerequisites
@@ -112,7 +112,7 @@ walkthrough. A no-JS page needs none of those optional browser capabilities.
 The locally selected SDK `0.9.0-alpha.7` includes
 `yetlet::view::tags`, now also published on crates.io, as an alternative to
 `Element::new`. These typed constructors are available from published SDK
-`0.9.0-alpha.7`; the introductory first-app example above intentionally continues
+`0.9.0-alpha.8`; the introductory first-app example above intentionally continues
 using the reviewed Reader Edition selected in [the site manifest](../site/pages.toml). See the actual
 [SDK alpha.7 publication](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
 and [YT-245 preparation](YT-245-ALPHA7-RELEASE-PREPARATION.md).

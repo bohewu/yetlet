@@ -1,6 +1,6 @@
 # Yetlet Architecture
 
-**Status:** Experimental. **Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
+**Status:** Experimental. **Published SDK:** `0.9.0-alpha.8` (`yetlet` / `yetlet-browser`).
 **Published CLI:** `0.3.1` (`yetlet-cli`).
 [Release readiness](RELEASE-READINESS.md) links the accepted publication records.
 M0–M9 implementation, selected M10 qualification and five application-owned

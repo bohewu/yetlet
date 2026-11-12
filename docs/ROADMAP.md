@@ -23,7 +23,11 @@ official samples. This qualification covers the tested M26 source and samples.
 [PR #86](https://github.com/bohewu/yetlet/pull/86)
 
 
-Published SDK `0.9.0-alpha.7`, CLI `0.3.1`, their release records, and the selected Reader Edition remain unchanged. New APIs are source-only until a later separately authorized SDK release; CLI templates, the published First App guide, and the Reader Edition snapshot are outside M26.
+The original M26 source delivery left SDK alpha.7 and CLI `0.3.1` published.
+SDK `0.9.0-alpha.8` now includes the M26 APIs. Its two packages and the fresh
+locked registry consumer passed after owner-approved publication. The
+independent CLI remains `0.3.1`.
+[SDK alpha.8 publication](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
 
 
 **YT-259 SDK-aware CLI startup scaffolds (source complete).**
@@ -34,9 +38,9 @@ alpha.7 generation. Settings, Vite and Service retain native startup. C passed
 independent review of locked alpha.7 and local M26 generated consumers, HTTP,
 CSP and browser checks. D passed independent review of native Ubuntu and
 Windows x64 MSVC CLI and generator checks, including actual Native Style and
-Service launch and private-console shutdown on Windows. Production M26
-capability rows remain empty pending approved SDK publication and a fresh
-registry-only consumer check.
+Service launch and private-console shutdown on Windows. SDK alpha.8 is now
+published. Production M26 capability activation still requires a fresh
+registry-only generated-app consumer check with the exact published package.
 
 **YT-250 CLI 0.3.1 release (2026-11-11): Published with registry consumer PASS.**
 [Preparation and gates](CLI-031-RELEASE-PREPARATION.md) align source and release

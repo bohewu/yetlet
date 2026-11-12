@@ -1,7 +1,7 @@
 # Build a browser-only Yetlet app
 
 Create a standalone interactive app with published CLI `0.3.1` and SDK
-`0.9.0-alpha.7`, without cloning Yetlet. Rust owns local state and interaction;
+`0.9.0-alpha.8`, without cloning Yetlet. Rust owns local state and interaction;
 JavaScript starts the WASM module. The finished app needs an HTTP(S) static host.
 These instructions use the pinned reader edition and existing APIs; commands
 below are a walkthrough, not evidence of a new execution.
@@ -63,7 +63,7 @@ deliberately use an existing protected parent and omit only its creation.
     export PATH="$(dirname "$(rustup which --toolchain 1.99.0 cargo)"):$HOME/.cargo/bin:$HOME/.local/share/yetlet-tools/bin:$PATH"
     yetlet_parent="$HOME/yetlet-browser-apps"
     mkdir -m 700 "$yetlet_parent"
-    yetlet new firstbrowser --template browser --parent "$yetlet_parent" --sdk-version 0.9.0-alpha.7
+    yetlet new firstbrowser --template browser --parent "$yetlet_parent" --sdk-version 0.9.0-alpha.8
     cd "$yetlet_parent/firstbrowser"
     cargo fetch --locked
     npm ci --prefix frontend --ignore-scripts --no-audit --no-fund

@@ -1,15 +1,16 @@
 # Yetlet Prototype Release Readiness
 
-**Current distribution (2026-11-11):** **Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
+**Current distribution (2026-11-12):** **Published SDK:** `0.9.0-alpha.8` (`yetlet` / `yetlet-browser`).
 **Published CLI:** `0.3.1` (`yetlet-cli`). The accepted
-[SDK publication record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+[SDK publication record](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
 and [CLI publication record](CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11)
 record actual GitHub/crates.io delivery, exact archives, signatures and consumer limits.
-The typed Tag Builder is included in published SDK alpha.7; the independent CLI
+The typed Tag Builder first shipped in SDK alpha.7. SDK alpha.8 includes M26
+application startup methods and the optional Axum Prelude. The independent CLI
 ships private app Style generation/templates and SDK resolution with exact app
 pins/locks. [Showcase](API-REFERENCE.md#source-only-checkout-additions) remains a
-checkout sample. The CLI 0.3.1 publication workflow and registry consumer passed.
-The selected public Reader Edition is SDK alpha.7 / CLI 0.3.1. Development version equality
+checkout sample. Both published distributions passed their registry consumers.
+The selected public Reader Edition is SDK alpha.8 / CLI 0.3.1. Development version equality
 does not establish archive/source equality. This is not Stable API, production,
 SLSA level or universal platform qualification.
 

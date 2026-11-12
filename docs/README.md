@@ -2,7 +2,7 @@
 
 Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 choose a [runnable sample](SAMPLES.md). The two-package
-[SDK `0.9.0-alpha.7`](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+[SDK `0.9.0-alpha.8`](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
 and independent [CLI `0.3.1`](CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11)
 are published on crates.io with matching Experimental GitHub pre-releases.
 The first-app instructions and selected reader sources use the edition pinned
@@ -23,7 +23,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   Typed tags are included in the published SDK alpha.7.
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
-- [Build your first Yetlet app](FIRST-APP.md): CLI0.3.1 → protected standalone project → SDK0.9.0-alpha.7 → app lock/cache → first build/run, then an optional [static-export path](FIRST-APP.md#next-export-a-static-site).
+- [Build your first Yetlet app](FIRST-APP.md): CLI0.3.1 → protected standalone project → SDK0.9.0-alpha.8 → app lock/cache → first build/run, then an optional [static-export path](FIRST-APP.md#next-export-a-static-site).
 - [Build a browser-only Yetlet app](BROWSER-APP.md): published CLI/SDK → explicit tool and lock preparation → local state/events → build/preview/watch → static ship directory.
 - [Write Views and reusable components](VIEW-COMPONENTS.md): typed data → functions → lists/conditions → existing SSR handler.
 - [Opt-in integration quick reference](OPT-IN-QUICK-REFERENCE.md): package/feature → startup API/options → consumer settings/defaults.

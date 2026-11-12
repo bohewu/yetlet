@@ -1,7 +1,7 @@
 # Current API reference
 
 Updated: 2026-11-11. This map distinguishes the published Experimental two-package
-SDK (`0.9.0-alpha.7`) from independent CLI tooling and checkout samples. `yetlet` contains the shared View and opt-in
+SDK (`0.9.0-alpha.8`) from independent CLI tooling and checkout samples. `yetlet` contains the shared View and opt-in
 native capabilities; `yetlet-browser` contains browser integrations and depends
 one-way on the same View. Both packages are available from crates.io at this version.
 Earlier release tags retain their original layouts and evidence.
@@ -40,14 +40,13 @@ The historical YT-245 source preparation selects SDK `0.9.0-alpha.7` locally;
 the reviewed packages are now publicly available from crates.io.
 
 
-## Source-only checkout additions
+## Published application startup — SDK alpha.8
 
 ### Application startup and optional Prelude — YT-258
 
 **Simple first, customizable when needed.** These startup methods and the
-optional native `server_axum::prelude` are checkout additions after published
-SDK `0.9.0-alpha.7`. Select `server-axum` and declare the application's Tokio
-runtime explicitly.
+optional native `server_axum::prelude` ship in SDK `0.9.0-alpha.8`.
+Select `server-axum` and declare the application's Tokio runtime explicitly.
 
 ```rust
 use yetlet::server_axum::prelude::*;
@@ -88,13 +87,15 @@ They never infer TLS from ports, hostnames or environment, provision certificate
 or create a hidden runtime. Binding all interfaces with `0.0.0.0` or `::`
 explicitly exposes the listener beyond loopback.
 
+## Source-only checkout additions
+
 The [Style Showcase](../examples/style-showcase/README.md) remains a checkout
 sample. This existing fragment also leads to the current CLI Style availability
 below; the generator and templates are now distributed in the CLI.
 
 ## CLI Style authoring and checkout Showcase
 
-Published SDKalpha.7/CLI0.3.1 artifacts serve separate roles. The CLI ships the
+Published SDKalpha.8/CLI0.3.1 artifacts serve separate roles. The CLI ships the
 private app Style generator and native/browser Style templates, with build/watch
 integration and exact SDK resolution/locking. The Style walkthroughs verify
 SDK alpha.7. By default, `new` selects the highest available non-yanked SemVer

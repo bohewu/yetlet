@@ -25,12 +25,13 @@ Rust Views with optional browser WASM when a screen needs local interaction.
 
 ## Current published releases
 
-**Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
+**Published SDK:** `0.9.0-alpha.8` (`yetlet` / `yetlet-browser`).
 **Published CLI:** `0.3.1` (`yetlet-cli`).
-The [SDK publication record](docs/ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+The [SDK publication record](docs/ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
 and [CLI publication record](docs/CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11)
 retain exact GitHub/crates.io archives, signatures and consumer evidence. The SDK
-includes typed Tag Builders. The independent CLI includes SDK version resolution,
+includes typed Tag Builders, `App::serve()`, `App::serve_on()` and the optional
+Axum adapter Prelude. The independent CLI includes SDK version resolution,
 exact generated app pins/locks and opt-in native/browser Style templates with a
 private app CSS generator. The Style walkthroughs select SDK alpha.7 explicitly.
 
@@ -40,12 +41,12 @@ before release closeout. Development manifest changes alone do not promote it.
 
 ## Start with native SSR
 
-**Experimental alpha.** This quickstart uses SDK `0.9.0-alpha.7` and the
+**Experimental alpha.** This quickstart uses SDK `0.9.0-alpha.8` and the
 independently versioned CLI `0.3.1`. The SDK is available
 on crates.io:
-[`yetlet`](https://crates.io/crates/yetlet/0.9.0-alpha.7) and
-[`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.7), version
-`0.9.0-alpha.7`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.7)
+[`yetlet`](https://crates.io/crates/yetlet/0.9.0-alpha.8) and
+[`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.8), version
+`0.9.0-alpha.8`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.8)
 contains the archives and verification material. To create a standalone app,
 follow [Build your first Yetlet app](docs/FIRST-APP.md). The independently
 published CLI `0.3.1` creates apps without a repository clone:

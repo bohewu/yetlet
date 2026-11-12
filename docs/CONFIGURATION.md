@@ -4,7 +4,7 @@ Load application-owned typed settings explicitly at native startup. The optional
 loader preserves finite source precedence and keeps secrets out of browser state.
 
 **Experimental SDK integration.** These modules are distributed in SDK
-`0.9.0-alpha.7`; use the documented features/target and source matching the
+`0.9.0-alpha.8`; use the documented features/target and source matching the
 version you consume. [Release readiness](RELEASE-READINESS.md) records distribution
 and its qualification limits.
 
