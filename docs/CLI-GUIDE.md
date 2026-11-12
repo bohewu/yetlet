@@ -754,9 +754,11 @@ historical YT-104 qualification describes the earlier static starter scope.
 <a id="optional-application-owned-rust-css-yt-239-working-tree"></a>
 ## Application-owned Rust CSS (YT-239/243)
 
-This release includes the opt-in Style templates and their existing build/watch
-integration. See [Style Showcase](https://github.com/bohewu/yetlet/blob/master/examples/style-showcase/README.md)
-for a separate framework sample and its version requirements.
+Application-owned Rust CSS first shipped in CLI `0.3.0` and remains available
+in CLI `0.4.0`. The opt-in Style templates generate external CSS at build time
+through a private application tool. The current Reader Edition selects SDK
+`0.9.0-alpha.8` and CLI `0.4.0`. App SDK selection follows
+[SDK resolution](#sdk-resolution-yt-247).
 
 `new --template native-style` and `new --template browser-style` opt into a private
 std-only Cargo generator with a complete lock, useful layout/dialog composition,
@@ -793,6 +795,21 @@ asset cleanup or deployment is supplied.
 The selected Cargo cache must satisfy protected filesystem ownership/write policy;
 host output uses its own `yetlet-styles/<app-root-sha256>` subtree. See the
 [implementation evidence and limitations](https://github.com/bohewu/yetlet/blob/master/docs/YT-239-STYLE-INTEGRATION.md).
-The [YT-243 source qualification](https://github.com/bohewu/yetlet/blob/master/docs/YT-243-RELEASE-QUALIFICATION.md)
-records independent review and bounded Linux/local Windows MSVC validation.
-Hosted release/signing/publication and wider platform qualification remain separate.
+
+### Style release and platform evidence
+
+| CLI | Linux installed registry consumer | Windows x64 MSVC |
+|---|---|---|
+| `0.3.0` | Accepted supplement passed Native Style SSR/CSS and Browser Style Vite/Wasm/Chrome with SDK alpha.7. The original publisher's consumer preflight failure is retained. [Publication record](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10) | New Style-template revalidation remained unverified. [Publication record](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10) |
+| `0.3.1` | Hosted consumer passed Native and Browser Style runtime with SDK alpha.7. [Publication record](CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11) | Corrected source passed Native SSR/CSS, Browser Vite/Wasm/Chrome and immediate port closure after Ctrl-Break for both apps. The reviewed formatting-only delta and package member comparison bind the tested source to the accepted archive. [Windows preparation](CLI-031-RELEASE-PREPARATION.md), [hosted archive record](CLI-031-HOSTED-RECORD.md#windows-corrected-replacement--2026-11-11) |
+| `0.4.0` | Hosted consumer passed Native Style HTTP/CSS and Browser Style Vite/Wasm/Chrome with exact SDK alpha.7. The separate alpha.8 first-app runtime check used plain Native. [Publication record](CLI-040-HOSTED-RECORD.md) | The preparation archive passed the locked SDK alpha.8 Native Style compile check, including SDK and startup-profile selection and lock preservation. Windows Style runtime evidence for this release remains unverified. [Qualification record](CLI-040-HOSTED-RECORD.md) |
+
+YT-243 records source qualification, including Linux release-profile browser
+checks and local Windows MSVC Native Style HTTP/CSS, Browser Style scaffold
+creation and wasm32 compile checks. Its Windows browser scope stops at
+compilation. [YT-243 source qualification](YT-243-RELEASE-QUALIFICATION.md)
+
+Todo and the native-first Style Showcase have their own bounded Linux
+Chrome/Firefox sample results. Showcase runs from a checkout and has an optional
+Wasm companion. [Todo qualification](YT-240-TODO-STYLE-QUALIFICATION.md),
+[Style Showcase](../examples/style-showcase/README.md)

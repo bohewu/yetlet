@@ -29,15 +29,15 @@ diagnostics together, follow [Settings, options and logging](SETTINGS-OPTIONS-LO
 
 ## Published typed Tag Builder — SDK alpha.7
 
-The published SDK now includes `yetlet::view::tags` with **101 typed ordinary tag
-constructors**, element-scoped attribute setters and the existing owned `View`.
+The SDK has included `yetlet::view::tags` since `0.9.0-alpha.7`, with **101 typed
+ordinary tag constructors**, element-scoped attribute setters and the existing
+owned `View`.
 See the [typed View guide](VIEW-COMPONENTS.md#optional-typed-tag-builders-yt-234),
 [source](../crates/yetlet/src/view/tags.rs) and
 [YT-235](YT-235-TAG-COVERAGE-PLAN.md) for constructor and renderer restrictions.
 The registry-first `Element::new` tutorial remains valid and intentionally uses
 the reviewed Reader Edition selected in [the site manifest](../site/pages.toml).
-The historical YT-245 source preparation selects SDK `0.9.0-alpha.7` locally;
-the reviewed packages are now publicly available from crates.io.
+[SDK alpha.7 publication and registry consumer](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
 
 
 ## Published application startup — SDK alpha.8
@@ -94,23 +94,25 @@ explicitly exposes the listener beyond loopback.
 
 ## Source-only checkout additions
 
-The [Style Showcase](../examples/style-showcase/README.md) remains a checkout
-sample. This existing fragment also leads to the current CLI Style availability
-below; the generator and templates are now distributed in the CLI.
+The native-first Style Showcase is a checkout sample with an optional Wasm
+companion. Both packages are built from the repository.
+[Style Showcase](../examples/style-showcase/README.md)
 
 ## CLI Style authoring and checkout Showcase
 
-Published SDKalpha.8/CLI0.4.0 artifacts serve separate roles. The CLI ships the
-private app Style generator and native/browser Style templates, with build/watch
-integration and exact SDK resolution/locking. The Style walkthroughs verify
-SDK alpha.7. By default, `new` selects the highest available non-yanked SemVer
-and checks the selected SDK for the template's required packages and features.
-Style CSS is generated at build time by the private app generator.
+Published SDKalpha.8/CLI0.4.0 artifacts serve separate roles. The Reader
+Edition uses the pair selected in the site manifest.
+Application-owned Rust CSS first shipped in CLI `0.3.0`. The CLI ships Native
+and Browser Style templates with a private build-time generator, build/watch
+integration and exact SDK resolution and locking. By default, `new` selects
+the highest available non-yanked SemVer and checks the selected SDK for the
+template's required packages and features.
+[CLI Style release and platform evidence](CLI-GUIDE.md#style-release-and-platform-evidence)
 
 | Source surface | Entry point and contract | Availability and limits |
 |---|---|---|
 | Optional Style authoring | [CLI Style integration](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree), [contract](YT-237-STYLE-REGISTRATION-CONTRACT.md), [implementation](YT-239-STYLE-INTEGRATION.md) | Published CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
-| Style Showcase | [Native-first gallery](../examples/style-showcase/README.md) | Checkout sample with actual View/Style/CSS disclosures and optional local WASM class switching; bounded Linux evidence, no new published package or platform qualification |
+| Style Showcase | [Native-first gallery](../examples/style-showcase/README.md) | Unpublished checkout sample with actual View/Style/CSS disclosures and optional local Wasm class switching. Bounded Linux Chrome/Firefox sample evidence |
 
 ## HTML, HTTP and browser modules
 

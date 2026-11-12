@@ -4,9 +4,11 @@
 Independent implementation Reviewer `wc_job_SjBc9esAHAREdWS7` returned PASS
 with zero material issues or required followups. The parent subsequently selected
 this gallery as the thirteenth formal sample: native SSR requires no browser
-runtime; the separate WASM companion remains an explicit optional enhancement.
-It uses checkout-only typed Tag Builders and the private finite style helper,
-not a published CSS API.
+runtime and the separate Wasm companion is optional. Both packages are
+unpublished and built from the checkout. The gallery uses SDK typed Tag Builders,
+available since `0.9.0-alpha.7`, and a private, finite CSS helper.
+[Typed Tag Builder API](../../docs/API-REFERENCE.md#published-typed-tag-builder--sdk-alpha7),
+[published CLI Style evidence](../../docs/CLI-GUIDE.md#style-release-and-platform-evidence)
 
 Run these exact commands from the repository root:
 
@@ -106,5 +108,7 @@ listener disposal through that probe remains unverified. Required Firefox page
 behavior and browser/server process teardown pass separately. This is not a
 Firefox console/CSP-log audit or 390px qualification. Original compile, lint and
 fixture failures are retained in the ignored YT-241 verification directory.
-The independent implementation review accepts this bounded evidence; production,
-other-platform qualification and public package publication remain separate.
+The independent implementation review accepts this bounded evidence. Later
+YT-243 Linux release-profile checks passed listener disposal in both browsers
+using the initialized page realm. Firefox at 390px and full Firefox console/CSP
+logging remain unverified. [YT-243 source qualification](../../docs/YT-243-RELEASE-QUALIFICATION.md)

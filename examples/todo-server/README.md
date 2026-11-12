@@ -47,10 +47,11 @@ The server never compiles WASM on request. Browser artifacts are built ahead of 
 
 ## App-owned Rust styles and typed Tag Builders
 
-The Todo list, shell and interactive layout use `yetlet::view::tags` from this
-checkout's YT-234/235 source and are included in published SDK alpha.7. These
-helpers lower into the same `View` tree. Existing keyed list classes,
-DOM identity, local events and explicit remote HTTP actions are preserved.
+The Todo list, shell and interactive layout use `yetlet::view::tags` from the
+checkout. The SDK has included these typed Tag Builders since
+`0.9.0-alpha.7`. They lower into the same `View` tree and preserve keyed list
+classes, DOM identity, local events and explicit remote HTTP actions.
+[Typed Tag Builder API](../../docs/API-REFERENCE.md#published-typed-tag-builder--sdk-alpha7)
 
 The private, host-only `stylegen/` package copies the finite YT-239 builder.
 `styles::stylesheet()` explicitly composes `layout` and `tasks`; both the views
@@ -92,5 +93,8 @@ cargo xtask check docs
 ```
 
 Historical behavior evidence remains in [M7j verification](../../docs/M7J-VERIFICATION.md).
-YT-240 retains its bounded Linux source qualification. Style Showcase is now a
-separately reviewed native-first catalog entry with an optional WASM companion.
+YT-240 verified Todo's Linux debug layout and computed styles in Chrome at
+390px and 1280px and in Firefox at 1280px. Firefox clamped the requested 390px
+window to 500px, so the narrow layout remains unverified in that engine.
+[YT-240 results](../../docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary),
+[published CLI Style evidence](../../docs/CLI-GUIDE.md#style-release-and-platform-evidence)

@@ -17,10 +17,12 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [Package publication surface and API consistency](YT-244-PUBLICATION-SURFACE-API-AUDIT.md):
   shipped README/guide link boundaries, registry-first install text and
   published-versus-source-only CLI/API claims; release approval remains separate.
-- [SDK/CLI Style carrier map](API-REFERENCE.md#source-only-checkout-additions):
-  private app Style generation/templates ship in the CLI;
-  [Style Showcase](../examples/style-showcase/README.md) remains a checkout sample.
-  Typed tags are included in the published SDK alpha.7.
+- [Optional application-owned Rust CSS](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree)
+  covers Native Style and Browser Style templates and build-time stylesheet
+  generation. CLI `0.3.0` introduced Style authoring. SDK `0.9.0-alpha.7`
+  introduced typed Tag Builders. See [CLI and SDK availability](API-REFERENCE.md#cli-style-authoring-and-checkout-showcase),
+  the [asset contract](ASSETS.md) and the native-first
+  [Style Showcase checkout sample](../examples/style-showcase/README.md).
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
 - [Build your first Yetlet app](FIRST-APP.md): CLI0.4.0 → protected standalone project → SDK0.9.0-alpha.8 → app lock/cache → first build/run with `App::serve()`. The optional

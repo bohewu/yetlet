@@ -102,7 +102,13 @@ Catalog paths, route sources, build scripts and evidence must resolve inside the
 | `multi-island-dashboard` | `yetlet-multi-island-dashboard` | Full stack | Yes | Complete SSR plus independently built/lazy Counter and Filter islands |
 | `style-showcase` | `yetlet-style-showcase` | Server rendered | No; optional WASM | Four-category style gallery, actual Rust/CSS disclosures and optional local class switching |
 
-YT-241 Style Showcase passed independent implementation Reviewer `wc_job_SjBc9esAHAREdWS7` before its separate parent-owned catalog promotion. Its catalog command and routes work with native Rust/Cargo only. The optional `yetlet-style-showcase-browser` package and exact build command are documented in its README; they are not prerequisites of the native catalog entry. The measured Chrome/Firefox scope and Firefox limitations remain explicit there.
+YT-241 Style Showcase passed independent implementation Reviewer `wc_job_SjBc9esAHAREdWS7`
+before its separate catalog promotion. The unpublished checkout sample runs with
+native Rust/Cargo. Its optional `yetlet-style-showcase-browser` companion has a
+separate build command. Todo and Style Showcase report their own bounded Linux
+Chrome/Firefox results. [Todo qualification](YT-240-TODO-STYLE-QUALIFICATION.md),
+[Showcase commands and verification](../examples/style-showcase/README.md),
+[published CLI Style evidence](CLI-GUIDE.md#style-release-and-platform-evidence)
 
 ## Research fixtures
 

@@ -5,7 +5,7 @@ implementation Reviewer PASS. No public API is promoted. The owner separately
 decides whether to promote work to YT-239.
 
 This implements the bounded [YT-237 contract](YT-237-STYLE-REGISTRATION-CONTRACT.md)
-and [YT-238 roadmap scope](YT-237-240-STYLE-CSS-ROADMAP.md#yt-238--minimal-rust-css-builder-proof)
+and [YT-238 roadmap scope](https://github.com/bohewu/yetlet/blob/14e40614ab723a8a5b6f2de0cf85a8db762b331f/docs/YT-237-240-STYLE-CSS-ROADMAP.md#yt-238--minimal-rust-css-builder-proof)
 in `feature/style-css-roadmap`, baseline
 `3ecbfc36a91a2a06ef2dee69a7a0d848a2ecd16e`. Only the new
 `experiments/style-authoring/` tree and this document are implementation sources.

@@ -138,11 +138,12 @@ implementation authorization. HMR, Windows Vite
 qualification, cloud delivery/retention, default/browser changes and public
 release are not implemented here. YT-092 through YT-096 remain untouched Todo.
 
-## Optional generated application CSS — YT-239 working tree
+## Optional generated application CSS
 
 The [YT-239 integration](YT-239-STYLE-INTEGRATION.md) supplies a separate small
-application-owned CSS consumer in selected CLI templates. It does not publish or
-change the experimental shared asset API above. Development uses a stable selected
+application-owned CSS consumer in the opt-in Style templates, first published
+in CLI `0.3.0` and available in CLI `0.4.0`. The experimental shared asset API
+above has its own contract. Development uses a stable selected
 CSS URL. Successful standalone builds accept a private logical `app-css` record
 and `app.<full-lowercase-sha256>.css`; the consumer verifies that digest against
 its exact immutable startup snapshot before linking/serving. Only the selected
@@ -160,5 +161,7 @@ native loader refuse either unfinished intent even when current hashes match.
 Acceptance commits only at marker removal after all fallible writes/checks.
 Preserve evidence and explicitly verify rollback or rollforward before clearing a
 retained marker; ordinary startup/retry never reconciles it. This supplies no
-retention, HA, cleanup or deployment guarantee. Local implementation review is
-pending; real-browser/Windows rendering qualification remains YT-240.
+retention, HA, cleanup or deployment guarantee. The CLI guide records accepted
+publication and platform evidence, and Todo's qualification records its bounded
+Linux sample results. [CLI Style evidence](CLI-GUIDE.md#style-release-and-platform-evidence),
+[YT-240 Todo qualification](YT-240-TODO-STYLE-QUALIFICATION.md)
