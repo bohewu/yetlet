@@ -1,6 +1,6 @@
 # yetlet-browser::wgpu — Experimental opt-in flat rectangles
 
-First-party Experimental module included in `yetlet-browser` SDK `0.9.0-alpha.7`. No performance, speedup,
+First-party Experimental module included in `yetlet-browser` SDK `0.9.0-alpha.8`. No performance, speedup,
 FPS, stable API, production readiness or publication guarantee. This is the
 bounded flat renderer extracted from the current `webgpu-scene-island` consumer.
 Future 3D is a motivation only; there is no 3D API, scene graph or engine.
@@ -19,10 +19,10 @@ later checkout changes are included in its registry archive:
 
 ```toml
 [dependencies]
-yetlet-browser = { path = "../../crates/yetlet-browser", version = "=0.9.0-alpha.7", default-features = false, features = ["wgpu"] }
+yetlet-browser = { path = "../../crates/yetlet-browser", version = "=0.9.0-alpha.8", default-features = false, features = ["wgpu"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
-yetlet-browser = { path = "../../crates/yetlet-browser", version = "=0.9.0-alpha.7", default-features = false, features = ["wgpu-browser"] }
+yetlet-browser = { path = "../../crates/yetlet-browser", version = "=0.9.0-alpha.8", default-features = false, features = ["wgpu-browser"] }
 ```
 
 The crate-level rustdoc example is compile-checked by `cargo test --doc`:

@@ -12,7 +12,7 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-yetlet-browser = { path = "../../crates/yetlet-browser", version = "0.9.0-alpha.7", default-features = false, features = ["dom"] }
+yetlet-browser = { path = "../../crates/yetlet-browser", version = "0.9.0-alpha.8", default-features = false, features = ["dom"] }
 yetlet-todo-ui = { path = "../todo-ui" }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]

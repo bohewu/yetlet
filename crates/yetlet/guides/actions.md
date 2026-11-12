@@ -1,7 +1,7 @@
 # yetlet::actions
 
 **Experimental SDK module.** Requires Rust 1.99 or newer. Included in
-`yetlet` SDK `0.9.0-alpha.7`; this guide describes the selected package contents.
+`yetlet` SDK `0.9.0-alpha.8`; this guide describes the selected package contents.
 Read source/rustdoc at the revision you consume; package selection does not
 establish registry availability or production qualification.
 

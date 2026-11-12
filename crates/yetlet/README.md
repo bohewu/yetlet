@@ -1,7 +1,7 @@
 # Yetlet
 
 HTML-first views and explicitly selected native capabilities, version
-`0.9.0-alpha.7`. See [GitHub releases](https://github.com/bohewu/yetlet/releases)
+`0.9.0-alpha.8`. See [GitHub releases](https://github.com/bohewu/yetlet/releases)
 for published artifacts. Earlier tags retain their original package layout and
 qualification evidence.
 
@@ -11,14 +11,14 @@ Use Rust 1.99+ and this exact registry dependency once this version is available
 
 ```toml
 [dependencies]
-yetlet = "=0.9.0-alpha.7"
+yetlet = "=0.9.0-alpha.8"
 ```
 
 For local preparation, use an explicitly reviewed checkout at the matching version:
 
 ```toml
 [dependencies]
-yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.7" }
+yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.8" }
 ```
 
 ```rust
@@ -46,6 +46,15 @@ let view: View = div().id("app").child(h1().text("Hello <Yetlet>"))
     .child(input().placeholder("Search")).into();
 assert!(yetlet::html::render_to_string(&view).unwrap().contains("Hello &lt;Yetlet&gt;"));
 ```
+
+## Native application startup
+
+This release includes simple startup with the opt-in `server-axum` feature.
+`App::serve()` listens for plain HTTP on `127.0.0.1:7878`.
+`App::serve_on(address)` takes an explicit bind address. The application owns
+its Tokio runtime and can use `App::into_router()` for native Axum listener and
+lifecycle control. Import `yetlet::server_axum::prelude::*` to opt into the
+curated server imports.
 
 ## Features and guides
 

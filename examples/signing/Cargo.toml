@@ -9,5 +9,5 @@ publish = false
 resolver = "3"
 
 [dependencies]
-yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.7", default-features = false, features = ["signing"] }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.8", default-features = false, features = ["signing"] }
 tokio = { version = "1", features = ["macros", "rt"] }

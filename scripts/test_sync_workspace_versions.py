@@ -42,14 +42,14 @@ def populate_current_docs(root):
         "SDK (" + tick + "0.1.0" + tick + ") from independent CLI tooling and checkout samples.\n"
         "Available since SDK " + tick + "0.9.0-alpha.6" + tick + ".\n"
         "Published SDKalpha.6/CLI0.2.0 artifacts serve separate roles.\n"
-        "YT-245 selects SDK " + tick + "0.1.0" + tick + " locally.\n")
+        "The historical YT-245 source preparation selects SDK " + tick + "0.9.0-alpha.7" + tick + " locally.\n")
     put(root, "docs/CAPABILITIES.md",
         "version " + tick + "0.1.0" + tick + ", available from crates.io.\n"
         "Published SDKalpha.6/CLI0.2.0 artifacts serve separate roles.\n"
-        "YT-245 selects local SDK\n" + tick + "0.1.0" + tick + " contents.\n")
+        "The original YT-245 preparation selects local SDK " + tick + "0.9.0-alpha.7" + tick + " contents.\n")
     put(root, "docs/COMPATIBILITY.md",
-        "## Selected local SDK 0.1.0 typed helpers\n"
-        "YT-245 selects SDK\n" + tick + "0.1.0" + tick + " locally.\n"
+        "## Selected local SDK 0.9.0-alpha.7 typed helpers\n"
+        "YT-245 originally selects SDK\n" + tick + "0.9.0-alpha.7" + tick + " locally.\n"
         "The methods are now **published in SDK " + tick + "0.1.0" + tick + "**;\n"
         "The published SDK alpha.6 and CLI 0.2.0 packages.\n"
         "The published SDK is " + tick + "yetlet" + tick + " / " +        tick + "yetlet-browser" + tick + " " + tick + "0.1.0" + tick + ";\n"
@@ -59,7 +59,7 @@ def populate_current_docs(root):
         "Style templates are distributed in CLI 0.2.0.\n" + references)
     put(root, "docs/VIEW-COMPONENTS.md",
         "Experimental SDK " + tick + "0.1.0" + tick + ", published on crates.io.\n"
-        "The locally selected SDK " + tick + "0.1.0" + tick + " includes typed tags.\n"
+        "The locally selected SDK " + tick + "0.9.0-alpha.7" + tick + " includes typed tags.\n"
         "available from published SDK " + tick + "0.1.0" + tick + ".\n")
     put(root, "docs/DOCUMENTATION-SCOPE.md",
         "The published Experimental SDK is yetlet and yetlet-browser\n"
@@ -287,16 +287,6 @@ class WorkspaceManifestTests(unittest.TestCase):
                 + FENCE + 'toml\n[dependencies]\nyetlet-browser = { version = "=0.9.0-alpha.6" }\nwgpu = "=27.0.1"\n' + FENCE + '\n'
                 '<details>\n<summary>Historical delivery evidence</summary>\n'
                 'Experimental ' + TICK + '0.9.0-alpha.5' + TICK + ', unpublished.\n</details>\n')
-            put(root, "docs/COMPATIBILITY.md",
-                '## Selected local SDK alpha.6 typed helpers\n'
-                'YT-245 selects SDK\n' + TICK + '0.9.0-alpha.6' + TICK + ' locally.\n'
-                '## Current distribution\nPublished SDK is ' + TICK + '0.9.0-alpha.6' + TICK + '.\n')
-            put(root, "docs/API-REFERENCE.md",
-                'YT-245 selects SDK ' + TICK + '0.9.0-alpha.6' + TICK + ' locally.\n')
-            put(root, "docs/CAPABILITIES.md",
-                'YT-245 selects local SDK\n' + TICK + '0.9.0-alpha.6' + TICK + ' contents.\n')
-            put(root, "docs/VIEW-COMPONENTS.md",
-                'The locally selected SDK ' + TICK + '0.9.0-alpha.6' + TICK + ' includes typed tags.\n')
             populate_current_docs(root)
             subprocess.run(["git", "init", "-q"], cwd=root, check=True)
             subprocess.run(["git", "add", "."], cwd=root, check=True)
@@ -324,7 +314,7 @@ class WorkspaceManifestTests(unittest.TestCase):
             api = (root / "docs/API-REFERENCE.md").read_text()
             self.assertIn("Available since SDK " + TICK + "0.9.0-alpha.6" + TICK, api)
             self.assertIn("SDK (" + TICK + "6.5.4-alpha.3" + TICK + ")", api)
-            self.assertIn("selects SDK " + TICK + "7.8.9-alpha.2" + TICK + " locally", api)
+            self.assertIn("selects SDK " + TICK + "0.9.0-alpha.7" + TICK + " locally", api)
             self.assertIn("127.0.0.1:3000", (root / "README.md").read_text())
             self.assertIn("6.5.4-alpha.3", (root / "README.md").read_text())
             self.assertIn("2.2.0", (root / "README.md").read_text())
@@ -350,6 +340,19 @@ class WorkspaceManifestTests(unittest.TestCase):
                           (root / "examples/sample/Cargo.toml").read_text())
             self.assertIn('yetlet-browser = "=6.5.4-alpha.3"',
                           (root / "examples/docs-site/Cargo.toml").read_text())
+
+            reference_docs = (
+                "docs/API-REFERENCE.md", "docs/CAPABILITIES.md",
+                "docs/COMPATIBILITY.md", "docs/VIEW-COMPONENTS.md",
+            )
+            before_advance = {path: (root / path).read_bytes() for path in reference_docs}
+            put(root, "Cargo.toml", '[workspace.package]\nversion = "7.8.9-alpha.3"\n')
+            changed = sync.sync(root)
+            self.assertIn("crates/yetlet/README.md", changed)
+            for path, original in before_advance.items():
+                with self.subTest(path=path):
+                    self.assertNotIn(path, changed)
+                    self.assertEqual((root / path).read_bytes(), original)
 
 
     @patch.object(sync, 'cli_sdk_version', return_value='6.5.4-alpha.3')

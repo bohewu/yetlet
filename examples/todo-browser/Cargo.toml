@@ -12,8 +12,8 @@ publish = false
 crate-type = ["cdylib", "rlib"]
 
 [dependencies]
-yetlet-browser = { path = "../../crates/yetlet-browser", version = "0.9.0-alpha.7", default-features = false, features = ["actions", "dom", "dom-keyed"] }
-yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.7", default-features = false, features = ["actions", "reactive"] }
+yetlet-browser = { path = "../../crates/yetlet-browser", version = "0.9.0-alpha.8", default-features = false, features = ["actions", "dom", "dom-keyed"] }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.8", default-features = false, features = ["actions", "reactive"] }
 yetlet-todo-ui = { path = "../todo-ui" }
 serde_json = "1"
 

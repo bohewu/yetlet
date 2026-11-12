@@ -3,7 +3,7 @@
 Build native HTML pages and JSON endpoints with a small facade over Axum/Tower.
 The server adapter does not install browser, Session or configuration capabilities.
 
-**Experimental SDK `0.9.0-alpha.7` package contents.** Select the
+**Experimental SDK `0.9.0-alpha.8` package contents.** Select the
 `server-axum` feature. The commands below run checkout examples; application
 authors can start without cloning using the [first-app guide](https://github.com/bohewu/yetlet/blob/master/docs/FIRST-APP.md).
 
@@ -24,15 +24,16 @@ From the repository root, run the existing complete example:
 cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
 ```
 
-The checkout example now uses the source-only `App::serve()` and optional
-Prelude, serving `http://127.0.0.1:7878/` and `/api/status`. These additions follow
-published SDK alpha.7. See the [source-only startup examples](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md#source-only-checkout-additions)
-for the default path and `from_router(...).serve_on(address)` at an explicit
-nondefault address. The application continues to own its Tokio runtime.
+The checkout example uses this package's `App::serve()` and opts into the curated
+`yetlet::server_axum::prelude` for imports such as `App`, `View` and `Json`.
+`App::serve()` binds exactly to `127.0.0.1:7878` for local plain HTTP, serving
+`/` and `/api/status`. Use `App::serve_on(address)` to choose an explicit bind
+address. All-interface addresses expose the listener on other network interfaces.
+Both methods run on the application's Tokio runtime and return bind errors.
 
-The following explicit-listener integration is compatible with published SDK
-alpha.7. It remains available in this checkout through `into_router()` and native
-Tokio/Axum, including `with_graceful_shutdown` for application-owned shutdown.
+Use `into_router()` and native Tokio/Axum for listener ownership, direct TLS or
+application-owned shutdown with `with_graceful_shutdown`. The following
+explicit-listener example also works with published SDK alpha.7.
 
 ```rust
 use yetlet::view::View;
@@ -86,7 +87,7 @@ Native upstream routing and extraction contracts remain Axum/Tower-owned.
 ### License and compatibility
 
 Dual-licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/LICENSE-MIT) or [Apache-2.0](https://github.com/bohewu/yetlet/blob/master/LICENSE-APACHE).
-This guide describes SDK `0.9.0-alpha.7` contents; APIs remain Experimental. Read
+This guide describes SDK `0.9.0-alpha.8` contents; APIs remain Experimental. Read
 [compatibility](https://github.com/bohewu/yetlet/blob/master/docs/COMPATIBILITY.md) and the
 [current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md) at the matching revision.
 The historical evidence below retains its original candidate and scope; it does

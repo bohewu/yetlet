@@ -1,7 +1,7 @@
 # Yetlet Browser
 
 Opt-in browser integrations sharing the single View type from `yetlet`.
-Version `0.9.0-alpha.7`; see [GitHub releases](https://github.com/bohewu/yetlet/releases)
+Version `0.9.0-alpha.8`; see [GitHub releases](https://github.com/bohewu/yetlet/releases)
 for published artifacts.
 Use Rust 1.99+, `wasm32-unknown-unknown`, and the matching wasm-bindgen toolchain
 when building actual browser assets.
@@ -12,16 +12,16 @@ Use these exact registry dependencies once this version is available:
 
 ```toml
 [dependencies]
-yetlet = { version = "=0.9.0-alpha.7", default-features = false }
-yetlet-browser = "=0.9.0-alpha.7"
+yetlet = { version = "=0.9.0-alpha.8", default-features = false }
+yetlet-browser = "=0.9.0-alpha.8"
 ```
 
 For local preparation, select matching source revisions for both crates:
 
 ```toml
 [dependencies]
-yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.7", default-features = false }
-yetlet-browser = { path = "/absolute/yetlet/crates/yetlet-browser", version = "=0.9.0-alpha.7" }
+yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.8", default-features = false }
+yetlet-browser = { path = "/absolute/yetlet/crates/yetlet-browser", version = "=0.9.0-alpha.8" }
 ```
 
 This release accepts the same shared View produced by the typed Tag Builder API
