@@ -1157,16 +1157,17 @@ dependencies = [
 
 [[package]]
 name = "yetlet"
-version = "0.9.0-alpha.7"
+version = "0.9.0-alpha.8"
 dependencies = [
  "axum",
  "serde",
+ "tokio",
  "tower",
 ]
 
 [[package]]
 name = "yetlet-browser"
-version = "0.9.0-alpha.7"
+version = "0.9.0-alpha.8"
 dependencies = [
  "wasm-bindgen",
  "web-sys",

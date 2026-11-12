@@ -1,7 +1,7 @@
 # Experimental Support Boundary
 
 `yetlet_browser::wgpu` is **Experimental and opt-in**, included as a module
-of `yetlet-browser` SDK `0.9.0-alpha.7`. The earlier separate-package metadata
+of `yetlet-browser` SDK `0.9.0-alpha.8`. The earlier separate-package metadata
 preparation is retained in [YT-201](https://github.com/bohewu/yetlet/blob/master/docs/YT-201-PACKAGE-PREPARATION.md).
 There is no performance, speedup, FPS, stable API, production-readiness or broad
 browser guarantee. The measured YT-077 comparison did not demonstrate a useful
@@ -45,7 +45,7 @@ its own workspace/lock. Workspace membership does not enable GPU features.
 
 ```toml
 [dependencies]
-yetlet-browser = { version = "=0.9.0-alpha.7", path = "/absolute/yetlet/crates/yetlet-browser", default-features = false, features = ["wgpu", "wgpu-browser"] }
+yetlet-browser = { version = "=0.9.0-alpha.8", path = "/absolute/yetlet/crates/yetlet-browser", default-features = false, features = ["wgpu", "wgpu-browser"] }
 
 [target.'cfg(target_arch = "wasm32")'.dependencies]
 

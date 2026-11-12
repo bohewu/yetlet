@@ -1,7 +1,7 @@
 # Experimental native secret providers
 
 `yetlet::secrets` is an explicit native module included in `yetlet` SDK
-`0.9.0-alpha.7`, selected through the `secrets` feature. Its only runtime dependency is `secrecy`. It does not register with
+`0.9.0-alpha.8`, selected through the `secrets` feature. Its only runtime dependency is `secrecy`. It does not register with
 Yetlet Core, App, configuration, the CLI, or browser code. Browser WASM is rejected.
 
 `SecretProvider: Send + Sync` exposes object-safe asynchronous

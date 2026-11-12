@@ -3,7 +3,7 @@
 Add bounded, process-local Memory Session state, cookie lifecycle and explicit
 CSRF checks to a native application. Session can be anonymous and is not authentication.
 
-**Experimental SDK module.** Included in `yetlet` SDK `0.9.0-alpha.7`;
+**Experimental SDK module.** Included in `yetlet` SDK `0.9.0-alpha.8`;
 use the documented feature/target and source matching the version you consume.
 
 

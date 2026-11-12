@@ -444,58 +444,6 @@ def sync_guides(root, version, write=False):
     return changed
 
 
-def sync_current_docs(root, version, write=False):
-    changes = {}
-    tick = chr(96)
-
-    relative = "docs/COMPATIBILITY.md"
-    text = (root / relative).read_text(encoding="utf-8")
-    current, historical = split_historical(text)
-    distribution = re.search(r"(?m)^## Current distribution\b", current)
-    if distribution:
-        local, remainder = current[:distribution.start()], current[distribution.start():]
-    else:
-        local, remainder = current, ""
-    local = re.sub(r"(?m)^## Selected local SDK [^ \n]+ (.*)$",
-                   lambda m: f"## Selected local SDK {version} {m.group(1)}", local)
-    local, count = re.subn(r"(selects SDK\s*\n\s*" + re.escape(tick) +
-                           r")" + VERSION_PATTERN + r"(" + re.escape(tick) + r")",
-                           lambda m: m.group(1) + version + m.group(2), local, count=1)
-    if count != 1:
-        raise ValueError(relative + ": selected local SDK version source field missing")
-    updated = local + remainder + historical
-    if updated != text:
-        changes[relative] = updated
-
-    specifications = {
-        "docs/API-REFERENCE.md": (
-            r"(selects SDK " + re.escape(tick) + r")" + VERSION_PATTERN + r"(" +
-            re.escape(tick) + r" locally)"),
-        "docs/CAPABILITIES.md": (
-            r"(selects local SDK\s*" + re.escape(tick) +
-            r")" + VERSION_PATTERN + r"(" + re.escape(tick) + r" contents)"),
-        "docs/VIEW-COMPONENTS.md": (
-            r"(The locally selected SDK " + re.escape(tick) +
-            r")" + VERSION_PATTERN + r"(" + re.escape(tick) + r" includes)"),
-    }
-    for relative, pattern in specifications.items():
-        text = (root / relative).read_text(encoding="utf-8")
-        current, historical = split_historical(text)
-        updated, count = re.subn(pattern, lambda m: m.group(1) + version + m.group(2),
-                                 current, count=1)
-        if count != 1:
-            raise ValueError(relative + ": selected local SDK version source field missing")
-        updated += historical
-        if updated != text:
-            changes[relative] = updated
-    if write:
-        for relative, value in changes.items():
-            (root / relative).write_text(value, encoding="utf-8")
-    return changes
-
-
-
-
 def replace_dependency_lines(text, package, version, exact=True, location="dependency"):
     lines = text.splitlines(keepends=True)
     indexes = [i for i, line in enumerate(lines)
@@ -613,7 +561,7 @@ def replace_once(text, pattern, callback, location, label):
     return updated
 
 
-def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
+def sync_published_docs(root, published, cli_sdk, edition):
     sdk = published["SDK"]
     cli = published["CLI"]
     sdk_short = re.sub(r"^[0-9]+\.[0-9]+\.[0-9]+-", "", sdk)
@@ -621,7 +569,7 @@ def sync_published_docs(root, published, cli_sdk, edition, base_changes=None):
     cli_sdk_short = re.sub(r"^[0-9]+\.[0-9]+\.[0-9]+-", "", cli_sdk_value)
     reader_sdk_short = re.sub(r"^[0-9]+\.[0-9]+\.[0-9]+-", "", edition["sdk"])
     tick = re.escape(chr(96))
-    changes = dict(base_changes or {})
+    changes = {}
 
     def apply(relative, operations):
         original = changes.get(relative)
@@ -858,8 +806,7 @@ def plan(root):
     paths = manifest_paths(root)
     updates, inventory = sync_manifests(root, paths, sdk)
     updates.update(sync_package_readmes(root, sdk, cli_version, cli_sdk))
-    local_docs = sync_current_docs(root, sdk)
-    updates.update(sync_published_docs(root, published_versions(root), cli_sdk, edition, local_docs))
+    updates.update(sync_published_docs(root, published_versions(root), cli_sdk, edition))
     for relative in sync_guides(root, sdk):
         text = (root / relative).read_text(encoding="utf-8")
         updates[relative] = sync_guide_text(text, sdk, relative)

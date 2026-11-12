@@ -1,6 +1,6 @@
 # yetlet::config
 
-Experimental module included in `yetlet` SDK `0.9.0-alpha.7`. Requires Rust 1.99+.
+Experimental module included in `yetlet` SDK `0.9.0-alpha.8`. Requires Rust 1.99+.
 This native-only module requires the `config` feature; it is not a global
 Settings service. Native APIs are absent from browser Wasm. Publication does
 not establish production qualification.

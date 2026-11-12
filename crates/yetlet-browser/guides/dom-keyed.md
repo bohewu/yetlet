@@ -1,6 +1,6 @@
 # yetlet-browser::dom_keyed
 
-**Experimental SDK `0.9.0-alpha.7` package contents.** Requires Rust 1.99
+**Experimental SDK `0.9.0-alpha.8` package contents.** Requires Rust 1.99
 or newer. Select the `dom-keyed` feature of `yetlet-browser` explicitly;
 actual DOM/listener operations require WASM and a browser host. Native
 `validate_keyed_order` is separate from browser execution.
@@ -35,7 +35,7 @@ Desired-key validation and missing-entry creation precede structural changes. Up
 ## License and compatibility
 
 Dual-licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/LICENSE-MIT) or
-[Apache-2.0](https://github.com/bohewu/yetlet/blob/master/LICENSE-APACHE). This guide describes SDK `0.9.0-alpha.7` package contents;
+[Apache-2.0](https://github.com/bohewu/yetlet/blob/master/LICENSE-APACHE). This guide describes SDK `0.9.0-alpha.8` package contents;
 APIs remain Experimental. Read [compatibility](https://github.com/bohewu/yetlet/blob/master/docs/COMPATIBILITY.md),
 the [current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md) and the matching
 source/rustdoc. Repository example execution and historical acceptance retain
