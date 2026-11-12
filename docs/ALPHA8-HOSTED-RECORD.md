@@ -1,11 +1,56 @@
 # Yetlet SDK 0.9.0-alpha.8 signing dossier
 
-2026-11-12. The hosted unsigned build and isolated readback of its original
-encrypted evidence passed. This checkpoint prepares the Experimental SDK
-candidate for signer review. The current public distributions and live Reader
-Edition are SDK `0.9.0-alpha.7` and CLI `0.3.1`. The unsigned checkpoint recorded
-no alpha.8 GitHub Release or registry version and read back eight live Reader
-pages at Pages deployment `7728960490`. [Current distribution](RELEASE-READINESS.md)
+## Owner-approved publication and registry consumer — 2026-11-12
+
+Owner `bohewu` approved `release-publish` Environment `25761919341` for
+[run 43177100178, attempt 1](https://github.com/bohewu/yetlet/actions/runs/43177100178).
+The [Experimental GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.8)
+is Release ID `442617970`, published `2026-11-12T07:44:09Z` at immutable C.
+The publisher staged six approved files and verified their public readback.
+Independent anonymous readback matches every file's SHA-256 and size.
+
+The signer, verifier and publisher source was
+`ed08de5c02a943f862b8e36e41ceba0665957b5d`, distinct from C.
+[PR #89](https://github.com/bohewu/yetlet/pull/89) passed the independent dossier
+review, strict/builtin Guard and exact PR and post-merge CI. The no-OIDC
+[freeze](https://github.com/bohewu/yetlet/actions/runs/43176020791),
+[signing](https://github.com/bohewu/yetlet/actions/runs/43176662929) and
+[independent verification](https://github.com/bohewu/yetlet/actions/runs/43176918278)
+all passed on attempt 1. The verifier checked both package subjects and all 79
+private manifest entries. The temporary encrypted Draft attachment was removed
+before publication.
+
+| Published package, in upload order | Bytes | SHA-256 |
+|---|---:|---|
+| `yetlet 0.9.0-alpha.8` | 173026 | `3e850fe4320f3511121b37cfa25bb2ce3ef422d5fe11ccbea59908687912fd59` |
+| `yetlet-browser 0.9.0-alpha.8` | 52559 | `26c1a93d91d5ab574f213a13048a8cd6a680539042d3d3166d0a4de2c475983f` |
+
+Both crates.io version entries are non-yanked. The version API, sparse index
+and anonymous downloads match the original signed package identities. A fresh
+registry-only consumer pinned both exact versions and passed `cargo +1.99.0
+check --locked`, with no path patches or forwarded credentials. Its lock
+SHA-256 is `857d88325b320f552ad009f3a7a720b93aaa4f0d17b95e17fd40062ae7d547b3`.
+The original publication result artifact `13924811286` is retained with ZIP
+SHA-256 `4c9b9396889163bdf5fb90ec19033ea0a1ad5502423c5a8a441e69dc7b0efb08`.
+The independent CLI remains `0.3.1`. The Reader Edition rollover uses that
+published CLI with SDK alpha.8 under the [release SOP](RELEASING.md#required-reader-update-after-every-sdk-or-cli-publication).
+
+The Reader source selects SDK alpha.8 and CLI `0.3.1`. Both standalone guide
+consumers were reconciled with Cargo, changing only the two SDK entries in each
+lock. A registry-installed CLI `0.3.1` generated the exact alpha.8 first app.
+The frozen build and run returned both HTTP routes, escaped HTML and strict
+CSP. The app lock and resolution receipt were unchanged after shutdown. Local
+native and Wasm verification produced the eight-chapter, fifteen-file Reader
+preview and the separate ten-file static reference export. The public artifact
+and live Pages delivery require readback at the deployed source.
+
+## Historical signer preparation checkpoint — 2026-11-12
+
+The hosted unsigned build and isolated readback of its original encrypted
+evidence passed. At this checkpoint SDK `0.9.0-alpha.7` and CLI `0.3.1` were the
+public distributions and live Reader Edition. The checkpoint recorded no
+alpha.8 distribution and read back all eight Reader pages at Pages deployment
+`7728960490`. [Current distribution](RELEASE-READINESS.md)
 
 ## Immutable product candidate
 
@@ -112,7 +157,7 @@ The canonical Cargo xtask checksum create and verify both passed.
   outside the release qualification. [Capability map](CAPABILITIES.md),
   [Release readiness](RELEASE-READINESS.md)
 
-## Gates after this checkpoint
+## Gates recorded at the historical checkpoint
 
 1. Independently review this dossier, release notes and the flat original-file
    selection. Deliver the docs-only signer change through strict/builtin Guard,

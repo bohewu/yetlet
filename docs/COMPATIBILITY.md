@@ -5,7 +5,8 @@
 [YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md) originally selects SDK
 `0.9.0-alpha.7`, including
 `yetlet::view::tags` with typed fluent constructors and additive convenience
-methods. These are now **published in SDK `0.9.0-alpha.7`**, but were absent from alpha.6.
+methods. These were absent from alpha.6, first shipped in `0.9.0-alpha.7` and
+are now **published in SDK `0.9.0-alpha.8`**.
 The historical CLI0.2.0 registry pin remains immutable. The current reader
 edition follows the verified publication pair through the required release
 closeout; a development manifest change alone does not promote it. The existing owned
@@ -30,24 +31,24 @@ DOM's existing admission/URL/image policy. Selected typed attribute setters
 the typed builder; generic `attribute` retains append-only semantics.
 The shared `View` representation and renderer behavior are unchanged.
 Published SDK alpha.7 includes these builders; CLI 0.2.0 stays independently pinned.
-The published SDK alpha.7 and CLI 0.3.1 packages are independently versioned;
+The published SDK alpha.8 and CLI 0.3.1 packages are independently versioned;
 only the SDK includes the typed Tag Builder.
 
 See [YT-235 follow-up](YT-235-TAG-COVERAGE-PLAN.md) for exact inclusion/exclusion
 and verification.
 
-## Current distribution — 2026-11-10
+## Current distribution — 2026-11-12
 
-The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.7`; the independently
+The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.8`; the independently
 published CLI is `yetlet-cli` `0.3.1`, with release build SDKalpha.7.
-See the [SDK publication record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+See the [SDK publication record](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
 and [CLI publication record](CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11)
 for the actual artifacts and consumers. YT-220/221's DOM vocabulary, pre handling
 and opt-in navigation/images are available in SDKalpha.6; YT-223's static export
 is available in CLI0.2.0. Existing defaults and Experimental API limits remain.
 
 The public reader/first-app edition remains explicitly pinned to
-SDKalpha.7/CLI0.3.1 in [the site manifest](../site/pages.toml).
+SDKalpha.8/CLI0.3.1 in [the site manifest](../site/pages.toml).
 
 Some registry-only
 reference examples retain their own SDKalpha.5 pins, independently of the

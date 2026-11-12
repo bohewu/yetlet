@@ -1,9 +1,9 @@
 # Build your first Yetlet app
 
 Create a standalone native SSR app with the published source-installed CLI and
-`yetlet` SDK `0.9.0-alpha.7`. This Linux/POSIX walkthrough uses the existing
+`yetlet` SDK `0.9.0-alpha.8`. This Linux/POSIX walkthrough uses the existing
 scaffold; the app needs no local SDK source or Cargo path overrides. APIs remain
-Experimental. CLI `0.3.1` and SDK `0.9.0-alpha.7` have independent versions.
+Experimental. CLI `0.3.1` and SDK `0.9.0-alpha.8` have independent versions.
 
 For an app whose UI and state run in the browser without a native HTTP backend,
 choose the separate [browser-only WASM walkthrough](BROWSER-APP.md).
@@ -62,7 +62,7 @@ env PATH="$yetlet_rust_bin:$PATH" yetlet doctor --json
 
 For an isolated prefix, add `--root /absolute/owned/cli-prefix` to the install
 command and invoke `/absolute/owned/cli-prefix/bin/yetlet`. The CLI version is
-independent of SDK `0.9.0-alpha.7`.
+independent of SDK `0.9.0-alpha.8`.
 `--locked` allows downloading locked dependencies. A version or doctor result
 identifies a tool/environment, not application readiness. For a Rustup setup,
 `rustup which` selects the actual already-installed toolchain directory. The
@@ -81,7 +81,7 @@ parent and skip its creation.
 ```sh
 yetlet_parent="$HOME/yetlet-first-apps"
 mkdir -m 700 "$yetlet_parent"
-env PATH="$yetlet_rust_bin:$PATH" yetlet new firstapp --parent "$yetlet_parent" --sdk-version 0.9.0-alpha.7
+env PATH="$yetlet_rust_bin:$PATH" yetlet new firstapp --parent "$yetlet_parent" --sdk-version 0.9.0-alpha.8
 yetlet_app="$yetlet_parent/firstapp"
 ```
 
@@ -90,6 +90,10 @@ Plain `new` selects the existing native template. It writes `Cargo.toml`,
 `.yetlet/sdk-resolution.json`. It installs no tools and starts no application
 server. The app declares its own
 standalone `[workspace]`; it is not added to Yetlet's workspace.
+
+CLI `0.3.1` generates an explicit listener even with SDK alpha.8. Applications
+that choose the SDK's simple startup methods can follow the
+[published application startup guide](API-REFERENCE.md#published-application-startup--sdk-alpha8).
 
 The explicit SDK selection keeps this walkthrough on its reviewed reader
 edition as newer SDK releases arrive. Omitting it selects the latest available
@@ -103,7 +107,7 @@ the optional runtime Settings loader. This path needs no `--settings`,
 
 ### 3. Prepare the app lock/cache, then build and run
 
-The generated manifest already selects `yetlet = "=0.9.0-alpha.7"` from crates.io
+The generated manifest already selects `yetlet = "=0.9.0-alpha.8"` from crates.io
 with `server-axum`; keep that dependency and its selected features. No manifest
 editing, SDK checkout, `[patch]` or path override is required. Work in the new
 app directory, outside the Yetlet checkout:
@@ -195,7 +199,7 @@ scaffold into an exporter. There is no `yetlet new --static` option.
 
 Start with the [standalone static-site example](../examples/static-site/README.md)
 and its explicit `site-export` binary, using the same published SDK
-`0.9.0-alpha.7`. Its [exporter source](../examples/static-site/src/main.rs)
+`0.9.0-alpha.8`. Its [exporter source](../examples/static-site/src/main.rs)
 shows finite public pages/assets and escaped Views. After preparing that
 application's own lock/cache, run from its protected directory with the
 installed CLI and selected physical Rust toolchain:

@@ -1,7 +1,7 @@
 # Current capability and API carrier map
 
-Updated: 2026-11-10. The published Experimental SDK has two implementation packages:
-`yetlet` and `yetlet-browser`, version `0.9.0-alpha.7`, available from crates.io.
+Updated: 2026-11-12. The published Experimental SDK has two implementation packages:
+`yetlet` and `yetlet-browser`, version `0.9.0-alpha.8`, available from crates.io.
 The module map below describes capabilities, not additional installable crates.
 Base defaults select HTML; Browser defaults select DOM. Native capabilities and
 GPU/action integrations are additive opt-ins with explicit startup wiring.
@@ -17,6 +17,10 @@ ownership/error boundaries and local rustdoc. [Documentation scope](DOCUMENTATIO
 classifies reader inputs and retained evidence; this inventory does not select
 publication of its linked execution records.
 
+SDK alpha.8 includes [simple application startup and the optional Axum Prelude](API-REFERENCE.md#published-application-startup--sdk-alpha8)
+with the opt-in `server-axum` feature. The published CLI `0.3.1` continues to
+generate its existing explicit-listener native scaffold.
+
 ## Published typed authoring and CLI Style tooling
 
 SDK alpha.7 **includes** `yetlet::view::tags` with 101 typed ordinary tag
@@ -27,7 +31,7 @@ The original YT-245 preparation selects local SDK `0.9.0-alpha.7` contents;
 these typed constructors are now distributed rather than checkout-only.
 
 
-Published SDKalpha.7/CLI0.3.1 artifacts serve separate roles. The independent CLI
+Published SDKalpha.8/CLI0.3.1 artifacts serve separate roles. The independent CLI
 ships native/browser Style templates and a private app generator. The Style
 walkthroughs verify SDK alpha.7 with exact app pins and locks. The
 [Style Showcase](../examples/style-showcase/README.md) remains a checkout sample.

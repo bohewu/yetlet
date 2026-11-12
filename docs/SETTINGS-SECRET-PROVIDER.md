@@ -4,7 +4,7 @@ Resolve an explicitly injected SecretProvider into selected protected startup
 settings fields. Ordinary settings loading remains independent and unchanged.
 
 **Experimental SDK integration.** These modules are distributed in SDK
-`0.9.0-alpha.7`; use the documented features/target and source matching the
+`0.9.0-alpha.8`; use the documented features/target and source matching the
 version you consume. [Release readiness](RELEASE-READINESS.md) records distribution
 and its qualification limits.
 
@@ -61,7 +61,7 @@ retains its accepted historical compatibility evidence.
 Enable the feature and inject an already-constructed read-only provider:
 
 ```toml
-yetlet = { version = "=0.9.0-alpha.7", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["config"] }
+yetlet = { version = "=0.9.0-alpha.8", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["config"] }
 ```
 
 ```rust

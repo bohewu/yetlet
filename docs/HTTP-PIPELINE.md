@@ -4,7 +4,7 @@ Compose native global, group and route middleware while keeping request-owned
 parts/body separate from typed application state. Axum/Tower owns HTTP transport.
 
 **Experimental SDK integration.** These modules are distributed in SDK
-`0.9.0-alpha.7`; use the documented features/target and source matching the
+`0.9.0-alpha.8`; use the documented features/target and source matching the
 version you consume. [Release readiness](RELEASE-READINESS.md) records distribution
 and its qualification limits.
 

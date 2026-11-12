@@ -2,16 +2,16 @@
 
 Date: 2026-10-26 classification, updated 2026-11-10 for published SDK/CLI and the separate reader edition.
 The published Experimental SDK is `yetlet` and `yetlet-browser`
-`0.9.0-alpha.7`; the independently published CLI is `yetlet-cli` `0.3.1`.
+`0.9.0-alpha.8`; the independently published CLI is `yetlet-cli` `0.3.1`.
 Use module guides and rustdoc from the version/revision you consume. The
-[SDK publication record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09) and
+[SDK publication record](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12) and
 [CLI publication record](CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11)
 retain their actual distribution/consumer evidence. Older previews retain their
 own package layouts, partial registry results and failure histories. This documentation
 classification activates no website/Wiki or additional publication, support or
 repository-visibility change. Historical candidate decisions retain their scope.
 
-The public reader/first-app edition is the explicitly selected SDKalpha.7/CLI0.3.1
+The public reader/first-app edition is the explicitly selected SDKalpha.8/CLI0.3.1
 pair in [the site manifest](../site/pages.toml). The new
 [browser-only walkthrough](BROWSER-APP.md) is repository guidance; it does not add
 a selected site chapter or promote the live site. The existing link rewriter

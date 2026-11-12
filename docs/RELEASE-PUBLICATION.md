@@ -1,9 +1,9 @@
 # Single-gate release automation and registry promotion
 
-Current distribution checkpoint, 2026-11-11:
-**Published SDK:** `0.9.0-alpha.7` (`yetlet` / `yetlet-browser`).
+Current distribution checkpoint, 2026-11-12:
+**Published SDK:** `0.9.0-alpha.8` (`yetlet` / `yetlet-browser`).
 **Published CLI:** `0.3.1` (`yetlet-cli`).
-The [SDK publication record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+The [SDK publication record](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
 and [CLI publication record](CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11)
 retain separate GitHub/crates.io archives, actual signatures and consumers. The
 CLI resolves the latest available non-yanked SDK per project by default and writes exact pins/locks;
