@@ -34,8 +34,12 @@ Published SDK alpha.7 includes these builders; CLI 0.2.0 stays independently pin
 The published SDK alpha.8 and CLI 0.4.0 packages are independently versioned;
 only the SDK includes the typed Tag Builder.
 
-See [YT-235 follow-up](YT-235-TAG-COVERAGE-PLAN.md) for exact inclusion/exclusion
-and verification.
+See the [typed View guide](VIEW-COMPONENTS.md#standard-html-authoring-coverage),
+[dated inventory](YT-219-HTML-INVENTORY.md) and
+[original YT-235 source-only evidence](https://github.com/bohewu/yetlet/blob/9a6f954dc38f3b9e854fce5a08c9b843182657f8/docs/YT-235-TAG-COVERAGE-PLAN.md#yt-235-final-local-acceptance--2026-11-07)
+for inclusion/exclusion and the original verification limits. Actual SDK
+publication and registry-only consumer qualification are recorded separately
+in [alpha.7](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09).
 
 ## Current distribution — 2026-11-12
 

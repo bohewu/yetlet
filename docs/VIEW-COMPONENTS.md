@@ -107,15 +107,18 @@ It adds no task mutation, persistent state, browser event listener or automatic
 DOM update. The existing `/hello/Ada` route remains as described in the first-app
 walkthrough. A no-JS page needs none of those optional browser capabilities.
 
-## Optional typed tag builders (YT-234)
+## Typed tag builders
 
-The locally selected SDK `0.9.0-alpha.7` includes
-`yetlet::view::tags`, now also published on crates.io, as an alternative to
-`Element::new`. These typed constructors are available from published SDK
-`0.9.0-alpha.8`; the introductory first-app example above intentionally continues
-using the reviewed Reader Edition selected in [the site manifest](../site/pages.toml). See the actual
-[SDK alpha.7 publication](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
-and [YT-245 preparation](YT-245-ALPHA7-RELEASE-PREPARATION.md).
+`yetlet::view::tags` is an **optional authoring API, first published in SDK
+`0.9.0-alpha.7`** and retained by later SDK versions. It offers typed
+constructors as a simpler alternative to the existing `Element::new` API,
+without a new rendering runtime, an extra crate or an automatic browser
+feature. They are also available from published SDK `0.9.0-alpha.8`.
+The first-app example above intentionally retains the reviewed
+[Reader Edition](../site/pages.toml), which is independently pinned to its
+published SDK and CLI. See the [alpha.7 publication and registry consumer](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+for distribution, rather than treating an earlier source-only acceptance as
+publication or browser qualification.
 
 ```rust
 use yetlet::view::{View, tags::{div, h1, input, textarea}};
@@ -145,17 +148,20 @@ can still be rejected by the renderer. A following dedicated setter
 consolidates its own attribute name. There is no `.style()` helper: inline
 style remains forbidden by the existing HTML and DOM output policies.
 
-The existing constructors and mixed child composition remain valid. Typed
-authoring is only an ergonomic, partial compile-time aid; renderer policies
-still validate the complete tree and can differ between native HTML and DOM.
-See the [typed authoring design](YT-234-VIEW-AUTHORING-API-PLAN.md) and
-[implementation](../crates/yetlet/src/view/tags.rs) for the exact contract.
+The original `Element::new` constructor and mixed child composition remain
+source compatible. Typed authoring is only an ergonomic, partial compile-time
+aid; renderer policies still validate the complete tree and can differ between
+native HTML and DOM. The [implementation](../crates/yetlet/src/view/tags.rs)
+is the current callable source. The [original YT-234 design and independent
+local acceptance](https://github.com/bohewu/yetlet/blob/9a6f954dc38f3b9e854fce5a08c9b843182657f8/docs/YT-234-VIEW-AUTHORING-API-PLAN.md#source-only-acceptance-record--2026-11-07)
+remain recoverable at that fixed pre-deletion commit, separate from the later
+SDK publication.
 
 
-### Complete standard tag authoring — YT-235
+### Standard HTML authoring coverage
 
-The YT-235 follow-up included in published SDK alpha.7 expands the module to **101 standard HTML
-constructors** from the dated [YT-219 inventory](YT-219-HTML-INVENTORY.md):
+The published SDK alpha.7 module has **101 standard HTML constructors**
+selected from the dated [HTML inventory](YT-219-HTML-INVENTORY.md):
 89 currently admitted Browser DOM elements, `img()` (admitted in Browser only
 when the caller selects an `ImagePolicy`) and 11 native SSR-only/deferred
 elements. The same owned `View` tree reaches the existing HTML and DOM
@@ -194,8 +200,12 @@ remain rejected. Foreign namespaces and custom elements are outside this
 API. This is **not** full HTML conformance or an enlargement of either
 renderer policy.
 
-See [YT-235's scope and evidence](YT-235-TAG-COVERAGE-PLAN.md) and
-[the typed constructors](../crates/yetlet/src/view/tags.rs).
+See the [current typed constructors](../crates/yetlet/src/view/tags.rs)
+and [original YT-235 source tests and independent acceptance](https://github.com/bohewu/yetlet/blob/9a6f954dc38f3b9e854fce5a08c9b843182657f8/docs/YT-235-TAG-COVERAGE-PLAN.md#yt-235-final-local-acceptance--2026-11-07).
+Those original native tests, doctests, wasm32 builds and Browser DOM policy
+unit checks validate only their dated source; they do not establish later
+browser interaction, production support or general HTML conformance.
+
 ## Configuration and errors
 
 `Element` and `View::text` store values; construction does not sanitize them.

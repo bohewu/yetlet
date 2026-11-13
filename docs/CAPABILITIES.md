@@ -27,7 +27,7 @@ receipt. [CLI startup profiles](CLI-GUIDE.md#sdk-resolution-yt-247)
 
 SDK alpha.7 **includes** `yetlet::view::tags` with 101 typed ordinary tag
 constructors, the same owned View and existing renderer restrictions. See the
-[typed View guide](VIEW-COMPONENTS.md#optional-typed-tag-builders-yt-234)
+[typed View guide](VIEW-COMPONENTS.md#typed-tag-builders)
 and the [SDK alpha.7 release record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09).
 The original YT-245 preparation selects local SDK `0.9.0-alpha.7` contents;
 these typed constructors are now distributed rather than checkout-only.

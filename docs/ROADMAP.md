@@ -153,18 +153,15 @@ unverified platforms remain separate. No release or source freeze is implied.
   [Todo qualification](YT-240-TODO-STYLE-QUALIFICATION.md) ·
   [Source and local package qualification](YT-243-RELEASE-QUALIFICATION.md)
 
-**YT-234/235 View authoring expansion (2026-11-07):** Done at
-local source and scoped verification only.
-[YT-235 coverage record](YT-235-TAG-COVERAGE-PLAN.md) builds on
-[YT-234 typed Builder](YT-234-VIEW-AUTHORING-API-PLAN.md): 101 standard
-View constructors, scoped attribute helpers, and typed void-element guards
-lower to the existing tree without changes to SSR/DOM runtime, Image Policy
-or any published SDK. Native and wasm32 validation plus both independent
-design/implementation Reviewer gates PASS with zero material findings.
-The branch is uncommitted; PR CI, Git delivery, browser interaction and
-publication have not been authorized or performed.
-
-
+- [x] **Typed View authoring** (YT-234/235). First published in
+  **SDK `0.9.0-alpha.7`**, `yetlet::view::tags` provides 101 typed
+  constructors, selected attribute setters and compile-time void-child guards
+  over the existing owned `View` tree. The [View guide](VIEW-COMPONENTS.md#typed-tag-builders)
+  and [dated HTML inventory](YT-219-HTML-INVENTORY.md) describe where
+  constructors exist without implying new DOM support, inline styles or
+  browser lifecycle guarantees. The [alpha.7 publication](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+  and [original scoped verification](https://github.com/bohewu/yetlet/blob/9a6f954dc38f3b9e854fce5a08c9b843182657f8/docs/YT-235-TAG-COVERAGE-PLAN.md#yt-235-final-local-acceptance--2026-11-07)
+  retain separate distribution and source-only evidence.
 
 **YT-233 development artifact management (2026-11-03):**
 [Bounded contract and checkpoint](DEV-ARTIFACTS.md) separates new isolated

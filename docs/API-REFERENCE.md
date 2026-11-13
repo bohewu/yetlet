@@ -36,9 +36,10 @@ diagnostics together, follow [Settings, options and logging](SETTINGS-OPTIONS-LO
 The SDK has included `yetlet::view::tags` since `0.9.0-alpha.7`, with **101 typed
 ordinary tag constructors**, element-scoped attribute setters and the existing
 owned `View`.
-See the [typed View guide](VIEW-COMPONENTS.md#optional-typed-tag-builders-yt-234),
-[source](../crates/yetlet/src/view/tags.rs) and
-[YT-235](YT-235-TAG-COVERAGE-PLAN.md) for constructor and renderer restrictions.
+See the [typed View guide](VIEW-COMPONENTS.md#typed-tag-builders),
+[actual constructors](../crates/yetlet/src/view/tags.rs) and
+[dated HTML inventory](YT-219-HTML-INVENTORY.md) for the 101 constructor
+selection, nine typed void tags and renderer admission boundaries.
 The registry-first `Element::new` tutorial remains valid and intentionally uses
 the reviewed Reader Edition selected in [the site manifest](../site/pages.toml).
 [SDK alpha.7 publication and registry consumer](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)

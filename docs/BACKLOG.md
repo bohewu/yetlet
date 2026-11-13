@@ -46,31 +46,17 @@ independent Reviewer returned PASS, zero issues/followups. The owner
 subsequently authorized Git PR delivery subject to strict Guard and CI;
 hosted concurrency cancellation behavior remains unverified until a later
 superseded PR run actually occurs.
-**YT-235 ordinary View tag authoring coverage (2026-11-07):** Done at
-local source and bounded validation scope. The [YT-234 follow-up plan](YT-235-TAG-COVERAGE-PLAN.md)
-covers 101 standard constructors from the fixed YT-219 inventory, nine typed
-void elements and seven selected scoped attribute setters, while preserving
-SSR, DOM, Image Policy, existing append-only generic attributes and published
-SDK boundaries. Two independent Reviewer Jobs (design and implementation) both
-return PASS with zero issues/followups. Native unit tests (23), doctests
-(3 pass + 4 compile-fail), Browser DOM unit tests (20), both wasm32 checks,
-Clippy, rustfmt, docs and whitespace checks pass. This is source-only:
-no Commit, Push, PR, Merge, release, deployment or cache deletion.
-
-
-
-
-**YT-234 typed View authoring (2026-11-07):** Done at local source and verification scope.
-[Scoped API plan](YT-234-VIEW-AUTHORING-API-PLAN.md) received independent
-ad hoc design and implementation Reviewer PASS, both with zero blocking issues
-and required followups. The additive typed tag constructors, class/set
-semantics, input/textarea placeholder and compile-time void-child guards
-lower to the existing owned `Element`/`View`; renderer/runtime/package
-boundaries and append-only `Element::attribute` are unchanged. Exact native
-View/DOM tests, rustdoc compile-fail checks, wasm32 compile, Clippy,
-formatting, documentation and whitespace checks pass on the feature branch.
-No Commit, Push, PR, Merge, release, browser interaction qualification or
-deployment was performed or authorized.
+**Typed View authoring — YT-234/235:** Done. The optional
+[typed tag builder](VIEW-COMPONENTS.md#typed-tag-builders) first shipped with
+SDK `0.9.0-alpha.7`: 101 constructors selected from the
+[dated inventory](YT-219-HTML-INVENTORY.md), including nine typed void tags,
+scoped setters and class/id replacement. They lower to the unchanged owned
+`Element`/`View` tree, with renderer policies and the append-only generic
+`.attribute` preserved. The [SDK publication record](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
+is separate from the [original YT-234](https://github.com/bohewu/yetlet/blob/9a6f954dc38f3b9e854fce5a08c9b843182657f8/docs/YT-234-VIEW-AUTHORING-API-PLAN.md#source-only-acceptance-record--2026-11-07)
+and [YT-235](https://github.com/bohewu/yetlet/blob/9a6f954dc38f3b9e854fce5a08c9b843182657f8/docs/YT-235-TAG-COVERAGE-PLAN.md#yt-235-final-local-acceptance--2026-11-07)
+source tests and independent review. No new browser-interaction, platform or
+production qualification follows from document consolidation.
 
 **YT-232 public delivery (2026-11-02):**
 [PR54/master993ce56 and Pages evidence](YT-232-PUBLIC-GUIDE-EDITION.md#subsequent-delivery-and-public-pages-update--2026-11-02)
