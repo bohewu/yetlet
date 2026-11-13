@@ -201,7 +201,7 @@ strict gates: read p95 `<250 ms`, write p95 `<500 ms`, combined p99 `<1000 ms`,
 unexpected fraction `<0.001`. SQLite WAL/FULL, no automatic write retry, raw tails,
 SSE reconnect/relogin, cleanup and tracing limitations remain explicit. Keep the
 original Ubuntu synchronized FAIL and separate Windows/Azure PASS in
-[cross-environment evidence](YT-074-CROSS-ENVIRONMENT-VERIFICATION.md). No old
+[cross-environment evidence](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-074-CROSS-ENVIRONMENT-VERIFICATION.md). No old
 receipt is relabeled as a port run. A small fixture/runtime case proves migration
 behavior only, never this 62-minute operating envelope, physical IME or spoken AT.
 

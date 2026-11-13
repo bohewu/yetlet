@@ -1,5 +1,13 @@
 # Native Axum / Yetlet workload comparison — YT-143
 
+The [historical performance and capacity matrix](../../docs/QUALIFICATION-MATRIX.md#historical-performance-and-capacity-evidence-bounded)
+summarizes the original failed, recovered and noncomparable cohorts. This
+README owns the **current optional fixture commands and finite admission
+settings**, not a product-wide capacity or SLA. Original numbered study links
+are pinned to the local pre-consolidation Git source and are **not yet verified
+as reachable on GitHub**. Historical failures, cleanup, source/host identities
+and result populations must not be silently requalified after that link repair.
+
 The optional [YT-176 fail-fast HTTP admission](../../docs/YT-176-HTTP-ADMISSION.md)
 uses `--features auth-workload-admission --bin auth-postgres`. With that feature,
 set `YT176_HTTP_MAX_IN_FLIGHT` to an explicit application-selected cap; for example,
@@ -42,7 +50,7 @@ recovery reads valid and exact-owned cleanup complete. Normal limits/security
 remain unchanged, failures/observer limits retained; final independent Reviewer
 PASS has zero issues/required followups, Done at bounded research scope.
 
-The optional [YT-171 staged Auth workload](../../docs/YT-171-AUTH-CAPACITY-RECOVERY.md)
+The optional [YT-171 staged Auth workload](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-171-AUTH-CAPACITY-RECOVERY.md)
 requires `--features auth-workload-observation --bin auth-postgres`. This fixture-
 only feature enables bounded pool/query/Session observations and the loopback
 `/fixture/observations` aggregate endpoint; feature-off has no observer work or
@@ -56,7 +64,7 @@ with zero SQL errors or generator drops. Both same-PID100/s recoveries and
 exact-owned cleanup pass. Failed points remain failed; independent final Reviewer
 PASS has zero issues/required followups. YT-171 is Done at bounded research scope. Existing accepted YT-170 evidence is preserved. No commit/push.
 
-The optional [YT-170 functional fixture](../../docs/YT-170-AUTH-SESSION-POSTGRES-WORKLOAD.md)
+The optional [YT-170 functional fixture](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-170-AUTH-SESSION-POSTGRES-WORKLOAD.md)
 requires `--features auth-session-postgres --bin auth-postgres`. It composes
 existing Auth/Valkey Sessions with PostgreSQL account/tenant authority and fresh
 JSON/Yetlet SSR. Its explicit synthetic sign-in asserts a preverified fixture
@@ -70,7 +78,7 @@ zero measured drops/errors, HTTP p95 2.116/2.112ms. All owned services/private
 material and newly acquired PG image are removed; original failures remain.
 See the report for synthetic-login/read-only/reference limits. No commit/push.
 
-The optional [YT-169 thirty-minute study](../../docs/YT-169-PRIVATE-HTTP-SUSTAINED-1800.md)
+The optional [YT-169 thirty-minute study](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-169-PRIVATE-HTTP-SUSTAINED-1800.md)
 adds `warmup-soak-5000` and `soak-5000` to `YT165_STEP` for one5000/s1800s
 exposure. Only the new measured plan uses16384request sparse diagnostics,
 keeping the accepted server bounds; all old plans retain4096. Every response
@@ -83,7 +91,7 @@ HTTP p95. All test resources are deleted; full gzip results, localized tails
 and one finite observer read gap remain in the report.
 New changes remain uncommitted and unpushed.
 
-The optional [YT-168 sustained5k study](../../docs/YT-168-PRIVATE-HTTP-SUSTAINED-5000.md)
+The optional [YT-168 sustained5k study](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-168-PRIVATE-HTTP-SUSTAINED-5000.md)
 adds `warmup-sustained-5000` and `sustained-5000` to `YT165_STEP` for one
 5000/s300s exposure. It keeps the accepted workload/oracle,256VUs and YT-167
 resource/capture limits. Old5k short and6k long observations remain unchanged;
@@ -93,7 +101,7 @@ retains1500001valid200 with0drops/errors,4999.983valid in-window responses/s
 and0.894ms HTTP p95. All test resources are deleted; full raw results and the
 old failed6k population remain. See the report for finite-observation limits.
 
-The optional [YT-167 sustained capacity study](../../docs/YT-167-PRIVATE-HTTP-SUSTAINED-CAPACITY.md)
+The optional [YT-167 sustained capacity study](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-167-PRIVATE-HTTP-SUSTAINED-CAPACITY.md)
 adds only `warmup-sustained-6000` and `sustained-6000` to `YT165_STEP` for one
 300s exposure at6000arrivals/s. It preserves the accepted app/workload/oracle,
 256VUs and sparse sampling. Client capture headroom explicitly increases for
@@ -104,7 +112,7 @@ p95, with5884.83valid in-window responses/s. All started requests validate,
 all test resources are deleted and the complete failed population is retained.
 See the report for different-allocation and finite-observation limits.
 
-The optional [YT-166 capacity refinement](../../docs/YT-166-PRIVATE-HTTP-CAPACITY-REFINEMENT.md)
+The optional [YT-166 capacity refinement](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-166-PRIVATE-HTTP-CAPACITY-REFINEMENT.md)
 extends the same caller with `warmup-5000` / `refine-5000`, corresponding6000
 and7000 labels in `YT165_STEP`. Only these new points execute in that study,
 with a fresh app instance for each rate. The existing oracle, request/timing
@@ -114,7 +122,7 @@ study observes5k/6k clean and7k pressure, retaining9585drops and approximately
 6016valid in-window responses/s at7k. These finite results are not a sustained
 capacity or production SLO; full evidence and cleanup are in the report.
 
-The optional [YT-165 private capacity study](../../docs/YT-165-PRIVATE-HTTP-CAPACITY-RECOVERY.md)
+The optional [YT-165 private capacity study](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-165-PRIVATE-HTTP-CAPACITY-RECOVERY.md)
 uses `ssr-capacity-probe.js` with explicit `YT165_STEP`, `YT164_TARGET_IPV4` and
 `YT157_PORT`. It admits only the declared finite staircase/recovery plan and
 private IPv4/39262, preserves the full SSR response oracle, and fixes256VUs.
@@ -122,7 +130,7 @@ It reuses the accepted diagnostic server with sparse bounded probe headers;
 its capacity/recovery results apply to the declared isolated profile. It does
 not change the path-study caller, default server behavior or Core APIs.
 
-The optional [YT-164 private transport study](../../docs/YT-164-PRIVATE-HTTP-SSH-COMPARISON.md)
+The optional [YT-164 private transport study](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-164-PRIVATE-HTTP-SSH-COMPARISON.md)
 uses the diagnostic SSR executable with `YT164_BIND_IPV4` and its existing k6
 caller with `YT164_TARGET_IPV4`. Unset values retain `127.0.0.1`; explicit values
 accept only that loopback address or canonical RFC1918 IPv4. The binding override
@@ -134,7 +142,7 @@ checks. This is a transport observation, not a new product-version comparison.
 
 This standalone public synthetic fixture compares the same Axum HTTP engine
 through native route registration and Yetlet's App facade. Read the
-[source-bound contract](../../docs/YT-143-AXUM-WORKLOAD-COMPARISON.md) before
+[source-bound contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-143-AXUM-WORKLOAD-COMPARISON.md) before
 running it. There is no database, Auth/Session provider, browser runtime or
 production-qualification claim. The existing protected Starter is unchanged.
 
@@ -202,7 +210,7 @@ SQLx 0.8.6 with only Tokio/PostgreSQL features, ordinary Axum State, one explici
 parameterized SELECT, a 16-connection asynchronous pool and fresh JSON responses.
 No Yetlet ORM or default database/provider dependency is introduced.
 
-Follow [the reviewed YT-144 contract](../../docs/YT-144-POSTGRES-WORKLOAD-COMPARISON.md)
+Follow [the reviewed YT-144 contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-144-POSTGRES-WORKLOAD-COMPARISON.md)
 for the pinned disposable PostgreSQL image, private Unix socket/credentials,
 read-only `postgres-fixture.sql`, finite resources and fixed paired load. The
 sample must use an isolated synthetic database; do not run the fixture against
@@ -243,7 +251,7 @@ zero issues and required followups, with no stable-overhead or capacity claim. S
 Status: Done at bounded comparison scope after independent contract Reviewer
 `/root/yt156_http_ssr_contract_review_20261024` and final Reviewer
 `/root/yt156_http_ssr_final_review_20261024` PASS, zero issues/required followups.
-[Contract](../../docs/YT-156-HTTP-SSR-COMPARISON.md) selects the separate `ssr`
+[Contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-156-HTTP-SSR-COMPARISON.md) selects the separate `ssr`
 binary and `ssr-workload.js`; old binaries/scripts and the lock are unchanged.
 Two new offline/locked release builds use actual products at `90f83867` and
 `0580a0a`, identical sample overlays and default dependencies. Each request to
@@ -286,7 +294,7 @@ after acceptance; no commit/push.
 Status: Done at bounded attribution scope after final independent Reviewer
 `/root/yt157_medium_tail_final_review_20261024` PASS0 and corrected contract Reviewer
 `/root/yt157_medium_tail_contract_review_20261024` PASS0; original denominator
-FAIL/correction retained. [Contract](../../docs/YT-157-MEDIUM-HTTP-TAIL-ATTRIBUTION.md)
+FAIL/correction retained. [Contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-157-MEDIUM-HTTP-TAIL-ATTRIBUTION.md)
 selects default-off `ssr-stage-probe = []` for the existing ssr binary, private
 stage_probe module and separate ssr-stage-probe.js. Normal handler/fixture/
 Page/body/headers, products, dependencies and locks remain unchanged.
@@ -341,7 +349,7 @@ Build using `cargo build --bin ssr --features ssr-context-study --release
 This is an intervention on render history, including allocator/cache/instruction
 and lifetime context. It cannot identify allocator bins, pure off-CPU time or
 the historical HTTP p95 cause. See
-[YT-158](../../docs/YT-158-RENDER-HISTORY-CONTEXT.md) for the contract, bounds and
+[YT-158](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-158-RENDER-HISTORY-CONTEXT.md) for the contract, bounds and
 independent review. Status: Done at bounded attribution scope; independent final Reviewer
 `/root/yt158_render_context_final_review_20261024` PASS0. No optimization,
 commit or push.
@@ -370,7 +378,7 @@ Build with `cargo build --bin ssr --features ssr-thread-cpu-probe --release
 `ssr-stage-probe.js` caller and private request IDs; metric names remain yt157,
 while this task has distinct binary/source/population identities. Follow the
 four fixed new-feature phases and resource/cleanup contract in
-[YT-159](../../docs/YT-159-HTTP-WORKER-THREAD-CPU.md). Do not rerun accepted groups.
+[YT-159](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-159-HTTP-WORKER-THREAD-CPU.md). Do not rerun accepted groups.
 
 Signed wall-minus-CPU includes observer overhead and possible descheduling; it
 is not pure off-CPU time. Thread CPU is never measured across an async await.

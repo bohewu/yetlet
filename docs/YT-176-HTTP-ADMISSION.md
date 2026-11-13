@@ -13,10 +13,10 @@ independent Reviewer PASS. New changes remain uncommitted/unpushed.
 
 The four YT-175 documents are committed as `b42f794`, strict/builtin Commit
 Guard PASS with zero findings, tree `a71f29bbc4703c7eff3cffc5d7fae539797d7f74`;
-no Push. Preserve [YT-171](YT-171-AUTH-CAPACITY-RECOVERY.md),
+no Push. Preserve [YT-171](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-171-AUTH-CAPACITY-RECOVERY.md),
 [YT-172](YT-172-SESSION-ADMISSION-BURSTS.md),
 [YT-173](YT-173-HTTP-SESSION-TIMELINE.md) and
-[YT-174](YT-174-HOST-PASSIVE-SAMPLING.md), including every failed request/review,
+[YT-174](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-174-HOST-PASSIVE-SAMPLING.md), including every failed request/review,
 observer limitation, native receipt and cleanup result. No old proof is replayed.
 
 The consumer is the existing opt-in `auth-postgres` binary in

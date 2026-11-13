@@ -32,6 +32,49 @@ which explicitly set `RUSTUP_TOOLCHAIN=stable`. [Integrity preparation](YT-020-I
 records the retained source boundaries. [Hosted rebuild preparation](YT-020-HOSTED-REBUILD.md)
 records the later authorized protected-check migration after actual Rust 1.99 CI PASS.
 
+## Historical performance and capacity evidence (bounded)
+
+The original research cohorts below are **dated, source- and machine-specific**
+observations; they do not establish current-version performance, minimum
+hardware, production capacity, a cloud SLA, regression thresholds or
+cross-platform equivalence. They remain recoverable from local Git source
+`1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb`, including full profiles,
+raw measurements, original failures, comparison rules, independent reviews and
+cleanup. That local source SHA is **not yet verified as publicly reachable**.
+Current build/fixture configuration belongs to the
+[SSR measurement example](../examples/ssr-performance-baselines/README.md)
+and [Axum/Yetlet workload example](../examples/axum-workload-comparison/README.md).
+The retained [YT-141 controlled-arrival reference](YT-141-PERFORMANCE-VALIDATION.md),
+[YT-074 Board qualification](YT-074-QUALIFICATION.md) and
+[YT-175 admission-policy contract](YT-175-SESSION-BURST-OVERLOAD-POLICY.md)
+retain their separate authorities.
+
+| Historical scope | Verified observations and important limits |
+|---|---|
+| YT-074 desktop and synchronized Board loads | Separate desktop/cross-environment comparison and fsync-stall observations were **not** a portable throughput baseline. Source, storage, platform and synchronized versus staggered conditions matter; failed and noncomparable captures remain at their original identities. The retained [desktop acceptance](YT-074-DESKTOP-ACCEPTANCE.md) and [Board qualification](YT-074-QUALIFICATION.md) remain distinct |
+| YT-141–144 API/saturation/router/PostgreSQL | YT-141's read-only controlled-arrival reference had 14,006 valid 200s, no drops and 1/2 ms p50/p95 only for its fixture. YT-142's first **1,000/s point FAILED** with 5 SQL-admission 503s among 10,001 requests; immediate 250/s recovery passed 7,501 valid 200s. YT-143 corrected only an unstarted comparator repetition; its SSR 4,000/s pair was **noncomparable** after a native Axum drop. YT-144's four isolated PostgreSQL pairs had 100,007 measured valid 200s; rejected preload/observer/lookup attempts and scope boundaries remain historical |
+| YT-145–160 SSR allocation/latency attribution | Fixed 8/128/1,024-row SSR output baselines and independent escaped-output hashes separate constructing a View, body/document serialization, combined costs and full HTTP p95. Original escaping accounted for 85.70% of measured *document allocation calls* in one YT-146 instrumented profile, **not** of total CPU. Private escape-into and URL-prefix changes reduced selected allocations while held/peak memory did not automatically fall. First-child preallocation (YT-152) was **rejected** on tradeoffs. Changes in timings/frequency/worker CPU cannot uniquely identify the cause of earlier HTTP p95 observations; no general speedup claim |
+| YT-161–164 benchmark isolation and transport | The attempted constrained execution profile **was not admitted** in YT-161; controlled-frequency evidence did not result. YT-162 retains 39,977 valid HTTP 200s and **27 dropped arrivals**, with only the first platform pair comparable. YT-163 attributes those 27 drops to a short exposure with full outstanding HTTP brackets but cannot identify a unique origin. YT-164 observed lower p95 under direct private HTTP than SSH forwarding in two bounded pairs; this is a transport/context effect, **not** proof of a faster Yetlet product |
+| YT-165–169 finite/sustained capacity | Short isolated 4k and selected 5k/6k points were clean in their specific profiles, while 7k encountered pressure and a prior 8k point was saturated. A **6k/s sustained 300-second run FAILED** with 34,302 dropped arrivals (reported HTTP p95 63.33 ms). Separate **5k/s 300-second** and **5k/s 1,800-second** runs completed with 1,500,001 and 9,000,001 valid 200 responses respectively and zero drops; different allocations and evidence capture prevent a controlled duration-only comparison or production SLO |
+| YT-170–174 synthetic Auth/Session/PostgreSQL | The synthetic sign-in is a **preverified fixture identity**, not real credential/OIDC verification; reads and private responses retain app-owned boundaries. YT-170's JSON/SSR fixed exposure had 2,000/2,001 valid 200s at 100/s each. YT-171 retained one Session Busy at JSON 500/s and 19 at SSR 2,000/s, followed by separate passing recoveries. YT-172's 648 read calls split into **552 valid / 96 Busy**. YT-173's bounded HTTP trace correlated 12 Busy outcomes in a 12,550-request cohort; passive host sampling in YT-174 does **not** establish an exact causal timing stage. Cleanup, failure and redaction policies remain source-bound |
+
+**Interpretation:** Counted logical allocation bytes are not whole-process RSS;
+nearest-rank HTTP p95 is not necessarily a k6 interpolated percentile; a valid
+HTTP status does not establish completed SQL business writes; drops, 503 and
+Session Busy must remain failed populations, not disappear into a success-only
+denominator. Connection/SSH/frequency, CPU affinity, working sets, tool settings,
+VM limits and benchmark fixture are part of the result identity. Unchanged
+test/source artifacts are **not rerun** by documentation consolidation.
+
+For application-owned outer HTTP admission and current operational priorities,
+use the [workload capacity-selection guide](../examples/axum-workload-comparison/README.md#http-admission-capacity-selection)
+and retained [YT-176–179 records](YT-176-HTTP-ADMISSION.md) rather than
+inferring an admission cap from historical private throughput. The
+[Starter production-readiness guide](PRODUCTION-READINESS-PHASE2.md) keeps the
+separately accepted local YT-129 load/recovery and error semantics. Authentication,
+authorization, CSRF, strict CSP, durable write ordering and distributed admission
+were not changed by these measurements.
+
 ## Workflow source and activation
 
 [Qualification workflow](../.github/workflows/qualification.yml) has only

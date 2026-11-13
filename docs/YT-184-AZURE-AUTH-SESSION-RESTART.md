@@ -23,9 +23,9 @@ post-commit worktree; no Push. Receipts remain in
 
 Retain [YT-139](YT-139-MULTI-INSTANCE-AUTHORITY-RECOVERY.md) namespace retirement,
 [YT-140](YT-140-OIDC-PROXY-REPLICAS.md) canonical-origin/session boundaries,
-[YT-170](YT-170-AUTH-SESSION-POSTGRES-WORKLOAD.md) native Auth/Session/SQL consumer,
-and [YT-164](YT-164-PRIVATE-HTTP-SSH-COMPARISON.md) /
-[YT-169](YT-169-PRIVATE-HTTP-SUSTAINED-1800.md) private network, protected Blob,
+[YT-170](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-170-AUTH-SESSION-POSTGRES-WORKLOAD.md) native Auth/Session/SQL consumer,
+and [YT-164](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-164-PRIVATE-HTTP-SSH-COMPARISON.md) /
+[YT-169](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-169-PRIVATE-HTTP-SUSTAINED-1800.md) private network, protected Blob,
 Managed Run Command and exact-owned cleanup. Do not replay their load, browser,
 IdP, provider matrices or qualify production/HA. Synthetic preverified fixture
 login remains synthetic; no external identity protocol is newly tested.

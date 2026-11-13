@@ -316,7 +316,7 @@ acknowledged rows/schema/index/sequence were unchanged, and native stop/owned
 cleanup completed. YT-141 is Done at bounded optional local reference scope after final independent
 Reviewer PASS, zero issues and required followups; eight hashes matched.
 No benchmark dependency or bypass is added to the app.
-The separately activated [YT-142 saturation/recovery follow-up](../../docs/YT-142-SATURATION-RECOVERY.md)
+The separately activated [YT-142 saturation/recovery follow-up](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-142-SATURATION-RECOVERY.md)
 has initial contract PASS and new isolated measurement/cleanup. The first
 1,000/s point failed with five SQL-admission 503 responses among 10,001 requests
 (~0.05%), without CPU or generator saturation. Immediate 250/s recovery completed

@@ -101,7 +101,7 @@ qualification follows.
 
 ## Separately activated saturation and recovery — YT-142
 
-[YT-142's reviewed contract](../../../../docs/YT-142-SATURATION-RECOVERY.md)
+[YT-142's reviewed contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-142-SATURATION-RECOVERY.md)
 adds a finite progressive experiment above the accepted YT-141 rates. The
 original phase/rate settings still select the original 16-VU single scenario;
 they are not rerun for YT-142. The same GET function, private inputs, timeout,

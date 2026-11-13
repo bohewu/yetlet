@@ -15,7 +15,7 @@ New changes must remain uncommitted; no Push is authorized.
 The previously authorized twelve YT-170/171 paths are committed as `fc56727`
 after strict/builtin Commit Guard PASS, zero findings, exact tree
 `5504fd4b0957e94c8a00877b7e38a7cf9a20dc07`. The worktree is clean before this
-study. [YT-171](YT-171-AUTH-CAPACITY-RECOVERY.md) and all its original reviews,
+study. [YT-171](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-171-AUTH-CAPACITY-RECOVERY.md) and all its original reviews,
 failed points and cleanup remain unchanged: one JSON 500/s `busy` and nineteen
 SSR 2000/s `busy`, no SQL errors/drops, and two successful same-PID recoveries.
 These finite observations are not a universal capacity ceiling.

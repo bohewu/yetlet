@@ -17,7 +17,7 @@ paths are committed as `51c4a49` after strict/builtin Commit Guard PASS, zero
 findings, exact tree `b097851ceb18ae35ea31d4fdd796f3b6d7faffc8`. The worktree
 is clean before this study. Preserve its 552 valid/96 rejected provider reads,
 eight successful recovery reads, original mapping/startup/glue FAIL history
-and actual cleanup confirmation. Preserve [YT-171](YT-171-AUTH-CAPACITY-RECOVERY.md)
+and actual cleanup confirmation. Preserve [YT-171](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-171-AUTH-CAPACITY-RECOVERY.md)
 and its twenty HTTP `busy` failures without rewriting reviews or rerunning its
 passing HTTP, lifecycle, provider, browser or security qualification.
 

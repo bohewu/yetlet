@@ -259,7 +259,7 @@ or recurring CI gate follows. A multi-instance fixture first needs applicable
 YT-139 authority/recovery acceptance; paid cloud execution needs separate
 activation and cleanup authority.
 
-The user has separately activated [YT-142 saturation and recovery](YT-142-SATURATION-RECOVERY.md).
+The user has separately activated [YT-142 saturation and recovery](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-142-SATURATION-RECOVERY.md).
 This new optional local question starts above the accepted YT-141 load points
 and measures bounded post-load recovery. Its initial contract passed independent
 review. First 1,000/s load failed: 10,001 requests, 9,996 valid HTTP 200 responses and five

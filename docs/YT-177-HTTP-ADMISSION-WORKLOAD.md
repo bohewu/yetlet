@@ -14,7 +14,7 @@ obtain independent Reviewer PASS. New changes remain uncommitted/unpushed.
 The eight YT-176 paths are committed as `d057dca`, strict/builtin Commit Guard
 PASS, zero findings, tree `9d34964b22561dc61aa90de14fdccefc0329e12a`; no Push.
 Preserve its six new test results, feature-off check, reviews and limits without
-rerunning them. Retain [YT-171](YT-171-AUTH-CAPACITY-RECOVERY.md) through
+rerunning them. Retain [YT-171](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-171-AUTH-CAPACITY-RECOVERY.md) through
 [YT-175](YT-175-SESSION-BURST-OVERLOAD-POLICY.md), all failures and exact cleanup
 records. YT-174 is a **historical control**, not a new gate-off arm.
 

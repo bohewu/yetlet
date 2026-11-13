@@ -138,8 +138,8 @@ Enabled default subscription. This is not proof of resource-creation rights,
 quota, regional SKU capacity, storage transfer or deployment. No account IDs,
 credentials, existing resources or subscription settings are changed/recorded.
 
-Reuse [YT-164](YT-164-PRIVATE-HTTP-SSH-COMPARISON.md) and
-[YT-169](YT-169-PRIVATE-HTTP-SUSTAINED-1800.md) isolation, private network,
+Reuse [YT-164](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-164-PRIVATE-HTTP-SSH-COMPARISON.md) and
+[YT-169](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-169-PRIVATE-HTTP-SUSTAINED-1800.md) isolation, private network,
 Managed Run Command, protected Blob transfer and exact-owned cleanup patterns;
 do not rerun their benchmarks or copy their large compute sizes as requirements.
 Reuse [YT-139](YT-139-MULTI-INSTANCE-AUTHORITY-RECOVERY.md) and
