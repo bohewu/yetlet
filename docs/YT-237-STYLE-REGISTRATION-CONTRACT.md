@@ -659,7 +659,7 @@ separately approves promotion.
 
 **YT-238 completion:** The default-wired reference fixture and this addendum
 received independent Reviewer PASS in Job `wc_job_hfecy9ZrNUTO61BZ` (exit 0,
-zero issues/followups). See the [prototype proof](YT-238-STYLE-BUILDER-PROOF.md).
+zero issues/followups). See the [original prototype proof](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-238-STYLE-BUILDER-PROOF.md#independent-review-and-completion).
 YT-238 is Done at prototype scope with a SIMPLIFY recommendation; YT-239/240
 and Git delivery remain separately gated.
 
@@ -706,7 +706,7 @@ Windows and real-browser rendering qualification remain outside this completion.
 
 ## 16. YT-239 integration completion
 
-The [YT-239 implementation and evidence](YT-239-STYLE-INTEGRATION.md) received
+The [original YT-239 implementation and evidence](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md#independent-review-and-completion) received
 independent Reviewer PASS in Job `wc_job_3s_tnZYc7hUssjK5`, terminal completed,
 exit 0, with zero issues/followups. The saved `gpt-6-astra` and resolver-selected
 `high` matched process telemetry. All 61 reviewed worktree source hashes stayed

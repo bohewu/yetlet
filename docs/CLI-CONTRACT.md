@@ -442,10 +442,14 @@ one explicit `main.rs` bin. Dedicated outputs are standalone
 `<cli.vite.root>/style-output/app.generated.css`, anchored to the selected app.
 The host compiler/toolchain, frozen bounded execution, owned cancellation,
 protected publication and app-owned consumer contract are described in the
-[YT-239 implementation record](YT-239-STYLE-INTEGRATION.md). That record includes
-lifecycle gates, source/production ownership, Python-free official paths, exact
-local verification and unresolved platform/regression limitations. Independent
-review is pending; no Core/server/renderer API or public style crate is added.
+[current CLI Style guide](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree)
+and the [retained registration contract](YT-237-STYLE-REGISTRATION-CONTRACT.md).
+[Original YT-239 source implementation and review](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md#independent-review-and-completion)
+passed independent review at its dated Linux/source scope; it does not qualify
+all subsequent Windows/runtime releases. Current CLI 0.3.0–0.4.0 publication
+and platform boundaries are recorded separately in the [release matrix](CLI-GUIDE.md#style-release-and-platform-evidence).
+The official generated CLI path requires no Python; no Core/server/renderer
+API or public style crate is added.
 
 Private `owner.pending.json` and `production.pending.json` retain prior accepted
 metadata during publication. Producers and the generated native loader refuse

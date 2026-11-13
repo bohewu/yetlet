@@ -140,7 +140,7 @@ release are not implemented here. YT-092 through YT-096 remain untouched Todo.
 
 ## Optional generated application CSS
 
-The [YT-239 integration](YT-239-STYLE-INTEGRATION.md) supplies a separate small
+The [published CLI Style integration](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree) supplies a separate small
 application-owned CSS consumer in the opt-in Style templates, first published
 in CLI `0.3.0` and available in CLI `0.4.0`. The experimental shared asset API
 above has its own contract. Development uses a stable selected
@@ -164,4 +164,5 @@ retained marker; ordinary startup/retry never reconciles it. This supplies no
 retention, HA, cleanup or deployment guarantee. The CLI guide records accepted
 publication and platform evidence, and Todo's qualification records its bounded
 Linux sample results. [CLI Style evidence](CLI-GUIDE.md#style-release-and-platform-evidence),
-[YT-240 Todo qualification](YT-240-TODO-STYLE-QUALIFICATION.md)
+[Todo CSS example](../examples/todo-server/README.md#app-owned-rust-styles-and-typed-tag-builders)
+and [original Linux qualification](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary)

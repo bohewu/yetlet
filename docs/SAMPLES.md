@@ -106,7 +106,8 @@ YT-241 Style Showcase passed independent implementation Reviewer `wc_job_SjBc9es
 before its separate catalog promotion. The unpublished checkout sample runs with
 native Rust/Cargo. Its optional `yetlet-style-showcase-browser` companion has a
 separate build command. Todo and Style Showcase report their own bounded Linux
-Chrome/Firefox results. [Todo qualification](YT-240-TODO-STYLE-QUALIFICATION.md),
+Chrome/Firefox results. [Todo CSS usage](../examples/todo-server/README.md#app-owned-rust-styles-and-typed-tag-builders),
+[original Todo browser scope](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary),
 [Showcase commands and verification](../examples/style-showcase/README.md),
 [published CLI Style evidence](CLI-GUIDE.md#style-release-and-platform-evidence)
 

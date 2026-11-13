@@ -12,7 +12,7 @@ below supplements, rather than rewrites, the original Linux implementation recor
 Evidence root: `artifacts/verification/yt243-release-qualification-20261108/`.
 `YT-243-IMPLEMENTATION-HANDOFF.md` binds commands/exits, source/package hashes,
 consumer selection, retained failures and cleanup. Existing
-[YT-239](YT-239-STYLE-INTEGRATION.md), [YT-240](YT-240-TODO-STYLE-QUALIFICATION.md)
+[YT-239](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md), [YT-240](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md)
 and [YT-241](../examples/style-showcase/README.md) proof retains its original scope.
 
 | Requirement | Actual implementation / evidence | Result and limit |

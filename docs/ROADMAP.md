@@ -138,7 +138,7 @@ unverified platforms remain separate. No release or source freeze is implied.
   Tailwind and Vite workflows.
   [CLI workflow](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree) ·
   [Registration contract](YT-237-STYLE-REGISTRATION-CONTRACT.md) ·
-  [Build, watch and asset integration](YT-239-STYLE-INTEGRATION.md)
+  [Original YT-239 source acceptance](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md#independent-review-and-completion)
 
   CLI `0.3.0` first shipped Style templates and generation, verified by the
   accepted installed Linux consumer supplement. Typed Tag Builders shipped
@@ -150,7 +150,8 @@ unverified platforms remain separate. No release or source freeze is implied.
   optional Wasm enhancement. The sample records its own bounded Linux
   Chrome and Firefox verification.
   [Style Showcase and limits](../examples/style-showcase/README.md#observed-yt-241-verification--2026-11-08) ·
-  [Todo qualification](YT-240-TODO-STYLE-QUALIFICATION.md) ·
+  [Todo sample](../examples/todo-server/README.md#app-owned-rust-styles-and-typed-tag-builders) ·
+  [original bounded Linux browser verification](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary) ·
   [Source and local package qualification](YT-243-RELEASE-QUALIFICATION.md)
 
 - [x] **Typed View authoring** (YT-234/235). First published in

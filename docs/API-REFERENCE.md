@@ -116,7 +116,7 @@ template's required packages and features.
 
 | Source surface | Entry point and contract | Availability and limits |
 |---|---|---|
-| Optional Style authoring | [CLI Style integration](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree), [contract](YT-237-STYLE-REGISTRATION-CONTRACT.md), [implementation](YT-239-STYLE-INTEGRATION.md) | Published CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
+| Optional Style authoring | [CLI Style guide](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree), [retained registration contract](YT-237-STYLE-REGISTRATION-CONTRACT.md) | Published CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
 | Style Showcase | [Native-first gallery](../examples/style-showcase/README.md) | Unpublished checkout sample with actual View/Style/CSS disclosures and optional local Wasm class switching. Bounded Linux Chrome/Firefox sample evidence |
 
 ## HTML, HTTP and browser modules

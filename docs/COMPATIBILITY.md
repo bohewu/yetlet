@@ -65,8 +65,11 @@ release gates.
 
 ## Published CLI Style authoring and checkout Showcase — 2026-11-10
 
-[YT-239](YT-239-STYLE-INTEGRATION.md) adds optional private app CSS generation
-and build/watch integration. Style templates are distributed in CLI 0.4.0.
+Optional application-local CSS generation and build/watch integration first
+shipped in **CLI 0.3.0**. Style templates are distributed in CLI 0.4.0.
+The [current CLI Style guide](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree)
+and [original implementation evidence](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md)
+retain current usage versus dated source-only qualification.
 The build SDK and embedded source snapshot are alpha.7; app SDK selection follows
 the separate reviewed resolver policy, exact pins and project Cargo.lock.
 [Showcase](../examples/style-showcase/README.md) demonstrates the current typed

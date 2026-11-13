@@ -767,7 +767,7 @@ failed attempts. New Windows browser-watch execution remains Not verified;
 historical YT-104 qualification describes the earlier static starter scope.
 
 <a id="optional-application-owned-rust-css-yt-239-working-tree"></a>
-## Application-owned Rust CSS (YT-239/243)
+## Application-owned Rust CSS
 
 Application-owned Rust CSS first shipped in CLI `0.3.0` and remains available
 in CLI `0.4.0`. The opt-in Style templates generate external CSS at build time
@@ -777,9 +777,17 @@ through a private application tool. The current Reader Edition selects SDK
 
 `new --template native-style` and `new --template browser-style` opt into a private
 std-only Cargo generator with a complete lock, useful layout/dialog composition,
-shared View class names and stylesheet connection. Ordinary templates keep ordinary
-CSS. Applicable Tailwind/Vite options compose with these choices. Creation runs
-Cargo lock generation, preserves the separate Style lock and executes no generator.
+shared View class names and stylesheet connection. Their `styles::stylesheet()`
+entry point already registers the `layout` and `dialog` modules, including a
+conditional-only class even when its View is initially absent. To add another
+module, explicitly declare it in the private Style registry and compose its
+`styles()` output; merely creating a Rust file never discovers or registers it.
+Keep target-neutral class constants shared by Views and the private generator.
+Module/class ownership is unique, deterministic and checked before CSS is emitted.
+Ordinary templates keep ordinary CSS; unsupported selector/value syntax stays
+in regular CSS rather than bypassing the finite typed vocabulary. Applicable
+Tailwind/Vite options compose with these choices. Creation runs Cargo lock
+generation, preserves the separate Style lock and executes no generator.
 
 The optional strict `[cli.styles]` section has `enabled`, `manifest`, `bin` and
 `output`; absence means no style effects. The finite manifest is
@@ -809,7 +817,10 @@ initially unknown temporaries remain untouched. No automatic install, retention,
 asset cleanup or deployment is supplied.
 The selected Cargo cache must satisfy protected filesystem ownership/write policy;
 host output uses its own `yetlet-styles/<app-root-sha256>` subtree. See the
-[implementation evidence and limitations](https://github.com/bohewu/yetlet/blob/master/docs/YT-239-STYLE-INTEGRATION.md).
+[original source implementation and independent review](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md#independent-review-and-completion).
+The earlier [YT-238 local prototype](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-238-STYLE-BUILDER-PROOF.md#independent-review-and-completion)
+selected the private builder and default module registration but was not
+itself a published CLI or public Style API.
 
 ### Style release and platform evidence
 
@@ -826,5 +837,6 @@ compilation. [YT-243 source qualification](YT-243-RELEASE-QUALIFICATION.md)
 
 Todo and the native-first Style Showcase have their own bounded Linux
 Chrome/Firefox sample results. Showcase runs from a checkout and has an optional
-Wasm companion. [Todo qualification](YT-240-TODO-STYLE-QUALIFICATION.md),
-[Style Showcase](../examples/style-showcase/README.md)
+Wasm companion. The [Todo sample's CSS instructions](../examples/todo-server/README.md#app-owned-rust-styles-and-typed-tag-builders)
+retain current usage; [its original bounded Linux qualification](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary)
+retains observed browser results and limits. [Style Showcase](../examples/style-showcase/README.md)
