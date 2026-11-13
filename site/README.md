@@ -1,11 +1,11 @@
 # Guide sources and legacy mdBook preview
 
-This checkout's [YT-226 integration](../docs/YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01)
+This checkout's [approved Reader workflow](../docs/GITHUB-PAGES-PUBLICATION.md#local-yetlet-workflow-integration--2026-11-01)
 uses one .github/workflows/docs.yml to build the Yetlet reader from the exact
 selection in pages.toml. Follow the [Yetlet site build guide](../examples/docs-site/README.md#formal-artifact-preparation-no-deployment)
 for current Rust/Node/Wasm prerequisites and artifact commands. Build records stay
 outside the upload root. The owner-authorized
-[public cutover](../docs/YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
+[public cutover](../docs/GITHUB-PAGES-PUBLICATION.md#authorized-yetlet-publication--2026-11-01)
 now serves this Yetlet reader at https://bohewu.github.io/yetlet/, source0ae6b93.
 PAGES_DEPLOY_ENABLED is true; relevant protected-master updates publish through
 the single workflow. Local build commands below do not enable or deploy Pages.

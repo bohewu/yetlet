@@ -1,12 +1,10 @@
 # Yetlet documentation site
 
-Application-owned, nonpublishable YT-224 package using registry SDK0.9.0-alpha.8,
-with [YT-225 public-mode artifact preparation](../../docs/YT-225-DOCS-PUBLIC-BUILD.md).
-It renders the eight existing selections/excerpts in site/pages.toml with Yetlet
-HTML, plus separately selected browser search. The later owner-authorized
-[YT-226 cutover](../../docs/YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
-publishes this reader at https://bohewu.github.io/yetlet/ without adding an SDK/CLI
-API. Local export commands do not change Pages. Static export is available in
+Application-owned, nonpublishable Reader example using registry SDK0.9.0-alpha.8,
+rendering the eight canonical Markdown selections from `site/pages.toml` as
+escaped Yetlet HTML with separately selected local Wasm search. The [approved Pages publication](../../docs/GITHUB-PAGES-PUBLICATION.md#authorized-yetlet-publication--2026-11-01)
+serves this Reader at https://bohewu.github.io/yetlet/ without adding a new SDK
+or CLI API. Local export commands do not change Pages. Static export is available in
 published CLI `0.2.0` and remains available in later releases; the reproducible
 source-bound build below uses the reviewed CLI from this checkout. The reader
 source edition/consumer is explicitly pinned to SDKalpha.8/CLI0.4.0 independently
@@ -163,8 +161,9 @@ old bookmarks are not preserved by the cutover.
 ### API and accepted evidence
 
 Use [HTML](../../crates/yetlet/guides/html.md), [DOM](../../crates/yetlet-browser/guides/dom.md),
-the [export contract](../../docs/YT-222-STATIC-HTML-CONTRACT.md) and
-[pilot evidence/limits](../../docs/YT-224-DOCS-PILOT.md). SDK/CLI versions, provider
+the [export contract](../../docs/YT-222-STATIC-HTML-CONTRACT.md),
+[original local pilot evidence](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-224-DOCS-PILOT.md) and
+[original hosted build acceptance](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-225-DOCS-PUBLIC-BUILD.md#authorized-delivery-and-hosted-artifact--2026-11-01). SDK/CLI versions, provider
 defaults and renderer APIs are unchanged. The initial local evidence is
 Linux/Chromium with desktop and emulated touch. The cutover adds exact public
 HTTPS bytes/MIME, directory navigation, real search and a narrow Firefox

@@ -1,11 +1,11 @@
-# GitHub Pages minimum publication plan — YT-218
+# GitHub Pages publication and Reader Edition cutover
 
 Date: 2026-10-31. Status: YT-218 Done after final independent Reviewer PASS0.
 The owner-adopted first-publication sequence completed at source
 `64d10742d62059c91dd2e46931aab1cb3b65d897`. That mdBook result remains accepted
 history. [The current public guide](https://bohewu.github.io/yetlet/) uses the
-Yetlet-built reader at source0ae6b93 under the later
-[YT-226 cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01).
+Yetlet-built Reader at source `0ae6b93` under the later
+[approved cutover](#authorized-yetlet-publication--2026-11-01).
 The historical preparation checkpoints below remain intact.
 
 ## Historical planning baseline and exact public scope
@@ -296,7 +296,7 @@ not incomplete first-publication criteria.
 ## Temporary automatic-update hold — 2026-11-01
 
 The owner subsequently authorizes PR44 Push and squash Merge after green CI,
-then a [Yetlet-built guide cutover plan](YT-226-PAGES-CUTOVER-PLAN.md), without
+then a [Yetlet-built guide cutover plan](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md), without
 deployment. Readback finds PAGES_DEPLOY_ENABLED true. To enforce that instruction,
 the repository CI variable is set false and read back before Merge. This stops
 new automatic publication; it neither unpublishes nor replaces the existing
@@ -313,7 +313,7 @@ tree6015c8d8c3ee4a412924b72c8c1ef278dfe00585, matching qualified headf73439b.
 All selected PR checks pass before Merge. The resulting master documentation
 run41277712999 succeeds with its deployment job skipped, confirming the hold.
 No manual dispatch or retry occurs; other automatic master checks remain a
-separate source-CI observation. The [cutover proposal](YT-226-PAGES-CUTOVER-PLAN.md)
+separate source-CI observation. The [cutover proposal](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md)
 does not implement a new deployment flow or re-enable this variable.
 
 Subsequent master MSRV/Stable, guide build and all four CodeQL analyses pass at
@@ -323,7 +323,7 @@ does not start implementation or re-enable publication; the hold remains false.
 
 ## Local Yetlet workflow integration — 2026-11-01
 
-The owner subsequently selects the [YT-226 minimal integration](YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01),
+The owner subsequently selects the [original minimal integration](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01),
 without Commit/Push or deployment. The checkout's single docs.yml now uses
 the accepted Yetlet builder; docs-preview.yml is removed. Build output is always
 clean/public-format HTML, independently of deployment eligibility. Only an
@@ -347,14 +347,18 @@ Run41289520993/attempt1 builds and deploys successfully; deployment7470678482
 serves the same HTTPS project URL. This supersedes the temporary false hold;
 relevant protected-master document updates can publish automatically again.
 
-The15-file archive/manifest/CLI receipts match the accepted master build.
-All8 public chapters and6 selected assets return200, exact bytes and correct
-MIME; native directory URLs, header search and touch navigation have retained
-observations. Browser checker mistakes, its final stale-H1 FAIL and the
-incidental root favicon404 are explicit in the YT-226 record, not erased or
-relabeled as clean script exits. Final independent Reviewer PASS0 accepts this
-bounded cutover, all8 document/83 evidence hashes and stated limits, with zero
-issues/followups; YT-226 is Done.
+The 15-file artifact/manifest/CLI receipts match accepted master source
+`0ae6b93`. Anonymous HTTPS readback checks all eight directory-route chapters
+and six CSS/JS/Wasm assets against the original hashes and MIME types; no old
+mdBook `.html` aliases or automatic redirect layer are provided. Reader
+navigation, keyboard, search and emulated touch observations are bounded rather
+than exhaustive browser/platform certification. The original Chrome/Firefox
+checker errors, **final Firefox stale-heading FAIL**, and incidental root
+favicon 404 remain explicitly recorded in the [immutable YT-226 evidence](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01),
+not relabeled as clean test exits. Independent final Reviewer PASS0 accepts this
+bounded public cutover, including eight document/83 evidence hashes with no
+required followups; the [original accepted review](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md#independent-final-acceptance--2026-11-01)
+retains its exact source and limitations. YT-226 is Done at that scope.
 
 The old42-file mdBook archive and pre-cutover live-home correspondence remain
 retained externally. No automatic rollback is implemented or executed. The

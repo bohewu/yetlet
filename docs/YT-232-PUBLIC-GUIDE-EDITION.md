@@ -81,8 +81,8 @@ the generated exact SDK dependency. CLI preparation also verifies the minimal
 SDKalpha.6 static consumer. Reuse these results without reinstalling or
 repackaging the releases.
 
-[YT-224](YT-224-DOCS-PILOT.md), [YT-225](YT-225-DOCS-PUBLIC-BUILD.md) and
-[YT-226](YT-226-PAGES-CUTOVER-PLAN.md) retain their original navigation, search,
+[Original YT-224](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-224-DOCS-PILOT.md), [YT-225](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-225-DOCS-PUBLIC-BUILD.md) and
+[YT-226](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md) retain their original navigation, search,
 touch, public artifact and HTTPS evidence. The eight-page shape, frontend and
 exporter source stay unchanged. Do not replay their whole browser/platform
 matrix or relabel old-source observations as new-source proof.

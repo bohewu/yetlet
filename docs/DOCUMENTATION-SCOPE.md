@@ -33,7 +33,7 @@ documentation does not renew that evidence or make an API stable.
 
 [The public documentation plan](PUBLIC-DOCS-PLAN.md) records GitHub Pages as
 the reader entry point, with selected repository guides and version-matched API
-documentation. The [completed cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
+documentation. The [completed cutover](GITHUB-PAGES-PUBLICATION.md#authorized-yetlet-publication--2026-11-01)
 records the actual Yetlet-built public reader. A separate Wiki contract remains
 deferred. The plan's original setup order and doc-comment findings retain their
 historical scope; a plan alone does not authorize another deployment.

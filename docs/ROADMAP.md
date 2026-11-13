@@ -2705,12 +2705,13 @@ publication, Commit or Push occurs in this document update.
   `0ae6b93`. All 15 artifact outputs matched the accepted build, and HTTPS
   readback of eight chapters and six assets matched the artifact bytes and MIME
   types. The independent final review accepted the cutover with the recorded
-  Firefox checker failure retained. See the [authorized cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
-  and [independent final acceptance](YT-226-PAGES-CUTOVER-PLAN.md#independent-final-acceptance--2026-11-01).
-  The [YT-224 pilot](YT-224-DOCS-PILOT.md) and [YT-225 hosted artifact](YT-225-DOCS-PUBLIC-BUILD.md#authorized-delivery-and-hosted-artifact--2026-11-01)
-  retain the preceding evidence. The cutover evidence applies to the original
-  deployment. [The Reader Edition manifest](../site/pages.toml) selects the
-  current SDK and CLI pair.
+  Firefox checker failure retained. The [formal Pages publication record](GITHUB-PAGES-PUBLICATION.md#authorized-yetlet-publication--2026-11-01)
+  describes the accepted deployment, source, hashes and limits. The original
+  [YT-224 local pilot](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-224-DOCS-PILOT.md),
+  [YT-225 hosted artifact](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-225-DOCS-PUBLIC-BUILD.md#authorized-delivery-and-hosted-artifact--2026-11-01)
+  and [YT-226 independent acceptance](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md#independent-final-acceptance--2026-11-01)
+  remain recoverable from fixed Git history. The [Reader Edition manifest](../site/pages.toml)
+  independently selects the current SDK and CLI pair.
 
 Formal Done items and dependencies remain in the [M25 Backlog](BACKLOG.md#m25--broader-html-dom-support-and-static-site-delivery).
 Static serialization does not require DOM mounting; the documentation pilot joins

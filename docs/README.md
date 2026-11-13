@@ -119,20 +119,15 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   functional-document ownership, actual YT file deletion, evidence recovery,
   review gates and the next topic-based batches.
 
-- [Local Yetlet documentation pilot — YT-224](YT-224-DOCS-PILOT.md):
-  application-owned eight-chapter static reader with optional Wasm search;
-  independent Reviewer PASS0 at local scope; existing public Pages retained.
-- [Public-mode guide artifact preparation — YT-225](YT-225-DOCS-PUBLIC-BUILD.md):
-  clean source/edition labels, selected output and private receipts, separate
-  build-only CI; no legacy URL aliases or live Pages replacement.
-- [Controlled Pages cutover — YT-226](YT-226-PAGES-CUTOVER-PLAN.md):
-  source0ae6b93 public guide, one successful build/deploy, exact HTTPS/artifact
-  readback and retained reader observations/failures; independent final Reviewer
-  PASS0, Done at bounded public-guide scope.
-
-- [GitHub Pages publication record](GITHUB-PAGES-PUBLICATION.md): exact edition,
-  dedicated workflow, master-only Environment, initial deployment/readback,
-  retained observations and automatic relevant master document updates.
+- [Yetlet Reader guide](../examples/docs-site/README.md): application-owned
+  eight-chapter selection, escaped Markdown, optional search, protected local
+  and public artifact preparation with separate non-deployment receipts.
+- [GitHub Pages publication and Reader cutover](GITHUB-PAGES-PUBLICATION.md#authorized-yetlet-publication--2026-11-01):
+  owner-approved source `0ae6b93`, the accepted 15-file public artifact, HTTPS
+  byte/MIME verification, master-only deployment and original limited browser
+  observations. The original YT-224–226 pilot/hosted/reader failures remain
+  recoverable from fixed Git history; public Pages qualification is distinct
+  from local preview and build-only CI.
 
 - [Historical mdBook reader preview](../site/README.md): pinned reference builder,
   exact chapter selection and loopback-only usage; use the

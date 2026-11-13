@@ -17,7 +17,7 @@ records green CI, source/artifact/edition matching and hosted reader acceptance,
 accepted by final independent Reviewer PASS0; YT-218 is Done. No product API/runtime/version change
 or expansion of signed release-candidate scope follows from website publication.
 
-**2026-11-01 public update:** [YT-226](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
+**2026-11-01 public update:** The [accepted Pages cutover](GITHUB-PAGES-PUBLICATION.md#authorized-yetlet-publication--2026-11-01)
 publishes the Yetlet-built reader at https://bohewu.github.io/yetlet/, source0ae6b93,
 through the single Pages workflow and successful run41289520993/1.
 Use the [current site build guide](../examples/docs-site/README.md#formal-artifact-preparation-no-deployment)
@@ -144,7 +144,7 @@ The [current M25 Roadmap](ROADMAP.md#m25--broader-html-dom-support-and-static-si
 now records the delivered DOM policies (SDK alpha.6), independent static HTML
 export (CLI 0.2.0) and Yetlet-built Reader Edition. The current guide is
 maintained by [the application-owned reader](../examples/docs-site/README.md),
-with [public cutover evidence](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
+with [published Pages evidence](GITHUB-PAGES-PUBLICATION.md#authorized-yetlet-publication--2026-11-01)
 and the selected [SDK/CLI edition](../site/pages.toml). The originally reviewed
 [YT-219–224 planning page](https://github.com/bohewu/yetlet/blob/1508b6910add4e74c9e2311a3f3eb4666539afce/docs/YT-219-224-DOM-STATIC-SITE-PLAN.md)
 is recoverable at its fixed Git version; its former Todo and pre-publication
