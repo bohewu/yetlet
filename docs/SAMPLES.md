@@ -115,6 +115,8 @@ Chrome/Firefox results. [Todo CSS usage](../examples/todo-server/README.md#app-o
 
 The five [completed research studies](README.md#completed-research-prototypes) are bounded application-owned prototypes, separate from this thirteen-application catalog. Use their fixture READMEs and retained measurements to understand the decisions and limitations; they do not select additional supported core APIs or change application qualification.
 
+The [Physics Lab](../examples/physics-lab/README.md) is a separate nested workspace with native SSR and explicitly selected Rapier/WebGPU assets; it is **not** a catalog or supported GPU engine. The [Experimental GPU support guide](../crates/yetlet-browser/guides/wgpu-support.md) gives the exact qualified Firefox/CPU/Wasm source conditions. Browser picking, timed draw submissions and original Firefox/WebGPU measurements must not be generalized into production performance or cross-browser support.
+
 Run the existing navigation checks:
 
 ```bash

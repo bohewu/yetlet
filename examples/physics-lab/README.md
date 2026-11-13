@@ -2,7 +2,7 @@
 
 A separate, application-owned prototype: native HTML describes a synthetic
 preset; the first explicit Run loads a private wgpu pipeline and Rapier CPU
-physics. No existing Yetlet renderer API changes. This is not a game engine,
+physics. Its earlier [source-level feasibility study](../../docs/YT-192-3D-PHYSICS-LAB-STUDY.md) alone did not verify an implementation; the independently accepted prototype, control, startup and scenario slices were subsequent, source-specific experiments. Their full original failures and reviews are recoverable from fixed local Git `983653adadcedb4ec196016b75281d39e2ed0acf`, not verified as public GitHub pages. No existing Yetlet renderer API changes. This is not a game engine,
 engineering/safety simulator, production feature or performance claim.
 
 ## Prerequisites
@@ -87,7 +87,7 @@ observers cancel pending start when hidden/offscreen/zero-size/detached, and
 visibility never automatically resumes a world. Reload ends all tab-local state.
 There is no server mutation or snapshot persistence.
 
-The [YT-194 action contract](../../docs/YT-194-PHYSICS-LAB-CONTROLS.md) supersedes
+The [YT-194 action contract](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-194-PHYSICS-LAB-CONTROLS.md) supersedes
 YT-193's initial Activate-then-Run interaction only. Its historical acceptance,
 scene bounds, WebGPU target limitations and prior failures remain unchanged.
 
@@ -118,7 +118,7 @@ second of real monotonic time, not GPU presentation/completion or fixed60Hz
 physics. Warmup shows Measuring; Pause/Step/suspension show Paused. A stopped or
 reset world clears previous samples. No extra sampling loop, benchmark target or
 hardware guarantee is added; existing DOM updates remain at most4times/second.
-Details and scoped new acceptance are in [YT-197](../../docs/YT-197-PHYSICS-LAB-SCENARIOS-FPS.md).
+Details and scoped new acceptance are in [YT-197](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-197-PHYSICS-LAB-SCENARIOS-FPS.md).
 
 ## Browser startup and failure help
 
@@ -163,7 +163,7 @@ never edits your browser preferences or selects an alternate backend silently.
 
 The UI uses bounded category messages, opens Browser help on failure and avoids
 raw exceptions/URLs/stacks. The developer diagnostic seam remains local to this
-prototype. [YT-195](../../docs/YT-195-BROWSER-STARTUP-GUIDANCE.md) records what is
+prototype. [YT-195](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-195-BROWSER-STARTUP-GUIDANCE.md) records what is
 newly checked; earlier Run/Pause/Reset/physics/GPU qualification is not rerun.
 
 ## Configuration and errors
@@ -203,7 +203,7 @@ The `browser` feature is default-off; wgpu/Web API dependencies are wasm-only,
 while optional CPU tests explicitly select physics through that same feature.
 Default native execution never creates a physics world/device.
 
-[YT-193 delivery](../../docs/YT-193-3D-PHYSICS-LAB-PROTOTYPE.md) records actual new
+[YT-193 delivery](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-193-3D-PHYSICS-LAB-PROTOTYPE.md) records actual new
 verification, failures, browser/adapter identity and cleanup; instructions above
 are not acceptance evidence. Original M11/flat-renderer evidence stays unchanged.
 

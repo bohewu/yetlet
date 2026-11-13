@@ -96,9 +96,9 @@ queue completion is not physical presentation or FPS.
 
 ## Qualification and release
 
-[YT-079](https://github.com/bohewu/yetlet/blob/master/docs/YT-079-VERIFICATION.md) and its
-[independent review](https://github.com/bohewu/yetlet/blob/master/docs/YT-079-INDEPENDENT-REVIEW.md) bind the actual
-candidate and consumer evidence. [YT-080](https://github.com/bohewu/yetlet/blob/master/docs/YT-080-VERIFICATION.md)
+[YT-079](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-079-VERIFICATION.md) and its
+[independent review](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-079-INDEPENDENT-REVIEW.md) bind the actual
+candidate and consumer evidence. [YT-080](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-080-VERIFICATION.md)
 records final source/artifact correspondence, default-profile observation,
 CPU/API/dependency checks and the separate final independent-review verdict.
 Consult that source-bound record rather than inferring support from a version

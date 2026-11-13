@@ -6,20 +6,20 @@ blocked, green done, blue active. Search, pagination, record detail and reset ar
 ordinary server-rendered GET controls. No Board storage or remote event circuit
 is used. The optional canvas reserves a 600×400 CSS viewport. YT-076 adds
 bounded resize/DPR, pause, loss/recovery and teardown behavior; its selected
-[Firefox browser and independent review gates passed](../../docs/YT-076-VERIFICATION.md). Picking, performance and public renderer
+[Firefox browser and independent review gates passed](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-076-VERIFICATION.md). Picking, performance and public renderer
 extraction remain later tasks. **Selected Ubuntu Firefox 158/X11 browser runtime qualification
 has passed** with the actual Rust/wgpu Wasm: 120/120 screenshot pixel centers,
 owner retirement/replacement, negative fallbacks and independent counter.
 Linux Firefox Stable requires `dom.webgpu.enabled=true`, enabled only
-in the disposable test profile. A fresh [independent review](../../docs/YT-075-INDEPENDENT-REVIEW.md)
+in the disposable test profile. A fresh [independent review](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-075-INDEPENDENT-REVIEW.md)
 returned **PASS (zero blocking issues)**; YT-075 is Done at this selected scope.
 Earlier Chrome/NVIDIA and Firefox headless failures are retained and do not
-extend the supported browser scope. See [selected Firefox evidence](../../docs/YT-075-UBUNTU-BROWSER-VERIFICATION.md) and
-[current verification](../../docs/YT-075-VERIFICATION.md).
+extend the supported browser scope. See [selected Firefox evidence](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-075-UBUNTU-BROWSER-VERIFICATION.md) and
+[current verification](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-075-VERIFICATION.md).
 
-**Current extracted candidate:** [YT-079](../../docs/YT-079-VERIFICATION.md)
+**Current extracted candidate:** [YT-079](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-079-VERIFICATION.md)
 passed actual browser qualification and independent API/dependency/security
-review. Final [YT-080 qualification](../../docs/YT-080-VERIFICATION.md) and the
+review. Final [YT-080 qualification](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-080-VERIFICATION.md) and the
 [Experimental support boundary](../../crates/yetlet-browser/guides/wgpu-support.md) distinguish
 this source from the historical pre-extraction receipts below. This is not a
 speedup, stable-API, production or 3D promise.
@@ -158,7 +158,7 @@ Native tests/builds do not establish browser or hardware support.
 
 ### YT-076 lifecycle continuation
 
-[YT-076 verification](../../docs/YT-076-VERIFICATION.md) records the current
+[YT-076 verification](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-076-VERIFICATION.md) records the current
 implementation/build slice and pending gates. Demand rendering coalesces resize
 and invalidation into at most one RAF per owner. DPR is bounded to 1–2, physical
 dimensions are clamped to the acquired device limit, and unchanged dimensions
@@ -187,7 +187,7 @@ Browser validation has not run for YT-076. Do not rerun or overwrite YT-075 evid
 
 YT-077 is **In progress**: implementation/build only; measurement **Not run**,
 parent parameter review and independent review pending. The [measurement method
-and build record](../../docs/YT-077-VERIFICATION.md) fixes the operational
+and build record](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-077-VERIFICATION.md) fixes the operational
 parameters before execution. `/scene` remains the 120-record SSR/default entry.
 The separate `/scene-comparison` loads a small external comparison script; neither
 entry fetches scene JS/WASM or initializes a GPU before explicit activation.
@@ -228,7 +228,7 @@ No speedup or 60 Hz acceptance is claimed before real measurement and review.
 
 ### YT-078 selection and prepared product test
 
-**Current outcome:** [YT-078 is Done](../../docs/YT-078-VERIFICATION.md) after
+**Current outcome:** [YT-078 is Done](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-078-VERIFICATION.md) after
 selected Firefox browser PASS and fresh independent Reviewer PASS, zero
 issues. The completed receipt is under `browser/viewport`; the first native
 window-size setup failure remains in `browser`. Portrait uses standard BiDi
@@ -236,7 +236,7 @@ viewport emulation (390 x 700 CSS pixels), not a physical phone. The original
 implementation-only instructions below are historical, not a request to rerun.
 
 YT-078 remains **In progress**. CPU/build checks pass; browser execution and
-independent review are **NOT RUN**. See [YT-078 verification](../../docs/YT-078-VERIFICATION.md).
+independent review are **NOT RUN**. See [YT-078 verification](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-078-VERIFICATION.md).
 
 The default 120-record scene supports CPU picking on taps, semantic selection
 text and a validated HTML detail link. Record slot + 1 is its stable semantic
@@ -322,6 +322,6 @@ benchmark or a replay of old passing receipts. It hashes candidate source,
 manifest, binary and generated assets and always owns cleanup.
 The historical implementation leaf did not launch a server/browser. The parent
 subsequently completed the actual candidate browser run and independent review;
-see [YT-079 verification](../../docs/YT-079-VERIFICATION.md). Its passing receipt
+see [YT-079 verification](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-079-VERIFICATION.md). Its passing receipt
 is under `browser/page-module-hook`; do not rerun it over existing evidence.
 YT-080 is recorded separately in the current qualification guide.

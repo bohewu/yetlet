@@ -1020,51 +1020,18 @@ Reviewer `/root/yt105_consumer_snapshot_review_oct20` PASS has zero issues or
 required followups; this bounded adoption is complete. No profiling/speedup
 claim or initial-render/HTTP/form change is selected.
 
-**YT-106 interoperability comparison (2026-10-20, research only):** the
-[package study](YT-106-FRONTEND-INTEROP-RESEARCH.md) recommends app-owned TS
-instances and existing wasm-bindgen for Rust-owned state, comparing direct JS,
-Web Components and React-only roots. It proposes Chart.js loaded-item bars first
-and a conditional CodeMirror description editor after CSP feasibility; nonce
-support alone does not prove style-attribute compatibility. Current renderer
-ownership/asset limits, read-only package metadata, cost uncertainty and focused
-future checks are recorded. Independent Reviewer
-`/root/yt106_frontend_interop_research_review_oct20` PASS has zero issues or
-required followups; YT-106 is Done at research-only scope. No package, adapter,
-CSP change, implementation or deployment is selected. The
-[original integration question](YT-094-API-OBSERVATIONS.md#third-party-frontend-components--yt-106)
-is retained separately.
-
-**YT-106 Chart.js trial (2026-10-20, separately authorized):** the
-[Admin slice](YT-106-CHART-VERIFICATION.md) adds loaded-item status bars driven
-by Rust drafts, a permanent native summary, private TS update/destroy ownership
-and existing CLI/Vite/WASM delivery. Native/WASM, strict Clippy, TypeScript and
-actual Chrome update/fallback/lifetime/CSP checks pass, with owned CLI cleanup
-and raw/gzip bundle costs recorded. Independent Reviewer
-`/root/yt106_chart_impl_review_oct20` PASS has zero issues or required followups;
-this bounded trial is complete. The conditional editor, core APIs and
-production/platform qualification remain separate.
-
-**YT-106 CodeMirror CSP study (2026-10-20, research only):** the
-[focused study](YT-106-CODEMIRROR-CSP-RESEARCH.md) inspects published view/style-mod
-paths and compares the current policy with a proposed page-local style nonce
-using isolated Chrome mechanisms. Matching-nonce styles and CSSOM values apply,
-while unapproved style blocks and inline attributes remain blocked. This supports
-a minimal future plain-text trial without unsafe-inline or a core nonce service;
-no CodeMirror code ran in Yetlet and no app policy/package changed. Independent
-Reviewer `/root/yt106_codemirror_csp_research_review_oct20` PASS has zero issues or
-required followups and completes this research; real editor behavior and bundle
-cost remain future evidence.
-
-**YT-106 Description editor (2026-10-20, separately authorized):** the
-[plain-text trial](YT-106-CODEMIRROR-VERIFICATION.md) implements a private TS editor
-handle/owned Rust callback, selected-item and pending/bound checks, page-local
-style nonce and native fallback. Native/WASM, strict Clippy, TypeScript and
-actual Chrome typing/history/Save/CSP/fallback/lifetime checks pass with existing
-CLI build/run/stop and recorded bundle cost. Independent Reviewer
-`/root/yt106_codemirror_impl_review_oct20` PASS has zero issues or required
-followups; this bounded trial is complete. No core/CLI/settings API, rich-text
-layer or wider platform matrix is selected.
-
+**YT-106 — Third-party component interoperability:** The independent
+research selected app-owned Rust/TS/Wasm component instances rather than
+a mandatory browser framework. The subsequent independently reviewed
+Admin Chart.js loaded-item bars and CodeMirror plain-text editor use
+per-page CSP style-nonce scoping, explicit owners/disposal, non-script
+fallback and existing CLI/Vite assets. Browser evidence is bounded to
+the source-matched Chrome/TypeScript trials; unapproved inline styles
+remain blocked. Current [Admin sample](../examples/admin-dashboard/README.md)
+owns the usage and lifecycle; original tests, CSP failures and reviewers
+remain at local Git `983653adadcedb4ec196016b75281d39e2ed0acf`.
+No editor/interop Core API, unsafe-inline policy, browser-wide assurance
+or automatic framework integration is selected.
 **YT-095 dependency composition (2026-10-20, research only):** the
 [current-consumer comparison](YT-095-COMPOSITION-RESEARCH.md) retains native
 constructors and Axum State/FromRef after inspecting Starter, signing, Admin
@@ -1425,8 +1392,27 @@ separate CLI/public release is inferred from this migration.
 
 **Current non-GPU continuation (2026-10-14):** YT-070–YT-073 remain Done at authorized local scopes. [YT-074](YT-074-QUALIFICATION.md) is Done at the owner-amended local scope, with retained real Chewing IME PASS, repaired [Firefox/Orca spoken AT PASS](YT-074-DESKTOP-ACCEPTANCE.md) and final Chrome/Firefox PASS. The owner accepted five staggered cohorts for a new full-duration mixed workload; the original synchronized-burst failure remains a limitation on that Ubuntu host. The full 62-minute mixed run passed with 45,000 measured requests and zero errors; fresh independent review passed with no material findings. [Cross-environment synchronized evidence](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-074-CROSS-ENVIRONMENT-VERIFICATION.md) adds native Windows/Azure Ubuntu full PASS at the original gates, with 44,850/45,000 actual formal requests, while retaining original Ubuntu FAIL and all instrumentation limits. The evidence supports an original-host system/storage limitation; no original-host repair or broader acceptance is claimed. [Handoff](M11-P-IMPLEMENTATION-HANDOFF.md) records completed documentation/static review and the subsequent conditional one-commit local delivery authority, with no new load or push. No GPU, release or deployment activation follows.
 
-**Subsequent GPU activation (2026-10-14):** The owner activated YT-075 with dependent-item sequencing only after independent review. The application-owned GPU example passes focused native/WASM build, strict lint and Todo/Search byte-isolation gates; seven Linux Chrome configurations retained their unsuccessful GPU scene drawing attempts. Separate Windows Chrome and Edge baseline Javascript scenes using the same YT-075 WGSL passed 120/120 actual pixels but did not run the app's Wasm. The **selected Ubuntu Firefox 158 Stable (experimental WebGPU opt-in only) X11/Intel Vulkan** browser now PASSES the **actual Rust/wgpu scene Wasm**, 120/120 canvas pixels, semantic HTML fallback, CSP, independent counter, late-device/owner retirement, missing-asset and injected GPU failure checks. [Selected browser qualification](YT-075-UBUNTU-BROWSER-VERIFICATION.md) and [all attempts](YT-075-VERIFICATION.md) preserve this scope. YT-075 is **Done at the selected Ubuntu Firefox 158 X11 experimental-opt-in scope** after [fresh independent reviewer PASS](YT-075-INDEPENDENT-REVIEW.md), zero blocking issues; Chrome/NVIDIA/default Firefox, loss/recovery, dynamic performance and extraction remain outside this slice. YT-076 is now [Done at selected lifecycle scope](YT-076-VERIFICATION.md): 11 real Firefox lifecycle checks, resized/recovered 120/120 pixel samples, verified cleanup and independent reviewer PASS (0 issues). YT-077 dynamic comparison [implemented and measured](YT-077-MEASUREMENT.md): all 24 matched Canvas2D/WebGPU lanes and 126 real pixel checks passed in the selected Firefox X11 environment; no GPU speedup was demonstrated; [fresh independent reviewer](YT-077-INDEPENDENT-REVIEW.md) returned PASS (zero issues), so YT-077 is Done at this bounded scope. The owner then approved [Experimental opt-in promotion](M11-G-EXPERIMENTAL-PROMOTION-DECISION.md), without a performance guarantee, and an initial strict/builtin-guarded local commit `8c52452`. [YT-078](YT-078-VERIFICATION.md) picking and [YT-079](YT-079-VERIFICATION.md) extraction are Done with their individual independent reviewer PASS. [YT-080](YT-080-VERIFICATION.md) is Done at the selected Experimental scope after exact runtime-byte correspondence, focused final checks, a distinct no-WebGPU-preference default-profile fallback PASS and [separate independent Reviewer PASS](YT-080-INDEPENDENT-REVIEW.md), zero issues and zero required followups. YT-075–YT-080 are complete at their declared scopes; the YT-078–YT-080 source was additionally committed as `e499d24` under strict/builtin Commit Guard. [YT-081 M11 closeout](YT-081-M11-CLOSEOUT.md) and [cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) are Done at the selected scopes after independent documentary review and a separately reviewed [Experimental GPU typed-error/first-retirement refinement](YT-081-WGPU-API-REFINEMENT.md), with [new-source Reviewer PASS](YT-081-WGPU-API-INDEPENDENT-REVIEW.md) (zero issues). No push, release or YT-020 activation follows.
+**M11 Experimental GPU acceptance (YT-075–081):** The owner authorized
+separate local browser-first qualification, CPU/GPU lifecycle and measured
+comparisons. Under the opt-in Firefox 158/X11/Intel Vulkan profile, the
+Rust/wgpu Wasm consumer passed selected real pixel checks, picking,
+loss/recovery, owner retirement and the independent reviews. Firefox's
+default WebDriver profile without explicit WebGPU preference instead
+showed the intended HTML/no-GPU fallback. Prior Linux Chrome/NVIDIA or
+other targets had failed/unqualified attempts; Windows JS shader baseline
+did not establish the same Rust/Wasm browser path.
 
+The [retained YT-077 comparison](YT-077-MEASUREMENT.md) covers finite
+Canvas2D versus WebGPU lanes **without a demonstrated useful speedup**;
+the [cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) and
+[support guide](../crates/yetlet-browser/guides/wgpu-support.md) preserve
+explicit SceneError/JsValue and first retirement versus outstanding-borrow
+settlement, app-owned fallback and failure boundaries. This research was
+accepted at Experimental source/browser scope, not general hardware,
+performance, production or first-party 3D-engine qualification.
+Original receipts/failed attempts remain at fixed local Git
+`983653adadcedb4ec196016b75281d39e2ed0acf`; no remote SHA
+reachability or fresh browser execution is implied by doc consolidation.
 ## Developer documentation refresh — YT-068
 
 The [developer documentation index](README.md) and root README now separate native SSR setup, optional browser behavior and the nine unpublished candidates from retained qualification history. The nine candidate guides, current/history navigation and [final Private source/package boundary](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) are reconciled. YT-068 is Done at documentation scope after bounded validation; the independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate; YT-020 stays Blocked and established YT-030/YT-065/YT-066/YT-067 bounds are retained. YT-029 is Done at bounded deadline/overhead research scope; YT-021 is Done at bounded incremental SSR comparison scope, retaining the app-owned prototype and rejecting core streaming/suspense promotion. YT-024 is Done at bounded typed network adapter proof scope, adopting the app-owned adapter pattern and rejecting core transport framework promotion. YT-022 is Done at bounded data-only handler/capture research scope, retaining explicit application-owned descriptors and rejecting generic/core resumability promotion. YT-023 is Done at bounded native wgpu/Vulkan scene research scope, retaining an opt-in app-owned prototype with actual draw/readback and frame/allocation-byte observations while rejecting core/browser-portability promotion. The next unblockable YT-020 preparation action is the explicit immutable-candidate/source/package and formal release-policy decision record; any new preflight/rebuild/provenance/SBOM/license/signing execution needs separate authority. Historical `8e557e7` signed bytes do not attest policy HEAD `abb2cce` plus current dirty research, root manifest/lock and candidate READMEs. A later local commit alone cannot activate release. No release gate or historical qualification result changes through this entry refresh.
@@ -2296,72 +2282,26 @@ A later isolated prototype needs separate authority; no new implementation item
 is automatically activated.
 
 
-YT-193 activates the [minimum isolated physics-lab prototype](YT-193-3D-PHYSICS-LAB-PROTOTYPE.md)
-after the reviewed YT-192 contract and separate commit authorization. New native
-SSR, application-owned optional CPU physics/private 3D pipeline, source-hashed
-assets and scoped controls/lifetime follow the bounded scene/clock/failure rules.
-Existing renderer API/graphs/old proof unchanged; new consumer verification only.
-Done at the isolated prototype scope after independent whole-item Reviewer PASS0:
-new CPU/SSR/Wasm/native/default-graph and actual3D/browser/lifecycle evidence,
-reviewed Firefox154/privateWayland/default NVIDIA Vulkan target; all failures
-and invalid Intel/blank-capture observations retained. This is not a general
-hardware/support, performance, second-active-canvas or production qualification.
-New changes remain unstaged/uncommitted/unpushed; no publication/deployment.
+**YT-193–198 — Isolated Physics Lab implementation:** After separately
+reviewed YT-192 feasibility, an opt-in native-SSR-first application gained
+application-owned Rapier CPU simulation and a private, explicitly activated
+browser WebGPU 3D pipeline. The selected native/browser tests and actual
+Firefox/Wayland/NVIDIA flows were bounded; failed GPU/adaptation attempts
+and original Reviewer corrections remain recorded, not transformed into
+general browser support.
 
-
-YT-194 applies the [owner-selected action contract](YT-194-PHYSICS-LAB-CONTROLS.md):
-firstRun owns explicit optional initialization; primary Run/Pause/Reset, Advanced
-Step and failure-only Retry replace technical Activate/Dispose buttons. Keep
-HTML-first fallback, fixed-step/resource limits and GPU lifetime/generation
-safety. Done after focused new action observations, one SSR test, corrected
-monotonic-time bridge and independent Reviewer PASS0; all failed receipts stay
-failed, actual defaultIntel/Vulkan metadata and telemetry limits are accepted at
-this application scope only. No old qualification replay, Commit/Push or public
-support expansion.
-
-
-YT-195 selects [browser startup and failure guidance](YT-195-BROWSER-STARTUP-GUIDANCE.md):
-normal-browser capability/secure-origin conditions, static/noJS help, bounded
-actionable errors, the general pre-Wasm HTML/CSS loading-shell contract and local
-reduced-motion feedback. Preserve YT-194
-actions, opt-in and lifetime/safety. Done after new SSR1pass/4filtered, native/
-asset/docs checks and9focused browser guidance/loading checks; independent
-Reviewer PASS0 with bounded evidence and unchanged protected sources. No old
-qualification replay or Commit/Push. Owner feedback
-for more scenarios and FPS remains candidate work. The clarified general loading
-shell was registered as YT-196 Todo for bounded shared-helper/template adoption;
-no implementation or support/performance claim follows automatically.
-
-
-YT-196 starts the [shared pre-Wasm shell adoption](YT-196-WASM-STARTUP-SHELL.md)
-under the reviewed contract: optional canonical JS/CSS, customized initial HTML,
-opaque UI tickets and scoped full-page/browser-template plus SSR-region use.
-Actual async resources remain loader-owned. Done after helper4/emission1/
-lifecycle2 checks, consumer builds/typecheck,8new browser cases and docs PASS.
-Initial P2 cached-page retirement was repaired; independent re-review PASS0 with
-26source/47evidence and1,110protected hash bindings unchanged. Failures retained;
-no old qualification replay, native default/Core API change or new-change
-Commit/Push.
-
-
-YT-197 starts [Lab scenarios and estimated render FPS](YT-197-PHYSICS-LAB-SCENARIOS-FPS.md):
-keep falling objects,add bounded stack impact/domino chain and a submission-rate
-HUD independent of physics60Hz. Staged selection applies with Reset; native SSR
-and existing opt-in/lifetime/budgets remain. Done after newRust4/JS3,builds/docs
-and7new browser observations; first keyboard-selection fixture failure retained.
-Independent Reviewer PASS0,13source/23evidence and1,126protected hash bindings
-unchanged. No slope/editor/Core API, old qualification replay, benchmark or
-new-change Commit/Push.
-
-
-YT-198 starts [slope shape/friction comparison](YT-198-PHYSICS-LAB-SLOPE.md):
-one fixed ramp,four box/ball/material lanes,active-world legend and existing
-staged Reset/FPS. Keep application-owned opt-in and64dynamic/fivestatic/pose
-budgets; preserve uncommitted YT-197. Done after newRust3,native/Wasm/assets/docs
-and actual slope browser flow PASS. Independent Reviewer PASS0 with9incremental
-source/24evidence and1,131protected current file bindings. No editor/Core/renderer
-API,old qualification replay,benchmark or Commit/Push.
-
+The [Physics Lab guide](../examples/physics-lab/README.md) now owns first
+click-to-Run, Pause/Step/Reset, explicit retry/cleanup, four scene presets
+including bounded slope/friction and an **estimated draw-submission FPS**
+which is neither GPU presentation rate nor a benchmark. The
+[pre-Wasm startup guide](WASM-STARTUP.md) owns static HTML help, customizable
+loader and failure handling before asynchronous Wasm initialization.
+Native no-JS remains readable; ordinary navigation does not initialize
+a GPU. Nothing here changes Core, the default dependency graph,
+engineering-grade physics guarantees or production/browser support.
+Complete original YT-193–198 implementation/negative tests are
+recoverable at local Git `983653adadcedb4ec196016b75281d39e2ed0acf`
+(not yet verified reachable on GitHub).
 **YT-202 remaining-cell inventory (2026-10-27):** [Current continuation](YT-202-NATIVE-FEATURE-GAPS.md#current-native-coverage--2026-10-27) retains all accepted GNU/package evidence and the original source binding; no library path changed at delivered4e5ef64. The reconnected Windows Runner now has Rust1.99MSVC, VC Tools and SDK ready. Only fourteen-package native default and Auth/session plus Config/secret-provider consumers remain. Both are Not run: prior official artifact transfer was policy-rejected, and detailed diagnostics require an unavailable admin scope. No exact configuration remedy has been established and no bypass or old test replay occurs. YT-202 remains Blocked pending an admitted route, those executions and final independent review; no new Commit/Push/Merge. Earlier missing-toolchain and Git delivery failures stay historical.
 
 **YT-202 authorized source-route update (2026-10-27):** The owner explicitly selects Git clone for the remaining Windows checks. [The new task-owned clone](YT-202-NATIVE-FEATURE-GAPS.md#owner-authorized-git-source-continuation--2026-10-27) is admitted and fixed at74f53fe/tree2faa, matching accepted YT-201 source; no rejected artifact is relocated or transferred. Windows prerequisites are ready; preparation uses the existing Cargo bootstrap/directory-source convention and a newly bound equivalent fourteen-package consumer. The earlier artifact/admin diagnostic blockers are historical. YT-202 is In progress, with both MSVC executions and final independent review pending; accepted GNU/package/provider/browser evidence is retained without replay. No new Commit/Push/Merge or final release selection.

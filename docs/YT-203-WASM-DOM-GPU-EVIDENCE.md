@@ -48,8 +48,8 @@ logs are not claimed to have been reverified or recreated.
 
 ## Optional GPU reconciliation
 
-[YT-081's refined API qualification](YT-081-WGPU-API-REFINEMENT.md) and
-[independent source review](YT-081-WGPU-API-INDEPENDENT-REVIEW.md) remain accepted.
+[YT-081's refined API qualification](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-WGPU-API-REFINEMENT.md) and
+[independent source review](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-WGPU-API-INDEPENDENT-REVIEW.md) remain accepted.
 The original result SHA-256 is
 `aef12ca8f882140064e3d3f1632791921507c29ec8457cfd7c7afe699a3fc96d`;
 the independent result remains

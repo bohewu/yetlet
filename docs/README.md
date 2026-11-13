@@ -384,43 +384,31 @@ Complete original closed task evidence is recoverable at fixed local Git
 
 ## M11 — historical planning and selected product/renderer delivery
 
-The original [M11 plan](M11-PLAN.md), [product-readiness research](M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](M11-WGPU-PLAN.md) and [planning review](M11-PLANNING-REVIEW.md) were documentation-only at the YT-069 checkpoint. **Subsequent owner authorizations and independent reviewers** accepted YT-070–YT-080 at separately selected bounds. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) now accepts only the bounded Experimental opt-in architecture; it does not grant stable or broad browser support. See the [M11 reconciliation](YT-081-M11-CLOSEOUT.md) and [API consistency audit](YT-081-API-CONTRACT-AUDIT.md); historical planning statements retain their original date and evidence.
+The original [M11 plan](M11-PLAN.md), [product-readiness research](M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](M11-WGPU-PLAN.md) and [planning review](M11-PLANNING-REVIEW.md) were documentation-only at the YT-069 checkpoint. **Subsequent owner authorizations and independent reviewers** accepted YT-070–YT-080 at separately selected bounds. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) now accepts only the bounded Experimental opt-in architecture; it does not grant stable or broad browser support. See the [M11 reconciliation](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-M11-CLOSEOUT.md) and [API consistency audit](YT-081-API-CONTRACT-AUDIT.md); historical planning statements retain their original date and evidence.
 
 ### Activated non-GPU implementation
 
 The owner committed planning as `d96f7af` and [activated YT-070–YT-074](M11-P-ACTIVATION.md); M11-P implementation is committed at `f00ec597`. [Form/asset evidence](M11-P-FORM-ASSET-VERIFICATION.md) records YT-070–YT-072; YT-073 is locally complete. [YT-074 qualification](YT-074-QUALIFICATION.md) is Done at the owner-amended local scope, with retained real Chewing IME, repaired Firefox/Orca speech and final Chrome/Firefox PASS. The new owner-authorized full 62-minute mixed-load execution passed with 45,000 measured requests and zero errors; fresh independent review also passed, and the earlier synchronized-burst failure is retained. Historical repair/test records retain their original source and commit boundaries. See [desktop acceptance](YT-074-DESKTOP-ACCEPTANCE.md), [spoken transcript](YT-074-SPOKEN-AT-EVIDENCE.json), [IME screenshots](screenshots/yt074-ime/README.md), [startup](BOARD-START.md) and [handoff](M11-P-IMPLEMENTATION-HANDOFF.md). No GPU or public-release change is claimed.
 
-### Experimental opt-in WebGPU candidate
+### Experimental GPU and cross-crate API evidence
 
-The owner separately approved [Experimental renderer extraction](M11-G-EXPERIMENTAL-PROMOTION-DECISION.md),
-without a performance guarantee. [YT-078 picking](YT-078-VERIFICATION.md) and
-[YT-079 candidate extraction](YT-079-VERIFICATION.md) have individual browser
-and independent-review PASS at their selected scopes. Use the
-[`yetlet-wgpu` guide](../crates/yetlet-browser/guides/wgpu.md), its
-[support matrix](../crates/yetlet-browser/guides/wgpu-support.md), and
-[YT-080 qualification](YT-080-VERIFICATION.md) and its
-[independent Reviewer PASS](YT-080-INDEPENDENT-REVIEW.md). YT-075–YT-080 are
-complete at their declared scopes; [YT-081](YT-081-M11-CLOSEOUT.md) reconciles the final evidence, while publication remains excluded.
-The candidate is CPU-only by default, explicitly browser-enabled, unpublished
-and outside the original nine
-release candidates. Future 3D is not implemented or guaranteed.
+The [GPU support guide](../crates/yetlet-browser/guides/wgpu-support.md)
+owns the current explicitly opt-in browser contract and exact Firefox
+158/X11/Intel Vulkan runtime limits; [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md)
+preserves the Experimental separation from ordinary SSR/DOM. The selected
+[Firefox Canvas2D/WebGPU measurement](YT-077-MEASUREMENT.md) found **no proven
+useful WebGPU speedup**. GPU-absent default Firefox, controlled device loss,
+picking/HTML alternatives, delayed borrows and retirement have separate
+historical accepted cases; browser/physical hardware coverage is not
+generalized. The retained [API contract audit](YT-081-API-CONTRACT-AUDIT.md)
+separates CPU typed errors, Wasm-facing errors and first logical retirement
+from physical GPU completion, and distinguishes Memory/Redis providers.
 
-### M11 selected-scope reconciliation and API contract review
-
-[YT-081 M11 closeout](YT-081-M11-CLOSEOUT.md) reconciles
-the complete selected SSR-first product and Experimental GPU lines,
-without upgrading their browser/host/production limitations into
-general support. The separate
-[cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) inventories
-handler-first setup, domain errors, sync Memory versus async Redis
-sessions, local/HTTP commands, lifecycle/disposal and opt-in GPU
-features. The owner also selected a narrow [Experimental GPU API
-refinement](YT-081-WGPU-API-REFINEMENT.md), which intentionally changes
-CPU validation errors and the retirement return type. It does **not**
-promote a Stable Candidate, publish a package or activate YT-020.
-The changed source passed its [own independent reviewer](YT-081-WGPU-API-INDEPENDENT-REVIEW.md)
-with zero issues and required followups. YT-081 is Done only at the
-selected documented scope.
+The original M11 product and GPU delivery passed independently reviewed
+local slices. Full source, failed attempts and reviewer evidence are
+recoverable at fixed **local Git** `983653adadcedb4ec196016b75281d39e2ed0acf`;
+GitHub public reachability has not been verified. Current SDK distribution
+and publication are separate from those dated experimental snapshots.
 
 ## Production-oriented reference application
 
@@ -448,25 +436,14 @@ and [reactive lifetime guide](../crates/yetlet/guides/reactive.md).
 Original YT-105 source studies and failed cases are recoverable from
 local Git `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; no later browser/production qualification is implied.
 Packaging is covered by YT-104 above.
-The separate [YT-106 package interoperability study](YT-106-FRONTEND-INTEROP-RESEARCH.md)
-recommends app-owned TS/wasm-bindgen boundaries, Chart.js as the first proposed
-trial and CodeMirror only after CSP feasibility. It compares Web Components
-and React roots, records package cost limits and leaves implementation separate;
-independent Reviewer PASS closes YT-106 at research-only scope.
-The separately selected [Admin Chart.js trial](YT-106-CHART-VERIFICATION.md)
-implements loaded draft-status bars with a permanent native summary and the
-existing Vite/WASM/CLI. Independent implementation Reviewer PASS completes that
-bounded trial; CodeMirror remains conditional on CSP feasibility.
-The [CodeMirror CSP follow-up](YT-106-CODEMIRROR-CSP-RESEARCH.md) now finds a
-response-local style nonce feasible at source/mechanism scope, preserving
-attribute restrictions and native fallback. Independent research Reviewer PASS
-has zero issues or required followups; no editor or application-policy change
-is implemented.
-The subsequent [Admin Description editor](YT-106-CODEMIRROR-VERIFICATION.md)
-implements the selected nonce/TS/Rust trial with native fallback, bounded local
-editing and existing CLI delivery. Targeted native/WASM/Chrome checks and
-independent implementation Reviewer PASS complete this bounded trial, with zero
-issues or required followups.
+**Frontend component interop (YT-106):** Existing Admin-dashboard
+[instructions](../examples/admin-dashboard/README.md) own the application-only
+Chart.js bars and CodeMirror plain-text editor, Rust/TS/Wasm interop, strict
+response-local CSP style nonce, explicit disposal and permanent native fallback.
+The original research and actual Chrome/TypeScript acceptance are recoverable
+at the fixed local Git source `983653adadcedb4ec196016b75281d39e2ed0acf`.
+No framework-level editor, general plugin system, unsafe-inline exception or
+cross-platform support follows from this bounded trial.
 The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
 completed native/browser checks from the returned operator-attested native
 IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.
@@ -950,16 +927,13 @@ M0–M9 are locally complete at prototype scope. M8 freezes the runnable sample 
 
 - [YT-192 3D physics lab minimum contract and feasibility](YT-192-3D-PHYSICS-LAB-STUDY.md): Done at documentation/source-level feasibility scope after independent Reviewer PASS0; browser/scene/fixed-step/GPU-failure contract, no implemented 3D API/sample or compile/runtime qualification.
 
-- [YT-193 Isolated physics-lab prototype](YT-193-3D-PHYSICS-LAB-PROTOTYPE.md): Done after whole-item Reviewer PASS0; separate native SSR/opt-in Rapier/private3D example, focused actual Firefox154/Wayland/NVIDIA interaction/recovery and cleanup proof; failures retained, no general support/performance/production claim.
-
-- [YT-194 Physics laboratory controls](YT-194-PHYSICS-LAB-CONTROLS.md): Done after independent Reviewer PASS0; firstRun opt-in start, primary Run/Pause/Reset, Advanced Step, failure-only Retry and focused corrected-clock/control proof; failures and actual default-GPU telemetry limits retained.
-
-- [YT-195 Browser startup and WebGPU guidance](YT-195-BROWSER-STARTUP-GUIDANCE.md): Done after independent Reviewer PASS0; ordinary-browser requirements, bounded actionable failures, static/noJS help, reduced-motion local loading and general pre-Wasm contract; reusable helper/template adoption is tracked in YT-196.
-
-- [YT-196 Common pre-Wasm shell adoption](YT-196-WASM-STARTUP-SHELL.md): Done after independent acceptance and P2 re-review PASS0; optional customizable JS/CSS, Tasks/CLI full-page and Lab SSR integration,8new browser cases plus focused helper/emission/lifecycle checks. Raw failures retained; no old qualification replay or new-change Commit/Push.
-
-- [YT-197 Lab scenes and estimated render FPS](YT-197-PHYSICS-LAB-SCENARIOS-FPS.md): Done after independent Reviewer PASS0; bounded stack/domino presets,staged selection/Reset and estimated running draw-submission HUD,7new automated tests and7browser observations; failed option fixture retained,no benchmark/support expansion.
-
-- [YT-198 Slope comparison](YT-198-PHYSICS-LAB-SLOPE.md): Done after independent Reviewer PASS0; fixed ramp/shape/material lanes,active-world legend and staged Reset,newRust3 and actual browser proof; existing limits/FPS retained,no benchmark/Core expansion.
-
+- **YT-193–198 — Physics Lab implementation:** The
+  [current application guide](../examples/physics-lab/README.md) owns the
+  opt-in Rapier/WebGPU experiment, first explicit Run, Pause/Step/Reset,
+  bounded scenarios including slope friction, estimated submission FPS
+  and safe native SSR/HTML fallback. [Wasm startup guidance](WASM-STARTUP.md)
+  owns pre-Wasm loading, explicit recovery and stale/disposed owner handling.
+  The original isolated Firefox/Wayland/NVIDIA test scope, failures and
+  review outcomes remain in fixed local Git history; neither hardware
+  portability nor physics correctness/SLO or public release is certified.
 </details>

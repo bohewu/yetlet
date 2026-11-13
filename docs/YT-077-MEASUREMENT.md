@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-14. **Selected browser measurement:** PASS (24 of 24
 declared lanes, no omissions). **Overall YT-077: Done** after fresh
-[independent reviewer PASS](YT-077-INDEPENDENT-REVIEW.md) with zero
+[independent reviewer PASS](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-077-INDEPENDENT-REVIEW.md) with zero
 issues or required followups. The performance observations below are
 actual measurements, not a speedup claim, an SLA, GPU timing queries,
 OS/VRAM measurements, or generally supported browser configurations.
@@ -19,7 +19,7 @@ The original strict-CSP semantic SSR, ordinary `/scene`, independently
 hashed scene/counter assets, lockfiles and unrelated Todo/Search files
 were not changed by the run.
 
-[Prepared methodology and implementation](YT-077-VERIFICATION.md)
+[Prepared methodology and implementation](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-077-VERIFICATION.md)
 declared the full input before measurement:
 
 - Sizes: 1,000, 10,000, 50,000 and 100,000 synthetic status records,
@@ -138,7 +138,7 @@ those gates cannot be silently waived by the user's implementation
 sequence authorization.
 
 The YT-077 **measurement** gate is PASS and the separate
-[independent reviewer](YT-077-INDEPENDENT-REVIEW.md) verified the
+[independent reviewer](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-077-INDEPENDENT-REVIEW.md) verified the
 frozen method, real samples, 126 screenshots, resource bounds,
 source isolation and cleanup. YT-077 is **Done at this selected scope**.
 No commit, push, release,

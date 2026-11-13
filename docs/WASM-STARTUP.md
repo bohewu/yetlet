@@ -95,8 +95,8 @@ of a partially mounted runtime. The shared helper does not own these resources.
 Only the new adoption/startup seam is checked, not the full prior CLI/Tasks matrix.
 
 The physics lab adopts the regional loading/error pattern in
-[YT-195](YT-195-BROWSER-STARTUP-GUIDANCE.md) and the same shared helper in
-[YT-196](YT-196-WASM-STARTUP-SHELL.md). It remains an optional GPU consumer,
+[YT-195](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-195-BROWSER-STARTUP-GUIDANCE.md) and the same shared helper in
+[YT-196](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-196-WASM-STARTUP-SHELL.md). It remains an optional GPU consumer,
 not the definition of all Wasm applications. More lab scenarios and visible FPS
 are separately recorded owner feedback; neither is part of this startup slice.
 
@@ -146,7 +146,7 @@ boundaries, CSP, escaping, build-time assets and dependency separation apply.
 The ready Tasks consumer has additional actual local Firefox154 evidence for
 cached Back and Forward restoration: persisted pageshow, unchanged document/
 model, retained completion and usable controls. The
-[YT-196 followup](YT-196-WASM-STARTUP-SHELL.md#actual-browser-backforward-cache-followup)
+[YT-196 followup](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-196-WASM-STARTUP-SHELL.md#actual-browser-backforward-cache-followup)
 records the fixture, preserved failures and automation unload interference.
 This is bounded ready-page evidence; browsers may decline or evict cached pages.
 Pending initialization, long retention, other browsers and GPU consumer cache

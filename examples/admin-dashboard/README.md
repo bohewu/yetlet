@@ -88,7 +88,7 @@ existing Vite/Rust/WASM enhancement. Native Open/Active/Blocked/Closed counts
 remain visible with JS off or if the chart fails. Totals cover all currently
 loaded items (at most 12), including unsaved status changes; filtering does not
 change their scope. Only an explicit Save writes to the server. See the
-[YT-106 slice record](../../docs/YT-106-CHART-VERIFICATION.md) for ownership,
+[YT-106 slice record](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-106-CHART-VERIFICATION.md) for ownership,
 fallback, browser/CLI checks and measured package cost.
 
 Description is enhanced with an app-owned CodeMirror plain-text editor on that
@@ -96,8 +96,8 @@ same page. Rust retains drafts and explicit Save; typing/undo/redo stays local,
 with a 4,000-character limit and fresh undo history on item switch or Reset.
 Only this HTML response receives a fresh style nonce. The native textarea stays
 usable if the package/nonce/styles are unavailable, and JS-off item links still
-reach the native editor. See the [editor record](../../docs/YT-106-CODEMIRROR-VERIFICATION.md)
-for policy, lifecycle and bounded verification.
+reach the native editor. See the [editor record](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-106-CODEMIRROR-VERIFICATION.md)
+for policy, lifecycle and bounded verification. A response-local nonce permits only the approved editor style-mod path; arbitrary inline attributes or an `unsafe-inline` CSP exception remain disallowed. The original research found that CSP mechanism feasible before the editor was separately implemented and browser-tested; neither trial adds a general frontend-plugin API or applies the result to all browsers. Complete original Chart/CodeMirror research, failed checks and review identities are recoverable from fixed local Git `983653adadcedb4ec196016b75281d39e2ed0acf` (public GitHub reachability not verified).
 
 Sign in → filter/sort/paginate work items → detail → edit → history. Native POST
 forms remain usable with JavaScript disabled. Validation and version conflicts

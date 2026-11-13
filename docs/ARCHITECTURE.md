@@ -309,6 +309,8 @@ The MVP does not forward raw DOM events. Remote actions need explicit input/outp
 
 ## 9. GPU and parallelism boundary (post-MVP)
 
+The first-party [`yetlet-browser::wgpu` module](../crates/yetlet-browser/guides/wgpu.md) is explicitly **Experimental and opt-in**; it is a bounded flat rectangle renderer, not a DOM/CSS accelerator. Its [support boundary](../crates/yetlet-browser/guides/wgpu-support.md) preserves the selected Firefox/WebGPU, no-device/default browser fallback, real/controlled failure and logical disposal limits. The [separate Physics Lab sample](../examples/physics-lab/README.md) uses app-owned Rapier CPU physics and a private 3D pipeline; it is not a shared framework 3D API or supported simulation engine. The [initial native Vulkan study](YT-023-WEBGPU-RESEARCH.md), [Firefox Canvas2D comparison](YT-077-MEASUREMENT.md) and [cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) remain distinct original authorities. None justifies production FPS/SLO, hardware portability, WebGPU default enablement or silent lifecycle ownership.
+
 WebGPU cannot accelerate ordinary DOM/CSS layout directly. A future WebGPU target must be a separate **Canvas/scene renderer**, which carries its own scene graph, focus, IME, text, and accessibility responsibilities. Workers may move computation away from the main thread, but DOM commits still occur on the main thread. The completed [YT-023 study](YT-023-WEBGPU-RESEARCH.md) retains native Vulkan draw/readback, completion-wall-time and explicit allocation-byte observations. Browser WebGPU, broad scene/text/accessibility support and matched DOM/CPU speedups remain unverified; no supported core renderer is selected. GPU development is not an MVP gate.
 
 ## 10. Risks and experiments

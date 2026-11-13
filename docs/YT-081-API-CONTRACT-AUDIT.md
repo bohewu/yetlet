@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-14. **Source:** original Ubuntu master checkout `e499d2438d9cf5f5c6e1095d2fcff4b1428e15ef`.
 **Scope:** nine original unpublished `0.1.0` library candidates, the separate experimental Redis provider, and the approved Experimental `yetlet-wgpu` crate.
-**Assessment:** no demonstrated cross-crate P0/P1 contract failure on the selected exercised consumer paths. The owner then authorized a targeted Experimental `yetlet-wgpu` API refinement. Its CPU errors and logical retirement now have precise typed/boolean contracts, while unrelated P2 design boundaries remain intentionally independent. [Refinement evidence](YT-081-WGPU-API-REFINEMENT.md) records the new candidate and the need for a fresh source-bound reviewer.
+**Assessment:** no demonstrated cross-crate P0/P1 contract failure on the selected exercised consumer paths. The owner then authorized a targeted Experimental `yetlet-wgpu` API refinement. Its CPU errors and logical retirement now have precise typed/boolean contracts, while unrelated P2 design boundaries remain intentionally independent. [Refinement evidence](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-WGPU-API-REFINEMENT.md) records the new candidate and the need for a fresh source-bound reviewer.
 
 The original nine candidates remain the only YT-020 release inventory. The Redis and GPU crates are unpublished, independent nested workspaces, and no broad platform, stability or compatibility promise is implied. See [API Contracts](API-CONTRACTS.md), [Compatibility](COMPATIBILITY.md) and the GPU [support boundary](../crates/yetlet-browser/guides/wgpu-support.md).
 
@@ -43,8 +43,8 @@ source changes** and separately tested evidence: six CPU tests, one
 doctest, twelve consumer tests, strict native/Wasm Clippy and a
 current-source Firefox real-Wasm PASS (inert disposal `[true,false]`,
 configured disposal `[true,true]`, 5 × 120/120 pixels). The
-[receipt](YT-081-WGPU-API-REFINEMENT.md) preserves source hashes
-and owned cleanup. A [fresh independent **new-source review**](YT-081-WGPU-API-INDEPENDENT-REVIEW.md)
+[receipt](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-WGPU-API-REFINEMENT.md) preserves source hashes
+and owned cleanup. A [fresh independent **new-source review**](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-WGPU-API-INDEPENDENT-REVIEW.md)
 subsequently returned **PASS** (zero issues, zero required followups),
 closing the two selected Experimental API debts at this bounded scope.
 Other P2 labels remain future design limits, not current failing callers.
@@ -70,15 +70,15 @@ the original checkout. Logs are retained at
 | Redis `cargo test --offline --locked --manifest-path crates/yetlet-session-redis/Cargo.toml --lib` | **Exit 0, 0 executed; one Redis-fixture-dependent test ignored**. This is a compile/runner check **not fresh Redis integration evidence** |
 | Initial `yetlet-wgpu` isolated `cargo test` | Historical PASS, four CPU tests plus one doctest (pre-refinement) |
 | Current-source isolated `yetlet-wgpu` tests | **PASS**, six CPU tests plus one doctest, including error variants and repeat retirement |
-| Current-source real Firefox/Wasm GPU test | **PASS**, 65 actions, five 120/120 pixel proofs, retirement booleans and actual device resource cleanup; [unique receipt](YT-081-WGPU-API-REFINEMENT.md) |
+| Current-source real Firefox/Wasm GPU test | **PASS**, 65 actions, five 120/120 pixel proofs, retirement booleans and actual device resource cleanup; [unique receipt](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-WGPU-API-REFINEMENT.md) |
 | Scene consumer isolated `cargo test` | **PASS**, twelve native tests |
 | Server `public_api_compat` test | **PASS**, two additive source-compatibility tests |
 
 Root workspace metadata currently lists 34 members; the Redis and GPU
 isolated crates are **not** members. Previous Redis real three-application
 single-primary proof is retained in [YT-066b3](YT-066B3-VERIFICATION.md),
-and Firefox GPU support comes from [YT-079](YT-079-VERIFICATION.md) and
-[YT-080](YT-080-VERIFICATION.md); this audit **does not repeat** either
+and Firefox GPU support comes from [YT-079](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-079-VERIFICATION.md) and
+[YT-080](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-080-VERIFICATION.md); this audit **does not repeat** either
 external Redis or GUI execution. A passing native compile/test run is
 not a statement of broad public API stability.
 
@@ -87,8 +87,8 @@ not a statement of broad public API stability.
 Retain the idiomatic, scoped APIs. The requested small Experimental GPU
 typed-error and first-retirement return improvement is implemented as a
 separate reviewed change, with source identity and separate reviewer PASS
-tracked in [YT-081 GPU API refinement](YT-081-WGPU-API-REFINEMENT.md)
-and [independent review](YT-081-WGPU-API-INDEPENDENT-REVIEW.md). Do not
+tracked in [YT-081 GPU API refinement](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-WGPU-API-REFINEMENT.md)
+and [independent review](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-WGPU-API-INDEPENDENT-REVIEW.md). Do not
 invent a common `YetletError`, force Memory sessions to async, or
 normalize unrelated domain-specific `dispose` return types for symmetry. Future changes
 to a Stable Candidate still require the compatibility rationale,

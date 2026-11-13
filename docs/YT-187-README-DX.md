@@ -121,7 +121,7 @@ status instructions. Relative links are rebased from the repository root to
 
 Yetlet is a small, HTML-first Rust universal UI framework. Write shared Rust Views for native server-rendered pages and opt-in browser WASM/DOM updates; use ordinary Axum handlers for HTTP and typed actions for explicit remote work.
 
-**Experimental `0.1.0`, unpublished, Private.** M0–M9 implementation, selected M10 qualification and M11-P/M11-G product/GPU work are complete at their recorded prototype scopes. [M11 closeout](../docs/YT-081-M11-CLOSEOUT.md) reconciles those limits; APIs are pre-public and may change. Public release (`YT-020`) remains **Blocked**; this repository is not production-qualified.
+**Experimental `0.1.0`, unpublished, Private.** M0–M9 implementation, selected M10 qualification and M11-P/M11-G product/GPU work are complete at their recorded prototype scopes. [M11 closeout](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-M11-CLOSEOUT.md) reconciles those limits; APIs are pre-public and may change. Public release (`YT-020`) remains **Blocked**; this repository is not production-qualified.
 
 #### Start with native SSR
 
