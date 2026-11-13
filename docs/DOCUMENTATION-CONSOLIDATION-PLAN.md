@@ -36,6 +36,58 @@ Every batch must identify:
 
 An item counts as **document consolidation** only when redundant YT files are actually deleted; a zero-deletion result is a documented blocker/defer, not a successful cleanup batch. Measure physical files, not just line counts. Any material expansion of the batch requires revising the plan and obtaining a fresh independent PASS before execution.
 
+## Repository-wide portfolio and large-batch queue — 2026-11-13
+
+**Planning audit only; no deletion is authorized by this table.** Baseline is clean local `master` `28f4a707cfa2ddeedd13ed3b2ccc37028b2c925c`, eight commits ahead of `origin/master`. The offline inventory covers **all 1,445 tracked paths** and classifies **all 529 Markdown files**, including **425 under `docs/`**, of which **275 are `docs/YT-*.md`**. Outside this YT set, `docs/` contains **59 `M*-*.md` milestone-history pages** and **14 non-YT research/review pages**, plus functional/authority documentation. Other project Markdown includes SDK, sample and tooling guides. These counts are separate; reducing 275 YT pages to 80 would still leave hundreds of Markdown files.
+
+A reproducible local per-file audit is retained at **`artifacts/verification/yt-doc-portfolio-20261113/`** (ignored evidence, **not** a new YT or tracked archive): `yt-dispositions.csv` has all 275 filenames, exact Git blob OIDs and SHA-256s, proposed batch, original Backlog state, decision/rationale and tracked filename-reference counts; `markdown-role-inventory.csv` classifies all 529 Markdown paths; `portfolio.json` aggregates totals. At this baseline their SHA-256s are, respectively, `3558d5f2294e20c7e8a630c92251b44ebd9fd44728635341e30d0af94f8227cb`, `e3dc14b93a247cbf3305760202f8fb5ed346116b62f5e4571343bc84561bedc1` and `41834c48a80be1501dd3e87d4a3621c31b9b12dc1cbc8a2b282812e1b44a272b`. The immutable baseline tree can regenerate this inventory if the local ignored artifacts are unavailable. **Do not mistake the offline filename-reference scan for comprehensive Markdown deep-anchor validation.**
+
+| Initial decision on 275 YT pages | Count | Meaning |
+|---|---:|---|
+| **MERGE_DELETE_CANDIDATE** | **213** | Closed narrative/proof/verification is likely redundant; it **must still pass a per-file technical, inbound-reference and evidence-retention review** before deletion |
+| **KEEP** | **17** | Dated inventory or currently authoritative contract/policy. Keep until a separately reviewed successor preserves its material content |
+| **REVIEW** | **44** | Security/session, source and platform qualification, delivery/provenance or uncertain normative status; **no automatic deletion** |
+| **DEFER** | **1** | `YT-236-CODEQL-PR-CONCURRENCY.md` lacks a directly matching formal Backlog row; resolve its authority/status before deciding |
+
+The 17 provisionally retained YT documents are `YT-020-PRIVATE-TRUST-POLICY`, `YT-020-REGISTRY-PUBLICATION-CONTRACT`, `YT-096-SIGNER-CONTRACT`, `YT-096-TRUST-DISCLOSURE-DECISIONS`, `YT-110-DOM-CAPABILITIES`, `YT-113-AUTHENTICATION-CONTRACT`, `YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT`, `YT-133-STARTER-SINGLE-INSTANCE-CONTRACT`, `YT-175-SESSION-BURST-OVERLOAD-POLICY`, `YT-181-SENSITIVE-WRITE-CONTRACT`, `YT-182-TRACING-WORKER-CONTRACT`, `YT-183-CATALOG-CACHE-CONTRACT`, `YT-219-HTML-INVENTORY`, `YT-222-STATIC-HTML-CONTRACT`, `YT-237-STYLE-REGISTRATION-CONTRACT`, `YT-247-SDK-VERSION-RESOLUTION-CONTRACT` and `YT-259-CLI-NEW-STARTUP-CONTRACT` (each `.md` under `docs/`). Their presence in a KEEP list is **not** a new promise of stability, release, or permanent preservation.
+
+The **44 per-file REVIEW exceptions** are also recorded here so future maintainers can reconstruct the protected baseline even if the ignored CSV is unavailable (each basename below is a `docs/*.md` file). Files not in KEEP/REVIEW/DEFER are **only candidates**, never implicitly approved deletions:
+
+- **B1**: `YT-093-SIGNING-CONTRACT`, `YT-093-SIGNING-VERIFICATION`
+- **B2**: `YT-102-CLI-CONTRACT-AUDIT-20261018`, `YT-103-ROLLING-ASSET-VERIFICATION`, `YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION`
+- **B3**: `YT-066B-COOKIE-ORDERING`, `YT-066B-REDIS-SESSION-DESIGN`, `YT-066B3-VERIFICATION`, `YT-094-OIDC`, `YT-094-SHARED-SQLITE`, `YT-094-VALKEY-SESSIONS`, `YT-113-123-OPT-IN-CAPABILITIES`, `YT-115-SESSION-AUTH`, `YT-117-RATE-LIMIT`, `YT-126-ADMIN-VALKEY-AUTH-ADOPTION`
+- **B4**: `YT-134-AZURE-REFERENCE`, `YT-181-SENSITIVE-WRITE-IMPLEMENTATION`, `YT-182-TRACING-WORKER-IMPLEMENTATION`, `YT-183-CATALOG-CACHE-IMPLEMENTATION`, `YT-184-AZURE-AUTH-SESSION-RESTART`
+- **B5**: `YT-074-QUALIFICATION`, `YT-141-PERFORMANCE-VALIDATION`
+- **B6**: `YT-081-API-CONTRACT-AUDIT`
+- **B7**: `YT-020-FIRST-PUBLISH-CONTRACT`, `YT-020-INTEGRITY-PREPARATION`, `YT-020-PRIVATE-RELEASE-PREP`, `YT-020-PRIVATE-SIGNING-VERIFICATION`, `YT-096-AGE-CUSTODY-INTEGRATION`, `YT-096-ALPHA-HOSTED-PLAN`, `YT-096-AZURE-CLEAN-BUILDER`, `YT-096-AZURE-RUN-COMMAND`, `YT-096-CANDIDATE-QUALIFICATION`, `YT-096-D1-D5-RELEASE-TRUST-PLAN`, `YT-096-EXISTING-REMOTE-TAG-BASELINE`, `YT-096-FORMAL-TRUST-PROPOSAL`, `YT-096-GITHUB-HOSTED-REBUILD`, `YT-096-HOSTED-DRILL-PLAN`, `YT-096-HOSTED-PREPARATION-PLAN`, `YT-096-KEY-ROTATION-DRILL`, `YT-096-RELEASE-CI-INTEGRATION`, `YT-096-SECURITY-RELEASE-REVIEW`, `YT-096-SUPPLY-CHAIN-DELTA`, `YT-209-RELEASE-AUTOMATION`, `YT-211-TWO-PACKAGE-MIGRATION`
+
+### Nine topic-based batches, not nine individual YT tickets
+
+Each numbered group below is a complete **exclusive partition** of the 275 YT documents in the audit CSV. Batch identifiers are local inventory group names, **not new YT backlog IDs**. Work order prioritizes high-yield historical cleanup before release-trust material; exact retained files, practical deletion counts and affected guides must be approved in an **independent per-batch plan review** before any implementation.
+
+| Order / group | Theme and living authority | YT pages | Candidate / Keep / Review / Defer | Tentative actual deletions |
+|---|---|---:|---:|---:|
+| 1 · B5 | Benchmark/latency/capacity → `QUALIFICATION-MATRIX.md`, production/readiness guides | 47 | 44 / 1 / 2 / 0 | 30–40 |
+| 2 · B1 | Early Core, HTML/DOM, browser and app proofs → architecture, API and DOM/HTTP guides | 50 | 47 / 1 / 2 / 0 | 30–42 |
+| 3 · B6 | Experimental GPU/scene/physics → ADR 0008, architecture and sample guides | 30 | 29 / 0 / 1 / 0 | 20–27 |
+| 4 · B2 | CLI, new/watch/HMR, SDK versioning → CLI contract/guide, browser and developer guides, ADR 0010 | 30 | 25 / 2 / 3 / 0 | 17–23 |
+| 5 · B3 | Authentication, sessions and providers → opt-in, secret/provider and security guides | 31 | 19 / 2 / 10 / 0 | 11–18 |
+| 6 · B4 | Reliability/admission/operational recovery → production and provider operations guides | 21 | 12 / 4 / 5 / 0 | 7–11 |
+| 7 · B9 | Docs/onboarding/CI guidance → current docs index, onboarding, Pages and template guides | 14 | 10 / 3 / 0 / 1 | 6–9 |
+| 8 · B8 | SDK/CLI release delivery and edition records → releasing, versioned hosted records and CLI guide | 11 | 11 / 0 / 0 / 0 | 6–10 |
+| 9 · B7 | Signer/hosted supply-chain and release trust → release supply chain, publication and readiness authorities | 41 | 16 / 4 / 21 / 0 | 8–16 |
+| **Total** | **Nine reviewed themes** | **275** | **213 / 17 / 44 / 1** | **135–196 (planning estimate)** |
+
+**Estimate correction:** Nine theme batches are a tractable work structure, **not a guarantee of only nine executions or of reaching 50–80 files**. On the conservative per-theme estimates, about **79–140 YT pages** could remain. Reaching 50–80 requires further source-specific release/security reviews or a later pass; never force deletion of normative records to satisfy a numerical target. Large 40–50-document themes may need multiple short, separately reviewed and guarded commits under one common topic plan. A batch with no actual deletions is a blocker/defer result, not a completed consolidation.
+
+### Required safeguards for each future batch
+
+1. Refresh the inventory against its **actual local HEAD** before acting; for every candidate reconcile its full content, formal Done/dependency row, unique negative tests and retained evidence with the proposed functional guide. Preserve real source/registry/runtime/browser/Windows/hosted distinctions and original failures. The current `cargo xtask check docs` checks selected docs, **not all 529 Markdown pages**; add explicit affected-file inbound-link and heading-anchor checks.
+2. Confirm an independently reviewed **plan PASS** naming the exact deletions, required KEEP/REVIEW/DEFER exceptions, living destinations and target physical file-count change. Do not merely rename, relocate or create a substitute historical document. After changes run docs/release-docs/whitespace, complete link/history/backlog checks, local Reader build if its selected inputs changed, independent final frozen-diff Reviewer PASS and strict/builtin staged Commit Guard/tree OID comparison before any owner-authorized **local** commit.
+3. **Git history reachability is a separate publication risk.** A fixed SHA with a verified local blob is not automatically accessible through GitHub. This checkout is eight commits ahead of the remote; a future squash merge could leave local-only SHAs unreachable even though Markdown links have the correct syntax. Before any remote publication or further history-dependent cleanup, require an approved strategy that keeps the original commits reachable (or an independently reviewed durable equivalent), verify remote reachability and all affected historical links **after** authorized delivery. Until then, describe fixed Git links as **local source identities**, not verified public URLs. This audit neither Pushes nor changes any remote branch or settings.
+4. The **other 73** non-YT historical pages (59 milestone reports + 14 studies/reviews) are marked `SECOND_PASS_REVIEW` in the full inventory; they are an additional potential reduction area, **not** silently included in the nine YT deletion totals. ADRs, exact hosted release records, project/sample/SDK guides, security authority and the Reader Edition stay protected unless a separately scoped review proves otherwise.
+5. Record actual files deleted and remaining YT/overall Markdown totals after each group in the **existing completed-batch ledger** below, not new numbered completion files. Preserve ignored audit evidence and the exact baseline Git identities.
+
 ## M25 corrective batch: YT-219–223 (scope and results)
 
 Baseline: local `master` commit `b9873f15bcfd4c36a2274508ef7517e5a83b807b` has **287 tracked `docs/YT-*.md` files**. The previous pass consolidated Roadmap outcomes and removed the shared `YT-219-224-DOM-STATIC-SITE-PLAN.md`. This corrective batch targets the **six remaining YT-219–223 files**, rather than merely rewriting their index entries.
