@@ -266,7 +266,7 @@ cargo clippy --locked --offline --all-targets -- -D warnings
 cargo fmt --check
 ```
 
-See [YT-092 verification](../../docs/YT-092-STARTER-VERIFICATION.md) for actual
+See [YT-092 verification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-092-STARTER-VERIFICATION.md) for actual
 platform evidence, limitations and the lessons that should inform later
 scaffolding work.
 

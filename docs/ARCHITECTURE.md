@@ -15,6 +15,29 @@ Current usage is documented in the [current module guides](API-REFERENCE.md), [H
 
 The design rationale and dated evidence below retain the original proposal and M7 decision history. Diagram references to compiler/macros and candidate IR are exploratory, not implemented authoring APIs. Current research decisions are in the [completed studies index](README.md#completed-research-prototypes); historical execution is not transferred to today's dirty source.
 
+## Retained early Core and browser proof boundaries
+
+The M12–M19 source-only verification history predates the published SDK/CLI.
+Current Rust `xtask` build/check/smoke paths and the independent CLI replace
+the original Python-driven toolchain, but do not claim that every historical
+native Windows, browser, build context or deployment case is requalified.
+See [developer commands](DEVELOPMENT.md), [CLI guide](CLI-GUIDE.md),
+[packaging and assets](ASSETS.md) and [release readiness](RELEASE-READINESS.md).
+The original local and Windows delivery evidence remains in Git history
+at `b610acc7e098020b6b59dfa0d1ab2b75b059e656`, which is not yet verified reachable on public GitHub.
+
+Early UI/form follow-ups retained handler-first and renderer ownership:
+native form/CSRF/validation and explicit save feedback remain app-owned,
+while local browser event state is independent from remote HTTP actions.
+Server HTML and the finite DOM vocabulary remain separate; `hidden` has
+a narrow shared-View SSR/DOM consistency rule but is not a general property
+binding or live two-way form framework. Consult the [View guide](VIEW-COMPONENTS.md),
+[HTTP pipeline](HTTP-PIPELINE.md), [bounded DOM contract](YT-110-DOM-CAPABILITIES.md)
+and [browser DOM guide](../crates/yetlet-browser/guides/dom.md). Research on
+streaming SSR, custom action transport and resumability remains opt-in or
+unpromoted; it does not make a general streaming/suspense, TCP transport,
+or resumption API available in Core.
+
 ## Developer tooling boundary — YT-247
 
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and the

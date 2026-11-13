@@ -104,7 +104,7 @@ forms remain usable with JavaScript disabled. Validation and version conflicts
 preserve drafts; permissions and CSRF checks run on the server. Closing keeps the
 record and history. The existing opt-in live-status enhancement remains optional.
 
-The [YT-107 form/save guide](../../docs/YT-107-FORM-FEEDBACK.md#application-authoring-guide)
+The [YT-107 form/save guide](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-107-FORM-FEEDBACK.md#application-authoring-guide)
 compares native forms, the WASM textarea/CodeMirror workspace and Todo, with
 source links and recovery boundaries. Native **Restore page values** resets to
 this document's initial values, including rejected values on a 422 page; its

@@ -95,9 +95,9 @@ The [YT-105 contract and accepted tests/consumer adoption](YT-105-GRAPH-SNAPSHOT
 remain applicable at their recorded source and platform bounds; no new graph
 abstraction or dependency was introduced by this slice.
 
-Retain [Starter](YT-092-STARTER-VERIFICATION.md),
+Retain [Starter](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-092-STARTER-VERIFICATION.md),
 [Admin closeout](YT-094-CLOSEOUT.md),
-[cloud delivery](YT-101-VERIFICATION.md), and
+[cloud delivery](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md), and
 [bounded rolling/asset retention](YT-103-ROLLING-ASSET-VERIFICATION.md)
 evidence. Those references do not establish production authentication,
 certificate custody, durability, SLA or HA guarantees for the nine packages.

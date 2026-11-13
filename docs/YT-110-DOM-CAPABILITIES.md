@@ -6,16 +6,16 @@ YT-108/YT-109 work on feat/yt108-safe-attribute-consistency.
 
 ## Authority and delivered scope
 
-After the [YT-109 comparison](YT-109-DOM-CAPABILITY-REVIEW.md) passed independent
+After the [YT-109 comparison](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-109-DOM-CAPABILITY-REVIEW.md) passed independent
 review, the owner selected completing its bounded implementation sequence in one
 delivery. YT-110 joins A1, A2, B and the concrete navigation portion of C. It does
 not reinterpret research Done as implementation authority: this later owner
 request is the implementation authorization. No commit or push was authorized.
 
 The existing [repository instructions](../AGENTS.md), renderer ADRs and
-[YT-107 authoring contract](YT-107-FORM-FEEDBACK.md#application-authoring-guide)
+[YT-107 authoring contract](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-107-FORM-FEEDBACK.md#application-authoring-guide)
 remain the requirements for safe rendering, explicit ownership, focused evidence
-and no unrelated framework expansion. [YT-108](YT-108-HIDDEN-ATTRIBUTE.md) and
+and no unrelated framework expansion. [YT-108](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-108-HIDDEN-ATTRIBUTE.md) and
 YT-109 historical documents remain unchanged. The separate YT-096 ce56e08
 candidate and YT-020 release gates are not requalified.
 

@@ -1,7 +1,7 @@
 # YT-105 — committed-state reads and initial rendering
 
 Date: 2026-10-19. Inspected source: `6e782bf`, after the independently reviewed
-[form-binding comparison](YT-105-FORM-BINDING-RESEARCH.md) was committed.
+[form-binding comparison](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-105-FORM-BINDING-RESEARCH.md) was committed.
 This is the second selected YT-105 research slice, not implementation or an
 accepted public API. Independent Reviewer `/root/yt105_state_read_review_oct19`
 PASS has zero issues or required followups.

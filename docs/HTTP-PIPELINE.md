@@ -175,7 +175,7 @@ The following commands are the original historical closeout. Current Rust
 equivalents are `cargo xtask check docs`, `cargo xtask build browser` and
 `cargo xtask smoke browser-chrome`; fresh smoke evidence uses
 `target/m12/yt085/browser-chrome-*/`. Their migration acceptance is recorded
-separately in [YT-085 verification](YT-085-VERIFICATION.md).
+separately in [YT-085 verification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-085-VERIFICATION.md).
 
 Final closeout commands executed successfully:
 

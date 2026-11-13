@@ -186,7 +186,7 @@ Creation runs no tools or installation and generates no app lock. Native `watch`
 
 #### Optional Linux container and Kubernetes configuration
 
-The unpublished CLI can scaffold a [service SSR app](../docs/YT-089A-VERIFICATION.md) with local-process liveness/readiness, configurable bind address, and graceful SIGTERM/Ctrl-C handling. The separate [configuration-only generators](../tools/yetlet-cli/README.md) emit Dockerfile, Compose and generic Linux/amd64 Kubernetes Deployment/Service files with an explicit, consistent Cargo.lock and compatible local Cargo path overrides retaining pinned versions. The [current generator source matrix](CLI-GUIDE.md#current-generator-source-matrix) covers the four exact current service profiles, including settings/Vite/Tailwind combinations. A separate [source-closure repair](../docs/YT-102-GENERATOR-SOURCE-CLOSURE.md) restores the fixed Config/Secrets export without enabling a secret provider: all 12 generator outputs and one sanitized Vite-source offline Cargo build passed focused checks. This is source/configuration evidence; historical platform and deployment qualification remains source-bound. Registry-only, standalone Tailwind and unsupported/edited layouts remain refused:
+The unpublished CLI can scaffold a [service SSR app](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-089A-VERIFICATION.md) with local-process liveness/readiness, configurable bind address, and graceful SIGTERM/Ctrl-C handling. The separate [configuration-only generators](../tools/yetlet-cli/README.md) emit Dockerfile, Compose and generic Linux/amd64 Kubernetes Deployment/Service files with an explicit, consistent Cargo.lock and compatible local Cargo path overrides retaining pinned versions. The [current generator source matrix](CLI-GUIDE.md#current-generator-source-matrix) covers the four exact current service profiles, including settings/Vite/Tailwind combinations. A separate [source-closure repair](../docs/YT-102-GENERATOR-SOURCE-CLOSURE.md) restores the fixed Config/Secrets export without enabling a secret provider: all 12 generator outputs and one sanitized Vite-source offline Cargo build passed focused checks. This is source/configuration evidence; historical platform and deployment qualification remains source-bound. Registry-only, standalone Tailwind and unsupported/edited layouts remain refused:
 
 ```sh
 YETLET=tools/yetlet-cli/target/debug/yetlet
@@ -196,21 +196,21 @@ YETLET=tools/yetlet-cli/target/debug/yetlet
 "$YETLET" generate k8s --manifest-path "$HOME/yetlet-apps/cloudapp/Cargo.toml" --output "$HOME/yetlet-apps/k8s-output" --image localhost:5000/team/cloudapp:v1
 ```
 
-Generation **does not** run Docker or Kubernetes, fetch dependencies, export private source, publish images, or deploy a cluster. Docker builds require separate audited `app-src` and `yetlet-src` named BuildKit contexts; deployment images/credentials, ports and namespaces remain operator responsibilities. Linux OCI/K3s output and Windows GNU/MSVC generator parity have [separate source-bound evidence](../docs/YT-089E-VERIFICATION.md). M15 is an unpublished preview, not production or YT-020 release qualification.
+Generation **does not** run Docker or Kubernetes, fetch dependencies, export private source, publish images, or deploy a cluster. Docker builds require separate audited `app-src` and `yetlet-src` named BuildKit contexts; deployment images/credentials, ports and namespaces remain operator responsibilities. Linux OCI/K3s output and Windows GNU/MSVC generator parity have [separate source-bound evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-089E-VERIFICATION.md). M15 is an unpublished preview, not production or YT-020 release qualification.
 
 #### Optional typed application configuration
 
 The separate unpublished [configuration guide](../docs/CONFIGURATION.md) shows typed
 Serde settings, explicit Development/Staging/Production layers, development-only
 secret files and native Axum State. The isolated workspace leaves default/core/
-browser dependencies unchanged. Current CLI templates opt into this same mechanism. [YT-090 verification](../docs/YT-090-VERIFICATION.md)
+browser dependencies unchanged. Current CLI templates opt into this same mechanism. [YT-090 verification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-090-VERIFICATION.md)
 records focused Linux checks and independent Reviewer PASS at the unpublished scope.
 
 #### Add browser behavior when needed
 
 The Todo application shares its Rust View between SSR and the browser. `/app` owns local keyed updates and a separate typed HTTP Create action; `/search` renders complete HTML before lazily loading its local Search Island.
 
-Browser builds additionally require `wasm32-unknown-unknown` and wasm-bindgen CLI 0.2.129. The unpublished Rust `cargo xtask` provides build, check, smoke, measure, qualification and release-preparation commands. Original Python files remain frozen reference oracles. YT-085 is accepted after its separate Reviewer PASS; [YT-086 verification](../docs/YT-086-VERIFICATION.md) records the migration candidate and remaining acceptance boundaries. No Python interpreter is required by the migrated command implementations.
+Browser builds additionally require `wasm32-unknown-unknown` and wasm-bindgen CLI 0.2.129. The unpublished Rust `cargo xtask` provides build, check, smoke, measure, qualification and release-preparation commands. Original Python files remain frozen reference oracles. YT-085 is accepted after its separate Reviewer PASS; [YT-086 verification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-086-VERIFICATION.md) records the migration candidate and remaining acceptance boundaries. No Python interpreter is required by the migrated command implementations.
 
 ```bash
 rustup target add wasm32-unknown-unknown

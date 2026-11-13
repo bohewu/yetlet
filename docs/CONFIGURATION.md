@@ -242,7 +242,7 @@ The following earlier checkpoint retains its original option spelling and status
 
 External vaults, encrypted secret storage, certificates, hot reload, Tailwind
 (YT-091), DI, signing, production starters/admin, formal release and CI/CD are
-deferred. The separate [YT-097 CLI opt-in](YT-097-VERIFICATION.md) now generates
+deferred. The separate [YT-097 CLI opt-in](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-097-VERIFICATION.md) now generates
 application-owned settings when `new --with-config` is explicitly selected,
 including a separate cloud application. Its changed source awaits independent
 review and Windows execution; the earlier YT-090 review does not cover it.
@@ -270,6 +270,6 @@ the original nine public candidates. Its runtime APIs do not change core, defaul
 The separate YT-097 CLI opt-in is Done at its recorded scope; current CLI
 settings/template and generator limits are maintained in the
 [CLI guide](CLI-GUIDE.md#current-generator-source-matrix). See the
-[scope and verification record](YT-090-VERIFICATION.md).
+[scope and verification record](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-090-VERIFICATION.md).
 
 </details>

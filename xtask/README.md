@@ -104,7 +104,7 @@ exiting while its descendants retain output pipes, rather than claiming Unix
 cleanup after an uncatchable supervisor kill.
 
 Linux and exact-source **Windows MSVC 1.99** checks are recorded in
-[YT-083 verification](../docs/YT-083-VERIFICATION.md): all selected process tests
+[YT-083 verification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-083-VERIFICATION.md): all selected process tests
 and doctor passed without global changes. A separate Windows GNU attempt failed
 in its installed import-library tool before tests and is not labeled supported.
 The final corrected foundation passed independent review (zero issues/followups).
@@ -155,9 +155,9 @@ Build/check negative fixtures and all four original catalog test cases are direc
 Rust tests. Commands locate the checkout from the compiled manifest, independent
 of caller cwd. No public Yetlet CLI or browser test is added.
 
-See [YT-084 evidence](../docs/YT-084-VERIFICATION.md) for 128 matched snapshot files,
+See [YT-084 evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-084-VERIFICATION.md) for 128 matched snapshot files,
 test commands, the early catalog CI adoption and remaining review gates. The
-Python sources remain frozen reference oracles. YT-085 smoke implementations are accepted. YT-086 adds the measurement, qualification and release candidate; its separate review and acceptance limits are recorded in [verification](../docs/YT-086-VERIFICATION.md).
+Python sources remain frozen reference oracles. YT-085 smoke implementations are accepted. YT-086 adds the measurement, qualification and release candidate; its separate review and acceptance limits are recorded in [verification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-086-VERIFICATION.md).
 
 
 ## YT-086 candidate commands

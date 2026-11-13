@@ -45,7 +45,7 @@ expand YT-094's pending platform/input qualification or its reviewed code.
 
 ## YT-107 form/save follow-up (2026-10-21)
 
-The separately selected [YT-107 guide](YT-107-FORM-FEEDBACK.md#application-authoring-guide)
+The separately selected [YT-107 guide](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-107-FORM-FEEDBACK.md#application-authoring-guide)
 connects these observations to actual Admin/Todo code: application-owned field
 feedback, per-draft save results, deliberate recovery, and native/editor/reset
 comparison. One rich-error Admin adapter and one code-only Todo mapping do not

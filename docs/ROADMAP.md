@@ -816,38 +816,26 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M10 — Release engineering and production-security qualification** | Licensing, governance, compatibility, threat model, supply-chain and operational qualification | YT-060–YT-067 | Maintainer decisions, hosted controls, reproducible release evidence and internal Codex-assisted security assessment |
 | **M11 — Done at selected product and Experimental renderer scopes** | Independent complete-product and browser-first opt-in renderer lines | YT-069–YT-081 | Reviewed plan; later separately authorized product/renderer evidence, isolation and independent implementation review; no release activation |
 | **M12 — Done at bounded migration scope** | Rust-native active developer build/check/smoke/qualification/release tooling, isolated from framework dependencies | YT-082–YT-086 | Exact 52-file/three-workflow parity, preserved suite gates, actual Linux/Windows owned-child evidence, Python-free transitive command graph and separate independent review per item; no public CLI or release activation |
-| **M13 — Done at bounded Linux CLI preview scope** | Unpublished Rust `yetlet` binary, minimal handler-first scaffold and local doctor/build/dev | YT-087 | [CLI contract](YT-087-CLI-PLAN.md), fail-closed templates and processes, actual local HTTP/PTY evidence and final independent Reviewer PASS; no registry publication, Windows qualification or release activation |
+| **M13 — Done at bounded Linux CLI preview scope** | Unpublished Rust `yetlet` binary, minimal handler-first scaffold and local doctor/build/dev | YT-087 | [CLI contract](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-087-CLI-PLAN.md), fail-closed templates and processes, actual local HTTP/PTY evidence and final independent Reviewer PASS; no registry publication, Windows qualification or release activation |
 | **M14 — Done at bounded Linux/Windows CLI preview scope** | Two internal OS adapters for filesystem-safe scaffolding and foreground process ownership | YT-088 | [Cross-platform plan](YT-088-CROSS-PLATFORM-CLI-PLAN.md), real GNU/MSVC positive new/build/dev HTTP/console/cleanup and per-slice independent reviews; no public release |
 | **M15 — Done at bounded Linux OCI/Kubernetes configuration-generator preview scope** | Opt-in CLI emission of Dockerfile, Compose and portable Kubernetes manifests without platform SDK coupling | YT-089 | [Generator plan](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md), source-path-aware image build, app-owned bind/health/SIGTERM, offline generation and per-slice independent verification; no image publication or cluster deployment |
-| **M16 — Done at bounded YT-090 / YT-097 scope** | Opt-in typed native configuration and optional CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](YT-090-VERIFICATION.md); [CLI integration Linux/Windows GNU/MSVC and independent Reviewer PASS](YT-097-VERIFICATION.md); no default/core/browser or release change |
-| **M17 — Done at bounded YT-091 Tailwind scope** | Opt-in build-time Tailwind CSS 4 application scaffolding | YT-091 | [Guide](CLI-GUIDE.md#opt-in-tailwind-css-4-yt-091-independently-reviewed), [evidence](YT-091-VERIFICATION.md); actual Linux HTTP/CSS/CSP/signals and native Windows GNU/MSVC Tailwind source-bound builds PASS; independent Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS, no core/browser change or release activation |
-| **M18 — Done at bounded YT-098–YT-101 scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; [YT-101 cloud delivery](YT-101-VERIFICATION.md) Done: real Linux Docker/Compose/K3s Pod/Service/asset PASS, Windows MSVC native/source PASS, subsequent Windows GNU 726/726 source and native tests/generator PASS after official MinGW64 GCC/Binutils installation, independent Reviewer `wc_job_fYtD9F8KXkXyzvYQ` PASS; no stable shared asset API, default/core/browser or release change |
+| **M16 — Done at bounded YT-090 / YT-097 scope** | Opt-in typed native configuration and optional CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-090-VERIFICATION.md); [CLI integration Linux/Windows GNU/MSVC and independent Reviewer PASS](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-097-VERIFICATION.md); no default/core/browser or release change |
+| **M17 — Done at bounded YT-091 Tailwind scope** | Opt-in build-time Tailwind CSS 4 application scaffolding | YT-091 | [Guide](CLI-GUIDE.md#opt-in-tailwind-css-4-yt-091-independently-reviewed), [evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-091-VERIFICATION.md); actual Linux HTTP/CSS/CSP/signals and native Windows GNU/MSVC Tailwind source-bound builds PASS; independent Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS, no core/browser change or release activation |
+| **M18 — Done at bounded YT-098–YT-101 scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; [YT-101 cloud delivery](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md) Done: real Linux Docker/Compose/K3s Pod/Service/asset PASS, Windows MSVC native/source PASS, subsequent Windows GNU 726/726 source and native tests/generator PASS after official MinGW64 GCC/Binutils installation, independent Reviewer `wc_job_fYtD9F8KXkXyzvYQ` PASS; no stable shared asset API, default/core/browser or release change |
 | **M19 — Production-oriented application and developer experience (partial)** | Production Starter, signing, Admin Dashboard, DI/DX research, browser-only starter and optional HA/rolling deployment asset compatibility | YT-092–YT-095, YT-102–YT-112 | Real native/browser/reference-app proof, independently reviewed DX research, a separately qualified browser-only static workflow, and independently validated multi-version asset-retention/rolling-availability evidence; no automatic production support or release claim |
 | **M20 — Release-candidate qualification in progress** | Candidate API/security/supply-chain validation before explicit public-release decision | YT-096, YT-020 | [Current selected source/tag, hosted build/verifier and owner-host retention](YT-096-HOSTED-DRILL-PLAN.md) PASS at bounded unsigned sixteen-package scope; D6 identity/signing and remaining trust/registry/final-release gates stay open. Historical original-nine qualification and failure dispositions follow: [Selected `ce56e08` candidate](YT-096-CANDIDATE-QUALIFICATION.md): original nine experimental 0.1.0 libraries and Rust 1.99; local source-package/clean-consumer preflight passes on Ubuntu 26.04.1. [Selected dependency/API preflight](YT-096-SUPPLY-CHAIN-DELTA.md) adds 23 scoped SBOM/license checks, nine passing RustSec scans and explicit coverage limits. [Partial platform execution](YT-096-PLATFORM-QUALIFICATION.md) adds Ubuntu 24.04.5 container userspace native/doctest PASS, five wasm builds and fresh Linux Firefox PASS; resumed Windows MSVC standalone-package execution passes 83 native tests/four doctests, with historical cache failures and shared-kernel/Chrome scope retained. [Two-host archive rebuild](YT-096-TWO-HOST-REBUILD.md) matches all nine Windows archives byte-for-byte to Linux with normal Cargo verification. [Azure Run Command continuation](YT-096-AZURE-RUN-COMMAND.md) passes actual Ubuntu 24.04.5 guest execution, empty-cache nine-archive rebuild, 83 native tests/four doctests and five wasm libraries; earlier SSH failures preserved and resources deleted. [GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) passes at the exact candidate with nine byte-identical archives and matched source/lock/tools, adding separately operated execution evidence. [Final documentary reconciliation](YT-096-FINAL-RECONCILIATION.md) joins nine archives to 23 SBOMs and retained compiler/platform/browser evidence without runtime reruns. The [owner accepted the bounded support scope and known inventory differences](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20), keeping exact-candidate Chrome and complete compiled/per-library/system inventory Not verified; [Final independent candidate review](YT-096-SECURITY-RELEASE-REVIEW.md) completed with technical/security evidence accepted but overall release gate FAIL, release-ready NO. Only support/inventory disposition is resolved; [minimum formal trust research](YT-096-FORMAL-TRUST-PROPOSAL.md) proposes conditional GitHub OIDC/public Sigstore and exact source/evidence bindings without implementation or policy selection. The [metadata decision brief](YT-096-TRUST-DISCLOSURE-DECISIONS.md) records public exposure/impacts and pending owner choices while retaining the original candidate and evidence without reruns or signing. Formal integrity/trust, registry proof, public activation controls and concrete final maintainer approval remain open; YT-020 stays Blocked, no auto-merge/release |
 | **M21 — Opt-in server capability roadmap (registered)** | Separate optional Authentication/Authorization, Session integration, rate limiting and conditional provider studies without bloating core | YT-113–YT-123 | [Staged capability plan](YT-113-123-OPT-IN-CAPABILITIES.md): YT-113 research and YT-114 native foundation Done after separate independent Reviewer PASS; YT-115 Done at Memory bridge scope and YT-116/119/120 Done at independently reviewed study scopes; [YT-117 rate limiting](YT-117-RATE-LIMIT.md) Done at per-process scope after independent Reviewer PASS; YT-118/121/122 research Done after independent Reviewer PASS and [YT-123 research](YT-123-TRACING-CORRELATION-STUDY.md) Done after independent Reviewer PASS; design gates and independent review before implementation; no M20 release-gate dependency or production claim |
 | **M22 — Production Readiness Phase 2 (bounded local scope complete)** | Sequential app-owned admission, opt-in observability, bounded capacity/recovery and upgrade compatibility | YT-127–YT-131 | [Contracts, baseline gaps and final matrix](PRODUCTION-READINESS-PHASE2.md): YT-127 Done at bounded A1 scope after independent Reviewer PASS; YT-128 Done after [local verification and independent Reviewer PASS](YT-128-OBSERVABILITY.md); YT-129 [local load/recovery evidence](YT-129-LOAD-SOAK-RECOVERY.md) Done after independent Reviewer PASS; YT-130 [local restore/runbook evidence](YT-130-BACKUP-RESTORE.md) Done after independent Reviewer PASS; YT-131 [v1-to-v2 implementation and local evidence](YT-131-MIXED-VERSION-COMPATIBILITY.md) Done after independent Reviewer PASS and controller acceptance; A1 → A2 → B1 → B2 → C1 with source-bound evidence and cleanup. Keep Implemented, Verified and Deployment-qualified separate; no generic infrastructure, M20 candidate expansion or production/release claim |
 
-YT-107 is Done at the [owner-selected application form/save-feedback scope](YT-107-FORM-FEEDBACK.md).
-Server field feedback, deliberate save-state/recovery and the final
-editor/native/Todo comparison have focused verification and independent
-Reviewer PASS. The authoring guide retains existing mechanisms, intentional
-ownership/HTTP/Reset differences and explicit manual-recovery/platform limits.
-This does not close the separate release gates.
-
-YT-108 is Done at the separately selected [narrow hidden-attribute scope](YT-108-HIDDEN-ATTRIBUTE.md).
-It preserves YT-107's accepted completion and the intentional overall SSR/DOM
-subset differences. 34 native tests, WASM/Clippy and the actual headless Chrome
-Todo/Search smoke pass with owned cleanup; independent Reviewer role-directed Job
-wc_job_0a2iPQ326nNUvRDi PASS has zero issues or required followups. No release
-candidate is requalified by this work.
-
-YT-109 is Done at the owner-selected [DOM capability and authoring research scope](YT-109-DOM-CAPABILITY-REVIEW.md).
-Independent Reviewer role-directed Job wc_job_QTvHEtko7LzZWmbB returned PASS with
-zero issues or required followups after the retained initial dispatch rejection.
-The review distinguishes shared-View consistency and safe vocabulary from
-application-owned property/event behavior, then proposes separately selectable
-control and URL slices. No self-review was needed. It does not implement those
-proposals, reopen YT-108, or change the release candidate.
+**M19 form/DOM authoring (YT-107–109):** Done at their originally
+bounded application feedback, narrow `hidden` attribute, and
+DOM-capability research scopes. Current [View/form usage](VIEW-COMPONENTS.md#configuration-and-errors)
+and [bounded DOM contract](YT-110-DOM-CAPABILITIES.md) retain actual
+rendering/browser ownership and strict attribute/escaping policies.
+These do not create general form binding, a remote event circuit or
+a newly qualified package release. Original source, browser failures,
+reviewer decisions and source identity remain in local Git
+`b610acc7e098020b6b59dfa0d1ab2b75b059e656` without public-link reachability claims.
 
 YT-110 is Done at the separately owner-selected [bounded DOM capability scope](YT-110-DOM-CAPABILITIES.md).
 Common View checks, finite semantic/accessibility vocabulary, native control
@@ -985,7 +973,7 @@ or required followups. Native SSR remains the default; no router,
 backend service, HMR, production hosting or release is selected.
 
 **YT-105 form-binding comparison (2026-10-19, research only):** the first
-[Admin/Todo study](YT-105-FORM-BINDING-RESEARCH.md) measures control/value/event
+[Admin/Todo study](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-105-FORM-BINDING-RESEARCH.md) measures control/value/event
 glue and recommends documenting native action-time drafts versus graph-owned
 drafts over existing `web-sys` and listener ownership. No public form-binding helper or
 runtime change is selected. HTTP feedback is compared in the third study below.
@@ -1004,7 +992,7 @@ separately selected snapshot slice is recorded below. Independent Reviewer
 for this research slice.
 
 **YT-105 HTTP-feedback comparison (2026-10-19, research only):** the
-[third Admin/Todo study](YT-105-HTTP-FEEDBACK-RESEARCH.md) finds the existing
+[third Admin/Todo study](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-105-HTTP-FEEDBACK-RESEARCH.md) finds the existing
 body-token CSRF sufficient for these callers and traces field-detail loss in
 both the Admin handler and common executor. It recommends a private Admin HTTP
 adapter/payload trial and Todo code mapping before changing public error types;
@@ -1102,7 +1090,7 @@ security/release qualification follows from this bounded Done status.
 **YT-092 bounded closeout (2026-10-18):** the independent
 [Issue Tracker starter](../examples/production-starter/README.md) exercises
 SSR forms, a command JSON API and explicit SQLite persistence using existing
-settings/CLI and optional modules. [Qualification](YT-092-STARTER-VERIFICATION.md)
+settings/CLI and optional modules. [Qualification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-092-STARTER-VERIFICATION.md)
 records Linux 15/15 and native Windows GNU 16/16 tests, actual HTTP, persistence
 across process restart, native console Ctrl-C, frozen CLI build/run, strict
 Linux lint/format/docs checks and independent Reviewer `/root/yt092_review` PASS
@@ -1339,7 +1327,7 @@ real Plain and Tailwind Chrome HMR/CSP/WS plus two actual foreground
 Ctrl-C/restart/cleanup paths PASS, and independent Reviewer
 `wc_job_MprRYhxeijOu6xG5` passed with zero issues/required followups.
 YT-101 is **Done at bounded opt-in cloud-delivery scope**:
-[implementation and real runtime evidence](YT-101-VERIFICATION.md) cover
+[implementation and real runtime evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md) cover
 plain/plugin Vite and optional typed config/config-only generators, absolute
 runtime roots, sanitized three-context inventories, runtime-only token wiring
 and 13/13 unchanged legacy outputs. Linux Docker Buildx/non-root runtime,
@@ -1367,7 +1355,7 @@ classes feed a bounded startup CSS snapshot served at its SHA-256 URL with
 strict CSP, CSS MIME, nosniff and immutable asset caching. Existing templates,
 core/browser APIs and the twelve-sample catalog remain unchanged. All generated
 source variants stay outside the deployment generators' accepted contract.
-[Implementation evidence](YT-091-VERIFICATION.md) records actual checks and
+[Implementation evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-091-VERIFICATION.md) records actual checks and
 operational limits. Parent native Linux HTTP/CSP/assets and Windows GNU/MSVC generated-app
 qualification passed on exact source. A separate independent read-only
 Reviewer `wc_job_T7Blu0CYQUOmaQTL` returned PASS with zero issues/followups,
@@ -1390,7 +1378,7 @@ later verified actual Linux HTTP/CSP/health/SIGTERM/SIGINT and native Windows
 GNU/MSVC generated-app/Cargo tests. A new independent read-only Reviewer
 `wc_job_efQ_nYLzdZltPEjt` passed (zero issues and required followups), closing
 YT-097 at this bounded unpublished opt-in CLI scope.
-[Evidence](YT-097-VERIFICATION.md) preserves these limits. Existing
+[Evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-097-VERIFICATION.md) preserves these limits. Existing
 Docker/Compose/Kubernetes generators reject the separate configuration cloud app.
 Tailwind YT-091 is now separately authorized under M17 above. Certificates,
 external vaults, hot reload, formal release and CI/CD remain deferred;
@@ -1398,35 +1386,36 @@ YT-020 remains Blocked.
 
 ## M15 — Opt-in Docker, Compose and Kubernetes generators
 
-[YT-089d Kubernetes generator](YT-089D-VERIFICATION.md) is independently accepted by Reviewer `wc_job_1SJSI37ZToF_od0U` after actual Linux K3s client/server dry-run, Ready Pod, ClusterIP HTTP/CSP/health, scale-down, test image removal and namespace cleanup, with exact native GNU/MSVC byte parity. These were parent-operated limited tests separate from the coding Job. Final YT-089e current-source/documentation review independently passed (`wc_job_ci3bjlyeh2KHRhta`, zero issues/followups); M15 is Done at the limited unpublished generator scope, not production release.
+**Done at bounded configuration-generator scope.** M15 delivered
+opt-in Dockerfile/Compose/Kubernetes *configuration outputs* with
+source confinement; Linux Docker/Compose and isolated K3s tests
+plus native Windows GNU/MSVC generated-output parity passed separately.
+These were not hosted production deployments or runtime-coupled
+containers in Yetlet Core. See the [retained generator plan](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md),
+[current CLI guide](CLI-GUIDE.md#original-cross-platform-tooling-and-cloud-generator-qualification),
+and [deployment profiles](PRODUCTION-DEPLOYMENT-PROFILES.md).
 
-Following reviewed YT-087/YT-088 commit `d24a05033c57e5b98dd57bf83189bc1297f6f28c`, the maintainer selected **generated configuration files over runtime platform coupling**. [YT-089](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md) is independently reviewed M15 design only (Reviewer `wc_job_9IplTI1HHkyZK9hv` PASS); [YT-089a opt-in cloud runtime](YT-089A-VERIFICATION.md) independently passed Linux bind/health/real SIGTERM/SIGINT/drain and native GNU/MSVC generated cloud builds (Reviewer `wc_job_0dvTDNAV22Vbpc5j` PASS). [YT-089b Docker configuration generation](YT-089B-VERIFICATION.md) is independently accepted by Reviewer `wc_job_IC92mEXoQMsG4nTg` after actual three-context Linux image build, HTTP/CSP/SIGTERM cleanup and bit-identical Windows GNU/MSVC output. Compose is independently accepted by Reviewer `wc_job_OCVGSYl5uAGET8w3`; Kubernetes is separately accepted by Reviewer `wc_job_1SJSI37ZToF_od0U` with real isolated Multipass K3s evidence and full cleanup. This does not authorize image publication, persistent K8s deployment or production release. YT-020 remains Blocked.
+## M13–M14 — Developer CLI preview and platform parity
 
-[YT-089c Compose](YT-089C-VERIFICATION.md) is independently accepted after source-bound
-Linux Compose HTTP/SIGTERM/cleanup and exact native GNU/MSVC two-file parity.
-[YT-089d Kubernetes](YT-089D-VERIFICATION.md) is independently accepted after actual schema/native parity and a parent-operated isolated Linux K3s deployment/HTTP/cleanup. The generator itself performs no cluster action. [YT-089e current-source closeout](YT-089E-VERIFICATION.md) passes Linux and GNU/MSVC Rust checks and preserves exactly the accepted source runtime semantics; independent final Reviewer `wc_job_ci3bjlyeh2KHRhta` PASS completes M15 at bounded unpublished config-generator scope.
+YT-087 initially delivered a **local Linux-only, unpublished CLI**.
+Windows GNU/MSVC initially proved compile/fail-closed behavior, then
+YT-088 separately qualified positive Windows `new/build/dev`, native
+HTTP/CSP and Ctrl-C/Break/child cleanup. Each scoped review and original
+failure remains recoverable in local Git `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; neither
+preview status nor qualified historical platform set should be projected
+onto current release packages. The [CLI contract](CLI-CONTRACT.md),
+[retained M14 plan](YT-088-CROSS-PLATFORM-CLI-PLAN.md) and
+[current CLI guide](CLI-GUIDE.md) own current development and release distinctions.
 
-## M13 — CLI developer preview
+## M12 — Repository-toolchain migration
 
-After independently accepted M12 commit `94cf8f555b554a26c2416842eab06110b229904d`, the maintainer authorized beginning [YT-087](YT-087-CLI-PLAN.md). Its Linux local `new`/`doctor` (087a) and frozen `build`/foreground `dev` (087b) slices have each received distinct independent Reviewer PASS after their bounded corrections. The 087c CLI documentation and isolated validation also passed final independent Reviewer `wc_job_avwDfY3wH233pvN7` (zero issues/followups). M13 is Done only at the unpublished Linux preview scope; none of these previews has been published. This is not a crates.io release or YT-020 qualification.
-
-A later [two-runner native Windows verification](YT-087-WINDOWS-VERIFICATION.md) initially failed on offline toolchain prerequisites and, after explicit maintainer authorization for installation, **passed Windows GNU/MSVC compilation, Windows-applicable tests and expected fail-closed non-Linux CLI behavior**. This validates native portability of the currently implemented source, not functioning Windows `new/build/dev` features or a broader M13 release-support envelope.
-
-## M14 — Platform-native Yetlet CLI parity
-
-The maintainer clarified that Linux and Windows should share the same working CLI command contract. The previously verified Windows GNU/MSVC **compilation and expected refusals** are not functional Windows CLI acceptance. [YT-088](YT-088-CROSS-PLATFORM-CLI-PLAN.md) implemented two narrow internal OS adapter boundaries (safe filesystem publication and owned-process/terminal execution). Distinct 088a–d independent Reviewer PASS receipts now cover Linux preservation and native Windows GNU/MSVC positive new/build/dev, full SSR HTTP/CSP, console Ctrl-C/Break and resistant-child Job cleanup. Final 088e documentation/current-source regressions passed on Linux and Windows GNU/MSVC, with independent Reviewer `wc_job_IPC2lyaZyAz72KlT` PASS (zero issues/followups). M14 is Done at the bounded unpublished Linux/Windows x86-64 developer CLI scope, not at production or public-release scope. Linux YT-087 historical acceptance stays unchanged and YT-020 remains Blocked.
-
-## M12 — Repository-toolchain planning checkpoint
-
-The [Rust toolchain plan](M12-RUST-TOOLCHAIN-PLAN.md), [complete migration ledger](M12-PYTHON-MIGRATION.md) and [YT-082 verification](YT-082-VERIFICATION.md) file the dependency order `YT-081 → YT-082 → YT-083 → YT-084 → YT-085 → YT-086`. The independent directional backlog review passed; this does not accept implementation. YT-082 is Done after separate independent document review PASS; YT-083 is Done after corrected Linux/Windows MSVC tests and fresh independent Reviewer PASS; YT-084 is Done after [128-file builder parity, Rust checks and independent reviewer PASS](YT-084-VERIFICATION.md); YT-085 is Done after its separate independent Reviewer PASS, retaining its scoped evidence and unavailable environment boundaries. YT-086 is Done at bounded source/fixture migration scope after independent Reviewer `wc_job_6UfDDdHnNCBXkMhA` PASS ([evidence](YT-086-VERIFICATION.md)); full runtime-graph and environment qualifications remain unverified. The original YT-082 checkpoint changed documents only. YT-087 was Deferred in the original M12 plan; its separately authorized M13 unpublished Linux preview is now Done after its own independent review. YT-020 remains Blocked.
-
-- [x] YT-082 plan and exact inventory independently accepted; documentation checks are recorded separately from software evidence.
-- [x] YT-083 isolated unpublished xtask/doctor/process foundation independently accepted, including actual Linux and Windows owned-child cleanup without global host changes.
-- [x] YT-084 seven builders and docs/catalog checks/tests accepted after parity and a separate independent Reviewer PASS.
-- [x] YT-085 thirty scenario/helper mappings accepted after scoped runtime evidence, status/cleanup repairs and a separate independent Reviewer PASS.
-- [x] YT-086 benchmarks/qualification/release/inline private rebuild and CI migration independently accepted at bounded source/fixture scope; controlled PATH proves executed commands interpreter-free, while unexecuted runtime graph remains Not verified.
-
-Each later gate needs its own independent Reviewer PASS. Historical receipts and failed qualification remain immutable. A bounded language-port check cannot claim full-load, physical IME/AT, GPU performance, production qualification or release acceptance. No Rust/CI implementation, downloads/installs, hosted trigger, new validation framework, commit or push occurs in YT-082.
+YT-082–086 ported seven builder/check/catalog paths and related scripts
+toward Rust `xtask`; exact original migration and source-closure evidence
+are in the [M12 plan](M12-RUST-TOOLCHAIN-PLAN.md) and
+[migration ledger](M12-PYTHON-MIGRATION.md). Historical acceptance
+did not run every unselected runtime/environment case. All individual
+YT-082–086 Backlog items remain Done at their accepted bounds; no
+separate CLI/public release is inferred from this migration.
 
 ## M11 — Product readiness and optional scene rendering (selected delivery)
 

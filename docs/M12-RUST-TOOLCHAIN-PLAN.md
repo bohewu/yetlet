@@ -8,7 +8,7 @@ verification and release-check toolchain**, using Rust tooling first and a publi
 CLI only later. The directional backlog review passed with no issues or required
 followups. That initial PASS approves the proposal only; a subsequent independent document review accepted this plan. Neither review
 implement a command, or close YT-083–YT-086. See the exact review and baseline in
-[YT-082 verification](YT-082-VERIFICATION.md) and the complete
+[YT-082 verification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-082-VERIFICATION.md) and the complete
 [52-file migration ledger](M12-PYTHON-MIGRATION.md).
 
 ## Authority and boundaries

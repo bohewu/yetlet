@@ -5,9 +5,24 @@ independently reviewed at its bounded YT-098 scope, under
 [ADR 0005](adr/0005-opt-in-capability-modules.md) and
 [handler-first ADR 0006](adr/0006-handler-first-mvc-optional.md).
 [Sources and run instructions](../experiments/asset-contract/README.md) and
-[verification boundaries](YT-098-VERIFICATION.md) are separate from the accepted
+[verification boundaries](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-098-VERIFICATION.md) are separate from the accepted
 [Vite feasibility spike](VITE-SPIKE-VERIFICATION.md). No shared or stable Yetlet
 asset API is promoted by this task.
+
+### Historical optional asset and Vite proof boundaries
+
+The early YT-098 application-owned producer-neutral graph, YT-099
+production Vite build, YT-100 development bridge and YT-101 generated
+cloud configuration were separate bounded experiments. Their current
+usage follows the [CLI Vite instructions](CLI-GUIDE.md#vite-execution),
+[generator matrix](CLI-GUIDE.md#current-generator-source-matrix) and
+[deployment profiles](PRODUCTION-DEPLOYMENT-PROFILES.md), not the original
+task checklists. They did **not** add a mandatory framework asset/runtime
+registry, transparent global HMR, automatic deployment or generalized
+production/Windows/cloud qualification. Keep strict prebuilt manifest/source
+closure, CSP and app-owned public versus private asset separation. The dated
+verification/negative cases are recoverable from Git commit `b610acc7e098020b6b59dfa0d1ab2b75b059e656`
+(local original identity; GitHub reachability remains unverified).
 
 ## Two actual producers before extraction
 
@@ -111,7 +126,7 @@ Any future immutable policy must verify a content digest against its URL, and
 operators must retain **all** old digest assets needed by old HTML and lazy JS
 through the full cache/rollout lifetime. An in-process snapshot protects current
 requests only until that process exits. Cache expiry cannot repair missing lazy
-chunks after a rollout. [YT-101](YT-101-VERIFICATION.md) qualifies bounded cloud
+chunks after a rollout. [YT-101](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md) qualifies bounded cloud
 delivery of these snapshots. The optional application/deployment-owned
 [YT-103 plan](YT-103-ROLLING-ASSET-PLAN.md) compares retention options, and its
 [local evidence](YT-103-ROLLING-ASSET-VERIFICATION.md) records an independent

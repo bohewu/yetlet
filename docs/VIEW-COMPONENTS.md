@@ -228,6 +228,26 @@ CSRF remain application responsibilities; composition alone supplies none of
 them. Follow [forms](../examples/forms-validation/README.md) and
 [Session cart](../examples/cart-server/README.md) for existing complete paths.
 
+**Form and reactive authoring boundaries:** the original Admin/Todo
+application feedback work demonstrated three app-owned slices: convert native
+server validation errors to field feedback; model explicit save/recovery state;
+and reconcile editor/native/Todo interactions without silently persisting each
+keystroke. An HTTP 200, field message or editor reset cannot alone establish a
+durable business write, authorization or safe retry. The current
+[forms example](../examples/forms-validation/README.md) owns native validation
+and redirect/CSRF behavior; [reactivity](../crates/yetlet/guides/reactive.md)
+owns scoped committed-state reads and weak-handle disposal. The
+[dated graph-snapshot contract](YT-105-GRAPH-SNAPSHOT.md) is retained for
+its narrow handle semantics. Early YT-107–109 checks remain source-bound,
+not certification of generalized two-way bindings.
+
+The native and browser renderers accept only their declared `hidden`
+attribute combinations. A successful SSR tree does not imply that unsupported
+DOM attributes or native control defaults will be mirrored by browser mount;
+manual controls, form reset, navigation and focus stay app/browser-owned.
+Read the [bounded DOM contract](YT-110-DOM-CAPABILITIES.md) and
+[DOM guide](../crates/yetlet-browser/guides/dom.md).
+
 The renderer-neutral shape does not make all Views browser-compatible.
 [DOM mounting](../crates/yetlet-browser/guides/dom.md) has a finite vocabulary and browser
 navigation/lifetime checks. List children and CSS classes do not create keyed

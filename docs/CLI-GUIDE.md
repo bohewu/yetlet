@@ -557,6 +557,30 @@ The fresh backend reads its runtime settings on each restart. Browser refresh,
 in-process state preservation and graceful request draining are not promised.
 Historical Vite lifecycle evidence does not qualify the added watch mode.
 
+## Original cross-platform tooling and cloud generator qualification
+
+The original YT-082–086 Rust repository toolchain migration and YT-087–089
+developer preview are **historic delivery**, not additional current commands.
+Current `cargo xtask` and independent `yetlet` CLI entry points are defined
+above and in [development instructions](DEVELOPMENT.md), while the
+[CLI contract](CLI-CONTRACT.md) owns supported command spelling and platform
+options. Linux-only preview and later native Windows GNU/MSVC
+build/new/dev verification were separate environments; an original failed
+Windows prerequisite is not proof of supported operation. The accepted M15
+experiment generated Dockerfile, Compose and Kubernetes *configuration
+artifacts* rather than bundling Docker/K3s or deploying into the request path.
+Original Linux Docker/Compose and isolated K3s results, generated-file Windows
+parity and cleanup are recoverable from the pre-cleanup local Git commit
+`b610acc7e098020b6b59dfa0d1ab2b75b059e656`; this does not qualify arbitrary source layouts, live clusters,
+production HA, rolling upgrades or an unreviewed public release.
+
+Current generators are explicitly opt-in, create protected files and neither
+pull/build images nor authenticate to registries or deploy workloads.
+See the [generator source matrix](#current-generator-source-matrix),
+[asset guide](ASSETS.md) and [deployment profiles](PRODUCTION-DEPLOYMENT-PROFILES.md).
+The retained [cloud-native plan](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md)
+describes the original scope and unsolved platform assumptions.
+
 ## Current generator source matrix
 
 Generators accept the following exact current `new --service` source shapes after
@@ -608,7 +632,7 @@ runtime/deployment evidence does not transfer automatically to this checkout.
 | Service with production Vite, optional settings/plugin Tailwind | Explicitly prebuilt and validated flat dist |
 
 The retained legacy matrix is separately qualified by
-[YT-101 evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-101-VERIFICATION.md). Standalone Tailwind,
+[YT-101 evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md). Standalone Tailwind,
 legacy dev bridge, edited/general apps and unknown dependencies/layouts remain
 refused; adding a marker or CLI namespace alone cannot qualify arbitrary code.
 
@@ -633,7 +657,7 @@ security defaults and operator-owned drain/retention limits remain unchanged.
 Use `new NAME --tailwind`; add `--vite` for the official Vite plugin. Without
 Vite, prepare the pinned standalone tool and CSS build explicitly using the
 [generated Tailwind instructions](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/tailwind/SELECTED-README.md).
-[YT-091 evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-091-VERIFICATION.md) retains the historical
+[YT-091 evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-091-VERIFICATION.md) retains the historical
 source-bound native/browser acceptance; it does not qualify the new settings
 representation.
 

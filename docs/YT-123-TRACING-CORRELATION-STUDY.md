@@ -32,7 +32,7 @@ semantics or label them as production background jobs. Middleware Lab's local
 `Trace` is a vector of static ordering markers, not Rust tracing or W3C context.
 Only Starter demonstrates application HTTP-to-tracing events in these inspected
 paths. There is no repeated shared span/propagation implementation to extract.
-Existing tests and historical [YT-092 evidence](YT-092-STARTER-VERIFICATION.md)
+Existing tests and historical [YT-092 evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-092-STARTER-VERIFICATION.md)
 were inspected/reused at their original scope, not rerun or refreshed.
 
 ## Identity, namespace and source trust

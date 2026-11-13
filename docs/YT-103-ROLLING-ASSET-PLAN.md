@@ -13,7 +13,7 @@ provider, CLI command, production deployment or release support promise.
 ## Existing boundary
 
 The [asset contract](ASSETS.md#cache-and-retention) and
-[YT-101 evidence](YT-101-VERIFICATION.md) qualify one image's startup snapshots.
+[YT-101 evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md) qualify one image's startup snapshots.
 The app-owned Vite adapter serves `/static/` from memory with `no-store`; replacing
 that image does not retain files referenced by old pages. The accepted Kubernetes
 generator provides health probes and a termination budget, without proving

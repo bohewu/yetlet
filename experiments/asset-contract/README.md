@@ -4,7 +4,7 @@ Experimental and unpublished. This standalone Cargo workspace consumes actual
 standalone Tailwind CSS and both existing Vite production profiles through one
 application-owned neutral snapshot. No framework crate, ADR, CLI flag/template,
 root dependency, browser runtime or VITE-SPIKE source is changed. See the
-[contract](../../docs/ASSETS.md) and [verification](../../docs/YT-098-VERIFICATION.md).
+[contract](../../docs/ASSETS.md) and [verification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-098-VERIFICATION.md).
 
 Use the already provisioned, pinned tools; these commands install nothing:
 

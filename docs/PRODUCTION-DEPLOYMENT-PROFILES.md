@@ -161,7 +161,7 @@ recorded with the focused integration proof.
 The [CLI source matrix](CLI-GUIDE.md#current-generator-source-matrix)
 accepts exact unedited generated profiles and constrained manifests/layouts.
 The custom Starter differs. Historical [YT-089](YT-089-VERIFICATION.md) and
-[YT-101](YT-101-VERIFICATION.md) Docker/Compose/Kubernetes PASS do not qualify
+[YT-101](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md) Docker/Compose/Kubernetes PASS do not qualify
 Starter delivery. Starter rejects generated `APP_SERVER__HOST=0.0.0.0`;
 generated `APP_SERVICE__TOKEN` differs from `APP_SERVICE__API_TOKEN`.
 Non-loopback Pod probes are not compatible by default. No generator repair,
