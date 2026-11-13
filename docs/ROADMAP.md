@@ -2681,8 +2681,8 @@ publication, Commit or Push occurs in this document update.
   retain same-origin navigation and no images. Read the [DOM guide](../crates/yetlet-browser/guides/dom.md)
   for per-mount policies, parser parity and ownership; the [dated inventory](YT-219-HTML-INVENTORY.md)
   remains the coverage and Typed Tag Builder selection reference. Element
-  admission does not imply every attribute or browser API. The [DOM expansion](YT-220-HTML-DOM-IMPLEMENTATION.md)
-  and [link/image policy](YT-221-DOM-URL-IMAGE-CONTRACT.md) retain focused
+  admission does not imply every attribute or browser API. The [DOM guide](../crates/yetlet-browser/guides/dom.md)
+  and [original policy evidence](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md) retain focused
   native/Wasm/Chrome/Firefox evidence and original failures, not exhaustive
   element, performance or platform qualification. The [publication record](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
   separately proves distribution and registry resolve/compile.
@@ -2695,7 +2695,7 @@ publication, Commit or Push occurs in this document update.
   create-only and private receipts stay outside uploaded content. Start with the
   [CLI guide](CLI-GUIDE.md#static-html-build) and [standalone example](../examples/static-site/README.md);
   retain the [static export contract](YT-222-STATIC-HTML-CONTRACT.md) and
-  [implementation evidence](YT-223-STATIC-HTML-IMPLEMENTATION.md). Bounded GNU/MSVC
+  [original implementation evidence](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md). Bounded GNU/MSVC
   CLI execution and Chrome/Firefox checks remain tied to their original inputs.
   The [CLI publication and installed-consumer record](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
   is separate from those static/browser checks. This tooling adds no static-export

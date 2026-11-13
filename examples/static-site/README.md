@@ -5,7 +5,7 @@ CLI `0.1.1` does not implement build --static. This reference application is
 explicitly pinned to the reader SDK in [Cargo.toml](Cargo.toml) alongside the introductory guide and
 can be copied outside the repository without SDK source/path overrides.
 See the [static export contract](../../docs/YT-222-STATIC-HTML-CONTRACT.md) and
-[actual evidence and validation limits](../../docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
+[historical implementation evidence](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
 
 ## Prerequisites
 

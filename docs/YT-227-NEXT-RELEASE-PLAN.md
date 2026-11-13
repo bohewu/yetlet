@@ -47,11 +47,11 @@ validity, token scope or a configured Trusted Publisher.
 
 | Surface | Included source changes | Compatibility and limits |
 |---|---|---|
-| SDK DOM | [YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md): 89 ordinary elements, scoped attributes, canonical structure and native controls | Bounded inventory; not all HTML, foreign namespaces or executable content |
-| SDK URL/image options | [YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md): `DomOptions`, `NavigationPolicy`, `ImagePolicy`, additive validation/mount entry points | Same-origin navigation and disabled images remain defaults. Per-mount opt-in HTTPS origins do not authorize arbitrary resources. Native validation is provisional; browser mount enforces origin and frozen-destination checks |
+| SDK DOM | [YT-220](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-220-HTML-DOM-IMPLEMENTATION.md): 89 ordinary elements, scoped attributes, canonical structure and native controls | Bounded inventory; not all HTML, foreign namespaces or executable content |
+| SDK URL/image options | [YT-221](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md): `DomOptions`, `NavigationPolicy`, `ImagePolicy`, additive validation/mount entry points | Same-origin navigation and disabled images remain defaults. Per-mount opt-in HTTPS origins do not authorize arbitrary resources. Native validation is provisional; browser mount enforces origin and frozen-destination checks |
 | SDK SSR | Initial `<pre>` LF/CR/CRLF preservation, included in YT-220 | Serialized leading newline bytes intentionally change to preserve parsed text; escaping and security checks remain |
 | SDK documentation | [YT-217](YT-217-DOCS-PREVIEW.md) API doc comments and examples | No new Session behavior or mandatory feature |
-| CLI | [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md): `yetlet build --static`, finite native export protocol, root/project paths, create-only output and private receipts; explicit optional Wasm islands | Published CLI0.1.1 lacks this command. Do not promise `yetlet new --static` or a general Markdown-site generator. Normal commands remain compatible |
+| CLI | [YT-223](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md): `yetlet build --static`, finite native export protocol, root/project paths, create-only output and private receipts; explicit optional Wasm islands | Published CLI0.1.1 lacks this command. Do not promise `yetlet new --static` or a general Markdown-site generator. Normal commands remain compatible |
 
 CLI0.2.0 is proposed for the additive static-build feature. The two-package SDK
 boundary and optional server/browser capabilities remain unchanged. No third-party

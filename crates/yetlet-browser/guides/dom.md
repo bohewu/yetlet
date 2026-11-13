@@ -13,10 +13,10 @@ validation. Default entry points keep same-origin navigation and no images;
 per-mount options can admit `img`, bringing the selected DOM scope to 90 elements.
 These additions are absent from SDK alpha.5's 38-element baseline.
 
-Use [the coverage contract and dated inventory](https://github.com/bohewu/yetlet/blob/master/docs/YT-219-HTML-DOM-CONTRACT.md#decision-and-inventory)
+Use [the coverage contract and dated inventory](https://github.com/bohewu/yetlet/blob/master/docs/YT-219-HTML-INVENTORY.md)
 for supported and deferred families. Typed View constructors do not imply DOM
-admission or complete browser API support. The original [DOM expansion](https://github.com/bohewu/yetlet/blob/master/docs/YT-220-HTML-DOM-IMPLEMENTATION.md)
-and [link/image policy](https://github.com/bohewu/yetlet/blob/master/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
+admission or complete browser API support. The original [DOM expansion](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-220-HTML-DOM-IMPLEMENTATION.md)
+and [link/image policy](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
 retain their focused native/Wasm/Chrome/Firefox evidence and failures. The
 [publication record](https://github.com/bohewu/yetlet/blob/master/docs/ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
 separately establishes distribution and registry resolve/compile; it does not
@@ -63,7 +63,7 @@ validation alone does not mount anything or prove browser navigation acceptance.
 
 The older SDKalpha.5 [YT-110 baseline](https://github.com/bohewu/yetlet/blob/master/docs/YT-110-DOM-CAPABILITIES.md#dom-vocabulary)
 supports38 tags and42 named attributes. SDKalpha.6 includes all51 additional
-ordinary elements selected by the [coverage contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-219-HTML-DOM-CONTRACT.md):
+ordinary elements selected by the [coverage contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-219-HTML-INVENTORY.md):
 text semantics, explicit table sections, figure/caption, pre, classic controls,
 details/summary and canvas/dialog hosts. New scoped attributes and numeric/keyword
 checks coexist with old admission rules. Unsupported names, duplicates, void
@@ -73,12 +73,16 @@ remain excluded through the default entry points.
 
 Build new structural families together in the supplied View: tables own explicit
 row sections, details owns its first summary, and figure owns its optional caption.
-This subset has no separate orphan-table-part/summary fragment context API. Native
-disclosure/control behavior remains browser-owned; imperative dialog methods and
-focus are explicitly application-owned. Pre's parsed initial newline and adjacent
+This subset has no separate orphan-table-part/summary fragment context API. New
+table structures accept HTML formatting whitespace but reject other stray text;
+existing classic select whitespace behavior stays compatible. Native
+disclosure/control behavior remains browser-owned; imperative dialog methods,
+focus, form associations and document-wide IDs are application-owned. Existing
+broadly admitted legacy attribute names remain compatible; the new numeric and
+keyword admission rules apply only to the selected element/attribute combinations. Pre's parsed initial newline and adjacent
 CR/LF stream now match direct DOM construction; affected serialized pre bytes may
 change starting in SDKalpha.6. Older published artifacts retain their old behavior.
-See the [implementation record and limits](https://github.com/bohewu/yetlet/blob/master/docs/YT-220-HTML-DOM-IMPLEMENTATION.md).
+See the [implementation record and limits](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-220-HTML-DOM-IMPLEMENTATION.md).
 
 Initial input/textarea/select/checkbox defaults are declarative; live values, chosen events, reset and submission remain browser/application-owned. Textarea text has LF normalization and preserves an initial newline across SSR and DOM. See the shared [native controls example](https://github.com/bohewu/yetlet/blob/master/examples/todo-ui/src/controls.rs), available at `/app` and the no-JS `/controls` route in Todo.
 
@@ -143,7 +147,9 @@ browser-owned; the policy checks initial assigned origins, not redirect chains.
 Loads may start before insertion and are not rolled back. Failed images keep
 native error/alt behavior; there is no framework retry or display guarantee.
 Accepted resources can send browser-managed credentials/referrers. This is not
-authentication or privacy isolation. See the [full policy and evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md).
+authentication, privacy isolation, redirect-chain enforcement or server-side
+request filtering. Failed policy checks must not echo raw URLs or configured
+origin strings in diagnostic output. See the [full policy and evidence](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md).
 
 ## API reference
 

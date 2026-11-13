@@ -145,7 +145,11 @@ The canonical invocation is build --static --export-bin NAME --output DIRECTORY,
 with optional --base-path /yetlet/, --release and --wasm-islands. It runs one
 explicit trusted native exporter with frozen Cargo, validates finite protocol1
 fragments/assets and writes complete public HTML. It does not crawl handlers,
-start a backend, install tools, clean/overwrite output or deploy. HTML-only apps
+start a backend, install tools, clean/overwrite output or deploy. The native
+exporter has a separately bounded execution deadline and explicit child-process
+cleanup; uncertain supervision or publication outcomes cannot report success.
+Source/input receipts describe observed inputs, not a sandboxed or hermetic
+compiler. Existing ordinary CLI commands keep their separate execution rules. HTML-only apps
 need no Node/Wasm/server or runtime Settings loader.
 
 Existing public settings are still validated and cli.target must be native.
@@ -183,7 +187,7 @@ independent `yetlet-cli` package, available since `0.2.0`; downstream exhaustive
 Rust matches may need a new arm. Static export does not add an SDK module or
 require the optional DOM renderer for HTML-only output.
 
-The [original implementation record](https://github.com/bohewu/yetlet/blob/master/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md)
+The [original implementation record](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md)
 retains GNU/MSVC native CLI execution, bounded Chrome/Firefox static/island
 checks and their failures. [CLI 0.2.0 release qualification](https://github.com/bohewu/yetlet/blob/master/docs/CLI-020-RELEASE-PREPARATION.md#local-affected-evidence--2026-11-01)
 separately verifies the packaged CLI, a generated registry-SDK alpha.6 app and a

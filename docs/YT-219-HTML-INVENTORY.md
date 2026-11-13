@@ -1,6 +1,6 @@
 # YT-219 — HTML element and attribute inventory
 
-Date: 2026-10-31. Status: independently accepted source inventory for the [compatibility contract](YT-219-HTML-DOM-CONTRACT.md); no implementation claim.
+Date: 2026-10-31. Independently accepted, dated selection inventory; the original [compatibility contract](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-219-HTML-DOM-CONTRACT.md#decision-and-inventory) is recoverable from its fixed Git revision. Codes and “not implemented” cells describe this **2026-10-31 decision snapshot**, not current package availability. The selected DOM vocabulary and opt-in URL/image policies first shipped in SDK `0.9.0-alpha.6`; follow the [current DOM guide](../crates/yetlet-browser/guides/dom.md) for use and limits. This inventory remains the Typed Tag Builder coverage source.
 
 ## Reference snapshot and interpretation
 

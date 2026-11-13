@@ -138,33 +138,14 @@ The later YT-218 publication adds actual public routing/assets/reader evidence
 at its recorded source and Chromium/emulated-mobile scope. Physical mobile,
 additional browsers and hosted generated rustdoc are not newly qualified.
 
-## Historical Yetlet-built consumer proposal — M25
+## M25 delivered reader and original proposal
 
-[YT-219–YT-224](https://github.com/bohewu/yetlet/blob/1508b6910add4e74c9e2311a3f3eb4666539afce/docs/YT-219-224-DOM-STATIC-SITE-PLAN.md) registers a separate path:
-review broad HTML/DOM coverage, implement selected vocabulary and controlled
-URL/images, define/implement finite static HTML build/CLI, then pilot this guide
-as an application-owned Yetlet consumer. Registration was planning only, with
-all six items Todo at its accepted checkpoint. The later
-[YT-219 contract](YT-219-HTML-DOM-CONTRACT.md) is Done at documentation scope
-after independent Reviewer PASS0. YT-220's [unreleased source implementation](YT-220-HTML-DOM-IMPLEMENTATION.md)
-is now Done at its unreleased-source scope after independent Reviewer PASS0;
-YT-221's [controlled links/images](YT-221-DOM-URL-IMAGE-CONTRACT.md) has contract
-PASS0 and a minimal unreleased implementation with new native/Chrome/Firefox
-evidence; final independent Reviewer PASS0 completes YT-221 at unreleased-source
-scope. [YT-222](YT-222-STATIC-HTML-CONTRACT.md) is Done at documentation-only
-static-export/CLI contract scope: finite public fragments/assets, bounded head,
-project-prefix paths, local CSP/islands and protected create-only output.
-Independent Reviewer PASS0. [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md) now has
-an unreleased static-build implementation and explicit standalone consumer;
-GNU/browser, bounded MSVC and required current-head CI evidence are complete;
-final independent Reviewer PASS0 accepts YT-223 Done at bounded source scope.
-[YT-224](YT-224-DOCS-PILOT.md) is Done at local pilot scope after independent
-Reviewer PASS0 and owned cleanup. Existing Pages remains the accepted public site. Published CLI0.1.1 does not contain the static mode.
-
-Retain the current mdBook site/workflow and these eight source/excerpt/disclosure
-boundaries during the pilot. The existing browser CLI already produces static-
-hosted Wasm assets; the new static HTML mode supplies build-time readable content
-with separately selected browser interactions. A pilot does not authorize
-changing Pages, replacing the public site, publishing a package or changing
-release identities. Live replacement requires later owner acceptance after
-independent review and source-bound consumer evidence.
+The [current M25 Roadmap](ROADMAP.md#m25--broader-html-dom-support-and-static-site-delivery)
+now records the delivered DOM policies (SDK alpha.6), independent static HTML
+export (CLI 0.2.0) and Yetlet-built Reader Edition. The current guide is
+maintained by [the application-owned reader](../examples/docs-site/README.md),
+with [public cutover evidence](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
+and the selected [SDK/CLI edition](../site/pages.toml). The originally reviewed
+[YT-219–224 planning page](https://github.com/bohewu/yetlet/blob/1508b6910add4e74c9e2311a3f3eb4666539afce/docs/YT-219-224-DOM-STATIC-SITE-PLAN.md)
+is recoverable at its fixed Git version; its former Todo and pre-publication
+status statements are historical, not present availability.

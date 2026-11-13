@@ -69,50 +69,34 @@ the separate reviewed resolver policy, exact pins and project Cargo.lock.
 Views and finite app-owned Style vocabulary with external build-time CSS.
 Neither is a public style crate or renderer change. Ordinary CSS stays default.
 
-## Historical SDKalpha.6 preparation — 2026-11-01
+## M25 published DOM and static-export compatibility
 
-The owner selects SDK `0.9.0-alpha.6` preparation under
-[YT-227](YT-227-NEXT-RELEASE-PLAN.md), stopping before publication. Workspace/path
-versions and locks advance without third-party upgrades; published registry-only
-consumers and CLI0.1.1 remain on alpha.5. The explicitly approved guide edition
-stays SDKalpha.5/CLI0.1.1 independently of development versions; a new edition
-still requires consumer review. This does not distribute new APIs or republish
-any previous version. YT-220/221's compatibility notes below remain applicable.
+The two-package SDK first delivered the expanded DOM and optional per-mount
+navigation/image policies in **0.9.0-alpha.6**. Native DOM validation is
+provisional; Wasm mounting enforces canonical allowed origins and frozen
+destinations before mutation. Existing entry points preserve default-disabled
+images, same-origin navigation/forms and their prior public signatures/error
+types. The 89 default-admitted tags become 90 only when the image policy
+explicitly admits `img`; neither count implies comprehensive HTML conformance.
+See the [current DOM guide](../crates/yetlet-browser/guides/dom.md) and
+[dated coverage inventory](YT-219-HTML-INVENTORY.md).
 
-## Historical distribution and unreleased DOM source — 2026-10-31
+Pre rendering now preserves an initially parsed newline, including CR/CRLF,
+where the HTML parser would otherwise consume it. The serialized bytes of
+affected `pre` content can change without changing the intended parsed text;
+the broad native SSR vocabulary and escaping rules are not globally narrowed.
 
-SDK0.9.0-alpha.5 is [published](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup)
-as yetlet/yetlet-browser; CLI0.1.1 is independently distributed. Historical
-checkpoints below retain their original pre-publication sources/status.
-
-[YT-220](YT-220-HTML-DOM-IMPLEMENTATION.md) is an unreleased source change:
-DOM admission expands from38 to89 tags, with selected scoped attributes and
-structures, while URL/resource exclusions and public entry points stay intact.
-Pre serialization now compensates a leading parsed newline, including CR/CRLF
-input; affected output bytes can change while parsed text is preserved. It does
-not globally tighten SSR vocabulary or change escape_text. Old snapshots needing
-those bytes should adopt this documented correction when selecting the new
-source. No package/version/tag/signature is changed or republished by this item.
-
-[YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md) adds unreleased DomOptions,
-NavigationPolicy, ImagePolicy, validate_with_options and Wasm mount_with_options.
-Existing validate/mount signatures and error variants are unchanged and delegate
-to strict default options: no images or external navigation; forms stay
-same-origin. Explicit policies select finite anchor attributes and optional img,
-with independent canonical HTTPS origin lists. Native validation remains
-provisional; browser preflight owns configuration parsing/origin enforcement.
-Existing consumers need no migration. Public View, SSR and package/dependency/
-feature/version identities are unchanged. Published artifacts do not contain
-these source APIs or inherit their new verification.
-
-[YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md) adds unreleased CLI build --static,
-an explicit native export protocol and Cli::BuildStatic/build_static support.
-Existing Build fields and ordinary commands/settings stay unchanged. Rust
-callers exhaustively matching Cli must handle the new variant; no old-name
-alias or silent settings migration is introduced. Public SDK View/HTML/server/
-browser APIs and published CLI0.1.1 are unchanged. Bounded new GNU/browser/MSVC
-evidence is recorded separately; it does not select a release version or extend
-the qualification of already-published artifacts.
+Independent CLI **0.2.0** first delivered `yetlet build --static`. Its
+`Cli::BuildStatic` enum variant may require a new arm in exhaustive downstream
+matches, but existing build/run/watch/new and public SDK View/SSR/browser APIs
+retain their boundaries. See the [static CLI guide](CLI-GUIDE.md#static-html-build)
+and [retained technical protocol](YT-222-STATIC-HTML-CONTRACT.md). Neither
+publication is new runtime/browser/production certification. The original
+[SDK alpha.6](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+and [CLI 0.2.0](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+records distinguish source tests from registry consumers. Dated unshipped
+checkpoints are available in [immutable Git history](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
+rather than duplicated as current compatibility status.
 
 ## Historical two-package pre-publication source — 2026-10-30
 

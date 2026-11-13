@@ -103,23 +103,21 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   SDKalpha.6/CLI0.2.0 sources, registry consumers, static introduction and bounded
   local verification; live Pages promotion remains separate.
 
-- [HTML DOM coverage and optional link/image policies](../crates/yetlet-browser/guides/dom.md):
-  available since SDK `0.9.0-alpha.6`; 89 default elements and explicit image
-  admission, with per-mount URL policy and browser-owned behavior. The
-  [compatibility contract](YT-219-HTML-DOM-CONTRACT.md) and [dated standards inventory](YT-219-HTML-INVENTORY.md)
-  preserve coverage decisions and Typed Tag Builder selection. Original
-  [DOM expansion](YT-220-HTML-DOM-IMPLEMENTATION.md) and [policy evidence](YT-221-DOM-URL-IMAGE-CONTRACT.md)
-  retain their bounded native/Wasm/browser checks and failures.
-- [Static HTML export](CLI-GUIDE.md#static-html-build): available since independent
-  CLI `0.2.0`; finite pages/assets, explicit prefixes/CSP/islands, create-only
-  output and private receipts. Use the [standalone example](../examples/static-site/README.md)
-  for setup, the [static export contract](YT-222-STATIC-HTML-CONTRACT.md) for the
-  protocol and the [implementation record](YT-223-STATIC-HTML-IMPLEMENTATION.md)
-  for original GNU/browser/MSVC evidence. This is CLI tooling, with no new SDK
-  static-export module.
-- [M25 delivery and history](ROADMAP.md#m25--broader-html-dom-support-and-static-site-delivery):
-  completed feature outcomes, first publication records and the fixed Git copy of
-  the superseded shared plan.
+- [HTML DOM coverage and optional URL/image policies](../crates/yetlet-browser/guides/dom.md):
+  first published in SDK `0.9.0-alpha.6`, with 89 default elements and an
+  explicitly opted-in image element. The [dated standards inventory](YT-219-HTML-INVENTORY.md)
+  remains the Typed Tag Builder selection reference. Current URL validation,
+  resource/security limits and browser ownership belong to the DOM guide.
+- [Static HTML export](CLI-GUIDE.md#static-html-build): first published in the
+  independent CLI `0.2.0`; includes bounded public pages/assets, project
+  prefixes, create-only output and private receipts. The [retained protocol](YT-222-STATIC-HTML-CONTRACT.md)
+  is the technical contract; the [standalone example](../examples/static-site/README.md)
+  provides the current consumer workflow.
+- [M25 delivered outcomes](ROADMAP.md#m25--broader-html-dom-support-and-static-site-delivery):
+  first publication, verification boundaries and Reader Edition closeout.
+- [Documentation consolidation plan](DOCUMENTATION-CONSOLIDATION-PLAN.md):
+  functional-document ownership, actual YT file deletion, evidence recovery,
+  review gates and the next topic-based batches.
 
 - [Local Yetlet documentation pilot — YT-224](YT-224-DOCS-PILOT.md):
   application-owned eight-chapter static reader with optional Wasm search;

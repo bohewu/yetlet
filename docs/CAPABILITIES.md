@@ -6,7 +6,7 @@ The module map below describes capabilities, not additional installable crates.
 Base defaults select HTML; Browser defaults select DOM. Native capabilities and
 GPU/action integrations are additive opt-ins with explicit startup wiring.
 Earlier sixteen-package releases and qualification records keep their original
-sources. Opt-in static HTML export from [YT-223](YT-223-STATIC-HTML-IMPLEMENTATION.md)
+sources. Opt-in static HTML export through the [independent CLI](CLI-GUIDE.md#static-html-build)
 is distributed in [CLI `0.2.0`](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02);
 it adds no SDK module/default. SDKalpha.6 includes the YT-220/221 DOM vocabulary
 and options, absent from SDKalpha.5. Earlier records keep their original
@@ -49,7 +49,7 @@ syntax. There is no public style crate, renderer change or runtime style injecti
 |---|---|---|---|
 | `yetlet::view` | Renderer-neutral Views/components and bounded binding vocabulary; M9 classification applies | Yes | [Core guide](../crates/yetlet/guides/core.md) |
 | `yetlet::html` | Escaped HTML serialization and allowlisted elements/attributes; M9 classification applies | Yes | [HTML guide](../crates/yetlet/guides/html.md) |
-| `yetlet_browser::dom` | Native validation/Wasm-only owned mount. Since SDKalpha.6:89 default tags,90 with explicit ImagePolicy; SDKalpha.5 has38. Independent per-mount HTTPS link/image policies retain strict defaults and same-origin forms. Not full HTML conformance | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md), [vocabulary](YT-220-HTML-DOM-IMPLEMENTATION.md), [URL/image contract](YT-221-DOM-URL-IMAGE-CONTRACT.md) |
+| `yetlet_browser::dom` | Native validation/Wasm-only owned mount. Since SDKalpha.6:89 default tags,90 with explicit ImagePolicy; SDKalpha.5 has38. Independent per-mount HTTPS link/image policies retain strict defaults and same-origin forms. Not full HTML conformance | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md), [dated coverage inventory](YT-219-HTML-INVENTORY.md) |
 | `yetlet_browser::dom_keyed` | Optional keyed children and disposable listener/entry ownership | Yes | [Keyed DOM guide](../crates/yetlet-browser/guides/dom-keyed.md) |
 | `yetlet::reactive` | Optional synchronous local reducer/commit graph with explicit lifetime | Yes | [Reactive guide](../crates/yetlet/guides/reactive.md) |
 | `yetlet::actions` | Typed commands and explicit local/HTTP execution boundaries | Yes | [Actions guide](../crates/yetlet/guides/actions.md) |
