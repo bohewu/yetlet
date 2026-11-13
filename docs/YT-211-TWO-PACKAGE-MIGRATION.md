@@ -1,7 +1,7 @@
 # YT-211 — Two implementation packages and consumer migration
 
 Date: 2026-10-30. Status: Done at the authorized migration/local verification scope after independent Reviewer PASS0. The owner's continuation after
-[YT-210](YT-210-PACKAGING-STUDY.md) authorizes the production source migration,
+[YT-210](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-210-PACKAGING-STUDY.md) authorizes the production source migration,
 consumer/tool updates and affected local proof. It does not authorize Git
 delivery, tag/hosted execution, signing, registry uploads or GitHub publication.
 The owner subsequently explicitly selects two packages, `yetlet` and

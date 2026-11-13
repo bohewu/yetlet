@@ -34,7 +34,7 @@ requires independent contract/final review; publication remains paused.
 
 **Packaging reconsideration (2026-10-30; proposal only):** The owner pauses new
 publication and asks to consider consolidating the public packages, including
-one implementation crate. [YT-210](../YT-210-PACKAGING-STUDY.md) preserves these
+one implementation crate. [YT-210](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-210-PACKAGING-STUDY.md) preserves these
 capability/target/security/runtime boundaries through proposed modules and
 additive features. It does not adopt that package shape, enable providers,
 replace current crate APIs or change historical acceptance. Independent

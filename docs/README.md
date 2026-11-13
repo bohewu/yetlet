@@ -170,9 +170,11 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [Single-gate release automation and registry promotion](RELEASE-PUBLICATION.md):
   automated build/sign/verification, final owner-approved GitHub then crates.io
   publication, local implementation and one-time rollout limits.
-- [Sixteen-package crates.io readiness](YT-020-REGISTRY-READINESS.md): live name
-  and public-account observations, dependency order, first-publication bootstrap
-  and remaining registry-only evidence; no upload authorization.
+- [Historical sixteen-name crates.io inventory](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-REGISTRY-READINESS.md):
+  2026-10-30 not-found observations, public account without proven publishing
+  rights, and original dependency/bootstrap limits. These are not current
+  registry availability or permission; use the [published SDK and CLI records](RELEASE-READINESS.md)
+  for actual distribution and [release SOP](RELEASING.md) for future actions.
 - [Config/Secrets first-publication contract](YT-020-FIRST-PUBLISH-CONTRACT.md):
   unchanged manifests, local normal publish dry-runs and their artifact/checksum
   limits; registry activation remains separate.
@@ -210,7 +212,7 @@ The [partial platform followup](YT-096-PLATFORM-QUALIFICATION.md) adds Ubuntu
 source-reconciled Firefox workflow. It retains the shared-kernel/Chrome evidence
 limits and the historical Windows cache failures. The resumed standalone
 archive lane passes all nine packages on Windows MSVC: 83 native tests and
-four doctests. The [two-host archive rebuild](YT-096-TWO-HOST-REBUILD.md) now
+four doctests. The [two-host archive rebuild](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md) now
 matches all nine Windows archives byte-for-byte to the Linux originals.
 Independent builder control and later release gates remain open. The earlier
 [SSH failures](YT-096-AZURE-CLEAN-BUILDER.md) are preserved. The
@@ -530,7 +532,7 @@ Generic hydration/resumability, a template macro, dependency-tracked signals/for
 
 [Qualification matrix](QUALIFICATION-MATRIX.md), [provider operations](PROVIDER-OPERATIONS.md) and [threat model](THREAT-MODEL.md) distinguish implemented behavior, retained evidence and unverified coverage. YT-030, YT-065, YT-066 and YT-067 retain their established bounded Done status; YT-020 remains Blocked.
 
-The [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [integrity preparation](YT-020-INTEGRITY-PREPARATION.md), [hosted rebuilding](YT-020-HOSTED-REBUILD.md), [trust policy](YT-020-PRIVATE-TRUST-POLICY.md), [signing verification](YT-020-PRIVATE-SIGNING-VERIFICATION.md) and [supply-chain design](RELEASE-SUPPLY-CHAIN.md) preserve their exact evidence identities. Signed source `8e557e760407a3d4b3f5a8b8f833748946be1387` differs from policy HEAD `abb2cce1253afe1d87a97e0a50f3f47efffe7280` and subsequent changes; historical signatures do not attest changed package contents. Formal release activation remains open.
+The [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [integrity preparation](YT-020-INTEGRITY-PREPARATION.md), [hosted rebuilding](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md), [trust policy](YT-020-PRIVATE-TRUST-POLICY.md), [signing verification](YT-020-PRIVATE-SIGNING-VERIFICATION.md) and [supply-chain design](RELEASE-SUPPLY-CHAIN.md) preserve their exact evidence identities. Signed source `8e557e760407a3d4b3f5a8b8f833748946be1387` differs from policy HEAD `abb2cce1253afe1d87a97e0a50f3f47efffe7280` and subsequent changes; historical signatures do not attest changed package contents. Formal release activation remains open.
 
 ## Historical documentation delivery status — YT-068
 
@@ -625,7 +627,7 @@ A runnable provider-free example is available with `cargo run -p yetlet-server-a
 
 #### Run the examples
 
-Requirements: Rust 1.99 or newer; `rust-toolchain.toml` pins development to Rust/Cargo 1.99.0. Building browser samples additionally needs the WASM target and wasm-bindgen 0.2.129, but the adopted Rust `cargo xtask build` commands need no Python. The Rust verification/qualification candidate is recorded in [YT-086 verification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-086-VERIFICATION.md); Firefox verification also requires Firefox and geckodriver. Native-only applications need no browser toolchain. The maintainer selected this unified baseline before the first experimental release. Historical Rust 1.88, Chrome 155 and Firefox 157 results retain their recorded sources; [integrity preparation](YT-020-INTEGRITY-PREPARATION.md) and [hosted rebuilding](YT-020-HOSTED-REBUILD.md) record current checks, the completed protected-check migration and the unsigned Private preparation boundary.
+Requirements: Rust 1.99 or newer; `rust-toolchain.toml` pins development to Rust/Cargo 1.99.0. Building browser samples additionally needs the WASM target and wasm-bindgen 0.2.129, but the adopted Rust `cargo xtask build` commands need no Python. The Rust verification/qualification candidate is recorded in [YT-086 verification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-086-VERIFICATION.md); Firefox verification also requires Firefox and geckodriver. Native-only applications need no browser toolchain. The maintainer selected this unified baseline before the first experimental release. Historical Rust 1.88, Chrome 155 and Firefox 157 results retain their recorded sources; [integrity preparation](YT-020-INTEGRITY-PREPARATION.md) and [hosted rebuilding](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md) record current checks, the completed protected-check migration and the unsigned Private preparation boundary.
 
 ```bash
 rustup target add wasm32-unknown-unknown
@@ -819,7 +821,7 @@ Yetlet is dual-licensed under your choice of [MIT](../LICENSE-MIT) or [Apache Li
 
 #### Qualification status
 
-[YT-020 Private release preparation](YT-020-PRIVATE-RELEASE-PREP.md) selects experimental `0.1.0` and the original nine library candidates. The prepared policy preserves API behavior and the selected Rust 1.99 minimum in `0.1.x` patches, with best-effort maintenance and no SLA. [Integrity preparation](YT-020-INTEGRITY-PREPARATION.md) retains earlier Ubuntu/Windows experiments; later [hosted rebuilding](YT-020-HOSTED-REBUILD.md) compares the same immutable source on separately operated builders. [Private trust policy](YT-020-PRIVATE-TRUST-POLICY.md) selects Cosign maintainer public-key preparation and future crates.io distribution. [Actual Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md) records a dedicated key/fingerprint, three signatures and separate public-only verification. Formal OIDC, certificate/chain, transparency/inclusion and builder/source guarantees remain open and unchanged; registry activation is unverified. No package has been published, no public support policy is activated, and the isolated Redis provider remains nonpublishable.
+[YT-020 Private release preparation](YT-020-PRIVATE-RELEASE-PREP.md) selects experimental `0.1.0` and the original nine library candidates. The prepared policy preserves API behavior and the selected Rust 1.99 minimum in `0.1.x` patches, with best-effort maintenance and no SLA. [Integrity preparation](YT-020-INTEGRITY-PREPARATION.md) retains earlier Ubuntu/Windows experiments; later [hosted rebuilding](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md) compares the same immutable source on separately operated builders. [Private trust policy](YT-020-PRIVATE-TRUST-POLICY.md) selects Cosign maintainer public-key preparation and future crates.io distribution. [Actual Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md) records a dedicated key/fingerprint, three signatures and separate public-only verification. Formal OIDC, certificate/chain, transparency/inclusion and builder/source guarantees remain open and unchanged; registry activation is unverified. No package has been published, no public support policy is activated, and the isolated Redis provider remains nonpublishable.
 
 M10 release-supply-chain design/preflight is independently reviewed. Four local Firefox release/keyboard suites, real local Session/SQLite operations and the YT-066a three-instance Docker/Memory proof passed with owned resource cleanup. The scheduled/manual qualification workflow was merged and hosted run `38043565238` passed Linux, Windows MSVC, macOS ARM64 and Linux Firefox lanes; separate local Windows GNU and offline Docker evidence also passed. YT-065 is complete at that bounded automated scope. Real IME, spoken screen-reader output, WebKit/mobile and zoom remain explicitly Not verified optional coverage. YT-066a demonstrates stateless multi-instance serving and current Memory Session limitations only; its final independent review passed, while the separately opt-in Redis provider and [three-application fixture](YT-066B3-VERIFICATION.md) now have passing bounded single-host/no-persistence execution, cleanup and independent b3 review; YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope. Production TLS/ACL policy, backups, business RPO/RTO and operational ownership are application responsibilities; broader deployment durability/recovery remains unverified. No result establishes a supported-device range, accessibility conformance, production deployment or publication approval.
 

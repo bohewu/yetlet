@@ -16,7 +16,7 @@ YT-203 is committed as `f31eed7423d00c29d6eedc0d661f7d5a8a58b63c`, tree
 four files, zero findings and exact matching pre-commit/committed tree. The
 working tree was clean afterward. No Push occurred.
 
-Scope follows the [sixteen-package plan](YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md#verification-work-registered-for-later-execution).
+Scope follows the [sixteen-package plan](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md#verification-work-registered-for-later-execution).
 Reuse the sixteen accepted [YT-201 archives](YT-201-PACKAGE-PREPARATION.md),
 their normalized manifests and included locks; all included runtime/test/example
 payloads and original manifests still match current library sources. No package

@@ -7,7 +7,7 @@ preflight scope after independent Reviewer PASS, zero issues/required followups.
 
 After the guarded YT-199/200 planning commit
 `f955251b75adc7bcd5750e9df2626653058e7f06`, the owner authorized continuation
-with the next item. Apply the reviewed [YT-201 contract](YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md#verification-work-registered-for-later-execution):
+with the next item. Apply the reviewed [YT-201 contract](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md#verification-work-registered-for-later-execution):
 prepare all sixteen at experimental 0.1.0, seven publication-eligible manifests,
 compatible normal/optional and retained dev dependency versions, package-local
 license texts/public guides and isolated archive/consumer preflight. Preserve

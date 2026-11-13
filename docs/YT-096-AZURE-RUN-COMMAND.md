@@ -71,7 +71,7 @@ Its 30 members include nine newly generated `.crate` files, raw logs, tool/host
 identity, installer/channel hashes, installed dpkg versions, command results
 and compiler-artifact events. Each actual returned archive matches the
 original accepted archive in complete bytes, size and SHA-256. The
-[existing nine-archive table](YT-096-TWO-HOST-REBUILD.md#archive-comparison)
+[existing nine-archive table](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md#archive-comparison)
 still applies; no archive or checksum bundle was replaced.
 
 ## Actual Cargo observations and inventory limits

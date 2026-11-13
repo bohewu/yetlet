@@ -8,7 +8,7 @@ sample, Commit, Push or Merge is authorized by this delivery.
 
 The owner authorized committing the four accepted YT-202 documents, without
 Push, then inventorying YT-203 and executing only missing selected checks under
-the [sixteen-package plan](YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md#proposed-per-package-platform-and-feature-scope).
+the [sixteen-package plan](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md#proposed-per-package-platform-and-feature-scope).
 The YT-202 commit is `acbc9cdd58888883783e5421b4ed6c8e2517aa28`, tree
 `f3b802f81378476fe8eb965f77ebd8b743b41e7c`: strict/builtin staged Guard PASS,
 four files, zero findings, with matching pre-commit tree and unchanged hooks.

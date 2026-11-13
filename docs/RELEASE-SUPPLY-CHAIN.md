@@ -1,7 +1,7 @@
 # Release Supply-Chain Design
 
 **Owner-selected version update (2026-10-28):** The next sixteen-package
-Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md).
+Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-ALPHA-VERSION-PREFLIGHT.md).
 The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
 (tree `6adff26fc4fec65e9aa8f40d7172ff266b7e500d`) as the new immutable alpha candidate C.
 The [minimum hosted/readback plan](YT-096-ALPHA-HOSTED-PLAN.md) records the
@@ -58,11 +58,35 @@ separate authority. No new policy, ignore, Push or publication is introduced.
 
 **Integrity preparation update (2026-10-12):** [Private integrity preparation](YT-020-INTEGRITY-PREPARATION.md) records Rust/Cargo 1.99.0, byte-identical nine-crate source archives rebuilt on separate Ubuntu/Windows hosts with fresh caches, target-specific inventories, unsigned SLSA v1 drafts, and public upstream signature/provenance verification experiments. Both hosts remain under shared maintainer/agent control and use recorded uncommitted metadata overlays. This does not satisfy independently controlled trusted-release rebuilding, actual Yetlet signing, immutable source/tag approval or publication. The existing release contract below remains mandatory.
 
-**Later Private follow-up (2026-10-12):** The maintainer authorized committing the reviewed preparation and continuing delivery/Private rebuilding. [Hosted rebuild preparation](YT-020-HOSTED-REBUILD.md) records the first-head required CI and completed protected-check migration, a bounded manual builder with a separately operated GitHub execution environment, and actual execution evidence retained separately. It retains unsigned-provenance limits and the existing transparency/signature contract; Private attestation availability or a provider without a transparency log cannot silently waive that release gate. No public activation or signing policy is selected implicitly.
+**Later Private follow-up (2026-10-12):** The maintainer authorized committing the reviewed preparation and continuing delivery/Private rebuilding. [Hosted rebuild preparation](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md) records the first-head required CI and completed protected-check migration, a bounded manual builder with a separately operated GitHub execution environment, and actual execution evidence retained separately. It retains unsigned-provenance limits and the existing transparency/signature contract; Private attestation availability or a provider without a transparency log cannot silently waive that release gate. No public activation or signing policy is selected implicitly.
 
 **Explicit Private trust decision (2026-10-12):** The maintainer selected [Cosign public-key preparation and future crates.io distribution](YT-020-PRIVATE-TRUST-POLICY.md). This documentation-only mode authenticates maintainer-approved bytes after separately authorized execution; it does not establish OIDC identity, certificate/chain, transparency/inclusion or authenticated builder evidence and does not replace any formal release guarantee below. Actual keys, signatures, registry activation and visibility changes remain unperformed.
 
 **Later authorized Private execution (2026-10-12):** [Private signing verification](YT-020-PRIVATE-SIGNING-VERIFICATION.md) records a dedicated encrypted key, public fingerprint, three actual preparation signatures, separate public-only verification and six expected negative outcomes. Formal log-required verification rejects the same no-log bundle. This updates Private execution status only; the release contract below, historical evidence identities and all formal guarantees remain mandatory. No push, tag, publication or visibility change occurred.
+
+## Historical release evidence and packaging transitions
+
+This table is a **current reading guide to dated evidence**, not a new
+signing, registry, workflow or release approval. Its full source/negative
+results remain in the original eight Git blobs at local pre-consolidation
+commit `849c5894f73d9732db9c2ccaa765385dc9d8a819`; public GitHub reachability has **not been verified**.
+
+| Historical source | Acceptance and exclusions |
+|---|---|
+| YT-020 Private GitHub rebuild and sixteen-name registry inventory | Manual, separate ephemeral GitHub builder and protected CI were prepared; unsigned provenance did not establish independent trust, certificate inclusion or formal signing. On **2026-10-30** sixteen candidate crate names returned not-found (404) and a public account was observed; neither current name availability nor ownership, an authorized upload or a production trust chain follows. Keep distinct original nine-library `0.1.0` source identities |
+| YT-096 alpha.1 preflight and two-host nine-package comparison | The sixteen-library alpha.1 manifest/version preflight was locally reviewed, **not published** by that act. Linux and Windows MSVC nine-source-archive bytes matched at an earlier exact `ce56e08` candidate; this is source-archive reproducibility, not binary reproducibility, separately controlled signing, or later candidate acceptance |
+| YT-200 and YT-205 technical sixteen-package preparation | YT-200 defined a bounded feasibility/verification queue. The later sixteen-package rebuild extension and selected `118f3d0` technical candidate passed scoped local/source checks, while subsequent source, CI, hosted, signer, inventory and registry gates retain their own authorities. A technical candidate or guarded commit is **not** publication |
+| YT-209 Environment proposal and YT-210 one-package study | The hosted verifier/Environment plan was a proposal, not an activated signing grant; later actual protected setup and deliveries have separate verified records. YT-210 evaluated a `publish = false` one-implementation-package experiment; the later [two-package migration](YT-211-TWO-PACKAGE-MIGRATION.md) selected `yetlet` and `yetlet-browser` instead. There was no publication of the one-package experiment |
+
+**Current distribution is separately established by actual release records:**
+[SDK `0.9.0-alpha.8`](ALPHA8-HOSTED-RECORD.md) and
+[independent CLI `0.4.0`](CLI-040-HOSTED-RECORD.md).
+The approved [release SOP](RELEASING.md) and
+[publication workflow contract](RELEASE-PUBLICATION.md) select a closed
+source/version-specific cohort; historical instructions below cannot be
+replayed for the current pair. Preserve preexisting FAIL, Pending, Blocked
+and negative evidence at their original dates, even where newer releases
+succeeded.
 
 ## Current preparation source boundary (2026-10-12)
 

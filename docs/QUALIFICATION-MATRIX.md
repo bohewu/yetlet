@@ -29,7 +29,7 @@ historical baseline workflow supplied the Rust 1.88 MSRV check. On 2026-10-12,
 the maintainer selected Rust 1.99 before first publication. The local baseline
 now pins 1.99.0; the new toolchain file does not override rolling stable lanes,
 which explicitly set `RUSTUP_TOOLCHAIN=stable`. [Integrity preparation](YT-020-INTEGRITY-PREPARATION.md)
-records the retained source boundaries. [Hosted rebuild preparation](YT-020-HOSTED-REBUILD.md)
+records the retained source boundaries. [Hosted rebuild preparation](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md)
 records the later authorized protected-check migration after actual Rust 1.99 CI PASS.
 
 ## Historical performance and capacity evidence (bounded)

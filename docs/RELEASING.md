@@ -368,7 +368,7 @@ record before prepare and preserve its digest through signing and independent
 readback. Original tagged workflows and accepted alpha results retain their old
 interfaces and identities. Do not dispatch a new interface against an old source.
 
-The [minimum hosted/Environment plan](YT-209-HOSTED-VERIFICATION-PLAN.md) lists
+The [minimum hosted/Environment plan](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-209-HOSTED-VERIFICATION-PLAN.md) lists
 the observed configuration, legacy receipt limits and ready-to-authorize steps.
 The `release-result-verify` Environment and existing `AGE_IDENTITY` provisioning
 are [installed and read back](YT-209-RELEASE-AUTOMATION.md#owner-authorized-recovery-delivery-and-setup--2026-10-29):
@@ -471,19 +471,24 @@ run ID, local key exception, candidate or successful result into a new release.
 
 ## Publishing to crates.io is a separate operation
 
-GitHub Release attachments are not a registry upload. YT-020 remains Blocked;
-this section is an operator reference, not execution authority. A real registry
-batch must select the current sixteen-package cohort/version and immutable source,
-confirm each name/owner right, derive dependency order, record credentials and
-limits, and verify actual registry bytes/resolution. The old nine-package YT-020
-records remain historical; do not reuse their scope as a sixteen-package grant.
+GitHub Release attachments are not a registry upload. This section includes
+**historical sixteen-package YT-020 / alpha.3 registry planning**, whose formal
+trust/first-publication gate was Blocked at that checkpoint; it is not the
+current two-library SDK publishing cohort. For a new release, select the
+manifest-derived closed cohort, exact version and source under the current
+[SDK/CLI release contract](#current-two-package-development-boundary--yt-211),
+confirm every actual name/owner right and dependency order, and verify the
+specific published registry bytes/resolution. Original nine and sixteen-package
+records cannot grant a new SDK or CLI publication or token scope.
 
-The [2026-10-30 sixteen-package inventory](YT-020-REGISTRY-READINESS.md) records
-not-found name observations, the public account and unverified publishing rights.
-Use its normal/build layers together with the Config/Secrets versioned
-development-dependency caveat. Five independent workspaces prevent selecting
-all sixteen with a root-only `--workspace`; the first-publication verification
-strategy remains to be proven. This inventory does not authorize an upload.
+The [original sixteen-package readiness inventory](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-REGISTRY-READINESS.md)
+records a **2026-10-30 read-only** not-found observation, public account and
+unverified publishing rights. Those sixteen names' earlier normal/build layers,
+Config/Secrets versioned development-dependency bootstrap and five independent
+workspaces are **historical source-specific concerns**, not requirements to
+publish sixteen crates from the current two-package SDK. Recheck current
+availability and rights at the actual authorized version/source; the original
+inventory does not reserve names, justify upload or prove current resolution.
 
 The subsequent [Config/Secrets contract and dry-runs](YT-020-FIRST-PUBLISH-CONTRACT.md)
 verify the pair normally with accepted local package sources and unchanged

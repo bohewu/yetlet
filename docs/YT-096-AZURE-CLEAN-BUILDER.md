@@ -13,7 +13,7 @@ but direct SSH/SCP connections timed out. No Rust installation, Cargo fetch,
 package rebuild, native test or wasm build ran on Azure. This is an environment
 connectivity failure, not a demonstrated product defect. The accepted
 [platform qualification](YT-096-PLATFORM-QUALIFICATION.md) and
-[two-host archive comparison](YT-096-TWO-HOST-REBUILD.md) remain unchanged.
+[two-host archive comparison](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md) remain unchanged.
 YT-096 stays In progress; YT-020 stays Blocked.
 
 ## Authorization and intended scope

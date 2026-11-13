@@ -251,7 +251,7 @@ release/security PASS is claimed here.
 | Candidate MSRV/platform execution | Rust 1.99.0 native GNU/MSVC and five wasm libraries PASS; preserve source/API reconciliation and final supported-matrix review |
 | Selected native/browser targets | [Owner-accepted scope](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20): actual Ubuntu 24.04/Windows MSVC native and five wasm-build PASS, source-reconciled Firefox and historical Chrome consumer reuse only. Exact-candidate Chrome qualification remains Not verified; no retroactive receipt is claimed |
 | Build-bound inventory | [Owner-accepted source-inventory scope and differences](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20) retain nine archives/locks, 23 SBOMs and 140 aggregate Cargo events. Known dev/conservative differences are accepted; complete per-library/output/native-system inventory and new Windows compiler-event coverage remain Not verified. Formal trust remains open |
-| Independent rebuild | [Two-host archive comparison](YT-096-TWO-HOST-REBUILD.md) PASS; [separately operated GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) matches all nine archives with exact source/tool/lock inputs. Final authenticated builder/source/tag/trust-policy acceptance remains required |
+| Independent rebuild | [Two-host archive comparison](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md) PASS; [separately operated GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) matches all nine archives with exact source/tool/lock inputs. Final authenticated builder/source/tag/trust-policy acceptance remains required |
 | Trust and registry | Current exact artifact provenance/signatures, formal trust requirements and separately authorized real registry rights/download/consumer checks |
 | Independent release/security review | [Final candidate review](YT-096-SECURITY-RELEASE-REVIEW.md) is complete: bounded technical/security evidence accepted with limits, no new material source defect identified; original overall verdict FAIL. Subsequent owner support/inventory acceptance resolves one disposition; four release conditions remain open |
 | Maintainer decision | Explicit final release approval and separate external activation authorization |
@@ -259,7 +259,7 @@ release/security PASS is claimed here.
 The [partial platform followup](YT-096-PLATFORM-QUALIFICATION.md) records
 Ubuntu userspace/wasm and Firefox results, the resumed Windows MSVC PASS for
 all nine standalone archived packages, retained cache-resolution failures and
-exact preservation/cleanup. The [Windows archive rebuild](YT-096-TWO-HOST-REBUILD.md)
+exact preservation/cleanup. The [Windows archive rebuild](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md)
 now produces nine byte-identical archives with normal Cargo verification.
 The subsequent reconciliation and owner decision below address the bounded
 platform/inventory disposition; formal builder trust and release approval remain open.

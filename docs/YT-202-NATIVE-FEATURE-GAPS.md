@@ -165,7 +165,7 @@ Merge, signing or publication is performed.
 ## Authority and fixed inputs
 
 The owner authorized YT-201 Commit/Push followed by YT-202 under the
-[reviewed per-package plan](YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md#proposed-per-package-platform-and-feature-scope).
+[reviewed per-package plan](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md#proposed-per-package-platform-and-feature-scope).
 YT-201 was committed as `8fd8751c3a505ad4811e0d3c83419e468565473a`, tree
 `2faa5d55cb5b251bac6242d9d77fafb26835eb45`, after strict/builtin staged Guard
 exit 0 with zero findings. This immutable reviewed source snapshot supplies the

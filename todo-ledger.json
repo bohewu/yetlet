@@ -232,11 +232,11 @@
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
         "docs/YT-020-PRIVATE-RELEASE-PREP.md",
-        "docs/YT-020-HOSTED-REBUILD.md",
+        "docs/RELEASE-SUPPLY-CHAIN.md",
         "docs/YT-020-PRIVATE-TRUST-POLICY.md",
         "docs/YT-020-PRIVATE-SIGNING-VERIFICATION.md"
       ],
-      "notes": "Priority P1; size S; milestone M5. Acceptance/evidence: [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [hosted rebuilding](YT-020-HOSTED-REBUILD.md), [trust/registry policy](YT-020-PRIVATE-TRUST-POLICY.md) and [actual Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md): dedicated key/fingerprint, three signatures, separate public-only verification and six negative cases pass; formal source/tag/identity/certificate/log/builder trust, registry/reporting/scanner gates and explicit activation approval remain open"
+      "notes": "Priority P1; size S; milestone M5. Acceptance/evidence: [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [hosted rebuilding, original fixed Git source](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md), [trust/registry policy](YT-020-PRIVATE-TRUST-POLICY.md) and [actual Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md): dedicated key/fingerprint, three signatures, separate public-only verification and six negative cases pass; formal source/tag/identity/certificate/log/builder trust, registry/reporting/scanner gates and explicit activation approval remain open"
     },
     {
       "id": "YT-021",

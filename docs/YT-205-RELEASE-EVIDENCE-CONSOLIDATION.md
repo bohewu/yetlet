@@ -34,7 +34,7 @@ its reviews, signatures and historical FAIL / release-ready NO remain intact.
 Technical C selection is only part of the unresolved formal source/workflow
 identity decision; D1–D6 remain Pending and YT-020 stays Blocked.
 
-Follow the [YT-205 acceptance contract](YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md#verification-work-registered-for-later-execution).
+Follow the [YT-205 acceptance contract](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-200-SIXTEEN-PACKAGE-RELEASE-PLAN.md#verification-work-registered-for-later-execution).
 Distinguish C's immutable archives, retained historical proof, new local checks
 and the later reader-documentation draft. Do not silently substitute a dirty
 overlay, moving HEAD or newer dependency for an accepted source identity.
@@ -328,7 +328,7 @@ earlier review verdict, source candidate or formal decision is replaced.
 ## Later rebuild preparation
 
 After the ten checkpoint documents are committed as012ecb3 without Push, the
-owner authorizes the [minimal sixteen-package rebuild extension](YT-205-SIXTEEN-PACKAGE-REBUILD.md).
+owner authorizes the [minimal sixteen-package rebuild extension](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-205-SIXTEEN-PACKAGE-REBUILD.md).
 The working overlay preserves original-nine mode and adds an explicit sixteen
 cohort across the existing independent workspaces, with separate bootstrap and
 normal verification records. Five focused tests, compile/lint/format and static

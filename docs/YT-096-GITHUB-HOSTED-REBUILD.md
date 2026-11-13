@@ -66,7 +66,7 @@ The root lock, source epoch, GNU tool digests and recorded defaults/profile
 match. Raw package logs contain all nine Packaging and Verifying steps with
 normal verification enabled. The returned complete bytes, sizes, SHA-256 values
 and tar member names match every original archive in the
-[nine-archive comparison table](YT-096-TWO-HOST-REBUILD.md#archive-comparison).
+[nine-archive comparison table](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md#archive-comparison).
 
 The existing command
 `cargo xtask release checksums verify artifacts/yt096-github-hosted-rebuild-20261020/returned`

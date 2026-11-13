@@ -298,7 +298,7 @@ commands. Historical root-workspace/cache failures remain preserved. The
 is not a replacement for the selected dependency inventories. The original
 inventory and checksum evidence above remains unchanged. Consuming those
 archives on Windows was not a second-host archive rebuild. The separately
-executed [two-host rebuild](YT-096-TWO-HOST-REBUILD.md) now produces nine
+executed [two-host rebuild](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md) now produces nine
 byte-identical Windows archives with normal Cargo verification. Original
 archive/SBOM/checksum bytes remain unchanged. Shared builder control and
 staged sources mean independent rebuilding, build-bound inventory and formal

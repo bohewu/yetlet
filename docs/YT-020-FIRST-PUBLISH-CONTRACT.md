@@ -27,7 +27,7 @@ dependencies, merge workspaces or add a publisher framework.
 `yetlet-config` has an optional normal dependency on `yetlet-secrets`.
 `yetlet-secrets` has versioned development dependencies on Config, Core and
 Server Axum; Config has development dependencies on Core and Server Axum. The
-[inventory](YT-020-REGISTRY-READINESS.md) distinguishes their normal dependency
+[inventory](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-REGISTRY-READINESS.md) distinguishes their normal dependency
 DAG from this mixed development edge.
 
 Keep both manifests intact. For bounded local verification, reuse the accepted

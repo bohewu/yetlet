@@ -54,7 +54,7 @@ feature additions, and unchanged CycloneDX 1.5 output bytes. The existing
 36-entry unsigned bundle binds those nine archives, 23 SBOMs and four supporting
 records. Its bytes and identities remain unchanged; it was not regenerated or
 signed. Full archive hashes remain in the
-[accepted archive table](YT-096-TWO-HOST-REBUILD.md#archive-comparison).
+[accepted archive table](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md#archive-comparison).
 
 The [source-inventory comparison](YT-096-SUPPLY-CHAIN-DELTA.md#target-inventory-and-sbom-coverage)
 has 23/23 normal/build metadata matches, 21 exact normal/build Cargo-tree matches

@@ -235,7 +235,7 @@ The selected-platform gate is still partial: Windows native qualification now
 passes. Actual Ubuntu 24.04 guest execution now supplies the native baseline
 beyond the earlier shared-kernel container. Reconcile the retained Chrome
 evidence against the final selected browser/support boundary. The subsequent
-[two-host archive rebuild](YT-096-TWO-HOST-REBUILD.md) now matches all nine
+[two-host archive rebuild](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md) now matches all nine
 Windows archives exactly to Linux; that is separate from this platform slice.
 Independently controlled builder evidence, build-bound inventory, formal
 provenance/trust/signature/registry checks, final independent release/security

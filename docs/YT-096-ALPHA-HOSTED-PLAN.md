@@ -823,7 +823,7 @@ version-migration paths, then selects that resulting commit as the new candidate
 | Historical source/tag | `3eacfe31f5e3281411d3bc4653a6baccab668b30` / existing immutable unsigned `v0.1.0`; unchanged |
 
 C is selected now, not silently substituted with a future patch or squash commit.
-The [local alpha preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md) and its independent
+The [local alpha preflight](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-ALPHA-VERSION-PREFLIGHT.md) and its independent
 PASS remain the accepted version/package evidence. Selecting C does not convert
 those dirty-tree preflight archives into clean immutable-C archives or qualify
 new hosted execution. Exact new output bytes, provenance and custody must bind
