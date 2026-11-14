@@ -1,4 +1,4 @@
-//! Single-primary engine adapted from the reviewed private YT-066b1 spike.
+//! Single-primary engine adapted from the reviewed disposable single-primary provider prototype.
 use crate::session_redis::{RedisOperationId, RedisSessionConfig, RedisSessionError as Error};
 use redis::aio::{ConnectionManager, ConnectionManagerConfig};
 use sha2::{Digest, Sha256};
@@ -567,21 +567,23 @@ mod tls_selection_tests {
     use super::*;
     #[cfg(feature = "session-redis-tls")]
     #[test]
-    fn yt184_tls_backend_is_constructible_without_other_consumers() {
+    fn tls_backend_is_constructible_without_other_consumers() {
         let _ = rustls::ClientConfig::builder()
             .with_root_certificates(rustls::RootCertStore::empty())
             .with_no_client_auth();
     }
     #[test]
-    fn yt184_tls_endpoint_selection_and_no_insecure_fragment() {
+    fn tls_endpoint_selection_and_no_insecure_fragment() {
         assert!(endpoint_supported("redis://127.0.0.1:6379/"));
         assert_eq!(
-            endpoint_supported("rediss://valkey.yt184.test:6379/"),
+            endpoint_supported("rediss://valkey.session-fixture.test:6379/"),
             cfg!(feature = "session-redis-tls")
         );
         assert!(!endpoint_supported(
-            "rediss://valkey.yt184.test:6379/#insecure"
+            "rediss://valkey.session-fixture.test:6379/#insecure"
         ));
-        assert!(!endpoint_supported("http://valkey.yt184.test:6379/"));
+        assert!(!endpoint_supported(
+            "http://valkey.session-fixture.test:6379/"
+        ));
     }
 }

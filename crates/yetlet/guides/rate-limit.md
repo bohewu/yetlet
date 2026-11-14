@@ -112,7 +112,7 @@ provider registry, per-request configuration lookup or ambient library setting
 is introduced. The root workspace excludes the nested config/secrets workspaces
 so they retain their isolation. In the shared root lockfile, config's existing
 exact libc pin resolves libc from 0.2.190 to 0.2.186; it adds no normal Settings
-dependency to the limiter or server. See the YT-117 follow-up evidence for the
+dependency to the limiter or server. The source-bound dependency review retained the
 explicit version delta and focused compile check.
 
 The [application-owned base TOML](../examples/rate_limit/settings/base.toml) declares:
@@ -199,7 +199,7 @@ rustdoc context; place wiring in your own fallible setup function.
 <summary>Historical delivery context and evidence</summary>
 
 An experimental, unpublished, native-only Tower/Axum admission layer for
-[YT-117](https://github.com/bohewu/yetlet/blob/master/docs/YT-117-RATE-LIMIT.md). Explicit installation is required;
+application-owned admission policy. Explicit installation is required;
 Core, the server facade, Auth and browser applications do not enable it.
 
 </details>

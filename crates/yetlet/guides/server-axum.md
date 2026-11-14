@@ -77,7 +77,7 @@ stops the foreground listener; a Router setup alone does not bind a listener.
 
 `Page::new`, `render_document` and `render_page` use the legacy `zh-Hant` root language. For another language, validate `LanguageTag` and select `DocumentMetadata` with `Page::with_metadata` or the metadata-aware render functions. The contract is title/language plus fixed charset/viewport; no arbitrary head DSL is installed. Language validation is conservative ASCII shape validation, not a complete BCP 47 registry.
 
-Views are escaped through `yetlet::html`. Rendering errors become a generic HTTP 500 through `Page`/`HtmlPageError`; HTML responses carry the strict default CSP. Full SSR buffers the document and needs no JS/WASM. Browser assets/loaders are explicitly application-owned build outputs. [Streaming](https://github.com/bohewu/yetlet/blob/master/docs/YT-021-STREAMING-SSR-RESEARCH.md) and [deadline](https://github.com/bohewu/yetlet/blob/master/docs/YT-029-HTTP-DEADLINE-RESEARCH.md) research remain app-owned opt-ins, without a core streaming/suspense/deadline API.
+Views are escaped through `yetlet::html`. Rendering errors become a generic HTTP 500 through `Page`/`HtmlPageError`; HTML responses carry the strict default CSP. Full SSR buffers the document and needs no JS/WASM. Browser assets/loaders are explicitly application-owned build outputs. Application-owned streaming and HTTP deadline research remain app-owned opt-ins, without a core streaming/suspense/deadline API.
 
 ## API reference
 

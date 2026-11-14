@@ -4,6 +4,22 @@ use serde::Serialize;
 use std::sync::atomic::AtomicU64;
 
 const CAPACITY: usize = 1024;
+const ADMISSION_COOKIE_SCOPE: &str = "session_admission";
+
+#[test]
+fn admission_fixture_cookie_scope_is_valid_without_redis() {
+    let config = RedisSessionConfig::new(
+        "disposable_fixture",
+        ADMISSION_COOKIE_SCOPE,
+        Duration::from_secs(300),
+        4,
+        256,
+    );
+    assert!(
+        config.is_ok(),
+        "admission fixture must satisfy cookie policy"
+    );
+}
 #[derive(Serialize)]
 struct Record {
     wave: u64,
@@ -215,13 +231,14 @@ async fn measure(
 }
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
-#[ignore = "YT-172: one explicitly selected, disposable Valkey research fixture"]
+#[ignore = "one explicitly selected disposable Valkey admission fixture"]
 async fn session_admission_burst_research() {
-    let endpoint = std::env::var("YT172_SESSION_URL").expect("private fixture endpoint");
-    let output = std::env::var("YT172_OUTPUT").expect("excluded research output");
+    let endpoint = std::env::var("YETLET_SESSION_ADMISSION_URL").expect("private fixture endpoint");
+    let output =
+        std::env::var("YETLET_SESSION_ADMISSION_OUTPUT").expect("excluded research output");
     let config = RedisSessionConfig::new(
         random_id().expect("random namespace"),
-        "yt172",
+        ADMISSION_COOKIE_SCOPE,
         Duration::from_secs(300),
         4,
         256,
@@ -268,7 +285,7 @@ async fn session_admission_burst_research() {
         .filter(|v| v["wave"].as_u64().unwrap_or(0) > 64)
         .all(|v| v["outcomes"] == serde_json::json!(["ok"]))
         && outcomes.len() == 72;
-    let report = serde_json::json!({"task":"YT-172","test_build_only":true,"plan":plan,"outcomes":outcomes,"records":*records,"capture_overflow":overflow,"append_ns_sum":store.inner.probe.append_ns_sum.load(Ordering::Relaxed),"append_ns_max":store.inner.probe.append_ns_max.load(Ordering::Relaxed),"elapsed_ns_including_setup_and_drain":elapsed,"running_workers_peak":store.inner.peak.load(Ordering::SeqCst),"running_workers_after_drain":store.inner.running.load(Ordering::SeqCst),"drain_reaped":drain.as_ref().ok(),"result":result.as_ref().err(),"recovery_ok":recovery_ok,"state_or_credentials_retained":false});
+    let report = serde_json::json!({"task":"session-admission-burst","test_build_only":true,"plan":plan,"outcomes":outcomes,"records":*records,"capture_overflow":overflow,"append_ns_sum":store.inner.probe.append_ns_sum.load(Ordering::Relaxed),"append_ns_max":store.inner.probe.append_ns_max.load(Ordering::Relaxed),"elapsed_ns_including_setup_and_drain":elapsed,"running_workers_peak":store.inner.peak.load(Ordering::SeqCst),"running_workers_after_drain":store.inner.running.load(Ordering::SeqCst),"drain_reaped":drain.as_ref().ok(),"result":result.as_ref().err(),"recovery_ok":recovery_ok,"state_or_credentials_retained":false});
     std::fs::write(
         output,
         serde_json::to_vec_pretty(&report).expect("redacted report"),

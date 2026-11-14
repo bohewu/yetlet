@@ -26,7 +26,7 @@ Invalid endpoints fail with `ActionError::InvalidEndpoint`. Query/fragment synta
 
 No automatic retry, application timeout, cancellation protocol, authentication or CSRF token attachment is provided. The server must validate inputs, authentication, authorization and CSRF policy; serialization alone provides none of those guarantees. A retired UI lifetime must suppress late results explicitly, as the Todo caller does.
 
-[Custom transport research](https://github.com/bohewu/yetlet/blob/master/docs/YT-024-CUSTOM-TRANSPORT-RESEARCH.md) proves one app-owned typed TCP adapter over this existing trait. It does not select a supported transport/plugin framework or change the default browser HTTP path.
+A bounded application-owned custom transport experiment proves one app-owned typed TCP adapter over this existing trait. It does not select a supported transport/plugin framework or change the default browser HTTP path.
 
 ## License and compatibility
 
