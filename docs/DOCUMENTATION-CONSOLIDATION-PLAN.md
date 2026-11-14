@@ -125,9 +125,64 @@ After C1 is a verified clean, committed SDK source, update **only the local, unr
 
 Remove the original hyphenated template/test labels, all 68 unhyphenated uppercase markers outside `framework.json`, **and the additional lowercase markers**. The CLI source union spans **21 tracked paths with task labels before canonicalization**: the embedded `framework.json`, the originally scoped 15 template/test/process paths, and five lowercase-only files `src/docker/tests.rs`, `src/platform/fs/windows_tests.rs`, `src/platform/process/mod.rs`, `src/static_export/tests.rs` and `tests/commands.rs`. Rename test-only `YT247_CAPTURE_HELPER`, `YT087B_*`, `YT088C_*`, `YT088D_*` and synthetic browser `YT112` labels to stable semantic case names **consistently across environment-variable writers, readers, subprocess fixture snippets, awaited UI text and assertions**; do not merely remove literal text on one side. Replace task-stamped report identifiers and disposable fixture names with meaningful *scenario* labels, preserving observable CLI product behavior, error policy, and test report/consumer schemas where needed. Add a regression test/gate rejecting **case-insensitive** ticket-number markers with or without a hyphen (`YT-<digits>`, `YT<digits>`, `yt<digits>`, `yt-<digits>`), including identifier suffixes, synthetic path/domain names, through current CLI package sources/templates/tests, embedded SDK source-map values and generated template output. Existing legitimate test behavior must be preserved by renaming both target fixture producers and readers, not just pattern scrubbing. Keep the gate itself free of ticket markers as literal text. The completed C1 snapshot must also have zero matching source entries before regeneration, and the C2 generator must fail closed if any SDK source or template content reintroduces either syntax. Guard also fails on dangerous YT Markdown links that require deleted working-tree pages. The selected source snapshot, templates, published CLI and generated apps are different contexts; test the actual source tree and one generated starter instead of assuming a grep is enough. The package source remains **unpublished** pending release approval; past alpha.7/CLI 0.4.0 users and published bytes do not change.
 
-**C2 acceptance:** zero ticket-number markers in tracked `tools/yetlet-cli/**`, especially the 81-entry bundled framework source JSON and all generated README/source templates; zero in the 11 SDK source closure files; regenerated identity/version/lock/source hash and Rust resource/source-history tests PASS; CLI unit, bounded generated-app/templating tests on available Linux toolchain, documentation/release-docs/samples and formatting PASS. Preserve original CLI runtime/SemVer resolver policy, external SDK registry behavior, strict CSP, safe filesystem paths, request/Session Auth semantics, all 256 formal Backlog states/dependencies, Reader eight pinned chapters, official hosted release records and signing trust unchanged. If the alpha.8 build SDK lock or source tests cannot resolve under the active environment, record the **actual** blocker and stop: do not forge a new snapshot, bypass source pinning or claim zero complete.
+### C2-A: exact server-axum Cargo.lock compatibility correction (reviewed amendment)
+
+**New actual evidence after the first C2 test attempt (2026-11-14):** the full CLI Rust test suite reached `tests/generator_selected.rs::current_service_profiles_generate_all_outputs_with_explicit_offline_locks` and its first Docker generator rejected an independently prepared, offline `Cargo.lock` with `CLI_SOURCE_UNSUPPORTED`. The source-qualified cause is **not** an arbitrary stale or unsafe lock: the old immutable CLI alpha.7 snapshot's `server-axum` feature declared exactly `html, axum, serde, tower`, whereas the accepted SDK alpha.8 source (actual C1 commit `ca0940ddda5655284450fc5ce8cc1252e1a6b899`) additionally declares `dep:tokio` for native `App::serve()`. The existing `tools/yetlet-cli/src/framework_source.rs::normal_dependencies` was still frozen to the old **axum/serde/tower** exact set, while `tools/yetlet-cli/src/compose.rs::validate_lock` correctly rejects a dependency mismatch. Original failure, both source feature lines, selected profile and actual unchanged security checks are recorded in ignored `artifacts/verification/cli-canonical-source-20261114/C2-cloud-lock-rejection.json` and `C2-cli-all-tests.log`.
+
+**R4 independent plan Reviewer FAIL — required fixture correction:** the single-file change is insufficient because
+`tools/yetlet-cli/tests/fixtures/docker_framework.rs::normal_dependencies` independently contains the same
+pre-alpha.8 three-item exact list. The unchanged `tests/fixtures/compose_app.rs` and
+`src/docker/tests.rs` source-specific fixtures use it to filter valid Cargo.lock dependency records.
+Changing the production guard alone would make preexisting positive Compose/Docker fixture tests
+fail, even while the real selected-profile test improves. Original R4 P2 finding and
+expected prior test behavior are retained in ignored `C2-plan-r4-output.json`.
+**A new R5 independent plan Reviewer PASS is a blocking gate before either source change.**
+Expand the exact C2 approved source set to **two** files: add only `tokio` to the
+`axum/serde/tower` direct SDK `server-axum` dependency BTreeSet in
+`tools/yetlet-cli/src/framework_source.rs` **and**
+`tools/yetlet-cli/tests/fixtures/docker_framework.rs`, with the original optional config
+extension (`toml`, `dotenvy`, `libc`) byte-identically preserved. Do not edit
+`compose::validate_lock`, the two dependent fixture callers, existing assertions, registry
+checksum validation, path/source security, arbitrary dependency policy, runtime behavior or
+producer/environment inputs. Verify both implementations independently reflect the exact
+SDK alpha.8 source feature delta and preserve its fail-closed nature.
+Run the **unchanged** originally failing selected cloud generator test and its dependent
+Compose/Docker positive and negative suites; they must accept the actual offline alpha.8
+lock without weakening any existing malformed/untrusted lock refusal. More source changes
+require another reviewed amendment; do not hand-patch the generated lock or fake its SHA.
+The source-only CLI checkout retains version `0.4.0` temporarily, but its dependency/README Build SDK metadata explicitly describes the **modified developer source**, not the historical published 0.4.0 package. The immutable published archive and current Reader `site/pages.toml` stay untouched; a new CLI version and separate owner-authorized release/consumer are mandatory before publication. C2's further source changes, including this deterministic allowlist adjustment and generated output, must receive independent **final** frozen-diff Reviewer PASS and strict/builtin Commit Guard. No Push/Release/Deploy or credential/service actions.
+
+**C2 acceptance:** zero case-insensitive ticket-number markers in tracked `tools/yetlet-cli/**`, including all **83** committed SDK source-map entries and generated README/source templates; zero across all **83** tracked SDK source files (with **16** actual C1 edits); regenerated identity/version/lock/source hash and Rust resource/source-history tests PASS; CLI unit, bounded generated-app/templating tests on available Linux toolchain, documentation/release-docs/samples and formatting PASS. Preserve original CLI runtime/SemVer resolver policy, external SDK registry behavior, strict CSP, safe filesystem paths, request/Session Auth semantics, all 256 formal Backlog states/dependencies, Reader eight pinned chapters, official hosted release records and signing trust unchanged. If the alpha.8 build SDK lock or source tests cannot resolve under the active environment, record the **actual** blocker and stop: do not forge a new snapshot, bypass source pinning or claim zero complete.
 
 Both C1 and C2 require **separate independent final Reviewer PASS and strict/builtin staged Commit Guard** before an authorized local commit; an R1 FAIL must be corrected and independently re-reviewed. After each commit verify actual HEAD, tree/review-diff identity and clean worktree. No Push, Release, Deploy, no remote tags or new credentials, no cleanup of mixed caches. Preserve separately recoverable evidence at ignored `artifacts/verification/cli-canonical-source-20261114/`. If C1 or C2 work is deferred, identify which CLI YT sources remain and the exact next gate; the final zero-YT repository goal remains in force.
+
+**C1 actual completion and C2 source-only verification (2026-11-14):** C1 SDK source commit
+`ca0940ddda5655284450fc5ce8cc1252e1a6b899` independently final-reviewed R2 PASS,
+strict/builtin Guard exit 0, clean source at commit. All 83 tracked SDK source files
+are free of case-insensitive numbered task identifiers. SDK-native 32 tests passed,
+2 external-provider tests ignored; 18 config tests passed; Session/TLS integration
+compiled. The selected Reader HTTP guide was changed, so the **actual local eight-page,
+15-file Wasm Reader preview** was built and verified, without public deployment.
+
+C2 regenerated all **83** bundled SDK files byte-identically from the C1 Git commit;
+`sdk-identity.json` and the source-specific Cargo.lock/manifest now bind SDK alpha.8.
+It also renamed every numbered task identifier across the current CLI source/templates
+and added generator-time rejection plus package/generated-starter test gates.
+The initial full CLI test FAIL in cloud generator exposed an exact SDK alpha.8
+`server-axum -> tokio` dependency addition. Independent R4 plan Reviewer FAIL identified
+a shared fixture mismatch; amended independent R5 plan Reviewer PASS authorized
+**two** exact `tokio` allowlist adjustments, keeping all strict rejection checks.
+Unchanged generator and dependent Docker/Compose tests then PASS, and the complete
+Linux CLI test suite and release-docs/docs/samples/format/JS syntax gates PASS.
+The generated source package scanner tests pass **4/4** (including actual native,
+Vite and browser-style starter contents). Source CLI version `0.4.0` here is
+**not the already published CLI 0.4.0 archive**; no package has been published
+and any new version, registry consumer, Windows-native verification and release
+need independent authorization. C2 still requires independent final diff Reviewer
+PASS, strict/builtin staged Guard and one local commit before source closeout.
+Full ignored evidence: `artifacts/verification/cli-canonical-source-20261114/`.
+The repo-wide final zero `docs/YT-*.md` target remains **104 → 0** after C1/C2;
+this phase removes CLI package coupling but does **not** delete those 104 files.
 
 ## Z1 execution plan — six historical research / planning reports into functional docs
 

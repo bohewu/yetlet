@@ -1,5 +1,5 @@
 
-## Selected optional cloud delivery profile (YT-101)
+## Selected optional cloud delivery profile (source-qualified)
 
 Use the exact image built from this app's separately generated Docker inventory.
 Vite requires an explicit operator `npm ci` and `npm run build` before generation;

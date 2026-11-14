@@ -1,4 +1,4 @@
-# @NAME@ — opt-in Vite production assets (YT-099, locally verified experimental scope)
+# @NAME@ — opt-in Vite production assets (Vite assets, locally verified experimental scope)
 
 This unpublished application owns its Rust adapter in `src/vite.rs`; it is not
 a stable Yetlet asset API. Rust renders meaningful, escaped HTML with JavaScript
@@ -62,5 +62,6 @@ There is no inline/data/CDN allowance, runtime compilation, dev server or HMR.
 No-store is conservative, not a rolling-deploy asset-retention guarantee. An old
 page can request a removed hash after a restart; retain old builds and route
 versions at deployment time under a separately reviewed policy. Existing Docker,
-Compose and Kubernetes generators reject this app until YT-101. Cloud here means
-only local bind/health/graceful shutdown composition. HMR belongs to YT-100.
+The opt-in Docker, Compose and Kubernetes configuration generators support only
+their separately selected source profiles. Generating configuration does not
+build images or deploy services. HMR is a separate explicit local dev profile.

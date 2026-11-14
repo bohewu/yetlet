@@ -55,6 +55,13 @@ for platform setup, settings and the full command reference, or follow the
 [browser app guide](https://bohewu.github.io/yetlet/browser/) for a Wasm starter.
 [GitHub releases](https://github.com/bohewu/yetlet/releases) record published versions.
 
-**CLI release:** `0.4.0`. **Build SDK:** `=0.9.0-alpha.7`.
+**CLI release:** `0.4.0`. **Build SDK:** `=0.9.0-alpha.8`.
+
+Source checkout note: the Build SDK value above describes the current developer
+source, not a retroactive change to the accepted registry archive. The
+installation command above still selects the previously published release,
+whose exact dependency and checksum remain fixed in the accepted hosted record.
+A new, independently reviewed CLI version and registry consumer are required
+before any of these newer source changes can be published.
 
 **SDK policy:** `sdk-latest-v2`.

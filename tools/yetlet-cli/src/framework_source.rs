@@ -63,7 +63,7 @@ pub(crate) fn collect(root: &Path) -> Result<BTreeMap<String, Vec<u8>>, String> 
 pub(crate) fn normal_dependencies(runtime_settings: bool) -> BTreeSet<String> {
     // The delivery profile accepts only server-axum and optionally config.
     // Cargo locks only activated optional dependencies for a path dependency.
-    let mut names = BTreeSet::from_iter(["axum", "serde", "tower"].map(str::to_owned));
+    let mut names = BTreeSet::from_iter(["axum", "serde", "tower", "tokio"].map(str::to_owned));
     if runtime_settings {
         names.extend(["toml", "dotenvy", "libc"].map(str::to_owned));
     }

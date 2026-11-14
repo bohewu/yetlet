@@ -2,6 +2,7 @@
 """Refresh the CLI's package-owned public resources from a reviewed checkout."""
 import json
 import hashlib
+import re
 from pathlib import Path
 import subprocess
 import tomllib
@@ -33,6 +34,11 @@ def main():
         files[name] = path.read_bytes().decode().replace('\r\n', '\n')
     if not files or 'crates/yetlet/src/lib.rs' not in files:
         raise SystemExit('Reviewed SDK source closure is missing.')
+    # Reject stale numbered worklog labels before hashing an immutable source map.
+    # The generated snapshot must remain byte-identical to the recorded Git source.
+    for name, body in files.items():
+        if re.search(r'yt-?\d+', body, re.IGNORECASE):
+            raise SystemExit(f'Numbered work item marker in packaged SDK source: {name}')
     (CLI / 'resources/framework.json').write_text(json.dumps(files, sort_keys=True, indent=2, ensure_ascii=False) + '\n')
     (CLI / 'resources/workspace.toml').write_text(workspace)
     (CLI / 'resources/framework.lock').write_bytes((ROOT / 'Cargo.lock').read_bytes())

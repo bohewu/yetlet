@@ -1,4 +1,4 @@
-//! Application-owned Vite production adapter, copied from the YT-098 experiment.
+//! Application-owned Vite production adapter, copied from the Vite production experiment.
 //! Trusted, quiescent build roots only; no public framework asset API.
 mod assets {
     //! Application-owned contract: producer adapters supply data, never markup.
@@ -309,7 +309,7 @@ mod assets {
             pub(crate) fn new() -> Self {
                 static ID: AtomicUsize = AtomicUsize::new(0);
                 let path = std::env::temp_dir().join(format!(
-                    "yt098-{}-{}",
+                    "vite-assets-{}-{}",
                     std::process::id(),
                     ID.fetch_add(1, Ordering::Relaxed)
                 ));

@@ -704,7 +704,7 @@ fn app_fixture(root: &Path) -> PathBuf {
 #[test]
 fn standalone_unicode_app_holds_cwd_manifest_and_lock_until_drop() {
     let root = tempfile::Builder::new()
-        .prefix("yt088c 雪 😀 ")
+        .prefix("winprocess 雪 😀 ")
         .tempdir()
         .unwrap();
     let manifest = app_fixture(root.path());

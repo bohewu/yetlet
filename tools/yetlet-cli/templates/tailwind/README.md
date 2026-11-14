@@ -83,6 +83,6 @@ rebuild. No output is embedded, fetched, compiled or updated by the server.
 Existing Docker/Compose/Kubernetes generators reject this separate source
 variant, including `--cloud`. This is an unpublished developer preview;
 production, browser rendering and Windows runtime qualification require
-separate evidence. YT-020 release remains Blocked.
+separate evidence. Local source generation does not approve registry publication.
 
 ## Retained application profile instructions
