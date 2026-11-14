@@ -2,7 +2,7 @@
 
 A separate, application-owned prototype: native HTML describes a synthetic
 preset; the first explicit Run loads a private wgpu pipeline and Rapier CPU
-physics. Its earlier [source-level feasibility study](../../docs/YT-192-3D-PHYSICS-LAB-STUDY.md) alone did not verify an implementation; the independently accepted prototype, control, startup and scenario slices were subsequent, source-specific experiments. Their full original failures and reviews are recoverable from fixed local Git `983653adadcedb4ec196016b75281d39e2ed0acf`, not verified as public GitHub pages. No existing Yetlet renderer API changes. This is not a game engine,
+physics. Its earlier [source-level feasibility study](../../docs/ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries) alone did not verify an implementation; the independently accepted prototype, control, startup and scenario slices were subsequent, source-specific experiments. Their full original failures and reviews are recoverable from fixed local Git `983653adadcedb4ec196016b75281d39e2ed0acf`, not verified as public GitHub pages. No existing Yetlet renderer API changes. This is not a game engine,
 engineering/safety simulator, production feature or performance claim.
 
 ## Prerequisites
@@ -12,7 +12,7 @@ with its own Cargo.lock, not an addition to the default workspace or sample
 catalog. Native SSR needs no GPU, physics feature, Node or WASM tools. The
 optional surface needs wasm32-unknown-unknown, wasm-bindgen-cli exactly 0.2.129,
 a secure-context loopback origin and a working WebGPU adapter/device.
-Scene bounds are in [the reviewed contract](../../docs/YT-192-3D-PHYSICS-LAB-STUDY.md).
+Scene bounds are in [the reviewed contract](../../docs/ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries).
 Your usual browser may open the page; Wayland is not an application prerequisite.
 Actual 3D operation needs the capabilities below. The isolated Firefox/Wayland
 receipts in YT-193/194 are bounded observations, not an all-browser support claim.

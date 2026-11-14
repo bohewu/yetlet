@@ -130,7 +130,7 @@ bridge. Browser errors are local to that capability; queue completion
 is not FPS. Its actual support is limited to the
 [documented Experimental configuration](../crates/yetlet-browser/guides/wgpu-support.md),
 without a speedup or future-3D API claim. See the
-[YT-081 cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) for typed
+[YT-081 cross-crate API audit](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement) for typed
 error and disposal-contract differences.
 
 ### Native dependency composition, not a container framework

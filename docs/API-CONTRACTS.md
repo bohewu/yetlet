@@ -89,7 +89,7 @@ inventory or change any M9 Stable Candidate classification:
 | `yetlet-session-redis::{RedisSessionConfig,RedisSessionManager,RedisSession,RedisSessionError,RedisSessionUpdateError,RedisOperationId,RedisOperationStatus}` | **Experimental, unpublished, isolated workspace**; explicitly connected async Redis single-primary provider. `connect/read/try_update/rotate/destroy/shutdown` are async because they do I/O; `open` only parses a cookie. Memory `yetlet-session` remains synchronous, and behavior/cancellation/uncertain results are not interchangeable. [Provider guide](../crates/yetlet/guides/session-redis.md) |
 | `yetlet-wgpu::{Batch,PickViewport,PickToken,Lifetime,SceneError}` and wasm32/browser `browser::SceneOwner` | **Experimental opt-in, `publish = false`**, CPU-only defaults; explicit browser feature. Bounded flat records, validation, picking, initialization, resize, queue completion and disposal were tested at one selected Firefox/X11/Intel Vulkan configuration. No GPU default dependency, 3D API, performance/stability/production claim or public wgpu type. [Crate guide](../crates/yetlet-browser/guides/wgpu.md) and [support matrix](../crates/yetlet-browser/guides/wgpu-support.md) |
 
-The [YT-081 cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) records
+The [YT-081 cross-crate API audit](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement) records
 intentional API differences and remaining P2 design debt: the Experimental
 GPU CPU error surface now uses typed `SceneError` with explicit Wasm
 `JsValue` conversion, and first-retirement `dispose` reports a `bool`;
@@ -113,6 +113,34 @@ when offering reload. This does not change configuration precedence,
 Core/browser defaults, signing semantics or the original release inventory.
 See the [contract and verification](SECRET-PROVIDERS.md).
 
+## Cross-crate API differences and scoped GPU refinement
+
+A dated cross-crate audit found **no P0/P1 exercised-path API defect**
+among its original library candidates and separately experimental
+Redis/GPU modules. The audit does not promise current stable ABI,
+SemVer compatibility or untested platform support.
+
+Intentionally distinct behavior stays distinct: Memory Session
+uses synchronous clone/commit, while Redis Session awaits network
+CAS and can return OutcomeUnknown, requiring separate resolution
+rather than automatic callback retry. Redis open parses Cookie data;
+ActionExecutor execute remains async even with local synchronous work.
+HTML, DOM, actions, providers and graph retain domain-specific errors,
+not a common YetletError or universally identical dispose shape.
+
+An independently selected Experimental GPU refinement later
+implemented typed CPU SceneError variants, translated browser failures
+at the Wasm JsValue boundary, and made first logical retirement
+return bool for Lifetime/SceneOwner. **A true retirement value is
+not proof that async Wasm borrows have settled**, nor permission
+to free the wrapper immediately. DOM listeners and Sessions preserve
+their own cleanup contracts. Other identified P2 differences were
+not automatically breaking defects or a stable public API promise.
+Changes to published surfaces still require separate compile fixtures,
+migration notes, testing and independent review.
+
+Full original audit matrix and bounded tested inputs remain at
+local Git dfb27dc816c452e8033ff24e2d853f88a451761a (public reachability unverified).
 ## Internal/support-only
 
 | Public surface | Reason |

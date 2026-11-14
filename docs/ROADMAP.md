@@ -1323,9 +1323,9 @@ showed the intended HTML/no-GPU fallback. Prior Linux Chrome/NVIDIA or
 other targets had failed/unqualified attempts; Windows JS shader baseline
 did not establish the same Rust/Wasm browser path.
 
-The [retained YT-077 comparison](YT-077-MEASUREMENT.md) covers finite
+The [retained YT-077 comparison](QUALIFICATION-MATRIX.md#experimental-gpu-browser-and-physics-lab-evidence) covers finite
 Canvas2D versus WebGPU lanes **without a demonstrated useful speedup**;
-the [cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) and
+the [cross-crate API audit](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement) and
 [support guide](../crates/yetlet-browser/guides/wgpu-support.md) preserve
 explicit SceneError/JsValue and first retirement versus outstanding-borrow
 settlement, app-owned fallback and failure boundaries. This research was
@@ -1649,7 +1649,7 @@ YT-096/D1–D6 and YT-020 gates remain unchanged; new documents are uncommitted.
 | Compile-time template IR | M7b–M7e prove one fixed shape; M7f–M7i promote only low-level contracts and one production keyed-list path. General trees remain required before any macro decision |
 | Resumability | [resumability decision](ARCHITECTURE.md#research-only-handler-resumption-and-native-composition) proves two finite versioned local handlers with bounded numeric captures and native size/cost evidence; retain explicit app-owned descriptors, reject generic/core resumability promotion |
 | Custom transport | [YT-024 proof](EXTENSIONS.md#application-owned-action-transport) uses existing ActionExecutor for one opt-in typed TCP adapter with bounded loopback/error/cancellation evidence; adopt the app-owned pattern, reject core framework promotion |
-| WebGPU renderer | [YT-023 study](YT-023-WEBGPU-RESEARCH.md) proves opt-in native wgpu/Vulkan draws at 10k–100k with raw completion-wall-time and explicit allocation-byte observations; retain the app-owned prototype, reject core/browser-portability promotion; no matched DOM/CPU speedup is established |
+| WebGPU renderer | [YT-023 study](ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries) proves opt-in native wgpu/Vulkan draws at 10k–100k with raw completion-wall-time and explicit allocation-byte observations; retain the app-owned prototype, reject core/browser-portability promotion; no matched DOM/CPU speedup is established |
 | Worker compute | Which computations can leave the main thread without compromising DOM correctness? |
 | Tooling | When do HMR, bundler integration, and devtools justify their complexity? |
 
@@ -2125,7 +2125,7 @@ Reader/Pages publication; the separately accepted YT-217 local Reader and
 YT-218 actual hosted publication retain different authorities.
 ## M24 — Application-owned 3D physics lab: contract and feasibility
 
-YT-192 selects [documentation-only minimum research](YT-192-3D-PHYSICS-LAB-STUDY.md)
+YT-192 selects [documentation-only minimum research](ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries)
 for a separate opt-in 3D physics example: private wgpu pipeline, Rapier CPU
 physics, first desktop-browser candidate, bounded cube/sphere scene, fixed-step
 clock and explicit GPU failure/lifetime recovery. Existing flat renderer APIs,

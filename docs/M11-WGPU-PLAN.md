@@ -3,7 +3,7 @@
 **Date:** 2026-10-12. **Planning task:** YT-069. **Implementation proposals:** YT-075–YT-080.
 **Status:** Proposed, documentation only. The owner requested planning for `yetlet-wgpu`; no crate extraction, dependency upgrade, browser execution or support declaration is authorized by this document.
 
-Read the [M11 plan](M11-PLAN.md), [product research](M11-PRODUCT-READINESS-RESEARCH.md), [proposed ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) and [original YT-023 research](YT-023-WEBGPU-RESEARCH.md). Product-readiness work does not depend on this line; neither line depends on publishing the original nine candidates.
+Read the [M11 plan](M11-PLAN.md), [product research](M11-PRODUCT-READINESS-RESEARCH.md), [proposed ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) and [original YT-023 research](https://github.com/bohewu/yetlet/blob/dfb27dc816c452e8033ff24e2d853f88a451761a/docs/YT-023-WEBGPU-RESEARCH.md). Product-readiness work does not depend on this line; neither line depends on publishing the original nine candidates.
 
 ## 1. Proposed product and promotion boundary
 
@@ -27,7 +27,7 @@ A `yetlet-scene` crate, general scene hierarchy, arbitrary shader plugins, text 
 
 **Source-confirmed at `c7ecc49eeb667e145cfb7e764c10b72ba104bbee`:** [research manifest](../examples/webgpu-scene-research/Cargo.toml) enables `wgpu = 27.0.1` only through `gpu`, with std/Vulkan/WGSL; [scene source](../examples/webgpu-scene-research/src/lib.rs) builds a fixed flat grid; [benchmark](../examples/webgpu-scene-research/src/bin/scene-bench.rs) initializes native offscreen resources, uploads once, draws, verifies readback and waits per timed submission. It has no Yetlet dependency, browser canvas surface, dynamic scene update or displayed frame loop.
 
-**Existing measured evidence, not rerun:** [YT-023](YT-023-WEBGPU-RESEARCH.md) retains RTX 4090/Vulkan all-center draw proof at 10k/50k/100k instances. Median CPU encode + submission + completion wall times are 0.033760/0.054286/0.083525 ms. These exclude preparation/upload/setup/readback and are not display FPS, browser paint, pure GPU timestamps, dynamic-update costs or superiority over another renderer. Explicit buffer/texture lengths are not measured resident VRAM/RSS.
+**Existing measured evidence, not rerun:** [YT-023](https://github.com/bohewu/yetlet/blob/dfb27dc816c452e8033ff24e2d853f88a451761a/docs/YT-023-WEBGPU-RESEARCH.md) retains RTX 4090/Vulkan all-center draw proof at 10k/50k/100k instances. Median CPU encode + submission + completion wall times are 0.033760/0.054286/0.083525 ms. These exclude preparation/upload/setup/readback and are not display FPS, browser paint, pure GPU timestamps, dynamic-update costs or superiority over another renderer. Explicit buffer/texture lengths are not measured resident VRAM/RSS.
 
 **Unknown:** browser portability, adapter refusal/loss, displayed rendering, resize/DPR, update/picking/interaction costs, low-power devices, cross-OS backends, and meaningful bundle/startup tradeoffs. The current 4090 result cannot qualify an integrated GPU or a browser support range.
 

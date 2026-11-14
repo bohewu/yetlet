@@ -222,9 +222,28 @@ sixteen-library GitHub preview cohort, while the original nine-package records
 remain historical. Coordinated versioning does not merge dependency graphs,
 enable optional features or expand their selected platform/GPU support. The
 default HTML/DOM/server dependency paths and root lock remain independent. See the
-[YT-081 source/API audit](YT-081-API-CONTRACT-AUDIT.md) before assuming
+[YT-081 source/API audit](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement) before assuming
 cross-provider interchangeability or a GPU stability guarantee.
 
+## Historical cross-crate API alignment decisions
+
+The 2026-10-14 source-specific API survey found **no P0/P1
+incompatibility on selected exercised paths**, not a stable
+cross-provider ABI. Memory synchronous Session commit and Redis
+async CAS/OutcomeUnknown are deliberately different; equivalent
+method names do not imply identical atomicity, retry or cancellation.
+Local Actions can use one async execute call site without creating
+a browser HTTP event circuit or requiring serialization.
+
+Later Experimental GPU API refinement added CPU typed SceneError
+and a first-retirement bool while browser JsValue boundaries and
+async resource settlement remained distinct. Do not standardize
+Memory into async, invent a shared YetletError or force unrelated
+domain dispose returns into mechanical parity. Preserve current
+release/consumer contracts independently from historical labels.
+See [API classification](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement)
+and [GPU support boundaries](../crates/yetlet-browser/guides/wgpu-support.md).
+The original complete audit is recoverable at **local Git** dfb27dc816c452e8033ff24e2d853f88a451761a (remote availability unverified).
 ## Change discipline
 
 A change to a **Stable Candidate** requires all of the following before merge:

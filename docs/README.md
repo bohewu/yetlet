@@ -429,7 +429,7 @@ Complete original closed task evidence is recoverable at fixed local Git
 
 ## M11 — historical planning and selected product/renderer delivery
 
-The original [M11 plan](M11-PLAN.md), [product-readiness research](M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](M11-WGPU-PLAN.md) and [planning review](M11-PLANNING-REVIEW.md) were documentation-only at the YT-069 checkpoint. **Subsequent owner authorizations and independent reviewers** accepted YT-070–YT-080 at separately selected bounds. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) now accepts only the bounded Experimental opt-in architecture; it does not grant stable or broad browser support. See the [M11 reconciliation](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-M11-CLOSEOUT.md) and [API consistency audit](YT-081-API-CONTRACT-AUDIT.md); historical planning statements retain their original date and evidence.
+The original [M11 plan](M11-PLAN.md), [product-readiness research](M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](M11-WGPU-PLAN.md) and [planning review](M11-PLANNING-REVIEW.md) were documentation-only at the YT-069 checkpoint. **Subsequent owner authorizations and independent reviewers** accepted YT-070–YT-080 at separately selected bounds. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) now accepts only the bounded Experimental opt-in architecture; it does not grant stable or broad browser support. See the [M11 reconciliation](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-M11-CLOSEOUT.md) and [API consistency audit](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement); historical planning statements retain their original date and evidence.
 
 ### Activated non-GPU implementation
 
@@ -441,11 +441,11 @@ The [GPU support guide](../crates/yetlet-browser/guides/wgpu-support.md)
 owns the current explicitly opt-in browser contract and exact Firefox
 158/X11/Intel Vulkan runtime limits; [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md)
 preserves the Experimental separation from ordinary SSR/DOM. The selected
-[Firefox Canvas2D/WebGPU measurement](YT-077-MEASUREMENT.md) found **no proven
+[Firefox Canvas2D/WebGPU measurement](QUALIFICATION-MATRIX.md#experimental-gpu-browser-and-physics-lab-evidence) found **no proven
 useful WebGPU speedup**. GPU-absent default Firefox, controlled device loss,
 picking/HTML alternatives, delayed borrows and retirement have separate
 historical accepted cases; browser/physical hardware coverage is not
-generalized. The retained [API contract audit](YT-081-API-CONTRACT-AUDIT.md)
+generalized. The retained [API contract audit](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement)
 separates CPU typed errors, Wasm-facing errors and first logical retirement
 from physical GPU completion, and distinguishes Memory/Redis providers.
 
@@ -571,7 +571,7 @@ All five authorized studies are Done at their recorded bounded scopes. Their fix
 | Incremental SSR | [YT-021](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing): retain the full-versus-streaming comparison; reject core streaming/suspense promotion | [Streaming SSR research](../examples/streaming-ssr-research/README.md) |
 | Custom typed transport | [YT-024](EXTENSIONS.md#application-owned-action-transport): adopt one explicit app-owned TCP adapter pattern; reject a core transport framework | [Custom action transport](../examples/custom-action-transport/README.md) |
 | Handler/capture descriptors | [architecture decision](ARCHITECTURE.md#research-only-handler-resumption-and-native-composition): retain finite versioned handlers/numeric captures; reject generic/core resumability | [Resumability research](../examples/resumability-research/README.md) |
-| Independent scene rendering | [YT-023](YT-023-WEBGPU-RESEARCH.md): retain opt-in native wgpu/Vulkan draw/readback and frame/allocation observations; reject core/browser-portability promotion | [Scene research](../examples/webgpu-scene-research/README.md) |
+| Independent scene rendering | [YT-023](ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries): retain opt-in native wgpu/Vulkan draw/readback and frame/allocation observations; reject core/browser-portability promotion | [Scene research](../examples/webgpu-scene-research/README.md) |
 
 Generic hydration/resumability, a template macro, dependency-tracked signals/forms and a stable general-purpose GPU renderer remain unselected. The separately approved Experimental opt-in candidate is documented above and does not change those stable/core boundaries. Default SSR, local browser events, typed remote boundaries and the existing ADR decisions remain intact.
 
@@ -976,7 +976,7 @@ M0–M9 are locally complete at prototype scope. M8 freezes the runnable sample 
   `4792565e6cff7a94c8c2c860d1858f840f122cbe`; these docs-only checks did not replay runtime/browser tests,
   publish a guide or validate novice usage. Public GitHub SHA reachability
   remains unverified until separately approved delivery.
-- [YT-192 3D physics lab minimum contract and feasibility](YT-192-3D-PHYSICS-LAB-STUDY.md): Done at documentation/source-level feasibility scope after independent Reviewer PASS0; browser/scene/fixed-step/GPU-failure contract, no implemented 3D API/sample or compile/runtime qualification.
+- [YT-192 3D physics lab minimum contract and feasibility](ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries): Done at documentation/source-level feasibility scope after independent Reviewer PASS0; browser/scene/fixed-step/GPU-failure contract, no implemented 3D API/sample or compile/runtime qualification.
 
 - **YT-193–198 — Physics Lab implementation:** The
   [current application guide](../examples/physics-lab/README.md) owns the

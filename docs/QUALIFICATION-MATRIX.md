@@ -88,6 +88,20 @@ guarantees. Complete source/measurement history is in **local Git**
 | Provider-only admission | 648 attempts: 552 validated / 96 Busy; eight recovery reads valid; 72 waves with four active/eight total | No fair queue, exact 1ms scheduling, 80ms expiry or universal capacity ceiling |
 | Same-process HTTP Session | 12 SSR Busy/503 rejections, four active/four pending owners; rejected before SQL | Different sixteen-VU arrivals; clock and resource observer interference, no proven unique cause or global SLO |
 | Native HTTP/SSR | App-owned streaming can expose first body sooner but finish later; 100ms response-creation timeout can return 504 | No rollback of started work, whole-body deadline, browser paint, TLS/proxy flushing or production latency guarantee |
+## Experimental GPU, browser and Physics Lab evidence
+
+These are separate, dated and **bounded** research scopes, not
+current universal GPU support or a 60 FPS/SLA criterion.
+
+| Scope | Actual evidence | Explicit exclusions |
+|---|---|---|
+| Native scene (Oct 12) | Linux RTX4090/Vulkan wgpu27 offscreen 10k/50k/100k static instances with readback proof; 30 frames each, median **0.033760/0.054286/0.083525ms** encode+submit+completion wall | No browser GPU, matched DOM/CPU, GPU timestamp, displayed FPS or actual VRAM consumption |
+| Browser Canvas2D/WebGPU (Oct 14) | Firefox158/X11/Intel Vulkan: original 50k screenshot-alignment attempt **FAIL**, separately repaired harness, then **24/24 PASS**, 2160 measured samples, 126 known-pixel screenshots | Different API completion semantics; no useful WebGPU speedup demonstrated, default Firefox/Chrome/Windows/macOS/mobile/NVIDIA not qualified |
+| Experimental GPU API | Independently reviewed typed CPU SceneError and logical first-retirement bool, source-specific native/Wasm/Firefox checks | Async Wasm borrows need separate settlement; no stable ABI or platform support promise |
+| 3D physics feasibility (Oct 26) | Source/registry comparison of wgpu27/Rapier3D0.36.1 and bounded app-owned design | **No joint Wasm build, browser 3D run or FPS measurement in that study**; later runnable sample has distinct evidence |
+
+Historical source and original failure receipts remain in local Git
+dfb27dc816c452e8033ff24e2d853f88a451761a; public SHA reachability is not verified.
 ## Workflow source and activation
 
 [Qualification workflow](../.github/workflows/qualification.yml) has only

@@ -123,6 +123,46 @@ or a performance speedup. See the [reactive SDK guide]
 The complete dated method research, actual Chrome/browser verification,
 original errors and full measurements remain in **local Git**
 `c3478b7f4e0c929a94ccbf21e05217535553a73d`; remote reachability is not yet verified.
+## Experimental scene, browser GPU and Physics Lab boundaries
+
+The first isolated [scene research fixture](../examples/webgpu-scene-research/README.md)
+used **native NVIDIA RTX 4090 / Vulkan**, not browser WebGPU.
+wgpu 27.0.1 drew deterministic colored 10k/50k/100k static rectangles
+into 1024×1024 RGBA with readback color-center checks. Thirty
+sequential frames per size measured median **0.033760/0.054286/0.083525ms**
+CPU command encoding, submission and GPU completion *wall* time.
+These are not GPU timestamp queries, displayed FPS, DOM/CPU speedups,
+VRAM accounting or browser support. Core/HTML/default SSR remain GPU-free.
+
+A separate **Firefox 158, X11, Intel Vulkan WebGPU** matched
+Canvas2D/Wasm comparison originally **FAILED** at screenshot-coordinate
+alignment on one 50k Canvas2D case; after a bounded harness-only
+correction, one full run completed **24/24 lanes, 2,160 timed samples
+and 126 known-pixel screenshots**. Renderer completion-wait semantics
+differ, and the study did **not demonstrate useful WebGPU speedup**,
+general browser/OS/device support, 60 FPS or GPU timestamp duration.
+See [bounded GPU qualification](QUALIFICATION-MATRIX.md#experimental-gpu-browser-and-physics-lab-evidence)
+and the existing [GPU support guide](../crates/yetlet-browser/guides/wgpu-support.md).
+
+An earlier **2026-10-26 Physics Lab feasibility study** only
+reviewed wgpu 27 and Rapier3D 0.36.1 metadata; it built **no**
+joint physics/Wasm/browser package at that checkpoint. The proposed
+isolated educational app owned 1–64 dynamic cubes/spheres and five
+static enclosure bodies, a fixed **1/60s physics step**, up to four
+steps per callback and at most 100ms admitted wall delta, discarding
+excess time rather than accumulating unbounded catch-up. An up-to-60
+render submissions/s cap was **not** an FPS guarantee. Pause, single
+step, reset, invalid-state freeze and CPU-owned state after GPU loss
+required explicit generation-guarded retry/disposal; SSR semantic HTML
+controls remain usable without a GPU. No Core 3D engine, persistent
+replay, physical accuracy or cross-device determinism was selected.
+The [later Physics Lab sample](../examples/physics-lab/README.md)
+has separate implemented/qualified source; do not backdate it to
+the feasibility-only research.
+
+The complete original source reports, measurements and negative
+results remain at **local Git** dfb27dc816c452e8033ff24e2d853f88a451761a; remote URL accessibility
+has not been verified.
 ## Developer tooling boundary — YT-247
 
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and the
@@ -266,7 +306,7 @@ Shared component source does not imply inclusion of server-side repositories or 
 | `examples/search-island` | Search-specific lazy island runtime | M3 |
 | `yetlet-actions` | Typed commands and pluggable executor boundaries | M4 |
 | `yetlet-macros` | Compile-time `ui!` DSL and template extraction | Future spike |
-| `yetlet-gpu` (concept only) | Independent scene renderer; no supported crate selected | Bounded app-owned [YT-023 study](YT-023-WEBGPU-RESEARCH.md) complete |
+| `yetlet-gpu` (concept only) | Independent scene renderer; no supported crate selected | Bounded app-owned [YT-023 study](ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries) complete |
 
 These are conceptual boundaries, **not** a promise that each one will become a public crate. Use the smallest validated interfaces across the two renderer targets before adding extra abstractions or splitting packages.
 
@@ -394,9 +434,9 @@ The MVP does not forward raw DOM events. Remote actions need explicit input/outp
 
 ## 9. GPU and parallelism boundary (post-MVP)
 
-The first-party [`yetlet-browser::wgpu` module](../crates/yetlet-browser/guides/wgpu.md) is explicitly **Experimental and opt-in**; it is a bounded flat rectangle renderer, not a DOM/CSS accelerator. Its [support boundary](../crates/yetlet-browser/guides/wgpu-support.md) preserves the selected Firefox/WebGPU, no-device/default browser fallback, real/controlled failure and logical disposal limits. The [separate Physics Lab sample](../examples/physics-lab/README.md) uses app-owned Rapier CPU physics and a private 3D pipeline; it is not a shared framework 3D API or supported simulation engine. The [initial native Vulkan study](YT-023-WEBGPU-RESEARCH.md), [Firefox Canvas2D comparison](YT-077-MEASUREMENT.md) and [cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) remain distinct original authorities. None justifies production FPS/SLO, hardware portability, WebGPU default enablement or silent lifecycle ownership.
+The first-party [`yetlet-browser::wgpu` module](../crates/yetlet-browser/guides/wgpu.md) is explicitly **Experimental and opt-in**; it is a bounded flat rectangle renderer, not a DOM/CSS accelerator. Its [support boundary](../crates/yetlet-browser/guides/wgpu-support.md) preserves the selected Firefox/WebGPU, no-device/default browser fallback, real/controlled failure and logical disposal limits. The [separate Physics Lab sample](../examples/physics-lab/README.md) uses app-owned Rapier CPU physics and a private 3D pipeline; it is not a shared framework 3D API or supported simulation engine. The [initial native Vulkan study](ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries), [Firefox Canvas2D comparison](QUALIFICATION-MATRIX.md#experimental-gpu-browser-and-physics-lab-evidence) and [cross-crate API audit](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement) remain distinct original authorities. None justifies production FPS/SLO, hardware portability, WebGPU default enablement or silent lifecycle ownership.
 
-WebGPU cannot accelerate ordinary DOM/CSS layout directly. A future WebGPU target must be a separate **Canvas/scene renderer**, which carries its own scene graph, focus, IME, text, and accessibility responsibilities. Workers may move computation away from the main thread, but DOM commits still occur on the main thread. The completed [YT-023 study](YT-023-WEBGPU-RESEARCH.md) retains native Vulkan draw/readback, completion-wall-time and explicit allocation-byte observations. Browser WebGPU, broad scene/text/accessibility support and matched DOM/CPU speedups remain unverified; no supported core renderer is selected. GPU development is not an MVP gate.
+WebGPU cannot accelerate ordinary DOM/CSS layout directly. A future WebGPU target must be a separate **Canvas/scene renderer**, which carries its own scene graph, focus, IME, text, and accessibility responsibilities. Workers may move computation away from the main thread, but DOM commits still occur on the main thread. The completed [YT-023 study](ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries) retains native Vulkan draw/readback, completion-wall-time and explicit allocation-byte observations. Browser WebGPU, broad scene/text/accessibility support and matched DOM/CPU speedups remain unverified; no supported core renderer is selected. GPU development is not an MVP gate.
 
 ## 10. Risks and experiments
 

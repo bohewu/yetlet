@@ -32,7 +32,7 @@ fails this proof. Five warmup frames precede 30 sequential timed frames per size
 explicit instance/texture/readback sizes. [Actual draw proof](render-proof.txt)
 records adapter/backend, checked centers, nonblack pixel counts, image FNV-1a
 fingerprints and cleanup. [Source identity](source-identity.json) pins measured
-source hashes and environment. [Research report](../../docs/YT-023-WEBGPU-RESEARCH.md)
+source hashes and environment. [Research report](../../docs/ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries)
 explains methodology, native-only limitations and the adoption decision.
 
 Timing includes CPU command encoding, submission and waiting for that submission

@@ -278,9 +278,9 @@
       ],
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
-        "docs/YT-023-WEBGPU-RESEARCH.md"
+        "docs/ARCHITECTURE.md"
       ],
-      "notes": "Priority P2; size L; milestone Later. Acceptance/evidence: [Bounded native scene research](YT-023-WEBGPU-RESEARCH.md): opt-in wgpu/Vulkan instanced draw and all-center readback at 10k/50k/100k, raw completion-wall-time and explicit allocation-byte observations; retain app-owned prototype, reject core/browser-portability promotion",
+      "notes": "Priority P2; size L; milestone Later. Acceptance/evidence: [Bounded native scene research](docs/ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries): opt-in wgpu/Vulkan instanced draw and all-center readback at 10k/50k/100k, raw completion-wall-time and explicit allocation-byte observations; retain app-owned prototype, reject core/browser-portability promotion",
       "completed_at": "2026-10-12"
     },
     {
