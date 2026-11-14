@@ -11,9 +11,11 @@ its build SDK/snapshot remain separate fixed release inputs. The public Reader
 Edition follows the verified published pair selected in `site/pages.toml`; its
 reviewed update and Pages readback are required for each publication closeout. Earlier release records retain their
 original bindings and failures. [RELEASING.md](RELEASING.md) is the general SOP;
-[YT-227](YT-227-NEXT-RELEASE-PLAN.md) retains the optional registry OIDC migration,
-which remains unadopted. Permissions, Secret policy and ADR0009 are unchanged.
-
+The original YT-227 proposal considered crates.io OIDC Trusted Publishing,
+but it has **not** been adopted or activated. Existing registry-token
+ownership, protected Environments and ADR 0009 remain unchanged; a future
+OIDC policy would need new approval and actual credential/issuer proof.
+The original version plan is recoverable at fixed local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
 ## Independent CLI cohort — YT-215
 
 [CLI first-release preparation](YT-215-CLI-FIRST-RELEASE.md) adds closed schema3/cli:

@@ -14,9 +14,11 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Reader entry points
 
-- [Package publication surface and API consistency](YT-244-PUBLICATION-SURFACE-API-AUDIT.md):
-  shipped README/guide link boundaries, registry-first install text and
-  published-versus-source-only CLI/API claims; release approval remains separate.
+- [Current publication and API documentation boundaries](RELEASING.md#release-documentation-gate):
+  package READMEs and versioned module guides must match the independently
+  published SDK/CLI, not a later source-only checkout; the original YT-244
+  package/link audit and repaired CLI heading failures remain in local Git
+  `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`, distinct from later hosted release qualification.
 - [Optional application-owned Rust CSS](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree)
   covers Native Style and Browser Style templates and build-time stylesheet
   generation. CLI `0.3.0` introduced Style authoring. SDK `0.9.0-alpha.7`
@@ -81,12 +83,12 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   retains the prepublication qualification scope.
 
 
-- [YT-245 SDK alpha.7 local preparation](YT-245-ALPHA7-RELEASE-PREPARATION.md):
-  two-package metadata/docs, exact local archive verification and release-note
-  drafts; SDK alpha.7 and the separate YT-248 CLI are now published. The
-  [CLI record](CLI-030-HOSTED-RECORD.md) retains actual outputs and setup failures.
-  Published guide pins stay fixed.
-
+- [Published SDK alpha.7 source and delivery evidence](ALPHA7-HOSTED-RECORD.md):
+  the original two-package YT-245 local SDK candidate and MSVC proof preceded
+  separately owner-authorized signing/publication. The independent
+  [CLI 0.3.0 release](CLI-030-HOSTED-RECORD.md) later shipped Style templates;
+  neither candidate preparation alone constituted publication. Original
+  source-only checkpoints remain in local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
 - [Documentation scope and dated YT-242 audit](DOCUMENTATION-SCOPE.md#yt-242-inventory-and-semantic-audit-boundary--2026-11-08):
   the original 2026-11-08 516-file inventory inspected 54 entry surfaces,
   corrected current/published claims and passed a corrective independent
@@ -161,9 +163,11 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [New-version release workflow](RELEASING.md): one-time setup versus each version,
   immutable C/S, protected jobs, exact approvals, independent verification and
   publication; distinguishes installed tooling from Pending hosted qualification.
-- [Original SDK/CLI delivery plan](YT-227-NEXT-RELEASE-PLAN.md): reviewed
-  SDKalpha.6-first/CLI0.2.0-second sequence, guide/version-binding prerequisites,
-  evidence reuse and optional registry OIDC; planning checkpoints remain historical.
+- [Release SOP and version authority](RELEASING.md#version-authorities-and-documentation-synchronization):
+  the 2026-11-01 YT-227 plan proposed SDK alpha.6 then independent CLI 0.2.0,
+  with a separate **unadopted** registry OIDC option. Those versions
+  subsequently shipped under independent accepted release/consumer evidence;
+  the original proposal does not authorize current publishing.
 - [Completed SDKalpha.6 release](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01):
   qualification, source-bound release stages, owner-approved GitHub/crates.io
   publication and registry consumer; registry OIDC deferred.

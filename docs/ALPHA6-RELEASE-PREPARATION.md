@@ -7,7 +7,7 @@ section records the actual publication without replacing their history.
 
 ## Selected scope and authority
 
-After accepting [YT-227's plan](YT-227-NEXT-RELEASE-PLAN.md), the owner authorizes
+After accepting [YT-227's plan](https://github.com/bohewu/yetlet/blob/ad564ad1ef07e5fca063ae88587c0f21e6edb5b1/docs/YT-227-NEXT-RELEASE-PLAN.md), the owner authorizes
 committing the six planning documents and proceeding through preparation to the
 last publication approval. Planning commit `a106c2f` passes strict/builtin Guard.
 Prepare SDK `0.9.0-alpha.6` first, then independent CLI `0.2.0` after the new SDK

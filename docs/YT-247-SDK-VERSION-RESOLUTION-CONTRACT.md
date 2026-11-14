@@ -37,7 +37,7 @@ Inspection baseline: branch `feat/cli-030-style-templates`, HEAD
 | `src/styles.rs`, `templates/styles/` | Copy a separate application-owned, dependency-free Style generator and its existing lock. This is template source, not the embedded SDK snapshot. |
 | Browser startup assets | Fixed template assets copied from reviewed source by resource sync; their compatibility is part of the template policy. |
 
-These observations preserve the [YT-246 historical version authorities](YT-246-VERSION-SOURCE-AUDIT.md).
+These observations preserve the [YT-246 historical version authorities](https://github.com/bohewu/yetlet/blob/ad564ad1ef07e5fca063ae88587c0f21e6edb5b1/docs/YT-246-VERSION-SOURCE-AUDIT.md).
 Changing only the CLI compile dependency to alpha.7 cannot implement this contract.
 
 ## Three version lifecycles

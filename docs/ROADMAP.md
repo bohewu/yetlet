@@ -65,52 +65,29 @@ verifies MSVC CLI compilation and actual resolver/new/locking execution on the
 existing prepared Runner; failed attempts, scoped test correction and cleanup
 are retained. Windows Style/browser runtime qualification remains separate.
 
-**YT-248 CLI 0.3.0 Style release (2026-11-10): Published; standalone registry consumer PASS.**
-The [preserved plan](CLI-030-RELEASE-PREPARATION.md) and
-[candidate](YT-248-CLI030-CANDIDATE.md) retain their source/runtime/review proof.
-The [hosted record](CLI-030-HOSTED-RECORD.md) binds immutable C/tag, distinct S,
-original build/custody/sign/V, Owner approval and exact GitHub/crates.io bytes.
-The original publisher remains FAIL during consumer preflight; two local setup
-failures are retained. After the required stop and explicit bounded Owner
-continuation, private Rust tools and target preparation allow the existing
-credential-free registry consumer to PASS all six resolver/lock cases and
-Native/Browser Style build/runtime/Chrome checks. No publication retry or SDK
-republishing occurs. Current distribution labels/links derive from accepted
-records; the initial alpha.6/CLI0.2 Reader Edition hold is superseded by YT-249.
-New Windows Style revalidation remains paused/unverified. Closeout review/Git delivery follows this
-receipt-backed source update.
+**YT-244–248 historical release and version-authority milestones:**
+YT-244 passed a bounded source-only package/README/API audit after restoring
+two CLI heading fragments flagged by an initial P2 Reviewer; Windows
+qualification was explicitly deferred. YT-245 prepared the two-package
+SDK alpha.7 at an exact PR/master and MSVC source scope, **not** signing or
+publishing; [actual alpha.7 release](ALPHA7-HOSTED-RECORD.md) has separate
+owner-approved records and registry consumer. YT-246 implemented separate
+SDK-source, CLI-source/build SDK, accepted published and Reader-version
+authorities, enforced through the [release SOP](RELEASING.md#version-authorities-and-documentation-synchronization),
+release-doc sync/check and [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md);
+original first-review and exact-head CI corrections stay source-bound.
 
-**YT-246 canonical version authorities and release-document synchronization (2026-11-10): Done.**
-[Version source audit](YT-246-VERSION-SOURCE-AUDIT.md) separates SDK source,
-accepted published SDK/CLI versions, the CLI-generated SDK pin and the explicit
-public reader edition. Sync/check, 49 regression tests, documentation DAG and
-sample catalog pass. Final independent Reviewer Job `wc_job_iTtOZOllaZ8sBEMf`
-completed at terminal exit 0 with JSON PASS and zero issues/followups. PR #66
-merged as `54c1e4436ad15ece4e1fad74fbc26c98884a98c4`; its exact-head Documentation,
-Rust baseline and CodeQL CI all PASS. Post-merge master CI PASS was confirmed in the Owner handoff.
-
-**YT-245 SDK alpha.7 local preparation (2026-11-09): Done at prepublication scope.**
-[Preparation record](YT-245-ALPHA7-RELEASE-PREPARATION.md) selects exactly
-`yetlet` then `yetlet-browser`, SDK `0.9.0-alpha.7`, with coherent path locks
-and package-carried docs. PR #63 merged to `master` as
-`1beb4d3cf2aea76b0cb29ca634a52e55bc55f088`; all PR exact-head and post-merge
-master workflows passed. The Windows Runner pulled that exact commit and passed
-the accepted MSVC native SDK/tests/SSR and wasm32 compile gate. Windows browser
-runtime, GNU, Safari/macOS/mobile and production qualification remain unverified.
-CLI0.2.0 and the public SDKalpha.6/CLI0.2.0 reader edition stay pinned. No
-immutable release candidate, tag, signature or registry publication is selected.
-**YT-244 publication surface and API consistency (2026-11-08): Done at local documentation scope.**
-The [source/package audit](YT-244-PUBLICATION-SURFACE-API-AUDIT.md) corrects the
-three Cargo package READMEs, their links and carried module-guide boundaries,
-and keeps the published CLI distinct from later source-only Style templates.
-Existing release-document regression gates are extended without changing
-product API or selecting a release version. First review found two broken
-legacy CLI headings; both fragments were restored and independent corrective
-Reviewer `wc_job_qL8yujng6i4r08m9` PASS closed the P2. Windows qualification
-is deferred by the owner; no Git delivery, hosted execution or publication is
-implied.
-
-
+YT-248 validated CLI 0.3.0 Style/source archives locally; that candidate
+was **not** itself signed or published. The separately
+[accepted CLI 0.3.0 hosted record](CLI-030-HOSTED-RECORD.md) preserves
+publisher preflight FAIL, selected original setup failures, explicit bounded
+continuation, owner-approved release and independent registry/Style consumer
+PASS. The old Reader-promotion hold was later superseded by the retained
+[YT-249 local edition follow-through](YT-249-READER-RELEASE-ROLLOVER.md);
+current public version truth is SDK alpha.8 and independent CLI 0.4.0,
+not this dated alpha.7/CLI 0.3.0 milestone. Original YT-244/245/246/248
+reports and reviewer/failed attempts remain at fixed local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
+No new product/runtime, signing, registry or Pages action occurs here.
 **YT-242 documentation truth audit (2026-11-08): Done at bounded documentation scope.**
 [Audit and corrections](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-242-DOCUMENTATION-TRUTH.md) separate published SDK/CLI,
 the selected guide edition and later checkout authoring/tools. The 516-file role
@@ -295,14 +272,15 @@ and private Draft are prepared; final Reviewer PASS0 and preflight41308935654/1
 PASS. YT-228 Done at preparation scope; owner gate waiting, publication held.
 CLI0.2 preparation follows SDK publication; no publication is authorized yet.
 
-**Next SDK/CLI delivery planning (2026-11-01):**
-[YT-227](YT-227-NEXT-RELEASE-PLAN.md) proposes SDKalpha.6 then independent
-CLI0.2.0 for the already implemented DOM/options/static-build delta. Guide edition
-compatibility, CLI/SDK bindings, optional registry OIDC and only missing
-qualification are explicit. Independent Reviewer PASS0 accepts YT-227 Done at
-planning scope,31 source hashes/six frozen docs/Git status match; no new version, candidate,
-auth policy or execution is selected. Existing distribution and Pages stay intact.
-
+**YT-227 SDK/CLI delivery planning (2026-11-01):** Done at
+documentation-only scope: proposed SDK alpha.6 first, CLI 0.2.0 later,
+the exact registry SDK binding, guide-edition hold and optional
+crates.io OIDC study. No candidate, hosted authorization or registry token
+policy changed at this checkpoint. Subsequent actual publications have
+separate [SDK receipts](ALPHA6-RELEASE-PREPARATION.md) and
+[CLI receipts](CLI-020-RELEASE-PREPARATION.md); OIDC Trusted Publishing
+was not selected. Original YT-227 proposal and review remain at fixed
+local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
 **Current distribution and next reader milestone (2026-10-31):**
 The two-package SDK `0.9.0-alpha.5` and independent CLI `0.1.1` are published.
 [YT-216's completed output and installed consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
@@ -381,7 +359,7 @@ The [two-package alpha.5 release](ALPHA5-HOSTED-RECORD.md#completed-publication-
 and both registry uploads complete at owner-approved run41104391525/1, with
 registry download/checksum and external consumer PASS. The owner subsequently
 deletes the obsolete actions crate; PR29 is closed unmerged. Preserve original
-source/tag/signature and failure evidence. [YT-214](YT-214-CLI-INSTALLATION.md)
+source/tag/signature and failure evidence. [YT-214](https://github.com/bohewu/yetlet/blob/ad564ad1ef07e5fca063ae88587c0f21e6edb5b1/docs/YT-214-CLI-INSTALLATION.md)
 is Done at bounded local GNU implementation/package/install proof scope after
 independent Reviewer PASS0: twelve affected tests, normal archive verification,
 token-free publish dry-run and registry-backed first-app build/HTTP/cleanup pass.

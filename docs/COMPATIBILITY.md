@@ -2,7 +2,7 @@
 
 ## Selected local SDK 0.9.0-alpha.7 typed authoring helpers — YT-234/245
 
-[YT-245](YT-245-ALPHA7-RELEASE-PREPARATION.md) originally selects SDK
+[YT-245](https://github.com/bohewu/yetlet/blob/ad564ad1ef07e5fca063ae88587c0f21e6edb5b1/docs/YT-245-ALPHA7-RELEASE-PREPARATION.md) originally selects SDK
 `0.9.0-alpha.7`, including
 `yetlet::view::tags` with typed fluent constructors and additive convenience
 methods. These were absent from alpha.6, first shipped in `0.9.0-alpha.7` and

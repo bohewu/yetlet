@@ -19,9 +19,11 @@ its version and SDK dependency come from its own reviewed manifest. Use the
 selected versioned release record and actual GitHub/crates.io publication receipts
 for version/status, rather than a version copied into this SOP. A development
 manifest or proposed Roadmap version does not establish registry availability.
-Existing token policy stays in force; the
-[OIDC option](YT-227-NEXT-RELEASE-PLAN.md#optional-cratesio-trusted-publishing)
-remains a separate policy decision.
+Existing token policy stays in force. crates.io **OIDC Trusted Publishing**
+was an unadopted alternative in the dated YT-227 planning checkpoint, not
+an activated issuer/owner capability, release permission or token
+migration. Future changes need a separate source-specific policy decision;
+the original proposal remains at fixed local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
 Schema2/`consolidated` is the closed two-package record;
 schema1/`sixteen` remains for earlier artifacts at their matching source.
 The library count is derived only from that validated cohort throughout build,
@@ -44,11 +46,13 @@ selected cohort. A new plan does not authorize hosted jobs, signing or upload.
 
 Select actual changes, cohort, version and missing qualification through the
 [Backlog](BACKLOG.md), [Roadmap](ROADMAP.md) and their versioned release records.
-The [delivery plan](YT-227-NEXT-RELEASE-PLAN.md) explains guide-edition separation,
-trusted CLI/SDK bindings and evidence reuse. Its planning checkpoints are not
-publication status. [SDKalpha.6's actual publication](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
-and [CLI0.1.1's installed consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
-are fixed reference executions, not fallback versions for a new release.
+At the dated YT-227 checkpoint, SDK alpha.6 and CLI 0.2.0 were proposed
+for separate publication, with Reader edition held until verified consumer
+and Pages closeout; neither plan nor a development manifest constituted
+release approval. [Actual SDK alpha.6](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+and [CLI 0.2.0 publication](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+are independently verified. The [CLI 0.1.1 consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+is an earlier fixed execution, not a fallback version for a new release.
 The [alpha.4 record](ALPHA4-HOSTED-RECORD.md) retains its one-of-sixteen partial
 publication and paused continuation; it does not describe a new cohort.
 

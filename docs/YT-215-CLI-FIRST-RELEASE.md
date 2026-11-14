@@ -61,7 +61,7 @@ no automatic write or job retry. A failed attempt does not renew its budget.
 
 ## Missing proof and reuse
 
-Reuse [YT-214](YT-214-CLI-INSTALLATION.md)'s twelve focused CLI tests and actual
+Reuse [YT-214](https://github.com/bohewu/yetlet/blob/ad564ad1ef07e5fca063ae88587c0f21e6edb5b1/docs/YT-214-CLI-INSTALLATION.md)'s twelve focused CLI tests and actual
 isolated source install/new/build/HTTP cleanup at their recorded input/scope
 limits. Current CLI runtime, templates, resources, manifest and lock stay the
 same; only its distribution README changes. Retain the HTTP byte-evidence limit
