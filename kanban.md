@@ -54,7 +54,7 @@ Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing
 | `YT-018` | medium | Strict CSP and browser security verification | YT-013, YT-016, YT-017 | — |
 | `YT-019` | medium | Cross-target/E2E tests and performance baseline | YT-006, YT-010, YT-013, YT-016, YT-018 | [M5 verification](docs/M5-VERIFICATION.md) |
 | `YT-021` | low | Streaming SSR benchmark | YT-006 | [Bounded incremental SSR research](docs/YT-021-STREAMING-SSR-RESEARCH.md) |
-| `YT-022` | low | Serializable handler/resumability spike | YT-017 | [Bounded resumability research](docs/YT-022-RESUMABILITY-RESEARCH.md) |
+| `YT-022` | low | Serializable handler/resumability spike | YT-017 | [resumability architecture decision](docs/ARCHITECTURE.md#research-only-handler-resumption-and-native-composition) |
 | `YT-023` | low | Independent WebGPU scene renderer spike | YT-009 | [Bounded native scene research](docs/YT-023-WEBGPU-RESEARCH.md) |
 | `YT-024` | low | Custom action executor transport | YT-015 | [Bounded custom transport research](docs/YT-024-CUSTOM-TRANSPORT-RESEARCH.md) |
 | `YT-025` | low | Static-template IR versus VDOM benchmark | YT-009 | [M7a evidence](docs/M7A-VERIFICATION.md) |

@@ -263,9 +263,9 @@
       ],
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
-        "docs/YT-022-RESUMABILITY-RESEARCH.md"
+        "docs/ARCHITECTURE.md"
       ],
-      "notes": "Priority P2; size L; milestone Later. Acceptance/evidence: [Bounded resumability research](YT-022-RESUMABILITY-RESEARCH.md): finite versioned handlers, constrained numeric capture round trips, rejection/trust tests and native encoded-size/cost measurements; app-owned descriptor pattern retained, generic/core promotion rejected",
+      "notes": "Priority P2; size L; milestone Later. Acceptance/evidence: [Bounded original resumability evidence](https://github.com/bohewu/yetlet/blob/42d8856b9acf5ddddab9a4b998b5bdd4c5e59210/docs/YT-022-RESUMABILITY-RESEARCH.md): finite versioned handlers, constrained numeric capture round trips, rejection/trust tests and native encoded-size/cost measurements; app-owned descriptor pattern retained, generic/core promotion rejected",
       "completed_at": "2026-10-12"
     },
     {

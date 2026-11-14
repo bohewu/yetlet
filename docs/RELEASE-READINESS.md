@@ -34,6 +34,27 @@ Owner-approved publication of the replacement. Anonymous GitHub and crates.io
 readback confirmed the same archive, and the installed consumer passed Native
 and Browser Style runtime checks.
 
+### Historical source-only package inventory versus current publication
+
+The 2026-10-26 YT-199 delivery-scope review was **documentation-only**:
+it compared a fixed nine-library `0.1.0` candidate against a later
+source checkout with seven additional experimental opt-in workspaces.
+At that **original** checkpoint none of the sixteen packages was
+published, YT-020 public signing remained Blocked and YT-096 source/trust
+gates were incomplete. Source comparisons were not package archives,
+registry consumers, a new release candidate or production qualification.
+Those dated findings remain recoverable at exact **local Git**
+`42d8856b9acf5ddddab9a4b998b5bdd4c5e59210` (remote reachability not verified). They must not be
+carried forward as current unavailability.
+
+The current published distribution is independently established above
+by the exact hosted **SDK alpha.8 two-package** and **CLI 0.4.0** records.
+Optional app-owned Auth/Session/cache/renderer integrations are not
+automatically included in those releases, and a source-only proof or
+an older certificate/signing result cannot qualify a newer checkout,
+browser, platform or production deployment. Follow the canonical
+[API/reference and compatibility guides](COMPATIBILITY.md) and the
+[actual release SOP](RELEASING.md) for current decisions.
 ## Historical readiness checkpoints
 
 **Owner-selected version update (2026-10-28):** The next sixteen-package
@@ -110,7 +131,7 @@ signing/registry/public activation. The original ce56e08 candidate and all
 YT-096/D1–D6/YT-020 gates remain intact.
 
 **Current-source planning (2026-10-26):** [YT-199 delivery scope and evidence
-gaps](YT-199-CURRENT-DELIVERY-READINESS.md) compares source snapshot `64a6d1c`
+gaps](https://github.com/bohewu/yetlet/blob/42d8856b9acf5ddddab9a4b998b5bdd4c5e59210/docs/YT-199-CURRENT-DELIVERY-READINESS.md) compares source snapshot `64a6d1c`
 with the unchanged nine-package `ce56e08` candidate. Sixteen current API entries
 do not select sixteen releases or transfer historical qualification. This is
 documentation planning accepted after independent Reviewer PASS with zero

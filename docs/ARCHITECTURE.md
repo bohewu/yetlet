@@ -38,6 +38,40 @@ streaming SSR, custom action transport and resumability remains opt-in or
 unpromoted; it does not make a general streaming/suspense, TCP transport,
 or resumption API available in Core.
 
+## Research-only handler resumption and native composition
+
+**No general resumability API is part of Yetlet Core.** The isolated
+[resumability example](../examples/resumability-research/README.md) demonstrated
+two statically compiled, literal versioned handlers (`counter.add` and
+`counter.subtract`) with an explicitly validated JSON envelope and numeric
+captures. The local payload cap was 256 UTF-8 bytes, with unknown/duplicate
+fields, unsupported IDs/versions and out-of-range values rejected. That
+work demonstrated bounded serialization and native dispatch, **not**
+capturing arbitrary Rust closures, resuming a stack, transporting events
+remotely, faster hydration or an approved production browser contract.
+UI event ownership stays local; remote behavior uses explicit typed
+HTTP/actions under [ADR 0002](adr/0002-events-and-actions.md).
+
+**Dependency composition uses ordinary Rust.** Construct services after
+typed settings validation, pass concrete constructors or generic traits
+by default, and use native Axum `State` or manual `FromRef<AppState>` for
+a smaller handler substate. A shared `Arc` retains an instance; it does
+not discover or instantiate a service. An application can select a
+dyn-compatible interface such as `Arc<dyn SecretProvider>` when runtime
+substitution is genuinely needed, but `impl Future` methods in the
+existing signing backend traits are not interchangeable
+`Arc<dyn SigningBackend>` interfaces. Explicit asynchronous startup,
+secret ownership, request identity/CSRF, resource lifetime and shutdown
+remain application concerns. The comparison of optional shaku/dill
+containers introduced **no** `yetlet-di`, service locator, registration
+system or measured performance advantage; see [extension composition](EXTENSIONS.md)
+and [ADRs 0005/0006](adr/0005-opt-in-capability-modules.md).
+
+These are conclusions from dated, independently reviewed research; the
+unaltered original descriptors, numerical results and negative cases
+remain in **local Git** `42d8856b9acf5ddddab9a4b998b5bdd4c5e59210`. The Git SHA has not been verified
+publicly reachable, and the studies are not current Core implementation
+or new platform qualification.
 ## Developer tooling boundary — YT-247
 
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and the

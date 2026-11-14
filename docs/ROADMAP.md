@@ -795,8 +795,8 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M11 — Done at selected product and Experimental renderer scopes** | Independent complete-product and browser-first opt-in renderer lines | YT-069–YT-081 | Reviewed plan; later separately authorized product/renderer evidence, isolation and independent implementation review; no release activation |
 | **M12 — Done at bounded migration scope** | Rust-native active developer build/check/smoke/qualification/release tooling, isolated from framework dependencies | YT-082–YT-086 | Exact 52-file/three-workflow parity, preserved suite gates, actual Linux/Windows owned-child evidence, Python-free transitive command graph and separate independent review per item; no public CLI or release activation |
 | **M13 — Done at bounded Linux CLI preview scope** | Unpublished Rust `yetlet` binary, minimal handler-first scaffold and local doctor/build/dev | YT-087 | [CLI contract](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-087-CLI-PLAN.md), fail-closed templates and processes, actual local HTTP/PTY evidence and final independent Reviewer PASS; no registry publication, Windows qualification or release activation |
-| **M14 — Done at bounded Linux/Windows CLI preview scope** | Two internal OS adapters for filesystem-safe scaffolding and foreground process ownership | YT-088 | [Cross-platform plan](YT-088-CROSS-PLATFORM-CLI-PLAN.md), real GNU/MSVC positive new/build/dev HTTP/console/cleanup and per-slice independent reviews; no public release |
-| **M15 — Done at bounded Linux OCI/Kubernetes configuration-generator preview scope** | Opt-in CLI emission of Dockerfile, Compose and portable Kubernetes manifests without platform SDK coupling | YT-089 | [Generator plan](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md), source-path-aware image build, app-owned bind/health/SIGTERM, offline generation and per-slice independent verification; no image publication or cluster deployment |
+| **M14 — Done at bounded Linux/Windows CLI preview scope** | Two internal OS adapters for filesystem-safe scaffolding and foreground process ownership | YT-088 | [CLI platform qualification limits](CLI-GUIDE.md#native-cli-platform-and-generated-deployment-boundaries), real GNU/MSVC positive new/build/dev HTTP/console/cleanup and per-slice independent reviews; no public release |
+| **M15 — Done at bounded Linux OCI/Kubernetes configuration-generator preview scope** | Opt-in CLI emission of Dockerfile, Compose and portable Kubernetes manifests without platform SDK coupling | YT-089 | [Generator plan](CLI-GUIDE.md#native-cli-platform-and-generated-deployment-boundaries), source-path-aware image build, app-owned bind/health/SIGTERM, offline generation and per-slice independent verification; no image publication or cluster deployment |
 | **M16 — Done at bounded YT-090 / YT-097 scope** | Opt-in typed native configuration and optional CLI scaffolding | YT-090, YT-097 | [Guide](CONFIGURATION.md), [focused Linux evidence and independent Reviewer PASS](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-090-VERIFICATION.md); [CLI integration Linux/Windows GNU/MSVC and independent Reviewer PASS](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-097-VERIFICATION.md); no default/core/browser or release change |
 | **M17 — Done at bounded YT-091 Tailwind scope** | Opt-in build-time Tailwind CSS 4 application scaffolding | YT-091 | [Guide](CLI-GUIDE.md#opt-in-tailwind-css-4-yt-091-independently-reviewed), [evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-091-VERIFICATION.md); actual Linux HTTP/CSS/CSP/signals and native Windows GNU/MSVC Tailwind source-bound builds PASS; independent Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS, no core/browser change or release activation |
 | **M18 — Done at bounded YT-098–YT-101 scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; [YT-101 cloud delivery](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md) Done: real Linux Docker/Compose/K3s Pod/Service/asset PASS, Windows MSVC native/source PASS, subsequent Windows GNU 726/726 source and native tests/generator PASS after official MinGW64 GCC/Binutils installation, independent Reviewer `wc_job_fYtD9F8KXkXyzvYQ` PASS; no stable shared asset API, default/core/browser or release change |
@@ -1000,7 +1000,7 @@ remain at local Git `983653adadcedb4ec196016b75281d39e2ed0acf`.
 No editor/interop Core API, unsafe-inline policy, browser-wide assurance
 or automatic framework integration is selected.
 **YT-095 dependency composition (2026-10-20, research only):** the
-[current-consumer comparison](YT-095-COMPOSITION-RESEARCH.md) retains native
+[current-consumer comparison](ARCHITECTURE.md#research-only-handler-resumption-and-native-composition) retains native
 constructors and Axum State/FromRef after inspecting Starter, signing, Admin
 and existing settings/secret examples. It compares shaku/dill without installing
 them, records static authoring costs and unmeasured build costs, and preserves
@@ -1279,8 +1279,8 @@ opt-in Dockerfile/Compose/Kubernetes *configuration outputs* with
 source confinement; Linux Docker/Compose and isolated K3s tests
 plus native Windows GNU/MSVC generated-output parity passed separately.
 These were not hosted production deployments or runtime-coupled
-containers in Yetlet Core. See the [retained generator plan](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md),
-[current CLI guide](CLI-GUIDE.md#original-cross-platform-tooling-and-cloud-generator-qualification),
+containers in Yetlet Core. See the [CLI generator limits](CLI-GUIDE.md#native-cli-platform-and-generated-deployment-boundaries),
+[current CLI guide](CLI-GUIDE.md#native-cli-platform-and-generated-deployment-boundaries),
 and [deployment profiles](PRODUCTION-DEPLOYMENT-PROFILES.md).
 
 ## M13–M14 — Developer CLI preview and platform parity
@@ -1292,7 +1292,7 @@ HTTP/CSP and Ctrl-C/Break/child cleanup. Each scoped review and original
 failure remains recoverable in local Git `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; neither
 preview status nor qualified historical platform set should be projected
 onto current release packages. The [CLI contract](CLI-CONTRACT.md),
-[retained M14 plan](YT-088-CROSS-PLATFORM-CLI-PLAN.md) and
+[CLI platform limits](CLI-GUIDE.md#native-cli-platform-and-generated-deployment-boundaries) and
 [current CLI guide](CLI-GUIDE.md) own current development and release distinctions.
 
 ## M12 — Repository-toolchain migration
@@ -1561,7 +1561,7 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 **Goal:** turn prototype evidence into explicit support, governance and production-security decisions without expanding Yetlet core or implying release approval.
 
 **Current-source planning / YT-199 (2026-10-26):** [Delivery scope and evidence
-gaps](YT-199-CURRENT-DELIVERY-READINESS.md), Done at documentation-planning scope
+gaps](RELEASE-READINESS.md#historical-source-only-package-inventory-versus-current-publication), Done at documentation-planning scope
 after independent Reviewer PASS with zero issues/required followups, compares
 `64a6d1c` with the unchanged `ce56e08` candidate. Four source/four evidence bindings
 and HEAD/status/staged-zero state matched through review; docs checks passed.
@@ -1647,7 +1647,7 @@ YT-096/D1–D6 and YT-020 gates remain unchanged; new documents are uncommitted.
 |---|---|
 | Streaming SSR | [YT-021 comparison](YT-021-STREAMING-SSR-RESEARCH.md) retains app-owned incremental fragments; large/delayed first-body gains trade off lower throughput, so supported-core streaming/suspense promotion is rejected |
 | Compile-time template IR | M7b–M7e prove one fixed shape; M7f–M7i promote only low-level contracts and one production keyed-list path. General trees remain required before any macro decision |
-| Resumability | [YT-022 study](YT-022-RESUMABILITY-RESEARCH.md) proves two finite versioned local handlers with bounded numeric captures and native size/cost evidence; retain explicit app-owned descriptors, reject generic/core resumability promotion |
+| Resumability | [resumability decision](ARCHITECTURE.md#research-only-handler-resumption-and-native-composition) proves two finite versioned local handlers with bounded numeric captures and native size/cost evidence; retain explicit app-owned descriptors, reject generic/core resumability promotion |
 | Custom transport | [YT-024 proof](YT-024-CUSTOM-TRANSPORT-RESEARCH.md) uses existing ActionExecutor for one opt-in typed TCP adapter with bounded loopback/error/cancellation evidence; adopt the app-owned pattern, reject core framework promotion |
 | WebGPU renderer | [YT-023 study](YT-023-WEBGPU-RESEARCH.md) proves opt-in native wgpu/Vulkan draws at 10k–100k with raw completion-wall-time and explicit allocation-byte observations; retain the app-owned prototype, reject core/browser-portability promotion; no matched DOM/CPU speedup is established |
 | Worker compute | Which computations can leave the main thread without compromising DOM correctness? |

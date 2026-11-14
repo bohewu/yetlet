@@ -406,14 +406,14 @@ Git source `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; this is not a public prod
 
 ## M12–M15 — Rust tooling, CLI and generated deployment artifacts
 
-The [current CLI guide](CLI-GUIDE.md#original-cross-platform-tooling-and-cloud-generator-qualification)
+The [current CLI guide](CLI-GUIDE.md#native-cli-platform-and-generated-deployment-boundaries)
 and [Rust development guide](DEVELOPMENT.md) own executable commands.
 The [M12 migration ledger](M12-PYTHON-MIGRATION.md) records the original
 Python-to-xtask migration and its bounded parity, with unrun runtime targets
 still unverified. M13 initially accepted only unpublished Linux CLI
 `new`/`doctor`/`build`/`dev`; a separate Windows GNU/MSVC run verified
 native compilation/fail-closed behavior, followed by independent M14
-positive Windows new/build/dev parity. [Retained M14 plan](YT-088-CROSS-PLATFORM-CLI-PLAN.md)
+positive Windows new/build/dev parity. [CLI platform and original qualification limits](CLI-GUIDE.md#native-cli-platform-and-generated-deployment-boundaries)
 and [CLI contract](CLI-CONTRACT.md) distinguish those stages from the
 subsequent published CLI, whose exact version is in the release records.
 
@@ -422,7 +422,7 @@ rather than runtime coupling. Original Linux Docker/Compose and isolated
 K3s Pod/Service/HTTP/cleanup, with Windows generated-file parity,
 were bounded historical observations and not permission for persistent
 cluster deployment, cloud publication or general production support.
-See [retained generator plan](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md),
+See [current CLI generator scope](CLI-GUIDE.md#native-cli-platform-and-generated-deployment-boundaries),
 [asset guide](ASSETS.md) and [deployment profiles](PRODUCTION-DEPLOYMENT-PROFILES.md).
 Complete original closed task evidence is recoverable at fixed local Git
 `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; GitHub reachability remains unverified until approved delivery.
@@ -524,7 +524,7 @@ keys/certificates, public-only verification and confirmed key CLI rotation with
 automatic profile settings updates. Its [verification record](YT-093-SIGNING-VERIFICATION.md)
 separates local, native Windows and disposable Azure experiment evidence.
 
-The [YT-095 composition comparison](YT-095-COMPOSITION-RESEARCH.md) inspects
+The [native Rust composition guidance](ARCHITECTURE.md#research-only-handler-resumption-and-native-composition) inspects
 Starter, signing, Admin and existing secret/settings consumers. It recommends
 constructors and native State/FromRef, with explicit generic, trait-object and
 finite-enum boundaries; no new container, provider contract or implementation
@@ -563,14 +563,14 @@ The optional [Redis provider module](../crates/yetlet/guides/session-redis.md) i
 
 ## Completed research prototypes
 
-All five authorized studies are Done at their recorded bounded scopes. Their fixtures are outside the thirteen-application catalog and do not establish supported core APIs, public release qualification or a benchmark winner. The linked records retain actual commands, raw observations, source identities and unverified environment coverage.
+All five authorized studies are Done at their recorded bounded scopes. Their fixtures are outside the thirteen-application catalog and do not establish supported core APIs, public release qualification or a benchmark winner. The linked functional decisions and fixtures identify original commands, measurements and source boundaries; full dated research records remain recoverable in local Git history, not necessarily through public GitHub links.
 
-| Study | Record and bounded decision | Existing fixture |
+| Study | Current decision or evidence scope | Existing fixture |
 |---|---|---|
 | Opt-in HTTP deadlines | [YT-029](YT-029-HTTP-DEADLINE-RESEARCH.md): retain explicit app-owned middleware; general provider/core promotion remains deferred | [Middleware Lab](../examples/middleware-lab/README.md) |
 | Incremental SSR | [YT-021](YT-021-STREAMING-SSR-RESEARCH.md): retain the full-versus-streaming comparison; reject core streaming/suspense promotion | [Streaming SSR research](../examples/streaming-ssr-research/README.md) |
 | Custom typed transport | [YT-024](YT-024-CUSTOM-TRANSPORT-RESEARCH.md): adopt one explicit app-owned TCP adapter pattern; reject a core transport framework | [Custom action transport](../examples/custom-action-transport/README.md) |
-| Handler/capture descriptors | [YT-022](YT-022-RESUMABILITY-RESEARCH.md): retain finite versioned handlers/numeric captures; reject generic/core resumability | [Resumability research](../examples/resumability-research/README.md) |
+| Handler/capture descriptors | [architecture decision](ARCHITECTURE.md#research-only-handler-resumption-and-native-composition): retain finite versioned handlers/numeric captures; reject generic/core resumability | [Resumability research](../examples/resumability-research/README.md) |
 | Independent scene rendering | [YT-023](YT-023-WEBGPU-RESEARCH.md): retain opt-in native wgpu/Vulkan draw/readback and frame/allocation observations; reject core/browser-portability promotion | [Scene research](../examples/webgpu-scene-research/README.md) |
 
 Generic hydration/resumability, a template macro, dependency-tracked signals/forms and a stable general-purpose GPU renderer remain unselected. The separately approved Experimental opt-in candidate is documented above and does not change those stable/core boundaries. Default SSR, local browser events, typed remote boundaries and the existing ADR decisions remain intact.

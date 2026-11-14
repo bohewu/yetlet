@@ -133,6 +133,18 @@ without a speedup or future-3D API claim. See the
 [YT-081 cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) for typed
 error and disposal-contract differences.
 
+### Native dependency composition, not a container framework
+
+Choose constructor parameters, native Axum `State` and manual `FromRef`
+when a handler needs only one handle from shared application state.
+Explicit startup creates and validates settings, network clients and
+Secrets; app state owns stop/drain and request-local identity remains
+request-local. Generic services stay generic unless an actual
+dyn-compatible interface (such as `Arc<dyn SecretProvider>`) is required.
+No container service graph or automatic registration is part of the
+public SDK; the original shaku/dill comparison was **research-only**
+and neither library was integrated or performance-benchmarked.
+See [Architecture](ARCHITECTURE.md#research-only-handler-resumption-and-native-composition).
 ### Designing another module
 
 The separately selected [secret provider](SECRET-PROVIDERS.md) is an opt-in

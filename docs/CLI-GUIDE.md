@@ -584,30 +584,40 @@ The fresh backend reads its runtime settings on each restart. Browser refresh,
 in-process state preservation and graceful request draining are not promised.
 Historical Vite lifecycle evidence does not qualify the added watch mode.
 
-## Original cross-platform tooling and cloud generator qualification
+## Native CLI platform and generated deployment boundaries
 
-The original YT-082–086 Rust repository toolchain migration and YT-087–089
-developer preview are **historic delivery**, not additional current commands.
-Current `cargo xtask` and independent `yetlet` CLI entry points are defined
-above and in [development instructions](DEVELOPMENT.md), while the
-[CLI contract](CLI-CONTRACT.md) owns supported command spelling and platform
-options. Linux-only preview and later native Windows GNU/MSVC
-build/new/dev verification were separate environments; an original failed
-Windows prerequisite is not proof of supported operation. The accepted M15
-experiment generated Dockerfile, Compose and Kubernetes *configuration
-artifacts* rather than bundling Docker/K3s or deploying into the request path.
-Original Linux Docker/Compose and isolated K3s results, generated-file Windows
-parity and cleanup are recoverable from the pre-cleanup local Git commit
-`b610acc7e098020b6b59dfa0d1ab2b75b059e656`; this does not qualify arbitrary source layouts, live clusters,
-production HA, rolling upgrades or an unreviewed public release.
+The original M14 Linux and Windows GNU/MSVC work separated only two CLI
+OS adapters: owned filesystem paths/no-replace with reparse/junction and
+Unicode safety, and foreground child/process ownership. The Windows
+source-bound proof used an owned Job Object (including descendant
+cleanup) and native Ctrl-C/Break console rules; Windows group signals
+and POSIX exit semantics are **not interchangeable**. A source compile
+alone was not the real native generated-app/SSR/cancellation proof, and
+the original GNU/MSVC checks do not certify every current release
+binary, Windows container, terminal or production environment.
 
-Current generators are explicitly opt-in, create protected files and neither
-pull/build images nor authenticate to registries or deploy workloads.
-See the [generator source matrix](#current-generator-source-matrix),
-[asset guide](ASSETS.md) and [deployment profiles](PRODUCTION-DEPLOYMENT-PROFILES.md).
-The retained [cloud-native plan](YT-089-CLOUD-NATIVE-GENERATORS-PLAN.md)
-describes the original scope and unsolved platform assumptions.
+The separate M15 opt-in Docker, Compose and K8s CLI commands generate
+**deterministic configuration files** targeting Linux workloads. They
+neither build/pull/push images nor authenticate to a registry, connect
+to a cluster or deploy workloads. The early Docker *design review FAIL*
+identified unsafe default build context and missing transitive Cargo
+source closure; the corrected independent design required three
+physically separated build contexts with deny-by-default source export
+and a complete minimal Cargo workspace. Later real Linux Docker and
+isolated K3s results and Windows generated-config parity accepted only
+their selected source/host slices, not general production HA or
+multi-architecture images. An application's host binding, TLS/ingress,
+health/readiness truth, Secrets, backups and operating SLOs remain
+application/operator decisions. Existing app source is never silently
+rewritten just because a deployment manifest is generated.
 
+The [current generator matrix](#current-generator-source-matrix) lists
+supported CLI input shapes; see [deployment profiles](PRODUCTION-DEPLOYMENT-PROFILES.md)
+for operating responsibility and [CLI contract](CLI-CONTRACT.md) for
+command spelling. Full original review failures and source tests are
+recoverable from **local Git** `42d8856b9acf5ddddab9a4b998b5bdd4c5e59210`; that SHA is not proven
+publicly reachable. These historical checks are not a fresh test of
+the published CLI 0.4.0 binary.
 ## Current generator source matrix
 
 Generators accept the following exact current `new --service` source shapes after

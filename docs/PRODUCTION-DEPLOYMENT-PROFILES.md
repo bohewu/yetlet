@@ -109,6 +109,21 @@ actual, distinct results. Original source/failed/blocked snapshots remain
 in fixed **local Git** `be337ff02826978a9baa1b88ddf85696cb4406b4`,
 not verified as remotely reachable or reproduced by this cleanup.
 
+## Generated infrastructure configuration does not select operations
+
+Opt-in CLI Docker/Compose/K8s generation creates bounded **Linux
+deployment files**, not a deployed system. Its accepted early design
+requires separate, deny-by-default build contexts so the live app and
+framework checkout cannot leak unapproved files/Secrets into the
+image; transitive local Cargo sources and workspace metadata must be
+closed and verified. The original design first failed source-closure
+and unsafe-context review, then passed a corrective design review;
+later Linux Docker and isolated K3s execution belonged to different
+source/host acceptance slices. Generated health probes must match
+application-owned real readiness endpoints; generic 200 responses are
+not proof of Redis/SQL availability. The operator remains responsible
+for image provenance, TLS/ingress, secrets, backup, rollouts, capacity
+and service availability. See [CLI source matrix](CLI-GUIDE.md#current-generator-source-matrix).
 ## Two proposed profiles
 ## Concrete Profile fields — selection checkpoint
 

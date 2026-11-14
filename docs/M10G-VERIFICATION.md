@@ -9,7 +9,7 @@ The original local/Memory sections and later b1/Cookie/b2/b3 entries below retai
 
 ## Authority and bounded scopes
 
-The original local/Memory work follows the [M10 remaining plan](M10-REMAINING-PLAN.md), [provider operations contract](PROVIDER-OPERATIONS.md), [ADR 0005](adr/0005-opt-in-capability-modules.md) and the independently reviewed [YT-065 / YT-066 plan](YT-065-066-PLAN.md). It preserves the existing synchronous process-local `SessionManager<T>` / `Session<T>` API and does not introduce Redis, a generic store trait, a second HTTP stack, DI, ORM or production deployment.
+The original local/Memory work follows the [M10 remaining plan](M10-REMAINING-PLAN.md), [provider operations contract](PROVIDER-OPERATIONS.md), [ADR 0005](adr/0005-opt-in-capability-modules.md) and the independently reviewed [YT-065 / YT-066 plan](https://github.com/bohewu/yetlet/blob/42d8856b9acf5ddddab9a4b998b5bdd4c5e59210/docs/YT-065-066-PLAN.md). It preserves the existing synchronous process-local `SessionManager<T>` / `Session<T>` API and does not introduce Redis, a generic store trait, a second HTTP stack, DI, ORM or production deployment.
 
 Two different evidence slices must remain separate:
 

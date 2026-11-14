@@ -56,7 +56,7 @@ frontend glue are outside the distributed nine-package scope. Existing
 applications may supply source-bound compatibility evidence without becoming
 registry-only consumers or supported packages. Native constructor,
 trait/Arc and Axum State/FromRef composition remains the
-[YT-095 decision](YT-095-COMPOSITION-RESEARCH.md).
+[YT-095 decision](https://github.com/bohewu/yetlet/blob/42d8856b9acf5ddddab9a4b998b5bdd4c5e59210/docs/YT-095-COMPOSITION-RESEARCH.md).
 
 ## Selected qualification matrix
 

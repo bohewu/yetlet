@@ -130,6 +130,31 @@ The tool's SQLite version is observed separately and must not be attributed to
 the Rust app's bundled SQLite library. The main agent must retain build/source
 identity if it needs to connect a prebuilt binary to a particular source freeze.
 
+## Historical automated qualification and Redis staging
+
+The YT-065/066 planning baseline distinguished native and browser
+automation from unqualified **real OS IME, assistive-technology speech,
+Safari/WebKit, mobile touch and 200%/400% zoom**. The accepted YT-065
+automated scope did not convert those optional manual lanes into PASS;
+see the [Qualification Matrix](QUALIFICATION-MATRIX.md). YT-066a's
+actual single-host Docker test verified stateless routing and the
+**inability** of process-local Memory Session cookies to authenticate
+across another instance or an old restarted instance.
+
+The separate opt-in Redis provider was accepted through staged design,
+b1 private spike, b2 implementation/testing and b3 actual single-host
+three-app qualification. The b2 CAS callback barrier originally hung
+twice; a later separately accepted correction and tests resolved the
+stall. The final b3 primary topology intentionally disabled persistence
+and did **not** prove cross-host HA, backup restore or production RPO/RTO.
+Unknown outcomes after dispatched writes, CSRF/Cookie ordering and worker
+drain require their separate retained source-specific evidence.
+Production storage, TLS/ACL, backup, recovery and business durability
+remain application/operator responsibilities, not blocked mandatory
+framework functionality. The original plan's earlier Pending and
+Blocked observations retain their original dates and are not current
+readiness labels. Full planning and review text remains at **local Git**
+`42d8856b9acf5ddddab9a4b998b5bdd4c5e59210` (not yet verified reachable through public GitHub).
 ## Single-host Docker/Memory qualification
 
 YT-066a adds a bounded deployment-shape proof without adding a Session provider. Run the focused source tests, then the owned Docker fixture:
