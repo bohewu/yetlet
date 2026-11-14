@@ -229,9 +229,9 @@ users must load a fresh page. There is no Starter login to restore or revoke.
 The separate Bearer API secret stays operator-supplied and outside the backup;
 restoring the database neither rotates nor recovers it.
 
-The [YT-066 responsibility boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md) and
+The [YT-066 responsibility boundary](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md) and
 [YT-094 Valkey evidence](YT-094-VALKEY-SESSIONS.md), summarized in
-[YT-094 closeout](YT-094-CLOSEOUT.md), retain their original single-host scope.
+[YT-094 closeout](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md), retain their original single-host scope.
 Admin explicitly selecting nonpersistent Valkey can retain sessions through an
 application restart; nonpersistent Valkey restart loses them and requires login.
 That does not give this Starter Valkey integration or durable Session restore.

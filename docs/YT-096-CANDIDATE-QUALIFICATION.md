@@ -96,7 +96,7 @@ remain applicable at their recorded source and platform bounds; no new graph
 abstraction or dependency was introduced by this slice.
 
 Retain [Starter](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-092-STARTER-VERIFICATION.md),
-[Admin closeout](YT-094-CLOSEOUT.md),
+[Admin closeout](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md),
 [cloud delivery](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md), and
 [bounded rolling/asset retention](YT-103-ROLLING-ASSET-VERIFICATION.md)
 evidence. Those references do not establish production authentication,

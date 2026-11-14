@@ -76,11 +76,11 @@ trusted request extensions stay out of browser builds and hydration state.
 
 | Carrier | Current status and boundary | Authority |
 |---|---|---|
-| Board/Admin OIDC | Existing application-owned maintained-client integration and explicit issuer/subject to local-account mapping. YT-116 research Done; no extracted generic OIDC adapter | [OIDC study](YT-116-OIDC-ADAPTER-STUDY.md), [accepted provider evidence](YT-094-OIDC.md) |
+| Board/Admin OIDC | Existing application-owned maintained-client integration and explicit issuer/subject to local-account mapping. YT-116 research Done; no extracted generic OIDC adapter | [OIDC study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-116-OIDC-ADAPTER-STUDY.md), [accepted provider evidence](YT-094-OIDC.md) |
 | YT-125 Valkey/Auth consumer | Isolated application-owned async Auth resolver and two-process qualification; fresh shared local authority, explicit lifecycle/failure semantics | [YT-125](YT-125-VALKEY-AUTH-INTEGRATION.md) |
 | Admin Valkey/Auth adoption | YT-126 Done after focused verification and independent review; explicit feature/runtime selection, fresh policy and documented pre-SQL race limit. No generic crate bridge or cross-store commit fencing | [YT-126](YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md), [contract study](YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md) |
 | Shop optional catalog display cache | YT-183 Done after independent Reviewer PASS, zero issues/followups: app-only default-off `catalog-cache`, bounded age/admission and generation invalidation; Session/checkout remain authoritative, no framework cache crate or output cache | [Contract](YT-183-CATALOG-CACHE-CONTRACT.md), [implementation/new proof](YT-183-CATALOG-CACHE-IMPLEMENTATION.md) |
-| Opaque Bearer capabilities | Existing File Server/Production Starter app-owned route guards; no generic identity-aware JWT/introspection provider | [Bearer study](YT-119-BEARER-STUDY.md) |
+| Opaque Bearer capabilities | Existing File Server/Production Starter app-owned route guards; no generic identity-aware JWT/introspection provider | [Bearer study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-119-BEARER-STUDY.md) |
 | Yetlet CLI | Independently published `yetlet-cli`, executable `yetlet`, with typed parser/support API, explicit scaffolding, static HTML export and configuration-only generators. Scaffolding pins the SDK selected by the resolver exactly and writes the app lock and receipt. Per-command and platform limits apply. | [Current CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory) |
 
 Application accounts, permissions, project policy, sensitive-write rechecks and
@@ -95,10 +95,10 @@ not qualify every later source revision or a production deployment.
 | YT-116 OIDC adapter | Research Done after independent Reviewer PASS; reuse existing app composition | No generic adapter selected |
 | YT-119 Bearer | Research Done after independent Reviewer PASS; retain app-owned opaque capabilities | No Bearer/JWT provider or Auth feature selected |
 | YT-120 Cookie primitives | Research Done after independent Reviewer PASS; reuse existing Session providers and mature Rust cookie primitives | No `yetlet-cookies`, ambient jar or duplicate CSRF/store subsystem selected |
-| YT-118 Audit | [Research](YT-118-AUDIT-STUDY.md) Done after independent Reviewer PASS; preserve app-owned history/event policy | No `yetlet-audit` implementation |
-| YT-121 Data cache | [Research](YT-121-CACHE-STUDY.md) Done after independent Reviewer PASS; current reads/snapshots remain app-owned | No `yetlet-cache` implementation |
-| YT-122 Output cache | [Research](YT-122-OUTPUT-CACHE-STUDY.md) Done after independent Reviewer PASS; retain app-owned header/static policy | No `yetlet-output-cache` implementation; private output remains uncached by default |
-| YT-123 Tracing | [Research](YT-123-TRACING-CORRELATION-STUDY.md) Done after independent Reviewer PASS; retain optional RequestIds and app-owned native composition | No `yetlet-tracing` implementation; request IDs alone are not distributed tracing |
+| YT-118 Audit | [Research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-118-AUDIT-STUDY.md) Done after independent Reviewer PASS; preserve app-owned history/event policy | No `yetlet-audit` implementation |
+| YT-121 Data cache | [Research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-121-CACHE-STUDY.md) Done after independent Reviewer PASS; current reads/snapshots remain app-owned | No `yetlet-cache` implementation |
+| YT-122 Output cache | [Research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-122-OUTPUT-CACHE-STUDY.md) Done after independent Reviewer PASS; retain app-owned header/static policy | No `yetlet-output-cache` implementation; private output remains uncached by default |
+| YT-123 Tracing | [Research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-123-TRACING-CORRELATION-STUDY.md) Done after independent Reviewer PASS; retain optional RequestIds and app-owned native composition | No `yetlet-tracing` implementation; request IDs alone are not distributed tracing |
 
 See the [M21 plan](YT-113-123-OPT-IN-CAPABILITIES.md), [Backlog](BACKLOG.md) and
 [Extensions](EXTENSIONS.md). Research Done records an accepted decision, not a

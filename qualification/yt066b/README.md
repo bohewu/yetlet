@@ -1,6 +1,6 @@
 # YT-066b1 private Redis semantics spike
 
-This unpublished experiment tests one Redis primary. It is a separate Cargo workspace, not a framework crate, Session middleware or a dependency of the existing Memory provider. See [design](../../docs/YT-066B-REDIS-SESSION-DESIGN.md) and [execution evidence](../../docs/YT-066B1-VERIFICATION.md).
+This unpublished experiment tests one Redis primary. It is a separate Cargo workspace, not a framework crate, Session middleware or a dependency of the existing Memory provider. See [design](../../docs/YT-066B-REDIS-SESSION-DESIGN.md) and [execution evidence](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md).
 
 `redis = 1.7.1` uses only `tokio-comp`, `connection-manager` and `script` (default features disabled). State is one typed counter/note encoded as JSON in an opaque Redis Hash field. Lua handles version/revision, primary-clock absolute expiry, CAS, atomic rotation/revocation and independent operation results. The Rust wrapper demonstrates once-only callbacks and explicit unknown outcomes. `command` and raw keys are fixture fault-injection seams, not proposed provider APIs.
 

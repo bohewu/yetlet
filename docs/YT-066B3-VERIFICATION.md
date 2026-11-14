@@ -196,7 +196,7 @@ The b3 changes consist of these 18 files:
 - `qualification/yt066b3/browser.py`
 
 YT-066b2 is locally committed; YT-066b3 is Done only at the bounded scope above.
-The later [responsibility clarification](YT-066-PERSISTENCE-RECOVERY-PLAN.md)
+The later [responsibility clarification](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md)
 keeps production topology/recovery policy and operational ownership with the
 application/operator. The next framework step is bounded documentation closeout
 and review; those deployment decisions are not mandatory Yetlet implementation.
@@ -222,5 +222,5 @@ first-screen coverage, `warn` and two findings. No bypass, policy change, push
 or new qualification execution occurred. The earlier unstaged/uncommitted
 statements record the review closeout before this later authorization.
 
-The [next planning document](YT-066-PERSISTENCE-RECOVERY-PLAN.md) is a separate,
+The [next planning document](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md) is a separate,
 unstaged documentation-only proposal, not production implementation or review PASS.

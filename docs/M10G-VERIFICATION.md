@@ -134,7 +134,7 @@ YT-066 remains **In progress**. The next separately authorized stage is YT-066b 
 
 ## Subsequent YT-066b1 execution — 2026-10-11
 
-After the independent YT-066b0 design PASS, the maintainer separately authorized a private real-Redis semantics spike and local independent review. [YT-066b1 verification](YT-066B1-VERIFICATION.md) records the isolated crate/client/image identities, six passing Rust 1.88 integration tests, the later counter-order correction with two affected passing tests, strict stable Clippy and complete owned-container cleanup. The HTTP cookie jar reproduces replacement-cookie loss after the final check or delayed Set/Clear delivery; that unresolved guarantee blocks full-provider implementation. This follow-on neither reruns nor relabels YT-066a evidence. Independent local read-only reviewer thread `01a12884-69a7-7e20-beb5-9710e561c4d9` returned canonical PASS, exit 0, with observed `gpt-6-astra` / `high` and unchanged workspace. YT-066 remains In progress.
+After the independent YT-066b0 design PASS, the maintainer separately authorized a private real-Redis semantics spike and local independent review. [YT-066b1 verification](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md) records the isolated crate/client/image identities, six passing Rust 1.88 integration tests, the later counter-order correction with two affected passing tests, strict stable Clippy and complete owned-container cleanup. The HTTP cookie jar reproduces replacement-cookie loss after the final check or delayed Set/Clear delivery; that unresolved guarantee blocks full-provider implementation. This follow-on neither reruns nor relabels YT-066a evidence. Independent local read-only reviewer thread `01a12884-69a7-7e20-beb5-9710e561c4d9` returned canonical PASS, exit 0, with observed `gpt-6-astra` / `high` and unchanged workspace. YT-066 remains In progress.
 
 The maintainer subsequently authorized the local YT-066b1 commit and a cookie-ordering repair without weakening the guarantee. [Cookie gate evidence](YT-066B-COOKIE-ORDERING.md) records commit `6fd6876`, the separately uncommitted candidate, actual Redis/HTTP observations, two material repairs and final independent reviewer **FAIL**. Reviewer thread `01a1289c-e4e8-77b2-b374-c6f4153e3a4f` completed read-only with observed `gpt-6-astra` / `high`, exit 0 and unchanged workspace. Delayed lower cookies can evict the replacement or logout fence; a focused actual-Chrome storage probe confirmed that boundary. The original guarantee was unchanged and unresolved at that failed-review checkpoint. YT-066b2 did not start on that evidence.
 
@@ -164,7 +164,7 @@ Native peon trace matched `gpt-6-luna` / `high`. Direct staged guard exited 0 wi
 audit/builtin first-screen coverage, `warn` and two findings; no bypass or policy
 change. No push or redundant test execution occurred.
 
-The [production persistence/recovery scope](YT-066-PERSISTENCE-RECOVERY-PLAN.md)
+The [production persistence/recovery scope](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md)
 is now drafted as documentation only. Proposed persistent clean restart and
 fenced invalidation after crash/older restore remain Not verified and unapproved
 for implementation. Production decisions remain open; YT-066 In progress,
@@ -174,7 +174,7 @@ YT-020 Blocked. The earlier unstaged b3 statement is its historical closeout sta
 
 The maintainer challenged treating production operations as framework work and
 requested independent review of the corrected documents. The [reconciled
-boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md) removes TLS/ACL deployment policy,
+boundary](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md) removes TLS/ACL deployment policy,
 backup protection, business RPO/RTO and operational ownership from mandatory
 Yetlet delivery and YT-066 completion gates. Provider semantics, supported
 configuration/error behavior, redaction and explicit recovery assumptions remain
@@ -189,7 +189,7 @@ contract and shared-resolver effort. Thread `01a12a04-d58f-7210-a995-c6f35860437
 reached terminal exit 0 with runtime `gpt-6-astra` / `high`, valid canonical PASS,
 no issues or required followups, and all 287 working inputs, HEAD/status and the
 empty index unchanged. No WebCodex Job or native managed-role identity is claimed.
-The [full receipt and exact 11-file list](YT-066-PERSISTENCE-RECOVERY-PLAN.md#independent-responsibility-scope-review--2026-10-11)
+The [full receipt and exact 11-file list](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md#independent-responsibility-scope-review--2026-10-11)
 retain the reviewed input identity. Existing documentation checks passed at
 75 required / 100 total Markdown documents and 67 backlog items; no runtime
 tests were repeated. Only these outcome receipts were added after review.
@@ -231,11 +231,11 @@ guarantee passed or change Memory's recorded API/test contract.
 |---|---|
 | Local Session/SQLite | Actual process-local isolation/restart limitations, local WAL conflict, backup/isolated restore/corrupt rejection and owned cleanup; reviewer `wc_job_YclpZ0R5tS4m8Y1I` PASS; no shared-memory-to-distributed inference |
 | YT-066a | Actual three-app Docker/Memory stateless distribution, worker stop/restart, cross-worker rejection and issuer-restart loss; retained execution plus focused cleanup repairs; final reviewer `01a1286a-5829-7411-9ecc-dbc3f00fe001` PASS |
-| YT-066b1 | [Real-Redis private spike](YT-066B1-VERIFICATION.md), direct mature-client choice and actual CAS/lifecycle/uncertain-result/bounds evidence at its recorded source; original Cookie gate failure remains historical, not relabeled PASS |
+| YT-066b1 | [Real-Redis private spike](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md), direct mature-client choice and actual CAS/lifecycle/uncertain-result/bounds evidence at its recorded source; original Cookie gate failure remains historical, not relabeled PASS |
 | Selected Cookie gate | [Explicit pure-SSR contract](YT-066B-COOKIE-ORDERING.md), focused Redis/HTTP/no-JS Chrome evidence; separate reviewer `01a128b4-dbc6-7922-87e7-ab67c171665a` PASS |
 | YT-066b2 | [Provider implementation](YT-066B2-VERIFICATION.md), applied barrier correction, five Rust 1.88 provider tests and retained cancellation/drain, Clippy/format/isolation checks; reviewer `01a128d5-37d1-7f40-a7c7-84fc0c923771` PASS |
 | YT-066b3 | [Actual three-application Redis fixture](YT-066B3-VERIFICATION.md), cross-worker CAS/rotate/revoke, TTL, Cookie boundary, unknown results, cancellation/drain, app restart and fail-closed outage/no-persistence restart; focused cleanup repair; final reviewer `01a129d2-3cce-72d3-a0de-bd286565dade` PASS |
-| Responsibility boundary | [Framework/application reconciliation](YT-066-PERSISTENCE-RECOVERY-PLAN.md), reviewer `01a12a04-d58f-7210-a995-c6f35860437c` PASS; this is prior documentation evidence, not the final closeout review |
+| Responsibility boundary | [Framework/application reconciliation](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md), reviewer `01a12a04-d58f-7210-a995-c6f35860437c` PASS; this is prior documentation evidence, not the final closeout review |
 
 The existing records retain each exact source/lock/image/process/run identity.
 For example, b3 executed at baseline `1f38d20b8ebaf9b679aa69ce461b495db1856db2`

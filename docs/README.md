@@ -297,10 +297,14 @@ Git source `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; this is not a public prod
   Windows browser-watch is not generalized by accepted Linux tests.
 - [YT-115 optional Memory Session/Auth bridge](YT-115-SESSION-AUTH.md): explicit feature, current account mapping, native-form CSRF and real loopback HTTP lifecycle evidence; independent Reviewer PASS.
 - [YT-117 optional rate limiting](YT-117-RATE-LIMIT.md): selected endpoint/group policies, separate configuration reuse and shared per-process budgets, and default-off startup installation; Done at per-process scope after independent Reviewer PASS.
-- [YT-118 Audit study](YT-118-AUDIT-STUDY.md): existing Auth Notes/Admin behavior, transactional business history versus diagnostics, allowlisted event semantics and explicit extraction threshold; Done at docs-only research scope after independent Reviewer PASS; no audit crate/runtime selected.
-- [YT-121 Cache study](YT-121-CACHE-STUDY.md): compares real business reads and asset snapshots, separates disposable data from authoritative state and HTTP output, and records native options/extraction thresholds; Done at docs-only research scope after independent Reviewer PASS; no cache crate/runtime selected.
-- [YT-122 Output Cache study](YT-122-OUTPUT-CACHE-STUDY.md): public assets versus personalized SSR/API, final HTTP header/cookie policy, Session/tenant isolation and invalidation; private content stays uncached by default. Done at docs-only research scope after independent Reviewer PASS; no output-cache crate/runtime selected.
-- [YT-123 Tracing/Correlation study](YT-123-TRACING-CORRELATION-STUDY.md): existing RequestIds/SSR/API diagnostics versus native tracing/Tower, explicit task/stream propagation and source-trust/redaction boundaries; Done at docs-only research scope after independent Reviewer PASS; no tracing crate/runtime/subscriber/exporter selected.
+- **Research-only Audit, Cache, Output Cache and Tracing (YT-118/121/122/123):**
+  the independently reviewed studies retained application-owned business
+  history, disposable data reads, strict no-store for private HTTP output and
+  native Request ID/correlation boundaries. **No generic audit, cache, output
+  cache or tracing framework module was selected.** See the
+  [current capability matrix](CAPABILITIES.md#research-decisions-and-unselected-candidates)
+  and [extension boundaries](EXTENSIONS.md); original reviews and negative cases
+  remain in fixed local Git `4ad0978f8a70b36c307f5e538aa1a3aa496a7403`.
 - [YT-134 optional release/storage capacity reference](YT-134-RELEASE-STORAGE-CAPACITY.md): predeclared direct-loopback measurements for the exact accepted release binary and disposable schema-2/ext4 fixture, retaining passing and failed load points, write reconciliation and cleanup; Done at bounded optional reference scope after independent Reviewer PASS, zero issues/required followups. Consumer hardware/SLO and production qualification remain separate. A separately authorized [ephemeral Azure supplement](YT-134-AZURE-REFERENCE.md) completed its workload, reconciliation, ordinary reboot/readback and full cleanup, with separate independent Reviewer PASS, zero issues/required followups; failed cloud points and measurement limits remain explicit.
 - [YT-135 current-schema recovery reference](YT-135-CURRENT-SCHEMA-RECOVERY.md): separately activated release/schema-2 backup, fresh restore, explicit two-acknowledgment loss accounting, missing-index refusal and forward-restart readback; isolated proof/cleanup complete with independent Reviewer PASS, zero issues/required followups; Done at bounded optional reference scope.
 - [YT-136 bounded telemetry collection reference](YT-136-TELEMETRY-COLLECTION.md): opt-in private snapshot/log collection and [reusable CLI guidance](../examples/production-starter/deployment/telemetry/README.md), reusing YT-128 observability and YT-133 access evidence. New collection/failure/staleness integration, bounded log projection, oversize rejection and cleanup complete; independent Reviewer PASS, zero issues/required followups; Done at bounded optional reference scope; no mandatory collector or production sink/alert operation.
@@ -344,10 +348,22 @@ Git source `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; this is not a public prod
 - [YT-126 opt-in Admin Valkey/Auth adoption](YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md): real application adoption with fresh shared local policy and actual two-Admin-process qualification; Done after independent Reviewer PASS, retaining existing pre-SQL ordering limits.
 - [YT-125 minimal Valkey/Auth integration](YT-125-VALKEY-AUTH-INTEGRATION.md): standalone application resolver and actual two-process qualification, Done after independent Reviewer PASS; no generic Auth feature or Admin migration.
 - [YT-124 multi-instance Auth/Valkey Session contract](YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md): owner-selected research follow-up, Done after independent Reviewer PASS; later Valkey two-app evidence is reused alongside historical Redis and rolling-asset proof. No async Auth bridge implementation is selected.
-- Auth provider studies: [YT-116 OIDC](YT-116-OIDC-ADAPTER-STUDY.md), [YT-119 Bearer](YT-119-BEARER-STUDY.md) and [YT-120 Cookies](YT-120-COOKIE-GAP-STUDY.md) record direct/native reuse decisions without new adapters; independent Reviewer PASS for each study.
+- **Auth provider research (YT-116/119/120):** independently reviewed
+  app-owned OIDC issuer/subject mapping, opaque Bearer guards and mature
+  Cookie/Session composition; no automatic OIDC/JWT/Cookie adapters.
+  See [current Auth and capability boundaries](CAPABILITIES.md#application-owned-integrations-and-tools)
+  and retained [OIDC reference evidence](YT-094-OIDC.md).
 - [YT-182 Opt-in tracing/worker implementation](YT-182-TRACING-WORKER-IMPLEMENTATION.md): Done after independent implementation Reviewer PASS, zero issues/followups; default-off Board/Admin feature and Settings, scoped HTTP/worker Dispatch, separate lifecycle outcomes, seven successful new test executions, original compile/drop failures retained and old proof not replayed.
 
-- [Planned M21 opt-in server capabilities](YT-113-123-OPT-IN-CAPABILITIES.md): YT-113–YT-123 register a staged `yetlet-auth` contract/foundation, optional Session/OIDC, rate limiting, and research-gated Bearer/Audit/Cookies/Cache/Output Cache/Tracing; [YT-113 contract research](YT-113-AUTHENTICATION-CONTRACT.md) is Done after independent Reviewer PASS; [YT-114 foundation](YT-114-IMPLEMENTATION.md) is Done after its separate independent Reviewer PASS; YT-115 is Done at Memory bridge scope and YT-116/119/120 are Done at independently reviewed research scopes; [YT-117 rate limiting](YT-117-RATE-LIMIT.md) is Done at the separately selected per-process scope after independent Reviewer PASS; [YT-118 Audit research](YT-118-AUDIT-STUDY.md) is Done after independent Reviewer PASS and [YT-121 Cache research](YT-121-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-122 Output Cache research](YT-122-OUTPUT-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-123 Tracing/Correlation research](YT-123-TRACING-CORRELATION-STUDY.md) is Done after independent Reviewer PASS, with no new core/server dependency or release guarantee.
+- [M21 opt-in server capability plan](YT-113-123-OPT-IN-CAPABILITIES.md):
+  all eleven registered tasks are now Done at distinct contract, native
+  Auth/Memory/rate-limit or research-only scopes. Actual runtime contracts are
+  [YT-113 Auth](YT-113-AUTHENTICATION-CONTRACT.md),
+  [YT-115 Memory bridge](YT-115-SESSION-AUTH.md) and
+  [YT-117 rate limiter](YT-117-RATE-LIMIT.md), with retained
+  [YT-114 foundation evidence](YT-114-IMPLEMENTATION.md). Research-only
+  OIDC/Bearer/Cookie/Audit/Cache/Tracing decisions do **not** install new
+  default providers or expand production support.
 - [Windows CLI exit-125 follow-up](WINDOWS-CLI-125-VERIFICATION.md): Cargo executable ACL diagnosis, safe stage diagnostics and source-matched native build/run/Ctrl-C cleanup with protected task-local tools.
 - [Development HTTPS](DEV-HTTPS-VERIFICATION.md): existing settings, externally prepared mkcert certificates, optional Rust TLS, Vite HTTPS/WSS and native run/stop/build evidence.
 - [Opt-in secret providers](SECRET-PROVIDERS.md): asynchronous named string lookup, explicit settings snapshots and constructor/State injection with replaceable providers.
@@ -427,15 +443,19 @@ finite, not production hosting or a native backend. The
 [current browser-only walkthrough](BROWSER-APP.md) owns commands for
 the published CLI and SDK; original YT-104 reviews and failures remain
 recoverable at the fixed local pre-consolidation Git source.
-The [SSR administration reference](../examples/admin-dashboard/README.md) closes
-YT-094 at the selected reference-application scope: CLI-created
-Vite/Tailwind/settings composition over the persisted Lab Operations Board, with
-native no-JS forms and responsive screens. The [closeout matrix](YT-094-CLOSEOUT.md)
-links existing evidence and accepted limitations; this is not production or
-public-release qualification. The application guide retains the first-slice results.
-The later [Rust/WASM triage slice](YT-094-WASM-TRIAGE.md) adds local multi-draft
-interaction and explicit HTTP saves; [API observations](YT-094-API-OBSERVATIONS.md)
-record the YT-105 follow-up. The historical form-value/event, state-read and HTTP-feedback studies
+The [Admin Dashboard](../examples/admin-dashboard/README.md) demonstrates
+the YT-094 application-owned SSR, Board storage, native form/CSRF, opt-in
+OIDC and separately selected Valkey/SQLite integrations. Its first local
+Linux/Chrome, Windows native MSVC and later Windows Rust/WASM evidence were
+**different qualification slices**, not one universal production matrix.
+The accepted closeout and original staged API/triage results remain at fixed
+local Git `4ad0978f8a70b36c307f5e538aa1a3aa496a7403`; current operation belongs to the app README.
+The optional triage workspace uses tab-local Rust/WASM drafts, keyed reorder
+and one explicit authenticated/version-checked HTTP save; queued-save
+lifetime failure and corrected zero-POST regression remain historical.
+Windows OS IME/AT attestations and ongoing TLS/deployment/HA limitations
+are source-specific and retained in [Windows WASM verification](YT-094-WINDOWS-WASM-VERIFICATION.md).
+The historical form-value/event, state-read and HTTP-feedback studies
 accepted **app-owned** native and graph draft handling, body-token CSRF,
 and explicit save/validation feedback rather than new public auto-binding
 APIs. The [retained state-read research](YT-105-STATE-READ-INITIAL-RENDER-RESEARCH.md)
@@ -456,9 +476,10 @@ cross-platform support follows from this bounded trial.
 The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
 completed native/browser checks from the returned operator-attested native
 IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.
-The [Windows desktop handoff](YT-094-WINDOWS-DESKTOP-HANDOFF.md) provides the
-historical mint-game setup and manual verification steps; its passed results and
-final cleanup are reconciled in the follow-up rather than rerun.
+The separately retained [Windows WASM qualification](YT-094-WINDOWS-WASM-VERIFICATION.md)
+reconciles source-matched browser output, manual Windows input/assistive
+technology observations and cleanup. Earlier setup-only handoff details
+remain recoverable at the fixed local original Git source.
 The [opt-in OIDC slice](YT-094-OIDC.md) records existing settings/SecretProvider
 composition and its separate real-provider qualification boundary.
 The [Valkey shared-session slice](YT-094-VALKEY-SESSIONS.md) records explicit

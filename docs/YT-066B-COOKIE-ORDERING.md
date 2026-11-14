@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-11
 **Status:** The maintainer explicitly selected the pure-SSR contract below on 2026-10-11. Its corrected fixed-name implementation has focused passing tests and independent reviewer **PASS**. The earlier unique-name candidate remains historical **FAIL**. The [subsequent YT-066b2 implementation](YT-066B2-VERIFICATION.md) has separate passing focused runtime evidence and independent reviewer PASS at bounded experimental-provider scope.
-**Related:** [Accepted plan](YT-065-066-PLAN.md), [Redis design](YT-066B-REDIS-SESSION-DESIGN.md), [original spike evidence](YT-066B1-VERIFICATION.md), [fixture](../qualification/yt066b/README.md).
+**Related:** [Accepted plan](YT-065-066-PLAN.md), [Redis design](YT-066B-REDIS-SESSION-DESIGN.md), [original spike evidence](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md), [fixture](../qualification/yt066b/README.md).
 
 ## Authority and committed baseline
 

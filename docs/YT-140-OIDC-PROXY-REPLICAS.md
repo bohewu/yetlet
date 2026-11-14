@@ -68,7 +68,7 @@ for the proposed test; no custom verifier, token signer or protocol peer is
 needed. Relevant pinned source hashes are included in the findings receipt.
 
 Reuse [YT-094 OIDC](YT-094-OIDC.md),
-[YT-116](YT-116-OIDC-ADAPTER-STUDY.md),
+[YT-116](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-116-OIDC-ADAPTER-STUDY.md),
 [YT-094 Valkey](YT-094-VALKEY-SESSIONS.md),
 [shared SQLite](YT-094-SHARED-SQLITE.md),
 [YT-124](YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md) and

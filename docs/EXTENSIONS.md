@@ -172,16 +172,17 @@ and [Shop](../examples/modular-shop/README.md) guides.
 
 ### M21 opt-in capabilities
 
-The [M21 batch plan](YT-113-123-OPT-IN-CAPABILITIES.md) registers
-YT-113–YT-123 as Todo at registration. [YT-113 contract research](YT-113-AUTHENTICATION-CONTRACT.md)
-is Done after independent Reviewer PASS. The separate [yetlet-auth foundation](../crates/yetlet/guides/auth.md)
-is Done at [YT-114 scope](YT-114-IMPLEMENTATION.md) after its separate independent Reviewer PASS;
-YT-115 is Done at Memory bridge scope and YT-116/119/120 are Done at independently reviewed research scopes; [YT-117 rate limiting](YT-117-RATE-LIMIT.md) is Done at the separately selected per-process scope after independent Reviewer PASS; [YT-118 Audit research](YT-118-AUDIT-STUDY.md) is Done after independent Reviewer PASS; [YT-121 Cache research](YT-121-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-122 Output Cache research](YT-122-OUTPUT-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-123 Tracing/Correlation research](YT-123-TRACING-CORRELATION-STUDY.md) is Done after independent Reviewer PASS. The plan separates the `yetlet::auth` verified-identity contract from application-owned authorization and separately selected Session integration. Existing app-owned OIDC and opaque Bearer capabilities do not establish generic adapters. A separate Cookie crate, generic audit event/sink capability,
-data/output caches and tracing remain unselected candidates;
-the existing native Axum/Tower and module setup APIs stay authoritative.
-Registration does not provide these runtime capabilities or qualify
-authenticated production deployments.
-
+The [original M21 plan](YT-113-123-OPT-IN-CAPABILITIES.md) registered
+YT-113–123 as proposed follow-ups, not shipped features. Each later
+closed independently at its selected scope: YT-113 Authentication contract;
+YT-114 native Auth foundation; YT-115 Memory Session bridge; YT-117
+default-off per-process rate limit; YT-116/118/119/120/121/122/123
+**research-only** OIDC, Audit, Bearer, Cookie, data/output cache and
+tracing decisions. The [current capability matrix](CAPABILITIES.md#research-decisions-and-unselected-candidates)
+distinguishes actual SDK features from rejected/unselected modules.
+Application-owned authorization, transaction history, private response
+no-store, Cookie/CSRF policy and tracing redaction remain explicit;
+research Done is not permission to install an automatic provider.
 The separately selected [YT-115 Memory bridge](YT-115-SESSION-AUTH.md) adds an
 explicit `yetlet-auth/session` feature and native HTTP proof with independent Reviewer PASS. Default Auth still has no Session dependency. Existing Memory sync and
 Redis async provider APIs remain unchanged.
@@ -197,14 +198,14 @@ with separate focused verification and independent Reviewer PASS. The loader is
 an example development dependency,
 not a Core service or normal limiter dependency.
 
-The owner-selected [YT-118 Audit study](YT-118-AUDIT-STUDY.md) compares Auth Notes,
+The owner-selected [YT-118 Audit study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-118-AUDIT-STUDY.md) compares Auth Notes,
 Admin/Board transactional history, SQLite CRUD and diagnostic HTTP observation.
 It recommends retaining application-owned event semantics and transaction/sink
 composition; no audit crate, callback registry or automatic capture is selected.
 Independent Reviewer PASS completes research only; existing history remains
 application-owned and no new Audit API/runtime is selected.
 
-The owner-selected [YT-121 Cache study](YT-121-CACHE-STUDY.md) compares
+The owner-selected [YT-121 Cache study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-121-CACHE-STUDY.md) compares
 Starter/Shop business reads, SQLite/Board reads and static asset reuse. No
 repeated data-cache adapter is demonstrated; retain typed app-owned composition.
 Session, permission policy and limiter accounting remain authoritative state;
@@ -215,14 +216,14 @@ is an app-only default-off Moka integration accepted after independent Reviewer 
 with zero issues/required followups;
 it preserves Session/checkout authority and does not extract a framework cache API.
 
-The owner-selected [YT-122 Output Cache study](YT-122-OUTPUT-CACHE-STUDY.md)
+The owner-selected [YT-122 Output Cache study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-122-OUTPUT-CACHE-STUDY.md)
 compares public assets and personalized SSR/API response lifecycles. Private
 content stays uncached by default; Vary or a tenant/user key does not replace
 no-store/current authorization. Retain existing header/static delivery; no
 duplicated safe response store or generic output-cache API/runtime is selected.
 Research is Done after independent Reviewer PASS.
 
-The owner-selected [YT-123 Tracing/Correlation study](YT-123-TRACING-CORRELATION-STUDY.md)
+The owner-selected [YT-123 Tracing/Correlation study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-123-TRACING-CORRELATION-STUDY.md)
 compares RequestIds, selected SSR/API projection and Starter diagnostics with
 native Rust tracing/Tower. Task and stream lifetimes, inbound-context trust
 and sensitive-field projection remain explicit application decisions; no

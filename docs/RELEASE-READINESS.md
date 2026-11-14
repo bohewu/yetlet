@@ -248,7 +248,7 @@ The table records both framework evidence and application deployment concerns.
 TLS/ACL deployment policy, backup protection, business RPO/RTO, on-call ownership
 and real production rollout are application/operator responsibilities, not
 prerequisites for bounded YT-066 framework completion. See the [responsibility
-boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md). YT-020 remains Blocked for its
+boundary](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md). YT-020 remains Blocked for its
 separate framework publication/activation gates; no release is authorized here.
 
 | Gate | State | Detail |

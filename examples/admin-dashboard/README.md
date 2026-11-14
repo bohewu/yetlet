@@ -1,7 +1,7 @@
 # SSR administration reference — YT-094
 
 YT-094 is Done at the selected reference-application scope. The
-[closeout matrix](../../docs/YT-094-CLOSEOUT.md) links the accepted evidence and
+[closeout matrix](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md) links the accepted evidence and
 limitations. Dated slice records below retain their original source/platform
 scope; their earlier overall task status is superseded by that closeout.
 
@@ -131,7 +131,7 @@ subsequent
 [Windows native slice](../../docs/YT-094-WINDOWS-VERIFICATION.md) records source-matched
 MSVC tests, CLI lifecycle and native HTTP separately from browser/OS input.
 Service delivery from this edited application layout is not qualified. See the
-[closeout](../../docs/YT-094-CLOSEOUT.md) for accepted limits and the
+[closeout](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md) for accepted limits and the
 [backlog](../../docs/BACKLOG.md) for separate follow-ups.
 
 ## First-slice local evidence — 2026-10-19
@@ -172,7 +172,7 @@ the existing compiled app and Board test binaries (13/13 and 15/15); no reviewer
 rebuild or workspace mutation occurred. At that first-slice review YT-094 remained
 In progress, with OS IME/assistive-technology, external OIDC and broader host
 coverage still open. Later evidence and owner decisions are reconciled in the
-[closeout](../../docs/YT-094-CLOSEOUT.md); production TLS/deployment,
+[closeout](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md); production TLS/deployment,
 authenticated dev-server bridging and production storage/HA remain boundaries.
 
 ## Opt-in OIDC
@@ -244,8 +244,8 @@ The frontend build now also needs the `wasm32-unknown-unknown` Rust target and
 `wasm-bindgen-cli` 0.2.129. `WASM_BINDGEN` can select that executable; the existing
 user-local Yetlet tools directory or PATH is the fallback. The existing settings
 and CLI build/run/stop workflow are unchanged. Generated bindings are ignored.
-See the [slice verification](../../docs/YT-094-WASM-TRIAGE.md) and
-[API observations](../../docs/YT-094-API-OBSERVATIONS.md). The earlier Windows
+See the [slice verification](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-WASM-TRIAGE.md) and
+[API observations](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-API-OBSERVATIONS.md). The earlier Windows
 native evidence does not qualify this changed slice; Windows browser and real
 OS input/assistive technology remain deferred to final qualification.
 

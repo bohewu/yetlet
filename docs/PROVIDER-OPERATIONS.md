@@ -14,15 +14,39 @@ synthetic Alice/Bob login codes do not make Session records shared. Restart
 discards the map, and a second worker cannot authenticate the first worker's
 cookie. Sticky routing alone cannot provide durable Session recovery.
 
-The separately selected experimental Redis provider now has reviewed b2
-implementation and [b3](YT-066B3-VERIFICATION.md) three-application qualification
-at single-host/single-primary/no-persistence scope. Peon committed b3 as `4da0f6c`.
-The [persistence/recovery boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md)
-is a later documentation-only responsibility clarification: AOF clean-restart
-retention and fenced fresh-generation invalidation rehearsals remain Not verified
-optional proposals, not required framework stages.
-This does not change the Memory provider or establish production durability.
+The experimental Redis Session work had **three distinct evidence stages**:
+the YT-066b1 private `redis-rs` spike established bounded atomic/Lua CAS,
+caller-cancellation and owned-worker drain semantics, but did not ship a
+framework provider and originally left the Cookie gate unsatisfied.
+YT-066b2 added a separate opt-in async provider; **two early real-Redis
+test attempts stalled on a synchronous CAS callback barrier** and were
+explicitly terminated, **not** counted as overall PASS. Only a separately
+authorized blocking-aware test-barrier correction and focused validation
+closed that failure. The retained [b2 provider evidence](YT-066B2-VERIFICATION.md)
+records **CSRF**, once-only CAS callbacks and scoped native SSR middleware
+in its focused integration tests. The separate
+[Cookie decision](YT-066B-COOKIE-ORDERING.md) preserves pure-SSR
+ordering, possible late-response login loss and stale/retired ID rejection.
 
+The later independently reviewed [b3 three-application run](YT-066B3-VERIFICATION.md)
+qualified a selected **single-host/single-primary** Redis topology with
+`save ""`, `appendonly no`, tmpfs and **no persistent volume**. It exercised
+expiry, rotation/revocation, CAS, outage and application restart at
+its recorded source. The b3 three-app matrix did **not** retest CSRF;
+that proof belongs to the retained b2 provider record. A dispatched write
+may finish after a caller timeout,
+so failure outcomes can be unknown until separately reconciled; permits and
+server work must remain owned through cancellation/drain.
+
+Proposed clean AOF restart or fenced fresh-generation recovery were
+**not executed** and did not become YT-066 completion prerequisites.
+Applications/deployments choose persistence, backup restore, TLS/ACL,
+RPO/RTO and operational acceptance; this lab proves neither durable
+writes, multi-host HA nor automatic recovery. The complete original
+b1 design/failed attempts and the YT-066 responsibility-plan rationale
+remain recoverable at fixed **local Git**
+`4ad0978f8a70b36c307f5e538aa1a3aa496a7403` (public SHA
+reachability not yet verified). Memory Session was not changed.
 The SQL-first `sqlite-crud` sample uses a local SQLite WAL database with explicit
 transactions, optimistic versions and transactional audit rows. Two local
 processes opening that same file exercise local filesystem locking, not nodes,

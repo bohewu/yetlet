@@ -15,7 +15,7 @@ no Push. Initial Guard rejection of a synthetic foreign-span test field and its
 single field-name correction remain in local commit receipts; no guard bypass
 or passing runtime-test replay occurred.
 
-[YT-121](YT-121-CACHE-STUDY.md) remains a historical no-extraction study. Current
+[YT-121](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-121-CACHE-STUDY.md) remains a historical no-extraction study. Current
 source inspection selects **Modular Shop's existing product-display projection**:
 [public catalog](../examples/modular-shop/src/catalog.rs) and authenticated
 [cart display](../examples/modular-shop/src/cart.rs) both call

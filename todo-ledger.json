@@ -886,11 +886,11 @@
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
         "docs/M10G-VERIFICATION.md",
-        "docs/YT-066B1-VERIFICATION.md",
+        "docs/PROVIDER-OPERATIONS.md",
         "docs/YT-066B2-VERIFICATION.md",
         "docs/YT-066B3-VERIFICATION.md"
       ],
-      "notes": "Priority P1; size L; milestone M10g. Acceptance/evidence: [M10g evidence](M10G-VERIFICATION.md): local operations and YT-066a proof reviewed PASS; [YT-066b1](YT-066B1-VERIFICATION.md) private Redis prototype has actual passing tests and independent reviewer PASS; the selected Cookie contract passed review; [YT-066b2](YT-066B2-VERIFICATION.md) focused provider tests and independent implementation review passed after the barrier repair at bounded experimental-provider scope; [YT-066b3](YT-066B3-VERIFICATION.md) Done at single-host/no-persistence scope after actual execution, cleanup and final independent reviewer PASS; Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability remains unverified"
+      "notes": "Priority P1; size L; milestone M10g. Acceptance/evidence: [M10g evidence](M10G-VERIFICATION.md): local operations and YT-066a proof reviewed PASS; [YT-066b1 original Git evidence](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md) private Redis prototype has actual passing tests and independent reviewer PASS; the selected Cookie contract passed review; [YT-066b2](YT-066B2-VERIFICATION.md) focused provider tests and independent implementation review passed after the barrier repair at bounded experimental-provider scope; [YT-066b3](YT-066B3-VERIFICATION.md) Done at single-host/no-persistence scope after actual execution, cleanup and final independent reviewer PASS; Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability remains unverified"
     },
     {
       "id": "YT-067",

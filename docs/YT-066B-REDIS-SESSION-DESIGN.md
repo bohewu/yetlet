@@ -2,8 +2,8 @@
 
 **Date:** 2026-10-10
 **Task:** YT-066 / M10g, bounded YT-066b design
-**Status:** Original revised design independently reviewed PASS on 2026-10-11 after four material corrections; [YT-066b1 execution](YT-066B1-VERIFICATION.md) subsequently passed its bounded review. A later explicit maintainer decision selects the pure-SSR cookie contract in section 10; its focused tests and [independent review](YT-066B-COOKIE-ORDERING.md) passed. The [experimental provider implementation](YT-066B2-VERIFICATION.md) has passing focused integration tests after its test barrier correction and independent implementation reviewer PASS at bounded YT-066b2 scope. [Three-application qualification](YT-066B3-VERIFICATION.md) is Done at single-host/single-primary/no-persistence scope after actual execution, cleanup and final independent reviewer PASS. No stable/full distributed production provider is accepted.
-**Related:** [Provider operations](PROVIDER-OPERATIONS.md), [M10g verification](M10G-VERIFICATION.md), [YT-065 / YT-066 plan](YT-065-066-PLAN.md), [ADR 0005](adr/0005-opt-in-capability-modules.md), [M8c verification](M8C-VERIFICATION.md), [planning verification](YT-066B-PLANNING-VERIFICATION.md).
+**Status:** Original revised design independently reviewed PASS on 2026-10-11 after four material corrections; [YT-066b1 execution](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md) subsequently passed its bounded review. A later explicit maintainer decision selects the pure-SSR cookie contract in section 10; its focused tests and [independent review](YT-066B-COOKIE-ORDERING.md) passed. The [experimental provider implementation](YT-066B2-VERIFICATION.md) has passing focused integration tests after its test barrier correction and independent implementation reviewer PASS at bounded YT-066b2 scope. [Three-application qualification](YT-066B3-VERIFICATION.md) is Done at single-host/single-primary/no-persistence scope after actual execution, cleanup and final independent reviewer PASS. No stable/full distributed production provider is accepted.
+**Related:** [Provider operations](PROVIDER-OPERATIONS.md), [M10g verification](M10G-VERIFICATION.md), [YT-065 / YT-066 plan](YT-065-066-PLAN.md), [ADR 0005](adr/0005-opt-in-capability-modules.md), [M8c verification](M8C-VERIFICATION.md), [planning verification](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B-PLANNING-VERIFICATION.md).
 
 ## 1. Goal and non-goals
 
@@ -350,7 +350,7 @@ Historical questions at the original design-review stage:
 
 Later b1/Cookie/b2/b3 evidence resolves the bounded provider choices at its
 recorded stages; the list is not a fresh task queue. The [responsibility
-clarification](YT-066-PERSISTENCE-RECOVERY-PLAN.md) keeps provider semantics,
+clarification](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md) keeps provider semantics,
 supported configuration/error behavior and honest persistence limits within
 Yetlet scope. Production TLS/ACL policy, backup protection, RPO/RTO and operator
 ownership are application concerns, not prerequisites for bounded YT-066

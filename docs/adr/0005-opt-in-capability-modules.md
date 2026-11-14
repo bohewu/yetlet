@@ -80,8 +80,8 @@ The other ADR candidates — `yetlet-cookies`, `yetlet-cache`,
 consumer-gated YT-120–YT-123 tasks. New proposals `yetlet-audit` (YT-118)
 and optional Bearer validation (YT-119) are **not accepted provider crates**.
 YT-119/120 are Done at research scope with no new adapter/crate selected;
-[YT-118 Audit research](../YT-118-AUDIT-STUDY.md) is Done after independent Reviewer PASS;
-[YT-121 Cache research](../YT-121-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-122 Output Cache research](../YT-122-OUTPUT-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-123 Tracing/Correlation research](../YT-123-TRACING-CORRELATION-STUDY.md) is Done after independent Reviewer PASS. The subsequent owner-selected
+[YT-118 Audit research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-118-AUDIT-STUDY.md) is Done after independent Reviewer PASS;
+[YT-121 Cache research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-121-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-122 Output Cache research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-122-OUTPUT-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-123 Tracing/Correlation research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-123-TRACING-CORRELATION-STUDY.md) is Done after independent Reviewer PASS. The subsequent owner-selected
 [YT-114 foundation](../YT-114-IMPLEMENTATION.md) implements only native identity
 resolution/extraction with independent Reviewer PASS. No Audit or Cache crate
 is implemented by this note. Previously qualified Session/Request ID/Secret

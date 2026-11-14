@@ -7,7 +7,7 @@ limits below. Physical stop: drain and numeric exit 0 corroborated by screenshot
 YT-094 remains In progress.**
 No application source changed, and no commit, push or deployment occurred in this
 verification continuation. The earlier [Windows SSR result](YT-094-WINDOWS-VERIFICATION.md)
-and [Linux WASM result](YT-094-WASM-TRIAGE.md) remain separate evidence.
+and [Linux WASM result](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-WASM-TRIAGE.md) remain separate evidence.
 
 ## Environment and source boundary
 
@@ -127,7 +127,7 @@ selected inputs, not the complete Git tree.
 
 Native desktop automation did not complete sign-in, real OS composition or
 spoken-AT observation. The owner requested a manual continuation. The
-[Windows desktop handoff](YT-094-WINDOWS-DESKTOP-HANDOFF.md) records exact paths,
+[Windows desktop handoff](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-WINDOWS-DESKTOP-HANDOFF.md) records exact paths,
 source/tool identities, process-local setup, commands, remaining journeys and
 automation limits. Narrator was still running at that pre-handoff observation;
 its blue cursor rectangles require the physical Windows+Ctrl+Enter shortcut to
@@ -201,7 +201,7 @@ retains the operation and evidence boundaries.
 | Original YT-094 criterion | Reconciled evidence and remaining boundary |
 | --- | --- |
 | Tailwind/Vite, meaningful SSR, typed forms, validation, pagination and error/empty states | The [first slice](../examples/admin-dashboard/README.md#first-slice-local-evidence--2026-10-19) remains accepted; returned native input evidence does not replace its no-JS proof. |
-| Responsive/mobile layout and local Rust/WASM interaction | The [Linux slice](YT-094-WASM-TRIAGE.md#local-verification) and Windows browser checks above remain accepted. Windows mobile devices and other browser versions were not qualified. |
+| Responsive/mobile layout and local Rust/WASM interaction | The [Linux slice](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-WASM-TRIAGE.md#local-verification) and Windows browser checks above remain accepted. Windows mobile devices and other browser versions were not qualified. |
 | Role/resource authorization, CSRF/session, concurrency, persistence failure and audit history | Existing native tests and real SSR/browser rejection/restart cases remain accepted at their documented local scope. Synthetic identities do not establish external OIDC or production authentication. |
 | Keyboard, CJK OS IME and spoken accessibility | The returned native journeys above supplement browser-protocol composition. Preserve operator-attested acceptance without promoting it to recorded speech or independent observation of physical input. |
 | Bounded load and graceful cleanup | The first-slice 40-read/concurrency-8 workload, prior Windows lifecycle checks, returned drain/exit-0 images and cleanup remain accepted; none is a production capacity or multi-replica claim. |
