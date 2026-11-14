@@ -1,7 +1,7 @@
 # YT-102 — Bounded Linux natural-completion latency
 
 Date: 2026-10-20. Base HEAD: `649be69` plus the already reviewed, uncommitted
-YT-095/YT-102 research documents. After the [DX audit](YT-102-DX-AUDIT.md), the
+YT-095/YT-102 research documents. After the [DX audit](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-DX-AUDIT.md), the
 owner selected the next bounded implementation: avoid the fixed natural-exit
 wait without weakening process ownership or cleanup. Implementation and focused
 verification pass. Independent Reviewer `/root/yt102_completion_latency_review_oct20`

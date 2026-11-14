@@ -9,7 +9,7 @@ No backlog status or release inclusion changes in this follow-up.
 Historical delivery note: this record describes the naming patch subsequently
 committed as `8c8fba3ae2e84c7493d56b74d0ccc8d8f26920ed`. Its uncommitted state
 and generator limitation below describe that reviewed snapshot. The owner then
-selected a separate [generator source-closure repair](YT-102-GENERATOR-SOURCE-CLOSURE.md);
+selected a separate [generator source-closure repair](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-SOURCE-CLOSURE.md);
 original naming/verification/FAIL/PASS results remain unchanged.
 
 ## Authority and baseline

@@ -6,8 +6,8 @@ Date: 2026-10-18 (Asia/Taipei).
 
 The owner explicitly requested Windows Vite pair-supervisor verification through
 WebCodex, followed by independent Reviewer review. This supplements the
-[CLI implementation](YT-102-CLI-IMPLEMENTATION.md) and
-[doctor follow-up](YT-102-DOCTOR-VERIFICATION.md).
+[CLI implementation](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-CLI-IMPLEMENTATION.md) and
+[doctor follow-up](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-DOCTOR-VERIFICATION.md).
 
 The source of truth is `$REPO`, branch
 `feat/yt090-configuration`, HEAD `a883469862c5be3d88b7fe22262e10be8b53b92a`
@@ -94,7 +94,7 @@ local-final.json in the local evidence directory. Local HEAD and index are prese
 ## Boundary
 
 This is bounded CLI process-lifecycle verification. A subsequent
-[Windows browser CSS HMR check](YT-102-WINDOWS-HMR-VERIFICATION.md) records the
+[Windows browser CSS HMR check](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-WINDOWS-HMR-VERIFICATION.md) records the
 separate generated-app browser evidence. Wider generated asset/runtime
 qualification, MSVC native execution, publication and
 production readiness remain separate. YT-102 broader DX research stays Todo;

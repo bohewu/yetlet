@@ -2,9 +2,24 @@
 
 Date: 2026-10-18 (Asia/Taipei). Task: YT-102, accepted CLI contract and authorized local implementation slice.
 
-- **Current implementation:** the [CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory) describes the revised working-tree CLI. [Implementation evidence](YT-102-CLI-IMPLEMENTATION.md) separates native Linux tests, subsequent selected Windows GNU verification, MSVC compile-only evidence and remaining release/generator limits.
-- **Accepted revised design:** implementation was explicitly authorized after independent design review. The latest user direction makes `new --vite` imply `--settings`; plain new retains the runtime module opt-in. The [design verification record](YT-102-CLI-CONTRACT-VERIFICATION.md) preserves prior revisions.
-- **Remaining qualification:** [selected native Windows GNU lifecycle cases](YT-102-WINDOWS-VITE-VERIFICATION.md) now have direct evidence; [current generator compatibility](YT-102-GENERATOR-COMPATIBILITY.md) records the separately extended local-source representation, with [native Windows GNU generator verification](YT-102-WINDOWS-GENERATOR-VERIFICATION.md) for the four current service profiles. Additional platform/runtime and registry release qualification remain open. The subsequent [DX audit](YT-102-DX-AUDIT.md) reconciles the broader research deliverables; independent Reviewer PASS completes YT-102 at research-only scope. Public release stays blocked.
+- **Present distribution:** the [CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory)
+  describes current public CLI behavior; the independent [CLI 0.4.0 release](CLI-040-HOSTED-RECORD.md)
+  and [SDK alpha.8 release](ALPHA8-HOSTED-RECORD.md) establish verified distribution,
+  rather than the original unpublished 2026-10-18 implementation checkpoint.
+- **Original contract design:** this settings-first grammar superseded the earlier
+  `dev` naming and opt-in flags, with `new --vite` implying Settings while
+  plain Native remains simple. The original source-only grammar and acceptance
+  tests are recoverable in fixed local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`.
+  The retained [YT-102 audit](YT-102-CLI-CONTRACT-AUDIT-20261018.md) documents
+  the original linked-dotenv F-01 mismatch; later accepted fixes are not a
+  retroactive PASS for that earlier inspection.
+- **Source-qualified operating limits:** the [native Windows Rust/Vite proof](YT-102-WINDOWS-VITE-VERIFICATION.md),
+  [Linux completion and cleanup proof](YT-102-COMPLETION-LATENCY.md),
+  [rolling asset qualification](YT-103-ROLLING-ASSET-VERIFICATION.md)
+  and [current generator matrix](CLI-GUIDE.md#current-generator-source-matrix)
+  remain bounded by actual source, toolchain, host, process owner, strict CSP,
+  frozen locks and application/deployment-owned resources. No broad native
+  platform, browser, HA or production promise follows.
 
 ## Accepted SDK resolution extension — 2026-11-10
 
@@ -15,9 +30,13 @@ The Owner authorized the [Phase B source implementation](YT-247-SDK-VERSION-RESO
 It supersedes source-only new and deferred app-lock descriptions below for this
 checkout: successful new resolves a compatible registry SDK, writes exact pins,
 generates an app Cargo.lock and records provenance before publication. Build,
-run and watch retain their frozen lock behavior. These additions are now
-distributed in [CLI 0.3.0](CLI-030-HOSTED-RECORD.md); the separately pinned Reader
-Edition remains SDK alpha.6 / CLI 0.2.0. Earlier releases retain their own behavior.
+run and watch retain their frozen lock behavior. These capabilities first shipped in
+[CLI 0.3.0](CLI-030-HOSTED-RECORD.md); that checkpoint's Reader Edition had
+the older SDK alpha.6 / CLI 0.2.0 pair. The **current selected Reader Edition**
+is SDK `0.9.0-alpha.8` / CLI `0.4.0` (see `site/pages.toml`), and the
+[CLI 0.4.0 publication](CLI-040-HOSTED-RECORD.md) additionally qualifies the
+finite generated-startup policy. Earlier releases keep their exact source-
+bound behavior; the CLI's own source snapshot does not float with app SDK.
 
 ## 1. Historical starting implementation and authority
 
@@ -236,7 +255,7 @@ A release-facing `new` emits the CLI release's qualified crate/version declarati
 
 ### Opt-in browser-only target — YT-104
 
-The [browser starter contract](YT-104-BROWSER-STARTER.md) adds public
+The [browser starter contract](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-104-BROWSER-STARTER.md) adds public
 `cli.target = "browser"`; absent target keeps `native`. Existing commands and
 the shared Loader are reused. `yetlet new tasks --template browser
 --tailwind` selects the finite browser starter and persists that execution target.
@@ -279,9 +298,15 @@ frontend supervisor owns Vite and all compiler descendants; cancellation aborts
 the active build, closes the listener and removes owned temporary generations.
 No installs, native backend, state restoration or production HMR are introduced.
 
-[Implementation/evidence](YT-112-IMPLEMENTATION.md) remains In progress pending
-independent review and real-browser/lifecycle proof. The native command behavior
-below remains unchanged.
+The original YT-112 implementation checkpoint was **In progress** pending
+browser and lifecycle proof; the later corrected Linux watch/browser run and
+independent follow-up Reviewer passed within its limited source/host scope.
+The original implementation and failed runtime checks are recoverable at
+fixed local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`.
+The following table records the dated CLI contract implementation boundary;
+its earlier `new` statement without SDK lock generation is **superseded** by
+the published CLI 0.4.0 resolver, exact pins/lock/receipt and startup policy in
+the [current guide](CLI-GUIDE.md#sdk-resolution-yt-247).
 
 | Command | Result/effects and success boundary |
 |---|---|
@@ -301,7 +326,7 @@ and DOM across accepted development HMR updates, with disposal of old listeners.
 User-defined JavaScript and TypeScript files may use normal frontend-relative
 imports and subdirectories without registration. Physical root confinement and
 private/tooling-file refusals remain. The CLI owns configured run/stop/build;
-Vite owns HMR. [Implementation and integration evidence](YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
+Vite owns HMR. [Implementation and integration evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
 records the state boundary, tested edits/restores and remaining scope.
 
 With Rust watch disabled, the pair supervisor uses bounded frontend readiness, native signal ownership, stage attribution and cleanup of both owned trees. Current native Linux tests cover failure, cancellation, descendants and PTY restoration; [native Windows GNU evidence](YT-102-WINDOWS-VITE-VERIFICATION.md) covers six selected real Vite/Rust cases for startup, failure, C/BREAK, port collision and disabled auto-start. In that non-watch mode, child failure must stop/reap the other owned tree; cleanup uncertainty is failure. Native Windows console/headless limits remain explicit; compile-only evidence cannot prove lifecycle support. Manual frontend startup and the current two-terminal fallback remain usable when automatic startup is disabled. Windows cross-compilation alone does not satisfy the native qualification gate.
@@ -352,7 +377,7 @@ Vite or a frontend build. Legacy dev bridge, standalone Tailwind, edited/general
 apps and unknown dependencies/layouts remain refused. Runtime token handling,
 sanitized three-context exports, bounded public inputs and no-overwrite remain
 unchanged. Actual evidence and remaining qualification are in the
-[compatibility record](YT-102-GENERATOR-COMPATIBILITY.md).
+[compatibility record](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-COMPATIBILITY.md).
 
 ## 6. Grammar, diagnostics and process contract
 
@@ -422,9 +447,9 @@ Rows describe the intentional migration. Current evidence and uncovered qualific
 
 ## 9. Remaining work
 
-The user explicitly authorized this CLI implementation and independent review. This authorization supersedes the former documentation-only next-step proposal. Current source-matched evidence is in [YT-102 implementation](YT-102-CLI-IMPLEMENTATION.md); prior design reviews remain historical evidence.
+The user explicitly authorized this CLI implementation and independent review. This authorization supersedes the former documentation-only next-step proposal. Current source-matched evidence is in [YT-102 implementation](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-CLI-IMPLEMENTATION.md); prior design reviews remain historical evidence.
 
-Selected native Windows GNU startup/cancellation/cleanup has [direct bounded evidence](YT-102-WINDOWS-VITE-VERIFICATION.md). The current generator local-source extension has its own [compatibility evidence](YT-102-GENERATOR-COMPATIBILITY.md) and [native Windows GNU verification](YT-102-WINDOWS-GENERATOR-VERIFICATION.md) for the four current service profiles; additional platform/runtime qualification, registry-only source/export representations, usable registry templates and release qualification remain open. Rust watch/recompile/restart is an explicit settings-controlled mode with the boundaries above; arbitrary proxy/auth/actions/multi-page bridging and alternative provider registries stay deferred. YT-102's subsequent [journey audit](YT-102-DX-AUDIT.md) records measured empty-target/warm/change-feedback costs, a prioritized DX roadmap and extension boundaries. Independent Reviewer PASS completes YT-102 at research-only scope; no proposed improvement is implemented by that report. YT-103 rolling asset retention and M20/YT-020 release remain separate. No commit, publication or deployment is implied.
+Selected native Windows GNU startup/cancellation/cleanup has [direct bounded evidence](YT-102-WINDOWS-VITE-VERIFICATION.md). The current generator local-source extension has its own [compatibility evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-COMPATIBILITY.md) and [native Windows GNU verification](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-WINDOWS-GENERATOR-VERIFICATION.md) for the four current service profiles; additional platform/runtime qualification, registry-only source/export representations, usable registry templates and release qualification remain open. Rust watch/recompile/restart is an explicit settings-controlled mode with the boundaries above; arbitrary proxy/auth/actions/multi-page bridging and alternative provider registries stay deferred. YT-102's subsequent [journey audit](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-DX-AUDIT.md) records measured empty-target/warm/change-feedback costs, a prioritized DX roadmap and extension boundaries. Independent Reviewer PASS completes YT-102 at research-only scope; no proposed improvement is implemented by that report. YT-103 rolling asset retention and M20/YT-020 release remain separate. No commit, publication or deployment is implied.
 
 ## Optional application-owned CSS integration — YT-239 working tree
 

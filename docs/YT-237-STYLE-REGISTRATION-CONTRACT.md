@@ -466,7 +466,7 @@ The current asset experiment still uses `Cache-Control: no-store`; this
 contract does not silently enable immutable caching. Hashing does not guarantee
 old-file availability. Deployment owners must retain the complete old asset
 graphs needed by old HTML/lazy code throughout cache, rollout and rollback
-lifetimes. Keep [YT-103](YT-103-ROLLING-ASSET-PLAN.md) separate. No automatic
+lifetimes. Keep [YT-103](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-103-ROLLING-ASSET-PLAN.md) separate. No automatic
 cache cleanup, HA, rolling deployment, source export or container qualification
 is granted by a generated CSS filename.
 

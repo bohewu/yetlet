@@ -57,7 +57,7 @@ CI and live readback remain the public-delivery gates.
 [CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) separate CLI build SDK,
 immutable source snapshot and template identity from the generated app's selected
-registry SDK. [Phase A handoff](YT-247-PHASE-A-HANDOFF.md) retains the design review
+registry SDK. [Phase A handoff](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md) retains the design review
 and PR #68 delivery; the [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
 reports resolver/cache/locking tests and six real registry compile combinations.
 These additions are now distributed in CLI0.3.0. The later [Windows supplement](YT-247-WINDOWS-VERIFICATION.md)
@@ -845,22 +845,17 @@ PASS has zero issues or required followups. The earlier executor dispatch reject
 and current-session implementation remain explicit. No forms runtime, keyed/reactive
 ownership rewrite or release-candidate requalification is implied.
 
-YT-111 is **Done** at the selected
-[read-only project inspection scope](YT-111-IMPLEMENTATION.md), using the existing
-public Loader and a separate `inspect` schema while preserving environment-only
-doctor. Independent Reviewer follow-up `wc_job_42fZ6Oced30fFBOS` PASS closes the
-initial DEL-escaping P2; targeted regression and required checks pass.
-YT-112 is **Done at the selected Linux scope** under the owner-selected
-[browser development-loop amendment](YT-112-IMPLEMENTATION.md): explicit watch,
-serialized frozen WASM generations, full reload and Vite-owned TS/CSS updates.
-The retained original Reviewer FAIL identified module-routing and runtime-proof
-gaps. The precise JS `?import` correction now passes all ten focused Linux
-browser/lifecycle groups, including HMR, recovery, queued edits, active-build
-cancellation and production build/static preview with cleanup. Independent
-follow-up Reviewer `wc_job_8jX83hMPaed3M1xI` PASS has zero issues or required
-followups. Prior failures remain preserved; new Windows browser-watch execution
-and release qualification are not implied.
-
+**YT-111–112 developer workflow completion:** Done at separately reviewed
+read-only CLI `inspect` project/Loader scope and selected Linux browser-only
+Rust edit/build/reload scope. `doctor` remains environment-only; Vite owns
+TS/CSS HMR, while Rust/Wasm changes use serialized source-hashed builds
+and an application-owned full reload, **not** arbitrary persistent Rust state.
+The original YT-112 Reviewer FAIL on module routing/runtime evidence was
+corrected and accepted on source-matched Linux; new Windows browser-watch
+execution and current release qualification were not implied. Current
+[CLI guide](CLI-GUIDE.md#historical-cli-and-developer-loop-qualification)
+and [Browser app](BROWSER-APP.md) own usage; full original tests and
+reviewers remain at fixed local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`.
 ## M19–M20 — Product readiness and release qualification (planned)
 
 The owner restored five previously discussed but never registered work items.
@@ -961,17 +956,13 @@ reads/updates, conflicts, restart and cleanup on one local volume, with independ
 Reviewer PASS. No core/browser dependency, IdP
 resource, registry, multi-host or production HA claim is added.
 
-**YT-104 browser-only starter (2026-10-19, bounded Done):** the
-[minimal contract and evidence](YT-104-BROWSER-STARTER.md) reuse existing CLI
-commands, `new --template browser` and public execution settings for a Rust/WASM
-task list.
-Linux native/Chrome desktop/mobile and a separate dist-only static host pass.
-Source-matched Windows GNU CLI creation/build/run/console Ctrl-C and cleanup
-pass. Original Reviewer `/root/yt104_browser_review_oct19` and template-amendment
-Reviewer `/root/yt104_template_closeout_review_oct19` both PASS with zero issues
-or required followups. Native SSR remains the default; no router,
-backend service, HMR, production hosting or release is selected.
-
+**YT-104 browser-only starter (2026-10-19):** Done at finite CLI-created
+Rust/Wasm task-list and static-host scope: separately selected Linux
+Chrome/desktop/mobile and native Windows GNU create/build/run/cleanup
+cases were accepted after independent review. No native router/backend,
+universal HMR, production hosting or release was selected. The
+[current browser app guide](BROWSER-APP.md) owns supported commands;
+the original 2026-10-19 evidence remains at fixed local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`.
 **YT-105 form-binding comparison (2026-10-19, research only):** the first
 [Admin/Todo study](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-105-FORM-BINDING-RESEARCH.md) measures control/value/event
 glue and recommends documenting native action-time drafts versus graph-owned
@@ -1077,86 +1068,37 @@ independent Reviewer PASS. Research does **not** implement a unified dev command
 make Node/Vite mandatory, authorize process automation, or alter production
 runtime/CSP, release or deployment.
 
-The 2026-10-18 [CLI contract](CLI-CONTRACT.md) now has an explicitly authorized
-[local implementation slice](YT-102-CLI-IMPLEMENTATION.md). The earlier
-[design-only verification](YT-102-CLI-CONTRACT-VERIFICATION.md) remains historical.
-Current Linux tests and Windows cross-compilation do not close native Windows
-qualification, broader DX research, registry release or new generator formats.
-The subsequent 2026-10-20 [DX audit](YT-102-DX-AUDIT.md) reconciles those research
-deliverables: current journey map, retained platform evidence, bounded Ubuntu
-empty-target/warm/change-feedback observations, prioritized proposals and DX
-extension boundary. Fixed cleanup latency is the first bounded code candidate;
-no improvement is implemented. Independent Reviewer
-`/root/yt102_dx_audit_review_oct20` PASS has zero issues or required followups;
-YT-102 is Done at research-only scope.
+**YT-102 CLI implementation, developer workflow and diagnostics:**
+Accepted original 2026-10-18 contract and authorizations introduced
+short settings-first CLI grammar, environment-scoped doctor, source-constrained
+scaffolds/generators, Vite ownership and selected native process supervision.
+The separately reviewed DX audit retained Cargo, Watchexec and Vite and
+documented first-use setup rather than adding a general new runtime.
+The selected dotenv symlink escape was subsequently corrected; the
+historical [CLI source audit](YT-102-CLI-CONTRACT-AUDIT-20261018.md)
+retains its original F-01 finding and cannot certify later bytes.
 
-**YT-102 Linux completion latency (2026-10-20, separately authorized):** the
-[bounded implementation](YT-102-COMPLETION-LATENCY.md) skips natural-exit grace
-only after an exited leader and exact retained-child/single-thread observation.
-Other children, unavailable inspection and cancellation retain existing waits;
-the leader stays pinned through all group signals and full cleanup still runs.
-Focused foreground/CLI tests and warm-build/PTY observations pass. Independent
-Reviewer `/root/yt102_completion_latency_review_oct20` PASS has zero issues or
-required followups; the bounded slice is complete. No public CLI/settings or
-Windows change. The subsequently requested native Windows MSVC followup in the
-same record verifies build/run, real console C/BREAK, native statuses and
-descendant cleanup; all six default cases have passing evidence across the
-initial invocation and a focused rerun after one environment-only correction.
-The same record adds a native Windows warm-build baseline: CLI median 267 ms
-versus direct Cargo 225 ms across three alternating pairs. Retain this bounded
-baseline for unrelated changes and revisit relevant Windows process/toolchain
-changes or reported regressions; no mandatory recurring benchmark is added.
-The subsequent documentation slice adds the CLI guide's compact native/Vite/
-browser first-use prerequisite table and preparation order, with explicit
-OpenSSL, initial-assets and doctor-scope boundaries. It changes no tool or
-runtime behavior. Docs/whitespace checks and the focused Markdown table-rendering
-check pass; independent Reviewer `/root/yt102_first_use_guide_review_oct20`
-followup PASS has zero issues or required followups after the recorded table fix.
-The following documentation slice records existing settings-selection order
-and native/browser execution decisions in the CLI guide. It preserves the
-shared Loader and public/secret boundary. Docs, rendered-table and whitespace
-checks pass; independent Reviewer `/root/yt102_settings_decisions_review_oct20`
-PASS has zero issues or required followups.
-The following [safe settings-error research](YT-102-SETTINGS-ERROR-RESEARCH.md)
-recommends an optional private three-group mapping over existing Loader errors
-and CLI guards. It introduces no implementation or new shared contract;
-research checks pass. Independent Reviewer
-`/root/yt102_settings_error_research_review_oct20` PASS has zero issues or
-required followups; implementation remains an owner decision.
-After research commit `b07e630`, the owner selected its
-[minimal CLI implementation](YT-102-SETTINGS-ERROR-RESEARCH.md#selected-cli-implementation-2026-10-20):
-private fixed source/profile/values hints, existing Loader and unchanged
-exit/channel/source boundaries. Focused native tests and docs/lint checks pass;
-independent Reviewer `/root/yt102_settings_error_impl_review_oct20` PASS has
-zero issues or required followups. Historical Windows, browser and
-performance evidence is retained without rerunning unrelated matrices.
-
-**YT-103, opt-in HA and rolling asset compatibility:** independently of the
-YT-102 developer workflow study, follow YT-101 with an application/deployment
-strategy for multi-replica readiness/draining and for older SSR pages that still
-request versioned CSS, JavaScript or lazy imports during and after a rolling
-update. Compare object storage/CDN, a separate static asset service and a bounded
-multi-version image approach before selecting a provider-neutral contract.
-A future task execution must demonstrate two-version K3s rolling replacement,
-old-tab lazy loading, rollback, a single-Pod disruption, retention and eventual
-safe cleanup using real HTTP/browser evidence with measured 404/5xx outcomes and
-independent Reviewer PASS. This registration authorizes **no** deployment,
-provider integration, core coupling, release or production HA claim; YT-096
-continues to record unsupported guarantees unless explicitly included in its
-owner-approved supported candidate.
-
-**YT-103 local closeout (2026-10-18):** the [reviewed plan](YT-103-ROLLING-ASSET-PLAN.md)
-and [qualification record](YT-103-ROLLING-ASSET-VERIFICATION.md) close the item at
-bounded local scope. Two actual builds used an independent static-service union;
-held Chrome pages loaded their original lazy JS/CSS after update and rollback.
-All 2,364 measured SSR requests succeeded through app rollouts and one graceful
-Pod deletion; an eight-second request completed after SIGTERM. Protected retention,
-explicit pin removal, expiry and exact resource cleanup passed. Independent
-Reviewer `/root/yt103_plan_review` returned PASS with zero issues/followups.
-Post-roll app placement occupied two nodes; node/host/zone failure availability
-and production HA remain unqualified. Core, CLI and generator runtime sources
-are unchanged. M19 reference applications and the release gates remain open.
-
+A further independently reviewed [Linux completion-latency improvement](YT-102-COMPLETION-LATENCY.md)
+skips the fixed 500ms grace only after safe WNOWAIT, single-thread and
+retained-child checks; failure/cancellation preserves the full cleanup.
+Selected native Windows GNU/MSVC build, signal/process/console and
+[Vite pair evidence](YT-102-WINDOWS-VITE-VERIFICATION.md) remains
+host/source-specific, not a general browser/production test.
+Source-selected project inspection and Rust Watch/Vite HMR now appear
+in the [current CLI guide](CLI-GUIDE.md#historical-cli-and-developer-loop-qualification).
+Original implementation logs, failed attempts and verification are
+recoverable from fixed local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`; no fresh product tests
+were performed for documentation consolidation.
+**YT-103 opt-in rolling asset retention (2026-10-18):** Accepted at one
+bounded local deployment laboratory, not as a new Yetlet Core/CLI generator
+or production HA guarantee. Independently built v1/v2 sources and a static
+asset union retained old-tab lazy JS/CSS through update and rollback.
+All 2,364 measured SSR requests and one held eight-second request
+completed through the selected K3s rollout/SIGTERM sequence; source
+checks, fail-closed missing/private assets and owned cleanup were recorded.
+Node/host/zone failure availability, CDN longevity and general rolling
+deployment remained unverified. See [asset policy](ASSETS.md#cache-and-retention)
+and retained [original qualification](YT-103-ROLLING-ASSET-VERIFICATION.md).
 **YT-104, opt-in browser-only application workflow:** complete the delivery path
 around the existing Rust/WASM DOM and local-state capabilities. First define a
 bounded sample against the current supported DOM subset, then integrate CLI

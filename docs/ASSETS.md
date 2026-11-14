@@ -127,11 +127,17 @@ operators must retain **all** old digest assets needed by old HTML and lazy JS
 through the full cache/rollout lifetime. An in-process snapshot protects current
 requests only until that process exits. Cache expiry cannot repair missing lazy
 chunks after a rollout. [YT-101](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md) qualifies bounded cloud
-delivery of these snapshots. The optional application/deployment-owned
-[YT-103 plan](YT-103-ROLLING-ASSET-PLAN.md) compares retention options, and its
-[local evidence](YT-103-ROLLING-ASSET-VERIFICATION.md) records an independent
-static service retaining two complete build graphs through rollout and rollback.
-That arrangement does not add retention to these templates or core. The snapshot
+delivery of these snapshots. The application/deployment-owned
+[YT-103 local qualification](YT-103-ROLLING-ASSET-VERIFICATION.md) actually
+validated a separate static service containing the complete two-version graph
+union (including late JS/CSS) through update, rollback, one Pod termination
+and old-tab lazy imports. All 2,364 measured SSR responses succeeded in that
+specific local K3s source/run and an eight-second held request completed after
+SIGTERM; missing/private-file handling, image identity and cleanup remained
+bounded. The original provider comparison and deployment-plan history are
+recoverable at fixed local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`.
+No production HA, node/zone failover, CDN retention guarantee or automatic
+snapshot retention is provided by Yetlet's generators or core. The snapshot
 caveat also applies to a digest URL produced by the unchanged YT-091 template.
 
 ## Extraction decision and next boundary

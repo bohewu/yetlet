@@ -6,7 +6,7 @@ Source baseline: `9850820f4ea5e35f5b09e521d8c24e00aa937d89`.
 Evidence root: `artifacts/yt103-rolling-20261018/`.
 
 The owner authorized committing the independently reviewed CLI/watch changes
-and continuing to YT-103. The [reviewed plan](YT-103-ROLLING-ASSET-PLAN.md) selects
+and continuing to YT-103. The [reviewed plan](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-103-ROLLING-ASSET-PLAN.md) selects
 an independent Nginx static/gateway Deployment with verified v1/v2 public assets
 before changing Rust HTML. This is an application/deployment-owned local proof;
 no core, CLI, generator, provider SDK or production default changes are included.

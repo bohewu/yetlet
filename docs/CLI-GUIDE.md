@@ -4,17 +4,44 @@ For registry installation, a native quickstart and the selected release, see the
 [package README](../tools/yetlet-cli/README.md). This guide covers the command
 reference, platform setup, project settings and source maintenance.
 
-See the [CLI contract](https://github.com/bohewu/yetlet/blob/master/docs/CLI-CONTRACT.md) and
-[implementation evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-CLI-IMPLEMENTATION.md).
-The subsequent [DX audit](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-DX-AUDIT.md) compares actual setup,
-build/run/watch, diagnostics, testing and deployment-preview journeys and records
-bounded costs and proposed improvements. Independent Reviewer PASS completes
-YT-102 at research-only scope, with zero issues or required followups. CLI
-behavior and wider qualification remain unchanged.
-The separately selected [Linux completion-latency slice](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md)
-avoids the natural-exit grace only after a conservative single-thread/pinned-child
-check; cancellation and descendant cleanup retain their existing behavior.
-Independent implementation Reviewer PASS has zero issues or required followups.
+Use the [current CLI contract](CLI-CONTRACT.md), [published CLI 0.4.0
+record](CLI-040-HOSTED-RECORD.md) and [published SDK alpha.8 record](ALPHA8-HOSTED-RECORD.md)
+for version and distribution authority. The CLI build SDK, its immutable
+packaged source snapshot and each generated application's selected SDK are
+**different identities**. The default latest resolver, exact `--sdk-version`,
+offline metadata/cache, generated Cargo.lock/creation receipt and finite
+SDK startup capability policy are described below and governed by
+[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md), the retained
+[YT-247 contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
+[YT-259 startup contract](YT-259-CLI-NEW-STARTUP-CONTRACT.md).
+
+### Historical CLI and developer-loop qualification
+
+Original YT-102, YT-104 and YT-111–112 source-only stages were narrower than
+the current published CLI. The implementation, doctor, settings-error,
+frontend dotenv confinement, generator source closure, Watch and HMR research
+and selected Linux/Windows evidence remain recoverable at fixed **local Git**
+`ed7a082b1f9f72430f06866f7d550b0ed9ecbae9` (not verified as publicly
+reachable on GitHub). The [accepted CLI audit](YT-102-CLI-CONTRACT-AUDIT-20261018.md)
+retains its historical F-01 finding, not a current unresolved security claim.
+[Natural-completion latency](YT-102-COMPLETION-LATENCY.md) permits skipping
+the Linux 500ms natural-exit grace only after a narrow WNOWAIT/single-thread/
+retained-child proof; cancellation and descendant cleanup still run.
+The [native Windows Vite pair](YT-102-WINDOWS-VITE-VERIFICATION.md) separately
+qualified its selected GNU process/console cases; compile-only and other
+Windows/browser tests cannot be substituted for that evidence.
+
+`run` with Rust watch rebuilds/restarts its owned native process generation;
+it does **not** preserve arbitrary live Rust process state. Vite owns
+frontend JS/TS/CSS HMR, with application-owned state disposal and bounded
+accepted generation changes; not all edits support hot replacement. Compile
+failure retains a recoverable previous generation only at the tested seams;
+stale assets, failed child cleanup or tool/cache absence must surface as errors.
+For an interactive browser-only project use the [Browser app walkthrough](BROWSER-APP.md);
+for rolling v1/v2 public assets use [ASSETS](ASSETS.md#cache-and-retention)
+and the retained [YT-103 actual qualification](YT-103-ROLLING-ASSET-VERIFICATION.md).
+Source-scoped run/watch/asset proof is **not** production HA, universal platform
+qualification or automatic dependency installation.
 
 <a id="current-command-and-capability-inventory"></a>
 ## SDK resolution (YT-247)
@@ -330,7 +357,7 @@ commands retain their explicit compatible local-source requirements below.
 
 ## Creation choices and settings
 
-YT-104 adds an explicitly selected [browser-only Rust/WASM task starter](https://github.com/bohewu/yetlet/blob/master/docs/YT-104-BROWSER-STARTER.md):
+YT-104 adds an explicitly selected [browser-only Rust/WASM task starter](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-104-BROWSER-STARTER.md):
 `yetlet new tasks --template browser --tailwind`. This persists
 `cli.target = "browser"` and includes Vite/public settings, with no native
 server or app-runtime settings/secret crate. Existing `build`/`run` then manage
@@ -593,7 +620,7 @@ explicit compatible local Cargo path overrides and separately prepared locks:
 | `new NAME --service --vite` | Settings implied; accepted with the validated Production Vite asset graph |
 | `new NAME --service --vite --tailwind` | Accepted with the pinned official plugin and validated Production Vite asset graph |
 
-The separate [2026-10-22 source-closure repair](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-GENERATOR-SOURCE-CLOSURE.md)
+The separate [2026-10-22 source-closure repair](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-SOURCE-CLOSURE.md)
 adds only six exact reviewed Config/Secrets source files, including Config's
 explicitly declared example. Settings profiles declare 20 framework-context
 files; plain service retains 14. These public source files are distinct from
@@ -615,7 +642,7 @@ Watch, auto_start and auto_build never execute during generation. Docker's
 inventory adds `app-src-source-paths` so a configured `frontend/dist` or custom
 root can be explicitly exported to canonical `dist/`. Follow the generated
 Docker README's physical allowlist/hash instructions. See the
-[compatibility evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-GENERATOR-COMPATIBILITY.md).
+[compatibility evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-COMPATIBILITY.md).
 
 Generators retain their separately qualified, **unedited legacy local-source**
 representation, consistent app lock and source revalidation. Retained internal
@@ -667,7 +694,7 @@ The CLI owns configured startup, stop/cleanup and build orchestration. Vite owns
 module compilation, dependency tracking and HMR. Frontend JS/TS files may use
 custom names and subdirectories without registration; physical root confinement
 still refuses private/tooling files and outside links. The default entry remains
-`app.ts`. [Integration evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
+`app.ts`. [Integration evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
 separates the earlier Windows browser checks from the current Linux follow-up.
 
 ```powershell
@@ -719,9 +746,9 @@ ENV, tokens or resolved absolute roots. Invalid selection/settings uses exit 1,
 empty stdout and safe stderr, including existing source/profile/values hints;
 `--json` does not alter error formatting. Usage failures use exit 2.
 
-The [inspection record](https://github.com/bohewu/yetlet/blob/master/docs/YT-111-IMPLEMENTATION.md) retains its
+The [inspection record](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-111-IMPLEMENTATION.md) retains its
 source-bound acceptance evidence. The separate
-[browser-loop record](https://github.com/bohewu/yetlet/blob/master/docs/YT-112-IMPLEMENTATION.md) records completed Linux
+[browser-loop record](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-112-IMPLEMENTATION.md) records completed Linux
 edit/error/recovery and lifecycle acceptance. New Windows browser-watch execution
 remains Not verified; the separate earlier Windows CLI evidence does not cover it.
 
@@ -747,7 +774,7 @@ parser/IO/Serde errors. The existing Loader, validation order, exit 1/stderr and
 caller wrappers remain intact, including generator rejection before output.
 Unexpected Loader errors retain the generic hint; existing browser-capability
 refusals and later TLS-file checks retain their messages. See the
-[research and bounded implementation evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-SETTINGS-ERROR-RESEARCH.md#selected-cli-implementation-2026-10-20).
+[research and bounded implementation evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-SETTINGS-ERROR-RESEARCH.md#selected-cli-implementation-2026-10-20).
 
 Doctor reports schema 1 environment checks only, never application, asset,
 frontend, console, generator or release readiness. Fixed local Rust/Cargo probes
@@ -756,7 +783,7 @@ unavailable executables fail; group-writable toolchain paths are refused on
 Linux. No installation/update, shell, app settings or Node probes occur.
 
 Linux has current native process/PTY/cleanup tests. Current Windows GNU
-[doctor and CLI evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-DOCTOR-VERIFICATION.md) and
+[doctor and CLI evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-DOCTOR-VERIFICATION.md) and
 [Rust/Vite pair evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-WINDOWS-VITE-VERIFICATION.md) supplement
 the separate MSVC compile-only pair checks and
 [native single-Cargo followup](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20).
@@ -785,7 +812,7 @@ backend-environment filtering remain enforced. A fresh document nonce permits
 Vite CSS styles without weakening production CSP. Ctrl-C stops the owned tree
 and removes private generations. Browser `run` stays static preview; `build`
 packages production `dist/`, with no watch artifacts. External path dependencies
-are not automatically watched. The [selected amendment](https://github.com/bohewu/yetlet/blob/master/docs/YT-112-IMPLEMENTATION.md)
+are not automatically watched. The [selected amendment](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-112-IMPLEMENTATION.md)
 records completed Linux browser/lifecycle acceptance and retains the original
 failed attempts. New Windows browser-watch execution remains Not verified;
 historical YT-104 qualification describes the earlier static starter scope.

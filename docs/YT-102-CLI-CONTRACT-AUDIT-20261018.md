@@ -109,7 +109,7 @@ refusal of a linked dotenv file, so their earlier PASS does not close F-01.
   Windows integrated watch used generated console events. The additive `watch`
   command has no fresh native Windows invocation claim. Preserve the recorded
   Linux PTY exit 1 without inventing signal status.
-- **Current generators:** [compatibility evidence](YT-102-GENERATOR-COMPATIBILITY.md)
+- **Current generators:** [compatibility evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-COMPATIBILITY.md)
   separates 110 Linux tests, MSVC compile-only, 14 generated-app tests, actual
   Vite/Docker runtime and exact cleanup. The structural dist fixture is distinct
   from actual producer output. **Native Windows execution of this extension
@@ -120,9 +120,9 @@ refusal of a linked dotenv file, so their earlier PASS does not close F-01.
   explicitly point to the later implementation records. Initial global HEAD or
   suite counts are not presented as current all-platform certification.
 
-Sources inspected include the [doctor record](YT-102-DOCTOR-VERIFICATION.md),
+Sources inspected include the [doctor record](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-DOCTOR-VERIFICATION.md),
 [Windows pair record](YT-102-WINDOWS-VITE-VERIFICATION.md),
-[integrated watch record](YT-102-RUST-WATCH-IMPLEMENTATION.md), and their retained
+[integrated watch record](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-RUST-WATCH-IMPLEMENTATION.md), and their retained
 source manifests/native receipts. No historical failure or qualification limit
 was removed.
 

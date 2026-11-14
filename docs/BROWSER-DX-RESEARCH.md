@@ -70,10 +70,14 @@ CLI, first-app, DOM, opt-in and troubleshooting guides. It also corrects the
 keyed DOM guide's current distribution description while retaining its historical
 delivery text. These are documentation changes, not new capability qualification.
 
-Retain the source/limits of [browser starter evidence](YT-104-BROWSER-STARTER.md),
-[Linux watch acceptance](YT-112-IMPLEMENTATION.md) and the
-[published CLI consumer](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02).
-Older statements in dated records keep their original checkpoint meaning.
+Current instructions belong to the [Browser-only walkthrough](BROWSER-APP.md)
+and [CLI guide](CLI-GUIDE.md#historical-cli-and-developer-loop-qualification).
+The original YT-104 browser starter and YT-112 Linux-only Rust/Wasm loop,
+including the initial module-routing Reviewer FAIL, are recoverable at fixed
+local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`. The
+[CLI 0.4.0 hosted record](CLI-040-HOSTED-RECORD.md) is the current public
+release authority. Earlier [CLI 0.2.0 consumer](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+retains its original source/date, not current distribution status.
 Only affected document checks and independent review are selected for this batch;
 no accepted build, browser, watch or platform check is replayed.
 

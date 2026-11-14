@@ -3,7 +3,7 @@
 Date: 2026-11-10 (Asia/Taipei). **Phase B implemented; independent Reviewer PASS.**
 The Owner accepted the [Contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) after the
-[Phase A delivery](YT-247-PHASE-A-HANDOFF.md), then authorized implementation,
+[Phase A delivery](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md), then authorized implementation,
 independent review and Strict/Builtin guarded Git delivery. This record describes
 checkout source, not a new published CLI. YT-248 is not started.
 

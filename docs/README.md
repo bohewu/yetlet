@@ -66,7 +66,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   and [ADR 0012](adr/0012-server-axum-prelude.md).
 - [YT-247 SDK resolution contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md),
   [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and
-  [Phase A handoff](YT-247-PHASE-A-HANDOFF.md): Owner-accepted version/cache/locking
+  [Phase A handoff](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md): Owner-accepted version/cache/locking
   boundary. The [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
   reports the source implementation, tests and platform limitations.
 - [YT-247 Windows supplement](YT-247-WINDOWS-VERIFICATION.md): actual MSVC
@@ -286,9 +286,15 @@ Git source `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; this is not a public prod
 - [Naming guide](NAMING.md): current Rust/CLI/settings vocabulary, one canonical pre-public Rust API and explicit source migrations. [Audit response](NAMING-AUDIT-20261022.md) records N01–N08 and focused evidence; [the earlier compatibility checkpoint](NAMING-COMPATIBILITY.md) retains its original accepted results and superseded alias decision.
 - [Current capability and API carrier map](CAPABILITIES.md): implemented packages/features, application integrations, research decisions and release inclusion.
 - [M9 API classification and historical supplements](API-CONTRACTS.md) and [Compatibility](COMPATIBILITY.md): the original classification and pre-public stability limits; later packages have separate contracts in the current map.
-- [CLI contract](CLI-CONTRACT.md): accepted settings-first CLI naming, grammar, execution boundaries and intentional migration; see [current implementation evidence](YT-102-CLI-IMPLEMENTATION.md). The [current CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory) remains the executable reference; [YT-102 baseline verification](YT-102-CLI-CONTRACT-VERIFICATION.md) records this documentation slice without completing DX research.
-- [YT-111 and YT-112 DX follow-ups](YT-111-112-DX-SCOPE.md): [read-only project inspection](YT-111-IMPLEMENTATION.md) and [browser-only Rust edit/build/reload](YT-112-IMPLEMENTATION.md) are Done at their selected scopes, with independent reviews and focused Linux runtime proof. Historical registration, failures and unverified Windows browser-watch scope remain explicit.
-
+- [CLI contract](CLI-CONTRACT.md) and [current CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory):
+  published CLI `0.4.0`, settings-first grammar, finite SDK resolution/startup
+  policy and explicit `inspect`, `run/watch` and generator boundaries.
+- [Browser-only app walkthrough](BROWSER-APP.md) and
+  [Browser DX evidence boundaries](BROWSER-DX-RESEARCH.md): project-owned
+  Rust/Wasm build/reload, Vite frontend changes and static preview. Earlier
+  YT-104 and YT-111/112 source-only implementations and their failed tests
+  remain recoverable from local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9` (not verified publicly reachable);
+  Windows browser-watch is not generalized by accepted Linux tests.
 - [YT-115 optional Memory Session/Auth bridge](YT-115-SESSION-AUTH.md): explicit feature, current account mapping, native-form CSRF and real loopback HTTP lifecycle evidence; independent Reviewer PASS.
 - [YT-117 optional rate limiting](YT-117-RATE-LIMIT.md): selected endpoint/group policies, separate configuration reuse and shared per-process budgets, and default-off startup installation; Done at per-process scope after independent Reviewer PASS.
 - [YT-118 Audit study](YT-118-AUDIT-STUDY.md): existing Auth Notes/Admin behavior, transactional business history versus diagnostics, allowlisted event semantics and explicit extraction threshold; Done at docs-only research scope after independent Reviewer PASS; no audit crate/runtime selected.
@@ -347,18 +353,18 @@ Git source `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; this is not a public prod
 - [Opt-in secret providers](SECRET-PROVIDERS.md): asynchronous named string lookup, explicit settings snapshots and constructor/State injection with replaceable providers.
 - [Settings from SecretProvider](SETTINGS-SECRET-PROVIDER.md): opt-in startup resolution into selected protected fields, narrow module settings and fail-closed errors.
 - [Shared SQLite reference](YT-094-SHARED-SQLITE.md): two Compose app replicas accessing one local business-data directory, application conflicts and restart/error behavior.
-- [Doctor follow-up](YT-102-DOCTOR-VERIFICATION.md): authorized Rustup permission repair and source-matched Linux/Windows verification; no change to doctor trust policy.
-- [Windows Vite pair verification](YT-102-WINDOWS-VITE-VERIFICATION.md): source-matched native Rust/Vite lifecycle checks using existing installed tools, with separate execution and review evidence.
-- [Windows browser CSS HMR verification](YT-102-WINDOWS-HMR-VERIFICATION.md): actual generated Rust SSR, rendered CSS updates with retained interaction state, restoration and owned browser/server cleanup.
-- [Historical Windows JS/TS update verification](YT-102-WINDOWS-JS-TS-VERIFICATION.md): pre-implementation TypeScript full-document reload, unsupported plain-JS route, retained recovery limitation and fresh-process restoration.
-- [Vite integration evidence](YT-102-STATEFUL-HMR-IMPLEMENTATION.md): configured CLI run/stop/build, frontend source confinement, current Linux follow-up and historical native Windows browser evidence.
-- [Rust hot-reload research](YT-102-RUST-HOT-RELOAD-RESEARCH.md): existing watch/rebuild/restart tools versus in-process replacement, current CLI integration seams and a bounded future evaluation; no implementation.
-- [Rust watch/restart experiment](YT-102-RUST-WATCH-POC.md): separately authorized Linux Watchexec trial of Rust edit, compile-error recovery and owned process cleanup; no native CLI integration.
-- [Windows Rust watch/restart verification](YT-102-WINDOWS-RUST-WATCH-VERIFICATION.md): source-matched WebCodex trial with compilation-error recovery, actual console keyboard Ctrl-C and owned process cleanup.
-- [Integrated Rust watch](YT-102-RUST-WATCH-IMPLEMENTATION.md): settings-controlled `run`, Watchexec file events, persistent Vite and Linux/Windows lifecycle verification.
-- [Historical CLI generator compatibility — 2026-10-18](YT-102-GENERATOR-COMPATIBILITY.md): source-bound service/settings/frontend verification; see the [current generator source matrix](CLI-GUIDE.md#current-generator-source-matrix) for present acceptance and required source closure.
-- [Generator source-closure repair — 2026-10-22](YT-102-GENERATOR-SOURCE-CLOSURE.md): exact opt-in Config/Secrets export, current profile outputs, negative-source tests and sanitized offline Cargo verification; separate from historical deployment qualification.
-- [YT-103 rolling deployment and retained assets](YT-103-ROLLING-ASSET-PLAN.md): provider comparison, application/deployment-owned retention, rollback and draining assumptions; [local qualification](YT-103-ROLLING-ASSET-VERIFICATION.md) records actual build/runtime evidence and its limits.
+- [CLI diagnosis and developer-loop scope](CLI-GUIDE.md#historical-cli-and-developer-loop-qualification):
+  doctor is environment-scoped, inspect is project-scoped, frontend dotenv
+  and generated assets are confined, and Rust Watch/restart is distinct from
+  Vite's app-owned HMR and source-matched Windows browser checks.
+- [Retained Linux completion safety](YT-102-COMPLETION-LATENCY.md) and
+  [native Windows Vite pair verification](YT-102-WINDOWS-VITE-VERIFICATION.md):
+  process-tree, console and bounded natural-exit evidence with no universal
+  platform or production performance claim.
+- [Rolling static assets](ASSETS.md#cache-and-retention) and
+  [local YT-103 verification](YT-103-ROLLING-ASSET-VERIFICATION.md):
+  application/deployment-owned source-hashed graphs, two-version coexistence,
+  rollback and cleanup, not a framework HA guarantee.
 - ADRs [0001](adr/0001-separation-of-concerns.md), [0002](adr/0002-events-and-actions.md), [0003](adr/0003-renderers-and-loading.md), [0004](adr/0004-request-context-and-middleware.md), [0005](adr/0005-opt-in-capability-modules.md), [0006](adr/0006-handler-first-mvc-optional.md) and [0007](adr/0007-bounded-keyed-dom-and-local-graph.md): retained decisions and tradeoffs.
 
 ## M12–M15 — Rust tooling, CLI and generated deployment artifacts
@@ -414,12 +420,13 @@ and publication are separate from those dated experimental snapshots.
 
 ## Production-oriented reference application
 
-The separate [browser-only task starter](YT-104-BROWSER-STARTER.md) exercises
-YT-104 with settings-selected CLI creation/build/run/stop and static Rust/WASM
-output. It requires JavaScript/WASM and serves without a native Yetlet backend;
-SSR/island defaults remain unchanged. Its qualification record distinguishes
-Linux browser/static-host evidence from native Windows checks.
-
+The separately accepted YT-104 browser task prototype reused CLI
+`new --template browser`, Rust/Wasm local state and static-only build output;
+its Linux Chrome/static host and source-matched Windows GNU scope were
+finite, not production hosting or a native backend. The
+[current browser-only walkthrough](BROWSER-APP.md) owns commands for
+the published CLI and SDK; original YT-104 reviews and failures remain
+recoverable at the fixed local pre-consolidation Git source.
 The [SSR administration reference](../examples/admin-dashboard/README.md) closes
 YT-094 at the selected reference-application scope: CLI-created
 Vite/Tailwind/settings composition over the persisted Lab Operations Board, with
@@ -484,17 +491,15 @@ YT-095 is Done at research-only scope.
 
 ## Library guides
 
-The [YT-102 developer workflow audit](YT-102-DX-AUDIT.md) reconciles current
-CLI/settings/tool responsibilities and retained platform evidence. Bounded
-Ubuntu measurements identify fixed process-completion waiting and onboarding
-costs; the report proposes minimal improvements and a DX extension boundary
-without changing implementation. Independent Reviewer PASS has zero issues or
-required followups; YT-102 is Done at research-only scope.
-The subsequent [Linux completion-latency slice](YT-102-COMPLETION-LATENCY.md)
-implements one separately selected improvement with targeted process/CLI tests
-and bounded warm-build/PTY observations. Independent implementation Reviewer
-PASS has zero issues or required followups.
-
+The early developer workflow audit selected the existing CLI, Cargo, Watchexec
+and Vite rather than another general dev-command system. Its only bounded
+process-latency improvement skips a natural-exit grace after a narrow Linux
+child/lifetime proof; ordinary cancellation and cleanup still apply.
+See [current CLI guidance](CLI-GUIDE.md#historical-cli-and-developer-loop-qualification),
+[Linux completion evidence](YT-102-COMPLETION-LATENCY.md) and the
+[preserved CLI contract audit](YT-102-CLI-CONTRACT-AUDIT-20261018.md).
+The original audit and research/verification sequence is recoverable at fixed
+local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`; no product runtime was requalified by document cleanup.
 These module guides describe the consolidated SDK and its practical limits.
 Use source/rustdoc matching the version you consume and Rust 1.99 or newer;
 native SSR needs no browser build. The [API reference](API-REFERENCE.md) covers

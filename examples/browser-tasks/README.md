@@ -107,7 +107,7 @@ cargo clippy --offline --locked --target wasm32-unknown-unknown -- -D warnings
 
 This reference was created by `yetlet new` in a protected temporary parent,
 then moved here and given explicit relative Cargo dependencies and a separately
-prepared lock. Its [contract and evidence](../../docs/YT-104-BROWSER-STARTER.md)
+prepared lock. Its [contract and evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-104-BROWSER-STARTER.md)
 record Linux Chrome desktop/mobile, a separate dist-only static host, native
 Windows GNU CLI build/run/console-stop and independent Reviewer PASS. Done at
 that selected scope; production hosting, Windows browser/MSVC, HMR and durable
@@ -115,6 +115,6 @@ task storage remain outside it. If moving `frontend/` to a different depth,
 keep the CSS `@source` path aligned with the Rust sources as well as updating
 `cli.vite.root`.
 
-The later [YT-112 development-loop amendment](../../docs/YT-112-IMPLEMENTATION.md)
+The later [YT-112 development-loop amendment](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-112-IMPLEMENTATION.md)
 is In progress pending independent review and actual browser/lifecycle validation.
 The original YT-104 qualification above does not attest to browser watch.

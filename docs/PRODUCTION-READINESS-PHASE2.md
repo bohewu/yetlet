@@ -24,7 +24,7 @@ are separate. M21 implementation and research completion does not implement
 all candidate providers. See [release readiness](RELEASE-READINESS.md),
 [current capability map](CAPABILITIES.md) and the [M21 plan](YT-113-123-OPT-IN-CAPABILITIES.md).
 
-The handoff's generator defect is stale: [YT-102 source closure](YT-102-GENERATOR-SOURCE-CLOSURE.md)
+The handoff's generator defect is stale: [YT-102 source closure](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-SOURCE-CLOSURE.md)
 records the bounded repair and independent acceptance. It is excluded here.
 YT-126's documented authorization-check-to-SQL race remains an accepted limit;
 sensitive-write transaction/fencing changes need separate tracking and authority.
