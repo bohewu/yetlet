@@ -58,7 +58,7 @@ The [provider implementation](../crates/yetlet/src/session_redis/store.rs),
 | Mechanism | Unit and scope | Existing behavior / boundary |
 | --- | --- | --- |
 | Session admission | Operations sharing one Store | Bounds backend work and short active-permit waiting; full gate can reject a brief cluster |
-| HTTP admission | Requests sharing an application gate | [Starter/YT-127](YT-127-ADMISSION-OVERLOAD.md) has immediate admission, zero HTTP queue and an application deadline; it is not installed in the Auth workload merely by selecting Session |
+| HTTP admission | Requests sharing an application gate | [Starter/YT-127](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md) has immediate admission, zero HTTP queue and an application deadline; it is not installed in the Auth workload merely by selecting Session |
 | Rate limit | Requests per time/key sharing one budget | [YT-117](YT-117-RATE-LIMIT.md) is independently opt-in and per-process; reuse policy values does not share accounting |
 | Auth / authorization | Verified identity, then application resource/action policy | Infrastructure pressure cannot become anonymous success, login expiry or permission denial |
 

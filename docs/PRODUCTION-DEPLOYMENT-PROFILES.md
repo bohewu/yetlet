@@ -29,13 +29,13 @@ reference implementation; their separate current review returned PASS.
 The user has activated [YT-135 current-schema recovery](YT-135-CURRENT-SCHEMA-RECOVERY.md),
 now **Done at bounded optional reference scope**, with isolated proof/cleanup
 complete and independent Reviewer PASS, zero issues and required followups.
-[YT-136 telemetry collection](YT-136-TELEMETRY-COLLECTION.md) is now separately
+[YT-136 telemetry collection](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-136-TELEMETRY-COLLECTION.md) is now separately
 activated and **Done at bounded optional reference scope**, with proof/cleanup
 complete and independent Reviewer PASS, zero issues and required followups.
-[YT-137 write-outcome/idempotency research](YT-137-WRITE-OUTCOME-IDEMPOTENCY.md) is
+[YT-137 write-outcome/idempotency research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-137-WRITE-OUTCOME-IDEMPOTENCY.md) is
 now **Done at source-bound research scope**, with independent Reviewer PASS,
 zero issues and required followups.
-[YT-138 authorization-to-commit ordering research](YT-138-AUTHORIZATION-COMMIT-ORDERING.md)
+[YT-138 authorization-to-commit ordering research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md)
 is now **Done at source-bound research scope**, after independent Reviewer PASS,
 zero issues and required followups.
 [YT-139 multi-instance authority/recovery](YT-139-MULTI-INSTANCE-AUTHORITY-RECOVERY.md)
@@ -77,28 +77,39 @@ consumer deployment prerequisites where applicable, **not M23 framework/referenc
 Done gates**. No commit, push, public activation or change to existing services
 is authorized by this correction.
 
+## Operational decisions versus research-only candidates
+
+**Neither an optional profile nor completed YT-136–140 research automatically
+activates production services.** The existing
+[Starter operations](../examples/production-starter/README.md) and
+[Phase 2 qualification matrix](PRODUCTION-READINESS-PHASE2.md#final-production-readiness-matrix)
+separate A1 admission/503/504, A2 loopback metrics, source-specific local
+schema-1 restore and C1 version migration from consumer deployment.
+[Bounded telemetry commands](../examples/production-starter/deployment/telemetry/README.md)
+collect only selected successful private metrics and bounded redacted log
+snapshots; failed/stale/oversize reads cannot advance last-good evidence.
+There is **no** mandatory collector, live alert, protected external sink,
+production SLO or globally synchronized trace identity.
+
+YT-137's study selected **no automatic mutation retry or generic idempotency
+middleware**. A create can commit after timeout without acknowledgment;
+Starter/Board operators must reconcile the business result before retrying.
+Only the separate Shop SQLite checkout key gives its scoped business
+deduplication. YT-138 documented an Admin pre-SQL account/policy revocation
+race: a Session/policy reread and SQL commit are **not one transaction**.
+Later [YT-181 commit-time write fencing](YT-181-SENSITIVE-WRITE-CONTRACT.md)
+addresses one explicitly selected application write, **not** general
+cross-store atomic authorization. The earlier YT-181–184 scheduling note
+was never execution authority; use the **separately reviewed**
+[YT-181 implementation](YT-181-SENSITIVE-WRITE-IMPLEMENTATION.md),
+[YT-182 worker evidence](YT-182-TRACING-WORKER-IMPLEMENTATION.md),
+[YT-183 catalog cache evidence](YT-183-CATALOG-CACHE-IMPLEMENTATION.md)
+and [YT-184 Azure restart](YT-184-AZURE-AUTH-SESSION-RESTART.md) for their
+actual, distinct results. Original source/failed/blocked snapshots remain
+in fixed **local Git** `be337ff02826978a9baa1b88ddf85696cb4406b4`,
+not verified as remotely reachable or reproduced by this cleanup.
+
 ## Two proposed profiles
-
-These are optional reference categories and consumer planning guidance.
-Single-instance can bound an initial reusable example; neither category mandates
-hardware, delivery mechanism, storage product or production deployment.
-
-| Optional profile | Topology and authority to describe | Limits to preserve |
-|---|---|---|
-| Single-instance | One application process on one host; business storage and process-local or separately selected Session authority | Host/process/storage failure and maintenance behavior. Memory Session restart loss can require re-login/form reload. No failover or HA claim |
-| Multi-instance | N replicas; distinguish same-host/cross-host placement and every business-data, Session and account/policy authority | Cross-replica consistency and identity freshness need a concrete integration. Shared Valkey is not shared business SQL; replica count or stickiness does not establish synchronization or HA |
-
-Same-host processes share a failure domain; cross-host placement alone does not
-prove failover, quorum, durability or availability. Maintenance downtime is a
-valid reference baseline. Zero downtime, HA and multi-region remain consumer
-choices requiring their own evidence.
-
-The Starter reference retains private loopback access. Anonymous SSR uses
-Session/CSRF; the shared Bearer protects `/api` only. This is not product login or
-a public anonymous SSR service secure by default. `Settings::address` accepts
-**127.0.0.1 only** in all settings profiles. Public access requires an appropriate
-application/access and trusted-edge contract; no reference PASS qualifies it.
-
 ## Concrete Profile fields — selection checkpoint
 
 For repository Done, record exact **development fixture** source/build, versions,
@@ -135,11 +146,11 @@ remain unchanged; no old qualification was rerun or transferred to this input.
 
 | Existing evidence | Exact limit and possible reference delta |
 |---|---|
-| [YT-127 admission](YT-127-ADMISSION-OVERLOAD.md) and [Starter](../examples/production-starter/README.md) | Existing 16 KiB request-body limit, 32 HTTP / 4 SQL permits, zero queues and 5 s response-creation deadline are implemented. TCP/header/response-body limits, runtime/filesystem watchdog and supervisor bounds can be illustrated by the optional YT-133 reference; consumers select their production bounds. 504/disconnect may be followed by a late commit; creates have no idempotency (conditional YT-137) |
-| [YT-128 observability](YT-128-OBSERVABILITY.md) | Default-off `/metrics` has no independent authentication; metrics/probes bypass HTTP admission. An enabled integration must protect edge/control paths and bound scrape/probe access; YT-133/136 may provide reusable examples, while production sinks/alerts remain consumer-owned. Response creation is neither body completion nor durable business success |
+| [YT-127 admission](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md) and [Starter](../examples/production-starter/README.md) | Existing 16 KiB request-body limit, 32 HTTP / 4 SQL permits, zero queues and 5 s response-creation deadline are implemented. TCP/header/response-body limits, runtime/filesystem watchdog and supervisor bounds can be illustrated by the optional YT-133 reference; consumers select their production bounds. 504/disconnect may be followed by a late commit; creates have no idempotency (conditional YT-137) |
+| [YT-128 observability](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md) | Default-off `/metrics` has no independent authentication; metrics/probes bypass HTTP admission. An enabled integration must protect edge/control paths and bound scrape/probe access; YT-133/136 may provide reusable examples, while production sinks/alerts remain consumer-owned. Response creation is neither body completion nor durable business success |
 | [YT-129 capacity](YT-129-LOAD-SOAK-RECOVERY.md) | Historical schema-1/debug/tmpfs, co-located closed-loop clients: 42,043 requests, 45 s sustained phase. Eight clients FAIL at 1.514% rejection / 341.73% CPU, excluded from the passing range; original thresholds stay intact. No evidence transfer to current-v2 release/persistent storage. [YT-134](YT-134-RELEASE-STORAGE-CAPACITY.md) adds separate bounded local measurements; no long-soak qualification |
-| [YT-130 recovery](YT-130-BACKUP-RESTORE.md) | Historical v1/schema-1/debug/ext4, synthetic three-row restore with source writes paused for backup. RPO proxy 41.30 ms, acknowledged-write exposure 39.26 ms and two excluded acknowledged mutations; RTO 52.36 ms only through local cutover eligibility. No current-v2 or production DR/traffic-switch result (YT-135) |
-| [YT-131 compatibility](YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions) | Actual 25 tests and 26-response data/migration matrix preserve the existing Issue API and add schema-2 status index/API. Old live v1 becomes unready but still writes: remove/drain before migration. Old restart refuses schema 2. V1-backup rollback loses newer writes; preserve schema 2 and forward-fix after v2 writes (YT-133/135). Reuse unchanged [YT-103 asset proof](YT-103-ROLLING-ASSET-VERIFICATION.md) without recertifying it |
+| [YT-130 recovery](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md) | Historical v1/schema-1/debug/ext4, synthetic three-row restore with source writes paused for backup. RPO proxy 41.30 ms, acknowledged-write exposure 39.26 ms and two excluded acknowledged mutations; RTO 52.36 ms only through local cutover eligibility. No current-v2 or production DR/traffic-switch result (YT-135) |
+| [YT-131 compatibility](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions) | Actual 25 tests and 26-response data/migration matrix preserve the existing Issue API and add schema-2 status index/API. Old live v1 becomes unready but still writes: remove/drain before migration. Old restart refuses schema 2. V1-backup rollback loses newer writes; preserve schema 2 and forward-fix after v2 writes (YT-133/135). Reuse unchanged [YT-103 asset proof](YT-103-ROLLING-ASSET-VERIFICATION.md) without recertifying it |
 | [YT-124 contract](YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md) and [YT-126 Admin adoption](YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md) | Two actual Admin processes already PASS cross-process Auth/login/logout, fresh local policy, fail-closed outage and recovery. Authority is a single-host policy file; Valkey was nonpersistent. No persistence/HA/cross-host-trust qualification (YT-139). Fresh pre-SQL checks do not atomically order revocation against business commit (conditional YT-138) |
 | [Existing OIDC evidence](YT-094-OIDC.md) and [adapter study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-116-OIDC-ADAPTER-STUDY.md) | Real-IdP loopback verification exists. Public HTTPS/trusted proxy, cross-replica callbacks, JWKS refresh and subject-map/account-disable freshness remain target-specific if OIDC is selected (YT-140); no new mandatory Auth product or generic adapter follows |
 
@@ -186,9 +197,9 @@ Do not add validation infrastructure or repeat unchanged accepted proof.
 | **YT-133** / optional Starter single-instance reference / YT-132, YT-127, YT-131 | Reusable private-access configuration/helpers and lifecycle guidance for one Linux/systemd/native-release, SSH/loopback-Nginx/local-SQLite development reference | Minimal implementation/docs, exact source/configuration/fixture limits, isolated focused proof of private listener/control-path protection, selected bounds and actual removal/drain, cleanup and independent Reviewer acceptance. Reference implementation, isolated checks and cleanup complete; correction/reference independent Reviewer PASS, zero issues and required followups | No mandated stack, real production host/operator acceptance, public qualification, generator repair or zero-downtime promise |
 | **YT-134** / optional capacity reference / YT-133, YT-128, YT-129 | [Release/persistent-storage workload contract](YT-134-RELEASE-STORAGE-CAPACITY.md) and bounded concrete-application measurements | Predeclare exact release/schema/storage/resources, dataset, workload/duration and measurement thresholds; retain errors/rejections, CPU/RSS/storage, saturation/recovery, failures and observed passing range. Local measurements, write reconciliation and cleanup complete; independent Reviewer PASS, zero issues and required followups. A multi-instance fixture first needs YT-139 authority-contract acceptance | No qualification of each consumer's hardware/SLO, historical debug/tmpfs promotion, universal req/s or new benchmark framework |
 | **YT-135** / optional retained-data recovery reference / YT-133, YT-130, YT-131 | [Current-schema recovery runbook](YT-135-CURRENT-SCHEMA-RECOVERY.md), backup/restore/upgrade/forward-fix procedures and disposable local proof | Bind exact source/schema/migrations and business rows/index/sequence invariants; consistent backup, fresh restore and bounded cutover/remove/drain/refusal proof, acknowledged-loss accounting and independent review. Current release/schema-2 three-row restore, two deliberately excluded acknowledgments, zero unknowns, missing-index refusal, four-row forward restart and cleanup complete; independent Reviewer PASS, zero issues and required followups. Record fixture recovery timing with its limits. A multi-instance fixture first needs YT-139 recovery-contract acceptance | No real operator DR/RPO/RTO/retention commitment, v1 timing transfer, silent loss approval or arbitrary downgrade |
-| **YT-136** / opt-in telemetry integration / YT-133, YT-128 | [Selected collection contract](YT-136-TELEMETRY-COLLECTION.md) and [bounded CLI reference](../examples/production-starter/deployment/telemetry/README.md), reusing accepted YT-128 | Reuse enabled/disabled/privacy/correlation/fault evidence; verify only new bounded private snapshot/log collection and fresh versus disabled/down/failed/stale observations, retain failure/resource limits and cleanup; optional sink/alert guidance and independent review. Enabled fresh scrape, stopped/disabled failure with unchanged last-good, bounded correlated logs and oversize rejection verified; one acknowledged row reconciled and cleanup complete; independent Reviewer PASS, zero issues and required followups | No mandatory collector, tracing/audit platform, production retention, on-call or alert-delivery operation |
-| **YT-137** / only for a genuine application retry/replay need / YT-132, YT-127 | [Selected application write-outcome/idempotency research](YT-137-WRITE-OUTCOME-IDEMPOTENCY.md) | Starter/Board retain no automatic mutation retry and bounded reconciliation; modular-shop retains its SQLite transaction/owner-key order deduplication within Session/cart/handler scope. Record operation identity, current replay authorization, payload binding, same-authority atomicity, retention/restore and reconciliation limits for any future app-owned replay mechanism; independent Reviewer PASS, zero issues and required followups; six hashes matched. Research Done does not require implementation; any implementation is separately authorized | No production-owner dependency, implied rollback, blind replay or universal retry middleware |
-| **YT-138** / application-owned ordering research / YT-132, YT-124, YT-126 | [Selected authorization-to-commit ordering research](YT-138-AUTHORIZATION-COMMIT-ORDERING.md) | Retain YT-126 pre-SQL race for actual native/triage saves; distinguish independent Session/policy snapshots, revocation acknowledgment, business ordering/commit and response acknowledgment. Conditional shared-authority fencing/serialization must define scope, in-flight/stale writers, failure and recovery; independent Reviewer PASS, zero issues and required followups; six hashes matched. Research Done does not require implementation; stronger strict guarantees and paused-write/revocation proof belong to separately authorized implementation | No production-owner dependency, instant revocation from rereads/local mutex/Session CAS or generic Auth redesign |
+| **YT-136** / opt-in telemetry integration / YT-133, YT-128 | [Selected collection contract](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-136-TELEMETRY-COLLECTION.md) and [bounded CLI reference](../examples/production-starter/deployment/telemetry/README.md), reusing accepted YT-128 | Reuse enabled/disabled/privacy/correlation/fault evidence; verify only new bounded private snapshot/log collection and fresh versus disabled/down/failed/stale observations, retain failure/resource limits and cleanup; optional sink/alert guidance and independent review. Enabled fresh scrape, stopped/disabled failure with unchanged last-good, bounded correlated logs and oversize rejection verified; one acknowledged row reconciled and cleanup complete; independent Reviewer PASS, zero issues and required followups | No mandatory collector, tracing/audit platform, production retention, on-call or alert-delivery operation |
+| **YT-137** / only for a genuine application retry/replay need / YT-132, YT-127 | [Selected application write-outcome/idempotency research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-137-WRITE-OUTCOME-IDEMPOTENCY.md) | Starter/Board retain no automatic mutation retry and bounded reconciliation; modular-shop retains its SQLite transaction/owner-key order deduplication within Session/cart/handler scope. Record operation identity, current replay authorization, payload binding, same-authority atomicity, retention/restore and reconciliation limits for any future app-owned replay mechanism; independent Reviewer PASS, zero issues and required followups; six hashes matched. Research Done does not require implementation; any implementation is separately authorized | No production-owner dependency, implied rollback, blind replay or universal retry middleware |
+| **YT-138** / application-owned ordering research / YT-132, YT-124, YT-126 | [Selected authorization-to-commit ordering research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md) | Retain YT-126 pre-SQL race for actual native/triage saves; distinguish independent Session/policy snapshots, revocation acknowledgment, business ordering/commit and response acknowledgment. Conditional shared-authority fencing/serialization must define scope, in-flight/stale writers, failure and recovery; independent Reviewer PASS, zero issues and required followups; six hashes matched. Research Done does not require implementation; stronger strict guarantees and paused-write/revocation proof belong to separately authorized implementation | No production-owner dependency, instant revocation from rereads/local mutex/Session CAS or generic Auth redesign |
 | **YT-139** / optional multi-instance integration / YT-133, YT-124, YT-126 | [Selected local authority/recovery contract](YT-139-MULTI-INSTANCE-AUTHORITY-RECOVERY.md) and concrete two-Admin fixture | Initial independent contract Reviewer PASS, zero issues/required followups. New exact two-Admin stale-Session restoration/new-epoch test PASS; old credentials denied, fresh identity obeys retained policy, complete current SQL rows/history/sequence/schema and policy equal; four graceful drains and owned cleanup complete. Final independent Reviewer PASS, zero issues/required followups; seven hashes matched. YT-137/138 limits retained; selected-record restoration only | No mandatory database/HA, actual customer recovery topology, shared-Valkey-equals-SQL, coherent per-replica SQLite or safe NFS assumption |
 | **YT-140** / optional OIDC proxy/replica integration / YT-133, YT-116, YT-126 | [Contract-first integration](YT-140-OIDC-PROXY-REPLICAS.md) for trusted origin/proxy, callbacks and identity freshness | Initial independent contract Reviewer PASS, zero issues/required followups. Optional explicit local Settings origin and callback Host/Origin integration implemented; three new exact tests PASS, with single-process two-Board-listener proxy pending consumption/replay proof. Default compile, strict lint/format and owned cleanup complete. Reuse original real-IdP/authority evidence; no new successful token exchange or cross-process Admin OIDC claim. Final independent Reviewer PASS, zero issues/required followups; twelve hashes matched | No new protocol or mandatory identity product, customer's real IdP/TLS/domain deployment, or unchanged old-proof rerun |
 

@@ -14,7 +14,7 @@ zero findings, tree `2c2e6ea89a02dfcc5ba3d1bf6e345521312537fb`; no Push.
 
 Select Board/Admin as **one actual underlying consumer**. Starter's existing
 request spans/subscriber and [YT-123](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-123-TRACING-CORRELATION-STUDY.md) /
-[YT-128](YT-128-OBSERVABILITY.md) provide comparison/evidence; do not modify or
+[YT-128](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md) provide comparison/evidence; do not modify or
 rerun Starter to manufacture a second consumer. No `yetlet-tracing` crate,
 common tracing trait, Core field or extraction claim is selected. Keep native
 Axum/Tower middleware, typed request extensions, `tracing` futures/synchronous

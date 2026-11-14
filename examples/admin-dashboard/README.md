@@ -312,7 +312,7 @@ cross-store fencing or strict write-after-revocation guarantee. See
 [YT-126 adoption record](../../docs/YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md) for review
 status and the exact bounded evidence; this is not production/HA qualification.
 
-The separately activated [YT-138 ordering research](../../docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md)
+The separately activated [YT-138 ordering research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md)
 examines the native/triage save and independent Session/policy authorities,
 distinguishing authorization snapshots, revocation acknowledgment and business
 commit. Its accepted decision retains the existing pre-SQL race for this

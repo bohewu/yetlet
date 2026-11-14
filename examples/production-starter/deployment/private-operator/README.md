@@ -17,8 +17,8 @@ restart. Public TLS, IdP, Valkey, multiple writers and HA are separate choices.
 
 See the [selected reference contract](../../../../docs/YT-133-STARTER-SINGLE-INSTANCE-CONTRACT.md),
 [application instructions](../../README.md),
-[write/deadline limits](../../../../docs/YT-127-ADMISSION-OVERLOAD.md) and
-[schema-2 forward-fix rules](../../../../docs/YT-131-MIXED-VERSION-COMPATIBILITY.md).
+[write/deadline limits](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md) and
+[schema-2 forward-fix rules](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md).
 Historical load, backup, identity and browser evidence is unchanged; this example
 does not rerun or promote it to release/storage/deployment qualification.
 

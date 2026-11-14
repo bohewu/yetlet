@@ -192,8 +192,8 @@ Retain redacted synthetic manifests and observations in ordinary `/tmp` evidence
 
 ## Upgrade and forward-fix rules
 
-Reuse [YT-131's accepted migration/overlap/refusal matrix](YT-131-MIXED-VERSION-COMPATIBILITY.md#observed-compatibility-matrix)
-and [upgrade conditions](YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions).
+Reuse [YT-131's accepted migration/overlap/refusal matrix](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md#observed-compatibility-matrix)
+and [upgrade conditions](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions).
 This exercise does not rerun v1-to-v2 migration. Stop all old writers before
 migration: a live v1 can write after readiness fails. Schema-2 writes require a
 compatible forward fix/restart; no down migration or arbitrary old-binary

@@ -195,7 +195,7 @@ boundary or interrupted-iteration difference from native k6 counts.
 
 ## Sampling, thresholds and completion
 
-Reuse accepted [YT-136 telemetry semantics](YT-136-TELEMETRY-COLLECTION.md) and
+Reuse accepted [YT-136 telemetry semantics](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-136-TELEMETRY-COLLECTION.md) and
 its bounded loopback snapshot command; do not rerun disabled/down/privacy or
 SQL fault proofs. Take non-overlapping metrics/readiness samples about once per
 second with the existing connect/total/watchdog and size bounds, including

@@ -205,7 +205,7 @@ The reusable lifecycle procedure must make these correctness boundaries clear:
    or explicit refusal procedure and test its selected seam. A green empty DB
    is not successful restore. One SQLite DB/WAL and one writer are assumed.
 2. Withdraw business proxy access and existing connections before stop. Readiness
-   false alone is insufficient: [YT-131](YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions)
+   false alone is insufficient: [YT-131](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions)
    proves live v1 still GET/PATCHes after schema-2 migration while readiness 503.
    The reference must identify the access and old-writer scope it actually closes.
 3. Signal and drain HTTP/SQL work; confirm all old writers/processes stopped
@@ -280,10 +280,10 @@ responsibility correction; historical results below retain their own scope.
 
 | Retained source-bound evidence | Limit retained for this selection |
 |---|---|
-| [YT-127](YT-127-ADMISSION-OVERLOAD.md), [YT-128](YT-128-OBSERVABILITY.md) | Local HTTP/SQL/deadline/drain and optional telemetry proof. Old Linux 10.054 s failed-drain exit evidence is not a chosen supervisor deadline or Windows qualification |
+| [YT-127](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md), [YT-128](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md) | Local HTTP/SQL/deadline/drain and optional telemetry proof. Old Linux 10.054 s failed-drain exit evidence is not a chosen supervisor deadline or Windows qualification |
 | [YT-129 B1](YT-129-LOAD-SOAK-RECOVERY.md) | v1/schema-1 debug/tmpfs baseline; eight-client FAIL retained. No v2 release/persistent-storage capacity or soak transfer |
-| [YT-130 B2](YT-130-BACKUP-RESTORE.md) | v1/schema-1 local backup/restore, not v2 recovery qualification or production RPO/RTO/cutover |
-| [YT-131 C1](YT-131-MIXED-VERSION-COMPATIBILITY.md) | Current local accepted v2/schema-2 status-index, migration/refusal and compatibility proof; not selected-host deployment acceptance |
+| [YT-130 B2](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md) | v1/schema-1 local backup/restore, not v2 recovery qualification or production RPO/RTO/cutover |
+| [YT-131 C1](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md) | Current local accepted v2/schema-2 status-index, migration/refusal and compatibility proof; not selected-host deployment acceptance |
 | [YT-103](YT-103-ROLLING-ASSET-VERIFICATION.md) | Unchanged asset proof reused at its original identity/scope; no recertification |
 
 [Generated-service delivery](PRODUCTION-DEPLOYMENT-PROFILES.md#delivery-mechanism-remains-unselected)

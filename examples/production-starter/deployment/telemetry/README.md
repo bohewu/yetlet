@@ -3,8 +3,8 @@
 Status: **Accepted after independent Reviewer PASS**, zero issues and required
 followups, at bounded optional reference scope. This is a Linux developer reference for
 one-shot collection, not an installed collector. Read the
-[bounded contract](../../../../docs/YT-136-TELEMETRY-COLLECTION.md),
-[accepted signal/privacy limits](../../../../docs/YT-128-OBSERVABILITY.md)
+[bounded contract](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-136-TELEMETRY-COLLECTION.md),
+[accepted signal/privacy limits](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md)
 and [private access reference](../private-operator/README.md).
 
 Start the existing app through your selected lifecycle with
@@ -202,7 +202,7 @@ this filter cannot establish audit completeness or make arbitrary logs safe.
 Retain collection time with the bounded snapshot; IDs reset per process.
 
 For sink, alert, diagnostic and retention guidance, see the
-[contract and observation limits](../../../../docs/YT-136-TELEMETRY-COLLECTION.md#diagnosis-and-optional-operations).
+[contract and observation limits](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-136-TELEMETRY-COLLECTION.md#diagnosis-and-optional-operations).
 No Prometheus/promtool, remote sink, real alert delivery, journal retention or log
 rotation service was started or qualified. The exercised result remains pending
 independent review in the linked contract.

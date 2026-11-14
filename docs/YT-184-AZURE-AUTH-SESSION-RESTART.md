@@ -259,7 +259,7 @@ and full SQL reconciliation are all unexecuted. Cleanup and a corrected local
 fixture are separate from those missing proofs. No production/HA/restore or
 cross-host Session qualification is inferred from unit/compile evidence.
 
-The already selected [scheduling bound](YT-181-184-APPLICATION-FOLLOWUPS.md#yt-184-minimum-useful-azure-experiment)
+The already selected [scheduling bound](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-181-184-APPLICATION-FOLLOWUPS.md#yt-184-minimum-useful-azure-experiment)
 and this contract admit one allocation generation; it is spent and deleted.
 A second resource generation requires explicit maintainer continuation approval
 rather than silently replacing this failed one. Keep the same item and canonical

@@ -10,7 +10,7 @@ historical scope. The later authorized implementation is tracked in the final
 section and its separate report; contract selection/invariants remain binding.
 
 The maintainer selects documentation-only contract work after committing the
-four [follow-up planning documents](YT-181-184-APPLICATION-FOLLOWUPS.md) as
+four [follow-up planning documents](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-181-184-APPLICATION-FOLLOWUPS.md) as
 `80d17a4`, strict/builtin Commit Guard PASS, zero findings, tree
 `ec0c4f56603eb703cb15ab6de5787663d7d4245f`; no Push. Preserve native middleware,
 typed State/Extensions and ordinary domain functions. No generic AOP, Auth
@@ -28,7 +28,7 @@ This is one domain commit boundary, not three independent interception systems.
 The chosen guarantee applies to revocation through this **new SQL write
 authority**. It does not strengthen one-Session logout, rotation/expiry, IdP
 logout, policy-file replacement or account disable performed only in the old
-file/Valkey authority. Their documented [YT-138 race](YT-138-AUTHORIZATION-COMMIT-ORDERING.md)
+file/Valkey authority. Their documented [YT-138 race](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md)
 remains. Those paths must not be described as atomic SQL revocation; applications
 requiring that scope would have to integrate it into the same authority under
 a separately selected contract. No currently running code gains this guarantee.
@@ -114,7 +114,7 @@ that happened to start earlier or erasure of already delivered data.
 or timing out the operation. `W_ack` requires known item/history commit. If a
 caller disconnects or loses a result, the worker may still finish; timeout does
 not prove rollback or revoke success. An unknown outcome is not permission to
-retry automatically. Preserve [YT-137 reconciliation](YT-137-WRITE-OUTCOME-IDEMPOTENCY.md)
+retry automatically. Preserve [YT-137 reconciliation](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-137-WRITE-OUTCOME-IDEMPOTENCY.md)
 and current authorization of any follow-up read; no exactly-once, deduplication
 or new idempotency API is selected.
 

@@ -119,12 +119,12 @@ an old namespace, reuse of an epoch, stale policy restore or surviving old write
 breaks the procedure. The application does not detect or prevent those operator
 errors automatically. If they cannot be excluded, keep protected service closed.
 
-This does not upgrade the [YT-138 pre-SQL race](YT-138-AUTHORIZATION-COMMIT-ORDERING.md):
+This does not upgrade the [YT-138 pre-SQL race](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md):
 Session/policy snapshots and SQL commit are separate authorities. Session
 invalidation does not cancel or atomically order previously admitted business
 work. Stopping and draining all old writers is a prerequisite here, not a new
 strict revocation-to-commit implementation. Preserve
-[YT-137 no automatic mutation retry](YT-137-WRITE-OUTCOME-IDEMPOTENCY.md);
+[YT-137 no automatic mutation retry](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-137-WRITE-OUTCOME-IDEMPOTENCY.md);
 no deduplication, exactly-once effect or universal operation ledger is selected.
 
 ## Minimum fixture and exact acceptance sequence

@@ -111,7 +111,7 @@ rejects unknown fields. There is no automatic `.env` discovery.
 - `APP_LOGGING__LEVEL`: `error`, `warn`, `info` (default), or `debug`.
 - `APP_METRICS__ENABLED`: boolean, default `false`; opt-in app-owned Prometheus
   collection at `GET /metrics`. Older settings without this table remain valid.
-  See [YT-128 implementation status and limits](../../docs/YT-128-OBSERVABILITY.md).
+  See [YT-128 implementation status and limits](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md).
 
 For Staging/Production, supply the API secret through the process environment
 from the operator's secret manager. Never copy `.env.development` into images,
@@ -162,7 +162,7 @@ startup transaction; issue fields and existing routes remain compatible.
 Retained v1 binaries refuse schema 2 at startup. Stop/drain v1 before upgrade;
 an already-running v1 can still serve legacy requests despite failing readiness.
 Reload held pages to obtain fresh process-local CSRF sessions. Stale expected
-versions return 409. The [YT-131 compatibility record](../../docs/YT-131-MIXED-VERSION-COMPATIBILITY.md)
+versions return 409. The [YT-131 compatibility record](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md)
 contains actual old/new HTTP/data evidence and the upgrade/rollback procedure.
 Rollback requires a verified schema-1 backup and no unaccounted later writes;
 preserve schema-2 data and forward-fix after new writes. The B2 runbook's schema-1
@@ -191,7 +191,7 @@ an unfinished write is not proof that it failed. Versioned status updates retain
 their expected-version check; reload before deciding whether to retry. A lost
 response, 503 or 504 is not evidence of rollback.
 
-The separately activated [YT-137 contract research](../../docs/YT-137-WRITE-OUTCOME-IDEMPOTENCY.md)
+The separately activated [YT-137 contract research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-137-WRITE-OUTCOME-IDEMPOTENCY.md)
 reviews this unknown-outcome risk alongside other consumers' retry/replay
 behavior, operation identity, authorization, atomicity, retention and recovery.
 The accepted decision retains no automatic mutation retry and makes unresolved
@@ -209,7 +209,7 @@ The grace is a cooperative runtime deadline, not an OS watchdog against a stalle
 runtime. Linux SIGINT/SIGTERM and Windows Ctrl-C/Ctrl-Break are handled. The new
 shutdown behavior has local Linux evidence; Windows execution is not rerun here.
 
-See [YT-127 admission evidence](../../docs/YT-127-ADMISSION-OVERLOAD.md) for normal
+See [YT-127 admission evidence](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md) for normal
 load, overload/recovery, late writes, shutdown and operating limits. TCP connection,
 header/transport and downstream body limits remain deployment responsibilities;
 this application policy is not network DoS protection or a capacity benchmark.
@@ -228,13 +228,13 @@ is explicitly zero, not SQLite lock or blocking-pool wait. HTTP timing ends at
 response creation; detached SQL remains active until its closure finishes.
 Neither measurement proves durable writes. Startup/shutdown remain JSON events.
 
-The [YT-128 record](../../docs/YT-128-OBSERVABILITY.md) lists exact signals,
+The [YT-128 record](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md) lists exact signals,
 configuration, privacy, collection and lifetime limits. This implementation is
 accepted at bounded local A2 scope after concurrent tests, actual localhost fault
 collection and independent Reviewer PASS with zero issues or required followups. No distributed
 tracing or persistent sessions are provided.
 
-The separately activated [YT-136 bounded collection reference](../../docs/YT-136-TELEMETRY-COLLECTION.md)
+The separately activated [YT-136 bounded collection reference](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-136-TELEMETRY-COLLECTION.md)
 adds [optional CLI snapshot/log guidance](deployment/telemetry/README.md), reusing
 the accepted metrics/logging and private-edge evidence. Focused enabled, stopped
 and disabled collection, last-good preservation, correlated log projection and
@@ -327,7 +327,7 @@ Reviewer PASS, zero issues/required followups; eight hashes matched. The load
 point remains FAIL. No app
 optimization or old passing-proof replay is selected.
 
-The [YT-130 backup/restore runbook](../../docs/YT-130-BACKUP-RESTORE.md) records
+The [YT-130 backup/restore runbook](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md) records
 a supported SQLite backup, fresh local restore with exact schema/business-data
 checks, measured RPO/RTO, process-local Session loss, and actual startup refusal
 for an unsupported-schema candidate. Local recovery took 52.36 ms; backup-start

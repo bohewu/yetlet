@@ -1,34 +1,41 @@
 # Production Readiness Phase 2 — bounded application capabilities
 
-Date: 2026-10-23. Status: registration accepted; YT-127 is **Done** at bounded A1 scope; YT-128 is **Done** after independent Reviewer PASS; YT-129 is **Done** at [independently reviewed local load/recovery scope](YT-129-LOAD-SOAK-RECOVERY.md); YT-130 is **Done** at [independently reviewed local restore/runbook scope](YT-130-BACKUP-RESTORE.md); YT-131 is **Done** at independently reviewed local C1 scope.
+Date: 2026-10-23. Status: registration accepted; YT-127 is **Done** at bounded A1 scope; YT-128 is **Done** after independent Reviewer PASS; YT-129 is **Done** at [independently reviewed local load/recovery scope](YT-129-LOAD-SOAK-RECOVERY.md); YT-130 is **Done** at [independently reviewed local restore/runbook scope](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md); YT-131 is **Done** at independently reviewed local C1 scope.
 Independent registration Reviewer PASS, zero issues and required followups. This document consolidates accepted application work and remaining gaps, without claiming production readiness.
 
+## Current operational use and historical evidence
+
+**The Starter reference remains application-owned, not production-certified.**
+The [final A1–C1 matrix](#final-production-readiness-matrix) records the
+original source/host-specific PASS and FAIL populations. For actual run
+settings, trust, SQL and HTTP behavior use the
+[Production Starter guide](../examples/production-starter/README.md),
+[current-schema recovery](YT-135-CURRENT-SCHEMA-RECOVERY.md),
+[private deployment profile](PRODUCTION-DEPLOYMENT-PROFILES.md) and
+[bounded collection guide](../examples/production-starter/deployment/telemetry/README.md).
+
+Specifically, early HTTP/SQL capacity is **32/4 with zero added queues**,
+request deadline **5 seconds**, readiness budget **1 second** and shutdown
+grace **10 seconds**; saturation returns 503, while a 504 or disconnected
+caller **does not cancel a started blocking SQL write** or make retry safe.
+The optional local `/metrics` registry defaults off, is loopback/control-path
+scoped and must not expose raw identity, credentials, URLs or request bodies.
+Source/response time does not imply database commit. The historical B2
+v1/schema-1 ext4 restore deliberately excluded two acknowledged writes;
+its measured recovery windows do **not** select business RPO/RTO or prove
+schema-2 durability. C1 adds schema-2 status indexing and a separate
+versioned API but cannot safely keep writing through an undrained v1 process:
+drain/remove old writers and use forward-fix after new writes, not an
+unproven rolling downgrade. The later [YT-135 schema-2 restore reference](YT-135-CURRENT-SCHEMA-RECOVERY.md)
+has different inputs, storage and tests.
+
+Original detailed A1/A2/B2/C1 execution, rejected alternatives, failed
+attempts, source fingerprints, commands and Reviewer receipts remain in
+**local Git** `be337ff02826978a9baa1b88ddf85696cb4406b4` and the
+ignored original T1–T5 evidence root named below. Local SHA reachability
+does **not** establish that GitHub currently serves those files.
+
 ## Baseline and evidence boundaries
-
-T0 rechecked branch `docs/yt113-123-opt-in-capability-plan`, HEAD
-`5db8b8c61b6d319a641814dff4af493ce3e5d965`, and a clean worktree before these
-three documentation edits. Ignored pipeline observations are local execution
-artifacts. A final repository search found no YT-127–YT-131 references before
-registration. The T0 patch changed this document, [Backlog](BACKLOG.md)
-and [Roadmap](ROADMAP.md); T0 inspected runtime source at the stated baseline.
-Exact pre-edit observations and source SHA-256 identities are retained in
-`.pipeline-output/prod-readiness-phase2-20261023T020406Z/observations/T0/baseline.json`.
-Historical PASS results below retain their original source and environment;
-no historical runtime, browser/CSP or deployment qualification was rerun for T0.
-
-The previously registered backlog has YT-020 **Blocked** and YT-096 **In progress**;
-other existing task rows are Done at their selected scopes. YT-096 D1–D6 remain
-**Pending**, and immutable release candidate `ce56e08` and its original nine
-experimental libraries remain unchanged. M19 remains partial; M20 release gates
-are separate. M21 implementation and research completion does not implement
-all candidate providers. See [release readiness](RELEASE-READINESS.md),
-[current capability map](CAPABILITIES.md) and the [M21 plan](YT-113-123-OPT-IN-CAPABILITIES.md).
-
-The handoff's generator defect is stale: [YT-102 source closure](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-SOURCE-CLOSURE.md)
-records the bounded repair and independent acceptance. It is excluded here.
-YT-126's documented authorization-check-to-SQL race remains an accepted limit;
-sensitive-write transaction/fencing changes need separate tracking and authority.
-
 ## Baseline coverage and gap matrix
 
 All source paths in this table are under `examples/production-starter/` unless
@@ -113,7 +120,7 @@ claims remain excluded. Unchanged historical qualification is reused, not repeat
   admission proves no distributed capacity, rate quota or HA property.
 - **Reviewer gate / state:** Independent diff/consumer/evidence PASS with no
   unresolved P0–P2 findings before acceptance or YT-128. **Done** at bounded A1 scope.
-  [Implementation and local verification](YT-127-ADMISSION-OVERLOAD.md) and independent Reviewer PASS have zero issues and required followups.
+  [Implementation and local verification](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md) and independent Reviewer PASS have zero issues and required followups.
 
 ### YT-128 — A2 Opt-in application observability
 
@@ -134,7 +141,7 @@ claims remain excluded. Unchanged historical qualification is reused, not repeat
 - **Known limitations:** App-owned Prometheus registry and finite labels are implemented and independently accepted at local A2 scope;
   app-local telemetry alone establishes no cross-service tracing or durable audit.
 - **Reviewer gate / state:** Independent diff/consumer/evidence PASS with no
-  unresolved P0–P2 findings before acceptance or YT-129. **Done**. [Local verification and preserved failure history](YT-128-OBSERVABILITY.md): concurrent tests and actual localhost fault/correlation/privacy/recovery/cleanup pass; independent Reviewer PASS, zero issues and required followups.
+  unresolved P0–P2 findings before acceptance or YT-129. **Done**. [Local verification and preserved failure history](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md): concurrent tests and actual localhost fault/correlation/privacy/recovery/cleanup pass; independent Reviewer PASS, zero issues and required followups.
 
 ### YT-129 — B1 Load, soak and recovery qualification
 
@@ -175,7 +182,7 @@ claims remain excluded. Unchanged historical qualification is reused, not repeat
   nonpersistent Valkey proof is not restore qualification. Destination/persistence
   choices remain open; protection/retention and production operations need owners.
 - **Reviewer gate / state:** Independent runbook/data-integrity/failure/evidence
-  PASS with no unresolved P0–P2 findings before acceptance or YT-131. **Done**: [local runbook and fresh restore/refusal evidence](YT-130-BACKUP-RESTORE.md), full schema/data/sequence checks and measured RPO/RTO complete; independent Reviewer PASS, zero issues and required followups.
+  PASS with no unresolved P0–P2 findings before acceptance or YT-131. **Done**: [local runbook and fresh restore/refusal evidence](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md), full schema/data/sequence checks and measured RPO/RTO complete; independent Reviewer PASS, zero issues and required followups.
 
 ### YT-131 — C1 Mixed-version schema, API and asset compatibility
 
@@ -196,7 +203,7 @@ claims remain excluded. Unchanged historical qualification is reused, not repeat
   retained v1 refuses schema 2 at startup. Asset retention cannot
   establish API/schema compatibility or multi-host deployment availability.
 - **Reviewer gate / state:** Independent version/data/consumer/evidence PASS with
-  no unresolved P0–P2 findings before acceptance. **Done** at [local C1 scope](YT-131-MIXED-VERSION-COMPATIBILITY.md), after independent Reviewer PASS, zero issues and required followups, and controller acceptance.
+  no unresolved P0–P2 findings before acceptance. **Done** at [local C1 scope](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md), after independent Reviewer PASS, zero issues and required followups, and controller acceptance.
 
 ## Final Production Readiness Matrix
 
@@ -208,11 +215,11 @@ with zero issues and zero required followups. Historical failures remain evidenc
 
 | Capability | Implemented | Verified | Deployment-qualified | Known gap |
 |---|---|---|---|---|
-| Admission/overload / YT-127 (A1) | App-owned HTTP capacity 32, SQL capacity 4, zero permit queues; explicit 503/504 and drain. Cooperative request deadline 5 s, readiness 1 s, shutdown grace 10 s; SQLite busy timeout 2 s | [A1 delivery](YT-127-ADMISSION-OVERLOAD.md): 10 unit + 10 HTTP tests, normal writes, actual overload/recovery, stalled-upload deadlines and successful/failed shutdown. Independent T1 PASS. C1's later focused regression preserves A1 behavior; original fault proofs remain bound to T1 source/binary | No; original single-host Linux/debug/localhost fault configuration only | No TCP/header/body transport bounds, operation/filesystem watchdog, rate quota, distributed admission or deployment capacity. Started blocking writes can commit after timeout/disconnect; creates lack idempotency |
-| Observability / YT-128 (A2) | Default-off app-local prometheus 0.14.0 registry; `APP_METRICS__ENABLED=true` or typed settings enables `/metrics`; native HTTP/SQL correlation, bounded labels, SQL late-completion accounting and lifecycle events | [A2 delivery and preserved failure/resume](YT-128-OBSERVABILITY.md): 11 unit tests plus corrected 11-thread/11-test HTTP suite; real SQLite contention, enabled/disabled collection, privacy, recovery and shutdown. Independent T2 PASS; no Core/HTML/DOM/browser dependency expansion | No; loopback Production settings/debug binary and synthetic fault only | Volatile process-local snapshots; response creation is not body completion or durable commit. Zero permit wait is immediate admission, not SQLite lock wait. Protected collection, retention, external sinks and cross-service propagation need deployment decisions |
+| Admission/overload / YT-127 (A1) | App-owned HTTP capacity 32, SQL capacity 4, zero permit queues; explicit 503/504 and drain. Cooperative request deadline 5 s, readiness 1 s, shutdown grace 10 s; SQLite busy timeout 2 s | [A1 delivery](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md): 10 unit + 10 HTTP tests, normal writes, actual overload/recovery, stalled-upload deadlines and successful/failed shutdown. Independent T1 PASS. C1's later focused regression preserves A1 behavior; original fault proofs remain bound to T1 source/binary | No; original single-host Linux/debug/localhost fault configuration only | No TCP/header/body transport bounds, operation/filesystem watchdog, rate quota, distributed admission or deployment capacity. Started blocking writes can commit after timeout/disconnect; creates lack idempotency |
+| Observability / YT-128 (A2) | Default-off app-local prometheus 0.14.0 registry; `APP_METRICS__ENABLED=true` or typed settings enables `/metrics`; native HTTP/SQL correlation, bounded labels, SQL late-completion accounting and lifecycle events | [A2 delivery and preserved failure/resume](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md): 11 unit tests plus corrected 11-thread/11-test HTTP suite; real SQLite contention, enabled/disabled collection, privacy, recovery and shutdown. Independent T2 PASS; no Core/HTML/DOM/browser dependency expansion | No; loopback Production settings/debug binary and synthetic fault only | Volatile process-local snapshots; response creation is not body completion or durable commit. Zero permit wait is immediate admission, not SQLite lock wait. Protected collection, retention, external sinks and cross-service propagation need deployment decisions |
 | Load/soak/recovery / YT-129 (B1) | Predeclared closed-loop synthetic workload and [source-bound capacity/recovery record](YT-129-LOAD-SOAK-RECOVERY.md); no runtime change | One run, 42,043 requests: passing paced normal points 43.64–467.01 rps; two-client 45 s sustained phase 153.08 rps, p99 5.80 ms. Eight-client phase FAIL: 1.514% rejection and 341.73% CPU; excluded from passing range. Forced-lock overload/recovery and teardown complete; independent T3 PASS | No; single debug process, co-located clients/monitor, Linux host, `/tmp` tmpfs database, historical schema 1/A2 executable | No arrival-rate upper-capacity bound, release-build/persistent-disk capacity, long soak, HA or SLA. Short closed-loop results do not establish deployment limits or transfer to C1 v2 |
-| Backup/restore / YT-130 (B2) | [Operator backup/fresh-restore/cutover runbook](YT-130-BACKUP-RESTORE.md); existing supported SQLite backup, no runtime change | Historical v1 debug/ext4: three complete rows, full schema/versions/sequence restored; readiness/API 200. RPO proxy age 41.30 ms, acknowledged-write exposure 39.26 ms, two excluded acknowledged mutations; RTO 52.36 ms through local cutover eligibility. Schema 999 refused before bind; old Session cookie 403; independent T4 PASS | No; serial synthetic local v1/schema-1 instances on ext4, source writer paused for backup | No v2 recovery requalification, external traffic switch, storage-loss/power-loss durability, backup retention/security or production RPO/RTO. Memory Sessions are lost on restart; earlier nonpersistent Valkey evidence does not establish recovery |
-| Mixed-version compatibility / YT-131 (C1) | Schema-2 status index plus additive Bearer-protected `/api/v2/issues?status=...`; existing wire/source contracts retained; [upgrade/drain/rollback procedure](YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions) | 25 tests (13 unit/12 HTTP) and actual 26-response old/new matrix; exact rows/schema/sequence, refusal, stale Session 403 then fresh-session old form 303, stale version 409, restart/forward recovery. Retained v1 binary/source and v2 identities; independent T5 PASS and controller acceptance | No; synthetic local debug binaries, deliberate two-process overlap only for compatibility observation; unchanged YT-103 asset proof retained without rerun | Old live process becomes unready but still serves legacy writes: explicit removal/drain before cutover required. Old restart on schema 2 refuses service. Backup rollback loses newer writes; preserve schema 2 and forward-fix after new writes. No zero-downtime/rolling deployment or generic migration qualification |
+| Backup/restore / YT-130 (B2) | [Operator backup/fresh-restore/cutover runbook](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md); existing supported SQLite backup, no runtime change | Historical v1 debug/ext4: three complete rows, full schema/versions/sequence restored; readiness/API 200. RPO proxy age 41.30 ms, acknowledged-write exposure 39.26 ms, two excluded acknowledged mutations; RTO 52.36 ms through local cutover eligibility. Schema 999 refused before bind; old Session cookie 403; independent T4 PASS | No; serial synthetic local v1/schema-1 instances on ext4, source writer paused for backup | No v2 recovery requalification, external traffic switch, storage-loss/power-loss durability, backup retention/security or production RPO/RTO. Memory Sessions are lost on restart; earlier nonpersistent Valkey evidence does not establish recovery |
+| Mixed-version compatibility / YT-131 (C1) | Schema-2 status index plus additive Bearer-protected `/api/v2/issues?status=...`; existing wire/source contracts retained; [upgrade/drain/rollback procedure](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions) | 25 tests (13 unit/12 HTTP) and actual 26-response old/new matrix; exact rows/schema/sequence, refusal, stale Session 403 then fresh-session old form 303, stale version 409, restart/forward recovery. Retained v1 binary/source and v2 identities; independent T5 PASS and controller acceptance | No; synthetic local debug binaries, deliberate two-process overlap only for compatibility observation; unchanged YT-103 asset proof retained without rerun | Old live process becomes unready but still serves legacy writes: explicit removal/drain before cutover required. Old restart on schema 2 refuses service. Backup rollback loses newer writes; preserve schema 2 and forward-fix after new writes. No zero-downtime/rolling deployment or generic migration qualification |
 
 ## Delivery records and source bindings
 
@@ -229,11 +236,11 @@ The following relative paths are under that root:
 
 | Item delivery | Execution / source identity | Independent review |
 |---|---|---|
-| [YT-127 / A1](YT-127-ADMISSION-OVERLOAD.md) | `observations/T1/task-result.json`, `source-identity.json`, `commands.json`; executable `06624507302c6757c7ade2e69acd44e7de9e9433939b47f9df1eb1d7f3e44540` | `observations/T1/independent-review.json`: PASS, zero issues/followups |
-| [YT-128 / A2](YT-128-OBSERVABILITY.md) | `observations/T2/task-result.json` (initial blocked result), `debugger-diagnosis-1.json`, `resume-task-result.json`, `resume-source.json`, `resume-local-command.txt`; preserved initial parallel tracing failure, user-authorized +5 same-run continuation and one in-place tracing-fixture correction | `observations/T2/independent-review.json`: PASS, zero issues/followups |
+| [YT-127 / A1](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md) | `observations/T1/task-result.json`, `source-identity.json`, `commands.json`; executable `06624507302c6757c7ade2e69acd44e7de9e9433939b47f9df1eb1d7f3e44540` | `observations/T1/independent-review.json`: PASS, zero issues/followups |
+| [YT-128 / A2](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md) | `observations/T2/task-result.json` (initial blocked result), `debugger-diagnosis-1.json`, `resume-task-result.json`, `resume-source.json`, `resume-local-command.txt`; preserved initial parallel tracing failure, user-authorized +5 same-run continuation and one in-place tracing-fixture correction | `observations/T2/independent-review.json`: PASS, zero issues/followups |
 | [YT-129 / B1](YT-129-LOAD-SOAK-RECOVERY.md) | `observations/T3/task-result.json`; `observations/b1/source-environment-settings.json`, `predeclared-workload-thresholds.json`, `exact-workload-command.txt`, `threshold-analysis.json`, `after-source-cleanup.json` | `observations/T3/independent-review.json`: PASS, zero issues/followups |
-| [YT-130 / B2](YT-130-BACKUP-RESTORE.md) | `observations/T4/task-result.json`; `observations/b2/source-environment-settings.json`, `exact-recovery-command.txt`, `derived-recovery-timings.json`, `after-source-cleanup.json` | `observations/T4/independent-review.json`: PASS, zero issues/followups |
-| [YT-131 / C1](YT-131-MIXED-VERSION-COMPATIBILITY.md) | `observations/T5/task-result.json`; `observations/c1/v1-identity.json`, `v1-source-manifest.json`, `final-source.json`, `exact-matrix-command.txt`, `matrix-result.json`, `cleanup.json` | `observations/T5/independent-review.json`: PASS, zero issues/followups; `observations/T5/review-acceptance.json`: controller accepted |
+| [YT-130 / B2](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md) | `observations/T4/task-result.json`; `observations/b2/source-environment-settings.json`, `exact-recovery-command.txt`, `derived-recovery-timings.json`, `after-source-cleanup.json` | `observations/T4/independent-review.json`: PASS, zero issues/followups |
+| [YT-131 / C1](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md) | `observations/T5/task-result.json`; `observations/c1/v1-identity.json`, `v1-source-manifest.json`, `final-source.json`, `exact-matrix-command.txt`, `matrix-result.json`, `cleanup.json` | `observations/T5/independent-review.json`: PASS, zero issues/followups; `observations/T5/review-acceptance.json`: controller accepted |
 
 A2/B1/B2 share retained v1 executable SHA-256
 `4dc7dec913722dbcf86a8677790e69d20fa27a3676e855e31fd9f238a40fcb29`.
