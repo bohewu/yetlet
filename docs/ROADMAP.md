@@ -112,7 +112,7 @@ implied.
 
 
 **YT-242 documentation truth audit (2026-11-08): Done at bounded documentation scope.**
-[Audit and corrections](YT-242-DOCUMENTATION-TRUTH.md) separate published SDK/CLI,
+[Audit and corrections](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-242-DOCUMENTATION-TRUTH.md) separate published SDK/CLI,
 the selected guide edition and later checkout authoring/tools. The 516-file role
 inventory includes bounded semantic inspection of 54 entries, not every document.
 Python suites (14/39/35), release-doc, docs/DAG, samples and whitespace pass.
@@ -308,7 +308,7 @@ The two-package SDK `0.9.0-alpha.5` and independent CLI `0.1.1` are published.
 [YT-216's completed output and installed consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
 close the CLI defect; YT-215 closes through that patch while its original0.1.0
 consumer FAIL remains. SDK/platform proof is not replayed or expanded.
-[YT-217](YT-217-DOCS-PREVIEW.md) is Done at bounded local scope: selected doc comments, four new
+[YT-217](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-217-DOCS-PREVIEW.md) is Done at bounded local scope: selected doc comments, four new
 examples, native/WASM rustdoc and an eight-chapter local static build pass. All454
 local links/assets/anchors pass after a genuine old step-link correction. The
 two original sidebar-count failures remain. The owner-authorized check correction
@@ -2121,92 +2121,30 @@ reference bookkeeping follows. No production/HA/arbitraryrestore/release upgrade
 YT-096/D1-D6 and YT-020 unchanged, new changes uncommitted/unpushed.
 
 
-YT-185 selects [application opt-in startup options](YT-185-OPT-IN-OPTIONS.md)
-after the maintainer's consistency request: contract first, minimum Board/Admin
-and Shop typed options integration, default-off feature/startup separation,
-optional Settings loader and unchanged security/provider/release boundaries.
-Done at application-integration scope after independent Reviewer
-/root/yt185_opt_in_options_independent_review_20261026 PASS0; four new tests/10
-successful executions, strict Clippy/format/default graphs/docs PASS; all19source/
-45evidence/13preserved YT-184 bindings stable, shared navigation prior hashes
-reconciled. Original failures retained, five Rust constructors migrated with no
-aliases, no accepted workload/provider proof replay, Commit or Push.
+**M23 onboarding and documentation sequence (YT-185–191): Done at their
+separately reviewed, bounded scopes.** YT-185 selected application-owned
+typed options for Board/Admin and Shop with separate Cargo feature flags
+and explicit default-off runtime startup; four new cases / ten selected
+executions passed, preserving all Auth/Session/CSRF semantics. No general
+configuration framework or automatic capability registry was selected.
 
-
-YT-186 selects [current API/reference and documentation publication scope](YT-186-DOCUMENTATION-SCOPE.md):
-classify reader sources and maintainer evidence first, then add a concise current
-API map and correct concrete stale usage. Repo documents plus rustdoc remain
-canonical; no Wiki copy, new sample/runtime, evidence rewrite or release expansion.
-Done at documentation-preparation scope after independent Reviewer
-/root/yt186_api_docs_scope_independent_review_20261026 PASS0, zero required followups;
-ten Markdown delivery paths, bounded docs/links/structure/whitespace/DAG PASS,
-492protected source/guide/history inputs unchanged. No old qualification replay,
-rustdoc build, full corpus privacy certification, site/publication, Commit or Push.
-Original release/trust/support decisions remain unchanged.
-
-
-YT-187 selects a [product-oriented README and developer entry](YT-187-README-DX.md)
-after the maintainer's DX/readability direction: one first-run path, current
-capability value and task-based guide links, with planned work tracked here and
-in Backlog rather than root milestone/qualification narration. Keep a dated root
-snapshot and all YT-186 outcomes; no new sample/runtime or publication.
-Done at bounded product/DX documentation scope after independent Reviewer
-/root/yt187_product_readme_dx_review_20261026 follow-up PASS0; initial one-P2 FAIL
-and browser-prerequisite fix retained. Root196to108lines, existing sample code and
-current task links, browser target/pinnedCLI/PATH setup; document gates PASS,
-six non-shared YT-186/492earlier inputs preserved. No measured novice study,
-new runtime/sample, old validation replay, publication, Commit or Push.
-
-
-YT-188 selects [consistent primary integration guides](YT-188-GUIDE-TEMPLATE.md)
-after the product README delivery: ten existing framework guides use one five-part
-reader template with prerequisites, minimum wiring, expected result, settings/errors
-and API reference. Retain source/security/ownership semantics, old anchors and
-historical proof; inventories/policies/application/CLI reference keep their roles.
-Done at selected documentation-only guide scope after independent Reviewer
-/root/yt188_integration_guides_independent_review_20261026 PASS0, zero followups;
-ten guides/sixteen Markdown paths,29original snippets/all old heading text retained,
-bounded docs/links/structure/whitespace/DAG PASS and489protected inputs unchanged.
-No new runtime/sample, old qualification replay, publication, Commit or Push.
-
-
-YT-189 selects [a first standalone application walkthrough](YT-189-FIRST-APP-GUIDE.md)
-after YT-188 delivery: connect existing native Linux/POSIX prerequisites, CLI
-creation, explicit unpublished local dependencies, independent app lock/cache,
-frozen build/run and expected routes with common failure guidance. One reader
-guide plus narrow navigation, no new sample/runtime/template or source behavior.
-Done at source-backed documentation scope after independent Reviewer
-/root/yt189_first_app_guide_independent_review_20261026 PASS0, zero followups;
-eight Markdown paths, bounded docs/links/structure/whitespace/DAG PASS and
-499protected source/guide/history inputs unchanged. No generated fixture,
-tutorial command/runtime/old qualification replay, publication, Commit or Push.
-
-
-YT-190 selects [common-error troubleshooting guidance](YT-190-TROUBLESHOOTING-GUIDE.md)
-after the first-app walkthrough: symptom → possible cause → correction → exact
-existing guide. Cover first use, CLI/settings/browser and selected opt-in HTTP
-failures; retain source, security and ownership semantics. One reference catalog
-plus narrow links, no new runtime/sample/diagnostic tool or old validation replay.
-Done at documentation/source-inspection scope after independent Reviewer
-/root/yt190_troubleshooting_guide_independent_review_20261026 PASS0, zero followups;
-27 rows/six groups/eight Markdown paths, bounded docs/links/structure/whitespace/
-DAG PASS and1,101 non-target tracked hashes unchanged. No runtime/tests,
-error reproduction or old qualification replay; new changes remain
-uncommitted/unpushed/unpublished and release gates unchanged.
-
-
-YT-191 selects [the three remaining DX documentation gaps](YT-191-DX-GUIDES.md):
-correct two stale current CLI status statements; continue the first app with
-existing View/function/list/conditional composition; and concentrate opt-in
-package/features, startup/options and consumer settings/defaults. Twelve Markdown
-paths, existing contracts and historical proof retained, no new API/runtime/sample
-or old qualification replay. Done at source-backed documentation scope after
-independent Reviewer /root/yt191_dx_guides_independent_review_20261026 PASS0,
-zero issues/followups; docs/links/structure/whitespace/DAG PASS and1,100 non-target
-tracked hashes unchanged. All original CLI fences retained; no new runtime/tests,
-authoring-fragment execution, old verification replay or Commit/Push/publication.
-
-
+YT-186 classified canonical source/Reader versus maintainer evidence and
+prepared a minimum API map, not publication. YT-187 replaced the root
+release-history-heavy README with a product/first-run entry and later
+corrected its initial Reviewer P2 browser prerequisite gap. YT-188 aligned
+ten integration guides to the five-part [Guide Template](GUIDE-TEMPLATE.md)
+while preserving old snippets and anchors; an early strict Guard/handoff
+failure was subsequently corrected rather than silently reclassified.
+YT-189 added a source-backed [First App](FIRST-APP.md) walkthrough,
+YT-190 created 27 [Troubleshooting](TROUBLESHOOTING.md) mappings in six
+groups without reproducing errors, and YT-191 closed dated CLI/View/opt-in
+navigation gaps using the [View guide](VIEW-COMPONENTS.md),
+[Opt-in reference](OPT-IN-QUICK-REFERENCE.md) and [CLI guide](CLI-GUIDE.md).
+Full original Done/reviewer/failed-check evidence remains at fixed **local**
+Git `4792565e6cff7a94c8c2c860d1858f840f122cbe`, not yet proven publicly reachable on GitHub. None of these
+steps shipped a new runtime, performed a broader test matrix or activated
+Reader/Pages publication; the separately accepted YT-217 local Reader and
+YT-218 actual hosted publication retain different authorities.
 ## M24 — Application-owned 3D physics lab: contract and feasibility
 
 YT-192 selects [documentation-only minimum research](YT-192-3D-PHYSICS-LAB-STUDY.md)

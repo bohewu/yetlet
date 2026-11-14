@@ -99,7 +99,7 @@ Stop/exclude all legacy writers; old binaries refuse v2 only at open.
 Board consumers use `Board::open_with_options` (or
 `open_with_oidc_and_options`) with `BoardOptions { write_authorization: true,
 ..BoardOptions::default() }`, supplying any selected frontend/Session fields.
-[YT-185](../../docs/YT-185-OPT-IN-OPTIONS.md) records the intentional pre-public
+[YT-185](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-185-OPT-IN-OPTIONS.md) records the intentional pre-public
 constructor migration; Cargo features and existing external settings are unchanged.
 Trusted application code can call
 `board.set_project_write_permission("alice", 1, false).await?` to revoke, or

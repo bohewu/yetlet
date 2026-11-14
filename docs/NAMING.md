@@ -133,7 +133,7 @@ avoid positional flags for another capability or a constructor per combination.
 Do not add a framework-wide options trait/registry or force identical IO shape.
 Board remains async; Shop opening remains synchronous.
 
-[The contract and migration table](YT-185-OPT-IN-OPTIONS.md) record five removed
+[The contract and migration table](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-185-OPT-IN-OPTIONS.md) record five removed
 capability-specific constructors, without stale aliases. Dated YT-181/182/183
 contracts and verification retain their former entry points and accepted
 results as history; current sample guides describe the options interface.

@@ -99,7 +99,7 @@ workspaces. Versions below are manifest values, not release decisions.
 OIDC/Bearer/Cookies, Audit, data/output cache and tracing research Done statuses
 do not imply that corresponding generic crates exist. Current application-owned
 write fencing, tracing and Shop cache are separately implemented and reviewed;
-see [capabilities](CAPABILITIES.md) and [YT-185 options](YT-185-OPT-IN-OPTIONS.md).
+see [capabilities](CAPABILITIES.md) and [YT-185 options](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-185-OPT-IN-OPTIONS.md).
 Server identity, provider handles, secrets and worker capabilities must stay out
 of browser dependencies and serialized hydration state (ADR [0005](adr/0005-opt-in-capability-modules.md)).
 

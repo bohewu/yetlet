@@ -100,15 +100,23 @@ sign artifacts, publish packages or resolve formal D1–D6/registry decisions.
 
 ## YT-242 inventory and semantic audit boundary — 2026-11-08
 
-[The audit report](YT-242-DOCUMENTATION-TRUTH.md) records corrections and remaining
-coverage. The baseline tracked inventory has **516 Markdown files**, including
-**413 under `docs/`** (ADRs and screenshot indexes included). Each path has one
-primary navigation role: **101 current-guidance**, **315 historical-evidence**,
-and **100 proposal-decision**. A role does not make every sentence in a mixed
-file current; completed proposals remain decisions, and current guides can retain
-explicit historical disclosures. The new YT-242 report is additional maintainer
-evidence, outside that baseline count. No role selects a site export.
-
+The [dated YT-242 report](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-242-DOCUMENTATION-TRUTH.md) records bounded
+corrections and remaining audit coverage. At its **2026-11-08** baseline,
+there were **516 tracked Markdown files** (413 under `docs/`) with
+**101 current-guidance**, **315 historical-evidence** and
+**100 proposal-decision** primary roles. These were the counts **at that
+original checkpoint**, not the current post-consolidation file total.
+Semantic inspection covered **54 current entry surfaces** for current
+availability/navigation/edition meaning, **not** line-by-line validation
+of all source files or every code example. Its initial Reviewer P2
+correction and final PASS remain original source-bound evidence.
+Other files and explicit historical text remain outside that audit.
+Current public SDK/CLI and Reader selection must instead come from the
+[accepted hosted release records](RELEASE-READINESS.md) and
+[Reader source manifest](../site/pages.toml), not the old SDK alpha.6 /
+CLI 0.2.0 audit checkpoint or a dev manifest. No role automatically
+includes a page in a public export, and audit PASS is not product or
+production qualification.
 | Role | Inventory boundary and disposition |
 |---|---|
 | Current guidance | Root reader/policy entries, current module guides, application/tool/template usage, and the explicitly selected current guides/SOPs above. Correct evidenced current availability/navigation claims; preserve embedded historical records |

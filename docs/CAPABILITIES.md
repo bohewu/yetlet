@@ -106,7 +106,7 @@ delivered provider. The [naming guide](NAMING.md) fixes the current vocabulary;
 historical plans and verification retain their original scopes and results.
 
 
-[YT-185 application startup options](YT-185-OPT-IN-OPTIONS.md) describe current
+[YT-185 application startup options](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-185-OPT-IN-OPTIONS.md) describe current
 Board/Admin and Shop instance selection. Cargo availability and startup enablement
 remain separate, default-off choices; Settings loading stays optional. Native
 provider TLS and private experiment configuration retain their distinct scopes.

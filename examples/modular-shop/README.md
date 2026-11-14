@@ -68,7 +68,7 @@ Embedded callers use `Database::open_with_options(path,
 DatabaseOptions { catalog_cache: true })`, then pass the Database to the existing
 `app` constructor. `DatabaseOptions::default()` leaves caching off even when
 compiled. Unsupported true selections fail before opening/creating storage.
-[YT-185](../../docs/YT-185-OPT-IN-OPTIONS.md) records the intentional pre-public
+[YT-185](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-185-OPT-IN-OPTIONS.md) records the intentional pre-public
 constructor migration. Options do not read ambient settings; the binary maps
 its existing native environment value into them. There
 is no new Settings-provider service, framework middleware/trait or Core/WASM

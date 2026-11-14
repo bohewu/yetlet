@@ -87,10 +87,13 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   [CLI record](CLI-030-HOSTED-RECORD.md) retains actual outputs and setup failures.
   Published guide pins stay fixed.
 
-- [YT-242 documentation truth audit](YT-242-DOCUMENTATION-TRUTH.md): bounded
-  current-entry audit, inventory classification, corrections and remaining coverage;
-  independent acceptance pending. YT-243 remains ordered and unstarted.
-
+- [Documentation scope and dated YT-242 audit](DOCUMENTATION-SCOPE.md#yt-242-inventory-and-semantic-audit-boundary--2026-11-08):
+  the original 2026-11-08 516-file inventory inspected 54 entry surfaces,
+  corrected current/published claims and passed a corrective independent
+  Reviewer after an earlier P2 finding. Its historical counts and SDK
+  alpha.6/CLI 0.2.0 edition are **not** present counts or current releases.
+  YT-243 separately completed source/Linux and local Windows-MSVC
+  qualification at its own scope; no complete corpus/production certification.
 - [Browser application DX research](BROWSER-DX-RESEARCH.md): selected
   documentation gaps, reuse of the browser starter and event ownership, and
   source-bound Yetlet evidence without new runtime or API changes.
@@ -132,7 +135,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [Historical mdBook reader preview](../site/README.md): pinned reference builder,
   exact chapter selection and loopback-only usage; use the
   [Yetlet reader](../examples/docs-site/README.md) for the current build path.
-  [YT-217 completion](YT-217-DOCS-PREVIEW.md)
+  [YT-217 completion](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-217-DOCS-PREVIEW.md)
   records API comments and independently accepted local reader checks with retained
   failures; the separate YT-218 record covers actual public hosting.
 
@@ -953,20 +956,22 @@ M0–M9 are locally complete at prototype scope. M8 freezes the runnable sample 
 
 - [YT-184 Azure cross-host Auth/Session and persistent restart](YT-184-AZURE-AUTH-SESSION-RESTART.md): Done at bounded reference scope after final independent Reviewer PASS0: native opt-in TLS/unit/compile proof and preallocation review pass; first cloud bootstrap fails before live Auth/restart, smallest Path fix locally checked and all owned resources/credentials removed. Limited first correction/cleanup review PASS0. Authorized generation2 reaches both apps READY/wrong-name TLS refusal, then fails the SQL observer before Auth/restart; observer corrected locally, both failed generations fully deleted. Full integration pending; maintainer explicitly authorizes generation3 with the reviewed observer fix and cumulative US$5/90min including cleanup bounds; generation3 passes private SQL/HTTPS checks then first auth form fails; missing direct-TIME ACL correction now locally verified by one new named-user Session provider regression (6oldcases filtered); local named-app/Session independent Reviewer PASS0, previous invalid probes retained, new local resources removed; first three Azure generations fully deleted; fourth passes cross-host Auth/policy/logout/app-restart then fails first Valkey recovery snapshot; new local persistent read-only readiness case and independent fourth-results/correction review PASS0; first four allocations deleted; fifth completes remaining authority recovery/VM/SQL-policy/new-epoch proof with native exit0; all five groups deleted, final Reviewer PASS0 accepts composed reference proof; no sixth authorized.
 
-- [YT-185 Application opt-in startup options](YT-185-OPT-IN-OPTIONS.md): Done after independent Reviewer PASS0; Board/Admin and Shop typed options, five former constructor migrations, ten successful focused test executions; existing security and feature/settings boundaries preserved.
-
-- [YT-186 Current API/documentation preparation](YT-186-DOCUMENTATION-SCOPE.md): Done at documentation-preparation scope after independent Reviewer PASS0; publication classification precedes the minimum reference/navigation/stale-guidance edits; no new runtime, sample, qualification replay or publication.
-
-- [YT-187 Product README and DX entry](YT-187-README-DX.md): Done after independent Reviewer follow-up PASS0; root196to108lines, browser prerequisites restored, prior README/first-P2 verdict retained; planning stays in Backlog/Roadmap.
-
-- [YT-188 Consistent integration guides](YT-188-GUIDE-TEMPLATE.md): Done after independent Reviewer PASS0; ten existing framework guides adopt the common reader template, with original29code blocks/anchors/contracts/history preserved and no runtime qualification replay.
-
-- [YT-189 First standalone application guide](YT-189-FIRST-APP-GUIDE.md): Done after independent Reviewer PASS0; connects existing native setup/local dependencies through first run/common failures; no generated project or runtime qualification replay.
-
-- [YT-190 Common-error troubleshooting guide](YT-190-TROUBLESHOOTING-GUIDE.md): Done after independent Reviewer PASS0; 27 source-backed symptom/cause/correction/guide rows across six groups, no error reproduction or runtime qualification replay.
-
-- [YT-191 View authoring, opt-in lookup and CLI status](YT-191-DX-GUIDES.md): Done after independent Reviewer PASS0; three selected documentation gaps closed with existing APIs/source and historical proof preserved, no runtime qualification replay.
-
+- **M23 onboarding and documentation (YT-185–191):** the accepted Board/Admin
+  and Shop startup options separate Cargo compile-time features from explicit
+  application typed runtime selection; no generic Core capability registry
+  or implicit settings provider was added. The docs-only sequence rebuilt
+  task-oriented entry points, ten five-part integration guides, a source-backed
+  native first-app walkthrough, 27 troubleshooting cases across six groups,
+  and current CLI/View/opt-in navigation. Refer to
+  [First App](FIRST-APP.md), [Guide Template](GUIDE-TEMPLATE.md),
+  [Troubleshooting](TROUBLESHOOTING.md), [View authoring](VIEW-COMPONENTS.md),
+  [Opt-in quick reference](OPT-IN-QUICK-REFERENCE.md), [CLI guide](CLI-GUIDE.md)
+  and [Documentation Scope](DOCUMENTATION-SCOPE.md). Original reviewer
+  failures and corrections (including YT-187 browser prerequisites and
+  YT-188/189 strict Guard handoff) are recoverable from fixed **local Git**
+  `4792565e6cff7a94c8c2c860d1858f840f122cbe`; these docs-only checks did not replay runtime/browser tests,
+  publish a guide or validate novice usage. Public GitHub SHA reachability
+  remains unverified until separately approved delivery.
 - [YT-192 3D physics lab minimum contract and feasibility](YT-192-3D-PHYSICS-LAB-STUDY.md): Done at documentation/source-level feasibility scope after independent Reviewer PASS0; browser/scene/fixed-step/GPU-failure contract, no implemented 3D API/sample or compile/runtime qualification.
 
 - **YT-193–198 — Physics Lab implementation:** The

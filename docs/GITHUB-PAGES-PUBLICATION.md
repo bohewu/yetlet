@@ -10,7 +10,7 @@ The historical preparation checkpoints below remain intact.
 
 ## Historical planning baseline and exact public scope
 
-[YT-217](YT-217-DOCS-PREVIEW.md) is Done at API-doc/local reader-preview scope.
+[YT-217](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-217-DOCS-PREVIEW.md) is Done at API-doc/local reader-preview scope.
 Local committed source is `9ef215c2bf9d754f587fc5b3130b107ff0664c68`;
 the observed remote `master` is `729fab315f7ea5c13da42cef87cf899a73d347f2`.
 The two local documentation commits have not been pushed. Repository metadata

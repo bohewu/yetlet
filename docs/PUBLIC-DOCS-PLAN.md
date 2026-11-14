@@ -9,7 +9,7 @@ first-app edition remain pinned to SDKalpha.5/CLI0.1.1; this status correction
 does not promote their consumer, alter Pages settings or rerun qualification.
 
 Date: 2026-10-31. YT-217 is Done at selected API-doc/local reader-preview
-scope after independent final Reviewer PASS0. Its [execution record](YT-217-DOCS-PREVIEW.md)
+scope after independent final Reviewer PASS0. Its [execution record](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-217-DOCS-PREVIEW.md)
 retains the original passing proof, stopped harness and authorized correction.
 YT-218 subsequently delivered the separate Pages workflow/settings and first
 publication at source64d1074. [Actual first-publication evidence](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31)
