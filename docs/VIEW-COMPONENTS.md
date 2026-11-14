@@ -237,8 +237,8 @@ durable business write, authorization or safe retry. The current
 [forms example](../examples/forms-validation/README.md) owns native validation
 and redirect/CSRF behavior; [reactivity](../crates/yetlet/guides/reactive.md)
 owns scoped committed-state reads and weak-handle disposal. The
-[dated graph-snapshot contract](YT-105-GRAPH-SNAPSHOT.md) is retained for
-its narrow handle semantics. Early YT-107–109 checks remain source-bound,
+[maintained weak-handle snapshot contract](ARCHITECTURE.md#weak-handle-published-state-snapshot-and-explicit-first-render)
+describes published-state reads, disposal and explicit first-render policy. Early YT-107–109 checks remain source-bound,
 not certification of generalized two-way bindings.
 
 The native and browser renderers accept only their declared `hidden`

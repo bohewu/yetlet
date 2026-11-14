@@ -18,8 +18,8 @@ failures and acceptance boundaries. Reuse evidence without rerunning it:
 | Retained study | What it supports | What it does not establish |
 | --- | --- | --- |
 | [YT-171](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-171-AUTH-CAPACITY-RECOVERY.md) | Twenty Session-busy failures at selected fixed loads; recovery succeeds | A universal capacity ceiling or exact internal cause of those historical failures |
-| [YT-172](YT-172-SESSION-ADMISSION-BURSTS.md) | Provider barrier waves reject above bounded admission; nominally spaced waves differ | HTTP fairness or a zero-error burst guarantee |
-| [YT-173](YT-173-HTTP-SESSION-TIMELINE.md) | Twelve new busy failures prove four active plus four pending owners | Exact release timestamps or unique historical causation |
+| [YT-172](https://github.com/bohewu/yetlet/blob/c3478b7f4e0c929a94ccbf21e05217535553a73d/docs/YT-172-SESSION-ADMISSION-BURSTS.md) | Provider barrier waves reject above bounded admission; nominally spaced waves differ | HTTP fairness or a zero-error burst guarantee |
+| [YT-173](https://github.com/bohewu/yetlet/blob/c3478b7f4e0c929a94ccbf21e05217535553a73d/docs/YT-173-HTTP-SESSION-TIMELINE.md) | Twelve new busy failures prove four active plus four pending owners | Exact release timestamps or unique historical causation |
 | [YT-174](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-174-HOST-PASSIVE-SAMPLING.md) | Nine new busy: eight of sixteen JSON burst requests, one of 10001 SSR observe requests; all prove four active/four pending | Causal latency/capacity improvement from lower observer cost |
 
 YT-174's recorded sample wall cost falls 88.54%, but observe HTTP p95 does not

@@ -75,6 +75,19 @@ separately accepted local YT-129 load/recovery and error semantics. Authenticati
 authorization, CSRF, strict CSP, durable write ordering and distributed admission
 were not changed by these measurements.
 
+## Early provider and HTTP attribution evidence
+
+These dated local research proofs are **not** new hosted qualification,
+production capacity, cross-host Session recovery or durable write
+guarantees. Complete source/measurement history is in **local Git**
+`c3478b7f4e0c929a94ccbf21e05217535553a73d`; remote GitHub availability is unverified.
+
+| Research | Verified bounded observation | Exclusions and historical failures |
+|---|---|---|
+| Redis async provider | Two real CAS barrier stalls were failed and cleaned; independently corrected test-only barrier followed by five actual Redis integration test passes | Previously accepted cancellation/drain and Cookie/browser tests not rerun; no production persistence or cross-host RPO/RTO |
+| Provider-only admission | 648 attempts: 552 validated / 96 Busy; eight recovery reads valid; 72 waves with four active/eight total | No fair queue, exact 1ms scheduling, 80ms expiry or universal capacity ceiling |
+| Same-process HTTP Session | 12 SSR Busy/503 rejections, four active/four pending owners; rejected before SQL | Different sixteen-VU arrivals; clock and resource observer interference, no proven unique cause or global SLO |
+| Native HTTP/SSR | App-owned streaming can expose first body sooner but finish later; 100ms response-creation timeout can return 504 | No rollback of started work, whole-body deadline, browser paint, TLS/proxy flushing or production latency guarantee |
 ## Workflow source and activation
 
 [Qualification workflow](../.github/workflows/qualification.yml) has only

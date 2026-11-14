@@ -248,9 +248,9 @@
       ],
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
-        "docs/YT-021-STREAMING-SSR-RESEARCH.md"
+        "docs/HTTP-PIPELINE.md"
       ],
-      "notes": "Priority P2; size M; milestone Later. Acceptance/evidence: [Bounded incremental SSR research](YT-021-STREAMING-SSR-RESEARCH.md): equivalent escaped fragments, barrier/error proof, matched HTTP first-body/completion/throughput measurements; app-owned prototype retained, core promotion rejected",
+      "notes": "Priority P2; size M; milestone Later. Acceptance/evidence: [Bounded incremental SSR research](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing): equivalent escaped fragments, barrier/error proof, matched HTTP first-body/completion/throughput measurements; app-owned prototype retained, core promotion rejected",
       "completed_at": "2026-10-12"
     },
     {
@@ -293,9 +293,9 @@
       ],
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
-        "docs/YT-024-CUSTOM-TRANSPORT-RESEARCH.md"
+        "docs/EXTENSIONS.md"
       ],
-      "notes": "Priority P2; size M; milestone Later. Acceptance/evidence: [Bounded custom transport research](YT-024-CUSTOM-TRANSPORT-RESEARCH.md): typed opt-in TCP adapter, real loopback request/results, malformed/error/cancellation proof and joined cleanup; app-owned pattern adopted, core promotion rejected",
+      "notes": "Priority P2; size M; milestone Later. Acceptance/evidence: [Bounded custom transport research](EXTENSIONS.md#application-owned-action-transport): typed opt-in TCP adapter, real loopback request/results, malformed/error/cancellation proof and joined cleanup; app-owned pattern adopted, core promotion rejected",
       "completed_at": "2026-10-12"
     },
     {
@@ -356,9 +356,9 @@
       ],
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
-        "docs/YT-029-HTTP-DEADLINE-RESEARCH.md"
+        "docs/HTTP-PIPELINE.md"
       ],
-      "notes": "Priority P1; size M; milestone Later. Acceptance/evidence: [Bounded deadline research](YT-029-HTTP-DEADLINE-RESEARCH.md): opt-in native Tower/Axum composition, cancellation/body limits, matched release overhead and application-owned adoption decision; general providers/core promotion remain deferred",
+      "notes": "Priority P1; size M; milestone Later. Acceptance/evidence: [Bounded deadline research](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing): opt-in native Tower/Axum composition, cancellation/body limits, matched release overhead and application-owned adoption decision; general providers/core promotion remain deferred",
       "completed_at": "2026-10-12"
     },
     {
@@ -887,10 +887,9 @@
       "artifact_paths": [
         "docs/M10G-VERIFICATION.md",
         "docs/PROVIDER-OPERATIONS.md",
-        "docs/YT-066B2-VERIFICATION.md",
         "docs/YT-066B3-VERIFICATION.md"
       ],
-      "notes": "Priority P1; size L; milestone M10g. Acceptance/evidence: [M10g evidence](M10G-VERIFICATION.md): local operations and YT-066a proof reviewed PASS; [YT-066b1 original Git evidence](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md) private Redis prototype has actual passing tests and independent reviewer PASS; the selected Cookie contract passed review; [YT-066b2](YT-066B2-VERIFICATION.md) focused provider tests and independent implementation review passed after the barrier repair at bounded experimental-provider scope; [YT-066b3](YT-066B3-VERIFICATION.md) Done at single-host/no-persistence scope after actual execution, cleanup and final independent reviewer PASS; Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability remains unverified"
+      "notes": "Priority P1; size L; milestone M10g. Acceptance/evidence: [M10g evidence](M10G-VERIFICATION.md): local operations and YT-066a proof reviewed PASS; [YT-066b1 original Git evidence](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md) private Redis prototype has actual passing tests and independent reviewer PASS; the selected Cookie contract passed review; [YT-066b2](PROVIDER-OPERATIONS.md#bounded-provider-bursts-and-http-attribution) focused provider tests and independent implementation review passed after the barrier repair at bounded experimental-provider scope; [YT-066b3](YT-066B3-VERIFICATION.md) Done at single-host/no-persistence scope after actual execution, cleanup and final independent reviewer PASS; Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability remains unverified"
     },
     {
       "id": "YT-067",

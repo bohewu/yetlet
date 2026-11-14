@@ -145,6 +145,22 @@ No container service graph or automatic registration is part of the
 public SDK; the original shaku/dill comparison was **research-only**
 and neither library was integrated or performance-benchmarked.
 See [Architecture](ARCHITECTURE.md#research-only-handler-resumption-and-native-composition).
+### Application-owned action transport
+
+An application can implement an existing ActionExecutor<C> without a
+new dependency injection registry or Core network transport.
+A bounded native proof used Tokio LengthDelimitedCodec, one Add
+command/Sum response, a four-byte length prefix and 1024-byte
+payload maximum; unknown fields, overflow, invalid frames and
+truncated replies fail closed. Synthetic error 422 is a local
+ActionError::Remote mapping, **not HTTP status received from TCP**.
+A 50ms deadline or future drop closes the owned connection but
+cannot roll back earlier effects or stop already detached work.
+The seven source-specific native tests in the
+[proof fixture](../examples/custom-action-transport/README.md)
+do not qualify authentication, authorization, CSRF, TLS, browser
+transport, idempotency or off-host deployment. Preserve these
+controls explicitly in any real application adapter.
 ### Designing another module
 
 The separately selected [secret provider](SECRET-PROVIDERS.md) is an opt-in

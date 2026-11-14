@@ -102,7 +102,7 @@ Native counts and browser coverage refer to the existing
 [platform record](YT-096-PLATFORM-QUALIFICATION.md),
 [Azure guest](YT-096-AZURE-RUN-COMMAND.md),
 [hosted rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) and
-[Chrome consumer verification](YT-105-GRAPH-SNAPSHOT.md#consumer-verification).
+[Chrome consumer verification](https://github.com/bohewu/yetlet/blob/c3478b7f4e0c929a94ccbf21e05217535553a73d/docs/YT-105-GRAPH-SNAPSHOT.md#consumer-verification).
 No historical signature, failure or earlier source identity was reassigned.
 
 The retained browser-source record matches the candidate's Git blobs and

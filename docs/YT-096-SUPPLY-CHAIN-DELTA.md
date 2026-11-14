@@ -226,7 +226,7 @@ target graph or a refresh of historical signatures.
 
 The nine package READMEs were added. The only selected library Rust change is
 `crates/yetlet-reactive/src/lib.rs`: the already accepted
-[YT-105 weak-handle snapshot](YT-105-GRAPH-SNAPSHOT.md). The other eight
+[YT-105 weak-handle snapshot](https://github.com/bohewu/yetlet/blob/c3478b7f4e0c929a94ccbf21e05217535553a73d/docs/YT-105-GRAPH-SNAPSHOT.md). The other eight
 libraries' Rust sources are unchanged. Existing Rust 1.99 metadata, first-slice
 nine-package compilation and packaged consumer evidence are retained; no lower
 MSRV or new cross-platform runtime result is inferred.

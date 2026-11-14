@@ -4,7 +4,7 @@ This private, unpublished fixture explicitly composes the experimental async
 Redis provider with three separate Yetlet/Axum processes and one Redis primary,
 behind the accepted YT-066a Nginx topology. See the
 [design](../../docs/YT-066B-REDIS-SESSION-DESIGN.md) and
-[provider evidence](../../docs/YT-066B2-VERIFICATION.md).
+[provider evidence](../../docs/PROVIDER-OPERATIONS.md#bounded-provider-bursts-and-http-attribution).
 
 Run from the repository root:
 

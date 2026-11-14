@@ -22,7 +22,7 @@ YT-066b2 added a separate opt-in async provider; **two early real-Redis
 test attempts stalled on a synchronous CAS callback barrier** and were
 explicitly terminated, **not** counted as overall PASS. Only a separately
 authorized blocking-aware test-barrier correction and focused validation
-closed that failure. The retained [b2 provider evidence](YT-066B2-VERIFICATION.md)
+closed that failure. The retained [b2 provider evidence](PROVIDER-OPERATIONS.md#bounded-provider-bursts-and-http-attribution)
 records **CSRF**, once-only CAS callbacks and scoped native SSR middleware
 in its focused integration tests. The separate
 [Cookie decision](YT-066B-COOKIE-ORDERING.md) preserves pure-SSR
@@ -60,6 +60,48 @@ protection. Existing [M9d file evidence](M9D-VERIFICATION.md) and
 [M9f SSE evidence](M9F-VERIFICATION.md) retain cancellation/backpressure tests.
 They are earlier local evidence, not newly executed distributed tests.
 
+## Bounded provider bursts and HTTP attribution
+
+**The experimental Redis provider did not pass on its first two real
+test runs:** both hung at a synchronous CAS callback barrier and
+were stopped with owned process/Compose cleanup. The subsequent
+owner-approved **test-only** blocking-aware barrier correction
+preserved once-only CAS behavior; five real provider integration
+tests then passed, covering typed lifecycle, Cookie/CSRF, rotation,
+revocation, native SSR middleware and unknown-outcome reconciliation.
+Earlier cancellation/drain and Cookie/browser proofs were **retained
+but not rerun**. Later single-host three-app testing disabled
+persistence; these outcomes do not qualify production HA, restore,
+cross-host operations, durable RPO/RTO or safe mutation retries.
+
+A separate provider-only burst experiment recorded **648 attempts
+(552 valid reads, 96 Busy)**, 72 finite waves, four active/eight
+total admission, 80ms queue-wait and 400ms caller budgets, plus
+eight successful sequential recovery reads. Barrier waves of
+12 or 16 rejected excess attempts, while nominally spaced 1ms
+waves had zero Busy; actual scheduling was neither exactly 1ms
+nor synchronized. These results establish burst-sensitive
+fail-fast behavior but not fairness, expiry at the configured
+80ms bound, or a production capacity limit.
+
+A later same-process HTTP/Session trace observed **12 SSR Busy/503
+rejections**, with exactly four active and four pending owners
+covering each rejected interval; they stopped before SQL.
+Different 16-VU HTTP JSON/SSR workloads without Busy had
+different actual arrivals, so the studies do not contradict.
+Client clock offsets, connection setup and instrumentation
+costs limit attribution. The coincidence of eleven errors with
+a Valkey resource-sample interval is only a possible observer
+effect, not confirmed unique causation or permit-release timing.
+No SQL pool enlargement or automatic capacity policy is selected.
+
+These are finite source/host-specific observations. Complete old
+failure attempts, wave populations, reviewer and cleanup records
+remain at **local Git** `c3478b7f4e0c929a94ccbf21e05217535553a73d` (unverified remote reachability).
+See [Qualification Matrix]
+(QUALIFICATION-MATRIX.md#early-provider-and-http-attribution-evidence)
+and [HTTP Pipeline]
+(HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing).
 ## One bounded local experiment
 
 From the current checkout, after the main agent verifies the two existing

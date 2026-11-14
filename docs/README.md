@@ -479,8 +479,8 @@ are source-specific and retained in [Windows WASM verification](YT-094-WINDOWS-W
 The historical form-value/event, state-read and HTTP-feedback studies
 accepted **app-owned** native and graph draft handling, body-token CSRF,
 and explicit save/validation feedback rather than new public auto-binding
-APIs. The [retained state-read research](YT-105-STATE-READ-INITIAL-RENDER-RESEARCH.md)
-and [weak-handle graph snapshot](YT-105-GRAPH-SNAPSHOT.md) preserve
+APIs. The [state-read proposal and settled contract](ARCHITECTURE.md#weak-handle-published-state-snapshot-and-explicit-first-render)
+and [weak-handle graph snapshot](ARCHITECTURE.md#weak-handle-published-state-snapshot-and-explicit-first-render) preserve
 source-specific semantics. Use [current View/form guidance](VIEW-COMPONENTS.md#configuration-and-errors)
 and [reactive lifetime guide](../crates/yetlet/guides/reactive.md).
 Original YT-105 source studies and failed cases are recoverable from
@@ -567,9 +567,9 @@ All five authorized studies are Done at their recorded bounded scopes. Their fix
 
 | Study | Current decision or evidence scope | Existing fixture |
 |---|---|---|
-| Opt-in HTTP deadlines | [YT-029](YT-029-HTTP-DEADLINE-RESEARCH.md): retain explicit app-owned middleware; general provider/core promotion remains deferred | [Middleware Lab](../examples/middleware-lab/README.md) |
-| Incremental SSR | [YT-021](YT-021-STREAMING-SSR-RESEARCH.md): retain the full-versus-streaming comparison; reject core streaming/suspense promotion | [Streaming SSR research](../examples/streaming-ssr-research/README.md) |
-| Custom typed transport | [YT-024](YT-024-CUSTOM-TRANSPORT-RESEARCH.md): adopt one explicit app-owned TCP adapter pattern; reject a core transport framework | [Custom action transport](../examples/custom-action-transport/README.md) |
+| Opt-in HTTP deadlines | [YT-029](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing): retain explicit app-owned middleware; general provider/core promotion remains deferred | [Middleware Lab](../examples/middleware-lab/README.md) |
+| Incremental SSR | [YT-021](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing): retain the full-versus-streaming comparison; reject core streaming/suspense promotion | [Streaming SSR research](../examples/streaming-ssr-research/README.md) |
+| Custom typed transport | [YT-024](EXTENSIONS.md#application-owned-action-transport): adopt one explicit app-owned TCP adapter pattern; reject a core transport framework | [Custom action transport](../examples/custom-action-transport/README.md) |
 | Handler/capture descriptors | [architecture decision](ARCHITECTURE.md#research-only-handler-resumption-and-native-composition): retain finite versioned handlers/numeric captures; reject generic/core resumability | [Resumability research](../examples/resumability-research/README.md) |
 | Independent scene rendering | [YT-023](YT-023-WEBGPU-RESEARCH.md): retain opt-in native wgpu/Vulkan draw/readback and frame/allocation observations; reject core/browser-portability promotion | [Scene research](../examples/webgpu-scene-research/README.md) |
 

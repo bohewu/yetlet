@@ -109,7 +109,7 @@ Snap configuration and resource:// Firefox messages. The functional suite and
 cleanup pass; no claim of a silent browser log or general accessibility/IME
 qualification is made.
 
-Retain the accepted [YT-105 Chrome consumer journey](YT-105-GRAPH-SNAPSHOT.md#consumer-verification)
+Retain the accepted [YT-105 Chrome consumer journey](https://github.com/bohewu/yetlet/blob/c3478b7f4e0c929a94ccbf21e05217535553a73d/docs/YT-105-GRAPH-SNAPSHOT.md#consumer-verification)
 and `target/m12/yt085/browser-chrome-dSWXtV/`. Its original result/cleanup are
 PASS and its accepted application/library source contract remains applicable.
 That raw old receipt has no independent candidate input manifest: it is

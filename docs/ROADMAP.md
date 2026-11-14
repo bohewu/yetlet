@@ -949,7 +949,7 @@ Independent Reviewer
 followups for this research slice.
 
 **YT-105 state-read/initial-render comparison (2026-10-19, research only):**
-the [second Admin/Todo study](YT-105-STATE-READ-INITIAL-RENDER-RESEARCH.md)
+the [second Admin/Todo study](ARCHITECTURE.md#weak-handle-published-state-snapshot-and-explicit-first-render)
 identifies duplicated committed-state mirrors and proposes a weak
 `GraphHandle::snapshot()` matching existing owner clone/error semantics. Initial
 rendering remains explicit application setup rather than constructor side
@@ -970,7 +970,7 @@ followups and explicitly approves YT-105 Done at research-only scope.
 No HTTP-feedback application/API implementation is selected by that study.
 
 **YT-105 weak-handle snapshot (2026-10-19, separately authorized):** the
-[implementation slice](YT-105-GRAPH-SNAPSHOT.md) adds `GraphHandle::snapshot()`
+[implementation slice](ARCHITECTURE.md#weak-handle-published-state-snapshot-and-explicit-first-render) adds `GraphHandle::snapshot()`
 using the owner's existing read/error/borrow semantics. Focused native tests
 and strict Clippy plus Wasm/rustdoc/docs checks pass. Independent Reviewer
 `/root/yt105_graph_snapshot_impl_review_oct19` PASS has zero issues or required
@@ -979,7 +979,7 @@ That original slice left consumer mirrors and initial-render/HTTP/form behavior
 unchanged.
 
 **YT-105 Admin/Todo adoption (2026-10-20, separately selected):** the same
-[snapshot record](YT-105-GRAPH-SNAPSHOT.md#admin--todo-adoption--2026-10-20)
+[snapshot record](https://github.com/bohewu/yetlet/blob/c3478b7f4e0c929a94ccbf21e05217535553a73d/docs/YT-105-GRAPH-SNAPSHOT.md#admin--todo-adoption--2026-10-20)
 now documents both consumers reading through weak handles without separate
 state mirrors. Wasm/native/strict Clippy and actual Chrome checks pass, including
 Admin CLI build/run/SIGINT drain and Todo's existing lifecycle smoke. Consumer
@@ -1435,7 +1435,7 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 - [x] `YT-028`: Actual API/SSR integration, streaming/request-isolation tests and browser boundary regression.
 
 **M4.1 evidence (2026-10-08):** 46/46 tests, strict Clippy/format, English docs, browser compile and one headless regression PASS. Two browser WASM artifacts remain byte-identical. Native overhead/production assurance remain unmeasured; see [HTTP pipeline](HTTP-PIPELINE.md).
-- [x] `YT-029`: [Opt-in deadline and measured native overhead research](YT-029-HTTP-DEADLINE-RESEARCH.md), completed 2026-10-12 at application-owned example scope. Adopt native Tower/Axum composition for explicitly selected use; general providers, supported core API promotion and production qualification remain deferred. Original P0 evidence above is unchanged.
+- [x] `YT-029`: [Opt-in deadline and measured native overhead research](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing), completed 2026-10-12 at application-owned example scope. Adopt native Tower/Axum composition for explicitly selected use; general providers, supported core API promotion and production qualification remain deferred. Original P0 evidence above is unchanged.
 
 ### M5 — MVP release-evidence freeze
 
@@ -1645,10 +1645,10 @@ YT-096/D1–D6 and YT-020 gates remain unchanged; new documents are uncommitted.
 
 | Track | Research question |
 |---|---|
-| Streaming SSR | [YT-021 comparison](YT-021-STREAMING-SSR-RESEARCH.md) retains app-owned incremental fragments; large/delayed first-body gains trade off lower throughput, so supported-core streaming/suspense promotion is rejected |
+| Streaming SSR | [YT-021 comparison](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing) retains app-owned incremental fragments; large/delayed first-body gains trade off lower throughput, so supported-core streaming/suspense promotion is rejected |
 | Compile-time template IR | M7b–M7e prove one fixed shape; M7f–M7i promote only low-level contracts and one production keyed-list path. General trees remain required before any macro decision |
 | Resumability | [resumability decision](ARCHITECTURE.md#research-only-handler-resumption-and-native-composition) proves two finite versioned local handlers with bounded numeric captures and native size/cost evidence; retain explicit app-owned descriptors, reject generic/core resumability promotion |
-| Custom transport | [YT-024 proof](YT-024-CUSTOM-TRANSPORT-RESEARCH.md) uses existing ActionExecutor for one opt-in typed TCP adapter with bounded loopback/error/cancellation evidence; adopt the app-owned pattern, reject core framework promotion |
+| Custom transport | [YT-024 proof](EXTENSIONS.md#application-owned-action-transport) uses existing ActionExecutor for one opt-in typed TCP adapter with bounded loopback/error/cancellation evidence; adopt the app-owned pattern, reject core framework promotion |
 | WebGPU renderer | [YT-023 study](YT-023-WEBGPU-RESEARCH.md) proves opt-in native wgpu/Vulkan draws at 10k–100k with raw completion-wall-time and explicit allocation-byte observations; retain the app-owned prototype, reject core/browser-portability promotion; no matched DOM/CPU speedup is established |
 | Worker compute | Which computations can leave the main thread without compromising DOM correctness? |
 | Tooling | When do HMR, bundler integration, and devtools justify their complexity? |

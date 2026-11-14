@@ -9,6 +9,49 @@ version you consume. [Release readiness](RELEASE-READINESS.md) records distribut
 and its qualification limits.
 
 
+## Application-owned deadlines, streaming and admission timing
+
+**Tower deadline bounds only the inner service until it creates a
+Response**, not the full response body or transport. In the selected
+middleware lab, a 200ms awaited handler with a 100ms TimeoutLayer
+and HandleErrorLayer returned 504; without the opt-in layer it
+still returned 200. Dropping a pending handler future may stop its
+remaining awaits, but does not roll back a preceding write or
+cancel a started spawn_blocking worker or detached task. A Response
+that already returned 200 can stream or stall beyond the deadline.
+Whole-body/idle/connection budgets, safe retries and business
+reconciliation remain application/server responsibilities. No
+generic Yetlet deadline provider was added.
+
+The 2026-10-12 native no-network study measured four million sequential
+synthetic requests and recorded median ns/request **375.590** for a
+direct Router, **538.303** with global envelope, **619.120** with
+no-op request context, and **622.542** with deadline/error mapping.
+Context and deadline compositions were alternatives, not stacked.
+These are local aggregate synthetic costs, not production p95/p99,
+concurrency, isolated middleware allocation or universal SLOs.
+See the [middleware lab](../examples/middleware-lab/README.md).
+
+Optional application-owned row-streamed SSR can emit first body bytes
+earlier in some large/synthetic delayed workloads, but increases
+total completion cost and cannot change a 200 already sent when a
+later row fails. Keep complete escaped SSR as the default; no
+browser progressive paint, TLS/HTTP2 or proxy flush promise follows.
+
+**HTTP Session rejection timing is a different measurement layer
+from direct provider barrier bursts.** Twelve SSR Busy/503 failures
+were observed with four active and four admitted-but-pending Session
+owners at each exact server-side rejection interval. Rejected
+requests did not dispatch provider reads or enter SQL. Distinct
+sixteen-VU JSON/SSR HTTP bursts had zero Busy, with 2.207ms/3.984ms
+server-entry spreads rather than synchronized provider arrivals.
+Client connect/setup, response completion, Redis work and shared
+resource instrumentation clocks cannot be added as identical spans.
+Eleven rejected intervals plausibly overlapped an external Valkey
+resource sample under an *advisory* clock estimate, not proof of
+observer causation; the other failure occurred outside its interval.
+Exact permit-release times and global HTTP capacity are unproven.
+See [Provider Operations](PROVIDER-OPERATIONS.md#bounded-provider-bursts-and-http-attribution).
 ## Prerequisites
 
 Use the pinned Rust/Cargo toolchain and the existing server adapter in a native
@@ -206,7 +249,7 @@ The two new server adapter modules contain **142 lines including comments/blank 
 
 - Reusable tracing/authentication/CORS/session/rate-limit providers remain separate opt-in components, not P0 defaults.
 - Native infallible Tower layers are supported and an existing tower-http layer is tested. Fallible services must use an explicit error-to-response adapter. The thin App facade is implemented in M6; arbitrary fallible-service convenience APIs remain deferred.
-- [YT-029 deadline/overhead research](YT-029-HTTP-DEADLINE-RESEARCH.md) now records an opt-in application-owned native Tower timeout, cancellation/body limits and matched in-process release measurements. This completes the bounded research item, not a supported core API or production benchmark. General provider policy and additional streaming/backpressure qualification remain deferred.
+- [YT-029 deadline/overhead research](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing) now records an opt-in application-owned native Tower timeout, cancellation/body limits and matched in-process release measurements. This completes the bounded research item, not a supported core API or production benchmark. General provider policy and additional streaming/backpressure qualification remain deferred.
 - Request-local extensions do not prevent a developer from deliberately inserting the same Arc into every request; the framework only avoids doing so implicitly.
 - M5 and M6 record local measurements, not a production performance/security certification. Public release and remaining operational-provider gates remain separate.
 

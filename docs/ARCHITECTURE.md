@@ -72,6 +72,57 @@ unaltered original descriptors, numerical results and negative cases
 remain in **local Git** `42d8856b9acf5ddddab9a4b998b5bdd4c5e59210`. The Git SHA has not been verified
 publicly reachable, and the studies are not current Core implementation
 or new platform qualification.
+## Application-owned streaming and custom action transport
+
+**Complete escaped SSR remains the default.** A bounded application-owned
+Axum Body::from_stream prototype generated one escaped View row per poll.
+Small-page first-body time was 0.257ms streamed versus 0.188ms full; a
+10,000-row page exposed first body bytes at 3.011ms versus 6.372ms but
+completed later at 12.451ms versus 6.855ms (full). A synthetic delayed
+tail demonstrates scheduling, not natural throughput benefit. Once headers
+are sent as 200, a later body render error cannot replace the status or
+construct a complete error page. No HTTP/2, TLS, proxy flushing, browser
+paint or generic Core streaming/suspense implementation was qualified.
+See [HTTP policy](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing)
+and the [original fixture](../examples/streaming-ssr-research/README.md).
+
+**Action transport remains application-owned.** A source-limited
+ActionExecutor<Add> uses a four-byte big-endian length-prefixed TCP
+frame (max 1024 payload bytes) over a native loopback socket.
+Seven native tests support typed result/error mapping; the synthetic
+ActionError::Remote status 422 is **not** an HTTP response.
+This experiment adds no Core transport, authentication, CSRF, TLS,
+browser, idempotency, retry or production-network guarantees.
+See [extension ownership](EXTENSIONS.md#application-owned-action-transport).
+
+## Weak-handle published-state snapshot and explicit first render
+
+The initially proposed GraphHandle::snapshot() was **subsequently
+implemented** as an additive experimental read and separately tested.
+It temporarily upgrades Weak, checks **Disposed before Faulted**,
+borrows the published state reference briefly and ends the RefCell
+borrow before running application State::clone. It does not retain a
+strong graph owner, render, flush queued commands, schedule callbacks
+or replay observers. Reads in reducer/commit see the **previous**
+published state, while observers read the newly published state;
+queued re-entrant work may still be pending. A commit failure or
+exhausted pass is Faulted, and disposed/dropped owners cause Disposed.
+A cloned state can outlive the graph but is not a freshness or deep
+immutability guarantee after the read.
+
+Later independently selected **Todo Browser** and **Admin triage Save**
+consumers replaced application mirror reads with this weak snapshot.
+Browser Tasks was **not** migrated. The initial DOM render remains
+explicit application setup, not a manufactured initial graph commit
+or observer replay; Admin still validates pending/dirty state,
+CSRF, item/version and runtime lifetime before Save. Linux/Wasm/Chrome
+source-bound checks do not prove Windows/browser universal coverage
+or a performance speedup. See the [reactive SDK guide]
+(../crates/yetlet/guides/reactive.md) and [View guide](VIEW-COMPONENTS.md).
+
+The complete dated method research, actual Chrome/browser verification,
+original errors and full measurements remain in **local Git**
+`c3478b7f4e0c929a94ccbf21e05217535553a73d`; remote reachability is not yet verified.
 ## Developer tooling boundary — YT-247
 
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and the

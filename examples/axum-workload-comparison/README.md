@@ -34,7 +34,7 @@ New focused composition tests use
 They use in-process synthetic Session/Auth/finalizer boundaries, not live backend
 qualification. Reuse prior Auth/Valkey/SQL/security evidence without replay.
 
-The [YT-173 HTTP/Session timeline study](../../docs/YT-173-HTTP-SESSION-TIMELINE.md)
+The [HTTP/Session admission timing boundaries](../../docs/HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing)
 requires `RUSTFLAGS='--cfg yetlet_session_admission_probe'` with the existing
 `--features auth-workload-observation --bin auth-postgres` research build.
 Only that build scopes a sanitized `X-Yetlet-Probe` synthetic ID and writes

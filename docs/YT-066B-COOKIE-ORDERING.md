@@ -1,7 +1,7 @@
 # YT-066b — Cookie response ordering gate
 
 **Date:** 2026-10-11
-**Status:** The maintainer explicitly selected the pure-SSR contract below on 2026-10-11. Its corrected fixed-name implementation has focused passing tests and independent reviewer **PASS**. The earlier unique-name candidate remains historical **FAIL**. The [subsequent YT-066b2 implementation](YT-066B2-VERIFICATION.md) has separate passing focused runtime evidence and independent reviewer PASS at bounded experimental-provider scope.
+**Status:** The maintainer explicitly selected the pure-SSR contract below on 2026-10-11. Its corrected fixed-name implementation has focused passing tests and independent reviewer **PASS**. The earlier unique-name candidate remains historical **FAIL**. The [subsequent YT-066b2 implementation](https://github.com/bohewu/yetlet/blob/c3478b7f4e0c929a94ccbf21e05217535553a73d/docs/YT-066B2-VERIFICATION.md) has separate passing focused runtime evidence and independent reviewer PASS at bounded experimental-provider scope.
 **Related:** [Accepted plan](https://github.com/bohewu/yetlet/blob/42d8856b9acf5ddddab9a4b998b5bdd4c5e59210/docs/YT-065-066-PLAN.md), [Redis design](YT-066B-REDIS-SESSION-DESIGN.md), [original spike evidence](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md), [fixture](../qualification/yt066b/README.md).
 
 ## Authority and committed baseline

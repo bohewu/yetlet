@@ -4,7 +4,7 @@
 **Status:** Done at bounded single-host, single-primary, no-persistence qualification scope: actual execution, owned cleanup and final independent reviewer PASS. YT-066 remains In progress; YT-020 remains Blocked.
 > **Later parent closeout:** [M10g](M10G-VERIFICATION.md#yt-066-bounded-framework-closeout--2026-10-11) marks YT-066 Done only at single-host Docker multi-instance and selected Redis-provider scope, with a separate final documentation review. This record retains b3's execution/review/delivery identities and its parent-task state at that stage; no new b3 run or durability result is claimed.
 
-**Related:** [fixture](../qualification/yt066b3/README.md), [design](YT-066B-REDIS-SESSION-DESIGN.md), [b2 evidence](YT-066B2-VERIFICATION.md), [Cookie decision](YT-066B-COOKIE-ORDERING.md), [M10g](M10G-VERIFICATION.md).
+**Related:** [fixture](../qualification/yt066b3/README.md), [design](YT-066B-REDIS-SESSION-DESIGN.md), [b2 evidence](https://github.com/bohewu/yetlet/blob/c3478b7f4e0c929a94ccbf21e05217535553a73d/docs/YT-066B2-VERIFICATION.md), [Cookie decision](YT-066B-COOKIE-ORDERING.md), [M10g](M10G-VERIFICATION.md).
 
 ## Authority and prior delivery
 

@@ -91,7 +91,7 @@ unchanged and all nine package READMEs have been added. The only selected-librar
 Rust source change is in `yetlet-reactive/src/lib.rs`: the reviewed additive
 weak-handle snapshot and shared snapshot implementation. Its source digest is
 `8aca69b38154384a7739d602e9ec6094caff882d0b0e66d6f1bb6ac91333a62b`.
-The [YT-105 contract and accepted tests/consumer adoption](YT-105-GRAPH-SNAPSHOT.md)
+The [YT-105 contract and accepted tests/consumer adoption](https://github.com/bohewu/yetlet/blob/c3478b7f4e0c929a94ccbf21e05217535553a73d/docs/YT-105-GRAPH-SNAPSHOT.md)
 remain applicable at their recorded source and platform bounds; no new graph
 abstraction or dependency was introduced by this slice.
 
