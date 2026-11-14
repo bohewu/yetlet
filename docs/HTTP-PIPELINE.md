@@ -52,6 +52,51 @@ resource sample under an *advisory* clock estimate, not proof of
 observer causation; the other failure occurred outside its interval.
 Exact permit-release times and global HTTP capacity are unproven.
 See [Provider Operations](PROVIDER-OPERATIONS.md#bounded-provider-bursts-and-http-attribution).
+## Opt-in application HTTP admission contract
+
+The Auth/PostgreSQL reference's **application-owned**, opt-in
+`auth-workload-admission` feature is not a Core/default limiter.
+With that feature compiled, its existing startup environment key
+`YT176_HTTP_MAX_IN_FLIGHT` is read once **before backend setup**:
+absent means no gate; ASCII digits 1–1024 select a cap; zero,
+non-Unicode, invalid or out-of-range input fails startup.
+Feature-off builds omit this module and env lookup entirely.
+The cap counts protected **HTTP request futures per process**,
+not RPS, connections, Session operations or distributed quota.
+
+One shared Arc semaphore surrounds the Session/Auth/SQL scoped
+API, private SSR, login/logout routes, inside the outer privacy/CSP
+layer. Health and optional fixture observations stay outside.
+A full gate uses immediate `try_acquire_owned`: **no HTTP
+wait queue, timer, automatic retry or downstream call**.
+The bounded private generic **503** carries no-store, Vary: Cookie,
+nosniff and strict CSP; it carries no Set-Cookie, redirect,
+authentication challenge or fabricated Retry-After. Distinguish
+overload 503 from keyed rate-limit 429, expired identity and CSRF
+or permission denial. Keep successful inner response headers intact.
+
+Admitted permits remain held through downstream response creation
+**including Session finalization**, ending at ResponseReady or
+future cancellation. They do **not** span response-body/socket
+delivery; cancellation releases only the HTTP permit, never
+any already dispatched, worker-owned Session/backend permit.
+Prior business or Session writes might have committed even
+if the HTTP caller times out or sees a finalizer 503. No retry,
+rollback, distributed admission or fallback to stale identity
+is implied. Provider admission remains **four active/eight total**,
+with 80ms active-permit wait and 400ms per-Session-operation
+deadline, independent of the four-connection SQL pool.
+
+Original integration tested **six native in-process Axum cases PASS**
+and separately compiled feature-off configuration, including
+shared rejection, a held finalizer, cancellation and recovery;
+those tests did **not** execute a new live Redis/SQL workload.
+Three subsequently accepted isolated Auth workloads are described
+in [Qualification Matrix](QUALIFICATION-MATRIX.md#opt-in-http-admission-4816-bounded-cohorts),
+with application decisions and exact latency populations in the
+[workload example](../examples/axum-workload-comparison/README.md#http-admission-capacity-selection).
+Complete original commands, source and Reviewer evidence survive
+in **local Git** `619b0d9d1e05c86ea0193efb5fc91a198ec930a8` (public SHA reachability unverified).
 ## Prerequisites
 
 Use the pinned Rust/Cargo toolchain and the existing server adapter in a native

@@ -102,6 +102,47 @@ See [Qualification Matrix]
 (QUALIFICATION-MATRIX.md#early-provider-and-http-attribution-evidence)
 and [HTTP Pipeline]
 (HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing).
+## Outer HTTP admission and downstream provider pressure
+
+Application-owned HTTP and Session admission bound **different units**.
+The outer cap applies to scoped HTTP request futures through
+Session finalization; the provider separately permits **four
+active/eight total** Session operations, with 80ms pending and
+400ms caller budgets. Neither queue nor count is distributed.
+More HTTP slots do not grant extra Session/SQL workers, and
+HTTP cancellation cannot release already dispatched backend
+work or undo uncertain mutations.
+
+In three nonrandomized isolated source-bound cap **4/8/16** cohorts,
+attempts were **12,550/12,549/12,552** and valid 200s
+**12,452/12,475/12,540**. Checked private **503** were
+**98/74/12**, all failed requests despite k6 command exit zero.
+Caps four/eight had only **98/74 HTTP-only outer rejections**
+and zero observed provider Busy/QueueTimeout. Cap sixteen had
+**7 outer-only + 5 provider Busy** (two JSON burst, three
+SSR observe) and zero observed QueueTimeout. Both eight-read
+recovery sequences per cohort and exact-owned cleanup passed.
+
+Exact correlated events were HTTP/provider/worker
+**12,550/12,452/12,452** at cap four,
+**12,549/12,475/12,475** at cap eight, and
+**12,552/12,545/12,540** at cap sixteen. Only the five
+provider Busy failures have an attempted provider call but no
+worker; outer-only 503 have **no provider call or worker**.
+That conditional distinction requires selected valid GET routes,
+known source/feature/startup cap, correct private 200/503 oracles,
+zero-overflow trace and reconciled provider/SQL/failure counters.
+The trace does not record actual HTTP gate reason/admit/release
+instants; a 503 body alone cannot prove which gate refused it.
+
+Cap sixteen numerically reduced total failures while exposing
+Session pressure; cap four shed more load before the provider.
+Offer boundaries differed (JSON observe 2,501/2,500/2,503),
+as did arrival, host allocation, warming, connection and
+sampling. Neither causal monotonic capacity nor optimal default
+can be inferred. See the [actual cap-selection guide](../examples/axum-workload-comparison/README.md#http-admission-capacity-selection),
+[Qualification Matrix](QUALIFICATION-MATRIX.md#opt-in-http-admission-4816-bounded-cohorts)
+and retained [Session policy](YT-175-SESSION-BURST-OVERLOAD-POLICY.md).
 ## One bounded local experiment
 
 From the current checkout, after the main agent verifies the two existing

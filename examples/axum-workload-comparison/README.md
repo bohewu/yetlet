@@ -8,7 +8,7 @@ are pinned to the local pre-consolidation Git source and are **not yet verified
 as reachable on GitHub**. Historical failures, cleanup, source/host identities
 and result populations must not be silently requalified after that link repair.
 
-The optional [YT-176 fail-fast HTTP admission](../../docs/YT-176-HTTP-ADMISSION.md)
+The optional [application HTTP admission gate](../../docs/HTTP-PIPELINE.md#opt-in-application-http-admission-contract)
 uses `--features auth-workload-admission --bin auth-postgres`. With that feature,
 set `YT176_HTTP_MAX_IN_FLIGHT` to an explicit application-selected cap; for example,
 `YT176_HTTP_MAX_IN_FLIGHT=4` selects four concurrent HTTP futures. Unset means
@@ -451,9 +451,11 @@ or replayed tests, builds, workloads or analysis programs.
 
 ### Retained outcomes and suitable application priorities
 
-These are the accepted isolated [cap-four](../../docs/YT-177-HTTP-ADMISSION-WORKLOAD.md),
-[cap-eight](../../docs/YT-178-HTTP-ADMISSION-EIGHT.md) and
-[cap-sixteen](../../docs/YT-179-HTTP-ADMISSION-SIXTEEN.md) cohorts. They use the
+These are three distinct accepted isolated **cap-four, cap-eight and
+cap-sixteen** cohorts. Their [qualified counts and negative evidence](../../docs/QUALIFICATION-MATRIX.md#opt-in-http-admission-4816-bounded-cohorts)
+are summarized in the maintained qualification guide. Full original reports
+and their failed requests are recoverable at locally verified Git source `619b0d9d1e05c86ea0193efb5fc91a198ec930a8`
+(not yet verified publicly reachable). They use the
 same release binary/caller and fixed JSON 500/s × 5s, SSR 2000/s × 5s,
 sixteen-request bursts and eight serial recovery reads per mode. The Auth/
 Valkey/PostgreSQL fixture and Session/SQL limits stay fixed.

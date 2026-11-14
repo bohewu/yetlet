@@ -68,8 +68,8 @@ test/source artifacts are **not rerun** by documentation consolidation.
 
 For application-owned outer HTTP admission and current operational priorities,
 use the [workload capacity-selection guide](../examples/axum-workload-comparison/README.md#http-admission-capacity-selection)
-and retained [YT-176–179 records](YT-176-HTTP-ADMISSION.md) rather than
-inferring an admission cap from historical private throughput. The
+and the [bounded cap-four/eight/sixteen results](#opt-in-http-admission-4816-bounded-cohorts),
+not a universal default or capacity guarantee from historical throughput. The
 [Starter production-readiness guide](PRODUCTION-READINESS-PHASE2.md) keeps the
 separately accepted local YT-129 load/recovery and error semantics. Authentication,
 authorization, CSRF, strict CSP, durable write ordering and distributed admission
@@ -102,6 +102,58 @@ current universal GPU support or a 60 FPS/SLA criterion.
 
 Historical source and original failure receipts remain in local Git
 dfb27dc816c452e8033ff24e2d853f88a451761a; public SHA reachability is not verified.
+## Opt-in HTTP admission 4/8/16 bounded cohorts
+
+These dated **2026-10-25** runs apply to one isolated Auth/Valkey/
+PostgreSQL reference, not framework defaults, future CLI versions,
+distributed capacity, a physical ceiling or a production SLO.
+JSON observe offered 500/s × 5s and SSR 2,000/s × 5s; each
+ran a sixteen-request burst and eight serial read recoveries
+per JSON and SSR mode. Every checked **503 is a failed request**.
+
+| HTTP cap | Attempted | Valid 200 | Failed checked 503 | Outer HTTP-only / provider Busy / QueueTimeout |
+|---:|---:|---:|---:|---|
+| 4 | 12,550 | 12,452 | **98** | **98 / 0 / 0** |
+| 8 | 12,549 | 12,475 | **74** | **74 / 0 / 0** |
+| 16 | 12,552 | 12,540 | **12** | **7 / 5 / 0** |
+
+Cap four rejected 98 before the Session provider, compared
+with the separate earlier gate-off cohort's nine Session Busy;
+this is a different source/build/oracle, **not an improvement
+in successful throughput**. Cap eight had 24 fewer failures
+and 23 more successes with **one fewer boundary attempt**;
+burst p95 and failed client tails could worsen. Cap sixteen
+added three boundary attempts versus cap eight and had seven
+outer-only and **five genuine provider Busy** (two JSON burst,
+three SSR observe), not twelve identical gate rejections.
+None had observed QueueTimeout, SQL errors, denials, generator
+drops, invalid 200, incomplete calls or capture overflow.
+Both mode-specific eight-read recoveries and cleanup passed
+for each run without making its failed requests successes.
+
+Source/feature/startup-cap, selected route/valid GET and exact
+private body/header 200/503 oracles plus complete joins are
+necessary to attribute outer-only rejections. **No HTTP gate
+admit/release/reason event** exists in the trace. Raw
+nearest-rank versus native k6 interpolated p95, all/valid/
+failed populations, separate Python recovery clocks and
+distinct client/server timestamps are noninterchangeable.
+These were sequential, not randomized comparisons: arrival,
+warming, host/observer changes and caps themselves are confounded.
+
+Original historical negative evidence: cap four needed a new
+binary and strict caller oracle; caps eight/sixteen reused the
+exact accepted binary/caller. Cap sixteen had one **pre-start
+receipt-writing harness FAIL**, referencing `enforcement`
+instead of `enforcement_status`; the limited correction
+occurred **before startup/measurement**, with no repeated
+exposure or runtime test failure. Earlier Session/Auth/CSRF/
+browser/live backend proofs were retained, not rerun.
+See the [current HTTP gate contract](HTTP-PIPELINE.md#opt-in-application-http-admission-contract)
+and [sample's complete p95 and choice table](../examples/axum-workload-comparison/README.md#http-admission-capacity-selection).
+Full original studies, failure receipts, raw timing and reviewer
+findings survive at **local Git** `619b0d9d1e05c86ea0193efb5fc91a198ec930a8`, but fixed GitHub
+historical links are **not yet verified publicly accessible**.
 ## Workflow source and activation
 
 [Qualification workflow](../.github/workflows/qualification.yml) has only
