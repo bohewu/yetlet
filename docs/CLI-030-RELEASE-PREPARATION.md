@@ -13,7 +13,7 @@ resolver. The Owner has accepted that design and authorized the
 This release plan moves to **YT-248** and depends on that implementation.
 The later Owner instruction authorizes this candidate-preparation slice and its
 reviewed Git delivery, with no publication or Reader Edition upgrade.
-The [later Windows supplement](YT-247-WINDOWS-VERIFICATION.md) qualifies the
+The [later Windows supplement](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) qualifies the
 Resolver/new/lock path only; the separate Windows Style runtime pause below
 retains its original scope.
 

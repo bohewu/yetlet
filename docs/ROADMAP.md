@@ -60,7 +60,7 @@ immutable source snapshot and template identity from the generated app's selecte
 registry SDK. [Phase A handoff](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md) retains the design review
 and PR #68 delivery; the [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
 reports resolver/cache/locking tests and six real registry compile combinations.
-These additions are now distributed in CLI0.3.0. The later [Windows supplement](YT-247-WINDOWS-VERIFICATION.md)
+These additions are now distributed in CLI0.3.0. The later [Windows supplement](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
 verifies MSVC CLI compilation and actual resolver/new/locking execution on the
 existing prepared Runner; failed attempts, scoped test correction and cleanup
 are retained. Windows Style/browser runtime qualification remains separate.
@@ -873,7 +873,7 @@ Vite build covers responsive list/filter/pagination, native forms, detail/histor
 and consistent failure states. Local Linux Chrome and CLI evidence is recorded in
 the application guide; independent Reviewer `/root/yt094_slice_review` PASS has
 zero material issues or required followups. The later
-[Windows native slice](YT-094-WINDOWS-VERIFICATION.md) passes source-matched MSVC
+[Windows native slice](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) passes source-matched MSVC
 tests, CLI lifecycle and HTTP, with independent Reviewer PASS and zero issues or
 required followups; browser/OS input remain open. YT-094 remains In progress:
 OS-level IME/accessibility qualification, wider native/browser coverage and
@@ -891,7 +891,7 @@ redesign or additional platform qualification is implied. Independent Reviewer
 lifetime finding; zero remaining material issues or required followups.
 
 **YT-094 returned Windows evidence (2026-10-19, historical):** the
-[Windows follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) retains the passed
+[Windows follow-up](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) retains the passed
 native/browser matrix and now reconciles operator-passed Bopomofo, draft/focus,
 Narrator, save/reload and physical-stop journeys. Images corroborate drain and
 exit 0; returned observations confirm no server/listener or running input/AT
@@ -1058,7 +1058,7 @@ A further independently reviewed [Linux completion-latency improvement](YT-102-C
 skips the fixed 500ms grace only after safe WNOWAIT, single-thread and
 retained-child checks; failure/cancellation preserves the full cleanup.
 Selected native Windows GNU/MSVC build, signal/process/console and
-[Vite pair evidence](YT-102-WINDOWS-VITE-VERIFICATION.md) remains
+[Vite pair evidence](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) remains
 host/source-specific, not a general browser/production test.
 Source-selected project inspection and Rust Watch/Vite HMR now appear
 in the [current CLI guide](CLI-GUIDE.md#historical-cli-and-developer-loop-qualification).

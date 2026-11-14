@@ -121,7 +121,7 @@ refusal of a linked dotenv file, so their earlier PASS does not close F-01.
   suite counts are not presented as current all-platform certification.
 
 Sources inspected include the [doctor record](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-DOCTOR-VERIFICATION.md),
-[Windows pair record](YT-102-WINDOWS-VITE-VERIFICATION.md),
+[Windows pair record](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence),
 [integrated watch record](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-RUST-WATCH-IMPLEMENTATION.md), and their retained
 source manifests/native receipts. No historical failure or qualification limit
 was removed.

@@ -63,6 +63,21 @@ Dated preparation and source-only
 checkpoints below retain their historical status; they are not current pending
 release gates.
 
+## Windows evidence scope (historical, source-specific)
+
+The [Windows qualification evidence](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
+separates a source-matched Admin native MSVC run, a later bounded Windows
+WASM/browser application overlay with **operator-attested** physical IME and
+Narrator results, an actual Windows GNU Rust/Vite pair, and a different Windows
+MSVC CLI resolver/new/locking run. Their original setup/test/Reviewer failures
+remain recorded; these scopes are **not** interchangeable and do not qualify
+the published CLI/SDK versions on every Windows host. In particular, the
+original Windows desktop Reviewer FAIL and model mismatch were not changed
+by the later independent source-side reconciliation PASS. Current distribution
+identity remains the published records above; Windows mobile, universal OS-IME/
+AT, authenticated HMR, production OIDC/HA and general compatibility are
+not inferred from this source-bound evidence.
+
 ## Published CLI Style authoring and checkout Showcase — 2026-11-10
 
 Optional application-local CSS generation and build/watch integration first

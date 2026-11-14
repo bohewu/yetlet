@@ -27,7 +27,7 @@ retains its historical F-01 finding, not a current unresolved security claim.
 [Natural-completion latency](YT-102-COMPLETION-LATENCY.md) permits skipping
 the Linux 500ms natural-exit grace only after a narrow WNOWAIT/single-thread/
 retained-child proof; cancellation and descendant cleanup still run.
-The [native Windows Vite pair](YT-102-WINDOWS-VITE-VERIFICATION.md) separately
+The [native Windows Vite pair](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) separately
 qualified its selected GNU process/console cases; compile-only and other
 Windows/browser tests cannot be substituted for that evidence.
 
@@ -718,7 +718,7 @@ $Yetlet = Join-Path (Get-Location) "tools\yetlet-cli\target\debug\yetlet.exe"
 ```
 
 Choose an existing owner-protected local fixed NTFS parent. Do not disable ACL,
-reparse or executable checks. The [native Windows GNU pair record](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-WINDOWS-VITE-VERIFICATION.md)
+reparse or executable checks. The [native Windows GNU pair record](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
 covers six selected real Rust/Vite lifecycle cases; MSVC pair evidence remains
 compile-only. Separately, [native MSVC single-Cargo evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20)
 covers build/run, native console cancellation and descendant cleanup, with a
@@ -794,7 +794,7 @@ Linux. No installation/update, shell, app settings or Node probes occur.
 
 Linux has current native process/PTY/cleanup tests. Current Windows GNU
 [doctor and CLI evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-DOCTOR-VERIFICATION.md) and
-[Rust/Vite pair evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-WINDOWS-VITE-VERIFICATION.md) supplement
+[Rust/Vite pair evidence](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) supplement
 the separate MSVC compile-only pair checks and
 [native single-Cargo followup](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20).
 Windows run still requires an attached console

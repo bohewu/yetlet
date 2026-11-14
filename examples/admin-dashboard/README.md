@@ -128,7 +128,7 @@ sessions are a local demonstration. Separately selected OIDC, Valkey sessions
 and shared-SQLite evidence is linked in the closeout; production TLS, HA,
 backups, remote deployment and general all-OS support remain unqualified. The
 subsequent
-[Windows native slice](../../docs/YT-094-WINDOWS-VERIFICATION.md) records source-matched
+[Windows native slice](../../docs/QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) records source-matched
 MSVC tests, CLI lifecycle and native HTTP separately from browser/OS input.
 Service delivery from this edited application layout is not qualified. See the
 [closeout](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md) for accepted limits and the
@@ -249,7 +249,7 @@ See the [slice verification](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b
 native evidence does not qualify this changed slice; Windows browser and real
 OS input/assistive technology remain deferred to final qualification.
 
-The subsequent [Windows Rust/WASM verification](../../docs/YT-094-WINDOWS-WASM-VERIFICATION.md)
+The subsequent [Windows Rust/WASM verification](../../docs/QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
 records the candidate's native/browser checks and returned operator-attested
 IME/keyboard/Narrator journeys, with drain/exit-0 images and final cleanup. Those
 results supersede the pending Windows input status above at their bounded scope;

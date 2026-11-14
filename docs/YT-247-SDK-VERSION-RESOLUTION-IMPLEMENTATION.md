@@ -99,7 +99,7 @@ their checkouts. One lacks `link.exe`; the other has MSVC but lacks the required
 native OpenSSL installation. Both stopped at prerequisites, with original logs
 transferred and no active jobs at closeout. The changed Windows staging/process
 code had **not** completed compile or runtime verification at the original Phase B
-freeze. The [Owner-requested Windows supplement](YT-247-WINDOWS-VERIFICATION.md)
+freeze. The [Owner-requested Windows supplement](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
 subsequently locates the existing qualified MSVC/OpenSSL inputs, compiles the
 merged production source and verifies Resolver/new execution, exact locks,
 offline hit/miss and repeated-destination preservation. Its original failures,

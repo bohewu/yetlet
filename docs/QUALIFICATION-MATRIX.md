@@ -32,6 +32,34 @@ which explicitly set `RUSTUP_TOOLCHAIN=stable`. [Integrity preparation](YT-020-I
 records the retained source boundaries. [Hosted rebuild preparation](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md)
 records the later authorized protected-check migration after actual Rust 1.99 CI PASS.
 
+## Historical Windows native, browser and CLI evidence
+
+These are **four different historical, bounded source/host verifications**, not a
+single current-version platform matrix or a fresh test run. The complete original
+documents, failure receipts and their exact heading identities remain in **local
+Git** `b6be7230194a36f87cbefa50ca5c7cc73ae04f3c`; public GitHub reachability
+of that unpublished ancestry is **not yet verified**. Current CLI release
+qualification and SDK/CLI version identity are separately maintained in
+[Release Readiness](RELEASE-READINESS.md) and the
+[CLI Guide](CLI-GUIDE.md). The earlier YT-065 lane matrix above does not
+silently gain a physical Windows IME or spoken-AT observation.
+
+| Dated cohort | Actual source-specific acceptance | Important original failures and non-claims |
+|---|---|---|
+| **2026-10-19 YT-094 Admin/Board Windows native MSVC**, `4bb8f08` | 820 source files matched a frozen archive. Protected CLI rebuilt; Admin build/typecheck, **12 Admin + 15 Board tests PASS**; real native HTTP exercised escaped Chinese text, strict CSP/CSS and persisted history across restart with retired sessions rejected. Two attached-console Ctrl-C drains returned **exit 0**, with owned process and port closure verified | Initial fnm reparse PATH spawn **125**, offline Cargo cache/index gaps, PowerShell quoting and too-early handle/exit assertions were setup/harness observations corrected separately; no Windows browser, physical IME, spoken accessibility, production auth/HA or shared-session claim from this native slice |
+| **2026-10-19 YT-094 Windows WASM/browser and returned desktop evidence**, `a402b6f` | Source identity is a **20-file application overlay**, not a full Git archive. Admin **12**, Board **17**, reducer **3** tests and focused Clippy passed; actual Windows browser loaded WASM/JS/CSS, retained local drafts, used one POST for save and preserved intentional **409 stale-draft / 422 invalid-state / 401 retired-session** rejections and restart history. Physical Bopomofo, keyboard/navigation and Narrator speech were **operator-attested**, with stop/exit-0 screenshots and retained evidence hashes | Physical composition and spoken audio were **not independently recorded**. The original Windows child Reviewer **FAIL** for missing numeric exit remained FAIL despite later image corroboration; its configured Astra versus observed Sol model mismatch remains uncorrected. A **separate source-side reconciliation Reviewer PASS** confirms returned hashes/screenshots, not the earlier reviewer or model route. The mint-game GNU CLI host is distinct from the MSVC Admin run; no other-browser/mobile or production OIDC claim. The original dated `In progress` status does not override the later [Admin reference closeout](../examples/admin-dashboard/README.md) |
+| **2026-10-18 YT-102 Windows GNU real Rust/Vite pair**, `a883469` bounded overlay | **393** source-hash matched inputs and one actual ignored native integration test executed **six** serialized Vite8.3.4/Rust console cases: Ctrl-C/Break, real frontend and backend **exit 23**, occupied port5173 **exit 125**, and disabled auto-start with Rust exit23. Both owned trees and unrelated listener isolation checked before outer safety cleanup; Reviewer PASS | No installed dependency by the CLI; no native MSVC pair runtime, authenticated Windows browser HMR or general publication/HA guarantee. Native cancellation status `0xc000013a` is not interchangeable with a normal successful-exit 0 |
+| **2026-11-10 YT-247 Windows MSVC CLI SDK version resolver**, PR#69 merge `9ec1ae6` | Exact protected compiler/OpenSSL/source inputs; first library run **102 PASS / 6 FAIL / 3 ignored**, then **six focused PASS** after fixture/test expectation correction, plus **2 release-interface + 3 Windows-new integration PASS**. Real CLI `new` verified exact registry SDK pins and Cargo/Style locks, online refresh, offline-cache without metadata calls, expected existing-destination/empty-cache errors. Cleanup and retained evidence digests reviewed independently | **Not** a single fresh all-library-green run; original TempDir ACL/console/Style assertion/setup errors and advisory Session `fail/source_unproven` remain evidence. Only an existing test assertion expected `YETLET_STYLE_DEV=1`; production behavior did not change. No Windows server/browser/Vite/GNU equivalence or runtime certification |
+
+These historical successes do **not** turn distinct Windows GNU/MSVC toolchains,
+a source-copy overlay, operator testimony or an accepted browser fixture into
+cross-platform coverage. Preserve the original rejected responses and failed
+Reviewer/test populations rather than converting them into successful cases.
+Use the [Admin example](../examples/admin-dashboard/README.md), the
+[CLI process contract](CLI-CONTRACT.md) and the
+[SDK resolver contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md)
+for current application and CLI decision boundaries.
+
 ## Historical performance and capacity evidence (bounded)
 
 The original research cohorts below are **dated, source- and machine-specific**

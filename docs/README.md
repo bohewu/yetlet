@@ -71,7 +71,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   [Phase A handoff](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md): Owner-accepted version/cache/locking
   boundary. The [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
   reports the source implementation, tests and platform limitations.
-- [YT-247 Windows supplement](YT-247-WINDOWS-VERIFICATION.md): actual MSVC
+- [YT-247 Windows supplement](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence): actual MSVC
   Resolver/new/lock/offline verification, scoped test correction and retained
   evidence with Owner-authorized temporary build/cache cleanup.
 - [YT-248 CLI 0.3.0 Style release](CLI-030-RELEASE-PREPARATION.md): preserved
@@ -395,7 +395,7 @@ Git source `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; this is not a public prod
   and generated assets are confined, and Rust Watch/restart is distinct from
   Vite's app-owned HMR and source-matched Windows browser checks.
 - [Retained Linux completion safety](YT-102-COMPLETION-LATENCY.md) and
-  [native Windows Vite pair verification](YT-102-WINDOWS-VITE-VERIFICATION.md):
+  [native Windows Vite pair verification](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence):
   process-tree, console and bounded natural-exit evidence with no universal
   platform or production performance claim.
 - [Rolling static assets](ASSETS.md#cache-and-retention) and
@@ -475,7 +475,7 @@ The optional triage workspace uses tab-local Rust/WASM drafts, keyed reorder
 and one explicit authenticated/version-checked HTTP save; queued-save
 lifetime failure and corrected zero-POST regression remain historical.
 Windows OS IME/AT attestations and ongoing TLS/deployment/HA limitations
-are source-specific and retained in [Windows WASM verification](YT-094-WINDOWS-WASM-VERIFICATION.md).
+are source-specific and retained in [Windows WASM verification](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence).
 The historical form-value/event, state-read and HTTP-feedback studies
 accepted **app-owned** native and graph draft handling, body-token CSRF,
 and explicit save/validation feedback rather than new public auto-binding
@@ -494,10 +494,10 @@ The original research and actual Chrome/TypeScript acceptance are recoverable
 at the fixed local Git source `983653adadcedb4ec196016b75281d39e2ed0acf`.
 No framework-level editor, general plugin system, unsafe-inline exception or
 cross-platform support follows from this bounded trial.
-The [Windows WASM follow-up](YT-094-WINDOWS-WASM-VERIFICATION.md) separates
+The [Windows WASM follow-up](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) separates
 completed native/browser checks from the returned operator-attested native
 IME/keyboard/spoken-AT journeys, exit-0 images and broader open qualification.
-The separately retained [Windows WASM qualification](YT-094-WINDOWS-WASM-VERIFICATION.md)
+The separately retained [Windows WASM qualification](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
 reconciles source-matched browser output, manual Windows input/assistive
 technology observations and cleanup. Earlier setup-only handoff details
 remain recoverable at the fixed local original Git source.

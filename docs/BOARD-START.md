@@ -48,7 +48,7 @@ YETLET_BOARD_LISTEN=127.0.0.1:3012 \
 cargo run --release --locked -p yetlet-lab-operations-board
 ```
 
-PowerShell equivalent configuration. Retained [Windows native execution](YT-094-WINDOWS-VERIFICATION.md)
+PowerShell equivalent configuration. Retained [Windows native execution](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
 includes Board tests and Admin HTTP/restart/drain at its recorded source; it is
 not new qualification of every later feature or this checkout:
 
