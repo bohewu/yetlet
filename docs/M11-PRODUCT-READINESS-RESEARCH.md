@@ -33,7 +33,7 @@ Only the three gaps in section 6 are priority-ranked. Other matrices define thei
 | S8 | [SQLite source](../examples/sqlite-crud/src/lib.rs), lines 1–78; [Modular Shop](../examples/modular-shop/README.md) | Direct SQL, bounded blocking work, explicit version and transaction concepts |
 | E1 | [M7d](M7D-VERIFICATION.md), [M7j](M7J-VERIFICATION.md) | Bounded text-input/keyed lifecycle and repaired late-action evidence |
 | E2 | [M9j](M9J-VERIFICATION.md), [qualification matrix](QUALIFICATION-MATRIX.md) | Historical application/native/browser tests; optional real IME/AT/mobile gaps |
-| E3 | [Redis b3](YT-066B3-VERIFICATION.md), lines 51–72 | Single-host, single-primary, no-persistence semantics and login-loss boundary |
+| E3 | [Redis b3](QUALIFICATION-MATRIX.md#historical-session-auth-oidc-and-cross-host-evidence), lines 51–72 | Single-host, single-primary, no-persistence semantics and login-loss boundary |
 | E4 | [release readiness](RELEASE-READINESS.md), [API classification](API-CONTRACTS.md) | Experimental candidates, separate release/source identities |
 
 ## 2. Workstream A — HTML, forms and browser behavior

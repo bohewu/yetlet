@@ -38,11 +38,11 @@ zero issues and required followups.
 [YT-138 authorization-to-commit ordering research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md)
 is now **Done at source-bound research scope**, after independent Reviewer PASS,
 zero issues and required followups.
-[YT-139 multi-instance authority/recovery](YT-139-MULTI-INSTANCE-AUTHORITY-RECOVERY.md)
+[YT-139 multi-instance authority/recovery](PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority)
 is now **Done at bounded optional local reference scope**, after independent
 contract review, new recovery proof, cleanup and final independent Reviewer
 PASS, zero issues and required followups.
-[YT-140 OIDC proxy/replica integration](YT-140-OIDC-PROXY-REPLICAS.md) is now
+[YT-140 OIDC proxy/replica integration](PROVIDER-OPERATIONS.md#oidc-cross-instance-origin-and-callback) is now
 **Done at bounded optional local integration scope**, after initial contract
 review, minimum implementation/proof/cleanup and final independent Reviewer
 PASS, zero issues and required followups.
@@ -104,7 +104,7 @@ was never execution authority; use the **separately reviewed**
 [YT-181 implementation](PROVIDER-OPERATIONS.md#commit-time-authority-and-revocation),
 [YT-182 worker evidence](PROVIDER-OPERATIONS.md#request-tracing-and-owned-worker-spans),
 [YT-183 catalog cache evidence](../examples/modular-shop/README.md#optional-catalog-display-cache--yt-183)
-and [YT-184 Azure restart](YT-184-AZURE-AUTH-SESSION-RESTART.md) for their
+and [YT-184 Azure restart](PRODUCTION-DEPLOYMENT-PROFILES.md#historical-shared-authority-and-azure-persistence-qualification) for their
 actual, distinct results. Original source/failed/blocked snapshots remain
 in fixed **local Git** `be337ff02826978a9baa1b88ddf85696cb4406b4`,
 not verified as remotely reachable or reproduced by this cleanup.
@@ -209,6 +209,89 @@ retention policy, ingress and incident drill remain consumer responsibility;
 do not generate deployment defaults or silently enable a cloud resource
 because a historical trial passed a subset of its checks.
 
+## Historical shared-authority and Azure persistence qualification
+
+The owner-selected local YT-124–126/139/140 references demonstrated
+two independent Admin/Board processes with an isolated common Valkey
+Session namespace and trusted current policy. Sharing the Session
+cookie and record permits cross-process login/logout, but does not
+share the backend's *local* admission semaphore, distribute the
+SQLite file, make local policy atomic with SQL commit, provide
+cluster-wide authorization freshness or authorize a public OIDC
+reverse proxy. Every protected local account/role/tenant decision
+reads the selected authoritative policy; missing/invalid/unavailable
+policy or Session store must fail private 503 rather than serve
+stale allow. SQL restart/recovery preserves restrictive authority,
+and requires a **new never-reused Session namespace** and fresh
+login when old credentials could otherwise resurrect revoked
+authority. Stop/drain old writers before coordinated trust cutover.
+
+The accepted static OIDC proxy fixture has two actual loopback
+listeners and one fixed local reverse proxy with strict configured
+canonical callback, Host/Origin matching, and discarded untrusted
+Forwarded headers. `http://127.0.0.1:<port>` with an explicit
+canonical decimal port other than 80 is the only selected optional
+origin. Startup issuer/JWKS/subject map snapshots do not refresh
+dynamically, and Session expiry is not upstream identity
+revocation. This is not public HTTPS, multi-AZ IdP or general
+Auth relay qualification. See
+[Admin guide](../examples/admin-dashboard/README.md#historical-auth-session-oidc-and-local-policy-evidence)
+and [Provider Operations](PROVIDER-OPERATIONS.md#oidc-cross-instance-origin-and-callback).
+
+### Composed Azure cross-host reference, not one all-PASS attempt
+
+The **YT-184** historical Azure reference used **five** explicitly
+authorized task-only resource generations within a cumulative
+**US$5 experiment ceiling** and per-allocation time/cleanup
+bounds. Original G1/G2/G3 bootstrap, SQL observer,
+ACL/access and login errors remain **failed attempts** even though
+all five owned resource groups/credentials were eventually deleted.
+G4 actually qualified the cross-host synthetic Auth login,
+tenant/current SQL permissions, disable/logout and app-process
+restart subset; its first Valkey restart recovery read was a
+**failure with missing wire status/body evidence**, not a
+documented 200 or retroactive corrected result. A separate local
+read-only recovery experiment showed initial 503 followed by
+valid reads without replaying business mutations.
+
+G5 executed the **remaining-only** Valkey/PostgreSQL controlled
+stop/restart and authority-VM/disk persistence proof, with native
+command exit0. Both peers gave **503 during stops**. After Valkey
+restart and a two-second settle, the first observations were
+A/B **503 at 11.143/23.565ms**; subsequent fresh read-only
+observations were **200 at 139.902/151.192ms**. PostgreSQL
+recovery's first A/B observations were **200 at
+35.705/59.305ms**. These are finite samples, **not** customer
+SLOs or proof of universal reconnection bounds.
+
+The same authority VM/disk was orderly restarted after consumer
+withdrawal. Actual SQL receipt digest
+`7a18f9eb72d9fd9a23093f7a7d523495d534d08117737198ac6b09c64db829c9`
+and current restrictive permission remained unchanged; an old
+unexpired credential still existed in AOF. New never-reused
+Session namespace caused old peer/credential combinations to
+refuse and require re-login; a newly logged-in principal still
+received **403** until trusted policy was explicitly re-enabled.
+It did not wipe/restore old SQL authority or authorize arbitrary
+re-login after a compromised epoch. G5 cleanup removed exactly
+the owned group and credentials in **512.496s**; all prior groups
+were already confirmed absent. No sixth allocation, live Azure
+resource, unsafe public SSH service, replayed mutation or
+new product/DB layer is introduced by this reference.
+
+Final independent Reviewer accepted the **composition of G4 Auth
+and G5 remaining recovery**, not one continuous all-green run.
+This is synthetic identity, an orderly isolated Linux VM restart
+and single-zone/selected-host evidence, **not** HA, external
+IdP/browser, power-loss durability, arbitrary backup restore,
+production RPO/RTO or a signed release. Complete original
+generations, failure records and source hashes remain
+recoverable from **local Git**
+`0ade9c62b67fe51ecb8e9ee6edc666daed24b5c1`
+while raw cloud/guest logs are independently task-owned/ignored,
+not automatically reconstructible from Git; remote GitHub
+reachability of this unpublished SHA is unverified.
+
 ## Retained evidence and concrete gaps
 
 Reuse the [current capability map](CAPABILITIES.md) and
@@ -223,8 +306,8 @@ remain unchanged; no old qualification was rerun or transferred to this input.
 | [YT-129 capacity](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts) | Historical schema-1/debug/tmpfs, co-located closed-loop clients: 42,043 requests, 45 s sustained phase. Eight clients FAIL at 1.514% rejection / 341.73% CPU, excluded from the passing range; original thresholds stay intact. No evidence transfer to current-v2 release/persistent storage. [YT-134](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts) adds separate bounded local measurements; no long-soak qualification |
 | [YT-130 recovery](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md) | Historical v1/schema-1/debug/ext4, synthetic three-row restore with source writes paused for backup. RPO proxy 41.30 ms, acknowledged-write exposure 39.26 ms and two excluded acknowledged mutations; RTO 52.36 ms only through local cutover eligibility. No current-v2 or production DR/traffic-switch result (YT-135) |
 | [YT-131 compatibility](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions) | Actual 25 tests and 26-response data/migration matrix preserve the existing Issue API and add schema-2 status index/API. Old live v1 becomes unready but still writes: remove/drain before migration. Old restart refuses schema 2. V1-backup rollback loses newer writes; preserve schema 2 and forward-fix after v2 writes (YT-133/135). Reuse unchanged [YT-103 asset proof](ASSETS.md#historical-single-host-rolling-asset-qualification) without recertifying it |
-| [YT-124 contract](YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md) and [YT-126 Admin adoption](YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md) | Two actual Admin processes already PASS cross-process Auth/login/logout, fresh local policy, fail-closed outage and recovery. Authority is a single-host policy file; Valkey was nonpersistent. No persistence/HA/cross-host-trust qualification (YT-139). Fresh pre-SQL checks do not atomically order revocation against business commit (conditional YT-138) |
-| [Existing OIDC evidence](YT-094-OIDC.md) and [adapter study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-116-OIDC-ADAPTER-STUDY.md) | Real-IdP loopback verification exists. Public HTTPS/trusted proxy, cross-replica callbacks, JWKS refresh and subject-map/account-disable freshness remain target-specific if OIDC is selected (YT-140); no new mandatory Auth product or generic adapter follows |
+| [YT-124 contract](PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority) and [YT-126 Admin adoption](../examples/admin-dashboard/README.md#historical-auth-session-oidc-and-local-policy-evidence) | Two actual Admin processes already PASS cross-process Auth/login/logout, fresh local policy, fail-closed outage and recovery. Authority is a single-host policy file; Valkey was nonpersistent. No persistence/HA/cross-host-trust qualification (YT-139). Fresh pre-SQL checks do not atomically order revocation against business commit (conditional YT-138) |
+| [Existing OIDC evidence](../examples/admin-dashboard/README.md#historical-auth-session-oidc-and-local-policy-evidence) and [adapter study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-116-OIDC-ADAPTER-STUDY.md) | Real-IdP loopback verification exists. Public HTTPS/trusted proxy, cross-replica callbacks, JWKS refresh and subject-map/account-disable freshness remain target-specific if OIDC is selected (YT-140); no new mandatory Auth product or generic adapter follows |
 
 Restoring Session/account/policy state must not resurrect revoked authority.
 An explicit re-login policy can discard Memory Sessions after restart; it does
@@ -272,8 +355,8 @@ Do not add validation infrastructure or repeat unchanged accepted proof.
 | **YT-136** / opt-in telemetry integration / YT-133, YT-128 | [Selected collection contract](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-136-TELEMETRY-COLLECTION.md) and [bounded CLI reference](../examples/production-starter/deployment/telemetry/README.md), reusing accepted YT-128 | Reuse enabled/disabled/privacy/correlation/fault evidence; verify only new bounded private snapshot/log collection and fresh versus disabled/down/failed/stale observations, retain failure/resource limits and cleanup; optional sink/alert guidance and independent review. Enabled fresh scrape, stopped/disabled failure with unchanged last-good, bounded correlated logs and oversize rejection verified; one acknowledged row reconciled and cleanup complete; independent Reviewer PASS, zero issues and required followups | No mandatory collector, tracing/audit platform, production retention, on-call or alert-delivery operation |
 | **YT-137** / only for a genuine application retry/replay need / YT-132, YT-127 | [Selected application write-outcome/idempotency research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-137-WRITE-OUTCOME-IDEMPOTENCY.md) | Starter/Board retain no automatic mutation retry and bounded reconciliation; modular-shop retains its SQLite transaction/owner-key order deduplication within Session/cart/handler scope. Record operation identity, current replay authorization, payload binding, same-authority atomicity, retention/restore and reconciliation limits for any future app-owned replay mechanism; independent Reviewer PASS, zero issues and required followups; six hashes matched. Research Done does not require implementation; any implementation is separately authorized | No production-owner dependency, implied rollback, blind replay or universal retry middleware |
 | **YT-138** / application-owned ordering research / YT-132, YT-124, YT-126 | [Selected authorization-to-commit ordering research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md) | Retain YT-126 pre-SQL race for actual native/triage saves; distinguish independent Session/policy snapshots, revocation acknowledgment, business ordering/commit and response acknowledgment. Conditional shared-authority fencing/serialization must define scope, in-flight/stale writers, failure and recovery; independent Reviewer PASS, zero issues and required followups; six hashes matched. Research Done does not require implementation; stronger strict guarantees and paused-write/revocation proof belong to separately authorized implementation | No production-owner dependency, instant revocation from rereads/local mutex/Session CAS or generic Auth redesign |
-| **YT-139** / optional multi-instance integration / YT-133, YT-124, YT-126 | [Selected local authority/recovery contract](YT-139-MULTI-INSTANCE-AUTHORITY-RECOVERY.md) and concrete two-Admin fixture | Initial independent contract Reviewer PASS, zero issues/required followups. New exact two-Admin stale-Session restoration/new-epoch test PASS; old credentials denied, fresh identity obeys retained policy, complete current SQL rows/history/sequence/schema and policy equal; four graceful drains and owned cleanup complete. Final independent Reviewer PASS, zero issues/required followups; seven hashes matched. YT-137/138 limits retained; selected-record restoration only | No mandatory database/HA, actual customer recovery topology, shared-Valkey-equals-SQL, coherent per-replica SQLite or safe NFS assumption |
-| **YT-140** / optional OIDC proxy/replica integration / YT-133, YT-116, YT-126 | [Contract-first integration](YT-140-OIDC-PROXY-REPLICAS.md) for trusted origin/proxy, callbacks and identity freshness | Initial independent contract Reviewer PASS, zero issues/required followups. Optional explicit local Settings origin and callback Host/Origin integration implemented; three new exact tests PASS, with single-process two-Board-listener proxy pending consumption/replay proof. Default compile, strict lint/format and owned cleanup complete. Reuse original real-IdP/authority evidence; no new successful token exchange or cross-process Admin OIDC claim. Final independent Reviewer PASS, zero issues/required followups; twelve hashes matched | No new protocol or mandatory identity product, customer's real IdP/TLS/domain deployment, or unchanged old-proof rerun |
+| **YT-139** / optional multi-instance integration / YT-133, YT-124, YT-126 | [Selected local authority/recovery contract](PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority) and concrete two-Admin fixture | Initial independent contract Reviewer PASS, zero issues/required followups. New exact two-Admin stale-Session restoration/new-epoch test PASS; old credentials denied, fresh identity obeys retained policy, complete current SQL rows/history/sequence/schema and policy equal; four graceful drains and owned cleanup complete. Final independent Reviewer PASS, zero issues/required followups; seven hashes matched. YT-137/138 limits retained; selected-record restoration only | No mandatory database/HA, actual customer recovery topology, shared-Valkey-equals-SQL, coherent per-replica SQLite or safe NFS assumption |
+| **YT-140** / optional OIDC proxy/replica integration / YT-133, YT-116, YT-126 | [Contract-first integration](PROVIDER-OPERATIONS.md#oidc-cross-instance-origin-and-callback) for trusted origin/proxy, callbacks and identity freshness | Initial independent contract Reviewer PASS, zero issues/required followups. Optional explicit local Settings origin and callback Host/Origin integration implemented; three new exact tests PASS, with single-process two-Board-listener proxy pending consumption/replay proof. Default compile, strict lint/format and owned cleanup complete. Reuse original real-IdP/authority evidence; no new successful token exchange or cross-process Admin OIDC claim. Final independent Reviewer PASS, zero issues/required followups; twelve hashes matched | No new protocol or mandatory identity product, customer's real IdP/TLS/domain deployment, or unchanged old-proof rerun |
 
 YT-134/135 evidence must bind to the actual reference application's source,
 binary, schema/migrations, business data and invariants. Starter schema-2

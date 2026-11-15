@@ -82,6 +82,36 @@ checks, real registry requests, Windows runtime and publication are different
 evidence classes. No new product tests, Windows execution, browser run or
 production load was performed during documentation consolidation.
 
+## Historical Session, Auth, OIDC and cross-host evidence
+
+These are **dated, separately sourced bounded qualifications** rather
+than a production Auth/Session service certification. Complete old
+YT-066B/094/113–117/124–126/139/140/175/184 reports and original
+negative results are locally recoverable at Git
+`0ade9c62b67fe51ecb8e9ee6edc666daed24b5c1`. Original raw
+fixtures, screenshot, IdP/Chrome/browser and cloud receipts are
+separately task-owned/ignored; local Git history does **not** by
+itself restore them or establish public remote reachability.
+
+| Selected evidence cohort | Actually observed / accepted | Retained failure or scope limit |
+|---|---|---|
+| **YT-066B** Redis Session atomic CAS, operation results, stale responses and Cookie candidate | Selected local Redis provider CAS/rotation/TTL semantics and later separately accepted **three-application, single-host/single-primary** native/Chrome qualification; original operation-result and callback-loss tests included | The **Cookie issuance candidate had independent Reviewer P1 FAIL**: **180 delayed old cookies** and real Chrome's **150-cookie quota** evicted a newer replacement/logout marker. Smaller focused PASS/57-cookie cases were inadequate; no proven protocol repair or production Cookie guarantee follows. An earlier real cleanup P2 failure was independently corrected before later provider acceptance |
+| **YT-094** optional Board OIDC, shared local SQLite and Valkey Session | Actual real-IdP loopback callback after WAF adjustment, native policy/CSRF/PKCE tests, separate **two-Board same-file SQLite** (conflict 303/409, held-writer 503), separate **Valkey** shared Session and later app-configurable 1800s default TTL (1s–30day) | Initial WAF/dependency-warning/setup and short 60s fixture were different checkpoints; two local SQLite connections are not distributed SQL; 303/409 success cannot exclude a subsequent Busy503 before version comparison, and token/cookie expiries are not equivalent |
+| **YT-113–117** native Auth typed principal, required/optional scope, Memory Session bridge and rate limiting | Source/focused tests and native Settings-example validation PASS with explicit auth-layer provenance, CSRF and bounded quota | Original Clippy, workspace-root and input/setup failures retained; these opt-in features are not a mandatory Core Auth service, general OIDC, automatic Request admission or per-cluster limiter. A rate-denial 429 is not provider-overload 503 |
+| **YT-124–126** same-host multi-process Valkey Auth and Admin adoption | Two actual Admin/Board processes exercise login A/resolution B, current shared local policy/account disable and logout/retired-identity refusal, with review PASS | Original harness default overlay and focused method-layer errors corrected later; old Session/policy errors fail 503, not anonymous allow. Local file-policy trust, restart and SQL commit races remain; no multi-host policy availability or distributed transaction proof |
+| **YT-139/140** shared authority and OIDC static loopback proxy | Native focused actual trust/epoch/Host/Origin/callback/nonce/one-shot state tests PASS, independently reviewed at source and local fixture identity | Startup snapshots not automatically refreshed, no IdP account-disable feed, untrusted Forwarded ignored; no public HTTPS/multi-host OIDC/callback service. Old Session epoch cannot be restored to revive authority; pre-SQL revocation vs commit race remains |
+| **YT-175** Session burst/overload policy | Independent **contract/recommendation** review PASS, no runtime change; 4 active/8 total local Session operations, 80ms wait, 400ms **per API operation** deadline | Not an HTTP deadline or cluster quota; no implemented new HTTP admission, automatic retry, distributed rate budget or guaranteed Retry-After |
+| **YT-184** five selected Azure cross-host generations | Independent final review accepted **composed G4 Auth** and **G5 Valkey/PostgreSQL outage, credential epoch and orderly authority-VM restart** evidence; all five owned groups cleaned | G1/G2/G3 failed and G4 first recovery status lacked wire evidence; G5 initially returned **A503/B503** after Valkey start, then **A200/B200** with valid data. No complete single-run PASS, arbitrary restoration, public IdP/HA or customer reconnect-SLO inference |
+
+Qualified browser, native CLI and workstation checks cannot be
+silently reused at a different code SHA, IdP snapshot or host.
+Different state failures, cookie queue/clock/revocation races and
+cross-host persistence are not equivalent. See
+[Provider Operations](PROVIDER-OPERATIONS.md#historical-session-auth-and-oidc-contracts-and-failures)
+for current operation boundaries and
+[Deployment Profiles](PRODUCTION-DEPLOYMENT-PROFILES.md#historical-shared-authority-and-azure-persistence-qualification)
+for the selected cloud evidence.
+
 ## Historical Windows native, browser and CLI evidence
 
 These are **four different historical, bounded source/host verifications**, not a
@@ -167,7 +197,7 @@ Current build/fixture configuration belongs to the
 and [Axum/Yetlet workload example](../examples/axum-workload-comparison/README.md).
 The retained [YT-141 controlled-arrival reference](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts),
 [YT-074 Board qualification](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) and
-[YT-175 admission-policy contract](YT-175-SESSION-BURST-OVERLOAD-POLICY.md)
+[YT-175 admission-policy contract](PROVIDER-OPERATIONS.md#provider-overload-and-quota-distinctions)
 retain their separate authorities.
 
 | Historical scope | Verified observations and important limits |

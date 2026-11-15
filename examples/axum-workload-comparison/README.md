@@ -536,7 +536,7 @@ Existing quota-based rate limiting remains a separately opted-in capability.
 
 ## Optional cross-host Auth/Session reference — YT-184
 
-The [contract and current evidence](../../docs/YT-184-AZURE-AUTH-SESSION-RESTART.md)
+The [contract and current evidence](../../docs/PRODUCTION-DEPLOYMENT-PROFILES.md#historical-shared-authority-and-azure-persistence-qualification)
 select `auth-cross-host` on the existing `auth-postgres` fixture, without
 installing Auth/SQL/Session/TLS in default builds. Existing `YT170_*` local
 Unix-socket/loopback mode remains unchanged. Cross-host mode is selected only

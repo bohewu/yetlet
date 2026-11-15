@@ -129,6 +129,42 @@ a universal durable business-commit receipt. See
 and [Board source](../examples/lab-operations-board/README.md#opt-in-request-and-sql-worker-tracing--yt-182)
 for exact opt-in activation and admitted scope.
 
+## Authentication, Session and quota HTTP failure ordering
+
+A guarded HTTP integration must select middleware and admission
+order intentionally: a bounded **application request gate** before
+expensive Auth/Session/SQL can shed calls early, but is not installed
+merely by enabling `yetlet::auth`, rate limiting or Redis Session.
+The Session backend's own **four active / eight total** operations,
+immediate total-admission Busy, 80ms active-permit wait and 400ms
+**per API operation** timeout are separate from an HTTP request
+deadline or route-level quota. A single HTTP request may resolve
+Session more than once and finalize/cancel after a handler.
+Timeout/drop does **not** reclaim already running backend permits,
+guarantee rollback, authorize blind mutation retry or guarantee
+that no Set-Cookie raced after a different replica's rotation.
+
+| Source decision | HTTP/application consequence |
+|---|---|
+| Verified missing/expired/revoked identity | Preserve the selected native unauthenticated/redirect handling and required authentication challenge; do **not** infer a storage outage |
+| Verified Auth principal but resource/role denied or CSRF invalid | Preserve current 403/CSRF application refusal |
+| Session/Valkey/policy unavailable, Busy, invalid record, over-capacity or unknown mutation result | Fail closed, private/no-store redacted **503**, never anonymous allow, 401/403 or successful Cookie rotation |
+| Actual rate quota denied under a bounded key/time policy | Existing no-store **429** with measured quota `Retry-After`; internal limiter/storage failure remains 503 |
+| An application-selected separate HTTP response-creation deadline | Keep that application's existing mapping (Starter uses 504), documenting that dispatched SQL work may still commit after HTTP response/cancellation |
+
+Do not derive an HTTP Retry-After from an 80ms Session slot wait
+or turn rate-budget `429` into general infrastructure `503`.
+The original YT-175 research recommends retaining the provider
+guard and selecting a bounded *outer* gate only for an application
+that needs overload protection; it **did not implement** new
+middleware, platform settings, distributed quotas or hidden retries.
+A queue consumes waiting memory/deadline and cannot promise burst
+acceptance; distinct manager processes/replicas multiply admission
+rather than sharing a global limit. See
+[Provider Operations](PROVIDER-OPERATIONS.md#provider-overload-and-quota-distinctions)
+and [Threat Model](THREAT-MODEL.md) for trust/cookie/forwarded-header,
+user and credential privacy boundaries.
+
 ## Prerequisites
 
 Use the pinned Rust/Cargo toolchain and the existing server adapter in a native

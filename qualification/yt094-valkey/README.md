@@ -1,7 +1,7 @@
 # YT-094 — two Admin replicas and Valkey
 
 This opt-in Linux Compose fixture uses the existing provider and app settings.
-See [implementation and observed results](../../docs/YT-094-VALKEY-SESSIONS.md).
+See [implementation and observed results](../../docs/PROVIDER-OPERATIONS.md#redis-session-cas-operation-outcome-and-cookie-ordering).
 It does not start an IdP or change the default Memory backend.
 
 ## Prepare the application image
@@ -79,7 +79,7 @@ same two `--file` arguments for lifecycle commands and `down --volumes`.
 
 Check that A-created records appear through B, B updates appear through A,
 stale/same-version writes report conflicts and restarting an app retains the
-shared record. The [focused application evidence](../../docs/YT-094-SHARED-SQLITE.md)
+shared record. The [focused application evidence](../../docs/PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority)
 also checks existing busy/error recovery through two independent native Board
 connections. This is a local-volume application integration, not a qualification
 of SQLite's transaction engine, distributed storage, network filesystems or HA.
