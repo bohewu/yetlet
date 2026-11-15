@@ -213,7 +213,9 @@ fn native_fixture() {
     };
     match mode.as_str() {
         "dev-console" => {
-            wait_file(&PathBuf::from(std::env::var_os("YETLET_WIN_JOB_GO").unwrap()));
+            wait_file(&PathBuf::from(
+                std::env::var_os("YETLET_WIN_JOB_GO").unwrap(),
+            ));
             let app = crate::platform::fs::open_app(&PathBuf::from(
                 std::env::var_os("YETLET_WIN_JOB_MANIFEST").unwrap(),
             ))
@@ -371,7 +373,11 @@ fn native_fixture() {
         }
         "resistant-leaf" => {
             assert_ne!(unsafe { SetConsoleCtrlHandler(Some(ignore_control), 1) }, 0);
-            fs::write(std::env::var_os("YETLET_WIN_JOB_LEAF_READY").unwrap(), "ready").unwrap();
+            fs::write(
+                std::env::var_os("YETLET_WIN_JOB_LEAF_READY").unwrap(),
+                "ready",
+            )
+            .unwrap();
             loop {
                 std::thread::sleep(Duration::from_secs(1));
             }
@@ -390,8 +396,14 @@ fn native_fixture() {
             std::process::exit(23);
         }
         "held" => {
-            fs::write(std::env::var_os("YETLET_WIN_PROCESS_RUNNING").unwrap(), "ready").unwrap();
-            wait_file(&PathBuf::from(std::env::var_os("YETLET_WIN_PROCESS_RELEASE").unwrap()));
+            fs::write(
+                std::env::var_os("YETLET_WIN_PROCESS_RUNNING").unwrap(),
+                "ready",
+            )
+            .unwrap();
+            wait_file(&PathBuf::from(
+                std::env::var_os("YETLET_WIN_PROCESS_RELEASE").unwrap(),
+            ));
         }
         "exit" => {
             assert_eq!(
@@ -402,7 +414,10 @@ fn native_fixture() {
             assert!(std::env::args_os().any(|actual| actual == arg));
             assert_eq!(std::env::var("CARGO_NET_OFFLINE").unwrap(), "true");
             assert_eq!(std::env::var("RUSTUP_AUTO_INSTALL").unwrap(), "0");
-            let code: u32 = std::env::var("YETLET_WIN_PROCESS_EXIT").unwrap().parse().unwrap();
+            let code: u32 = std::env::var("YETLET_WIN_PROCESS_EXIT")
+                .unwrap()
+                .parse()
+                .unwrap();
             std::process::exit(code as i32);
         }
         _ => panic!("unknown private fixture"),

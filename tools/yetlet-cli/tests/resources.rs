@@ -117,12 +117,9 @@ fn snapshot_digests_and_recorded_source_are_independent_of_current_sdk_checkout(
     }
 }
 
-
 fn contains_numbered_marker(bytes: &[u8]) -> bool {
     for i in 0..bytes.len().saturating_sub(2) {
-        if bytes[i].to_ascii_lowercase() != b'y'
-            || bytes[i + 1].to_ascii_lowercase() != b't'
-        {
+        if bytes[i].to_ascii_lowercase() != b'y' || bytes[i + 1].to_ascii_lowercase() != b't' {
             continue;
         }
         let digit = if bytes.get(i + 2) == Some(&b'-') {
@@ -141,7 +138,10 @@ fn contains_numbered_marker(bytes: &[u8]) -> bool {
 fn package_sources_omit_numbered_work_items() {
     fn check(path: &Path) {
         let metadata = std::fs::symlink_metadata(path).unwrap();
-        assert!(!metadata.file_type().is_symlink(), "unexpected package symlink: {path:?}");
+        assert!(
+            !metadata.file_type().is_symlink(),
+            "unexpected package symlink: {path:?}"
+        );
         if metadata.is_dir() {
             for item in std::fs::read_dir(path).unwrap() {
                 check(&item.unwrap().path());
@@ -160,16 +160,25 @@ fn package_sources_omit_numbered_work_items() {
     assert!(contains_numbered_marker(&[b'Y', b'T', b'-', b'7']));
     assert!(contains_numbered_marker(&[b'y', b't', b'7', b'_', b'X']));
     assert!(contains_numbered_marker(&[b'_', b'Y', b't', b'4', b'2']));
-    assert!(!contains_numbered_marker(b"yetlet and stylesheet are ordinary words"));
+    assert!(!contains_numbered_marker(
+        b"yetlet and stylesheet are ordinary words"
+    ));
     let root = Path::new(env!("CARGO_MANIFEST_DIR"));
     for path in [
-        "src", "templates", "resources", "tests", "scripts", "README.md",
-        "Cargo.toml", "Cargo.lock", "LICENSE-MIT", "LICENSE-APACHE",
+        "src",
+        "templates",
+        "resources",
+        "tests",
+        "scripts",
+        "README.md",
+        "Cargo.toml",
+        "Cargo.lock",
+        "LICENSE-MIT",
+        "LICENSE-APACHE",
     ] {
         check(&root.join(path));
     }
 }
-
 
 #[cfg(target_os = "linux")]
 #[test]
@@ -177,26 +186,67 @@ fn selected_generated_starters_omit_numbered_work_items() {
     use std::os::unix::fs::PermissionsExt;
     fn inspect(path: &Path) -> usize {
         let metadata = std::fs::symlink_metadata(path).unwrap();
-        assert!(!metadata.file_type().is_symlink(), "generated tree contains a symlink: {path:?}");
+        assert!(
+            !metadata.file_type().is_symlink(),
+            "generated tree contains a symlink: {path:?}"
+        );
         if metadata.is_dir() {
-            std::fs::read_dir(path).unwrap()
+            std::fs::read_dir(path)
+                .unwrap()
                 .map(|entry| inspect(&entry.unwrap().path()))
                 .sum()
         } else {
             assert!(metadata.is_file(), "unsupported output entry: {path:?}");
             let data = std::fs::read(path).unwrap();
-            assert!(!contains_numbered_marker(&data), "numbered task label in generated starter: {}", path.display());
+            assert!(
+                !contains_numbered_marker(&data),
+                "numbered task label in generated starter: {}",
+                path.display()
+            );
             1
         }
     }
     let root = tempfile::tempdir().unwrap();
     std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
     for (name, template, service, settings, tailwind, vite) in [
-        ("native-probe", yetlet_cli::scaffold::Template::Native, true, false, false, false),
-        ("vite-probe", yetlet_cli::scaffold::Template::Native, true, true, true, true),
-        ("browser-style-probe", yetlet_cli::scaffold::Template::BrowserStyle, false, false, false, false),
+        (
+            "native-probe",
+            yetlet_cli::scaffold::Template::Native,
+            true,
+            false,
+            false,
+            false,
+        ),
+        (
+            "vite-probe",
+            yetlet_cli::scaffold::Template::Native,
+            true,
+            true,
+            true,
+            true,
+        ),
+        (
+            "browser-style-probe",
+            yetlet_cli::scaffold::Template::BrowserStyle,
+            false,
+            false,
+            false,
+            false,
+        ),
     ] {
-        yetlet_cli::scaffold::create_selected(name, root.path(), template, service, settings, tailwind, vite).unwrap();
-        assert!(inspect(&root.path().join(name)) > 3, "generated starter must have files");
+        yetlet_cli::scaffold::create_selected(
+            name,
+            root.path(),
+            template,
+            service,
+            settings,
+            tailwind,
+            vite,
+        )
+        .unwrap();
+        assert!(
+            inspect(&root.path().join(name)) > 3,
+            "generated starter must have files"
+        );
     }
 }
