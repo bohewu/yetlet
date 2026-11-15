@@ -120,9 +120,9 @@ The 19 packages with `publish = false` are `yetlet-auth-notes`, `yetlet-cart-ser
 
 ## License and source gate
 
-`deny.toml` targets cargo-deny **0.20.2**. It allows MIT, Apache-2.0, BSD-3-Clause and Unicode-3.0, plus the owner's explicit [YT-204 approval of Zlib, BSL-1.0 and ISC](YT-204-PACKAGE-SECURITY-COVERAGE.md#authorized-license-policy-followup--2026-10-27). It checks development/build dependencies and sets private-package ignore to false. All other licenses remain denied unless the checker can satisfy an alternative expression with an allowed license. At the original preflight, observed LLVM-exception, BSL, LGPL and Unlicense alternatives did not require additional approval when MIT or Apache-2.0 satisfied the expression. Current AND expressions still require every obligation; retain applicable notices in distributed artifacts.
+`deny.toml` targets cargo-deny **0.20.2**. It allows MIT, Apache-2.0, BSD-3-Clause and Unicode-3.0, plus the owner's explicit [YT-204 approval of Zlib, BSL-1.0 and ISC](RELEASE-SUPPLY-CHAIN.md#historical-license-and-advisory-qualification). It checks development/build dependencies and sets private-package ignore to false. All other licenses remain denied unless the checker can satisfy an alternative expression with an allowed license. At the original preflight, observed LLVM-exception, BSL, LGPL and Unlicense alternatives did not require additional approval when MIT or Apache-2.0 satisfied the expression. Current AND expressions still require every obligation; retain applicable notices in distributed artifacts.
 
-This is a policy-wide SPDX allowlist for the dependency graph checked by this configuration, including future dependencies with these license IDs; it is not a package/version-specific exception. It does not relicense Yetlet or third-party code, authorize publication, or waive copyright, license-text or modified-source notices. `BSL-1.0` means Boost Software License 1.0. Package-specific terms and eventual source/binary/browser-bundle contents still govern distribution obligations; see the [YT-204 scope summary](YT-204-PACKAGE-SECURITY-COVERAGE.md#license-scope-and-distribution-obligations).
+This is a policy-wide SPDX allowlist for the dependency graph checked by this configuration, including future dependencies with these license IDs; it is not a package/version-specific exception. It does not relicense Yetlet or third-party code, authorize publication, or waive copyright, license-text or modified-source notices. `BSL-1.0` means Boost Software License 1.0. Package-specific terms and eventual source/binary/browser-bundle contents still govern distribution obligations; see the [YT-204 scope summary](RELEASE-SUPPLY-CHAIN.md#historical-license-and-advisory-qualification).
 
 Unknown registries and Git sources are denied; only the crates.io registry is accepted. Workspace paths belong to the reviewed source snapshot, not a registry trust exemption. Do not suppress failures, add blanket exceptions or change package licenses to obtain a pass. A future dependency change requires renewed license/source review. Vulnerability audit remains the separate existing RustSec gate.
 
@@ -135,6 +135,62 @@ target/m10-tools/bin/cargo-deny --locked --offline --workspace \
 ```
 
 For release, regenerate metadata with the same target/features as each build; the unfiltered workspace check is additional coverage, not proof of every feature/target configuration. Preserve exit status, diagnostics, counts, input/policy/tool digests and exact coverage. The installed `--help` confirms the options above. See the upstream [license policy](https://embarkstudios.github.io/cargo-deny/checks/licenses/cfg.html) and [source policy](https://embarkstudios.github.io/cargo-deny/checks/sources/cfg.html).
+
+## Historical license and advisory qualification
+
+At the **2026-10-27** sixteen-package source checkpoint, `cargo-deny 0.20.2`
+assessed **42 selected target/feature license-and-source cells**. The first
+policy allowed only MIT, Apache-2.0, BSD-3-Clause and Unicode-3.0: **31 new
+cells PASS, five FAIL** with eight license errors; another six previously
+qualified cells were retained, for **37/42**, not a clean first pass.
+All new source checks reported **zero source errors**, which does not erase
+the five policy failures or establish full vulnerability absence.
+
+| Actually rejected before owner authorization | License expression requiring attention |
+|---|---|
+| Rate-limit default GNU and MSVC; wgpu WASM `browser` | `foldhash0.2.0` dependency used **Zlib** via `hashbrown0.16.1` |
+| Redis Session GNU default and `tls` | `xxhash-rust0.8.19` carried **BSL-1.0** (Boost Software License 1.0) |
+| Redis Session GNU `tls` additionally | `rustls-webpki0.103.16`/`untrusted0.9.0` carried **ISC**; `ring0.17.14` carried **Apache-2.0 AND ISC**, requiring both notices/obligations |
+
+The owner explicitly approved only adding **Zlib, BSL-1.0 and ISC** to the
+policy-wide SPDX allowlist and preserving matching source/distribution notices.
+Those **same five original failed inputs were subsequently rerun and all five
+PASS**, preserving source/metadata/notice hashes; together with the retained
+37 passing cells this is **42/42 selected coverage**, **not 42 freshly
+executed scans**. Six new *unused-allowance warnings* remained nonblocking.
+Original failed logs are still failures; no dependency upgrade, ignore rule,
+source exception or publication approval was implied.
+
+The policy applies across all dependency graphs evaluated by `deny.toml`,
+including future dependencies with those IDs; it is **not a package-specific
+license override**. Zlib's origin/modified-source notices, Boost BSL-1.0's
+copyright/license-text requirements and its narrow generated-object-code
+exception, ISC's retained copyright/permission text and conjunctive
+`Apache-2.0 AND ISC` obligations remain applicable to actual shipped
+source/native/browser artifacts. Passing cargo-deny does not fulfill notices,
+relicense Yetlet, authorize proprietary third-party use irrespective of terms,
+or certify eventual distributed binaries. Evaluate exact artifact contents
+and notices before publication.
+
+A separate dated **cargo-audit 0.22.2** run over sixteen package locks
+(252 distinct external name/version pairs) found **zero reported
+vulnerabilities** but **retained ten occurrences of informational
+RUSTSEC-2026-0386**, concerning Tokio **1.53.2** `AsyncFd` Unix
+file-descriptor lifetime. Observed grep of Yetlet's selected source showed
+no direct `AsyncFd` usage, **not** a proof that all dependencies/consumer
+applications avoid that path. Full lockfiles include unused target/dev
+dependencies, so ten warnings are not ten independent vulnerabilities or
+proof of default-browser linkage. Patch review, source/host input selection
+and fresh advisories remain separate future release obligations.
+
+Selected SBOM/source checks and existing accepted scan receipts do not cover
+all native libraries, tool binaries, JS/Wasm glue, system/runtime dependencies
+or later source graph changes. Complete original YT-204 **historical** findings,
+advisory/database identity, accepted notice hashes, policy changes, reviewers,
+failures and followed-up checks are locally recoverable from Git
+`a3f0519eaf0e8d04468b6b8f238121e08dcc754e`; the original raw
+scan evidence lives in ignored task-owned artifacts, **not in Git**.
+These dated results do not update today's vulnerability status.
 
 ## Tool-generated SBOM and artifact binding
 

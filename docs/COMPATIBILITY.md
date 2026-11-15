@@ -193,7 +193,7 @@ no prior support or release approval is transferred by changing the number.
 
 The maintainer authorized [Private release preparation](YT-020-PRIVATE-RELEASE-PREP.md), not publication or a visibility change. Existing API classifications remain unchanged.
 
-**Current package preparation (2026-10-26):** [YT-201](YT-201-PACKAGE-PREPARATION.md)
+**Current package preparation (2026-10-26):** [YT-201](QUALIFICATION-MATRIX.md#historical-sixteen-package-qualification-and-wasm-proof)
 aligns sixteen library manifests to experimental 0.1.0 with compatible registry
 dependency requirements and unchanged independent workspaces/default features.
 They remain unpublished. This extends preparation, not the immutable ce56e08

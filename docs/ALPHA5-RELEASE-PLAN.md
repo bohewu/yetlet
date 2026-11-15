@@ -104,9 +104,9 @@ for those inputs. Final C needs fresh normally verified archives and exact
 source/manifest/lock/checksum correspondence, not another replay of unaffected
 runtime tests. The pre-migration Windows, browser/GPU, security and performance
 records retain their original scope; the
-[YT-202](YT-202-NATIVE-FEATURE-GAPS.md),
-[YT-203](YT-203-WASM-DOM-GPU-EVIDENCE.md) and
-[YT-204](YT-204-PACKAGE-SECURITY-COVERAGE.md) matrices are historical evidence,
+[YT-202](QUALIFICATION-MATRIX.md#historical-sixteen-package-qualification-and-wasm-proof),
+[YT-203](QUALIFICATION-MATRIX.md#historical-sixteen-package-qualification-and-wasm-proof) and
+[YT-204](RELEASE-SUPPLY-CHAIN.md#historical-license-and-advisory-qualification) matrices are historical evidence,
 not alpha.5 package names or new-source acceptance labels.
 
 ## Original qualification and remaining release gates

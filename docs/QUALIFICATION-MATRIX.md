@@ -32,6 +32,32 @@ which explicitly set `RUSTUP_TOOLCHAIN=stable`. [Integrity preparation](YT-020-I
 records the retained source boundaries. [Hosted rebuild preparation](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md)
 records the later authorized protected-check migration after actual Rust 1.99 CI PASS.
 
+## Historical sixteen-package qualification and WASM proof
+
+The **2026-10-26/27** YT-201–203 checkpoints prepared a historical experimental
+**sixteen-package 0.1.0 source cohort**, not the currently distributed
+two-crate SDK or independently versioned CLI. All four complete original reports,
+including unsuccessful operations and immutable source/digest records, remain
+recoverable at **local Git** `a3f0519eaf0e8d04468b6b8f238121e08dcc754e`;
+this unpublished Git identity is **not verified publicly reachable**.
+Raw original execution records and browser captures were retained separately
+in task-specific ignored evidence directories: Git alone does not reproduce
+those bytes. Current publication truth belongs to
+[Release Readiness](RELEASE-READINESS.md),
+[Release Publication](RELEASE-PUBLICATION.md) and the hosted records.
+
+| Historical source and target | Actual bounded result | Preserved failure / exclusion |
+|---|---|---|
+| **YT-201** Ubuntu26 GNU package/consumer preparation | **16 ordinary `cargo package --offline --locked --allow-dirty` verifications PASS**, seven newly eligible 0.1.0 manifests, matching README/dual-license and source archives, and **two external directory-source native consumers** (default and selected Auth/Config/Redis integrations) exited zero with `packaged consumer OK` | Initial `core-foundation0.10.1` unavailable for locked offline vendoring: **exit101**, corrected only through a bounded locked source fetch. An archive inspector expected `git.dirty` when omitted/false and failed `KeyError` before consumers; corrected without product changes. Sixteen bootstrap archives made with `--no-verify --exclude-lockfile` were **collection only**, not verified package checks. Directory-source null registry package checksums, dirty `--allow-dirty` inputs and no immutable release source C do **not** prove crates.io upload, registered name ownership, published archives or signed release |
+| **YT-202** selected native GNU and Windows MSVC external package consumer | Distinct Ubuntu24/OpenSSL3.5.9 GNU and Windows11/MSVC1.99 execution; Windows external **default and integrated consumer PASS**, with **14 selected packages** and CPU-only wgpu, Auth `session`, Config `secret-provider` and missing Memory layer refusal | Signing/Redis Windows coverage excluded; prior transfer `source_read_failed / policy_rejected` and administrative trace `UNAUTHORIZED` were real blockers, **not** retroactive transfer success. Owner separately authorized pinned Git acquisition. Initial MSVC fixture missing `futures` returned **101** before native tests; corrected with already-locked Tokio. GNU/native, package-directory and later MSVC evidence have different sources/toolchains; no cross-host HA/production/Windows Signing or Redis claim |
+| **YT-203** six-package WASM/browser selection | Rust1.99 default Wasm release **build PASS**, explicit `browser` feature **compile PASS**, wasm-bindgen CLI **0.2.129**, **34 distinct** default build-graph packages; actual packaged-source DOM/Wasm mounted in **Firefox154 Linux** and **23 focused checks PASS** for native controls/reset, URL/base refusal, safe navigation, preserved DOM subtree, and CSP (including deliberately blocked inline JS) | Browser-only GPU feature was **compile only**, not WebGPU device/browser rendering. Old selected Firefox158 GPU/Chrome results were retained at different source identities, not repeated. No default native GPU, server/Auth/Redis dependencies in the selected Wasm graph, but no universal dependency, device, mobile, physical IME, assistive technology or production browser qualification. Six source archives were directory-sourced with null registry checksums, **not** actual crates.io downloads |
+
+Selected consumer, OS, feature, source and lock determine what was actually
+tested. A PASS at one selected matrix cell does not qualify all targets,
+optional providers, new releases or real signed/registry consumers. Historical
+license/advisory observations and their initial failures are retained in
+[Release Supply Chain](RELEASE-SUPPLY-CHAIN.md#historical-license-and-advisory-qualification).
+
 ## Historical CLI contract, process and SDK resolver evidence
 
 The following are **dated source-specific** qualifications, not current release

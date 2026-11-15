@@ -96,7 +96,7 @@ TLS is compilation/API evidence, without a new transport or live-provider claim.
 
 ## Selected inventory and security records
 
-The [YT-204 selected matrix](YT-204-PACKAGE-SECURITY-COVERAGE.md) has42 cells.
+The [YT-204 selected matrix](RELEASE-SUPPLY-CHAIN.md#historical-license-and-advisory-qualification) has42 cells.
 Fourteen normal/build closures actually contain Tokio: GNU/MSVC Auth default
 and session, Rate-limit, Request-ID, Axum adapter and Memory Session, plus GNU
 Redis default/tls. Only these fourteen receive new locked metadata, real

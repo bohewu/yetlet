@@ -2,7 +2,7 @@
 
 `yetlet_browser::wgpu` is **Experimental and opt-in**, included as a module
 of `yetlet-browser` SDK `0.9.0-alpha.8`. The earlier separate-package metadata
-preparation is retained in [YT-201](https://github.com/bohewu/yetlet/blob/master/docs/YT-201-PACKAGE-PREPARATION.md).
+preparation is retained in [YT-201](https://github.com/bohewu/yetlet/blob/master/docs/QUALIFICATION-MATRIX.md#historical-sixteen-package-qualification-and-wasm-proof).
 There is no performance, speedup, FPS, stable API, production-readiness or broad
 browser guarantee. The measured YT-077 comparison did not demonstrate a useful
 WebGPU speedup; experimental promotion was separately approved for an optional
