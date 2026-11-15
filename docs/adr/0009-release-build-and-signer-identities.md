@@ -5,8 +5,8 @@
 - **Task:** YT-096; D1/D3 amendment. D6 Pending; YT-020 Blocked.
 - **Related:** [Signer contract](../YT-096-SIGNER-CONTRACT.md),
   [D1–D5 policy](../YT-096-D1-D5-RELEASE-TRUST-PLAN.md),
-  [CI integration](../YT-096-RELEASE-CI-INTEGRATION.md),
-  [hosted checkpoint](../YT-096-HOSTED-DRILL-PLAN.md).
+  [CI integration](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-RELEASE-CI-INTEGRATION.md),
+  [hosted checkpoint](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-HOSTED-DRILL-PLAN.md).
 
 The [later alpha integration](../YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)
 applies this unchanged design to actual source `bf33638`, unsigned alpha tag and

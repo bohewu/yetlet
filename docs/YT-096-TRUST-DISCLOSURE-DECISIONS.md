@@ -88,8 +88,8 @@ as release source. Existing archives, SBOMs, builder/platform evidence, owner
 waivers and historical failures retain their exact scope; none is rerun,
 regenerated, re-signed or relabelled. No new release guarantee is inferred.
 
-The [original candidate review](YT-096-SECURITY-RELEASE-REVIEW.md) remains
-**FAIL / release-ready NO**. The [owner's support/inventory disposition](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20)
+The [original candidate review](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-SECURITY-RELEASE-REVIEW.md) remains
+**FAIL / release-ready NO**. The [owner's support/inventory disposition](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20)
 resolved that disposition only: exact-candidate Chrome qualification and
 complete compiled/system inventory stay Not verified. YT-096 stays In progress;
 YT-020 stays Blocked. The original nine-package release scope is unchanged.

@@ -212,9 +212,9 @@ current checkout. Current task status remains in [Backlog](BACKLOG.md).
 
 ## Historical release-candidate qualification
 
-[YT-096 candidate selection and package preflight](YT-096-CANDIDATE-QUALIFICATION.md) records the owner-approved `ce56e08` source, original nine experimental `0.1.0` libraries, Rust 1.99 and selected support targets. Nine source packages and a clean packaged-input native consumer pass on Ubuntu 26.04.1. The [selected dependency/API delta](YT-096-SUPPLY-CHAIN-DELTA.md) records 23 SBOMs and license/source checks, nine passing RustSec package-lock scans, API/threat reconciliation and an unsigned checksum bundle with explicit coverage limits. The selected Ubuntu 24.04 baseline and remaining platform/build-bound inventory/rebuild/formal review/trust gates are explicit. YT-096 is In progress and YT-020 remains Blocked. Historical accepted evidence is preserved; no publication or production support is activated.
+[YT-096 candidate selection and package preflight](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) records the owner-approved `ce56e08` source, original nine experimental `0.1.0` libraries, Rust 1.99 and selected support targets. Nine source packages and a clean packaged-input native consumer pass on Ubuntu 26.04.1. The [selected dependency/API delta](RELEASE-SUPPLY-CHAIN.md#historical-candidate-inventory-and-technical-consolidation) records 23 SBOMs and license/source checks, nine passing RustSec package-lock scans, API/threat reconciliation and an unsigned checksum bundle with explicit coverage limits. The selected Ubuntu 24.04 baseline and remaining platform/build-bound inventory/rebuild/formal review/trust gates are explicit. YT-096 is In progress and YT-020 remains Blocked. Historical accepted evidence is preserved; no publication or production support is activated.
 
-The [partial platform followup](YT-096-PLATFORM-QUALIFICATION.md) adds Ubuntu
+The [partial platform followup](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) adds Ubuntu
 24.04.5 container userspace tests/doctests, five packaged wasm builds and a
 source-reconciled Firefox workflow. It retains the shared-kernel/Chrome evidence
 limits and the historical Windows cache failures. The resumed standalone
@@ -222,28 +222,28 @@ archive lane passes all nine packages on Windows MSVC: 83 native tests and
 four doctests. The [two-host archive rebuild](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md) now
 matches all nine Windows archives byte-for-byte to the Linux originals.
 Independent builder control and later release gates remain open. The earlier
-[SSH failures](YT-096-AZURE-CLEAN-BUILDER.md) are preserved. The
-[Azure Run Command continuation](YT-096-AZURE-RUN-COMMAND.md) now passes on an
+[SSH failures](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) are preserved. The
+[Azure Run Command continuation](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) now passes on an
 actual Ubuntu 24.04.5 guest with an empty cache: nine identical archives,
 83 native tests/four doctests and five wasm libraries. All temporary resources
 are deleted; aggregate Cargo observations retain explicit SBOM/dev-only limits.
 
-The [GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) reuses the
+The [GitHub-hosted candidate rebuild](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) reuses the
 existing manual workflow at the exact same candidate. All nine returned archives
 match complete primary bytes with matched source/lock/tool inputs and verified
 unsigned bindings. This adds separately operated execution evidence; formal
 trust and release approval remain open. The owner subsequently accepted only
 the bounded inventory/platform disposition described below.
 
-The [final inventory/platform evidence reconciliation](YT-096-FINAL-RECONCILIATION.md)
+The [final inventory/platform evidence reconciliation](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence)
 joins nine archives to 23 target SBOMs and retained Cargo observations, with
 133 browser-source/eight asset identities checked and no runtime reruns.
-The [owner's support/inventory decision](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20)
+The [owner's support/inventory decision](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence)
 accepts the experimental nine-source-package scope and known differences.
 Exact-candidate Chrome qualification and complete compiled/system inventory
 remain Not verified; no formal release gate is waived.
 
-The [final candidate security/release review](YT-096-SECURITY-RELEASE-REVIEW.md)
+The [final candidate security/release review](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints)
 is complete. Bounded technical/security evidence is accepted with limits and no
 new material source defect was identified; the overall release gate is FAIL,
 release-ready NO. Subsequent owner support/inventory acceptance resolves one
@@ -266,7 +266,7 @@ validity and compatibility checks, and source-package-only claims with acyclic
 bindings. No actual release SHA, tag, final output/payload, authenticated Cosign
 installation or new build result is established by adoption.
 
-The owner authorizes build/verify-only [Release preparation workflow implementation](YT-096-RELEASE-CI-INTEGRATION.md),
+The owner authorizes build/verify-only [Release preparation workflow implementation](RELEASING.md#existing-workflow-map-and-limits),
 with new changes uncommitted/unpushed. Hosted build/verify execution needs separate
 explicit authority and may be authorized while D6 remains Pending. D6 holds
 identity issuance/signing; publication needs separate explicit approval.

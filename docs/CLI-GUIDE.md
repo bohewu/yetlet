@@ -988,7 +988,7 @@ itself a published CLI or public Style API.
 YT-243 records source qualification, including Linux release-profile browser
 checks and local Windows MSVC Native Style HTTP/CSS, Browser Style scaffold
 creation and wasm32 compile checks. Its Windows browser scope stops at
-compilation. [YT-243 source qualification](YT-243-RELEASE-QUALIFICATION.md)
+compilation. [YT-243 source qualification](QUALIFICATION-MATRIX.md#historical-two-package-migration-and-style-source-qualification)
 
 Todo and the native-first Style Showcase have their own bounded Linux
 Chrome/Firefox sample results. Showcase runs from a checkout and has an optional

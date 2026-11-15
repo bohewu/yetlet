@@ -10,7 +10,7 @@ sources. Opt-in static HTML export through the [independent CLI](CLI-GUIDE.md#st
 is distributed in [CLI `0.2.0`](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02);
 it adds no SDK module/default. SDKalpha.6 includes the YT-220/221 DOM vocabulary
 and options, absent from SDKalpha.5. Earlier records keep their original
-source, API names and scope. See [the migration](YT-211-TWO-PACKAGE-MIGRATION.md).
+source, API names and scope. See [the migration](COMPATIBILITY.md#two-package-feature-and-target-contract).
 
 Start at [Current API reference](API-REFERENCE.md) for current entry points,
 ownership/error boundaries and local rustdoc. [Documentation scope](DOCUMENTATION-SCOPE.md)

@@ -24,7 +24,7 @@ were the selected S, and replacement source selection requires explicit authorit
 **Historical alpha preparation checkpoint — 2026-10-28:** The owner accepts
 preparing the two signing inputs and a separate signer workflow. Original alpha
 build `40669449040`/attempt1 and manually approved verifier `40688772221`/attempt1
-PASS at the [recorded custody scope](YT-096-ALPHA-HOSTED-PLAN.md#actual-alpha-protected-verifier-and-retention--pass).
+PASS at the [recorded custody scope](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-ALPHA-HOSTED-PLAN.md#actual-alpha-protected-verifier-and-retention--pass).
 The execution source is `bf3363801132f4481263ceb411d9bba3349df86d`, immutable unsigned
 `v0.9.0-alpha.1`, with sixteen Experimental `0.9.0-alpha.1` libraries. The earlier
 `5d7b918` was version-preflight C, not this hosted execution source. Historical

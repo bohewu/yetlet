@@ -38,7 +38,7 @@ packet. YT-096 In progress; YT-020 Blocked.
 Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-ALPHA-VERSION-PREFLIGHT.md).
 The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
 (tree `6adff26fc4fec65e9aa8f40d7172ff266b7e500d`) as the new immutable alpha candidate C.
-The [minimum hosted/readback plan](YT-096-ALPHA-HOSTED-PLAN.md) records the
+The [minimum hosted/readback plan](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-ALPHA-HOSTED-PLAN.md) records the
 remaining fixed-binding patch, consumed Guard-state disposition and separate
 execution-source selection/authorization gates. Existing `v0.1.0`, source
 `3eacfe3`, hosted/readback runs and retained bytes stay historical and unchanged;
@@ -59,7 +59,7 @@ The original independent read-only review PASS, zero blocking findings, applies
 to the proposal only. The original adoption did not select a release source or
 authorize execution. Later separate owner approvals selected `C_release`
 `3eacfe31f5e3281411d3bc4653a6baccab668b30` and unsigned lightweight `v0.1.0`;
-[the actual hosted checkpoint](YT-096-HOSTED-DRILL-PLAN.md) records build
+[the actual hosted checkpoint](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-HOSTED-DRILL-PLAN.md) records build
 `40628943583` / attempt1, protected verifier `40631789238` / attempt1 and verified
 repository-external owner-host retention, all successful at their bounded scopes.
 D6 remains Pending. The resulting unsigned outputs are recorded evidence, not
@@ -101,7 +101,7 @@ a valid signature from another repository/workflow must fail identity checks.
 This work provides release integrity and traceability. It does not establish
 defect-free code, complete compiled/system inventory, a SLSA level or production
 certification. Public source-preview use is already available after
-[YT-206](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md); this work adds no Yetlet runtime API.
+[YT-206](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-206-PUBLIC-PREVIEW-DISCLOSURE.md); this work adds no Yetlet runtime API.
 
 ## Adopted choices — 2026-10-27
 
@@ -132,7 +132,7 @@ still require explicit authority; no certificate or signature is claimed.
 
 The historical sources above predate `.github/workflows/release.yml`; the selected
 co-located source contains it. The [original formal proposal](YT-096-FORMAL-TRUST-PROPOSAL.md)
-remains the design basis, while the [hosted checkpoint](YT-096-HOSTED-DRILL-PLAN.md)
+remains the design basis, while the [hosted checkpoint](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-HOSTED-DRILL-PLAN.md)
 records the completed source/tag/build/readback/custody operations. Preserve the
 private-rebuild guard and immutable tag; unsigned preparation is not release approval.
 
@@ -252,7 +252,7 @@ separate isolated, manually approved protected GitHub Environment verifier,
 superseding the earlier local-only CI policy. The original integration authority
 covered code/local proof only; its independent review PASS retains that scope.
 Later settings/Secret installation, hosted execution and owner-host retention were
-separately approved and completed in the [actual hosted checkpoint](YT-096-HOSTED-DRILL-PLAN.md).
+separately approved and completed in the [actual hosted checkpoint](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-HOSTED-DRILL-PLAN.md).
 See [custody integration and manual rotation](YT-096-AGE-CUSTODY-INTEGRATION.md)
 for the preserved local and rotation evidence. This extension does not authorize
 OIDC, signing or publication. D6 remains Pending; recorded owner-host retention
@@ -352,7 +352,7 @@ defines the statement's structure; using it does not confer a SLSA level.
 | `reader-source-inventory-C.json` | `d444e88da31b86fc9b1a2057291a9a94632311240e275c6f347a57a87e9f2b6e` |46 source-bound reader manuscripts; not a published/sanitized reader site |
 
 The records reside under `target/yetlet-yt205-execution-20261027-qecriekl/`;
-the [accepted YT-205 consolidation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)
+the [accepted YT-205 consolidation](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)
 maps required CI, current-lock GNU/MSVC, packaged WASM/DOM, scoped GPU,
 license/advisory/source-security and rustdoc evidence. Preserve each input scope:
 MSVC excludes Signing/Redis Windows and actual GPU; old GPU proof is limited to
@@ -396,7 +396,7 @@ operations. No new operational-readiness or business SLO gate is added.
 YT-206 remains Done at its source-preview/reporting scope. The original adoption
 and read-only review covered the proposal; later implementation/local reviews
 and separately authorized source/tag/build/verifier/custody operations retain
-their own evidence and scopes. The [actual checkpoint](YT-096-HOSTED-DRILL-PLAN.md)
+their own evidence and scopes. The [actual checkpoint](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-HOSTED-DRILL-PLAN.md)
 binds the selected source and unsigned outputs to the single successful build,
 protected verifier, owner approval and repository-external retention.
 

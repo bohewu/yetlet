@@ -32,6 +32,91 @@ which explicitly set `RUSTUP_TOOLCHAIN=stable`. [Integrity preparation](YT-020-I
 records the retained source boundaries. [Hosted rebuild preparation](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md)
 records the later authorized protected-check migration after actual Rust 1.99 CI PASS.
 
+## Historical nine-package candidate platform and builder evidence
+
+On **2026-10-20**, C `ce56e0814e5423782440acd2c959ca777d572cd4`
+(tree `0c5fa71179741f7b52dead078ff6d8a9efc30241`) selected nine default-feature,
+unpublished experimental0.1.0 packages on Rust1.99.0. Source archive SHA256
+`9096cabe9a7b6d8b809c5bd337c2a8ab88f33ff19b6b4c8b59f31267c7335546`
+and63 input hashes bound the immutable export; only18 existing license aliases
+were materialized. Plain Git archives lack Cargo VCS metadata and use external
+source bindings. Source/consumer locks and nine archive digests remain in the
+[original candidate record](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-CANDIDATE-QUALIFICATION.md#immutable-source-and-package-evidence).
+Local Git source/heading is verified; remote SHA accessibility is unverified.
+
+| Actual environment / lane | Result | Preserved negative and limit |
+|---|---|---|
+| Ubuntu26.04.1 GNU local package simulation | Nine normal locked/offline Cargo package verifications; four external directory-source native consumer tests PASS (81 resolved packages, nine Yetlet/71 third-party plus consumer) | Existing cached dependencies, fresh target; no registry download/name-right proof. Optional-key metadata parser failed before tests and was corrected without product changes |
+| Ubuntu24.04.5 container | Nine standalone package commands,83 native tests/four doctests PASS; core/actions/reactive/dom/dom-keyed packaged wasm libraries build PASS | Shared Ubuntu26.04 kernel7.0.0-38, not a booted Ubuntu24 guest or browser/wasm runtime suite |
+| Windows x64 build26300, VS2022 Professional, Rust1.99.0 MSVC | Nine standalone archive roots eventually PASS83 native/four doctests,76 normalized files/locks preserved | Initial vcvars wrapper failed, then root-workspace offline caches failed101 for wasm-bindgen and unselected openidconnect before tests. Separate standalone core passed5, actions failed101 for inactive-target wasi; one correction expanded75 staged directories to the existing331 and resumed only eight packages. Neither failed lane is a PASS or selected inventory |
+| Azure SSH, two disposable guests | Provisioning/host-key reads succeeded; **blocked before source transfer/build**, two SSH/SCP timeouts | Corrected bounded egress allowlist still timed out; no Rust/fetch/package/native/wasm result. Both groups/all12 resources removed. Review PASS accepted truthful blocked report/cleanup only |
+| Azure Run Command/private Blob continuation | Actual Ubuntu24.04.5 kernel7.0.0-1017-azure; empty Cargo cache/upstream locked fetch, nine byte-identical archives,83 native/four doctests and five wasm builds PASS | Same maintainer/controller, not independently controlled trust. Managed execution and native exits0; private authenticated HTTPS Blob endpoint was public, not a Private Endpoint. Group/all8 resources and earlier groups removed; no retained VM/storage |
+| GitHub-hosted rebuild39418279958/1, job118612562396 | Ubuntu24.04.5 image20261018.339.1, source/workflow=C, exact63 inputs/lock/epoch/tools, nine archives byte-identical to Linux/Windows/Azure, fetch/package exit0 and cleanup PASS | No new native/wasm/browser suite, compiled-binary reproducibility, new SBOM, authenticated attestation or SLSA level. ZIP artifact12262540945 SHA256 `afec916ec8545f9c2f45321bbd4267fdcdade11c3e24c97add4deadce4526126`; local bytes/logs saved before10-27 expiry |
+| Firefox158/geckodriver0.37.1 | Source-reconciled Todo/Search debug workflow PASS on Ubuntu26.04.1,133 source entries/eight assets, digest2b8ea18c1298900c | Browser-internal diagnostics retained; not Ubuntu24 desktop, release build, general accessibility/IME or universal Firefox support |
+| Historical Chrome155.0.8059.84 consumer reuse | Original native Chrome exit0 and cleanup PASS retained | No original independent candidate-wide source manifest: exact-candidate Chrome **Not verified**, even after present source hashes match |
+
+Owner acceptance after final report commit2118495 accepts these bounded support
+and known inventory differences; it does not manufacture missing evidence or
+replace the original **FAIL / release-ready NO**. Windows OIDC and repeated
+Windows IME/assistive-technology waivers stay scoped. No new macOS/Windows GNU,
+device/GPU/HA/durability or production support follows. Full original platform,
+Azure, hosted and reconciliation Markdown is locally recoverable at
+`c440c4542c888671750738a5908a667d2124db15`; raw evidence stays in
+`artifacts/yt096-{candidate-preflight,platform-qualification,azure-clean-builder,github-hosted-rebuild,final-reconciliation}-20261020/`
+(brace notation names separate stores, not a new path). Git does not guarantee
+those raw bytes or remote history availability.
+
+## Historical two-package migration and Style source qualification
+
+The **2026-10-30 YT-211** migration passed169 accepted base tests (168 initial
+plus corrected environment-only OpenSSL gate),18 Browser tests,192 root example
+tests,11 SDK doctests and21 moved-example tests. Nine existing external-service
+cases remained ignored. Exactly two normal final archives and a native/wasm
+directory-source consumer passed; importing native Auth on wasm32 was refused.
+Core/default HTML graphs contained only the base SDK; broad wasm feature unions
+excluded native security/provider stacks. These are local migration inputs,
+not selected/frozen release artifacts or registry/Windows/live-browser proof.
+
+Original contract P2/rate-limit omission, serde-alias rejection, compile/golden/
+generator/diagnostic-feature corrections, mistaken .js/.mjs paths, stale smokes
+racing a build and OpenSSL3.5.5 versus required3.5.9 failures remain failures.
+First final review **FAIL/two P2** was followed by focused Auth target eligibility
+and feature-name/doc corrections, then independent PASS accepting bounded Done.
+Later alpha.5 publication and owner deletion of old actions alpha.4 were separate
+operations in [the hosted record](ALPHA5-HOSTED-RECORD.md); PR29 closed unmerged.
+
+The **2026-11-08 YT-243** source qualification began at
+`b1b8fa08c70269cd6083b933c6a200895829ea8d`. Its local packages retained then-published
+SDKalpha.6/CLI0.2.0 version labels but were **source-preflight bytes, not replacement
+releases**. Linux normal two-SDK/CLI packaging and exact directory-source consumers
+PASS; the nested templates/styles/Cargo.toml exclusion first failed packaging,
+then storage as manifest.toml fixed the archive while emitted Cargo.toml stayed
+unchanged. CLI library107 PASS/one ignored follows initial105 PASS/two failures/
+one ignored; focused cloud-lock correction preserved the original production guard.
+
+| YT-243 selected execution | Actual result and exclusion |
+|---|---|
+| Linux release Chrome157.0.8103.38 / Firefox159 | Both Style/Showcase smokes PASS, no-JS HTML, exact CSP/MIME/nosniff, one stylesheet, computed selection/disclosure/focus and page-realm disposal. Chrome390/768/1280; Firefox500/768/1280 (requested390 clamped). **No Firefox390 or full Firefox console/CSP-log PASS** |
+| Local Windows Rust1.99.0 MSVC | View14/typed-tag doctests5/Showcase4, Style6/cloud13/scaffold1/creation3/build6/release-interface2 targeted groups PASS; groups overlap, not a disjoint suite total. Same exact SDK/CLI archives and native/wasm typed consumer, generated native HTTP/CSS PASS with Linux-identical CSS hash; browser-style creation/wasm compile was not a Windows browser runtime/bundle test |
+| CI setup | First independent review found missing Windows OpenSSL configuration; corrected final setup with existing static3.5.9 prefix and two Style commands PASS6+1 locally. Hosted dynamic-image/DLL-copy branch **unexecuted**, no hosted CI claim |
+
+Windows setup refusals (missing checksum/nested workspace, untrusted installed
+compiler ACL, rejected absolute RUSTC override) remain recorded. A byte-verified
+task-owned private compiler copy and normal vetted PATH succeeded without
+changing original ACLs or product allowlists. Original consumer renderer-Result
+and cache-permission corrections, staged-archive parent-workspace harness limit,
+earlier review finding and accepted final PASS all keep their scopes. Three local
+archive SHA256 values were `fb9fc6b727279ae18a5b1ae2f7d9f2131c71050a2f8c7c655fa5c8c5fc905e58`
+(base), `885669fed852b77b9860e807bab6d7a7e18b8a466789cea73bf3689593eab388`
+(Browser), `029419a39c47af4b7141cd6cc384c600224f5acd315b533566146e7cbc6a6491`
+(CLI). Owned processes/listeners/profiles were cleaned; no installation or hosted
+release ran. Original Markdown at local Git
+`c440c4542c888671750738a5908a667d2124db15` preserves full YT-211/YT-243 identities;
+raw stores are `target/yt211-single-package-20261030/` and
+`artifacts/verification/yt243-release-qualification-20261108/`. Remote original
+SHA and raw-byte availability are unverified. Hosted CI, other platforms,
+Windows browser runtime and release C/signing/publication remain separate gates.
+
 ## Historical sixteen-package qualification and WASM proof
 
 The **2026-10-26/27** YT-201–203 checkpoints prepared a historical experimental

@@ -156,4 +156,4 @@ Feature names use Cargo kebab-case: `server-axum`, `auth-session`,
 `session-redis-tls`, `rate-limit`, `dom-keyed`, `wgpu-browser`. Rust modules use
 snake_case. Existing type/method names, application feature names, settings keys
 and wire formats remain unchanged. Historical release documentation keeps its
-original names. See the [migration map](YT-211-TWO-PACKAGE-MIGRATION.md).
+original names. See the [migration map](COMPATIBILITY.md#two-package-feature-and-target-contract).

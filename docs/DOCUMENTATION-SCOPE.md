@@ -72,7 +72,7 @@ visibility alone does not promote them to recommended or supported Yetlet APIs.
 Generated output for optional or browser APIs must use the relevant feature and
 target; one native default build cannot represent every configuration.
 
-The [YT-205 current-C reconciliation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#reader-inventory-and-decision-reconciliation)
+The [YT-205 current-C reconciliation](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#reader-inventory-and-decision-reconciliation)
 binds46 exact reader manuscripts at technical candidate118f3d0 to the previously
 selected draft and retains native/WASM rustdoc input limits. Both Session README
 corrections are now in C's actual archives. This is a versioned source selection,
@@ -85,13 +85,13 @@ sources. This documentation-only addition does not revise the historical
 46-manuscript inventory at `118f3d0`, select another release candidate or
 publish a documentation site.
 
-The [YT-206 post-activation record](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#post-activation-status)
+The [YT-206 post-activation record](CI-SECURITY-REVIEW.md#public-source-preview-and-private-reporting)
 preserves the pre-public inventory and records the owner's source/history/Actions
 disclosure approval. PR12 is merged as d7065bb and the repository is Public as an
 Experimental source preview. GitHub private reporting is enabled, its public entry
 is visible and maintainer repository notifications are subscribed/not ignored;
 a separate mailbox/domain is optional. The [authenticated external-reporter form
-and actual notification delivery](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#reporting-completion)
+and actual notification delivery](CI-SECURITY-REVIEW.md#public-source-preview-and-private-reporting)
 now PASS: one authorized non-vulnerability private test reaches the maintainer's
 configured Gmail route and is closed without publication. Historical failures and
 earlier Not verified results are retained; independent completion Reviewer PASS,

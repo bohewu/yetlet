@@ -25,7 +25,7 @@ Yetlet's baseline SSR/HTTP and browser WASM must remain useful without sessions,
 **Selected two-package migration (2026-10-30; implementation pending):** The
 owner explicitly selects `yetlet` for portable contracts and optional native
 capabilities, plus `yetlet-browser` for DOM/keyed/browser execution and optional
-WebGPU. [YT-211](../YT-211-TWO-PACKAGE-MIGRATION.md) keeps one shared View and a
+WebGPU. [YT-211](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-211-TWO-PACKAGE-MIGRATION.md) keeps one shared View and a
 one-way browser-to-base dependency, additive features, explicit startup options
 and native-only security/storage dependencies outside wasm32. This supersedes
 the earlier single-package implementation proposal, while preserving its

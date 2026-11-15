@@ -194,6 +194,39 @@ remain the exact selected `.crate` files, original unsigned provenance, public c
 public Sigstore bundle and reduced acceptance summary. Publication receipts and
 the complete private evidence are not added through a directory glob.
 
+## Exact public plan and upload boundary
+
+Local `stage`, `readback` and `publish` are separate explicit operations by exact
+Release ID. Before writes, verify immutable tag→C, Release ID/tag/C/name/body
+digest and prerelease identity; preserve `draft=false`, `prerelease=true` and
+`make_latest=false` on publication. `--confirm publish-exact-approved-plan` is an
+operator assertion, not owner authorization. Validate all local bytes first;
+reject duplicates, unexpected existing assets and clobber. Upload each missing
+asset once, verify actual downloaded names/IDs/sizes/hashes, and stop on failure
+with partial state retained. Anonymous metadata and actual bytes must agree after
+publication; failed observation never authorizes republishing.
+
+The public set derives from the cohort: archives, original unsigned provenance,
+public checksum, public DSSE bundle and reduced signing approval (twenty files
+for historical sixteen, six for the two SDKs, five for CLI). The complete private
+manifest is not the public checksum manifest. Full verification receipts/private
+bundles/raw findings are never public attachments. Reduced approval binds
+`record_sha256`, C, S, verification/manifest/public-bundle digests and the accepted
+scope/destination; the combined policy additionally binds its registry plan and
+request. Retain exact plan/schema distinctions; generated GitHub source ZIP/tar
+downloads are not signed package subjects.
+
+The 2026-10-30 alpha.3 Python upload failed with zero assets and an unknown
+original HTTP status. Successful later `gh api` transport did not diagnose that
+old failure. The canonical transport uses authenticated `gh api`, fixed upload
+origin, explicit binary Content-Type/Content-Length and byte-exact stdin;
+metadata reads retain bounded HTTP handling without credential forwarding to
+public asset hosts. Timeout, unavailable CLI, command/HTTP failure and malformed
+response produce bounded phase/class/status receipts, never raw stderr/bodies,
+tokens or signed URLs. Preserve the separate alpha.4 length failure/correction in
+its [accepted record](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair).
+There is no silent fallback, automatic retry, tag change or implicit registry grant.
+
 ## Registry-only continuation contract — 2026-10-30
 
 The owner authorizes a local parser correction and preparation of one explicit

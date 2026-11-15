@@ -55,13 +55,54 @@ an older certificate/signing result cannot qualify a newer checkout,
 browser, platform or production deployment. Follow the canonical
 [API/reference and compatibility guides](COMPATIBILITY.md) and the
 [actual release SOP](RELEASING.md) for current decisions.
+## Historical release and hosted source checkpoints
+
+These are dated results, not the current published pair above or renewed
+execution authority. The eighteen original Z11 Markdown records and heading/blob
+identities are locally recoverable at Git
+`c440c4542c888671750738a5908a667d2124db15`; their GitHub SHA reachability is
+unverified. Original logs, signatures and receipts remain in their recorded
+ignored/external stores, whose continued byte availability is not guaranteed by
+Git. Current operating rules belong to [RELEASING](RELEASING.md),
+[publication](RELEASE-PUBLICATION.md) and the retained normative trust contracts.
+
+| Date / immutable scope | Actual result and surviving limit |
+|---|---|
+| 2026-10-20, nine unpublished experimental 0.1.0 packages, C `ce56e0814e5423782440acd2c959ca777d572cd4`, Rust1.99.0 | Nine normally verified archives and four directory-source consumer tests PASS; this was a local prepublication simulation, not registry ownership/download proof. Native/wasm/browser/inventory results are separated in the [qualification matrix](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) |
+| Same C, final security/release review | **FAIL / release-ready NO** despite accepted bounded technical/security evidence and no new material defect found in the inspected delta. Five conditions were unmet: formal integrity/trust, support/inventory disposition, actual registry proof, public activation/reporting and concrete final maintainer approval. After report commit `2118495`, owner acceptance resolved only support/inventory disposition; four conditions remained open. Chrome exact-candidate binding and complete compiled/system inventory stayed Not verified; later releases do not retrospectively pass this candidate |
+| 2026-10-27, sixteen unpublished 0.1.0 packages | At `a2d6474a72d5a4f6a56c19195a348c1d648b32ae`, ten changed-Tokio-lock normal package checks plus six exact compilation reuses, one consumer, eight rustdoc commands/22 entries and fourteen affected inventory cells PASS. Twenty-eight inventories were retained. Initial checkpoint and GNU-delta reviews both PASS but explicitly `item_can_be_done:false`; MSVC/current-source CI/rebuild and two package-guide corrections were still open |
+| 2026-10-27, successor C `118f3d0f496b487ef20fe243f4e73179f9eadc43` | CI40473956480 PASS on synthetic merge `d53a0f6830e3c31ed8a00a9278dd8577f9e859b6` with complete tree equal C; hosted40475829522/1 and matching local Git-archive recipe each pass33 phases, all16 archives byte-identical. Two affected MSVC consumers and46 reader manuscripts reconcile. Independent PASS closes YT-205 technical/reader scope; D1–D6 remained Pending at that checkpoint, with no signing/publication approval |
+| 2026-10-28, historical unsigned `v0.1.0`, C `3eacfe31f5e3281411d3bc4653a6baccab668b30` | Build40628943583/1, protected verifier40631789238/1 and local correspondence PASS. Actual owner-approved readback reports complete preparation/full manifest; owner-host custody51 files/129,846,094 bytes recorded12:25:12 UTC+08. Seven-day artifacts expiring11-04 were transport only; no offsite/indefinite availability, signing or registry claim |
+| 2026-10-28, alpha.1 C `bf3363801132f4481263ceb411d9bba3349df86d` | PR14 tree equality/source selection and master CI40654332287/1 PASS after retained format failure40651836854. Build40669449040/1 PASS initially left readback Pending/Not verified. Separately authorized verifier40688772221/1 and owner approval later PASS full manifest; distinct custody57 files/130,178,085 bytes, index `426c4d0252a92cb5a39a658c7d3d95734d802dcbb431554b7954b64c41b62405`. Original0.1.0 custody is unchanged |
+| 2026-10-29, alpha.1 signer failures then distinct accepted S | Prepare40717870186/1 at S87d24e9 failed read-only preflight, protected work skipped; prepare40789535074/1 at S0e8fb60 failed Draft metadata HTTP403. At Se2d4a9f,40795794183/1 froze/uploaded data but final Go-cache cleanup failed: overall **FAIL**, ineligible for signing. Local handoff/diagnostic/cleanup fixes did not convert those runs to PASS |
+| 2026-10-29, alpha.1 S `d65e3180ad3076659f03c069fc71cd0e7e3f0518` | New authorized prepare40806988578/1 and sign40811275645/1 PASS. Independent public/private verification binds16 subjects/all117 entries; single-use local custody exception and final Reviewer PASS0 activate exact-output owner acceptance. D6 Complete/YT-096 Done at accepted source-package signing/integrity scope. Separate owner approval then publishes alpha.1 GitHub Experimental pre-release with20 public files, not Latest, anonymous readback PASS; no registry upload at that checkpoint |
+
+The original direct planned-input tag Guard screen failed with13 historical
+findings across two commits/six files (23 commits/1,760 scan operations).
+It was not native-hook execution. Design Reviewer P2 FAIL then focused PASS
+corrected that distinction. Later authorized Guard0.44 native one-use tag Push
+passed with zero outgoing commits; findings remained accepted-existing debt.
+An after-Push stdout/stderr wrapper failure was corrected by observing the same
+successful Push, without repush/rearm. Guard0.45 used-binding retirement was
+metadata-only and preserved the exact archived used record, not a new grant.
+These dated results do not authorize Guard installation, remote access or work
+in another repository. Preserve [current source/tag and freeze rules](RELEASING.md#release-identities-and-freeze-order).
+
+Detailed original alpha failure/custody identities remain in the retained
+[signer contract](YT-096-SIGNER-CONTRACT.md); the original
+[alpha checkpoint](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-ALPHA-HOSTED-PLAN.md#actual-alpha-protected-verifier-and-retention--pass)
+is locally verified history, with remote reachability unverified. Failure
+stores include `target/yt096-alpha-hosted-*20261028/`,
+`target/yt209-delivery-20261029/` and the recorded repository-external custody
+indexes; no raw store is moved or claimed newly verified by consolidation.
+
 ## Historical readiness checkpoints
 
 **Owner-selected version update (2026-10-28):** The next sixteen-package
 Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-ALPHA-VERSION-PREFLIGHT.md).
 The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
 (tree `6adff26fc4fec65e9aa8f40d7172ff266b7e500d`) as the new immutable alpha candidate C.
-The [minimum hosted/readback plan](YT-096-ALPHA-HOSTED-PLAN.md) records the
+The [minimum hosted/readback plan](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints) records the
 remaining fixed-binding patch, consumed Guard-state disposition and separate
 execution-source selection/authorization gates. Existing `v0.1.0`, source
 `3eacfe3`, hosted/readback runs and retained bytes stay historical and unchanged;
@@ -72,7 +113,7 @@ is authorized by this migration.
 
 **Latest YT-205 execution:** Candidate118f3d0 has required CI PASS, sixteen
 byte-identical hosted/local package archives and both affected MSVC consumers
-PASS. [Current evidence and limits](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)
+PASS. [Current evidence and limits](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints)
 have final independent Reviewer PASS0 at selected technical/reader scope. The
 earlier dated checkpoints below retain their
 point-in-time identities; no Merge/signing/publication and D1–D6 remain Pending.
@@ -81,7 +122,7 @@ point-in-time identities; no Merge/signing/publication and D1–D6 remain Pendin
 and the native hook pass with zero findings for the ten-path rebuild-extension
 commit `118f3d0f496b487ef20fe243f4e73179f9eadc43`; its tree matches `tree_oid`.
 The owner selects that exact commit as new technical C. The
-[remaining plan](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
+[remaining plan](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
 orders separately authorized source delivery, required PR CI, explicit sixteen
 cohort hosted/local archive comparison, affected fourteen-package MSVC scope
 and final evidence reconciliation/independent review. Old a2d6474 archives/results
@@ -91,7 +132,7 @@ validation. YT-205 remains In progress, YT-020 Blocked and D1–D6 Pending.
 
 **YT-205 selected-source consolidation (2026-10-27):** After guarded28-path
 commita2d6474 without Push, the owner selects that immutable source for all16
-experimental0.1.0 libraries. [The evidence packet](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md)
+experimental0.1.0 libraries. [The evidence packet](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints)
 binds16 clean C archives,10 new changed-lock package checks/six exact compilation
 reuses, one new integration consumer, eight first-time rustdoc commands and14
 affected inventory cells, all new commands PASS after preserved preparation
@@ -154,9 +195,9 @@ This document separates bounded repository evidence from a support or security c
 
 ## Current candidate selection and local preflights (2026-10-20)
 
-The owner selected immutable `ce56e0814e5423782440acd2c959ca777d572cd4`, the original nine experimental `0.1.0` libraries and Rust 1.99/1.99.0. [YT-096 candidate qualification](YT-096-CANDIDATE-QUALIFICATION.md) records the approved native/browser targets, exact new archive digests and remaining gates. Nine-package Cargo verification, archive/license/normalized-manifest checks and four clean packaged-input consumer tests pass on the actual Ubuntu 26.04.1 GNU host. The [selected dependency/API delta](YT-096-SUPPLY-CHAIN-DELTA.md) now records 23 target-specific SBOMs with documented dev-feature over-inclusion, 23 passing license/source checks, nine passing fresh-database RustSec scans, source/API/threat reconciliation and a verified unsigned checksum bundle. These initial local preflights alone do not establish the selected platform/browser matrix, exact compiled-artifact inventory, independent rebuild, final release/security review or formal trust/registry evidence. YT-096 is In progress; YT-020 stays Blocked. No old signature or historical PASS is reassigned to these new artifacts. The dated preparation checkpoints below remain historical evidence.
+The owner selected immutable `ce56e0814e5423782440acd2c959ca777d572cd4`, the original nine experimental `0.1.0` libraries and Rust 1.99/1.99.0. [YT-096 candidate qualification](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) records the approved native/browser targets, exact new archive digests and remaining gates. Nine-package Cargo verification, archive/license/normalized-manifest checks and four clean packaged-input consumer tests pass on the actual Ubuntu 26.04.1 GNU host. The [selected dependency/API delta](RELEASE-SUPPLY-CHAIN.md#historical-candidate-inventory-and-technical-consolidation) now records 23 target-specific SBOMs with documented dev-feature over-inclusion, 23 passing license/source checks, nine passing fresh-database RustSec scans, source/API/threat reconciliation and a verified unsigned checksum bundle. These initial local preflights alone do not establish the selected platform/browser matrix, exact compiled-artifact inventory, independent rebuild, final release/security review or formal trust/registry evidence. YT-096 is In progress; YT-020 stays Blocked. No old signature or historical PASS is reassigned to these new artifacts. The dated preparation checkpoints below remain historical evidence.
 
-The [partial platform continuation](YT-096-PLATFORM-QUALIFICATION.md) now records
+The [partial platform continuation](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) now records
 83 native tests/four doctests in Ubuntu 24.04.5 container userspace, five packaged
 wasm builds and a fresh source-reconciled Firefox workflow on Ubuntu 26.04.1.
 Its shared host-kernel limitation and historical Chrome boundary remain
@@ -169,14 +210,14 @@ now matches all nine Windows source archives exactly to the Linux originals,
 with normal Cargo verification. Shared control/staged dependencies do not
 satisfy independent builder evidence. Build-bound inventory and formal
 trust/release/security/approval gates remain open. The
-[earlier Azure SSH attempts](YT-096-AZURE-CLEAN-BUILDER.md) remain historical
-failures. The [Run Command/private Blob continuation](YT-096-AZURE-RUN-COMMAND.md)
+[earlier Azure SSH attempts](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) remain historical
+failures. The [Run Command/private Blob continuation](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence)
 now passes actual Ubuntu 24.04.5 native execution, empty-cache nine-archive
 rebuilding, 83 native tests/four doctests and five wasm libraries. Actual Cargo
 observations retain known dev-only SBOM differences and inventory limits.
 All temporary resources are deleted; formal independent trust is not established.
 
-The subsequently authorized [GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md)
+The subsequently authorized [GitHub-hosted candidate rebuild](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence)
 uses the existing manual workflow at immutable ce56e08. Run 39418279958 passes
 with all nine archives byte-identical, 63 selected source inputs and exact
 lock/epoch/tool matches; checksum and unsigned provenance bindings pass. This
@@ -185,7 +226,7 @@ builder/provenance/trust-policy acceptance and final security/release approval
 remain open. No signing or publication occurred; API classifications remain
 unchanged and YT-020 remains Blocked.
 
-The [final documentary reconciliation](YT-096-FINAL-RECONCILIATION.md) now
+The [final documentary reconciliation](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) now
 joins nine source archives/package locks to 23 SBOMs and the retained 36-entry
 unsigned bundle; actual GNU/wasm Cargo observations have only known dev-only
 differences. Existing native/wasm/Firefox and historical Chrome results are
@@ -195,7 +236,7 @@ Not verified. At that reconciliation checkpoint, support/inventory-limit
 acceptance and remaining formal trust/registry/final review/maintainer gates
 were open; the subsequent decisions below retain those evidence boundaries.
 
-The subsequent [independent final candidate review](YT-096-SECURITY-RELEASE-REVIEW.md)
+The subsequent [independent final candidate review](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints)
 is complete with overall FAIL and release-ready NO. It accepts bounded
 technical/security evidence and identifies no new material source defect in the
 inspected delta. At that review checkpoint, formal integrity/trust, final
@@ -205,7 +246,7 @@ the review authorized no repairs, reruns, signing or publication. YT-096 stays
 In progress and YT-020 stays Blocked.
 
 After the review report was committed as `2118495`, the owner explicitly
-accepted the [bounded support scope and known inventory differences](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20).
+accepted the [bounded support scope and known inventory differences](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence).
 Missing evidence remains Not verified, including exact-candidate Chrome
 qualification and complete compiled/binary/system inventory. This resolves
 only the missing support/inventory disposition. The original final verdict
@@ -328,9 +369,9 @@ Yetlet keeps native HTTP, renderer, browser and optional provider dependencies s
 
 **YT-204 final policy acceptance (2026-10-27):** [Independent Reviewer PASS](RELEASE-SUPPLY-CHAIN.md#historical-license-and-advisory-qualification), zero issues/required followups, closes the authorized license blocker and marks YT-204 Done at selected inventory/security scope. Six candidates/five followup evidence bindings,39 inputs/10 notices/138 source-and-alias bindings and prior canonical/supplemental records verify; all five affected checks pass under the sole three-ID allowlist delta. Other policy, dependency/runtime and historical warning/failure identities remain intact. Restored package trees and owned Cargo home are removed, raw evidence preserved. Six paths stay uncommitted/staged0; no other passed-check replay, Commit/Push/Merge or release activation. YT-205 is next but unopened; formal release gates remain separate.
 
-**YT-205 independent checkpoint acceptance (2026-10-27):** [Read-only Reviewer PASS](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#independent-checkpoint-acceptance--2026-10-27), zero issues/packet repair requirements, verifies10document/185evidence/1179protected bindings,16clean C archives and their retained/new proof distinctions. The reviewer explicitly keeps item_can_be_done:false for current-source CI/rebuild, affected native dependency evidence and reader-source disposition; YT-205 remains In progress. Owned caches/extracted packages are removed; archives, failure logs, SBOMs and rustdoc remain. No product replay or new-change Commit/Push/Merge, and D1-D6 remain Pending.
+**YT-205 independent checkpoint acceptance (2026-10-27):** [Read-only Reviewer PASS](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#independent-checkpoint-acceptance--2026-10-27), zero issues/packet repair requirements, verifies10document/185evidence/1179protected bindings,16clean C archives and their retained/new proof distinctions. The reviewer explicitly keeps item_can_be_done:false for current-source CI/rebuild, affected native dependency evidence and reader-source disposition; YT-205 remains In progress. Owned caches/extracted packages are removed; archives, failure logs, SBOMs and rustdoc remain. No product replay or new-change Commit/Push/Merge, and D1-D6 remain Pending.
 
-**YT-205 current-lock GNU delta (2026-10-27):** [One additional Ubuntu24/OpenSSL3.5.9 integration run](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#once-only-current-lock-ubuntu24-continuation) PASS at C/Tokio1.53.3 with unchanged source/lock and observed Rust1.99/glibc2.39. It closes only this selected native dependency gap; no old suite is replayed. Owned image/container/vendor/build inputs are removed and all raw evidence retained. The earlier checkpoint PASS remains intact; separate independent GNU delta review PASS0 verifies10docs/12additional records, original185records unchanged, and explicitly keeps item_can_be_done:false. Current-source hosted CI/sixteen-package rebuild, MSVC dependency evidence and reader-source disposition keep YT-205 In progress; no Commit/Push/Merge or formal decision.
+**YT-205 current-lock GNU delta (2026-10-27):** [One additional Ubuntu24/OpenSSL3.5.9 integration run](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#once-only-current-lock-ubuntu24-continuation) PASS at C/Tokio1.53.3 with unchanged source/lock and observed Rust1.99/glibc2.39. It closes only this selected native dependency gap; no old suite is replayed. Owned image/container/vendor/build inputs are removed and all raw evidence retained. The earlier checkpoint PASS remains intact; separate independent GNU delta review PASS0 verifies10docs/12additional records, original185records unchanged, and explicitly keeps item_can_be_done:false. Current-source hosted CI/sixteen-package rebuild, MSVC dependency evidence and reader-source disposition keep YT-205 In progress; no Commit/Push/Merge or formal decision.
 
 **YT-205 rebuild preparation (2026-10-27):** After strict/builtin guarded ten-document commit012ecb3 without Push, [the bounded builder extension](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-205-SIXTEEN-PACKAGE-REBUILD.md) preserves original-nine mode and adds explicit sixteen selection, six manifest/lock roots, separate bootstrap/normal verification and conditional pinned OpenSSL3.5.9 preparation. Five focused tests, native compile/lint/format and static manual-workflow checks PASS; expected fixture compile rejection retained and old product proofs not replayed. Independent review is pending. No hosted workflow/OpenSSL setup execution, successor candidate, new-change Commit/Push/Merge or D1-D6 decision; whole YT-205 remains In progress.
 
@@ -338,7 +379,7 @@ Yetlet keeps native HTTP, renderer, browser and optional provider dependencies s
 
 **YT-205 current-C technical execution (2026-10-27):** Authorized strict/builtin
 Push updates PR12 to118f3d0 after5commits/56file operations/0findings and native
-hook PASS. [New execution evidence](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)
+hook PASS. [New execution evidence](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints)
 records both required CI jobs PASS with a C-equivalent synthetic merge tree,
 explicit sixteen hosted/local rebuilds with all33 phases PASS each and all16
 archives byte-identical, and two affected current-lock MSVC consumer PASS.

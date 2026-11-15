@@ -112,7 +112,7 @@ checks. The current maintenance correction makes that successful upload
 transport canonical; local checks do not claim another live release.
 Before another release, review its
 source/record, applicable version changes and missing qualification, then use the
-[versioned interfaces](YT-209-RELEASE-AUTOMATION.md). No version change alone
+[versioned interfaces](RELEASING.md#versioned-record-and-receipt-contract). No version change alone
 authorizes a dispatch. Historical tagged workflows retain their original guarded
 interfaces; never pass invented new inputs to those old sources. Local tooling
 acceptance does not qualify a new candidate or grant key/signing/publication
@@ -228,7 +228,7 @@ is reusable setup; its current authentication/validity checks are not waived.
 | Release dossier | Reviewed scope, source/evidence/approval documents and receipts: version/cohort/C/tag, feature/target limits, S/identity/tool pins, original runs/digests, closure, both raw signing hashes, approvals and destinations |
 | Schema-1 release record | Strict data-only input implemented by YT-209: core version/C/cohort, then exact build, custody verifier, S, raw public provenance identity and Release ID; extra fields are rejected |
 
-The [implemented record schema](YT-209-RELEASE-AUTOMATION.md#integration-reference)
+The [implemented record schema](RELEASING.md#versioned-record-and-receipt-contract)
 is the workflow input, not the complete release dossier. Keep additional scope,
 trust pins, later results and approvals in their defined external records/trusted
 code. Populate inputs from actual outputs and retain each snapshot; never overwrite
@@ -258,6 +258,74 @@ retire a used binding only under the approved metadata authority. Never rearm
 a consumed binding, force a tag, treat history acceptance as full-history
 cleanliness, or reinstall hooks as routine release work. Tool/platform support
 and a passing Guard do not themselves authorize a tag or Push.
+
+## Versioned record and receipt contract
+
+Release inputs are closed JSON data, not executable commands, paths or URLs.
+The validated cohort determines package names, counts, order and tag derivation:
+schema1/`sixteen` is historical; schema2/`consolidated` selects the two SDKs;
+schema3/`cli` selects only the independent CLI. Use the matching source's parser,
+not a later interface against an old tag. Version is canonical SemVer without
+build metadata; source and signer are full lowercase commit hashes. Reject
+unknown/duplicate fields, invalid types, oversized data and arbitrary cohorts.
+Repository/owner identities, endpoints, workflow paths and trust pins stay in
+reviewed code, outside caller-controlled data.
+
+| Record stage | Required data and binding |
+|---|---|
+| Core | `schema`, `version`, `source` C, `cohort`; tag derives from version/cohort |
+| Build readback | Core plus `build`: positive decimal `run`, `attempt`, `artifact`, and original ZIP `sha256` |
+| Complete, before prepare | Preserve build unchanged; add `custody_verifier` (`run`, `attempt`, `environment_id`), distinct `signer_commit` S, `provenance` (raw `sha256`, integer `size`), `release_id` |
+| Independent result request | `verifier_commit` V, original `signing_request`, `sign_run`, `sign_attempt`, `sign_artifact`, `sign_digest`, raw `execution_sha256` |
+| Local public plan | `schema`, `record_sha256`, `release_id`, `name`, `notes_sha256`, exact `assets` (name/size/SHA), `verification_sha256`, `approval_sha256` |
+
+Retain every snapshot and its canonical digest in custody. Corrections produce
+a separately reviewed snapshot, never overwrite an accepted record. Canonical
+JSON hashes use sorted keys, ASCII escapes, compact separators and a trailing
+newline; payload/file hashes cover original bytes. Sign request `digest` and
+`sign_digest` identify Actions ZIPs, `receipt_sha256` identifies raw
+`SIGNING-INPUTS.json`, and `execution_sha256` identifies raw
+`SIGNING-EXECUTION.json`. These digests are not interchangeable. Later results,
+signature bundles and approvals remain external to the frozen record/manifest.
+
+The no-OIDC result verifier at V checks exact-source CI, protected master=V,
+original successful prepare/sign runs at S, exact artifacts, approved Environment
+and authenticated tools before isolated decryption. It checks both raw payloads,
+all selected subjects, the complete manifest and every entry, both original
+bundles and S/run/attempt certificate/CT/log/timestamp claims. Public DSSE must
+contain the original statement, not a reconstruction. Partial/failure artifacts,
+private bundle mismatch or failed plaintext/key cleanup fail verification.
+Only the reduced result receipt and allowlisted public files leave that job;
+the private manifest, bundle, raw logs and identity remain private.
+
+## Encrypted preparation and evidence custody
+
+Build/capture receives only the pinned public age recipient. The private identity
+belongs only in the isolated approved readback/preparation phases, outside Git,
+build jobs, logs and artifacts; remove it before OIDC. Authenticate pinned tools
+before key access. Capture only the explicit private assembly and known OpenSSL
+extras, never all runner temporary files, Cargo home or environment dumps.
+Freeze raw records/inventory first, provenance second, complete manifest last;
+put encryption/transport/readback receipts outside the assembly to avoid cycles.
+Preparation-manifest completeness does not automatically close the final reused
+qualification/security/support evidence required for signing.
+
+Success requires the original native exit0, `PREPARATION_SUCCESS`, `complete=true`,
+exact source/recipe/tools/locks/subjects, full manifest/inventory verification and
+independent public-byte correspondence. `FAILED_INCOMPLETE` preserves the original
+failure and partial records; green readback of failure evidence is not successful
+preparation. Capture/encryption/upload failure, cancellation or runner loss may
+mean `NOT SAVED`. No plaintext fallback or guaranteed cancellation capture exists.
+
+Download within the planned 24-hour window and before seven-day Actions expiry.
+Retain successful and failed ciphertext, original receipts, public bytes and
+necessary old tools/bindings outside Git through explicit owner disposition.
+Record actual decrypt/full-entry verification and durable custody separately from
+upload/readback. Owner-host 0700 directories/0600 files, flush and reread receipts
+prove that recorded local copy, not offsite replication, HA or indefinite host
+availability. Git recovers tracked Markdown and recorded identities; it does not
+guarantee the original ignored/external logs, signatures or receipts. Preserve
+their recorded stores under [DEV-ARTIFACTS](DEV-ARTIFACTS.md).
 
 ## Baseline release checklist
 
@@ -348,7 +416,7 @@ maintenance work does not remove reviewers or enable bypass.
 ## Existing workflow map and limits
 
 This is the checked-in implementation baseline, not permission to dispatch it.
-[YT-209](YT-209-RELEASE-AUTOMATION.md) defines the versioned input and operator
+[YT-209](RELEASING.md#versioned-record-and-receipt-contract) defines the versioned input and operator
 interfaces; focused local checks and independent implementation review PASS.
 Tooling integration, Environment installation and alpha.3 positive protected
 verification are recorded in the actual execution record. Historical Pending
@@ -375,7 +443,7 @@ interfaces and identities. Do not dispatch a new interface against an old source
 The [minimum hosted/Environment plan](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-209-HOSTED-VERIFICATION-PLAN.md) lists
 the observed configuration, legacy receipt limits and ready-to-authorize steps.
 The `release-result-verify` Environment and existing `AGE_IDENTITY` provisioning
-are [installed and read back](YT-209-RELEASE-AUTOMATION.md#owner-authorized-recovery-delivery-and-setup--2026-10-29):
+are [installed and read back](CI-SECURITY-REVIEW.md#versioned-release-automation-integration-history):
 required owner reviewer, master only, no admin bypass. Installation/name readback
 does not yet qualify actual decryption; each approved execution must recheck its
 settings and original input bindings. It verifies actual original signing bundles

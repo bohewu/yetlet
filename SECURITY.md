@@ -11,7 +11,7 @@ The following is the historical pre-public policy checkpoint, not current distri
 Do **not** open a public GitHub Issue for a suspected vulnerability.
 
 - While the repository is private, use an existing private collaborator channel to contact the maintainer.
-- Use GitHub Private Vulnerability Reporting through the repository's Security → Advisories → Report a vulnerability entry. The [accepted reporting verification](docs/YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#reporting-completion) records the form and actual maintainer notification delivery at its original scope.
+- Use GitHub Private Vulnerability Reporting through the repository's Security → Advisories → Report a vulnerability entry. The [accepted reporting verification](docs/CI-SECURITY-REVIEW.md#public-source-preview-and-private-reporting) records the form and actual maintainer notification delivery at its original scope.
 - If reporting configuration changes, verify the form and maintainer notification route before advertising the changed route.
 - A separate email address, custom domain or email-forwarding service is optional and is not a prerequisite for the source preview.
 - If the private form is unavailable, a public Issue may request a private reporting route only. Do not include vulnerability details, exploit steps, secrets or personal data in that Issue.

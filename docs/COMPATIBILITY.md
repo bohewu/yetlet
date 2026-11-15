@@ -120,10 +120,36 @@ records distinguish source tests from registry consumers. Dated unshipped
 checkpoints are available in [immutable Git history](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
 rather than duplicated as current compatibility status.
 
+## Two-package feature and target contract
+
+The published SDK has one shared View type in `yetlet`; `yetlet-browser`
+depends on it with defaults disabled, with no reverse normal/build/development
+edge. Base defaults select `html`; disabling defaults exposes the view model
+without external normal dependencies. Browser defaults select `dom`.
+Portable Actions contracts/local execution and Reactive stay in the base;
+browser HTTP execution implements the shared ActionExecutor trait.
+
+Capabilities use additive features and explicit startup installation. The native
+Auth/Memory bridge is `auth-session`, Redis TLS is `session-redis-tls`, and
+browser GPU is `wgpu-browser`. Memory Session remains synchronous; the remote
+provider remains asynchronous. Native modules require both their feature and a
+native target; selecting a feature union must not expose native Auth/Session/HTTP
+or networking/crypto/storage stacks on wasm32. Shared Serde/JSON dependencies can
+still compile in a mixed union: target isolation does not promise an empty lock
+or zero shared serialization dependencies. There is no `full` preset or compiling
+old-crate facade. Old imports require migration, not old/new type interoperability.
+
+The 2026-10-30 migration retained resolver3/Rust1.99 and introduced no external
+version/source/checksum identity beyond the old lock union. It aligned existing
+serde_json pins to 1.0.151; Cargo rejected the attempted dual-name serde alias.
+No provider, retry policy, authorization rule or runtime service was added by
+repackaging. See [release cohort rules](RELEASING.md#current-two-package-development-boundary--yt-211)
+and [source-specific migration proof](QUALIFICATION-MATRIX.md#historical-two-package-migration-and-style-source-qualification).
+
 ## Historical two-package pre-publication source — 2026-10-30
 
 The unreleased development train is `0.9.0-alpha.5`, with exactly `yetlet` and
-`yetlet-browser`. [YT-211](YT-211-TWO-PACKAGE-MIGRATION.md) records the intentional
+`yetlet-browser`. [YT-211](COMPATIBILITY.md#two-package-feature-and-target-contract) records the intentional
 crate/module import migration, one shared View and native/browser feature
 boundaries. Base defaults select HTML; Browser defaults select DOM. Applications
 still opt into capabilities and startup installation explicitly. There are no
@@ -171,7 +197,7 @@ sources, decisions and failures; they do not override this current status.
 Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-ALPHA-VERSION-PREFLIGHT.md).
 The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
 (tree `6adff26fc4fec65e9aa8f40d7172ff266b7e500d`) as the new immutable alpha candidate C.
-The [minimum hosted/readback plan](YT-096-ALPHA-HOSTED-PLAN.md) records the
+The [minimum hosted/readback plan](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints) records the
 remaining fixed-binding patch, consumed Guard-state disposition and separate
 execution-source selection/authorization gates. Existing `v0.1.0`, source
 `3eacfe3`, hosted/readback runs and retained bytes stay historical and unchanged;
@@ -246,17 +272,17 @@ are validation assets, not independently versioned public packages.
 **Current candidate selection (2026-10-27):** The owner selects immutable
 `118f3d0f496b487ef20fe243f4e73179f9eadc43`, tree
 `07faa3e90c0fca5d27a4e55262c75acf851d884a`, after the guarded rebuild-extension
-commit. The [verification order](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
+commit. The [verification order](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
 preserves the sixteen experimental 0.1.0 libraries and selected platform/feature
 limits. Earlier input-bound results remain historical. New-C required CI, sixteen-package
 hosted/local byte comparison and affected MSVC consumers now PASS;
-[final independent acceptance](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27)
+[final independent acceptance](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints)
 is PASS with zero issues/required followups, closing selected YT-205 technical
 scope. Platform limits remain unchanged and D1–D6 remain Pending.
 
 **Earlier candidate selection (2026-10-27):** The owner selected the sixteen
 experimental 0.1.0 libraries at immutable `a2d6474` for
-[technical evidence consolidation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md).
+[technical evidence consolidation](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints).
 The original nine-package ce56e08 records retain their identities. Selection
 does not complete current-source CI/rebuild gates, expand platform support or
 authorize signing, registry publication or activation; D1–D6 remain Pending.

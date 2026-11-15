@@ -111,4 +111,4 @@ fixture failures are retained in the ignored YT-241 verification directory.
 The independent implementation review accepts this bounded evidence. Later
 YT-243 Linux release-profile checks passed listener disposal in both browsers
 using the initialized page realm. Firefox at 390px and full Firefox console/CSP
-logging remain unverified. [YT-243 source qualification](../../docs/YT-243-RELEASE-QUALIFICATION.md)
+logging remain unverified. [YT-243 source qualification](../../docs/QUALIFICATION-MATRIX.md#historical-two-package-migration-and-style-source-qualification)

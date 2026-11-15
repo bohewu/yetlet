@@ -8,7 +8,7 @@ release-integrity work adds no framework runtime feature or production guarantee
 The [D1–D5 owner packet](YT-096-D1-D5-RELEASE-TRUST-PLAN.md) retains the adopted
 sixteen-source-package disclosure, service and claim boundaries. Separate owner
 authority selected `C_release` `3eacfe31f5e3281411d3bc4653a6baccab668b30` and its
-unsigned lightweight `v0.1.0` tag. The [actual hosted checkpoint](YT-096-HOSTED-DRILL-PLAN.md)
+unsigned lightweight `v0.1.0` tag. The [actual hosted checkpoint](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-HOSTED-DRILL-PLAN.md)
 records build `40628943583` / attempt1 and protected verifier `40631789238` /
 attempt1, both PASS, followed by repository-external owner-host retention.
 

@@ -6,6 +6,78 @@
 
 **Later private preparation update (2026-10-11):** PR #4 delivered bounded YT-065/066 qualification; required PR CI and post-merge `a61f409` CI passed. The maintainer then selected [experimental 0.1.0 Private preparation](YT-020-PRIVATE-RELEASE-PREP.md) for the original nine library candidates. This update reconciles remaining activation work below without relabeling earlier tests/scans or authorizing publication, settings changes or production work.
 
+## Public source preview and private reporting
+
+The Private/Pending statements in this post-M9 review describe **2026-10-10**.
+The **2026-10-27 YT-206** owner-approved disclosure/activation subsequently made
+the repository Public as an Experimental source preview. PR12 squash
+`d7065bbfb5b733c418f65ef55324f4d0ce6ac4d6`, tree
+`cca0153c3e56bc5e13e651a4a4bb1469dc042cfe`, matched reviewed3d63f0b;
+CI40497321153 PASS preserved required checks/admin enforcement/no-force and
+collaborator-only PR policy. The bounded inventory covered1,191 tracked files,
+114 reachable commits/2,177 unique blobs,15 PNGs,38 Actions runs (32 success/six
+failure),16 artifacts and12 PR bodies. It found historical workspace disclosures
+at six representative document paths and operational/reviewer identifiers;
+bounded zero credential-marker matches were not comprehensive secret scanning
+or credential validation. The owner accepted normal source/history/PR/image and
+Actions disclosure, including failures; hiding links or deleting current reports
+does not privatize Git history. No history/failure deletion or formal signing
+disclosure approval followed from source-preview acceptance.
+
+GitHub Private Vulnerability Reporting was enabled and the public entry verified.
+Settings-only subscription/enablement originally left the signed-in form and
+actual notification delivery **Not verified**. A separately authorized controlled
+**non-vulnerability** test then completed on2026-10-27: a non-admin reporter's
+authenticated form/submission created one private Triage record at20:25:29
+Asia/Taipei; maintainer/collaborator messages reached the configured owner Gmail
+at20:25:50/51 (21/22 seconds), with matching Delivered-To and GitHub DKIM/SPF.
+The owner closed it at20:29:04, API Closed, without publication/CVE/private fork.
+Independent PASS accepted this bounded form/delivery/closeout scope, not an SLA.
+Private advisory IDs, mailbox addresses, tokens and mail bodies remain private.
+
+Earlier owner/admin draft-form API submission **403**, zero reports/notifications,
+signed-out/robots/browser observations, optional On GitHub Watching readbacks that
+did not persist, and the To-header parser failure remain failures/limits. The
+corrected parser reused the same messages and checked Delivered-To; no second
+report was sent. Only Email delivery was proved, not Web inbox delivery. The
+owner selected GitHub reporting as sufficient; a separate email/domain is
+optional. Reverify form/notification routing when advertising a changed route
+under [SECURITY.md](../SECURITY.md#reporting-a-vulnerability).
+
+Current distribution is separately the [published SDKalpha.8/CLI0.4.0](RELEASE-READINESS.md),
+not the old preview About text saying packages unpublished. Source visibility
+did not publish a Reader site, registry packages or resolve D1–D6 at that checkpoint.
+The original [disclosure/reporting record](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#reporting-completion)
+and inventories are recoverable in local Git; remote SHA reachability is
+unverified. Raw proof stays in ignored
+`target/yetlet-public-preview-inventory-20261027-yot7fza7/evidence/activation/reporting-completion/`,
+not Git-guaranteed private evidence storage.
+
+## Versioned release automation integration history
+
+YT-209's local30 distinct focused checks and implementation PASS at
+`c70a7431226c307a097c218050348477de85671d` did not qualify hosted execution.
+On **2026-10-29**, PR20 CI40871149693/1 passed MSRV but failed Stable at the
+existing Rust importlib caller (`ModuleNotFoundError: release_record`) before
+audit/browser. Old custody/preparation fixtures also used obsolete fixed-alpha
+inputs. Local edit/fixture failures are retained; focused sibling-import and
+actual schema-1 fixture corrections preserved identity, artifact and secret-order
+checks. YT-209 reopened for integration repair; old local PASS never authorized
+merging that failed head.
+
+Separately authorized repaircdde3c4 was delivered once, CI40873628263/1 PASS;
+PR20 squash `7de77c84e0e56e683cea4567048397caa0614590`, tree
+`95c65e754a51fadce648645791f41620b56f8bca`, matched qualified repair and
+master CI40875245510/1 PASS. `release-result-verify` Environment25684187945
+was installed with owner reviewer/master-only/no-admin-bypass and existing
+AGE_IDENTITY via protected stdin. Configuration/name readback was not decryption
+qualification; later alpha.3 supplied actual positive protected verification.
+No old candidate/signature or failure result was replaced. This setup history
+predates the separately adopted [single publication policy](RELEASE-PUBLICATION.md).
+Original [integration and recovery](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-209-RELEASE-AUTOMATION.md#subsequent-integration-ci--2026-10-29)
+Markdown is locally recoverable (remote SHA unverified); logs/settings receipts
+remain in `target/yt209-delivery-20261029/`, not guaranteed by Git.
+
 ## 1. Remote CI failure diagnosis
 
 GitHub Actions run `38012171376` executed commit `292b1524ff2ed0e223aeb2575e5b744cda14dfc5`. Documentation, format, strict Clippy, native tests, doctests, wasm32 compilation, browser asset generation and the native server build passed. The only failed step was the Chrome Browser E2E smoke.

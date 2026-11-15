@@ -5,7 +5,7 @@ independent implementation review PASS (zero issues and required followups).** D
 The original integration scope authorized code and local proof only. Later
 separate approvals completed the hosted build, protected readback and persistent
 repository-external owner-host retention on 2026-10-28. See the authoritative
-[actual hosted/custody checkpoint](YT-096-HOSTED-DRILL-PLAN.md#actual-hosted-and-custody-checkpoint--2026-10-28)
+[actual hosted/custody checkpoint](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-HOSTED-DRILL-PLAN.md#actual-hosted-and-custody-checkpoint--2026-10-28)
 for source, runs, artifacts, approval, verification and retention evidence/limits.
 This update grants no new Commit/Push, OIDC, signing or publication authority.
 

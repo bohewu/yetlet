@@ -7,7 +7,7 @@ one-way on the same View. Both packages are available from crates.io at this ver
 Earlier release tags retain their original layouts and evidence.
 
 Use guides for behavior and rustdoc from the same revision for signatures.
-[The migration contract](YT-211-TWO-PACKAGE-MIGRATION.md) records the complete
+[The migration contract](COMPATIBILITY.md#historical-two-package-pre-publication-source--2026-10-30) records the complete
 source break, feature names and preserved boundaries.
 
 | Capability | First published version | Current usage and original release evidence |

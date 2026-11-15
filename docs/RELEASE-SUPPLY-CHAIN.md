@@ -1,10 +1,17 @@
 # Release Supply-Chain Design
 
+Current distribution is the accepted [SDKalpha.8 and CLI0.4.0](RELEASE-READINESS.md)
+pair. Dated source-only/preparation statements below preserve their original
+scope, not current unavailability. New releases follow the closed
+[cohort/freeze SOP](RELEASING.md), [publication contract](RELEASE-PUBLICATION.md)
+and unchanged normative signer/trust policies. A historical PASS is not reusable
+authority or evidence for changed bytes.
+
 **Owner-selected version update (2026-10-28):** The next sixteen-package
 Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-ALPHA-VERSION-PREFLIGHT.md).
 The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
 (tree `6adff26fc4fec65e9aa8f40d7172ff266b7e500d`) as the new immutable alpha candidate C.
-The [minimum hosted/readback plan](YT-096-ALPHA-HOSTED-PLAN.md) records the
+The [minimum hosted/readback plan](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints) records the
 remaining fixed-binding patch, consumed Guard-state disposition and separate
 execution-source selection/authorization gates. Existing `v0.1.0`, source
 `3eacfe3`, hosted/readback runs and retained bytes stay historical and unchanged;
@@ -33,7 +40,7 @@ their dated Pending statements do not undo later owner decisions.
 **Historical technical candidate checkpoint (2026-10-27):** After the guarded ten-path rebuild
 extension commit, the owner selects `118f3d0f496b487ef20fe243f4e73179f9eadc43`,
 tree `07faa3e90c0fca5d27a4e55262c75acf851d884a`. The
-[remaining verification order](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
+[remaining verification order](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
 records the later authorized Push, required CI, sixteen-package hosted/local
 byte-identical rebuild and affected MSVC PASS. Final independent Reviewer PASS,
 zero issues/required followups, closes YT-205 technical scope. These notes remain
@@ -43,7 +50,7 @@ Earlier source, archive, signature and review identities remain intact.
 
 **Earlier sixteen-package technical candidate (2026-10-27):** The owner selects
 immutable `a2d6474`/tree`1c3eab` for experimental0.1.0
-[YT-205 reconciliation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md). Sixteen local
+[YT-205 reconciliation](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints). Sixteen local
 C archive digests, retained versus new package/inventory results and an unsigned
 sixteen-subject proposal are bound explicitly. This does not rewrite the original
 nine-subject proposal or old provenance, complete current-C CI/rebuild/platform
@@ -76,7 +83,7 @@ commit `849c5894f73d9732db9c2ccaa765385dc9d8a819`; public GitHub reachability ha
 | YT-020 Private GitHub rebuild and sixteen-name registry inventory | Manual, separate ephemeral GitHub builder and protected CI were prepared; unsigned provenance did not establish independent trust, certificate inclusion or formal signing. On **2026-10-30** sixteen candidate crate names returned not-found (404) and a public account was observed; neither current name availability nor ownership, an authorized upload or a production trust chain follows. Keep distinct original nine-library `0.1.0` source identities |
 | YT-096 alpha.1 preflight and two-host nine-package comparison | The sixteen-library alpha.1 manifest/version preflight was locally reviewed, **not published** by that act. Linux and Windows MSVC nine-source-archive bytes matched at an earlier exact `ce56e08` candidate; this is source-archive reproducibility, not binary reproducibility, separately controlled signing, or later candidate acceptance |
 | YT-200 and YT-205 technical sixteen-package preparation | YT-200 defined a bounded feasibility/verification queue. The later sixteen-package rebuild extension and selected `118f3d0` technical candidate passed scoped local/source checks, while subsequent source, CI, hosted, signer, inventory and registry gates retain their own authorities. A technical candidate or guarded commit is **not** publication |
-| YT-209 Environment proposal and YT-210 one-package study | The hosted verifier/Environment plan was a proposal, not an activated signing grant; later actual protected setup and deliveries have separate verified records. YT-210 evaluated a `publish = false` one-implementation-package experiment; the later [two-package migration](YT-211-TWO-PACKAGE-MIGRATION.md) selected `yetlet` and `yetlet-browser` instead. There was no publication of the one-package experiment |
+| YT-209 Environment proposal and YT-210 one-package study | The hosted verifier/Environment plan was a proposal, not an activated signing grant; later actual protected setup and deliveries have separate verified records. YT-210 evaluated a `publish = false` one-implementation-package experiment; the later [two-package migration](COMPATIBILITY.md#two-package-feature-and-target-contract) selected `yetlet` and `yetlet-browser` instead. There was no publication of the one-package experiment |
 
 **Current distribution is separately established by actual release records:**
 [SDK `0.9.0-alpha.8`](ALPHA8-HOSTED-RECORD.md) and
@@ -87,6 +94,79 @@ source/version-specific cohort; historical instructions below cannot be
 replayed for the current pair. Preserve preexisting FAIL, Pending, Blocked
 and negative evidence at their original dates, even where newer releases
 succeeded.
+
+## Historical candidate inventory and technical consolidation
+
+For **2026-10-20 C `ce56e0814e5423782440acd2c959ca777d572cd4`**, nine
+unpublished0.1.0 archives/locks bind23 default-feature package/target CycloneDX1.5
+SBOMs (nine GNU, nine MSVC, five wasm). All23 match filtered normal/build metadata;
+21 match normal/build Cargo trees exactly. Native server-axum's two SBOMs retain
+conservative `serde_derive1.0.229` from development-feature unification. No missing
+normal/build component was recorded; exact compiled feature equivalence was not.
+`--all` means transitive dependencies, not all workspaces/dev/test targets;
+cargo-cyclonedx0.5.9 excludes dev-only edges and test/example/bench/custom-build
+targets. Build-only components can be present with scope `excluded`.
+
+All23 license/source checks PASS with unchanged original policy and29 unused
+allowance warnings (BSD-3-Clause17/Unicode-3.0 12). Nine complete package-lock
+audits PASS/zero reported vulnerabilities or warnings against RustSec
+`999ec89d5d3f10f20be14750ec8c2d8b44e0ac9b`, completed2026-10-20 07:53:16 UTC;
+73 distinct third-party pairs include dev/build/inactive-target records. This is
+a dated database result, not a fresh scan or proof of vulnerability absence.
+
+Actual Azure compilation retained140 events:97 native-test events/70 package
+pairs and43 wasm events/32 pairs. Native68/70 occur in the GNU SBOM union;
+`tower-http0.6.11`/`bitflags2.13.2` are explained test/dev-only observations.
+All32 wasm pairs occur in the wasm union and every observed version is in the
+root lock. Aggregate events do not establish per-library compiled features,
+output hashes, Rust sysroot/native-linker/system closure or new Windows compiler
+events. JS/loader/glue assets remain outside Cargo inventory. The unchanged
+36-file unsigned bundle (nine archives,23 SBOMs,four supporting records), checksum
+manifest SHA256 `9e49da9da4991c97dc2c48d1a6f8937ff1cd426265cd255f509164c19bc4908a`,
+and separate hosted unsigned provenance do not authenticate a combined statement.
+The owner accepted only these bounded differences; missing evidence stayed
+Not verified and the original final candidate verdict stayed FAIL.
+
+For **2026-10-27 YT-205**, a2d6474's16 archives retained old source/package proof;
+ten locks moved Tokio1.53.2→1.53.3 and six contained no Tokio. Ten new normal
+package checks plus six exact compilation reuses are not16 fresh verifications.
+Fourteen affected normal/build inventory cells were regenerated and PASS;
+28 were reused (22 unchanged closures and six Core/Reactive cells). Audit
+containment used13 accepted live-lock results against RustSec
+`3279c99911354c400e1d41e47c7d60e39258b147`, unchanged RSA exception, no new ignore;
+old ten-warning outputs were not rewritten. Tokio's patched range does not
+promise fd ownership for every upstream API. The scoped120-regular/18-alias
+zero-reportable source scan was not a post-upgrade full/application scan.
+
+The successor118f3d0's local/hosted plain-Git-archive recipe matched all16 final
+archives after33 phases each: one vendor,16 bootstrap **collections only**,16
+normal verifications. Both bind source/epoch/tools/inputs/six locks; compiled
+OpenSSL3.5.9 executable digests differed honestly across hosts. Do not compare
+plain-export outputs against older checkout/VCS-attributed archives or call this
+compiled-output reproducibility. Fourteen-package MSVC default/integrated
+consumer PASS used CRLF-normalized Git-source equivalence, not Linux archive-byte
+identity. The result ZIP transfer was policy-rejected; original Windows text
+records were reviewed at source, with **no** received/locally verified ZIP claim.
+
+Initial missing p256 vendor source, extracted-package parent-workspace discovery,
+Windows newline assumption and denied ZIP transfer remain recorded. Forty-six
+reader manuscripts finally match C, including the two Session README corrections
+absent from a2d6474 archives; eight rustdoc commands/22 entries were local generation,
+not docs.rs/site publication. Manuscript selection and350 links to unselected
+files were not a sanitized ready-to-host site or confidentiality audit.
+Partial publication is non-atomic: preserve successful subjects/errors and stop;
+resume/new-version/yank decisions need their own authority, never overwrite,
+repackage or retag approved bytes.
+
+Full source/SBOM counts, tools, archive digests, original FAIL/Blocked/Pending and
+review identities remain in the18 original Z11 Markdown blobs at **local Git**
+`c440c4542c888671750738a5908a667d2124db15` (remote reachability unverified), including
+[inventory coverage](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-SUPPLY-CHAIN-DELTA.md#target-inventory-and-sbom-coverage)
+and [sixteen-package execution](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27).
+Raw stores remain `artifacts/yt096-supply-chain-delta-20261020/` and the recorded
+`target/yetlet-yt205-*20261027-*` task roots; Git preserves their references, not
+availability of every original raw byte. Neither technical consolidation nor
+source-resolution SBOMs establish registry or formal trust acceptance.
 
 ## Current preparation source boundary (2026-10-12)
 
