@@ -54,7 +54,7 @@ See [M9i verification](../../docs/M9I-VERIFICATION.md) for retained integration,
 
 ## Optional catalog display cache — YT-183
 
-[The selected contract](../../docs/YT-183-CATALOG-CACHE-CONTRACT.md) applies only
+[The selected contract](README.md#optional-catalog-display-cache--yt-183) applies only
 to the existing public product projection used by catalog and cart displays.
 Default `Database::open` and normal startup remain uncached. Enable both the
 application feature and its single native startup environment selection:
@@ -74,7 +74,7 @@ its existing native environment value into them. There
 is no new Settings-provider service, framework middleware/trait or Core/WASM
 cache feature. Missing/`false` selection stays off; only exact `true`/`false`
 is accepted, and true without compiled feature fails redacted startup validation.
-Selection is startup-only. See [new evidence](../../docs/YT-183-CATALOG-CACHE-IMPLEMENTATION.md).
+Selection is startup-only. See [new evidence](README.md#optional-catalog-display-cache--yt-183).
 
 Native Moka coalesces fallible fills. The application admits at most 64 products
 and an estimated 64 KiB payload per retained projection, with native best-effort

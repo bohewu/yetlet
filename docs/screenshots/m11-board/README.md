@@ -12,4 +12,4 @@ Captured during the repaired Chrome 155.0.8059.39 journey on 2026-10-13. These a
 
 The current session visually inspected all five images. Text/labels are readable, the selected controls and stored values are visible, desktop navigation remains separate from the task surface, the narrow layout stacks controls, and the conflict notice does not erase the user's draft. Long pages scroll normally; these are viewport captures, not claims that every page fits in one screen. The simple Bootstrap design and explicit Unix-second history timestamps are retained; this is not a new visual redesign, WCAG conformance or spoken screen-reader signoff.
 
-See [startup instructions](../../BOARD-START.md) and [qualification scope/results](../../YT-074-QUALIFICATION.md).
+See [startup instructions](../../BOARD-START.md) and [qualification scope/results](../../../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence).

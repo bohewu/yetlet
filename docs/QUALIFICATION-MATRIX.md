@@ -110,6 +110,49 @@ Use the [Admin example](../examples/admin-dashboard/README.md), the
 [SDK resolver contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md)
 for current application and CLI decision boundaries.
 
+## Historical operations, capacity and recovery cohorts
+
+These measurements and desktop checks are **dated, source-/host-specific**
+qualifications, not a current supported-hardware matrix, SLO, readiness
+certificate or transferable production capacity. Complete reports and original
+FAIL/blocked observations are recoverable in **local Git**
+`99906e421c0510231291bf527e2cbd2e7ad0ffda` (the local unpublished
+history is not verified reachable through GitHub). Raw results, screenshots,
+logs and host-side evidence were separately retained under their original
+task-owned/ignored evidence paths and **are not thereby Git-recoverable**.
+For current app behavior, use the [Starter example](../examples/production-starter/README.md),
+[Lab Board example](../examples/lab-operations-board/README.md), and
+[Production Readiness](PRODUCTION-READINESS-PHASE2.md).
+
+| Distinct original source and test fixture | Actual bounded observation | Failed or excluded evidence that must not disappear |
+|---|---|---|
+| **YT-074 Board desktop, native/AT and load qualification** | Actual selected Firefox/Linux Fcitx CJK input and Orca speech/live-status, separate host/browser/Windows evidence, persisted Board version and history, and bounded desktop/load acceptance. The corrected status message uses a semantic live container and a message child admitted through Orca's real event path | Initial Orca/AT-SPI browser-registration and speech tests produced startup/key echo but **not Board content**; subsequent successful real application journey is distinct. Early caption/table keyboard paths, setup/prototype and original load/host failures remain historical. Screenshots and operator observations do not certify every screen reader/mobile OS or public capacity |
+| **YT-129 Starter local load/soak/recovery** | Original application schema-1/debug/tmpfs and co-located, closed-loop client fixture generated **42,043 requests** and separately bounded accepted lower-load/recovery results | The **eight-client point FAILED**, with **1.514% rejected** and **341.73% CPU**. It is excluded from the passing range; source, storage, traffic shape, response status, worker permit and observed CPU are not present-day release limits or a 45s-to-long-soak guarantee |
+| **YT-134 local persistent-release Starter profile** | Separate release/schema-2/persistent storage fixture: **23,549** workload requests, **17,829 HTTP200 / 1,945 HTTP201 / 3,775 HTTP503**. Four-worker step was the highest *tested passing* point at approximately **452.48 req/s**; final data contained exactly **1,965 rows = 20 seeds + 1,945 acknowledged creates**, with SQLite integrity check `ok` | Unpaced eight-worker step **FAILED** with **3,775 workload 503** (27.5568%) and readiness rejections, not a hard capacity threshold. Later lower-load recovery passed; no read of a 503 or timeout proves a failed/rolled-back SQL write, no cross-environment equivalence |
+| **YT-134 separate optional Azure reference** | A private operator/Run Command/Blob-selected ephemeral Azure disk/VM trial generated **34,329** workload requests: **25,059 HTTP200 / 2,889 HTTP201 / 6,381 HTTP503**. Reconciled **2,909 rows = 20 seeds + 2,889 acknowledged creates**; subsequent lower-load/reboot and explicit resource cleanup were bounded to this fixture | Original public-SSH bootstrap proposal/attempt was stopped and replaced by owner-authorized private access. **Four-worker step FAILED readiness** despite its accepted load-side population; **eight-worker step FAILED** with **6,381 HTTP503**. Reboot/cleanup and nonproduction device/OS provenance do not imply Azure service HA, durable SLO or general deployment guidance |
+| **YT-135 current schema-2 recovery** | Separate stop/withdraw, source check, manifest/backup, intentionally rejected invalid restoration and fresh-instance schema/data/API verification; observed **113.14 ms** local withdrawal-to-complete-eligibility **RTO proxy** | Not a live traffic switch, general business RPO/RTO, host loss, power-loss durability or production DR; earlier v1/schema-1 B2 restoration figures cannot be substituted |
+| **YT-141 controlled-arrival read-only API fixture** | One explicit source/host client arrival profile produced **14,006** actual exact-body HTTP200 results at selected 100/s and 500/s bands; measured p50/p95 values of the bounded fixture remain in original evidence | These are not a whole-app, SSR/Session, storage durability, current-version or network-wide p95 promise; scheduled arrivals and observed request counts differ, and future rates/hosts require new proof |
+
+The later **owner-amended YT-074 62-minute staggered Board run** selected
+five client-cycle offsets (25 clients at 0.5 requests/second each, ten SSE
+readers), 120s warmup, three 600s rounds and 1,800s soak with SQLite FULL.
+It **PASSED** its selected thresholds with **45,000 measured requests and
+zero unexpected HTTP/SSE errors**. Exactly **9,300 committed writes** advanced
+the seeded 90,000 history records to **99,300** with SQLite integrity `ok`.
+That replaces neither the original **synchronized** full attempt, whose
+write p95 **548.299ms exceeded the 500ms threshold and FAILED** before
+later rounds/soak, nor the separate earlier host/desktop profiles. The
+staggered arrival pattern did not prove maximum throughput or immunity to
+synchronized bursts, other load distributions or production capacity.
+
+In every cohort, count HTTP response/error populations, dropped arrivals,
+source writes, started/unfinished blocking SQL operations, independent probes
+and retry attempts separately. Neither an HTTP200 nor a ready probe proves
+durable business writes. A failed step is still a failed step after a passing
+recovery. Cross-host cache, CPU, toolchain, client pacing and connection
+conditions are part of the result identity; no undocumented default capacity
+or production operating threshold is inferred.
+
 ## Historical performance and capacity evidence (bounded)
 
 The original research cohorts below are **dated, source- and machine-specific**
@@ -122,14 +165,14 @@ cleanup. That local source SHA is **not yet verified as publicly reachable**.
 Current build/fixture configuration belongs to the
 [SSR measurement example](../examples/ssr-performance-baselines/README.md)
 and [Axum/Yetlet workload example](../examples/axum-workload-comparison/README.md).
-The retained [YT-141 controlled-arrival reference](YT-141-PERFORMANCE-VALIDATION.md),
-[YT-074 Board qualification](YT-074-QUALIFICATION.md) and
+The retained [YT-141 controlled-arrival reference](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts),
+[YT-074 Board qualification](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) and
 [YT-175 admission-policy contract](YT-175-SESSION-BURST-OVERLOAD-POLICY.md)
 retain their separate authorities.
 
 | Historical scope | Verified observations and important limits |
 |---|---|
-| YT-074 desktop and synchronized Board loads | Separate desktop/cross-environment comparison and fsync-stall observations were **not** a portable throughput baseline. Source, storage, platform and synchronized versus staggered conditions matter; failed and noncomparable captures remain at their original identities. The retained [desktop acceptance](YT-074-DESKTOP-ACCEPTANCE.md) and [Board qualification](YT-074-QUALIFICATION.md) remain distinct |
+| YT-074 desktop and synchronized Board loads | Separate desktop/cross-environment comparison and fsync-stall observations were **not** a portable throughput baseline. Source, storage, platform and synchronized versus staggered conditions matter; failed and noncomparable captures remain at their original identities. The retained [desktop acceptance](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) and [Board qualification](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) remain distinct |
 | YT-141–144 API/saturation/router/PostgreSQL | YT-141's read-only controlled-arrival reference had 14,006 valid 200s, no drops and 1/2 ms p50/p95 only for its fixture. YT-142's first **1,000/s point FAILED** with 5 SQL-admission 503s among 10,001 requests; immediate 250/s recovery passed 7,501 valid 200s. YT-143 corrected only an unstarted comparator repetition; its SSR 4,000/s pair was **noncomparable** after a native Axum drop. YT-144's four isolated PostgreSQL pairs had 100,007 measured valid 200s; rejected preload/observer/lookup attempts and scope boundaries remain historical |
 | YT-145–160 SSR allocation/latency attribution | Fixed 8/128/1,024-row SSR output baselines and independent escaped-output hashes separate constructing a View, body/document serialization, combined costs and full HTTP p95. Original escaping accounted for 85.70% of measured *document allocation calls* in one YT-146 instrumented profile, **not** of total CPU. Private escape-into and URL-prefix changes reduced selected allocations while held/peak memory did not automatically fall. First-child preallocation (YT-152) was **rejected** on tradeoffs. Changes in timings/frequency/worker CPU cannot uniquely identify the cause of earlier HTTP p95 observations; no general speedup claim |
 | YT-161–164 benchmark isolation and transport | The attempted constrained execution profile **was not admitted** in YT-161; controlled-frequency evidence did not result. YT-162 retains 39,977 valid HTTP 200s and **27 dropped arrivals**, with only the first platform pair comparable. YT-163 attributes those 27 drops to a short exposure with full outstanding HTTP brackets but cannot identify a unique origin. YT-164 observed lower p95 under direct private HTTP than SSH forwarding in two bounded pairs; this is a transport/context effect, **not** proof of a faster Yetlet product |

@@ -148,6 +148,60 @@ Pages use the existing escaped renderer, English document metadata and strict
 CSP. Anonymous sessions use HttpOnly/SameSite cookies, explicit local HTTP mode
 and hidden CSRF tokens. API credentials never enter HTML or session state.
 
+## Single-instance reference and schema recovery boundaries
+
+This optional production **starter** is still an application-owned private
+single-instance reference, not a certified public deployment recipe.
+The historical 2026-10-23 YT-133 checked a trusted workstation →
+verified SSH host/key → local forward → bounded loopback reverse proxy →
+the existing `127.0.0.1` application. A tunnel is *access transport*,
+not user authentication; SSR uses anonymous Memory Session for CSRF
+rather than operator identity, while the JSON API requires its separate
+configured literal Bearer token and rejects Origin-bearing calls.
+Keep the canonical Host restriction, security headers, Cookie/Vary,
+no-store, CSRF and API credential boundary; never remove Origin to
+make a reverse proxy appear to work. `/health/live`,
+`/health/ready`, and enabled `/metrics` bypass business admission
+and have no independent auth; expose only under a protected local
+operator surface. A browser outside trusted loopback/SSH or a public
+HTTPS service requires **new** Auth, cookie, trust and deployment
+qualification. The documented reference uses an optional **2vCPU/2GiB
+persistent local SSD starting point**, not guaranteed hardware.
+
+Startup must open, migrate and **verify the current schema/data** before
+listening; never automatically create a new empty database in place of
+unexpectedly missing, empty, replaced or corrupt persistent storage.
+Liveness is not SQL correctness; readiness is a one-second guarded
+schema/query probe sharing the four SQL permits, so it can return 503
+on saturation. A selected operator implementation used a bounded 60s
+startup gate and periodic protected probes; **no automatic restart,
+watchdog, protection against an untrusted local user or production SLO**
+is selected by that local fixture. Graceful withdrawal stops new
+HTTP/SQL admission and drains started work, including a write that may
+commit after a caller loses its response. Never retry an uncertain
+create without reconciliation.
+
+For a matching **schema-2** backup and recovery, remove/drain old
+writers, bind a consistent selected source snapshot and private
+configuration, verify exact schema/status index/data/acknowledged
+effects, and rehearse rejection of invalid restore inputs before
+making a fresh candidate eligible. A v1 process already serving must
+be stopped before schema-2 migration; after new-schema writes,
+forward-fix is safer than a blind schema-1 rollback. Reopen with the
+correct binary, verify integrity, liveness/readiness, protected API,
+SSR/session/CSRF and actual business history, and only then admit
+traffic. A historical local YT-135 rehearsal measured a **113.14ms
+withdrawal-to-complete-eligibility RTO proxy**, including deliberate
+refusal; it is **not** a consumer RPO/RTO, HA, power-loss durability,
+remote traffic cutover or DR certificate. Raw inputs/logs are
+task-owned, while the full original report and failures are
+recoverable through local Git `99906e421c0510231291bf527e2cbd2e7ad0ffda`
+without claiming remote availability. Historical v1 B2 recovery,
+current schema2 recovery and YT-134 local/Azure throughput are
+**distinct** fixtures. For their actual rejected points see
+[Qualification Matrix](../../docs/QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts)
+and [Deployment Profiles](../../docs/PRODUCTION-DEPLOYMENT-PROFILES.md#bounded-private-and-azure-operations).
+
 ## Operate, copy and extend
 
 The app initializes and checks its versioned SQL schema before binding. SQLite
@@ -270,7 +324,7 @@ See [YT-092 verification](https://github.com/bohewu/yetlet/blob/b610acc7e098020b
 platform evidence, limitations and the lessons that should inform later
 scaffolding work.
 
-The [YT-129 local load/soak/recovery record](../../docs/YT-129-LOAD-SOAK-RECOVERY.md)
+The [YT-129 local load/soak/recovery record](../../docs/QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts)
 reports one predeclared synthetic run on the retained v1 debug binary and temporary
 **tmpfs** SQLite data. Passing paced normal points span 43.64–467.01 requests/second;
 two clients sustained 153.08 requests/second for 45 seconds with zero errors or
@@ -281,7 +335,7 @@ these measurements do not qualify persistent storage, release builds, long soak
 or deployment capacity.
 
 
-The [YT-134 release/storage capacity reference](../../docs/YT-134-RELEASE-STORAGE-CAPACITY.md)
+The [YT-134 release/storage capacity reference](../../docs/QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts)
 records 23,549 predeclared direct-loopback requests against the accepted release
 executable and disposable schema-2/ext4 data. The highest tested passing point
 was 452.48 req/s for about ten seconds; two workers sustained 153.65 req/s for
@@ -291,14 +345,14 @@ YT-134 is Done at bounded optional reference scope after independent Reviewer
 PASS, zero issues and required followups. These measurements do not
 qualify SSH/proxy throughput,
 consumer hardware/SLO, long soak, crash durability or production deployment.
-The separately authorized [ephemeral Azure supplement](../../docs/YT-134-AZURE-REFERENCE.md)
+The separately authorized [ephemeral Azure supplement](../../docs/PRODUCTION-DEPLOYMENT-PROFILES.md#bounded-private-and-azure-operations)
 uses separate app/load VMs and a managed data disk. Its 34,329-request workload,
 write reconciliation, ordinary reboot/readback and full deletion are complete,
 with separate independent Reviewer PASS, zero issues and required followups.
 Failed cloud load points and probe/clock limits remain explicit; local PASS
 keeps its own scope.
 
-The separately activated [YT-135 current-schema recovery reference](../../docs/YT-135-CURRENT-SCHEMA-RECOVERY.md)
+The separately activated [YT-135 current-schema recovery reference](../../docs/PRODUCTION-READINESS-PHASE2.md#current-schema-recovery-and-starter-ownership)
 targets the accepted release binary and schema 2, including the status index,
 complete business rows/sequence, safe fresh restore and explicit loss accounting.
 The three-row snapshot restored exactly; two deliberately excluded source
@@ -306,7 +360,7 @@ acknowledgments were reconciled, zero unknown outcomes remained, a missing-index
 candidate was refused, and an accounted postrestore create plus same-release
 restart preserved all four rows. Owned cleanup is complete; independent Reviewer
 PASS has zero issues and required followups, completing YT-135 at bounded optional reference scope. Historical YT-130/131 results below retain their original binary/schema scopes. The separately activated
-[YT-141 performance reference](../../docs/YT-141-PERFORMANCE-VALIDATION.md) compares
+[YT-141 performance reference](../../docs/QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts) compares
 community tools before a bounded new controlled-arrival read-only API workload.
 Independent contract review passed; the [optional k6 script and guidance](deployment/performance/README.md)
 produced 14,006 measured valid-200 responses plus 501 warmup at fixed 100/500/s,

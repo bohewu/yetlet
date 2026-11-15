@@ -1,7 +1,7 @@
 # Optional controlled-arrival API reference — YT-141
 
 This small script exercises the Starter's authenticated, read-only
-`GET /api/issues` route. Read the [source-bound contract](../../../../docs/YT-141-PERFORMANCE-VALIDATION.md)
+`GET /api/issues` route. Read the [source-bound contract](../../../../docs/QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts)
 before using it. It adds no runtime dependency, required throughput, consumer
 SLO or CI gate. Results apply only to the recorded fixture. Independent contract and final
 reviews returned PASS, zero issues/required followups; YT-141 is Done at its

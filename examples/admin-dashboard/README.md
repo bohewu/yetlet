@@ -364,7 +364,7 @@ browser behavior, cross-host deployment or atomic revocation of business writes.
 ## Opt-in commit-time write authorization — YT-181
 
 The application feature `commit-write-auth` supplies the
-[YT-181 SQL-owned reference](../../docs/YT-181-SENSITIVE-WRITE-IMPLEMENTATION.md).
+[YT-181 SQL-owned reference](../../docs/PROVIDER-OPERATIONS.md#commit-time-authority-and-revocation).
 It is default-off and adds no Core/Auth API or generic AOP. The existing Session,
 CSRF, current file policy, item version, worker limits and response security
 remain in effect. Its extra SQL authority covers only Alice/project-one item
@@ -411,7 +411,7 @@ The reference adds no retry, new queue, remote transaction or HA guarantee.
 
 ## Opt-in request and SQL-worker tracing — YT-182
 
-[The application reference](../../docs/YT-182-TRACING-WORKER-IMPLEMENTATION.md)
+[The application reference](../../docs/PROVIDER-OPERATIONS.md#request-tracing-and-owned-worker-spans)
 uses native middleware and Rust `tracing`, with no generic AOP or tracing crate.
 The `request-tracing` Cargo feature is default-off; compiling it does not
 activate tracing. Embedded consumers use `Board::open_with_options` or

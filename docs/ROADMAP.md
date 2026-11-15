@@ -190,7 +190,7 @@ claimed. Operational tool/browser failures retained; independent Reviewer PASS0
 verifies24 unchanged sources, artifacts and both lock deltas. Live promotion is separate.
 
 **YT-231 Lab SQLite test stability (2026-11-02):** Done at local test-correction scope.
-[Bounded correction](YT-231-LAB-SQLITE-CONCURRENCY.md) separates the existing
+[Bounded correction](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) separates the existing
 finite Busy outcome from version conflict. Keep runtime/security/limits and the
 original CI failure; prove one committed effect and strict stale409 after the
 race. Controlled real-lock and changed-race checks, Clippy/format/docs/whitespace
@@ -803,7 +803,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M19 — Production-oriented application and developer experience (partial)** | Production Starter, signing, Admin Dashboard, DI/DX research, browser-only starter and optional HA/rolling deployment asset compatibility | YT-092–YT-095, YT-102–YT-112 | Real native/browser/reference-app proof, independently reviewed DX research, a separately qualified browser-only static workflow, and independently validated multi-version asset-retention/rolling-availability evidence; no automatic production support or release claim |
 | **M20 — Release-candidate qualification in progress** | Candidate API/security/supply-chain validation before explicit public-release decision | YT-096, YT-020 | [Current selected source/tag, hosted build/verifier and owner-host retention](YT-096-HOSTED-DRILL-PLAN.md) PASS at bounded unsigned sixteen-package scope; D6 identity/signing and remaining trust/registry/final-release gates stay open. Historical original-nine qualification and failure dispositions follow: [Selected `ce56e08` candidate](YT-096-CANDIDATE-QUALIFICATION.md): original nine experimental 0.1.0 libraries and Rust 1.99; local source-package/clean-consumer preflight passes on Ubuntu 26.04.1. [Selected dependency/API preflight](YT-096-SUPPLY-CHAIN-DELTA.md) adds 23 scoped SBOM/license checks, nine passing RustSec scans and explicit coverage limits. [Partial platform execution](YT-096-PLATFORM-QUALIFICATION.md) adds Ubuntu 24.04.5 container userspace native/doctest PASS, five wasm builds and fresh Linux Firefox PASS; resumed Windows MSVC standalone-package execution passes 83 native tests/four doctests, with historical cache failures and shared-kernel/Chrome scope retained. [Two-host archive rebuild](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md) matches all nine Windows archives byte-for-byte to Linux with normal Cargo verification. [Azure Run Command continuation](YT-096-AZURE-RUN-COMMAND.md) passes actual Ubuntu 24.04.5 guest execution, empty-cache nine-archive rebuild, 83 native tests/four doctests and five wasm libraries; earlier SSH failures preserved and resources deleted. [GitHub-hosted candidate rebuild](YT-096-GITHUB-HOSTED-REBUILD.md) passes at the exact candidate with nine byte-identical archives and matched source/lock/tools, adding separately operated execution evidence. [Final documentary reconciliation](YT-096-FINAL-RECONCILIATION.md) joins nine archives to 23 SBOMs and retained compiler/platform/browser evidence without runtime reruns. The [owner accepted the bounded support scope and known inventory differences](YT-096-FINAL-RECONCILIATION.md#owner-support-and-inventory-acceptance-2026-10-20), keeping exact-candidate Chrome and complete compiled/per-library/system inventory Not verified; [Final independent candidate review](YT-096-SECURITY-RELEASE-REVIEW.md) completed with technical/security evidence accepted but overall release gate FAIL, release-ready NO. Only support/inventory disposition is resolved; [minimum formal trust research](YT-096-FORMAL-TRUST-PROPOSAL.md) proposes conditional GitHub OIDC/public Sigstore and exact source/evidence bindings without implementation or policy selection. The [metadata decision brief](YT-096-TRUST-DISCLOSURE-DECISIONS.md) records public exposure/impacts and pending owner choices while retaining the original candidate and evidence without reruns or signing. Formal integrity/trust, registry proof, public activation controls and concrete final maintainer approval remain open; YT-020 stays Blocked, no auto-merge/release |
 | **M21 — Opt-in server capability roadmap (registered)** | Separate optional Authentication/Authorization, Session integration, rate limiting and conditional provider studies without bloating core | YT-113–YT-123 | [Staged capability plan](YT-113-123-OPT-IN-CAPABILITIES.md): YT-113 research and YT-114 native foundation Done after separate independent Reviewer PASS; YT-115 Done at Memory bridge scope and YT-116/119/120 Done at independently reviewed study scopes; [YT-117 rate limiting](YT-117-RATE-LIMIT.md) Done at per-process scope after independent Reviewer PASS; YT-118/121/122 research Done after independent Reviewer PASS and [YT-123 research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-123-TRACING-CORRELATION-STUDY.md) Done after independent Reviewer PASS; design gates and independent review before implementation; no M20 release-gate dependency or production claim |
-| **M22 — Production Readiness Phase 2 (bounded local scope complete)** | Sequential app-owned admission, opt-in observability, bounded capacity/recovery and upgrade compatibility | YT-127–YT-131 | [Contracts, baseline gaps and final matrix](PRODUCTION-READINESS-PHASE2.md): YT-127 Done at bounded A1 scope after independent Reviewer PASS; YT-128 Done after [local verification and independent Reviewer PASS](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md); YT-129 [local load/recovery evidence](YT-129-LOAD-SOAK-RECOVERY.md) Done after independent Reviewer PASS; YT-130 [local restore/runbook evidence](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md) Done after independent Reviewer PASS; YT-131 [v1-to-v2 implementation and local evidence](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md) Done after independent Reviewer PASS and controller acceptance; A1 → A2 → B1 → B2 → C1 with source-bound evidence and cleanup. Keep Implemented, Verified and Deployment-qualified separate; no generic infrastructure, M20 candidate expansion or production/release claim |
+| **M22 — Production Readiness Phase 2 (bounded local scope complete)** | Sequential app-owned admission, opt-in observability, bounded capacity/recovery and upgrade compatibility | YT-127–YT-131 | [Contracts, baseline gaps and final matrix](PRODUCTION-READINESS-PHASE2.md): YT-127 Done at bounded A1 scope after independent Reviewer PASS; YT-128 Done after [local verification and independent Reviewer PASS](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md); YT-129 [local load/recovery evidence](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts) Done after independent Reviewer PASS; YT-130 [local restore/runbook evidence](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md) Done after independent Reviewer PASS; YT-131 [v1-to-v2 implementation and local evidence](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md) Done after independent Reviewer PASS and controller acceptance; A1 → A2 → B1 → B2 → C1 with source-bound evidence and cleanup. Keep Implemented, Verified and Deployment-qualified separate; no generic infrastructure, M20 candidate expansion or production/release claim |
 
 **M19 form/DOM authoring (YT-107–109):** Done at their originally
 bounded application feedback, narrow `hidden` attribute, and
@@ -1311,7 +1311,7 @@ separate CLI/public release is inferred from this migration.
 
 **Historical planning checkpoint:** YT-069 covers documentation and owner-permitted planning review only. At that checkpoint, YT-070–YT-081 were Todo and required separate activation. Documentation/static checks and [self-review](M11-PLANNING-REVIEW.md) cannot qualify a runtime or satisfy later independent implementation/security gates. The original nine candidates and YT-020 remain unchanged. The YT-068/68-item status below is a retained pre-M11 checkpoint, not the current expanded backlog count.
 
-**Current non-GPU continuation (2026-10-14):** YT-070–YT-073 remain Done at authorized local scopes. [YT-074](YT-074-QUALIFICATION.md) is Done at the owner-amended local scope, with retained real Chewing IME PASS, repaired [Firefox/Orca spoken AT PASS](YT-074-DESKTOP-ACCEPTANCE.md) and final Chrome/Firefox PASS. The owner accepted five staggered cohorts for a new full-duration mixed workload; the original synchronized-burst failure remains a limitation on that Ubuntu host. The full 62-minute mixed run passed with 45,000 measured requests and zero errors; fresh independent review passed with no material findings. [Cross-environment synchronized evidence](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-074-CROSS-ENVIRONMENT-VERIFICATION.md) adds native Windows/Azure Ubuntu full PASS at the original gates, with 44,850/45,000 actual formal requests, while retaining original Ubuntu FAIL and all instrumentation limits. The evidence supports an original-host system/storage limitation; no original-host repair or broader acceptance is claimed. [Handoff](M11-P-IMPLEMENTATION-HANDOFF.md) records completed documentation/static review and the subsequent conditional one-commit local delivery authority, with no new load or push. No GPU, release or deployment activation follows.
+**Current non-GPU continuation (2026-10-14):** YT-070–YT-073 remain Done at authorized local scopes. [YT-074](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) is Done at the owner-amended local scope, with retained real Chewing IME PASS, repaired [Firefox/Orca spoken AT PASS](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) and final Chrome/Firefox PASS. The owner accepted five staggered cohorts for a new full-duration mixed workload; the original synchronized-burst failure remains a limitation on that Ubuntu host. The full 62-minute mixed run passed with 45,000 measured requests and zero errors; fresh independent review passed with no material findings. [Cross-environment synchronized evidence](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-074-CROSS-ENVIRONMENT-VERIFICATION.md) adds native Windows/Azure Ubuntu full PASS at the original gates, with 44,850/45,000 actual formal requests, while retaining original Ubuntu FAIL and all instrumentation limits. The evidence supports an original-host system/storage limitation; no original-host repair or broader acceptance is claimed. [Handoff](M11-P-IMPLEMENTATION-HANDOFF.md) records completed documentation/static review and the subsequent conditional one-commit local delivery authority, with no new load or push. No GPU, release or deployment activation follows.
 
 **M11 Experimental GPU acceptance (YT-075–081):** The owner authorized
 separate local browser-first qualification, CPU/GPU lifecycle and measured
@@ -1664,7 +1664,7 @@ YT-127 (A1 admission), YT-128 (A2 observability), YT-129 (B1 load/soak/recovery)
 YT-130 (B2 backup/restore) and YT-131 (C1 mixed-version compatibility).
 [YT-127 implementation/local verification](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md) is
 Done at bounded A1 scope after independent Reviewer PASS, zero issues and
-required followups; YT-128 is Done after [local verification and independent Reviewer PASS](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md); YT-129 is [Done after independent Reviewer PASS at local load/recovery scope](YT-129-LOAD-SOAK-RECOVERY.md); YT-130 is [Done after independent Reviewer PASS at local restore scope](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md); YT-131 is [Done after independent Reviewer PASS and controller acceptance at local C1 scope](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md).
+required followups; YT-128 is Done after [local verification and independent Reviewer PASS](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md); YT-129 is [Done after independent Reviewer PASS at local load/recovery scope](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts); YT-130 is [Done after independent Reviewer PASS at local restore scope](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md); YT-131 is [Done after independent Reviewer PASS and controller acceptance at local C1 scope](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md).
 Implementation, verification and deployment qualification remain separate.
 Fully validate and independently review each item before its successor;
 unresolved material P0–P2 findings prevent acceptance. The [final five-capability matrix](PRODUCTION-READINESS-PHASE2.md#final-production-readiness-matrix) consolidates accepted scopes; the controller owns aggregate documentation checks and final consolidation review. The separate release-owner decision remains YT-096 D1–D6; [M23 profile planning](#m23--production-deployment-profile-contracts) records accepted deployment-contract planning without expanding accepted M22 proof. Neither authorizes signing or release.
@@ -1682,7 +1682,7 @@ In progress with D1–D6 Pending, and YT-020 Blocked remain unchanged.
 historical documentation-only scope after independent Reviewer PASS, zero
 issues and required followups. Its one-process/one-host and N-replica categories
 retain the same-host/cross-host distinction and all source-bound evidence limits.
-[YT-133](YT-133-STARTER-SINGLE-INSTANCE-CONTRACT.md) retains historical base-contract
+[YT-133](../examples/production-starter/README.md#single-instance-reference-and-schema-recovery-boundaries) retains historical base-contract
 and private operator selection Reviewer PASS. The later user-approved
 framework/responsibility correction and reference implementation have a separate
 **independent Reviewer PASS**, zero issues and required followups; earlier PASS
@@ -1710,7 +1710,7 @@ required. A production Profile is a consumer evidence record, not a Loader
 environment, configuration key, CLI flag or runtime feature.
 
 [Backlog M23](BACKLOG.md#m23--production-deployment-profile-contracts-planning)
-now includes activated [YT-141 performance validation](YT-141-PERFORMANCE-VALIDATION.md),
+now includes activated [YT-141 performance validation](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts),
 Done at bounded optional local reference scope after contract PASS, bounded new workload,
 owned cleanup and final independent Reviewer PASS, zero issues and required followups. The user has now
 activated [YT-140 OIDC proxy/replica integration](YT-140-OIDC-PROXY-REPLICAS.md),
@@ -1730,11 +1730,11 @@ and required followups. The user has now
 activated [YT-136 bounded telemetry collection](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-136-TELEMETRY-COLLECTION.md),
 Done after new integration proof, cleanup and independent Reviewer PASS, zero
 issues and required followups. The user has activated
-[YT-135 current-schema recovery](YT-135-CURRENT-SCHEMA-RECOVERY.md), now Done
+[YT-135 current-schema recovery](PRODUCTION-READINESS-PHASE2.md#current-schema-recovery-and-starter-ownership), now Done
 after bounded release/schema-2 proof, cleanup and independent Reviewer PASS,
 zero issues and required followups. YT-134 is
 **Done at bounded optional reference scope** under the separately authorized [release/storage workload
-contract](YT-134-RELEASE-STORAGE-CAPACITY.md), reusing the accepted release binary
+contract](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts), reusing the accepted release binary
 for isolated schema-2/ext4 measurements: 23,549 requests, passing paced
 1/2/4-worker points, retained Step 8 503/readiness FAIL, exact acknowledged-write
 reconciliation and cleanup complete; independent Reviewer
@@ -1765,7 +1765,7 @@ Done. No broader roadmap redesign, validation infrastructure, production
 activation, signing or release is selected.
 
 YT-134's bounded local release/storage reference is Done after independent
-review. The separately authorized [ephemeral Azure supplement](YT-134-AZURE-REFERENCE.md)
+review. The separately authorized [ephemeral Azure supplement](PRODUCTION-DEPLOYMENT-PROFILES.md#bounded-private-and-azure-operations)
 completed its workload, reconciliation, ordinary reboot/readback and full
 resource deletion, with separate independent Reviewer PASS, zero issues and
 required followups. Failed cloud points and probe/clock limits remain retained;
@@ -1795,7 +1795,7 @@ contract Reviewer PASS, zero issues/required followups; minimum origin integrati
 three new focused tests, static checks and owned cleanup complete. Final
 independent Reviewer PASS, zero issues/required followups; twelve hashes matched.
 New live proof is single-process Board listeners
-with no successful token exchange or cross-process Admin OIDC claim. [YT-141](YT-141-PERFORMANCE-VALIDATION.md) is Done after independent contract
+with no successful token exchange or cross-process Admin OIDC claim. [YT-141](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts) is Done after independent contract
 PASS and the minimal k6 reference/new controlled-arrival proof: 14,006 measured
 valid-200 responses plus 501 warmup, no drops/errors, p50/p95 1/2 ms and p99
 2–4 ms. All six phase bounds passed; no saturation maximum is established.
@@ -1824,7 +1824,7 @@ all historical failures; distinguish application saturation from generator or
 resource caps. No unchanged passing proof, product tuning or cloud execution
 is selected.
 The user separately requested future performance validation, registered as
-[YT-141](YT-141-PERFORMANCE-VALIDATION.md), now explicitly activated. Tool selection
+[YT-141](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts), now explicitly activated. Tool selection
 compares community HTTP benchmark/load tools with a minimal
 application-specific driver for a new controlled-arrival read-only API question. Preserve reproducible
 workloads, offered-versus-achieved load, all/successful latency, rejection/error
@@ -1897,7 +1897,7 @@ planning update. Independent Reviewer acceptance is required before each new
 item is Done. YT-096/YT-020 release gates and no Commit/Push remain unchanged.
 
 
-YT-181 now activates only its [minimal sensitive-write contract](YT-181-SENSITIVE-WRITE-CONTRACT.md),
+YT-181 now activates only its [minimal sensitive-write contract](PROVIDER-OPERATIONS.md#commit-time-authority-and-revocation),
 In progress: selected SQL-owned local-account/project write revoke, private
 old-generation ticket and the shared IMMEDIATE item/history/revoke transaction
 order. Preserve native middleware/domain composition without generic AOP,
@@ -1911,7 +1911,7 @@ independent review. YT-182–184 remain Todo; no benchmark replay, runtime/cloud
 change or new-change Commit/Push.
 
 
-The separately authorized [YT-181 opt-in implementation](YT-181-SENSITIVE-WRITE-IMPLEMENTATION.md)
+The separately authorized [YT-181 opt-in implementation](PROVIDER-OPERATIONS.md#commit-time-authority-and-revocation)
 is Done at bounded application-reference scope after independent Reviewer
 /root/yt181_commit_write_auth_implementation_review_20261025 PASS, zero issues/
 followups;19files/41evidence/12retained hashes stable, strict Clippy/fmt/docs PASS. Default-off app
@@ -1925,7 +1925,7 @@ file-policy race, worker/security bounds and no generic AOP remain. No new-chang
 Commit/Push or YT-182–184 activation.
 
 
-YT-182 activates the [opt-in request tracing/worker contract](YT-182-TRACING-WORKER-CONTRACT.md),
+YT-182 activates the [opt-in request tracing/worker contract](PROVIDER-OPERATIONS.md#request-tracing-and-owned-worker-spans),
 In progress. Select Board/Admin as one consumer and preserve Starter evidence;
 explicit feature/Settings, native middleware and server-generated RequestIds,
 allowlisted safe root/worker spans with scoped Dispatch, distinct Response-return/
@@ -1937,7 +1937,7 @@ change Commit/Push or release expansion.
 
 
 YT-182 contract Reviewer `/root/yt182_safe_tracing_contract_review_20261025`
-returns PASS, zero issues/followups. The [application integration/new proof](YT-182-TRACING-WORKER-IMPLEMENTATION.md)
+returns PASS, zero issues/followups. The [application integration/new proof](PROVIDER-OPERATIONS.md#request-tracing-and-owned-worker-spans)
 is In progress pending independent implementation acceptance: five new Board
 cases and the new Admin setting case in two feature conditions have seven
 successful executions, with old cases filtered; original compile/future-drop
@@ -1959,7 +1959,7 @@ updated after review; runtime/test/dependency bytes stay reviewed. YT-183/184
 remain Todo, release gates unchanged; no new-change Commit/Push.
 
 
-YT-183 now selects the [Shop catalog/cart display contract](YT-183-CATALOG-CACHE-CONTRACT.md),
+YT-183 now selects the [Shop catalog/cart display contract](../examples/modular-shop/README.md#optional-catalog-display-cache--yt-183),
 In progress before minimum integration: default-off application Moka cache,
 two-second source-age bound, bounded retained projection/fill wait and local
 commit-generation invalidation safe against late old fills. Cart mutations,
@@ -1969,7 +1969,7 @@ is selected without prior benchmark/test replay. Independent acceptance precedes
 Done; YT-184 remains Todo, no new-change Commit/Push.
 
 
-YT-183 is now Done at its [bounded application-reference scope](YT-183-CATALOG-CACHE-IMPLEMENTATION.md):
+YT-183 is now Done at its [bounded application-reference scope](../examples/modular-shop/README.md#optional-catalog-display-cache--yt-183):
 independent Reviewer `/root/yt183_catalog_cache_independent_review_20261025` PASS,
 zero issues/required followups; 20 file/41 evidence/16 retained bindings and Git
 baseline stable. Nine new test executions, strict Clippy/fmt/docs/default-graph

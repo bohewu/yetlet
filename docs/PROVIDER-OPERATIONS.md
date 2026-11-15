@@ -289,6 +289,108 @@ load separate Session snapshots. A pluggable Redis backend by itself therefore
 does not prove the stronger atomicity/rotation/revocation contract above. This
 is a reason to qualify the selected integration, not to write an in-house store.
 
+## Optional sensitive writes, tracing and catalog consistency
+
+The following remain **application-owned, opt-in references** rather than
+new Yetlet Core/Session middleware, global providers or stable public APIs.
+The original YT-181/182/183 contracts, implementation verifications, failed
+probes and review receipts are recoverable from fixed **local Git**
+`99906e421c0510231291bf527e2cbd2e7ad0ffda`; source Git does not
+contain all ignored native/raw evidence. Precise activation, defaults and
+business behavior remain in the [Lab Board](../examples/lab-operations-board/README.md)
+and [Modular Shop](../examples/modular-shop/README.md) guides.
+
+### Commit-time authority and revocation
+
+Opt-in Board `commit-write-auth` adds a **server-issued private ticket**
+bound to a trusted Store-held authority row/generation; the real application
+SQL write checks current permission while holding the same independent SQLite
+`BEGIN IMMEDIATE` business-effect transaction. A prior HTTP/Session/IdP
+check alone cannot guarantee revocation against an already-admitted worker.
+SQL revoke advances the generation, and explicit re-enable advances again:
+a stale ticket never becomes valid simply because authority is later
+re-enabled. A writer holding an IMMEDIATE transaction *before* revocation
+commits may finish before revoke is eligible; a later response does not
+change commit ordering. Private trusted integration controls issuance and
+re-enable, **not** an untrusted form/query/client generation. Missing,
+empty, legacy or replaced authority is denied on reopen; no implicit
+allow/reseed or automatic restore of revoked authority.
+
+Only selected SQL-owned write permission gains this commit-order property.
+Session logout, account disable, file policy, IdP refresh and other current
+Auth/Session/OIDC checks retain their own bounded freshness races. There is
+no generic two-phase commit, distributed lock, cross-replica authority,
+exactly-once outcome, automatic rollback or retry. Existing four SQL
+workers, 250ms SQLite Busy limit, one-second worker admission, item/history
+storage and safe 409/503 remain unchanged. Started SQL can complete after
+HTTP cancellation or 504: check committed state before any new action.
+The historical second-connection Busy/revoke-before-explicit-restore and
+reopen-deny tests are source-specific evidence, not new production
+certification. Original first compiler visibility warning was corrected
+without treating earlier test execution as a post-change rerun.
+
+### Request tracing and owned worker spans
+
+Opt-in Board `request-tracing` is default off, requires deliberate
+`BoardOptions.request_tracing=true` through the embedding host, and
+**does not initialize a global subscriber**. It is independent of
+`write_authorization`; merely compiling the feature selects neither.
+Only a trusted server-issued positive process-local request ID, a finite
+method, fixed worker operation and `ok`/`error` may enter the safe span.
+No caller-supplied trace parent, raw URI/query/body, SQL parameters,
+identity, Cookie, Session ID, credential or secret crosses the boundary.
+Propagate only the selected root/span/Dispatch into actual owned async
+and blocking worker work; unrelated ambient spans are not copied.
+Worker lifetime and its permits continue after a dropped HTTP future.
+`http_response_constructed`, `http_future_dropped`, and
+`sql_worker_completed` are **different** events; neither response
+construction nor worker success alone proves response-body delivery or
+durable business commit. Host/Origin pre-router refusals, static routers
+and streamed body chunks are outside that selected instrumentation.
+
+No new tracing server/exporter, global recorder, implicit diagnostics
+route, universal audit identity or worker cancellation is implied.
+Original selected regression and redacted output proofs are bounded;
+the old stricter Commit Guard finding in a synthetic foreign-span test
+field was corrected without weakening Guard or changing runtime behavior.
+
+### Opt-in catalog-data cache boundary
+
+Shop's `catalog-cache` native feature and
+`YETLET_SHOP_CATALOG_CACHE_ENABLED` exact true/false startup selection
+are both default off. Reject invalid/non-Unicode input or enabled
+selection without the compiled feature before listener startup.
+Only the public ordered product id/name/price/stock projection may be
+cached in an application-local private native Moka store; never cache
+Session, CSRF, cart ownership, orders, idempotency, checkout pricing,
+authorization or SQL stock authority. Browser responses are still
+rendered freshly with private/no-store semantics.
+
+The selected source-age cap is **2 seconds from monotonic SQL load start**
+at value selection plus separate native 2s insertion TTL; cache hits
+do not extend either. Admit at most 64 products and approximately
+64KiB typed retained payload; oversized success returns **uncached**
+without truncation. Moka's one-entry target is best-effort rather than a
+whole-process peak-memory ceiling. One actual SQL-origin fill permit,
+native same-generation coalescing and cooperative **500ms** lookup/fill
+wait apply. Started blocking SQL holds its fill/SQL permits after caller
+timeout/drop. Miss or source error never returns a stale-on-error or
+cached negative authorization result, and no app retry queue is added.
+
+Successful checkout/idempotent committed return advances a local
+generation **inside the blocking SQL transaction closure before returning**;
+rollback does not publish. A late old-generation fill cannot populate the
+new active key, although readers that selected a prior generation may
+finish with an older **bounded-age** display. Generation saturates
+without wrap; cached reads fail unavailable until cold reopen without
+changing checkout authority. Separate Store opens/processes and
+out-of-band SQL writers are **not** coherent or invalidated remotely;
+the two-second bound is not a linearizable read or durable distributed
+cache guarantee. A previously observed missing-offline-dependency
+exit101 was a fixture/preparation failure, not a cache product defect.
+See [Shop cache activation](../examples/modular-shop/README.md#optional-catalog-display-cache--yt-183)
+for the current app's actual feature and tests.
+
 ## Application/operator responsibilities and unverified deployments
 
 No production topology, recovery budget, retention policy or SLA is chosen by

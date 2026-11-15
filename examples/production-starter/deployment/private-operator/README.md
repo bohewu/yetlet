@@ -15,7 +15,7 @@ requires its Bearer token and rejects every Origin header. Local HTTP cookies
 remain HttpOnly/SameSite=Lax but **not Secure**. Reload forms after each app
 restart. Public TLS, IdP, Valkey, multiple writers and HA are separate choices.
 
-See the [selected reference contract](../../../../docs/YT-133-STARTER-SINGLE-INSTANCE-CONTRACT.md),
+See the [selected reference contract](../../README.md#single-instance-reference-and-schema-recovery-boundaries),
 [application instructions](../../README.md),
 [write/deadline limits](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md) and
 [schema-2 forward-fix rules](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md).

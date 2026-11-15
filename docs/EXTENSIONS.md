@@ -239,7 +239,7 @@ repeated data-cache adapter is demonstrated; retain typed app-owned composition.
 Session, permission policy and limiter accounting remain authoritative state;
 data caching does not authorize HTTP output reuse. Research is Done
 after independent Reviewer PASS; that research selected no cache trait/crate or runtime.
-The later separately authorized [YT-183 Shop reference](YT-183-CATALOG-CACHE-IMPLEMENTATION.md)
+The later separately authorized [YT-183 Shop reference](../examples/modular-shop/README.md#optional-catalog-display-cache--yt-183)
 is an app-only default-off Moka integration accepted after independent Reviewer PASS
 with zero issues/required followups;
 it preserves Session/checkout authority and does not extract a framework cache API.

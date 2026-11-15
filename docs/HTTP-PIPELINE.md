@@ -97,6 +97,38 @@ with application decisions and exact latency populations in the
 [workload example](../examples/axum-workload-comparison/README.md#http-admission-capacity-selection).
 Complete original commands, source and Reviewer evidence survive
 in **local Git** `619b0d9d1e05c86ea0193efb5fc91a198ec930a8` (public SHA reachability unverified).
+## HTTP completion, sensitive-write and worker lifetime boundaries
+
+The HTTP `Response` is constructed before its full body is sent;
+a disconnected/timed-out caller does not thereby cancel a previously
+dispatched SQL closure, revoke its own write permission, prove a
+business commit or permit a blind retry. This applies to the native
+Starter admission/deadline path and to application-selected Lab
+Board opt-ins. Current request admission, CSRF/Session, SQL Busy
+and handler cleanup remain consumer-owned.
+
+The optional Board **commit-write-auth** protects only its selected
+SQL business-write effect with a private Store-owned permission
+ticket checked while holding the real `BEGIN IMMEDIATE` transaction.
+A revoke ordered after that transaction may not preempt its commit;
+a fresh revoke/re-enable generation invalidates older tickets.
+This is **not** a generic framework authorization middleware,
+distributed lock or guarantee that Session/IdP revocation and SQL
+commit are atomic. Refusing missing/legacy/malformed authority on
+reopen is a deliberate fail-closed application policy.
+
+Optional **request-tracing** uses a server-origin process-local
+request ID and selected safe HTTP method into a native root span;
+the approved worker span/Dispatch survives an HTTP future drop
+only for the real owned work. It must not propagate user-supplied
+ambient trace context, URI/query, identity, cookie, SQL parameter
+or secrets. Response construction, future drop and SQL worker
+completion are different events; a worker's `ok` result is not
+a universal durable business-commit receipt. See
+[Provider Operations](PROVIDER-OPERATIONS.md#optional-sensitive-writes-tracing-and-catalog-consistency)
+and [Board source](../examples/lab-operations-board/README.md#opt-in-request-and-sql-worker-tracing--yt-182)
+for exact opt-in activation and admitted scope.
+
 ## Prerequisites
 
 Use the pinned Rust/Cargo toolchain and the existing server adapter in a native

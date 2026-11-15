@@ -73,4 +73,4 @@ Then open `http://127.0.0.1:3012/board` locally. This is a suggested operator co
 
 ## Verification and screenshots
 
-The application README documents focused commands. [Qualification](YT-074-QUALIFICATION.md) distinguishes actual browser/native/load evidence from unverified real OS IME, spoken assistive technology and production claims. The [screenshot gallery](screenshots/m11-board/README.md) contains real browser captures of synthetic records. Those records belonged to an isolated verification database which was cleaned up; they are not silently seeded into your normal database.
+The application README documents focused commands. [Qualification](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) distinguishes actual browser/native/load evidence from unverified real OS IME, spoken assistive technology and production claims. The [screenshot gallery](screenshots/m11-board/README.md) contains real browser captures of synthetic records. Those records belonged to an isolated verification database which was cleaned up; they are not silently seeded into your normal database.
