@@ -66,20 +66,21 @@ def archives(directory, cycle=False, consolidated=False, cli=False, cli_version=
         if name == 'yetlet-cli' and r['version'] not in records.LEGACY_CLI_VERSIONS:
             package = HERE.parent / 'tools/yetlet-cli'
             files = {p: (package / p).read_bytes() for p in release_docs.SDK_RESOURCE_PATHS}
+            # This is a synthetic registry archive, not the released crate's bytes.
+            # Its tested Build SDK must follow the historical release binding;
+            # the checkout's newer embedded snapshot is only hash-closed fixture data.
+            policy_bytes = files['resources/sdk-compatibility.json']
             if r['version'] in ('0.3.0', '0.3.1'):
-                # Historical resolver archives retain their original policy.
-                revision = records.CLI_SDK_POLICIES[r['version']]
                 policy_bytes = HISTORICAL_POLICY if r['version'] == '0.3.0' else LATEST_POLICY
-                readme = readme.replace('Generated SDK', 'Build SDK') + (
-                    f'\n**SDK policy:** `{revision}`.\n'
-                    '## CLI command and capability inventory\n'
-                    'native-style browser-style --sdk-version --offline Cargo.lock\n')
                 files['resources/sdk-compatibility.json'] = policy_bytes
-                identity = json.loads(files['resources/sdk-identity.json'])
-                identity['policy_sha256'] = registry.sha(policy_bytes)
-                files['resources/sdk-identity.json'] = json.dumps(identity).encode()
-            else:
-                readme = (package / 'README.md').read_text()
+            identity = json.loads(files['resources/sdk-identity.json'])
+            identity['build_sdk'] = records.cli_sdk_version(r['version'])
+            identity['policy_sha256'] = registry.sha(policy_bytes)
+            files['resources/sdk-identity.json'] = json.dumps(identity).encode()
+            readme = (readme.replace('Generated SDK', 'Build SDK') +
+                      f'\n**SDK policy:** `{records.CLI_SDK_POLICIES[r["version"]]}`.\n'
+                      '## CLI command and capability inventory\n'
+                      'native-style browser-style --sdk-version --offline Cargo.lock\n')
             extra_files = list(files.items())
         with tarfile.open(fileobj=raw, mode='w:gz') as archive:
             for path, data in [('Cargo.toml', manifest.encode()), ('README.md', (readme + readme_suffix).encode()), *extra_files]:
@@ -111,7 +112,12 @@ class RegistryTests(unittest.TestCase):
                     policy_bytes = archive.extractfile(f'yetlet-cli-{version}/resources/sdk-compatibility.json').read()
                 self.assertEqual(policy_bytes, expected_policy)
                 if version == '0.4.0':
-                    self.assertEqual(meta['readme'], (package / 'README.md').read_text())
+                    # Published CLI 0.4.0 used alpha.7; current source-only README
+                    # describes an alpha.8 checkout and must not become the fixture.
+                    self.assertIn('**Build SDK:** `=0.9.0-alpha.7`.', meta['readme'])
+                    self.assertIn('**Build SDK:** `=0.9.0-alpha.8`.',
+                                  (package / 'README.md').read_text())
+                    self.assertNotEqual(meta['readme'], (package / 'README.md').read_text())
                 r, subjects = archives(Path(temp), cli=True, cli_version=version, cli_sdk='0.9.0-alpha.6')
                 with self.assertRaises(ValueError): registry.prepare(r, temp, subjects)
 

@@ -60,7 +60,10 @@ class ReleaseDocsTests(unittest.TestCase):
                                 ('0.3.1', LATEST_POLICY)]:
             readme = (f'**CLI release:** `{version}`.\n'
                       f"**SDK policy:** `{json.loads(policy)['revision']}`.\n")
+            # Historical resolver release identity is alpha.7; the checkout's
+            # alpha.8 resource snapshot remains source-only and hash-closed.
             identity = json.loads(files['resources/sdk-identity.json'])
+            identity['build_sdk'] = records.cli_sdk_version(version)
             identity['policy_sha256'] = docs.hashlib.sha256(policy).hexdigest()
             selected = dict(files, **{'resources/sdk-compatibility.json':policy,
                                      'resources/sdk-identity.json':json.dumps(identity).encode()})
