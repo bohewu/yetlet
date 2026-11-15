@@ -4,7 +4,7 @@
 **Scope:** CI reliability, dependency security, repository controls and next qualification work after the M9 evidence freeze.
 **Decision:** The current source remains an experimental private prototype. The changes in this review improve CI and close one concrete RustSec advisory; they do not authorize public package publication or production deployment.
 
-**Later private preparation update (2026-10-11):** PR #4 delivered bounded YT-065/066 qualification; required PR CI and post-merge `a61f409` CI passed. The maintainer then selected [experimental 0.1.0 Private preparation](YT-020-PRIVATE-RELEASE-PREP.md) for the original nine library candidates. This update reconciles remaining activation work below without relabeling earlier tests/scans or authorizing publication, settings changes or production work.
+**Later private preparation update (2026-10-11):** PR #4 delivered bounded YT-065/066 qualification; required PR CI and post-merge `a61f409` CI passed. The maintainer then selected [experimental 0.1.0 Private preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) for the original nine library candidates. This update reconciles remaining activation work below without relabeling earlier tests/scans or authorizing publication, settings changes or production work.
 
 ## Public source preview and private reporting
 
@@ -79,6 +79,9 @@ Markdown is locally recoverable (remote SHA unverified); logs/settings receipts
 remain in `target/yt209-delivery-20261029/`, not guaranteed by Git.
 
 ## 1. Remote CI failure diagnosis
+
+The later [separate-signer failure chronology](#separate-signer-integration-failures-and-corrections--2026-10-28-and-29)
+retains each original failure independently of successful final output acceptance.
 
 GitHub Actions run `38012171376` executed commit `292b1524ff2ed0e223aeb2575e5b744cda14dfc5`. Documentation, format, strict Clippy, native tests, doctests, wasm32 compilation, browser asset generation and the native server build passed. The only failed step was the Chrome Browser E2E smoke.
 
@@ -205,3 +208,46 @@ The `run-ci` artifacts under `.pipeline-output/20261010-yetlet-ci-audit/` are ig
 4. a new GitHub Actions run observed to terminal status, with every required job/step reported.
 
 GitHub Actions run `38024582602` is the terminal hosted evidence for commit `86c30a42114ca74f4197f0389707861308a844a7`; both required jobs completed successfully. Future commits require their own terminal CI result. A green CI run does not close public-release task `YT-020`, which remains Blocked.
+
+## Separate signer integration failures and corrections — 2026-10-28 and 29
+
+The independent-S design preserves C `bf3363801132f4481263ceb411d9bba3349df86d`,
+both original tags and exact build/verifier bytes. Local integration PASS did
+not qualify hosted execution. Every replacement S required separately approved
+delivery, exact reviewed tree, actual PR/master CI and source selection.
+Original failures remain ineligible even where later payload hashes match.
+
+| Checkpoint | Actual failure, correction and preserved limit |
+|---|---|
+| Local signer implementation2026-10-28 | Closed prepare/sign, isolated custody, exact S/OIDC and partial-output sealing were reviewed PASS0. Initial TUF API/test-block errors remained. Reviewer runtime trace was unavailable, so configured model/effort stayed unverified. No hosted or formal-assurance proof followed |
+| PR15 S `d2562e14af75d08c177c01e976cbd8f13124b8ff`, tree `74dd75a7f132f9080885190e1cecdc99245d57af` | Before dispatch, real original layout exposed duplicate OpenSSL log/result names in private and extras. Synthetic fixture had missed extras. No hosted/key attempt occurred. Unique BUILD-EXTRA labels/closure mapping and real-layout regression preserved both copies. Followup PASS0 retained unavailable-trace limitation |
+| Qualification selection |53original records, reviewed proposal SHA `91dc6c988e2d3452a1614b157ad1e71bfef1694cd65f6ccfe55cbe464683e999`, then external review receipt yielded54records plus closure/manifest,56flat files/18,267,605bytes. Manifest `20757af3039310399145a93acf9bab06439d88235a55aa7e776aa90280bece3c`, encrypted ZIP `c90d98d20d579ed76c9ba8e705a6b204e1e43186eb3e02ec0121e91d15596168`. Neither was the final signing manifest |
+| PR16 delivery | PR CI40710158856/1 failed Chrome debugger startup before assertions. Owner-authorized failed-Stable-only attempt2 passed, original MSRV timestamps retained. Selected S `87d24e9e63b4c9486d63a4b0141c20368ceaf540`, tree `977b82db0323e57f8692b8c22172f609a7c8c008`, master40716085116/1 PASS |
+| Prepare40717870186/1 | Generic read-only preflight rejection. Prepare/sign skipped, no key/OIDC/approval/output. Exact cause remained unknown. Owner-context cached metadata did not prove hosted job-token access. Draft visibility stayed a hypothesis. Failure custody23files/200,037bytes, index `351cf237ce2010d36ca262f370da50d11ab8d1684f5288b7563aef8f6082d160` |
+| Safe diagnostics | Only fixed stage, http/network/metadata/internal class and bounded integer HTTP status. Closed error responses without reading private bodies. Missing-entry and HTTP-finalizer warning failures were retained. Focused correction/PASS0 changed no gate/permissions. This review had matching native reviewer/model/high evidence |
+| PR17 S `0e8fb600af7aaebd4641a78c477035afe637c67e`, tree `a4abae728a957991611c2f362ba5b005522b1abd` | PR40788520807/1/master40789389079/1 PASS. Prepare40789535074/1 failed `gate=qualification-release class=http status=403` after earlier gates passed. Protected work skipped. This observed status did not diagnose the earlier generic failure. Provider body/permission headers were deliberately unretained. Failure custody41files/224,168bytes, index `517c584090f91c6318275263dbb51f0b770a9755d229c29b35e0fb7ea258824d` |
+| Encrypted capability correction | Reused existing Draft asset685300857 through owner-resolved age-encrypted read capability. Actual local transfer with test age identity and nine focused cases passed. No owner key/qualification plaintext read. No owner credential forwarded. Independent PASS0 had matched native reviewer/max evidence. Hosted source qualification remained separate |
+| PR18 S `e2d4a9f64925f2a20c35c7e7aeae6e352e4938ef`, tree `07404415d79443c83109a1205b0ccb6a25584cd7` | PR40794539309/1/master40795652719/1 PASS. One owner-approved prepare40795794183/1 passed preflight123191847380, all tools/data/full-manifest/freeze/upload, then cleanup failed200 permission-denied entries inside task-private Go module cache. Job123191897780/overall run stayed FAIL, sign123191900050 skipped. Logs showed no errors elsewhere, without independent filesystem-cleanup certification |
+| Failed frozen candidate readback | Artifact12863583130,74,815,048bytes, ZIP `561058586354c54c935af000f7b5fac3d1084d93ae12f606dd257262cfc49b4b`, safe receipt `b6b79e3b98a21c1caa226ea27a004fab367ac7d2eb951e6785340f06025e19a5`, ciphertext `e47f1d0544acc240f31310eec7f1c79d169187312f5e1a4bec716086b83a4f27`. Final-manifest hash matched later success, but this run remained ineligible. No local decrypt or automatic retry |
+| Scoped cleanup repair | Task-private bootstrap GOFLAGS=-modcacherw made its new Go cache removable. One focused native offline case reproduced old removal failure and proved corrected removal. Global settings, tool pins, sumdb, keys and ordinary strict cleanup gate stayed intact. Original failure/local review PASS0 did not claim repaired hosted success |
+| PR19 S `d65e3180ad3076659f03c069fc71cd0e7e3f0518`, tree `5812dcfbc9e50a76c4d230bd5d32a336568db12a` | PR40805140129/1/master40806189605/1 PASS. New separately approved prepare40806988578/1 and sign40811275645/1 passed, followed by independent cryptographic verification and exact-output owner acceptance. The [accepted identities](RELEASE-READINESS.md#alpha1-frozen-inputs-signatures-and-acceptance--2026-10-29) retain the spent one-use local verification exception and wrapper failures |
+
+The supplemental selection preserved actual C export, locks/recipes, accepted
+qualification/support/scans and the original370-member security ZIP. Denied
+Windows ZIP transfer remained denied, represented only by admitted remote text/
+index/reference scope. The Tokio audit ZIP remained a referenced reconciliation,
+without a claim that its raw bytes were in the local selection. Neither source
+export nor review created complete compiled/native/system inventory or a new
+all-source scan. Final source-specific acceptance closed D6/YT-096 only at its
+documented signing/integrity scope. The earlier ce56e08 FAIL/release-ready NO,
+13historical Guard findings and all custody/rotation/reviewer/wrapper failures
+retain their original results. No repeated test, key operation or cache change
+is performed by this consolidation.
+
+Raw records remain at `target/yt096-alpha-signer-preparation-20261028/implementation/`,
+`target/yt096-signer-prepare-batch-20261028/` and
+`target/yt096-owned-cache-cleanup-delivery-20261029/`, plus indexed owner custody.
+The [original dated signer narrative](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#hosted-preflight-failure-and-safe-local-diagnostics--2026-10-29)
+is locally Git-recoverable with unverified remote reachability. This preserves
+provenance of claims and raw-store locations, without asserting current raw-byte
+availability or granting operations against those stores.

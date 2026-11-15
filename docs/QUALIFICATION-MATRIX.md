@@ -28,11 +28,14 @@ Linux. Stable Rust is explicitly installed and observed; the unchanged
 historical baseline workflow supplied the Rust 1.88 MSRV check. On 2026-10-12,
 the maintainer selected Rust 1.99 before first publication. The local baseline
 now pins 1.99.0; the new toolchain file does not override rolling stable lanes,
-which explicitly set `RUSTUP_TOOLCHAIN=stable`. [Integrity preparation](YT-020-INTEGRITY-PREPARATION.md)
+which explicitly set `RUSTUP_TOOLCHAIN=stable`. [Integrity preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12)
 records the retained source boundaries. [Hosted rebuild preparation](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md)
 records the later authorized protected-check migration after actual Rust 1.99 CI PASS.
 
 ## Historical nine-package candidate platform and builder evidence
+
+Earlier [private preparation and tool fixtures](#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12)
+retain their distinct overlay sources and shared-control limits.
 
 On **2026-10-20**, C `ce56e0814e5423782440acd2c959ca777d572cd4`
 (tree `0c5fa71179741f7b52dead078ff6d8a9efc30241`) selected nine default-feature,
@@ -473,6 +476,10 @@ Cleanup failure prevents PASS. No screenshots or visible browser are needed.
 
 ## Optional future manual qualification runbook (currently Not verified)
 
+The native [local signing/key CLI evidence](#local-signing-key-cli-and-azure-evidence--2026-10-18)
+and [custody test-key drill](#custody-and-local-rotation-evidence--2026-10-27-and-28)
+retain separate execution and acceptance scopes.
+
 Record tester/date, source/build identity, OS/architecture, browser version,
 assistive technology or IME version/settings, profile and observed result for
 each attempt. Use synthetic text and loopback fixtures; retain only redacted
@@ -517,3 +524,162 @@ for failures. A blank record or successful automation is not manual evidence.
 The local/browser and hosted run IDs, terminal results, observed versions/architectures and artifact references are recorded in [M10f verification](M10F-VERIFICATION.md). The authorized workflow merge and actual hosted run reached terminal success. YT-065 is therefore Done at the bounded automated desktop/native/browser scope.
 
 The manual cells above remain explicitly Not verified and optional. They do not block this bounded task, do not become supported-platform or accessibility-conformance claims, and must not be inferred from typed Unicode or DOM assertions. Supported platform/version policy, real-device/assistive-technology ownership and any application-specific manual evidence remain future decisions. YT-020 release qualification remains Blocked. YT-066 is a separate backlog item.
+
+## Private nine-package preparation and verifier fixtures — 2026-10-11 and 12
+
+The original nine0.1.0 candidates were Core/Actions/Reactive/HTML/DOM/DOM-keyed/
+Server Axum/Request-ID/Session, with samples and isolated Redis excluded. On
+2026-10-11 Cargo1.88 offline batch packaging failed101 on unpublished core
+resolution after creating two archives. Cargo1.99 native temporary-registry
+batch packaging with Rust1.88 compiler passed normal extracted verification
+for all nine. Both license texts, normalized versions, compatible dependencies
+and source bytes matched. cargo-deny0.20.2 license/source and cargo-cyclonedx0.5.9
+default-workspace/all-target metadata matched nine inventories. Dev-only, sysroot,
+native/system, JS and separately built feature/platform coverage were omitted.
+Nine name404 observations did not reserve or qualify names. Private PVR404,
+secret-scanning disabled404 and code-scanning unavailable403 remained limitations.
+Raw proof is under `target/yt020-private-prep-20261011/`.
+
+PR5 candidate `c7f21b4d620a1b6836fb52a94bf19434af059368` and merge
+`633db585f3173f82c512689a09fd9a2065db6ffe` shared tree
+`d9d6c4abe08a25ca753647a9149d8e16a80bffa9`. PR38144070219 and master38145022739
+required checks passed at those sources. The subsequent owner-selected Rust1.99
+decision unified development/MSRV/package metadata before publication. Protected
+Rust1.88 check migration required separately authorized delivery and actual
+Rust1.99 CI. A changed local YAML alone did not change the hosted gate.
+
+The 2026-10-12 two-host recipe used base633db585 plus recorded Cargo/toolchain
+overlays, with source archive SHA-256
+`cbcfe22c8008ac66fb0374c5aee566a436d7a1241ab143cb3ee9cc966cb11b00`,
+Cargo.toml `10857511488c65b515d4953360b101b628df94d07b9dd131507ad6e4b3ea62df`,
+toolchain `b2c19d86958ed6810741488db5cd352856f303c53bcf0ea774e72f94ee4d201e`,
+lock `7260eef21ce05abbe90ebccc4b255b3da07cdf5cd0acac51fdbb90ee7b3d4b57`
+and54-input mapping `8e5799c319d626812daca22c90feba41a41d23d07ecd642af4d6d3506dc7afb7`.
+Both hosts observed Rust1.99.0 `b940084d7`/Cargo1.99.0 `5f94df478`.
+They separately fetched locked dependencies and normally packaged nine archives
+with fresh host-local state,18 materialized license aliases, no Git/VCS metadata,
+default features and epoch1791726849. All nine raw archives matched in size/hash.
+
+Ubuntu GNU and Windows GNU Job `wc_job_hW6_8gK6yQeL2dPx` passed extracted
+compilation. Windows used task-local w64devkit and self-contained host linking.
+The old Windows checkout3128d235 stayed unchanged. Initial Rust1.88 Job
+`wc_job_7LkjxkmPZbcBLYaE` failed101 at host `-lgcc_eh`. Rust1.99 installation
+Job `wc_job_r7qfbREmB0pL4ee0` installed binaries then failed1 at rustup self-update.
+The final build used verified installed binaries directly. No overlapping retries
+or global toolchain change occurred. The WebCodex `validation_source_unproven`
+warning remained because its ledger observed a different branch from the
+archive/overlay. Explicit54-input bindings supplied the build identity.
+Shared owner/agent control prevented an independently controlled trust claim.
+
+Eighteen CycloneDX1.5 inventories matched target-filtered normal/build metadata,
+with Linux counts1/12/1/2/2/2/59/60/69 and Windows1/12/1/2/2/2/58/59/68 in the
+original candidate order. Generation ran on Ubuntu for both targets. Two unsigned
+SLSA-v1 drafts used `urn:yetlet:build:private-cargo-source-package:v1` and local
+builder URNs. The final34-artifact unsigned bundle plus manifest differed from
+the preserved earlier incomplete bundle. Checksums supplied no authentication.
+
+Public-fixture bootstrap authenticated Cosign3.1.3 via TUF7.0.1/securesystemslib1.5.1
+and OpenSSL artifact-key verification. Artifact key SHA-256 was
+`59ebf97a9850aecec4bc39c1f5c1dc46e6490a6b5fd2a6cacdcac0c3a6fc4cbf`,
+gh2.102.0 original root JSONL
+`65ca537f6ed8a47fd0e560c421baa1f6c1efb8b25fc200d8c5c02c0e92eb2b9c`.
+Three positive verifier observations covered upstream Cosign Google identity
+and gh2.102.0 archive
+`bb766f710eef8ede859c18578c72c327597cd4c8a85b06001b1f3843c6019386`
+under exact `cli/cli` deployment.yml/trunk/source
+`fc4b137cdef0a6bd28fd461b7cf9c84a5812a8cd`. Eleven expected rejections covered
+wrong issuer/repository/workflow/ref/source/predicate/root, changed subject,
+damaged signature, missing transparency and a valid foreign fixture under Yetlet
+policy. Missing ensurepip, TUF bootstrap bytes and incompatible gh selector/root
+inputs were retained invocation failures. None signed or uploaded Yetlet bytes.
+Current validity/actual Yetlet identity acceptance was a separate future gate.
+Raw stores remain `target/yt020-integrity-prep-20261012/`, with later historical
+signatures governed by the [private trust record](RELEASE-SUPPLY-CHAIN.md#private-maintainer-key-preparation-policy-and-historical-signatures).
+
+## Local signing, key CLI and Azure evidence — 2026-10-18
+
+Base `c726af4a4f2f3cf3cf6225de0c793541b564249d` plus dirty working inputs bound
+the accepted [local OpenSSL/provider contract](SECRET-PROVIDERS.md#local-signing-and-replaceable-provider-contract--yt-093).
+Linux passed11 signing tests, core/sample/CLI fmt and strict Clippy,80 CLI library
+tests, seven initial key integrations and nine focused integrations after repairs.
+Actual Yetlet CLI sample build/run demonstrated PEM/PFX, tamper rejection,
+v1→v2 rotation, independent invoices, public-only verification and revoked-v1
+rejection. Persistent terminal yes and explicit initialization/rotation preserved
+the unselected key, base settings and0700/0600 private modes. Status needed no
+password. Temporary private fixtures were removed.
+
+Original sample bootstrap failed on an owned0755 public parent. The correction
+allowed owned non-group/world-writable public parents, retaining0700 immutable
+versions and0600 files. A0775 parent stayed rejected. Task-created sample group
+write caused a separate build refusal. Independent review then found lost TOML
+comments/array decorations. The smallest correction covered inline arrays and
+arrays of tables in inherited base and selected profiles, with strict reload.
+Duplicate-key/revocation substitution was closed during contract review.
+
+Windows MSVC source bundle196files SHA-256
+`643e0a90c82355d49874c0320a601d344b47507916f7279d282d32043fe5833a`
+and two-file delta `6f236a283c71c493b5afff9ccbc5388e3371dda8736caa83647890f963d5098c`
+were independently manifested before execution. Existing Rust1.99/VS/SDK plus
+task-local Perl/OpenSSL passed11 signing,72 CLI library and seven key tests,
+native sample six outcomes and five actual key/status commands, preserving five
+unselected files. All196 final hashes and14 exported logs matched review.
+Private fixture/tools/cache/build cleanup and zero owned processes were verified.
+An initial core lib command executed zero tests and remained compilation-only.
+An incorrect lock-file-deletion assertion failed, then exclusive-open confirmed
+released locking without replaying successful rotation.
+
+Actual Windows `yetlet build` supervision failed125 `CLI_SPAWN Other`. The exact
+pre-change CLI failed identically on the same sample, baseline bundle
+`d073c5bc39f9eb77d049fdcf66be6a58caab61442081e55fc652131dc1e8a493`.
+Its cause was unproven then. The later [Windows125 follow-up](WINDOWS-CLI-125-VERIFICATION.md)
+found unsafe Cargo executable write access and separately qualified protected-path
+build/run/cancellation. It did not rewrite the original failure or turn original
+native crypto/key PASS into CLI-supervision qualification.
+
+Owner-authorized Azure Standard/software EC-P256 lab used CLI2.91.0. Separate
+documents/invoices keys, distinct-version rotation and three signatures verified
+through Rust public-only code. Tamper, wrong routing and local revocation failed
+as expected. Azure `isValid:false` with exit0 was an expected rejection.
+The successful attempt recorded29 native-zero commands. Response-projection and
+scratch Rust compilation failures remained with corrections. Both attempts
+removed keys/access policy/vault/resource group, left subscription default
+unchanged and verified active absence. Two soft-deleted vaults were retained
+until scheduled2026-10-25 expiry without purge. No billing or actual expiry
+readback is inferred. CLI verification may be local SDK execution. Remote signing
+and Rust interoperability supply the proven scope. No Azure adapter was delivered.
+
+Independent final review PASS0 accepted the source/Windows/Azure evidence with
+the supervision limit. Raw records stay under `artifacts/yt093-signing-20261018/`,
+including Windows manifests, original failures, reports and cleanup. Production
+custody, cloud adapters, distributed reload, PKI/timestamps and release activation
+were excluded. Later formatting/Guard preparation preserved original source-bound
+logs and recorded another11-test pass separately.
+
+## Custody and local rotation evidence — 2026-10-27 and 28
+
+The age integration's authenticated LOCAL roundtrip matched original manifest
+`bbbea5d051f243d722963e8b8667eca261df5fcd8f1a97edc62c77ce2e7bdf06`.
+Native exit17 evidence remained incomplete. Ciphertext tampering, authentication
+failure despite recomputed receipt hash and manifest mismatch were rejected.
+Eight integration/two unit tests passed, with three preparation passes retained.
+Fmt/Clippy, two YAML/fifteen Bash blocks and direct metadata/ZIP checks passed.
+Five bounded repairs/original failures remain in `yt096-age-custody-20261027`.
+`complete_product_custody=false` meant no actual sixteen-package/OpenSSL product
+build or hosted durability proof. Review PASS0 accepted18 source hashes only
+at local integration scope. Later hosted setup/readback was separately approved.
+
+Rotation baseline `47936205fa4a9f05d4a22e41c08f76008b422081` used Linux/GNU
+disposable LOCAL A/B keys. Nine tests, syntax, preparation/apply-check, two offline
+locked builds and25 real commands covered the
+[manual lifecycle contract](RELEASING.md#manual-custody-review-rotation-and-retirement).
+All successful restored members matched original manifest
+`c83de73f29daa8209ca4e449e6dcfb2120d1ecf0b751180eaa804e0754409fad`.
+Receipts stayed `FAILED_INCOMPLETE`/complete=false. The first drill rejected
+baseline license symlinks before Cargo. One material correction used checked
+internal source symlinks and Python tar data filtering. Corrected real drill and
+private modes/cleanup passed. A workflow-state initialization failure remained
+operational. Owner-key metadata was checked by stat only, without key reads.
+Review PASS0 accepted LOCAL test-copy recovery, excluding owner-key/Secret
+recovery, production rotation, platform expansion and release approval.
+Original proof remains in the recorded `.pipeline-output/yt096-key-rotation-local-20261028/`
+handoffs. No raw evidence store was moved by consolidation.

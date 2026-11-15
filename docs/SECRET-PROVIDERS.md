@@ -1,5 +1,9 @@
 # Opt-in secret providers
 
+The native local signing service and operator key administration are described
+in the [replaceable signing contract](#local-signing-and-replaceable-provider-contract--yt-093).
+Release signing follows the separate [release trust policy](RELEASE-SUPPLY-CHAIN.md#adopted-release-trust-and-disclosure-policy--yt-096).
+
 Inject read-only native secret lookup into application constructors or typed
 state. Lookup is asynchronous; loading settings and rotating credentials remain
 separate, explicitly selected operations.
@@ -194,7 +198,7 @@ no-op or stale-update rejection. Source identity/freshness, local snapshot
 adoption and an external service's acceptance of old credentials are distinct.
 
 Generic string lookup does not export a non-exportable signing key or replace
-the [versioned signing contract](YT-093-SIGNING-CONTRACT.md). Signing rotation,
+the [versioned signing contract](SECRET-PROVIDERS.md#local-signing-and-replaceable-provider-contract--yt-093). Signing rotation,
 TLS certificate preparation and cloud-provider implementations remain separate
 capabilities. Explicit local snapshot replacement and a bounded Azure CLI
 rotation experiment are documented in the separate follow-up; no secret-write
@@ -223,7 +227,7 @@ a compromised reader should not gain credential-management authority. Automated
 rotation can be application-owned code running as a separate worker; it need
 not be manual or part of a deployment, and is not a side effect of `get`.
 
-Keep [signing administration](YT-093-SIGNING-CONTRACT.md) separate from normal
+Keep [signing administration](SECRET-PROVIDERS.md#local-signing-and-replaceable-provider-contract--yt-093) separate from normal
 signing. Retain old public verification material according to policy; rotating
 a key is not revoking its trust. TLS certificate renewal belongs to the chosen
 certificate/platform tooling, followed by explicit server adoption. Azure
@@ -309,3 +313,120 @@ owner subsequently selected those checks in the linked follow-up. Neither slice
 claims browser secret handling or authorizes a commit/push.
 
 </details>
+
+## Local signing and replaceable provider contract — YT-093
+
+The 2026-10-18 implementation and independent review accepted an opt-in native
+OpenSSL signing service, the console sample and selected key CLI operations.
+Its original nonpublishable nested workspace later joined the historical
+sixteen-package cohort. The current [two-package SDK](COMPATIBILITY.md#two-package-feature-and-target-contract)
+and independently versioned CLI retain their own publication authority.
+Cloud adapters remain future selected work. The Azure CLI experiment established
+interoperability at its recorded scope. It did not implement an Azure adapter.
+
+Keep signing policy independent of Core, HTTP, Tokio, cloud SDKs and private-key
+file formats. Constructor-injected ordinary Rust traits with `Future + Send`
+separate exact-version asynchronous signing from exact-version public-material
+resolution. Public-only verification needs no signing authority. Key creation,
+import, rotation and deletion are provider administration. They are separate
+from the common signing capability. No provider registry, DI container or
+background rotation service is required.
+
+### Exact bytes, key identity and trust
+
+| Contract | Requirement |
+|---|---|
+| Key reference | Configured provider scope, logical key ID and immutable opaque version. A versionless `latest` alias cannot identify a completed signature |
+| Admission | Capture the exact active version before awaiting signing. Reject a backend response naming another version. No silent provider/key fallback or retry |
+| Input | Hash exact input bytes once using the established hash library. Pass a typed 32-byte SHA-256 digest to the backend without rehashing or text normalization |
+| Result | Envelope version, explicit algorithm, exact scoped key version and signature bytes. Reference algorithm ECDSA P-256/SHA-256, fixed64-byte `r || s` interchange |
+| Adapter encoding | Translate DER/vendor representations through maintained library APIs. Accept valid high-S and low-S signatures. Signature uniqueness, application IDs and replay prevention require separate semantics |
+| Authority | Envelope fields only select configured scopes. They never authorize an endpoint, tenant, root, certificate or new key |
+
+Raw signatures authenticate input bytes. Envelope routing/version metadata does
+not cryptographically attest which provider or certificate version signed.
+Independently revocable identities must use distinct public keys. Reject duplicate
+public keys across all scopes, including retained retired/revoked identities,
+using library key-equality checks at configuration and policy updates. Certificate
+renewal may reuse a key, so certificate fingerprints alone are insufficient.
+Retain revoked public identity to prevent its reintroduction under another version.
+A future alias must share one trust/revocation identity and needs its own contract.
+
+Authorize the exact key version under explicit trust policy before acceptance.
+The local implementation checks leaf-certificate pins, key/certificate matching,
+supported curve/algorithm, dates and signing key usage. PFX-supplied certificates
+cannot enroll themselves. A bare public key has no invented expiry. The contract
+provides no general PKI/OS-store chain construction, revocation service, trusted
+timestamp or historical certificate-validity decision. Future KMS metadata need
+not use X.509. Detached results carry no JWS/CMS/XMLDSig/PAdES or legal compliance
+guarantee.
+
+Offline verification can use configured public material only and fails closed on
+missing/disallowed versions, invalid material/password, unsupported algorithms,
+invalid signatures, policy rejection and backend unavailability. Return closed
+nonsecret errors without library chains, key bytes, passwords or vendor details.
+A timeout cannot establish that remote signing produced no effect.
+
+### Local policy lifecycle and operator CLI
+
+Trust v2 public material before activation while v1 can still sign. Activate v2
+atomically for new operations. An already admitted v1 operation may finish as v1.
+Retire v1 from new signing while preserving its public material for old signatures.
+Revoke v1 to reject verification even where signature mathematics remains valid.
+Local policy does not delete a remote key, cancel admitted work or synchronize
+multiple processes. Rotation, revocation and private-key destruction remain
+separate operations. Each logical key rotates independently.
+
+The existing commands are `yetlet key status [KEY] [--provider NAME]
+[--manifest-path PATH]` and `yetlet key rotate [KEY] [--provider NAME]
+[--manifest-path PATH] [--yes] [--from PATH]`. A provider name is a configured
+alias. Omitted names use explicit `default_provider`/`default_key`, without
+guessing. Snake_case table keys follow the existing settings loader.
+Applications use the service directly. There is no general CLI signing command.
+
+Use a top-level `signing` section separate from `cli`. Base settings declare all
+provider/key names and version arrays. A selected profile may replace a declared
+array while preserving unknown-key rejection. Passwords come only from explicitly
+named process environment variables. Status is read-only and password-free.
+It reports certificate dates/availability without conflating renewal and rotation.
+
+Rotation confirmation shows provider, key, current version and selected settings
+file. Require terminal approval or explicit `--yes` before effects. Bind the plan
+to the inspected snapshot and reject concurrent changes. `self_signed_test`
+generates synthetic material with OpenSSL, including empty-key initialization.
+Imported identities require replacement PFX via `--from`, with certificate/public
+fingerprint in the confirmation. Preserve the actual issuance process. A reused
+public key cannot become an independently revocable version.
+
+After confirmation validate material/trust, publish an immutable private version,
+then atomically update only the chosen key's public version records and
+`active_version` in its selected profile. Preserve comments, array decorations,
+unrelated settings, other keys/providers and old public records. Retire old signing
+policy without automatically deleting private material. Failed settings writes
+preserve the previous active selection and cannot report activation. Masking
+environment overrides, unsafe files, unsupported providers and read-only settings
+fail explicitly. The shared settings loader has no general write API.
+Applications must restart and reload settings to adopt changes. Automatic file
+watching, distributed rollout and cloud autorotation remain outside this contract.
+
+### OpenSSL implementation and qualification boundary
+
+Maintained Rust OpenSSL bindings perform hashing, cryptographic arithmetic,
+randomness, PEM/PFX decoding, encryption and signature encoding. The recorded
+native pin is OpenSSL3.5.9 LTS with `openssl0.10.81` / `openssl-sys0.9.117`,
+official source SHA-256
+`603f5602e2eef00d77fbd429d34dcd5822bb301757a1bc9cdb24c670f1eb859a`.
+Linux used isolated static `OPENSSL_DIR`/`OPENSSL_STATIC=1` because development
+headers were unavailable and vendored sources lagged the selected patch.
+No cryptographic library was patched. PFX requires a present password-verified
+MAC. This does not assert encryption of every bag. Generated private PEM is
+encrypted. Lock the application dependencies and review advisories and supported
+PEM/PFX profiles. Using the binding supplies no audit or FIPS qualification.
+
+Native headers/libraries or C/Perl/make prerequisites require their own host proof.
+Windows SQLite/Zig evidence does not qualify OpenSSL. A pure-Rust/pre-release
+PKCS#12 replacement needs a separate maturity decision. Future Azure Key Vault
+and OpenBao adapters must demonstrate the same exact-version/digest contract and
+native integration. Two independently constructed local providers alone cannot
+prove cloud compatibility. See the source-specific
+[Linux, Windows and Azure results](QUALIFICATION-MATRIX.md#local-signing-key-cli-and-azure-evidence--2026-10-18).

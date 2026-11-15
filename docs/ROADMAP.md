@@ -492,7 +492,7 @@ registry proof remain open. This does not expand product support or mark
 YT-020 complete.
 
 **YT-020 registry method and artifact contract (2026-10-30):** The
-[formal contract](YT-020-REGISTRY-PUBLICATION-CONTRACT.md) resolves the policy:
+[formal contract](RELEASE-PUBLICATION.md#first-registry-publication-and-immutable-artifact-contract) resolves the policy:
 break the first-name development cycle by moving the Settings state example to
 Config, keep runtime/feature/workspace boundaries, prepare final artifacts in
 all-kind dependency order, bind all sixteen subjects to new R/V and promote the
@@ -505,7 +505,7 @@ Implementation/freeze/live acceptance remain open, YT-020 Blocked. The five prio
 no Push or new-change Commit.
 
 **YT-020 Config/Secrets local preflight (2026-10-30):** The
-[dependency contract](YT-020-FIRST-PUBLISH-CONTRACT.md) preserves manifests,
+[dependency contract](RELEASE-PUBLICATION.md#dated-local-evidence-and-remaining-provenance) preserves manifests,
 features and source locks. Secrets and Config/secret-provider publish dry-runs
 normally verify using accepted archive directory sources, with explicit upload
 abort. Failed offline/configuration and Config rustup observations remain; no
@@ -629,7 +629,7 @@ SUCCESS at unchanged S `d65e318`, including cleanup. Independent public/private
 verification PASS covers both fixed payloads, all 16 subjects, all 117 manifest
 entries and exact signer/CT/log/timestamp claims. The owner's explicit one-phase
 local custody exception and conditional acceptance of actual bundle hashes are
-[recorded](YT-096-SIGNER-CONTRACT.md#actual-signing-independent-verification-and-owner-acceptance--2026-10-29).
+[recorded](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#actual-signing-independent-verification-and-owner-acceptance--2026-10-29).
 All temporary plaintext removed; retained wrapper errors cause no signing or
 cryptographic retry. Final independent Reviewer PASS0 activates the owner's
 acceptance: D6 Complete, YT-096 Done at source-package signing/integrity scope.
@@ -641,7 +641,7 @@ S `d65e318`, reviewed tree unchanged; PR/master CI PASS. Owner-approved prepare
 `40806988578/1` SUCCESS includes final cleanup and verified encrypted readback.
 Repository-external retention PASS; conditional temporary asset deletion is
 complete, Draft remains unpublished, earlier failures retain their outcomes.
-The [single D6 confirmation packet](YT-096-SIGNER-CONTRACT.md#d6-confirmation-packet--2026-10-29)
+The [single D6 confirmation packet](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#d6-confirmation-packet--2026-10-29)
 lists both actual raw payload hashes, exact source/artifact/receipt and public
 metadata for one recommended later sign run. Keep master at fixed S; this
 documentation grants no execution/Git authority. Six docs are uncommitted/unstaged;
@@ -654,7 +654,7 @@ S `e2d4a9f`; PR/master CI PASS. Owner-approved prepare `40795794183/1` passes
 preflight, tool authentication, original ciphertext retrieval, isolated
 handoff/decryption/full manifest/freeze, and encrypted output upload. Final owned
 cleanup fails only on read-only Go module-cache entries; the run remains FAIL.
-[Actual output/custody and minimal cleanup repair](YT-096-SIGNER-CONTRACT.md#actual-frozen-output-and-go-cache-cleanup-failure--2026-10-29)
+[Actual output/custody and minimal cleanup repair](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#actual-frozen-output-and-go-cache-cleanup-failure--2026-10-29)
 retain all evidence and the ineligible frozen candidate. One new offline native
 Go regression reproduces the failure and passes with task-private
 `GOFLAGS=-modcacherw`; no key, data, permission or signing-gate change. New repair
@@ -664,7 +664,7 @@ retried, D6 Pending, YT-096 In progress, YT-020 Blocked. Prior records keep scop
 **YT-096 current repair (2026-10-29):** Strict/builtin delivery of PR17 selects
 S `0e8fb60`; PR/master CI pass. The additional prepare `40789535074/1` rejects
 reading the Draft Release with HTTP403; protected jobs are skipped. The
-[local encrypted capability handoff](YT-096-SIGNER-CONTRACT.md#encrypted-ciphertext-capability-handoff--2026-10-29)
+[local encrypted capability handoff](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#encrypted-ciphertext-capability-handoff--2026-10-29)
 now moves that owner-only read to the operator and gives the protected job an
 age-encrypted, short-lived, read-only asset capability. Existing CI permissions,
 Secret and C/tags stay unchanged. Real encrypted-ZIP retrieval/age handoff passes
@@ -678,7 +678,7 @@ The dated checkpoints below preserve their original scopes and failures.
 **YT-096 current checkpoint (2026-10-29):** Owner-authorized real-layout delivery
 is squash merged as S `87d24e9`; PR16 CI attempt 2 and automatic master CI pass,
 with the first Chrome startup failure retained. The one
-[unsigned prepare run](YT-096-SIGNER-CONTRACT.md#hosted-preflight-failure-and-safe-local-diagnostics--2026-10-29)
+[unsigned prepare run](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#hosted-preflight-failure-and-safe-local-diagnostics--2026-10-29)
 `40717870186/1` fails in read-only preflight; protected prepare/sign are skipped,
 no key step or frozen artifact exists. Exact cause is unknown, D6 Pending,
 YT-096 In progress and YT-020 Blocked. Owner-requested local diagnostics add only
@@ -690,7 +690,7 @@ The dated checkpoints below retain their original historical scopes.
 
 **YT-096 pre-hosted correction (2026-10-28):** The owner batch merges PR15 and
 selects S `d2562e1`; the approved new Environment/Secret setup is complete, old
-verifier unchanged. [Actual-input inspection](YT-096-SIGNER-CONTRACT.md#pre-hosted-real-layout-correction--2026-10-28)
+verifier unchanged. [Actual-input inspection](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#pre-hosted-real-layout-correction--2026-10-28)
 finds duplicate OpenSSL log/result labels before hosted execution. The minimum
 local fix preserves both origins under explicit extra labels; focused regression
 FAIL-to-PASS retained. A 53-record existing-evidence selection preserves original
@@ -700,7 +700,7 @@ YT-020 Blocked, no official signing or publication.
 
 **YT-096 local signer integration (2026-10-28):** Prior five-document checkpoint
 is committed as `765757d` after strict/builtin/native-hook PASS, not Pushed. The
-[local implementation](YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)
+[local implementation](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)
 adds closed manual prepare/sign modes, isolated encrypted evidence handling,
 exact S/C/payload/Environment/OIDC boundaries and no publication permissions.
 New Cosign3.1.4/TUF and local synthetic supplied-statement proof PASS; targeted
@@ -710,7 +710,7 @@ evidence upload, Environment/Secret setup, hosted prepare, signing or publicatio
 new integration uncommitted, D6 Pending, YT-096 In progress, YT-020 Blocked.
 
 **Alpha signing inputs and Release draft (2026-10-28):** The owner accepts local
-preparation and requests a Release. The [current signer contract](YT-096-SIGNER-CONTRACT.md#d6-completion-and-the-github-draft-boundary)
+preparation and requests a Release. The [current signer contract](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#d6-completion-and-the-github-draft-boundary)
 records actual alpha build source/run identities, fixed original public provenance
 bytes/SHA and Pending complete private-manifest/S/tool/setup/execution gates.
 Unpublished Draft pre-release `426670086` uses existing `v0.9.0-alpha.1`/C,
@@ -740,7 +740,7 @@ Pending. No signing or publication occurs; YT-096 In progress, YT-020 Blocked.
 **Status:** Evidence-gated prototype roadmap; developer entry/status refresh 2026-10-12. Historical qualification dates and source identities remain unchanged.
 
 **YT-096 signer contract amendment (2026-10-28):** The owner selects a separate,
-fixed-SHA [signer workflow](YT-096-SIGNER-CONTRACT.md), with the D1/D3 amendment
+fixed-SHA [signer workflow](RELEASE-SUPPLY-CHAIN.md#two-payloads-complete-assembly-and-independent-verification), with the D1/D3 amendment
 and [ADR 0009](adr/0009-release-build-and-signer-identities.md). Preserve existing
 build `C_release`, product tag and output bytes; signer `S` remains a separate
 future reviewed source. Two payloads are the original provenance and a frozen,
@@ -762,7 +762,7 @@ D6 Pending, YT-096 In progress, YT-020 Blocked and YT-206 Done remain unchanged.
 Original failures and prior dated reviews are retained; the checkpoints below
 keep their historical scopes. No accepted execution/qualification was replayed.
 
-**Historical YT-096 local rotation slice (2026-10-28):** The [contract](YT-096-KEY-ROTATION-DRILL.md)
+**Historical YT-096 local rotation slice (2026-10-28):** The [contract](QUALIFICATION-MATRIX.md#custody-and-local-rotation-evidence--2026-10-27-and-28)
 selects thin manual public-key preparation and an actual LOCAL synthetic test-key
 custody drill from custody commit `4793620`. Implementation delivered; local drill
 PASS with nine focused tests, two offline builds and 25 real commands; independent
@@ -801,7 +801,7 @@ Milestones are sequenced by capability and dependencies rather than invented del
 | **M17 — Done at bounded YT-091 Tailwind scope** | Opt-in build-time Tailwind CSS 4 application scaffolding | YT-091 | [Guide](CLI-GUIDE.md#opt-in-tailwind-css-4-yt-091-independently-reviewed), [evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-091-VERIFICATION.md); actual Linux HTTP/CSS/CSP/signals and native Windows GNU/MSVC Tailwind source-bound builds PASS; independent Reviewer `wc_job_T7Blu0CYQUOmaQTL` PASS, no core/browser change or release activation |
 | **M18 — Done at bounded YT-098–YT-101 scopes** | Optional asset contract, Vite production/dev profiles and cloud delivery | YT-098–YT-101 | [Bounded Linux Vite spike](VITE-SPIKE-VERIFICATION.md) passed build/native/browser checks; [YT-098 application-owned producer proof](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-098-VERIFICATION.md) passed 11 native tests, four local Chrome checks, cleanup and independent Reviewer `/root/yt098_browser_closeout_review` (zero issues/followups). [YT-099 production CLI integration](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-099-VERIFICATION.md) Done at bounded experimental scope: Linux/Windows GNU/MSVC, local Chrome JS on/off, cleanup and independent Reviewer `/root/yt099_local_browser_acceptance_review` PASS; [YT-100 opt-in dev bridge](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-100-VERIFICATION.md) Done: pinned Vite8 env P1 fixed; native Windows GNU/MSVC source-bound tests, Linux Plain/Tailwind Chrome 11/11 HMR/CSP/WS, actual dual-terminal Ctrl-C/restart/503/cleanup PASS; independent Reviewer `wc_job_MprRYhxeijOu6xG5` PASS (zero issues/followups). Windows live HMR remains unverified; [YT-101 cloud delivery](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md) Done: real Linux Docker/Compose/K3s Pod/Service/asset PASS, Windows MSVC native/source PASS, subsequent Windows GNU 726/726 source and native tests/generator PASS after official MinGW64 GCC/Binutils installation, independent Reviewer `wc_job_fYtD9F8KXkXyzvYQ` PASS; no stable shared asset API, default/core/browser or release change |
 | **M19 — Production-oriented application and developer experience (partial)** | Production Starter, signing, Admin Dashboard, DI/DX research, browser-only starter and optional HA/rolling deployment asset compatibility | YT-092–YT-095, YT-102–YT-112 | Real native/browser/reference-app proof, independently reviewed DX research, a separately qualified browser-only static workflow, and independently validated multi-version asset-retention/rolling-availability evidence; no automatic production support or release claim |
-| **M20 — Release-candidate qualification in progress** | Candidate API/security/supply-chain validation before explicit public-release decision | YT-096, YT-020 | [Current selected source/tag, hosted build/verifier and owner-host retention](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints) PASS at bounded unsigned sixteen-package scope; D6 identity/signing and remaining trust/registry/final-release gates stay open. Historical original-nine qualification and failure dispositions follow: [Selected `ce56e08` candidate](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence): original nine experimental 0.1.0 libraries and Rust 1.99; local source-package/clean-consumer preflight passes on Ubuntu 26.04.1. [Selected dependency/API preflight](RELEASE-SUPPLY-CHAIN.md#historical-candidate-inventory-and-technical-consolidation) adds 23 scoped SBOM/license checks, nine passing RustSec scans and explicit coverage limits. [Partial platform execution](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) adds Ubuntu 24.04.5 container userspace native/doctest PASS, five wasm builds and fresh Linux Firefox PASS; resumed Windows MSVC standalone-package execution passes 83 native tests/four doctests, with historical cache failures and shared-kernel/Chrome scope retained. [Two-host archive rebuild](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md) matches all nine Windows archives byte-for-byte to Linux with normal Cargo verification. [Azure Run Command continuation](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) passes actual Ubuntu 24.04.5 guest execution, empty-cache nine-archive rebuild, 83 native tests/four doctests and five wasm libraries; earlier SSH failures preserved and resources deleted. [GitHub-hosted candidate rebuild](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) passes at the exact candidate with nine byte-identical archives and matched source/lock/tools, adding separately operated execution evidence. [Final documentary reconciliation](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) joins nine archives to 23 SBOMs and retained compiler/platform/browser evidence without runtime reruns. The [owner accepted the bounded support scope and known inventory differences](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence), keeping exact-candidate Chrome and complete compiled/per-library/system inventory Not verified; [Final independent candidate review](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints) completed with technical/security evidence accepted but overall release gate FAIL, release-ready NO. Only support/inventory disposition is resolved; [minimum formal trust research](YT-096-FORMAL-TRUST-PROPOSAL.md) proposes conditional GitHub OIDC/public Sigstore and exact source/evidence bindings without implementation or policy selection. The [metadata decision brief](YT-096-TRUST-DISCLOSURE-DECISIONS.md) records public exposure/impacts and pending owner choices while retaining the original candidate and evidence without reruns or signing. Formal integrity/trust, registry proof, public activation controls and concrete final maintainer approval remain open; YT-020 stays Blocked, no auto-merge/release |
+| **M20 — Release-candidate qualification in progress** | Candidate API/security/supply-chain validation before explicit public-release decision | YT-096, YT-020 | [Current selected source/tag, hosted build/verifier and owner-host retention](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints) PASS at bounded unsigned sixteen-package scope; D6 identity/signing and remaining trust/registry/final-release gates stay open. Historical original-nine qualification and failure dispositions follow: [Selected `ce56e08` candidate](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence): original nine experimental 0.1.0 libraries and Rust 1.99; local source-package/clean-consumer preflight passes on Ubuntu 26.04.1. [Selected dependency/API preflight](RELEASE-SUPPLY-CHAIN.md#historical-candidate-inventory-and-technical-consolidation) adds 23 scoped SBOM/license checks, nine passing RustSec scans and explicit coverage limits. [Partial platform execution](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) adds Ubuntu 24.04.5 container userspace native/doctest PASS, five wasm builds and fresh Linux Firefox PASS; resumed Windows MSVC standalone-package execution passes 83 native tests/four doctests, with historical cache failures and shared-kernel/Chrome scope retained. [Two-host archive rebuild](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-TWO-HOST-REBUILD.md) matches all nine Windows archives byte-for-byte to Linux with normal Cargo verification. [Azure Run Command continuation](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) passes actual Ubuntu 24.04.5 guest execution, empty-cache nine-archive rebuild, 83 native tests/four doctests and five wasm libraries; earlier SSH failures preserved and resources deleted. [GitHub-hosted candidate rebuild](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) passes at the exact candidate with nine byte-identical archives and matched source/lock/tools, adding separately operated execution evidence. [Final documentary reconciliation](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence) joins nine archives to 23 SBOMs and retained compiler/platform/browser evidence without runtime reruns. The [owner accepted the bounded support scope and known inventory differences](QUALIFICATION-MATRIX.md#historical-nine-package-candidate-platform-and-builder-evidence), keeping exact-candidate Chrome and complete compiled/per-library/system inventory Not verified; [Final independent candidate review](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints) completed with technical/security evidence accepted but overall release gate FAIL, release-ready NO. Only support/inventory disposition is resolved; [minimum formal trust research](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-FORMAL-TRUST-PROPOSAL.md#historical-nine-package-proposal--2026-10-20) proposes conditional GitHub OIDC/public Sigstore and exact source/evidence bindings without implementation or policy selection. The [metadata decision brief](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-TRUST-DISCLOSURE-DECISIONS.md#historical-decision-brief--2026-10-23) records public exposure/impacts and pending owner choices while retaining the original candidate and evidence without reruns or signing. Formal integrity/trust, registry proof, public activation controls and concrete final maintainer approval remain open; YT-020 stays Blocked, no auto-merge/release |
 | **M21 — Opt-in server capability roadmap (registered)** | Separate optional Authentication/Authorization, Session integration, rate limiting and conditional provider studies without bloating core | YT-113–YT-123 | [Staged capability plan](EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection): YT-113 research and YT-114 native foundation Done after separate independent Reviewer PASS; YT-115 Done at Memory bridge scope and YT-116/119/120 Done at independently reviewed study scopes; [YT-117 rate limiting](EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection) Done at per-process scope after independent Reviewer PASS; YT-118/121/122 research Done after independent Reviewer PASS and [YT-123 research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-123-TRACING-CORRELATION-STUDY.md) Done after independent Reviewer PASS; design gates and independent review before implementation; no M20 release-gate dependency or production claim |
 | **M22 — Production Readiness Phase 2 (bounded local scope complete)** | Sequential app-owned admission, opt-in observability, bounded capacity/recovery and upgrade compatibility | YT-127–YT-131 | [Contracts, baseline gaps and final matrix](PRODUCTION-READINESS-PHASE2.md): YT-127 Done at bounded A1 scope after independent Reviewer PASS; YT-128 Done after [local verification and independent Reviewer PASS](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md); YT-129 [local load/recovery evidence](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts) Done after independent Reviewer PASS; YT-130 [local restore/runbook evidence](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md) Done after independent Reviewer PASS; YT-131 [v1-to-v2 implementation and local evidence](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md) Done after independent Reviewer PASS and controller acceptance; A1 → A2 → B1 → B2 → C1 with source-bound evidence and cleanup. Keep Implemented, Verified and Deployment-qualified separate; no generic infrastructure, M20 candidate expansion or production/release claim |
 
@@ -844,7 +844,7 @@ closeouts below record implementation and review evidence. Their scopes are defi
 reference after YT-098, with typed configuration, developer secrets, health,
 tracing, graceful shutdown, truthful failure modes and operational evidence;
 it does not wait for Vite HMR. YT-093 first defines an opt-in
-[signing/provider contract](YT-093-SIGNING-CONTRACT.md), then exercises local
+[signing/provider contract](SECRET-PROVIDERS.md#local-signing-and-replaceable-provider-contract--yt-093), then exercises local
 PFX/PEM signing with established cryptographic libraries, multiple named keys
 and confirmed CLI rotation with automatic selected-profile settings updates.
 Azure Key Vault/OpenBao
@@ -1010,7 +1010,7 @@ Independent Reviewer `/root/yt095_composition_research_review_oct20` PASS has
 zero issues or required followups; YT-095 is Done at research-only scope.
 
 **YT-093 bounded closeout (2026-10-18):** the
-[signing verification](YT-093-SIGNING-VERIFICATION.md) records the opt-in signing
+[signing verification](QUALIFICATION-MATRIX.md#local-signing-key-cli-and-azure-evidence--2026-10-18) records the opt-in signing
 crate, local multi-key CLI, confirmed automatic settings updates and independent
 Reviewer PASS. Linux and source-matched Windows native signing/key operations
 pass; actual Linux CLI sample build/run and terminal confirmation pass. The
@@ -1336,7 +1336,7 @@ Original receipts/failed attempts remain at fixed local Git
 reachability or fresh browser execution is implied by doc consolidation.
 ## Developer documentation refresh — YT-068
 
-The [developer documentation index](README.md) and root README now separate native SSR setup, optional browser behavior and the nine unpublished candidates from retained qualification history. The nine candidate guides, current/history navigation and [final Private source/package boundary](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) are reconciled. YT-068 is Done at documentation scope after bounded validation; the independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate; YT-020 stays Blocked and established YT-030/YT-065/YT-066/YT-067 bounds are retained. YT-029 is Done at bounded deadline/overhead research scope; YT-021 is Done at bounded incremental SSR comparison scope, retaining the app-owned prototype and rejecting core streaming/suspense promotion. YT-024 is Done at bounded typed network adapter proof scope, adopting the app-owned adapter pattern and rejecting core transport framework promotion. YT-022 is Done at bounded data-only handler/capture research scope, retaining explicit application-owned descriptors and rejecting generic/core resumability promotion. YT-023 is Done at bounded native wgpu/Vulkan scene research scope, retaining an opt-in app-owned prototype with actual draw/readback and frame/allocation-byte observations while rejecting core/browser-portability promotion. The next unblockable YT-020 preparation action is the explicit immutable-candidate/source/package and formal release-policy decision record; any new preflight/rebuild/provenance/SBOM/license/signing execution needs separate authority. Historical `8e557e7` signed bytes do not attest policy HEAD `abb2cce` plus current dirty research, root manifest/lock and candidate READMEs. A later local commit alone cannot activate release. No release gate or historical qualification result changes through this entry refresh.
+The [developer documentation index](README.md) and root README now separate native SSR setup, optional browser behavior and the nine unpublished candidates from retained qualification history. The nine candidate guides, current/history navigation and [final Private source/package boundary](RELEASE-SUPPLY-CHAIN.md#current-preparation-source-boundary-2026-10-12) are reconciled. YT-068 is Done at documentation scope after bounded validation; the independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate; YT-020 stays Blocked and established YT-030/YT-065/YT-066/YT-067 bounds are retained. YT-029 is Done at bounded deadline/overhead research scope; YT-021 is Done at bounded incremental SSR comparison scope, retaining the app-owned prototype and rejecting core streaming/suspense promotion. YT-024 is Done at bounded typed network adapter proof scope, adopting the app-owned adapter pattern and rejecting core transport framework promotion. YT-022 is Done at bounded data-only handler/capture research scope, retaining explicit application-owned descriptors and rejecting generic/core resumability promotion. YT-023 is Done at bounded native wgpu/Vulkan scene research scope, retaining an opt-in app-owned prototype with actual draw/readback and frame/allocation-byte observations while rejecting core/browser-portability promotion. The next unblockable YT-020 preparation action is the explicit immutable-candidate/source/package and formal release-policy decision record; any new preflight/rebuild/provenance/SBOM/license/signing execution needs separate authority. Historical `8e557e7` signed bytes do not attest policy HEAD `abb2cce` plus current dirty research, root manifest/lock and candidate READMEs. A later local commit alone cannot activate release. No release gate or historical qualification result changes through this entry refresh.
 
 ## Critical path
 
@@ -1442,13 +1442,13 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 - [x] Reproducible **local** results for A01–A09, mapped to actual Rust/Chrome/Firefox tests.
 - [x] Release-mode baseline measured for local SSR first-byte, HTML, gzip artifact estimates, Browser/WASM and Search Island readiness; environment and limitations recorded.
 - [x] Documentation distinguishes locally tested prototype capabilities from production/public release gates.
-- [ ] **Public-release authorization:** The license and bounded qualification work are complete. [Private experimental 0.1.0 preparation](YT-020-PRIVATE-RELEASE-PREP.md) selects the original nine libraries and prepared API/MSRV/maintenance scope; immutable-source/registry, trusted release integrity, public reporting/scanner activation and explicit approval remain open. Application deployment qualification is separate.
+- [ ] **Public-release authorization:** The license and bounded qualification work are complete. [Private experimental 0.1.0 preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) selects the original nine libraries and prepared API/MSRV/maintenance scope; immutable-source/registry, trusted release integrity, public reporting/scanner activation and explicit approval remain open. Application deployment qualification is separate.
 
 **M5 local evidence (2026-10-08):** [M5 acceptance and measurements](M5-VERIFICATION.md) documents A01–A10, release Rust/Chrome 155, Firefox 157 physical-keyboard E2E, 30 SSR timing samples, 5 Chrome navigation/activation samples, and asset sizes. `YT-019` is locally Done; `YT-020` is Blocked for publication, with explicit owners in [Release readiness](RELEASE-READINESS.md). GitHub CI has not executed the new M5 workflow changes.
 
 **Later delivery/preparation update (2026-10-11):** The earlier hosted-CI statement above records the M5 checkpoint. Maintainer PR #4 and post-merge `a61f409` required CI passed. YT-065/066/067 retain their bounded completion and historical source identities. The maintainer authorized private `0.1.0` preparation only; local package verification is not a hosted run on these uncommitted changes, signed release evidence or publication approval. YT-020 remains Blocked for actual activation.
 
-**Private integrity update (2026-10-12):** PR #5 delivered the original package preparation as `633db585`; required PR/master runs `38144070219` / `38145022739` passed with the original check names. The maintainer then selected Rust 1.99 before first publication. [Integrity preparation](YT-020-INTEGRITY-PREPARATION.md) records byte-identical nine-crate source archives from separate Ubuntu/Windows hosts, honest shared-control limits, target inventories, unsigned provenance drafts and public verification fixtures. These working overlays have no new hosted CI or release authority. Protected-check migration and the existing concrete activation gates remain open; YT-020 stays Blocked.
+**Private integrity update (2026-10-12):** PR #5 delivered the original package preparation as `633db585`; required PR/master runs `38144070219` / `38145022739` passed with the original check names. The maintainer then selected Rust 1.99 before first publication. [Integrity preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) records byte-identical nine-crate source archives from separate Ubuntu/Windows hosts, honest shared-control limits, target inventories, unsigned provenance drafts and public verification fixtures. These working overlays have no new hosted CI or release authority. Protected-check migration and the existing concrete activation gates remain open; YT-020 stays Blocked.
 
 **Later authorized Private follow-up (2026-10-12):** Reviewed integrity preparation was committed as `9ec9b7b`. PR #6 first-head run `38193149046` passed both new jobs on tree-equal synthetic checkout `cdc67bb6`; protected checks were then atomically migrated to Rust 1.99 MSRV plus the unchanged Stable job, with all other controls retained. [Hosted rebuilding](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md) prepares a single manual GitHub-operated builder for the same immutable source as the primary. Later candidate/merge/rebuild evidence is retained separately and never attributed to the first-head run. Signing and actual release activation remain open; YT-020 stays Blocked.
 
@@ -1552,9 +1552,9 @@ This bounded extension comes from the Middleware Pipeline & RequestContext hando
 **M9i / YT-058 evidence (2026-10-10):** Identity, catalog, Session cart and direct-SQL orders compose through ordinary Rust modules. Nine focused tests, 190 workspace tests, five doctests, a three-process restart/authorization/disabled-module smoke, 28 dependency trees, eight wasm32 packages and 136 byte-identical production assets pass. First reviewer `wc_job_a_WnhFSftzNoYYgf` found a readiness-failure leak in the Python smoke harness; terminate/kill/reap/stream-close regressions repaired it, and repeat reviewer `wc_job_zbWS7OSbUtaKzYcn` returned PASS. The exact twelfth catalog entry was promoted. See [M9i verification](M9I-VERIFICATION.md).
 **M9j / YT-059 evidence (2026-10-10):** The [API inventory](API-CONTRACTS.md) classifies 170 public declarations/constants. Complete regression passes 190 tests, five doctests, 11 native smokes, eight wasm32 packages, three Chrome and three Firefox suites, 28 dependency trees and 136 byte-identical production files. First reviewer `wc_job_BzkzTPcKr4FKATTr` found omitted constants/errors and over-broad upstream reexport classification; both were repaired without runtime changes, and repeat reviewer `wc_job_QkQkovlBlvrhPxCE` returned PASS. Stable Candidates remain pre-SemVer evidence; YT-020 remains Blocked. See [M9j verification](M9J-VERIFICATION.md).
 
-**Historical trust/registry policy checkpoint (2026-10-12):** [Private public-key preparation and future crates.io distribution](YT-020-PRIVATE-TRUST-POLICY.md) are selected for the original nine experimental `0.1.0` libraries. Only documentation and independent review are authorized now. Actual key/signing, real registry rights/resolution and formal release integrity/approval remain unverified; OIDC, certificate/chain, transparency/inclusion and builder/source guarantees are preserved. YT-020 stays Blocked and no repository visibility transition is implied.
+**Historical trust/registry policy checkpoint (2026-10-12):** [Private public-key preparation and future crates.io distribution](RELEASE-SUPPLY-CHAIN.md#private-maintainer-key-preparation-policy-and-historical-signatures) are selected for the original nine experimental `0.1.0` libraries. Only documentation and independent review are authorized now. Actual key/signing, real registry rights/resolution and formal release integrity/approval remain unverified; OIDC, certificate/chain, transparency/inclusion and builder/source guarantees are preserved. YT-020 stays Blocked and no repository visibility transition is implied.
 
-**Later authorized Private signing (2026-10-12):** The reviewed policy was locally committed as `abb2cce`. [Dedicated-key signing and separate verification](YT-020-PRIVATE-SIGNING-VERIFICATION.md) now pass for three preparation signatures, 37 artifacts and six negative cases. Formal log-required verification rejects the no-log bundle; all release guarantees remain mandatory. Source/build/inventory identities are retained without broad reruns. YT-020 stays Blocked for formal activation; no push, publication or visibility change occurred.
+**Later authorized Private signing (2026-10-12):** The reviewed policy was locally committed as `abb2cce`. [Dedicated-key signing and separate verification](RELEASE-SUPPLY-CHAIN.md#private-maintainer-key-preparation-policy-and-historical-signatures) now pass for three preparation signatures, 37 artifacts and six negative cases. Formal log-required verification rejects the no-log bundle; all release guarantees remain mandatory. Source/build/inventory identities are retained without broad reruns. YT-020 stays Blocked for formal activation; no push, publication or visibility change occurred.
 
 ### M10 — Release engineering and production-security qualification
 
@@ -2268,7 +2268,7 @@ C118f3d0, YT-096 In progress, YT-020 Blocked and D1–D6 Pending remain unchange
 no Commit/Push, signing, version tag, package publication or reader-site export.
 
 **YT-096 supply-chain purpose and D1–D5 recommendation (2026-10-27):** The
-[owner packet](YT-096-D1-D5-RELEASE-TRUST-PLAN.md) makes the remaining purpose
+[owner packet](RELEASE-SUPPLY-CHAIN.md#adopted-release-trust-and-disclosure-policy--yt-096) makes the remaining purpose
 explicit: reduce substituted release bytes, official-signer impersonation and
 source/build mismatch risks. It proposes exact public identity/payload fields,
 sixteen0.1.0 source packages, technical C118f3d0 as reuse baseline, a future
@@ -2283,7 +2283,7 @@ All D1–D6 remain Pending, YT-096 In progress and YT-020 Blocked; YT-206 stays 
 
 
 **YT-096 D1–D5 owner adoption (2026-10-27):** The owner adopts the
-[recommended policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md): GitHub workload/public
+[recommended policy](RELEASE-SUPPLY-CHAIN.md#adopted-release-trust-and-disclosure-policy--yt-096): GitHub workload/public
 Sigstore disclosure, closed sixteen-subject public provenance/DSSE and complete
 private evidence, sixteen experimental `0.1.0` packages with technical baseline
 `118f3d0` and future co-located `C_release`/`release.yml`/proposed `v0.1.0`,
@@ -2310,7 +2310,7 @@ record; focused checks do not establish a signing-ready or completed release.
 
 
 **YT-096 encrypted custody adoption (2026-10-27):** The owner adopts the
-[age custody and D2 safe-metadata extension](YT-096-AGE-CUSTODY-INTEGRATION.md),
+[age custody and D2 safe-metadata extension](RELEASING.md#custody-handoff-and-manual-key-lifecycle),
 including a source-pinned public recipient for build/capture and transient private
 identity use only in an isolated manually approved protected Environment verifier.
 A dedicated local identity and authenticated task-scoped Linux amd64 age bootstrap

@@ -329,6 +329,9 @@ their recorded stores under [DEV-ARTIFACTS](DEV-ARTIFACTS.md).
 
 ## Baseline release checklist
 
+The detailed [custody, handoff and manual rotation procedures](#custody-handoff-and-manual-key-lifecycle)
+apply alongside the [two-payload trust contract](RELEASE-SUPPLY-CHAIN.md#two-payloads-complete-assembly-and-independent-verification).
+
 This is the accepted alpha.3/manual-signing sequence. For the newly selected
 combined GitHub/crates.io path, use the [single publication checklist](RELEASE-PUBLICATION.md#each-version).
 The candidate, payload, identity and independent-verification requirements below
@@ -493,7 +496,7 @@ then checks target-version absence. Keep master=P until completion. Unknown
 account limits can still reject a write; HTTP429 stops without retry. The normal
 publication job retains its60minute bound. It is not an automatic/general resume.
 
-Use the adopted [D1/D2 field/attachment policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md)
+Use the adopted [D1/D2 field/attachment policy](RELEASE-SUPPLY-CHAIN.md#adopted-release-trust-and-disclosure-policy--yt-096)
 and a closed exact list. The first alpha has twenty public files: sixteen `.crate`
 archives, original provenance/public checksum, public DSSE bundle and a reduced
 owner-acceptance summary. This is a historical count, not a future directory glob.
@@ -562,14 +565,14 @@ publish sixteen crates from the current two-package SDK. Recheck current
 availability and rights at the actual authorized version/source; the original
 inventory does not reserve names, justify upload or prove current resolution.
 
-The subsequent [Config/Secrets contract and dry-runs](YT-020-FIRST-PUBLISH-CONTRACT.md)
+The subsequent [Config/Secrets contract and dry-runs](RELEASE-PUBLICATION.md#dated-local-evidence-and-remaining-provenance)
 verify the pair normally with accepted local package sources and unchanged
 manifests. Actual registry availability/acceptance is not simulated. Their
 generated archives differ from the signed set in internal packaged-lock
 checksums; resolve the sixteen-package artifact/checksum contract before
 uploading or claiming existing signatures cover a repackaged registry set.
 
-The [formal registry contract](YT-020-REGISTRY-PUBLICATION-CONTRACT.md) now selects
+The [formal registry contract](RELEASE-PUBLICATION.md#first-registry-publication-and-immutable-artifact-contract) now selects
 the first-name dependency correction and exact-byte promotion of sixteen newly
 prepared artifacts. It requires a separately selected immutable R/V, artifact
 freeze and reviewed transport. Current alpha.3 archives have a Config/Secrets
@@ -615,3 +618,166 @@ and [current enhancements](https://blog.rust-lang.org/2026/01/21/crates-io-devel
 describe that model. Registry publisher configuration/credentials are separate
 from GitHub Release rights and Sigstore identity. No crates.io token, publisher
 workflow, registry Environment, name claim or upload is installed by this work.
+
+## Custody, handoff and manual key lifecycle
+
+### Capture and protected readback
+
+The adopted D2 ciphertext scheme uses the public recipient in
+`.github/release-evidence-recipient.txt`, pinned SHA-256
+`b861a3c7e2abf3caf4c7071c045f6114704db94e8cc39ce010e7fa10711ff506`.
+The original bootstrap pins age1.3.2, Sigsum0.13.1 and Go1.27.3, verifies archive/
+proof hashes and the `sigsum-generic-2025-1` two-of-three witness quorum before age
+execution. Official Go HTTPS/checksum and module sumdb are its trust roots.
+This provides neither TUF bootstrap nor independently reproduced binaries.
+Use authenticated tools and exact approved bindings through the existing CLI.
+All variables below are operator placeholders and require existing authority.
+
+```sh
+cargo run --locked --manifest-path xtask/Cargo.toml -- release custody capture \
+  --age "$AGE" --recipient .github/release-evidence-recipient.txt \
+  --source "$SOURCE" --run "$RUN" --attempt "$ATTEMPT" \
+  --private "$PRIVATE_ASSEMBLY" --extras "$OPENSSL_EXTRAS" \
+  --exit "$ORIGINAL_EXIT" --output "$NEW_TRANSPORT"
+
+cargo run --locked --manifest-path xtask/Cargo.toml -- release custody verify \
+  --age "$AGE" --recipient .github/release-evidence-recipient.txt \
+  --source "$SOURCE" --run "$RUN" --attempt "$ATTEMPT" \
+  --transport "$TRANSPORT" --identity "$IDENTITY" --output "$NEW_READBACK"
+```
+
+Capture accepts the flat private assembly and only `openssl-3.5.9.tar.gz`,
+`openssl-build.log`, `openssl-build-result.json` extras. Transport contains only
+`private-evidence.tar.age` and `transport-receipt.json`. Its encrypted inventory
+binds source/workflow/run/attempt, recipient, exact members/digests, original
+native exit and completeness. New private readback outside Git contains `private/`,
+`extras/`, inventory and `local-readback-receipt.json`. Reject unsafe members,
+binding/authentication/digest failures, overwrites and plaintext fallback.
+The generic diagnostic is `custody NOT SAVED or readback rejected; private diagnostics suppressed`.
+Full original private-manifest verification remains required. A valid failure
+inventory stays `FAILED_INCOMPLETE` with its original exit.
+
+The original manual verifier used Environment `release-evidence-verify`, sole
+reviewer `bohewu`, self-approval under the single-owner policy, disabled admin
+bypass and exact custom **tag** policy `v0.1.0`. `AGE_IDENTITY` was an Environment
+Secret restricted to isolated verification. The current versioned record selects
+the approved tag. The later [automation policy](RELEASE-PUBLICATION.md#separation-of-privileges)
+supersedes repeated reviewer clicks only for reviewed future executions.
+Environment administrators remain trusted policy roots. A document or Secret
+name cannot prove runtime protections or grant key access.
+
+Before protected work and again before key use, require checkout/event/workflow/
+peeled tag agreement and approved source membership in origin/master. The
+original manual inputs were `expected_commit`, `build_run`, `build_attempt`,
+`artifact_id` and raw `artifact_sha256`. Source-specific parsers still govern old
+tagged runs. REST readback must establish original completed release workflow/
+run/attempt/repository/source, exact artifact name/ID/digest/size/unexpired state,
+Environment reviewer/ref policy and exact two-file ZIP. Never forward GitHub
+credentials to storage redirects. Build is contents-read. Verifier has contents/
+actions read, without OIDC/write. Unavailable metadata/permissions fail closed
+before key access. Documented runtime Environment approval supplies the approval
+boundary where APIs expose no current-approval or bypass proof field.
+
+Keep key access step-scoped in ephemeral0700/0600 storage. Authenticate tools
+before key access. Remove identity/plaintext and unset key variables before OIDC,
+including failure cleanup. Upload only safe receipts and encrypted allowed data.
+Runner loss/cancellation may prevent capture or cleanup. Seven-day transport/
+receipt retention and planned24-hour download do not prove durable custody.
+Preserve failed and successful original bytes outside Git through disposition.
+
+### Supplemental ciphertext and short-lived intake
+
+Review a flat external qualification selection and `QUALIFICATION-CLOSURE.json`
+with exact unique names/sizes/hashes, original sources, roles and limitations.
+Run normal checksum create/verify before `scripts/release-sign.py pack` using
+authenticated `SIGN_AGE`. Its new output `qualification-inputs.zip` contains only
+age ciphertext and a safe receipt. The helper has no upload command or recursive
+discovery. Remove its temporary plaintext TAR on failure as well as success.
+Actual attachment to a Draft requires its own authority and exact asset binding.
+
+After the original read-only Draft API403, the adopted handoff reuses a stored
+encrypted asset through a narrowly bound download capability. The owner-local
+`handoff` command uses existing gh authentication for exactly github.com API,
+checks master/S, Draft/tag/C, asset ID/name/size/hash, then retrieves the original
+ZIP unauthenticated and checks its two-file shape/hash/qualification receipt.
+Only HTTPS `release-assets.githubusercontent.com` URLs under this repository's
+asset prefix are accepted, without port/userinfo/fragment/redirects. Require
+read-only capability permissions. The earlier SAS expiry or unverified download
+JWT `exp` only shortens validity. TLS/provider authorization and immutable hashes
+remain required. Direct-stream/unsupported responses fail closed.
+
+Encrypt the capability with the pinned public recipient without owner-key access.
+New external0700/0600 output is `request.json` and `HANDOFF-RECEIPT.json`.
+Remove temporary URL plaintext. No owner token or plaintext URL reaches CI input,
+logs, receipts or provenance. The original five-field prepare template contains
+`mode`, `signer_commit`, `qualification_asset`, `qualification_sha256` and
+`qualification_manifest_sha256`. Hosted preparation additionally requires
+`qualification_handoff`, its SHA-256 and `qualification_expires`. A bare template
+is rejected. Generate only after S selection, immediately before dispatch.
+
+The original20/5-minute freshness thresholds and roughly30-minute provider life
+are historical. The 2026-10-31 alpha.5 correction handles an actual five-minute
+capability. Local handoff/preflight require120seconds remaining. The isolated
+`qualification_intake` job authenticates SHA-pinned age before key access,
+rechecks source/CI/Environment, and requires60seconds at actual URL use. It
+decrypts the bounded URL, retrieves ciphertext without credentials/redirects,
+verifies ZIP/hash/receipt, then removes key and URL plaintext. Upload only original
+qualification ciphertext/receipt plus safe closed intake receipt to seven-day
+Actions storage. Intake has no OIDC or repository write authority.
+
+Fresh-runner preparation authenticates the full toolchain before key use and
+accepts only its successful dependency's original artifact ID/digest. Match
+repository/S/run/attempt/name, full record/request hashes, original ZIP/manifest
+and ciphertext. Late decryption rechecks the intake receipt without URL retrieval.
+Missing/stale data or late scheduling fails closed. Structure validation after
+expiry does not authorize URL use. Preflight5minutes, intake3 and prepare27
+preserve the original protected30-minute total. Sign mode consumes frozen bytes
+and does not retrieve qualification data. No expired-URL fallback, automatic
+refresh/retry, new credential or padded artifact is permitted.
+
+Sign requests bind `mode`, `signer_commit`, `run`, `attempt`, `artifact`, raw ZIP
+`digest`, raw `receipt_sha256`, `provenance_sha256`, `manifest_sha256` and exact
+policy-specific `d6`. IDs are positive decimal strings and SHAs full lowercase
+hex. Original manual `approve-exact-signing-inputs` and current
+`reviewed-automation` remain source-specific policies. A text field alone cannot
+grant owner authority. Preflight rejects unknown fields/modes and implicit S.
+Closed phase/class/status diagnostics may show an HTTP400–599 integer. Never
+emit URLs, raw exceptions/bodies/headers, tokens or private paths. Failures seal
+available partial bundles as FAIL, without automatic signing retries.
+
+### Manual custody review, rotation and retirement
+
+Review custody periodically and replace for identified leakage/access changes.
+There is no automatic30/90-day schedule. Record recipient fingerprint/version
+per ciphertext. New encryption requires a reviewed source-pinned recipient and
+matching versioned Environment Secret. GitHub does not synchronize custom age
+rotation. Retain old decrypt keys while old ciphertext is needed, or re-encrypt
+and independently verify a new external receipt without changing original frozen
+manifest/provenance. Re-encryption cannot revoke previously copied ciphertext.
+Never overwrite/delete a still-needed old key.
+
+`scripts/release-evidence-rotation.py prepare` accepts exact repository HEAD and
+new public recipient, compares operational Git bytes and emits only
+`rotation.patch`/`manifest.json`, without identity input or apply operation.
+Bind all four sites coherently, namely the recipient file, `RECIPIENT_SHA`, the
+literal encryption recipient in `xtask/src/release/custody.rs`, and release.yml's
+independent file-hash check. Reject missing/duplicate/inconsistent expected-old
+anchors and changed baseline before output. The manifest binds old/new recipient,
+files, patch and retained tools. Shape validation alone cannot approve a key.
+Application must recheck expected-old bindings and create a complete new isolated
+snapshot without overwrites or partial state. Never apply to the live checkout
+as part of the local drill.
+
+`drill` uses authenticated cached age/age-keygen and retained authentication
+evidence, fresh LOCAL test A/B identities, isolated baseline snapshots and locked
+offline xtask builds. Preserve full original LOCAL manifest and compare every
+restored member. Require actual A→A/B→B success, wrong-key and new-pin/old-transport
+rejection, retained A tooling→A readback, actual A rollback capture/readback,
+and test-copy loss/failure/restoration/readback. Retain old helper/binary/public
+file/bindings and key while needed. Key retention alone cannot make a new-pin
+verifier accept old transport. LOCAL recovery does not prove owner-key or GitHub
+Secret recovery. No real identity is read/copied or current recipient changed.
+Handled refusal exits1, invalid usage exits2, and failed started drills retain
+FAILED proof and private diagnostics. Use the existing tool's exact CLI help.
+The [dated local drill evidence](QUALIFICATION-MATRIX.md#custody-and-local-rotation-evidence--2026-10-27-and-28)
+retains original failures and limits.

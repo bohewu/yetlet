@@ -10,7 +10,7 @@ Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing
 
 | ID | Priority | Work item | Depends on | Evidence |
 |---|---|---|---|---|
-| `YT-020` | medium | Build/run docs and release readiness | YT-019 | [Private preparation](docs/YT-020-PRIVATE-RELEASE-PREP.md)<br>[hosted rebuilding](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md)<br>[trust/registry policy](docs/YT-020-PRIVATE-TRUST-POLICY.md)<br>[actual Private signing](docs/YT-020-PRIVATE-SIGNING-VERIFICATION.md) |
+| `YT-020` | medium | Build/run docs and release readiness | YT-019 | [Private preparation](docs/QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12)<br>[hosted rebuilding](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md)<br>[trust/registry policy](docs/RELEASE-SUPPLY-CHAIN.md#private-maintainer-key-preparation-policy-and-historical-signatures)<br>[actual Private signing](docs/RELEASE-SUPPLY-CHAIN.md#private-maintainer-key-preparation-policy-and-historical-signatures) |
 
 ## Todo — remaining M11 work
 
@@ -100,5 +100,5 @@ Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing
 | `YT-065` | medium | Add scheduled platform/browser/accessibility qualification | YT-059 | [M10f evidence](docs/M10F-VERIFICATION.md) |
 | `YT-066` | medium | Qualify distributed providers and operational behavior | YT-046, YT-054, YT-057, YT-059 | [M10g evidence](docs/M10G-VERIFICATION.md)<br>[YT-066b1](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md)<br>[YT-066b2](docs/PROVIDER-OPERATIONS.md#bounded-provider-bursts-and-http-attribution)<br>[YT-066b3](docs/QUALIFICATION-MATRIX.md#historical-session-auth-oidc-and-cross-host-evidence) |
 | `YT-067` | high | Perform Codex-assisted internal security scan | YT-063, YT-064 | [M10h evidence](docs/M10H-VERIFICATION.md) |
-| `YT-068` | medium | Refresh developer entry, candidate documentation and evidence-preserving navigation/status | YT-067 | [Documentation-stage record](docs/README.md#documentation-delivery-status--yt-068)<br>[final Private source/package boundary](docs/YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) |
+| `YT-068` | medium | Refresh developer entry, candidate documentation and evidence-preserving navigation/status | YT-067 | [Documentation-stage record](docs/README.md#documentation-delivery-status--yt-068)<br>[final Private source/package boundary](docs/RELEASE-SUPPLY-CHAIN.md#current-preparation-source-boundary-2026-10-12) |
 | `YT-069` | medium | Integrated M11 documentation and permitted self-review | YT-068, YT-023 | [Plan](docs/M11-PLAN.md), [documentation-only self-review](docs/M11-PLANNING-REVIEW.md) |

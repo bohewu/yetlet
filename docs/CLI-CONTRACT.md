@@ -270,7 +270,7 @@ exclusive scoped help, with no supplied values echoed.
 
 The owner included key CLI administration in the first signing slice and required
 automatic settings updates after explicit rotation approval. The
-[signing contract](YT-093-SIGNING-CONTRACT.md) defines multiple named local keys,
+[signing contract](SECRET-PROVIDERS.md#local-signing-and-replaceable-provider-contract--yt-093) defines multiple named local keys,
 immutable versions, PEM/PFX profiles, trust, retirement/revocation and the exact
 profile-write boundary. This is an explicit operator action, independent of
 `new`, `run`, `watch`, frontend startup and normal application signing.
@@ -286,7 +286,7 @@ configured process environment source. No cloud SDK, arbitrary endpoint,
 Rotation preserves old public/private material and does not revoke/delete it.
 The app adopts updated settings on its next load; the first version requires a
 restart and does not claim live reload. See the
-[verification record](YT-093-SIGNING-VERIFICATION.md) for platform evidence,
+[verification record](QUALIFICATION-MATRIX.md#local-signing-key-cli-and-azure-evidence--2026-10-18) for platform evidence,
 including the separately retained Windows Cargo-supervision limitation.
 
 ## 3. One settings mechanism

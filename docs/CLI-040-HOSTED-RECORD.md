@@ -84,7 +84,7 @@ security, inventory, support, review and failures. The checksum manifest
 covers 37 entries and has 6277 bytes with SHA-256
 `f5f0dac068bd4aad5970addf70eef178f70a4c61af355805ec1aec4ebbf6f993`.
 The source map, raw transport ZIPs and release notes are retained separately.
-[Supplemental transport contract](YT-096-SIGNER-CONTRACT.md#explicit-supplemental-input-transport)
+[Supplemental transport contract](RELEASING.md#supplemental-ciphertext-and-short-lived-intake)
 
 - Linux used the earlier local preparation archive for six generation variants
   and seven additional locked checks. Native Style passed HTTP, CSS and CSP.

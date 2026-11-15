@@ -4,7 +4,7 @@
 
 Yetlet is currently a pre-release prototype. No version is production-supported and there is no security-fix service-level agreement. Reports about the current `master` branch and the published Experimental SDK/CLI are welcome. See [Release readiness](docs/RELEASE-READINESS.md) for distribution identity; publication does not establish production support.
 
-The following is the historical pre-public policy checkpoint, not current distribution status. The maintainer selected [Private preparation](docs/YT-020-PRIVATE-RELEASE-PREP.md) for experimental `0.1.0` and the original nine library candidates. After separately approved activation, the latest `0.1.x` patch would be maintained on a best-effort basis; older patches would be upgrade targets, not separate maintained branches. This prepared policy does not mean a version has been released or create a response/remediation deadline.
+The following is the historical pre-public policy checkpoint, not current distribution status. The maintainer selected [Private preparation](docs/QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) for experimental `0.1.0` and the original nine library candidates. After separately approved activation, the latest `0.1.x` patch would be maintained on a best-effort basis; older patches would be upgrade targets, not separate maintained branches. This prepared policy does not mean a version has been released or create a response/remediation deadline.
 
 ## Reporting a vulnerability
 

@@ -126,7 +126,7 @@ qualification, security, inventory, support, review and failures. Its
 `1b4869621fdf0925bd8e2aa57a693b29367318b9d9fa535f675203043df48e84`.
 The reviewable original-file mapping is retained alongside the flat directory.
 The canonical Cargo xtask checksum create and verify both passed.
-[Supplemental transport contract](YT-096-SIGNER-CONTRACT.md#explicit-supplemental-input-transport)
+[Supplemental transport contract](RELEASING.md#supplemental-ciphertext-and-short-lived-intake)
 
 - The local exact-archive native consumer built and exercised both loopback
   startup paths, JSON and 404 responses, strict CSP and escaped HTML. The
