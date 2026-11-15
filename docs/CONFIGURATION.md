@@ -219,7 +219,7 @@ provider. The separately opt-in `secret-provider` feature adds explicit
 directly into chosen `SecretString` fields. See the
 [integration contract and checks](SETTINGS-SECRET-PROVIDER.md).
 
-The separately selected [development HTTPS follow-up](DEV-HTTPS-VERIFICATION.md)
+The separately selected [development HTTPS follow-up](DEVELOPMENT.md#opt-in-local-https-preparation-and-lifecycle)
 adds public `server.tls` declarations to settings-enabled CLI scaffolds. It reuses
 this loader and the existing secret rules; optional application TLS dependencies
 remain outside the configuration crate and Core/browser defaults. This is a
@@ -273,3 +273,22 @@ settings/template and generator limits are maintained in the
 [scope and verification record](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-090-VERIFICATION.md).
 
 </details>
+
+### Development TLS and explicit snapshot adoption
+
+For settings-enabled CLI scaffolds, TLS defaults to disabled with empty
+certificate/private_key paths. Enable it only in Development, using protected
+app-relative files outside frontend sources. Follow the
+[mkcert preparation and CLI lifecycle](DEVELOPMENT.md#opt-in-local-https-preparation-and-lifecycle).
+This public configuration selects optional app TLS dependencies. Certificate
+contents and CA authority never become public settings or browser state.
+
+A separately selected SettingsSecrets adapter adopts a complete application
+selection through `replace`. Every reload writer takes the same application gate
+before load, validation, selection and publication. Failed load/validation
+retains the healthy snapshot. Previously returned values and credential-bearing
+clients require their own adoption lifecycle. The
+[reload contract](SECRET-PROVIDERS.md#minimal-local-reload-contract) and
+[MSVC evidence](QUALIFICATION-MATRIX.md#secret-provider-native-and-review-evidence)
+cover that specific composition. The original typed-loader checkpoint's
+unverified Windows ACL claims above retain their original scope.

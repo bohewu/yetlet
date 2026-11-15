@@ -31,7 +31,7 @@ revision and feature/target selection of any generated rustdoc. Existing tests
 and qualification records remain bound to their own source identities; publishing
 documentation does not renew that evidence or make an API stable.
 
-[The public documentation plan](PUBLIC-DOCS-PLAN.md) records GitHub Pages as
+[The public documentation plan](GITHUB-PAGES-PUBLICATION.md#public-guide-architecture-and-original-local-acceptance) records GitHub Pages as
 the reader entry point, with selected repository guides and version-matched API
 documentation. The [completed cutover](GITHUB-PAGES-PUBLICATION.md#authorized-yetlet-publication--2026-11-01)
 records the actual Yetlet-built public reader. A separate Wiki contract remains
@@ -244,3 +244,18 @@ Signing, registry and consumer outcomes remain separately scoped in those record
 an old Pending registry checkpoint is not current distribution status.
 Documentation preparation does not itself publish
 packages, sign artifacts, enable hosting or expand support.
+
+## Reader architecture and versioned API ownership
+
+The [public guide architecture](GITHUB-PAGES-PUBLICATION.md#public-guide-architecture-and-original-local-acceptance)
+keeps the README as the short entry, the guide as integration teaching and
+same-version rustdoc as callable API reference. Rustdoc must identify source,
+target and selected features. A native default build cannot represent optional
+browser APIs. Checkout improvements never change an already signed candidate's
+identity. A separately selected development edition must be labelled Development.
+The initial mdBook0.5.4 choice is historical, and the Yetlet-built static reader
+with optional Wasm search owns the current Pages path. Keep the exact eight
+chapters and SDKalpha.8/CLI0.4.0 selection, with no recursive report export or
+second manually maintained guide tree. Original task/source links preserve dated
+proof, while operating contracts live in maintained guides. Wiki and hosted
+rustdoc remain separate unselected publication surfaces.

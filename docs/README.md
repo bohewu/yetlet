@@ -51,7 +51,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 - [Public developer guide](https://bohewu.github.io/yetlet/): eight selected chapters,
   navigation and search, labeled with SDK/CLI edition and source commit.
-- [Public documentation plan](PUBLIC-DOCS-PLAN.md): source/API boundaries,
+- [Public documentation plan](GITHUB-PAGES-PUBLICATION.md#public-guide-architecture-and-original-local-acceptance): source/API boundaries,
   doc-comment gaps and deferred Wiki.
 
 ## Maintainer entry points
@@ -96,7 +96,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   alpha.6/CLI 0.2.0 edition are **not** present counts or current releases.
   YT-243 separately completed source/Linux and local Windows-MSVC
   qualification at its own scope; no complete corpus/production certification.
-- [Browser application DX research](BROWSER-DX-RESEARCH.md): selected
+- [Browser application DX research](BROWSER-APP.md#browser-dx-research-and-selected-follow-up): selected
   documentation gaps, reuse of the browser starter and event ownership, and
   source-bound Yetlet evidence without new runtime or API changes.
 
@@ -299,14 +299,14 @@ continued availability of those raw bytes.
 - [Bounded DOM capability implementation](BROWSER-APP.md#historical-native-dom-controls-and-navigation-boundaries): finite View vocabulary, duplicate/void consistency, native control defaults/reset, same-origin navigation and actual verification; no general binding runtime.
 - [HTTP pipeline](HTTP-PIPELINE.md): native Axum/Tower handlers, middleware, request state and response semantics.
 - [Extensions](EXTENSIONS.md): explicit opt-in setup and provider boundaries.
-- [Naming guide](NAMING.md): current Rust/CLI/settings vocabulary, one canonical pre-public Rust API and explicit source migrations. [Audit response](NAMING-AUDIT-20261022.md) records N01–N08 and focused evidence; [the earlier compatibility checkpoint](NAMING-COMPATIBILITY.md) retains its original accepted results and superseded alias decision.
+- [Naming guide](NAMING.md): current Rust/CLI/settings vocabulary, one canonical pre-public Rust API and explicit source migrations. [Audit response](NAMING.md#dated-naming-audit-dispositions) records N01–N08 and focused evidence; [the earlier compatibility checkpoint](NAMING-COMPATIBILITY.md) retains its original accepted results and superseded alias decision.
 - [Current capability and API carrier map](CAPABILITIES.md): implemented packages/features, application integrations, research decisions and release inclusion.
 - [M9 API classification and historical supplements](API-CONTRACTS.md) and [Compatibility](COMPATIBILITY.md): the original classification and pre-public stability limits; later packages have separate contracts in the current map.
 - [CLI contract](CLI-CONTRACT.md) and [current CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory):
   published CLI `0.4.0`, settings-first grammar, finite SDK resolution/startup
   policy and explicit `inspect`, `run/watch` and generator boundaries.
 - [Browser-only app walkthrough](BROWSER-APP.md) and
-  [Browser DX evidence boundaries](BROWSER-DX-RESEARCH.md): project-owned
+  [Browser DX evidence boundaries](BROWSER-APP.md#browser-dx-research-and-selected-follow-up): project-owned
   Rust/Wasm build/reload, Vite frontend changes and static preview. Earlier
   YT-104 and YT-111/112 source-only implementations and their failed tests
   remain recoverable from local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9` (not verified publicly reachable);
@@ -394,8 +394,8 @@ continued availability of those raw bytes.
   [YT-114 foundation evidence](EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection). Research-only
   OIDC/Bearer/Cookie/Audit/Cache/Tracing decisions do **not** install new
   default providers or expand production support.
-- [Windows CLI exit-125 follow-up](WINDOWS-CLI-125-VERIFICATION.md): Cargo executable ACL diagnosis, safe stage diagnostics and source-matched native build/run/Ctrl-C cleanup with protected task-local tools.
-- [Development HTTPS](DEV-HTTPS-VERIFICATION.md): existing settings, externally prepared mkcert certificates, optional Rust TLS, Vite HTTPS/WSS and native run/stop/build evidence.
+- [Windows CLI exit-125 follow-up](QUALIFICATION-MATRIX.md#windows-exit-125-diagnosis-and-native-results): Cargo executable ACL diagnosis, safe stage diagnostics and source-matched native build/run/Ctrl-C cleanup with protected task-local tools.
+- [Development HTTPS](DEVELOPMENT.md#opt-in-local-https-preparation-and-lifecycle): existing settings, externally prepared mkcert certificates, optional Rust TLS, Vite HTTPS/WSS and native run/stop/build evidence.
 - [Opt-in secret providers](SECRET-PROVIDERS.md): asynchronous named string lookup, explicit settings snapshots and constructor/State injection with replaceable providers.
 - [Settings from SecretProvider](SETTINGS-SECRET-PROVIDER.md): opt-in startup resolution into selected protected fields, narrow module settings and fail-closed errors.
 - [Shared SQLite reference](PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority): two Compose app replicas accessing one local business-data directory, application conflicts and restart/error behavior.

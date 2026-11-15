@@ -631,7 +631,7 @@ released locking without replaying successful rotation.
 Actual Windows `yetlet build` supervision failed125 `CLI_SPAWN Other`. The exact
 pre-change CLI failed identically on the same sample, baseline bundle
 `d073c5bc39f9eb77d049fdcf66be6a58caab61442081e55fc652131dc1e8a493`.
-Its cause was unproven then. The later [Windows125 follow-up](WINDOWS-CLI-125-VERIFICATION.md)
+Its cause was unproven then. The later [Windows125 follow-up](QUALIFICATION-MATRIX.md#windows-exit-125-diagnosis-and-native-results)
 found unsafe Cargo executable write access and separately qualified protected-path
 build/run/cancellation. It did not rewrite the original failure or turn original
 native crypto/key PASS into CLI-supervision qualification.
@@ -958,3 +958,237 @@ is locally recoverable at `b610acc7e098020b6b59dfa0d1ab2b75b059e656`.
 Remote SHA accessibility is unverified. Raw historical target/m12 logs remain
 separate and unchanged. Current commands follow [Development](DEVELOPMENT.md#rust-tooling-migration-contracts-and-historical-inventory)
 and [xtask usage](../xtask/README.md), with later tools/status assessed separately.
+
+## Browser and Vite feasibility evidence
+
+The Browser DX study dated 2026-11-07 inspected
+`bebdd03660ca7dc33fdd1ed4c7e56b5680e055c1`, published SDKalpha.6/CLI0.2.0.
+It selected a connected guide over new APIs, event registries or desktop-host
+integration and replayed no product checks. The
+[browser walkthrough](BROWSER-APP.md#browser-dx-research-and-selected-follow-up)
+retains preparation, DOM/listener ownership and unselected ideas.
+
+The 2026-10-17 Vite feasibility base was
+`6d1de322739fb3defd32dccd1f6ae3790aecdddd` plus the isolated experiment.
+Vite8.3.4, Tailwind/official plugin4.3.3, TypeScript7.0.2,
+Node24.21.0/npm12.2.0 and Playwright Core1.64.1 were tooling inputs.
+Both plain/plugin production builds and typecheck passed. Nine Rust tests,
+format, strict Clippy and build passed. Offline npm ci/rebuild reproduced all 18
+output files and package-lock SHA256
+`79a124daf75a2a18f164d0ce8707e50531205d116decca4d6cda86dcb198bfff`.
+
+Installed headless Chrome155.0.8059.84 at 840x650 passed both profiles with JS
+on/off, escaped useful SSR, computed shared/plain/plugin CSS, external SVG,
+two clicks and lazy module/CSS200 with expected MIME. No recorded CSP violation,
+console error or external-origin request occurred. Six unsupported paths per
+profile returned404, including private manifest/traversal/query cases. The
+synthetic backend sentinel was absent from assets/HTML. Browser/server exited,
+port closed. The narrow SVG/cycle/CSS fixture establishes no mobile,
+accessibility, other-browser or hostile-filesystem qualification. Screenshots
+were functional inspection, without visual-design acceptance.
+
+Initial role-directed executor Job wc_job_MXjlDUIEJIPAaSIM lost its Runner
+association (`runner_instance_replaced`) and never supplied a terminal role
+result. Network-denied npm stalled and its exact owned PID was stopped after
+cwd/command inspection. Later absence was verified. Current-session role
+emulation completed dependency provisioning and bounded checks after that
+failure. It supplied no saved-model/effort/native-identity or Job-success claim.
+Independent role-directed Reviewer Job wc_job_SuuEr3YetGlVbs_8 separately
+completed exit0, JSON pass, no issues/followups, checking 24 source paths and
+permitted evidence hashes. Its saved model was observed as gpt-6-astra, with
+inherit mode and no applied effort selector. Both results retain their distinct
+identity and scope. The spike's original Todo YT-098–101 plan was later delivered
+under separate bounded acceptances, and supplies no stable shared asset API,
+WASM/HMR/Windows/deployment or public release by itself.
+Raw ignored evidence remains at artifacts/vite-spike-20261017. The
+[full original spike](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/VITE-SPIKE-VERIFICATION.md) and
+[DX study](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/BROWSER-DX-RESEARCH.md) are locally Git-recoverable only.
+
+## Development HTTPS evidence and original failures
+
+The 2026-10-18 YT-102 follow-up used branch feat/yt090-configuration at
+`dbcae2dbb47a9e8a0f1e103b49ec225ee019b63f` plus bounded changes. Public paths,
+Development opt-in, optional TLS, private backend and build-without-credentials
+are current [development contracts](DEVELOPMENT.md#opt-in-local-https-preparation-and-lifecycle).
+Linux lacked mkcert initially. The extracted Ubuntu1.4.4-1ubuntu2 package
+matched metadata SHA256
+`f2ed2a59b2ebce55a97a8efd218e4a0aea35a6c0c233e411728f3f43b3a5b592`.
+The GitHub1.4.4 release predated asset digests. Windows checked the official1.4.4
+binary against Scoop manifest SHA256
+`d2660b50a9ed59eada480750561c96abc2ed4c9a38c6a24d93e30e0977631398`.
+Both used isolated CAROOT and explicit client CA/hostname verification.
+
+| Source-bound check | Actual result and retained limit |
+|---|---|
+| Linux settings-service and Vite-service builds | Both CLI build0 with certificate directories absent. Explicit local framework paths, separately prepared offline locks and offline npm ci. Generated runtime/service tests passed |
+| Linux direct Rust/Vite run | Rust HTTPS200 atlocalhost/127.0.0.1 with wrong-host rejection. Vite page/client/TS HTTPS200, trusted WSS101, private Rust HTTP health200. Certificate/config/foreign-file requests403 and scheme-aware CSP retained |
+| Linux invalid material and cancellation | Invalid key exit1, no listener and no PEM log output. Actual controlling-terminal Ctrl-C preserved native SIGINT -2 for both CLI processes |
+| Linux final suite |125 passed/0 failed/5 ignored across17 binaries. Node13 passed, four settings profiles across Docker/Compose/Kubernetes passed, strict Clippy/fmt/docs/samples passed. Ignored external/runtime tests were unexecuted |
+| Original Linux failures | Docker synthetic lock predated optional TLS dependencies. Exact two optional edges and fixture corrected. Later watch fixture collided with coordinator Vite5173. After stopping that service, full serial suite passed. Both prior failed logs remain |
+| Windows source/tools |197 selected files matched, initial ZIP SHA256 c413cb412119844c5fa5063600a8859bf17a17fa00431a45c324ee8058b4235c. Post-build Docker fixture-only delta was outside runtime inputs. Rust/Cargo1.99 MSVC, VS2022 14.44.35207, Node24.18.0/npm12.2.0, Python3.14.3. Process-local protected Cargo/static OpenSSL3.5.9 reused |
+| Windows CLI/app builds | CLI build0 with a retained linker warning. Rust TLS, Vite TLS and default HTTP build0. TLS directories absent at build. Source-matched CLI SHA256 94c892aa04fd8dab68cde3c78206ba0f0fa64781cd24d5cfcffc5a1df73816d1 |
+| Windows Rust TLS | CA/localhost/IP validation200, wrong hostname refused. Malformed cert/key exit1, no startup listener/listening log/material leak. Real console Ctrl-C preserved CLI/Rust DWORD0xc000013a, later process/listener absence verified |
+| Windows Vite/default HTTP | Page and client HTTPS200, token-bound HMR WSS101, private backend HTTP200. Real Ctrl-Break exited six named CLI/Cargo/Rust/Node handles, released3000/5173, sentinel survived,1.0324s. Default HTTP200 and real Ctrl-C cleanup2.0952s |
+| Original Windows wrapper failures | AttachConsole failed while already attached. One FreeConsole correction reached valid Rust HTTPS/Ctrl-C, then zero-time descendant wait found unidentified PID26224 active. Its identity/exit delay remain unknown. Later process absence and separate bounded Vite cleanup passed. An earlier PowerShell scalar-splat creation input failed before explicit literal argv succeeded |
+
+Windows Jobs for CLI build, dependency preparation and app builds each reached
+terminal0. Direct runtime and closeout commands exited0. Initial GitHub API
+prerequisite observation was lost, followed by separately verified host TLS
+binary import. No new OpenSSL bootstrap occurred. All 36 exported public files
+matched hashes. Independent `/root/https_review` PASS0 reviewed source,
+Linux/Windows raw evidence,197 source entries, failed wrappers and later cleanup
+without rerunning services/tests. A tls.rs no-index diff returned expected1 for
+content difference without whitespace errors.
+
+Closeout removed only owned apps/CA/leaf private keys and confirmed task process
+and listener absence. Linux's pre-existing3010 health remained200. Windows
+preserved196 prior source files/CLI, global Cargo ACLs and both root stores.
+No system trust installation, physical-keyboard proof, full browser HMR,
+Windows GNU, production TLS/PKI or release/deployment acceptance follows.
+Original logs stay in artifacts/dev-https-20261018. The
+[Linux record](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/DEV-HTTPS-VERIFICATION.md),
+[native Windows record](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/DEV-HTTPS-WINDOWS-VERIFICATION.md) and
+[independent review](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/DEV-HTTPS-REVIEW.md) remain exact local Git sources.
+
+## Secret provider native and review evidence
+
+The initial2026-10-18 native prototype at
+`b627d291696fe1aaa4a3db5040da07e2ad44da04` plus scoped changes passed
+three provider/four State tests, one doctest, strict Clippy/fmt/dependency
+isolation and synthetic State200. `/root/secret_provider_review` independently
+accepted object-safe Send lookup, owned/empty/missing values, fixed errors,
+selected snapshots and explicit constructor/State composition. It inspected ten
+new files and786 baseline hashes with five intended existing-doc deltas.
+This initial review did not cover Windows/cloud/browser or release behavior.
+
+The separate Windows package SHA256
+`bd15490c6c2fe205ef6d041ed6f7e34d4d19588991a4e2bd72b9b03ca9930140`
+contained208 matching imported files before/after native checks on Windows11
+Pro10.0.26300.0, x86_64 MSVC, PowerShell7.6.6, Rust/Cargo1.99,
+Clippy0.1.99 and rustfmt1.10.0-stable. VS2022 vcvars64 and protected Cargo
+were process-local. Job wc_job_dg3H7A3qqxAhZevz completed0 with 13 tests
+(one poison, four provider, five State/Loader, three Azure parser), one doctest,
+strict Clippy/fmt and configured State200. Loader file rewrite/reload/replace,
+removed/empty/missing names, retained owned old values, State injection,
+SSR/CSP and profile precedence were exercised. Azure parser tests made no cloud
+calls, and Router::oneshot needed no socket listener.
+
+The first offline command failed101 before compilation on missing
+signal-hook-registry index metadata. An explicitly authorized locked MSVC fetch
+filled the cache, then unchanged source/locks passed offline/locked. A preliminary
+PowerShell -Command input was rejected before start. cargo-fmt.exe -V returned2,
+while rustfmt -V and actual fmt succeeded. Export readback returned Unknown
+resource, followed by corrected bounded text transport after oversized-batch
+and object/array-envelope errors. All25 transferred public files matched native
+hashes, with original native ZIP retained SHA256
+`dd3b67897a0974ec31e1432be20a0d4b6ae75a30f3e57afbf14ed2263b1503b7`.
+The later crate README qualification-link delta left 207 files/all compiled
+inputs identical. The Work Result's mixed/current-failed cache-miss aggregate
+remains unchanged beside final terminal passing command evidence.
+
+Final native preservation checked 208 files, previous196/197 task source trees,
+Cargo config/credential hashes, zero private fixture/process/payload-log matches
+and unchanged global tools/trust/ACL. Only the task-root ACL was restricted.
+Linux's real Azure experiment is separately recorded in the
+[retained original rotation proof](SECRET-ROTATION-VERIFICATION.md#actual-azure-result-and-cleanup)
+and [operator lifecycle](PROVIDER-OPERATIONS.md#secret-snapshot-adoption-and-operator-credential-lifecycle).
+It establishes no Azure-on-Windows authentication or external credential retirement.
+
+`/root/secret_rotation_review` independently passed the rotation/native/cloud
+scope with zero findings, checking 13 Linux/native tests, doctest/State200,
+Azure latest-v2/pinned-disabled-v1/retained-old semantics and resource cleanup.
+It verified208 hashes before the README update and207 plus the documented delta
+afterward. The later minimum-local-contract review directly reran 15 tests/one
+doctest/Clippy/fmt and accepted competing gated reloads and malformed/invalid
+failure retention/recovery. Its registered reviewer/high dispatch had unavailable
+trace evidence, leaving effective role/model/effort unverified. This local
+follow-up reran neither Windows nor Azure. Production credential lifecycle,
+SDK adapter, scheduler, browser and release qualification stay outside scope.
+The [Windows source](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/SECRET-PROVIDER-WINDOWS-VERIFICATION.md),
+[initial review](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/SECRET-PROVIDER-REVIEW.md) and
+[rotation/minimum-contract reviews](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/SECRET-ROTATION-REVIEW.md)
+are locally recoverable. Raw logs remain at artifacts/secret-provider-20261018
+and artifacts/secret-rotation-20261018 in their original ignored locations.
+
+## Windows exit-125 diagnosis and native results
+
+The 2026-10-18 source was `c726af4a4f2f3cf3cf6225de0c793541b564249d`
+plus signing and bounded diagnostics/regression. The same CLI/sample returned125
+with default rustup Cargo PATH and0 with byte-identical protected Cargo, SHA256
+`6f4bef66261261fcb43131be8720bab817d403a09edec7455c371974b90bdb7e`.
+Three inherited allow ACEs granted unrelated identities0x1301bf including write,
+and physical MSVC Cargo was also writable. Rejection occurred before child
+creation/Job assignment through protected policy io::ErrorKind::Other, without
+a native Win32 error code. This isolated an executable-permission cause.
+
+The diagnostic exposes fixed CLI_PROCESS stage=executable, kind and optional
+numeric OS error without path/argv/environment/arbitrary error text. The
+regression deliberately grants Everyone write on a disposable Cargo copy,
+proves refusal/no output, then builds with a protected copy. Global unsafe Cargo
+and permission policy stayed intact. All 196 selected source files matched;
+post-test CLI README link synchronization did not change compiled inputs.
+
+| Native check | Actual result |
+|---|---|
+| Task-local OpenSSL3.5.9 static MSVC no-shared/no-asm/no-tests and locked CLI/sample fetch |0. This does not run upstream OpenSSL tests |
+| Windows windows_build integration suite |6 PASS,0 failed,2 ignored Vite/watch. Default signing sample build125 with kind=Other/native_os_error=None. Same build protected PATH0, sample run0/six demonstration outcomes |
+| Finite/frozen/offline/headless cases | App23 propagated. Lock/cache failures101 and preflight/headless refusals retained |
+| Real native console cancellation | CREATE_NEW_CONSOLE plus GenerateConsoleCtrlEvent C/Break, both CLI DWORD0xc000013a. Three pinned descendants exited and forwarded Break markers checked before outer cleanup. Unrelated process group survived, lock retained |
+| Linux focused library suite |80 PASS with isolated static OpenSSL inputs. Later Guard-preparation byte-equivalent label/config formatting had separate11 signing tests PASS, without a Windows rerun |
+
+Finite sample run used CONIN$ with processed input, file stdout/stderr and NUL
+stdin. No stdin control-byte simulation or physical-keyboard claim was made.
+The synthetic signing password stayed child-local, generated identities stayed
+in memory. Owned task processes were absent, global ACLs/source preserved and
+only authorized bootstrap/disposable fixtures removed. Source, protected tools,
+OpenSSL/cache/builds/logs remained reusable. Independent final review PASS0
+checked196 hashes, seven intended changes against799-file baseline, root-cause
+comparison and cleanup, with matching native role/model/effort trace. The
+[original report and source-bound PowerShell setup](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/WINDOWS-CLI-125-VERIFICATION.md)
+retain exact identities and prior failed signing logs. Separate later Windows
+GNU Vite-pair qualification lives in
+[the Windows matrix](#historical-windows-native-browser-and-cli-evidence).
+This MSVC follow-up did not run those ignored cases or qualify HTTPS, physical
+keyboard, crypto performance, deployment or release. Raw evidence remains in
+artifacts/windows-cli-125-20261018 and artifacts/yt093-signing-20261018.
+
+## Naming audit results and generator failure
+
+The 2026-10-22 N01–N08 response was based on checkpoint83f417e and later
+committed as8c8fba3. [The naming guide](NAMING.md#dated-naming-audit-dispositions)
+owns canonical names and wire/source distinctions.
+
+| Focused area | Historical executed result |
+|---|---|
+| Config | Loading/public-naming18+2 default,23+4 optional provider PASS. Starter3/Admin6 config tests PASS. Config/provider/consumer strict Clippy, Admin all-feature/all-target check and formatting PASS |
+| Auth/rate limit | Public naming3+2, README doctests2+1, configured native example7 PASS. Auth/rate/Board all-feature/all-target and isolated YT-125 checks/strict Clippy/format PASS. Existing HTTP/runtime suites compiled where applicable without replay |
+| Signing | Certificate-backed/free focused tests2/2 PASS, ten filtered per invocation, all-target checks/Clippy/format PASS with local OpenSSL3.5.5. Original omitted Result test import failed, then smallest import correction passed. No transfer of old3.5.9 qualification |
+| CLI | Focused parser/template/removed-option, settings8, help/inspect4, scaffold14, selected generated-Rust compile/test, key9 and service-scaffold1 PASS. All-target check/strict Clippy/format PASS. Other opt-in ignored cases stayed unexecuted |
+
+The separately run generator_selected command failed101 after plain service
+Docker/Compose/Kubernetes output, at settings profile
+`CLI_SOURCE_UNSUPPORTED generate docker: unsupported config crate layout`.
+Existing config src/secrets.rs at83f417e violated the generator's isolated
+lib.rs-only export. The same guard covered legacy runtime-settings layouts.
+This predated naming edits and remained a failed probe, with registry-only
+source unqualified. Independent review first failed P2 for README's overstated
+legacy-layout acceptance. Both entry guides were narrowed, then focused
+re-review PASS0 confirmed 65 hashes and only three Markdown deltas from the
+first review. All 62 other paths stayed identical. Docs75/Backlog126 and584
+changed-Markdown links passed. Raw evidence stays in the original external
+yetlet-naming-audit-20261022-gh6dtwyj location.
+
+The subsequently selected generator source-closure repair has separate original
+failure/repaired acceptance at local Git
+`ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`, with current supported shapes in
+[the CLI matrix](CLI-GUIDE.md#current-generator-source-matrix).
+Naming PASS did not rerun old Auth/Valkey/IdP/browser/CSP, Windows, cloud,
+security or release suites. It changed no backlog state or release inclusion.
+The [complete original audit response](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/NAMING-AUDIT-20261022.md)
+retains original dated In-progress/Blocked states as history.
+
+All twelve Z16 source Markdown blobs/headings are recoverable at exact local Git
+`c0a40af80a48932f3cdf7c593f36fe563e4ec669`. GitHub SHA reachability is unverified.
+Git recovery does not recover ignored/external raw logs, private credentials or
+remote environments. This consolidation reuses dated evidence without rerunning
+product/browser/platform/cloud experiments.

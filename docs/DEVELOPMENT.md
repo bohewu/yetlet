@@ -270,3 +270,63 @@ the branches actually executed. Source graph audit plus one branch cannot prove
 every unexecuted runtime/platform path. Full-load, physical IME/AT and cloud
 acceptance must not be rerun or borrowed merely for a language port; see the
 [migration qualification limits](QUALIFICATION-MATRIX.md#m12-migration-acceptance-and-unexecuted-paths).
+
+## Opt-in local HTTPS preparation and lifecycle
+
+Settings-enabled CLI scaffolds, including `new --vite`, declare public
+`server.tls` keys. Prepare a private application-owned `.dev/certs/` directory
+outside the frontend root and Git, then explicitly select Development:
+
+```toml
+[server.tls]
+enabled = true
+certificate = ".dev/certs/localhost.pem"
+private_key = ".dev/certs/localhost-key.pem"
+```
+
+Install mkcert separately and generate a loopback leaf from the app directory:
+
+```text
+mkcert -cert-file .dev/certs/localhost.pem -key-file .dev/certs/localhost-key.pem localhost 127.0.0.1 ::1
+```
+
+`mkcert -install` is an explicit operator trust-store action. Keep the CA private
+key under operator control and protect certificate/key parents and files.
+Public settings carry paths only. Normal CLI new/build/run never install trust
+or generate certificates. Supply existing app secret inputs separately. The
+usual loader precedence applies, and its public CLI projection skips the
+Development secret file.
+
+`build` selects optional `yetlet-dev-tls` compilation and configured frontend
+build without reading TLS material or starting listeners. Direct run/watch
+uses ordinary Axum with axum-server/rustls. Paired automatic Vite startup exposes
+HTTPS/WSS at 127.0.0.1:5173 and fixes its private Rust backend to HTTP
+127.0.0.1:3000. Disabling automatic Vite starts direct Rust HTTPS. The existing
+GET/HEAD root-page bridge retains exact Host/Origin, confined paths, nonce/CSP
+and no-cookie/no-credential forwarding. Frontend build environments remove TLS
+paths. Missing/invalid run material fails closed with owned-process teardown.
+See [CLI settings](CLI-CONTRACT.md#development-https) and
+[dated Linux/MSVC evidence](QUALIFICATION-MATRIX.md#development-https-evidence-and-original-failures).
+
+The 2026-10-18 Linux and MSVC checks used isolated CAROOT and explicit client CA
+trust with hostname validation. System browser trust, physical keyboard input,
+full browser HMR, Windows GNU and production TLS/PKI remain unqualified by those
+checks. Production TLS deployment guidance is separately scoped.
+
+## Protected Windows tools and historical exit 125
+
+Use physical protected executable directories and absolute PATH entries with
+trusted owners and no unrelated write grants or reparse traversal. Initialize
+Visual Studio's native compiler environment only for the selected process,
+then select its protected Cargo directory on PATH. Scope Cargo home/target and
+OpenSSL include/library/static settings to the task and retain source/tool hashes.
+An ordinary copy inheriting unsafe ACLs does not establish protection. Keep an
+attached processed-input console for run/cancellation checks.
+
+The original 2026-10-18 signing build failed before child creation or Job
+assignment because both rustup-proxy and physical MSVC Cargo allowed unrelated
+writes. Byte-identical protected Cargo changed the same build from125 to0.
+The [CLI guide](CLI-GUIDE.md#protected-windows-tool-preparation) owns setup and
+[qualification](QUALIFICATION-MATRIX.md#windows-exit-125-diagnosis-and-native-results)
+retains original errors, native results and source limits. Global ACLs and PATH
+were preserved during that historical remediation.

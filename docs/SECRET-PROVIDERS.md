@@ -249,7 +249,7 @@ the [current API reference](API-REFERENCE.md).
 
 Date: 2026-10-18. Scope: separately authorized YT-090 follow-up.
 Status: the initial read contract passed focused local verification and
-[independent review](SECRET-PROVIDER-REVIEW.md), with zero blocking issues or
+[independent review](SECRET-PROVIDERS.md#native-verification-and-independent-review-boundaries), with zero blocking issues or
 required followups. The separately authorized
 [rotation/Windows/Azure follow-up](SECRET-ROTATION-VERIFICATION.md) extends that
 slice; its current results and review are recorded separately. Local commit is
@@ -430,3 +430,26 @@ and OpenBao adapters must demonstrate the same exact-version/digest contract and
 native integration. Two independently constructed local providers alone cannot
 prove cloud compatibility. See the source-specific
 [Linux, Windows and Azure results](QUALIFICATION-MATRIX.md#local-signing-key-cli-and-azure-evidence--2026-10-18).
+
+## Native verification and independent review boundaries
+
+The initial 2026-10-18 read-only provider review at
+`b627d291696fe1aaa4a3db5040da07e2ad44da04` plus scoped uncommitted source
+passed with zero blocking findings. It checked object-safe Send lookup,
+owned protected values, missing/empty distinctions, fixed errors, immutable
+selected snapshots and constructor/State replacement without Loader changes.
+Three provider/four example tests, one doctest, strict Clippy/fmt, dependency
+isolation and synthetic State200 were reviewed. All786 baseline hashes showed
+only five intended existing-doc changes, with ten new crate files inspected.
+This initial review's scope was local native prototype behavior.
+
+The subsequent rotation review passed separately after inspecting Linux13 tests,
+one doctest, native MSVC13 tests/State200 and the Linux-hosted real Azure CLI
+experiment. The minimum local-contract follow-up separately passed15 tests,
+one doctest, strict Clippy/fmt and independent direct reruns. Its registered
+reviewer/high request lacked trace evidence, so effective role/model/effort
+remained unverified. That provenance limit stays with its source review result.
+The [retained rotation proof](SECRET-ROTATION-VERIFICATION.md) and
+[platform/failure reconciliation](QUALIFICATION-MATRIX.md#secret-provider-native-and-review-evidence)
+retain exact scope. No production cloud SDK, refresh scheduler,
+Azure-on-Windows authentication or browser secret qualification follows.

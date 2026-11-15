@@ -242,3 +242,23 @@ finalization. These are migrated tool behaviors, not proof that an old full
 Board/Docker qualification ran under a later Rust tool. Original raw
 target/m12/yt083, yt084, yt085 and yt086 receipts remain in place; local Git
 restores their Markdown descriptions only.
+
+## Development TLS evidence and private fixture custody
+
+The 2026-10-18 HTTPS checks retained logs/source identities in ignored
+`artifacts/dev-https-20261018/`, including windows-native-logs and exported
+file hashes. Windows used an owner-only inheritable task-root DACL before
+source/tools/credentials. Linux used an extracted Ubuntu mkcert1.4.4-1ubuntu2
+package, Windows the official mkcert1.4.4 binary checked against a pinned Scoop
+manifest. Both used isolated CAROOT, without system trust installation.
+The [qualification matrix](QUALIFICATION-MATRIX.md#development-https-evidence-and-original-failures)
+retains initial dependency/port/console-wrapper failures and later actual results.
+
+Historical closeout removed task-local CA/leaf private keys and disposable apps,
+confirmed task process/listener absence and preserved unrelated services,
+previous sources, global Cargo permissions and Windows root stores. Public logs,
+certificates and reusable build output stayed at their recorded locations.
+This describes completed historical cleanup. New evidence belongs outside
+rebuildable caches under the current layout above. Original source Markdown is
+recoverable at local Git `c0a40af80a48932f3cdf7c593f36fe563e4ec669`.
+Git does not recover ignored/private evidence or prove remote SHA reachability.

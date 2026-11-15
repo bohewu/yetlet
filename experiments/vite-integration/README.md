@@ -3,7 +3,7 @@
 **Experimental, unpublished and application-owned.** This is a bounded proof of
 Rust SSR consuming Vite production assets, not a new Yetlet core API, public
 asset crate or supported CLI profile. See the [experiment evidence and future
-work](../../docs/VITE-SPIKE-VERIFICATION.md). Existing framework/CLI sources,
+work](../../docs/QUALIFICATION-MATRIX.md#browser-and-vite-feasibility-evidence). Existing framework/CLI sources,
 root Cargo workspace and YT-091 standalone Tailwind scaffolding are unchanged.
 
 ## What is demonstrated

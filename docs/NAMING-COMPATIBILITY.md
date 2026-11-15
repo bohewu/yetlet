@@ -4,7 +4,7 @@
 subsequently committed as `83f417ea12dfc4cc2aa5c05e0f712706ba78565a`.
 Its compatibility aliases, test targets and no-commit state below describe that
 slice only. The owner then selected one canonical name before publication;
-the [current naming guide](NAMING.md) and [audit response](NAMING-AUDIT-20261022.md)
+the [current naming guide](NAMING.md) and [audit response](NAMING.md#dated-naming-audit-dispositions)
 supersede the alias-retention decision. Original validation and Reviewer results
 below remain historical evidence, not acceptance of the later removal.
 
@@ -154,3 +154,17 @@ file checks are recorded as `docs-final.*` and `closure-checks.json` alongside
 no commit/push. No new security scan, browser/platform/production claim or M20
 release change follows. YT-118 is the next independent Todo candidate and needs
 separate owner selection.
+
+## Subsequent canonical-name audit outcome
+
+The original checkpoint's alias choice above was superseded by the owner's
+2026-10-22 one-name migration, recorded in
+[N01–N08 dispositions](NAMING.md#dated-naming-audit-dispositions).
+The later review first failed P2 because README overstated legacy-settings
+generator acceptance. Entry-guide wording was restricted to the evidenced
+plain-service probe, and focused independent re-review passed. This preserves
+the initial FAIL and the separate generator_selected101 unsupported config-layout
+finding. The separately selected source-closure repair subsequently qualified
+current supported shapes through [the maintained CLI matrix](CLI-GUIDE.md#current-generator-source-matrix).
+Neither the alias-checkpoint PASS nor the naming PASS qualifies another runtime,
+Windows/cloud source, registry consumer or production release.

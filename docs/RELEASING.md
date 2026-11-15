@@ -781,3 +781,17 @@ Handled refusal exits1, invalid usage exits2, and failed started drills retain
 FAILED proof and private diagnostics. Use the existing tool's exact CLI help.
 The [dated local drill evidence](QUALIFICATION-MATRIX.md#custody-and-local-rotation-evidence--2026-10-27-and-28)
 retains original failures and limits.
+
+## Reader and API publication separation
+
+The [public guide architecture](GITHUB-PAGES-PUBLICATION.md#public-guide-architecture-and-original-local-acceptance)
+preserves the initial mdBook preview/publication and later Yetlet-built cutover
+as source-pinned accepted events. A local nonpublishing preview can validate
+selected source/output hashes and links using a dirty documentation checkout.
+Only accepted publication/consumer evidence promotes the edition through the
+required reader-update procedure above. Same-version rustdoc links retain
+native/browser target and feature labels, with no implied hosted rustdoc build.
+The current pair stays SDKalpha.8/CLI0.4.0. Website source/Pages authority,
+SDK/CLI signing/registry authority and local preview results are independently
+recorded. Historical proof is locally Git-recoverable, with remote SHA access
+unverified until separately authorized delivery/readback.

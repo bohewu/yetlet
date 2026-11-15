@@ -6,7 +6,7 @@ independently reviewed at its bounded YT-098 scope, under
 [handler-first ADR 0006](adr/0006-handler-first-mvc-optional.md).
 [Sources and run instructions](../experiments/asset-contract/README.md) and
 [verification boundaries](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-098-VERIFICATION.md) are separate from the accepted
-[Vite feasibility spike](VITE-SPIKE-VERIFICATION.md). No shared or stable Yetlet
+[Vite feasibility spike](#vite-feasibility-decisions-and-limits). No shared or stable Yetlet
 asset API is promoted by this task.
 
 ### Historical optional asset and Vite proof boundaries
@@ -279,3 +279,33 @@ enhancement preserves readable SSR. Required CSS absence must fail package/readi
 checks and remain readable/reportable at runtime. Hashed filenames alone do not
 prove cache policy. Any future widget exclusively owns its subtree/listeners and
 retired callbacks; Yetlet must not reconcile the same children concurrently.
+
+## Vite feasibility decisions and limits
+
+The 2026-10-17 spike at base `6d1de322739fb3defd32dccd1f6ae3790aecdddd`
+selected producer-neutral boundaries with optional Vite and preserved the
+no-Node standalone Tailwind path. Its application-owned loader consumed plain
+Vite8.3.4 and official Tailwind/plugin4.3.3 manifests, static/dynamic JS imports,
+split CSS and one external SVG. The combined experimental package retained both
+profiles' devDependencies even when the plain build left the plugin inactive.
+The later production CLI templates have their own qualification.
+
+Startup validates and snapshots a bounded graph. Yetlet renders escaped HTML
+with same-origin external CSS/scripts, DEFAULT_CSP, no-store and nosniff.
+The spike disabled dotenv discovery, public-directory copying, data-URI inlining,
+source maps and the module-preload polyfill. Its canonical-path/symlink checks
+require an operator-owned quiescent tree. They supply no hostile-filesystem race
+isolation or SVG sanitization. Dependency-first CSS and cycle refusal were
+explicitly narrower than full Vite semantics. Filename appearance supplies no
+digest authentication, immutable cache or old-chunk retention.
+
+YT-098 subsequently qualified producer-neutral ordering/snapshot policy,
+YT-099 optional plain/official-plugin production integration, YT-100 a separate
+dev origin/WSS/nonce/process boundary, and YT-101 sanitized cloud-generated
+asset/configuration roots. Their current bounded Done states belong to the
+Backlog and the [existing CLI guide](CLI-GUIDE.md#vite-execution). The spike's
+original Todo list remains historical. It alone selected no shared stable asset
+crate, WASM bundling, Windows Vite, HMR, CI/CD, deployment or public release.
+[Original spike and independent acceptance](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/VITE-SPIKE-VERIFICATION.md)
+are locally Git-recoverable, with detailed results in the
+[qualification matrix](QUALIFICATION-MATRIX.md#browser-and-vite-feasibility-evidence).

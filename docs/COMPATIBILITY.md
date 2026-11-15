@@ -459,3 +459,36 @@ inline-logic mapping and original per-workflow SHA256 remain in the immutable
 M12 ledger linked from Development.
 See [tool contracts](DEVELOPMENT.md#rust-tooling-migration-contracts-and-historical-inventory)
 and [actual limited acceptance](QUALIFICATION-MATRIX.md#m12-migration-acceptance-and-unexecuted-paths).
+
+## Development TLS, secret providers and naming source boundaries
+
+The 2026-10-18 development HTTPS source at `dbcae2d` plus bounded changes passed
+Linux and native MSVC TLS/build/console checks with explicit isolated CA trust.
+Windows used Rust/Cargo1.99, VS2022 14.44.35207, Node24.18.0, npm12.2.0 and
+Python3.14.3. Windows GNU, system browser trust, physical keyboard and full HMR
+were outside that run. A failed immediate descendant wait remains unresolved
+at its original PID/timing boundary despite later verified process absence.
+See [precise HTTPS evidence](QUALIFICATION-MATRIX.md#development-https-evidence-and-original-failures).
+
+The earlier signing CLI125 diagnosis used native x86_64 MSVC and protected
+byte-identical Cargo. Six Windows integration tests passed with two ignored
+Vite/watch cases. Separate later Windows GNU Vite-pair results retain their own
+source and do not extend this MSVC receipt. Protected local PATH/ACL preparation
+preserved the default unsafe Cargo refusal and global environment.
+See [the error and native-result matrix](QUALIFICATION-MATRIX.md#windows-exit-125-diagnosis-and-native-results).
+
+SecretProvider's Windows11 Pro10.0.26300.0/MSVC Rust1.99 source transfer had 208
+matching files and13 tests/one doctest plus State200. A later README-only delta
+left 207 files and all compiled inputs identical. This qualifies local
+snapshot/Loader composition. Linux Azure reads and the later15-test local reload
+follow-up remain separate. No Azure request ran on Windows.
+See [native/review evidence](QUALIFICATION-MATRIX.md#secret-provider-native-and-review-evidence).
+
+The 2026-10-22 naming audit deliberately removed pre-public Rust aliases and
+renamed variants/fields, while retaining external interval keys, diagnostics,
+validation, middleware and crypto behavior. N01–N08 dispositions and original
+P2 FAIL/focused PASS are in [the naming guide](NAMING.md#dated-naming-audit-dispositions).
+Its generator_selected exit101 source-closure refusal preceded the naming patch;
+subsequent repair has its own source-bound acceptance in the
+[current generator matrix](CLI-GUIDE.md#current-generator-source-matrix).
+These dated tests establish no newer published-source or production claim.

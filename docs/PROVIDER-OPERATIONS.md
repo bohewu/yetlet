@@ -711,3 +711,39 @@ This URL's source/blob is locally verified; remote reachability is unverified.
 Original ignored `target/yt066a/`, `target/yt066a-closeout-local-20261011/` and
 `target/yt066-closeout-20261011/` evidence remains in place and is not restored by
 Git alone. Historic Private/YT-020 Blocked states do not alter later publication.
+
+## Secret snapshot adoption and operator credential lifecycle
+
+Read-only SecretProvider lookup and full-map SettingsSecrets publication have
+separate ownership. Its native RwLock covers only clone/replace, without I/O or
+await while held. Poisoning returns fixed Unavailable. A lookup sees a complete
+snapshot, while separate lookups can span replacements. An injected same Arc
+sees later values, while previously owned strings and copied clients retain old
+credentials. All application reload writers must serialize load, validation,
+selection and replacement under one gate acquired before reading. Failed input
+keeps the healthy snapshot. Restart reads current input without a revision floor.
+See [the minimal reload contract](SECRET-PROVIDERS.md#minimal-local-reload-contract).
+
+Operators separately create the real credential, publish its vault version,
+update its target, roll consumers forward, retire old use and revoke trust or
+destroy private material according to policy. A new vault version establishes
+neither source freshness nor external acceptance. Business identities receive
+only necessary reads/signing operations. Creation, disabling and deletion belong
+to a separate operator or dedicated automation identity. Keep non-exportable keys
+behind signing operations and retain public verification identities as required.
+Local signing rotation and certificate renewal have their own adoption contracts.
+
+The application-owned read-only Azure CLI example uses literal argv, exact JSON
+strings without trimming and fixed safe errors. Missing/denied responses retain
+their categories. Unknown failures, malformed output and a30-second timeout
+return Unavailable, and drop kills its owned CLI child. It writes no cloud state
+and prints fixed markers only. Three parser tests make no cloud calls.
+The actual Linux experiment used one disposable Standard vault/resource group
+in East Asia, synthetic values via private --file inputs and only scoped
+get/set/list/delete secret permissions. Its six reads and14 operator lifecycle
+commands exited0, latest v2 succeeded, disabled pinned v1 returned AccessDenied,
+missing returned None and retained owned v1 stayed unchanged. Active resources,
+private files and process were removed, subscription preserved, and soft-deleted
+vault retention to 2026-10-25 recorded without purge or later expiry readback.
+The [original proof](SECRET-ROTATION-VERIFICATION.md#actual-azure-result-and-cleanup)
+remains separate from MSVC local tests and production credential operations.

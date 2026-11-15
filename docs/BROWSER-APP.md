@@ -307,3 +307,24 @@ not independent security assurance. A broadened HTML/URL/live-control security
 boundary or externally reachable authenticated product retains its separate
 independent gate. Exact research and form-proof records remain at local Git
 `40b66f1ad9bd0eb5666a9e1c8f113310993a3544`; remote access is unverified.
+
+## Browser DX research and selected follow-up
+
+The 2026-11-07 inspection used source
+`bebdd03660ca7dc33fdd1ed4c7e56b5680e055c1`, SDK alpha.6 and CLI0.2.0.
+It selected this connected walkthrough over adding a generator, event registry,
+state abstraction or desktop host. Existing template preparation, matching
+bindgen, frozen build, startup shell, listener disposal and frontend/dist
+ownership supplied the workflow. Future SDK work still requires a concrete
+separately selected limitation. This study selected no new API or platform test.
+
+The browser template owns its local graph, typed commands, keyed rows and
+listener handles. A caller-owned Rust closure, as in documentation search, is
+sufficient for smaller interactions. Subtree replacement requires rebinding and
+disposal, while keyed identity leaves live input, focus and selection to the app.
+The [View lifetime contract](VIEW-COMPONENTS.md#binding-metadata-and-explicit-lifetimes)
+and [asset contract](ASSETS.md#vite-feasibility-decisions-and-limits) retain those
+boundaries. The earlier YT-104 starter and YT-112 Linux Rust/Wasm loop, including
+its initial module-routing Reviewer FAIL, remain at local Git
+`ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`. The study added no selected Reader
+chapter and replayed no accepted build/browser/watch/platform qualification.

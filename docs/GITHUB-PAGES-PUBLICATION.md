@@ -401,3 +401,35 @@ retained externally. No automatic rollback is implemented or executed. The
 master-only Environment, HTTPS, source scope, private-record exclusion and
 release protections are unchanged. No workflow/deployment retry or new
 Commit/Push accompanies these closeout documents.
+
+## Public guide architecture and original local acceptance
+
+The original public-doc decision kept one repository of canonical English
+Markdown, selected GitHub Pages for the guide and version-matched rustdoc for
+API signatures. Wiki, custom domain, organization split, translation, analytics,
+login and third-party JavaScript services were deferred. Navigation groups were
+Start, Write UI, Choose features, API reference, Examples/help and Status/policies.
+The exact eight export selections remain authoritative and nonrecursive.
+New Rust terms should be explained at first use, and existing working snippets
+reused. Necessary behavior/security limits survive reader editing.
+
+YT-217 selected two crate homepages, View/Element/Attribute and SessionConfig
+entry documentation, purpose/examples, ownership/errors and target/feature
+limits. It introduced no repository-wide missing-docs gate. Its four examples,
+selected native/Wasm rustdoc and mdBook0.5.4 local Chromium/emulated-mobile
+reader preview passed final independent review. Original stopped harness and
+authorized correction remain in the
+[execution record](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-217-DOCS-PREVIEW.md).
+Physical mobile, other browsers and hosted generated rustdoc stayed unqualified.
+
+YT-218 separately delivered the mdBook first publication at 64d1074 on 2026-10-31.
+YT-226's separately authorized2026-11-01 cutover at 0ae6b93 used the Yetlet-built
+application-owned static reader with optional Wasm search, one Pages workflow
+and run41289520993/1. Both received independent PASS0 at their recorded scope.
+mdBook remains an explicit historical/reference builder. The current accepted
+Reader pair is SDKalpha.8/CLI0.4.0 in site/pages.toml, with publication authority
+in the accepted hosted SDK/CLI records. Local documentation preview, source
+publication and actual hosted reader readback retain separate evidence.
+The [original plan](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/PUBLIC-DOCS-PLAN.md) is locally recoverable at the
+frozen SHA, while remote reachability and private raw evidence availability
+remain unverified. Its old edition labels describe their dated checkpoints.

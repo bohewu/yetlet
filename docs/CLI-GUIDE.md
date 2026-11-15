@@ -252,7 +252,7 @@ traversal, a trusted executable owner and no untrusted write access. A refusal
 prints `CLI_PROCESS stage=executable` with the error kind and optional numeric OS
 code before returning exit 125. Prepare a protected tool installation and select
 its physical directory on PATH; tool permissions are managed separately from the CLI.
-See the [native Windows diagnosis and verification](https://github.com/bohewu/yetlet/blob/master/docs/WINDOWS-CLI-125-VERIFICATION.md).
+See the [native Windows diagnosis and verification](#protected-windows-tool-preparation).
 
 ## Static HTML build
 
@@ -360,7 +360,7 @@ files for a CLI rebuild, app dependencies/settings/secrets, Node/npm, WASM tools
 frontend dist or whether `run` will work. Use the selected setup instructions
 and actual build/run for those checks. On Windows, also prepare protected
 physical tool paths and an attached processed-input console for native run;
-see [native tool preparation](https://github.com/bohewu/yetlet/blob/master/docs/WINDOWS-CLI-125-VERIFICATION.md#reuse-the-prepared-runner-tools).
+see [native tool preparation](DEVELOPMENT.md#protected-windows-tools-and-historical-exit-125).
 
 ## Build locally and create an application
 
@@ -995,3 +995,36 @@ Chrome/Firefox sample results. Showcase runs from a checkout and has an optional
 Wasm companion. The [Todo sample's CSS instructions](../examples/todo-server/README.md#app-owned-rust-styles-and-typed-tag-builders)
 retain current usage; [its original bounded Linux qualification](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary)
 retains observed browser results and limits. [Style Showcase](../examples/style-showcase/README.md)
+
+## Development HTTPS
+
+Use the existing public `server.tls` settings in a settings-enabled app with
+Development selected. Prepare loopback certificates and trust explicitly through
+[the development guide](DEVELOPMENT.md#opt-in-local-https-preparation-and-lifecycle).
+`yetlet build` can compile with certificate directories absent. `yetlet run`
+and `watch` require valid prepared material and select optional yetlet-dev-tls.
+Automatic Vite startup owns HTTPS/WSS5173 and a private HTTP Rust backend3000.
+With automatic Vite disabled Rust serves HTTPS directly. Preserve bridge
+Host/Origin/path/CSP and native owned-process cancellation. The
+[Linux and MSVC results](QUALIFICATION-MATRIX.md#development-https-evidence-and-original-failures)
+separate actual TLS/console checks, failed wrappers and later cleanup.
+
+## Protected Windows tool preparation
+
+The executable trust check can return125 before creating any child. Choose an
+owner-protected physical directory, verify the expected tool hash, and select
+its absolute directory on process-local PATH. Prepare the corresponding native
+Visual Studio and OpenSSL environment, explicit Cargo cache and target roots.
+Use an attached console with processed input for run. Preserve the global tool
+installation and permission policy.
+
+The historical retained Cargo SHA256 was
+`6f4bef66261261fcb43131be8720bab817d403a09edec7455c371974b90bdb7e` and
+source-matched CLI SHA256 was
+`1cccc6815f63ce8e3318aefa3ce7dbb550b1015694a2725f5b32e326cf0034a9`.
+These identify the 2026-10-18 fixture only. The
+[original process-local PowerShell setup](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/WINDOWS-CLI-125-VERIFICATION.md#reuse-the-prepared-runner-tools)
+is locally recoverable for that owned root. Current installations need their
+own identity and permissions checks. A copy under ordinary inherited unsafe
+ACLs remains refused. [Native results and original failures](QUALIFICATION-MATRIX.md#windows-exit-125-diagnosis-and-native-results)
+retain the MSVC/GNU and console scope of each observation.

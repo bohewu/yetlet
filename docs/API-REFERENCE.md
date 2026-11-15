@@ -223,7 +223,7 @@ qualification. Published archives retain their original documentation:
 | [`View` / `Element`](../crates/yetlet/src/view/mod.rs) | Variant/field docs, builder/accessor semantics, an owned-tree example and renderer trust boundaries | Constructors still perform no sanitization or renderer validation |
 | [`session::SessionConfig`](../crates/yetlet/src/session/mod.rs) | Constructor/example/error-variant docs, exact TTL/capacity/name validation, Secure default and guide link | No provider installation, authenticated identity, cookie-prefix validation or remote-provider qualification |
 
-The selected work follows [YT-217](PUBLIC-DOCS-PLAN.md#implementation-order--yt-217);
+The selected work follows [YT-217](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/PUBLIC-DOCS-PLAN.md#implementation-order--yt-217);
 other modules retain their existing documentation and can be improved when needed.
 Guides should explain how to integrate a capability; doc comments should explain
 the callable API's behavior, ownership, errors and applicable security limits.

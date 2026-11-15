@@ -72,4 +72,4 @@ This reference preview's navigation, search and assets use mdBook's built-in HTM
 base `/yetlet/`; Rust playground execution is disabled. Initial Pages enablement
 and public publication follow the separately owner-authorized sequence under the
 [publication scope](../docs/DOCUMENTATION-SCOPE.md) and
-[public documentation plan](../docs/PUBLIC-DOCS-PLAN.md).
+[public documentation plan](../docs/GITHUB-PAGES-PUBLICATION.md#public-guide-architecture-and-original-local-acceptance).

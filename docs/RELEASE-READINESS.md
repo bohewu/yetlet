@@ -498,3 +498,16 @@ locally verified with unverified remote reachability. Raw logs/signatures remain
 under recorded `target/yt096-*` and repository-external owner custody. Markdown
 recovery provides their references and historical claims, without new raw-byte
 availability verification or renewed execution authority.
+
+## Public reader acceptance boundaries
+
+YT-217's selected API comments and local mdBook0.5.4 preview passed at
+Chromium/emulated-mobile scope. YT-218 separately accepted the first Pages
+publication at 64d1074, and YT-226 accepted the Yetlet-built/Wasm-search cutover
+at 0ae6b93 with run41289520993/1 and actual public-byte/MIME/reader observations.
+Original failed/stopped harness and later passing proof retain their own
+sources in [Pages history](GITHUB-PAGES-PUBLICATION.md#public-guide-architecture-and-original-local-acceptance).
+They qualify neither physical mobile, other browsers, hosted rustdoc nor a new
+product release. The accepted published SDKalpha.8/CLI0.4.0 pair and protected
+site/pages.toml remain current. Local documentation consolidation does not
+advance the edition or replace live Pages.

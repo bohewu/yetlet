@@ -473,7 +473,7 @@ compilation without reading certificate/key files; frontend build environments
 do not receive development TLS paths. Runtime TLS settings require Development;
 missing or invalid material fails rather than falling back to HTTP.
 
-See [setup and verification](DEV-HTTPS-VERIFICATION.md). Default HTTP, existing
+See [setup and verification](DEVELOPMENT.md#opt-in-local-https-preparation-and-lifecycle). Default HTTP, existing
 secrets, Core/browser dependencies and the minimal plain scaffold stay unchanged.
 
 ### Opt-in Rust watch
@@ -518,7 +518,7 @@ with a fixed error kind, optional numeric OS code and protected-tool guidance.
 Selected paths, arguments, environment values and arbitrary OS error text are not
 included. This diagnostic preserves exit 125 and the existing trusted-owner,
 untrusted-write and no-reparse executable checks.
-The [Windows exit-125 follow-up](WINDOWS-CLI-125-VERIFICATION.md) records the
+The [Windows exit-125 follow-up](QUALIFICATION-MATRIX.md#windows-exit-125-diagnosis-and-native-results) records the
 selected Runner's Cargo ACL refusal and native MSVC build/run/Ctrl-C cleanup
 with protected task-local tools.
 
@@ -618,3 +618,24 @@ CLI commands or promises. Current accepted CLI0.4.0 and SDKalpha.8 retain their
 own immutable release inputs and qualification. Original52-file/three-workflow
 migration evidence is historical, with source graph/runtime/platform limitations
 in the [qualification matrix](QUALIFICATION-MATRIX.md#m12-migration-acceptance-and-unexecuted-paths).
+
+## Source-specific diagnostics and naming acceptance
+
+The 2026-10-18 exit125 follow-up isolated Cargo executable trust refusal before
+child creation/Job assignment. Protected byte-identical Cargo changed the same
+MSVC signing build125 to0. Fixed CLI_PROCESS stage=executable diagnostics retain
+kind/optional native code and omit raw path/argv/env/error text. Native console
+C/Break and protected-tool build/run evidence have their own
+[source-bound result matrix](QUALIFICATION-MATRIX.md#windows-exit-125-diagnosis-and-native-results).
+Later GNU Vite results and current published CLI0.4.0 keep separate identities.
+
+N01–N08's2026-10-22 naming acceptance preserved argv/settings/runtime behavior
+and intentionally renamed Rust support fields. It first exposed the pre-existing
+generator_selected101 unsupported config-layout failure. Initial review failed
+P2 on overstated legacy-settings acceptance, followed by corrected documentation
+and focused PASS. The separately selected source-closure repair and current
+[generator matrix](CLI-GUIDE.md#current-generator-source-matrix) supply later
+acceptance. The [dated audit results](QUALIFICATION-MATRIX.md#naming-audit-results-and-generator-failure)
+retain original failures and focused counts. Browser DX selected documentation,
+with local graph/listener ownership, matching bindgen, frozen builds and
+frontend/dist output under the [browser guide](BROWSER-APP.md).
