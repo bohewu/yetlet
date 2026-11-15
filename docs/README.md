@@ -66,7 +66,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   [CLI 0.4.0 SDK-aware scaffolding](CLI-GUIDE.md#generated-startup-profiles).
   The accepted API decisions are in [ADR 0011](adr/0011-application-startup-api.md)
   and [ADR 0012](adr/0012-server-axum-prelude.md).
-- [YT-247 SDK resolution contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md),
+- [YT-247 SDK resolution contract](CLI-GUIDE.md#sdk-resolution-yt-247),
   [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and
   [Phase A handoff](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md): Owner-accepted version/cache/locking
   boundary. The [Phase B record](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
@@ -104,18 +104,18 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   separate new cache/evidence roots, inventory logical sizes and preview cleanup;
   preserve failures and unknown legacy output, with no deletion operation.
 
-- [Next public guide edition — YT-232](YT-232-PUBLIC-GUIDE-EDITION.md): selected
+- [Next public guide edition — YT-232](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence): selected
   SDKalpha.6/CLI0.2.0 sources, registry consumers, static introduction and bounded
   local verification; live Pages promotion remains separate.
 
 - [HTML DOM coverage and optional URL/image policies](../crates/yetlet-browser/guides/dom.md):
   first published in SDK `0.9.0-alpha.6`, with 89 default elements and an
-  explicitly opted-in image element. The [dated standards inventory](YT-219-HTML-INVENTORY.md)
+  explicitly opted-in image element. The [dated standards inventory](API-CONTRACTS.md#historical-html-element-and-attribute-inventory)
   remains the Typed Tag Builder selection reference. Current URL validation,
   resource/security limits and browser ownership belong to the DOM guide.
 - [Static HTML export](CLI-GUIDE.md#static-html-build): first published in the
   independent CLI `0.2.0`; includes bounded public pages/assets, project
-  prefixes, create-only output and private receipts. The [retained protocol](YT-222-STATIC-HTML-CONTRACT.md)
+  prefixes, create-only output and private receipts. The [retained protocol](CLI-CONTRACT.md#historical-static-export-protocol-and-guardrails)
   is the technical contract; the [standalone example](../examples/static-site/README.md)
   provides the current consumer workflow.
 - [M25 delivered outcomes](ROADMAP.md#m25--broader-html-dom-support-and-static-site-delivery):
@@ -141,9 +141,9 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   records API comments and independently accepted local reader checks with retained
   failures; the separate YT-218 record covers actual public hosting.
 
-- [Completed CLI0.1.1 release](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31):
+- [Completed CLI0.1.1 release](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures):
   accepted output, owner-approved publication and installed consumer; the
-  [CLI0.1.0 failure](YT-215-CLI-FIRST-RELEASE.md#actual-first-publication-and-consumer-failure--2026-10-31)
+  [CLI0.1.0 failure](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
   remains preserved.
 
 - [Alpha.5 two-package release plan](ALPHA5-RELEASE-PLAN.md): committed migration
@@ -277,7 +277,7 @@ keep field validation, explicit save/recovery state, editor feedback and
 narrow native/DOM `hidden` consistency application-owned. Follow the
 [current View/form guidance](VIEW-COMPONENTS.md#configuration-and-errors),
 [HTTP pipeline](HTTP-PIPELINE.md), [forms sample](../examples/forms-validation/README.md)
-and [retained bounded DOM contract](YT-110-DOM-CAPABILITIES.md). The original
+and [retained bounded DOM contract](BROWSER-APP.md#historical-native-dom-controls-and-navigation-boundaries). The original
 reviews and browser/native/negative test results remain in immutable local
 Git source `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; this is not a public production/browser promise.
 
@@ -287,7 +287,7 @@ Git source `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; this is not a public prod
 
 - [Architecture](ARCHITECTURE.md) and [MVP contract](MVP.md): responsibilities, trust boundaries and original acceptance criteria.
 - [DOM capability and authoring review](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-109-DOM-CAPABILITY-REVIEW.md): current renderer/consumer inventory, property and ownership boundaries, and staged proposals; research only, not runtime implementation.
-- [Bounded DOM capability implementation](YT-110-DOM-CAPABILITIES.md): finite View vocabulary, duplicate/void consistency, native control defaults/reset, same-origin navigation and actual verification; no general binding runtime.
+- [Bounded DOM capability implementation](BROWSER-APP.md#historical-native-dom-controls-and-navigation-boundaries): finite View vocabulary, duplicate/void consistency, native control defaults/reset, same-origin navigation and actual verification; no general binding runtime.
 - [HTTP pipeline](HTTP-PIPELINE.md): native Axum/Tower handlers, middleware, request state and response semantics.
 - [Extensions](EXTENSIONS.md): explicit opt-in setup and provider boundaries.
 - [Naming guide](NAMING.md): current Rust/CLI/settings vocabulary, one canonical pre-public Rust API and explicit source migrations. [Audit response](NAMING-AUDIT-20261022.md) records N01–N08 and focused evidence; [the earlier compatibility checkpoint](NAMING-COMPATIBILITY.md) retains its original accepted results and superseded alias decision.

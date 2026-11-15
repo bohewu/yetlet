@@ -32,7 +32,7 @@ while local browser event state is independent from remote HTTP actions.
 Server HTML and the finite DOM vocabulary remain separate; `hidden` has
 a narrow shared-View SSR/DOM consistency rule but is not a general property
 binding or live two-way form framework. Consult the [View guide](VIEW-COMPONENTS.md),
-[HTTP pipeline](HTTP-PIPELINE.md), [bounded DOM contract](YT-110-DOM-CAPABILITIES.md)
+[HTTP pipeline](HTTP-PIPELINE.md), [bounded DOM contract](BROWSER-APP.md#historical-native-dom-controls-and-navigation-boundaries)
 and [browser DOM guide](../crates/yetlet-browser/guides/dom.md). Research on
 streaming SSR, custom action transport and resumability remains opt-in or
 unpromoted; it does not make a general streaming/suspense, TCP transport,
@@ -166,7 +166,7 @@ has not been verified.
 ## Developer tooling boundary — YT-247
 
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and the
-[CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) define an internal
+[CLI contract](CLI-GUIDE.md#sdk-resolution-yt-247) define an internal
 CLI SDK resolver with separate metadata/cache, compatibility and scaffold
 responsibilities. CLI build SDK and qualified embedded source-export snapshot
 remain fixed release inputs; generated app SDK selection is a separate registry

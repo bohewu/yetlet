@@ -38,7 +38,7 @@ ordinary tag constructors**, element-scoped attribute setters and the existing
 owned `View`.
 See the [typed View guide](VIEW-COMPONENTS.md#typed-tag-builders),
 [actual constructors](../crates/yetlet/src/view/tags.rs) and
-[dated HTML inventory](YT-219-HTML-INVENTORY.md) for the 101 constructor
+[dated HTML inventory](API-CONTRACTS.md#historical-html-element-and-attribute-inventory) for the 101 constructor
 selection, nine typed void tags and renderer admission boundaries.
 The registry-first `Element::new` tutorial remains valid and intentionally uses
 the reviewed Reader Edition selected in [the site manifest](../site/pages.toml).
@@ -116,7 +116,7 @@ template's required packages and features.
 
 | Source surface | Entry point and contract | Availability and limits |
 |---|---|---|
-| Optional Style authoring | [CLI Style guide](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree), [retained registration contract](YT-237-STYLE-REGISTRATION-CONTRACT.md) | Published CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
+| Optional Style authoring | [CLI Style guide](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree), [retained registration contract](CLI-CONTRACT.md#application-owned-rust-style-registration-and-css-publication) | Published CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
 | Style Showcase | [Native-first gallery](../examples/style-showcase/README.md) | Unpublished checkout sample with actual View/Style/CSS disclosures and optional local Wasm class switching. Bounded Linux Chrome/Firefox sample evidence |
 
 ## HTML, HTTP and browser modules

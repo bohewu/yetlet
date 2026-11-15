@@ -165,6 +165,51 @@ lifetime details; [troubleshooting](TROUBLESHOOTING.md#browser-builds-and-intera
 links the broader failure paths. Keep accepted failures and evidence separate
 from rebuildable output using the [artifact guide](DEV-ARTIFACTS.md).
 
+## Historical native DOM controls and navigation boundaries
+
+The original YT-110 source-bound browser/SSR exercise extended the finite
+DOM vocabulary with native text/textarea/select/checkbox controls,
+fieldset/legend, explicit reset/submit and labelled hints. An initial
+`value`, `checked`, or option `selected` attribute supplies a
+**browser default**, not a continuously synchronized live property.
+`readonly` values submit; **disabled/unchecked** fields do not.
+Boolean attributes use **presence** semantics, so the literal string
+`false` still means present/true. On reset, the browser restores the
+current page's captured defaults; stateful live edits/IME/focus restoration
+after View replacement remain application-owned.
+
+Native textarea content normalizes CRLF/CR to LF. The SSR serializer
+preserves a requested *leading LF* that the HTML parser ordinarily
+removes immediately after an opening textarea; do not add a second
+manual leading-newline sentinel in application views. The sample's
+`GET /controls` route is an escaped/bounded **preview only**, with
+no Todo mutation, authorization, file upload, or CSRF assurance.
+Do not put secrets in the GET query.
+
+The selected **static input grammar** admits a hash or a single
+root-relative slash for `href`, one root-relative slash for form
+`action`, and `get`/`post` for form `method`. Empty, absolute,
+protocol-relative, path-relative, backslash and control/whitespace
+values are rejected by the scoped DOM policy. On actual mount, URL
+resolution uses the effective document base and native URL parser:
+only same-origin HTTP(S) targets without credentials survive;
+the resolved URL is fixed on the detached replacement before
+publication, so a later base change cannot redirect it. Invalid
+structure, attribute or navigation **must leave the prior subtree
+untouched**. The SSR serializer has a distinct broader URL policy,
+and this small DOM restriction is **not** a universal sanitizer,
+redirect check, HTTP authorization, focus preservation or Content
+Security Policy.
+
+For current released features follow the
+[versioned DOM guide](../crates/yetlet-browser/guides/dom.md);
+for the dated finite-element/attribute matrix and negative cases see
+[HTML inventory history](API-CONTRACTS.md#historical-html-element-and-attribute-inventory)
+and the full original report at local Git
+`8b3e13004a58380accf16ea440707f84e6271871`.
+Original rejected shapes, browser fixtures and review results remain
+historical; this consolidation performs no new browser execution.
+
 ## API reference
 
 - [CLI browser template and prerequisites](../tools/yetlet-cli/templates/browser/README.md)

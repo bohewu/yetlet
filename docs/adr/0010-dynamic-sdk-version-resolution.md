@@ -3,7 +3,7 @@
 - **Status:** Accepted; Owner correction on 2026-11-10 supersedes v1 selection for CLI 0.3.1 source. Original Phase B implementation/review remains historical.
 - **Date:** 2026-11-10 (Asia/Taipei).
 - **Task:** YT-247, Dynamic SDK Version Resolution; YT-248 released the initial policy; YT-250 corrects latest selection.
-- **Related:** [CLI contract](../YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md),
+- **Related:** [CLI contract](../CLI-GUIDE.md#sdk-resolution-yt-247),
   [Phase A handoff](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md),
   [Phase B implementation](../QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence),
   [version authorities](https://github.com/bohewu/yetlet/blob/ad564ad1ef07e5fca063ae88587c0f21e6edb5b1/docs/YT-246-VERSION-SOURCE-AUDIT.md),
@@ -28,7 +28,7 @@ mislabeling alpha.6 source as an alpha.7 app.
 
 ## Decision
 
-Adopt the Owner-accepted normative [YT-247 CLI contract](../YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md).
+Adopt the Owner-accepted normative [YT-247 CLI contract](../CLI-GUIDE.md#sdk-resolution-yt-247).
 Keep resolution inside the independent Rust CLI:
 
 1. A small resolver composes a registry/index provider, local public-metadata

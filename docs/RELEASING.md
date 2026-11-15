@@ -51,7 +51,7 @@ for separate publication, with Reader edition held until verified consumer
 and Pages closeout; neither plan nor a development manifest constituted
 release approval. [Actual SDK alpha.6](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
 and [CLI 0.2.0 publication](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
-are independently verified. The [CLI 0.1.1 consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+are independently verified. The [CLI 0.1.1 consumer](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
 is an earlier fixed execution, not a fallback version for a new release.
 The [alpha.4 record](ALPHA4-HOSTED-RECORD.md) retains its one-of-sixteen partial
 publication and paused continuation; it does not describe a new cohort.
@@ -203,7 +203,7 @@ open and must be reported; do not invent compatibility, relabel a failed run,
 republish immutable packages or deploy unverified reader inputs. This is the
 owner-selected default for subsequent SDK and CLI publication closeouts, not an
 automatic hosted publication or a change to release workflow permissions.
-[YT-249](YT-249-READER-RELEASE-ROLLOVER.md) records its first application.
+[YT-249](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence) records its first application.
 
 ## Separate one-time setup from each release
 

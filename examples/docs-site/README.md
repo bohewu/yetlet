@@ -8,9 +8,9 @@ or CLI API. Local export commands do not change Pages. Static export is availabl
 published CLI `0.2.0` and remains available in later releases; the reproducible
 source-bound build below uses the reviewed CLI from this checkout. The reader
 source edition/consumer is explicitly pinned to SDKalpha.8/CLI0.4.0 independently
-of future builder versions. [YT-249](../../docs/YT-249-READER-RELEASE-ROLLOVER.md)
+of future builder versions. [YT-249](../../docs/DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence)
 records this promotion and the mandatory update after each verified publication;
-[YT-232](../../docs/YT-232-PUBLIC-GUIDE-EDITION.md) retains the prior edition's proof.
+[YT-232](../../docs/DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence) retains the prior edition's proof.
 
 ## Prerequisites
 
@@ -161,7 +161,7 @@ old bookmarks are not preserved by the cutover.
 ### API and accepted evidence
 
 Use [HTML](../../crates/yetlet/guides/html.md), [DOM](../../crates/yetlet-browser/guides/dom.md),
-the [export contract](../../docs/YT-222-STATIC-HTML-CONTRACT.md),
+the [export contract](../../docs/CLI-CONTRACT.md#historical-static-export-protocol-and-guardrails),
 [original local pilot evidence](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-224-DOCS-PILOT.md) and
 [original hosted build acceptance](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-225-DOCS-PUBLIC-BUILD.md#authorized-delivery-and-hosted-artifact--2026-11-01). SDK/CLI versions, provider
 defaults and renderer APIs are unchanged. The initial local evidence is

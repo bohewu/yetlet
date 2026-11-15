@@ -128,7 +128,7 @@ Do not add repeated release-style manual gates for each wording correction.
 The original planning batch reconciled existing release receipts and source
 comments without product verification replay. The later owner-authorized
 YT-217 slice adds only its new examples, selected rustdoc and preview checks.
-[CLI0.1.1's completed consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+[CLI0.1.1's completed consumer](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
 and the [SDK release record](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup)
 keep their original sources and limits. The API inventory is a manual sample of
 public entry points, not a full coverage score. Source comments and the local

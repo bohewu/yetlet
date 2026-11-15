@@ -12,8 +12,8 @@ packaged source snapshot and each generated application's selected SDK are
 offline metadata/cache, generated Cargo.lock/creation receipt and finite
 SDK startup capability policy are described below and governed by
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md), the retained
-[YT-247 contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
-[YT-259 startup contract](YT-259-CLI-NEW-STARTUP-CONTRACT.md).
+[YT-247 contract](CLI-GUIDE.md#sdk-resolution-yt-247) and
+[YT-259 startup contract](CLI-GUIDE.md#generated-startup-profiles).
 
 ### Historical CLI and developer-loop qualification
 
@@ -47,7 +47,7 @@ qualification or automatic dependency installation.
 ## SDK resolution (YT-247)
 
 This release implements the accepted
-[SDK resolution contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md).
+[SDK resolution contract](#sdk-resolution-yt-247).
 The CLI's build dependency and embedded snapshot are independent of the SDK
 chosen for each new project.
 
@@ -126,11 +126,86 @@ The top-level `startup_profile` in the schema 1 creation receipt at
 `cargo_lock_sha256` identifies the generated lockfile bytes. The receipt records
 creation provenance. The manifest and lockfile govern subsequent builds.
 
+## Historical SDK resolver, startup and first CLI release evidence
+
+The present [SDK resolution](#sdk-resolution-yt-247) and
+[generated startup profile table](#generated-startup-profiles)
+are the actual CLI0.4.0 behavioral contract. The original
+YT-247 Phase A/Phase B design had an **obsolete**
+`sdk-compat-v1` alpha.6/alpha.7 policy; it is not a current
+approval list or default pin. Current `sdk-latest-v2` without an
+explicit version selects the greatest valid non-yanked SemVer,
+**including prereleases**, using complete registry metadata.
+It does not prefer stable, bound latest to the CLI build SDK,
+silently fall back when chosen SDK is incompatible or substitute
+old cache metadata after an online failure. Effective offline
+(`--offline` or `CARGO_NET_OFFLINE=true`) forbids resolver
+transport, requires a valid local metadata set *and* separate
+Cargo crate cache, and prints an age/cache-scope notice. Missing
+or corrupt proof fails closed; latest known offline is not
+promised to be globally current.
+
+The CLI build dependency, its immutable version-bound packaged
+source snapshot and the exact new-app selected SDK are
+**three identities**. A `new` request uses private protected
+staging, checks registry origin/SDK checksum and a new generated
+`Cargo.lock`, preserves any independent stylegen lock, and
+publishes only an absent destination with a schema-1
+`.yetlet/sdk-resolution.json` source/selection receipt.
+`build`/`run`/`watch` never resolve or auto-upgrade the SDK;
+the actual retained lock governs transitive reproducibility.
+Original binary `new` refusal on unsafe tools and early
+Windows/MSVC correction cases were independent historical
+failures, not first-pass success.
+
+For YT-259's source-specific M26 proposal, the five
+`startup_profile` values are `legacy-axum`, `m26-app-serve`,
+`configured-axum`, `service-axum`, `browser-wasm`;
+a **matching exact SDK core archive index checksum** is required
+for any explicitly listed capability row, including offline.
+An unlisted version remains eligible but emits the legacy
+simple native listener on *that same SDK*, not a downgrade.
+A listed checksum contradiction reports
+`SDK_INCOMPATIBLE/template-capability` with no destination.
+Published CLI0.4.0 advertises the verified alpha.8 capability
+row; unlisted alpha.7 keeps legacy behavior. The simple
+capability-matched Native/Native Style `.serve()` path uses
+`127.0.0.1:7878` and ignores `YETLET_PORT`, while a legacy
+simple scaffold reads `YETLET_PORT`. Explicit
+`serve_on` selects a different address; configured-axum,
+Service/genuine shutdown, Vite/Settings TLS and Browser/Wasm
+remain distinct. A generated receipt's startup profile is a
+creation fact, not a release attestation or change in running
+app policy. The old YT-259 contract-only and local MSVC
+qualification gates are **not** proof that every later SDK
+archive supports the M26 APIs; verify the exact published
+archive and locked consumer.
+
+The original CLI0.1.0 GitHub/crates.io publication succeeded,
+but its anonymous installed binary printed
+`yetlet 0.1.0 (unpublished preview)`; the full registry
+consumer therefore **FAILED** at version assertion before
+help/new. Earlier custody readback mistakenly bound the SDK tag
+and was independently corrected; neither green preliminary
+job nor upload success changes the consumer result.
+The later separately authorized CLI0.1.1 package, SHA-256
+`10a1ffebf42de0baba9604ee2764b2304f601c5119ddcb5fcb988fbe319e1424`,
+passed anonymous install/version/help/`new` (original SDK
+alpha.5 pin) without rewriting 0.1.0 or claiming that
+generated applications compiled. Current distribution and
+newer versions are governed only by accepted
+[hosted CLI release records](CLI-040-HOSTED-RECORD.md).
+Original failed, consumed and accepted records are retrievable
+at fixed **local Git**
+`8b3e13004a58380accf16ea440707f84e6271871`;
+their task-specific raw CI/ZIP receipts are separately owned,
+not guaranteed by Git or publicly reachable at that SHA.
+
 ## Historical CLI source evidence and operation limits
 
 Current `new` SDK resolution, app `Cargo.lock`, source receipt, guarded
 temporary creation and online/offline selection are defined by the
-[SDK version contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md)
+[SDK version contract](CLI-GUIDE.md#sdk-resolution-yt-247)
 and [CLI process contract](CLI-CONTRACT.md#historical-cli-source-qualification-and-process-constraints).
 Do not select the old Phase B `sdk-compat-v1` alpha.7 default merely because
 the historical source/implementation report used it; the currently selected

@@ -38,7 +38,7 @@ ships native/browser Style templates and a private app generator. The Style
 walkthroughs verify SDK alpha.7 with exact app pins and locks. The
 [Style Showcase](../examples/style-showcase/README.md) remains a checkout sample.
 See the [API carrier map](API-REFERENCE.md#source-only-checkout-additions)
-and [Style contract](YT-237-STYLE-REGISTRATION-CONTRACT.md).
+and [Style contract](CLI-CONTRACT.md#application-owned-rust-style-registration-and-css-publication).
 Style authoring has a finite private app vocabulary, explicit registration and
 external build-time CSS; ordinary CSS remains the default and supplies unsupported
 syntax. There is no public style crate, renderer change or runtime style injection.
@@ -49,7 +49,7 @@ syntax. There is no public style crate, renderer change or runtime style injecti
 |---|---|---|---|
 | `yetlet::view` | Renderer-neutral Views/components and bounded binding vocabulary; M9 classification applies | Yes | [Core guide](../crates/yetlet/guides/core.md) |
 | `yetlet::html` | Escaped HTML serialization and allowlisted elements/attributes; M9 classification applies | Yes | [HTML guide](../crates/yetlet/guides/html.md) |
-| `yetlet_browser::dom` | Native validation/Wasm-only owned mount. Since SDKalpha.6:89 default tags,90 with explicit ImagePolicy; SDKalpha.5 has38. Independent per-mount HTTPS link/image policies retain strict defaults and same-origin forms. Not full HTML conformance | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md), [dated coverage inventory](YT-219-HTML-INVENTORY.md) |
+| `yetlet_browser::dom` | Native validation/Wasm-only owned mount. Since SDKalpha.6:89 default tags,90 with explicit ImagePolicy; SDKalpha.5 has38. Independent per-mount HTTPS link/image policies retain strict defaults and same-origin forms. Not full HTML conformance | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md), [dated coverage inventory](API-CONTRACTS.md#historical-html-element-and-attribute-inventory) |
 | `yetlet_browser::dom_keyed` | Optional keyed children and disposable listener/entry ownership | Yes | [Keyed DOM guide](../crates/yetlet-browser/guides/dom-keyed.md) |
 | `yetlet::reactive` | Optional synchronous local reducer/commit graph with explicit lifetime | Yes | [Reactive guide](../crates/yetlet/guides/reactive.md) |
 | `yetlet::actions` | Typed commands and explicit local/HTTP execution boundaries | Yes | [Actions guide](../crates/yetlet/guides/actions.md) |

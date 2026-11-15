@@ -147,6 +147,62 @@ the old rule, so this observation is not a new speedup claim. A controlled
 hosted non-Markdown before/after comparison remains unmeasured. Rust-relevant input changes are not
 expected to get faster, and PR/master duplicate Rust work is deliberately retained.
 
+## Historical CodeQL PR concurrency and Rust analysis evidence
+
+The original 2026-11-07 YT-236 local change addressed
+*scheduling redundant work*, not the speed of a single
+Rust CodeQL analysis. PR #60’s selected Rust CodeQL
+job took approximately **14m44s**, while other
+language and Rust CI jobs had finished; a later
+default-branch push analyzed the merged source
+separately, as intended. The single workflow-level
+group selected was:
+
+```yaml
+concurrency:
+  group: yetlet-codeql-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+```
+
+A newer commit to **the same PR** can cancel its own
+older unfinished CodeQL workflow; a different PR
+gets a different group. For protected `master`
+pushes, scheduled and manual events, the **unique
+`run_id`** prevents accidental pending-run
+replacement even with `cancel-in-progress=false`.
+The workflow namespace prevents cross-workflow
+cancellation. Existing pull-request, master,
+weekly and manual triggers, four-language matrix,
+permissions, pinned CodeQL action, build mode
+and query scope are retained; a text edit
+alone does not execute or cancel a hosted job.
+
+The actual PR and master diagnostics recorded
+**no reusable Rust overlay-base database**.
+The PR had diff-informed analysis input, but
+`overlay mode: none without caching` remained.
+The master run was deliberately not diff-informed
+and used ordinary database cleanup; do not infer
+Rust overlay caching, a 15-minute latency fix,
+or a reason to introduce `actions/cache`,
+unofficial flags, language exclusions or
+query-suite changes. Earlier Rust extractor
+warnings about files without a loadable module
+were not silently suppressed. The local YAML
+parser/9-event truth-table and independent
+Reviewer passed **at source/static scope**;
+a real CodeQL hosted cancellation observation
+was a subsequent delivery gate, not proven by
+the pre-delivery local test alone.
+
+Original CLI/CI source and immutable GitHub job
+references are recoverable via local Git
+`8b3e13004a58380accf16ea440707f84e6271871`
+(public remote reachability not established).
+Do not manufacture a new Backlog ID, change
+the current workflow or security permissions
+during documentation consolidation.
+
 ## Delivery boundary
 
 The review diff consists only of `.github/workflows/codeql.yml`,

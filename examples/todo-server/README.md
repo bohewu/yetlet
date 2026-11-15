@@ -80,7 +80,7 @@ here, not in a separate task report.
 
 The `/app` page includes the same [native control View](../todo-ui/src/controls.rs) used by `/controls`: input, textarea, single select, checkbox, readonly/disabled fields and explicit submit/reset buttons. Edits stay in the native controls through unrelated keyed list updates. Reset restores the current page's defaults; GET Preview shows bounded escaped query values without creating a Todo. It works without JS on `/controls`. Do not place secrets in this read-only preview's URL.
 
-The View also declares root-relative and fragment links. DOM mount resolves them through the browser URL parser with the [YT-110 same-origin contract](../../docs/YT-110-DOM-CAPABILITIES.md); native SSR retains its app-owned URL/CSP policy. No new binding runtime, persistence or CSRF/auth qualification is implied.
+The View also declares root-relative and fragment links. DOM mount resolves them through the browser URL parser with the [YT-110 same-origin contract](../../docs/BROWSER-APP.md#historical-native-dom-controls-and-navigation-boundaries); native SSR retains its app-owned URL/CSP policy. No new binding runtime, persistence or CSRF/auth qualification is implied.
 
 ## Verify
 

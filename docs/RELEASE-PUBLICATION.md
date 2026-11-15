@@ -18,15 +18,15 @@ OIDC policy would need new approval and actual credential/issuer proof.
 The original version plan is recoverable at fixed local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
 ## Independent CLI cohort — YT-215
 
-[CLI first-release preparation](YT-215-CLI-FIRST-RELEASE.md) adds closed schema3/cli:
+[CLI first-release preparation](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures) adds closed schema3/cli:
 only yetlet-cli, version from its own manifest, tag yetlet-cli-vVERSION, one source
 archive and five public files. Its dependency on the published SDK is not another
 release subject or upload. The existing source-bound builder, signer identity,
 separate verifier/custody and final owner gate apply. The final consumer installs
 the executable with its packaged lock. Existing SDK schemas/outputs remain
-unchanged. [CLI0.1.0 is published](YT-215-CLI-FIRST-RELEASE.md#actual-first-publication-and-consumer-failure--2026-10-31),
+unchanged. [CLI0.1.0 is published](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures),
 with successful installation but failed exact version-output validation.
-[CLI0.1.1's completed publication](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+[CLI0.1.1's completed publication](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
 repairs that bounded interface: install, exact version, help and scaffold pass.
 It does not replace0.1.0 or re-publish SDK; every future CLI cohort retains its
 own final owner gate.

@@ -147,6 +147,52 @@ YT-242 implementation handoff. Classification/counting alone is not semantic
 acceptance; independent review is pending. Later public guide promotion and
 YT-243 remain separate.
 
+## Historical Reader source and rollover evidence
+
+The site selects exactly **eight source chapters** via the
+reviewed `site/pages.toml` paths/stop markers and its
+independently controlled SDK/CLI **edition**. This selected
+edition is separate from Cargo workspace package versions.
+Local page builds use these actual checked-out sources and
+may include uncommitted href edits; an accepted published
+Reader is a separately source-/artifact-/workflow-bound
+result with exact Pages readback. Public documentation
+must update after **every verified SDK or CLI publication**;
+do not silently advance edition labels from development
+manifests or an unverified CLI/SDK pairing.
+
+Original YT-232 (2026-11-02) ran a selected **alpha.6 /
+CLI0.2.0** local reader-source preview, eight chapters,
+**15 public site files and 219 checked links**, plus a
+distinct **six-file static reference**; native and Wasm
+sources and exact reader-only SDK registry pins/locks
+were checked. Its browser-host access failure occurred
+**before** a tab was created, and an initial missing
+`wasm-bindgen` PATH lookup was corrected by selecting
+the already installed matching binary. Neither failure
+is retroactively browser PASS or live Pages acceptance.
+Original YT-249 separately tested the **alpha.7 / CLI0.3.0**
+reader/source rollover: native+Wasm and static build
+proof, generated first-app locked SDK receipt and
+selected compilation, link/manifest checks, and
+one 0700-output-parent correction. Historical owner
+approval for Reader publication still required actual
+protected-branch CI/merge/master CI and *live*
+Pages readback, not merely a green local build.
+
+The original reports, full version-bound locks,
+rejected first checks and frozen 8-source selection
+are recoverable locally at Git
+`8b3e13004a58380accf16ea440707f84e6271871`;
+task-local raw logs/receipts were separately stored and
+are not inherently in Git. This history does not change
+the **current published alpha.8 / CLI0.4.0 edition** or
+authorize a Pages update. The Z10 maintenance of a few
+Markdown hrefs in existing selected chapters keeps the
+edition and chapter paths stable; a **local nonpublishing
+Reader build** is required to demonstrate the repaired
+navigation. It is not a live public deployment.
+
 ## Retained evidence and maintainer material
 
 The [repository index](README.md) is intentionally a mixed navigation record,

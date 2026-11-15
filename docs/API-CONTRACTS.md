@@ -113,6 +113,48 @@ when offering reload. This does not change configuration precedence,
 Core/browser defaults, signing semantics or the original release inventory.
 See the [contract and verification](SECRET-PROVIDERS.md).
 
+## Historical HTML element and attribute inventory
+
+The original **2026-10-31** WHATWG index classification was a *design*
+inventory, not a current conformance claim or complete list of public typed
+builder methods. It used a fixed 488,697-byte WHATWG element/attribute index
+(SHA-256 `0a865ea90576d2976db607d324b1e27de14a7d5f53f96da3f63c209ea288181d`):
+**113 named HTML elements**, two foreign roots and one custom-element
+family; **180** attribute/applicability rows covering **144** distinct
+names; and **89** event-handler-content attribute names. The original
+element-by-element and applicability matrices, accepted/deferred decisions,
+source index and review identity are recoverable at **local Git**
+`8b3e13004a58380accf16ea440707f84e6271871` (public historical
+GitHub reachability not verified); the raw WHATWG download and extracted
+rows were task-local, **not committed with this report**.
+
+Its historical dispositions were: **C** = then accepted with limited
+scope; **220/221** = proposed ordinary-content/navigation-image work
+(not yet implemented *at that snapshot*); **W** = document/head/asset
+writer ownership; **D** = deferred for an explicit consumer/lifecycle;
+**X** = excluded from the ordinary DOM View path. Later typed Tag Builder
+and DOM additions have their own actual acceptance and release records:
+do **not** reuse a 2026-10-31 "No" cell as evidence that the current
+SDK lacks a feature. Current Rust APIs and allowed DOM/SSR shapes are
+defined by the [HTML guide](../crates/yetlet/guides/html.md),
+[DOM guide](../crates/yetlet-browser/guides/dom.md) and actual
+[published API](API-REFERENCE.md), including its version limits.
+
+The inventory did **not** authorize arbitrary element/attribute
+spreading, custom `data-*`/`aria-*`, `on*` handler strings, inline
+CSS, `srcdoc`, hostile resource URLs or namespaced foreign markup.
+All 89 indexed event-handler content attributes are **excluded from
+HTML/DOM emission**; attach explicit owned Rust/web-sys listeners.
+Even admitted ARIA names require application-appropriate role/state
+and real reference targets; admission alone does not certify AT speech
+or WCAG conformance. The finite historical DOM set included selected
+global `role`, data-`id`/`completed`/`selected` and named ARIA
+controls, plus host-specific form/URL attributes; an `InertAttributeName`
+or generic HTML SSR identifier is *not* an automatic DOM whitelist.
+Document-owned `head`/`base`/external assets remain separate from
+the replaceable subtree. No unconditional browser/OS, image/network
+or custom-element semantics follows from the inventory.
+
 ## Cross-crate API differences and scoped GPU refinement
 
 A dated cross-crate audit found **no P0/P1 exercised-path API defect**

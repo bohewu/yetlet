@@ -4,7 +4,7 @@
 
 ## YT-247 / YT-248 sequencing amendment
 
-The Owner redefines [YT-247](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) as
+The Owner redefines [YT-247](CLI-GUIDE.md#sdk-resolution-yt-247) as
 Dynamic SDK Version Resolution. Phase A produces the proposed CLI contract and
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md), independent review and
 Git delivery, then stops for Owner acceptance. Phase B implements the accepted

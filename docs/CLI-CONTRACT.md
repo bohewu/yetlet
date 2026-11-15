@@ -21,9 +21,101 @@ Date: 2026-10-18 (Asia/Taipei). Task: YT-102, accepted CLI contract and authoriz
   frozen locks and application/deployment-owned resources. No broad native
   platform, browser, HA or production promise follows.
 
+## Historical static export protocol and guardrails
+
+The original **YT-222** static exporter contract was proposed before its
+independently qualified implementation. Its example
+`yetlet build --static --export-bin site-export --output ... --base-path /yetlet/`
+was *not executable at that original design checkpoint*. The
+[current CLI static build guide](CLI-GUIDE.md#static-html-build)
+and [published CLI version authority](CLI-040-HOSTED-RECORD.md)
+take precedence; the historic protocol and original negative cases
+remain retrievable in **local Git**
+`8b3e13004a58380accf16ea440707f84e6271871`.
+
+Static export is **explicit**, not an automatic mode of
+`run`/`watch`/`new`; an app-owned trusted exporter produces
+a private `export.json` schema-1 descriptor, fragments and finite
+prepared local assets. The protected pipeline runs an exact selected
+Cargo binary via `cargo run --frozen`, with no arbitrary shell,
+user argv forwarding or implicit dependency/tool installation.
+A valid descriptor has one root page, an optional unique 404 page,
+canonical route mapping and local page/asset names; the writer
+constructs escaped head/title, fixed restrictive **meta CSP** and
+approved stylesheet/module references around trusted application
+fragments. This is **not** sanitization of arbitrary third-party HTML.
+Meta CSP is not an HTTP response-header framing policy
+(`frame-ancestors` requires a host header); generated pages still
+need appropriate hosting, MIME and security configuration.
+
+Historical bounded budgets were **256 pages**, **1,024 assets**,
+**1MiB** descriptor, **2MiB** per fragment, **16MiB** per asset and
+**64MiB** total; these are local implementation limits, not capacity
+or production-hosting claims. Output is a **previously absent**
+protected destination. Validate source/input/lock, output
+non-intersection and symlink/reparse ownership before any public
+write; supervise the owned generator with bounded cancellation and
+child cleanup. Retain source/lock/export/asset SHA and private
+receipts **outside** the public site, then publish a complete owned
+tree via no-replace. A failed child, changed source, invalid
+descriptor, partially written receipt, output conflict or uncertain
+cleanup is an explicit **failure**, not permission to overwrite,
+silently clean an unrelated path, assume rollback or reuse a
+last-good artifact as the current one. The selected exporter is
+trusted native application code, **not a sandbox**; exported
+content and secrets remain the app author's responsibility.
+Experimental Wasm islands must use already prepared same-origin
+module/Wasm assets, progressive HTML fallback and no inline
+scripts/automatic npm or frontend build. Current deployment and
+old-asset retention are separate.
+
+## Application-owned Rust Style registration and CSS publication
+
+The original **YT-237** contract selected explicit
+`styles::stylesheet()` root registration of actual style modules,
+shared class-name constants usable in both views and the CSS
+generator, and deterministic output from the **registered
+composition**, not auto-discovery of files/modules or execution of
+every View. Conditions intentionally register selectors that may
+not be rendered on the current route; the root/aggregator determines
+membership. A module source added without registration is **not**
+silently discovered. The typed builder is application-owned/tool
+composition, not a mandatory Yetlet Core CSS registry, DI or
+cross-target renderer trait.
+
+A protected app-relative generated CSS destination requires ownership
+and source binding. Reject absolute/traversal paths, symlink/reparse
+ancestors, unowned/stale hand edits and source/config/lock/served
+private roots. Generate into private staging with finite byte bounds;
+validate generator success, content and hash; only then atomically
+publish CSS and its separate metadata. A crash between CSS replacement
+and metadata acceptance leaves **unaccepted/unreconciled** output,
+not a provably valid last-good build. Development failure may retain
+old bytes for diagnosis but must label them stale, never fresh.
+Cancelling an owned generator reaps the exact child, not an unrelated
+application. In standalone mode reference verified content-addressed
+CSS only after the complete asset/build graph is accepted; Vite
+instead consumes a stable generated source under its validated
+frontend root, without dual-hashing the same output. Hosted
+rollback/old CSS availability and caches remain deployment-owned.
+
+The YT-238 owner-selected default-wired prototype had independent
+acceptance; YT-239 later implemented native Rust CLI
+`native-style`/`browser-style` selections, private flat
+`stylegen/` manifest/lock, populated sample root, style output
+and Vite/Tailwind composition in a **separately source-qualified**
+implementation. Ordinary CSS stays the default; initial Python
+publisher was experiment-only and is **not** a generated-app runtime
+dependency. That source-stage retained two cloud-lock failures,
+Windows and real-browser gaps; it did not itself publish a CLI
+release. Later actual package availability is determined by
+[CLI release records](CLI-040-HOSTED-RECORD.md) and
+[CLI Guide](CLI-GUIDE.md#application-owned-rust-css), not by
+old design-stage claims.
+
 ## Accepted SDK resolution extension — 2026-11-10
 
-The [YT-247 contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
+The [YT-247 contract](CLI-GUIDE.md#sdk-resolution-yt-247) and
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) define a separate
 SDK resolver, exact version/offline options and successful-new app lock creation.
 The Owner authorized the [Phase B source implementation](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence).
@@ -63,7 +155,7 @@ compatibility selection and Cargo's own dependency cache, produced exact app
 manifests/locks plus a source/freshness receipt, and required create-only
 publication from private staging. Its `sdk-compat-v1` alpha.6/alpha.7 policy
 and CLI0.2.0 build/snapshot are **historical**. The
-[retained resolver contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md)
+[retained resolver contract](CLI-GUIDE.md#sdk-resolution-yt-247)
 and [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) govern current
 `sdk-latest-v2` selection; the released CLI0.4.0 is a separate package identity.
 Original real binary refusal on unsafe tool paths, Windows source defects
@@ -500,7 +592,7 @@ one explicit `main.rs` bin. Dedicated outputs are standalone
 The host compiler/toolchain, frozen bounded execution, owned cancellation,
 protected publication and app-owned consumer contract are described in the
 [current CLI Style guide](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree)
-and the [retained registration contract](YT-237-STYLE-REGISTRATION-CONTRACT.md).
+and the [retained registration contract](CLI-CONTRACT.md#application-owned-rust-style-registration-and-css-publication).
 [Original YT-239 source implementation and review](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md#independent-review-and-completion)
 passed independent review at its dated Linux/source scope; it does not qualify
 all subsequent Windows/runtime releases. Current CLI 0.3.0–0.4.0 publication

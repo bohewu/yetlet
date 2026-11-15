@@ -223,6 +223,42 @@ These checks do not claim hosted Pages acceptance. Final clean-source public
 integration precedes Push; actual public URL/artifact/source readback follows
 the one authorized deployment. Mark YT-218 Done only after those outcomes exist.
 
+## Reader edition history and publication boundaries
+
+The current documented Reader is built from eight explicit
+`site/pages.toml` chapter paths with a version pair
+selected from **actual accepted SDK and CLI publication
+records**, not from a workspace `Cargo.toml` bump.
+A local preview and an official Pages release are different
+events: a local preview can contain working-tree Markdown
+and source-only href fixes; it does not prove
+`https://bohewu.github.io/yetlet/` serves them.
+The canonical [Reader source scope](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence)
+retains YT-232’s old eight-chapter alpha.6 preview,
+219 linked targets, the separately checked six-file
+static reference and initial browser/tool failures.
+YT-249’s later alpha.7/CLI0.3.0 source/lock/receipt
+rollover has independent local acceptance, while
+protected Git delivery, official hosted readback
+and public edition activation are separate gates.
+
+Each future SDK or CLI publication must recheck its
+selected compatible package pair, generator/lock/
+browser consumer, the native and Wasm Reader,
+complete public-file inventory, protected
+`site/pages.toml` edition, release-document check
+and actual public Pages source correspondence.
+Do not treat a local `--public` flag as permission
+to Deploy or infer that an old source branch/Tag/Reader
+cohort is live. Z10’s href-only changes in existing
+Reader chapters require a **nonpublishing** local
+render and actual link/heading audit; neither
+modifies the published edition, signed assets,
+SDK/CLI package versions or Pages settings.
+Historical original raw source/evidence remains
+bounded to local Git and its task-owned retained
+records, not automatically accessible via GitHub.
+
 ## Completed delivery and first publication — 2026-10-31
 
 Implementation review PASS0 accepted the ten changed inputs without required

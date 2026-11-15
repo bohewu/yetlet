@@ -8,7 +8,7 @@ embedded SDK snapshot use `0.9.0-alpha.7`. Generated applications select
 their registry SDK independently. With the verified alpha.8 core archive
 and compatible flags, Native and Native Style use `App::serve()`.
 Alpha.7 uses the legacy listener. Settings, Vite, Service and Browser
-keep their documented startup profiles. [Scaffold contract](YT-259-CLI-NEW-STARTUP-CONTRACT.md)
+keep their documented startup profiles. [Scaffold contract](CLI-GUIDE.md#generated-startup-profiles)
 
 At this checkpoint CLI 0.4.0 is unsigned and unpublished. The published
 SDK is `0.9.0-alpha.8` and the published CLI is `0.3.1`. The Reader

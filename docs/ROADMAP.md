@@ -46,7 +46,7 @@ registry consumer. The Reader Edition selected SDK alpha.7 / CLI 0.3.1
 at that release.
 
 **YT-249 Reader Edition publication follow-through (2026-11-10): Source/consumer review PASS.**
-[Contract and evidence](YT-249-READER-RELEASE-ROLLOVER.md) promote the reader to
+[Contract and evidence](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence) promote the reader to
 the verified published SDK/CLI pair and require the same reviewed README/Pages
 update after each future SDK or CLI publication. Development versions do not
 promote the reader; immutable archives and historical release bindings remain.
@@ -54,7 +54,7 @@ Local native/Wasm/static/first-app proof and independent review PASS; exact-head
 CI and live readback remain the public-delivery gates.
 
 **YT-247 Dynamic SDK Version Resolution (2026-11-10): Done at source implementation scope; independent Reviewer PASS.**
-[CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
+[CLI contract](CLI-GUIDE.md#sdk-resolution-yt-247) and
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) separate CLI build SDK,
 immutable source snapshot and template identity from the generated app's selected
 registry SDK. [Phase A handoff](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md) retains the design review
@@ -83,7 +83,7 @@ was **not** itself signed or published. The separately
 publisher preflight FAIL, selected original setup failures, explicit bounded
 continuation, owner-approved release and independent registry/Style consumer
 PASS. The old Reader-promotion hold was later superseded by the retained
-[YT-249 local edition follow-through](YT-249-READER-RELEASE-ROLLOVER.md);
+[YT-249 local edition follow-through](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence);
 current public version truth is SDK alpha.8 and independent CLI 0.4.0,
 not this dated alpha.7/CLI 0.3.0 milestone. Original YT-244/245/246/248
 reports and reviewer/failed attempts remain at fixed local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
@@ -114,7 +114,7 @@ unverified platforms remain separate. No release or source freeze is implied.
   delivery under the default CSP. Ordinary CSS is the default, with optional
   Tailwind and Vite workflows.
   [CLI workflow](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree) ·
-  [Registration contract](YT-237-STYLE-REGISTRATION-CONTRACT.md) ·
+  [Registration contract](CLI-CONTRACT.md#application-owned-rust-style-registration-and-css-publication) ·
   [Original YT-239 source acceptance](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md#independent-review-and-completion)
 
   CLI `0.3.0` first shipped Style templates and generation, verified by the
@@ -135,7 +135,7 @@ unverified platforms remain separate. No release or source freeze is implied.
   **SDK `0.9.0-alpha.7`**, `yetlet::view::tags` provides 101 typed
   constructors, selected attribute setters and compile-time void-child guards
   over the existing owned `View` tree. The [View guide](VIEW-COMPONENTS.md#typed-tag-builders)
-  and [dated HTML inventory](YT-219-HTML-INVENTORY.md) describe where
+  and [dated HTML inventory](API-CONTRACTS.md#historical-html-element-and-attribute-inventory) describe where
   constructors exist without implying new DOM support, inline styles or
   browser lifecycle guarantees. The [alpha.7 publication](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
   and [original scoped verification](https://github.com/bohewu/yetlet/blob/9a6f954dc38f3b9e854fce5a08c9b843182657f8/docs/YT-235-TAG-COVERAGE-PLAN.md#yt-235-final-local-acceptance--2026-11-07)
@@ -167,7 +167,7 @@ cleanup retry. Operational independent Reviewer PASS0 accepts completion. This i
 retention or Git/runtime/global configuration authority.
 
 **YT-232 authorized public guide update (2026-11-02):**
-[Delivered source/HTTPS proof](YT-232-PUBLIC-GUIDE-EDITION.md#subsequent-delivery-and-public-pages-update--2026-11-02)
+[Delivered source/HTTPS proof](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence)
 binds PR54 squash master993ce56 to the unchanged reviewed tree; PR/master
 necessary CI and master Pages build/deploy PASS attempt1. Public SDKalpha.6/
 CLI0.2.0 guide has8 chapters/15 exact HTTPS files/219 checked links and static
@@ -179,7 +179,7 @@ accepted sources, artifacts and public responses. Three closing documents remain
 uncommitted; no package publication or additional deployment.
 
 **YT-232 next public guide edition (2026-11-02):** Done at local guide-source update scope.
-[Selected source update](YT-232-PUBLIC-GUIDE-EDITION.md) aligns introductory
+[Selected source update](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence) aligns introductory
 instructions, eight-page reader and static reference with published
 SDKalpha.6/CLI0.2.0. Reuse distribution/browser proof; verify only changed
 edition/registry-consumer/content inputs. Independent review precedes Done;
@@ -283,7 +283,7 @@ was not selected. Original YT-227 proposal and review remain at fixed
 local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
 **Current distribution and next reader milestone (2026-10-31):**
 The two-package SDK `0.9.0-alpha.5` and independent CLI `0.1.1` are published.
-[YT-216's completed output and installed consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+[YT-216's completed output and installed consumer](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
 close the CLI defect; YT-215 closes through that patch while its original0.1.0
 consumer FAIL remains. SDK/platform proof is not replayed or expanded.
 [YT-217](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-217-DOCS-PREVIEW.md) is Done at bounded local scope: selected doc comments, four new
@@ -311,7 +311,7 @@ Dated checkpoints below retain historical authorization/status wording and do
 not override these completed release records.
 
 **YT-216 fixed candidate and tag (2026-10-31):**
-[PR39/source Cae5dd4c](YT-216-CLI-011-PATCH-RELEASE.md#selected-candidate-and-source-delivery--2026-10-31)
+[PR39/source Cae5dd4c](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
 passes reviewed implementation/normal packaging and required CI. Preserve the
 first master SQLite failure; the owner-authorized failed-Stable-only attempt2
 passes with original MSRV reused. Strict/builtin0.1.1 tag/readback and consumed-
@@ -321,10 +321,10 @@ signatures/result and final owner approval remain Pending; old0.1.0 release and
 all failures remain unchanged. No0.1.1 upload or additional retry is authorized.
 
 **YT-216 CLI0.1.1 patch preparation (2026-10-31):**
-[YT-215 publishes CLI0.1.0](YT-215-CLI-FIRST-RELEASE.md#actual-first-publication-and-consumer-failure--2026-10-31)
+[YT-215 publishes CLI0.1.0](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
 and installs it successfully, but final run41169732818/1 fails on the stale
 unpublished version suffix before help/new. Preserve that partial outcome,
-release, archive, tag and signatures. [YT-216](YT-216-CLI-011-PATCH-RELEASE.md)
+release, archive, tag and signatures. [YT-216](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
 fixes the version/help labels, adds real executable checks to existing MSRV CI
 and prepares only CLI0.1.1 through the final owner gate. SDK0.9.0-alpha.5,
 third-party dependencies and generator/runtime semantics remain unchanged.
@@ -332,7 +332,7 @@ Reuse original proof at its scope; new source-bound outputs require acceptance.
 No failed-job retry or new publication is authorized before the final gate.
 
 **YT-215 corrected candidate selected (2026-10-31):**
-[PR37 and exact master CI](YT-215-CLI-FIRST-RELEASE.md#corrected-candidate-and-fixed-tag--2026-10-31)
+[PR37 and exact master CI](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
 PASS at corrected C6f013ac. New immutable yetlet-cli-v0.1.0 tag/strict Guard
 readback PASS; consumed binding retired. Changed-source build41168153070/1 is
 running once; corrected actual custody and later S/signatures/result remain
@@ -341,7 +341,7 @@ runtime inputs. Old tags/jobs/wrong-ref receipt remain intact, with no SDK uploa
 or CLI signing/publication. Final owner gate remains required.
 
 **YT-215 first independent CLI release preparation (2026-10-31):**
-The owner selects [yetlet-cli0.1.0](YT-215-CLI-FIRST-RELEASE.md) through the final
+The owner selects [yetlet-cli0.1.0](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures) through the final
 owner gate, retaining published SDK0.9.0-alpha.5. Initial C6f26961, PR36/master
 CI, cli-v0.1.0 tag and build41165581554/1 pass at their recorded scope. Actual
 readback41166121653/1 is GitHub green but rejected as CLI identity proof: its
@@ -808,14 +808,14 @@ Milestones are sequenced by capability and dependencies rather than invented del
 **M19 form/DOM authoring (YT-107–109):** Done at their originally
 bounded application feedback, narrow `hidden` attribute, and
 DOM-capability research scopes. Current [View/form usage](VIEW-COMPONENTS.md#configuration-and-errors)
-and [bounded DOM contract](YT-110-DOM-CAPABILITIES.md) retain actual
+and [bounded DOM contract](BROWSER-APP.md#historical-native-dom-controls-and-navigation-boundaries) retain actual
 rendering/browser ownership and strict attribute/escaping policies.
 These do not create general form binding, a remote event circuit or
 a newly qualified package release. Original source, browser failures,
 reviewer decisions and source identity remain in local Git
 `b610acc7e098020b6b59dfa0d1ab2b75b059e656` without public-link reachability claims.
 
-YT-110 is Done at the separately owner-selected [bounded DOM capability scope](YT-110-DOM-CAPABILITIES.md).
+YT-110 is Done at the separately owner-selected [bounded DOM capability scope](BROWSER-APP.md#historical-native-dom-controls-and-navigation-boundaries).
 Common View checks, finite semantic/accessibility vocabulary, native control
 initialization and constrained navigation have native/WASM and actual browser
 proof with cleanup. Independent Reviewer role-directed Job wc_job_v5BMe9GdWQmvY03d
@@ -2393,7 +2393,7 @@ publication, Commit or Push occurs in this document update.
   89 ordinary elements with scoped attributes and canonical structures; explicit
   image options add `img` for a 90-element selected scope. Existing entry points
   retain same-origin navigation and no images. Read the [DOM guide](../crates/yetlet-browser/guides/dom.md)
-  for per-mount policies, parser parity and ownership; the [dated inventory](YT-219-HTML-INVENTORY.md)
+  for per-mount policies, parser parity and ownership; the [dated inventory](API-CONTRACTS.md#historical-html-element-and-attribute-inventory)
   remains the coverage and Typed Tag Builder selection reference. Element
   admission does not imply every attribute or browser API. The [DOM guide](../crates/yetlet-browser/guides/dom.md)
   and [original policy evidence](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md) retain focused
@@ -2408,7 +2408,7 @@ publication, Commit or Push occurs in this document update.
   islands. HTML-only export needs no backend, browser or Node. Output is
   create-only and private receipts stay outside uploaded content. Start with the
   [CLI guide](CLI-GUIDE.md#static-html-build) and [standalone example](../examples/static-site/README.md);
-  retain the [static export contract](YT-222-STATIC-HTML-CONTRACT.md) and
+  retain the [static export contract](CLI-CONTRACT.md#historical-static-export-protocol-and-guardrails) and
   [original implementation evidence](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md). Bounded GNU/MSVC
   CLI execution and Chrome/Firefox checks remain tied to their original inputs.
   The [CLI publication and installed-consumer record](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)

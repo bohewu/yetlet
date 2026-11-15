@@ -104,7 +104,7 @@ Edition remain authoritative; `site/pages.toml` is unchanged.
   [candidate](https://github.com/bohewu/yetlet/blob/ad564ad1ef07e5fca063ae88587c0f21e6edb5b1/docs/YT-248-CLI030-CANDIDATE.md) and
   [hosted record](CLI-030-HOSTED-RECORD.md) retain their original scope/evidence.
 
-The [current contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
+The [current contract](CLI-GUIDE.md#sdk-resolution-yt-247) and
 [ADR 0010 amendment](adr/0010-dynamic-sdk-version-resolution.md) supersede the
 finite v1 selection rules for this source. The reviewed docs-site masthead
 change in `examples/docs-site/README.md` and `examples/docs-site/src/main.rs`

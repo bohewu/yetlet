@@ -35,7 +35,7 @@ The published SDK alpha.8 and CLI 0.4.0 packages are independently versioned;
 only the SDK includes the typed Tag Builder.
 
 See the [typed View guide](VIEW-COMPONENTS.md#standard-html-authoring-coverage),
-[dated inventory](YT-219-HTML-INVENTORY.md) and
+[dated inventory](API-CONTRACTS.md#historical-html-element-and-attribute-inventory) and
 [original YT-235 source-only evidence](https://github.com/bohewu/yetlet/blob/9a6f954dc38f3b9e854fce5a08c9b843182657f8/docs/YT-235-TAG-COVERAGE-PLAN.md#yt-235-final-local-acceptance--2026-11-07)
 for inclusion/exclusion and the original verification limits. Actual SDK
 publication and registry-only consumer qualification are recorded separately
@@ -101,7 +101,7 @@ images, same-origin navigation/forms and their prior public signatures/error
 types. The 89 default-admitted tags become 90 only when the image policy
 explicitly admits `img`; neither count implies comprehensive HTML conformance.
 See the [current DOM guide](../crates/yetlet-browser/guides/dom.md) and
-[dated coverage inventory](YT-219-HTML-INVENTORY.md).
+[dated coverage inventory](API-CONTRACTS.md#historical-html-element-and-attribute-inventory).
 
 Pre rendering now preserves an initially parsed newline, including CR/CRLF,
 where the HTML parser would otherwise consume it. The serialized bytes of
@@ -112,7 +112,7 @@ Independent CLI **0.2.0** first delivered `yetlet build --static`. Its
 `Cli::BuildStatic` enum variant may require a new arm in exhaustive downstream
 matches, but existing build/run/watch/new and public SDK View/SSR/browser APIs
 retain their boundaries. See the [static CLI guide](CLI-GUIDE.md#static-html-build)
-and [retained technical protocol](YT-222-STATIC-HTML-CONTRACT.md). Neither
+and [retained technical protocol](CLI-CONTRACT.md#historical-static-export-protocol-and-guardrails). Neither
 publication is new runtime/browser/production certification. The original
 [SDK alpha.6](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
 and [CLI 0.2.0](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
@@ -198,6 +198,42 @@ aligns sixteen library manifests to experimental 0.1.0 with compatible registry
 dependency requirements and unchanged independent workspaces/default features.
 They remain unpublished. This extends preparation, not the immutable ce56e08
 candidate, support classifications, final source C or release authorization.
+
+## Historical first CLI releases and consumer failures
+
+The original standalone CLI0.1.0 was independently signed and
+published to GitHub and crates.io, but its fresh installed binary
+printed `yetlet 0.1.0 (unpublished preview)`. The exact version
+assertion **FAILED**, before `help`/`new`; do not label its
+complete anonymous registry consumer PASS just because upload,
+checksum and `cargo install` succeeded. Earlier preparation
+included a materially wrong CLI custody/readback that used the
+SDK alpha.5 tag, corrected under a separate CLI-specific
+source/tag workflow; the original wrong-ref record remains
+an actual failed evidence lineage, not rewritten history.
+
+A separately approved **CLI0.1.1 patch** restored the correct
+version output and completed actual anonymous registry
+install, `--version`, help and `new` consumer PASS.
+Its published 471,926-byte archive has SHA-256
+`10a1ffebf42de0baba9604ee2764b2304f601c5119ddcb5fcb988fbe319e1424`;
+the generated app pinned SDK `=0.9.0-alpha.5`.
+Those checks did **not** include compiling that generated
+application or retroactively fix/repackage CLI0.1.0.
+The earlier CLI source/CI/lock/cache and failed Consumer
+artifacts are preserved at **local Git**
+`8b3e13004a58380accf16ea440707f84e6271871`
+and separate ignored/hosted receipts. No current GitHub access
+is inferred for this unpublished SHA.
+
+Today’s active published CLI/SDK identity comes from
+[CLI0.4.0 hosted acceptance](CLI-040-HOSTED-RECORD.md),
+[SDK alpha.8 hosted acceptance](ALPHA8-HOSTED-RECORD.md)
+and their immutable distribution/registry readbacks, **not**
+from these earlier historical source-only reports.
+Version-selected SDK, CLI build SDK and packaged snapshot
+are different identities; retain the generated app’s exact
+lock/receipt for reproducible future builds.
 
 ## Historical release train
 

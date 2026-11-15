@@ -15,7 +15,7 @@ continue to select CLI 0.3.1 and SDK 0.9.0-alpha.8.
 - Native and Native Style select `App::serve()` with that capability and the
   compatible flag set. Alpha.7 keeps the legacy listener. Settings, Vite,
   Service and Browser retain their documented startup profiles.
-  [Scaffold contract](YT-259-CLI-NEW-STARTUP-CONTRACT.md)
+  [Scaffold contract](CLI-GUIDE.md#generated-startup-profiles)
 
 ## Activation proof
 

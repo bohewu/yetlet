@@ -42,7 +42,7 @@ authorized source-CI retry below remains part of this version's history.
 | [Prepare cleanup](YT-096-SIGNER-CONTRACT.md#actual-frozen-output-and-go-cache-cleanup-failure--2026-10-29) | Data verification/freeze/upload passed, but task-private read-only Go module-cache entries prevented cleanup. The overall job failed. | Verify cleanup of resources actually created. The scoped `-modcacherw` bootstrap correction preserves the cleanup gate; an uploaded artifact alone is not overall PASS. |
 | [Alpha.3 upload](YT-209-RELEASE-AUTOMATION.md#publication-upload-maintenance--2026-10-30) and [alpha.4 upload](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair) | Generic errors hid the failing operation/status. A separate local loopback reproduced missing `Content-Length` with the observed `gh api --input -` path. | Use the canonical byte-exact upload path, explicit length, safe phase/class/status diagnostics and the existing loopback case. Preserve unknown historical HTTP causes as unknown; local reproduction does not identify an earlier unrecorded status. |
 | [Alpha.4 registry response](ALPHA4-HOSTED-RECORD.md#actual-public-release-and-one-package-registry-outcome) | `yetlet-actions` was accepted, but the parser required `krate.name`; its mocks shared that false assumption. The other fifteen uploads never started. | Test against the provider's documented response contract, including warnings-only success. Resolve actual identity/content using index and download readback before considering any continuation. A parser failure after PUT is not proof of no write. |
-| [CLI 0.1.0 consumer](YT-215-CLI-FIRST-RELEASE.md#actual-first-publication-and-consumer-failure--2026-10-31) | Publication and install succeeded, but the real executable printed a stale unpublished suffix. Help/new were not reached. | Check the real binary's exact version, help and project creation before delivery. Derive the CLI version from its own manifest. Published 0.1.0 remains historical; 0.1.1 is a distinct patch release. |
+| [CLI 0.1.0 consumer](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures) | Publication and install succeeded, but the real executable printed a stale unpublished suffix. Help/new were not reached. | Check the real binary's exact version, help and project creation before delivery. Derive the CLI version from its own manifest. Published 0.1.0 remains historical; 0.1.1 is a distinct patch release. |
 
 ### Limits that must not be rewritten as known root causes
 
@@ -55,13 +55,13 @@ authorized source-CI retry below remains part of this version's history.
   demonstrate a 429. The owner later selected two SDK packages and a separately
   versioned CLI. Package boundaries follow API, target, opt-in and installation
   needs; quota alone is not an architectural reason to combine everything.
-- [Source CI 41172082238/1](YT-216-CLI-011-PATCH-RELEASE.md#selected-candidate-and-source-delivery--2026-10-31)
+- [Source CI 41172082238/1](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
   failed an unchanged Lab SQLite concurrency assertion: expected 303/409,
   observed 303/503 Busy. Only the owner-authorized failed Stable job was retried;
   attempt 2 passed with the original MSRV execution reused. The observation does
   not prove a scheduler/SQLite root cause, fix the test or authorize future retries.
 - The retained CLI Clippy findings and offline-cache/private-directory fixture
-  failures have their own [YT-216 scope](YT-216-CLI-011-PATCH-RELEASE.md#selected-candidate-and-source-delivery--2026-10-31).
+  failures have their own [YT-216 scope](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures).
   Do not convert an inherited diagnostic or local harness failure into a new
   release implementation project without an unmet requirement.
 

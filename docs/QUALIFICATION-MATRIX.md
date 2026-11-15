@@ -68,7 +68,7 @@ the unpublished GitHub history is **not verified reachable**. Current CLI
 behavior and SDK selection instead follow the maintained
 [CLI process contract](CLI-CONTRACT.md#historical-cli-source-qualification-and-process-constraints),
 [CLI guide](CLI-GUIDE.md#historical-cli-source-evidence-and-operation-limits)
-and retained [SDK resolution contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md).
+and retained [SDK resolution contract](CLI-GUIDE.md#sdk-resolution-yt-247).
 
 | Historical cohort | Observed accepted scope | Original failures / limits |
 |---|---|---|
@@ -137,7 +137,7 @@ cross-platform coverage. Preserve the original rejected responses and failed
 Reviewer/test populations rather than converting them into successful cases.
 Use the [Admin example](../examples/admin-dashboard/README.md), the
 [CLI process contract](CLI-CONTRACT.md) and the
-[SDK resolver contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md)
+[SDK resolver contract](CLI-GUIDE.md#sdk-resolution-yt-247)
 for current application and CLI decision boundaries.
 
 ## Historical operations, capacity and recovery cohorts

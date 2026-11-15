@@ -161,7 +161,7 @@ SDK publication.
 ### Standard HTML authoring coverage
 
 The published SDK alpha.7 module has **101 standard HTML constructors**
-selected from the dated [HTML inventory](YT-219-HTML-INVENTORY.md):
+selected from the dated [HTML inventory](API-CONTRACTS.md#historical-html-element-and-attribute-inventory):
 89 currently admitted Browser DOM elements, `img()` (admitted in Browser only
 when the caller selects an `ImagePolicy`) and 11 native SSR-only/deferred
 elements. The same owned `View` tree reaches the existing HTML and DOM
@@ -245,7 +245,7 @@ The native and browser renderers accept only their declared `hidden`
 attribute combinations. A successful SSR tree does not imply that unsupported
 DOM attributes or native control defaults will be mirrored by browser mount;
 manual controls, form reset, navigation and focus stay app/browser-owned.
-Read the [bounded DOM contract](YT-110-DOM-CAPABILITIES.md) and
+Read the [bounded DOM contract](BROWSER-APP.md#historical-native-dom-controls-and-navigation-boundaries) and
 [DOM guide](../crates/yetlet-browser/guides/dom.md).
 
 The renderer-neutral shape does not make all Views browser-compatible.

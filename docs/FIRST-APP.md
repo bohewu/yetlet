@@ -100,7 +100,7 @@ The explicit SDK selection keeps this walkthrough on its reviewed reader
 edition as newer SDK releases arrive. Omitting it selects the latest available
 non-yanked SDK by SemVer, including prereleases. `--offline` uses
 only local resolver metadata and Cargo index/cache; missing inputs fail clearly
-without contacting the registry. See the [resolver CLI contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md).
+without contacting the registry. See the [resolver CLI contract](CLI-GUIDE.md#sdk-resolution-yt-247).
 
 The public TOMLs configure CLI behavior. They do not mean the app has selected
 the optional runtime Settings loader. This path needs no `--settings`,

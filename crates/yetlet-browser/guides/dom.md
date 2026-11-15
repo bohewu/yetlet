@@ -13,7 +13,7 @@ validation. Default entry points keep same-origin navigation and no images;
 per-mount options can admit `img`, bringing the selected DOM scope to 90 elements.
 These additions are absent from SDK alpha.5's 38-element baseline.
 
-Use [the coverage contract and dated inventory](https://github.com/bohewu/yetlet/blob/master/docs/YT-219-HTML-INVENTORY.md)
+Use [the coverage contract and dated inventory](https://github.com/bohewu/yetlet/blob/master/docs/API-CONTRACTS.md#historical-html-element-and-attribute-inventory)
 for supported and deferred families. Typed View constructors do not imply DOM
 admission or complete browser API support. The original [DOM expansion](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-220-HTML-DOM-IMPLEMENTATION.md)
 and [link/image policy](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-221-DOM-URL-IMAGE-CONTRACT.md)
@@ -61,9 +61,9 @@ validation alone does not mount anything or prove browser navigation acceptance.
 
 ### Supported subset and lifetime
 
-The older SDKalpha.5 [YT-110 baseline](https://github.com/bohewu/yetlet/blob/master/docs/YT-110-DOM-CAPABILITIES.md#dom-vocabulary)
+The older SDKalpha.5 [YT-110 baseline](https://github.com/bohewu/yetlet/blob/master/docs/BROWSER-APP.md#historical-native-dom-controls-and-navigation-boundaries)
 supports38 tags and42 named attributes. SDKalpha.6 includes all51 additional
-ordinary elements selected by the [coverage contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-219-HTML-INVENTORY.md):
+ordinary elements selected by the [coverage contract](https://github.com/bohewu/yetlet/blob/master/docs/API-CONTRACTS.md#historical-html-element-and-attribute-inventory):
 text semantics, explicit table sections, figure/caption, pre, classic controls,
 details/summary and canvas/dialog hosts. New scoped attributes and numeric/keyword
 checks coexist with old admission rules. Unsupported names, duplicates, void
@@ -86,7 +86,7 @@ See the [implementation record and limits](https://github.com/bohewu/yetlet/blob
 
 Initial input/textarea/select/checkbox defaults are declarative; live values, chosen events, reset and submission remain browser/application-owned. Textarea text has LF normalization and preserves an initial newline across SSR and DOM. See the shared [native controls example](https://github.com/bohewu/yetlet/blob/master/examples/todo-ui/src/controls.rs), available at `/app` and the no-JS `/controls` route in Todo.
 
-`href` accepts a root-relative path or fragment; form `action` accepts a root-relative path. Static `validate` checks the narrow spelling. WASM mount additionally uses the browser URL parser and effective document base, rejects non-HTTP(S), cross-origin or credential-bearing destinations, and stores absolute URLs before touching the target. Therefore mount can reject a View that passed static validation. Later base changes do not retarget accepted attributes. The broader SSR URL policy remains separate; see [navigation limits](https://github.com/bohewu/yetlet/blob/master/docs/YT-110-DOM-CAPABILITIES.md#navigation-and-submission-boundary).
+`href` accepts a root-relative path or fragment; form `action` accepts a root-relative path. Static `validate` checks the narrow spelling. WASM mount additionally uses the browser URL parser and effective document base, rejects non-HTTP(S), cross-origin or credential-bearing destinations, and stores absolute URLs before touching the target. Therefore mount can reject a View that passed static validation. Later base changes do not retarget accepted attributes. The broader SSR URL policy remains separate; see [navigation limits](https://github.com/bohewu/yetlet/blob/master/docs/BROWSER-APP.md#historical-native-dom-controls-and-navigation-boundaries).
 
 The caller owns the target and event listener lifetime. Keep listeners outside the replaced subtree or explicitly release/rebind them. Subtree replacement does not preserve child identity, focus or selection as a general contract, and unexpected DOM API failures are not transactional rollback. Choose the opt-in `dom-keyed` feature for proven identity-sensitive collections. There is no general VDOM, hydration, resumability or GPU acceleration.
 

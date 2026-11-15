@@ -120,7 +120,7 @@ preserve all default-branch, weekly, and manually requested CodeQL runs,
 including pending jobs. The four-language matrix, triggers, and documented
 Markdown-only admission are unchanged. The observed Rust CodeQL PR execution
 was diff-informed but did not use an overlay-base cache; Rust overlay support
-is not presumed or forced. See [YT-236 diagnostics](YT-236-CODEQL-PR-CONCURRENCY.md).
+is not presumed or forced. See [YT-236 diagnostics](CODEQL-CI-PERFORMANCE.md#historical-codeql-pr-concurrency-and-rust-analysis-evidence).
 
 Activation is a separate delivery step. After the workflow is merged and its
 local checks pass, record the current default-setup settings, disable default
