@@ -521,7 +521,7 @@ for failures. A blank record or successful automation is not manual evidence.
 
 ## Bounded task acceptance and optional future coverage
 
-The local/browser and hosted run IDs, terminal results, observed versions/architectures and artifact references are recorded in [M10f verification](M10F-VERIFICATION.md). The authorized workflow merge and actual hosted run reached terminal success. YT-065 is therefore Done at the bounded automated desktop/native/browser scope.
+The local/browser and hosted run IDs, terminal results, observed versions/architectures and artifact references are recorded in [M10f verification](QUALIFICATION-MATRIX.md#m10-native-browser-and-delivery-reconciliation). The authorized workflow merge and actual hosted run reached terminal success. YT-065 is therefore Done at the bounded automated desktop/native/browser scope.
 
 The manual cells above remain explicitly Not verified and optional. They do not block this bounded task, do not become supported-platform or accessibility-conformance claims, and must not be inferred from typed Unicode or DOM assertions. Supported platform/version policy, real-device/assistive-technology ownership and any application-specific manual evidence remain future decisions. YT-020 release qualification remains Blocked. YT-066 is a separate backlog item.
 
@@ -871,3 +871,90 @@ YT-020 stayed Blocked at that time. Neither prototype completion nor Stable
 Candidate declared a stable/public/production release. Later publication records
 control today's distribution identity; broad IME/AT/WebKit/mobile and production
 security were not established by these historical runs.
+
+## M10 native, browser and delivery reconciliation
+
+The 2026-10-10 M10 evidence separates source checks from actual native/browser
+execution. YT-065 implementation reviewer `wc_job_FH0L7fH4UH6ICPoW` PASS covered
+source/local gates; hosted execution was accepted only after PR1 and actual run
+`38043565238` at `c38837835dac683b09194b475baab2d8eda5a875`. Candidate
+`3128d23591feee15ce976d7b83a56dcd587048d7` and squash tree matched. Candidate
+required CI38042614403 and merged baseline38043547271 passed independently.
+
+| Executed lane | Result and preserved failure boundary |
+|---|---|
+| Local Windows build26300 / PowerShell7.6.6 / Rust1.88 GNU | Nine reusable crates:80 tests/four doctests PASS, Job `wc_job_2fmSUCLQI2b9dOe9`, clean separate checkout. Initial compile passed but test linking lacked GNU prerequisites. User-local w64devkit2.10.0, actual dlltool/assembler/unwind inputs and process-local `-C link-self-contained=yes` resolved it; no stub library, skipped test, elevated workload or global PATH change. This is native GNU, not local MSVC/browser evidence; source logs remained on that runner when artifact transfer was refused |
+| Offline Debian12 Linux x86_64 container | Pinned Rust1.88 image `rust@sha256:af306cfa71d987911a781c37b59d7d67d934f49684058f96cf72079c3626bfe0`, exact3128d23 Git archive and locked vendor read-only, no network/ports/socket/credentials, nonroot and bounded resources. Job `wc_job_MUaVCKwQYsrSwseh`:196 tests/five doctests and real loopback SSR/escaping/CSP/404/405 PASS. Owned server/container removed; no orchestration/deployment claim |
+| Hosted native qualification | Rust1.99: Ubuntu24.04 x86_64 GNU image20261004.327.1, Windows2025 x86_64 MSVC image20260925.250.1, macOS15 ARM64 image20260907.0337.1; each nine-crate80/four PASS. Named downloaded artifacts, not job titles, establish identity |
+| Local/hosted Firefox | Local Job `wc_job_sv9TmUH_rdBF2DdM`: Todo/Search, keyed, multi-island PASS. Added real Tab/Enter/Unicode/labels/error-focus/root-language/stateless303 forms journey:five groups PASS. Hosted Firefox157.0/geckodriver0.37.1/Python3.12.15:all four suites and sanitized report/cleanup PASS. All136 pre-existing production assets were unchanged by local builders |
+
+The initial mocked forms cleanup test failed at an unmocked socket PermissionError;
+one fixture correction passed eight mocked cases. Mocked syntax/startup/failure
+checks are not real-browser proof. Local form teardown observed driver exit0,
+server-15 and closed owned resources. A documentation reviewer later found three
+stale hosted-pending claims; correcting those did not rerun platform tests or
+convert a document review into a security scan. Real OS IME, spoken AT,
+WebKit/mobile, touch/soft keyboard and zoom/reflow remain **Not verified in this
+M10 cohort**, optional future scope without WCAG/device/general support claims.
+Later Board IME/Orca evidence has its own source and does not rewrite these cells.
+
+Full original M10E/F/G/H, remaining-plan and delivery headings/blobs remain locally
+recoverable at `40b66f1ad9bd0eb5666a9e1c8f113310993a3544`; remote reachability is
+unverified. Raw evidence stays under its original `target/m10-remaining/`,
+`target/m10-delivery/docker/`, `target/qualification/` and runner-local stores.
+
+## M12 migration acceptance and unexecuted paths
+
+The original2026-10-15 M12 migration accepted10 YT-084,30 YT-085 and12 YT-086
+file mappings, the transitive Rust fixture caller and three workflow surfaces
+after separate reviews. This is bounded tool migration, not current universal
+Python-free, platform, browser/GPU or production qualification.
+
+YT-083 actual Linux and exact-source Windows MSVC1.99 process/doctor checks
+passed after foundation corrections. The separate GNU import-library attempt
+failed before tests, not supported-platform evidence. Doctor/foundation does
+not qualify Windows persistent-Service or later browser/qualification commands.
+YT-084 compared128 independently generated artifacts and preserved original
+Python bytes; early catalog/README/checker/CI adoption followed parity. No
+new GPU/browser or long-load acceptance came from those build outputs.
+
+YT-085 initially exhausted four repairs/two operational retries while loopback
+allocation returned PermissionDenied; missing Board/scene commands and runtime
+gaps stayed explicit. Later separate implementations and host evidence produced
+26 source-bound receipts:25 positive scenarios and one **nonzero scene-chrome
+GPU-unavailable** result. Default Firefox Support was semantic fallback with
+gpu_acceptance=false. Shared-helper/report/Board-retention repairs used focused
+checks;16 final Board tests/fmt/Clippy passed. Final independent review at
+target/m12/yt085/reviewer-board-retention-20261015/result.json PASS accepted
+the30 mappings, while Windows persistent-Service and external Redis fixture
+execution remained **Not verified**; their caller migration belonged to YT-086.
+
+YT-086's source/fixture corrections passed57 focused tests (nine measurement,
+10 local,21 Docker,17 checksum). The full xtask attempt remained **exit101:
+117 passed/four existing server_status loopback-PermissionDenied failures/two
+ignored**, later integration binaries/doctests not reached. Earlier compiler,
+inspection/edit-tool errors and exhausted/overrun counters were retained, not
+reset into a fresh all-green suite. Controlled-PATH sample-dx and checksum
+create/verify exited0 with zero Python/Node sentinel invocations, proving only
+their executed filesystem/source branches. No hosted workflow was triggered.
+
+Independent reviewer `wc_job_uEQye7iAKqzfoe59` resolved10 of12 prior P2s and
+retained two. Separately authorized fixes made corrupt-start inspect recursive
+per-attempt native-exit/cleanup receipts, and preserved first SIGINT/SIGTERM
+identity through Docker/report finalization. Check/fmt passed;34 focused cases
+(11 local/23 Docker) passed; an unused-import Clippy failure preceded corrected
+PASS. A whitespace-wrapper failure and its unsuccessful correction were stopped;
+ordinary git diff --check passed. No full application/Docker replay followed.
+Final independent YT-086 reviewer `wc_job_6UfDDdHnNCBXkMhA` PASS with zero
+issues/followups accepted the **bounded migration**; it did not erase those failed
+or unexecuted paths, establish complete runtime-graph parity, actual private
+rebuild/hosted execution, Windows cancellation here, long-load, physical IME/AT,
+cloud or new GPU support.
+
+Full original52-row migration ledger and plan, exact direct cases/options/env,
+status transitions and hashes are locally recoverable at
+`40b66f1ad9bd0eb5666a9e1c8f113310993a3544`; original YT-082–086 verification
+is locally recoverable at `b610acc7e098020b6b59dfa0d1ab2b75b059e656`.
+Remote SHA accessibility is unverified. Raw historical target/m12 logs remain
+separate and unchanged. Current commands follow [Development](DEVELOPMENT.md#rust-tooling-migration-contracts-and-historical-inventory)
+and [xtask usage](../xtask/README.md), with later tools/status assessed separately.

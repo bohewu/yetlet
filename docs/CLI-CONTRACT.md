@@ -607,3 +607,14 @@ All fallible writes/checks precede the marker-removal acceptance commit point.
 Prepublication failures can recover without replacing accepted data; uncertainty
 after replacement requires preserved evidence and explicit operator rollback or
 verified rollforward before clearing the marker. Unknown temporaries are preserved.
+
+## Repository xtask and public CLI separation
+
+M12 migrated internal repository automation before the independent public CLI.
+Use [Development](DEVELOPMENT.md#rust-tooling-migration-contracts-and-historical-inventory)
+and [xtask usage](../xtask/README.md) for repository command/argv/cwd/environment,
+exit/signal/process and fixture contracts; those are not additional published
+CLI commands or promises. Current accepted CLI0.4.0 and SDKalpha.8 retain their
+own immutable release inputs and qualification. Original52-file/three-workflow
+migration evidence is historical, with source graph/runtime/platform limitations
+in the [qualification matrix](QUALIFICATION-MATRIX.md#m12-migration-acceptance-and-unexecuted-paths).

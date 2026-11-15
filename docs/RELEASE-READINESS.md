@@ -275,7 +275,7 @@ Signed source `8e557e760407a3d4b3f5a8b8f833748946be1387`, policy HEAD `abb2cce12
 
 ## M11 planning boundary (2026-10-12)
 
-[M11](M11-PLAN.md) separately proposes product-readiness and an official opt-in Experimental `yetlet-wgpu` line. This documentation filing does not implement a product/renderer, expand the original nine release candidates, change YT-020 or qualify an operating environment. Current source inspection starts from clean `c7ecc49eeb667e145cfb7e764c10b72ba104bbee`; historical dirty/signing/CI statements retain their original checkpoints. Lack of public publication does not itself prevent an explicitly approved immutable-source private deployment, and publication/signatures do not establish runtime correctness. [Product research](M11-PRODUCT-READINESS-RESEARCH.md) defines the finite application evidence and owner responsibilities required before such a scoped claim.
+[M11](ARCHITECTURE.md#m11-product-and-renderer-decisions) separately proposes product-readiness and an official opt-in Experimental `yetlet-wgpu` line. This documentation filing does not implement a product/renderer, expand the original nine release candidates, change YT-020 or qualify an operating environment. Current source inspection starts from clean `c7ecc49eeb667e145cfb7e764c10b72ba104bbee`; historical dirty/signing/CI statements retain their original checkpoints. Lack of public publication does not itself prevent an explicitly approved immutable-source private deployment, and publication/signatures do not establish runtime correctness. [Product research](ARCHITECTURE.md#m11-product-and-renderer-decisions) defines the finite application evidence and owner responsibilities required before such a scoped claim.
 
 ## Implemented behavior and retained validation
 

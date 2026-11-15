@@ -417,7 +417,7 @@ continued availability of those raw bytes.
 
 The [current CLI guide](CLI-GUIDE.md#native-cli-platform-and-generated-deployment-boundaries)
 and [Rust development guide](DEVELOPMENT.md) own executable commands.
-The [M12 migration ledger](M12-PYTHON-MIGRATION.md) records the original
+The [M12 migration ledger](DEVELOPMENT.md#rust-tooling-migration-contracts-and-historical-inventory) records the original
 Python-to-xtask migration and its bounded parity, with unrun runtime targets
 still unverified. M13 initially accepted only unpublished Linux CLI
 `new`/`doctor`/`build`/`dev`; a separate Windows GNU/MSVC run verified
@@ -438,11 +438,11 @@ Complete original closed task evidence is recoverable at fixed local Git
 
 ## M11 — historical planning and selected product/renderer delivery
 
-The original [M11 plan](M11-PLAN.md), [product-readiness research](M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](M11-WGPU-PLAN.md) and [planning review](M11-PLANNING-REVIEW.md) were documentation-only at the YT-069 checkpoint. **Subsequent owner authorizations and independent reviewers** accepted YT-070–YT-080 at separately selected bounds. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) now accepts only the bounded Experimental opt-in architecture; it does not grant stable or broad browser support. See the [M11 reconciliation](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-M11-CLOSEOUT.md) and [API consistency audit](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement); historical planning statements retain their original date and evidence.
+The original [M11 plan](ARCHITECTURE.md#m11-product-and-renderer-decisions), [product-readiness research](ARCHITECTURE.md#m11-product-and-renderer-decisions), [GPU plan](ARCHITECTURE.md#m11-product-and-renderer-decisions) and [planning review](ARCHITECTURE.md#m11-product-and-renderer-decisions) were documentation-only at the YT-069 checkpoint. **Subsequent owner authorizations and independent reviewers** accepted YT-070–YT-080 at separately selected bounds. [ADR 0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md) now accepts only the bounded Experimental opt-in architecture; it does not grant stable or broad browser support. See the [M11 reconciliation](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-M11-CLOSEOUT.md) and [API consistency audit](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement); historical planning statements retain their original date and evidence.
 
 ### Activated non-GPU implementation
 
-The owner committed planning as `d96f7af` and [activated YT-070–YT-074](M11-P-ACTIVATION.md); M11-P implementation is committed at `f00ec597`. [Form/asset evidence](M11-P-FORM-ASSET-VERIFICATION.md) records YT-070–YT-072; YT-073 is locally complete. [YT-074 qualification](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) is Done at the owner-amended local scope, with retained real Chewing IME, repaired Firefox/Orca speech and final Chrome/Firefox PASS. The new owner-authorized full 62-minute mixed-load execution passed with 45,000 measured requests and zero errors; fresh independent review also passed, and the earlier synchronized-burst failure is retained. Historical repair/test records retain their original source and commit boundaries. See [desktop acceptance](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence), [spoken transcript](YT-074-SPOKEN-AT-EVIDENCE.json), [IME screenshots](screenshots/yt074-ime/README.md), [startup](BOARD-START.md) and [handoff](M11-P-IMPLEMENTATION-HANDOFF.md). No GPU or public-release change is claimed.
+The owner committed planning as `d96f7af` and [activated YT-070–YT-074](PRODUCTION-READINESS-PHASE2.md#m11-board-acceptance-and-original-blocked-journeys); M11-P implementation is committed at `f00ec597`. [Form/asset evidence](ASSETS.md#m11-native-css-proof-and-retained-wrapper-decision) records YT-070–YT-072; YT-073 is locally complete. [YT-074 qualification](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) is Done at the owner-amended local scope, with retained real Chewing IME, repaired Firefox/Orca speech and final Chrome/Firefox PASS. The new owner-authorized full 62-minute mixed-load execution passed with 45,000 measured requests and zero errors; fresh independent review also passed, and the earlier synchronized-burst failure is retained. Historical repair/test records retain their original source and commit boundaries. See [desktop acceptance](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence), [spoken transcript](YT-074-SPOKEN-AT-EVIDENCE.json), [IME screenshots](screenshots/yt074-ime/README.md), [startup](BOARD-START.md) and [handoff](PRODUCTION-READINESS-PHASE2.md#m11-board-acceptance-and-original-blocked-journeys). No GPU or public-release change is claimed.
 
 ### Experimental GPU and cross-crate API evidence
 
@@ -675,7 +675,7 @@ let page = Page::with_metadata(
 );
 ```
 
-The metadata contract is deliberately only title + language. Charset/viewport stay fixed and CSP remains server response policy; Yetlet does not add an arbitrary head manager or DSL. See [Compatibility Policy](COMPATIBILITY.md) and [M10c plan](M10C-PLAN.md).
+The metadata contract is deliberately only title + language. Charset/viewport stay fixed and CSP remains server response policy; Yetlet does not add an arbitrary head manager or DSL. See [Compatibility Policy](COMPATIBILITY.md) and [M10c plan](COMPATIBILITY.md#m10-metadata-compatibility-evidence).
 
 `configure`/`try_configure` execute ordinary module setup functions once at application construction. Providers compose native scoped middleware and typed request/application state. The Todo server explicitly selects `yetlet-request-id`; the M8c cart explicitly selects `yetlet-session` only for `/cart`. A minimal app depends on neither. See [Extensions](EXTENSIONS.md), [complete M6 evidence](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements) and [M8c evidence](M8C-VERIFICATION.md).
 
@@ -902,25 +902,25 @@ M10 release-supply-chain design/preflight is independently reviewed. Four local 
 - [Public API contract classification](API-CONTRACTS.md)
 - [Post-M9 CI and security review](CI-SECURITY-REVIEW.md)
 - [Pre-public compatibility policy](COMPATIBILITY.md)
-- [M10c compatibility/document metadata plan](M10C-PLAN.md)
-- [M10c planning reviewer evidence](M10C-PLANNING-VERIFICATION.md)
-- [M10c implementation verification](M10C-VERIFICATION.md)
-- [M10d production edge/authentication threat-model plan](M10D-PLAN.md)
-- [M10d planning reviewer evidence](M10D-PLANNING-VERIFICATION.md)
+- [M10c compatibility/document metadata plan](COMPATIBILITY.md#m10-metadata-compatibility-evidence)
+- [M10c planning reviewer evidence](COMPATIBILITY.md#m10-metadata-compatibility-evidence)
+- [M10c implementation verification](COMPATIBILITY.md#m10-metadata-compatibility-evidence)
+- [M10d production edge/authentication threat-model plan](THREAT-MODEL.md#m10-threat-model-acceptance-and-corrected-boundaries)
+- [M10d planning reviewer evidence](THREAT-MODEL.md#m10-threat-model-acceptance-and-corrected-boundaries)
 - [Production edge and authentication threat model](THREAT-MODEL.md)
-- [M10d threat-model verification](M10D-VERIFICATION.md)
-- [M10a license/security-policy verification](M10A-VERIFICATION.md)
-- [M10b repository-governance verification](M10B-VERIFICATION.md)
-- [Remaining M10 qualification plan](M10-REMAINING-PLAN.md)
+- [M10d threat-model verification](THREAT-MODEL.md#m10-threat-model-acceptance-and-corrected-boundaries)
+- [M10a license/security-policy verification](CI-SECURITY-REVIEW.md#m10-policy-governance-and-scan-evidence)
+- [M10b repository-governance verification](CI-SECURITY-REVIEW.md#m10-policy-governance-and-scan-evidence)
+- [Remaining M10 qualification plan](QUALIFICATION-MATRIX.md#m10-native-browser-and-delivery-reconciliation)
 - [Release supply-chain design and preflight](RELEASE-SUPPLY-CHAIN.md)
-- [M10e release verification](M10E-VERIFICATION.md)
+- [M10e release verification](RELEASE-SUPPLY-CHAIN.md#m10-unsigned-supply-chain-preflight-evidence)
 - [Platform/browser/accessibility matrix](QUALIFICATION-MATRIX.md)
-- [M10f automated platform/browser qualification evidence](M10F-VERIFICATION.md)
+- [M10f automated platform/browser qualification evidence](QUALIFICATION-MATRIX.md#m10-native-browser-and-delivery-reconciliation)
 - [Provider operations and local limitations](PROVIDER-OPERATIONS.md)
-- [M10g local operational evidence](M10G-VERIFICATION.md)
+- [M10g local operational evidence](PROVIDER-OPERATIONS.md#m10-local-operations-and-bounded-framework-closeout)
 - [Optional future external-assessment template](EXTERNAL-SECURITY-REVIEW.md)
-- [M10h internal security-scan status](M10H-VERIFICATION.md)
-- [M10 CI, Windows and Docker delivery verification](M10-DELIVERY-VERIFICATION.md)
+- [M10h internal security-scan status](CI-SECURITY-REVIEW.md#m10-policy-governance-and-scan-evidence)
+- [M10 CI, Windows and Docker delivery verification](QUALIFICATION-MATRIX.md#m10-native-browser-and-delivery-reconciliation)
 - [Contribution policy](../CONTRIBUTING.md)
 - [Security policy](../SECURITY.md)
 - [Module composition and optional providers](EXTENSIONS.md)

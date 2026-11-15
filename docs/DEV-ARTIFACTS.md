@@ -219,3 +219,26 @@ subdirectory of the existing YT-233
 evidence run retains the plan, preservation manifests, per-directory removal
 journal and actual result. The earlier read-only acceptance and original Windows
 test/transport failures remain intact.
+
+## Migration receipts and process evidence
+
+For repository-tool migration, freeze each family's actual source/lock/tool,
+argv/cwd/environment selection and old/new output hashes separately. The original
+M12 ledger's52 Python-file hashes and three workflow inputs are historical
+snapshots in [Development](DEVELOPMENT.md#rust-tooling-migration-contracts-and-historical-inventory),
+not an instruction to overwrite old reports or run frozen Python oracles.
+Retain unsigned checksum/schema, forms report, Board raw phases/tails, PNG pixel
+proof and source manifests at original locations. Preserve original failures,
+unavailable capability status and focused post-repair results individually.
+Build caches can be reused; evidence is not cache.
+
+Process success requires verified owned-child/group/Job termination, stream
+closure and owned-work cleanup before PASS. Unknown native exit, missing cleanup
+receipt, failed final Docker query or provisional report after cancellation is
+not success. Corrupt-start decisions consume recursive per-attempt exit receipts
+and reject successful startup, missing/zero/unknown/invalid native exit,
+malformed JSON and incomplete cleanup. First signal identity survives report
+finalization. These are migrated tool behaviors, not proof that an old full
+Board/Docker qualification ran under a later Rust tool. Original raw
+target/m12/yt083, yt084, yt085 and yt086 receipts remain in place; local Git
+restores their Markdown descriptions only.

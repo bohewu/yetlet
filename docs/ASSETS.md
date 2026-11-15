@@ -246,3 +246,36 @@ publication and platform evidence, and Todo's qualification records its bounded
 Linux sample results. [CLI Style evidence](CLI-GUIDE.md#style-release-and-platform-evidence),
 [Todo CSS example](../examples/todo-server/README.md#app-owned-rust-styles-and-typed-tag-builders)
 and [original Linux qualification](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary)
+
+## M11 native CSS proof and retained-wrapper decision
+
+YT-070/072 (2026-10-12) selected exact Bootstrap5.3.8 CSS-only/MIT inputs,
+verified upstream SHA384/notices, deterministically externalized23 embedded SVG
+occurrences into22 hashed output files, and served a finite same-origin manifest.
+No Bootstrap JS, CDN, remote fonts, data: allowance, unsafe-inline/eval or CSP
+relaxation was selected. Plain framework licenses do not license commercial
+themes, icon/font/photo assets. Tailwind build-time literal-source scanning was
+an alternative; JS widgets remained a separately owned lifecycle/security cost.
+
+Todo Search's exact CSS/loader/icon digest, Dashboard's per-island file/existence
+fallback and the form proof's ordered/deduplicated MIME-bound assets had distinct
+availability/deployment policies. Focused regressions on all three justified
+**retaining application-owned wrappers**, with no new public stylesheet/head API,
+Page signature or default dependency. The later optional asset contract above
+has its own evidence and does not retroactively change that decision.
+
+Ten proof tests,27 selected package tests plus one selected Todo route test,
+asset checks and actual Chrome155 journey passed. A test-initializer Clippy
+failure was corrected before final checks. Computed styles/no overflow at390px,
+no external requests/CSP errors and missing/hostile manifest tests establish
+bounded behavior; screenshot access was refused by artifact policy, so no visual
+signoff was claimed. No alternate image path was used. The original
+[form/asset record](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M11-P-FORM-ASSET-VERIFICATION.md)
+is locally Git-verified; remote SHA reachability is unverified. Raw browser.json
+and images remain under original target/m11-form-proof, separate from Git.
+
+Use verified content-addressed caches with old-HTML retention; a missing optional
+enhancement preserves readable SSR. Required CSS absence must fail package/readiness
+checks and remain readable/reportable at runtime. Hashed filenames alone do not
+prove cache policy. Any future widget exclusively owns its subtree/listeners and
+retired callbacks; Yetlet must not reconcile the same children concurrently.

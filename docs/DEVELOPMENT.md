@@ -185,3 +185,88 @@ For source freezing, tags, protected jobs, signing and publication, switch to
 [the release workflow](RELEASING.md). The release freeze is a bounded promotion
 window, not a permanent block on development: feature branches may continue,
 while master merges wait only when the selected signer gate requires it.
+
+## Rust tooling migration contracts and historical inventory
+
+Use the repository-root `cargo xtask` route documented in
+[xtask usage](../xtask/README.md); it is independent of the published CLI.
+The alias's relative manifest path is **root-only**. From a subdirectory use
+the quoted absolute xtask/Cargo.toml path. The program locates its repository
+from its compiled manifest; explicit relative user outputs resolve against the
+invoking cwd. xtask is unpublished with its own workspace/lock/target; framework
+and browser production dependency graphs do not depend on it.
+
+M12's original inventory at7cfac613f908c5c19fa581438288386809870b56 contained
+**52 tracked Python files/14,006 lines**:35 scripts, eight scene, four Board,
+two form-proof, three Redis-qualification files, plus **three workflow surfaces**.
+Its sorted `<sha256>  <path>\n` inventory digest was
+59a2eb8eb822e6d6054591e6c26625cbfdd2f7620c78dd45a28f19767b66b4e5.
+The exact52 rows/file hashes, original direct cases, workflow/root-input hashes
+and changing checkpoint statuses remain in the
+[original migration ledger](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M12-PYTHON-MIGRATION.md#all-52-tracked-files)
+and [original adoption plan](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M12-RUST-TOOLCHAIN-PLAN.md).
+Those Git objects/headings are locally verified; remote reachability is
+unverified. They describe2026-10-15 migration, **not today's Python inventory**.
+Later release/docs helpers can exist; frozen sources are compatibility oracles,
+not a claim that every current task must avoid Python or that an old checker
+understands later catalogs. Do not run scripts/check_docs.py as the live gate:
+its historical REQUIRED list intentionally still names retired documents.
+
+| Accepted mapping family | Canonical Rust route and retained scope |
+|---|---|
+| Seven YT-084 builders | `build browser`, `keyed-bindings`, `multi-island-dashboard`, `render-bench`, `scene-island`, `form-css-proof`, `board-assets`; independent Todo/Search, Counter/Filter and nested scene/root counter builds, matching locks/tool profiles/assets, no interpreter wrapper |
+| Two checks/direct catalog test | `check docs`, `check samples`, `cargo test --locked --manifest-path xtask/Cargo.toml --test check_samples`; English/links/fences/whitespace/Backlog DAG and catalog types/path/route/command/dependency/source-marker negatives preserved |
+| Thirty YT-085 mappings | Separate native/browser/Board/scene scenarios, CDP/WebDriver/BiDi/PNG helpers and two direct harness suites; retain assertions, raw/native exit and ownership, not a generic successful smoke. Internal Redis browser fixtures take the already-owned base URL explicitly |
+| Twelve YT-086 mappings | `measure baseline`, `render-strategies`, `sample-dx`, `scene-dynamic`; `qualify local-operations`, `multi-instance`, `redis-three-app`, `board`; `release checksums create/verify`; three direct local-operation/Docker/checksum test counterparts as recorded in the ledger |
+| Additional invocation graph | Rust cookie_fencing caller launches the Rust fixture with explicit argv/status, not Python or recursive parent Cargo tests. Redis-three-app uses ported browser/Docker helpers. rust.yml, qualification.yml and private-rebuild.yml switched their mapped calls, including real inline private-rebuild archive/provenance/checksum logic, without widening gate/ref/token/timeout controls |
+
+Keep old supported options/defaults, profile selection, output schemas and
+report locations; unknown/repeated/unsupported flags are usage errors. Help and
+doctor launch no suites/server/browser. Doctor probes installed tools read-only,
+never installs; Cargo bootstrap itself can write cache and needs pre-resolved
+dependencies offline. Missing tools/targets/browser/driver/capabilities fail
+nonzero with Not run/Blocked, never a successful skip or automatic install.
+Explicit pinned CSS `--fetch` is separate from build/check, never fallback.
+
+Processes use literal native argv and explicit cwd/env, with spaces/non-ASCII
+and native separators preserved, no shell concatenation or Python/Node wrappers.
+Keep executable discovery and inherited configured environment, with tool
+identity verified and no global default change. Build children select
+RUSTUP_AUTO_INSTALL=0; rolling stable stays explicit. Match wasm-bindgen to the
+applicable root/nested lock (0.2.129 at migration), not a timeless hardcoded pin.
+stdout reports/progress and stderr diagnostics remain separate; continuously
+drain bounded captures without deadlocks or secret/raw-cookie/exception leakage.
+Monotonic readiness/protocol/process/cleanup deadlines preserve suite budgets;
+timeout never retries an uncertain write or truncates a chosen long profile.
+
+Success0 requires complete checks **and cleanup**; validation/capability1,
+usage2, owned timeout124, spawn/pipe/setup/cleanup infrastructure125, cancellation
+130 at the runner boundary. Preserve exact child-native exit/origin separately,
+including reserved-code collisions; Unix signals keep identity/128+signal,
+Windows DWORD survives separately from portable mapping/Cargo wrapper status.
+Register ownership immediately, including partial startup: Unix owned groups,
+Windows suspended child→Job Object→resume; terminate/escalate/wait/reap/close
+streams/remove owned profiles and verify absence on every path. Never kill by
+executable name or attach to user browsers. Detached daemon groups and Unix
+SIGKILL cleanup remain unsupported; unavailable Windows primitives fail closed.
+Keep first SIGINT/SIGTERM identity through final report write, even mixed signals;
+cleanup/report/removal failures prevent provisional PASS.
+
+Positive and negative parity precede live adoption. Preserve build digest
+domains (`yetlet-v1`, `yt075-v1`, isolated domains), sorted filename/NUL/bytes,
+truncation/JSON/generation bytes, target/output roots, asset MIME/cache/CSP and
+unrelated-bundle isolation. Explicit --check must reject missing/extra/stale CSS
+without writes. Catalog Rust-command representation/checker/README adoption must
+land together; no route/package/path/dependency assertion is dropped. New raw
+measurements/goldens/receipts stay distinct from old acceptance, with exact
+source/tools/argv/cwd hashes and no overwrite.
+
+Keep all original direct-case subassertions, not merely test counts: four
+catalog cases,10 local-operation cases,18 original Docker cleanup/signal cases,
+16 checksum cases,three browser-process cases and two shop-readiness cases.
+The existing test suites are the product verification; no generic migration
+framework is required. Controlled-PATH failing Python/Node sentinels prove only
+the branches actually executed. Source graph audit plus one branch cannot prove
+every unexecuted runtime/platform path. Full-load, physical IME/AT and cloud
+acceptance must not be rerun or borrowed merely for a language port; see the
+[migration qualification limits](QUALIFICATION-MATRIX.md#m12-migration-acceptance-and-unexecuted-paths).

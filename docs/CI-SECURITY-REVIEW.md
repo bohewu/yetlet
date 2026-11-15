@@ -251,3 +251,31 @@ The [original dated signer narrative](https://github.com/bohewu/yetlet/blob/66de
 is locally Git-recoverable with unverified remote reachability. This preserves
 provenance of claims and raw-store locations, without asserting current raw-byte
 availability or granting operations against those stores.
+
+## M10 policy, governance and scan evidence
+
+These are dated **2026-10-10** observations, not a readback of current GitHub
+settings. Current reporting and distribution follow the public-source section
+above and [Release Readiness](RELEASE-READINESS.md).
+
+| Historical slice | Accepted evidence and original limits |
+|---|---|
+| YT-060 licensing/policy | `MIT OR Apache-2.0` lets the consumer choose either license; Apache supplies its patent grant. All 28 original manifests carried license/repository metadata, 19 applications were nonpublishable, nine library package lists included both texts through 18 exact aliases. Reviewer `wc_job_MPF4l2t8JaJXBguv` PASS. Licensing grants fork/use rights, not upstream PR acceptance, publication or legal assurance. Security reporting remains private, best effort and without response SLA under SECURITY.md |
+| YT-061 Private governance | Collaborator-only upstream PRs, sole owner, squash-only/no auto-merge/no DCO, automatic deletion of merged branches; protected master required PRs with zero human approvals, conversation resolution, linear history and administrator enforcement, no force/delete. Required checks were `Rust 1.88 MSRV` and `Stable native, samples, and Chrome`. Actions were read-only, unable to approve PRs, GitHub-owned/full-SHA, with checkout credentials disabled; Dependabot alerts/security fixes enabled. Private reporting returned404, secret scanning/push protection422, CodeQL default setup403: none was silently enabled or treated as PASS |
+| Governance review correction | First reviewer `wc_job_ISJjq_EUBG8tmQfQ` found missing check-run proof and stale monitoring claims. Retained `target/m10ab-evidence/check-runs.json` proves both contexts succeeded at `86c30a42114ca74f4197f0389707861308a844a7`, Actions app15368. Corrected text distinguishes alerts/security fixes/per-CI audit from absent scheduled updates and scanning. Repeat reviewer `wc_job_lu2WynqvKYemLlmd` PASS; this closed Private-state governance only |
+| Original YT-067 Standard scan | Codex Security0.1.32 scan `580f6c9a-ded9-4f69-a3c9-16bbcc29ab97`, source `3128d23591feee15ce976d7b83a56dcd587048d7`, coordinator `wc_job_oCTu5__mlpWYcsLr`: process completed but semantic result **incomplete**, ten reviewed files, no final report/counts. A group-writable Codex-home ancestor blocked checkpointing; owner changed0775→0755. Same-scan continuation was refused before a Job ID. No bypass, handwritten replacement report or repository-clean claim followed |
+| Later distinct source scan | Official Standard scan `fc4d4af8-5864-4ace-b098-23ebfe249b31`, Job `wc_job_qawaocVOmnaMdOj2`, clean source `25bff77ccc5a3641b30be27c4ca5d862c06f535d`: semantic completion/exit0, 227/227 regular files plus18 license symlinks, complete coverage, no deferred questions; **one Low/medium-confidence finding**, zero Critical/High/Medium. Canonical manifest/findings/coverage/threatmodel/report remain private in scanner-owned state; no attack traffic, external audit or complete dependency audit |
+| Bounded finding correction | Public-library `HttpExecutor::new` could disagree with browser URL normalization on ASCII controls. The local patch rejects every ASCII control byte before browser Request parsing. The shipped Todo used a fixed endpoint and restrictive CSP; no working shipped exploit was demonstrated. Three focused tests on stable/MSRV, strict Clippy, stable/MSRV Wasm, 196 workspace tests and five doctests per toolchain, eight Wasm packages and Chrome release E2E passed. Todo Wasm became294,576 bytes (+21), digest27597bad9c53b93e. Reviewer `wc_job_sTA8TdP3N3Veu9uC` PASS closes scan/fix scope; **no post-patch whole-repository rescan** |
+
+The maintainer replaced the paid external-assessor prerequisite with the internal
+scan. The [external template](EXTERNAL-SECURITY-REVIEW.md) remains optional, with
+no commissioned assessor or external attestation. Earlier M10 release blockers
+describe their checkpoint; they do not undo the accepted SDKalpha.8/CLI0.4.0
+receipts. No scan here certifies current production security.
+
+Full original policy, governance, delivery and scan records are recoverable from
+local Git `40b66f1ad9bd0eb5666a9e1c8f113310993a3544` as
+`docs/M10A-VERIFICATION.md`, `M10B-VERIFICATION.md`,
+`M10-DELIVERY-VERIFICATION.md` and `M10H-VERIFICATION.md`. Remote SHA accessibility
+is unverified. Raw `target/yt067-evidence/` logs and private scan reports stay at
+their recorded locations; Git recovery restores Markdown, not those raw files.

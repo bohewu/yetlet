@@ -272,3 +272,38 @@ Chrome/Firefox debug/release tests proved click-then-dispose starts neither loca
 work nor HTTP, held old responses cannot mutate after remount, and retired nodes
 stay inert. [Dated validation and costs](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence)
 keep that FAIL separate from repeat final PASS.
+
+## M11 native form and safe-content decision
+
+The historical YT-071 outcome retained native SSR controls and an explicitly
+enabled application-owned **read-only text preview**. It did not widen the then
+generic DOM/URL allowlist or introduce controlled inputs, rich HTML, namespaces,
+keyed control reorder or arbitrary user destinations. Later released DOM
+coverage above is a separate source/qualification, not backdated M11 evidence.
+
+False booleans are omitted; defaults differ from dirty live properties. Preview
+reads current textarea/select/checkbox state, never rewrites user controls,
+preserves identity/selection and uses owned abortable listeners/queued work.
+Native reset restores defaults; synthetic composition suppression/end is not OS
+IME proof. Chrome155 tested remount's single listener, disposal cancellation,
+reset, native submit/303 PRG, no local mutation POST/event circuit and CSP.
+The proof was stateless/unauthenticated, without credentialed-CSRF assurance;
+Board supplied separate Session/authorization/CSRF/storage behavior.
+
+Safe View escaping is contextual encoding, not a rich-HTML sanitizer, universal
+URL/origin policy or protection for raw Axum Html/keyed callbacks. Store bounded
+plain text, not pre-escaped strings, and test edit/save/read/preview/history as
+one path. Page reapplies default CSP on its own error response; successful
+render-page helpers attach CSP, directly converted renderer errors differ, and
+string renderers cannot attach HTTP headers. Applications can overwrite headers.
+Do not infer namespace support from a URL-policy name or assume compound URL
+values/redirects are validated. Structured Markdown must reject raw HTML and
+validate destinations; imported rich HTML/editor integration would require a
+separately selected vetted sanitizer and mutation/parity/security review, not a
+regex or new unconstrained RawHtml escape hatch.
+
+Current-session self-review accepted this bounded application decision; it was
+not independent security assurance. A broadened HTML/URL/live-control security
+boundary or externally reachable authenticated product retains its separate
+independent gate. Exact research and form-proof records remain at local Git
+`40b66f1ad9bd0eb5666a9e1c8f113310993a3544`; remote access is unverified.

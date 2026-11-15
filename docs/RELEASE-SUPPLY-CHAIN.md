@@ -317,7 +317,7 @@ Promote only already verified immutable digests: do not rebuild, repackage or su
 
 ## Historical M10e and overlay boundary
 
-The M10e dirty snapshot and later YT-020 working overlays are development-only, not an immutable release source, trusted provenance, signed Yetlet artifacts or independently controlled trusted-release evidence. [M10e verification](M10E-VERIFICATION.md), [original Private preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) and [integrity preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) separate their actual source/run identities and experiments from pending activation. Independent reviewer PASS may accept their bounded design/preparation scopes only. Public activation and any application-selected production qualification remain separate; paid external security review is optional, not a framework publication prerequisite.
+The M10e dirty snapshot and later YT-020 working overlays are development-only, not an immutable release source, trusted provenance, signed Yetlet artifacts or independently controlled trusted-release evidence. [M10e verification](RELEASE-SUPPLY-CHAIN.md#m10-unsigned-supply-chain-preflight-evidence), [original Private preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) and [integrity preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) separate their actual source/run identities and experiments from pending activation. Independent reviewer PASS may accept their bounded design/preparation scopes only. Public activation and any application-selected production qualification remain separate; paid external security review is optional, not a framework publication prerequisite.
 
 ## Adopted release trust and disclosure policy — YT-096
 
@@ -527,3 +527,39 @@ received no old-signature coverage. Original key-header, symlink, container-owne
 and read-only-fixture failures remain with final proof under
 `target/yt020-private-signing-20261012/`. Git preserves the source narrative,
 while keys, raw signatures and receipts retain separate private custody.
+
+## M10 unsigned supply-chain preflight evidence
+
+YT-064 (2026-10-10) completed **design/preflight**, not signing or reproducibility.
+At baseline7c5d126 plus78 dirty paths, actual metadata contained131 packages,
+28 workspace members/103 registry dependencies, nine candidates and19
+nonpublishable examples. License/source default-deny checks with cargo-deny0.20.2
+passed against unfiltered locked/offline metadata. cargo-cyclonedx0.5.9 generated
+41 CycloneDX1.5 JSON BOMs for native x86_64 GNU/all-features/all-Cargo-targets
+from a disposable source copy, with original/copied lock and source unchanged.
+Those plus BUILD-IDENTITY formed42 unsigned local files; checksum create/verify
+and16 positive/negative cases passed. Initial diagnostic `--version` placement
+was wrong after successful installs; only the diagnostic was corrected.
+
+The experiment excludes Wasm, other OS/targets, sysroot/system-library contents,
+authenticated origin and independent rebuild. Dirty development bytes are not
+HEAD/tag identity. Reviewer `wc_job_CeUNYnHsO1yI_kBz` PASS closes this scope only;
+earlier executor-pending paragraphs were handoff history. Clean immutable source,
+coordinated path-dependency versions, artifact/feature selection, SBOM binding,
+independent rebuild, authenticated signer/issuer, pinned verifier/trust roots,
+approvers, revocation and rollback remained separate activation gates at that
+checkpoint; later accepted publication follows current release records above.
+The exact input/tool hashes and original checksum bounds/negative cases remain
+in [M10e's original record](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M10E-VERIFICATION.md),
+locally Git-verified with remote reachability unverified. Raw
+`target/m10-remaining/sbom-result.json`, SBOMs and license/source logs remain
+separate historical evidence. An SBOM is inventory; checksums alone do not
+authenticate artifacts or prove independent control.
+
+The subsequent M10 delivery Guard had two initial blockers: a machine-specific
+plan path and a credential-like redaction-test sentinel. Their bounded correction
+passed ten tests and reviewer `wc_job_GiP1-EnLMgPXkOlb` PASS. Staged/outgoing
+strict/builtin checks then exited0 with **warning** status:18 known license-alias
+coverage warnings and one absolute-drive-path test warning, not zero findings.
+The checked staged tree matched the delivered candidate. This dated receipt
+grants no present Git authority.

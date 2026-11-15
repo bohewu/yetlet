@@ -193,3 +193,14 @@ It prepares exactly nine unsigned source packages; no signing/publication occurs
 Checksums require Linux POSIX no-follow descriptors; unqualified platforms fail
 closed. All 52 Python sources remain unchanged. See the verification record for
 actual tests, runtime availability and the reserved independent Reviewer gate.
+
+## Migration evidence and compatibility limits
+
+The [development guide](../docs/DEVELOPMENT.md#rust-tooling-migration-contracts-and-historical-inventory)
+maintains command/argument/environment/process/parity contracts and the original
+52-file/three-workflow inventory identity. The
+[qualification matrix](../docs/QUALIFICATION-MATRIX.md#m12-migration-acceptance-and-unexecuted-paths)
+records accepted migration and original failed/unexecuted runtime paths. The
+historical Python checker remains a frozen oracle and names retired documents;
+use cargo xtask check docs for the live gate. Original report bytes and long-run
+qualification are preserved, not regenerated or claimed by tool presence.

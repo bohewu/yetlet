@@ -4,7 +4,7 @@ Derived from [`todo-ledger.json`](todo-ledger.json). The project backlog source 
 
 **Items:** 82 — 74 Done, 1 Blocked, 7 Todo.
 
-Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing IME, repaired Firefox/Orca speech and final Chrome/Firefox PASS. The owner-amended full 62-minute mixed-load run passed with 45,000 measured requests and zero errors, followed by fresh independent review PASS. The original synchronized-burst failure remains a limitation. GPU is unactivated. See [qualification](examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence), [desktop acceptance](examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) and [handoff](docs/M11-P-IMPLEMENTATION-HANDOFF.md).
+Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing IME, repaired Firefox/Orca speech and final Chrome/Firefox PASS. The owner-amended full 62-minute mixed-load run passed with 45,000 measured requests and zero errors, followed by fresh independent review PASS. The original synchronized-burst failure remains a limitation. GPU is unactivated. See [qualification](examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence), [desktop acceptance](examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) and [handoff](docs/PRODUCTION-READINESS-PHASE2.md#m11-board-acceptance-and-original-blocked-journeys).
 
 ## Blocked
 
@@ -16,13 +16,13 @@ Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing
 
 | ID | Priority | Work item | Depends on | Plan |
 |---|---|---|---|---|
-| `YT-075` | medium | Browser WebGPU island and SSR fallback | YT-069, YT-023 | [GPU plan](docs/M11-WGPU-PLAN.md) |
-| `YT-076` | medium | GPU lifecycle/resource ownership | YT-075 | [GPU plan](docs/M11-WGPU-PLAN.md) |
-| `YT-077` | medium | Matched dynamic renderer measurements | YT-076 | [GPU plan](docs/M11-WGPU-PLAN.md) |
-| `YT-078` | medium | Picking and semantic accessibility alternative | YT-077 | [GPU plan](docs/M11-WGPU-PLAN.md) |
-| `YT-079` | medium | Approved opt-in yetlet-wgpu candidate | YT-078 | [GPU plan](docs/M11-WGPU-PLAN.md) |
-| `YT-080` | medium | Selected renderer target qualification | YT-079 | [GPU plan](docs/M11-WGPU-PLAN.md) |
-| `YT-081` | medium | Selected M11 closeout and unmet gates | YT-074, YT-080 | [M11 plan](docs/M11-PLAN.md) |
+| `YT-075` | medium | Browser WebGPU island and SSR fallback | YT-069, YT-023 | [GPU plan](docs/ARCHITECTURE.md#m11-product-and-renderer-decisions) |
+| `YT-076` | medium | GPU lifecycle/resource ownership | YT-075 | [GPU plan](docs/ARCHITECTURE.md#m11-product-and-renderer-decisions) |
+| `YT-077` | medium | Matched dynamic renderer measurements | YT-076 | [GPU plan](docs/ARCHITECTURE.md#m11-product-and-renderer-decisions) |
+| `YT-078` | medium | Picking and semantic accessibility alternative | YT-077 | [GPU plan](docs/ARCHITECTURE.md#m11-product-and-renderer-decisions) |
+| `YT-079` | medium | Approved opt-in yetlet-wgpu candidate | YT-078 | [GPU plan](docs/ARCHITECTURE.md#m11-product-and-renderer-decisions) |
+| `YT-080` | medium | Selected renderer target qualification | YT-079 | [GPU plan](docs/ARCHITECTURE.md#m11-product-and-renderer-decisions) |
+| `YT-081` | medium | Selected M11 closeout and unmet gates | YT-074, YT-080 | [M11 plan](docs/ARCHITECTURE.md#m11-product-and-renderer-decisions) |
 
 ## Done
 
@@ -30,10 +30,10 @@ Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing
 |---|---|---|---|---|
 | `YT-074` | medium | Owner-amended full mixed load, IME, spoken AT, Chrome/Firefox and independent review PASS | YT-073 | [Current results and retained failures](examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) |
 | `YT-259` | high | CLI new scaffolds aligned with M26 startup at tested platform scope | YT-250, YT-253, YT-254 | [Contract and qualification](docs/CLI-GUIDE.md#generated-startup-profiles) |
-| `YT-073` | medium | Persisted Board, repaired native login and Chrome/Firefox journeys | YT-071, YT-072 | [Current evidence](docs/M11-P-BOARD-VERIFICATION.md), [screenshots](docs/screenshots/m11-board/README.md) |
-| `YT-070` | medium | Native form and existing-CSS proof | YT-069 | [Native and Chrome proof](docs/M11-P-FORM-ASSET-VERIFICATION.md) |
-| `YT-071` | medium | Selected native/application-owned form contract | YT-070 | [Bounded decision and limits](docs/M11-P-FORM-ASSET-VERIFICATION.md) |
-| `YT-072` | medium | Retain application stylesheet wrappers | YT-070 | [Consumer evidence](docs/M11-P-FORM-ASSET-VERIFICATION.md) |
+| `YT-073` | medium | Persisted Board, repaired native login and Chrome/Firefox journeys | YT-071, YT-072 | [Current evidence](docs/PRODUCTION-READINESS-PHASE2.md#m11-board-acceptance-and-original-blocked-journeys), [screenshots](docs/screenshots/m11-board/README.md) |
+| `YT-070` | medium | Native form and existing-CSS proof | YT-069 | [Native and Chrome proof](docs/ASSETS.md#m11-native-css-proof-and-retained-wrapper-decision) |
+| `YT-071` | medium | Selected native/application-owned form contract | YT-070 | [Bounded decision and limits](docs/ASSETS.md#m11-native-css-proof-and-retained-wrapper-decision) |
+| `YT-072` | medium | Retain application stylesheet wrappers | YT-070 | [Consumer evidence](docs/ASSETS.md#m11-native-css-proof-and-retained-wrapper-decision) |
 | `YT-001` | high | Repository docs / ADR / roadmap / backlog | — | — |
 | `YT-002` | high | Cargo workspace + native/WASM targets | YT-001 | — |
 | `YT-003` | high | Minimal shared `Component/View` model | YT-002 | — |
@@ -92,13 +92,13 @@ Non-GPU YT-070–YT-074 are complete at selected scopes. YT-074 has real Chewing
 | `YT-057` | medium | Build security-bounded `auth-notes` | YT-056, YT-046 | [M9h evidence](docs/SAMPLES.md#auth-notes-acceptance) |
 | `YT-058` | medium | Build `modular-shop` reference application | YT-057, YT-054, YT-056 | [M9i evidence](docs/SAMPLES.md#modular-shop-acceptance) |
 | `YT-059` | medium | Audit API friction, classify contracts and freeze M9 evidence | YT-058 | [M9j evidence](docs/API-CONTRACTS.md#original-inventory-acceptance-and-review-limits) |
-| `YT-060` | high | Choose repository/crate licenses and vulnerability-reporting policy | YT-059 | [M10a evidence](docs/M10A-VERIFICATION.md) |
-| `YT-061` | high | Protect `master` and enable repository security automation | YT-059 | [M10b evidence](docs/M10B-VERIFICATION.md) |
-| `YT-062` | medium | Define SemVer/API compatibility and document metadata contract | YT-059 | [M10c evidence](docs/M10C-VERIFICATION.md) |
-| `YT-063` | high | Produce production edge/authentication threat model | YT-057, YT-059 | [M10d evidence](docs/M10D-VERIFICATION.md) |
-| `YT-064` | medium | Design reproducible release artifacts and supply-chain evidence | YT-060, YT-062 | [M10e evidence](docs/M10E-VERIFICATION.md) |
-| `YT-065` | medium | Add scheduled platform/browser/accessibility qualification | YT-059 | [M10f evidence](docs/M10F-VERIFICATION.md) |
-| `YT-066` | medium | Qualify distributed providers and operational behavior | YT-046, YT-054, YT-057, YT-059 | [M10g evidence](docs/M10G-VERIFICATION.md)<br>[YT-066b1](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md)<br>[YT-066b2](docs/PROVIDER-OPERATIONS.md#bounded-provider-bursts-and-http-attribution)<br>[YT-066b3](docs/QUALIFICATION-MATRIX.md#historical-session-auth-oidc-and-cross-host-evidence) |
-| `YT-067` | high | Perform Codex-assisted internal security scan | YT-063, YT-064 | [M10h evidence](docs/M10H-VERIFICATION.md) |
+| `YT-060` | high | Choose repository/crate licenses and vulnerability-reporting policy | YT-059 | [M10a evidence](docs/CI-SECURITY-REVIEW.md#m10-policy-governance-and-scan-evidence) |
+| `YT-061` | high | Protect `master` and enable repository security automation | YT-059 | [M10b evidence](docs/CI-SECURITY-REVIEW.md#m10-policy-governance-and-scan-evidence) |
+| `YT-062` | medium | Define SemVer/API compatibility and document metadata contract | YT-059 | [M10c evidence](docs/COMPATIBILITY.md#m10-metadata-compatibility-evidence) |
+| `YT-063` | high | Produce production edge/authentication threat model | YT-057, YT-059 | [M10d evidence](docs/THREAT-MODEL.md#m10-threat-model-acceptance-and-corrected-boundaries) |
+| `YT-064` | medium | Design reproducible release artifacts and supply-chain evidence | YT-060, YT-062 | [M10e evidence](docs/RELEASE-SUPPLY-CHAIN.md#m10-unsigned-supply-chain-preflight-evidence) |
+| `YT-065` | medium | Add scheduled platform/browser/accessibility qualification | YT-059 | [M10f evidence](docs/QUALIFICATION-MATRIX.md#m10-native-browser-and-delivery-reconciliation) |
+| `YT-066` | medium | Qualify distributed providers and operational behavior | YT-046, YT-054, YT-057, YT-059 | [M10g evidence](docs/PROVIDER-OPERATIONS.md#m10-local-operations-and-bounded-framework-closeout)<br>[YT-066b1](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md)<br>[YT-066b2](docs/PROVIDER-OPERATIONS.md#bounded-provider-bursts-and-http-attribution)<br>[YT-066b3](docs/QUALIFICATION-MATRIX.md#historical-session-auth-oidc-and-cross-host-evidence) |
+| `YT-067` | high | Perform Codex-assisted internal security scan | YT-063, YT-064 | [M10h evidence](docs/CI-SECURITY-REVIEW.md#m10-policy-governance-and-scan-evidence) |
 | `YT-068` | medium | Refresh developer entry, candidate documentation and evidence-preserving navigation/status | YT-067 | [Documentation-stage record](docs/README.md#historical-documentation-delivery-status--yt-068)<br>[final Private source/package boundary](docs/RELEASE-SUPPLY-CHAIN.md#current-preparation-source-boundary-2026-10-12) |
-| `YT-069` | medium | Integrated M11 documentation and permitted self-review | YT-068, YT-023 | [Plan](docs/M11-PLAN.md), [documentation-only self-review](docs/M11-PLANNING-REVIEW.md) |
+| `YT-069` | medium | Integrated M11 documentation and permitted self-review | YT-068, YT-023 | [Plan](docs/ARCHITECTURE.md#m11-product-and-renderer-decisions), [documentation-only self-review](docs/ARCHITECTURE.md#m11-product-and-renderer-decisions) |

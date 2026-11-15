@@ -374,7 +374,7 @@ This classification does not change crate versions or establish SemVer compatibi
 
 The native server adapter owns one bounded complete-document value: escaped title plus a validated root language. `Page::new`, `App::page` and the original render functions retain the `zh-Hant` default; explicit-language handlers use `DocumentMetadata` and `Page::with_metadata`. Charset and viewport remain fixed correctness defaults, while CSP remains response policy rather than page metadata.
 
-This resolves the M9c nested-language workaround without introducing a head tree, SEO collection, raw head markup, scripts/styles, per-page CSP, DI or another rendering framework. The conservative `LanguageTag` shape is serialization-safe but not a full BCP 47 registry implementation. See [Compatibility Policy](COMPATIBILITY.md) and [M10c verification](M10C-VERIFICATION.md).
+This resolves the M9c nested-language workaround without introducing a head tree, SEO collection, raw head markup, scripts/styles, per-page CSP, DI or another rendering framework. The conservative `LanguageTag` shape is serialization-safe but not a full BCP 47 registry implementation. See [Compatibility Policy](COMPATIBILITY.md) and [M10c verification](COMPATIBILITY.md#m10-metadata-compatibility-evidence).
 
 ### Data-access capabilities
 
@@ -499,3 +499,63 @@ application-owned; **Yetlet supplies no ORM**. A reusable data API would require
 separately reviewed convergent consumers and an ADR. An external ORM may be an
 explicit app choice, never a default SDK/browser dependency. See
 [sample contracts and dated acceptance](SAMPLES.md#sample-acceptance-and-source-boundaries).
+
+## M11 product and renderer decisions
+
+The source-grounded YT-069 study at c7ecc49eeb667e145cfb7e764c10b72ba104bbee
+selected two independent lines under [ADR0008](adr/0008-product-readiness-and-opt-in-scene-renderer.md).
+Product completeness does not depend on GPU; renderer qualification does not
+establish product readiness or publication. Planning used owner-permitted
+**current-session self-review**, not an independent agent/security assurance.
+The original three priorities were G1 safe form/live-property semantics,
+G2 reusable CSS/document integration and actual theme/CSP proof, and G3 complete
+persisted, authorized product failure journeys. Existing CSS and escaping were
+already present; no generic hydration/forms/head/UI-kit framework was justified.
+
+The first product was a noncritical Lab Operations Board: persisted work items,
+Viewer/Operator and project authorization, SQL history/CAS, validation/PRG,
+retained conflict drafts, meaningful status and authoritative refresh. A small
+CMS, simulated shop and structured knowledge workspace were alternatives, not
+additional activated products. Remote machine control, school/customer data,
+payments, arbitrary HTML/editors, collaborative CRDT/OT, ORM and production HA
+were excluded. Framework correctness, application domain/auth/SQL/content policy
+and operator TLS/IdP/secrets/backup/rollout remain different responsibilities.
+
+On2026-10-14 the owner explicitly approved the bounded first-party
+**Experimental opt-in flat-scene renderer despite no demonstrated WebGPU
+speedup**. This superseded the original useful-speedup extraction prerequisite
+only for that candidate; it did not amend the native Vulkan or matched browser
+measurements. Each YT-078/079/080 item still required its own independent PASS.
+At extraction the crate stayed publish=false; later package distribution is
+separately recorded. Official maintenance did not mean default activation,
+stable API, universal browser/HA/production support or FPS guarantees.
+
+One canvas/lifetime owner, independent prebuilt island assets, async generation
+guards, bounded dimensions/DPR/allocation, one coalesced RAF, hidden/zero-size
+suspension, explicit bounded loss retry and deterministic disposal are the
+renderer design boundaries. Validate finite data/IDs/size arithmetic before GPU
+work; trusted build-time WGSL is not user-supplied shader text or per-request
+Wasm compilation. HTML owns labels/controls/IME/selection detail and a useful
+paginated/searchable data alternative; GPU failure must not disable siblings or
+essential actions. No default Core/View GPU variant, CSS accelerator, game loop,
+3D engine, arbitrary shader plugin, ECS, text shaper or general scene graph was
+selected. A general scene abstraction needs a materially different second
+consumer; another instance of the same demo is insufficient.
+
+Browser-first proof required one actual selected browser/OS/adapter plus
+unavailable/loss fallback. A latest-wgpu upgrade, all native backends, integrated
+GPU or Safari/mobile support was never automatically required or proved. Fair
+Canvas2D/WebGPU comparisons keep equivalent seed/coverage/viewport/operations,
+startup/upload/preparation/completion/presentation separate, raw sample counts
+and omitted lanes explicit. GPU completion is not paint/FPS; correctness
+readback is outside timing. Pointer coordinates map through CSS/DPR/transforms
+to stable IDs, with stale-result rejection, keyboard/touch/reset alternatives
+and reduced motion. Small selection state does not justify cloning100k mutable
+marks or changing LocalGraph into a global async scheduler.
+
+The exact original M11 plan/research/GPU proposal, self-review and owner decision
+are recoverable at local Git `40b66f1ad9bd0eb5666a9e1c8f113310993a3544`.
+Remote SHA reachability is unverified. Current API and actual browser evidence
+follow [API classification](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement)
+and [GPU qualification](QUALIFICATION-MATRIX.md#experimental-gpu-browser-and-physics-lab-evidence),
+not conceptual constructor names or proposed60Hz targets in the original plan.

@@ -111,7 +111,7 @@ Docker multi-instance, single-primary and no-persistence scope. It uses explicit
 async operations and native scoped Axum middleware; the synchronous Memory API
 and Core/default-server/browser graphs remain unchanged. See the [provider
 README](../crates/yetlet/guides/session-redis.md), [selected Cookie contract](PROVIDER-OPERATIONS.md#redis-session-cas-operation-outcome-and-cookie-ordering)
-and [bounded closeout](M10G-VERIFICATION.md#yt-066-bounded-framework-closeout--2026-10-11).
+and [bounded closeout](PROVIDER-OPERATIONS.md#m10-local-operations-and-bounded-framework-closeout).
 The pure-SSR Cookie contract preserves retired-ID rejection but permits login
 loss under extreme response reordering. This is not a Stable Candidate API,
 authentication system, production durability/HA result or mandatory dependency.

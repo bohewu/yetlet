@@ -333,3 +333,45 @@ The next remaining decision is **YT-096 D1–D6**, all Pending. YT-096 remains
 In progress, YT-020 Blocked, and candidate `ce56e08` immutable and unchanged.
 No automatic signing, release, registry activation or deployment follows this
 matrix. No general production, HA, SLA or release qualification is claimed.
+
+## M11 Board acceptance and original blocked journeys
+
+The initial selected product was a **loopback, synthetic-identity** Board with
+Memory Session/CSRF, fixed server-owned Viewer/Operator/project policy, direct
+SQLite and transactional history/version checks. Persist business records in SQL,
+not Session; a restart may require login. Successful writes use303 PRG, invalid
+fields422, stale version409 with draft retained. A durable history row is the
+authority; bounded notifications are invalidations/versions, with authoritative
+refresh after reconnect/replay gap and no automatic mutation replay. Closed-loop
+UI, route visibility, client role fields or guessed IDs never grant permission.
+No real IdP, production data/rollout, CORS expansion or GPU was accepted here.
+
+The proposed25-user/10k-item/100k-history envelope was a planning assumption.
+Qualification instead seeded90k history to preserve finite write headroom below
+the100k cap; intentional cap rejection cannot count as successful throughput.
+Read p95<250ms, write p95<500ms, combined p99<1000ms, unexpected fraction<0.001,
+25 paced clients/10 SSE, SQLite WAL/FULL and no automatic write retry remained
+explicit gates. Broader identity, browsers, TLS/backup/HA need their own scope.
+
+| Original checkpoint | Result and later disposition |
+|---|---|
+| Initial implementation | Offline rusqlite default-feature resolution failed; aligned existing0.40.2 bundled/default-features=false. A form test expected400 instead of Axum422; corrected expectation preserved rejection. Twelve native tests/build/Clippy passed, including audit rollback, CAS, schema/caps, restart/session loss, worker drain and SSE logout. These were not browser acceptance |
+| First integrated Board journey | Helper `http` import collision failed before launch; after correction Job `wc_job_527eQkVSC7ar0N9I` failed exit1 at login navigation despite native/direct-HTTP success. Owned resources cleaned. Later diagnostic `wc_job_coYClslQmjZVENuW` observed403: no-referrer yielded Origin:null for native POST. Response policy same-origin fixed login while retaining exact Host/foreign/null-Origin rejection and CSRF |
+| Repaired browser journey | Intentional409 console network message initially failed a generic harness check; only that asserted negative message was admitted. Fourteen native tests, Chrome/Firefox create/edit/conflict/history/SSE/restart journeys passed. Application/UI improvements remained app-owned, without core policy widening |
+| Bounded load | Job `wc_job_dyJlYei47wcEM5Dq`:24k measured requests, zero unexpected responses, three60s rounds/300s soak; first write p99≈561ms. Fault/contention/unread-response/recovery/session-retirement/drain passed. This did not close the originally longer/manual gates |
+| Real desktop / first full failure | Chewing candidates/composition and exact stored Chinese title/multiline text,422 association/409 retained draft PASS. Initial Orca only echoed startup/keys; Board absent from AT-SPI, so content speech **Blocked**, not PASS. Edge SSH failed; owner selected retained Chrome/Firefox. A warmup-gate-placement error preceded a corrected full run failing first-round write p95548.299ms; later rounds/soak were not run |
+| Owner-amended mixed acceptance | App-local live-status repair enabled actual Firefox/Orca announcements; final Chrome/Firefox and14 Board tests passed. Five staggered cohorts explicitly approved; full62-minute mixed run2026-10-13T04:00:15Z,45k measured requests, zero errors, all latency gates PASS,99,300 history rows and cleanup. Fresh independent review PASS closed YT-074 at this selected scope, not synchronized bursts |
+| Retained synchronized/host failures | Two12-minute diagnostics each7,500 requests/zero errors passed; synchronized/staggered write p9576.133/45.240ms, but staggered retained a505.907ms WAL stall. Later original-Ubuntu full synchronized run failed round3 write p95548.889ms after22,500 responses/zero HTTP-SSE errors;30-minute soak Not run. Independent owned-file probing reproduced505–508ms ext4-journal/device-flush delay; precise driver/device/scheduling trigger remained unknown, no host/firmware repair claimed |
+| Windows/Azure continuation | Initial source-archive transfer was policy-rejected twice, respected without bypass; separately approved fixed source f79ccde enabled native Windows build/HTTP/restart/drain after private GNU prerequisites. Two full WebCodex attempts were Runner-lost with unknown native exits; partial7,475 requests were not full PASS. Subsequent native Windows44,850 and Azure Ubuntu45k formal synchronized runs each completed62 minutes/zero errors at original gates. Windows fsync timing stayed Not instrumented; Azure max timed fsync45.535ms. Azure first-SSE-login startup failed then received a two-line helper correction, short PASS and full PASS as distinct records; all dedicated resources/keys were removed |
+
+The original owner-permitted planning/non-GPU implementation **self-review** does
+not become independent security assurance. Independent mixed-load acceptance
+does not attest every later helper delta or all platforms; documentation/static
+reconciliation retained that limit. Source hashes, lost attempts, raw samples,
+slow tails, screenshots and spoken transcript remain at their original stores.
+Use the [Board sample evidence](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence)
+for exact accepted measurements and [startup guide](BOARD-START.md) for usage.
+The original activation/Board/form/handoff/plan/research Markdown is recoverable
+at local Git `40b66f1ad9bd0eb5666a9e1c8f113310993a3544`; remote accessibility
+is unverified. None is current production, physical-device or universal-browser
+qualification, and no old commit/test authority authorizes a new run.

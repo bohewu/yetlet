@@ -1,7 +1,7 @@
 # Provider Operations — Local Evidence and Open Qualification
 
 **Task:** YT-066 / M10g. **Status:** Done at single-host Docker multi-instance and selected Redis-provider scope.
-Application operations are not framework blockers; the [final documentation review gate](M10G-VERIFICATION.md#yt-066-bounded-framework-closeout--2026-10-11) is recorded separately. This document follows the approved [remaining plan](M10-REMAINING-PLAN.md)
+Application operations are not framework blockers; the [final documentation review gate](PROVIDER-OPERATIONS.md#m10-local-operations-and-bounded-framework-closeout) is recorded separately. This document follows the approved [remaining plan](QUALIFICATION-MATRIX.md#m10-native-browser-and-delivery-reconciliation)
 and [ADR 0005](adr/0005-opt-in-capability-modules.md). It introduces no runtime
 provider API, store implementation or default dependency.
 
@@ -161,7 +161,7 @@ service or install dependencies. Run it once; no repeated soak or latency gate
 is defined. These current YT-086 commands remain pending independent review.
 The historical commands were `PYTHONDONTWRITEBYTECODE=1 python3 scripts/test_local_operations.py`
 and `PYTHONDONTWRITEBYTECODE=1 python3 scripts/qualify_local_operations.py`.
-[M10g verification](M10G-VERIFICATION.md) separates those ten original Python
+[M10g verification](PROVIDER-OPERATIONS.md#m10-local-operations-and-bounded-framework-closeout) separates those ten original Python
 source/lifecycle tests from the actual historical local run, which passed with
 seven processes reaped and temporary data removed.
 
@@ -262,9 +262,9 @@ run. The historical observations were:
 - application containers had zero host bindings; the proxy host address was `127.0.0.1`; backend network `Internal=true`; and
 - four service containers, the build container, two networks, zero volumes and the generated application image were removed, with no related process or Docker object left.
 
-This is `pass-for-docker-memory`: it demonstrates stateless multi-instance serving and the current Memory provider's limitations. It does **not** demonstrate distributed Session, sticky-session correctness, Redis, cross-host HA, failover, load/SLOs, production recovery or a deployment image. Durations are observations without acceptance thresholds. Exact source/image/Job identities and the two classified operational fixture failures are recorded in [M10g verification](M10G-VERIFICATION.md).
+This is `pass-for-docker-memory`: it demonstrates stateless multi-instance serving and the current Memory provider's limitations. It does **not** demonstrate distributed Session, sticky-session correctness, Redis, cross-host HA, failover, load/SLOs, production recovery or a deployment image. Durations are observations without acceptance thresholds. Exact source/image/Job identities and the two classified operational fixture failures are recorded in [M10g verification](PROVIDER-OPERATIONS.md#m10-local-operations-and-bounded-framework-closeout).
 
-The YT-066a reviewers found cleanup-proof, signal/finalization and report-I/O defects in the harness, followed by a duplicated-fragment syntax failure; these do not invalidate the retained successful Yetlet behavior observation. The corrected harness uses one phase-aware SIGTERM/SIGINT state, an outer transition recovery boundary, fail-closed Docker queries, exact image verification, required owned-work removal and report-I/O failure handling. A first cancellation signal at the covered teardown/finalization stages records nonpassing cancellation while cleanup continues; subsequent cancellation signals are ignored and both prior handlers are restored. In-memory compilation and the existing 18 focused mocked regressions pass after the 2026-10-11 syntax repair. The successful Docker qualification was not rerun. Final independent read-only reviewer thread `01a1286a-5829-7411-9ecc-dbc3f00fe001` returned PASS, completing YT-066a at single-host Docker/Memory proof scope. See [M10g verification](M10G-VERIFICATION.md) for the historical source identities and each review outcome.
+The YT-066a reviewers found cleanup-proof, signal/finalization and report-I/O defects in the harness, followed by a duplicated-fragment syntax failure; these do not invalidate the retained successful Yetlet behavior observation. The corrected harness uses one phase-aware SIGTERM/SIGINT state, an outer transition recovery boundary, fail-closed Docker queries, exact image verification, required owned-work removal and report-I/O failure handling. A first cancellation signal at the covered teardown/finalization stages records nonpassing cancellation while cleanup continues; subsequent cancellation signals are ignored and both prior handlers are restored. In-memory compilation and the existing 18 focused mocked regressions pass after the 2026-10-11 syntax repair. The successful Docker qualification was not rerun. Final independent read-only reviewer thread `01a1286a-5829-7411-9ecc-dbc3f00fe001` returned PASS, completing YT-066a at single-host Docker/Memory proof scope. See [M10g verification](PROVIDER-OPERATIONS.md#m10-local-operations-and-bounded-framework-closeout) for the historical source identities and each review outcome.
 
 ## Application-selected mature store acceptance contract
 
@@ -619,3 +619,95 @@ unblocks YT-020 publication. The earlier local execution and reviewer
 and its six earlier review outcomes, bounded repairs and final PASS are recorded in M10g verification.
 The experimental single-primary provider is explicitly selected; broader
 deployment guarantees remain unverified and belong to application qualification.
+
+## M10 local operations and bounded framework closeout
+
+**Historical 2026-10-10/11 YT-066 acceptance** closes single-host Docker
+multi-instance and selected Experimental Redis-provider scope. Memory remains
+synchronous/process-local; the selected async Redis provider is single-primary,
+`redis://` only, `appendonly no`, `save ""`, tmpfs/no persistent volume. No
+mandatory generic store, DI/ORM/Controller/registry or new HTTP stack follows.
+
+The original local run `target/m10-remaining/local-operations.json` used real
+Auth Notes and SQLite binaries: issuing Memory process200, other process401,
+issuer restart401; synchronized same-version local WAL writes yielded200/409,
+version2 and exactly two successful audit rows. Online backup, integrity,
+foreign-key/schema validation, isolated exact restore, exclusion of a late write
+and corrupt-candidate rejection passed; seven owned processes and temporary
+DB/WAL/SHM state were removed. Cookies/CSRF/codes/bodies/logs were excluded from
+the report. Ten lifecycle tests and reviewer `wc_job_YclpZ0R5tS4m8Y1I` PASS are
+local evidence, not shared Session, remote storage or arbitrary restore safety.
+
+YT-066a's real three-Auth-Notes/Nginx Docker execution reached all workers, then
+18 pooled requests through two after stopping A and three after rejoin. A login
+worked only on A; B/C and restarted A rejected it401; private responses retained
+no-store. Stop/rejoin observations3.194/2.167s are not SLOs. Apps were nonpublished,
+read-only UID10001; proxy UID101 published only host127.0.0.1 through a front bridge
+and Docker-internal backend. The explicit insecure HTTP lab entrypoint required
+`YETLET_AUTH_ISOLATED_CONTAINER_LAB=1`; ordinary Auth Notes still rejected wildcard
+listening. Pinned Rust1.88/Nginx1.30.5 offline inputs and release-binary SHA
+`41bc64432004e84101d3c917dd4f7a58decf4988ec5fdfb23848d3bb087cba45` bind the run.
+
+Preserve both earlier readiness failures: read-only Nginx temp paths outside
+tmpfs, then Docker29.9 internal-only networking suppressing published ports.
+Successful Job `wc_job_cgCLjWo0A9YvXAK1` report SHA
+`912b8c463371bfe1c1579d1937b128f3090bf3c28e733441ce463bec461af219`
+binds HEAD8e157b4 plus working source1deb6e81bbfdd6e1de06195e12d3ac221c051a63b624b472acc87c23a8163e4d,
+before later harness repairs. Four service containers, build container, two
+networks, generated image and owned work were removed; no volumes were used.
+
+Six failed cleanup reviews are not overwritten by the eventual PASS: failed
+Docker queries could look like absence; generated-image existence was unchecked;
+SIGTERM could escape or be ignored at cleanup/report transitions; report/removal
+errors could hide failure; SIGINT could interrupt finalization; finally a stale
+eight-line fragment caused IndentationError and invalidated a claimed18-test PASS.
+The recovered phase-aware finalizer treats failed queries as unknown, always
+checks exact image/resource absence, records first cancellation through report
+write, removes work independently of report IO, prevents provisional PASS on IO
+failure and restores handlers. Actual in-memory compile plus18 focused tests
+passed after the syntax repair. Reviewer `01a1286a-5829-7411-9ecc-dbc3f00fe001`
+PASS closed the harness; the retained Docker run was **not rerun** or attributed
+to the repaired harness source.
+
+Redis b1's six tests and counter-order correction did not solve the original
+Cookie-retention guarantee. The failed Cookie gate and Chrome quota evidence
+remain in the [selected Cookie contract](#redis-session-cas-operation-outcome-and-cookie-ordering).
+The owner instead accepted pure SSR/no mandatory JS and possible login loss:
+only proven create/rotate/replace emits a currently validated fixed-name cookie;
+read/update/error/logout emits no Set/Clear, retired IDs fail closed, no alternate
+cookie is chosen. Four policy/Redis/HTTP cases and corrected no-JS Chrome passed;
+reviewer `01a128b4-dbc6-7922-87e7-ab67c171665a` PASS opens b2 without converting
+the earlier guarantee into a success.
+
+b2 initially stalled twice at the unapplied CAS callback barrier correction;
+cleanup and the repeated-failure stop were recorded. The separately authorized,
+verified `block_in_place` test-only correction then passed all five Rust1.88
+provider tests, retained earlier cancellation/drain and passed strict Clippy;
+reviewer `01a128d5-37d1-7f40-a7c7-84fc0c923771` PASS. b3 executed three apps,
+Nginx and one Redis: cross-process CAS/rotate/revoke, TTL, prepared Cookie reorder,
+no-JS behavior, unknown-result reconciliation/expiry, cancellation/admission/drain,
+app restart and fail-closed Redis outage/no-persistence restart. Its first browser
+cancellation-cleanup defect required four focused checks, **no Docker replay**;
+reviewer `01a129d2-3cce-72d3-a0de-bd286565dade` PASS. Execution baseline1f38d20
+plus285 inputs differs from its286-input review and delivery4da0f6c.
+
+Responsibility reconciliation reviewer `01a12a04-d58f-7210-a995-c6f35860437c`
+and final documentation reviewer `01a12a61-fd85-7d40-8df2-4ce9b5977dd7` each
+returned PASS; the latter examined16 Markdown changes at4da0f6c with287 inputs
+unchanged. No new runtime qualification ran. Provider semantics, supported
+configuration/errors/bounds/redaction and stated recovery assumptions remain
+framework work. TLS/ACL/certificates, backup protection/retention, business
+RPO/RTO/SLA and on-call ownership belong to operators. Automatic reconnect,
+rediss/TLS, AOF/RDB/fsync durability, crash/older-backup restore, failover/Cluster,
+cross-host partitions, load/soak and SQL Session remain unverified. Restoring
+older state can resurrect revoked authority: traffic fencing/reconciliation or
+fresh namespace invalidation is a prerequisite, not a proven restore feature.
+p1/p2 persistence rehearsals were unexecuted optional proposals; YT-066c stayed
+cancelled. These exclusions were not mandatory framework-completion blockers.
+
+The exact original chronology, raw report digests and headings are recoverable
+in [M10g at local baseline Git](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M10G-VERIFICATION.md).
+This URL's source/blob is locally verified; remote reachability is unverified.
+Original ignored `target/yt066a/`, `target/yt066a-closeout-local-20261011/` and
+`target/yt066-closeout-20261011/` evidence remains in place and is not restored by
+Git alone. Historic Private/YT-020 Blocked states do not alter later publication.

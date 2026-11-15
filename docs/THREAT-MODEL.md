@@ -442,3 +442,37 @@ A specific application deployment is not production-qualified until all applicab
 - **YT-067:** the maintainer requires an internal Codex Security Standard source scan rather than a paid external assessment. The updated-source scan completed with a canonical report (227/227 regular files, one Low finding); its local corrective patch passed regressions and independent reviewer `wc_job_sTA8TdP3N3Veu9uC` (0 material findings). The earlier scan remains incomplete. YT-066 is independently necessary for any distributed-deployment claims.
 
 This document is a requirements boundary. Passing its documentation review does not prove any external IdP, proxy, limiter, store, secret manager or production deployment meets it.
+
+## M10 threat-model acceptance and corrected boundaries
+
+YT-063 (2026-10-10) delivered this product-neutral reference topology,20 threats
+T01–T20,15 abuse scenarios and ownership/checklist, after planning reviewer
+`wc_job__wg1bHF6DG3ztjjg` PASS. It did not implement an edge, IdP, durable Session,
+limiter, secret manager, authorization engine or production deployment. Existing
+sample CSP/body/origin/rotation/CSRF/SQL/file/SSE evidence was bounded; the model's
+production controls were requirements, not executed compliance.
+
+One reviewer Job was lost on Runner replacement without output; its unknown
+conclusion was not used. Completed reviewer `wc_job_UPiINEJpZ28tLFyl` found two
+P2s: missing shared-cache isolation, and an incorrect blanket prohibition on
+rendering the initiating user's synchronizer CSRF token. The repaired contract
+requires no-store on authenticated/personalized/identity-changing Set-Cookie
+responses, edge/CDN bypass, relevant Vary and a two-Session cross-user cache test.
+Vary alone never substitutes for no-store. A Session-bound synchronizer token
+may appear in its initiating user's protected no-store form, never URLs, shared
+caches, unrelated responses, logs or metrics. Session IDs, OAuth tokens and
+server secrets remain excluded from rendered state. Repeat security-focused
+reviewer `wc_job_AlEmAzdabqC_tuHv` PASS accepted those documentation repairs,
+without runtime/provider/security-certification claims.
+
+Required trusted-edge stripping/injection, fail-closed duplicate/malformed
+security headers, exact OIDC issuer/redirect/state/nonce/PKCE/claims/key rotation,
+opaque rotation/revocation, CSRF independent of SameSite, per-resource/tenant
+authorization, exact credentialed CORS, layered abuse limits, external secret
+custody/redaction and outage/drain/recovery ownership remain in the sections
+above. They are not optional merely because the small framework does not own
+their deployment. The original plan, planning review and final failure/PASS
+chronology are recoverable at local Git
+`40b66f1ad9bd0eb5666a9e1c8f113310993a3544` under M10D-*.md; remote SHA
+accessibility is unverified. Historic release blockers do not override current
+accepted publication receipts.
