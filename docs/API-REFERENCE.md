@@ -245,3 +245,16 @@ The native entry page is `target/doc/yetlet/index.html`; browser output is under
 `target/wasm32-unknown-unknown/doc/yetlet_browser/index.html`. Signing separately
 requires its documented native OpenSSL dependency. Local rustdoc instructions
 are not fresh platform qualification or a docs.rs publication claim.
+
+## Historical evidence and current API ownership
+
+M6's thin App/Page and M7's metadata, optional keyed ownership and local graph
+established the handler/component boundaries used by the current SDK. Follow the
+module guides above for current signatures; original multi-crate names in the
+[historical API classification](API-CONTRACTS.md) describe a dated inventory.
+Stable Candidate is an evidence category, not a stability or SemVer guarantee.
+The [sample acceptance guide](SAMPLES.md#catalog-contract)
+and [qualification matrix](QUALIFICATION-MATRIX.md#coverage-and-evidence-boundaries)
+retain the original failed reviews, repaired scope and native/browser freeze.
+No sample introduces a Yetlet ORM, mandatory Controller/DI, generic forms,
+implicit browser circuit or production-security promise.

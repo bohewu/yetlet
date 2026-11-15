@@ -31,8 +31,8 @@ Only the three gaps in section 6 are priority-ranked. Other matrices define thei
 | S6 | [browser build](../scripts/build_browser.py), lines 69–79 and 97–147; [Todo server](../examples/todo-server/src/lib.rs), lines 75–111 and 136 | Separate builds, hashed CSS/JS/WASM, validated application head insertion |
 | S7 | [dashboard source](../examples/multi-island-dashboard/src/lib.rs), lines 136–205 and 212–251; [dashboard guide](../examples/multi-island-dashboard/README.md) | Asset existence/path checks, per-island fallback and application response policy |
 | S8 | [SQLite source](../examples/sqlite-crud/src/lib.rs), lines 1–78; [Modular Shop](../examples/modular-shop/README.md) | Direct SQL, bounded blocking work, explicit version and transaction concepts |
-| E1 | [M7d](M7D-VERIFICATION.md), [M7j](M7J-VERIFICATION.md) | Bounded text-input/keyed lifecycle and repaired late-action evidence |
-| E2 | [M9j](M9J-VERIFICATION.md), [qualification matrix](QUALIFICATION-MATRIX.md) | Historical application/native/browser tests; optional real IME/AT/mobile gaps |
+| E1 | [M7d](https://github.com/bohewu/yetlet/blob/ac98cdc127ccd299cb1150fef922b0560453a1d4/docs/M7D-VERIFICATION.md), [M7j](https://github.com/bohewu/yetlet/blob/ac98cdc127ccd299cb1150fef922b0560453a1d4/docs/M7J-VERIFICATION.md) | Bounded text-input/keyed lifecycle and repaired late-action evidence |
+| E2 | [M9j](https://github.com/bohewu/yetlet/blob/ac98cdc127ccd299cb1150fef922b0560453a1d4/docs/M9J-VERIFICATION.md), [qualification matrix](QUALIFICATION-MATRIX.md) | Historical application/native/browser tests; optional real IME/AT/mobile gaps |
 | E3 | [Redis b3](QUALIFICATION-MATRIX.md#historical-session-auth-oidc-and-cross-host-evidence), lines 51–72 | Single-host, single-primary, no-persistence semantics and login-loss boundary |
 | E4 | [release readiness](RELEASE-READINESS.md), [API classification](API-CONTRACTS.md) | Experimental candidates, separate release/source identities |
 

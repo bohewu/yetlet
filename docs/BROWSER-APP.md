@@ -221,3 +221,54 @@ historical; this consolidation performs no new browser execution.
 
 This guide connects existing capabilities. It adds no runtime/API, platform
 qualification or documentation-site deployment, and selects no desktop host.
+
+## Keyed ownership and runtime retirement
+
+The renderer-neutral identity/key/slot vocabulary validates deterministic
+lowercase component/instance/slot tokens, nonempty control-free keys and inert
+attribute names. It does not authorize raw HTML, URL attributes, inline handlers,
+`style`, `srcdoc` or the reserved `data-yetlet-*` namespace. Renderers still own
+escaping and DOM admission. See [View ownership](VIEW-COMPONENTS.md#binding-metadata-and-explicit-lifetimes)
+and the [keyed module guide](../crates/yetlet-browser/guides/dom-keyed.md).
+
+Keyed children own the complete direct-child key/entry set and caller row state.
+Desired-key validation and creation of detached missing entries precede structural
+mutation; an attached create result is rejected. Retained entries are updated,
+then stale nodes removed and nodes inserted/moved. Removal disconnects the node
+and drops its state/listeners; disposal removes propagation while leaving DOM
+readable. Caller updates can mutate before returning an error and final browser
+DOM errors have no transactional rollback. Applications own callback atomicity.
+
+The M7b–M7d experimental fixture additionally preflights the exact SSR root,
+instance, keyed rows, attributes, direct child/text slots and input live/serialized
+values before installing listeners. It supports one controlled text input,
+one conditional text and one click path per fixed row, not arbitrary nested
+components/forms. It writes a live input value only when different, capturing
+focus/selection before successful keyed moves and restoring only a still-connected
+input. Removing the focused row deliberately does not focus a detached node.
+Chrome 155 and Firefox 157 verified input identity/value/focus/selection, keyed
+reorder/removal, detached input/click inertness and disposal; this is no real IME,
+WebKit/mobile, screen-reader or general focus-manager qualification.
+
+The synchronous graph owns committed state, reducer, commit callback, FIFO queue
+and observers. Handles/subscriptions are weak; unsubscribe/drop releases captures.
+An explicit outer batch reduces one cloned draft and commits/notifies once;
+empty batches do nothing. Re-entrant work runs in later FIFO passes, bounded by
+the experimental default 64. Reducer failure clears work and preserves usability;
+commit failure faults the graph without publishing the draft; pass exhaustion
+faults after any already-completed commits. Disposal clears owners/captures and
+weak dispatch returns Disposed. Arbitrary commit callbacks are responsible for
+external atomicity; observer panics are not caught. There is no automatic field
+dependency tracking, async effect scheduler, worker or heap/GC guarantee.
+The unchanged [M7g record](M7G-VERIFICATION.md) retains extraction evidence.
+
+Todo's production local list opts into these primitives; remote result/Search
+updates retain subtree replacement. Its route owner holds graph, listeners and a
+lifetime token. Retirement invalidates the token first, including tasks queued by
+`spawn_local`; HTTP completion checks it again after await before any DOM/status
+write. Remount owns a fresh token and one listener path. The first final M7
+review found this queued/in-flight race despite an earlier narrower PASS. Repaired
+Chrome/Firefox debug/release tests proved click-then-dispose starts neither local
+work nor HTTP, held old responses cannot mutate after remount, and retired nodes
+stay inert. [Dated validation and costs](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence)
+keep that FAIL separate from repeat final PASS.

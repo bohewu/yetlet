@@ -194,7 +194,7 @@ checkpoints below retain their original evidence and verdicts.
 
 **Later authorized execution (2026-10-12):** [Private signing evidence](RELEASE-SUPPLY-CHAIN.md#private-maintainer-key-preparation-policy-and-historical-signatures) now records key/fingerprint enrollment, three preparation signatures and separate verification of 37 artifacts and six negative cases. Formal log-required verification correctly rejects this bundle. Earlier pending-key/signing statements describe their policy checkpoints; formal release guarantees and registry activation remain open. The policy was locally committed; subsequent execution documentation remains unstaged and no push/publication/visibility change occurred.
 
-This document separates bounded repository evidence from a support or security commitment. See [M9 final evidence](M9J-VERIFICATION.md), [API contract classification](API-CONTRACTS.md) and the [post-M9 CI/security review](CI-SECURITY-REVIEW.md).
+This document separates bounded repository evidence from a support or security commitment. See [M9 final evidence](API-CONTRACTS.md#original-inventory-acceptance-and-review-limits), [API contract classification](API-CONTRACTS.md) and the [post-M9 CI/security review](CI-SECURITY-REVIEW.md).
 
 ## Current candidate selection and local preflights (2026-10-20)
 

@@ -6,7 +6,7 @@
 
 | Lane | Defined scope | Current YT-065 evidence | Historical evidence |
 |---|---|---|---|
-| Ubuntu 24.04 native | Stable Rust check, library tests and doctests for nine reusable crates | Hosted Rust 1.99, x86_64-unknown-linux-gnu: 80 tests/four doctests PASS | [M9j](M9J-VERIFICATION.md) local native workspace freeze; not this hosted lane |
+| Ubuntu 24.04 native | Stable Rust check, library tests and doctests for nine reusable crates | Hosted Rust 1.99, x86_64-unknown-linux-gnu: 80 tests/four doctests PASS | [M9j](API-CONTRACTS.md#original-inventory-acceptance-and-review-limits) local native workspace freeze; not this hosted lane |
 | Windows 2025 native | Same nine crates, native runner host target | Hosted Rust 1.99, x86_64-pc-windows-msvc: 80 tests/four doctests PASS | Separate authorized local Windows GNU Rust 1.88 run: 80/four PASS; not local MSVC |
 | macOS 15 native | Same nine crates, native runner host target | Hosted Rust 1.99, aarch64-apple-darwin: 80 tests/four doctests PASS | No x86_64 macOS qualification claimed |
 | Ubuntu 24.04 Firefox | Release Todo/Search, keyed bindings, multi-island suites; SSR forms keyboard/semantic checks | Local and hosted Firefox 157.0: all four suites PASS; hosted forms report cleanup PASS | M9j: three release suites PASS on local Firefox 157/geckodriver 0.37.1; forms keyboard suite did not exist |
@@ -683,3 +683,191 @@ Review PASS0 accepted LOCAL test-copy recovery, excluding owner-key/Secret
 recovery, production rotation, platform expansion and release approval.
 Original proof remains in the recorded `.pipeline-output/yt096-key-rotation-local-20261028/`
 handoffs. No raw evidence store was moved by consolidation.
+
+## Early SSR and handler measurements
+
+The following are **dated source-specific local results**, not new executions.
+All 34 M2–M9 original Markdown sources, headings and Git blobs are recoverable
+at local Git `ac98cdc127ccd299cb1150fef922b0560453a1d4`; GitHub reachability has
+not been verified. Original JSON measurements, failed/reviewer output and raw
+logs remain in their separately recorded ignored/external stores, **not in Git**.
+Current tooling and published package scope are documented separately.
+
+On 2026-10-08, M2 passed 16 native tests, wasm32/build-time hashing and Chrome 155
+SSR/DOM byte parity, two local toggles with zero HTTP/WebSocket, asset/console and
+CSP checks. Its debug WASM was 281,324 bytes; it measured no latency, release size
+or other browsers. M3 added lazy Search, preserved input/results, bounded
+allowlisted server state and corrupt-schema fail-closed SSR. Headless retained
+focus made repeated `focus()` unreliable; deterministic input triggered activation.
+M4 validated typed local/HTTP commands and 400/403/404/413/415/422 errors with no
+failed-mutation revision advance. It was anonymous, process-local, direct HTTP,
+not authentication, session CSRF, trusted-proxy or independent security evidence.
+
+M5 passed A01–A10 only at local prototype scope: escaping, no-JS SSR, versioned
+island state, local Chrome/Firefox interaction, Chrome byte parity, typed API
+errors, strict external-script CSP, wasm32 server-dependency exclusion and a
+reproducible baseline. WASM requires `wasm-unsafe-eval`, never general
+`unsafe-eval`/`unsafe-inline`. Chrome smoke used debug native artifacts; Firefox
+and measurements used matched release server/WASM. Do not mix profiles.
+
+M5/M6 measurements used Linux x86_64, Rust 1.99.0, Python 3.14.4 and Chrome
+155.0.8059.39 with cache disabled. M5 Firefox smoke used 157.0/geckodriver 0.37.1.
+The 30-sample first-byte clock starts with request write on an already-connected
+TCP socket and ends at the first response byte, possibly headers. It excludes
+connection establishment, TLS/WAN, concurrency and cold-process startup. Browser
+marks are DevTools-injected MutationObservers, five runs per measurement; they
+are not LCP/INP. No independent security review or remote GitHub Actions execution
+was established by M2–M6, and the then-declared Rust 1.85 was not tested.
+
+| M5 release measurement | Median | p95 | Range |
+|---|---:|---:|---:|
+| SSR first HTTP byte, 30 | 0.034 ms | 0.039 ms | 0.032–0.052 ms |
+| Chrome app ready, 5 | 48.5 ms | 50.6 ms | 47.9–50.6 ms |
+| Search trigger to ready, 5 | 3.7 ms | 5.3 ms | 3.0–5.3 ms |
+
+Release digest was `3f3c5f074478c525`. HTML sizes were `/` 532, `/app` 554 and
+`/search` 1,431 bytes. Browser WASM was 216,006 bytes and Search 179,716 bytes.
+Browser JS+WASM gzip estimate was 81,307 bytes; Search initial loader 551 and
+activated JS+WASM 74,481. These are local compressed artifact sums excluding
+CSS/favicon, not HTTP compression or measured wire bytes.
+
+M6a (2026-10-09) passed 51 workspace tests, five App integration scenarios,
+compiled rustdoc and Chrome/Firefox; debug digest `dbd3b1631850d93a` was unchanged.
+It predated `App::page`. Complete M6 passed 66 workspace tests/four doctests,
+strict Clippy, minimal/native/wasm32 builds, five typed-result tests, three setup
+tests and seven Request ID tests. Todo's migration preserved API errors, CSP,
+HTML sizes and all release assets at the M5 digest; Browser/Search excluded
+native Axum/Tower/Hyper/RequestContext and optional Request ID.
+
+| Sequential release medians | M5 historical | M6 same-session before | M6 after |
+|---|---:|---:|---:|
+| SSR first byte | 0.034 ms | 0.019 ms | 0.033 ms |
+| App ready | 48.5 ms | 49.5 ms | 49.0 ms |
+| Search ready | 3.7 ms | 3.3 ms | 3.8 ms |
+
+**Native SSR increased 0.014 ms** in that same session; Search increased 0.5 ms.
+Scheduling/process/browser conditions were not controlled. This is disclosure,
+not zero-overhead, statistical equivalence, a speed improvement or a performance
+budget. Real IME/AT, WebKit/mobile, persistence/auth/proxy and production assurance
+were outside this early scope.
+
+## Keyed renderer and lifecycle evidence
+
+The M7a canonical report is timestamped `2026-10-09T02:02:22+00:00`, not replaced
+by later reruns. Linux/Rust 1.99/Python 3.14.4/headless Chrome 155, release mode,
+cache disabled: 200 keyed rows, 500 seed-7 toggles, ten measured rounds with
+rotating strategy order and a 50-update warm-up per strategy; append/remove/move
+followed. Equivalent checksum, outside/owned-input focus and keyed identity were
+checked. Times include WASM/DOM work with no per-update JS crossing.
+
+| Strategy | Update median/p95 | Round median/p95 | Identity outcome |
+|---|---:|---:|---|
+| Subtree replacement | 0.400/0.500 ms | 213.500/228.200 ms | Owned input/focus and untouched row lost |
+| Positional View patch | 0.100/0.200 ms | 41.700/42.900 ms | Input retained; semantic keyed identity lost on reorder |
+| Keyed direct DOM | 0.000/0.000 ms | 2.000/2.100 ms | Input/focus and keyed row retained |
+| Runtime static slots | 0.000/0.000 ms | 1.900/2.600 ms | Input/focus and keyed row retained |
+
+All outside focus and final states passed. Timer resolution makes zero entries
+nonliteral. Replacement created 2,015,000 update nodes versus zero for the other
+three; each alternative recorded 5,000 text/10,000 attribute mutations. Positional
+reorder added 4,000 text/8,012 attribute rewrites. These count explicit/logical
+operations, not engine allocation/layout/clone internals. Static slots use runtime
+`cloneNode`, not a compiler. Benchmark digest `71182d03b13e4d13`, WASM 165,287
+bytes/58,383 local gzip; production before/after stayed `3f3c5f074478c525`.
+No layout/paint/heap/GC, long-lived leak, other-browser timing or framework
+comparison was performed. One known-shape list cannot select a general winner.
+
+M7b's first reviewer found three P2s: incomplete exact child/text preflight,
+reserved-attribute case handling and stale-owner disposal/drop. Repairs preceded
+73 workspace tests/five doctests, isolated Chrome and existing debug-profile
+Chrome/Firefox regression PASS. M7c passed 17 focused tests (13 graph tests), one
+authoring doctest and Chrome batching/re-entrancy/drop/failure cases; nested
+subscription, reducer disposal and queued-capture cleanup regressions passed.
+Its final byte comparison initially used a wrong dist path; only that harness
+comparison was corrected after product PASS. M7d passed 86/five workspace tests
+and isolated **release** Chrome/Firefox input/focus/selection/listener tests;
+production browser regression remained **debug**, with separate byte-identical
+release assets. Isolated digests progressed M7b `63da15682051d80d`, M7c
+`150d17ce892eaebd`, M7d `c33a92498904a715`; these are distinct snapshots.
+
+M7e was a **no-decision freeze**, with 86 tests/five doctests, wasm32, Chrome/
+Firefox and isolated fixtures PASS. Its aggregate helper failed a sibling-module
+import after product checks; bounded asset-reader recovery completed exact bytes
+and cleanup without source changes. Repeat benchmark medians 213.8/41.7/1.9/1.9 ms
+were variation, not replacement canonical results. Reviewer
+`wc_job_9hT23HL0mwaTto4S` passed. Fixed templates/input/conditional slots, general
+VDOM/signals/forms/macros/resumability and WebGPU integration were not promoted.
+
+M7f extracted only metadata (5 core + 17 fixture tests, one doctest PASS);
+M7g retains its [unaltered original](M7G-VERIFICATION.md). M7h's attempted placement
+in the existing DOM crate changed production digests to `6895d575d9c6a494`, then
+`fdb6f0049bde5083` even when feature-gated. The independent keyed crate restored
+all pre-adoption production bytes. Its isolated Chrome/Firefox release fixture
+passed at `6754025153168694`, WASM 272,728/75,818 local-gzip bytes. This is not
+zero cost after adoption. M7f/M7h independent continuation reviews passed.
+
+M7i's combined browser Cargo invocation unified web-sys features and changed
+Search JS by three bytes; separate entry builds restored Search exactly. Todo
+adoption plus final lifetime repair changed production digest to
+`faebb0709dccd863`: Browser runtime 317,005 raw/101,349 gzip versus M7e
+234,279/81,307, an **increase of 82,726 raw/20,042 gzip bytes**. Search JS
+14,699/WASM 179,716 remained byte-identical (SHA256 respectively
+`1aca190b9e125e3e09f79c66be7c249f7be0fb794273575f547e6912f91e4f9b` and
+`ff46e70c132238db34765e9718692b8246359d2516e344258f464b5d6fc85db9`).
+
+M7i reviewer PASS did not close the broader final gate: M7j reviewer
+`wc_job_orP7QpVjLsh07HWI` failed a P2 queued `spawn_local`/late HTTP lifetime race.
+Token retirement plus before-start/after-await checks repaired it. Complete
+replacement validation passed **91 tests/five doctests**, six wasm32 packages,
+Chrome 155/Firefox 157 debug/release production and lifetime-race suites, isolated
+release lifecycle and full benchmark. The final cleanup helper matched its own
+ancestor command and exited 1 **after product PASS**; bounded ancestor-excluding
+cleanup passed. Repeat reviewer `wc_job_XZzdXEOIx6owj1o5` returned terminal exit 0,
+PASS, empty issues/followups. These were role-directed local Codex Jobs, not
+native managed-role identity or independent production security assurance.
+
+M7j local medians/p95/ranges: SSR 30 samples 0.037/0.073/0.015–0.076 ms; app five
+49.0/54.8/48.1–54.8 ms; Search five 3.5/5.9/3.3–5.9 ms. Benchmark round medians
+219.0/42.25/2.05/1.8 ms at `2026-10-09T07:08:21+00:00` preserved the canonical
+report and production assets. The bounded decision is metadata + optional graph
++ keyed ownership for Todo local only, not general API promotion or superiority.
+
+## Sample and API freeze evidence
+
+M8e (2026-10-09) first passed 113 tests/five doctests and the full debug/release
+Chrome/Firefox, REST/Cart, wasm32, benchmark and asset matrix. Final reviewer
+`wc_job_dospP8AM0wUmvHFd` found stale Session destroy could send a removal cookie
+after another request rotated identity. The repair clears the cookie only after
+removing the exact record; retired identity returns Destroyed with no directive.
+Focused Session/Cart 16/16, full **114/five**, Cart smoke, dependency isolation and
+all production bytes passed. Browser suites were **not replayed** for that
+native-only repair. Repeat `wc_job_J_MVNzFaVgTH1Gr1` passed the retained matrix.
+M8e digest stayed `faebb0709dccd863`; local SSR/app/Search medians were
+0.034/48.8/3.4 ms (30/5/5 samples), p95 0.072/51.4/4.2 ms. No equivalence claim.
+
+M9j (2026-10-10) actually reran the complete 12-application freeze: **190 native
+tests/five doctests**, format/strict Clippy/rustdoc, twelve release server builds,
+eleven native smoke/cleanup checks, eight wasm32 packages, three release suites
+in **each** Chrome 155 and Firefox 157 (Todo/Search, keyed lifecycle, dashboard),
+12 catalog entries/four checker tests, 28 normal dependency trees and 170 API
+entries in 14 files. All 136 production dist files stayed byte-identical, digest
+`faebb0709dccd863`. SQL/Session remained in declared native consumers; no
+SQLx/Diesel/SeaORM was present. Counter/Filter remained separately built at
+`1eccb326477b59ae`. Current catalog thirteen includes the later Showcase gate.
+
+Local informational M9j medians/p95: SSR 0.034/0.037 ms, app 48.7/89.8 ms,
+Search 3.6/4.7 ms; the same loopback/cache-disabled 30/5/5 method applies.
+Benchmark medians 215.75/41.75/1.90/1.80 ms retained equivalent states and the
+original benchmark digest. Browser activated total was 317,005 raw/101,349 gzip;
+Search activated excluding loader 194,415/74,481 plus loader 1,144/551.
+These are estimates and source-specific repeats, not Web Vitals, network or SLA.
+
+Two post-product evidence assertions were corrected: Session must occur in its
+own dependency tree; API crate labels must accept the documented grouped form.
+First final review then failed omitted constants and overbroad upstream API
+classification. [Inventory repairs and repeat PASS](API-CONTRACTS.md#original-inventory-acceptance-and-review-limits)
+changed documentation only; product matrix remained retained. Original release
+YT-020 stayed Blocked at that time. Neither prototype completion nor Stable
+Candidate declared a stable/public/production release. Later publication records
+control today's distribution identity; broad IME/AT/WebKit/mobile and production
+security were not established by these historical runs.

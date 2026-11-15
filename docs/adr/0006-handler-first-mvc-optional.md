@@ -41,7 +41,7 @@ let app: axum::Router = App::new()
     .into_router();
 ```
 
-`page(path, title, handler)` supports no-argument async View functions. Parameterized or fallible handlers use ordinary `.get` and return Page or Result<Page, E>. Page delegates to escaped SSR, preserves strict CSP and returns a generic 500 for rendering failure. Json, Redirect, error/status/header tuples and typed bindings are native Axum, not Yetlet-specific class hierarchies. The working API patterns are covered by rustdoc and integration tests in [M6 evidence](../M6-VERIFICATION.md).
+`page(path, title, handler)` supports no-argument async View functions. Parameterized or fallible handlers use ordinary `.get` and return Page or Result<Page, E>. Page delegates to escaped SSR, preserves strict CSP and returns a generic 500 for rendering failure. Json, Redirect, error/status/header tuples and typed bindings are native Axum, not Yetlet-specific class hierarchies. The working API patterns are covered by rustdoc and integration tests in [M6 evidence](https://github.com/bohewu/yetlet/blob/ac98cdc127ccd299cb1150fef922b0560453a1d4/docs/M6-VERIFICATION.md).
 
 `configure`/`try_configure` accept typed setup functions, and an independent optional request-ID module demonstrates scoped/global registration. The Todo routes now use the facade and typed results/bindings; shared browser UI source and release assets remain unchanged. See [Extensions](../EXTENSIONS.md).
 

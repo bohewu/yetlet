@@ -27,7 +27,7 @@ trait ActionExecutor<C: Command> {
 }
 ```
 
-The first implementation contains both `LocalExecutor` and a browser-only `HttpExecutor`. They share typed Todo commands and do **not** automatically serialize browser events to execute their listeners remotely. See [M4 verification](../M4-VERIFICATION.md).
+The first implementation contains both `LocalExecutor` and a browser-only `HttpExecutor`. They share typed Todo commands and do **not** automatically serialize browser events to execute their listeners remotely. See [M4 verification](https://github.com/bohewu/yetlet/blob/ac98cdc127ccd299cb1150fef922b0560453a1d4/docs/M4-VERIFICATION.md).
 
 ## Security requirements
 

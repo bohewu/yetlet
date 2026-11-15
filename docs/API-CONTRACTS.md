@@ -209,3 +209,24 @@ Before a public stability declaration:
 5. declare supported browsers/OS/toolchains and CI coverage;
 6. decide which optional provider security claims require independent audit;
 7. add migration notes and compile-level compatibility fixtures for adopted Stable Candidates.
+
+## Original inventory acceptance and review limits
+
+The 2026-10-10 M9j inventory covers **170 public declarations/constants in
+14 source files**, rather than the complete current SDK. First final review
+`wc_job_BzkzTPcKr4FKATTr` accepted product regression but failed two P2 inventory
+claims: omitted public constants/typed errors and overbroad Stable Candidate
+classification of upstream reexports. The repaired inventory explicitly includes
+`SessionConfigError`, `InvalidStart`, Request ID `HEADER`, `DEFAULT_CSP` and
+`LocalGraph::DEFAULT_MAX_PASSES`. The last two are Experimental policy defaults;
+broad Axum/http/extract/response reexports are Internal/support-only. Selected
+upstream sample use is no proof for whole upstream modules.
+
+Repeat independent role-directed read-only review `wc_job_QkQkovlBlvrhPxCE`
+returned terminal exit 0, PASS with no issues/followups after documentation-only
+repair. It was not native managed-role dispatch or formal assurance. Product
+source did not change for that repair. Original declarations and raw logs are
+separately retained ignored evidence; original Markdown is recoverable at local
+Git `ac98cdc127ccd299cb1150fef922b0560453a1d4`. Remote GitHub reachability has not
+been verified. [Freeze scope](QUALIFICATION-MATRIX.md#sample-and-api-freeze-evidence)
+records what was actually executed and what remained unqualified.

@@ -36,7 +36,7 @@ Mutations require exactly one `application/json` content type where a JSON body 
 
 New database files are created with owner-only mode `0600` on Unix before SQLite opens them. The bundled SQLite library improves single-binary portability for this prototype but increases native build size. Opening a connection per bounded operation is intentionally simpler than introducing a pool; applications with measured pool/concurrency requirements may select a mature pool explicitly. The database path is operator configuration, not user input.
 
-See [M9e data-access comparison](../../docs/M9E-DATA-ACCESS-COMPARISON.md) for the bounded `rusqlite` versus `sqlx` spike and [M9e verification](../../docs/M9E-VERIFICATION.md) for retained test/reviewer evidence.
+See [M9e data-access comparison](../../docs/SAMPLES.md#sql-first-data-access-and-sqlite-acceptance) for the bounded `rusqlite` versus `sqlx` spike and [M9e verification](../../docs/SAMPLES.md#sql-first-data-access-and-sqlite-acceptance) for retained test/reviewer evidence.
 
 ## Advanced lifecycle
 

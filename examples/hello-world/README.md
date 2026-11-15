@@ -49,4 +49,4 @@ cargo tree --locked -p yetlet-hello-world
 cargo xtask check samples
 ```
 
-See [M9a verification](../../docs/M9A-VERIFICATION.md) for reproducible evidence and independent reviewer outcome.
+See [M9a verification](../../docs/SAMPLES.md#hello-world-acceptance) for reproducible evidence and independent reviewer outcome.

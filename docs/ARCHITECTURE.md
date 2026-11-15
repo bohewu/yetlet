@@ -289,7 +289,7 @@ GET /app → shell HTML + compiled client artifacts
 
 Shared component source does not imply inclusion of server-side repositories or other privileged dependencies in browser artifacts. Browser data access is through capabilities that bind to explicit HTTP APIs.
 
-**M7i production evidence (2026-10-09):** `/app` now preflights and binds its local Todo list through optional `yetlet-dom-keyed`, then drives typed `TodoCommand` values through one strongly owned `yetlet-reactive::LocalGraph`. Existing keyed rows are updated in place; the separate Create button remains an explicit `HttpExecutor` path. Chrome and Firefox verify identity, disposal, remount and no local request circuit. The Search Island does not acquire either dependency. See [M7i verification](M7I-VERIFICATION.md).
+**M7i production evidence (2026-10-09):** `/app` now preflights and binds its local Todo list through optional `yetlet-dom-keyed`, then drives typed `TodoCommand` values through one strongly owned `yetlet-reactive::LocalGraph`. Existing keyed rows are updated in place; the separate Create button remains an explicit `HttpExecutor` path. Chrome and Firefox verify identity, disposal, remount and no local request circuit. The Search Island does not acquire either dependency. See [M7i verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 
 ## 5. Implemented and proposed module boundaries
 
@@ -314,17 +314,17 @@ These are conceptual boundaries, **not** a promise that each one will become a p
 
 Server features such as sessions, authentication, data caching, output caching, request tracing and rate limiting are **modular, opt-in, and pay-for-what-you-use**. Integrate them through independent Rust crates/providers, native Tower/Axum layers, typed request extensions and explicit application state. Do not add an always-on DI container or plugin manager. Application cache and HTTP output cache have different safety constraints; cookie-based authentication need not require a server session.
 
-`App::configure` and `try_configure` now compose ordinary typed setup functions once, while providers reuse native Tower scopes, explicit state and Extensions. The independent `yetlet-request-id` crate is the M6 opt-in proof: the Todo app installs `RequestIds::new().global(app)`, and a scoped provider can be configured only on selected groups. The core has no dependency on this provider. `RequestContext` itself still generates no ID. No server extension or provider dependency is copied into Browser WASM/hydration. See [Extensions](EXTENSIONS.md), [ADR 0005](adr/0005-opt-in-capability-modules.md) and [M6 evidence](M6-VERIFICATION.md).
+`App::configure` and `try_configure` now compose ordinary typed setup functions once, while providers reuse native Tower scopes, explicit state and Extensions. The independent `yetlet-request-id` crate is the M6 opt-in proof: the Todo app installs `RequestIds::new().global(app)`, and a scoped provider can be configured only on selected groups. The core has no dependency on this provider. `RequestContext` itself still generates no ID. No server extension or provider dependency is copied into Browser WASM/hydration. See [Extensions](EXTENSIONS.md), [ADR 0005](adr/0005-opt-in-capability-modules.md) and [M6 evidence](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements).
 
 M8c adds the independent `yetlet-session` crate as a second, security-bounded proof. The cart explicitly installs `SessionManager<Cart>` only on its `/cart` group. IDs and CSRF tokens are OS-random, state and expiry remain server-side, unknown IDs are not adopted, mutations use a session-bound token, and clear/end demonstrate rotation and revocation. The server adapter, Todo, REST and Browser packages do not depend on Session. This is an anonymous process-local provider, not authentication or production qualification. See [M8c evidence](M8C-VERIFICATION.md).
 
-M8d's measured three-sample audit retains these boundaries rather than introducing another runtime API: Todo pays for Browser/keyed/reactive capabilities, REST remains a native one-package API, and Cart remains a native one-package SSR application selecting Session. Shared candidates such as listener helpers, JSON errors, origin policy and forms remain application-specific until more examples converge. M8e freezes the complete artifact/dependency regression and final reviewer PASS without changing these boundaries. See [M8d evidence](M8D-VERIFICATION.md) and [M8e evidence](M8E-VERIFICATION.md).
+M8d's measured three-sample audit retains these boundaries rather than introducing another runtime API: Todo pays for Browser/keyed/reactive capabilities, REST remains a native one-package API, and Cart remains a native one-package SSR application selecting Session. Shared candidates such as listener helpers, JSON errors, origin policy and forms remain application-specific until more examples converge. M8e freezes the complete artifact/dependency regression and final reviewer PASS without changing these boundaries. See [M8d evidence](SAMPLES.md#dx-audit-and-final-freeze) and [M8e evidence](QUALIFICATION-MATRIX.md#sample-and-api-freeze-evidence).
 
 ### Handler-first application API (M6 implemented)
 
 **Handler-first, Component-first, MVC optional, minimal boilerplate.** MVC is a code organization convention, not an application requirement. A simple SSR page or typed JSON endpoint uses ordinary Rust handler functions and shared `View`/components, with no Controller superclass, mandatory folder structure, custom model binder, broad `ActionResult` hierarchy or service locator.
 
-M6a now implements `yetlet-server-axum::App<S>`, a thin facade over `axum::Router<S>`. `get`, `post`, `route`, `group`, `route_layer`, `with_state`, `map_router` and conversion to/from native Router preserve Axum/Tower handler, extractor, middleware, 404/405 and response semantics. `RequestContext<S>` remains optional. [M6a verification](M6A-VERIFICATION.md) records the native integration tests and reproducible commands.
+M6a now implements `yetlet-server-axum::App<S>`, a thin facade over `axum::Router<S>`. `get`, `post`, `route`, `group`, `route_layer`, `with_state`, `map_router` and conversion to/from native Router preserve Axum/Tower handler, extractor, middleware, 404/405 and response semantics. `RequestContext<S>` remains optional. [M6a verification](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements) records the native integration tests and reproducible commands.
 
 M6 now adds `App::page(path, title, handler)` for no-argument async View functions and the small `Page` HTTP result for handlers with native typed extractors or `Result<Page, E>` errors. Json, Redirect and status/header results use native Axum semantics. The Todo server now uses App, Page, native State/Json and explicit provider registration. There is still no Controller runtime, discovery macro, custom model binder or full MVC framework. See [ADR 0006](adr/0006-handler-first-mvc-optional.md).
 
@@ -342,25 +342,25 @@ fn TodoList(items: &[Todo]) -> View {
 
 The native target outputs HTML; the browser target creates and updates DOM. Component boundaries and stable identifiers must be deterministic to avoid hydration mismatches.
 
-**M7a measured evidence:** An isolated release benchmark compared current subtree replacement, a positional `View` patch, keyed direct DOM and runtime-cloned static slots over 200 rows × 500 updates × 10 rounds. The retained `2026-10-09T02:02:22+00:00` report recorded median round totals of 213.500, 41.700, 2.000 and 1.900 ms respectively on one local Chrome 155 environment. Whole replacement lost owned input/keyed-row identity; the positional patch preserved the input but not keyed identity after reorder; keyed/slot prototypes preserved both. Production Browser/Search assets remained byte-identical. See [M7a verification](M7A-VERIFICATION.md).
+**M7a measured evidence:** An isolated release benchmark compared current subtree replacement, a positional `View` patch, keyed direct DOM and runtime-cloned static slots over 200 rows × 500 updates × 10 rounds. The retained `2026-10-09T02:02:22+00:00` report recorded median round totals of 213.500, 41.700, 2.000 and 1.900 ms respectively on one local Chrome 155 environment. Whole replacement lost owned input/keyed-row identity; the positional patch preserved the input but not keyed identity after reorder; keyed/slot prototypes preserved both. Production Browser/Search assets remained byte-identical. See [M7a verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 
-**M7b prototype evidence:** The isolated `yetlet-keyed-bindings` crate expresses one fixed keyed-list shape with native SSR, allowlisted typed text/attributes, one conditional slot and one local typed row action. Browser binding preflights component/instance/key/slot/shape identity before attaching listeners, preserves existing SSR nodes, reconciles keyed insert/remove/reorder, and supports explicit disposal. Production Browser/Search assets and dependency graphs remain unchanged. See [M7b verification](M7B-VERIFICATION.md).
+**M7b prototype evidence:** The isolated `yetlet-keyed-bindings` crate expresses one fixed keyed-list shape with native SSR, allowlisted typed text/attributes, one conditional slot and one local typed row action. Browser binding preflights component/instance/key/slot/shape identity before attaching listeners, preserves existing SSR nodes, reconciles keyed insert/remove/reorder, and supports explicit disposal. Production Browser/Search assets and dependency graphs remain unchanged. See [M7b verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 
-**M7c prototype evidence:** The same isolated crate now contains one explicitly owned synchronous local graph. Strong ownership stays in `LocalGraph`; dispatch handles and subscriptions are weak. FIFO batches reduce into one draft and one commit, re-entrant messages run in a later bounded pass, reducer errors preserve the previous commit, renderer errors fault the graph, and disposal releases observers/listeners/captures. Chrome verifies the graph driving the M7b binding without HTTP or WebSocket traffic. See [M7c verification](M7C-VERIFICATION.md).
+**M7c prototype evidence:** The same isolated crate now contains one explicitly owned synchronous local graph. Strong ownership stays in `LocalGraph`; dispatch handles and subscriptions are weak. FIFO batches reduce into one draft and one commit, re-entrant messages run in a later bounded pass, reducer errors preserve the previous commit, renderer errors fault the graph, and disposal releases observers/listeners/captures. Chrome verifies the graph driving the M7b binding without HTTP or WebSocket traffic. See [M7c verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 
-**M7d prototype evidence:** The fixed row now optionally owns one controlled text input. Model-aware live-value updates avoid resetting caret selection; successful keyed reconciliation captures/restores a connected focused input and selection, while focused row removal deliberately leaves the detached node unfocused. Chrome 155 and Firefox 157 verify input identity/value/focus/selection across reorder plus listener cleanup after row removal and owner disposal. See [M7d verification](M7D-VERIFICATION.md).
+**M7d prototype evidence:** The fixed row now optionally owns one controlled text input. Model-aware live-value updates avoid resetting caret selection; successful keyed reconciliation captures/restores a connected focused input and selection, while focused row removal deliberately leaves the detached node unfocused. Chrome 155 and Firefox 157 verify input identity/value/focus/selection across reorder plus listener cleanup after row removal and owner disposal. See [M7d verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 
-**M7e evidence freeze:** The complete native/wasm32/Chrome/Firefox regression, M7a benchmark rerun, production asset comparison and dependency isolation pass without changing production Browser/Search bytes. The evidence identifies small identity, slot, keyed reconciliation, ownership/disposal and weak-handle patterns as candidates for later extraction, but promotes none of the current APIs. See [M7e verification](M7E-VERIFICATION.md).
+**M7e evidence freeze:** The complete native/wasm32/Chrome/Firefox regression, M7a benchmark rerun, production asset comparison and dependency isolation pass without changing production Browser/Search bytes. The evidence identifies small identity, slot, keyed reconciliation, ownership/disposal and weak-handle patterns as candidates for later extraction, but promotes none of the current APIs. See [M7e verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 
-**M7f promoted contract:** `yetlet-core::binding` now owns renderer-neutral `ComponentIdentity`, `BindingKey`, `SlotName`, `InertAttributeName` and `SlotDescriptor` types. The fixed M7b authoring prototype consumes these contracts, eliminating duplicate validation while remaining experimental. This promotion selects only the shared trust-boundary vocabulary; it does not select a template IR, DOM reconciler, scheduler or hydration protocol. See [M7f verification](M7F-VERIFICATION.md).
+**M7f promoted contract:** `yetlet-core::binding` now owns renderer-neutral `ComponentIdentity`, `BindingKey`, `SlotName`, `InertAttributeName` and `SlotDescriptor` types. The fixed M7b authoring prototype consumes these contracts, eliminating duplicate validation while remaining experimental. This promotion selects only the shared trust-boundary vocabulary; it does not select a template IR, DOM reconciler, scheduler or hydration protocol. See [M7f verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 
 **M7g optional graph:** The exact synchronous graph proven in M7c now lives in dependency-free `yetlet-reactive`. It retains one strong owner, weak dispatch/subscription handles, FIFO batching, bounded later-pass re-entrancy, recoverable reducer errors, faulted commit errors and deterministic disposal. It is an explicit local message/commit primitive, not field-level signals, automatic effects or an async scheduler. See [M7g verification](M7G-VERIFICATION.md).
 
-**M7h optional keyed DOM:** `yetlet-dom-keyed` now owns validated keyed order, element-plus-state entries, insert/remove/reorder reconciliation and disposable event-listener ownership. The M7b–M7d fixture consumes the primitive and retains its Chrome/Firefox identity, controlled-input and cleanup evidence. Keeping it independent from `yetlet-dom` is required for pre-adoption production asset isolation; attempts to place or feature-gate it inside the existing renderer changed compiled Browser/Search bytes. The update/DOM mutation failure boundary remains explicit and non-transactional. See [M7h verification](M7H-VERIFICATION.md).
+**M7h optional keyed DOM:** `yetlet-dom-keyed` now owns validated keyed order, element-plus-state entries, insert/remove/reorder reconciliation and disposable event-listener ownership. The M7b–M7d fixture consumes the primitive and retains its Chrome/Firefox identity, controlled-input and cleanup evidence. Keeping it independent from `yetlet-dom` is required for pre-adoption production asset isolation; attempts to place or feature-gate it inside the existing renderer changed compiled Browser/Search bytes. The update/DOM mutation failure boundary remains explicit and non-transactional. See [M7h verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 
-**M7i production adoption:** Todo Browser now binds its local list to the promoted keyed owner and uses a graph-backed adapter at the existing `ActionExecutor<TodoCommand>` boundary. Route runtime ownership is explicit; disposal invalidates the runtime lifetime before dropping local/remote listeners, so queued actions cannot start and in-flight HTTP completions cannot update retired DOM. Readable DOM remains, and remount creates exactly one fresh action path. The remote result list and Search results retain their prior bounded subtree strategy. Separate Cargo builds prevent Todo's expanded browser features from perturbing Search assets. See [M7i verification](M7I-VERIFICATION.md).
+**M7i production adoption:** Todo Browser now binds its local list to the promoted keyed owner and uses a graph-backed adapter at the existing `ActionExecutor<TodoCommand>` boundary. Route runtime ownership is explicit; disposal invalidates the runtime lifetime before dropping local/remote listeners, so queued actions cannot start and in-flight HTTP completions cannot update retired DOM. Readable DOM remains, and remount creates exactly one fresh action path. The remote result list and Search results retain their prior bounded subtree strategy. Separate Cargo builds prevent Todo's expanded browser features from perturbing Search assets. See [M7i verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 
-**M7j architecture freeze:** [ADR 0007](adr/0007-bounded-keyed-dom-and-local-graph.md) accepts the renderer-neutral binding vocabulary, optional explicitly owned local graph, separate optional keyed DOM owner and one production Todo local-list adoption. It retains direct subtree mounting for simpler/independent surfaces and explicitly rejects inferring a general VDOM, template DSL, signals/forms framework or resumability design from the benchmark. The first final reviewer found one queued/in-flight disposal race; explicit lifetime invalidation plus Chrome/Firefox debug/release regressions repair it. Replacement validation and repeat reviewer Job `wc_job_XZzdXEOIx6owj1o5` PASS are recorded in [M7j verification](M7J-VERIFICATION.md).
+**M7j architecture freeze:** [ADR 0007](adr/0007-bounded-keyed-dom-and-local-graph.md) accepts the renderer-neutral binding vocabulary, optional explicitly owned local graph, separate optional keyed DOM owner and one production Todo local-list adoption. It retains direct subtree mounting for simpler/independent surfaces and explicitly rejects inferring a general VDOM, template DSL, signals/forms framework or resumability design from the benchmark. The first final reviewer found one queued/in-flight disposal race; explicit lifetime invalidation plus Chrome/Firefox debug/release regressions repair it. Replacement validation and repeat reviewer Job `wc_job_XZzdXEOIx6owj1o5` PASS are recorded in [M7j verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 
 M7a–M7e made the keyed/static-slot/local-ownership direction concrete and ended in a no-decision freeze. M7f–M7h promote only independently proven low-level contracts; M7i adopts them for one production Todo local-list path; M7j freezes the bounded decision, repaired runtime lifetime, complete regression evidence and repeat reviewer PASS. The fixed authoring shape, current text-input API, focus policy and conditional-slot shape remain experimental. No public VDOM, dependency-tracked signals/forms runtime, macro DSL or general template compiler is selected.
 
@@ -416,7 +416,7 @@ pointer/keyboard/input DOM event
 
 The MVP does not forward raw DOM events. Remote actions need explicit input/output/error schemas; the server must validate permissions again. HTTP mutations must address CSRF, idempotency, replay, and retries. Keep future custom transports separate from renderer interfaces.
 
-**M4 prototype evidence (2026-10-08):** `yetlet-actions` exposes `Command` and injected `ActionExecutor<C>` implementations: `LocalExecutor` runs a shared domain transition; `HttpExecutor` makes an explicit JSON POST to `/api/todos`. `examples/todo-ui` owns `TodoCommand`/`TodoSnapshot`; the server uses the same transition behind an Axum adapter with a per-router in-memory store. Browser E2E confirmed local toggle with no HTTP and a separate semantic Create POST. Typed errors are surfaced without executing untrusted HTML. See [M4 verification](M4-VERIFICATION.md).
+**M4 prototype evidence (2026-10-08):** `yetlet-actions` exposes `Command` and injected `ActionExecutor<C>` implementations: `LocalExecutor` runs a shared domain transition; `HttpExecutor` makes an explicit JSON POST to `/api/todos`. `examples/todo-ui` owns `TodoCommand`/`TodoSnapshot`; the server uses the same transition behind an Axum adapter with a per-router in-memory store. Browser E2E confirmed local toggle with no HTTP and a separate semantic Create POST. Typed errors are surfaced without executing untrusted HTML. See [M4 verification](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements).
 
 **M7i local adapter evidence (2026-10-09):** Todo Browser's local executor now dispatches the same typed command through a weak graph handle and returns only the last successfully committed snapshot. Graph ownership, rendering and listener lifetime remain local to the route runtime; `HttpExecutor` remains the only remote path. This changes local scheduling/DOM ownership, not the command or transport contract.
 
@@ -452,3 +452,50 @@ WebGPU cannot accelerate ordinary DOM/CSS layout directly. A future WebGPU targe
 | GPU renderer not matching HTML semantics | Keep GPU outside MVP and provide a separate scene interface |
 
 See [ADR 0001](adr/0001-separation-of-concerns.md), [ADR 0002](adr/0002-events-and-actions.md), [ADR 0003](adr/0003-renderers-and-loading.md), and [ADR 0007](adr/0007-bounded-keyed-dom-and-local-graph.md).
+
+## SSR, browser and handler architecture boundaries
+
+The M2–M9 prototypes established separable HTML serialization, DOM ownership,
+asset loading, local updates and typed HTTP commands. Their original package
+names describe the historical layout; use the [current API map](API-REFERENCE.md)
+for the published two-package SDK. Neither the historical package count nor a
+prototype PASS is a current support or stability promise.
+
+Native SSR returns complete escaped HTML with no mandatory JS/WASM. Browser
+assets are compiled and content-addressed at build time. Missing or invalid
+island assets leave readable SSR; no code is evaluated or compiled per request.
+The original DOM renderer used `createElement`/`createTextNode`, never `innerHTML`.
+The Search proof binds only its named/versioned boundary, preserves the input
+and initial results, and updates the result subtree/count. Its bounded,
+allowlisted `SearchStateV1` rejects unknown fields, duplicate IDs, excess size,
+item limits and schema mismatch before binding. It filters server-supplied
+initial data; this is not a general hydration registry or resumability.
+
+M6's handler-first facade owns only the native Axum Router. `get`/`post`, nested
+`group`, `route`, state and middleware delegate to Axum; `map_router`,
+`from_router` and `into_router` retain native escape hatches. MVC/Controllers are
+optional application organization. There is no second router, binder, result
+class hierarchy, runtime discovery or DI container. `App::page` accepts a
+no-argument async View handler; parameterized/fallible handlers use native
+extractors and `Page`/`Result<Page, E>`. Rendering failures return a generic 500
+with strict CSP; application errors keep their selected response semantics.
+[HTTP composition](HTTP-PIPELINE.md#handler-and-typed-action-boundaries) and
+[explicit installation](EXTENSIONS.md#construction-and-optional-provider-ownership)
+retain the security and ownership details.
+
+The M7e freeze selected no renderer. Later M7f–M7j promoted only safe identity/slot
+metadata, an optional synchronous owned graph and optional keyed child/listener
+ownership. Todo's local list selects both; remote Todo and Search results retain
+owned-subtree replacement. The fixed template/input/focus authoring fixture stays
+experimental. [Browser ownership](BROWSER-APP.md#keyed-ownership-and-runtime-retirement)
+and [qualification](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements)
+record the measured costs and failed alternatives. General VDOM, signals/effects,
+macros, forms, async scheduling, full resumability and WebGPU-for-DOM were not
+adopted. GPU scenes remain an independent optional renderer.
+
+M8's three-shape DX audit and M9's twelve-sample freeze required no new runtime
+abstraction. SQL, transactions, synthetic identity, uploads and SSE stay
+application-owned; **Yetlet supplies no ORM**. A reusable data API would require
+separately reviewed convergent consumers and an ADR. An external ORM may be an
+explicit app choice, never a default SDK/browser dependency. See
+[sample contracts and dated acceptance](SAMPLES.md#sample-acceptance-and-source-boundaries).

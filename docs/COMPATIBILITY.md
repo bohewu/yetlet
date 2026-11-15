@@ -372,3 +372,29 @@ The [Private preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparati
 ## Historical activation blockers
 
 Licensing/security policy (YT-060) and private-state maintainer-only governance (YT-061) are complete and independently reviewed. Release design/preflight (YT-064) is complete at that scope, not signed publication. YT-065 is complete at its bounded automated desktop/native/browser scope; real-device/IME/assistive-technology/WebKit/mobile/zoom evidence remains optional and Not verified. YT-066 is Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability/HA/TLS/recovery remains Not verified. The selected experimental policy is prepared privately, with [remaining activation gates](RELEASE-SUPPLY-CHAIN.md#current-preparation-source-boundary-2026-10-12) for immutable source, registry resolution, release integrity, public reporting/scanner controls and explicit approval. The completed YT-067 scan/fix retains its source boundary; no external certification or post-patch whole-repository scan is claimed. Public release YT-020 remains Blocked.
+
+## Early prototype compatibility limits
+
+M2–M9 local PASS claims apply to their frozen sources and tools, not today's
+checkout or universal browser/MSRV support. M5 used Linux x86_64, Rust 1.99.0,
+Chrome 155.0.8059.39, Firefox 157.0/geckodriver 0.37.1 and Python 3.14.4.
+Its then-declared Rust 1.85 minimum was untested. M9j used the same tool versions;
+a later security round separately validated Rust 1.88 for patched `time 0.3.47`.
+Current publication/toolchain policy above supersedes those historical minimums.
+
+Chrome captured strict CSP/resource/console telemetry; early Firefox covered
+physical keyboard input/clearing, WASM, local/HTTP actions and typed 422 without
+an equivalent complete console/CSP telemetry claim. M7's isolated focus/selection
+and listener lifecycle suites ran in Chrome and Firefox, but did not qualify
+real IME/composition, WebKit/mobile, assistive technology or long-lived heap/GC.
+M9 native-only stages reused unchanged browser bytes and wasm32 checks, then
+M9j actually reran the complete cross-product browser matrix. These are distinct
+evidence scopes. No framework comparison, WAN/TLS throughput, SLA, universal
+security or production qualification follows from local timing or test totals.
+
+Historical blockers such as licensing, document metadata and public publication
+were later handled at their separately recorded gates. Preserve their original
+Blocked/Pending scope without misrepresenting them as today's distribution state.
+Current releases remain Experimental; the [qualification matrix](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements)
+and [sample guide](SAMPLES.md#sample-acceptance-and-source-boundaries) preserve
+source-specific negative results and reviewer limits.

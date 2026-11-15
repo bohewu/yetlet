@@ -677,7 +677,7 @@ let page = Page::with_metadata(
 
 The metadata contract is deliberately only title + language. Charset/viewport stay fixed and CSP remains server response policy; Yetlet does not add an arbitrary head manager or DSL. See [Compatibility Policy](COMPATIBILITY.md) and [M10c plan](M10C-PLAN.md).
 
-`configure`/`try_configure` execute ordinary module setup functions once at application construction. Providers compose native scoped middleware and typed request/application state. The Todo server explicitly selects `yetlet-request-id`; the M8c cart explicitly selects `yetlet-session` only for `/cart`. A minimal app depends on neither. See [Extensions](EXTENSIONS.md), [complete M6 evidence](M6-VERIFICATION.md) and [M8c evidence](M8C-VERIFICATION.md).
+`configure`/`try_configure` execute ordinary module setup functions once at application construction. Providers compose native scoped middleware and typed request/application state. The Todo server explicitly selects `yetlet-request-id`; the M8c cart explicitly selects `yetlet-session` only for `/cart`. A minimal app depends on neither. See [Extensions](EXTENSIONS.md), [complete M6 evidence](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements) and [M8c evidence](M8C-VERIFICATION.md).
 
 A runnable provider-free example is available with `cargo run -p yetlet-server-axum --example minimal`.
 
@@ -704,7 +704,7 @@ A minimal native-only Hello World application has no optional providers or brows
 cargo run -p yetlet-hello-world
 ```
 
-It listens on `http://127.0.0.1:3003` by default, with a script-free SSR `/` and a safely escaped `/hello/{name}` route. See [M9a evidence](M9A-VERIFICATION.md); independent reviewer `wc_job_Htk-Quo_aFExMJs3` PASS.
+It listens on `http://127.0.0.1:3003` by default, with a script-free SSR `/` and a safely escaped `/hello/{name}` route. See [M9a evidence](SAMPLES.md#hello-world-acceptance); independent reviewer `wc_job_Htk-Quo_aFExMJs3` PASS.
 
 The native-only REST sample requires no browser toolchain:
 
@@ -728,7 +728,7 @@ The native Middleware Lab demonstrates request/context scope and streaming witho
 cargo run -p yetlet-middleware-lab
 ```
 
-It listens on `http://127.0.0.1:3004` by default; inspect `/outside`, `/lab/plain`, `/lab/guarded`, `/lab/stream` and `/lab/broken-stream` for global/group/method-specific middleware, reverse unwind, 404/405 and streaming failure semantics. See [M9b evidence](M9B-VERIFICATION.md); independent reviewer `wc_job_UnKflDaA8ZQHXCce` PASS.
+It listens on `http://127.0.0.1:3004` by default; inspect `/outside`, `/lab/plain`, `/lab/guarded`, `/lab/stream` and `/lab/broken-stream` for global/group/method-specific middleware, reverse unwind, 404/405 and streaming failure semantics. See [M9b evidence](SAMPLES.md#middleware-lab-acceptance); independent reviewer `wc_job_UnKflDaA8ZQHXCce` PASS.
 
 The optional, **stateless** SSR Forms Validation sample demonstrates accessible field errors and no-side-effect PRG without JavaScript or Session:
 
@@ -736,7 +736,7 @@ The optional, **stateless** SSR Forms Validation sample demonstrates accessible 
 cargo run -p yetlet-forms-validation
 ```
 
-It listens on `http://127.0.0.1:3005` by default. Routes are `/form`, POST `/form/submit`, and `/form/success`. A valid POST redirects with HTTP 303, but **stores nothing**; this is not a claim of credentialed CSRF defense. See [M9c evidence](M9C-VERIFICATION.md); final independent reviewer `wc_job_lGtk_ZIoAvK4F6PW` PASS.
+It listens on `http://127.0.0.1:3005` by default. Routes are `/form`, POST `/form/submit`, and `/form/success`. A valid POST redirects with HTTP 303, but **stores nothing**; this is not a claim of credentialed CSRF defense. See [M9c evidence](SAMPLES.md#forms-validation-acceptance); final independent reviewer `wc_job_lGtk_ZIoAvK4F6PW` PASS.
 
 The native File Server passed M9d independent acceptance review:
 
@@ -744,7 +744,7 @@ The native File Server passed M9d independent acceptance review:
 cargo run -p yetlet-file-server
 ```
 
-It requires loopback (default port 3006), exposes a fixed static fixture and token-gated uploads/downloads, and stores only bounded temporary text files. See the [File Server README](../examples/file-server/README.md) for the private local development token and curl workflow, and [M9d evidence](M9D-VERIFICATION.md) for verification status. It is not a public file-hosting or identity service.
+It requires loopback (default port 3006), exposes a fixed static fixture and token-gated uploads/downloads, and stores only bounded temporary text files. See the [File Server README](../examples/file-server/README.md) for the private local development token and curl workflow, and [M9d evidence](SAMPLES.md#file-server-acceptance) for verification status. It is not a public file-hosting or identity service.
 
 The SQL-first SQLite CRUD sample passed M9e independent repeat review:
 
@@ -752,7 +752,7 @@ The SQL-first SQLite CRUD sample passed M9e independent repeat review:
 cargo run -p yetlet-sqlite-crud
 ```
 
-It defaults to loopback port 3007 and `target/yetlet-sqlite-crud.sqlite3`. It uses application-local direct `rusqlite`, explicit SQL migrations/transactions and bounded `spawn_blocking`; no Yetlet ORM or mandatory data layer is introduced. Reviewer `wc_job_Q3pBfUqPYGYNSIrD` found and prompted a fail-closed schema-column repair; repeat reviewer `wc_job_aVBprnEsYc8o3ubi` returned PASS. See the [comparison](M9E-DATA-ACCESS-COMPARISON.md) and [M9e evidence](M9E-VERIFICATION.md).
+It defaults to loopback port 3007 and `target/yetlet-sqlite-crud.sqlite3`. It uses application-local direct `rusqlite`, explicit SQL migrations/transactions and bounded `spawn_blocking`; no Yetlet ORM or mandatory data layer is introduced. Reviewer `wc_job_Q3pBfUqPYGYNSIrD` found and prompted a fail-closed schema-column repair; repeat reviewer `wc_job_aVBprnEsYc8o3ubi` returned PASS. See the [comparison](SAMPLES.md#sql-first-data-access-and-sqlite-acceptance) and [M9e evidence](SAMPLES.md#sql-first-data-access-and-sqlite-acceptance).
 
 The native SSE Notifications sample passed M9f independent repeat review:
 
@@ -760,7 +760,7 @@ The native SSE Notifications sample passed M9f independent repeat review:
 cargo run -p yetlet-sse-notifications
 ```
 
-It listens on loopback port 3008 by default. `/events` uses bounded replay, heartbeat comments and `Last-Event-ID`; `/notifications` is a loopback command-oriented JSON publisher. No browser runtime, WebSocket or framework-global event circuit is introduced. First reviewer `wc_job_LF-i2IsQxFXO-obd` found control-character validation occurred after trim; raw-input validation fixed it and repeat reviewer `wc_job_fa8KJiTxGRuWIEDF` returned PASS. See [M9f evidence](M9F-VERIFICATION.md).
+It listens on loopback port 3008 by default. `/events` uses bounded replay, heartbeat comments and `Last-Event-ID`; `/notifications` is a loopback command-oriented JSON publisher. No browser runtime, WebSocket or framework-global event circuit is introduced. First reviewer `wc_job_LF-i2IsQxFXO-obd` found control-character validation occurred after trim; raw-input validation fixed it and repeat reviewer `wc_job_fa8KJiTxGRuWIEDF` returned PASS. See [M9f evidence](SAMPLES.md#sse-notifications-acceptance).
 
 The isolated Multi-Island Dashboard passed M9g final independent review:
 
@@ -768,7 +768,7 @@ The isolated Multi-Island Dashboard passed M9g final independent review:
 cargo xtask build multi-island-dashboard && cargo run -p yetlet-multi-island-dashboard
 ```
 
-It listens on loopback port 3009 and keeps generated Counter/Filter bundles under `target/multi-island-dashboard-dist/`, outside production `dist/`. Complete SSR remains when either bundle or the whole manifest is missing/invalid. Final reviewer `wc_job_OMstvGrtDiKZ5p6C` returned PASS after retained Chrome/Firefox fallback evidence was supplied. See [M9g evidence](M9G-VERIFICATION.md).
+It listens on loopback port 3009 and keeps generated Counter/Filter bundles under `target/multi-island-dashboard-dist/`, outside production `dist/`. Complete SSR remains when either bundle or the whole manifest is missing/invalid. Final reviewer `wc_job_OMstvGrtDiKZ5p6C` returned PASS after retained Chrome/Firefox fallback evidence was supplied. See [M9g evidence](SAMPLES.md#multi-island-dashboard-acceptance).
 
 The loopback-only Auth Notes fixture passed M9h security-focused review:
 
@@ -776,7 +776,7 @@ The loopback-only Auth Notes fixture passed M9h security-focused review:
 cargo run -p yetlet-auth-notes
 ```
 
-It generates synthetic Alice/Bob login codes in the local terminal, uses opt-in Session rotation/CSRF, and rechecks note ownership on every request. Reviewer `wc_job_EgSLng_VafIvs3ju` returned PASS. It is not a password, OIDC, MFA or production identity provider. See [M9h evidence](M9H-VERIFICATION.md).
+It generates synthetic Alice/Bob login codes in the local terminal, uses opt-in Session rotation/CSRF, and rechecks note ownership on every request. Reviewer `wc_job_EgSLng_VafIvs3ju` returned PASS. It is not a password, OIDC, MFA or production identity provider. See [M9h evidence](SAMPLES.md#auth-notes-acceptance).
 
 The larger Modular Shop reference application passed M9i repeat independent review:
 
@@ -784,7 +784,7 @@ The larger Modular Shop reference application passed M9i repeat independent revi
 cargo run -p yetlet-modular-shop
 ```
 
-It listens on loopback port 3008, composes synthetic identity, SQL catalog, Session cart and transactional orders through explicit Rust modules, and can disable Orders with `YETLET_SHOP_DISABLE_ORDERS=1`. First reviewer `wc_job_a_WnhFSftzNoYYgf` found and prompted smoke readiness cleanup; repeat reviewer `wc_job_zbWS7OSbUtaKzYcn` returned PASS. It is not a payment or production commerce system. See [M9i evidence](M9I-VERIFICATION.md).
+It listens on loopback port 3008, composes synthetic identity, SQL catalog, Session cart and transactional orders through explicit Rust modules, and can disable Orders with `YETLET_SHOP_DISABLE_ORDERS=1`. First reviewer `wc_job_a_WnhFSftzNoYYgf` found and prompted smoke readiness cleanup; repeat reviewer `wc_job_zbWS7OSbUtaKzYcn` returned PASS. It is not a payment or production commerce system. See [M9i evidence](SAMPLES.md#modular-shop-acceptance).
 
 `cargo xtask build browser --release` produces an optimized browser bundle. Do not confuse debug WASM bytes with production transfer sizes or performance.
 
@@ -842,9 +842,9 @@ cargo xtask smoke keyed-bindings-chrome --profile release
 cargo xtask smoke keyed-bindings-firefox --profile release
 ```
 
-Do not mix debug and release asset builds. Results are recorded in [M5 verification](M5-VERIFICATION.md); size estimates refer to local gzip artifacts, not actual transfer bytes.
+Do not mix debug and release asset builds. Results are recorded in [M5 verification](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements); size estimates refer to local gzip artifacts, not actual transfer bytes.
 
-Browser smoke tests use isolated headless profiles and temporary localhost servers, stopping only their own processes. M2 checks shared DOM/local clicks; M3 covers lazy islands and fail-closed state; M4 covers the explicit typed HTTP boundary. M7i additionally checks stable keyed row/list identity, explicit graph/listener disposal, readable detached DOM and duplicate-free remount in Chrome and Firefox. See [M7i verification](M7I-VERIFICATION.md).
+Browser smoke tests use isolated headless profiles and temporary localhost servers, stopping only their own processes. M2 checks shared DOM/local clicks; M3 covers lazy islands and fail-closed state; M4 covers the explicit typed HTTP boundary. M7i additionally checks stable keyed row/list identity, explicit graph/listener disposal, readable detached DOM and duplicate-free remount in Chrome and Firefox. See [M7i verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 
 #### Workspace structure
 
@@ -867,7 +867,7 @@ Browser smoke tests use isolated headless profiles and temporary localhost serve
 - `examples/cart-server` — Native-only SSR cart with explicitly scoped `yetlet-session` and no browser/WASM dependency.
 - `cargo xtask build browser` — Content-addressed browser asset pipeline with isolated Todo/Search Cargo builds.
 
-**Known limitations:** Only the production Todo local list uses the promoted keyed graph; remote Todo results and Search result updates retain bounded subtree replacement. The fixed keyed/static-slot authoring shape, text-input/focus policy and conditional slot remain experimental. Nested/general component trees, async effects, IME/mobile/WebKit coverage and generic hydration/resumability remain absent. The Todo API and Session cart are process-local/in-memory; the Session proof is anonymous, single-node and not production auth/CSRF qualification. Durable persistence, stable API, full IME/a11y matrix and cross-framework benchmarks remain absent. See [M7i verification](M7I-VERIFICATION.md), [M8c verification](M8C-VERIFICATION.md) and [release readiness](RELEASE-READINESS.md).
+**Known limitations:** Only the production Todo local list uses the promoted keyed graph; remote Todo results and Search result updates retain bounded subtree replacement. The fixed keyed/static-slot authoring shape, text-input/focus policy and conditional slot remain experimental. Nested/general component trees, async effects, IME/mobile/WebKit coverage and generic hydration/resumability remain absent. The Todo API and Session cart are process-local/in-memory; the Session proof is anonymous, single-node and not production auth/CSRF qualification. Durable persistence, stable API, full IME/a11y matrix and cross-framework benchmarks remain absent. See [M7i verification](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence), [M8c verification](M8C-VERIFICATION.md) and [release readiness](RELEASE-READINESS.md).
 
 #### Governance, security, and license
 
@@ -890,38 +890,16 @@ M10 release-supply-chain design/preflight is independently reviewed. Four local 
 - [Full MVP specification](MVP.md)
 - [Roadmap](ROADMAP.md)
 - [Backlog](BACKLOG.md)
-- [M2 verification record](M2-VERIFICATION.md)
-- [M3 verification record](M3-VERIFICATION.md)
-- [M4 typed actions/API verification](M4-VERIFICATION.md)
-- [M5 acceptance and measured baseline](M5-VERIFICATION.md)
-- [M6a App Builder verification](M6A-VERIFICATION.md)
-- [Complete M6 verification and performance comparison](M6-VERIFICATION.md)
-- [M7a render-strategy benchmark](M7A-VERIFICATION.md)
-- [M7b keyed/static-slot authoring prototype](M7B-VERIFICATION.md)
-- [M7c explicitly owned local-reactivity prototype](M7C-VERIFICATION.md)
-- [M7d keyed lifecycle and form-state verification](M7D-VERIFICATION.md)
-- [M7e renderer regression and no-decision evidence freeze](M7E-VERIFICATION.md)
-- [M7f renderer-neutral binding contracts](M7F-VERIFICATION.md)
+- [SSR, browser and handler architecture](ARCHITECTURE.md#ssr-browser-and-handler-architecture-boundaries)
+- [Early SSR/handler measurements and limits](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements)
+- [Keyed ownership and runtime retirement](BROWSER-APP.md#keyed-ownership-and-runtime-retirement)
+- [Sample-specific acceptance and failures](SAMPLES.md#sample-acceptance-and-source-boundaries)
+- [SQL-first application data access; no Yetlet ORM](SAMPLES.md#sql-first-data-access-and-sqlite-acceptance)
+- [Original API inventory and review limits](API-CONTRACTS.md#original-inventory-acceptance-and-review-limits)
 - [M7g optional synchronous local graph](M7G-VERIFICATION.md)
-- [M7h optional keyed DOM ownership](M7H-VERIFICATION.md)
-- [M7i production Todo keyed-graph adoption](M7I-VERIFICATION.md)
-- [M7j final architecture and evidence freeze](M7J-VERIFICATION.md)
 - [Sample application contract and catalog](SAMPLES.md)
-- [M8a sample contract verification](M8A-VERIFICATION.md)
-- [M8b API-only REST verification](M8B-VERIFICATION.md)
 - [M8c Session and SSR cart verification](M8C-VERIFICATION.md)
-- [M8d sample developer-experience audit](M8D-VERIFICATION.md)
-- [M8e final sample architecture and evidence freeze](M8E-VERIFICATION.md)
-- [M9 proposed sample expansion and API contract qualification plan](M9-PLAN.md)
-- [M9 planning reviewer gate](M9-PLANNING-VERIFICATION.md)
-- [M9e SQLite data-access comparison](M9E-DATA-ACCESS-COMPARISON.md)
-- [M9e SQL-first SQLite CRUD verification](M9E-VERIFICATION.md)
-- [M9f bounded SSE Notifications verification](M9F-VERIFICATION.md)
-- [M9g independent multi-island dashboard verification](M9G-VERIFICATION.md)
-- [M9h synthetic authentication and private-notes verification](M9H-VERIFICATION.md)
-- [M9i modular shop integration verification](M9I-VERIFICATION.md)
 - [Public API contract classification](API-CONTRACTS.md)
-- [M9j final compatibility and evidence freeze](M9J-VERIFICATION.md)
 - [Post-M9 CI and security review](CI-SECURITY-REVIEW.md)
 - [Pre-public compatibility policy](COMPATIBILITY.md)
 - [M10c compatibility/document metadata plan](M10C-PLAN.md)

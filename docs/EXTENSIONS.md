@@ -181,7 +181,7 @@ authentication; data cache is not HTTP output caching. Key rotation for protecte
 client-side data, distributed-store durability/HA, trusted proxy identity and
 production qualification cannot be inferred from typed registration.
 
-See [ADR 0005](adr/0005-opt-in-capability-modules.md), [ADR 0006](adr/0006-handler-first-mvc-optional.md), [HTTP pipeline](HTTP-PIPELINE.md), and [M6 evidence](M6-VERIFICATION.md).
+See [ADR 0005](adr/0005-opt-in-capability-modules.md), [ADR 0006](adr/0006-handler-first-mvc-optional.md), [HTTP pipeline](HTTP-PIPELINE.md), and [M6 evidence](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements).
 
 ## Historical opt-in Auth, Session and rate-limiter selection
 
@@ -323,3 +323,23 @@ and triage saves retain the documented pre-SQL consistency limit; no generic
 bridge, framework API or cross-store commit fencing is selected.
 
 </details>
+
+## Construction and optional provider ownership
+
+M6's `configure`/`try_configure` are ordinary typed setup functions invoked once
+at construction. Failure propagates the caller's error type; there is no
+per-request registry, discovery, service locator or mandatory Controller.
+Capabilities require an explicit dependency and installation through native
+Tower layers, State and typed extensions. Unselected providers initialize nothing
+and do not enter core/browser graphs.
+
+The original independent Request ID proof starts at 1, shares a counter across
+clones, replaces untrusted inbound IDs and returns 503 on exhaustion. IDs are
+process/provider-local correlation, not authentication, persistence or global
+uniqueness. Scoped installation and global 404/405 wrapping were tested along
+with absence, short circuit, invalid configuration and 12 concurrent requests.
+The minimal server adapter did not depend on that provider; Todo explicitly did.
+M8 later selected bounded Memory Session separately. Its current lifecycle and
+security contract remains in the [Session guide](../crates/yetlet/guides/session.md)
+and the unchanged [M8c source record](M8C-VERIFICATION.md); neither Session nor
+Auth/Cache becomes a default through this historical proof.

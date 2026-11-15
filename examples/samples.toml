@@ -17,7 +17,7 @@ browser_runtime = false
 browser_packages = []
 browser_build = ""
 optional_dependencies = []
-evidence = "docs/M9A-VERIFICATION.md"
+evidence = "docs/SAMPLES.md"
 
 [[sample]]
 id = "todo"
@@ -38,7 +38,7 @@ browser_runtime = true
 browser_packages = ["yetlet-todo-browser", "yetlet-search-island"]
 browser_build = "cargo xtask build browser"
 optional_dependencies = ["yetlet", "yetlet-browser"]
-evidence = "docs/M7J-VERIFICATION.md"
+evidence = "docs/SAMPLES.md"
 
 [[sample]]
 id = "rest-api"
@@ -58,7 +58,7 @@ browser_runtime = false
 browser_packages = []
 browser_build = ""
 optional_dependencies = ["yetlet"]
-evidence = "docs/M8B-VERIFICATION.md"
+evidence = "docs/SAMPLES.md"
 
 [[sample]]
 id = "session-cart"
@@ -106,7 +106,7 @@ browser_runtime = false
 browser_packages = []
 browser_build = ""
 optional_dependencies = ["yetlet"]
-evidence = "docs/M9H-VERIFICATION.md"
+evidence = "docs/SAMPLES.md"
 
 [[sample]]
 id = "middleware-lab"
@@ -128,7 +128,7 @@ browser_runtime = false
 browser_packages = []
 browser_build = ""
 optional_dependencies = []
-evidence = "docs/M9B-VERIFICATION.md"
+evidence = "docs/SAMPLES.md"
 
 [[sample]]
 id = "file-server"
@@ -150,7 +150,7 @@ browser_runtime = false
 browser_packages = []
 browser_build = ""
 optional_dependencies = []
-evidence = "docs/M9D-VERIFICATION.md"
+evidence = "docs/SAMPLES.md"
 
 [[sample]]
 id = "sse-notifications"
@@ -171,7 +171,7 @@ browser_runtime = false
 browser_packages = []
 browser_build = ""
 optional_dependencies = []
-evidence = "docs/M9F-VERIFICATION.md"
+evidence = "docs/SAMPLES.md"
 
 [[sample]]
 id = "modular-shop"
@@ -196,7 +196,7 @@ browser_runtime = false
 browser_packages = []
 browser_build = ""
 optional_dependencies = ["yetlet"]
-evidence = "docs/M9I-VERIFICATION.md"
+evidence = "docs/SAMPLES.md"
 
 [[sample]]
 id = "forms-validation"
@@ -216,7 +216,7 @@ browser_runtime = false
 browser_packages = []
 browser_build = ""
 optional_dependencies = []
-evidence = "docs/M9C-VERIFICATION.md"
+evidence = "docs/SAMPLES.md"
 
 [[sample]]
 id = "sqlite-crud"
@@ -236,7 +236,7 @@ browser_runtime = false
 browser_packages = []
 browser_build = ""
 optional_dependencies = []
-evidence = "docs/M9E-VERIFICATION.md"
+evidence = "docs/SAMPLES.md"
 
 [[sample]]
 id = "multi-island-dashboard"
@@ -255,7 +255,7 @@ browser_runtime = true
 browser_packages = ["yetlet-dashboard-counter-island", "yetlet-dashboard-filter-island"]
 browser_build = "cargo xtask build multi-island-dashboard"
 optional_dependencies = []
-evidence = "docs/M9G-VERIFICATION.md"
+evidence = "docs/SAMPLES.md"
 
 [[sample]]
 id = "style-showcase"

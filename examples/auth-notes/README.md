@@ -55,4 +55,4 @@ cargo tree --locked -p yetlet-auth-notes --edges normal
 cargo xtask check samples
 ```
 
-See [M9h verification](../../docs/M9H-VERIFICATION.md). This is a bounded authentication/authorization semantics fixture, not production security certification.
+See [M9h verification](../../docs/SAMPLES.md#auth-notes-acceptance). This is a bounded authentication/authorization semantics fixture, not production security certification.

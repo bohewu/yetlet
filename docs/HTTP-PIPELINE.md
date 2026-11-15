@@ -213,7 +213,7 @@ fn app() -> Router {
 }
 ```
 
-This is the **original native** Axum Router integration; M6a also implements a thin handler-first `App<S>`/group facade **over the same Router**, not a second router, MVC Controller runtime or middleware engine. Native `State`/`Request` handlers, `MethodRouter`, group-scoped `route_layer` and pre-routing `with_global` remain compatible. Use `App::into_router()` before adding the outer global layer. See [M6a verification](M6A-VERIFICATION.md) and [ADR 0006](adr/0006-handler-first-mvc-optional.md).
+This is the **original native** Axum Router integration; M6a also implements a thin handler-first `App<S>`/group facade **over the same Router**, not a second router, MVC Controller runtime or middleware engine. Native `State`/`Request` handlers, `MethodRouter`, group-scoped `route_layer` and pre-routing `with_global` remain compatible. Use `App::into_router()` before adding the outer global layer. See [M6a verification](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements) and [ADR 0006](adr/0006-handler-first-mvc-optional.md).
 
 ## Expected result
 
@@ -316,7 +316,7 @@ The old P0/P1 delivery assessment below is a dated checkpoint, not a current Tod
 
 ### Validation and evidence
 
-The counts and byte comparisons below record the original P0 checkpoint. Complete M6 integration and its migrated Todo results are recorded separately in [M6 verification](M6-VERIFICATION.md); the original evidence is retained, not relabeled as a new run.
+The counts and byte comparisons below record the original P0 checkpoint. Complete M6 integration and its migrated Todo results are recorded separately in [M6 verification](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements); the original evidence is retained, not relabeled as a new run.
 
 Focused commands observed passing during implementation:
 
@@ -367,3 +367,26 @@ The two new server adapter modules contain **142 lines including comments/blank 
 - M5 and M6 record local measurements, not a production performance/security certification. Public release and remaining operational-provider gates remain separate.
 
 </details>
+
+## Handler and typed action boundaries
+
+Local `Command`/`ActionExecutor` execution need not implement serialization.
+Only the HTTP executor requires serializable semantic input/output. Raw DOM
+events stay local, and non-idempotent commands are not automatically retried.
+The original anonymous Todo API used a per-router Mutex store, strict command
+fields, a 4 KiB JSON body cap, up to 100 items and trimmed 1–100-character
+non-control titles. Its verified errors were 400 unknown fields, 403 Origin,
+404 unknown ID, 413 body limit, 415 media type and 422 invalid title; failed
+commands did not advance revision. Origin comparison assumed direct HTTP and
+was neither authentication nor credentialed CSRF protection. Do not transfer
+that demo's policy to a trusted TLS proxy without explicit host/scheme policy.
+
+M6 preserves native State/Path/Query/Json, redirects, response tuples and
+`IntoResponse` errors. `Page` provides escaped SSR; it does not add HTTP imports
+to shared View. `route_layer` affects already-registered matched routes;
+unmatched paths need an explicit global wrapper. RequestContext owns request
+parts/body and typed request-local extensions, separately from shared app state.
+It never serializes cookies, arbitrary extensions or server handles into HTML.
+The [sample acceptance sections](SAMPLES.md#sample-acceptance-and-source-boundaries)
+distinguish REST's native 404/405 header boundary, middleware body errors,
+stateless forms, file uploads and bounded SSE delivery.

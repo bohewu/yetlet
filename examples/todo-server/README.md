@@ -95,7 +95,7 @@ cargo xtask check samples
 cargo xtask check docs
 ```
 
-Historical behavior evidence remains in [M7j verification](../../docs/M7J-VERIFICATION.md).
+Historical behavior evidence remains in [M7j verification](../../docs/QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
 YT-240 verified Todo's Linux debug layout and computed styles in Chrome at
 390px and 1280px and in Firefox at 1280px. Firefox clamped the requested 390px
 window to 500px, so the narrow layout remains unverified in that engine.

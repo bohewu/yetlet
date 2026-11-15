@@ -35,7 +35,7 @@ At this template's original preparation, source HEAD `7c5d1267fd2ea3490738da105b
 | [Provider operations](PROVIDER-OPERATIONS.md), [M10g](M10G-VERIFICATION.md) | Real process-local Session limits, two-process local SQLite concurrency and isolated backup/restore | Distributed Session, HA, failover, production RPO/RTO or load/SLO |
 | [API contracts](API-CONTRACTS.md), [compatibility](COMPATIBILITY.md) | Experimental/Stable Candidate boundaries and source compatibility fixtures | Stable framework or production support contract |
 | [Security policy](../SECURITY.md), [governance](M10B-VERIFICATION.md) | Reporting/contribution controls and private-state repository settings | Complete security-service coverage or incident response execution |
-| [M9 freeze](M9J-VERIFICATION.md) | Historical sample, browser, lifecycle and dependency evidence | Current deployment acceptance or externally signed conclusions |
+| [M9 freeze](API-CONTRACTS.md#original-inventory-acceptance-and-review-limits) | Historical sample, browser, lifecycle and dependency evidence | Current deployment acceptance or externally signed conclusions |
 
 Ignored `target/` outputs are local evidence, not durable committed audit records. Before sharing, regenerate or export only approved sanitized evidence, record its source and SHA-256, and verify completeness and confidentiality. Never export Cargo caches, browser profiles, raw cookie/token/CSRF values, environment dumps or unrelated files.
 

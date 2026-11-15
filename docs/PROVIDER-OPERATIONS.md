@@ -56,8 +56,8 @@ of its shared-memory coordination. See [SQLite WAL](https://sqlite.org/wal.html)
 
 Existing [M8c Session evidence](M8C-VERIFICATION.md) retains atomic update,
 rotation, CSRF and revocation regressions, including stale response cookie
-protection. Existing [M9d file evidence](M9D-VERIFICATION.md) and
-[M9f SSE evidence](M9F-VERIFICATION.md) retain cancellation/backpressure tests.
+protection. Existing [M9d file evidence](SAMPLES.md#file-server-acceptance) and
+[M9f SSE evidence](SAMPLES.md#sse-notifications-acceptance) retain cancellation/backpressure tests.
 They are earlier local evidence, not newly executed distributed tests.
 
 ## Bounded provider bursts and HTTP attribution

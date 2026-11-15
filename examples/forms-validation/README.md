@@ -30,4 +30,4 @@ cargo tree --locked -p yetlet-forms-validation
 cargo xtask check samples
 ```
 
-This is a bounded prototype for ergonomics and accessible markup, not a production identity, registration or email-verification flow. See [M9c verification](../../docs/M9C-VERIFICATION.md).
+This is a bounded prototype for ergonomics and accessible markup, not a production identity, registration or email-verification flow. See [M9c verification](../../docs/SAMPLES.md#forms-validation-acceptance).

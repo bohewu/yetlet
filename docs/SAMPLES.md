@@ -124,38 +124,312 @@ cargo xtask check samples
 cargo xtask check docs
 ```
 
-## Retained sample delivery history
+## Sample acceptance and source boundaries
 
-The expandable record below preserves intermediate M8/M9 planning and promotion claims, reviewer identities and evidence links. Its references to remaining planned work describe those earlier stages; the current catalog above has thirteen applications verified at bounded prototype scope, including the separately reviewed YT-241 addition.
+These dated acceptance sections retain the catalog's M8/M9 evidence after
+consolidation. They describe the **original frozen source on the local Linux
+host**, not a fresh run of today's SDK. Rust/Cargo 1.99.0, Python 3.14.4, Chrome
+155.0.8059.39 and Firefox 157.0/geckodriver 0.37.1 were the recorded tools.
+Native-only stages did not each repeat browser suites; they checked wasm32,
+normal dependency trees and exact rebuilt Todo/Search assets, followed by the
+actual cross-product M9j browser freeze. Original Markdown and headings are
+recoverable at local Git `ac98cdc127ccd299cb1150fef922b0560453a1d4`; remote
+GitHub reachability is unverified. Raw tests, source snapshots and reviewer logs
+remain separately retained ignored/external evidence, not committed Git payloads.
+The [qualification matrix](QUALIFICATION-MATRIX.md#sample-and-api-freeze-evidence)
+records aggregate scope, bundle costs and failure/replacement populations.
 
-<details>
-<summary>M8/M9 delivery sequence and promotion evidence</summary>
+### Catalog and planning acceptance
 
-## M8 delivery sequence
+M8a / YT-044 (2026-10-09) introduced repository-backed paths, exact README commands,
+route source markers, companion/build mappings and direct optional dependencies.
+Shape-only validation initially accepted false command/route/browser claims and
+escaped evidence. Three failed independent reviews additionally found a task
+edge, API-kind isolation, route prefix/suffix and malformed package/type gaps.
+Those counterexamples were repaired before final reviewer
+`wc_job_vQ6pGDE0slh9gV8c` PASS, which exercised 32 adjacent counterexamples. That
+catalog contract was not weakened for this consolidation.
 
-- **M8a / YT-044:** establish this catalog, documentation and validation gate;
-- **M8b / YT-045:** add an API-only REST sample with no browser dependency;
-- **M8c / YT-046:** add an SSR shopping cart using an explicit opt-in Session provider;
-- **M8d / YT-047:** audit application boilerplate and promote only repeated, proven improvements;
-- **M8e / YT-048:** run the complete regression, dependency/bundle review and evidence freeze.
+M9p / YT-049 planned the original nine names in display order (Hello, Todo, REST,
+Cart, Auth, Middleware, Files, SSE, Shop) plus Forms, SQLite and Dashboard. Display
+order differs from dependency/security implementation order. Planning did not
+authorize implementation or catalog promotion. Reviewer `wc_job_fr93PI1YLOtR3KjE`
+passed the eight-file documentation-only gate (40 docs/59 task IDs, existing
+three-entry catalog/four checker tests). A mistaken normalized-string harness
+assertion was corrected without product failure. YT-050–059 then had separate
+sequential implementation/review gates; no unbuilt proposal became verified.
 
-## M9 expansion: all twelve samples and final freeze verified
+### Hello World acceptance
 
-The [review-gated M9 plan](M9-PLAN.md) preserves the agreed public-facing display sequence: `hello-world`, `todo`, `rest-api`, `session-cart`, `auth-notes`, `middleware-lab`, `file-server`, `sse-notifications`, `modular-shop`; supplements are `forms-validation`, `sqlite-crud` and `multi-island-dashboard`.
+M9a / YT-050, 2026-10-09: three native tests, real loopback smoke, complete
+117 workspace tests/five doctests, strict Clippy and debug/release builds PASS.
+`/` and escaped `/hello/{name}` retained strict script-free CSP and native
+404/405, with no cookie/provider/browser/DB dependencies. It is distinct from
+the adapter's internal minimal example. Local unstripped debug/release binaries
+were 26,737,520/1,857,904 bytes, not memory or wire size. A catalog negative fixture
+was repaired to select Todo by stable ID rather than item zero. Independent
+read-only reviewer `wc_job_Htk-Quo_aFExMJs3` PASS preceded fourth-entry promotion.
+Anonymous loopback development is not an exposed hardened service.
 
-**Verified now:** Todo, REST, Session Cart and native Hello World (`YT-050` reviewer `wc_job_Htk-Quo_aFExMJs3` PASS). Middleware Lab is now also verified (reviewer `wc_job_UnKflDaA8ZQHXCce` PASS). M9 implementation is sequenced by dependency/security prerequisites rather than display order. Forms Validation has now passed its repeat reviewer `wc_job_lGtk_ZIoAvK4F6PW` (after the English-language accessibility repair); all remaining planned samples must be independently reviewed before being considered complete. M9 planning reviewer `wc_job_fr93PI1YLOtR3KjE` already passed.
+### Todo acceptance
 
-The bounded [File Server](../examples/file-server/README.md) serves an exact public fixture and token-protected temporary uploads/downloads on loopback. Its [M9d evidence](M9D-VERIFICATION.md) and exact catalog entry passed reviewer `wc_job_g8JSu80-Jseg6lmG` before promotion. No arbitrary document root, browser upload form or default storage provider is implied.
+M2–M7j (2026-10-08/09) proved script-free SSR, shared SSR/DOM TodoList byte parity,
+lazy bounded Search state, local toggles with zero requests and explicit semantic
+HTTP create/error handling. M6 preserved native handler/middleware/API behavior.
+M7j finished with 91 workspace tests/five doctests, six wasm32 packages and
+Chrome/Firefox debug/release plus isolated keyed lifecycle tests. Initial M7b
+review found preflight/reserved-attribute/stale-owner gaps; the first final M7j
+review then found queued/in-flight retirement races despite M7i's earlier PASS.
+Token lifetime repairs passed replacement validation and repeat final reviewer
+`wc_job_XZzdXEOIx6owj1o5`. Native HTML/CSP, no raw-event circuit, detached listeners
+and duplicate-free remount were checked; cleanup's ancestor-matching false
+positive was resolved separately after product PASS. [Ownership and bounds](BROWSER-APP.md#keyed-ownership-and-runtime-retirement)
+remain explicit. Only the local list adopts keyed/reactive; Search and remote
+lists retain replacement. Browser bundle grew 82,726 raw/20,042 local-gzip bytes;
+Search stayed byte-identical after separate entry builds. The in-memory API is
+anonymous, not auth/credentialed CSRF, general forms or real IME qualification.
 
-SQLite/data access stays **SQL-first, application-local and opt-in**: no Yetlet ORM, mandatory DB adapter or automatic ORM dependency. The bounded M9e comparison selects direct `rusqlite` for this one-file sample and isolates synchronous calls through a bounded blocking-task gate. After repairing reviewer-discovered incomplete-schema handling, repeat reviewer `wc_job_aVBprnEsYc8o3ubi` returned PASS and the eighth catalog entry was promoted. Any external ORM remains an explicit future application choice, not a framework default.
+### REST API acceptance
 
-The M9f SSE source is native HTTP only: an explicit app-owned Hub bounds replay and per-subscriber queues, disconnects lagging consumers and supports `Last-Event-ID` replay. After repairing reviewer-discovered control-character normalization, repeat reviewer `wc_job_fa8KJiTxGRuWIEDF` returned PASS and the ninth catalog entry was promoted.
+M8b / YT-045, 2026-10-09: seven tests, native build/strict Clippy and real loopback
+Book CRUD/policy smoke PASS; normal trees excluded every browser/DOM/reactive
+runtime. Optimistic versions, validation, 8 KiB JSON limit and no-store/nosniff/API
+version headers are application policy. Registered method fallback is empty 405
+with route/global headers; unmatched `/api/missing` is empty 404 with global
+correlation only. Do not promise JSON or route headers for every fallback.
 
-M9g uses a separate server sample and two separate WASM companion packages. Complete SSR survives missing, malformed or partially invalid manifests; each loader fetches only its own module/WASM and owns only its root/listeners/lifetime. After reviewers required whole-manifest browser evidence and retained exit-0 logs, final reviewer `wc_job_OMstvGrtDiKZ5p6C` returned PASS and the tenth catalog entry was promoted.
+Initial reviews found duplicate/malformed Origin/Host bypass and overstated
+fallback coverage; a repeat found Authority accepted commas/bad ports. Three
+later reviewer executions failed before model output (`workspace routing
+discovery failed`), providing **no review result**. Self-review fixed duplicate
+Content-Type but did not satisfy independence. Recovered review found supplied
+Host validation could be skipped by no-Origin. Final policy validates any
+supplied Host first, requires single syntactically valid direct-HTTP authorities,
+handles bracketed IPv6/ports and rejects ambiguous values before mutation.
+Complete validation was rerun; final `wc_job_d911MsTpbwT6fZY3` PASS closed that
+scope. No-Origin clients are allowed, but this is neither authentication nor a
+TLS reverse-proxy trust policy, persistence or distributed-concurrency contract.
 
-M9h keeps authentication, Session, authorization and note storage distinct. OS-random synthetic terminal codes authenticate two fixture users; successful login/logout rotate Session identity/CSRF, and every note route checks server-owned ownership. The complete isolation/security matrix and reviewer `wc_job_EgSLng_VafIvs3ju` passed, and the eleventh catalog entry was promoted. This remains a loopback fixture, not a production identity provider.
+### Session Cart acceptance
 
-The [Modular Shop](../examples/modular-shop/README.md) composes Identity, Catalog, Session Cart and SQL Orders through ordinary typed setup functions. Its rollback/idempotency/authorization/disabled-module matrix and repeat reviewer `wc_job_zbWS7OSbUtaKzYcn` passed before the exact twelfth catalog entry was promoted. No plugin registry, DI container or ORM is introduced.
+The catalog deliberately retains the unchanged [M8c record](M8C-VERIFICATION.md).
+It proves native SSR/forms with explicitly selected bounded Memory Session,
+opaque cookie/CSRF identity, absolute expiry/capacity, rotation/revocation and no
+browser dependency. It is an anonymous single-node cart, not authentication,
+durable/distributed storage or production CSRF qualification. M8e's later
+stale-destroy P2 and repaired 114-test freeze remain recorded in the
+[qualification matrix](QUALIFICATION-MATRIX.md#sample-and-api-freeze-evidence).
 
+### Middleware Lab acceptance
 
-</details>
+M9b / YT-051, 2026-10-09: seven focused tests, 124 workspace tests/five doctests,
+strict Clippy, native builds and real ephemeral loopback smoke PASS. Tests prove
+global/group/method entry and reverse unwind, 403 short circuit without body
+polling, 404/405/Allow, request extension versus Arc state isolation, Tower HTTP
+headers and preserved mid-stream body failure. A stream failing after headers
+is not successful recovery. Runtime tree excluded providers/browser/DB; local
+release binary was 2,101,760 raw bytes. Terminal exit-0 independent reviewer
+`wc_job_UnKflDaA8ZQHXCce` PASS preceded fifth-entry promotion. There is no second
+middleware engine, distributed tracing, proxy/TLS or zero-overhead claim.
+
+### Forms Validation acceptance
+
+M9c / YT-052, 2026-10-09: six tests, 130 workspace tests/five doctests, native
+strict Clippy/build and real HTTP smoke PASS. Invalid SSR is escaped 422 with
+labels, described errors, invalid fields and first-error focus; valid submission
+uses stateless/no-side-effect 303 PRG. No JS, cookies, Session or DB is required.
+Native Form unknown-field rejection is 422, not the initially expected 400.
+An initial smoke used a valid name while expecting a name error; separate
+hostile-escaping and invalid-name cases repaired that evidence. First reviewer
+`wc_job_7D2rtHdGEfwW1Aet` failed English content inheriting the then-default
+zh-Hant document language. Sample-owned main language overrides repaired all
+three response paths; later metadata work owns the current root-language API.
+Repeat `wc_job_lGtk_ZIoAvK4F6PW` PASS accepted the source/evidence, explicitly
+without independent verification of effective model/effort beyond requested
+selectors. This is no CSRF claim: credentials or persistent mutation require
+separate security design; email validation is illustrative.
+
+### File Server acceptance
+
+M9d / YT-053, 2026-10-09: 14 focused tests, 144 workspace tests/five doctests,
+native builds, six wasm32 checks and all 136 unchanged production dist files PASS.
+Real loopback sockets proved static GET/HEAD/range, bearer-protected bounded
+multipart upload, opaque repeated download/HEAD, content/disposition/nosniff,
+Origin/name/extension/binary/size/path/method rejection and mid-upload disconnect
+cleanup followed by successful upload. Shutdown reaped the server and private
+root. Unix symlink replacement never exposed the substituted file; deadline,
+capacity, cancellation/backpressure and store lifetime were tested. Initial
+getrandom-to-io error conversion failed to compile; conversion preserves
+fail-closed RNG behavior. A failing test exposed tempfile directory mode;
+explicit Unix 0700 at creation repaired the defect rather than weakening it.
+
+Independent `wc_job_g8JSu80-Jseg6lmG` PASS checked 143 source/136 asset hashes;
+seven-entry catalog promotion then passed. Runtime trace verified its requested
+model/effort, but did not establish native role identity or formal security
+assurance. Release binary was 2,863,128 local raw bytes. File libraries stay
+app-local; no arbitrary root/directory listing, executable uploads, browser upload
+form, default storage feature or production exposure is authorized. Browser E2E
+was not replayed in this native-only stage; M9j provided the later full matrix.
+
+### SQL-first data access and SQLite acceptance
+
+**No Yetlet ORM is supplied, built or required.** SQL/parameters, migration,
+transactions and row mapping belong to the app, through ordinary State/owned
+native handles. No query DSL, implicit DbContext, generated models, migration
+engine, mandatory repository/Unit of Work or DI layer was adopted. External
+SQLx/mappers/ORMs remain explicit future app choices; no DB handles, secrets,
+SQL/schema internals enter browser hydration state.
+
+M9e's 2026-10-09 two disposable in-memory fixtures created a table, inserted a
+parameterized row and mapped it into Rust under installed Rust 1.99. The then
+unverified 1.85 baseline excluded SQLx 0.9's declared 1.94 requirement, so the
+comparison used SQLx 0.8.6, not a universal MSRV conclusion.
+
+| Selected fixture | Features | Packages | Raw release bytes | Initial / clean offline build |
+|---|---|---:|---:|---:|
+| rusqlite 0.40.2 | no defaults, bundled | 12 | 2,600,400 | 28.800 / 27.770 s |
+| sqlx 0.8.6 | no defaults, runtime-tokio/sqlite/macros | 117 | 4,365,424 | 31.837 / 30.460 s |
+
+SQLx had 109 packages absent from the rusqlite fixture and supplies async pooling,
+multiple databases and derives not needed here. Single-host build times are
+informational, not a comparative speed claim. Direct `Row::get` and a bundled
+single-file DB selected app-local rusqlite. Four-permit `spawn_blocking` bounds
+synchronous operations; startup alone owns migration/WAL, then each bounded
+operation opens a connection. This is no universal anti-pooling decision.
+
+M9e / YT-054 passed nine focused tests, 153 workspace tests/five doctests,
+three-process restart smoke (one 200/one 409 concurrent winner, durable update
+and deletion), rollback after prior write, parameter/injection-like values,
+NOCASE uniqueness, Unix owner-only creation and explicit schema/version checks.
+The first catalog check failed README route token discoverability; docs repaired
+it without runtime change. First reviewer `wc_job_Q3pBfUqPYGYNSIrD` then found
+version-1 renamed columns passed table-name-only validation. Exact ordered columns
+for notes and audit are now checked; both renamed-column fixtures fail startup
+with SchemaMismatch. Complete replacement validation, 22 dependency trees, six
+wasm32 and 136 unchanged production assets passed; repeat
+`wc_job_aVBprnEsYc8o3ubi` PASS preceded eighth-entry promotion. Browser E2E was
+not repeated here. Release sample binary was 4,676,656 local raw bytes. Loopback
+SQLite is application persistence, not a framework data provider.
+
+### SSE Notifications acceptance
+
+M9f / YT-055, 2026-10-10: ten tests, 163 workspace tests/five doctests, native
+builds, six wasm32, 23 package trees and 136 unchanged production assets PASS.
+An app Hub limits replay to 16 events, subscribers to eight and queued events to
+four each; one-second comment heartbeats and finite monotonic IDs are explicit.
+Fresh clients get future events only; Last-Event-ID replays greater retained IDs.
+Old-gap/future/malformed/duplicate cursors fail closed. Full queues disconnect
+laggards without blocking publishers; queued events drain before reconnect.
+This is bounded at-least-once, not durable/exactly-once messaging or a global UI
+circuit. Mutation rejects every Origin, requires one JSON Content-Type and caps
+body at 2 KiB; streams set text/event-stream/no-store/nosniff/no-buffering.
+
+Live smoke observed heartbeat, IDs 1–3, disconnect cleanup, offline 4–5 then replay
+from 3, malformed/future cursors and Origin rejection. Initial harness stopped
+before gates because Cargo was missing from PATH; corrected environment ran all
+gates. First reviewer `wc_job_LF-i2IsQxFXO-obd` failed trim-before-control-check:
+leading newline/trailing tab were silently normalized. Raw payload control checks
+now precede space trim; 422 cases leave latest retained ID unchanged. Complete
+replacement validation and `wc_job_fa8KJiTxGRuWIEDF` PASS preceded ninth-entry
+promotion. No browser E2E replay here; release binary was 2,292,888 local raw bytes.
+
+### Multi-Island Dashboard acceptance
+
+M9g / YT-056, 2026-10-10: six server tests, 169 workspace tests/five doctests,
+eight wasm32, 26 trees, release Chrome/Firefox and 136 unchanged Todo/Search
+files PASS. Each island owns its versioned state/boundary, external loader,
+module/WASM, listeners and mount/dispose lifetime. Server validates hashed
+same-origin manifest URLs and file existence independently. Missing/malformed
+whole manifest means strict script-free SSR; missing Counter WASM/invalid Filter
+loader drops only that enhancement. Sibling DOM and readable panels survive.
+
+Browser checks prove no initial WASM request, independent Counter then Filter
+activation, root/input/value identity, Filter focus, delayed Counter retirement,
+detached inertness and one-listener remount. Invalid Filter version fails locally;
+restoring it binds from live input. Early harness fixes addressed synthetic focus,
+`wasm` versus `WebAssembly` query text, favicon 404 and Firefox expression wrapping;
+deterministic activation uses the documented local yetlet-activate event before
+real focus/input assertions. First reviewer `wc_job_63A__nJFK3BgNWPk` failed missing
+whole-manifest **browser** evidence despite native tests. Added missing/malformed
+server runs proved HTTP200/default CSP/both panels/zero scripts/globals/requests
+in both browsers. Second `wc_job_6pk1_UnsnH8WR4Ns` required actual retained new
+exit-0 logs, not scripts alone. Exact unchanged scripts reran, logs retained;
+final `wc_job_OMstvGrtDiKZ5p6C` PASS preceded tenth-entry promotion.
+
+Dashboard digest `1eccb326477b59ae`: Counter 166,999 raw/63,710 gzip, Filter
+177,694/68,753, CSS 416/279; server 2,635,496 raw bytes. Gzip is local estimate.
+Separate companion builds never overwrite production dist. Native server excludes
+browser companions; companions exclude server/Session/DB. No common state,
+general hydration/resumability, RPC or browser-support guarantee is implied.
+
+### Auth Notes acceptance
+
+M9h / YT-057, 2026-10-10: twelve focused tests, 181 workspace tests/five doctests,
+27 trees, eight wasm32 and 136 unchanged production files PASS. Two cookie-jar
+localhost smoke exercised login/rotation, per-user CRUD/403 IDOR, CSRF and logout;
+server was reaped. Synthetic OS-random 256-bit codes are printed only to the
+local terminal, never SSR/browser/Debug secrets. Fixed-shape constant-time compare
+uses a dummy unknown-user value. Login verifies anonymous CSRF and replaces/
+rotates ID/CSRF/state; logout rotates to fresh anonymous state. Every handler
+checks current server Session user and server-owned note ownership. Note storage
+is bounded process-local, separate from Session; unknown client IDs are not adopted.
+Secure-cookie defaults remain, with insecure HTTP allowed only after loopback
+admission. No passwords, IdP, brute-force protection or reusable auth provider is
+qualified. Credentials and persistent security require their own production design.
+
+Initial Clippy unused code was removed; an apostrophe test corrected its expected
+escaped `&#39;`. An oversize test exposed collapsed BytesRejection status; source
+preserves 413 instead of weakening it. Evidence initially expected literal codes
+in Python too; correction recorded dynamic smoke construction and absence of test
+fixtures from optimized binary. Security-focused reviewer
+`wc_job_EgSLng_VafIvs3ju` PASS preceded eleventh-entry promotion. Native HTTP
+cookie/form evidence was used, not new browser E2E or penetration testing.
+Release binary was 2,547,064 local raw bytes; effective scoped source review is
+not production security assurance.
+
+### Modular Shop acceptance
+
+M9i / YT-058, 2026-10-10: nine tests, 190 workspace tests/five doctests, 28 trees,
+eight wasm32 and 136 identical production files PASS. Explicit Identity/Catalog/
+Cart/Orders modules use synthetic-code Session rotation/CSRF and app-owned direct
+rusqlite. BEGIN IMMEDIATE atomically writes inventory/lines/order; Session-CSRF
+plus cart-revision idempotency prevents a committed checkout from decrementing
+twice if Session cleanup fails. Tests cover rollback after line write failure,
+last-stock one-winner concurrency, persistence, owner 403 and stale cart.
+Disabling Orders removes routes/navigation/checkout; invalid module combinations
+fail construction. Three-process loopback smoke verifies checkout/restart/Bob403
+and disabled Orders. There is no plugin/DI/Controller/ORM, real payment gateway,
+production commerce, backup/encryption or multiprocess inventory claim.
+
+An evidence allowlist initially forgot SQLite CRUD is another intended DB
+consumer; correcting that assertion did not change runtime. First reviewer
+`wc_job_a_WnhFSftzNoYYgf` reproduced readiness-failure child/log leakage in smoke
+start(). Cleanup now terminates/reaps, bounded-kills/reaps if needed, closes the
+stream and rethrows the original exception. Two mocked regressions and real
+three-process smoke passed; unchanged Rust's retained 190-test matrix remained
+valid. Repeat `wc_job_zbWS7OSbUtaKzYcn` PASS preceded twelfth-entry promotion.
+Browser E2E was not replayed in this native-only stage; server release binary was
+5,062,464 raw local bytes.
+
+### DX audit and final freeze
+
+M8d / YT-047 (2026-10-09) measured Todo/REST/Cart source shape, not complexity,
+quality or performance: application packages 4/1/1, production nonblank Rust lines
+1,102/551/424, tests 536/417/200, async functions 10/8/7, routes 4/3/7, direct
+dependency names 16/6/6. Todo includes transitive app-owned UI. Optional provider
+implementation was counted separately, not charged as application authoring.
+32 sample/provider tests and four checker tests passed; reviewer
+`wc_job_lZSDSBgMKWu1X5X7` PASS supported **no runtime API change**. The 11–14-line
+native bootstraps, differing JSON/security policies and Cart-only forms did not
+justify a hidden run helper, generic error/form engine, shared Origin policy,
+Controllers, DI or a required layout. Future promotion needs convergent consumers
+and explicit TLS/shutdown/security requirements, not line-count rank.
+
+M8e's native-only stale-destroy repair and M9j's actual full twelve-sample,
+170-declaration final freeze are in the [qualification matrix](QUALIFICATION-MATRIX.md#sample-and-api-freeze-evidence)
+and [API review scope](API-CONTRACTS.md#original-inventory-acceptance-and-review-limits).
+Original independent reviews were role-directed local Codex Jobs, not native
+managed agent dispatch or formal assurance. Each FAIL/operational no-result remains
+separate from subsequent PASS. Historical release blockers did not disappear
+because samples passed; today's accepted SDK/CLI publication records govern
+current distribution, while production qualification remains open.

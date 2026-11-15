@@ -49,7 +49,7 @@ cargo xtask check samples
 cargo xtask check docs
 ```
 
-See [M9i verification](../../docs/M9I-VERIFICATION.md) for retained integration, rollback, reviewer and dependency-isolation evidence.
+See [M9i verification](../../docs/SAMPLES.md#modular-shop-acceptance) for retained integration, rollback, reviewer and dependency-isolation evidence.
 
 
 ## Optional catalog display cache — YT-183

@@ -264,3 +264,20 @@ those capabilities, with their ownership and disposal contracts.
 - [Current API reference](API-REFERENCE.md) and
   [opt-in quick reference](OPT-IN-QUICK-REFERENCE.md): later capability selection.
 - [Troubleshooting](TROUBLESHOOTING.md): existing setup, renderer and HTTP failures.
+
+## Binding metadata and explicit lifetimes
+
+Ordinary View functions do not subscribe to state implicitly. Optional browser
+binding uses validated component/instance identities, nonempty unique keys and
+safe slot descriptors; these metadata values select neither a renderer nor a
+macro/compiler. Inert attribute names still require renderer admission and
+escaping, and cannot grant raw HTML or reserved framework attributes.
+
+For updates, explicitly select the [keyed DOM module](../crates/yetlet-browser/guides/dom-keyed.md)
+and [local graph](../crates/yetlet/guides/reactive.md) when needed. Keyed identity
+preserves owned nodes/state through reorder; graph handles are weak and the caller
+retains the strong lifetime owner. Listener disposal and queued/awaiting task
+retirement are separate obligations. The [browser ownership contract](BROWSER-APP.md)
+explains mutation failures and input/focus limits. The historical fixed-list
+`KeyedListTemplate`/`BoundKeyedList` authoring fixture is experimental and is not
+a current general component, forms, signals or resumability API.
