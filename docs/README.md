@@ -194,7 +194,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   coordinated migration/custody correction, accepted checks and harness limits.
 - [Alpha.2 retained build/custody failure](ALPHA2-HOSTED-RECORD.md): immutable
   unpromoted tag, original outputs and correction rationale; its
-  [earlier local package preflight](ALPHA2-VERSION-PREFLIGHT.md) keeps its scope.
+  [earlier local package preflight](RELEASING.md#historical-alpha2-version-package-and-release-gates--2026-10-29) keeps its scope.
 
 These are repository-maintenance guides, not application prerequisites or
 default reader-site exports. Use them for procedures; use dated records below

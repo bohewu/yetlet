@@ -1192,3 +1192,103 @@ All twelve Z16 source Markdown blobs/headings are recoverable at exact local Git
 Git recovery does not recover ignored/external raw logs, private credentials or
 remote environments. This consolidation reuses dated evidence without rerunning
 product/browser/platform/cloud experiments.
+
+## Historical alpha.2 local package verification and PR22 correction
+
+On 2026-10-29, the YT-096/YT-209 alpha.2 local preflight and independent
+Reviewer passed with zero issues/required followups. Subsequent PR22 CI failed
+at the synthetic rebuild fixture. The following preserves the actual local
+checks, the failure and the separately reviewed focused correction. At that
+checkpoint Merge remained blocked pending repair delivery and required CI.
+[Version/source and remaining gates](RELEASING.md#historical-alpha2-version-package-and-release-gates--2026-10-29).
+
+### Alpha.2 affected verification and actual results
+
+The existing alpha.1 local package recipe and external consumer are reused with
+new output/version inputs. Rust/Cargo1.99.0, four build jobs and the local GNU
+host/system OpenSSL are used. This is local packaging/linkage preflight, not an
+Ubuntu24/OpenSSL3.5.9 hosted build or new Windows/GPU qualification.
+
+| Check | Result and limit |
+|---|---|
+| Nineteen affected manifest roots | `cargo +1.99.0 metadata --offline --locked --format-version 1` PASS; no lock drift |
+| Version/dependency correspondence | Sixteen versions, eighteen internal requirements and 112 local lock fields match; all third-party blocks unchanged |
+| Sixteen new-version archives | Normal `cargo package --offline --locked --allow-dirty` verification PASS; no verification-bypass flag on final commands |
+| Archive input correspondence | All sixteen normalized manifests and packaged locks differ from retained alpha.1 archives only by the local version; 132 current source/test/example/README/license/original-manifest payload files match |
+| External packaged consumer | `cargo run --offline --locked --features integrations` PASS, prints `packaged consumer OK`; Auth/session, Config/secret-provider and Redis/tls compile/integrate through verified directory sources |
+| Consumer dependency resolution | Locked metadata resolves all sixteen alpha.2 libraries from final verified directory-source packages, with no checkout paths/patches |
+
+Sixteen `--no-verify --exclude-lockfile` bootstrap collections populate ordinary
+directory sources for unpublished siblings; they are not verification PASS.
+Final verified archives replace those bootstrap sources before the external
+consumer executes. `--allow-dirty` applies only to this uncommitted local
+preflight; it does not waive the clean-source release gate. The consumer's
+program is byte-identical to the accepted alpha.1 consumer. No live Redis,
+Session service, cloud resource, network provider or registry is exercised.
+
+Evidence is retained at `target/yt096-alpha2-version-20261029/` (local, ignored):
+master CI receipt, baseline hashes, migration/metadata records,
+`manifest-lock-verification.json`, `package-command-results.json`,
+`package-inventory.json`, `archive-delta.json`, `package-completion.json` and
+original command outputs. The thirty-five package workflow commands include
+collection, normal verification, consumer execution and metadata; they are not
+thirty-five behavioral tests. No affected package/consumer check failed.
+
+Accepted YT-202/203/204/205, alpha.1 version preflight and YT-209 implementation
+evidence retain their exact original sources/inputs/limits. Runtime and release
+tool implementation files are unchanged. No native functional suite, browser,
+WASM/GPU, CSP, MSVC, security scan, load test, hosted build, custody drill or
+unchanged release-tool test is replayed. Old advisory evidence retains its DB
+date; this migration does not call it a fresh scan.
+
+### Subsequent PR22 integration failure and local correction
+
+The owner authorized strict/builtin Commit of the reviewed 53 paths as
+`dbe1fbbb139fe3d7814ec8188a119a365286464c`, then Push and PR22. The staged and
+exact outgoing range/native hook checks PASS. Original
+[CI40888941346/1](https://github.com/bohewu/yetlet/actions/runs/40888941346)
+passed MSRV but failed Stable's Rust-tool tests before audit/browser execution.
+No Merge or automatic retry followed. Earlier archive/consumer PASS results
+remain valid at their local preflight scope; they are not a current CI PASS.
+
+The failed existing case is
+`private_rebuild::real_cargo_sixteen_alpha_packages_and_normal_verification_refusal`.
+Its synthetic manifests, internal requirements and expected archive names were
+still literal alpha.1; the reviewed recipe derives alpha.2 from its compiled
+root manifest. Cargo collected an alpha.1 fixture archive while staging correctly
+looked for alpha.2. This version-sensitive test consumer was missed in the
+initial migration/verification selection. It is a fixture mismatch, not a failed
+real sixteen-library package check.
+
+The minimal correction changes only `xtask/tests/private_rebuild.rs`: synthetic
+versions, dependency requirements, filenames and manifest assertions read the
+same compiled workspace-version authority. No public helper, runtime, recipe,
+historical trust pin, feature or dependency is changed. Normal verification and
+the intentional compile-error refusal remain required. An inventory of the other
+alpha.1 literals identifies retained legacy custody pins and deliberate negative
+or self-contained synthetic inputs, not additional current-version fixtures.
+
+The one failed case passes locally with `--offline --locked`, including all
+sixteen synthetic archives and its expected negative verification refusal.
+Owning-test Clippy with `-D warnings` and format PASS. No already accepted package,
+consumer, browser or platform check is replayed. Original CI metadata/full log
+and focused repair output are retained at `target/yt096-alpha2-pr22-20261029/`.
+The expected compile-error output is the passing negative assertion, not a new
+product failure. Independent repair Reviewer
+`/root/alpha2_version_independent_review_20261029` PASS0; all four source hashes
+match before/after read-only review, and the negative block remains byte-identical.
+Native reviewer/model/actual high effort are verified; only completion metadata
+follows the review. New Commit/Push/CI
+delivery requires the applicable authority; conditional Merge remains blocked.
+
+
+The later [actual alpha.2 hosted outcome](ALPHA2-HOSTED-RECORD.md) has a distinct
+C/tag/build and failed custody qualification because its receipt retained
+alpha.1 identity fields. [Alpha.3 recovery](ALPHA3-VERSION-PREFLIGHT.md) and its
+[accepted hosted record](ALPHA3-HOSTED-RECORD.md) retain the subsequent correction
+and publication boundaries. The alpha.2 GNU preflight adds no Windows, browser,
+GPU, registry or current-release qualification. Full dated text and original
+rendered headings remain at the locally verified
+[original source](https://github.com/bohewu/yetlet/blob/8d6fad7e95ee25849872b974f922d10c71b70a95/docs/ALPHA2-VERSION-PREFLIGHT.md#affected-verification-and-actual-results).
+Its Git SHA/blob/SHA256 are recorded in the linked release-gate section.
+Remote reachability and continued raw evidence availability are unverified.

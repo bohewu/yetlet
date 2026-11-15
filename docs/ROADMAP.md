@@ -28,754 +28,100 @@
   [CLI publication](CLI-040-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-12) ·
   [First App](FIRST-APP.md) · [Reader Edition selection](../site/pages.toml)
 
-**YT-250 CLI 0.3.1 release (2026-11-11): Published with registry consumer PASS.**
-[Preparation and gates](CLI-031-RELEASE-PREPARATION.md) align source and release
-consumers with `sdk-latest-v2`: maximum available non-yanked SemVer, including
-future prereleases and required same-version Browser availability, followed by
-selected-version feature/dependency checks without fallback. Cargo owns actual
-toolchain/dependency feasibility. Exact app pins/locks/receipts, alpha.7 build
-SDK/snapshot and historical release bindings remain intact. Independent
-semantic/source-freeze review, candidate/local consumers, original hosted
-build/custody, separate S review/CI, frozen prepare/sign and independent V passed.
-The [hosted dossier](CLI-031-HOSTED-RECORD.md) retains the original candidate's
-five-file public and single-package registry plans. The replacement addresses
-Browser Style shutdown on Windows and has fresh build/custody, frozen prepare,
-signing, independent V and read-only publication plan evidence.
-The approved publication run verified GitHub, crates.io and the installed
-registry consumer. The Reader Edition selected SDK alpha.7 / CLI 0.3.1
-at that release.
-
-**YT-249 Reader Edition publication follow-through (2026-11-10): Source/consumer review PASS.**
-[Contract and evidence](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence) promote the reader to
-the verified published SDK/CLI pair and require the same reviewed README/Pages
-update after each future SDK or CLI publication. Development versions do not
-promote the reader; immutable archives and historical release bindings remain.
-Local native/Wasm/static/first-app proof and independent review PASS; exact-head
-CI and live readback remain the public-delivery gates.
-
-**YT-247 Dynamic SDK Version Resolution (2026-11-10): Done at source implementation scope; independent Reviewer PASS.**
-[CLI contract](CLI-GUIDE.md#sdk-resolution-yt-247) and
-[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) separate CLI build SDK,
-immutable source snapshot and template identity from the generated app's selected
-registry SDK. [Phase A handoff](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md) retains the design review
-and PR #68 delivery; the [Phase B record](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
-reports resolver/cache/locking tests and six real registry compile combinations.
-These additions are now distributed in CLI0.3.0. The later [Windows supplement](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
-verifies MSVC CLI compilation and actual resolver/new/locking execution on the
-existing prepared Runner; failed attempts, scoped test correction and cleanup
-are retained. Windows Style/browser runtime qualification remains separate.
-
-**YT-244–248 historical release and version-authority milestones:**
-YT-244 passed a bounded source-only package/README/API audit after restoring
-two CLI heading fragments flagged by an initial P2 Reviewer; Windows
-qualification was explicitly deferred. YT-245 prepared the two-package
-SDK alpha.7 at an exact PR/master and MSVC source scope, **not** signing or
-publishing; [actual alpha.7 release](ALPHA7-HOSTED-RECORD.md) has separate
-owner-approved records and registry consumer. YT-246 implemented separate
-SDK-source, CLI-source/build SDK, accepted published and Reader-version
-authorities, enforced through the [release SOP](RELEASING.md#version-authorities-and-documentation-synchronization),
-release-doc sync/check and [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md);
-original first-review and exact-head CI corrections stay source-bound.
-
-YT-248 validated CLI 0.3.0 Style/source archives locally; that candidate
-was **not** itself signed or published. The separately
-[accepted CLI 0.3.0 hosted record](CLI-030-HOSTED-RECORD.md) preserves
-publisher preflight FAIL, selected original setup failures, explicit bounded
-continuation, owner-approved release and independent registry/Style consumer
-PASS. The old Reader-promotion hold was later superseded by the retained
-[YT-249 local edition follow-through](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence);
-current public version truth is SDK alpha.8 and independent CLI 0.4.0,
-not this dated alpha.7/CLI 0.3.0 milestone. Original YT-244/245/246/248
-reports and reviewer/failed attempts remain at fixed local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
-No new product/runtime, signing, registry or Pages action occurs here.
-**YT-242 documentation truth audit (2026-11-08): Done at bounded documentation scope.**
-[Audit and corrections](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-242-DOCUMENTATION-TRUTH.md) separate published SDK/CLI,
-the selected guide edition and later checkout authoring/tools. The 516-file role
-inventory includes bounded semantic inspection of 54 entries, not every document.
-Python suites (14/39/35), release-doc, docs/DAG, samples and whitespace pass.
-Independent corrective Reviewer `wc_job_m2SOL6psGzaIGPjm` PASS closes the original
-one-P2 review; original failures remain retained. Local delivery follows strict
-Guard. [YT-243 source qualification and existing CI coverage](QUALIFICATION-MATRIX.md#historical-two-package-migration-and-style-source-qualification)
-is Done at source/Linux/local Windows MSVC scope after the YT-242 local commit.
-Final independent Reviewer `wc_job_ukE1zeoMQlt3wLvu` PASS, zero issues/followups.
-Local Linux release
-Chrome/Firefox, affected CLI and exact local-package consumers pass. Windows
-MSVC/wasm32, exact packages, generated native Style HTTP/CSS and the corrected
-CI setup with seven Style tests also pass at their recorded local scopes.
-The first independent review's Windows OpenSSL prerequisite finding is closed;
-parent acceptance preserves every recorded limit. Hosted image/CI execution and
-unverified platforms remain separate. No release or source freeze is implied.
-
-- [x] **Optional application-owned Rust CSS (YT-237–241).**
-  Native Style and Browser Style templates wire a private host-side generator
-  into `yetlet build` and `yetlet watch`. Apps register style modules explicitly
-  and share class names between Views and the generator. The generator writes
-  deterministic external CSS before runtime, with same-origin stylesheet
-  delivery under the default CSP. Ordinary CSS is the default, with optional
-  Tailwind and Vite workflows.
-  [CLI workflow](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree) ·
-  [Registration contract](CLI-CONTRACT.md#application-owned-rust-style-registration-and-css-publication) ·
-  [Original YT-239 source acceptance](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md#independent-review-and-completion)
-
-  CLI `0.3.0` first shipped Style templates and generation, verified by the
-  accepted installed Linux consumer supplement. Typed Tag Builders shipped
-  in SDK `0.9.0-alpha.7`.
-  [First CLI Style publication and consumer supplement](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10) ·
-  [Current API availability](API-REFERENCE.md#cli-style-authoring-and-checkout-showcase)
-
-  The native-first Style Showcase is a checkout sample with complete SSR and
-  optional Wasm enhancement. The sample records its own bounded Linux
-  Chrome and Firefox verification.
-  [Style Showcase and limits](../examples/style-showcase/README.md#observed-yt-241-verification--2026-11-08) ·
-  [Todo sample](../examples/todo-server/README.md#app-owned-rust-styles-and-typed-tag-builders) ·
-  [original bounded Linux browser verification](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary) ·
-  [Source and local package qualification](QUALIFICATION-MATRIX.md#historical-two-package-migration-and-style-source-qualification)
-
-- [x] **Typed View authoring** (YT-234/235). First published in
-  **SDK `0.9.0-alpha.7`**, `yetlet::view::tags` provides 101 typed
-  constructors, selected attribute setters and compile-time void-child guards
-  over the existing owned `View` tree. The [View guide](VIEW-COMPONENTS.md#typed-tag-builders)
-  and [dated HTML inventory](API-CONTRACTS.md#historical-html-element-and-attribute-inventory) describe where
-  constructors exist without implying new DOM support, inline styles or
-  browser lifecycle guarantees. The [alpha.7 publication](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
-  and [original scoped verification](https://github.com/bohewu/yetlet/blob/9a6f954dc38f3b9e854fce5a08c9b843182657f8/docs/YT-235-TAG-COVERAGE-PLAN.md#yt-235-final-local-acceptance--2026-11-07)
-  retain separate distribution and source-only evidence.
-
-**YT-233 development artifact management (2026-11-03):**
-[Bounded contract and checkpoint](DEV-ARTIFACTS.md) separates new isolated
-rebuildable caches from retained evidence, adds read-only space inventory/cleanup
-preview and keeps legacy failure records at their original locations. Nine new
-focused cases pass on GNU and Windows after a retained Windows test-path failure
-and affected-case-only correction. Main inventories cover local Linux and both
-selected Windows locations; mint-game report readback/hash PASS. Initial
-independent implementation and first delta Reviewer PASS0 retain an unavailable
-model/effort trace. Extra names-only listing terminates lost/not_started after a
-connection failure, with no accepted output or retry; original main inventories
-remain valid. Final completion-record delta Reviewer PASS0 accepts YT-233 Done
-at the non-destructive tooling and scoped inventory boundary. At that initial
-checkpoint, no actual cache deletion, runtime/Cargo configuration change, old
-qualification replay, Commit, Push or deployment was authorized.
-
-**YT-233 owner-authorized cleanup followup (2026-11-03):** The owner subsequently
-authorizes actual scoped cache deletion. [Completed operations](DEV-ARTIFACTS.md#owner-authorized-cleanup--2026-11-03)
-remove only confirmed Cargo compiler internals on local Linux and mint-game;
-observed free-space increases total53.20GiB, all selected paths are absent and
-retained-file/source/HEAD/status checks pass. Other Windows locations have no
-selected Yetlet cache. Original evidence/failures/final artifacts remain;
-post-operation remote full-file readback timeout stays explicit, without a
-cleanup retry. Operational independent Reviewer PASS0 accepts completion. This is not automatic
-retention or Git/runtime/global configuration authority.
-
-**YT-232 authorized public guide update (2026-11-02):**
-[Delivered source/HTTPS proof](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence)
-binds PR54 squash master993ce56 to the unchanged reviewed tree; PR/master
-necessary CI and master Pages build/deploy PASS attempt1. Public SDKalpha.6/
-CLI0.2.0 guide has8 chapters/15 exact HTTPS files/219 checked links and static
-next step. Final master CodeQL41382427860/1 passes all four analyses; the
-initial pending observation remains historical.
-Browser availability failure retained, without a fresh interaction claim or
-retry. Independent closeout Reviewer PASS0 verifies three unchanged documents,
-accepted sources, artifacts and public responses. Three closing documents remain
-uncommitted; no package publication or additional deployment.
-
-**YT-232 next public guide edition (2026-11-02):** Done at local guide-source update scope.
-[Selected source update](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence) aligns introductory
-instructions, eight-page reader and static reference with published
-SDKalpha.6/CLI0.2.0. Reuse distribution/browser proof; verify only changed
-edition/registry-consumer/content inputs. Independent review precedes Done;
-local sources/output do not replace live Pages. No Commit/Push or deployment.
-Affected11-test/registry-lock proof, eight-chapter local native/Wasm build and
-static reference PASS; no fresh browser interaction or hosted qualification is
-claimed. Operational tool/browser failures retained; independent Reviewer PASS0
-verifies24 unchanged sources, artifacts and both lock deltas. Live promotion is separate.
-
-**YT-231 Lab SQLite test stability (2026-11-02):** Done at local test-correction scope.
-[Bounded correction](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) separates the existing
-finite Busy outcome from version conflict. Keep runtime/security/limits and the
-original CI failure; prove one committed effect and strict stale409 after the
-race. Controlled real-lock and changed-race checks, Clippy/format/docs/whitespace
-PASS; independent Reviewer PASS0 verifies five frozen source hashes and unchanged
-runtime. No hosted/stress qualification or Git/deployment/release action.
-
-**YT-230 release-document gate (2026-11-02):** Done at local implementation scope.
-[Contract](RELEASING.md#release-documentation-gate) requires manifest-derived
-README/install references and current-reader review before C/packaging, plus
-actual frozen README checks before publication. History and the pinned guide
-edition remain separate. Affected60-test baseline and corrected boundary/history
-checks PASS; first failure retained. Source/YAML/docs/whitespace PASS and
-independent Reviewer PASS0,24 unchanged hashes, zero issues/followups. No hosted
-qualification, Commit/Push, signing, publication or Pages change; remote gate
-activation follows separately authorized delivery.
-
-**CLI0.2.0 publication and registry consumer complete (2026-11-02):**
-[Owner-approved41319625709/1](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
-PASS: five-file GitHub Experimental pre-release, exact crates.io archive and
-fresh registry installation/version/help/new. Anonymous assets, registry bytes
-and non-yanked index match the frozen checksum; generated SDKalpha.6 pin is
-exact, without path patches or forwarded credentials. Original preparation
-acceptance, failures and immutable C/S/tag remain; no retry, duplicate upload or
-SDK republishing. The dated Pending checkpoints below remain historical.
-
-**YT-229 accepted through the final owner gate (2026-11-01):**
-[Final preparation acceptance](CLI-020-RELEASE-PREPARATION.md#owner-publication-gate-ready--2026-11-01)
-PASS0,0 issues/followups; actual preflight41319625709/1 PASS and publish waits
-release-publish. Hosted public/registry plans match the reviewed five-file/oneCLI
-set. Fixed C7fb963a/SVP86e5da2 and five successful first-attempt stages retain
-one verified subject/all54 private entries. YT-229 Done at preparation scope;
-Draft private/empty, GitHub/registry/installed-registry-consumer unexecuted.
-Original failures remain, no release retry or SDK republishing. Three local
-closing docs are uncommitted; owner approval has not been performed.
-
-**CLI0.2 verified release preparation (2026-11-01):**
-[YT-229](CLI-020-RELEASE-PREPARATION.md#fixed-signer-and-verified-outputs--2026-11-01)
-retains fixed C7fb963a and PR50/S/V/P86e5da2 with actual required master CI PASS.
-Build/readback/prepare/sign/independent result each PASS attempt1; one CLI subject
-and all54 final private entries verified. Five prospective public files, notes
-and exact-byte registry plan are prepared; Draft remains private/empty. Final
-review/preflight/owner-gate observation Pending, YT-229 In progress. Original
-failures retained, no release retry, private-key access or publication locally.
-Three closing docs remain uncommitted; no SDK republishing or guide promotion.
-
-**CLI0.2 source and original custody accepted (2026-11-01):**
-[YT-229](CLI-020-RELEASE-PREPARATION.md#successful-original-build-and-custody--2026-11-01)
-uses PR49/C7fb963a with matching reviewed tree and actual master CI PASS. Current
-version expectations derive from the CLI manifest; exact-source MSVC7-pass/1-ignored
-and final source review PASS0. Unsigned CLI tag is fixed after strict/builtin Guard;
-build41315130983/1 and original readback41315597052/1 PASS. One archive/SDKalpha.6
-pin, original failures and published SDK/guide boundaries remain intact. S and
-later release stages/final owner gate Pending; YT-229 remains In progress.
-
-**CLI0.2.0 continuation (2026-11-01):**
-[YT-229](CLI-020-RELEASE-PREPARATION.md) follows successful SDKalpha.6 publication.
-Prepare the independent CLI version, qualified bundled resources and trusted
-version-specific SDK binding, then only affected native/archive/consumer checks.
-Retain CLI0.1.x historical bindings and the current public guide edition.
-Independent review and fixed C/S remain Pending; stop at the final owner
-publication gate. No SDK republishing, dependency upgrade or automatic retry.
-
-**SDKalpha.6 distribution complete (2026-11-01):**
-[Owner-approved41308935654/1](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
-publishes six reviewed GitHub pre-release files and both crates.io packages.
-Anonymous download/checksum/index correspondence and the fresh exact-version
-registry-only locked consumer compile PASS. Fixed C/S/V/P, signatures and original
-failures remain; no retry or broader qualification. YT-228 preparation acceptance
-is preserved; CLI0.2's SDK-publication prerequisite is satisfied, not implemented.
-
-**Selected next delivery (2026-11-01):**
-[YT-228](ALPHA6-RELEASE-PREPARATION.md) starts SDKalpha.6 preparation through the
-final owner publication gate, preserving the published reader edition and
-existing token route. Local affected metadata/archive/native/Wasm/MSVC checks,
-independent preparation/platform reviews and PR47/master CI PASS. Cc7e6372/tag
-are fixed; S/V/P6531001 has actual required CI. Build/readback/prepare/sign/result
-each PASS attempt1, two subjects/all44 private entries verified. Six public files
-and private Draft are prepared; final Reviewer PASS0 and preflight41308935654/1
-PASS. YT-228 Done at preparation scope; owner gate waiting, publication held.
-CLI0.2 preparation follows SDK publication; no publication is authorized yet.
-
-**YT-227 SDK/CLI delivery planning (2026-11-01):** Done at
-documentation-only scope: proposed SDK alpha.6 first, CLI 0.2.0 later,
-the exact registry SDK binding, guide-edition hold and optional
-crates.io OIDC study. No candidate, hosted authorization or registry token
-policy changed at this checkpoint. Subsequent actual publications have
-separate [SDK receipts](ALPHA6-RELEASE-PREPARATION.md) and
-[CLI receipts](CLI-020-RELEASE-PREPARATION.md); OIDC Trusted Publishing
-was not selected. Original YT-227 proposal and review remain at fixed
-local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
-**Current distribution and next reader milestone (2026-10-31):**
-The two-package SDK `0.9.0-alpha.5` and independent CLI `0.1.1` are published.
-[YT-216's completed output and installed consumer](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
-close the CLI defect; YT-215 closes through that patch while its original0.1.0
-consumer FAIL remains. SDK/platform proof is not replayed or expanded.
-[YT-217](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-217-DOCS-PREVIEW.md) is Done at bounded local scope: selected doc comments, four new
-examples, native/WASM rustdoc and an eight-chapter local static build pass. All454
-local links/assets/anchors pass after a genuine old step-link correction. The
-two original sidebar-count failures remain. The owner-authorized check correction
-separates eight chapter URLs from four heading fragments; navigation/search,
-mobile touch interaction and three screenshots PASS at local Chromium scope.
-Original source/build acceptance is reused; final independent browser-acceptance
-review PASS0 explicitly allows Done, with registered model/effective effort verified.
-YT-217 itself changed no API/runtime/version or hosting; its original local
-scope is preserved.
-[YT-218](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31)
-has completed PR43 reviewed strict/builtin delivery and green merged-master CI
-at64d1074. [The guide](https://bohewu.github.io/yetlet/) is live after successful
-first build/deploy41198529190/1, actual artifact/source/edition/HTTPS readback and
-desktop navigation/search plus emulated-mobile touch acceptance. Final independent
-evidence Reviewer PASS0 accepts completion; YT-218 is Done. The Pages Environment allows only master,
-relevant master updates deploy automatically, release CI/Secrets are unchanged,
-and original404 settings/harness observations remain recorded without hosted retry.
-See [M25](#m25--broader-html-dom-support-and-static-site-delivery) for the
-delivered DOM policies, static HTML export and Reader Edition, with their first
-published versions and bounded verification evidence.
-Dated checkpoints below retain historical authorization/status wording and do
-not override these completed release records.
-
-**YT-216 fixed candidate and tag (2026-10-31):**
-[PR39/source Cae5dd4c](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
-passes reviewed implementation/normal packaging and required CI. Preserve the
-first master SQLite failure; the owner-authorized failed-Stable-only attempt2
-passes with original MSRV reused. Strict/builtin0.1.1 tag/readback and consumed-
-binding retirement PASS; build41173099066/1 dispatched once. This documentation
-source provides later S without new code/SDK inputs. Actual archive/custody/
-signatures/result and final owner approval remain Pending; old0.1.0 release and
-all failures remain unchanged. No0.1.1 upload or additional retry is authorized.
-
-**YT-216 CLI0.1.1 patch preparation (2026-10-31):**
-[YT-215 publishes CLI0.1.0](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
-and installs it successfully, but final run41169732818/1 fails on the stale
-unpublished version suffix before help/new. Preserve that partial outcome,
-release, archive, tag and signatures. [YT-216](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
-fixes the version/help labels, adds real executable checks to existing MSRV CI
-and prepares only CLI0.1.1 through the final owner gate. SDK0.9.0-alpha.5,
-third-party dependencies and generator/runtime semantics remain unchanged.
-Reuse original proof at its scope; new source-bound outputs require acceptance.
-No failed-job retry or new publication is authorized before the final gate.
-
-**YT-215 corrected candidate selected (2026-10-31):**
-[PR37 and exact master CI](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
-PASS at corrected C6f013ac. New immutable yetlet-cli-v0.1.0 tag/strict Guard
-readback PASS; consumed binding retired. Changed-source build41168153070/1 is
-running once; corrected actual custody and later S/signatures/result remain
-Pending. This documentation delivery provides a separate later S without new
-runtime inputs. Old tags/jobs/wrong-ref receipt remain intact, with no SDK upload
-or CLI signing/publication. Final owner gate remains required.
-
-**YT-215 first independent CLI release preparation (2026-10-31):**
-The owner selects [yetlet-cli0.1.0](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures) through the final
-owner gate, retaining published SDK0.9.0-alpha.5. Initial C6f26961, PR36/master
-CI, cli-v0.1.0 tag and build41165581554/1 pass at their recorded scope. Actual
-readback41166121653/1 is GitHub green but rejected as CLI identity proof: its
-receipt incorrectly uses the SDK tag/workflow. Original jobs/bytes and immutable
-old tag remain evidence. PR37 delivers the record-derived custody correction;
-new C and canonical yetlet-cli-v0.1.0 tag need affected source-bound proof.
-Focused CLI/SDK context tests preserve old SDK/legacy semantics; no runtime,
-platform or dependency suite replay. CLI-only schema3, one archive/five public
-files, existing signing identity/custody/protections and final owner gate remain.
-Later S, successful actual CLI custody, signatures/result and owner publication
-approval remain Pending. No CLI signing, public release or SDK upload yet.
-
-**Current alpha.5 publication and CLI installation (2026-10-31):**
-The [two-package alpha.5 release](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup)
-and both registry uploads complete at owner-approved run41104391525/1, with
-registry download/checksum and external consumer PASS. The owner subsequently
-deletes the obsolete actions crate; PR29 is closed unmerged. Preserve original
-source/tag/signature and failure evidence. [YT-214](https://github.com/bohewu/yetlet/blob/ad564ad1ef07e5fca063ae88587c0f21e6edb5b1/docs/YT-214-CLI-INSTALLATION.md)
-is Done at bounded local GNU implementation/package/install proof scope after
-independent Reviewer PASS0: twelve affected tests, normal archive verification,
-token-free publish dry-run and registry-backed first-app build/HTTP/cleanup pass.
-First CLI publication remains Pending; the no-clone `cargo install yetlet-cli`
-interface is prepared, not live yet. YT-020 is Done at Experimental distribution
-scope from retained successful publication/consumer receipts and final review.
-No new CLI publication, SDK change, hosted/signing run or source Git delivery is
-selected. Stale branch cleanup preserves a verified external Git bundle and the
-one local checkpoint with four unproven unique commits.
-
-**Historical alpha.5 pre-publication execution (2026-10-31):**
-The owner authorizes advancing to the final publication gate under the adopted
-[single-gate policy](RELEASE-PUBLICATION.md). [The new hosted record](ALPHA5-HOSTED-RECORD.md)
-selects C `0a9fa8a594e3dd2ce753422dd848df10cd8c98df` after PR31 and exact master
-CI PASS; all101 SDK inputs and two MSVC-tested tool hashes retain their accepted
-proof. The fixed unsigned alpha.5 tag is pushed with strict/builtin/native Guard
-PASS; one two-package build41087985092/1 is running. Original readback, actual S,
-frozen payloads, signing/result and final plans remain Pending. No publication
-or owner-gate approval; old source/tags/results/failures and paused PR29 remain.
-
-**YT-213 Windows xtask POSIX isolation (2026-10-30):**
-The owner authorizes a repository-tooling correction for the retained MSVC E0277:
-ordinary xtask commands must compile/run; POSIX Docker qualification must reject
-unsupported platforms explicitly before setup/build effects. Preserve Unix
-identity, Docker arguments/limits and cleanup. Only affected GNU/MSVC proof and
-independent review are selected; SDK/browser evidence and selected C `0f0c84a`
-remain unchanged. No Commit/Push/tag, release-hosted, signing or publication.
-GNU24 and MSVC13 affected tests, ordinary help/docs commands and cleanup PASS;
-final independent acceptance PASS0; YT-213 Done. One existing unused-function Windows
-warning is retained without suppression.
-
-**YT-212 qualification and delivery (2026-10-30):**
-[PR30](https://github.com/bohewu/yetlet/pull/30) is squash-merged at R
-`0f0c84abf9b6c269987cef31c2d0651fa2d1f3ff`, tree
-`a0940f6806fc92ac8b16b96fc4827645ac82b316`, after strict/builtin delivery and
-independent A/B correction PASS0. Both PR/master CI jobs pass; normal two-package
-archives, native/WASM consumers, selected MSVC consumers, current Firefox/Chrome
-DOM journeys and inventory/security correspondence pass. GNU/MSVC archive bytes
-and the MSVC consumer lock match. See the [actual qualification record](ALPHA5-RELEASE-PLAN.md#actual-qualification-results--yt-212)
-for failures, exclusions and the unresolved Windows xtask/POSIX tooling limit.
-Windows test resources are removed; inert evidence retained. Final independent
-PASS0 accepts YT-212 Done at qualification scope; unchanged R is the owner-authorized
-alpha.5 C. The five closeout documents remain uncommitted.
-No tag, release-hosted run, Secret/Environment change, signing or publication.
-Original branches/history and paused PR29 remain preserved.
-
-**Historical alpha.5 planning checkpoint (2026-10-30):**
-Owner-authorized strict/builtin Commit records the accepted consolidation as
-`0f867f11a7e73675158597f0ec3caff71f1d8d0f`, tree
-`4c612e6b3418641114f91bff2e66fee58930f3c6`, without Push.
-[Scope/source/gate inventory](ALPHA5-RELEASE-PLAN.md) proposes schema2/consolidated,
-exactly `yetlet` then `yetlet-browser`, version `0.9.0-alpha.5`. Final C/S/V/P,
-tag and new output hashes remain unselected. Existing migration proof is reused;
-remaining active qualification/guide carryovers must be corrected before final C,
-then only missing package/platform/inventory/CI and original hosted/signing/
-distribution gates are supplemented under later authority. No new execution,
-Secret/Environment change or publication; the old fifteen-package continuation
-stays paused and YT-020 remains Blocked. This is planning, not release readiness.
-
-**YT-211 two-package migration complete (2026-10-30):**
-The owner continues from the accepted YT-210 prototype. [Selected migration
-contract](COMPATIBILITY.md#two-package-feature-and-target-contract) uses one `yetlet` implementation
-archive for shared/native features and a separate `yetlet-browser` implementation
-archive; default HTML/DOM respectively, shared View, opt-in target-gated modules
-and unreleased alpha.5. The explicit two-package selection replaces the initial
-one-package proposal before source migration.
-Current consumers/tools/guides and closed release-subject checks are migrated.
-Native/WASM consumers,34 example manifests, CLI generation and normal archive/
-predecessor proof pass. The first final review found two P2 test/guide feature
-mismatches; focused corrections and independent followup PASS0 accept Done
-at the bounded migration scope. Original failures and evidence stay retained. No Commit/Push, new hosted/signing/publication action
-or PR29 Merge is authorized; publication stays paused.
-
-**YT-210 package consolidation proposal / publication paused (2026-10-30):**
-The owner asks to evaluate one package as well as a smaller public set.
-[Static feasibility and candidate contract](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-210-PACKAGING-STUDY.md) recommend
-one implementation package with opt-in modules/features, preserving native/
-browser isolation, existing provider semantics and explicit startup selection.
-Contract Reviewer PASS0 and owner continuation permit a local four-module proof:
-normal package verification, three new tests/three doctests, native/wasm32
-archive consumers and mixed-feature target isolation PASS. Original formatter/
-fixture failures remain. Final independent Reviewer PASS0 accepts YT-210 Done
-at bounded feasibility scope (four documents/96 evidence hashes); full package
-adoption was deferred to YT-211, whose bounded migration completion is recorded above. PR29 stays
-open/unmerged; no continuation is dispatched. Preserve existing alpha.4
-publication/signatures and failed evidence; YT-020 remains Blocked. This is
-documentation research, not an adopted API or new release candidate.
-
-**Alpha.4 registry-only continuation preparation (2026-10-30):**
-[Actual P `1c0bb31` execution](ALPHA4-HOSTED-RECORD.md#actual-public-release-and-one-package-registry-outcome)
-verifies the public twenty-asset GitHub prerelease and the first registry archive;
-the job stops on a wrong success-response assumption. Local correction prepares
-only the remaining fifteen, preserves all published/signed bytes and history,
-and retains a single owner gate in a GitHub-read-only continuation job.
-The owner authorizes delivery and selects a fixed11minute wait before each
-unique PUT, including the first, within a210minute registry-only job. Live
-authority/release checks follow each wait; errors including429 stop. Pacing
-review, new source/CI and actual registry/consumer completion remain open;
-actual account quota is not proven and no new upload occurs. YT-020 Blocked.
-
-**Earlier alpha.4 publication maintenance (2026-10-30):**
-[Actual prepare/sign/independent verification](ALPHA4-HOSTED-RECORD.md#actual-preparation-signing-and-independent-verification)
-PASS at unchanged C/tag and S/V `6ed70c3`. The owner-approved final run fails
-at GitHub staging with no assets or registry attempt. Local length/diagnostic
-repair and [pinned CI tool caching](RELEASE-PUBLICATION.md#alpha4-timing-and-bounded-ci-maintenance--2026-10-30)
-retain all required checks, independent verification and final owner gate.
-Local review and corrected hosted publication are separate gates; no measured
-cache speedup, live delivery or YT-020 completion is claimed.
-
-**Earlier alpha.4 hosted evidence checkpoint (2026-10-30):**
-[Original build/readback and retained source-package evidence](ALPHA4-HOSTED-RECORD.md)
-PASS at fixed C `c45e10c` and immutable unsigned tag. Distinct signer selection,
-actual prepare/signature/results remain Pending. Keep the selected Experimental
-scope and one final owner publication gate; no new support or registry claim.
-
-
-**Alpha.4 preparation (2026-10-30):**
-[Sixteen-package version preflight](ALPHA4-VERSION-PREFLIGHT.md) coordinates
-manifests, internal requirements and local lock versions without third-party
-upgrades. Affected package/consumer/version checks and independent Reviewer PASS0;
-accepted unaffected evidence is retained. Candidate selection, Git delivery, tag/hosted/signing and
-publication remain separate; YT-020 stays Blocked.
-
-
-**Release automation / registry followup (2026-10-30):** the owner-selected
-[single publication gate](RELEASE-PUBLICATION.md) keeps build, signer, independent
-verifier and publisher privileges separate. Config/Secrets source-cycle repair
-and exact-byte promotion are local work; Environment rollout and actual
-registry proof remain open. This does not expand product support or mark
-YT-020 complete.
-
-**YT-020 registry method and artifact contract (2026-10-30):** The
-[formal contract](RELEASE-PUBLICATION.md#first-registry-publication-and-immutable-artifact-contract) resolves the policy:
-break the first-name development cycle by moving the Settings state example to
-Config, keep runtime/feature/workspace boundaries, prepare final artifacts in
-all-kind dependency order, bind all sixteen subjects to new R/V and promote the
-frozen bytes through the official API. Prototype metadata/compile and sixteen
-offline wire previews PASS; no old tests replayed or actual source/registry
-mutation. Existing Cargo login is reported complete; publishing rights remain
-unverified. Independent re-review PASS0 after the retained plan/receipt P2
-correction; all five source hashes match, temporary cleanup PASS.
-Implementation/freeze/live acceptance remain open, YT-020 Blocked. The five prior documents are committed as `15abc44`;
-no Push or new-change Commit.
-
-**YT-020 Config/Secrets local preflight (2026-10-30):** The
-[dependency contract](RELEASE-PUBLICATION.md#dated-local-evidence-and-remaining-provenance) preserves manifests,
-features and source locks. Secrets and Config/secret-provider publish dry-runs
-normally verify using accepted archive directory sources, with explicit upload
-abort. Failed offline/configuration and Config rustup observations remain; no
-passed suite replay. Generated archives differ solely in internal packaged-lock
-checksums and cannot inherit old signatures. Next resolve the registry artifact/
-checksum contract, then rights/source/authority and actual registry proof.
-Independent Reviewer PASS0, all five reviewed source hashes match; temporary
-source, Cargo home, vendor and build cleanup PASS. YT-020 Blocked, no new Commit/Push or upload.
-
-**YT-020 registry next step (2026-10-30):** [Read-only sixteen-package
-inventory](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-REGISTRY-READINESS.md) follows guarded local seven-path commit
-`6371ba8`, without Push. All requested names return not-found and the public
-publisher account exists; actual publishing rights/claimability remain
-unverified. Five normal/build layers do not resolve the Config/Secrets versioned
-development bootstrap across five independent workspaces. Plan and verify that
-missing registry path and archive-byte identity, then obtain actual upload
-authority; reuse the accepted alpha.3 build/platform/security/signing evidence.
-No new build, hosted run, signing or registry upload; YT-020 stays Blocked.
-
-**Alpha.3 publication and tooling maintenance (2026-10-30):**
-[Fixed C `557ab76`, S/V `30baf25`](ALPHA3-HOSTED-RECORD.md#signing-independent-verification-and-publication--2026-10-30):
-sign40982672108/1 and independent result40983028507/1 PASS, all16 subjects/all112
-private entries and cleanup. Existing alpha.3 Release428536609 is public with
-exact20 owner-approved files, authenticated/anonymous byte readback PASS and no
-Latest selection. First upload failure retained; accepted `gh api` recovery
-completes delivery. Local YT-209 maintenance standardizes upload transport and
-clarifies four protected approvals without changing Environment policy or
-replaying qualification. No new release or crates.io upload; YT-020 Blocked.
-
-**Alpha.3 hosted custody and prepare grant (2026-10-30):**
-[Actual C `557ab76` and immutable tag](ALPHA3-HOSTED-RECORD.md), PR23 Merge and
-both PR/master CI jobs PASS; build40906989456/1 and protected readback40908551139/1
-SUCCESS, complete manifest/inventory and cleanup verified. Qualified owner-local
-retention covers 70 files; no offsite backup claim. Failures remain. The next
-authorized batch ends at prepare: reviewed document PR/CI-conditional Merge,
-actual independent S, unpublished Draft/encrypted handoff, one owner-gated
-prepare. S/execution/outputs remain Pending; no product qualification replay,
-signing/publication. Historical alpha.1 D6 remains Complete and YT-020 Blocked.
-
-**Alpha.3 recovery/preflight (2026-10-29):** [Approved bounded batch](ALPHA3-VERSION-PREFLIGHT.md)
-retires the used Guard binding without changing alpha.2 tag/evidence and fixes
-custody version construction/validation and its consumers. Sixteen normal
-new-version package checks, external consumer, nineteen locked roots and four
-changed-version cases PASS, with no third-party upgrade. Optional synthetic
-readback unverified after an isolated recipient-pin harness mismatch, failures
-retained and no formal key access. Final independent Reviewer PASS0, all 56 source
-hashes matched before/after review; Git delivery/CI/conditional
-Merge. New source/tag/build/readback remain individually gated within the one
-approved batch; no signing/publication or expanded product support.
-
-**Alpha.2 hosted outcome (2026-10-29):** [Build40895514392/1 and custody disposition](ALPHA2-HOSTED-RECORD.md):
-sixteen-package preparation PASS, custody qualification FAIL because the actual
-receipt retains fixed alpha.1 workflow/ref fields. Original outputs and immutable
-alpha.2 tag retained; no decrypt/readback or Environment change. Local minimal
-helper/fixture correction and three affected checks PASS; independent Reviewer
-PASS0, all six source hashes unchanged. A corrected candidate/version and any execution need new authority;
-positive schema-1 qualification remains Pending, with alpha.1 D6 Complete.
-
-**Alpha.2 PR22 integration failure (2026-10-29):** MSRV PASS; Stable fails the
-existing rebuild fixture's stale alpha.1 version while its recipe expects
-alpha.2. The [minimum test-only correction](ALPHA2-VERSION-PREFLIGHT.md#subsequent-pr22-integration-failure-and-local-correction)
-passes the failed local case and owning-test Clippy/format; independent repair
-Reviewer PASS0, all four source hashes unchanged. Real sixteen-package preflight remains accepted at its original
-scope, but PR Merge is blocked until repaired delivery/required CI PASS. Original
-failure retained; no automatic CI retry, new Git delivery or release operation.
-
-**Alpha.2 version preflight (2026-10-29):** The
-[YT-096/YT-209 package follow-up](ALPHA2-VERSION-PREFLIGHT.md) updates the
-sixteen-library Experimental train and internal requirements without changing
-runtime, features, platform scope or third-party dependencies. Nineteen affected
-locked metadata roots, sixteen normally verified archives and an external
-packaged integration consumer PASS; independent Reviewer PASS0. All 53 reviewed
-source hashes match; only completion metadata follows. This is local
-uncommitted preflight, not a new candidate or hosted qualification. Existing
-alpha.1 publication/D6 remain Complete; YT-020 stays Blocked. No tag, signing or
-publication is authorized by this update.
-
-**YT-209 delivery and Environment setup (2026-10-29):** [PR20](https://github.com/bohewu/yetlet/pull/20)
-squash merged as `7de77c84e0e56e683cea4567048397caa0614590`, tree
-`95c65e754a51fadce648645791f41620b56f8bca`, identical to qualified repair head
-`cdde3c4`. Both required jobs in CI `40873628263/1` PASS, including Chrome.
-The new `release-result-verify` Environment `25684187945` and existing
-`AGE_IDENTITY` installation/readback PASS: owner reviewer, exact master policy,
-admin bypass disabled; other Environments and owner identity unchanged. No local
-private-evidence decryption, release dispatch, new tag, signing or publication.
-Automatic post-merge master CI `40875245510/1` PASS, both required jobs. YT-209 Done at
-implementation/integration/setup scope; positive release-result hosted
-qualification remains Pending. Earlier failures stay recorded below.
-
-**Historical YT-209 integration failure (2026-10-29):** Reopened after [PR20](https://github.com/bohewu/yetlet/pull/20)
-CI `40871149693/1`: MSRV PASS, Stable failed at the existing preflight importlib
-consumer before browser/audit steps. Three-file compatibility repair and two
-consumer checks/xtask Clippy PASS locally; independent repair Reviewer PASS0.
-No CI retry, Merge or Environment/Secret write. Initial local acceptance and
-failed evidence retained; see the [repair record](CI-SECURITY-REVIEW.md#versioned-release-automation-integration-history).
-
-**YT-209 release automation (2026-10-29):** [Contract](RELEASING.md#versioned-record-and-receipt-contract) and minimal implementation Done at local scope after contract/final independent Reviewer PASS0. 30 distinct focused checks plus docs/format/syntax PASS; all 17 reviewed source hashes match. Versioned data-only inputs, protected independent result verification and closed public attachment operations preserve C/S, key and owner gates. Hosted qualification/Environment setup remain Pending. No formal key, old qualification replay, hosted, signing, publication or new-change Commit/Push.
-
-**YT-208 maintainer SOP (2026-10-29):** The
-[development/PR guide](DEVELOPMENT.md) and [new-version release guide](RELEASING.md)
-separate normal development, one-time setup, per-version promotion and failure-only
-recovery. Current distribution/navigation is reconciled without replaying
-qualification or changing workflows/settings. Docs/whitespace and independent
-Reviewer PASS0; YT-208 Done at documentation scope. YT-209 was registered to address the observed hard-coded release inputs,
-missing protected independent private-result verifier and operator-only public
-staging/readback; at YT-208 completion these were future tooling, not a claimed
-generic pipeline. The subsequent YT-209 entry above records the later local scope.
-D6/YT-096 alpha acceptance and YT-020 Blocked retain their existing scopes.
-
-**Subsequent owner-approved GitHub pre-release (2026-10-29):**
-[Yetlet v0.9.0-alpha.1](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
-is public as an Experimental pre-release, not Latest, at unchanged C `bf33638`.
-The owner separately approves publication of the exact notes and 20 public
-attachments; anonymous API and bundle-download readback PASS. No private evidence,
-private bundle, registry upload, new signing or Git operation is included.
-D6 remains Complete, YT-096 Done at accepted source-package signing/integrity
-scope, YT-020 Blocked. Earlier unpublished/Pending records retain their dated scope.
-
-**YT-096 actual signing (2026-10-29):** Owner-approved sign `40811275645/1`
-SUCCESS at unchanged S `d65e318`, including cleanup. Independent public/private
-verification PASS covers both fixed payloads, all 16 subjects, all 117 manifest
-entries and exact signer/CT/log/timestamp claims. The owner's explicit one-phase
-local custody exception and conditional acceptance of actual bundle hashes are
-[recorded](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#actual-signing-independent-verification-and-owner-acceptance--2026-10-29).
-All temporary plaintext removed; retained wrapper errors cause no signing or
-cryptographic retry. Final independent Reviewer PASS0 activates the owner's
-acceptance: D6 Complete, YT-096 Done at source-package signing/integrity scope.
-Six docs uncommitted/unstaged, no Git or
-publication; YT-020 Blocked. Historical records below keep their original scope.
-
-**YT-096 current execution (2026-10-29):** PR19 strict/builtin delivery selects
-S `d65e318`, reviewed tree unchanged; PR/master CI PASS. Owner-approved prepare
-`40806988578/1` SUCCESS includes final cleanup and verified encrypted readback.
-Repository-external retention PASS; conditional temporary asset deletion is
-complete, Draft remains unpublished, earlier failures retain their outcomes.
-The [single D6 confirmation packet](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#d6-confirmation-packet--2026-10-29)
-lists both actual raw payload hashes, exact source/artifact/receipt and public
-metadata for one recommended later sign run. Keep master at fixed S; this
-documentation grants no execution/Git authority. Six docs are uncommitted/unstaged;
-docs/whitespace and independent Reviewer PASS0; no qualification replay.
-D6 Pending, YT-096 In progress,
-YT-020 Blocked. Earlier dated checkpoints retain their original scope.
-
-**YT-096 historical execution (2026-10-29, PR18):** PR18 strict/builtin delivery selects
-S `e2d4a9f`; PR/master CI PASS. Owner-approved prepare `40795794183/1` passes
-preflight, tool authentication, original ciphertext retrieval, isolated
-handoff/decryption/full manifest/freeze, and encrypted output upload. Final owned
-cleanup fails only on read-only Go module-cache entries; the run remains FAIL.
-[Actual output/custody and minimal cleanup repair](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#actual-frozen-output-and-go-cache-cleanup-failure--2026-10-29)
-retain all evidence and the ineligible frozen candidate. One new offline native
-Go regression reproduces the failure and passes with task-private
-`GOFLAGS=-modcacherw`; no key, data, permission or signing-gate change. New repair
-and status docs are uncommitted; independent followup Reviewer PASS0. No run was
-retried, D6 Pending, YT-096 In progress, YT-020 Blocked. Prior records keep scope.
-
-**YT-096 current repair (2026-10-29):** Strict/builtin delivery of PR17 selects
-S `0e8fb60`; PR/master CI pass. The additional prepare `40789535074/1` rejects
-reading the Draft Release with HTTP403; protected jobs are skipped. The
-[local encrypted capability handoff](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#encrypted-ciphertext-capability-handoff--2026-10-29)
-now moves that owner-only read to the operator and gives the protected job an
-age-encrypted, short-lived, read-only asset capability. Existing CI permissions,
-Secret and C/tags stay unchanged. Real encrypted-ZIP retrieval/age handoff passes
-locally with a disposable test key; formal key and qualification plaintext remain
-unread. Nine affected/new focused cases, docs/syntax/whitespace and independent
-Reviewer PASS0 accept this bounded local implementation;
-new changes are uncommitted, with no additional hosted run. D6 Pending,
-YT-096 In progress, YT-020 Blocked; final manifest remains unfrozen.
-The dated checkpoints below preserve their original scopes and failures.
-
-**YT-096 current checkpoint (2026-10-29):** Owner-authorized real-layout delivery
-is squash merged as S `87d24e9`; PR16 CI attempt 2 and automatic master CI pass,
-with the first Chrome startup failure retained. The one
-[unsigned prepare run](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#hosted-preflight-failure-and-safe-local-diagnostics--2026-10-29)
-`40717870186/1` fails in read-only preflight; protected prepare/sign are skipped,
-no key step or frozen artifact exists. Exact cause is unknown, D6 Pending,
-YT-096 In progress and YT-020 Blocked. Owner-requested local diagnostics add only
-fixed stages/error classes and safe HTTP status, preserving all checks and
-permissions; three new focused tests pass. Independent Reviewer PASS0 accepts
-this bounded local change; new-change Commit/Push remain Pending. No hosted retry,
-signing or publication is authorized.
-The dated checkpoints below retain their original historical scopes.
-
-**YT-096 pre-hosted correction (2026-10-28):** The owner batch merges PR15 and
-selects S `d2562e1`; the approved new Environment/Secret setup is complete, old
-verifier unchanged. [Actual-input inspection](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#pre-hosted-real-layout-correction--2026-10-28)
-finds duplicate OpenSSL log/result labels before hosted execution. The minimum
-local fix preserves both origins under explicit extra labels; focused regression
-FAIL-to-PASS retained. A 53-record existing-evidence selection preserves original
-scopes and unavailable/denied transfer limits. Independent followup review PASS0
-with unavailable-runtime-trace limitation; source delivery Pending; zero hosted attempts used, D6 Pending, YT-096 In progress,
-YT-020 Blocked, no official signing or publication.
-
-**YT-096 local signer integration (2026-10-28):** Prior five-document checkpoint
-is committed as `765757d` after strict/builtin/native-hook PASS, not Pushed. The
-[local implementation](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)
-adds closed manual prepare/sign modes, isolated encrypted evidence handling,
-exact S/C/payload/Environment/OIDC boundaries and no publication permissions.
-New Cosign3.1.4/TUF and local synthetic supplied-statement proof PASS; targeted
-new integration tests pass (13 unique cases). Independent Reviewer PASS0; native
-role/model/effort trace unavailable, retained as an ordinary review limitation. No real supplementary
-evidence upload, Environment/Secret setup, hosted prepare, signing or publication;
-new integration uncommitted, D6 Pending, YT-096 In progress, YT-020 Blocked.
-
-**Alpha signing inputs and Release draft (2026-10-28):** The owner accepts local
-preparation and requests a Release. The [current signer contract](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#d6-completion-and-the-github-draft-boundary)
-records actual alpha build source/run identities, fixed original public provenance
-bytes/SHA and Pending complete private-manifest/S/tool/setup/execution gates.
-Unpublished Draft pre-release `426670086` uses existing `v0.9.0-alpha.1`/C,
-with no uploaded assets. No signing, publication, hosted run, private-key access,
-Commit or Push; D6 Pending, YT-096 In progress, YT-020 Blocked.
-
-**Unsigned alpha build/readback and retention completed (2026-10-28):**
-The owner-selected `C_release_alpha` remains
-`bf3363801132f4481263ceb411d9bba3349df86d`, tree
-`c4ee13aa558489ba3962874dbf5e0a0a1bc99605`, for sixteen Experimental
-`0.9.0-alpha.1` libraries. Local tracking commit `b271af0` is not Pushed.
-The [actual alpha execution record](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints)
-binds immutable unsigned `v0.9.0-alpha.1` to successful
-[build 40669449040](https://github.com/bohewu/yetlet/actions/runs/40669449040)
-and [protected verifier 40688772221](https://github.com/bohewu/yetlet/actions/runs/40688772221),
-each attempt 1. Actual owner Environment approval, isolated decryption/full
-private manifest and cleanup PASS. Independent local public checksum/16-package
-subject/source/receipt correspondence PASS; repository-external owner-host
-retention indexes 57 files, 130,178,085 bytes, flushed and reread successfully.
-No automatic expiry is configured; offsite/replication and indefinite host
-availability are not verified. No accepted qualification or hosted run is replayed.
-Original branches/history, `v0.1.0`, custody/failures and the retired old binding
-remain intact. The alpha Guard binding remains used; later ordinary Push needs
-explicit retirement. Exact signing-payload hashes, signer S and D6 remain
-Pending. No signing or publication occurs; YT-096 In progress, YT-020 Blocked.
-
-**Status:** Evidence-gated prototype roadmap; developer entry/status refresh 2026-10-12. Historical qualification dates and source identities remain unchanged.
-
-**YT-096 signer contract amendment (2026-10-28):** The owner selects a separate,
-fixed-SHA [signer workflow](RELEASE-SUPPLY-CHAIN.md#two-payloads-complete-assembly-and-independent-verification), with the D1/D3 amendment
-and [ADR 0009](adr/0009-release-build-and-signer-identities.md). Preserve existing
-build `C_release`, product tag and output bytes; signer `S` remains a separate
-future reviewed source. Two payloads are the original provenance and a frozen,
-complete private evidence manifest. The contract specifies no-OIDC preparation,
-explicit scope/digest acquisition and D6-gated signing with distinct identities.
-Implementation, exact `S`, final manifest SHA and isolated Environment/key setup
-remain Pending. This is documentation only; D6 Pending, YT-096 In progress and
-YT-020 Blocked, with original failures and accepted evidence preserved.
-
-**Historical YT-096 0.1.0 checkpoint (2026-10-28, Asia/Taipei):** The
-[actual hosted build/verifier/custody record](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints) binds
-owner-selected `C_release` `3eacfe3` and unsigned `v0.1.0` to build
-`40628943583`/attempt1 and protected verifier `40631789238`/attempt1, both PASS.
-Decryption, inventory/full private manifest and independent local public18
-checksums/receipt/source bindings passed; repository-external owner-host retention
-is recorded without automatic expiry. This is bounded unsigned preparation and
-custody evidence, without an offsite/replication or release-identity claim.
-D6 Pending, YT-096 In progress, YT-020 Blocked and YT-206 Done remain unchanged.
-Original failures and prior dated reviews are retained; the checkpoints below
-keep their historical scopes. No accepted execution/qualification was replayed.
-
-**Historical YT-096 local rotation slice (2026-10-28):** The [contract](QUALIFICATION-MATRIX.md#custody-and-local-rotation-evidence--2026-10-27-and-28)
-selects thin manual public-key preparation and an actual LOCAL synthetic test-key
-custody drill from custody commit `4793620`. Implementation delivered; local drill
-PASS with nine focused tests, two offline builds and 25 real commands; independent
-Reviewer acceptance PASS (zero issues and required followups). First extraction failure/one material repair retained;
-new rotation changes remain uncommitted. No owner
-key/GitHub Secret recovery or hosted execution is claimed. D6 Pending, YT-096
-In progress and YT-020 Blocked remain unchanged.
-
-**Historical YT-096 CI planning (2026-10-27):** The [integration plan](RELEASING.md#existing-workflow-map-and-limits)
-proposes separate PR, release-build/evidence and approved signing/publication lanes;
-feature/codex → PR → actual `master` initially, with `dev` optional. Documentation
-review is Pending; no workflow/settings change or release execution follows.
-D1–D6 Pending, YT-096 In progress, YT-020 Blocked and YT-206 Done remain unchanged.
+**M26 authoring and tooling outcomes.** Typed View builders (YT-234/235) first
+shipped in SDK alpha.7 with 101 constructors, selected setters and compile-time
+void-child guards over the owned View tree. CLI 0.3.0 first shipped private
+application Style generation (YT-237–241) with explicit module registration,
+deterministic external CSS and default-CSP delivery. Ordinary CSS, optional
+Tailwind/Vite and the native-first checkout Style Showcase retain their own
+scope. The SDK resolver (YT-247) separates CLI build SDK/snapshot/template
+identity from each generated app's exact registry pins, locks and receipt.
+CLI 0.3.1 adopted `sdk-latest-v2`, maximum non-yanked SemVer including
+prereleases, followed by selected-version checks without fallback. Cargo owns
+toolchain/dependency feasibility. CLI 0.4.0 adds the startup scaffolds above.
+[View guide](VIEW-COMPONENTS.md#typed-tag-builders) ·
+[Style workflow](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree) ·
+[Style registration](CLI-CONTRACT.md#application-owned-rust-style-registration-and-css-publication) ·
+[Resolver contract](CLI-GUIDE.md#sdk-resolution-yt-247) ·
+[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md).
+
+**Dated qualification and navigation outcomes (2026-11-07–12).** YT-242's
+516-file role inventory inspected 54 entries semantically. Its initial P2 and
+YT-243's Windows OpenSSL prerequisite finding were corrected before independent
+acceptance. Linux Chrome/Firefox, local MSVC/Wasm, exact package consumers and
+generated native Style HTTP/CSS retain separate source bounds. The corrected
+CI setup passed seven Style tests locally, with hosted image/CI execution still
+separate. YT-244–246 distinguish source-only API/package audit, alpha.7
+preparation, accepted distribution and Reader authorities. YT-248's original
+publisher preflight FAIL precedes its separately accepted registry/Style
+consumer PASS. YT-250 preserves both CLI 0.3.1 candidates, Windows Browser Style
+shutdown correction and the replacement's fresh hosted/signing/consumer proof.
+YT-249's edition rollover requires reviewed README/Pages follow-through after
+each verified publication. Development versions do not advance the Reader.
+[Backlog acceptance](BACKLOG.md#yt-237yt-250--style-delivery-sdk-resolution-and-release-preparation) ·
+[Style source qualification](QUALIFICATION-MATRIX.md#historical-two-package-migration-and-style-source-qualification) ·
+[CLI 0.3.0 publication](CLI-030-HOSTED-RECORD.md) ·
+[CLI 0.3.1 preparation](CLI-031-RELEASE-PREPARATION.md) ·
+[CLI 0.3.1 publication](CLI-031-HOSTED-RECORD.md) ·
+[Reader rollover](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence).
+
+**Repository and reader milestones (2026-10-31–11-07).** YT-236 is Done at
+local source/static CodeQL concurrency scope. Four language scans and
+protected-master/weekly/manual analysis remain, same-PR supersession is scoped,
+and Rust overlay caching remains unsupported. Hosted cancellation behavior
+was unverified at acceptance. YT-233's separate cache/evidence layout, nine
+GNU/Windows focused cases and scoped inventories retain their Windows path
+failure, unavailable role trace and lost/not_started listing. Later explicitly
+authorized compiler-internals cleanup observed +53.20 GiB and preserved
+retained sources/evidence. The remote full-result readback timeout remains.
+YT-231 corrected the SQLite race test to admit the existing finite Busy503,
+prove one committed item/history and strict post-commit stale409, preserving
+250ms/worker/runtime/security bounds. YT-230 added manifest-derived release-doc
+gates, preserved its first boundary/history failure and rejected the historical
+CLI020 README at its actual scope. These Done results retain independent review.
+[CodeQL evidence](CODEQL-CI-PERFORMANCE.md#historical-codeql-pr-concurrency-and-rust-analysis-evidence) ·
+[Development artifacts](DEV-ARTIFACTS.md) ·
+[SQLite correction](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) ·
+[Release-document gate](RELEASING.md#release-documentation-gate).
+
+YT-217's local eight-chapter preview retained two sidebar assertion failures,
+then passed the owner-authorized eight-URL/four-fragment correction and local
+navigation/search/touch/screenshots. YT-218 separately delivered PR43/master
+`64d1074` and first Pages deployment `41198529190/1`, actual public bytes and
+hosted reader acceptance. Settings/harness404 observations remain historical.
+YT-232's later alpha.6/CLI0.2 edition passed eleven affected checks and local
+native/Wasm/static sources before PR54/master `993ce56` and first-attempt
+Pages delivery. Its fifteen HTTPS files/219 links and final four-language
+CodeQL PASS retain the original browser-unavailable boundary. YT-226's later
+Yetlet-built cutover and current edition have separate records.
+[Reader milestones](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence) ·
+[First Pages delivery](GITHUB-PAGES-PUBLICATION.md#completed-delivery-and-first-publication--2026-10-31) ·
+[Public reader boundaries](RELEASE-READINESS.md#public-reader-acceptance-boundaries).
+
+**Historical release milestones (2026-10-29–11-02).** The dated gates in this
+table belong to their original source and checkpoint. Current distribution is
+SDK alpha.8 / CLI 0.4.0, established by the accepted records above. Formal item
+states and substantive acceptance remain in [Backlog](BACKLOG.md).
+
+| Dated milestone | State, boundary and canonical proof |
+|---|---|
+| 2026-11-01–02, YT-227–229 | Planning selected SDK alpha.6 before independent CLI0.2, retained exact SDK binding and Reader hold, and deferred OIDC Trusted Publishing. SDK Cc7e6372/SVP6531001 verified two subjects/all 44 private entries before owner-approved41308935654/1 published six public files/both registry packages and passed a fresh locked consumer. CLI C7fb963a/SVP86e5da2 verified one subject/all 54 entries before 41319625709/1 published five files/exact archive and passed install/version/help/new. Original failures and preparation-only Pending gates remain in the [SDK record](ALPHA6-RELEASE-PREPARATION.md) and [CLI record](CLI-020-RELEASE-PREPARATION.md) |
+| 2026-10-31, YT-214–216 | Source-installed CLI implementation/package/first-app proof preceded actual publication. CLI0.1.0 uploaded and installed but failed its stale version label before help/new. Wrong SDK-ref custody receipts remain rejected. Separate CLI0.1.1 Cae5dd4c/SVP1207ba5 passed actual install/version/help/scaffold, preserving the first master SQLite FAIL and authorized failed-Stable-only retry. No release-stage retry or SDK change. [First CLI releases](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures) |
+| 2026-10-30–31, YT-210–213 and alpha.5 | Four-module one-package feasibility passed normal archive/native/Wasm/target-isolation proof before the explicit two-package selection. Initial contract/final test-guide P2s remain corrected historical findings. PR30 R0f0c84a qualified native/Wasm/MSVC/DOM/inventory, with matching GNU/MSVC archives and consumer lock. Windows xtask POSIX E0277 was resolved separately by YT-213 GNU24/MSVC13 tests, explicit pre-effect platform rejection and retained warning. Hosted alpha.5 selected distinct C0a9fa8a/SV864f2ab/Pbb414d1, owner-approved41104391525/1 and actual registry consumer. Obsolete actions crate deletion/PR29 closure and branch-recovery bundle retain their own scope. [Migration](COMPATIBILITY.md#two-package-feature-and-target-contract), [qualification/failures](ALPHA5-RELEASE-PLAN.md#actual-qualification-results--yt-212), [publication](ALPHA5-HOSTED-RECORD.md#completed-publication-and-subsequent-cleanup) |
+| 2026-10-30, alpha.4 / YT-020 | Sixteen-version preflight retained third-party bytes. Prepare/sign/V passed at S/V6ed70c3, while the first publisher failed GitHub staging. Later GitHub twenty-file publication and only the first registry write succeeded before an incorrect success-response assumption stopped the job. Remaining fifteen/consumer were unexecuted. An owner-selected eleven-minute-before-each-PUT/210-minute continuation with live authority checks stayed separately gated and was later paused for consolidation. Account quota was unproven. [Preflight](ALPHA4-VERSION-PREFLIGHT.md), [immutable outcome](ALPHA4-HOSTED-RECORD.md#actual-public-release-and-one-package-registry-outcome), [continuation contract](RELEASE-PUBLICATION.md#registry-only-continuation-contract--2026-10-30) |
+| 2026-10-30, first-name registry bootstrap | Config/Secrets normal publish dry-runs retained offline/rustup failures and changed packaged-lock checksums, requiring new artifact identities. The adopted contract moved the Settings example to Config, removed the reverse development edge and required all-kind ordering/frozen exact-byte promotion. Sixteen offline envelopes and prototype checks established local feasibility only. Absent-name GETs/existing login did not prove claimability or rights. Original plan/receipt P2 and Guard refusal remain historical. [Dependency evidence](RELEASE-PUBLICATION.md#dated-local-evidence-and-remaining-provenance), [artifact contract](RELEASE-PUBLICATION.md#first-registry-publication-and-immutable-artifact-contract) |
+| 2026-10-29–30, alpha.3 | Used-binding retirement, sixteen normal packages/external consumer/nineteen roots/four version cases passed. Optional synthetic readback remained unverified after a recipient-pin harness mismatch. C557ab76/SV30baf25 later completed build/custody,16 subjects/all 112 entries and exact20 public files. Original Python upload failure remained, with approved gh-api recovery and no registry claim. [Recovery](ALPHA3-VERSION-PREFLIGHT.md), [hosted/signing/publication](ALPHA3-HOSTED-RECORD.md) |
+| 2026-10-29, alpha.2 | Local sixteen-package/toolchain/lock preflight passed. PR22 Stable then failed the stale-alpha.1 synthetic rebuild fixture while MSRV passed; focused source-derived fixture correction and independent repair passed, with required delivery/CI still gating Merge. Distinct Caf7bbe5/tag/build40895514392/1 passed packaging but failed custody for alpha.1 receipt fields, with no decrypt/verifier/sign/publication. Local three-check correction could not qualify that output. [Migrated preflight/gates](RELEASING.md#historical-alpha2-version-package-and-release-gates--2026-10-29), [original failure/correction](QUALIFICATION-MATRIX.md#subsequent-pr22-integration-failure-and-local-correction), [immutable hosted failure](ALPHA2-HOSTED-RECORD.md) |
+| 2026-10-29, YT-208/209 | Maintainer SOP preceded versioned data-only records, protected no-OIDC V and closed public staging. Thirty focused checks and independent review accepted local implementation. PR20 importlib-consumer CI FAIL preceded reviewed compatibility repair, same-tree squash7de77c8 and CI40873628263/40875245510 PASS. Owner setup of result Environment25684187945 and AGE_IDENTITY passed, with positive hosted qualification Pending then and later alpha.3 V accepted separately. [Record contract](RELEASING.md#versioned-record-and-receipt-contract), [integration failure](CI-SECURITY-REVIEW.md#versioned-release-automation-integration-history) |
+| 2026-10-28–29, alpha.1 D6 | Distinct Cbf33638/Sd65e318, unsigned build40669449040/1/verifier40688772221/1, successful prepare40806988578/1 and sign40811275645/1 bind both frozen payloads,16 subjects/all 117 entries. One spent owner-local custody exception, exact-output acceptance and independent review closed D6/YT-096. Separate approval published20 Experimental GitHub files with no registry upload. Earlier prepare40717870186 preflight,40789535074 HTTP403 and40795794183 Go-cache-cleanup FAILs remain ineligible. [Exact frozen/signed identities and acceptance](RELEASE-READINESS.md#alpha1-frozen-inputs-signatures-and-acceptance--2026-10-29) |
+| 2026-10-27–28, original unsigned/custody work | Earlier C3eacfe3/v0.1.0 build40628943583/verifier40631789238 and owner-local51-file retention stayed distinct from alpha.1's57-file retention. No offsite/indefinite availability followed. The LOCAL synthetic-key rotation drill from4793620 passed nine cases/two builds/25 commands after an extraction failure. CI-lane planning and the separate signer D1/D3 amendment retained Pending implementation/S/manifest/D6 gates at their dates. [Hosted history](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints), [rotation](QUALIFICATION-MATRIX.md#custody-and-local-rotation-evidence--2026-10-27-and-28), [ADR 0009](adr/0009-release-build-and-signer-identities.md) |
+
+The complete dated M26 chronology, exact intermediate Git/CI/source-freeze
+identities, reviewer scopes and original failed attempts remain at local Git
+`8d6fad7e95ee25849872b974f922d10c71b70a95`. Raw logs/signatures/custody stay at
+their original ignored/external locations. Local object recovery establishes
+neither remote GitHub reachability nor continued raw-evidence availability.
+[Original M26 chronology](https://github.com/bohewu/yetlet/blob/8d6fad7e95ee25849872b974f922d10c71b70a95/docs/ROADMAP.md#m26--application-startup--sample-experience).
 
 Milestones are sequenced by capability and dependencies rather than invented delivery dates. The [MVP specification](MVP.md) provides acceptance criteria. Each gate must retain real commands, results, and relevant architectural decisions.
 
@@ -1678,163 +1024,39 @@ In progress with D1–D6 Pending, and YT-020 Blocked remain unchanged.
 
 ## M23 — Production deployment profile contracts
 
-[YT-132 contract planning](PRODUCTION-DEPLOYMENT-PROFILES.md) remains Done at its
-historical documentation-only scope after independent Reviewer PASS, zero
-issues and required followups. Its one-process/one-host and N-replica categories
-retain the same-host/cross-host distinction and all source-bound evidence limits.
-[YT-133](../examples/production-starter/README.md#single-instance-reference-and-schema-recovery-boundaries) retains historical base-contract
-and private operator selection Reviewer PASS. The later user-approved
-framework/responsibility correction and reference implementation have a separate
-**independent Reviewer PASS**, zero issues and required followups; earlier PASS
-retains its original scope.
+M23 delivers optional framework capabilities, application/reference integrations,
+developer guidance and bounded source/fixture proof. YT-132's independently
+reviewed deployment-profile contract remains Done at documentation scope.
+YT-133 is Done after separate base-contract/operator-selection and corrected
+framework/responsibility reviews, minimal implementation, isolated integration
+and cleanup. Its Linux/systemd/native-release, SSH/loopback Nginx/SQLite stack
+is an optional private single-instance development reference. Numeric fixture
+parameters are reproducibility choices. A production Profile is a consumer
+evidence record. Consumer host/accounts/keys/service users/secrets, on-call,
+SLO/RPO/RTO/retention/alerts, IdP/infra rollout and production qualification
+remain consumer decisions. Security, CSRF/Auth/secret isolation, honest source
+limits, unknown-write handling and stop/drain-before-migration remain required.
+[Deployment profiles](PRODUCTION-DEPLOYMENT-PROFILES.md) ·
+[Starter reference](../examples/production-starter/README.md#single-instance-reference-and-schema-recovery-boundaries) ·
+[Formal M23 acceptance/dependencies](BACKLOG.md#m23--production-deployment-profile-contracts-planning).
 
-M23 now describes optional framework capabilities, reusable app/reference
-integrations, developer documentation and bounded source/fixture verification.
-YT-133 is **Done** at the scope of a minimal private single-instance development
-reference using Linux/systemd/native release, SSH/loopback Nginx and local
-SQLite. This is one possible stack, not required Yetlet infrastructure or current
-host production adoption. The minimal reference and isolated integration checks
-with cleanup are complete; independent Reviewer
-`/root/yt133_optional_reference_review_20261023` returned PASS with zero issues
-and required followups, all eight input hashes matched. Numeric
-host/probe/transport/stop parameters are reference
-validation choices, not framework defaults, measured capacity or promises.
+| Accepted dated scope, 2026-10-23 | Outcome and surviving gate/limit |
+|---|---|
+| YT-134 local release/schema-2/ext4 |23,549 requests; paced1/2/4-worker points passed, Step8/readiness503 failed; exact acknowledged writes reconciled. Separate ephemeral Azure workload/reboot/readback/cleanup and independent review preserved failed cloud points and probe/clock limits. Fixture capacity establishes no universal req/s or consumer SLO. [Distinct cohorts](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts) |
+| YT-135 recovery | Three-row snapshot restore, explicit two-acknowledgment loss, missing-index refusal and four-row forward-restart readback passed; rows/index/sequence/unknown-outcome/forward-fix rules remain. [Current-schema recovery](PRODUCTION-READINESS-PHASE2.md#current-schema-recovery-and-starter-ownership) |
+| YT-136 telemetry | Enabled/stopped/disabled collection, last-good preservation, safe correlated log projection and oversize refusal passed with cleanup/independent acceptance. Collector, sink, alert and retention operation remain optional. [Original collection proof](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-136-TELEMETRY-COLLECTION.md) |
+| YT-137/138 research | Starter/Board retain manual uncertain-write reconciliation and no automatic retry; Shop retains its existing order deduplication scope. Future replay identity/authorization/atomic effects/retention/restore remain app-owned. Accepted pre-SQL authorization race persists for actual Admin/Board saves until separately selected commit-time authority. Research Done selects no implementation. [Write outcomes](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-137-WRITE-OUTCOME-IDEMPOTENCY.md), [commit ordering](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md) |
+| YT-139/140 local authority and OIDC | Stale-Session restore/re-login, business/policy reconciliation and four Admin drains passed. Minimum origin integration and three new focused OIDC tests passed. New live proof used single-process Board listeners without successful token exchange or cross-process Admin OIDC. Accepted IdP/Valkey proof retains its original scope. [Authority/recovery](PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority), [proxy/replica contract](PROVIDER-OPERATIONS.md#oidc-cross-instance-origin-and-callback) |
+| YT-141 controlled arrival | Tool comparison and minimal k6 read-only reference passed 14,006 measured valid200 plus501 warmup, p50/p95 1/2ms, p99 2–4ms, six phase bounds/no drops/errors;20 rows/schema/index/sequence reconciled with native stop/cleanup. No saturation maximum. [Cohort](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts) |
+| YT-142 saturation/recovery | First1,000/s point FAILED with 5 SQL-admission503 among 10,001 requests, app CPU49.49%, no generator drops/throttling.250/s recovery passed 7,501 valid200,30 healthy bins, first0–1s healthy and ten-bin confirmation10.000s. Deliberate stop before 2,000/s leaves no sustained/CPU maximum or new matched passing bracket.20-row/schema/index/sequence equality and cleanup passed. [Original saturation/recovery](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-142-SATURATION-RECOVERY.md) |
 
-Consumer developers choose actual hosts, addresses/accounts/keys, production
-service users and secret sources, operators/on-call/data-loss authority,
-production SLO/RPO/RTO/retention/alerts, IdP/infra deployment and production
-qualification. These are nonblocking consumer guidance, not framework/reference
-Done criteria. Security, CSRF/Auth/secret isolation, honest resource/evidence
-limits, unknown-write outcomes and stop/drain-before-migration correctness remain
-required. A production Profile is a consumer evidence record, not a Loader
-environment, configuration key, CLI flag or runtime feature.
-
-[Backlog M23](BACKLOG.md#m23--production-deployment-profile-contracts-planning)
-now includes activated [YT-141 performance validation](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts),
-Done at bounded optional local reference scope after contract PASS, bounded new workload,
-owned cleanup and final independent Reviewer PASS, zero issues and required followups. The user has now
-activated [YT-140 OIDC proxy/replica integration](PROVIDER-OPERATIONS.md#oidc-cross-instance-origin-and-callback),
-Done at bounded optional local integration scope after initial contract review,
-minimum implementation, three new focused tests, cleanup and final independent
-Reviewer PASS, zero issues and required followups. The user has now
-activated [YT-139 multi-instance authority/recovery](PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority),
-Done at bounded optional local reference scope after independent contract
-review, new stale-Session restoration/re-login proof, cleanup and final
-independent Reviewer PASS, zero issues and required followups. The user has now
-activated [YT-138 authorization-to-commit ordering research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md),
-Done at source-bound research scope after independent Reviewer PASS, zero issues
-and required followups. YT-137 is now
-separately activated for [write-outcome/idempotency research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-137-WRITE-OUTCOME-IDEMPOTENCY.md),
-Done at source-bound research scope after independent Reviewer PASS, zero issues
-and required followups. The user has now
-activated [YT-136 bounded telemetry collection](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-136-TELEMETRY-COLLECTION.md),
-Done after new integration proof, cleanup and independent Reviewer PASS, zero
-issues and required followups. The user has activated
-[YT-135 current-schema recovery](PRODUCTION-READINESS-PHASE2.md#current-schema-recovery-and-starter-ownership), now Done
-after bounded release/schema-2 proof, cleanup and independent Reviewer PASS,
-zero issues and required followups. YT-134 is
-**Done at bounded optional reference scope** under the separately authorized [release/storage workload
-contract](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts), reusing the accepted release binary
-for isolated schema-2/ext4 measurements: 23,549 requests, passing paced
-1/2/4-worker points, retained Step 8 503/readiness FAIL, exact acknowledged-write
-reconciliation and cleanup complete; independent Reviewer
-`/root/yt134_release_storage_independent_review_20261023` PASS, zero issues and
-required followups, all six hashes matched. It offers
-an optional reproducible capacity reference and workload guidance; it does not qualify consumer hardware/SLO or replace B1 limits with
-universal req/s. YT-135 offers optional current-schema Starter backup/restore/
-upgrade procedures and disposable local proof, preserving rows/index/sequence,
-unknown-outcome and forward-fix rules without production DR commitments.
-YT-136 offers opt-in telemetry collection/logging guidance using YT-128, without
-mandatory collectors, on-call or retention/alert operation. YT-137 documents
-selected consumers' uncertain-write/retry and existing application idempotency
-contracts; YT-138 now researches application authorization-to-commit ordering
-and the existing pre-SQL race limit. Each is Done at its independently reviewed application-owned decision;
-any implementation requires separate authorization. YT-139 offers optional
-multi-instance authority/recovery integration using a concrete local consumer
-and topology fixture, reusing accepted Valkey bridges without mandating a
-database/HA/customer topology. YT-140 offers optional maintained-client OIDC
-proxy/replica guidance/reference, reusing source-bound IdP evidence without
-requiring customer's real IdP/TLS/domain deployment or repeating old proof.
-
-Dependencies retain repository acceptance order, with multi-instance authority
-prerequisites conditional on the selected fixture; none demands consumer
-production adoption. Reference evidence binds the exact app/binary/schema/data
-and fixture limits; Starter YT-129–YT-131 PASS does not qualify Admin or another
-consumer. Independent review remains necessary before each activated item is
-Done. No broader roadmap redesign, validation infrastructure, production
-activation, signing or release is selected.
-
-YT-134's bounded local release/storage reference is Done after independent
-review. The separately authorized [ephemeral Azure supplement](PRODUCTION-DEPLOYMENT-PROFILES.md#bounded-private-and-azure-operations)
-completed its workload, reconciliation, ordinary reboot/readback and full
-resource deletion, with separate independent Reviewer PASS, zero issues and
-required followups. Failed cloud points and probe/clock limits remain retained;
-local PASS keeps its own scope. YT-135 current-schema recovery guidance/reference
-is now Done at bounded optional reference scope after complete three-row snapshot
-restore, explicit two-acknowledgment loss accounting, missing-index refusal and
-four-row postrestore forward-restart readback; owned cleanup is complete and
-independent Reviewer PASS, zero issues and required followups, with six hashes
-matched. YT-136 is now Done after bounded enabled/stopped/disabled collection,
-last-good preservation, correlated log projection and oversize rejection; owned
-cleanup is complete with independent Reviewer PASS, zero issues and required
-followups; seven hashes matched. YT-137 is Done at source-bound
-write-outcome/idempotency research scope after independent Reviewer PASS, zero
-issues and required followups; six hashes matched. YT-138 is Done at
-source-bound authorization-to-commit ordering research scope after independent
-Reviewer PASS, zero issues and required followups; six hashes matched. Its
-accepted decision retains the YT-126 pre-SQL race for actual
-Admin/Board native/triage saves; future shared-authority ordering must distinguish
-revocation scope, in-flight work, commit/acknowledgment and recovery boundaries.
-YT-139 is Done at bounded optional local authority/recovery reference scope; independent
-contract review PASS, zero issues/required followups. New exact recovery test,
-full business/policy reconciliation, four Admin drains and owned cleanup are
-complete; final independent Reviewer PASS, zero issues/required followups; seven
-hashes matched. YT-140 is Done at bounded optional local OIDC proxy/replica
-integration, reusing accepted IdP and authority evidence; initial independent
-contract Reviewer PASS, zero issues/required followups; minimum origin integration,
-three new focused tests, static checks and owned cleanup complete. Final
-independent Reviewer PASS, zero issues/required followups; twelve hashes matched.
-New live proof is single-process Board listeners
-with no successful token exchange or cross-process Admin OIDC claim. [YT-141](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts) is Done after independent contract
-PASS and the minimal k6 reference/new controlled-arrival proof: 14,006 measured
-valid-200 responses plus 501 warmup, no drops/errors, p50/p95 1/2 ms and p99
-2–4 ms. All six phase bounds passed; no saturation maximum is established.
-Twenty rows/schema/index/sequence reconciled, native stop and cleanup complete;
-final independent Reviewer `/root/yt141_performance_final_review_20261023` returned
-PASS, zero issues/required followups; eight hashes matched. The accepted YT-137
-decision preserves Starter/Board no-automatic-retry behavior and manual unknown
-outcome reconciliation limits, plus modular-shop's existing SQLite order
-deduplication within its Session/cart/handler scope. Any future durable replay
-ledger requires application-owned identity, authorization, atomic business
-effects, retention and restore semantics; no implementation is selected here. Accepted YT-128/133
-evidence was reused; only the new collection/failure/staleness integration was
-verified. Sink/alert/retention choices remain
-optional consumer guidance, without a mandatory collector or runtime change.
-The user has now separately activated [YT-142 saturation and recovery](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-142-SATURATION-RECOVERY.md),
-Done at bounded optional observation scope after initial contract PASS, new
-load/recovery/cleanup and final independent Reviewer PASS, zero issues and
-required followups; eight hashes matched. The first 1,000/s load point failed with five
-SQL-admission 503 responses among 10,001 requests (~0.05%); app inner-load CPU
-49.49%, no client drops/throttling. The 250/s recovery completed 7,501 valid HTTP 200 responsess;
-all 30 bins healthy, first 0–1 s healthy and ten-bin confirmation at 10.000 s. Stop
-before 2,000/s and higher was deliberate; no CPU/sustained maximum or new matched passing
-bracket is established. Full 20-row/schema/index/sequence equality and owned
-cleanup are complete. Preserve YT-141 baseline acceptance and
-all historical failures; distinguish application saturation from generator or
-resource caps. No unchanged passing proof, product tuning or cloud execution
-is selected.
-The user separately requested future performance validation, registered as
-[YT-141](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts), now explicitly activated. Tool selection
-compares community HTTP benchmark/load tools with a minimal
-application-specific driver for a new controlled-arrival read-only API question. Preserve reproducible
-workloads, offered-versus-achieved load, all/successful latency, rejection/error
-and resource populations, exact writes and cleanup. The new bounded local workload has independent contract PASS, minimum
-reproducible proof, cleanup and final independent Reviewer PASS, zero issues/required followups;
-no consumer SLO/CI gate or repeat of accepted YT-134 proof follows.
-YT-133's bounded reference is accepted after
-independent review and completed focused proof/cleanup. Existing local PASS/FAIL, M21/M22
-scopes, YT-103 asset proof, immutable M20 candidate `ce56e08`/original nine,
-YT-096 In progress with D1–D6 Pending and YT-020 Blocked remain unchanged.
+Each accepted item retained independent contract/final review as applicable,
+owned cleanup and source/app/binary/schema/data bindings. Conditional authority
+prerequisites preserve acceptance order. Starter YT-129–131 proof does not
+qualify Admin, another consumer or production. Exact test/reviewer/hash scopes
+remain in the formal rows and the locally verified
+[original M23 history](https://github.com/bohewu/yetlet/blob/8d6fad7e95ee25849872b974f922d10c71b70a95/docs/ROADMAP.md#m23--production-deployment-profile-contracts).
+Remote reachability and ignored/external evidence availability are unverified.
 
 **Historical native/SSR/capacity qualification (YT-143–174):** Done only at
 each dated and independently reviewed local comparison/attribution scope.
@@ -1883,221 +1105,77 @@ YT-180 records the [example HTTP admission capacity selection guide](../examples
 
 ### Post-benchmark application follow-ups — YT-181–YT-184
 
-The maintainer requests the [follow-up evaluation and schedule](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-181-184-APPLICATION-FOLLOWUPS.md)
-after closing the benchmark phase through YT-180. At registration all new items were **Todo**; the later YT-181 contract stage is
-tracked below. YT-181 selects a contract-first opt-in commit-time authorization reference for
-one real Admin write/revoke scope; YT-182 selects optional native tracing/worker
-propagation composition; YT-183 selects a useful non-authoritative cache consumer
-before conditional implementation; YT-184 selects a bounded secure private Azure
-cross-host authority/persistent-restart reference. Audit remains application-owned
-and public output cache remains consumer-gated/deferred, not missing mandatory
-framework packages. No implementation, tests, cloud allocation, benchmark replay,
-universal default, mandatory infrastructure or HA claim is activated by this
-planning update. Independent Reviewer acceptance is required before each new
-item is Done. YT-096/YT-020 release gates and no Commit/Push remain unchanged.
+The maintainer selected YT-181–184 after the benchmark phase through YT-180.
+Registration was Todo, followed by separately reviewed contracts,
+implementation/new focused proof and final independent acceptance. All four are
+now Done at their bounded application-reference scopes. Audit remains
+application-owned and public output cache remains consumer-gated/deferred.
+[Original evaluation and schedule](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-181-184-APPLICATION-FOLLOWUPS.md).
 
+- **YT-181 commit-time authorization.** Default-off Board/Admin opt-in selects
+  a fresh v2 SQL reference, private Store-bound old-generation tickets and
+  same-IMMEDIATE-transaction item/history/revoke order. Trusted revoke/re-enable
+  advances generations. Existing-v2 open denies until trusted re-enable;
+  restored allow and auto-migration are refused. Six new Board cases plus one
+  Admin setting case in two feature conditions passed. Contract and final
+  implementation reviews passed with 19 source/41 evidence/12 retained bindings.
+  Native middleware/domain composition, Session/file-policy race, bounded
+  workers and unknown-outcome/no-blind-retry semantics persist.
+  [Authority contract](PROVIDER-OPERATIONS.md#commit-time-authority-and-revocation).
+- **YT-182 tracing/worker composition.** Default-off Board/Admin safe
+  server-generated RequestId correlation uses scoped Dispatch during HTTP
+  future destruction and blocking work, separating response return, drop and
+  worker completion. Five new Board cases plus an Admin case in two feature
+  conditions yielded seven successful executions after retained compile/drop
+  failures. Final independent review verified 21 implementation/81 evidence/
+  15 retained bindings. Allowlisted namespace-filtered JSON remains app-owned;
+  durable audit, body/remote propagation, exporter/framework extraction and
+  performance qualification were excluded.
+  [Tracing contract](PROVIDER-OPERATIONS.md#request-tracing-and-owned-worker-spans).
+- **YT-183 display cache.** Default-off Shop Moka projection reuse preserves
+  two-second source-age, bounded retention/fill wait, late-fill-safe local
+  generation invalidation and cancellation/oversize/failure handling. Cart,
+  Session/CSRF/order identity and checkout price/stock SQL remain authoritative.
+  Nine new executions, strict Clippy/fmt/docs/default isolation and independent
+  review passed 20 file/41 evidence/16 retained bindings after the retained offline
+  dependency failure. Distributed coherence, latency/throughput and framework
+  cache promotion remain unqualified.
+  [Shop reference](../examples/modular-shop/README.md#optional-catalog-display-cache--yt-183).
+- **YT-184 cross-host/persistent restart.** The optional two-VM SQL/Valkey TLS
+  reference used canonical private HTTPS/Secure Session cookies, one authority
+  disk and fresh-epoch re-login. Each authorized generation had90 minutes with
+  20 reserved for cleanup and a cumulative US$5 ceiling. The original SKU CLI
+  timeout preceded same-SKU REST admission. G1 bootstrap failed on two Path
+  expressions. G2 reached READY/eight SQL backends and wrong-name TLS refusals,
+  then failed the inet netmask observer before raw-row persistence. G3 passed
+  eight encrypted SQL connections/four per peer and HTTPS wrong-name refusal,
+  then failed the first Auth form without raw HTTP status/body. Source/ACL
+  simulation found missing TIME permission. Failed local app-identity probes
+  remained invalid diagnostics and stopped that harness path. A separately
+  reviewed local named-app/password-AUTH test proved +time-only create/read/
+  CSRF/rotate/revoke with namespace/admin denials, preserving the compile
+  failure and TCP/oneshot-only scope. G4 passed cross-host Auth/fullJSONSSR/
+  tenant/current-policy/logout/app-restart, then failed the first expected200
+  after fixed2s Valkey restart while both offline503 remained. One local AOF
+  case retained 503 at 2s then200 after 107.495/110.289ms additional observation,
+  leading to bounded5s/100ms read-only readiness capture. G5 reused G4 Auth and
+  completed authority outage/recovery and same-VM/disk restart with nativeexit0,
+  retained transient503, full unchanged SQL/current restrictive policy and
+  persisted unexpired old-Session refusal under a fresh epoch, followed by
+  policy-respecting login/JSONSSR/logout. G1–5 cleanup passed 440.35/493.61/
+  469.97/467.05/512.50s respectively, all groups/credentials gone. Local
+  named-app and AOF cleanups took1.034/3.882s. Independent final review
+  `/root/yt184_cross_host_final_results_review_20261025` PASS0 verified 17 source/
+  83 evidence/eight runtime-config-lock bindings and accepted composed G4/G5
+  proof. No sixth allocation was authorized. Arbitrary restore, production/HA
+  and release qualification remain outside this accepted reference.
+  [Topology, failures and accepted results](PRODUCTION-DEPLOYMENT-PROFILES.md#historical-shared-authority-and-azure-persistence-qualification).
 
-YT-181 now activates only its [minimal sensitive-write contract](PROVIDER-OPERATIONS.md#commit-time-authority-and-revocation),
-In progress: selected SQL-owned local-account/project write revoke, private
-old-generation ticket and the shared IMMEDIATE item/history/revoke transaction
-order. Preserve native middleware/domain composition without generic AOP,
-Session/file-policy limitations, bounded workers, unknown outcomes and no blind
-retry. Optional v2 reference/legacy exclusion and restore refusal remain future
-implementation obligations, not executed proof. Independent contract Reviewer
-/root/yt181_sensitive_write_contract_review_20261025 PASS, zero issues/followups;
-5document/13evidence/17source hashes stable and new docs/whitespace PASS. YT-181
-cannot be Done before later implementation/new focused evidence/
-independent review. YT-182–184 remain Todo; no benchmark replay, runtime/cloud
-change or new-change Commit/Push.
-
-
-The separately authorized [YT-181 opt-in implementation](PROVIDER-OPERATIONS.md#commit-time-authority-and-revocation)
-is Done at bounded application-reference scope after independent Reviewer
-/root/yt181_commit_write_auth_implementation_review_20261025 PASS, zero issues/
-followups;19files/41evidence/12retained hashes stable, strict Clippy/fmt/docs PASS. Default-off app
-feature plus Admin Settings selects a fresh v2 reference, private Store-bound
-generation tickets and same-transaction item/history enforcement; trusted SQL
-revoke/re-enable advances generations. Existing v2 open conservatively denies
-before trusted re-enable; no auto-migration or restored allow. Six new Board
-cases and one new Admin setting case in two feature conditions pass, with old
-tests filtered and benchmark/provider proof retained without replay. Session/
-file-policy race, worker/security bounds and no generic AOP remain. No new-change
-Commit/Push or YT-182–184 activation.
-
-
-YT-182 activates the [opt-in request tracing/worker contract](PROVIDER-OPERATIONS.md#request-tracing-and-owned-worker-spans),
-In progress. Select Board/Admin as one consumer and preserve Starter evidence;
-explicit feature/Settings, native middleware and server-generated RequestIds,
-allowlisted safe root/worker spans with scoped Dispatch, distinct Response-return/
-future-drop/worker completion and application-owned namespace-filtered JSON
-output. No generic AOP/crate/exporter, body instrumentation or old-proof replay.
-Contract Reviewer precedes minimal integration; final independent Reviewer and
-new focused proof precede Done. YT-181 Done and YT-183/184 Todo remain; no new-
-change Commit/Push or release expansion.
-
-
-YT-182 contract Reviewer `/root/yt182_safe_tracing_contract_review_20261025`
-returns PASS, zero issues/followups. The [application integration/new proof](PROVIDER-OPERATIONS.md#request-tracing-and-owned-worker-spans)
-is In progress pending independent implementation acceptance: five new Board
-cases and the new Admin setting case in two feature conditions have seven
-successful executions, with old cases filtered; original compile/future-drop
-failures and smallest corrections remain recorded. Native scoped Dispatch is
-retained for HTTP future destruction as well as blocking workers. Strict Clippy
-and default normal dependency isolation pass; no new generic AOP/crate, old
-proof replay, cloud allocation or new-change Commit/Push.
-
-
-YT-182 is now Done at that bounded application-reference scope: independent
-implementation Reviewer `/root/yt182_safe_tracing_implementation_review_20261025`
-PASS, zero issues/required followups, all 21 implementation/81 evidence/15 retained
-hashes and Git baseline stable. Scope remains default-off Board/Admin native
-middleware, safe scoped request/worker correlation and distinct lifecycle facts;
-no durable audit, body/remote propagation, performance qualification or framework
-tracing extraction. Seven successful new test executions and original failures
-are retained without old-proof replay. Only acceptance/status documentation is
-updated after review; runtime/test/dependency bytes stay reviewed. YT-183/184
-remain Todo, release gates unchanged; no new-change Commit/Push.
-
-
-YT-183 now selects the [Shop catalog/cart display contract](../examples/modular-shop/README.md#optional-catalog-display-cache--yt-183),
-In progress before minimum integration: default-off application Moka cache,
-two-second source-age bound, bounded retained projection/fill wait and local
-commit-generation invalidation safe against late old fills. Cart mutations,
-Session/CSRF, order ownership/idempotency and transactional price/stock remain
-authoritative; Board/SSE and Starter are unchanged. New focused reuse evidence
-is selected without prior benchmark/test replay. Independent acceptance precedes
-Done; YT-184 remains Todo, no new-change Commit/Push.
-
-
-YT-183 is now Done at its [bounded application-reference scope](../examples/modular-shop/README.md#optional-catalog-display-cache--yt-183):
-independent Reviewer `/root/yt183_catalog_cache_independent_review_20261025` PASS,
-zero issues/required followups; 20 file/41 evidence/16 retained bindings and Git
-baseline stable. Nine new test executions, strict Clippy/fmt/docs/default-graph
-checks PASS; old cases filtered, initial missing-offline-dependency result kept.
-Shop display reuse leaves Session/CSRF/checkout SQL authoritative; source-age/
-local generation/cancellation/oversize/failure limits stay explicit. No latency,
-throughput, distributed coherence, framework cache or production qualification.
-Only acceptance/status docs change after review; runtime/test/dependencies stay
-reviewed. YT-184 stays Todo/unactivated, release gates unchanged, new changes
-uncommitted/unpushed.
-
-
-YT-184 now selects the [Azure cross-host/persistent-restart contract](PRODUCTION-DEPLOYMENT-PROFILES.md#historical-shared-authority-and-azure-persistence-qualification),
-In progress before opt-in transport and minimum new proof. Two fixed task VMs,
-native verified SQL/Valkey TLS, canonical private HTTPS/Secure Session cookies,
-one authority disk and explicit new-epoch re-login after authority-host restart;
-current SQL/Session authority and release gates unchanged. Ninety minutes total,
-twenty reserved for cleanup, US$5 ceiling and one allocation; initial SKU CLI
-timeout retained, same-SKU REST admission passed. No old load/provider replay or
-HA/default claim. Independent mapping before allocation and final results/cleanup
-acceptance before Done; no new-change Commit/Push.
-
-
-YT-184's first resource generation passes Blob/ARM/provisioning but **fails**
-authority bootstrap before live Auth/Session/TLS/restart. Preallocation Reviewer
-PASS0 remains historical mapping acceptance, not successful execution. The
-executed failed bootstrap is retained; one canonical two-Path-expression fix
-passes four local checks without cloud/passing-proof replay. Cleanup PASS after
-440.35seconds: exact group absent, zero tagged resources, private runtime removed.
-YT-184 remains In progress with all live acceptance unexecuted; one-allocation
-bound requires explicit continuation before another resource generation. No
-release-gate change, Done promotion, new-change Commit or Push.
-
-
-YT-184's explicitly authorized additional generation reaches both apps READY,
-eight combined SQL backends and wrong SQL/Valkey TLS-name startup refusal. Its
-journey exits1 at the initial observer: inet-to-text includes a netmask while
-expected peers are bare IPs; raw rows are unavailable because persistence came
-after assertion. The failed source is retained; canonical host(inet) and
-save-before-assert correction preserve exact connection/TLS/peer requirements.
-One new native timeout privacy check passes; no old proof is replayed. Generation2
-cleanup PASS after493.61seconds, zero owned resources/private credentials.
-Both allocation permissions are spent, no third allocation authorized. Full
-Auth/restart remains unexecuted, YT-184 In progress; no new Commit/Push.
-
-
-YT-184 generation3 is explicitly authorized after the second correction review:
-same two VMs/new90minute maximum including20minute cleanup, US$5 cumulative
-ceiling, unchanged product/binary and retained first two failures. Reuse old
-passing unit/build/negative-TLS evidence; no fourth allocation authorized.
-Remaining Auth/restart proof and final independent acceptance are pending.
-
-
-YT-184 generation3 retains exactly8encrypted SQL connections/four per private
-peer and passed HTTPS wrong-name refusal, then exits1 at the first auth form;
-raw HTTP status/body are unavailable. Source/direct ACL simulation establish
-missing TIME permission for Store::prepare; canonical +time-only deployment
-correction and safe numeric-status failure capture are prepared but not runtime-
-validated. Local CLI probes failed to establish app-user identity and are retained
-as invalid diagnostics; repeated identity failure stops further harness attempts.
-Cleanup PASS469.97seconds, exact group absent/zero resources/private credentials;
-all three permissions spent, no fourth allocation authorized, no Commit/Push.
-Full Auth/restart acceptance remains pending and YT-184 In progress.
-
-
-YT-184 explicitly resumes only local named-app/Session confirmation. Default
-off/password AUTH eliminates the previous diagnostic-identity ambiguity;
-original TIME/provider create refuse, +time-only grant enables real provider
-secure cookie/create/read/CSRF/rotate/revoke across managers while namespace/
-admin denial stays. One new exact ignored regression PASS/6oldcases filtered,
-initial compile preparation failure retained, local container/private files
-removed within1.034seconds. Native TCP/router oneshot only, no SQL/TLS/cloud
-restart proof. Local named-app/Session independent Reviewer /root/yt184_local_named_acl_session_review_20261025
-PASS0 (17source/20evidence stable); no fourth Azure allocation or new Commit/Push,
-full item remains In progress pending actual Azure Auth/restart proof.
-
-
-YT-184 generation4 is explicitly authorized after local named-app/Session PASS:
-same two VMs/new90min including20mincleanup/US$5 cumulative, unchanged product/
-binary/topology, reviewed +time and fresh protected inputs. Reuse successful
-old negatives and unit/build proof; execute only fresh transport/input admission
-and remaining Auth/outage/persistent restart. No fifth allocation authorized;
-actual results/final review pending, no new Commit/Push.
-
-
-YT-184 generation4 passes actual cross-host Auth/fullJSONSSR/tenant/current-policy/
-logout/app-restart, then fails first expected200 after Valkey restart/fixed2s;
-actual recovery status unavailable, both offline503 retained. Cleanup PASS467.05s,
-all four generations deleted. One new local AOF restart case PASS/7oldcases
-filtered records both503 after2s then complete200 at107.495/110.289ms additional
-read-only observation; no provider limit/retry/API changes, local resources/private
-files removed3.882s. Canonical bounded5s/100ms read-only readiness/status capture
-and reuse of passed Auth proof prepared; review/cloud remainder pending.
-YT-184 In progress, no fifth allocation or new Commit/Push authorization.
-
-
-Independent fourth-results/local-recovery Reviewer
-/root/yt184_fourth_auth_recovery_observation_review_20261025 PASS0, zero required
-followups, all17source/28evidence stable. It accepts the actual Auth subset,
-retention/cleanup/local recovery and minimum remaining-only contract, not full
-Azure authority/VM restart or another allocation. YT-184 remains In progress;
-all owned resources are deleted, no fifth allocation or new Commit/Push.
-
-
-YT-184 generation5 is explicitly authorized for remaining authority service
-recovery/persistent VM restart only, same2VM/new90min incl20mincleanup/US$5
-cumulative. Accepted canonical sources/binary reused with fresh protected inputs;
-prior Auth and negative proof reused, no sixth allocation or new Commit/Push.
-Actual outcome/final independent acceptance pending, full item In progress.
-
-
-YT-184 generation5 completes remaining-only authority/VM proof with nativeexit0:
-both offline503/recovery, retained transient503s before full200, sameVM/disk
-restart, unchanged full SQL receipt/current restrictive policy, persisted unexpired
-oldSession refusal under fresh epoch, policy-respecting login/durable JSONSSR/
-logout. G4Auth reused, no oldcase replay. CleanupPASS512.50s/all5groups gone;
-final independent acceptance pending before Done. No sixth allocation/Commit/Push.
-
-
-YT-184 **Done at bounded opt-in cross-host Auth/Session and orderly persistent-
-restart reference scope**, after independent final Reviewer
-/root/yt184_cross_host_final_results_review_20261025 PASS0, zero required followups.
-All17source/83evidence and8original runtime/config/lock bindings stable. Accept
-composed G4Auth/G5authority recovery/VM/SQLpolicy/unexpiredSession-epoch proof;
-all5owned groups/credentials deleted, failed attempts/503 retained. Only status/
-reference bookkeeping follows. No production/HA/arbitraryrestore/release upgrade;
-YT-096/D1-D6 and YT-020 unchanged, new changes uncommitted/unpushed.
-
+The original contract-stage Pending states, named reviews, failed attempts and
+exact source/cleanup receipts remain locally recoverable under the unchanged
+[post-benchmark heading](https://github.com/bohewu/yetlet/blob/8d6fad7e95ee25849872b974f922d10c71b70a95/docs/ROADMAP.md#post-benchmark-application-follow-ups--yt-181yt-184).
+Formal Backlog acceptance and dependency order remain authoritative. These
+results selected no broader roadmap, benchmark replay or release activation.
 
 **M23 onboarding and documentation sequence (YT-185–191): Done at their
 separately reviewed, bounded scopes.** YT-185 selected application-owned

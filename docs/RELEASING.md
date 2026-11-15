@@ -795,3 +795,85 @@ The current pair stays SDKalpha.8/CLI0.4.0. Website source/Pages authority,
 SDK/CLI signing/registry authority and local preview results are independently
 recorded. Historical proof is locally Git-recoverable, with remote SHA access
 unverified until separately authorized delivery/readback.
+
+## Historical alpha.2 version, package and release gates — 2026-10-29
+
+The following records the original local sixteen-library preflight and its
+then-pending gates. Current cohort rules are above. The accepted alpha.8 SDK and
+CLI 0.4.0 publications have their own Hosted Records in
+[Readiness](RELEASE-READINESS.md). The original source is locally recoverable at
+Git `8d6fad7e95ee25849872b974f922d10c71b70a95`, blob
+`b18838aa009fc3d528c7de3dbee83ba5a2e6bad8`, SHA256
+`e3010095e7e02dc04df6dfd9ad2fb7f827d2ef937cf2eb3e812ed22c8a561641`.
+Remote GitHub reachability and raw ignored evidence availability are unverified.
+[Original authority and source](https://github.com/bohewu/yetlet/blob/8d6fad7e95ee25849872b974f922d10c71b70a95/docs/ALPHA2-VERSION-PREFLIGHT.md#authority-and-source).
+
+### Alpha.2 authority and source
+
+The owner approved synchronizing all sixteen libraries to `0.9.0-alpha.2`,
+internal dependency requirements, affected locks and outdated current documents,
+with no third-party upgrade. Only affected package/external-consumer checks are
+selected; accepted behavior/platform/security evidence is retained.
+
+The clean baseline is merged master
+`c2d4bd085682cf86748bdd3ff18d6ca9f26534fc`, tree
+`32ad5a974f8de1cd405bbc96fa37c731bbb7d9fd`. Both required jobs in automatic
+[master CI40884588178/1](https://github.com/bohewu/yetlet/actions/runs/40884588178)
+PASS before this migration. PR21's original CI40883138343/1 and squash/tree
+readback remain recorded. This uncommitted preflight does not select a new C,
+S or V, create a tag, execute hosted release work, sign or publish.
+
+The published baseline remains Experimental
+[v0.9.0-alpha.1](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
+at `bf3363801132f4481263ceb411d9bba3349df86d`, with its accepted signatures,
+D6 decision and public assets unchanged. YT-020 remains Blocked.
+
+### Alpha.2 package and compatibility contract
+
+Eleven library versions inherit the root; five retain explicit isolated-workspace
+versions. All sixteen and eighteen versioned normal/optional/dev sibling edges
+move to alpha.2. Paths, optional features, targets, API/runtime behavior,
+Rust1.99 and the coordinated Experimental compatibility policy are unchanged.
+Inherited versions also move twenty-six unpublished workspace examples; those
+examples do not join the sixteen-library distribution cohort. Independent
+tool/example/vendor versions remain unchanged.
+
+Thirteen current package READMEs update usage requirements. Nineteen locks change
+only 112 unsourced local version fields. Reversing alpha.2 to alpha.1 reproduces
+the original bytes of every changed manifest, package README and lock. All 2,372
+sourced package blocks across the twenty-one tracked locks retain exact bytes,
+including third-party names, versions, sources, checksums and dependency records.
+No dependency upgrade, ignore, feature expansion or registry claim is introduced.
+
+The current compatibility/release guides distinguish the published alpha.1 from
+the alpha.2 checkout and record completed YT-209 Environment installation versus
+Pending positive schema-1 hosted qualification. The hosted plan gains a current
+disposition while retaining its dated pre-installation inventory/proposals.
+Historical candidate decisions, failures, original qualification, old archive
+names and signed payloads retain their original version/source identities.
+
+### Alpha.2 independent review and remaining gates
+
+`cargo xtask check docs` PASS: 75 required documents, 209 backlog items, links,
+Markdown structure, whitespace and dependency DAG. Changed/new Markdown link
+and whitespace inspection also PASS. Independent Reviewer
+`/root/alpha2_version_independent_review_20261029` PASS, zero issues/required
+followups. All 53 source and 125 evidence hashes matched before/after review;
+sixteen archive hashes, 132 current payload and 181 final vendor correspondences
+were verified read-only. Native reviewer/model/actual high effort are verified.
+Only review-completion metadata follows this frozen source boundary.
+Review targets are the actual version/document diff,
+original commands/archives, unchanged-dependency evidence and preserved source
+boundary; a local PASS does not qualify new hosted output.
+
+The next Git action requires separate authority. After delivery/required CI,
+select exact C before any separately approved tag/build/readback. The new
+schema-1 prepare/sign/result/public sequence still needs actual new record,
+run/artifact/payload hashes, concrete owner approvals, cleanup and retained
+outputs. It cannot reuse/edit old receipts lacking `record_sha256`.
+
+The three existing Environments and age identity are not changed or read here.
+Future exact evidence-tag policy rollover is separate from current version
+editing. Alpha.1 D6 stays Complete; future signing/publication is not authorized,
+and no local private-key exception is renewed. No Commit/Push, tag, hosted
+dispatch, signing or publication occurs in this slice.
