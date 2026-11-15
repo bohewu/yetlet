@@ -32,6 +32,30 @@ which explicitly set `RUSTUP_TOOLCHAIN=stable`. [Integrity preparation](YT-020-I
 records the retained source boundaries. [Hosted rebuild preparation](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md)
 records the later authorized protected-check migration after actual Rust 1.99 CI PASS.
 
+## Historical CLI contract, process and SDK resolver evidence
+
+The following are **dated source-specific** qualifications, not current release
+tests or new package/platform support. Four full originals (including their
+failed observations, commands, evidence digests and Reviewer receipts) are
+recoverable in **local Git** `47b0a99ffde069236eaa82ef9fac34c5c6348f3c`;
+the unpublished GitHub history is **not verified reachable**. Current CLI
+behavior and SDK selection instead follow the maintained
+[CLI process contract](CLI-CONTRACT.md#historical-cli-source-qualification-and-process-constraints),
+[CLI guide](CLI-GUIDE.md#historical-cli-source-evidence-and-operation-limits)
+and retained [SDK resolution contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md).
+
+| Historical cohort | Observed accepted scope | Original failures / limits |
+|---|---|---|
+| **2026-10-18 YT-102 CLI Contract audit** | Original CLI grammar and source audit mapped contracts, source-qualified tests and deferred work | **F-01 linked dotenv input outside frontend root was an observed gap**; prior relevant passing checks did not establish secure refusal. The original audit did **not** deliver an all-criteria PASS, later CLI fixes or a new Windows/browser/release qualification |
+| **2026-10-20 YT-102 Linux natural completion** | Under a native Linux child/process-owner observation, a `waitid(WNOWAIT)`-checked natural exit could skip a fixed 500ms grace **only** after leader exit was observed, no cancellation pending, and no additional tracked/adopted direct children, including zombies; uncertain ownership or cancelled work retained the usual bounded grace, reap and escalation | Earlier single CLI warm build **0.565s**, later CLI **0.030/0.034/0.038s** and direct Cargo **0.026/0.025/0.023s** were not simultaneous randomized pairs; no general Vite/watch or cross-platform speedup |
+| **2026-10-20 YT-102 Windows MSVC completion follow-up** | Attached-console run preserved application exit **23**, Ctrl-C/Ctrl-Break `0xc000013a`, owned cleanup of three resistant descendants, protected-tool preflight refusal **125** and unchanged lock. On one i7-10700/MSVC fixture, warm build medians: Yetlet **267.108ms**, direct Cargo **225.420ms**, difference **41.688ms** | First native suite had **four PASS/two FAIL** build cases, then two focused cases PASS after environment correction. Those are not one first-pass clean run; command compilation timing is not end-user latency. The Windows medians do not isolate a cause or justify optimization |
+| **2026-11-10 YT-247 SDK Resolver Phase B (historical CLI0.2.0)** | SDK `sdk-compat-v1` source/registry policy was implemented for alpha.6/alpha.7, separate from the immutable CLI build SDK/snapshot; offline requires both CLI metadata and Cargo caches, forbids transport, and online complete-set refresh fails closed. Creates exact registry-pinned manifests, app `Cargo.lock` and `.yetlet/sdk-resolution.json` in private staging before no-replace publication. Linux suite **182 PASS/8 ignored**, separate live-registry and six policy-compile lanes PASS | Local `new` binary initially refused a group-writable tool path **exit 125**, so Linux tests were not a successful binary-new journey there. Fixture/alpha.6-snapshot/permissions failures and **two original Windows staging/process Reviewer FAILs** preceded correction and independent final PASS. Windows prerequisite gaps and later distinct MSVC verification cannot be backdated; no browser, runtime or release proof follows. The original alpha.7 default and v1 policy are superseded by current **`sdk-latest-v2`** and published CLI0.4.0—do not treat this older source snapshot as current policy |
+
+Historical Linux test counts, unexecuted Windows-only cases, compile-only
+checks, real registry requests, Windows runtime and publication are different
+evidence classes. No new product tests, Windows execution, browser run or
+production load was performed during documentation consolidation.
+
 ## Historical Windows native, browser and CLI evidence
 
 These are **four different historical, bounded source/host verifications**, not a

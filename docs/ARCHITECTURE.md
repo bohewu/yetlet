@@ -171,7 +171,7 @@ CLI SDK resolver with separate metadata/cache, compatibility and scaffold
 responsibilities. CLI build SDK and qualified embedded source-export snapshot
 remain fixed release inputs; generated app SDK selection is a separate registry
 consumer decision with exact pins and its own lock. The
-[Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md) describes its
+[Phase B record](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence) describes its
 implementation and bounded verification, now distributed in CLI 0.3.0.
 Earlier CLI releases retain their historical behavior. This changes none of the
 framework execution/rendering/transport boundaries below.

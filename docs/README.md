@@ -69,7 +69,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 - [YT-247 SDK resolution contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md),
   [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) and
   [Phase A handoff](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md): Owner-accepted version/cache/locking
-  boundary. The [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
+  boundary. The [Phase B record](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
   reports the source implementation, tests and platform limitations.
 - [YT-247 Windows supplement](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence): actual MSVC
   Resolver/new/lock/offline verification, scoped test correction and retained
@@ -394,12 +394,12 @@ Git source `b610acc7e098020b6b59dfa0d1ab2b75b059e656`; this is not a public prod
   doctor is environment-scoped, inspect is project-scoped, frontend dotenv
   and generated assets are confined, and Rust Watch/restart is distinct from
   Vite's app-owned HMR and source-matched Windows browser checks.
-- [Retained Linux completion safety](YT-102-COMPLETION-LATENCY.md) and
+- [Retained Linux completion safety](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence) and
   [native Windows Vite pair verification](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence):
   process-tree, console and bounded natural-exit evidence with no universal
   platform or production performance claim.
 - [Rolling static assets](ASSETS.md#cache-and-retention) and
-  [local YT-103 verification](YT-103-ROLLING-ASSET-VERIFICATION.md):
+  [local YT-103 verification](ASSETS.md#historical-single-host-rolling-asset-qualification):
   application/deployment-owned source-hashed graphs, two-version coexistence,
   rollback and cleanup, not a framework HA guarantee.
 - ADRs [0001](adr/0001-separation-of-concerns.md), [0002](adr/0002-events-and-actions.md), [0003](adr/0003-renderers-and-loading.md), [0004](adr/0004-request-context-and-middleware.md), [0005](adr/0005-opt-in-capability-modules.md), [0006](adr/0006-handler-first-mvc-optional.md) and [0007](adr/0007-bounded-keyed-dom-and-local-graph.md): retained decisions and tradeoffs.
@@ -538,8 +538,8 @@ and Vite rather than another general dev-command system. Its only bounded
 process-latency improvement skips a natural-exit grace after a narrow Linux
 child/lifetime proof; ordinary cancellation and cleanup still apply.
 See [current CLI guidance](CLI-GUIDE.md#historical-cli-and-developer-loop-qualification),
-[Linux completion evidence](YT-102-COMPLETION-LATENCY.md) and the
-[preserved CLI contract audit](YT-102-CLI-CONTRACT-AUDIT-20261018.md).
+[Linux completion evidence](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence) and the
+[preserved CLI contract audit](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence).
 The original audit and research/verification sequence is recoverable at fixed
 local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`; no product runtime was requalified by document cleanup.
 These module guides describe the consolidated SDK and its practical limits.

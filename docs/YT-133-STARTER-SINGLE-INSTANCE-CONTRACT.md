@@ -284,7 +284,7 @@ responsibility correction; historical results below retain their own scope.
 | [YT-129 B1](YT-129-LOAD-SOAK-RECOVERY.md) | v1/schema-1 debug/tmpfs baseline; eight-client FAIL retained. No v2 release/persistent-storage capacity or soak transfer |
 | [YT-130 B2](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md) | v1/schema-1 local backup/restore, not v2 recovery qualification or production RPO/RTO/cutover |
 | [YT-131 C1](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md) | Current local accepted v2/schema-2 status-index, migration/refusal and compatibility proof; not selected-host deployment acceptance |
-| [YT-103](YT-103-ROLLING-ASSET-VERIFICATION.md) | Unchanged asset proof reused at its original identity/scope; no recertification |
+| [YT-103](ASSETS.md#historical-single-host-rolling-asset-qualification) | Unchanged asset proof reused at its original identity/scope; no recertification |
 
 [Generated-service delivery](PRODUCTION-DEPLOYMENT-PROFILES.md#delivery-mechanism-remains-unselected)
 does not deploy this custom Starter. Generated all-interface/token settings and

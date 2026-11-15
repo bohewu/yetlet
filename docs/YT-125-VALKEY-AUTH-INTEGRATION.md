@@ -71,7 +71,7 @@ actually execute; a filtered or ignored test is not a PASS. Children and the
 container require bounded owned cleanup on success/failure.
 
 Existing [YT-066b3](YT-066B3-VERIFICATION.md), [YT-094 Valkey/TTL](YT-094-VALKEY-SESSIONS.md),
-[shared SQLite](YT-094-SHARED-SQLITE.md), [YT-103 rolling assets](YT-103-ROLLING-ASSET-VERIFICATION.md)
+[shared SQLite](YT-094-SHARED-SQLITE.md), [YT-103 rolling assets](ASSETS.md#historical-single-host-rolling-asset-qualification)
 and YT-114/115 results retain their original source/topology limits and are not
 rerun. No browser, real IdP, K3s, Windows, HA, persistence/restore, production
 TLS/ACL, benchmark or full security rescan is implied by this local slice.

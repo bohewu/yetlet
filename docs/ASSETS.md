@@ -128,7 +128,7 @@ through the full cache/rollout lifetime. An in-process snapshot protects current
 requests only until that process exits. Cache expiry cannot repair missing lazy
 chunks after a rollout. [YT-101](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md) qualifies bounded cloud
 delivery of these snapshots. The application/deployment-owned
-[YT-103 local qualification](YT-103-ROLLING-ASSET-VERIFICATION.md) actually
+[YT-103 local qualification](ASSETS.md#historical-single-host-rolling-asset-qualification) actually
 validated a separate static service containing the complete two-version graph
 union (including late JS/CSS) through update, rollback, one Pod termination
 and old-tab lazy imports. All 2,364 measured SSR responses succeeded in that
@@ -139,6 +139,65 @@ recoverable at fixed local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`.
 No production HA, node/zone failover, CDN retention guarantee or automatic
 snapshot retention is provided by Yetlet's generators or core. The snapshot
 caveat also applies to a digest URL produced by the unchanged YT-091 template.
+
+## Historical single-host rolling asset qualification
+
+The **2026-10-18** local `YT-103` verification used three Multipass K3s
+VMs on **one physical host** (`v1.36.4+k3s1`), three app replicas and two
+separate Nginx gateway/static replicas. Each release had seven reachable
+CSS/JS graph files; the union held **11** verified files. The real
+application/deployment-owned static service preserved v1/v2 asset bytes
+across an upgrade/rollback; publishing different bytes at the **same URL**
+was explicitly rejected. Original frozen image **index digests** and
+K3s imageID **config digests** were different identities, not an error.
+The complete original report (not its raw execution artifacts) is recoverable
+from **local Git** `47b0a99ffde069236eaa82ef9fac34c5c6348f3c`
+(public historical reachability unverified). The image/source receipts,
+raw logs and browser screenshots were recorded separately in Git-ignored
+`artifacts/yt103-rolling-20261018/`; Git history alone cannot restore
+those task-owned evidence bytes.
+
+| Measured local phase, 10 SSR requests/s | HTTP 200 | Observed p95 (ms) |
+|---|---:|---:|
+| v1 → v2 | 537 | 2.040 |
+| Rollback v2 → v1 | 627 | 2.114 |
+| Graceful single Pod deletion | 261 | 2.094 |
+| Final v2 rollout and retention | 939 | 1.947 |
+| **Combined** | **2,364** | Different phase populations; no pooled p95 asserted |
+
+Within only those finite observation windows there were **no observed SSR
+404, 5xx, connection error or timeout**. An eight-second in-flight handler
+returned **200** around 1.987s **after observed SIGTERM**; it did not prove
+hard kill, PDB enforcement or node failure behavior. Actual scheduling
+collapsed from app Pods on three VMs to two after rolling; these VMs shared
+one physical fault domain. No multi-host/zone HA, SLA, automatic rollback
+or persistent server-side asset retention follows.
+
+Two actually held Chrome155 pages loaded previously *unrequested* v1/v2
+lazy JS and CSS **200 after the opposite version had fully replaced app
+Pods**, without page reload. A separate favicon **404** remained in the
+browser console and is not silently counted as a lazy-load failure.
+The conservative old-build eligibility covered **30 seconds plus a 5-second
+margin** after the last v1 app Pod retired; **344** dedicated old/new lazy
+requests during that window returned 200 and matched SHA-256. After a
+separately invoked rollback-unpin and static-image GC, v1-only lazy JS/CSS
+returned **expected 404** while all seven v2 graph files survived. There was
+**no continuous SSR availability run during static-service GC**; the
+35-second lab window is not a production retention recommendation.
+
+Preserved original setup negatives: non-root app could not read exported
+public TOML due to inherited permissions; Nginx could not create its
+temporary cache directory; a lazy-asset HTML oracle accidentally matched
+DOM IDs; the browser wrapper's direct ESM import failed before an existing
+CommonJS alternative was used. These were bounded image/fixture/browser
+setup corrections, **not product-source upgrades**. The original execution
+receipts, failed image archive, verified screenshots, seven/eleven-file graph
+hashes and cleanup remain in local source/evidence history. Cleanup removed
+only the owned namespace, temporary images/uploads and test Docker tags;
+the three K3s nodes, pre-existing resource identities, Valkey/OpenBao and
+shared caches were preserved. Actual general serving continues to use
+`no-store`; an old hashed URL or in-process snapshot alone does not extend
+asset lifetime.
 
 ## Extraction decision and next boundary
 

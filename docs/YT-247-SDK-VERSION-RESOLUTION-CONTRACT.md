@@ -6,7 +6,7 @@ Registry latest policy for CLI 0.3.1 source (YT-250).** The initial accepted
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) records the amendment;
 [CLI 0.3.1 preparation](CLI-031-RELEASE-PREPARATION.md) records the source and
 pre-publication gates. The [Phase A handoff](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md) and
-[Phase B implementation record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
+[Phase B implementation record](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
 retain their original design, implementation and review evidence.
 
 ## Scope and gates

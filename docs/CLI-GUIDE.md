@@ -22,9 +22,9 @@ the current published CLI. The implementation, doctor, settings-error,
 frontend dotenv confinement, generator source closure, Watch and HMR research
 and selected Linux/Windows evidence remain recoverable at fixed **local Git**
 `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9` (not verified as publicly
-reachable on GitHub). The [accepted CLI audit](YT-102-CLI-CONTRACT-AUDIT-20261018.md)
+reachable on GitHub). The [accepted CLI audit](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
 retains its historical F-01 finding, not a current unresolved security claim.
-[Natural-completion latency](YT-102-COMPLETION-LATENCY.md) permits skipping
+[Natural-completion latency](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence) permits skipping
 the Linux 500ms natural-exit grace only after a narrow WNOWAIT/single-thread/
 retained-child proof; cancellation and descendant cleanup still run.
 The [native Windows Vite pair](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) separately
@@ -39,7 +39,7 @@ failure retains a recoverable previous generation only at the tested seams;
 stale assets, failed child cleanup or tool/cache absence must surface as errors.
 For an interactive browser-only project use the [Browser app walkthrough](BROWSER-APP.md);
 for rolling v1/v2 public assets use [ASSETS](ASSETS.md#cache-and-retention)
-and the retained [YT-103 actual qualification](YT-103-ROLLING-ASSET-VERIFICATION.md).
+and the retained [YT-103 actual qualification](ASSETS.md#historical-single-host-rolling-asset-qualification).
 Source-scoped run/watch/asset proof is **not** production HA, universal platform
 qualification or automatic dependency installation.
 
@@ -125,6 +125,25 @@ The top-level `startup_profile` in the schema 1 creation receipt at
 `sdk.policy_sha256` identifies the packaged policy bytes used at creation, and
 `cargo_lock_sha256` identifies the generated lockfile bytes. The receipt records
 creation provenance. The manifest and lockfile govern subsequent builds.
+
+## Historical CLI source evidence and operation limits
+
+Current `new` SDK resolution, app `Cargo.lock`, source receipt, guarded
+temporary creation and online/offline selection are defined by the
+[SDK version contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md)
+and [CLI process contract](CLI-CONTRACT.md#historical-cli-source-qualification-and-process-constraints).
+Do not select the old Phase B `sdk-compat-v1` alpha.7 default merely because
+the historical source/implementation report used it; the currently selected
+policy is `sdk-latest-v2` and each new project is pinned to the result of
+its actual resolver decision.
+
+The [historical qualification matrix](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
+keeps the original linked-dotenv audit failure, Linux guarded natural-exit
+fast path and noncausal warm timings, Windows native process/cancellation
+statuses, and the separately corrected SDK Resolver initial tests.
+Do not substitute a compile check for an executed Windows CLI, a Linux
+fixture for registry access or a source-only implementation review for the
+published SDK/CLI package consumer.
 
 ## CLI command and capability inventory
 
@@ -720,7 +739,7 @@ $Yetlet = Join-Path (Get-Location) "tools\yetlet-cli\target\debug\yetlet.exe"
 Choose an existing owner-protected local fixed NTFS parent. Do not disable ACL,
 reparse or executable checks. The [native Windows GNU pair record](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
 covers six selected real Rust/Vite lifecycle cases; MSVC pair evidence remains
-compile-only. Separately, [native MSVC single-Cargo evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20)
+compile-only. Separately, [native MSVC single-Cargo evidence](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
 covers build/run, native console cancellation and descendant cleanup, with a
 bounded warm-build baseline in the same record.
 
@@ -796,7 +815,7 @@ Linux has current native process/PTY/cleanup tests. Current Windows GNU
 [doctor and CLI evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-DOCTOR-VERIFICATION.md) and
 [Rust/Vite pair evidence](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) supplement
 the separate MSVC compile-only pair checks and
-[native single-Cargo followup](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20).
+[native single-Cargo followup](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence).
 Windows run still requires an attached console
 with processed Ctrl-C input and protected app/tool paths; npm uses vetted native
 node.exe plus its same-install npm CLI script, without a .cmd shell fallback.

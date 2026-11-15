@@ -47,7 +47,20 @@ linked otherwise. This table preserves the T0 pre-implementation baseline; the f
 | A2 / YT-128 | `src/web.rs::observe` emits JSON method/status/duration/process-local request ID; excludes URI/query/headers/bodies/errors. [YT-123](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-123-TRACING-CORRELATION-STUDY.md) is accepted research with no new tracing runtime/API selected | No collection endpoint/equivalent or SQL wait/saturation diagnostics. Observer ends at Response return, not body completion/commit. Need opt-in app/configuration/Store/lifecycle instrumentation and real fault diagnosis |
 | B1 / YT-129 | Existing HTTP/Store tests and [YT-074](YT-074-QUALIFICATION.md) provide adjacent bounded evidence | No Starter workload, predefined thresholds, soak/recovery record or capacity range. YT-074 is a different application. Need isolated existing-tool workload and source/environment-bound measurements, without new general validation infrastructure |
 | B2 / YT-130 | WAL/schema version 1 and startup rejection in `src/store.rs`; Starter guide describes supported backup or stopped-process copy and separate restore. [YT-066 responsibility boundary](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md) and [YT-094 closeout](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md) retain provider/application recovery evidence | No Starter fresh-instance business-data restore/cutover runbook or measured RPO/RTO. Need selected local configuration, consistent backup, schema/data/readiness checks and explicit Session/Valkey policy; do not recertify SQLite or transfer other-app recovery claims |
-| C1 / YT-131 | `migrations/0001_init.sql`, fixed version checks and unsupported-schema tests. [Accepted YT-103](YT-103-ROLLING-ASSET-VERIFICATION.md) proves selected asset retention/update/rollback only | No real Starter v1-to-v2 API/schema/data scenario or mixed-version evidence. Need application migration/HTTP fixtures, stale-client policy and rollback/forward-fix decision; reuse unchanged YT-103 evidence without rerun or expansion |
+| C1 / YT-131 | `migrations/0001_init.sql`, fixed version checks and unsupported-schema tests. [Accepted YT-103](ASSETS.md#historical-single-host-rolling-asset-qualification) proves selected asset retention/update/rollback only | No real Starter v1-to-v2 API/schema/data scenario or mixed-version evidence. Need application migration/HTTP fixtures, stale-client policy and rollback/forward-fix decision; reuse unchanged YT-103 evidence without rerun or expansion |
+
+## Retained rolling asset local evidence
+
+The [original app-owned single-host asset trial](ASSETS.md#historical-single-host-rolling-asset-qualification)
+completed upgrade, rollback and one graceful Pod deletion with **2,364**
+observed SSR 200s under finite 10/s sampling, then checked old/new late
+CSS/JS fetches and expected v1-only **404** after separate GC. This was
+three K3s VMs on one physical host, with no measured continuous SSR
+availability during static-image GC and no node/zone failure, production
+HA or general retention/lifetime qualification. Browser favicon 404,
+non-root image-preparation failures and post-retirement evidence are
+preserved in the dated original Git source, not silently converted into
+an unconditional PASS.
 
 ## Operational and architectural boundaries
 

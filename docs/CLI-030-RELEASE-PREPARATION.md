@@ -9,7 +9,7 @@ Dynamic SDK Version Resolution. Phase A produces the proposed CLI contract and
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md), independent review and
 Git delivery, then stops for Owner acceptance. Phase B implements the accepted
 resolver. The Owner has accepted that design and authorized the
-[Phase B implementation](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md).
+[Phase B implementation](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence).
 This release plan moves to **YT-248** and depends on that implementation.
 The later Owner instruction authorizes this candidate-preparation slice and its
 reviewed Git delivery, with no publication or Reader Edition upgrade.

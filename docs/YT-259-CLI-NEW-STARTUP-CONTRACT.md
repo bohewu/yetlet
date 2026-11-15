@@ -90,7 +90,7 @@ caches without network, with the existing source and age notices. Keep exact
 registry manifest pins, protected staging and root lock validation. `new`
 performs bounded lock generation and writes a new project. Subsequent build,
 run and watch use the generated lock without resolving the app SDK again.
-[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) · [YT-247 contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) · [YT-247 implementation history](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md) · [CLI contract](CLI-CONTRACT.md)
+[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) · [YT-247 contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) · [YT-247 implementation history](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence) · [CLI contract](CLI-CONTRACT.md)
 
 The complete initial source policy adds a required `scaffold_capabilities`
 object to the existing resource.

@@ -10,12 +10,12 @@ Date: 2026-10-18 (Asia/Taipei). Task: YT-102, accepted CLI contract and authoriz
   `dev` naming and opt-in flags, with `new --vite` implying Settings while
   plain Native remains simple. The original source-only grammar and acceptance
   tests are recoverable in fixed local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`.
-  The retained [YT-102 audit](YT-102-CLI-CONTRACT-AUDIT-20261018.md) documents
+  The retained [YT-102 audit](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence) documents
   the original linked-dotenv F-01 mismatch; later accepted fixes are not a
   retroactive PASS for that earlier inspection.
 - **Source-qualified operating limits:** the [native Windows Rust/Vite proof](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence),
-  [Linux completion and cleanup proof](YT-102-COMPLETION-LATENCY.md),
-  [rolling asset qualification](YT-103-ROLLING-ASSET-VERIFICATION.md)
+  [Linux completion and cleanup proof](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence),
+  [rolling asset qualification](ASSETS.md#historical-single-host-rolling-asset-qualification)
   and [current generator matrix](CLI-GUIDE.md#current-generator-source-matrix)
   remain bounded by actual source, toolchain, host, process owner, strict CSP,
   frozen locks and application/deployment-owned resources. No broad native
@@ -26,7 +26,7 @@ Date: 2026-10-18 (Asia/Taipei). Task: YT-102, accepted CLI contract and authoriz
 The [YT-247 contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) define a separate
 SDK resolver, exact version/offline options and successful-new app lock creation.
-The Owner authorized the [Phase B source implementation](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md).
+The Owner authorized the [Phase B source implementation](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence).
 It supersedes source-only new and deferred app-lock descriptions below for this
 checkout: successful new resolves a compatible registry SDK, writes exact pins,
 generates an app Cargo.lock and records provenance before publication. Build,
@@ -37,6 +37,38 @@ is SDK `0.9.0-alpha.8` / CLI `0.4.0` (see `site/pages.toml`), and the
 [CLI 0.4.0 publication](CLI-040-HOSTED-RECORD.md) additionally qualifies the
 finite generated-startup policy. Earlier releases keep their exact source-
 bound behavior; the CLI's own source snapshot does not float with app SDK.
+
+## Historical CLI source qualification and process constraints
+
+The original [CLI Contract audit](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
+identified a **linked-dotenv frontend-root escape (F-01)** that earlier source
+PASS checks did not close. That dated finding is not an assertion that the
+present implementation still has the defect, nor a claim that the audit passed
+all criteria. For the actual current command/settings and frontend boundary,
+follow this contract and the [CLI Guide](CLI-GUIDE.md), not an obsolete
+ticket-specific execution record.
+
+The selected Linux natural-completion fast path skips the fixed grace only
+when the leader's exit is observed via `waitid(WNOWAIT)`, cancellation is
+absent, and the owned process tree has no additional adopted/tracked children.
+Uncertain or still-living descendants, zombies, other direct children and
+cancellation require bounded waiting, escalation and ownership-verified cleanup.
+The historical Linux warm measurements and later native Windows console status,
+descendant cleanup and warm-build comparison remain separate in the
+[qualification matrix](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence);
+none is a cross-platform timing promise or proof of Windows browser HMR.
+
+The original Phase B SDK Resolver separated registry metadata caching,
+compatibility selection and Cargo's own dependency cache, produced exact app
+manifests/locks plus a source/freshness receipt, and required create-only
+publication from private staging. Its `sdk-compat-v1` alpha.6/alpha.7 policy
+and CLI0.2.0 build/snapshot are **historical**. The
+[retained resolver contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md)
+and [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) govern current
+`sdk-latest-v2` selection; the released CLI0.4.0 is a separate package identity.
+Original real binary refusal on unsafe tool paths, Windows source defects
+and their correction/independent review cannot be turned into clean initial
+runs or expanded platform support.
 
 ## 1. Historical starting implementation and authority
 

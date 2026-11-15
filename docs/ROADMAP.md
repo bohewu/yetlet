@@ -58,7 +58,7 @@ CI and live readback remain the public-delivery gates.
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) separate CLI build SDK,
 immutable source snapshot and template identity from the generated app's selected
 registry SDK. [Phase A handoff](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-247-PHASE-A-HANDOFF.md) retains the design review
-and PR #68 delivery; the [Phase B record](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md)
+and PR #68 delivery; the [Phase B record](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
 reports resolver/cache/locking tests and six real registry compile combinations.
 These additions are now distributed in CLI0.3.0. The later [Windows supplement](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
 verifies MSVC CLI compilation and actual resolver/new/locking execution on the
@@ -1051,10 +1051,10 @@ scaffolds/generators, Vite ownership and selected native process supervision.
 The separately reviewed DX audit retained Cargo, Watchexec and Vite and
 documented first-use setup rather than adding a general new runtime.
 The selected dotenv symlink escape was subsequently corrected; the
-historical [CLI source audit](YT-102-CLI-CONTRACT-AUDIT-20261018.md)
+historical [CLI source audit](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
 retains its original F-01 finding and cannot certify later bytes.
 
-A further independently reviewed [Linux completion-latency improvement](YT-102-COMPLETION-LATENCY.md)
+A further independently reviewed [Linux completion-latency improvement](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
 skips the fixed 500ms grace only after safe WNOWAIT, single-thread and
 retained-child checks; failure/cancellation preserves the full cleanup.
 Selected native Windows GNU/MSVC build, signal/process/console and
@@ -1074,7 +1074,7 @@ completed through the selected K3s rollout/SIGTERM sequence; source
 checks, fail-closed missing/private assets and owned cleanup were recorded.
 Node/host/zone failure availability, CDN longevity and general rolling
 deployment remained unverified. See [asset policy](ASSETS.md#cache-and-retention)
-and retained [original qualification](YT-103-ROLLING-ASSET-VERIFICATION.md).
+and retained [original qualification](ASSETS.md#historical-single-host-rolling-asset-qualification).
 **YT-104, opt-in browser-only application workflow:** complete the delivery path
 around the existing Rust/WASM DOM and local-state capabilities. First define a
 bounded sample against the current supported DOM subset, then integrate CLI

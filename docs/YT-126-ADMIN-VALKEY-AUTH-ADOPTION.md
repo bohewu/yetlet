@@ -128,7 +128,7 @@ clean up owned app processes, temporary files and the isolated service.
 
 The prior [YT-094 Valkey/TTL](YT-094-VALKEY-SESSIONS.md),
 [shared SQLite](YT-094-SHARED-SQLITE.md), [OIDC](YT-094-OIDC.md),
-[YT-103 rolling-assets](YT-103-ROLLING-ASSET-VERIFICATION.md) and YT-125
+[YT-103 rolling-assets](ASSETS.md#historical-single-host-rolling-asset-qualification) and YT-125
 results retain their recorded source/topology limits. Do not repeat their
 passing browser, IdP or deployment workloads. No frontend layout, IME,
 assistive-technology, Windows, real-provider, persistence, HA or multi-host

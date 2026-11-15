@@ -98,7 +98,7 @@ abstraction or dependency was introduced by this slice.
 Retain [Starter](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-092-STARTER-VERIFICATION.md),
 [Admin closeout](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md),
 [cloud delivery](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md), and
-[bounded rolling/asset retention](YT-103-ROLLING-ASSET-VERIFICATION.md)
+[bounded rolling/asset retention](ASSETS.md#historical-single-host-rolling-asset-qualification)
 evidence. Those references do not establish production authentication,
 certificate custody, durability, SLA or HA guarantees for the nine packages.
 The owner-waived Windows OIDC and routine repeated Windows IME/assistive

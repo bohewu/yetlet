@@ -152,6 +152,20 @@ SQLite WAL/local disk is not cross-host shared SQL, safe NFS or coherent
 per-replica files. A future integration must demonstrate its data authority;
 PostgreSQL, an ORM, Valkey business storage or a Core change is not selected.
 
+## Historical bounded single-host rolling asset evidence
+
+The [maintained asset-retention evidence](ASSETS.md#historical-single-host-rolling-asset-qualification)
+records a **single-host three-VM K3s** upgrade/rollback with 2,364 measured
+SSR HTTP 200 responses, separate held-browser lazy-load/35-second retention
+evidence and expected old-only asset **404** after explicit GC. Its observed
+three- to two-node app placement and separate static-service GC with no
+continuous SSR sampling preclude claiming physical HA, node/zone fault
+tolerance, CDN retention, rolling availability outside the sampled phases
+or a product/default deployment controller. Every deployment must select
+its own verified immutable asset graph, rollback pin, retirement boundary
+and operational ownership; a prior local fixture cannot guarantee this
+profile on a hosted installation.
+
 ## Retained evidence and concrete gaps
 
 Reuse the [current capability map](CAPABILITIES.md) and
@@ -165,7 +179,7 @@ remain unchanged; no old qualification was rerun or transferred to this input.
 | [YT-128 observability](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md) | Default-off `/metrics` has no independent authentication; metrics/probes bypass HTTP admission. An enabled integration must protect edge/control paths and bound scrape/probe access; YT-133/136 may provide reusable examples, while production sinks/alerts remain consumer-owned. Response creation is neither body completion nor durable business success |
 | [YT-129 capacity](YT-129-LOAD-SOAK-RECOVERY.md) | Historical schema-1/debug/tmpfs, co-located closed-loop clients: 42,043 requests, 45 s sustained phase. Eight clients FAIL at 1.514% rejection / 341.73% CPU, excluded from the passing range; original thresholds stay intact. No evidence transfer to current-v2 release/persistent storage. [YT-134](YT-134-RELEASE-STORAGE-CAPACITY.md) adds separate bounded local measurements; no long-soak qualification |
 | [YT-130 recovery](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md) | Historical v1/schema-1/debug/ext4, synthetic three-row restore with source writes paused for backup. RPO proxy 41.30 ms, acknowledged-write exposure 39.26 ms and two excluded acknowledged mutations; RTO 52.36 ms only through local cutover eligibility. No current-v2 or production DR/traffic-switch result (YT-135) |
-| [YT-131 compatibility](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions) | Actual 25 tests and 26-response data/migration matrix preserve the existing Issue API and add schema-2 status index/API. Old live v1 becomes unready but still writes: remove/drain before migration. Old restart refuses schema 2. V1-backup rollback loses newer writes; preserve schema 2 and forward-fix after v2 writes (YT-133/135). Reuse unchanged [YT-103 asset proof](YT-103-ROLLING-ASSET-VERIFICATION.md) without recertifying it |
+| [YT-131 compatibility](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions) | Actual 25 tests and 26-response data/migration matrix preserve the existing Issue API and add schema-2 status index/API. Old live v1 becomes unready but still writes: remove/drain before migration. Old restart refuses schema 2. V1-backup rollback loses newer writes; preserve schema 2 and forward-fix after v2 writes (YT-133/135). Reuse unchanged [YT-103 asset proof](ASSETS.md#historical-single-host-rolling-asset-qualification) without recertifying it |
 | [YT-124 contract](YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md) and [YT-126 Admin adoption](YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md) | Two actual Admin processes already PASS cross-process Auth/login/logout, fresh local policy, fail-closed outage and recovery. Authority is a single-host policy file; Valkey was nonpersistent. No persistence/HA/cross-host-trust qualification (YT-139). Fresh pre-SQL checks do not atomically order revocation against business commit (conditional YT-138) |
 | [Existing OIDC evidence](YT-094-OIDC.md) and [adapter study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-116-OIDC-ADAPTER-STUDY.md) | Real-IdP loopback verification exists. Public HTTPS/trusted proxy, cross-replica callbacks, JWKS refresh and subject-map/account-disable freshness remain target-specific if OIDC is selected (YT-140); no new mandatory Auth product or generic adapter follows |
 
