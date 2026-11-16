@@ -21,6 +21,13 @@
 
 | YT-250 | P1 | M | M10 | Correct Registry latest SDK selection and prepare CLI 0.3.1 | YT-247, YT-248, YT-249 | [Preparation](CLI-031-RELEASE-PREPARATION.md) records latest SemVer selection, exact registry pins and locking, and Windows Browser Style preview port closure at CLI exit. The [hosted dossier](CLI-031-HOSTED-RECORD.md) preserves the first candidate and records the replacement's guarded tag transition, verified GitHub and crates.io publication, and installed registry consumer PASS. The Reader Edition selects SDK alpha.7 / CLI 0.3.1 | Done |
 
+## M27 — Real-world Developer Experience
+
+| ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
+|---|---|---|---|---|---|---|---|
+| YT-260 | P2 | S | M27 | Correct CLI first-use Cargo.lock guidance | YT-259 | [M27 DX Gap Report](M27-DX-GAP-REPORT.md#dx-01--correct-the-stale-cargolock-creation-statement) and [Prioritized Plan](M27-PRIORITIZED-PLAN.md#candidate-1--dx-01-acceptance): update only the CLI Guide first-use sequence to reflect that CLI 0.4.0 new creates Cargo.lock and SDK-resolution receipt before publish; use cargo fetch --locked before build/run; retain offline and no-implicit-install boundaries. Do not change generated README templates, resolver or lock behavior. Independent plan Reviewer R4 PASS; implementation and documentation checks PASS; independent final Reviewer `wc_job_ab4Zl3f_I3Q3_Fu4` PASS; no runtime behavior change | Done |
+| YT-261 | P2 | S | M27 | Document generated Service health and bind contract | YT-259 | [M27 DX Gap Report](M27-DX-GAP-REPORT.md#dx-02--document-the-generated-service-operational-contract) and [Prioritized Plan](M27-PRIORITIZED-PLAN.md#candidate-2--dx-02-acceptance): add a conditional Service README fragment at tools/yetlet-cli/templates/service/SELECTED-README.md, appended only for --service by scaffold::selected_files_version. Cover /health/live, /health/ready, readiness transition before graceful shutdown, plain-Service YETLET_HOST/YETLET_PORT defaults/allowed values, and Settings/Vite server.host/server.port plus APP_SERVER__HOST/PORT and APP_SERVICE__TOKEN requirements. Verify plain Native, Service-only, Service+Settings and Service+Vite generated outputs; generated documentation only, no runtime behavior changes. Independent plan Reviewer R4 PASS; 4 real CLI generated variants and selected_scaffold tests PASS; independent final Reviewer `wc_job_ab4Zl3f_I3Q3_Fu4` PASS; no runtime behavior change | Done |
+
 ## M26 — Application Startup & Sample Experience
 
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |

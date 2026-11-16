@@ -795,6 +795,11 @@ pub(crate) fn selected_files_version(
             .1
             .push_str(include_str!("../templates/tailwind/SELECTED-README.md"));
     }
+    if service {
+        entries[1]
+            .1
+            .push_str(include_str!("../templates/service/SELECTED-README.md"));
+    }
     if runtime_settings {
         entries[0].1 = entries[0].1.replacen("[dependencies]\n", "[dependencies]\naxum-server = { version = \"=0.8.0\", default-features = false, features = [\"tls-rustls-no-provider\"], optional = true }\nrustls = { version = \"0.23\", default-features = false, features = [\"ring\", \"std\", \"tls12\"], optional = true }\n", 1);
         entries[0]

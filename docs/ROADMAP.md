@@ -1,5 +1,12 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+## M27 — Real-world Developer Experience
+
+- [x] **Correct CLI first-use lock guidance (YT-260).** Align the first-use sequence in `docs/CLI-GUIDE.md` with CLI 0.4.0: `yetlet new` already creates the exact app lock and SDK-resolution receipt; fetch the existing lock with `cargo fetch --locked` before build/run. Preserve explicit offline-cache and no-implicit-install boundaries. Independent final Reviewer `wc_job_ab4Zl3f_I3Q3_Fu4` PASS.
+- [x] **Document the generated Service operational contract (YT-261).** Add conditional `--service` guidance to the generated README: liveness/readiness routes, readiness transition on graceful shutdown, and the distinct bind configuration for plain Service versus Service with Settings/Vite. Documentation only; no runtime behavior change. Independent final Reviewer `wc_job_ab4Zl3f_I3Q3_Fu4` PASS.
+
+The M27-A/B audit and prioritization are recorded in [DX Gap Report](M27-DX-GAP-REPORT.md) and [Prioritized Plan](M27-PRIORITIZED-PLAN.md). Both work items received independent plan Reviewer R4 PASS and independent implementation Reviewer `wc_job_ab4Zl3f_I3Q3_Fu4` PASS; YT-260 and YT-261 are complete at their bounded documentation scope.
+
 ## M26 — Application Startup & Sample Experience
 
 - [x] **SDK `0.9.0-alpha.8` application startup and Axum prelude.**
