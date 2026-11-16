@@ -51,6 +51,36 @@ fn all_creation_choices_publish_shared_settings_and_complete_frontend_without_to
                     source_scaffold::create(root.path(), &name, "native", &flags).unwrap();
                     let app = root.path().join(&name);
                     let before = inventory(&app);
+                    let readme = String::from_utf8(before["README.md"].clone()).unwrap();
+                    if service {
+                        for contract in [
+                            "## Service profile (`--service`)",
+                            "`GET /health/live`",
+                            "`GET /health/ready`",
+                            "graceful shutdown",
+                        ] {
+                            assert!(readme.contains(contract), "{name}: missing {contract}");
+                        }
+                        for contract in [
+                            "without",
+                            "`YETLET_HOST`",
+                            "`YETLET_PORT`",
+                            "`--service --settings`",
+                            "`--service --vite`",
+                            "`server.host`",
+                            "`server.port`",
+                            "`APP_SERVER__HOST`",
+                            "`APP_SERVER__PORT`",
+                            "`APP_SERVICE__TOKEN`",
+                        ] {
+                            assert!(readme.contains(contract), "{name}: missing {contract}");
+                        }
+                    } else {
+                        assert!(
+                            !readme.contains("## Service profile (`--service`)"),
+                            "{name}: plain scaffold must not advertise Service routes"
+                        );
+                    }
                     assert!(before.values().all(|s| {
                         !String::from_utf8_lossy(s).contains("private-sentinel-do-not-copy")
                     }));

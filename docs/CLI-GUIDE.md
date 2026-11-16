@@ -345,12 +345,16 @@ Settings-enabled native apps, including `--vite`, need their own service token
 before startup; use the existing [settings/Development-secret mechanism](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/config/SELECTED-README.md),
 keeping credentials out of public TOMLs and frontend files.
 
-Use this order: prepare tools/cache, build the CLI, create the selected app,
-generate its own Cargo lock and fetch its locked dependencies, prepare any
-selected frontend dependencies/assets, then build/run. `new` does not install
-tools, generate Cargo.lock or produce dist; selected frontend templates include
-their pinned package lock. `run` does not create the initial dist;
-with frontend auto_build disabled, prepare it separately before startup.
+Use this order: prepare tools and the required resolver/Cargo caches, build the
+CLI, then create the selected app. A successful `yetlet new` resolves and pins
+the selected SDK, generates `Cargo.lock` in private staging, records
+`.yetlet/sdk-resolution.json`, and publishes both with the app. Fetch the
+already-generated lock with `cargo fetch --locked`; do not regenerate it.
+Prepare any selected frontend dependencies/assets, then build/run. `new` does
+not install tools or packages, build the app, start a listener or produce `dist`;
+selected frontend templates include their own pinned package lock. `run` does
+not create the initial dist. With frontend `auto_build` disabled, prepare it
+separately before startup.
 Offline commands require an already populated cache. CLI execution never
 installs dependencies or repairs locks automatically.
 
