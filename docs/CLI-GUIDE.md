@@ -798,29 +798,202 @@ representation.
 
 ## Windows PowerShell (native GNU/MSVC)
 
-The CLI owns configured startup, stop/cleanup and build orchestration. Vite owns
-module compilation, dependency tracking and HMR. Frontend JS/TS files may use
-custom names and subdirectories without registration; physical root confinement
-still refuses private/tooling files and outside links. The default entry remains
-`app.ts`. [Integration evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
-separates the earlier Windows browser checks from the current Linux follow-up.
+### Windows x64 MSVC first app and native watch
+
+This is the PowerShell counterpart of [First App](FIRST-APP.md), for the
+**published CLI `0.4.0` and SDK `0.9.0-alpha.8`** on native Windows x64
+MSVC. Do not paste POSIX shell commands into PowerShell. This is a plain
+Native SSR workflow: Node, Vite, WASM and a database are not required.
+Keep the CLI installation, app SDK selection, app Cargo cache and optional
+Watchexec installation separate. The CLI installs none of those tools.
+
+Use a new **x64 Developer PowerShell for Visual Studio 2022** (or initialize
+the same developer environment in an ordinary PowerShell process). The example
+below selects the MSVC tools for this process only; it does not alter system
+PATH, registry, ACLs or an existing Rust installation:
+
+```powershell
+$vswhere = Join-Path ([Environment]::GetEnvironmentVariable('ProgramFiles(x86)')) 'Microsoft Visual Studio\Installer\vswhere.exe'
+if (!(Test-Path -LiteralPath $vswhere)) { throw 'Install VS 2022 C++ x64 tools first' }
+$vs = & $vswhere -latest -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath |
+    Select-Object -First 1
+if (!$vs) { throw 'VS 2022 x64 MSVC tools not found' }
+Import-Module (Join-Path $vs 'Common7\Tools\Microsoft.VisualStudio.DevShell.dll') -ErrorAction Stop
+Enter-VsDevShell -VsInstallPath $vs -DevCmdArguments '-arch=x64 -host_arch=x64' -SkipAutomaticLocation
+Get-Command cl.exe, link.exe -ErrorAction Stop | Select-Object Name, Source
+
+$cargo = (& rustup which --toolchain 1.99.0 cargo)
+if ($LASTEXITCODE -ne 0 -or !$cargo -or !(Test-Path -LiteralPath $cargo)) {
+    throw 'Select an already-installed physical x64 MSVC Rust 1.99 toolchain'
+}
+$rustBin = Split-Path -Parent $cargo
+$env:PATH = "$rustBin;$env:PATH"
+& (Join-Path $rustBin 'rustc.exe') -vV
+& $cargo -vV
+$cargoHome = Join-Path $env:LOCALAPPDATA 'YetletCargo040'
+$targetRoot = Join-Path $env:LOCALAPPDATA 'YetletNativeTarget040'
+if ((Test-Path -LiteralPath $cargoHome) -or (Test-Path -LiteralPath $targetRoot)) {
+    throw 'Choose unused, owner-protected local Cargo cache and build directories'
+}
+New-Item -ItemType Directory -Path $cargoHome -ErrorAction Stop | Out-Null
+New-Item -ItemType Directory -Path $targetRoot -ErrorAction Stop | Out-Null
+$env:CARGO_HOME = $cargoHome
+$env:CARGO_TARGET_DIR = $targetRoot
+```
+
+The selected `rustc -vV` must report `host: x86_64-pc-windows-msvc`,
+and Cargo must be version 1.99. Confirm the real toolchain and ancestors
+are owner-protected local fixed NTFS paths with no reparse traversal. If
+Rustup points to a rejected or redirected tool directory, select an
+already-prepared trusted physical toolchain instead; do not disable Yetlet's
+path, executable or ACL checks. A compiler build also requires the native
+MSVC linker and any source-install OpenSSL headers/libraries. When using a
+separately prepared OpenSSL prefix, configure `OPENSSL_DIR` and related
+linker variables **only in this PowerShell process**. This prerequisite is
+for compiling the CLI; the generated plain Native app does not opt into
+signing. Alternatively, reuse an already installed, verified CLI `0.4.0`
+from an accepted installation; no prebuilt executable is promised by the
+source release.
+
+For a fresh **source installation from the published crates.io CLI
+package**, choose an unused, owner-protected local prefix. The two version
+numbers are independent:
+
+```powershell
+$cliRoot = Join-Path $env:LOCALAPPDATA 'YetletCli040'
+if (Test-Path -LiteralPath $cliRoot) { throw 'Choose an unused CLI prefix' }
+New-Item -ItemType Directory -Path $cliRoot -ErrorAction Stop | Out-Null
+& $cargo install yetlet-cli --version 0.4.0 --locked --root $cliRoot
+if ($LASTEXITCODE -ne 0) { throw 'CLI installation failed; retain the Cargo error' }
+$yetlet = Join-Path $cliRoot 'bin\yetlet.exe'
+& $yetlet --version
+& $yetlet --help
+& $yetlet doctor --json
+if ($LASTEXITCODE -ne 0) { throw 'Doctor failed; inspect its environment report' }
+```
+
+`doctor` reports schema 1, scope `environment`: installed Rust/Cargo
+identity and compiled filesystem capability. Its `ok` field does **not**
+certify OpenSSL for rebuilding the CLI, app locks, Settings, secrets, Vite,
+assets, console behavior, or application readiness. Do not treat its pass as
+permission to skip the app's actual build/run.
+
+Use a fresh trusted app parent and explicit SDK pin. Keep network access
+for the **first** SDK metadata resolution and Cargo lock generation;
+`--offline` requires both cached resolver metadata and Cargo inputs and
+must fail when either is missing:
+
+```powershell
+$appParent = Join-Path $env:LOCALAPPDATA 'YetletFirstApps'
+if (Test-Path -LiteralPath $appParent) { throw 'Choose an unused protected app parent' }
+New-Item -ItemType Directory -Path $appParent -ErrorAction Stop | Out-Null
+& $yetlet new firstapp --parent $appParent --sdk-version 0.9.0-alpha.8
+if ($LASTEXITCODE -ne 0) { throw 'Native scaffold creation failed' }
+$app = Join-Path $appParent 'firstapp'
+$manifest = Join-Path $app 'Cargo.toml'
+if (!(Test-Path -LiteralPath (Join-Path $app 'Cargo.lock')) -or
+    !(Test-Path -LiteralPath (Join-Path $app '.yetlet\sdk-resolution.json'))) {
+    throw 'Generated lock or SDK resolution receipt missing'
+}
+Push-Location $app
+try {
+    & $cargo fetch --locked
+    if ($LASTEXITCODE -ne 0) { throw 'Locked app dependency fetch failed' }
+    & $yetlet inspect --manifest-path $manifest --json
+    if ($LASTEXITCODE -ne 0) { throw 'Inspect failed' }
+    & $yetlet build --manifest-path $manifest
+    if ($LASTEXITCODE -ne 0) { throw 'Native build failed' }
+    & $yetlet run --manifest-path $manifest
+} finally {
+    Pop-Location
+}
+```
+
+Use a real attached Windows console with **processed Ctrl+C input** for
+`run`. Open `http://127.0.0.1:7878/` and `/hello/Ada` (both should return
+HTTP 200 with default CSP) and press Ctrl+C to exit before proceeding.
+`run` does not turn on Rust watch by default. The generated
+`Cargo.toml`, `Cargo.lock` and `.yetlet/sdk-resolution.json` belong to
+this app; do not copy another workspace's lock, inject local SDK paths,
+or silently re-resolve dependencies. Frozen build/run/watch do not
+download missing crates, repair the lock, or install tools.
+
+`inspect --json` is schema 1, scope `project-execution-plan`: a
+read-only explanation of the selected settings, Native target and intended
+`build`/`run`/`watch` stages. It starts no child and does not validate tools,
+TLS, assets, secrets, listener availability or runtime readiness. For this
+plain Native app, Vite and default Rust watch are off; explicit `watch`
+selects the Rust watcher.
+
+Optionally prepare a **separate, trusted Watchexec 2.8.0** executable on
+the current process PATH, then check its identity before starting Native
+Watch. Yetlet does not download it. From the same protected app:
+
+```powershell
+$watchexec = Get-Command watchexec.exe -ErrorAction Stop
+& $watchexec.Source --version  # Expect Watchexec 2.8.0
+& $yetlet watch --manifest-path $manifest
+```
+
+Edit the existing home-handler text in `src\main.rs` and save: Native Watch
+must rebuild and launch a **new process**, not preserve in-process state.
+An attached console cancellation must stop the owned Watch/Cargo/app tree
+and release port 7878. This is **not** Browser/Vite Watch, not HMR,
+and not a guarantee of arbitrary hot reload. Compilation errors can leave
+the watcher awaiting the next source change; check its terminal output.
+
+### Windows x64 MSVC command/evidence matrix (M27-C, 2026-11-16)
+
+This is an evidence snapshot, **not a universal Windows support claim**.
+The retained local Windows Runner record is
+`artifacts/verification/m27-c-windows-msvc-20261116/`, based on
+`1312006841ddf883d578da84f8bf38bfcfddeccd`. The exercised
+`yetlet.exe` is a previously built **CLI 0.4.0** with SHA-256
+`8a8c2b436755a14f0f3a6fe9737f574af71c1b249b4f8fd6486282d91af39a74`;
+it is **not** asserted to be byte-identical to the published CLI crate.
+The M27-B source difference from the original PR #94 build checkout is
+the Service-only README composition in `scaffold.rs`; Doctor, Inspect,
+native Run/Watch and plain Native scaffold code are unchanged.
+
+| Lane | Native MSVC result and evidence | Boundary |
+|---|---|---|
+| CLI/toolchain | `0.4.0`; rustc/Cargo `1.99.0`, `x86_64-pc-windows-msvc`, VS C++ tools `14.44.35207`; `doctor/toolchain-probes.json` | No global toolchain or ACL change |
+| Doctor | Exit 0; `doctor/doctor.json`: schema 1, `environment`, Rust/Cargo/Windows filesystem pass; app readiness not checked | Not an app/console/OpenSSL certification |
+| Native new/lock | Initial offline metadata cache miss retained (`first-use/yetlet-new.exit` = 1); separate online `new` exit 0, exact SDK alpha.8, `m26-app-serve` and lock/receipt SHA match (`first-use/yetlet-new-online-summary.json`) | Registry metadata is distinct from `cargo fetch`; offline failure was not a successful first pass |
+| Fetch and Inspect | `cargo fetch --locked` exit 0; `inspect` exit 0 and schema 1 `project-execution-plan`; `inspect/files-before.json` / `files-after.json` are unchanged | Settings-derived plan only; no runtime readiness proof |
+| Build and ordinary Run | Reuse the **separate** accepted published CLI 0.4.0/SDK alpha.8 Windows Native locked first-app result ([M26 Roadmap](ROADMAP.md#m26--application-startup--sample-experience), [CLI release record](CLI-040-HOSTED-RECORD.md)); HTTP 200 at two routes, strict CSP, ordinary Run Ctrl+C and port reuse | This M27-C run did not replay standalone `build`/`run`; their original archive/source identity remains separate from the local source-built executable |
+| Native Watch | **New native MSVC runtime**: Watchexec `2.8.0` (SHA-256 `0a362aa3bb944337f9d2e8d37f8a4fdc4aba2f3a6d83e5d69df43a7eedfbfd14`); initial HTTP 200, changed-source HTTP 200, distinct PID, old generation reaped, owned tree and port 7878 closed (`native-watch-summary.json`, `native-watch-process-tree.json`) | Test sent **Ctrl+Break**, not Ctrl+C; native cancel exit `0xC000013A` is expected and not exit 0. No Browser/Vite/Node runtime |
+| Historical comparison | Windows GNU Rust/Vite pair and older MSVC single-Cargo/process or compile qualifications remain in [Qualification Matrix](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) | GNU does not establish current MSVC Browser/Vite; current Native Watch does not retroactively pass historical cases |
+
+Keep all failed setup/test attempts alongside successful evidence, including
+the original MSVC console-mode test-harness failures and the M27-C offline
+metadata miss. The M27-C Watch test performed a **Ctrl+Break** cancellation;
+the already accepted M26 ordinary Run evidence covers **Ctrl+C** on its
+separate published source. Do not describe the Watch test as a Ctrl+C
+test or combine their exit semantics. No new API, command, JSON schema,
+dependency, installer, production readiness or Pages release follows.
+
+### Historical Windows source-checkout example
+
+For maintainer-only evaluation, the earlier source-checkout commands remain
+separate from the published install path:
 
 ```powershell
 cargo build --offline --locked --manifest-path .\tools\yetlet-cli\Cargo.toml
-$Yetlet = Join-Path (Get-Location) "tools\yetlet-cli\target\debug\yetlet.exe"
-& $Yetlet --help
-& $Yetlet new sampleapp --parent C:\ProtectedApps
-# Prepare compatible local Cargo overrides and the app lock as its README describes.
-& $Yetlet build --manifest-path C:\ProtectedApps\sampleapp\Cargo.toml
-& $Yetlet run --manifest-path C:\ProtectedApps\sampleapp\Cargo.toml
+$YetletFromCheckout = Join-Path (Get-Location) 'tools\yetlet-cli\target\debug\yetlet.exe'
+& $YetletFromCheckout --help
 ```
 
-Choose an existing owner-protected local fixed NTFS parent. Do not disable ACL,
-reparse or executable checks. The [native Windows GNU pair record](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
-covers six selected real Rust/Vite lifecycle cases; MSVC pair evidence remains
-compile-only. Separately, [native MSVC single-Cargo evidence](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
-covers build/run, native console cancellation and descendant cleanup, with a
-bounded warm-build baseline in the same record.
+The CLI owns native startup and process cleanup. Vite independently owns
+frontend compilation and HMR. Frontend JS/TS files may use custom names and
+subdirectories while physical root confinement rejects private paths and
+outside links. The default entry is `app.ts`.
+[Historical integration evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
+is distinct from this Native-only MSVC result. Historical Windows GNU pair
+acceptance covers six separate Rust/Vite cases; the older MSVC pair
+qualification is compile-only. Historical single-Cargo MSVC evidence covers
+native cancellation and process ownership without proving this full
+current CLI 0.4.0 workflow.
 
 ## Read-only project inspection (YT-111)
 
