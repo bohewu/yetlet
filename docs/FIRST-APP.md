@@ -27,8 +27,9 @@ choose the separate [browser-only WASM walkthrough](BROWSER-APP.md).
 - Use a terminal without unrelated `APP_CLI__*` or settings-root overrides.
   The plain native scaffold defaults to Production CLI settings, Vite off and
   Rust watch off. Keep loopback port 7878 available for the app.
-  Windows has [separate native setup](CLI-GUIDE.md#windows-powershell-native-gnumsvc);
-  these POSIX commands are not a Windows walkthrough.
+  Windows x64 MSVC has a separate
+  [PowerShell first-app and Native Watch walkthrough](CLI-GUIDE.md#windows-x64-msvc-first-app-and-native-watch);
+  these POSIX commands are not Windows commands.
 
 Stop at the first error. All paths below are explicit; no ancestor search,
 existing-project overwrite is assumed. The installation below places the CLI

@@ -4,6 +4,8 @@
 
 - [x] **Correct CLI first-use lock guidance (YT-260).** Align the first-use sequence in `docs/CLI-GUIDE.md` with CLI 0.4.0: `yetlet new` already creates the exact app lock and SDK-resolution receipt; fetch the existing lock with `cargo fetch --locked` before build/run. Preserve explicit offline-cache and no-implicit-install boundaries. Independent final Reviewer `wc_job_ab4Zl3f_I3Q3_Fu4` PASS.
 - [x] **Document the generated Service operational contract (YT-261).** Add conditional `--service` guidance to the generated README: liveness/readiness routes, readiness transition on graceful shutdown, and the distinct bind configuration for plain Service versus Service with Settings/Vite. Documentation only; no runtime behavior change. Independent final Reviewer `wc_job_ab4Zl3f_I3Q3_Fu4` PASS.
+- [x] **Windows x64 MSVC first-use and Native Watch (YT-262).** The [PowerShell CLI Guide](CLI-GUIDE.md#windows-x64-msvc-first-app-and-native-watch) and First App link cover CLI 0.4.0 / SDK alpha.8, environment-only Doctor, read-only Inspect and locked Native build/run/watch. Actual MSVC Native Watch edit/restart/Ctrl+Break (`0xC000013A`) and owned cleanup passed; the separate M26 first-app result supplies ordinary Run/Ctrl+C/CSP evidence. Windows docs and independent Reviewer `wc_job_6WNK0nuaj1AQDaRL` PASS. Documentation-only, no Browser/Vite or release qualification.
+
 
 The M27-A/B audit and prioritization are recorded in [DX Gap Report](M27-DX-GAP-REPORT.md) and [Prioritized Plan](M27-PRIORITIZED-PLAN.md). Both work items received independent plan Reviewer R4 PASS and independent implementation Reviewer `wc_job_ab4Zl3f_I3Q3_Fu4` PASS; YT-260 and YT-261 are complete at their bounded documentation scope.
 
