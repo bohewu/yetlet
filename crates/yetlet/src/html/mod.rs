@@ -191,7 +191,7 @@ mod tests {
     use crate::view::{Element, View};
 
     #[test]
-    fn yt147_private_append_and_public_wrapper_match_literals() {
+    fn private_append_and_public_wrapper_match_literals() {
         for (input, expected) in [
             ("", ""),
             ("plain", "plain"),
@@ -328,12 +328,12 @@ mod tests {
 }
 
 #[cfg(test)]
-mod tests_yt220 {
+mod pre_textarea_tests {
     use super::render_to_string;
     use crate::view::{Element, View};
 
     #[test]
-    fn yt220_pre_preserves_first_parsed_line_and_escapes_content() {
+    fn pre_preserves_first_parsed_line_and_escapes_content() {
         for (text, expected) in [
             ("", "<pre></pre>"),
             ("\ncode", "<pre>\n\ncode</pre>"),

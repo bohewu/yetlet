@@ -7,7 +7,7 @@ and two local setup failures are preserved without a publication retry.**
 
 ## Authority and immutable product source
 
-After accepting the [candidate](YT-248-CLI030-CANDIDATE.md), the Owner authorized
+After accepting the [candidate](https://github.com/bohewu/yetlet/blob/ad564ad1ef07e5fca063ae88587c0f21e6edb5b1/docs/YT-248-CLI030-CANDIDATE.md), the Owner authorized
 merging CodeQL PR #72 and publishing the independent CLI 0.3.0 release under the
 [existing single-publication policy](RELEASE-PUBLICATION.md#each-version).
 The closed cohort is schema 3 / `cli`, exactly `yetlet-cli`; the already published

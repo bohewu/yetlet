@@ -232,11 +232,11 @@
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
         "docs/YT-020-PRIVATE-RELEASE-PREP.md",
-        "docs/YT-020-HOSTED-REBUILD.md",
+        "docs/RELEASE-SUPPLY-CHAIN.md",
         "docs/YT-020-PRIVATE-TRUST-POLICY.md",
         "docs/YT-020-PRIVATE-SIGNING-VERIFICATION.md"
       ],
-      "notes": "Priority P1; size S; milestone M5. Acceptance/evidence: [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [hosted rebuilding](YT-020-HOSTED-REBUILD.md), [trust/registry policy](YT-020-PRIVATE-TRUST-POLICY.md) and [actual Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md): dedicated key/fingerprint, three signatures, separate public-only verification and six negative cases pass; formal source/tag/identity/certificate/log/builder trust, registry/reporting/scanner gates and explicit activation approval remain open"
+      "notes": "Priority P1; size S; milestone M5. Acceptance/evidence: [Private preparation](YT-020-PRIVATE-RELEASE-PREP.md), [hosted rebuilding, original fixed Git source](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md), [trust/registry policy](YT-020-PRIVATE-TRUST-POLICY.md) and [actual Private signing](YT-020-PRIVATE-SIGNING-VERIFICATION.md): dedicated key/fingerprint, three signatures, separate public-only verification and six negative cases pass; formal source/tag/identity/certificate/log/builder trust, registry/reporting/scanner gates and explicit activation approval remain open"
     },
     {
       "id": "YT-021",
@@ -248,9 +248,9 @@
       ],
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
-        "docs/YT-021-STREAMING-SSR-RESEARCH.md"
+        "docs/HTTP-PIPELINE.md"
       ],
-      "notes": "Priority P2; size M; milestone Later. Acceptance/evidence: [Bounded incremental SSR research](YT-021-STREAMING-SSR-RESEARCH.md): equivalent escaped fragments, barrier/error proof, matched HTTP first-body/completion/throughput measurements; app-owned prototype retained, core promotion rejected",
+      "notes": "Priority P2; size M; milestone Later. Acceptance/evidence: [Bounded incremental SSR research](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing): equivalent escaped fragments, barrier/error proof, matched HTTP first-body/completion/throughput measurements; app-owned prototype retained, core promotion rejected",
       "completed_at": "2026-10-12"
     },
     {
@@ -263,9 +263,9 @@
       ],
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
-        "docs/YT-022-RESUMABILITY-RESEARCH.md"
+        "docs/ARCHITECTURE.md"
       ],
-      "notes": "Priority P2; size L; milestone Later. Acceptance/evidence: [Bounded resumability research](YT-022-RESUMABILITY-RESEARCH.md): finite versioned handlers, constrained numeric capture round trips, rejection/trust tests and native encoded-size/cost measurements; app-owned descriptor pattern retained, generic/core promotion rejected",
+      "notes": "Priority P2; size L; milestone Later. Acceptance/evidence: [Bounded original resumability evidence](https://github.com/bohewu/yetlet/blob/42d8856b9acf5ddddab9a4b998b5bdd4c5e59210/docs/YT-022-RESUMABILITY-RESEARCH.md): finite versioned handlers, constrained numeric capture round trips, rejection/trust tests and native encoded-size/cost measurements; app-owned descriptor pattern retained, generic/core promotion rejected",
       "completed_at": "2026-10-12"
     },
     {
@@ -278,9 +278,9 @@
       ],
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
-        "docs/YT-023-WEBGPU-RESEARCH.md"
+        "docs/ARCHITECTURE.md"
       ],
-      "notes": "Priority P2; size L; milestone Later. Acceptance/evidence: [Bounded native scene research](YT-023-WEBGPU-RESEARCH.md): opt-in wgpu/Vulkan instanced draw and all-center readback at 10k/50k/100k, raw completion-wall-time and explicit allocation-byte observations; retain app-owned prototype, reject core/browser-portability promotion",
+      "notes": "Priority P2; size L; milestone Later. Acceptance/evidence: [Bounded native scene research](docs/ARCHITECTURE.md#experimental-scene-browser-gpu-and-physics-lab-boundaries): opt-in wgpu/Vulkan instanced draw and all-center readback at 10k/50k/100k, raw completion-wall-time and explicit allocation-byte observations; retain app-owned prototype, reject core/browser-portability promotion",
       "completed_at": "2026-10-12"
     },
     {
@@ -293,9 +293,9 @@
       ],
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
-        "docs/YT-024-CUSTOM-TRANSPORT-RESEARCH.md"
+        "docs/EXTENSIONS.md"
       ],
-      "notes": "Priority P2; size M; milestone Later. Acceptance/evidence: [Bounded custom transport research](YT-024-CUSTOM-TRANSPORT-RESEARCH.md): typed opt-in TCP adapter, real loopback request/results, malformed/error/cancellation proof and joined cleanup; app-owned pattern adopted, core promotion rejected",
+      "notes": "Priority P2; size M; milestone Later. Acceptance/evidence: [Bounded custom transport research](EXTENSIONS.md#application-owned-action-transport): typed opt-in TCP adapter, real loopback request/results, malformed/error/cancellation proof and joined cleanup; app-owned pattern adopted, core promotion rejected",
       "completed_at": "2026-10-12"
     },
     {
@@ -356,9 +356,9 @@
       ],
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
-        "docs/YT-029-HTTP-DEADLINE-RESEARCH.md"
+        "docs/HTTP-PIPELINE.md"
       ],
-      "notes": "Priority P1; size M; milestone Later. Acceptance/evidence: [Bounded deadline research](YT-029-HTTP-DEADLINE-RESEARCH.md): opt-in native Tower/Axum composition, cancellation/body limits, matched release overhead and application-owned adoption decision; general providers/core promotion remain deferred",
+      "notes": "Priority P1; size M; milestone Later. Acceptance/evidence: [Bounded deadline research](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing): opt-in native Tower/Axum composition, cancellation/body limits, matched release overhead and application-owned adoption decision; general providers/core promotion remain deferred",
       "completed_at": "2026-10-12"
     },
     {
@@ -886,11 +886,10 @@
       "source": "docs/BACKLOG.md",
       "artifact_paths": [
         "docs/M10G-VERIFICATION.md",
-        "docs/YT-066B1-VERIFICATION.md",
-        "docs/YT-066B2-VERIFICATION.md",
+        "docs/PROVIDER-OPERATIONS.md",
         "docs/YT-066B3-VERIFICATION.md"
       ],
-      "notes": "Priority P1; size L; milestone M10g. Acceptance/evidence: [M10g evidence](M10G-VERIFICATION.md): local operations and YT-066a proof reviewed PASS; [YT-066b1](YT-066B1-VERIFICATION.md) private Redis prototype has actual passing tests and independent reviewer PASS; the selected Cookie contract passed review; [YT-066b2](YT-066B2-VERIFICATION.md) focused provider tests and independent implementation review passed after the barrier repair at bounded experimental-provider scope; [YT-066b3](YT-066B3-VERIFICATION.md) Done at single-host/no-persistence scope after actual execution, cleanup and final independent reviewer PASS; Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability remains unverified"
+      "notes": "Priority P1; size L; milestone M10g. Acceptance/evidence: [M10g evidence](M10G-VERIFICATION.md): local operations and YT-066a proof reviewed PASS; [YT-066b1 original Git evidence](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md) private Redis prototype has actual passing tests and independent reviewer PASS; the selected Cookie contract passed review; [YT-066b2](PROVIDER-OPERATIONS.md#bounded-provider-bursts-and-http-attribution) focused provider tests and independent implementation review passed after the barrier repair at bounded experimental-provider scope; [YT-066b3](YT-066B3-VERIFICATION.md) Done at single-host/no-persistence scope after actual execution, cleanup and final independent reviewer PASS; Done at single-host Docker multi-instance and selected Redis-provider scope; broader deployment durability remains unverified"
     },
     {
       "id": "YT-067",

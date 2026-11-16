@@ -1,4 +1,4 @@
-# @NAME@ — explicit local Vite HMR profile (YT-100, experimental)
+# @NAME@ — explicit local Vite HMR profile (Vite HMR, experimental)
 
 This section applies only because `new --assets vite --with-vite-dev` was
 selected. The production instructions below still describe `npm run build`
@@ -64,4 +64,4 @@ deploy them or expose this experimental dev server outside the local host.
 The two-terminal arrangement is a temporary, explicit architecture choice.
 There is no automatic startup, detached process, public-listener fallback, shared
 asset crate or support for any other asset provider. Independent browser,
-lifecycle, Windows and Reviewer evidence is tracked in YT-100 separately.
+lifecycle, Windows and Reviewer evidence is tracked in Vite HMR separately.

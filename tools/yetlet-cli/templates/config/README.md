@@ -1,7 +1,7 @@
 # @NAME@ — opt-in typed configuration preview
 
 This standalone, unpublished native SSR application uses local Yetlet source
-paths and the finite YT-090 loader. No JS, DI container, secret discovery,
+paths and the finite typed settings loader. No JS, DI container, secret discovery,
 authentication implementation or production qualification is included.
 `new` only wrote synthetic files. It did not read environment values or secret
 files, install tools, create Cargo.lock, compile, contact a network or deploy.
@@ -104,4 +104,4 @@ original unmodified cloud template and fixed dependencies. They reject this
 configuration application. The retained cloud-profile marker does not widen
 that acceptance. Container/configuration delivery, sanitized settings/secret
 injection, images and deployment require a separate reviewed design. No
-publication, deployment or YT-020 release activation follows from scaffolding.
+publication, deployment or registry release activation follows from scaffolding.

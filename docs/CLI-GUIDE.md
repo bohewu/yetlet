@@ -4,23 +4,50 @@ For registry installation, a native quickstart and the selected release, see the
 [package README](../tools/yetlet-cli/README.md). This guide covers the command
 reference, platform setup, project settings and source maintenance.
 
-See the [CLI contract](https://github.com/bohewu/yetlet/blob/master/docs/CLI-CONTRACT.md) and
-[implementation evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-CLI-IMPLEMENTATION.md).
-The subsequent [DX audit](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-DX-AUDIT.md) compares actual setup,
-build/run/watch, diagnostics, testing and deployment-preview journeys and records
-bounded costs and proposed improvements. Independent Reviewer PASS completes
-YT-102 at research-only scope, with zero issues or required followups. CLI
-behavior and wider qualification remain unchanged.
-The separately selected [Linux completion-latency slice](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md)
-avoids the natural-exit grace only after a conservative single-thread/pinned-child
-check; cancellation and descendant cleanup retain their existing behavior.
-Independent implementation Reviewer PASS has zero issues or required followups.
+Use the [current CLI contract](CLI-CONTRACT.md), [published CLI 0.4.0
+record](CLI-040-HOSTED-RECORD.md) and [published SDK alpha.8 record](ALPHA8-HOSTED-RECORD.md)
+for version and distribution authority. The CLI build SDK, its immutable
+packaged source snapshot and each generated application's selected SDK are
+**different identities**. The default latest resolver, exact `--sdk-version`,
+offline metadata/cache, generated Cargo.lock/creation receipt and finite
+SDK startup capability policy are described below and governed by
+[ADR 0010](adr/0010-dynamic-sdk-version-resolution.md), the retained
+[YT-247 contract](CLI-GUIDE.md#sdk-resolution-yt-247) and
+[YT-259 startup contract](CLI-GUIDE.md#generated-startup-profiles).
+
+### Historical CLI and developer-loop qualification
+
+Original YT-102, YT-104 and YT-111–112 source-only stages were narrower than
+the current published CLI. The implementation, doctor, settings-error,
+frontend dotenv confinement, generator source closure, Watch and HMR research
+and selected Linux/Windows evidence remain recoverable at fixed **local Git**
+`ed7a082b1f9f72430f06866f7d550b0ed9ecbae9` (not verified as publicly
+reachable on GitHub). The [accepted CLI audit](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
+retains its historical F-01 finding, not a current unresolved security claim.
+[Natural-completion latency](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence) permits skipping
+the Linux 500ms natural-exit grace only after a narrow WNOWAIT/single-thread/
+retained-child proof; cancellation and descendant cleanup still run.
+The [native Windows Vite pair](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) separately
+qualified its selected GNU process/console cases; compile-only and other
+Windows/browser tests cannot be substituted for that evidence.
+
+`run` with Rust watch rebuilds/restarts its owned native process generation;
+it does **not** preserve arbitrary live Rust process state. Vite owns
+frontend JS/TS/CSS HMR, with application-owned state disposal and bounded
+accepted generation changes; not all edits support hot replacement. Compile
+failure retains a recoverable previous generation only at the tested seams;
+stale assets, failed child cleanup or tool/cache absence must surface as errors.
+For an interactive browser-only project use the [Browser app walkthrough](BROWSER-APP.md);
+for rolling v1/v2 public assets use [ASSETS](ASSETS.md#cache-and-retention)
+and the retained [YT-103 actual qualification](ASSETS.md#historical-single-host-rolling-asset-qualification).
+Source-scoped run/watch/asset proof is **not** production HA, universal platform
+qualification or automatic dependency installation.
 
 <a id="current-command-and-capability-inventory"></a>
 ## SDK resolution (YT-247)
 
 This release implements the accepted
-[SDK resolution contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md).
+[SDK resolution contract](#sdk-resolution-yt-247).
 The CLI's build dependency and embedded snapshot are independent of the SDK
 chosen for each new project.
 
@@ -65,13 +92,133 @@ qualified native source exporter; app SDK resolution does not expand Docker or
 Compose source support. Policy and snapshot identity resources ship in the CLI
 archive and remain bound to that archive's checksum and immutable source.
 
-CLI `0.4.0` records `startup_profile` in the creation receipt. For the
-verified SDK `0.9.0-alpha.8` archive, Native and Native Style use
-`m26-app-serve` and call `App::serve()` on `127.0.0.1:7878` when the selected
-options allow simple startup, including Tailwind without Settings, Vite or
-Service. SDK alpha.7 uses the legacy native listener. Settings, Vite and
-Service select their own native startup profiles, and Browser templates
-keep Wasm startup. [Scaffold policy and migration matrix](YT-259-CLI-NEW-STARTUP-CONTRACT.md)
+### Generated startup profiles
+
+CLI `0.4.0` checks the selected exact SDK version against its packaged startup
+capability policy. A matching row must also match the registry index SHA-256 of
+the core `yetlet` archive. The packaged policy lists SDK `0.9.0-alpha.8`.
+An unlisted version, including `0.9.0-alpha.7`, uses the legacy listener for
+simple Native and Native Style scaffolds on that same version. A checksum
+contradiction for a listed version stops creation with
+`SDK_INCOMPATIBLE` and `template-capability`. The check applies to all templates
+and also runs offline. If a matched simple template cannot be composed, creation
+fails with the same error category. Both failures leave the destination absent.
+[Packaged policy](../tools/yetlet-cli/resources/sdk-compatibility.json)
+
+| Generated selection | Unlisted SDK | Exact capability match | Generated startup |
+|---|---|---|---|
+| Plain Native | `legacy-axum` | `m26-app-serve` | Legacy uses an explicit listener. M26 uses the curated prelude and `App::new().page(...).serve()`. |
+| Native Style or standalone Tailwind on Native or Native Style | `legacy-axum` | `m26-app-serve` | Compose the selected asset routes before serving. M26 uses `App::from_router(router).serve()`. |
+| Native or Native Style with Settings or Vite, without Service | `configured-axum` | `configured-axum` | Explicit listener and `config::serve` preserve typed configuration, actual bound-address logging and optional development TLS. Vite implies Settings. |
+| Native or Native Style with Service | `service-axum` | `service-axum` | Explicit listener, health and readiness routes, and graceful shutdown, with `config::serve` when Settings or Vite is selected. Service takes precedence over those options. |
+| Browser or Browser Style | `browser-wasm` | `browser-wasm` | The existing frontend and Wasm startup uses the exact SDK package pair. Browser templates reject Service. |
+
+The first two rows apply when Settings, Vite and Service are absent. Simple M26
+scaffolds use fixed HTTP at `127.0.0.1:7878`. The legacy simple listener reads
+`YETLET_PORT`. To choose a different address in M26 app code, use
+`App::serve_on(address)`. To inspect the actual address after binding port
+`0`, coordinate graceful shutdown, or terminate TLS directly, own the native
+listener. [SDK startup API](API-REFERENCE.md#published-application-startup--sdk-alpha8)
+
+The top-level `startup_profile` in the schema 1 creation receipt at
+`.yetlet/sdk-resolution.json` records the branch that emitted the source.
+`sdk.policy_sha256` identifies the packaged policy bytes used at creation, and
+`cargo_lock_sha256` identifies the generated lockfile bytes. The receipt records
+creation provenance. The manifest and lockfile govern subsequent builds.
+
+## Historical SDK resolver, startup and first CLI release evidence
+
+The present [SDK resolution](#sdk-resolution-yt-247) and
+[generated startup profile table](#generated-startup-profiles)
+are the actual CLI0.4.0 behavioral contract. The original
+YT-247 Phase A/Phase B design had an **obsolete**
+`sdk-compat-v1` alpha.6/alpha.7 policy; it is not a current
+approval list or default pin. Current `sdk-latest-v2` without an
+explicit version selects the greatest valid non-yanked SemVer,
+**including prereleases**, using complete registry metadata.
+It does not prefer stable, bound latest to the CLI build SDK,
+silently fall back when chosen SDK is incompatible or substitute
+old cache metadata after an online failure. Effective offline
+(`--offline` or `CARGO_NET_OFFLINE=true`) forbids resolver
+transport, requires a valid local metadata set *and* separate
+Cargo crate cache, and prints an age/cache-scope notice. Missing
+or corrupt proof fails closed; latest known offline is not
+promised to be globally current.
+
+The CLI build dependency, its immutable version-bound packaged
+source snapshot and the exact new-app selected SDK are
+**three identities**. A `new` request uses private protected
+staging, checks registry origin/SDK checksum and a new generated
+`Cargo.lock`, preserves any independent stylegen lock, and
+publishes only an absent destination with a schema-1
+`.yetlet/sdk-resolution.json` source/selection receipt.
+`build`/`run`/`watch` never resolve or auto-upgrade the SDK;
+the actual retained lock governs transitive reproducibility.
+Original binary `new` refusal on unsafe tools and early
+Windows/MSVC correction cases were independent historical
+failures, not first-pass success.
+
+For YT-259's source-specific M26 proposal, the five
+`startup_profile` values are `legacy-axum`, `m26-app-serve`,
+`configured-axum`, `service-axum`, `browser-wasm`;
+a **matching exact SDK core archive index checksum** is required
+for any explicitly listed capability row, including offline.
+An unlisted version remains eligible but emits the legacy
+simple native listener on *that same SDK*, not a downgrade.
+A listed checksum contradiction reports
+`SDK_INCOMPATIBLE/template-capability` with no destination.
+Published CLI0.4.0 advertises the verified alpha.8 capability
+row; unlisted alpha.7 keeps legacy behavior. The simple
+capability-matched Native/Native Style `.serve()` path uses
+`127.0.0.1:7878` and ignores `YETLET_PORT`, while a legacy
+simple scaffold reads `YETLET_PORT`. Explicit
+`serve_on` selects a different address; configured-axum,
+Service/genuine shutdown, Vite/Settings TLS and Browser/Wasm
+remain distinct. A generated receipt's startup profile is a
+creation fact, not a release attestation or change in running
+app policy. The old YT-259 contract-only and local MSVC
+qualification gates are **not** proof that every later SDK
+archive supports the M26 APIs; verify the exact published
+archive and locked consumer.
+
+The original CLI0.1.0 GitHub/crates.io publication succeeded,
+but its anonymous installed binary printed
+`yetlet 0.1.0 (unpublished preview)`; the full registry
+consumer therefore **FAILED** at version assertion before
+help/new. Earlier custody readback mistakenly bound the SDK tag
+and was independently corrected; neither green preliminary
+job nor upload success changes the consumer result.
+The later separately authorized CLI0.1.1 package, SHA-256
+`10a1ffebf42de0baba9604ee2764b2304f601c5119ddcb5fcb988fbe319e1424`,
+passed anonymous install/version/help/`new` (original SDK
+alpha.5 pin) without rewriting 0.1.0 or claiming that
+generated applications compiled. Current distribution and
+newer versions are governed only by accepted
+[hosted CLI release records](CLI-040-HOSTED-RECORD.md).
+Original failed, consumed and accepted records are retrievable
+at fixed **local Git**
+`8b3e13004a58380accf16ea440707f84e6271871`;
+their task-specific raw CI/ZIP receipts are separately owned,
+not guaranteed by Git or publicly reachable at that SHA.
+
+## Historical CLI source evidence and operation limits
+
+Current `new` SDK resolution, app `Cargo.lock`, source receipt, guarded
+temporary creation and online/offline selection are defined by the
+[SDK version contract](CLI-GUIDE.md#sdk-resolution-yt-247)
+and [CLI process contract](CLI-CONTRACT.md#historical-cli-source-qualification-and-process-constraints).
+Do not select the old Phase B `sdk-compat-v1` alpha.7 default merely because
+the historical source/implementation report used it; the currently selected
+policy is `sdk-latest-v2` and each new project is pinned to the result of
+its actual resolver decision.
+
+The [historical qualification matrix](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
+keeps the original linked-dotenv audit failure, Linux guarded natural-exit
+fast path and noncausal warm timings, Windows native process/cancellation
+statuses, and the separately corrected SDK Resolver initial tests.
+Do not substitute a compile check for an executed Windows CLI, a Linux
+fixture for registry access or a source-only implementation review for the
+published SDK/CLI package consumer.
 
 ## CLI command and capability inventory
 
@@ -105,7 +252,7 @@ traversal, a trusted executable owner and no untrusted write access. A refusal
 prints `CLI_PROCESS stage=executable` with the error kind and optional numeric OS
 code before returning exit 125. Prepare a protected tool installation and select
 its physical directory on PATH; tool permissions are managed separately from the CLI.
-See the [native Windows diagnosis and verification](https://github.com/bohewu/yetlet/blob/master/docs/WINDOWS-CLI-125-VERIFICATION.md).
+See the [native Windows diagnosis and verification](#protected-windows-tool-preparation).
 
 ## Static HTML build
 
@@ -119,7 +266,11 @@ The canonical invocation is build --static --export-bin NAME --output DIRECTORY,
 with optional --base-path /yetlet/, --release and --wasm-islands. It runs one
 explicit trusted native exporter with frozen Cargo, validates finite protocol1
 fragments/assets and writes complete public HTML. It does not crawl handlers,
-start a backend, install tools, clean/overwrite output or deploy. HTML-only apps
+start a backend, install tools, clean/overwrite output or deploy. The native
+exporter has a separately bounded execution deadline and explicit child-process
+cleanup; uncertain supervision or publication outcomes cannot report success.
+Source/input receipts describe observed inputs, not a sandboxed or hermetic
+compiler. Existing ordinary CLI commands keep their separate execution rules. HTML-only apps
 need no Node/Wasm/server or runtime Settings loader.
 
 Existing public settings are still validated and cli.target must be native.
@@ -150,10 +301,21 @@ under target/yetlet-static/RUN_ID/ bind selected inputs/output hashes and outcom
 keep them outside uploaded content. A supervision error retains private export
 evidence and does not claim child cleanup or success. No automatic retry.
 
-Cli::BuildStatic and build_static are Experimental CLI support APIs available since `0.2.0`;
-downstream exhaustive Rust matches may need a new arm. Current-source evidence
-and bounded GNU/browser/MSVC validation are explicit in [YT-223](https://github.com/bohewu/yetlet/blob/master/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
-No SDK/CLI version is republished by this source change.
+### Static export release and validation scope
+
+`Cli::BuildStatic` and `build_static` are Experimental support APIs of the
+independent `yetlet-cli` package, available since `0.2.0`; downstream exhaustive
+Rust matches may need a new arm. Static export does not add an SDK module or
+require the optional DOM renderer for HTML-only output.
+
+The [original implementation record](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md)
+retains GNU/MSVC native CLI execution, bounded Chrome/Firefox static/island
+checks and their failures. [CLI 0.2.0 release qualification](https://github.com/bohewu/yetlet/blob/master/docs/CLI-020-RELEASE-PREPARATION.md#local-affected-evidence--2026-11-01)
+separately verifies the packaged CLI, a generated registry-SDK alpha.6 app and a
+six-file static export. The [actual publication and installed consumer](https://github.com/bohewu/yetlet/blob/master/docs/CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+prove registry installation, exact version, help and scaffolding; they do not
+rerun or broaden the earlier static/browser qualification. SDK registry
+resolve/compile evidence alone does not qualify CLI execution or browser behavior.
 
 ## First-use prerequisites
 
@@ -198,7 +360,7 @@ files for a CLI rebuild, app dependencies/settings/secrets, Node/npm, WASM tools
 frontend dist or whether `run` will work. Use the selected setup instructions
 and actual build/run for those checks. On Windows, also prepare protected
 physical tool paths and an attached processed-input console for native run;
-see [native tool preparation](https://github.com/bohewu/yetlet/blob/master/docs/WINDOWS-CLI-125-VERIFICATION.md#reuse-the-prepared-runner-tools).
+see [native tool preparation](DEVELOPMENT.md#protected-windows-tools-and-historical-exit-125).
 
 ## Build locally and create an application
 
@@ -289,7 +451,7 @@ commands retain their explicit compatible local-source requirements below.
 
 ## Creation choices and settings
 
-YT-104 adds an explicitly selected [browser-only Rust/WASM task starter](https://github.com/bohewu/yetlet/blob/master/docs/YT-104-BROWSER-STARTER.md):
+YT-104 adds an explicitly selected [browser-only Rust/WASM task starter](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-104-BROWSER-STARTER.md):
 `yetlet new tasks --template browser --tailwind`. This persists
 `cli.target = "browser"` and includes Vite/public settings, with no native
 server or app-runtime settings/secret crate. Existing `build`/`run` then manage
@@ -516,6 +678,40 @@ The fresh backend reads its runtime settings on each restart. Browser refresh,
 in-process state preservation and graceful request draining are not promised.
 Historical Vite lifecycle evidence does not qualify the added watch mode.
 
+## Native CLI platform and generated deployment boundaries
+
+The original M14 Linux and Windows GNU/MSVC work separated only two CLI
+OS adapters: owned filesystem paths/no-replace with reparse/junction and
+Unicode safety, and foreground child/process ownership. The Windows
+source-bound proof used an owned Job Object (including descendant
+cleanup) and native Ctrl-C/Break console rules; Windows group signals
+and POSIX exit semantics are **not interchangeable**. A source compile
+alone was not the real native generated-app/SSR/cancellation proof, and
+the original GNU/MSVC checks do not certify every current release
+binary, Windows container, terminal or production environment.
+
+The separate M15 opt-in Docker, Compose and K8s CLI commands generate
+**deterministic configuration files** targeting Linux workloads. They
+neither build/pull/push images nor authenticate to a registry, connect
+to a cluster or deploy workloads. The early Docker *design review FAIL*
+identified unsafe default build context and missing transitive Cargo
+source closure; the corrected independent design required three
+physically separated build contexts with deny-by-default source export
+and a complete minimal Cargo workspace. Later real Linux Docker and
+isolated K3s results and Windows generated-config parity accepted only
+their selected source/host slices, not general production HA or
+multi-architecture images. An application's host binding, TLS/ingress,
+health/readiness truth, Secrets, backups and operating SLOs remain
+application/operator decisions. Existing app source is never silently
+rewritten just because a deployment manifest is generated.
+
+The [current generator matrix](#current-generator-source-matrix) lists
+supported CLI input shapes; see [deployment profiles](PRODUCTION-DEPLOYMENT-PROFILES.md)
+for operating responsibility and [CLI contract](CLI-CONTRACT.md) for
+command spelling. Full original review failures and source tests are
+recoverable from **local Git** `42d8856b9acf5ddddab9a4b998b5bdd4c5e59210`; that SHA is not proven
+publicly reachable. These historical checks are not a fresh test of
+the published CLI 0.4.0 binary.
 ## Current generator source matrix
 
 Generators accept the following exact current `new --service` source shapes after
@@ -528,7 +724,7 @@ explicit compatible local Cargo path overrides and separately prepared locks:
 | `new NAME --service --vite` | Settings implied; accepted with the validated Production Vite asset graph |
 | `new NAME --service --vite --tailwind` | Accepted with the pinned official plugin and validated Production Vite asset graph |
 
-The separate [2026-10-22 source-closure repair](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-GENERATOR-SOURCE-CLOSURE.md)
+The separate [2026-10-22 source-closure repair](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-SOURCE-CLOSURE.md)
 adds only six exact reviewed Config/Secrets source files, including Config's
 explicitly declared example. Settings profiles declare 20 framework-context
 files; plain service retains 14. These public source files are distinct from
@@ -550,7 +746,7 @@ Watch, auto_start and auto_build never execute during generation. Docker's
 inventory adds `app-src-source-paths` so a configured `frontend/dist` or custom
 root can be explicitly exported to canonical `dist/`. Follow the generated
 Docker README's physical allowlist/hash instructions. See the
-[compatibility evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-GENERATOR-COMPATIBILITY.md).
+[compatibility evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-COMPATIBILITY.md).
 
 Generators retain their separately qualified, **unedited legacy local-source**
 representation, consistent app lock and source revalidation. Retained internal
@@ -567,7 +763,7 @@ runtime/deployment evidence does not transfer automatically to this checkout.
 | Service with production Vite, optional settings/plugin Tailwind | Explicitly prebuilt and validated flat dist |
 
 The retained legacy matrix is separately qualified by
-[YT-101 evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-101-VERIFICATION.md). Standalone Tailwind,
+[YT-101 evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md). Standalone Tailwind,
 legacy dev bridge, edited/general apps and unknown dependencies/layouts remain
 refused; adding a marker or CLI namespace alone cannot qualify arbitrary code.
 
@@ -592,7 +788,7 @@ security defaults and operator-owned drain/retention limits remain unchanged.
 Use `new NAME --tailwind`; add `--vite` for the official Vite plugin. Without
 Vite, prepare the pinned standalone tool and CSS build explicitly using the
 [generated Tailwind instructions](https://github.com/bohewu/yetlet/blob/master/tools/yetlet-cli/templates/tailwind/SELECTED-README.md).
-[YT-091 evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-091-VERIFICATION.md) retains the historical
+[YT-091 evidence](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-091-VERIFICATION.md) retains the historical
 source-bound native/browser acceptance; it does not qualify the new settings
 representation.
 
@@ -602,7 +798,7 @@ The CLI owns configured startup, stop/cleanup and build orchestration. Vite owns
 module compilation, dependency tracking and HMR. Frontend JS/TS files may use
 custom names and subdirectories without registration; physical root confinement
 still refuses private/tooling files and outside links. The default entry remains
-`app.ts`. [Integration evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
+`app.ts`. [Integration evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
 separates the earlier Windows browser checks from the current Linux follow-up.
 
 ```powershell
@@ -616,9 +812,9 @@ $Yetlet = Join-Path (Get-Location) "tools\yetlet-cli\target\debug\yetlet.exe"
 ```
 
 Choose an existing owner-protected local fixed NTFS parent. Do not disable ACL,
-reparse or executable checks. The [native Windows GNU pair record](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-WINDOWS-VITE-VERIFICATION.md)
+reparse or executable checks. The [native Windows GNU pair record](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
 covers six selected real Rust/Vite lifecycle cases; MSVC pair evidence remains
-compile-only. Separately, [native MSVC single-Cargo evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20)
+compile-only. Separately, [native MSVC single-Cargo evidence](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
 covers build/run, native console cancellation and descendant cleanup, with a
 bounded warm-build baseline in the same record.
 
@@ -654,9 +850,9 @@ ENV, tokens or resolved absolute roots. Invalid selection/settings uses exit 1,
 empty stdout and safe stderr, including existing source/profile/values hints;
 `--json` does not alter error formatting. Usage failures use exit 2.
 
-The [inspection record](https://github.com/bohewu/yetlet/blob/master/docs/YT-111-IMPLEMENTATION.md) retains its
+The [inspection record](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-111-IMPLEMENTATION.md) retains its
 source-bound acceptance evidence. The separate
-[browser-loop record](https://github.com/bohewu/yetlet/blob/master/docs/YT-112-IMPLEMENTATION.md) records completed Linux
+[browser-loop record](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-112-IMPLEMENTATION.md) records completed Linux
 edit/error/recovery and lifecycle acceptance. New Windows browser-watch execution
 remains Not verified; the separate earlier Windows CLI evidence does not cover it.
 
@@ -682,7 +878,7 @@ parser/IO/Serde errors. The existing Loader, validation order, exit 1/stderr and
 caller wrappers remain intact, including generator rejection before output.
 Unexpected Loader errors retain the generic hint; existing browser-capability
 refusals and later TLS-file checks retain their messages. See the
-[research and bounded implementation evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-SETTINGS-ERROR-RESEARCH.md#selected-cli-implementation-2026-10-20).
+[research and bounded implementation evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-SETTINGS-ERROR-RESEARCH.md#selected-cli-implementation-2026-10-20).
 
 Doctor reports schema 1 environment checks only, never application, asset,
 frontend, console, generator or release readiness. Fixed local Rust/Cargo probes
@@ -691,10 +887,10 @@ unavailable executables fail; group-writable toolchain paths are refused on
 Linux. No installation/update, shell, app settings or Node probes occur.
 
 Linux has current native process/PTY/cleanup tests. Current Windows GNU
-[doctor and CLI evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-DOCTOR-VERIFICATION.md) and
-[Rust/Vite pair evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-WINDOWS-VITE-VERIFICATION.md) supplement
+[doctor and CLI evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-DOCTOR-VERIFICATION.md) and
+[Rust/Vite pair evidence](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) supplement
 the separate MSVC compile-only pair checks and
-[native single-Cargo followup](https://github.com/bohewu/yetlet/blob/master/docs/YT-102-COMPLETION-LATENCY.md#windows-native-followup-2026-10-20).
+[native single-Cargo followup](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence).
 Windows run still requires an attached console
 with processed Ctrl-C input and protected app/tool paths; npm uses vetted native
 node.exe plus its same-install npm CLI script, without a .cmd shell fallback.
@@ -720,23 +916,33 @@ backend-environment filtering remain enforced. A fresh document nonce permits
 Vite CSS styles without weakening production CSP. Ctrl-C stops the owned tree
 and removes private generations. Browser `run` stays static preview; `build`
 packages production `dist/`, with no watch artifacts. External path dependencies
-are not automatically watched. The [selected amendment](https://github.com/bohewu/yetlet/blob/master/docs/YT-112-IMPLEMENTATION.md)
+are not automatically watched. The [selected amendment](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-112-IMPLEMENTATION.md)
 records completed Linux browser/lifecycle acceptance and retains the original
 failed attempts. New Windows browser-watch execution remains Not verified;
 historical YT-104 qualification describes the earlier static starter scope.
 
 <a id="optional-application-owned-rust-css-yt-239-working-tree"></a>
-## Application-owned Rust CSS (YT-239/243)
+## Application-owned Rust CSS
 
-This release includes the opt-in Style templates and their existing build/watch
-integration. See [Style Showcase](https://github.com/bohewu/yetlet/blob/master/examples/style-showcase/README.md)
-for a separate framework sample and its version requirements.
+Application-owned Rust CSS first shipped in CLI `0.3.0` and remains available
+in CLI `0.4.0`. The opt-in Style templates generate external CSS at build time
+through a private application tool. The current Reader Edition selects SDK
+`0.9.0-alpha.8` and CLI `0.4.0`. App SDK selection follows
+[SDK resolution](#sdk-resolution-yt-247).
 
 `new --template native-style` and `new --template browser-style` opt into a private
 std-only Cargo generator with a complete lock, useful layout/dialog composition,
-shared View class names and stylesheet connection. Ordinary templates keep ordinary
-CSS. Applicable Tailwind/Vite options compose with these choices. Creation runs
-Cargo lock generation, preserves the separate Style lock and executes no generator.
+shared View class names and stylesheet connection. Their `styles::stylesheet()`
+entry point already registers the `layout` and `dialog` modules, including a
+conditional-only class even when its View is initially absent. To add another
+module, explicitly declare it in the private Style registry and compose its
+`styles()` output; merely creating a Rust file never discovers or registers it.
+Keep target-neutral class constants shared by Views and the private generator.
+Module/class ownership is unique, deterministic and checked before CSS is emitted.
+Ordinary templates keep ordinary CSS; unsupported selector/value syntax stays
+in regular CSS rather than bypassing the finite typed vocabulary. Applicable
+Tailwind/Vite options compose with these choices. Creation runs Cargo lock
+generation, preserves the separate Style lock and executes no generator.
 
 The optional strict `[cli.styles]` section has `enabled`, `manifest`, `bin` and
 `output`; absence means no style effects. The finite manifest is
@@ -766,7 +972,59 @@ initially unknown temporaries remain untouched. No automatic install, retention,
 asset cleanup or deployment is supplied.
 The selected Cargo cache must satisfy protected filesystem ownership/write policy;
 host output uses its own `yetlet-styles/<app-root-sha256>` subtree. See the
-[implementation evidence and limitations](https://github.com/bohewu/yetlet/blob/master/docs/YT-239-STYLE-INTEGRATION.md).
-The [YT-243 source qualification](https://github.com/bohewu/yetlet/blob/master/docs/YT-243-RELEASE-QUALIFICATION.md)
-records independent review and bounded Linux/local Windows MSVC validation.
-Hosted release/signing/publication and wider platform qualification remain separate.
+[original source implementation and independent review](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md#independent-review-and-completion).
+The earlier [YT-238 local prototype](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-238-STYLE-BUILDER-PROOF.md#independent-review-and-completion)
+selected the private builder and default module registration but was not
+itself a published CLI or public Style API.
+
+### Style release and platform evidence
+
+| CLI | Linux installed registry consumer | Windows x64 MSVC |
+|---|---|---|
+| `0.3.0` | Accepted supplement passed Native Style SSR/CSS and Browser Style Vite/Wasm/Chrome with SDK alpha.7. The original publisher's consumer preflight failure is retained. [Publication record](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10) | New Style-template revalidation remained unverified. [Publication record](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10) |
+| `0.3.1` | Hosted consumer passed Native and Browser Style runtime with SDK alpha.7. [Publication record](CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11) | Corrected source passed Native SSR/CSS, Browser Vite/Wasm/Chrome and immediate port closure after Ctrl-Break for both apps. The reviewed formatting-only delta and package member comparison bind the tested source to the accepted archive. [Windows preparation](CLI-031-RELEASE-PREPARATION.md), [hosted archive record](CLI-031-HOSTED-RECORD.md#windows-corrected-replacement--2026-11-11) |
+| `0.4.0` | Hosted consumer passed Native Style HTTP/CSS and Browser Style Vite/Wasm/Chrome with exact SDK alpha.7. The separate alpha.8 first-app runtime check used plain Native. [Publication record](CLI-040-HOSTED-RECORD.md) | The preparation archive passed the locked SDK alpha.8 Native Style compile check, including SDK and startup-profile selection and lock preservation. Windows Style runtime evidence for this release remains unverified. [Qualification record](CLI-040-HOSTED-RECORD.md) |
+
+YT-243 records source qualification, including Linux release-profile browser
+checks and local Windows MSVC Native Style HTTP/CSS, Browser Style scaffold
+creation and wasm32 compile checks. Its Windows browser scope stops at
+compilation. [YT-243 source qualification](QUALIFICATION-MATRIX.md#historical-two-package-migration-and-style-source-qualification)
+
+Todo and the native-first Style Showcase have their own bounded Linux
+Chrome/Firefox sample results. Showcase runs from a checkout and has an optional
+Wasm companion. The [Todo sample's CSS instructions](../examples/todo-server/README.md#app-owned-rust-styles-and-typed-tag-builders)
+retain current usage; [its original bounded Linux qualification](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary)
+retains observed browser results and limits. [Style Showcase](../examples/style-showcase/README.md)
+
+## Development HTTPS
+
+Use the existing public `server.tls` settings in a settings-enabled app with
+Development selected. Prepare loopback certificates and trust explicitly through
+[the development guide](DEVELOPMENT.md#opt-in-local-https-preparation-and-lifecycle).
+`yetlet build` can compile with certificate directories absent. `yetlet run`
+and `watch` require valid prepared material and select optional yetlet-dev-tls.
+Automatic Vite startup owns HTTPS/WSS5173 and a private HTTP Rust backend3000.
+With automatic Vite disabled Rust serves HTTPS directly. Preserve bridge
+Host/Origin/path/CSP and native owned-process cancellation. The
+[Linux and MSVC results](QUALIFICATION-MATRIX.md#development-https-evidence-and-original-failures)
+separate actual TLS/console checks, failed wrappers and later cleanup.
+
+## Protected Windows tool preparation
+
+The executable trust check can return125 before creating any child. Choose an
+owner-protected physical directory, verify the expected tool hash, and select
+its absolute directory on process-local PATH. Prepare the corresponding native
+Visual Studio and OpenSSL environment, explicit Cargo cache and target roots.
+Use an attached console with processed input for run. Preserve the global tool
+installation and permission policy.
+
+The historical retained Cargo SHA256 was
+`6f4bef66261261fcb43131be8720bab817d403a09edec7455c371974b90bdb7e` and
+source-matched CLI SHA256 was
+`1cccc6815f63ce8e3318aefa3ce7dbb550b1015694a2725f5b32e326cf0034a9`.
+These identify the 2026-10-18 fixture only. The
+[original process-local PowerShell setup](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/WINDOWS-CLI-125-VERIFICATION.md#reuse-the-prepared-runner-tools)
+is locally recoverable for that owned root. Current installations need their
+own identity and permissions checks. A copy under ordinary inherited unsafe
+ACLs remains refused. [Native results and original failures](QUALIFICATION-MATRIX.md#windows-exit-125-diagnosis-and-native-results)
+retain the MSVC/GNU and console scope of each observation.

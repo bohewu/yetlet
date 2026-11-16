@@ -33,7 +33,7 @@ crates.io package; it must no longer be described as an available dependency.
 The old signed artifacts/tags and first-publication result remain historical
 evidence. PR29 is closed unmerged and its legacy continuation is retired.
 Later release-note status corrections do not alter those signed attachments or
-move any tag. CLI installation followup is [YT-214](YT-214-CLI-INSTALLATION.md),
+move any tag. CLI installation followup is [YT-214](https://github.com/bohewu/yetlet/blob/ad564ad1ef07e5fca063ae88587c0f21e6edb5b1/docs/YT-214-CLI-INSTALLATION.md),
 not a third SDK publication or a new version of either released package.
 
 ## Source and selected scope

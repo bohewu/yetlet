@@ -1,7 +1,7 @@
 # YT-125: application-owned Auth/Valkey qualification fixture
 
 This unpublished, standalone Linux/native workspace implements the owner-selected
-first candidate from the reviewed [YT-124 contract](../../docs/YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md).
+first candidate from the reviewed [YT-124 contract](../../docs/PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority).
 It is a **test-only application with a synthetic trusted identity**. The login
 button does not verify a password, OIDC token, or other credential. Never deploy
 it as an authentication application. It is not adopted into Admin or the example
@@ -65,7 +65,7 @@ cookie-enforcement qualification is claimed.
 The explicit local-HTTP cookie override is fixture-only. Reads do not mint or
 renew cookies; observed stale finalization suppresses Set, and logout emits no
 Set/Clear. Previously prepared responses retain the provider's documented
-[pure-SSR late-cookie limits](../../docs/YT-066B-COOKIE-ORDERING.md): an old
+[pure-SSR late-cookie limits](../../docs/PROVIDER-OPERATIONS.md#redis-session-cas-operation-outcome-and-cookie-ordering): an old
 response may replace a newer browser cookie and force another login, but cannot
 restore retired server authority. This test does not strengthen that guarantee.
 

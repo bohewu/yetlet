@@ -8,7 +8,7 @@ This document classifies the public Rust surface exercised by M0–M10c and the 
 
 This historical classification separates **Stable Candidate**, **Experimental**, and **Internal/support-only** contracts. These labels are evidence classifications, not SemVer guarantees, production approval or a promise that package names and signatures will never change. The provisional change discipline is recorded in [Compatibility Policy](COMPATIBILITY.md); current vocabulary and intentional pre-public source migrations are recorded in the [naming guide](NAMING.md).
 
-The original post-M9 security round validated Rust 1.88; that evidence remains historical. Licensing, document metadata, bounded qualification and private governance are now complete at their recorded scopes. The maintainer selected experimental `0.1.0` and Rust 1.99 before publication; [Compatibility Policy](COMPATIBILITY.md) defines patch preservation and future increases. Public activation remains blocked by [concrete release gates](YT-020-INTEGRITY-PREPARATION.md#remaining-activation-gates), not by a requirement to certify every platform or application deployment. These API classifications remain unchanged.
+The original post-M9 security round validated Rust 1.88; that evidence remains historical. Licensing, document metadata, bounded qualification and private governance are now complete at their recorded scopes. The maintainer selected experimental `0.1.0` and Rust 1.99 before publication; [Compatibility Policy](COMPATIBILITY.md) defines patch preservation and future increases. Public activation remains blocked by [concrete release gates](RELEASE-SUPPLY-CHAIN.md#current-preparation-source-boundary-2026-10-12), not by a requirement to certify every platform or application deployment. These API classifications remain unchanged.
 
 For current entry points, feature/target selection and application options,
 start at [Current API reference](API-REFERENCE.md). This historical classification
@@ -89,7 +89,7 @@ inventory or change any M9 Stable Candidate classification:
 | `yetlet-session-redis::{RedisSessionConfig,RedisSessionManager,RedisSession,RedisSessionError,RedisSessionUpdateError,RedisOperationId,RedisOperationStatus}` | **Experimental, unpublished, isolated workspace**; explicitly connected async Redis single-primary provider. `connect/read/try_update/rotate/destroy/shutdown` are async because they do I/O; `open` only parses a cookie. Memory `yetlet-session` remains synchronous, and behavior/cancellation/uncertain results are not interchangeable. [Provider guide](../crates/yetlet/guides/session-redis.md) |
 | `yetlet-wgpu::{Batch,PickViewport,PickToken,Lifetime,SceneError}` and wasm32/browser `browser::SceneOwner` | **Experimental opt-in, `publish = false`**, CPU-only defaults; explicit browser feature. Bounded flat records, validation, picking, initialization, resize, queue completion and disposal were tested at one selected Firefox/X11/Intel Vulkan configuration. No GPU default dependency, 3D API, performance/stability/production claim or public wgpu type. [Crate guide](../crates/yetlet-browser/guides/wgpu.md) and [support matrix](../crates/yetlet-browser/guides/wgpu-support.md) |
 
-The [YT-081 cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) records
+The [YT-081 cross-crate API audit](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement) records
 intentional API differences and remaining P2 design debt: the Experimental
 GPU CPU error surface now uses typed `SceneError` with explicit Wasm
 `JsValue` conversion, and first-retirement `dispose` reports a `bool`;
@@ -113,6 +113,76 @@ when offering reload. This does not change configuration precedence,
 Core/browser defaults, signing semantics or the original release inventory.
 See the [contract and verification](SECRET-PROVIDERS.md).
 
+## Historical HTML element and attribute inventory
+
+The original **2026-10-31** WHATWG index classification was a *design*
+inventory, not a current conformance claim or complete list of public typed
+builder methods. It used a fixed 488,697-byte WHATWG element/attribute index
+(SHA-256 `0a865ea90576d2976db607d324b1e27de14a7d5f53f96da3f63c209ea288181d`):
+**113 named HTML elements**, two foreign roots and one custom-element
+family; **180** attribute/applicability rows covering **144** distinct
+names; and **89** event-handler-content attribute names. The original
+element-by-element and applicability matrices, accepted/deferred decisions,
+source index and review identity are recoverable at **local Git**
+`8b3e13004a58380accf16ea440707f84e6271871` (public historical
+GitHub reachability not verified); the raw WHATWG download and extracted
+rows were task-local, **not committed with this report**.
+
+Its historical dispositions were: **C** = then accepted with limited
+scope; **220/221** = proposed ordinary-content/navigation-image work
+(not yet implemented *at that snapshot*); **W** = document/head/asset
+writer ownership; **D** = deferred for an explicit consumer/lifecycle;
+**X** = excluded from the ordinary DOM View path. Later typed Tag Builder
+and DOM additions have their own actual acceptance and release records:
+do **not** reuse a 2026-10-31 "No" cell as evidence that the current
+SDK lacks a feature. Current Rust APIs and allowed DOM/SSR shapes are
+defined by the [HTML guide](../crates/yetlet/guides/html.md),
+[DOM guide](../crates/yetlet-browser/guides/dom.md) and actual
+[published API](API-REFERENCE.md), including its version limits.
+
+The inventory did **not** authorize arbitrary element/attribute
+spreading, custom `data-*`/`aria-*`, `on*` handler strings, inline
+CSS, `srcdoc`, hostile resource URLs or namespaced foreign markup.
+All 89 indexed event-handler content attributes are **excluded from
+HTML/DOM emission**; attach explicit owned Rust/web-sys listeners.
+Even admitted ARIA names require application-appropriate role/state
+and real reference targets; admission alone does not certify AT speech
+or WCAG conformance. The finite historical DOM set included selected
+global `role`, data-`id`/`completed`/`selected` and named ARIA
+controls, plus host-specific form/URL attributes; an `InertAttributeName`
+or generic HTML SSR identifier is *not* an automatic DOM whitelist.
+Document-owned `head`/`base`/external assets remain separate from
+the replaceable subtree. No unconditional browser/OS, image/network
+or custom-element semantics follows from the inventory.
+
+## Cross-crate API differences and scoped GPU refinement
+
+A dated cross-crate audit found **no P0/P1 exercised-path API defect**
+among its original library candidates and separately experimental
+Redis/GPU modules. The audit does not promise current stable ABI,
+SemVer compatibility or untested platform support.
+
+Intentionally distinct behavior stays distinct: Memory Session
+uses synchronous clone/commit, while Redis Session awaits network
+CAS and can return OutcomeUnknown, requiring separate resolution
+rather than automatic callback retry. Redis open parses Cookie data;
+ActionExecutor execute remains async even with local synchronous work.
+HTML, DOM, actions, providers and graph retain domain-specific errors,
+not a common YetletError or universally identical dispose shape.
+
+An independently selected Experimental GPU refinement later
+implemented typed CPU SceneError variants, translated browser failures
+at the Wasm JsValue boundary, and made first logical retirement
+return bool for Lifetime/SceneOwner. **A true retirement value is
+not proof that async Wasm borrows have settled**, nor permission
+to free the wrapper immediately. DOM listeners and Sessions preserve
+their own cleanup contracts. Other identified P2 differences were
+not automatically breaking defects or a stable public API promise.
+Changes to published surfaces still require separate compile fixtures,
+migration notes, testing and independent review.
+
+Full original audit matrix and bounded tested inputs remain at
+local Git dfb27dc816c452e8033ff24e2d853f88a451761a (public reachability unverified).
 ## Internal/support-only
 
 | Public surface | Reason |
@@ -139,3 +209,24 @@ Before a public stability declaration:
 5. declare supported browsers/OS/toolchains and CI coverage;
 6. decide which optional provider security claims require independent audit;
 7. add migration notes and compile-level compatibility fixtures for adopted Stable Candidates.
+
+## Original inventory acceptance and review limits
+
+The 2026-10-10 M9j inventory covers **170 public declarations/constants in
+14 source files**, rather than the complete current SDK. First final review
+`wc_job_BzkzTPcKr4FKATTr` accepted product regression but failed two P2 inventory
+claims: omitted public constants/typed errors and overbroad Stable Candidate
+classification of upstream reexports. The repaired inventory explicitly includes
+`SessionConfigError`, `InvalidStart`, Request ID `HEADER`, `DEFAULT_CSP` and
+`LocalGraph::DEFAULT_MAX_PASSES`. The last two are Experimental policy defaults;
+broad Axum/http/extract/response reexports are Internal/support-only. Selected
+upstream sample use is no proof for whole upstream modules.
+
+Repeat independent role-directed read-only review `wc_job_QkQkovlBlvrhPxCE`
+returned terminal exit 0, PASS with no issues/followups after documentation-only
+repair. It was not native managed-role dispatch or formal assurance. Product
+source did not change for that repair. Original declarations and raw logs are
+separately retained ignored evidence; original Markdown is recoverable at local
+Git `ac98cdc127ccd299cb1150fef922b0560453a1d4`. Remote GitHub reachability has not
+been verified. [Freeze scope](QUALIFICATION-MATRIX.md#sample-and-api-freeze-evidence)
+records what was actually executed and what remained unqualified.

@@ -1,6 +1,6 @@
 # Lab Operations Board — M11-P
 
-**Unpublished, loopback-only application; YT-073 locally complete.** Fourteen native tests, final Chrome/Firefox journeys, real Chewing IME and actual Firefox/Orca speech pass. YT-074 is Done at the owner-amended mixed-load scope: the full 62-minute run passed with 45,000 measured requests and zero errors, followed by fresh independent review PASS. The prior synchronized-burst write-p95 failure remains a limitation. See [qualification](../../docs/YT-074-QUALIFICATION.md), [desktop acceptance](../../docs/YT-074-DESKTOP-ACCEPTANCE.md) and [startup](../../docs/BOARD-START.md). This is not production certification or a newly promoted catalog sample.
+**Unpublished, loopback-only application; YT-073 locally complete.** Fourteen native tests, final Chrome/Firefox journeys, real Chewing IME and actual Firefox/Orca speech pass. YT-074 is Done at the owner-amended mixed-load scope: the full 62-minute run passed with 45,000 measured requests and zero errors, followed by fresh independent review PASS. The prior synchronized-burst write-p95 failure remains a limitation. See [qualification](README.md#historical-board-desktop-and-sqlite-concurrency-evidence), [desktop acceptance](README.md#historical-board-desktop-and-sqlite-concurrency-evidence) and [startup](../../docs/BOARD-START.md). This is not production certification or a newly promoted catalog sample.
 
 ## Run locally
 
@@ -31,7 +31,7 @@ the SQLite write lock within the existing budget returns 503; it does not wait
 indefinitely for a 409. After the winning request completes and the lock is free,
 a new submission of the old version returns 409 with its escaped unsaved draft.
 These are distinct outcomes, with no automatic mutation retry. The
-[focused concurrency-test correction](../../docs/YT-231-LAB-SQLITE-CONCURRENCY.md)
+[focused concurrency-test correction](README.md#historical-board-desktop-and-sqlite-concurrency-evidence)
 preserves the runtime, limits and atomic item/history semantics.
 
 ## HTML, assets and optional live status
@@ -43,6 +43,76 @@ The module supports stop and explicit reconnect, retains last-known counts on er
 The application owns a finite embedded asset table and document wrapper. Bootstrap 5.3.8 CSS and MIT notices are retained under `assets/upstream/`; `assets/inventory.json` records source and generated hashes. Build-time externalization removes embedded SVG data URLs without relaxing CSP. `cargo xtask build board-assets` reproduces the application-owned transform, using a separate `/board-assets/` prefix and independent local CSS/JS. There is no public stylesheet/head API, Bootstrap JS, remote font, CDN dependency or new CSS engine. Separate prefixes and inventories preserve app asset ownership and release inputs; the original Python transform remains a reference oracle.
 
 Routes: `/` redirects to `/board`; `/board` resolves login or the current project; GET/POST `/board/login`; POST `/board/logout`; GET/POST `/board/projects/{project}/items`; GET `.../items/new`; GET/POST `.../items/{id}`; GET `.../items/{id}/edit`; GET `/board/projects/{project}/events`; `/healthz` is stateless liveness; `/readyz` checks storage/shutdown; `/board-assets/{name}` serves only embedded bytes; `/favicon.ico` returns 204. Unknown paths/methods retain native 404/405 and outer security headers.
+
+## Historical Board desktop and SQLite concurrency evidence
+
+The Board's **2026-10-13–14** selected native/UI qualifications are historical
+source-/host-bound observations, not universal accessibility compliance,
+performance, Windows input or production support. Local Git
+`99906e421c0510231291bf527e2cbd2e7ad0ffda` retains the original
+full reports, original FAILs, review receipts and section anchors; raw
+screenshots/speech logs and host evidence are separately retained where
+available, **not presumed to live in Git**.
+
+The real Firefox/Linux/Fcitx CJK composition and Orca desktop journeys
+eventually exercised the application rather than a synthetic DOM-only
+assertion. A polite/atomic live status needed both a semantic status
+container and a child message whose role was recognized by the installed
+Orca/AT-SPI event path; merely adding a wrapper or changing JavaScript
+emission order failed to yield Board speech. The accepted actual app
+rebuild emitted message before adjacent counters and skipped unchanged
+text updates; separate captures and spoken-event transcripts document
+the successful selected focus/live-status journey. Earlier attempts in
+which Orca spoke only startup/key echo, or failed to register the Firefox
+application, and caption/table navigation experiments remain **FAIL or
+inconclusive**, not silently repurposed as successful evidence. Later
+operator-reported Windows/keyboard/IME results remain separate from
+independently recorded Linux speech and do not qualify other screen
+readers, browsers, devices, live speech recording or WCAG certification.
+Existing [screenshots](../../docs/screenshots/m11-board/README.md)
+are supporting visual evidence, not a substitute for assistive technology.
+
+The later **owner-selected full 62-minute Board mix** used 25
+authenticated clients with staggered five-cycle offsets at 0.5
+requests/second/client and ten concurrent SSE readers, after 120s warmup,
+three 600s rounds and an 1,800s soak. It passed the selected thresholds
+with **45,000 measured requests**, zero HTTP/SSE errors and exactly
+**99,300 history records** (90,000 seeded + 9,300 completed writes) on
+SQLite FULL. Earlier **synchronized** clients emitted 25-write bursts:
+the round-one write **p95 548.299ms FAILED** the original
+500ms threshold; that full attempt did not finish its later rounds/soak.
+The subsequent staggered PASS is **not** retroactive success of the
+synchronized exposure or a general production throughput limit.
+
+**2026-11-02 SQLite contention test correction (historical YT-231):**
+the same accepted merged source had a first Stable CI observation
+**303/503**, while an assertion demanded **303/409**; an explicitly
+authorized later attempt passed. Both must remain recorded. Four
+application SQL workers and SQLite's **250ms busy timeout** are
+distinct from version comparison: independent writers use
+`BEGIN IMMEDIATE`; a contender may expire and return the fixed safe
+**Failure::Busy / HTTP503** *before it can inspect a stale version*.
+Only after acquiring the lock may it compare the expected item
+version and return **409** for a mismatch. The corrected concurrent
+test requires exactly one **303** winner, with the losing request
+either **409** (retained draft) or **503 only with the exact safe
+Busy body**, and **one persisted effect/history advance**. After
+the writer finishes, an explicit old-version request must return
+**409** with no additional mutation.
+
+A separate deterministic controlled fixture holds an independent
+IMMEDIATE transaction, verifies a **503 Busy without effects**, then
+rolls back and proves a new genuine stale-version **409** after a
+separate committed change. The historical first test-only attempt
+looked for an internal Failure response extension that was absent;
+that failed probe was corrected to inspect the real safe HTTP body
+without changing application runtime or 250ms policy. The original
+CI failure's exact timing/cause is **not inferred** from the later
+controlled proof. No blind write retry, increased busy window,
+automatic lock queue, external service test, cloud/host throughput,
+production SQL durability or generic retry contract follows.
+Relevant operation and [source-bound qualification](../../docs/QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts)
+remain intentionally separate from this current Board behavior.
 
 ## Validation
 
@@ -79,7 +149,7 @@ The actual spoken journey covers page/navigation/form labels, validation discove
 ## Opt-in commit-time write authorization — YT-181
 
 The application feature `commit-write-auth` supplies the
-[YT-181 SQL-owned reference](../../docs/YT-181-SENSITIVE-WRITE-IMPLEMENTATION.md).
+[YT-181 SQL-owned reference](../../docs/PROVIDER-OPERATIONS.md#commit-time-authority-and-revocation).
 It is default-off and adds no Core/Auth API or generic AOP. The existing Session,
 CSRF, current file policy, item version, worker limits and response security
 remain in effect. Its extra SQL authority covers only Alice/project-one item
@@ -99,7 +169,7 @@ Stop/exclude all legacy writers; old binaries refuse v2 only at open.
 Board consumers use `Board::open_with_options` (or
 `open_with_oidc_and_options`) with `BoardOptions { write_authorization: true,
 ..BoardOptions::default() }`, supplying any selected frontend/Session fields.
-[YT-185](../../docs/YT-185-OPT-IN-OPTIONS.md) records the intentional pre-public
+[YT-185](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-185-OPT-IN-OPTIONS.md) records the intentional pre-public
 constructor migration; Cargo features and existing external settings are unchanged.
 Trusted application code can call
 `board.set_project_write_permission("alice", 1, false).await?` to revoke, or
@@ -126,7 +196,7 @@ The reference adds no retry, new queue, remote transaction or HA guarantee.
 
 ## Opt-in request and SQL-worker tracing — YT-182
 
-[The application reference](../../docs/YT-182-TRACING-WORKER-IMPLEMENTATION.md)
+[The application reference](../../docs/PROVIDER-OPERATIONS.md#request-tracing-and-owned-worker-spans)
 uses native middleware and Rust `tracing`, with no generic AOP or tracing crate.
 The `request-tracing` Cargo feature is default-off; compiling it does not
 activate tracing. Embedded consumers use `Board::open_with_options` or

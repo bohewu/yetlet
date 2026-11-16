@@ -7,17 +7,21 @@ one-way on the same View. Both packages are available from crates.io at this ver
 Earlier release tags retain their original layouts and evidence.
 
 Use guides for behavior and rustdoc from the same revision for signatures.
-[The migration contract](YT-211-TWO-PACKAGE-MIGRATION.md) records the complete
+[The migration contract](COMPATIBILITY.md#historical-two-package-pre-publication-source--2026-10-30) records the complete
 source break, feature names and preserved boundaries.
 
-**Available since SDK `0.9.0-alpha.6`:** YT-220 expands the DOM vocabulary;
-[YT-221](YT-221-DOM-URL-IMAGE-CONTRACT.md) adds DomOptions, NavigationPolicy,
-ImagePolicy, validate_with_options and Wasm mount_with_options. The
-[DOM guide](../crates/yetlet-browser/guides/dom.md#explicit-links-and-images)
-shows their per-mount selection and provisional native validation.
-[SDK publication and consumer evidence](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
-records their distribution. These additions are absent from SDKalpha.5; the
-separately pinned public guide edition does not select a newer SDK automatically.
+| Capability | First published version | Current usage and original release evidence |
+|---|---|---|
+| Broader DOM coverage and per-mount link/image policies | SDK `0.9.0-alpha.6` | [DOM guide](../crates/yetlet-browser/guides/dom.md#explicit-links-and-images); [SDK publication and registry consumer](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01) |
+| Static HTML export with `yetlet build --static` | Independent CLI `0.2.0` | [Static build guide](CLI-GUIDE.md#static-html-build); [CLI publication and installed consumer](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02) |
+
+The DOM APIs include `DomOptions`, `NavigationPolicy`, `ImagePolicy`,
+`validate_with_options` and Wasm `mount_with_options`. Native validation is
+provisional; actual mounting enforces browser URL policy. Static export is CLI
+orchestration around an application-owned exporter, not an SDK static-site module.
+Source/browser qualification and later registry-consumer checks retain their
+separate scopes in the linked records. The [Reader Edition](../site/pages.toml)
+selects its SDK/CLI pair independently of these first-release versions.
 
 For first authoring, follow [Views/components](VIEW-COMPONENTS.md). For package
 features, startup wiring and consumer settings/defaults in one place, use the
@@ -29,15 +33,16 @@ diagnostics together, follow [Settings, options and logging](SETTINGS-OPTIONS-LO
 
 ## Published typed Tag Builder — SDK alpha.7
 
-The published SDK now includes `yetlet::view::tags` with **101 typed ordinary tag
-constructors**, element-scoped attribute setters and the existing owned `View`.
-See the [typed View guide](VIEW-COMPONENTS.md#optional-typed-tag-builders-yt-234),
-[source](../crates/yetlet/src/view/tags.rs) and
-[YT-235](YT-235-TAG-COVERAGE-PLAN.md) for constructor and renderer restrictions.
+The SDK has included `yetlet::view::tags` since `0.9.0-alpha.7`, with **101 typed
+ordinary tag constructors**, element-scoped attribute setters and the existing
+owned `View`.
+See the [typed View guide](VIEW-COMPONENTS.md#typed-tag-builders),
+[actual constructors](../crates/yetlet/src/view/tags.rs) and
+[dated HTML inventory](API-CONTRACTS.md#historical-html-element-and-attribute-inventory) for the 101 constructor
+selection, nine typed void tags and renderer admission boundaries.
 The registry-first `Element::new` tutorial remains valid and intentionally uses
 the reviewed Reader Edition selected in [the site manifest](../site/pages.toml).
-The historical YT-245 source preparation selects SDK `0.9.0-alpha.7` locally;
-the reviewed packages are now publicly available from crates.io.
+[SDK alpha.7 publication and registry consumer](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
 
 
 ## Published application startup — SDK alpha.8
@@ -94,23 +99,25 @@ explicitly exposes the listener beyond loopback.
 
 ## Source-only checkout additions
 
-The [Style Showcase](../examples/style-showcase/README.md) remains a checkout
-sample. This existing fragment also leads to the current CLI Style availability
-below; the generator and templates are now distributed in the CLI.
+The native-first Style Showcase is a checkout sample with an optional Wasm
+companion. Both packages are built from the repository.
+[Style Showcase](../examples/style-showcase/README.md)
 
 ## CLI Style authoring and checkout Showcase
 
-Published SDKalpha.8/CLI0.4.0 artifacts serve separate roles. The CLI ships the
-private app Style generator and native/browser Style templates, with build/watch
-integration and exact SDK resolution/locking. The Style walkthroughs verify
-SDK alpha.7. By default, `new` selects the highest available non-yanked SemVer
-and checks the selected SDK for the template's required packages and features.
-Style CSS is generated at build time by the private app generator.
+Published SDKalpha.8/CLI0.4.0 artifacts serve separate roles. The Reader
+Edition uses the pair selected in the site manifest.
+Application-owned Rust CSS first shipped in CLI `0.3.0`. The CLI ships Native
+and Browser Style templates with a private build-time generator, build/watch
+integration and exact SDK resolution and locking. By default, `new` selects
+the highest available non-yanked SemVer and checks the selected SDK for the
+template's required packages and features.
+[CLI Style release and platform evidence](CLI-GUIDE.md#style-release-and-platform-evidence)
 
 | Source surface | Entry point and contract | Availability and limits |
 |---|---|---|
-| Optional Style authoring | [CLI Style integration](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree), [contract](YT-237-STYLE-REGISTRATION-CONTRACT.md), [implementation](YT-239-STYLE-INTEGRATION.md) | Published CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
-| Style Showcase | [Native-first gallery](../examples/style-showcase/README.md) | Checkout sample with actual View/Style/CSS disclosures and optional local WASM class switching; bounded Linux evidence, no new published package or platform qualification |
+| Optional Style authoring | [CLI Style guide](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree), [retained registration contract](CLI-CONTRACT.md#application-owned-rust-style-registration-and-css-publication) | Published CLI templates and private app generator, finite typed vocabulary and explicit registration. Build-time external CSS; ordinary CSS handles unsupported syntax. No public style crate, runtime style injection or renderer change |
+| Style Showcase | [Native-first gallery](../examples/style-showcase/README.md) | Unpublished checkout sample with actual View/Style/CSS disclosures and optional local Wasm class switching. Bounded Linux Chrome/Firefox sample evidence |
 
 ## HTML, HTTP and browser modules
 
@@ -216,7 +223,7 @@ qualification. Published archives retain their original documentation:
 | [`View` / `Element`](../crates/yetlet/src/view/mod.rs) | Variant/field docs, builder/accessor semantics, an owned-tree example and renderer trust boundaries | Constructors still perform no sanitization or renderer validation |
 | [`session::SessionConfig`](../crates/yetlet/src/session/mod.rs) | Constructor/example/error-variant docs, exact TTL/capacity/name validation, Secure default and guide link | No provider installation, authenticated identity, cookie-prefix validation or remote-provider qualification |
 
-The selected work follows [YT-217](PUBLIC-DOCS-PLAN.md#implementation-order--yt-217);
+The selected work follows [YT-217](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/PUBLIC-DOCS-PLAN.md#implementation-order--yt-217);
 other modules retain their existing documentation and can be improved when needed.
 Guides should explain how to integrate a capability; doc comments should explain
 the callable API's behavior, ownership, errors and applicable security limits.
@@ -238,3 +245,16 @@ The native entry page is `target/doc/yetlet/index.html`; browser output is under
 `target/wasm32-unknown-unknown/doc/yetlet_browser/index.html`. Signing separately
 requires its documented native OpenSSL dependency. Local rustdoc instructions
 are not fresh platform qualification or a docs.rs publication claim.
+
+## Historical evidence and current API ownership
+
+M6's thin App/Page and M7's metadata, optional keyed ownership and local graph
+established the handler/component boundaries used by the current SDK. Follow the
+module guides above for current signatures; original multi-crate names in the
+[historical API classification](API-CONTRACTS.md) describe a dated inventory.
+Stable Candidate is an evidence category, not a stability or SemVer guarantee.
+The [sample acceptance guide](SAMPLES.md#catalog-contract)
+and [qualification matrix](QUALIFICATION-MATRIX.md#coverage-and-evidence-boundaries)
+retain the original failed reviews, repaired scope and native/browser freeze.
+No sample introduces a Yetlet ORM, mandatory Controller/DI, generic forms,
+implicit browser circuit or production-security promise.

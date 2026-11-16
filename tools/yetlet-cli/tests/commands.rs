@@ -25,14 +25,14 @@ fn code(output: Output, expected: i32) -> Output {
 #[test]
 fn frozen_cli_build_run_and_lock_cache_failures_use_native_cargo() {
     let root = tempfile::Builder::new()
-        .prefix("yt087b 空 間;$literal-")
+        .prefix("foreground_fixture 空 間;$literal-")
         .tempdir()
         .unwrap();
     fs::set_permissions(root.path(), fs::Permissions::from_mode(0o700)).unwrap();
     let manifest = root.path().join("Cargo.toml");
     let lock = root.path().join("Cargo.lock");
     let manifest_text =
-        "[package]\nname='yt087b_fixture'\nversion='0.1.0'\nedition='2024'\n[workspace]\n";
+        "[package]\nname='foreground_fixture'\nversion='0.1.0'\nedition='2024'\n[workspace]\n";
     fs::write(&manifest, manifest_text).unwrap();
     fs::set_permissions(&manifest, fs::Permissions::from_mode(0o600)).unwrap();
     fs::create_dir(root.path().join("src")).unwrap();
@@ -47,7 +47,7 @@ fn frozen_cli_build_run_and_lock_cache_failures_use_native_cargo() {
     // Explicit fixture lock, independent of all repository/CLI lockfiles.
     fs::write(
         &lock,
-        "version=4\n[[package]]\nname='yt087b_fixture'\nversion='0.1.0'\n",
+        "version=4\n[[package]]\nname='foreground_fixture'\nversion='0.1.0'\n",
     )
     .unwrap();
     fs::set_permissions(&lock, fs::Permissions::from_mode(0o600)).unwrap();

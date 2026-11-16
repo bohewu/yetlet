@@ -134,11 +134,11 @@ access. An uncertain/failed policy lookup must not turn into an allow.
 
 ### Boundaries
 
-YT-114 tests a synthetic resolver, not a production login protocol. Distributed Session
+The native integration tests use a synthetic resolver, not a production login protocol. Distributed Session
 bridging, real OIDC, cookie changes, account storage, refresh/revocation services
 and provider-specific operational qualification are outside this crate's
-current scope. [YT-115](https://github.com/bohewu/yetlet/blob/master/docs/YT-113-123-OPT-IN-CAPABILITIES.md#yt-115--optional-session-and-cookie-authentication-bridge)
-was separately selected at the Memory bridge scope. Existing Session APIs and
+current scope. A separately reviewed optional Memory Session/Cookie bridge
+was selected without changing the native authentication foundation. Existing Session APIs and
 no-JS form support are preserved; asynchronous Redis bridging remains unselected. The `auth` feature exposes this native module in the consolidated SDK;
 native APIs remain absent on wasm32.
 Baseline apps do not depend on it, initialize its state or execute its layer.
@@ -195,10 +195,10 @@ in your own fallible setup function instead of copying them as Rust statements.
 <summary>Historical delivery context and evidence</summary>
 
 Unpublished, experimental, explicitly selected **native** identity foundation.
-It implements the [YT-113 contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-113-AUTHENTICATION-CONTRACT.md)
-at the bounded [YT-114 scope](https://github.com/bohewu/yetlet/blob/master/docs/YT-114-IMPLEMENTATION.md). It verifies no
+It implements the reviewed authentication contract
+at a bounded native-only implementation scope. It verifies no
 credentials itself and installs no default Session, Cookie, OIDC or Bearer provider.
 The separately enabled `auth-session` feature adds a bridge to existing Memory Session;
-see [YT-115 evidence](https://github.com/bohewu/yetlet/blob/master/docs/YT-115-SESSION-AUTH.md).
+the Memory bridge is separately verified at its native scope.
 
 </details>

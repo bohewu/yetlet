@@ -138,7 +138,7 @@ mod tests {
     use super::{Element, View};
 
     #[test]
-    fn yt152_child_conversion_order_clone_and_unwind() {
+    fn child_conversion_order_clone_and_unwind() {
         use std::cell::Cell;
 
         struct Converted<'a>(&'a Cell<usize>);

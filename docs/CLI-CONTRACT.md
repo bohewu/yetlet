@@ -2,22 +2,165 @@
 
 Date: 2026-10-18 (Asia/Taipei). Task: YT-102, accepted CLI contract and authorized local implementation slice.
 
-- **Current implementation:** the [CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory) describes the revised working-tree CLI. [Implementation evidence](YT-102-CLI-IMPLEMENTATION.md) separates native Linux tests, subsequent selected Windows GNU verification, MSVC compile-only evidence and remaining release/generator limits.
-- **Accepted revised design:** implementation was explicitly authorized after independent design review. The latest user direction makes `new --vite` imply `--settings`; plain new retains the runtime module opt-in. The [design verification record](YT-102-CLI-CONTRACT-VERIFICATION.md) preserves prior revisions.
-- **Remaining qualification:** [selected native Windows GNU lifecycle cases](YT-102-WINDOWS-VITE-VERIFICATION.md) now have direct evidence; [current generator compatibility](YT-102-GENERATOR-COMPATIBILITY.md) records the separately extended local-source representation, with [native Windows GNU generator verification](YT-102-WINDOWS-GENERATOR-VERIFICATION.md) for the four current service profiles. Additional platform/runtime and registry release qualification remain open. The subsequent [DX audit](YT-102-DX-AUDIT.md) reconciles the broader research deliverables; independent Reviewer PASS completes YT-102 at research-only scope. Public release stays blocked.
+- **Present distribution:** the [CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory)
+  describes current public CLI behavior; the independent [CLI 0.4.0 release](CLI-040-HOSTED-RECORD.md)
+  and [SDK alpha.8 release](ALPHA8-HOSTED-RECORD.md) establish verified distribution,
+  rather than the original unpublished 2026-10-18 implementation checkpoint.
+- **Original contract design:** this settings-first grammar superseded the earlier
+  `dev` naming and opt-in flags, with `new --vite` implying Settings while
+  plain Native remains simple. The original source-only grammar and acceptance
+  tests are recoverable in fixed local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`.
+  The retained [YT-102 audit](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence) documents
+  the original linked-dotenv F-01 mismatch; later accepted fixes are not a
+  retroactive PASS for that earlier inspection.
+- **Source-qualified operating limits:** the [native Windows Rust/Vite proof](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence),
+  [Linux completion and cleanup proof](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence),
+  [rolling asset qualification](ASSETS.md#historical-single-host-rolling-asset-qualification)
+  and [current generator matrix](CLI-GUIDE.md#current-generator-source-matrix)
+  remain bounded by actual source, toolchain, host, process owner, strict CSP,
+  frozen locks and application/deployment-owned resources. No broad native
+  platform, browser, HA or production promise follows.
+
+## Historical static export protocol and guardrails
+
+The original **YT-222** static exporter contract was proposed before its
+independently qualified implementation. Its example
+`yetlet build --static --export-bin site-export --output ... --base-path /yetlet/`
+was *not executable at that original design checkpoint*. The
+[current CLI static build guide](CLI-GUIDE.md#static-html-build)
+and [published CLI version authority](CLI-040-HOSTED-RECORD.md)
+take precedence; the historic protocol and original negative cases
+remain retrievable in **local Git**
+`8b3e13004a58380accf16ea440707f84e6271871`.
+
+Static export is **explicit**, not an automatic mode of
+`run`/`watch`/`new`; an app-owned trusted exporter produces
+a private `export.json` schema-1 descriptor, fragments and finite
+prepared local assets. The protected pipeline runs an exact selected
+Cargo binary via `cargo run --frozen`, with no arbitrary shell,
+user argv forwarding or implicit dependency/tool installation.
+A valid descriptor has one root page, an optional unique 404 page,
+canonical route mapping and local page/asset names; the writer
+constructs escaped head/title, fixed restrictive **meta CSP** and
+approved stylesheet/module references around trusted application
+fragments. This is **not** sanitization of arbitrary third-party HTML.
+Meta CSP is not an HTTP response-header framing policy
+(`frame-ancestors` requires a host header); generated pages still
+need appropriate hosting, MIME and security configuration.
+
+Historical bounded budgets were **256 pages**, **1,024 assets**,
+**1MiB** descriptor, **2MiB** per fragment, **16MiB** per asset and
+**64MiB** total; these are local implementation limits, not capacity
+or production-hosting claims. Output is a **previously absent**
+protected destination. Validate source/input/lock, output
+non-intersection and symlink/reparse ownership before any public
+write; supervise the owned generator with bounded cancellation and
+child cleanup. Retain source/lock/export/asset SHA and private
+receipts **outside** the public site, then publish a complete owned
+tree via no-replace. A failed child, changed source, invalid
+descriptor, partially written receipt, output conflict or uncertain
+cleanup is an explicit **failure**, not permission to overwrite,
+silently clean an unrelated path, assume rollback or reuse a
+last-good artifact as the current one. The selected exporter is
+trusted native application code, **not a sandbox**; exported
+content and secrets remain the app author's responsibility.
+Experimental Wasm islands must use already prepared same-origin
+module/Wasm assets, progressive HTML fallback and no inline
+scripts/automatic npm or frontend build. Current deployment and
+old-asset retention are separate.
+
+## Application-owned Rust Style registration and CSS publication
+
+The original **YT-237** contract selected explicit
+`styles::stylesheet()` root registration of actual style modules,
+shared class-name constants usable in both views and the CSS
+generator, and deterministic output from the **registered
+composition**, not auto-discovery of files/modules or execution of
+every View. Conditions intentionally register selectors that may
+not be rendered on the current route; the root/aggregator determines
+membership. A module source added without registration is **not**
+silently discovered. The typed builder is application-owned/tool
+composition, not a mandatory Yetlet Core CSS registry, DI or
+cross-target renderer trait.
+
+A protected app-relative generated CSS destination requires ownership
+and source binding. Reject absolute/traversal paths, symlink/reparse
+ancestors, unowned/stale hand edits and source/config/lock/served
+private roots. Generate into private staging with finite byte bounds;
+validate generator success, content and hash; only then atomically
+publish CSS and its separate metadata. A crash between CSS replacement
+and metadata acceptance leaves **unaccepted/unreconciled** output,
+not a provably valid last-good build. Development failure may retain
+old bytes for diagnosis but must label them stale, never fresh.
+Cancelling an owned generator reaps the exact child, not an unrelated
+application. In standalone mode reference verified content-addressed
+CSS only after the complete asset/build graph is accepted; Vite
+instead consumes a stable generated source under its validated
+frontend root, without dual-hashing the same output. Hosted
+rollback/old CSS availability and caches remain deployment-owned.
+
+The YT-238 owner-selected default-wired prototype had independent
+acceptance; YT-239 later implemented native Rust CLI
+`native-style`/`browser-style` selections, private flat
+`stylegen/` manifest/lock, populated sample root, style output
+and Vite/Tailwind composition in a **separately source-qualified**
+implementation. Ordinary CSS stays the default; initial Python
+publisher was experiment-only and is **not** a generated-app runtime
+dependency. That source-stage retained two cloud-lock failures,
+Windows and real-browser gaps; it did not itself publish a CLI
+release. Later actual package availability is determined by
+[CLI release records](CLI-040-HOSTED-RECORD.md) and
+[CLI Guide](CLI-GUIDE.md#application-owned-rust-css), not by
+old design-stage claims.
 
 ## Accepted SDK resolution extension — 2026-11-10
 
-The [YT-247 contract](YT-247-SDK-VERSION-RESOLUTION-CONTRACT.md) and
+The [YT-247 contract](CLI-GUIDE.md#sdk-resolution-yt-247) and
 [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) define a separate
 SDK resolver, exact version/offline options and successful-new app lock creation.
-The Owner authorized the [Phase B source implementation](YT-247-SDK-VERSION-RESOLUTION-IMPLEMENTATION.md).
+The Owner authorized the [Phase B source implementation](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence).
 It supersedes source-only new and deferred app-lock descriptions below for this
 checkout: successful new resolves a compatible registry SDK, writes exact pins,
 generates an app Cargo.lock and records provenance before publication. Build,
-run and watch retain their frozen lock behavior. These additions are now
-distributed in [CLI 0.3.0](CLI-030-HOSTED-RECORD.md); the separately pinned Reader
-Edition remains SDK alpha.6 / CLI 0.2.0. Earlier releases retain their own behavior.
+run and watch retain their frozen lock behavior. These capabilities first shipped in
+[CLI 0.3.0](CLI-030-HOSTED-RECORD.md); that checkpoint's Reader Edition had
+the older SDK alpha.6 / CLI 0.2.0 pair. The **current selected Reader Edition**
+is SDK `0.9.0-alpha.8` / CLI `0.4.0` (see `site/pages.toml`), and the
+[CLI 0.4.0 publication](CLI-040-HOSTED-RECORD.md) additionally qualifies the
+finite generated-startup policy. Earlier releases keep their exact source-
+bound behavior; the CLI's own source snapshot does not float with app SDK.
+
+## Historical CLI source qualification and process constraints
+
+The original [CLI Contract audit](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence)
+identified a **linked-dotenv frontend-root escape (F-01)** that earlier source
+PASS checks did not close. That dated finding is not an assertion that the
+present implementation still has the defect, nor a claim that the audit passed
+all criteria. For the actual current command/settings and frontend boundary,
+follow this contract and the [CLI Guide](CLI-GUIDE.md), not an obsolete
+ticket-specific execution record.
+
+The selected Linux natural-completion fast path skips the fixed grace only
+when the leader's exit is observed via `waitid(WNOWAIT)`, cancellation is
+absent, and the owned process tree has no additional adopted/tracked children.
+Uncertain or still-living descendants, zombies, other direct children and
+cancellation require bounded waiting, escalation and ownership-verified cleanup.
+The historical Linux warm measurements and later native Windows console status,
+descendant cleanup and warm-build comparison remain separate in the
+[qualification matrix](QUALIFICATION-MATRIX.md#historical-cli-contract-process-and-sdk-resolver-evidence);
+none is a cross-platform timing promise or proof of Windows browser HMR.
+
+The original Phase B SDK Resolver separated registry metadata caching,
+compatibility selection and Cargo's own dependency cache, produced exact app
+manifests/locks plus a source/freshness receipt, and required create-only
+publication from private staging. Its `sdk-compat-v1` alpha.6/alpha.7 policy
+and CLI0.2.0 build/snapshot are **historical**. The
+[retained resolver contract](CLI-GUIDE.md#sdk-resolution-yt-247)
+and [ADR 0010](adr/0010-dynamic-sdk-version-resolution.md) govern current
+`sdk-latest-v2` selection; the released CLI0.4.0 is a separate package identity.
+Original real binary refusal on unsafe tool paths, Windows source defects
+and their correction/independent review cannot be turned into clean initial
+runs or expanded platform support.
 
 ## 1. Historical starting implementation and authority
 
@@ -127,7 +270,7 @@ exclusive scoped help, with no supplied values echoed.
 
 The owner included key CLI administration in the first signing slice and required
 automatic settings updates after explicit rotation approval. The
-[signing contract](YT-093-SIGNING-CONTRACT.md) defines multiple named local keys,
+[signing contract](SECRET-PROVIDERS.md#local-signing-and-replaceable-provider-contract--yt-093) defines multiple named local keys,
 immutable versions, PEM/PFX profiles, trust, retirement/revocation and the exact
 profile-write boundary. This is an explicit operator action, independent of
 `new`, `run`, `watch`, frontend startup and normal application signing.
@@ -143,7 +286,7 @@ configured process environment source. No cloud SDK, arbitrary endpoint,
 Rotation preserves old public/private material and does not revoke/delete it.
 The app adopts updated settings on its next load; the first version requires a
 restart and does not claim live reload. See the
-[verification record](YT-093-SIGNING-VERIFICATION.md) for platform evidence,
+[verification record](QUALIFICATION-MATRIX.md#local-signing-key-cli-and-azure-evidence--2026-10-18) for platform evidence,
 including the separately retained Windows Cargo-supervision limitation.
 
 ## 3. One settings mechanism
@@ -236,7 +379,7 @@ A release-facing `new` emits the CLI release's qualified crate/version declarati
 
 ### Opt-in browser-only target — YT-104
 
-The [browser starter contract](YT-104-BROWSER-STARTER.md) adds public
+The [browser starter contract](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-104-BROWSER-STARTER.md) adds public
 `cli.target = "browser"`; absent target keeps `native`. Existing commands and
 the shared Loader are reused. `yetlet new tasks --template browser
 --tailwind` selects the finite browser starter and persists that execution target.
@@ -279,9 +422,15 @@ frontend supervisor owns Vite and all compiler descendants; cancellation aborts
 the active build, closes the listener and removes owned temporary generations.
 No installs, native backend, state restoration or production HMR are introduced.
 
-[Implementation/evidence](YT-112-IMPLEMENTATION.md) remains In progress pending
-independent review and real-browser/lifecycle proof. The native command behavior
-below remains unchanged.
+The original YT-112 implementation checkpoint was **In progress** pending
+browser and lifecycle proof; the later corrected Linux watch/browser run and
+independent follow-up Reviewer passed within its limited source/host scope.
+The original implementation and failed runtime checks are recoverable at
+fixed local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`.
+The following table records the dated CLI contract implementation boundary;
+its earlier `new` statement without SDK lock generation is **superseded** by
+the published CLI 0.4.0 resolver, exact pins/lock/receipt and startup policy in
+the [current guide](CLI-GUIDE.md#sdk-resolution-yt-247).
 
 | Command | Result/effects and success boundary |
 |---|---|
@@ -301,10 +450,10 @@ and DOM across accepted development HMR updates, with disposal of old listeners.
 User-defined JavaScript and TypeScript files may use normal frontend-relative
 imports and subdirectories without registration. Physical root confinement and
 private/tooling-file refusals remain. The CLI owns configured run/stop/build;
-Vite owns HMR. [Implementation and integration evidence](YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
+Vite owns HMR. [Implementation and integration evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-STATEFUL-HMR-IMPLEMENTATION.md)
 records the state boundary, tested edits/restores and remaining scope.
 
-With Rust watch disabled, the pair supervisor uses bounded frontend readiness, native signal ownership, stage attribution and cleanup of both owned trees. Current native Linux tests cover failure, cancellation, descendants and PTY restoration; [native Windows GNU evidence](YT-102-WINDOWS-VITE-VERIFICATION.md) covers six selected real Vite/Rust cases for startup, failure, C/BREAK, port collision and disabled auto-start. In that non-watch mode, child failure must stop/reap the other owned tree; cleanup uncertainty is failure. Native Windows console/headless limits remain explicit; compile-only evidence cannot prove lifecycle support. Manual frontend startup and the current two-terminal fallback remain usable when automatic startup is disabled. Windows cross-compilation alone does not satisfy the native qualification gate.
+With Rust watch disabled, the pair supervisor uses bounded frontend readiness, native signal ownership, stage attribution and cleanup of both owned trees. Current native Linux tests cover failure, cancellation, descendants and PTY restoration; [native Windows GNU evidence](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) covers six selected real Vite/Rust cases for startup, failure, C/BREAK, port collision and disabled auto-start. In that non-watch mode, child failure must stop/reap the other owned tree; cleanup uncertainty is failure. Native Windows console/headless limits remain explicit; compile-only evidence cannot prove lifecycle support. Manual frontend startup and the current two-terminal fallback remain usable when automatic startup is disabled. Windows cross-compilation alone does not satisfy the native qualification gate.
 
 ### Development HTTPS
 
@@ -324,7 +473,7 @@ compilation without reading certificate/key files; frontend build environments
 do not receive development TLS paths. Runtime TLS settings require Development;
 missing or invalid material fails rather than falling back to HTTP.
 
-See [setup and verification](DEV-HTTPS-VERIFICATION.md). Default HTTP, existing
+See [setup and verification](DEVELOPMENT.md#opt-in-local-https-preparation-and-lifecycle). Default HTTP, existing
 secrets, Core/browser dependencies and the minimal plain scaffold stay unchanged.
 
 ### Opt-in Rust watch
@@ -352,7 +501,7 @@ Vite or a frontend build. Legacy dev bridge, standalone Tailwind, edited/general
 apps and unknown dependencies/layouts remain refused. Runtime token handling,
 sanitized three-context exports, bounded public inputs and no-overwrite remain
 unchanged. Actual evidence and remaining qualification are in the
-[compatibility record](YT-102-GENERATOR-COMPATIBILITY.md).
+[compatibility record](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-COMPATIBILITY.md).
 
 ## 6. Grammar, diagnostics and process contract
 
@@ -369,7 +518,7 @@ with a fixed error kind, optional numeric OS code and protected-tool guidance.
 Selected paths, arguments, environment values and arbitrary OS error text are not
 included. This diagnostic preserves exit 125 and the existing trusted-owner,
 untrusted-write and no-reparse executable checks.
-The [Windows exit-125 follow-up](WINDOWS-CLI-125-VERIFICATION.md) records the
+The [Windows exit-125 follow-up](QUALIFICATION-MATRIX.md#windows-exit-125-diagnosis-and-native-results) records the
 selected Runner's Cargo ACL refusal and native MSVC build/run/Ctrl-C cleanup
 with protected task-local tools.
 
@@ -422,9 +571,9 @@ Rows describe the intentional migration. Current evidence and uncovered qualific
 
 ## 9. Remaining work
 
-The user explicitly authorized this CLI implementation and independent review. This authorization supersedes the former documentation-only next-step proposal. Current source-matched evidence is in [YT-102 implementation](YT-102-CLI-IMPLEMENTATION.md); prior design reviews remain historical evidence.
+The user explicitly authorized this CLI implementation and independent review. This authorization supersedes the former documentation-only next-step proposal. Current source-matched evidence is in [YT-102 implementation](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-CLI-IMPLEMENTATION.md); prior design reviews remain historical evidence.
 
-Selected native Windows GNU startup/cancellation/cleanup has [direct bounded evidence](YT-102-WINDOWS-VITE-VERIFICATION.md). The current generator local-source extension has its own [compatibility evidence](YT-102-GENERATOR-COMPATIBILITY.md) and [native Windows GNU verification](YT-102-WINDOWS-GENERATOR-VERIFICATION.md) for the four current service profiles; additional platform/runtime qualification, registry-only source/export representations, usable registry templates and release qualification remain open. Rust watch/recompile/restart is an explicit settings-controlled mode with the boundaries above; arbitrary proxy/auth/actions/multi-page bridging and alternative provider registries stay deferred. YT-102's subsequent [journey audit](YT-102-DX-AUDIT.md) records measured empty-target/warm/change-feedback costs, a prioritized DX roadmap and extension boundaries. Independent Reviewer PASS completes YT-102 at research-only scope; no proposed improvement is implemented by that report. YT-103 rolling asset retention and M20/YT-020 release remain separate. No commit, publication or deployment is implied.
+Selected native Windows GNU startup/cancellation/cleanup has [direct bounded evidence](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence). The current generator local-source extension has its own [compatibility evidence](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-GENERATOR-COMPATIBILITY.md) and [native Windows GNU verification](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-WINDOWS-GENERATOR-VERIFICATION.md) for the four current service profiles; additional platform/runtime qualification, registry-only source/export representations, usable registry templates and release qualification remain open. Rust watch/recompile/restart is an explicit settings-controlled mode with the boundaries above; arbitrary proxy/auth/actions/multi-page bridging and alternative provider registries stay deferred. YT-102's subsequent [journey audit](https://github.com/bohewu/yetlet/blob/ed7a082b1f9f72430f06866f7d550b0ed9ecbae9/docs/YT-102-DX-AUDIT.md) records measured empty-target/warm/change-feedback costs, a prioritized DX roadmap and extension boundaries. Independent Reviewer PASS completes YT-102 at research-only scope; no proposed improvement is implemented by that report. YT-103 rolling asset retention and M20/YT-020 release remain separate. No commit, publication or deployment is implied.
 
 ## Optional application-owned CSS integration — YT-239 working tree
 
@@ -442,10 +591,14 @@ one explicit `main.rs` bin. Dedicated outputs are standalone
 `<cli.vite.root>/style-output/app.generated.css`, anchored to the selected app.
 The host compiler/toolchain, frozen bounded execution, owned cancellation,
 protected publication and app-owned consumer contract are described in the
-[YT-239 implementation record](YT-239-STYLE-INTEGRATION.md). That record includes
-lifecycle gates, source/production ownership, Python-free official paths, exact
-local verification and unresolved platform/regression limitations. Independent
-review is pending; no Core/server/renderer API or public style crate is added.
+[current CLI Style guide](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree)
+and the [retained registration contract](CLI-CONTRACT.md#application-owned-rust-style-registration-and-css-publication).
+[Original YT-239 source implementation and review](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md#independent-review-and-completion)
+passed independent review at its dated Linux/source scope; it does not qualify
+all subsequent Windows/runtime releases. Current CLI 0.3.0–0.4.0 publication
+and platform boundaries are recorded separately in the [release matrix](CLI-GUIDE.md#style-release-and-platform-evidence).
+The official generated CLI path requires no Python; no Core/server/renderer
+API or public style crate is added.
 
 Private `owner.pending.json` and `production.pending.json` retain prior accepted
 metadata during publication. Producers and the generated native loader refuse
@@ -454,3 +607,35 @@ All fallible writes/checks precede the marker-removal acceptance commit point.
 Prepublication failures can recover without replacing accepted data; uncertainty
 after replacement requires preserved evidence and explicit operator rollback or
 verified rollforward before clearing the marker. Unknown temporaries are preserved.
+
+## Repository xtask and public CLI separation
+
+M12 migrated internal repository automation before the independent public CLI.
+Use [Development](DEVELOPMENT.md#rust-tooling-migration-contracts-and-historical-inventory)
+and [xtask usage](../xtask/README.md) for repository command/argv/cwd/environment,
+exit/signal/process and fixture contracts; those are not additional published
+CLI commands or promises. Current accepted CLI0.4.0 and SDKalpha.8 retain their
+own immutable release inputs and qualification. Original52-file/three-workflow
+migration evidence is historical, with source graph/runtime/platform limitations
+in the [qualification matrix](QUALIFICATION-MATRIX.md#m12-migration-acceptance-and-unexecuted-paths).
+
+## Source-specific diagnostics and naming acceptance
+
+The 2026-10-18 exit125 follow-up isolated Cargo executable trust refusal before
+child creation/Job assignment. Protected byte-identical Cargo changed the same
+MSVC signing build125 to0. Fixed CLI_PROCESS stage=executable diagnostics retain
+kind/optional native code and omit raw path/argv/env/error text. Native console
+C/Break and protected-tool build/run evidence have their own
+[source-bound result matrix](QUALIFICATION-MATRIX.md#windows-exit-125-diagnosis-and-native-results).
+Later GNU Vite results and current published CLI0.4.0 keep separate identities.
+
+N01–N08's2026-10-22 naming acceptance preserved argv/settings/runtime behavior
+and intentionally renamed Rust support fields. It first exposed the pre-existing
+generator_selected101 unsupported config-layout failure. Initial review failed
+P2 on overstated legacy-settings acceptance, followed by corrected documentation
+and focused PASS. The separately selected source-closure repair and current
+[generator matrix](CLI-GUIDE.md#current-generator-source-matrix) supply later
+acceptance. The [dated audit results](QUALIFICATION-MATRIX.md#naming-audit-results-and-generator-failure)
+retain original failures and focused counts. Browser DX selected documentation,
+with local graph/listener ownership, matching bindgen, frozen builds and
+frontend/dist output under the [browser guide](BROWSER-APP.md).

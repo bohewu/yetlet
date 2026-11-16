@@ -10,7 +10,7 @@ signing, certificates, public logs or a registry upload.
 
 Use source/rustdoc matching your selected SDK version. The selected
 reference is GNU/Linux; Windows, macOS and browser Wasm are not qualified by
-this package preparation. YT-093's native evidence uses an isolated static
+this package preparation. The bounded native signing evidence uses an isolated static
 OpenSSL 3.5.9 build with `openssl 0.10.81` / `openssl-sys 0.9.117`; that is a
 recorded recipe, not a promise that every installed OpenSSL is compatible.
 
@@ -44,7 +44,7 @@ diagnostics. Provider adapters and actual production custody are separate choice
 ## API reference and license
 
 Read source/rustdoc at the selected revision for signatures and ownership. The
-repository's [signing contract](https://github.com/bohewu/yetlet/blob/master/docs/YT-093-SIGNING-CONTRACT.md)
-provides additional context when repository access is available; its branch URL
-does not pin the package's evidence. Dual licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-signing/LICENSE-MIT) or
+signing service requires explicit backend/public trust and key-policy custody.
+Refer to source/rustdoc for the selected SDK build; a floating repository URL
+is not a portable package attestation. Dual licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-signing/LICENSE-MIT) or
 [Apache-2.0](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-signing/LICENSE-APACHE).

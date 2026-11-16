@@ -1,10 +1,19 @@
 # Fixed SSR cost observations
 
 This unpublished, standalone optional sample implements the
-[YT-145 contract](../../docs/YT-145-SSR-PERFORMANCE-BASELINES.md). It uses existing
+[YT-145 contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-145-SSR-PERFORMANCE-BASELINES.md). It uses existing
 Core/HTML/server-Axum APIs, without HTTP, browser code or optional providers.
 Its private workspace/lock and default-empty features leave root consumers
 unchanged. No performance threshold or CI gate is introduced.
+
+This guide owns the current fixture commands and bounded result interpretation.
+The [performance qualification matrix](../../docs/QUALIFICATION-MATRIX.md#historical-performance-and-capacity-evidence-bounded)
+summarizes the accepted/rejected historical populations. Links to original
+numbered experiment records point to the **fixed local pre-consolidation Git
+source**, which is not yet verified as publicly reachable on GitHub; they are
+traceability, not current setup instructions. All historical failures, counted
+allocation/ordinary timing distinctions, output equality and source controls
+remain bound to their original executions.
 
 Build normal timing and counted binaries separately:
 
@@ -46,7 +55,7 @@ reused. Consult the contract for current results, limits and review status.
 
 ## YT-146 attribution extension
 
-The [YT-146 contract](../../docs/YT-146-SSR-SERIALIZER-ATTRIBUTION.md) adds two
+The [YT-146 contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-146-SSR-SERIALIZER-ATTRIBUTION.md) adds two
 sample-only, default-off features without changing dependencies or the old
 commands. `serializer-attribution` enables `allocation-counts` plus a pinned
 source-derived serializer copy. `attribution-output EXISTING_DIRECTORY` checks
@@ -83,7 +92,7 @@ implementation is claimed; independent final review remains pending.
 
 ## YT-147 private escaping comparison
 
-The separately selected [YT-147 contract](../../docs/YT-147-PRIVATE-ESCAPE-INTO.md)
+The separately selected [YT-147 contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-147-PRIVATE-ESCAPE-INTO.md)
 adds default-off `escape-comparison`. It reuses the existing shadow serializer
 as the reference with fixed no-op tags and calls the changed actual libraries as
 current. The reference still allocates through public `escape_text`; it is a
@@ -115,7 +124,7 @@ review remains required; YT-147 is In progress.
 
 ## YT-148 standalone URL-check attribution
 
-The [YT-148 contract](../../docs/YT-148-URL-CHECK-ATTRIBUTION.md) adds default-off
+The [YT-148 contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-148-URL-CHECK-ATTRIBUTION.md) adds default-off
 `url-probes`. Its private checker is the unchanged source-derived checker shared
 with the existing shadow. The shadow keeps its original feature gates; selected
 URL builds enable no old probe feature. Product crates, locks, dependencies and
@@ -181,7 +190,7 @@ population, whole-render timing/count, browser/CSP/HTTP test or old test entry
 point was replayed. Product APIs, dependencies, locks, `counts.rs`, default
 features and old shadow/reference remain unchanged.
 
-[The full YT-149 contract and results](../../docs/YT-149-PRIVATE-URL-PREFIX.md)
+[The full YT-149 contract and results](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-149-PRIVATE-URL-PREFIX.md)
 retain proof, source bindings, six output hashes, raw paths, all timing statistics,
 reconciliation, resource bounds, cleanup and failures. The initial metadata
 binding assertion failed and received one parent-authorized harness correction;
@@ -197,7 +206,7 @@ retained for review. No product repair, operational retry, commit or push occurr
 
 Status: Done at bounded full-SSR measurement scope after independent final
 Reviewer PASS, zero issues and required followups.
-See [the contract](../../docs/YT-150-FULL-SSR-COMPARISON.md). Default-off
+See [the contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-150-FULL-SSR-COMPARISON.md). Default-off
 `page-comparison` calls actual product APIs from two pinned source archives,
 with identical frozen sample code. This covers the existing 1,024-row page,
 separating owned View/metadata construction, complete-document render with
@@ -231,7 +240,7 @@ limitations and cleanup. No product optimization or old proof replay follows.
 ## YT-151 View and metadata construction attribution
 
 Status: Done at bounded attribution/proposal scope after independent final
-Reviewer `/root/yt151_view_attribution_final_review_20261024` PASS, zero issues and required followups. [The contract](../../docs/YT-151-VIEW-CONSTRUCTION-ATTRIBUTION.md)
+Reviewer `/root/yt151_view_attribution_final_review_20261024` PASS, zero issues and required followups. [The contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-151-VIEW-CONSTRUCTION-ATTRIBUTION.md)
 fixes the new population and resource bounds. Default-off `construction-study`
 uses a source-derived fixture builder calling actual unchanged Core/metadata APIs.
 Build ordinary with `--features construction-study`; counted adds
@@ -272,7 +281,7 @@ final independent Reviewer PASS matches all nine reviewed file hashes.
 ## YT-152 private first-child capacity comparison
 
 Status: Done at bounded comparison/rejected-candidate scope after independent
-final Reviewer `/root/yt152_first_child_final_review_20261024` PASS, zero issues and required followups. [The contract](../../docs/YT-152-FIRST-CHILD-CAPACITY.md)
+final Reviewer `/root/yt152_first_child_final_review_20261024` PASS, zero issues and required followups. [The contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-152-FIRST-CHILD-CAPACITY.md)
 compares actual baseline/current Core sources with identical default-off
 `child-capacity` sample code; counted adds `allocation-counts` and rejects timing.
 No old study feature is selected. New commands are
@@ -317,7 +326,7 @@ proof/workload failed or was replayed. Final independent Reviewer `/root/yt152_f
 ## YT-153 document buffer attribution
 
 Status: Done at bounded attribution/proposal scope after independent final
-Reviewer `/root/yt153_document_buffer_final_review_20261024` PASS, zero issues and required followups. [The contract](../../docs/YT-153-DOCUMENT-BUFFER-ATTRIBUTION.md)
+Reviewer `/root/yt153_document_buffer_final_review_20261024` PASS, zero issues and required followups. [The contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-153-DOCUMENT-BUFFER-ATTRIBUTION.md)
 adds default-off `buffer-study`; counted adds `allocation-counts` and rejects
 timing. No old study feature is selected. New commands are
 `buffer-output EXISTING_DIRECTORY`, `buffer-timing 1|2` and counted-only
@@ -363,7 +372,7 @@ format proof are disclosed, with no counted-test replay. Final independent Revie
 ## YT-154 actual document tail-capacity comparison
 
 Status: Done at bounded implementation/comparison scope after independent final
-Reviewer `/root/yt154_document_capacity_final_review_20261024` PASS, zero issues and required followups. [The contract](../../docs/YT-154-DOCUMENT-CAPACITY-COMPARISON.md)
+Reviewer `/root/yt154_document_capacity_final_review_20261024` PASS, zero issues and required followups. [The contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-154-DOCUMENT-CAPACITY-COMPARISON.md)
 compares pinned actual baseline/current libraries with identical sample code.
 Default-off `document-capacity = ["buffer-study"]` reuses the unchanged accepted
 finite trace; counted adds `allocation-counts`, ordinary excludes the allocator.
@@ -410,7 +419,7 @@ was replayed. Final independent Reviewer `/root/yt154_document_capacity_final_re
 
 Status: Done at bounded research scope after independent contract and final
 Reviewer `/root/yt155_latency_stability_final_review_20261024` PASS, zero issues and
-required followups. [The contract](../../docs/YT-155-SMALL-MEDIUM-LATENCY-STABILITY.md)
+required followups. [The contract](https://github.com/bohewu/yetlet/blob/1d0eabcb99eeeb681795c1db3e27b2a5b47e0bcb/docs/YT-155-SMALL-MEDIUM-LATENCY-STABILITY.md)
 adds default-off `latency-study = []` with no previous study/counter dependency.
 Build two new ordinary binaries against YT-154's accepted reference/current
 product bytes and identical measurement sample overlay. Product sources, locks,

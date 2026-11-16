@@ -41,7 +41,7 @@ fn value(root: &Path) -> serde_json::Value {
 }
 
 #[test]
-fn yt223_parser_contract_preserves_ordinary_build() {
+fn static_export_parser_contract_preserves_ordinary_build() {
     assert_eq!(
         parse(&args(&["build", "--release"])),
         Ok(Cli::Build {
@@ -93,7 +93,7 @@ fn yt223_parser_contract_preserves_ordinary_build() {
     }
 }
 #[test]
-fn yt223_metadata_csp_and_project_urls() {
+fn static_export_metadata_csp_and_project_urls() {
     let (_tmp, root) = fixture();
     let prepared = protocol::prepare(&root, "/yetlet/", false).unwrap();
     let html = std::str::from_utf8(&prepared.files["index.html"]).unwrap();
@@ -109,7 +109,7 @@ fn yt223_metadata_csp_and_project_urls() {
     assert!(!prepared.files.contains_key("export.json"));
 }
 #[test]
-fn yt223_descriptor_keys_routes_and_limits_fail_closed() {
+fn static_export_descriptor_keys_routes_and_limits_fail_closed() {
     let (_tmp, root) = fixture();
     let original = value(&root);
     for route in [
@@ -163,7 +163,7 @@ fn yt223_descriptor_keys_routes_and_limits_fail_closed() {
     assert!(protocol::prepare(&root, "/", false).is_err());
 }
 #[test]
-fn yt223_assets_islands_and_unlisted_directories() {
+fn static_export_assets_islands_and_unlisted_directories() {
     let (_tmp, root) = fixture();
     std::fs::write(root.join("assets/entry.mjs"), "export const ready=true;").unwrap();
     let mut d = value(&root);
@@ -186,7 +186,7 @@ fn yt223_assets_islands_and_unlisted_directories() {
     assert!(protocol::prepare(&root, "/", true).is_err());
 }
 #[test]
-fn yt223_no_replace_binary_roundtrip_and_cleanup() {
+fn static_export_no_replace_binary_roundtrip_and_cleanup() {
     let (_tmp, root) = fixture();
     let parent = fs::open_directory(&root).unwrap();
     let stage = files::new_directory(&parent, "stage").unwrap();
@@ -214,7 +214,7 @@ fn yt223_no_replace_binary_roundtrip_and_cleanup() {
     assert!(!root.join("site").exists());
 }
 #[test]
-fn yt223_hard_link_and_symlink_reads_refused() {
+fn static_export_hard_link_and_symlink_reads_refused() {
     let (_tmp, root) = fixture();
     std::fs::hard_link(root.join("assets/site.css"), root.join("linked.css")).unwrap();
     assert!(files::read(&root, "linked.css", 100).is_err());
@@ -226,7 +226,7 @@ fn yt223_hard_link_and_symlink_reads_refused() {
     }
 }
 #[test]
-fn yt223_command_uses_literal_protocol_and_frozen_cargo() {
+fn static_export_command_uses_literal_protocol_and_frozen_cargo() {
     let cargo = files::CargoDirectories {
         target: "target".into(),
         build: "target".into(),

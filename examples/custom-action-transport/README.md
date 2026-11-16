@@ -36,7 +36,7 @@ rate limits, deployment policy, and any future cookie/browser CSRF design remain
 application responsibilities and are not implemented here. Deadlines drop owned
 sockets but cannot roll back effects already performed by a future real handler.
 
-See [the research decision and verification record](../../docs/YT-024-CUSTOM-TRANSPORT-RESEARCH.md)
+See [the application-owned transport decision](../../docs/EXTENSIONS.md#application-owned-action-transport)
 and [retained direct proof output](proof.log). Native compile and wire tests passed;
 browser/WASM and CSP enforcement were not run. This is bounded prototype evidence,
 not production security, portability or release qualification.

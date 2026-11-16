@@ -164,7 +164,7 @@ fn private_cargo(app: &Path) {
         lpSecurityDescriptor: descriptor.0,
         bInheritHandle: 0,
     };
-    let private = app.join(".yt088c-private-cargo");
+    let private = app.join(".winprocess-private-cargo");
     let path: Vec<_> = private.as_os_str().encode_wide().chain([0]).collect();
     // SAFETY: private app parent, create-new directory, explicit protected DACL
     // at creation. Never repair inherited permissions after publication.
@@ -230,7 +230,7 @@ fn cli(path: &Path) -> Command {
     // which the CLI correctly refuses; our fixture copies that proxy under
     // the app's protected DACL instead of weakening executable validation.
     if let Some(parent) = path.parent() {
-        let private = parent.join(".yt088c-private-cargo");
+        let private = parent.join(".winprocess-private-cargo");
         if private.join("cargo.exe").is_file() {
             let mut paths = vec![private];
             paths.extend(std::env::split_paths(
@@ -274,7 +274,7 @@ fn fixture(root: &Path) -> PathBuf {
     let path = root.join("app");
     fs::write(
         path.join("Cargo.toml"),
-        "[package]\nname='yt088c_fixture'\nversion='0.1.0'\nedition='2024'\n[workspace]\n",
+        "[package]\nname='winprocess_fixture'\nversion='0.1.0'\nedition='2024'\n[workspace]\n",
     )
     .unwrap();
     fs::write(path.join("src/main.rs"), "fn main() {}\n").unwrap();
@@ -289,9 +289,9 @@ fn native_cli_build_debug_release_and_lock_cache_errors_are_frozen() {
     // independently retain Unicode, spaces and reparse-path coverage.
     // MSVC continues this build journey inside the original Unicode path.
     #[cfg(target_env = "gnu")]
-    let prefix = "yt088c-build-";
+    let prefix = "winprocess-build-";
     #[cfg(not(target_env = "gnu"))]
-    let prefix = "yt088c 空 間;$literal-😀";
+    let prefix = "winprocess 空 間;$literal-😀";
     let root = tempfile::Builder::new().prefix(prefix).tempdir().unwrap();
     let app = fixture(root.path());
     let manifest = app.join("Cargo.toml");
@@ -301,14 +301,14 @@ fn native_cli_build_debug_release_and_lock_cache_errors_are_frozen() {
     // Explicit fixture lock. The CLI never runs a resolver/lock generator.
     fs::write(
         &lock,
-        "version=4\n[[package]]\nname='yt088c_fixture'\nversion='0.1.0'\n",
+        "version=4\n[[package]]\nname='winprocess_fixture'\nversion='0.1.0'\n",
     )
     .unwrap();
     let initial = fs::read(&lock).unwrap();
     code(cli(&manifest).output().unwrap(), 0);
     code(cli(&manifest).arg("--release").output().unwrap(), 0);
-    assert!(app.join("target/debug/yt088c_fixture.exe").is_file());
-    assert!(app.join("target/release/yt088c_fixture.exe").is_file());
+    assert!(app.join("target/debug/winprocess_fixture.exe").is_file());
+    assert!(app.join("target/release/winprocess_fixture.exe").is_file());
     assert_eq!(fs::read(&lock).unwrap(), initial);
     // This local dependency needs no download/cache; only a lock update is absent.
     fs::create_dir_all(app.join("dependency/src")).unwrap();
@@ -367,13 +367,13 @@ fn untrusted_cargo_reports_executable_stage_before_spawn_and_trusted_copy_builds
     let manifest = app.join("Cargo.toml");
     fs::write(
         app.join("Cargo.lock"),
-        "version=4\n[[package]]\nname='yt088c_fixture'\nversion='0.1.0'\n",
+        "version=4\n[[package]]\nname='winprocess_fixture'\nversion='0.1.0'\n",
     )
     .unwrap();
     let unsafe_tools = app.join("untrusted-tools");
     fs::create_dir(&unsafe_tools).unwrap();
     let cargo = unsafe_tools.join("cargo.exe");
-    fs::copy(app.join(".yt088c-private-cargo/cargo.exe"), &cargo).unwrap();
+    fs::copy(app.join(".winprocess-private-cargo/cargo.exe"), &cargo).unwrap();
     let sddl: Vec<_> = "D:P(A;;FA;;;WD)".encode_utf16().chain([0]).collect();
     let mut descriptor = null_mut();
     // SAFETY: set only this disposable executable's DACL, preserving its owner.
@@ -417,7 +417,7 @@ fn untrusted_cargo_reports_executable_stage_before_spawn_and_trusted_copy_builds
         "untrusted Cargo must not start"
     );
     code(cli(&manifest).output().unwrap(), 0);
-    assert!(app.join("target/debug/yt088c_fixture.exe").is_file());
+    assert!(app.join("target/debug/winprocess_fixture.exe").is_file());
 }
 
 #[test]
@@ -445,7 +445,7 @@ fn preflight_and_executable_selection_never_launch_app_local_cargo() {
     assert!(!app.join("Cargo.lock").exists());
     fs::write(
         app.join("Cargo.lock"),
-        "version=4\n[[package]]\nname='yt088c_fixture'\nversion='0.1.0'\n",
+        "version=4\n[[package]]\nname='winprocess_fixture'\nversion='0.1.0'\n",
     )
     .unwrap();
     // A runnable app-local executable must never be Windows' implicit first hit.
@@ -462,7 +462,7 @@ fn preflight_and_executable_selection_never_launch_app_local_cargo() {
     assert!(!app.join("target").exists());
 }
 
-// YT-088d: reuse the accepted protected Cargo/app fixture without changing any
+// Windows Job: reuse the accepted protected Cargo/app fixture without changing any
 // build/new/ACL assertion. Each console journey runs in a fresh owned console.
 fn dev_cli(manifest: &Path) -> Command {
     let build = cli(manifest);
@@ -568,16 +568,16 @@ fn console_fixture(case: &str) {
     // ASCII GNU link output, as in the accepted 088c build integration. MSVC
     // preserves its Unicode path coverage and both use a real native console.
     #[cfg(target_env = "gnu")]
-    let prefix = "yt088d-console-";
+    let prefix = "winjob-console-";
     #[cfg(not(target_env = "gnu"))]
-    let prefix = "yt088d-console 雪 😀-";
+    let prefix = "winjob-console 雪 😀-";
     let root = tempfile::Builder::new().prefix(prefix).tempdir().unwrap();
     let job = ConsoleJob::new();
     let mut helper = Command::new(std::env::current_exe().unwrap());
     helper
         .args(["--exact", "native_dev_console_fixture", "--nocapture"])
-        .env("YT088D_CASE", case)
-        .env("YT088D_ROOT", root.path())
+        .env("YETLET_WIN_JOB_CASE", case)
+        .env("YETLET_WIN_JOB_ROOT", root.path())
         .stdout(fs::File::create(root.path().join("console.stdout")).unwrap())
         .stderr(fs::File::create(root.path().join("console.stderr")).unwrap())
         .creation_flags(CREATE_NEW_CONSOLE);
@@ -673,7 +673,7 @@ fn main() {
     assert_eq!(std::env::var("RUSTUP_SKIP_UPDATE_CHECK").unwrap(),"1");
     assert!(std::path::Path::new("Cargo.toml").is_file());
     assert!(std::path::Path::new("Cargo.lock").is_file());
-    if std::env::var("YT088D_BEHAVIOR").unwrap()=="exit" { std::process::exit(23); }
+    if std::env::var("YETLET_WIN_JOB_BEHAVIOR").unwrap()=="exit" { std::process::exit(23); }
     assert_ne!(unsafe { SetConsoleCtrlHandler(Some(control),1) },0);
     let depth:usize=std::env::args().nth(1).unwrap_or("0".into()).parse().unwrap();
     let _child=if depth<2 { Some(std::process::Command::new(std::env::current_exe().unwrap()).arg((depth+1).to_string()).spawn().unwrap()) } else { None };
@@ -691,7 +691,7 @@ fn dev_frozen(app: &Path) {
     fs::write(app.join("src/main.rs"), DEV_APP).unwrap();
     code(
         dev_cli(&manifest)
-            .env("YT088D_BEHAVIOR", "exit")
+            .env("YETLET_WIN_JOB_BEHAVIOR", "exit")
             .output()
             .unwrap(),
         1,
@@ -700,13 +700,13 @@ fn dev_frozen(app: &Path) {
     assert!(!app.join("target").exists());
     fs::write(
         &lock,
-        "version=4\n[[package]]\nname='yt088c_fixture'\nversion='0.1.0'\n",
+        "version=4\n[[package]]\nname='winprocess_fixture'\nversion='0.1.0'\n",
     )
     .unwrap();
     let initial = fs::read(&lock).unwrap();
     code(
         dev_cli(&manifest)
-            .env("YT088D_BEHAVIOR", "exit")
+            .env("YETLET_WIN_JOB_BEHAVIOR", "exit")
             .output()
             .unwrap(),
         23,
@@ -773,7 +773,7 @@ fn dev_cancel(app: &Path, case: &str) {
     fs::write(app.join("src/main.rs"), DEV_APP).unwrap();
     fs::write(
         app.join("Cargo.lock"),
-        "version=4\n[[package]]\nname='yt088c_fixture'\nversion='0.1.0'\n",
+        "version=4\n[[package]]\nname='winprocess_fixture'\nversion='0.1.0'\n",
     )
     .unwrap();
     let lock = fs::read(app.join("Cargo.lock")).unwrap();
@@ -781,14 +781,14 @@ fn dev_cancel(app: &Path, case: &str) {
     fs::create_dir(&sentinel_root).unwrap();
     let mut sentinel = Command::new(std::env::current_exe().unwrap())
         .args(["--exact", "native_dev_console_fixture", "--nocapture"])
-        .env("YT088D_CASE", "sentinel")
-        .env("YT088D_ROOT", &sentinel_root)
+        .env("YETLET_WIN_JOB_CASE", "sentinel")
+        .env("YETLET_WIN_JOB_ROOT", &sentinel_root)
         .creation_flags(CREATE_NEW_PROCESS_GROUP)
         .spawn()
         .unwrap();
     wait_marker(&sentinel_root.join("ready"));
     let mut command = dev_cli(&manifest);
-    command.env("YT088D_BEHAVIOR", "resist");
+    command.env("YETLET_WIN_JOB_BEHAVIOR", "resist");
     if case == "ctrl-break" {
         command.creation_flags(CREATE_NEW_PROCESS_GROUP);
     }
@@ -895,7 +895,7 @@ export default { plugins: [{ name: 'native-pair-fixture', configureServer() {
     fs::write(app.join("src/main.rs"), &source).unwrap();
     fs::write(
         app.join("Cargo.lock"),
-        "version=4\n[[package]]\nname='yt088c_fixture'\nversion='0.1.0'\n",
+        "version=4\n[[package]]\nname='winprocess_fixture'\nversion='0.1.0'\n",
     )
     .unwrap();
     let lock = fs::read(app.join("Cargo.lock")).unwrap();
@@ -913,7 +913,7 @@ export default { plugins: [{ name: 'native-pair-fixture', configureServer() {
         .env("YETLET_CONFIG_ROOT", app)
         .env("VITE_PAIR_PUBLIC", "synthetic-public-marker")
         .env(
-            "YT088D_BEHAVIOR",
+            "YETLET_WIN_JOB_BEHAVIOR",
             if auto_start { "resist" } else { "exit" },
         );
     if matches!(case, "vite-collision" | "vite-disabled") {
@@ -936,8 +936,8 @@ export default { plugins: [{ name: 'native-pair-fixture', configureServer() {
     fs::create_dir(&sentinel_root).unwrap();
     let mut sentinel = Command::new(std::env::current_exe().unwrap())
         .args(["--exact", "native_dev_console_fixture", "--nocapture"])
-        .env("YT088D_CASE", "sentinel")
-        .env("YT088D_ROOT", &sentinel_root)
+        .env("YETLET_WIN_JOB_CASE", "sentinel")
+        .env("YETLET_WIN_JOB_ROOT", &sentinel_root)
         .creation_flags(CREATE_NEW_PROCESS_GROUP)
         .spawn()
         .unwrap();
@@ -1126,10 +1126,10 @@ export default { plugins: [{ name: 'native-pair-fixture', configureServer() {
 
 #[test]
 fn native_dev_console_fixture() {
-    let Ok(case) = std::env::var("YT088D_CASE") else {
+    let Ok(case) = std::env::var("YETLET_WIN_JOB_CASE") else {
         return;
     };
-    let root = PathBuf::from(std::env::var_os("YT088D_ROOT").unwrap());
+    let root = PathBuf::from(std::env::var_os("YETLET_WIN_JOB_ROOT").unwrap());
     if case == "sentinel" {
         assert_ne!(
             unsafe { SetConsoleCtrlHandler(Some(fixture_control), 1) },

@@ -4,7 +4,7 @@
 - **Date:** 2026-11-11.
 - **Task:** YT-251, M26 Application Startup & Sample Experience.
 - **Owner amendment (2026-11-11):** Changed the fixed loopback HTTP development port from `3000` to `7878` to avoid a pre-existing service on port `3000`. The bind-address policy, security boundary, `serve_on` override and transport behavior remain unchanged. This owner amendment was independently reviewed in Job `wc_job_eJ9LTvWN2G-Yt7Oh` (terminal exit 0, saved Reviewer `gpt-6-astra`/high, JSON PASS with zero issues). The earlier YT-251 PASS remains evidence of the preceding contract revision.
-- **Related:** [M26 plan](../YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md),
+- **Related:** [Historical M26 plan](https://github.com/bohewu/yetlet/blob/1508b6910add4e74c9e2311a3f3eb4666539afce/docs/YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md),
   [ADR 0001 — Separation of concerns](0001-separation-of-concerns.md),
   [ADR 0005 — Opt-in capability modules](0005-opt-in-capability-modules.md),
   [ADR 0006 — Handler-first and optional MVC](0006-handler-first-mvc-optional.md),

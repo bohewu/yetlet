@@ -3,12 +3,12 @@
 - **Status:** Accepted design; local implementation independently reviewed PASS; setup and execution Pending.
 - **Date:** 2026-10-28.
 - **Task:** YT-096; D1/D3 amendment. D6 Pending; YT-020 Blocked.
-- **Related:** [Signer contract](../YT-096-SIGNER-CONTRACT.md),
-  [D1–D5 policy](../YT-096-D1-D5-RELEASE-TRUST-PLAN.md),
-  [CI integration](../YT-096-RELEASE-CI-INTEGRATION.md),
-  [hosted checkpoint](../YT-096-HOSTED-DRILL-PLAN.md).
+- **Related:** [Signer contract](../RELEASE-SUPPLY-CHAIN.md#two-payloads-complete-assembly-and-independent-verification),
+  [D1–D5 policy](../RELEASE-SUPPLY-CHAIN.md#adopted-release-trust-and-disclosure-policy--yt-096),
+  [CI integration](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-RELEASE-CI-INTEGRATION.md),
+  [hosted checkpoint](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-HOSTED-DRILL-PLAN.md).
 
-The [later alpha integration](../YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)
+The [later alpha integration](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#local-workflow-implementation--2026-10-28)
 applies this unchanged design to actual source `bf33638`, unsigned alpha tag and
 retained build/verifier. S and execution authority remain Pending. The original
 `0.1.0` context below keeps its historical source/run identities.
@@ -79,7 +79,7 @@ certificate, signature, hosted execution, Commit or Push is produced by this ADR
 A separately owner-authorized additional run `40789535074/1` at selected S
 `0e8fb60` fails at Draft metadata HTTP403 before protected work. The owner requests
 a working data path while preserving the read-only signer and existing custody.
-The [handoff contract](../YT-096-SIGNER-CONTRACT.md#encrypted-ciphertext-capability-handoff--2026-10-29)
+The [handoff contract](https://github.com/bohewu/yetlet/blob/66de5b5794ee9587dfbfe5e5c629c572e1af7b8a/docs/YT-096-SIGNER-CONTRACT.md#encrypted-ciphertext-capability-handoff--2026-10-29)
 uses an owner-local read to obtain a short-lived, specific-asset read capability,
 verifies unauthenticated ciphertext retrieval, and encrypts the URL to the
 existing age public recipient. CI receives no owner credential or plaintext URL.

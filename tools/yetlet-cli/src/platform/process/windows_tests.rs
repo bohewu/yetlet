@@ -41,7 +41,7 @@ fn fixture(executable: &Path, mode: &str) -> Command {
             "platform::process::windows::tests::native_fixture",
             "--nocapture",
         ])
-        .env("YT088C_FIXTURE", mode);
+        .env("YETLET_WIN_PROCESS_FIXTURE", mode);
     command
 }
 fn wait_file(path: &std::path::Path) {
@@ -123,7 +123,7 @@ fn frozen_build_and_dev_commands_are_explicit() {
 #[test]
 fn owned_native_child_preserves_exit_bits_unicode_argv_cwd_and_environment() {
     let root = tempfile::Builder::new()
-        .prefix("yt088c 雪 😀 ")
+        .prefix("winprocess 雪 😀 ")
         .tempdir()
         .unwrap();
     let app = app(root.path());
@@ -131,9 +131,9 @@ fn owned_native_child_preserves_exit_bits_unicode_argv_cwd_and_environment() {
     for code in [23_u32, 0xc0000005] {
         let mut command = fixture(&executable, "exit");
         command
-            .env("YT088C_EXIT", code.to_string())
-            .env("YT088C_CWD", &app.cwd)
-            .env("YT088C_ARG", "空 間;\"literal\\")
+            .env("YETLET_WIN_PROCESS_EXIT", code.to_string())
+            .env("YETLET_WIN_PROCESS_CWD", &app.cwd)
+            .env("YETLET_WIN_PROCESS_ARG", "空 間;\"literal\\")
             .args(["--skip", "空 間;\"literal\\"])
             .env("CARGO_NET_OFFLINE", "true")
             .env("RUSTUP_AUTO_INSTALL", "0");
@@ -152,7 +152,7 @@ fn job_reaps_descendant_and_leaves_unrelated_native_child_running() {
     let mut sentinel = fixture(&executable, "sleep").spawn().unwrap();
     let pid_file = app.cwd.join("descendant-pid");
     let mut command = fixture(&executable, "descendant");
-    command.env("YT088C_PID", &pid_file);
+    command.env("YETLET_WIN_PROCESS_PID", &pid_file);
     let result = run(&app, &mut command, false);
     let sentinel_alive = sentinel.try_wait().unwrap().is_none();
     sentinel.kill().unwrap();
@@ -190,8 +190,8 @@ fn pinned_app_parent_and_files_cannot_be_replaced_during_native_execution() {
     let release = app.cwd.join("release");
     let mut command = fixture(&executable, "held");
     command
-        .env("YT088C_RUNNING", &marker)
-        .env("YT088C_RELEASE", &release);
+        .env("YETLET_WIN_PROCESS_RUNNING", &marker)
+        .env("YETLET_WIN_PROCESS_RELEASE", &release);
     std::thread::scope(|scope| {
         let child = scope.spawn(|| run(&app, &mut command, false));
         wait_file(&marker);
@@ -208,14 +208,16 @@ fn pinned_app_parent_and_files_cannot_be_replaced_during_native_execution() {
 
 #[test]
 fn native_fixture() {
-    let Ok(mode) = std::env::var("YT088C_FIXTURE") else {
+    let Ok(mode) = std::env::var("YETLET_WIN_PROCESS_FIXTURE") else {
         return;
     };
     match mode.as_str() {
         "dev-console" => {
-            wait_file(&PathBuf::from(std::env::var_os("YT088D_GO").unwrap()));
+            wait_file(&PathBuf::from(
+                std::env::var_os("YETLET_WIN_JOB_GO").unwrap(),
+            ));
             let app = crate::platform::fs::open_app(&PathBuf::from(
-                std::env::var_os("YT088D_MANIFEST").unwrap(),
+                std::env::var_os("YETLET_WIN_JOB_MANIFEST").unwrap(),
             ))
             .unwrap();
             assert!(
@@ -229,9 +231,9 @@ fn native_fixture() {
             for code in [23_u32, 0xc0000005] {
                 let mut command = fixture(&std::env::current_exe().unwrap(), "exit");
                 command
-                    .env("YT088C_EXIT", code.to_string())
-                    .env("YT088C_CWD", &app.cwd)
-                    .env("YT088C_ARG", "literal")
+                    .env("YETLET_WIN_PROCESS_EXIT", code.to_string())
+                    .env("YETLET_WIN_PROCESS_CWD", &app.cwd)
+                    .env("YETLET_WIN_PROCESS_ARG", "literal")
                     .args(["--skip", "literal"])
                     .env("CARGO_NET_OFFLINE", "true")
                     .env("RUSTUP_AUTO_INSTALL", "0");
@@ -249,7 +251,7 @@ fn native_fixture() {
                 let marker = app.cwd.join(format!("grace-{event}"));
                 let mut command = fixture(&std::env::current_exe().unwrap(), "grace");
                 assert_ne!(command.get_args().next(), Some(OsStr::new("run")));
-                command.env("YT088D_READY", &marker);
+                command.env("YETLET_WIN_JOB_READY", &marker);
                 let sender = std::thread::spawn(move || {
                     wait_file(&marker);
                     // Only this fixture's new private console is in scope.
@@ -272,16 +274,16 @@ fn native_fixture() {
                 let leaf_pid = app.cwd.join("resistant-leaf-pid");
                 let sentinel_ready = app.cwd.join("unrelated-sentinel-ready");
                 let mut sentinel = fixture(&std::env::current_exe().unwrap(), "resistant-leaf")
-                    .env("YT088D_LEAF_READY", &sentinel_ready)
+                    .env("YETLET_WIN_JOB_LEAF_READY", &sentinel_ready)
                     .spawn()
                     .unwrap();
                 wait_file(&sentinel_ready);
                 let marker = app.cwd.join("resistant-ready");
                 let mut command = fixture(&std::env::current_exe().unwrap(), "resistant");
                 command
-                    .env("YT088D_READY", &marker)
-                    .env("YT088D_LEAF_READY", &leaf_ready)
-                    .env("YT088D_LEAF_PID", &leaf_pid);
+                    .env("YETLET_WIN_JOB_READY", &marker)
+                    .env("YETLET_WIN_JOB_LEAF_READY", &leaf_ready)
+                    .env("YETLET_WIN_JOB_LEAF_PID", &leaf_pid);
                 let sender = std::thread::spawn(move || {
                     wait_file(&marker);
                     // Safe only in the helper's CREATE_NEW_CONSOLE.
@@ -337,7 +339,7 @@ fn native_fixture() {
                 unsafe { SetConsoleCtrlHandler(Some(previous_control), 1) },
                 0
             );
-            fs::write(std::env::var_os("YT088D_READY").unwrap(), "ready").unwrap();
+            fs::write(std::env::var_os("YETLET_WIN_JOB_READY").unwrap(), "ready").unwrap();
             let deadline = Instant::now() + Duration::from_secs(10);
             while PREVIOUS.load(AtomicOrdering::SeqCst) == 0 {
                 assert!(Instant::now() < deadline, "no real graceful console event");
@@ -347,9 +349,9 @@ fn native_fixture() {
         }
         "resistant" => {
             assert_ne!(unsafe { SetConsoleCtrlHandler(Some(ignore_control), 1) }, 0);
-            let leaf_ready = std::env::var_os("YT088D_LEAF_READY").unwrap();
+            let leaf_ready = std::env::var_os("YETLET_WIN_JOB_LEAF_READY").unwrap();
             let mut leaf = fixture(&std::env::current_exe().unwrap(), "resistant-leaf")
-                .env("YT088D_LEAF_READY", &leaf_ready)
+                .env("YETLET_WIN_JOB_LEAF_READY", &leaf_ready)
                 .spawn()
                 .unwrap();
             let pid = leaf.id();
@@ -359,19 +361,23 @@ fn native_fixture() {
                 let _ = leaf.wait();
             });
             fs::write(
-                std::env::var_os("YT088D_LEAF_PID").unwrap(),
+                std::env::var_os("YETLET_WIN_JOB_LEAF_PID").unwrap(),
                 pid.to_string(),
             )
             .unwrap();
             wait_file(&PathBuf::from(leaf_ready));
-            fs::write(std::env::var_os("YT088D_READY").unwrap(), "ready").unwrap();
+            fs::write(std::env::var_os("YETLET_WIN_JOB_READY").unwrap(), "ready").unwrap();
             loop {
                 std::thread::sleep(Duration::from_secs(1));
             }
         }
         "resistant-leaf" => {
             assert_ne!(unsafe { SetConsoleCtrlHandler(Some(ignore_control), 1) }, 0);
-            fs::write(std::env::var_os("YT088D_LEAF_READY").unwrap(), "ready").unwrap();
+            fs::write(
+                std::env::var_os("YETLET_WIN_JOB_LEAF_READY").unwrap(),
+                "ready",
+            )
+            .unwrap();
             loop {
                 std::thread::sleep(Duration::from_secs(1));
             }
@@ -382,7 +388,7 @@ fn native_fixture() {
                 .spawn()
                 .unwrap();
             fs::write(
-                std::env::var_os("YT088C_PID").unwrap(),
+                std::env::var_os("YETLET_WIN_PROCESS_PID").unwrap(),
                 child.id().to_string(),
             )
             .unwrap();
@@ -390,19 +396,28 @@ fn native_fixture() {
             std::process::exit(23);
         }
         "held" => {
-            fs::write(std::env::var_os("YT088C_RUNNING").unwrap(), "ready").unwrap();
-            wait_file(&PathBuf::from(std::env::var_os("YT088C_RELEASE").unwrap()));
+            fs::write(
+                std::env::var_os("YETLET_WIN_PROCESS_RUNNING").unwrap(),
+                "ready",
+            )
+            .unwrap();
+            wait_file(&PathBuf::from(
+                std::env::var_os("YETLET_WIN_PROCESS_RELEASE").unwrap(),
+            ));
         }
         "exit" => {
             assert_eq!(
                 std::env::current_dir().unwrap(),
-                PathBuf::from(std::env::var_os("YT088C_CWD").unwrap())
+                PathBuf::from(std::env::var_os("YETLET_WIN_PROCESS_CWD").unwrap())
             );
-            let arg = std::env::var_os("YT088C_ARG").unwrap();
+            let arg = std::env::var_os("YETLET_WIN_PROCESS_ARG").unwrap();
             assert!(std::env::args_os().any(|actual| actual == arg));
             assert_eq!(std::env::var("CARGO_NET_OFFLINE").unwrap(), "true");
             assert_eq!(std::env::var("RUSTUP_AUTO_INSTALL").unwrap(), "0");
-            let code: u32 = std::env::var("YT088C_EXIT").unwrap().parse().unwrap();
+            let code: u32 = std::env::var("YETLET_WIN_PROCESS_EXIT")
+                .unwrap()
+                .parse()
+                .unwrap();
             std::process::exit(code as i32);
         }
         _ => panic!("unknown private fixture"),
@@ -449,8 +464,8 @@ fn dev_native_console_exit_identity_and_handler_restoration() {
     let go = app.cwd.join("console-go");
     let job = Job::new().unwrap();
     let mut helper = fixture(&executable, "dev-console")
-        .env("YT088D_GO", &go)
-        .env("YT088D_MANIFEST", app.cwd.join("Cargo.toml"))
+        .env("YETLET_WIN_JOB_GO", &go)
+        .env("YETLET_WIN_JOB_MANIFEST", app.cwd.join("Cargo.toml"))
         .creation_flags(CREATE_NEW_CONSOLE)
         .spawn()
         .unwrap();

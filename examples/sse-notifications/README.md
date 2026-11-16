@@ -52,4 +52,4 @@ cargo tree --locked -p yetlet-sse-notifications --edges normal
 cargo xtask check samples
 ```
 
-See [M9f verification](../../docs/M9F-VERIFICATION.md) for retained regression, dependency-isolation and reviewer evidence.
+See [M9f verification](../../docs/SAMPLES.md#sse-notifications-acceptance) for retained regression, dependency-isolation and reviewer evidence.

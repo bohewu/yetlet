@@ -6,7 +6,7 @@ static OBSERVED: AtomicI32 = AtomicI32::new(0);
 
 #[test]
 fn cargo_capture_combines_streams_bounds_output_and_preserves_cancellation() {
-    if std::env::var_os("YT247_CAPTURE_HELPER").is_some() {
+    if std::env::var_os("YETLET_PROCESS_CAPTURE_HELPER").is_some() {
         let mut success = Command::new("/bin/sh");
         success.args(["-c", "printf out; printf err >&2"]);
         assert_eq!(capture_combined(&mut success, 32).unwrap(), b"outerr");
@@ -31,7 +31,7 @@ fn cargo_capture_combines_streams_bounds_output_and_preserves_cancellation() {
         return;
     }
     let output = Command::new(std::env::current_exe().unwrap()).args(["--exact", "platform::process::linux::foreground::tests::cargo_capture_combines_streams_bounds_output_and_preserves_cancellation", "--nocapture"])
-        .env("YT247_CAPTURE_HELPER", "1").output().unwrap();
+        .env("YETLET_PROCESS_CAPTURE_HELPER", "1").output().unwrap();
     assert!(
         output.status.success(),
         "{}",
@@ -52,8 +52,8 @@ fn fixture(mode: &str, root: &Path) -> Command {
             "platform::process::linux::foreground::tests::owned_fixture",
             "--nocapture",
         ])
-        .env("YT087B_FIXTURE", mode)
-        .env("YT087B_ROOT", root)
+        .env("YETLET_FOREGROUND_FIXTURE", mode)
+        .env("YETLET_FOREGROUND_ROOT", root)
         .stdin(Stdio::null())
         .stdout(Stdio::null())
         .stderr(Stdio::null());
@@ -74,10 +74,10 @@ fn ready(path: &Path) {
 #[test]
 #[allow(clippy::zombie_processes)] // the product supervisor must adopt/reap this fixture
 fn owned_fixture() {
-    let Ok(mode) = std::env::var("YT087B_FIXTURE") else {
+    let Ok(mode) = std::env::var("YETLET_FOREGROUND_FIXTURE") else {
         return;
     };
-    let root = std::path::PathBuf::from(std::env::var_os("YT087B_ROOT").unwrap());
+    let root = std::path::PathBuf::from(std::env::var_os("YETLET_FOREGROUND_ROOT").unwrap());
     if mode == "watch-supervise" {
         let mut rust = Command::new("sh");
         rust.current_dir(&root).args([

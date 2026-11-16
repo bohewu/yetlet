@@ -25,7 +25,7 @@ Yetlet's baseline SSR/HTTP and browser WASM must remain useful without sessions,
 **Selected two-package migration (2026-10-30; implementation pending):** The
 owner explicitly selects `yetlet` for portable contracts and optional native
 capabilities, plus `yetlet-browser` for DOM/keyed/browser execution and optional
-WebGPU. [YT-211](../YT-211-TWO-PACKAGE-MIGRATION.md) keeps one shared View and a
+WebGPU. [YT-211](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-211-TWO-PACKAGE-MIGRATION.md) keeps one shared View and a
 one-way browser-to-base dependency, additive features, explicit startup options
 and native-only security/storage dependencies outside wasm32. This supersedes
 the earlier single-package implementation proposal, while preserving its
@@ -34,7 +34,7 @@ requires independent contract/final review; publication remains paused.
 
 **Packaging reconsideration (2026-10-30; proposal only):** The owner pauses new
 publication and asks to consider consolidating the public packages, including
-one implementation crate. [YT-210](../YT-210-PACKAGING-STUDY.md) preserves these
+one implementation crate. [YT-210](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-210-PACKAGING-STUDY.md) preserves these
 capability/target/security/runtime boundaries through proposed modules and
 additive features. It does not adopt that package shape, enable providers,
 replace current crate APIs or change historical acceptance. Independent
@@ -65,8 +65,8 @@ a commitment to build all of them. Simpler features need not each become a crate
 
 ## M21 planned follow-up (2026-10-22; registration only)
 
-The maintainer approved scheduling the [YT-113–YT-123 opt-in capability batch](../YT-113-123-OPT-IN-CAPABILITIES.md),
-**not** immediate implementation or a new `yetlet-core` API. YT-113 now records the [documentation-only authentication contract study](../YT-113-AUTHENTICATION-CONTRACT.md),
+The maintainer approved scheduling the [YT-113–YT-123 opt-in capability batch](../EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection),
+**not** immediate implementation or a new `yetlet-core` API. YT-113 now records the [documentation-only authentication contract study](../PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority),
 Done at research scope after independent Reviewer PASS. It selects the smallest server-side
 authentication contract and application-owned authorization boundary. The
 subsequently selected YT-114 foundation and YT-115 Memory Session bridge are
@@ -80,16 +80,16 @@ The other ADR candidates — `yetlet-cookies`, `yetlet-cache`,
 consumer-gated YT-120–YT-123 tasks. New proposals `yetlet-audit` (YT-118)
 and optional Bearer validation (YT-119) are **not accepted provider crates**.
 YT-119/120 are Done at research scope with no new adapter/crate selected;
-[YT-118 Audit research](../YT-118-AUDIT-STUDY.md) is Done after independent Reviewer PASS;
-[YT-121 Cache research](../YT-121-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-122 Output Cache research](../YT-122-OUTPUT-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-123 Tracing/Correlation research](../YT-123-TRACING-CORRELATION-STUDY.md) is Done after independent Reviewer PASS. The subsequent owner-selected
-[YT-114 foundation](../YT-114-IMPLEMENTATION.md) implements only native identity
+[YT-118 Audit research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-118-AUDIT-STUDY.md) is Done after independent Reviewer PASS;
+[YT-121 Cache research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-121-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-122 Output Cache research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-122-OUTPUT-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-123 Tracing/Correlation research](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-123-TRACING-CORRELATION-STUDY.md) is Done after independent Reviewer PASS. The subsequent owner-selected
+[YT-114 foundation](../EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection) implements only native identity
 resolution/extraction with independent Reviewer PASS. No Audit or Cache crate
 is implemented by this note. Previously qualified Session/Request ID/Secret
 work remains unchanged. Server-only authentication must never add default
 frontend/WASM dependencies, serialize a trusted principal, adopt unsigned
 roles, or bypass the existing Axum/Tower route-scope contract.
 
-The later owner-selected [YT-117 rate-limiting slice](../YT-117-RATE-LIMIT.md)
+The later owner-selected [YT-117 rate-limiting slice](../EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection)
 is Done at per-process scope after independent Reviewer PASS. It uses a separate
 native Tower layer, validated reusable Policy
 settings and explicitly shared Budget state, with bounded per-process Governor
@@ -112,4 +112,4 @@ Core/server/browser or default Admin normal dependency graphs.
 
 An always-on session/auth/cache layer, a global service locator, a central dynamic plugin registry, and a mega-crate with every provider enabled by default all impose unnecessary coupling or per-application cost.
 
-**Current implementation:** `App::configure` takes an ordinary typed setup function, and `try_configure` propagates its chosen error type. They execute once during construction, not per request. `yetlet-request-id` proves independent optional correlation. M8c adds `yetlet-session`, with scoped native middleware, typed `Session<T>`, OS-random identity/CSRF, absolute expiry/capacity, rotation/revocation and an SSR cart consumer. Both remain absent from the core/browser dependency graphs unless explicitly selected. The later separately selected [YT-114 Auth foundation](../YT-114-IMPLEMENTATION.md) is Done at bounded scope after independent Reviewer PASS; The separately selected [YT-115 Memory Session bridge](../YT-115-SESSION-AUTH.md) is now Done after independent Reviewer PASS; Cache remains unimplemented. The later separate `yetlet-session-redis` nested workspace is experimental and explicitly selected by applications; [M10g](../M10G-VERIFICATION.md#yt-066-bounded-framework-closeout--2026-10-11) qualifies its single-host/single-primary/no-persistence scope without changing Memory or Core/default/browser graphs. Other distributed providers and production durability/HA remain unqualified. See [Extensions](../EXTENSIONS.md), [M6 evidence](../M6-VERIFICATION.md) and [M8c evidence](../M8C-VERIFICATION.md).
+**Current implementation:** `App::configure` takes an ordinary typed setup function, and `try_configure` propagates its chosen error type. They execute once during construction, not per request. `yetlet-request-id` proves independent optional correlation. M8c adds `yetlet-session`, with scoped native middleware, typed `Session<T>`, OS-random identity/CSRF, absolute expiry/capacity, rotation/revocation and an SSR cart consumer. Both remain absent from the core/browser dependency graphs unless explicitly selected. The later separately selected [YT-114 Auth foundation](../EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection) is Done at bounded scope after independent Reviewer PASS; The separately selected [YT-115 Memory Session bridge](../EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection) is now Done after independent Reviewer PASS; Cache remains unimplemented. The later separate `yetlet-session-redis` nested workspace is experimental and explicitly selected by applications; [M10g](../PROVIDER-OPERATIONS.md#m10-local-operations-and-bounded-framework-closeout) qualifies its single-host/single-primary/no-persistence scope without changing Memory or Core/default/browser graphs. Other distributed providers and production durability/HA remain unqualified. See [Extensions](../EXTENSIONS.md), [M6 evidence](https://github.com/bohewu/yetlet/blob/ac98cdc127ccd299cb1150fef922b0560453a1d4/docs/M6-VERIFICATION.md) and [M8c evidence](../M8C-VERIFICATION.md).

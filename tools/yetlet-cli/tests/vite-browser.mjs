@@ -1,4 +1,4 @@
-// YT-099: focused, opt-in actual browser acceptance for one generated Vite app.
+// vite-assets: focused, opt-in actual browser acceptance for one generated Vite app.
 // This QA script is not scaffolded, installed, or used by the Rust runtime.
 import assert from 'node:assert/strict';
 import { access, mkdir, readFile, writeFile } from 'node:fs/promises';
@@ -33,9 +33,9 @@ const origin = 'http://127.0.0.1:' + port;
 const binary = resolve(argumentsMap.get('--binary'));
 const dist = resolve(argumentsMap.get('--dist'));
 const output = argumentsMap.has('--out') ? resolve(argumentsMap.get('--out')) : null;
-const sentinel = '000123-yt099-synthetic-only';
+const sentinel = '000123-vite-assets-synthetic-only';
 const strictCsp = "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
-const evidence = { task_id: 'YT-099', mode, withConfig, isCloud, status: 'running', cleanup: {} };
+const evidence = { task_id: 'vite-assets', mode, withConfig, isCloud, status: 'running', cleanup: {} };
 let browser;
 let server;
 let backendLog = '';

@@ -20,7 +20,7 @@ pub fn create(root: &Path) {
 
 #[allow(dead_code)] // Reused by Compose/Kubernetes targets; Docker-only target needs only create.
 pub fn normal_dependencies(runtime_settings: bool) -> std::collections::BTreeSet<String> {
-    let mut names = BTreeSet::from_iter(["axum", "serde", "tower"].map(str::to_owned));
+    let mut names = BTreeSet::from_iter(["axum", "serde", "tower", "tokio"].map(str::to_owned));
     if runtime_settings {
         names.extend(["toml", "dotenvy", "libc"].map(str::to_owned));
     }

@@ -3,7 +3,7 @@
 - **Status:** Accepted; YT-254 source implementation Reviewer PASS (published alpha.7 unchanged).
 - **Date:** 2026-11-11.
 - **Task:** YT-252, M26 Application Startup & Sample Experience.
-- **Related:** [M26 plan](../YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md),
+- **Related:** [Historical M26 plan](https://github.com/bohewu/yetlet/blob/1508b6910add4e74c9e2311a3f3eb4666539afce/docs/YT-251-258-APPLICATION-STARTUP-SAMPLE-PLAN.md),
   [ADR 0001 — Separation of concerns](0001-separation-of-concerns.md),
   [ADR 0005 — Opt-in capability modules](0005-opt-in-capability-modules.md),
   [ADR 0006 — Handler-first and optional MVC](0006-handler-first-mvc-optional.md),
@@ -90,7 +90,7 @@ The prelude is intentionally curated, not exhaustive. Adding another name later 
 - Reviewer result: `overall_status = pass`; `issues = []`; `required_followups = []`; `optional_notes = []`.
 - Ignored evidence: `.pipeline-output/yt252-application-prelude-contract-review-20261111/reviewer-output.json` and `reviewer-trace.json`.
 
-- YT-254 independent implementation Reviewer `wc_job_t0nfWyjaZtjOd5Gx` completed exit `0`, JSON PASS with zero issues/required followups; saved role `reviewer`, model `gpt-6-astra`, effective effort `high`, and parent trace all matched. The source-only verification and evidence are documented in [YT-254 verification](../YT-254-PRELUDE-VERIFICATION-20261111.md).
+- YT-254 independent implementation Reviewer `wc_job_t0nfWyjaZtjOd5Gx` completed exit `0`, JSON PASS with zero issues/required followups; saved role `reviewer`, model `gpt-6-astra`, effective effort `high`, and parent trace all matched. The source-only verification and evidence are documented in [YT-254 verification](https://github.com/bohewu/yetlet/blob/1508b6910add4e74c9e2311a3f3eb4666539afce/docs/YT-254-PRELUDE-VERIFICATION-20261111.md).
 
 ## Acceptance boundary
 

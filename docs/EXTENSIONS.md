@@ -110,8 +110,8 @@ M10g qualified the then-separate provider at single-host
 Docker multi-instance, single-primary and no-persistence scope. It uses explicit
 async operations and native scoped Axum middleware; the synchronous Memory API
 and Core/default-server/browser graphs remain unchanged. See the [provider
-README](../crates/yetlet/guides/session-redis.md), [selected Cookie contract](YT-066B-COOKIE-ORDERING.md)
-and [bounded closeout](M10G-VERIFICATION.md#yt-066-bounded-framework-closeout--2026-10-11).
+README](../crates/yetlet/guides/session-redis.md), [selected Cookie contract](PROVIDER-OPERATIONS.md#redis-session-cas-operation-outcome-and-cookie-ordering)
+and [bounded closeout](PROVIDER-OPERATIONS.md#m10-local-operations-and-bounded-framework-closeout).
 The pure-SSR Cookie contract preserves retired-ID rejection but permits login
 loss under extreme response reordering. This is not a Stable Candidate API,
 authentication system, production durability/HA result or mandatory dependency.
@@ -130,9 +130,37 @@ bridge. Browser errors are local to that capability; queue completion
 is not FPS. Its actual support is limited to the
 [documented Experimental configuration](../crates/yetlet-browser/guides/wgpu-support.md),
 without a speedup or future-3D API claim. See the
-[YT-081 cross-crate API audit](YT-081-API-CONTRACT-AUDIT.md) for typed
+[YT-081 cross-crate API audit](API-CONTRACTS.md#cross-crate-api-differences-and-scoped-gpu-refinement) for typed
 error and disposal-contract differences.
 
+### Native dependency composition, not a container framework
+
+Choose constructor parameters, native Axum `State` and manual `FromRef`
+when a handler needs only one handle from shared application state.
+Explicit startup creates and validates settings, network clients and
+Secrets; app state owns stop/drain and request-local identity remains
+request-local. Generic services stay generic unless an actual
+dyn-compatible interface (such as `Arc<dyn SecretProvider>`) is required.
+No container service graph or automatic registration is part of the
+public SDK; the original shaku/dill comparison was **research-only**
+and neither library was integrated or performance-benchmarked.
+See [Architecture](ARCHITECTURE.md#research-only-handler-resumption-and-native-composition).
+### Application-owned action transport
+
+An application can implement an existing ActionExecutor<C> without a
+new dependency injection registry or Core network transport.
+A bounded native proof used Tokio LengthDelimitedCodec, one Add
+command/Sum response, a four-byte length prefix and 1024-byte
+payload maximum; unknown fields, overflow, invalid frames and
+truncated replies fail closed. Synthetic error 422 is a local
+ActionError::Remote mapping, **not HTTP status received from TCP**.
+A 50ms deadline or future drop closes the owned connection but
+cannot roll back earlier effects or stop already detached work.
+The seven source-specific native tests in the
+[proof fixture](../examples/custom-action-transport/README.md)
+do not qualify authentication, authorization, CSRF, TLS, browser
+transport, idempotency or off-host deployment. Preserve these
+controls explicitly in any real application adapter.
 ### Designing another module
 
 The separately selected [secret provider](SECRET-PROVIDERS.md) is an opt-in
@@ -153,7 +181,47 @@ authentication; data cache is not HTTP output caching. Key rotation for protecte
 client-side data, distributed-store durability/HA, trusted proxy identity and
 production qualification cannot be inferred from typed registration.
 
-See [ADR 0005](adr/0005-opt-in-capability-modules.md), [ADR 0006](adr/0006-handler-first-mvc-optional.md), [HTTP pipeline](HTTP-PIPELINE.md), and [M6 evidence](M6-VERIFICATION.md).
+See [ADR 0005](adr/0005-opt-in-capability-modules.md), [ADR 0006](adr/0006-handler-first-mvc-optional.md), [HTTP pipeline](HTTP-PIPELINE.md), and [M6 evidence](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements).
+
+## Historical opt-in Auth, Session and rate-limiter selection
+
+Auth, Redis-protocol Session and request rate limits remain **separate
+optional modules**; this framework does not install them by default or
+provide a mandatory global identity/DI container. Start from the
+[Auth guide](../crates/yetlet/guides/auth.md),
+[Session guide](../crates/yetlet/guides/session.md),
+[Redis Session guide](../crates/yetlet/guides/session-redis.md) and
+[rate-limit guide](../crates/yetlet/guides/rate-limit.md).
+The reviewed YT-113–123 roadmap included **research-only** Audit,
+Bearer, Cookie and other capability candidates; inclusion in an old
+backlog paragraph does not imply implementation or a new stable API.
+
+An application chooses identity trust (explicit verified principal,
+local account/permission resolution), optional vs required Auth,
+Session and CSRF ordering, and independent rate-limit budget
+identity. It cannot promote identity text, Cookie content or User/
+Tenant headers into trusted permissions. Missing/retired identity
+is different from a decoder/Session/authority outage; unavailability
+must fail closed rather than grant anonymous access. Authenticated
+authorization and CSRF errors remain application policy. Session
+provides its own per-Store operation gate; optional endpoint/group
+rate limits enforce **key/time quotas**, not concurrency. A real
+quota can return no-store 429 with calculated `Retry-After`;
+infrastructure/limiter/Session failure returns private 503. No
+hidden background retries, default Memory fallback, global
+per-tenant quota or automatic distributed budget is selected.
+
+The historic YT-114 typed-principal integration, YT-115 Memory
+Session-to-Auth bridge and YT-117 policy/Settings-loader examples
+received **focused** independent review and native validation,
+not blanket real-IdP, browser/mobile, distributed deployment or
+production release certification. Original `result_large_err` Clippy
+and `multiple workspace roots found` example-setting failures
+were separately corrected; they are not retroactively first-pass
+successes. For the actual Local/Valkey Session CAS/cookie and Auth
+operating boundaries, including an unresolved historical Cookie
+quota counterexample, see
+[Provider Operations](PROVIDER-OPERATIONS.md#historical-session-auth-and-oidc-contracts-and-failures).
 
 ## API reference
 
@@ -172,57 +240,58 @@ and [Shop](../examples/modular-shop/README.md) guides.
 
 ### M21 opt-in capabilities
 
-The [M21 batch plan](YT-113-123-OPT-IN-CAPABILITIES.md) registers
-YT-113–YT-123 as Todo at registration. [YT-113 contract research](YT-113-AUTHENTICATION-CONTRACT.md)
-is Done after independent Reviewer PASS. The separate [yetlet-auth foundation](../crates/yetlet/guides/auth.md)
-is Done at [YT-114 scope](YT-114-IMPLEMENTATION.md) after its separate independent Reviewer PASS;
-YT-115 is Done at Memory bridge scope and YT-116/119/120 are Done at independently reviewed research scopes; [YT-117 rate limiting](YT-117-RATE-LIMIT.md) is Done at the separately selected per-process scope after independent Reviewer PASS; [YT-118 Audit research](YT-118-AUDIT-STUDY.md) is Done after independent Reviewer PASS; [YT-121 Cache research](YT-121-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-122 Output Cache research](YT-122-OUTPUT-CACHE-STUDY.md) is Done after independent Reviewer PASS; [YT-123 Tracing/Correlation research](YT-123-TRACING-CORRELATION-STUDY.md) is Done after independent Reviewer PASS. The plan separates the `yetlet::auth` verified-identity contract from application-owned authorization and separately selected Session integration. Existing app-owned OIDC and opaque Bearer capabilities do not establish generic adapters. A separate Cookie crate, generic audit event/sink capability,
-data/output caches and tracing remain unselected candidates;
-the existing native Axum/Tower and module setup APIs stay authoritative.
-Registration does not provide these runtime capabilities or qualify
-authenticated production deployments.
-
-The separately selected [YT-115 Memory bridge](YT-115-SESSION-AUTH.md) adds an
+The [original M21 plan](EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection) registered
+YT-113–123 as proposed follow-ups, not shipped features. Each later
+closed independently at its selected scope: YT-113 Authentication contract;
+YT-114 native Auth foundation; YT-115 Memory Session bridge; YT-117
+default-off per-process rate limit; YT-116/118/119/120/121/122/123
+**research-only** OIDC, Audit, Bearer, Cookie, data/output cache and
+tracing decisions. The [current capability matrix](CAPABILITIES.md#research-decisions-and-unselected-candidates)
+distinguishes actual SDK features from rejected/unselected modules.
+Application-owned authorization, transaction history, private response
+no-store, Cookie/CSRF policy and tracing redaction remain explicit;
+research Done is not permission to install an automatic provider.
+The separately selected [YT-115 Memory bridge](EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection) adds an
 explicit `yetlet-auth/session` feature and native HTTP proof with independent Reviewer PASS. Default Auth still has no Session dependency. Existing Memory sync and
 Redis async provider APIs remain unchanged.
 
-The separately selected [YT-117 rate limiter](YT-117-RATE-LIMIT.md) uses ordinary
+The separately selected [YT-117 rate limiter](EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection) uses ordinary
 Tower/Axum method scopes and independent per-process accounting. Application-owned
 startup configuration defaults off and omits limiter construction and request
 work while disabled. No Auth dependency, framework-wide policy registry, live
 reload or distributed quota is selected. The bounded implementation is Done
 after focused verification and independent Reviewer PASS. The owner later
-selected the [existing Settings loader in its example](YT-117-RATE-LIMIT.md#settings-loader-follow-up--2026-10-22),
+selected the [existing Settings loader in its example](EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection),
 with separate focused verification and independent Reviewer PASS. The loader is
 an example development dependency,
 not a Core service or normal limiter dependency.
 
-The owner-selected [YT-118 Audit study](YT-118-AUDIT-STUDY.md) compares Auth Notes,
+The owner-selected [YT-118 Audit study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-118-AUDIT-STUDY.md) compares Auth Notes,
 Admin/Board transactional history, SQLite CRUD and diagnostic HTTP observation.
 It recommends retaining application-owned event semantics and transaction/sink
 composition; no audit crate, callback registry or automatic capture is selected.
 Independent Reviewer PASS completes research only; existing history remains
 application-owned and no new Audit API/runtime is selected.
 
-The owner-selected [YT-121 Cache study](YT-121-CACHE-STUDY.md) compares
+The owner-selected [YT-121 Cache study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-121-CACHE-STUDY.md) compares
 Starter/Shop business reads, SQLite/Board reads and static asset reuse. No
 repeated data-cache adapter is demonstrated; retain typed app-owned composition.
 Session, permission policy and limiter accounting remain authoritative state;
 data caching does not authorize HTTP output reuse. Research is Done
 after independent Reviewer PASS; that research selected no cache trait/crate or runtime.
-The later separately authorized [YT-183 Shop reference](YT-183-CATALOG-CACHE-IMPLEMENTATION.md)
+The later separately authorized [YT-183 Shop reference](../examples/modular-shop/README.md#optional-catalog-display-cache--yt-183)
 is an app-only default-off Moka integration accepted after independent Reviewer PASS
 with zero issues/required followups;
 it preserves Session/checkout authority and does not extract a framework cache API.
 
-The owner-selected [YT-122 Output Cache study](YT-122-OUTPUT-CACHE-STUDY.md)
+The owner-selected [YT-122 Output Cache study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-122-OUTPUT-CACHE-STUDY.md)
 compares public assets and personalized SSR/API response lifecycles. Private
 content stays uncached by default; Vary or a tenant/user key does not replace
 no-store/current authorization. Retain existing header/static delivery; no
 duplicated safe response store or generic output-cache API/runtime is selected.
 Research is Done after independent Reviewer PASS.
 
-The owner-selected [YT-123 Tracing/Correlation study](YT-123-TRACING-CORRELATION-STUDY.md)
+The owner-selected [YT-123 Tracing/Correlation study](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-123-TRACING-CORRELATION-STUDY.md)
 compares RequestIds, selected SSR/API projection and Starter diagnostics with
 native Rust tracing/Tower. Task and stream lifetimes, inbound-context trust
 and sensitive-field projection remain explicit application decisions; no
@@ -231,21 +300,21 @@ after independent Reviewer PASS; no tracing crate/subscriber/exporter is selecte
 
 ### Multi-instance Auth follow-up
 
-[YT-124](YT-124-MULTI-INSTANCE-AUTH-SESSION-CONTRACT.md) is an owner-selected
+[YT-124](PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority) is an owner-selected
 documentation-only study, Done after independent Reviewer PASS. The Admin
 reference already selects Valkey through `valkey` settings/features and the
 compatible existing `yetlet::session_redis` package; its [two-app and TTL
-evidence](YT-094-VALKEY-SESSIONS.md) is distinct from historical YT-066b3 Redis
+evidence](PROVIDER-OPERATIONS.md#redis-session-cas-operation-outcome-and-cookie-ordering) is distinct from historical YT-066b3 Redis
 execution. The new Auth crate currently bridges only Memory. The study defines
 explicit async resolver composition, shared authority, lifecycle/freshness and
 failure semantics; it adds no runtime feature, default provider or Core API.
 
-The subsequent [YT-125 implementation slice](YT-125-VALKEY-AUTH-INTEGRATION.md)
+The subsequent [YT-125 implementation slice](../examples/admin-dashboard/README.md#historical-auth-session-oidc-and-local-policy-evidence)
 selects an isolated application-owned async resolver, shared local authority and
 two-process Valkey proof. It is Done after independent Reviewer PASS; existing framework/provider APIs
 and default dependencies stay unchanged.
 
-The owner subsequently selected [YT-126 Admin adoption](YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md),
+The owner subsequently selected [YT-126 Admin adoption](../examples/admin-dashboard/README.md#historical-auth-session-oidc-and-local-policy-evidence),
 Done after focused verification and independent Reviewer PASS. It
 selects application-owned native resolution/extraction with explicit feature
 and runtime configuration and fresh shared local account policy. Existing
@@ -254,3 +323,23 @@ and triage saves retain the documented pre-SQL consistency limit; no generic
 bridge, framework API or cross-store commit fencing is selected.
 
 </details>
+
+## Construction and optional provider ownership
+
+M6's `configure`/`try_configure` are ordinary typed setup functions invoked once
+at construction. Failure propagates the caller's error type; there is no
+per-request registry, discovery, service locator or mandatory Controller.
+Capabilities require an explicit dependency and installation through native
+Tower layers, State and typed extensions. Unselected providers initialize nothing
+and do not enter core/browser graphs.
+
+The original independent Request ID proof starts at 1, shares a counter across
+clones, replaces untrusted inbound IDs and returns 503 on exhaustion. IDs are
+process/provider-local correlation, not authentication, persistence or global
+uniqueness. Scoped installation and global 404/405 wrapping were tested along
+with absence, short circuit, invalid configuration and 12 concurrent requests.
+The minimal server adapter did not depend on that provider; Todo explicitly did.
+M8 later selected bounded Memory Session separately. Its current lifecycle and
+security contract remains in the [Session guide](../crates/yetlet/guides/session.md)
+and the unchanged [M8c source record](M8C-VERIFICATION.md); neither Session nor
+Auth/Cache becomes a default through this historical proof.

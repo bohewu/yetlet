@@ -19,9 +19,11 @@ its version and SDK dependency come from its own reviewed manifest. Use the
 selected versioned release record and actual GitHub/crates.io publication receipts
 for version/status, rather than a version copied into this SOP. A development
 manifest or proposed Roadmap version does not establish registry availability.
-Existing token policy stays in force; the
-[OIDC option](YT-227-NEXT-RELEASE-PLAN.md#optional-cratesio-trusted-publishing)
-remains a separate policy decision.
+Existing token policy stays in force. crates.io **OIDC Trusted Publishing**
+was an unadopted alternative in the dated YT-227 planning checkpoint, not
+an activated issuer/owner capability, release permission or token
+migration. Future changes need a separate source-specific policy decision;
+the original proposal remains at fixed local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
 Schema2/`consolidated` is the closed two-package record;
 schema1/`sixteen` remains for earlier artifacts at their matching source.
 The library count is derived only from that validated cohort throughout build,
@@ -44,11 +46,13 @@ selected cohort. A new plan does not authorize hosted jobs, signing or upload.
 
 Select actual changes, cohort, version and missing qualification through the
 [Backlog](BACKLOG.md), [Roadmap](ROADMAP.md) and their versioned release records.
-The [delivery plan](YT-227-NEXT-RELEASE-PLAN.md) explains guide-edition separation,
-trusted CLI/SDK bindings and evidence reuse. Its planning checkpoints are not
-publication status. [SDKalpha.6's actual publication](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
-and [CLI0.1.1's installed consumer](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
-are fixed reference executions, not fallback versions for a new release.
+At the dated YT-227 checkpoint, SDK alpha.6 and CLI 0.2.0 were proposed
+for separate publication, with Reader edition held until verified consumer
+and Pages closeout; neither plan nor a development manifest constituted
+release approval. [Actual SDK alpha.6](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01)
+and [CLI 0.2.0 publication](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02)
+are independently verified. The [CLI 0.1.1 consumer](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
+is an earlier fixed execution, not a fallback version for a new release.
 The [alpha.4 record](ALPHA4-HOSTED-RECORD.md) retains its one-of-sixteen partial
 publication and paused continuation; it does not describe a new cohort.
 
@@ -108,7 +112,7 @@ checks. The current maintenance correction makes that successful upload
 transport canonical; local checks do not claim another live release.
 Before another release, review its
 source/record, applicable version changes and missing qualification, then use the
-[versioned interfaces](YT-209-RELEASE-AUTOMATION.md). No version change alone
+[versioned interfaces](RELEASING.md#versioned-record-and-receipt-contract). No version change alone
 authorizes a dispatch. Historical tagged workflows retain their original guarded
 interfaces; never pass invented new inputs to those old sources. Local tooling
 acceptance does not qualify a new candidate or grant key/signing/publication
@@ -199,7 +203,7 @@ open and must be reported; do not invent compatibility, relabel a failed run,
 republish immutable packages or deploy unverified reader inputs. This is the
 owner-selected default for subsequent SDK and CLI publication closeouts, not an
 automatic hosted publication or a change to release workflow permissions.
-[YT-249](YT-249-READER-RELEASE-ROLLOVER.md) records its first application.
+[YT-249](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence) records its first application.
 
 ## Separate one-time setup from each release
 
@@ -224,7 +228,7 @@ is reusable setup; its current authentication/validity checks are not waived.
 | Release dossier | Reviewed scope, source/evidence/approval documents and receipts: version/cohort/C/tag, feature/target limits, S/identity/tool pins, original runs/digests, closure, both raw signing hashes, approvals and destinations |
 | Schema-1 release record | Strict data-only input implemented by YT-209: core version/C/cohort, then exact build, custody verifier, S, raw public provenance identity and Release ID; extra fields are rejected |
 
-The [implemented record schema](YT-209-RELEASE-AUTOMATION.md#integration-reference)
+The [implemented record schema](RELEASING.md#versioned-record-and-receipt-contract)
 is the workflow input, not the complete release dossier. Keep additional scope,
 trust pins, later results and approvals in their defined external records/trusted
 code. Populate inputs from actual outputs and retain each snapshot; never overwrite
@@ -255,7 +259,78 @@ a consumed binding, force a tag, treat history acceptance as full-history
 cleanliness, or reinstall hooks as routine release work. Tool/platform support
 and a passing Guard do not themselves authorize a tag or Push.
 
+## Versioned record and receipt contract
+
+Release inputs are closed JSON data, not executable commands, paths or URLs.
+The validated cohort determines package names, counts, order and tag derivation:
+schema1/`sixteen` is historical; schema2/`consolidated` selects the two SDKs;
+schema3/`cli` selects only the independent CLI. Use the matching source's parser,
+not a later interface against an old tag. Version is canonical SemVer without
+build metadata; source and signer are full lowercase commit hashes. Reject
+unknown/duplicate fields, invalid types, oversized data and arbitrary cohorts.
+Repository/owner identities, endpoints, workflow paths and trust pins stay in
+reviewed code, outside caller-controlled data.
+
+| Record stage | Required data and binding |
+|---|---|
+| Core | `schema`, `version`, `source` C, `cohort`; tag derives from version/cohort |
+| Build readback | Core plus `build`: positive decimal `run`, `attempt`, `artifact`, and original ZIP `sha256` |
+| Complete, before prepare | Preserve build unchanged; add `custody_verifier` (`run`, `attempt`, `environment_id`), distinct `signer_commit` S, `provenance` (raw `sha256`, integer `size`), `release_id` |
+| Independent result request | `verifier_commit` V, original `signing_request`, `sign_run`, `sign_attempt`, `sign_artifact`, `sign_digest`, raw `execution_sha256` |
+| Local public plan | `schema`, `record_sha256`, `release_id`, `name`, `notes_sha256`, exact `assets` (name/size/SHA), `verification_sha256`, `approval_sha256` |
+
+Retain every snapshot and its canonical digest in custody. Corrections produce
+a separately reviewed snapshot, never overwrite an accepted record. Canonical
+JSON hashes use sorted keys, ASCII escapes, compact separators and a trailing
+newline; payload/file hashes cover original bytes. Sign request `digest` and
+`sign_digest` identify Actions ZIPs, `receipt_sha256` identifies raw
+`SIGNING-INPUTS.json`, and `execution_sha256` identifies raw
+`SIGNING-EXECUTION.json`. These digests are not interchangeable. Later results,
+signature bundles and approvals remain external to the frozen record/manifest.
+
+The no-OIDC result verifier at V checks exact-source CI, protected master=V,
+original successful prepare/sign runs at S, exact artifacts, approved Environment
+and authenticated tools before isolated decryption. It checks both raw payloads,
+all selected subjects, the complete manifest and every entry, both original
+bundles and S/run/attempt certificate/CT/log/timestamp claims. Public DSSE must
+contain the original statement, not a reconstruction. Partial/failure artifacts,
+private bundle mismatch or failed plaintext/key cleanup fail verification.
+Only the reduced result receipt and allowlisted public files leave that job;
+the private manifest, bundle, raw logs and identity remain private.
+
+## Encrypted preparation and evidence custody
+
+Build/capture receives only the pinned public age recipient. The private identity
+belongs only in the isolated approved readback/preparation phases, outside Git,
+build jobs, logs and artifacts; remove it before OIDC. Authenticate pinned tools
+before key access. Capture only the explicit private assembly and known OpenSSL
+extras, never all runner temporary files, Cargo home or environment dumps.
+Freeze raw records/inventory first, provenance second, complete manifest last;
+put encryption/transport/readback receipts outside the assembly to avoid cycles.
+Preparation-manifest completeness does not automatically close the final reused
+qualification/security/support evidence required for signing.
+
+Success requires the original native exit0, `PREPARATION_SUCCESS`, `complete=true`,
+exact source/recipe/tools/locks/subjects, full manifest/inventory verification and
+independent public-byte correspondence. `FAILED_INCOMPLETE` preserves the original
+failure and partial records; green readback of failure evidence is not successful
+preparation. Capture/encryption/upload failure, cancellation or runner loss may
+mean `NOT SAVED`. No plaintext fallback or guaranteed cancellation capture exists.
+
+Download within the planned 24-hour window and before seven-day Actions expiry.
+Retain successful and failed ciphertext, original receipts, public bytes and
+necessary old tools/bindings outside Git through explicit owner disposition.
+Record actual decrypt/full-entry verification and durable custody separately from
+upload/readback. Owner-host 0700 directories/0600 files, flush and reread receipts
+prove that recorded local copy, not offsite replication, HA or indefinite host
+availability. Git recovers tracked Markdown and recorded identities; it does not
+guarantee the original ignored/external logs, signatures or receipts. Preserve
+their recorded stores under [DEV-ARTIFACTS](DEV-ARTIFACTS.md).
+
 ## Baseline release checklist
+
+The detailed [custody, handoff and manual rotation procedures](#custody-handoff-and-manual-key-lifecycle)
+apply alongside the [two-payload trust contract](RELEASE-SUPPLY-CHAIN.md#two-payloads-complete-assembly-and-independent-verification).
 
 This is the accepted alpha.3/manual-signing sequence. For the newly selected
 combined GitHub/crates.io path, use the [single publication checklist](RELEASE-PUBLICATION.md#each-version).
@@ -344,7 +419,7 @@ maintenance work does not remove reviewers or enable bypass.
 ## Existing workflow map and limits
 
 This is the checked-in implementation baseline, not permission to dispatch it.
-[YT-209](YT-209-RELEASE-AUTOMATION.md) defines the versioned input and operator
+[YT-209](RELEASING.md#versioned-record-and-receipt-contract) defines the versioned input and operator
 interfaces; focused local checks and independent implementation review PASS.
 Tooling integration, Environment installation and alpha.3 positive protected
 verification are recorded in the actual execution record. Historical Pending
@@ -368,10 +443,10 @@ record before prepare and preserve its digest through signing and independent
 readback. Original tagged workflows and accepted alpha results retain their old
 interfaces and identities. Do not dispatch a new interface against an old source.
 
-The [minimum hosted/Environment plan](YT-209-HOSTED-VERIFICATION-PLAN.md) lists
+The [minimum hosted/Environment plan](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-209-HOSTED-VERIFICATION-PLAN.md) lists
 the observed configuration, legacy receipt limits and ready-to-authorize steps.
 The `release-result-verify` Environment and existing `AGE_IDENTITY` provisioning
-are [installed and read back](YT-209-RELEASE-AUTOMATION.md#owner-authorized-recovery-delivery-and-setup--2026-10-29):
+are [installed and read back](CI-SECURITY-REVIEW.md#versioned-release-automation-integration-history):
 required owner reviewer, master only, no admin bypass. Installation/name readback
 does not yet qualify actual decryption; each approved execution must recheck its
 settings and original input bindings. It verifies actual original signing bundles
@@ -421,7 +496,7 @@ then checks target-version absence. Keep master=P until completion. Unknown
 account limits can still reject a write; HTTP429 stops without retry. The normal
 publication job retains its60minute bound. It is not an automatic/general resume.
 
-Use the adopted [D1/D2 field/attachment policy](YT-096-D1-D5-RELEASE-TRUST-PLAN.md)
+Use the adopted [D1/D2 field/attachment policy](RELEASE-SUPPLY-CHAIN.md#adopted-release-trust-and-disclosure-policy--yt-096)
 and a closed exact list. The first alpha has twenty public files: sixteen `.crate`
 archives, original provenance/public checksum, public DSSE bundle and a reduced
 owner-acceptance summary. This is a historical count, not a future directory glob.
@@ -471,28 +546,33 @@ run ID, local key exception, candidate or successful result into a new release.
 
 ## Publishing to crates.io is a separate operation
 
-GitHub Release attachments are not a registry upload. YT-020 remains Blocked;
-this section is an operator reference, not execution authority. A real registry
-batch must select the current sixteen-package cohort/version and immutable source,
-confirm each name/owner right, derive dependency order, record credentials and
-limits, and verify actual registry bytes/resolution. The old nine-package YT-020
-records remain historical; do not reuse their scope as a sixteen-package grant.
+GitHub Release attachments are not a registry upload. This section includes
+**historical sixteen-package YT-020 / alpha.3 registry planning**, whose formal
+trust/first-publication gate was Blocked at that checkpoint; it is not the
+current two-library SDK publishing cohort. For a new release, select the
+manifest-derived closed cohort, exact version and source under the current
+[SDK/CLI release contract](#current-two-package-development-boundary--yt-211),
+confirm every actual name/owner right and dependency order, and verify the
+specific published registry bytes/resolution. Original nine and sixteen-package
+records cannot grant a new SDK or CLI publication or token scope.
 
-The [2026-10-30 sixteen-package inventory](YT-020-REGISTRY-READINESS.md) records
-not-found name observations, the public account and unverified publishing rights.
-Use its normal/build layers together with the Config/Secrets versioned
-development-dependency caveat. Five independent workspaces prevent selecting
-all sixteen with a root-only `--workspace`; the first-publication verification
-strategy remains to be proven. This inventory does not authorize an upload.
+The [original sixteen-package readiness inventory](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-REGISTRY-READINESS.md)
+records a **2026-10-30 read-only** not-found observation, public account and
+unverified publishing rights. Those sixteen names' earlier normal/build layers,
+Config/Secrets versioned development-dependency bootstrap and five independent
+workspaces are **historical source-specific concerns**, not requirements to
+publish sixteen crates from the current two-package SDK. Recheck current
+availability and rights at the actual authorized version/source; the original
+inventory does not reserve names, justify upload or prove current resolution.
 
-The subsequent [Config/Secrets contract and dry-runs](YT-020-FIRST-PUBLISH-CONTRACT.md)
+The subsequent [Config/Secrets contract and dry-runs](RELEASE-PUBLICATION.md#dated-local-evidence-and-remaining-provenance)
 verify the pair normally with accepted local package sources and unchanged
 manifests. Actual registry availability/acceptance is not simulated. Their
 generated archives differ from the signed set in internal packaged-lock
 checksums; resolve the sixteen-package artifact/checksum contract before
 uploading or claiming existing signatures cover a repackaged registry set.
 
-The [formal registry contract](YT-020-REGISTRY-PUBLICATION-CONTRACT.md) now selects
+The [formal registry contract](RELEASE-PUBLICATION.md#first-registry-publication-and-immutable-artifact-contract) now selects
 the first-name dependency correction and exact-byte promotion of sixteen newly
 prepared artifacts. It requires a separately selected immutable R/V, artifact
 freeze and reviewed transport. Current alpha.3 archives have a Config/Secrets
@@ -538,3 +618,262 @@ and [current enhancements](https://blog.rust-lang.org/2026/01/21/crates-io-devel
 describe that model. Registry publisher configuration/credentials are separate
 from GitHub Release rights and Sigstore identity. No crates.io token, publisher
 workflow, registry Environment, name claim or upload is installed by this work.
+
+## Custody, handoff and manual key lifecycle
+
+### Capture and protected readback
+
+The adopted D2 ciphertext scheme uses the public recipient in
+`.github/release-evidence-recipient.txt`, pinned SHA-256
+`b861a3c7e2abf3caf4c7071c045f6114704db94e8cc39ce010e7fa10711ff506`.
+The original bootstrap pins age1.3.2, Sigsum0.13.1 and Go1.27.3, verifies archive/
+proof hashes and the `sigsum-generic-2025-1` two-of-three witness quorum before age
+execution. Official Go HTTPS/checksum and module sumdb are its trust roots.
+This provides neither TUF bootstrap nor independently reproduced binaries.
+Use authenticated tools and exact approved bindings through the existing CLI.
+All variables below are operator placeholders and require existing authority.
+
+```sh
+cargo run --locked --manifest-path xtask/Cargo.toml -- release custody capture \
+  --age "$AGE" --recipient .github/release-evidence-recipient.txt \
+  --source "$SOURCE" --run "$RUN" --attempt "$ATTEMPT" \
+  --private "$PRIVATE_ASSEMBLY" --extras "$OPENSSL_EXTRAS" \
+  --exit "$ORIGINAL_EXIT" --output "$NEW_TRANSPORT"
+
+cargo run --locked --manifest-path xtask/Cargo.toml -- release custody verify \
+  --age "$AGE" --recipient .github/release-evidence-recipient.txt \
+  --source "$SOURCE" --run "$RUN" --attempt "$ATTEMPT" \
+  --transport "$TRANSPORT" --identity "$IDENTITY" --output "$NEW_READBACK"
+```
+
+Capture accepts the flat private assembly and only `openssl-3.5.9.tar.gz`,
+`openssl-build.log`, `openssl-build-result.json` extras. Transport contains only
+`private-evidence.tar.age` and `transport-receipt.json`. Its encrypted inventory
+binds source/workflow/run/attempt, recipient, exact members/digests, original
+native exit and completeness. New private readback outside Git contains `private/`,
+`extras/`, inventory and `local-readback-receipt.json`. Reject unsafe members,
+binding/authentication/digest failures, overwrites and plaintext fallback.
+The generic diagnostic is `custody NOT SAVED or readback rejected; private diagnostics suppressed`.
+Full original private-manifest verification remains required. A valid failure
+inventory stays `FAILED_INCOMPLETE` with its original exit.
+
+The original manual verifier used Environment `release-evidence-verify`, sole
+reviewer `bohewu`, self-approval under the single-owner policy, disabled admin
+bypass and exact custom **tag** policy `v0.1.0`. `AGE_IDENTITY` was an Environment
+Secret restricted to isolated verification. The current versioned record selects
+the approved tag. The later [automation policy](RELEASE-PUBLICATION.md#separation-of-privileges)
+supersedes repeated reviewer clicks only for reviewed future executions.
+Environment administrators remain trusted policy roots. A document or Secret
+name cannot prove runtime protections or grant key access.
+
+Before protected work and again before key use, require checkout/event/workflow/
+peeled tag agreement and approved source membership in origin/master. The
+original manual inputs were `expected_commit`, `build_run`, `build_attempt`,
+`artifact_id` and raw `artifact_sha256`. Source-specific parsers still govern old
+tagged runs. REST readback must establish original completed release workflow/
+run/attempt/repository/source, exact artifact name/ID/digest/size/unexpired state,
+Environment reviewer/ref policy and exact two-file ZIP. Never forward GitHub
+credentials to storage redirects. Build is contents-read. Verifier has contents/
+actions read, without OIDC/write. Unavailable metadata/permissions fail closed
+before key access. Documented runtime Environment approval supplies the approval
+boundary where APIs expose no current-approval or bypass proof field.
+
+Keep key access step-scoped in ephemeral0700/0600 storage. Authenticate tools
+before key access. Remove identity/plaintext and unset key variables before OIDC,
+including failure cleanup. Upload only safe receipts and encrypted allowed data.
+Runner loss/cancellation may prevent capture or cleanup. Seven-day transport/
+receipt retention and planned24-hour download do not prove durable custody.
+Preserve failed and successful original bytes outside Git through disposition.
+
+### Supplemental ciphertext and short-lived intake
+
+Review a flat external qualification selection and `QUALIFICATION-CLOSURE.json`
+with exact unique names/sizes/hashes, original sources, roles and limitations.
+Run normal checksum create/verify before `scripts/release-sign.py pack` using
+authenticated `SIGN_AGE`. Its new output `qualification-inputs.zip` contains only
+age ciphertext and a safe receipt. The helper has no upload command or recursive
+discovery. Remove its temporary plaintext TAR on failure as well as success.
+Actual attachment to a Draft requires its own authority and exact asset binding.
+
+After the original read-only Draft API403, the adopted handoff reuses a stored
+encrypted asset through a narrowly bound download capability. The owner-local
+`handoff` command uses existing gh authentication for exactly github.com API,
+checks master/S, Draft/tag/C, asset ID/name/size/hash, then retrieves the original
+ZIP unauthenticated and checks its two-file shape/hash/qualification receipt.
+Only HTTPS `release-assets.githubusercontent.com` URLs under this repository's
+asset prefix are accepted, without port/userinfo/fragment/redirects. Require
+read-only capability permissions. The earlier SAS expiry or unverified download
+JWT `exp` only shortens validity. TLS/provider authorization and immutable hashes
+remain required. Direct-stream/unsupported responses fail closed.
+
+Encrypt the capability with the pinned public recipient without owner-key access.
+New external0700/0600 output is `request.json` and `HANDOFF-RECEIPT.json`.
+Remove temporary URL plaintext. No owner token or plaintext URL reaches CI input,
+logs, receipts or provenance. The original five-field prepare template contains
+`mode`, `signer_commit`, `qualification_asset`, `qualification_sha256` and
+`qualification_manifest_sha256`. Hosted preparation additionally requires
+`qualification_handoff`, its SHA-256 and `qualification_expires`. A bare template
+is rejected. Generate only after S selection, immediately before dispatch.
+
+The original20/5-minute freshness thresholds and roughly30-minute provider life
+are historical. The 2026-10-31 alpha.5 correction handles an actual five-minute
+capability. Local handoff/preflight require120seconds remaining. The isolated
+`qualification_intake` job authenticates SHA-pinned age before key access,
+rechecks source/CI/Environment, and requires60seconds at actual URL use. It
+decrypts the bounded URL, retrieves ciphertext without credentials/redirects,
+verifies ZIP/hash/receipt, then removes key and URL plaintext. Upload only original
+qualification ciphertext/receipt plus safe closed intake receipt to seven-day
+Actions storage. Intake has no OIDC or repository write authority.
+
+Fresh-runner preparation authenticates the full toolchain before key use and
+accepts only its successful dependency's original artifact ID/digest. Match
+repository/S/run/attempt/name, full record/request hashes, original ZIP/manifest
+and ciphertext. Late decryption rechecks the intake receipt without URL retrieval.
+Missing/stale data or late scheduling fails closed. Structure validation after
+expiry does not authorize URL use. Preflight5minutes, intake3 and prepare27
+preserve the original protected30-minute total. Sign mode consumes frozen bytes
+and does not retrieve qualification data. No expired-URL fallback, automatic
+refresh/retry, new credential or padded artifact is permitted.
+
+Sign requests bind `mode`, `signer_commit`, `run`, `attempt`, `artifact`, raw ZIP
+`digest`, raw `receipt_sha256`, `provenance_sha256`, `manifest_sha256` and exact
+policy-specific `d6`. IDs are positive decimal strings and SHAs full lowercase
+hex. Original manual `approve-exact-signing-inputs` and current
+`reviewed-automation` remain source-specific policies. A text field alone cannot
+grant owner authority. Preflight rejects unknown fields/modes and implicit S.
+Closed phase/class/status diagnostics may show an HTTP400–599 integer. Never
+emit URLs, raw exceptions/bodies/headers, tokens or private paths. Failures seal
+available partial bundles as FAIL, without automatic signing retries.
+
+### Manual custody review, rotation and retirement
+
+Review custody periodically and replace for identified leakage/access changes.
+There is no automatic30/90-day schedule. Record recipient fingerprint/version
+per ciphertext. New encryption requires a reviewed source-pinned recipient and
+matching versioned Environment Secret. GitHub does not synchronize custom age
+rotation. Retain old decrypt keys while old ciphertext is needed, or re-encrypt
+and independently verify a new external receipt without changing original frozen
+manifest/provenance. Re-encryption cannot revoke previously copied ciphertext.
+Never overwrite/delete a still-needed old key.
+
+`scripts/release-evidence-rotation.py prepare` accepts exact repository HEAD and
+new public recipient, compares operational Git bytes and emits only
+`rotation.patch`/`manifest.json`, without identity input or apply operation.
+Bind all four sites coherently, namely the recipient file, `RECIPIENT_SHA`, the
+literal encryption recipient in `xtask/src/release/custody.rs`, and release.yml's
+independent file-hash check. Reject missing/duplicate/inconsistent expected-old
+anchors and changed baseline before output. The manifest binds old/new recipient,
+files, patch and retained tools. Shape validation alone cannot approve a key.
+Application must recheck expected-old bindings and create a complete new isolated
+snapshot without overwrites or partial state. Never apply to the live checkout
+as part of the local drill.
+
+`drill` uses authenticated cached age/age-keygen and retained authentication
+evidence, fresh LOCAL test A/B identities, isolated baseline snapshots and locked
+offline xtask builds. Preserve full original LOCAL manifest and compare every
+restored member. Require actual A→A/B→B success, wrong-key and new-pin/old-transport
+rejection, retained A tooling→A readback, actual A rollback capture/readback,
+and test-copy loss/failure/restoration/readback. Retain old helper/binary/public
+file/bindings and key while needed. Key retention alone cannot make a new-pin
+verifier accept old transport. LOCAL recovery does not prove owner-key or GitHub
+Secret recovery. No real identity is read/copied or current recipient changed.
+Handled refusal exits1, invalid usage exits2, and failed started drills retain
+FAILED proof and private diagnostics. Use the existing tool's exact CLI help.
+The [dated local drill evidence](QUALIFICATION-MATRIX.md#custody-and-local-rotation-evidence--2026-10-27-and-28)
+retains original failures and limits.
+
+## Reader and API publication separation
+
+The [public guide architecture](GITHUB-PAGES-PUBLICATION.md#public-guide-architecture-and-original-local-acceptance)
+preserves the initial mdBook preview/publication and later Yetlet-built cutover
+as source-pinned accepted events. A local nonpublishing preview can validate
+selected source/output hashes and links using a dirty documentation checkout.
+Only accepted publication/consumer evidence promotes the edition through the
+required reader-update procedure above. Same-version rustdoc links retain
+native/browser target and feature labels, with no implied hosted rustdoc build.
+The current pair stays SDKalpha.8/CLI0.4.0. Website source/Pages authority,
+SDK/CLI signing/registry authority and local preview results are independently
+recorded. Historical proof is locally Git-recoverable, with remote SHA access
+unverified until separately authorized delivery/readback.
+
+## Historical alpha.2 version, package and release gates — 2026-10-29
+
+The following records the original local sixteen-library preflight and its
+then-pending gates. Current cohort rules are above. The accepted alpha.8 SDK and
+CLI 0.4.0 publications have their own Hosted Records in
+[Readiness](RELEASE-READINESS.md). The original source is locally recoverable at
+Git `8d6fad7e95ee25849872b974f922d10c71b70a95`, blob
+`b18838aa009fc3d528c7de3dbee83ba5a2e6bad8`, SHA256
+`e3010095e7e02dc04df6dfd9ad2fb7f827d2ef937cf2eb3e812ed22c8a561641`.
+Remote GitHub reachability and raw ignored evidence availability are unverified.
+[Original authority and source](https://github.com/bohewu/yetlet/blob/8d6fad7e95ee25849872b974f922d10c71b70a95/docs/ALPHA2-VERSION-PREFLIGHT.md#authority-and-source).
+
+### Alpha.2 authority and source
+
+The owner approved synchronizing all sixteen libraries to `0.9.0-alpha.2`,
+internal dependency requirements, affected locks and outdated current documents,
+with no third-party upgrade. Only affected package/external-consumer checks are
+selected; accepted behavior/platform/security evidence is retained.
+
+The clean baseline is merged master
+`c2d4bd085682cf86748bdd3ff18d6ca9f26534fc`, tree
+`32ad5a974f8de1cd405bbc96fa37c731bbb7d9fd`. Both required jobs in automatic
+[master CI40884588178/1](https://github.com/bohewu/yetlet/actions/runs/40884588178)
+PASS before this migration. PR21's original CI40883138343/1 and squash/tree
+readback remain recorded. This uncommitted preflight does not select a new C,
+S or V, create a tag, execute hosted release work, sign or publish.
+
+The published baseline remains Experimental
+[v0.9.0-alpha.1](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.1)
+at `bf3363801132f4481263ceb411d9bba3349df86d`, with its accepted signatures,
+D6 decision and public assets unchanged. YT-020 remains Blocked.
+
+### Alpha.2 package and compatibility contract
+
+Eleven library versions inherit the root; five retain explicit isolated-workspace
+versions. All sixteen and eighteen versioned normal/optional/dev sibling edges
+move to alpha.2. Paths, optional features, targets, API/runtime behavior,
+Rust1.99 and the coordinated Experimental compatibility policy are unchanged.
+Inherited versions also move twenty-six unpublished workspace examples; those
+examples do not join the sixteen-library distribution cohort. Independent
+tool/example/vendor versions remain unchanged.
+
+Thirteen current package READMEs update usage requirements. Nineteen locks change
+only 112 unsourced local version fields. Reversing alpha.2 to alpha.1 reproduces
+the original bytes of every changed manifest, package README and lock. All 2,372
+sourced package blocks across the twenty-one tracked locks retain exact bytes,
+including third-party names, versions, sources, checksums and dependency records.
+No dependency upgrade, ignore, feature expansion or registry claim is introduced.
+
+The current compatibility/release guides distinguish the published alpha.1 from
+the alpha.2 checkout and record completed YT-209 Environment installation versus
+Pending positive schema-1 hosted qualification. The hosted plan gains a current
+disposition while retaining its dated pre-installation inventory/proposals.
+Historical candidate decisions, failures, original qualification, old archive
+names and signed payloads retain their original version/source identities.
+
+### Alpha.2 independent review and remaining gates
+
+`cargo xtask check docs` PASS: 75 required documents, 209 backlog items, links,
+Markdown structure, whitespace and dependency DAG. Changed/new Markdown link
+and whitespace inspection also PASS. Independent Reviewer
+`/root/alpha2_version_independent_review_20261029` PASS, zero issues/required
+followups. All 53 source and 125 evidence hashes matched before/after review;
+sixteen archive hashes, 132 current payload and 181 final vendor correspondences
+were verified read-only. Native reviewer/model/actual high effort are verified.
+Only review-completion metadata follows this frozen source boundary.
+Review targets are the actual version/document diff,
+original commands/archives, unchanged-dependency evidence and preserved source
+boundary; a local PASS does not qualify new hosted output.
+
+The next Git action requires separate authority. After delivery/required CI,
+select exact C before any separately approved tag/build/readback. The new
+schema-1 prepare/sign/result/public sequence still needs actual new record,
+run/artifact/payload hashes, concrete owner approvals, cleanup and retained
+outputs. It cannot reuse/edit old receipts lacking `record_sha256`.
+
+The three existing Environments and age identity are not changed or read here.
+Future exact evidence-tag policy rollover is separate from current version
+editing. Alpha.1 D6 stays Complete; future signing/publication is not authorized,
+and no local private-key exception is renewed. No Commit/Push, tag, hosted
+dispatch, signing or publication occurs in this slice.

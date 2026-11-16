@@ -47,4 +47,4 @@ cargo xtask smoke multi-island-dashboard-firefox --profile release
 cargo xtask check samples
 ```
 
-See [M9g verification](../../docs/M9G-VERIFICATION.md) for retained Chrome/Firefox, manifest-fallback, lifecycle, bundle and dependency-isolation evidence. This remains a local prototype, not a generalized island/hydration contract or browser support guarantee.
+See [M9g verification](../../docs/SAMPLES.md#multi-island-dashboard-acceptance) for retained Chrome/Firefox, manifest-fallback, lifecycle, bundle and dependency-isolation evidence. This remains a local prototype, not a generalized island/hydration contract or browser support guarantee.

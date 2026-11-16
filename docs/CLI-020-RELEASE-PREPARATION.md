@@ -14,7 +14,7 @@ SDKalpha.6 publication closeout documents, then prepare independent CLI0.2.0
 through the final owner publication gate. The closeout commit is0275291.
 [SDKalpha.6 is already published](ALPHA6-RELEASE-PREPARATION.md#owner-approved-publication-and-registry-consumer--2026-11-01);
 this item does not rebuild or republish either SDK package. The accepted
-[YT-227 plan](YT-227-NEXT-RELEASE-PLAN.md#g2-bind-each-cli-version-to-its-actual-published-sdk)
+[YT-227 plan](https://github.com/bohewu/yetlet/blob/ad564ad1ef07e5fca063ae88587c0f21e6edb5b1/docs/YT-227-NEXT-RELEASE-PLAN.md#g2-bind-each-cli-version-to-its-actual-published-sdk)
 supplies the version-specific binding requirement.
 
 Exactly one distribution subject is selected: yetlet-cli0.2.0, executable yetlet,

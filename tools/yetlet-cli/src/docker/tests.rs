@@ -550,13 +550,13 @@ fn delivery_profile_matrix_exact_inventory_env_and_no_secrets_or_developer_paths
         crate::compose::generate(
             &f.manifest(),
             &f.parent.join("compose"),
-            "localhost:5000/yt101:local",
+            "localhost:5000/docker_fixture:local",
         )
         .unwrap();
         crate::k8s::generate(
             &f.manifest(),
             &f.parent.join("k8s"),
-            "localhost:5000/yt101:local",
+            "localhost:5000/docker_fixture:local",
             1,
         )
         .unwrap();
@@ -574,7 +574,7 @@ fn delivery_profile_matrix_exact_inventory_env_and_no_secrets_or_developer_paths
                 .unwrap();
         let container = &deploy["spec"]["template"]["spec"]["containers"][0];
         assert_eq!(container["securityContext"]["readOnlyRootFilesystem"], true);
-        assert_eq!(container["image"], "localhost:5000/yt101:local");
+        assert_eq!(container["image"], "localhost:5000/docker_fixture:local");
         let env = container["env"].as_array().unwrap();
         let token = env.iter().find(|v| v["name"] == "APP_SERVICE__TOKEN");
         assert_eq!(token.is_some(), config);

@@ -22,7 +22,7 @@ separate actual records; this does not promote a future output to PASS.
 
 | Input | Actual value / disposition |
 |---|---|
-| Accepted migration | [YT-211](YT-211-TWO-PACKAGE-MIGRATION.md), Done at migration and affected local-proof scope after independent followup PASS0; original contract/final review failures retained |
+| Accepted migration | [YT-211](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-211-TWO-PACKAGE-MIGRATION.md), Done at migration and affected local-proof scope after independent followup PASS0; original contract/final review failures retained |
 | Local source checkpoint | `0f867f11a7e73675158597f0ec3caff71f1d8d0f` |
 | Tree | `4c612e6b3418641114f91bff2e66fee58930f3c6` |
 | Parent / branch | `678adfec81f1878b0f3d0a886d8a12ef2e83eccc`; `codex/alpha4-registry-continuation` |
@@ -47,7 +47,7 @@ present in the previous lock union; this is not a claim that every lock block
 or dependency declaration stayed byte-identical.
 
 Alpha.5 intentionally changes Rust crate/module imports. Follow the
-[migration contract](YT-211-TWO-PACKAGE-MIGRATION.md) and
+[migration contract](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-211-TWO-PACKAGE-MIGRATION.md) and
 [naming guide](NAMING.md#two-package-module-paths--yt-211), including
 `auth-session`, `session-redis-tls` and `wgpu-browser`. No source compatibility
 alias is promised for the former sixteen crate names.
@@ -74,7 +74,7 @@ proposed. A wider claim needs its own actual gap and selection.
 
 ## Accepted evidence to retain
 
-[YT-211's result table](YT-211-TWO-PACKAGE-MIGRATION.md#implementation-and-affected-evidence--2026-10-30)
+[YT-211's result table](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-211-TWO-PACKAGE-MIGRATION.md#implementation-and-affected-evidence--2026-10-30)
 is the detailed local proof index: both SDKs native/WASM, all34 example
 manifests,192 workspace example tests, selected isolated combinations,169 base
 and18 Browser accepted tests,21 moved example tests,11 doctests, CLI creation/
@@ -104,9 +104,9 @@ for those inputs. Final C needs fresh normally verified archives and exact
 source/manifest/lock/checksum correspondence, not another replay of unaffected
 runtime tests. The pre-migration Windows, browser/GPU, security and performance
 records retain their original scope; the
-[YT-202](YT-202-NATIVE-FEATURE-GAPS.md),
-[YT-203](YT-203-WASM-DOM-GPU-EVIDENCE.md) and
-[YT-204](YT-204-PACKAGE-SECURITY-COVERAGE.md) matrices are historical evidence,
+[YT-202](QUALIFICATION-MATRIX.md#historical-sixteen-package-qualification-and-wasm-proof),
+[YT-203](QUALIFICATION-MATRIX.md#historical-sixteen-package-qualification-and-wasm-proof) and
+[YT-204](RELEASE-SUPPLY-CHAIN.md#historical-license-and-advisory-qualification) matrices are historical evidence,
 not alpha.5 package names or new-source acceptance labels.
 
 ## Original qualification and remaining release gates

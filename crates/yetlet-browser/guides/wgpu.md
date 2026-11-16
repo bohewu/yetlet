@@ -96,13 +96,13 @@ or FPS. Peak transition buffer bytes include old and replacement allocations.
 
 ## Selected Experimental support
 
-The actual extracted candidate passed [YT-079 verification](https://github.com/bohewu/yetlet/blob/master/docs/YT-079-VERIFICATION.md)
-and [independent review](https://github.com/bohewu/yetlet/blob/master/docs/YT-079-INDEPENDENT-REVIEW.md) on selected
+The actual extracted candidate passed [YT-079 verification](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-079-VERIFICATION.md)
+and [independent review](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-079-INDEPENDENT-REVIEW.md) on selected
 Firefox 158 / Ubuntu X11 / Intel Vulkan with disposable WebGPU opt-in. See the
 [source-bound support matrix](wgpu-support.md) and final YT-080 qualification record.
 Windows JS baseline and failed Chrome configurations are not candidate PASS.
 No broad browser, physical mobile, native backend, stable API, production or 3D
-support is claimed. See [YT-079 verification](https://github.com/bohewu/yetlet/blob/master/docs/YT-079-VERIFICATION.md).
+support is claimed. See [YT-079 verification](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-079-VERIFICATION.md).
 
 The renderer is now a module of the browser SDK in the root workspace; the
 consumer retains its separate workspace/lock. Use the explicit commands:

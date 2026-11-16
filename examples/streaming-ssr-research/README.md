@@ -24,7 +24,7 @@ proves initial-fragment availability before later row construction. The HTML
 uses native `main`, `h1` and `ul`/`li` semantics, an English root language and a
 viewport declaration; no CSS, script, WASM or external assets are needed.
 
-[Research record](../../docs/YT-021-STREAMING-SSR-RESEARCH.md) describes the
+[Maintained streaming and deadline decisions](../../docs/HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing) describes the
 timing definitions, error/header/backpressure limits, decision and verification
 boundary. [Raw observations](measurements.csv) retain all 120 samples from the
 current dirty-checkout research run; they are local observations without a

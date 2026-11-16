@@ -11,20 +11,22 @@ its build SDK/snapshot remain separate fixed release inputs. The public Reader
 Edition follows the verified published pair selected in `site/pages.toml`; its
 reviewed update and Pages readback are required for each publication closeout. Earlier release records retain their
 original bindings and failures. [RELEASING.md](RELEASING.md) is the general SOP;
-[YT-227](YT-227-NEXT-RELEASE-PLAN.md) retains the optional registry OIDC migration,
-which remains unadopted. Permissions, Secret policy and ADR0009 are unchanged.
-
+The original YT-227 proposal considered crates.io OIDC Trusted Publishing,
+but it has **not** been adopted or activated. Existing registry-token
+ownership, protected Environments and ADR 0009 remain unchanged; a future
+OIDC policy would need new approval and actual credential/issuer proof.
+The original version plan is recoverable at fixed local Git `ad564ad1ef07e5fca063ae88587c0f21e6edb5b1`.
 ## Independent CLI cohort — YT-215
 
-[CLI first-release preparation](YT-215-CLI-FIRST-RELEASE.md) adds closed schema3/cli:
+[CLI first-release preparation](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures) adds closed schema3/cli:
 only yetlet-cli, version from its own manifest, tag yetlet-cli-vVERSION, one source
 archive and five public files. Its dependency on the published SDK is not another
 release subject or upload. The existing source-bound builder, signer identity,
 separate verifier/custody and final owner gate apply. The final consumer installs
 the executable with its packaged lock. Existing SDK schemas/outputs remain
-unchanged. [CLI0.1.0 is published](YT-215-CLI-FIRST-RELEASE.md#actual-first-publication-and-consumer-failure--2026-10-31),
+unchanged. [CLI0.1.0 is published](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures),
 with successful installation but failed exact version-output validation.
-[CLI0.1.1's completed publication](YT-216-CLI-011-PATCH-RELEASE.md#completed-publication-and-installed-consumer--2026-10-31)
+[CLI0.1.1's completed publication](COMPATIBILITY.md#historical-first-cli-releases-and-consumer-failures)
 repairs that bounded interface: install, exact version, help and scaffold pass.
 It does not replace0.1.0 or re-publish SDK; every future CLI cohort retains its
 own final owner gate.
@@ -57,7 +59,7 @@ legacy requests retain their original interface and approval rules.
 
 Signing still creates public certificate/identity and transparency-log metadata
 **before** publication. The standing signing authority accepts only the already
-reviewed [D1/D2 disclosure fields](YT-096-D1-D5-RELEASE-TRUST-PLAN.md); new fields,
+reviewed [D1/D2 disclosure fields](RELEASE-SUPPLY-CHAIN.md#adopted-release-trust-and-disclosure-policy--yt-096); new fields,
 identities or custody policies need another decision. No private evidence is
 promoted by this change, and an unsuccessful publication cannot retract a log.
 
@@ -191,6 +193,39 @@ it cannot claim that a combined registry request was fulfilled. Public attachmen
 remain the exact selected `.crate` files, original unsigned provenance, public checksum,
 public Sigstore bundle and reduced acceptance summary. Publication receipts and
 the complete private evidence are not added through a directory glob.
+
+## Exact public plan and upload boundary
+
+Local `stage`, `readback` and `publish` are separate explicit operations by exact
+Release ID. Before writes, verify immutable tag→C, Release ID/tag/C/name/body
+digest and prerelease identity; preserve `draft=false`, `prerelease=true` and
+`make_latest=false` on publication. `--confirm publish-exact-approved-plan` is an
+operator assertion, not owner authorization. Validate all local bytes first;
+reject duplicates, unexpected existing assets and clobber. Upload each missing
+asset once, verify actual downloaded names/IDs/sizes/hashes, and stop on failure
+with partial state retained. Anonymous metadata and actual bytes must agree after
+publication; failed observation never authorizes republishing.
+
+The public set derives from the cohort: archives, original unsigned provenance,
+public checksum, public DSSE bundle and reduced signing approval (twenty files
+for historical sixteen, six for the two SDKs, five for CLI). The complete private
+manifest is not the public checksum manifest. Full verification receipts/private
+bundles/raw findings are never public attachments. Reduced approval binds
+`record_sha256`, C, S, verification/manifest/public-bundle digests and the accepted
+scope/destination; the combined policy additionally binds its registry plan and
+request. Retain exact plan/schema distinctions; generated GitHub source ZIP/tar
+downloads are not signed package subjects.
+
+The 2026-10-30 alpha.3 Python upload failed with zero assets and an unknown
+original HTTP status. Successful later `gh api` transport did not diagnose that
+old failure. The canonical transport uses authenticated `gh api`, fixed upload
+origin, explicit binary Content-Type/Content-Length and byte-exact stdin;
+metadata reads retain bounded HTTP handling without credential forwarding to
+public asset hosts. Timeout, unavailable CLI, command/HTTP failure and malformed
+response produce bounded phase/class/status receipts, never raw stderr/bodies,
+tokens or signed URLs. Preserve the separate alpha.4 length failure/correction in
+its [accepted record](ALPHA4-HOSTED-RECORD.md#owner-approved-publication-failure-and-local-repair).
+There is no silent fallback, automatic retry, tag change or implicit registry grant.
 
 ## Registry-only continuation contract — 2026-10-30
 
@@ -349,3 +384,124 @@ not another product build, prepare, signature or independent verifier when
 their frozen inputs remain unchanged. Retain the failed attempt and inspect
 remote state before requesting a bounded continuation. No Git delivery,
 Environment change, hosted retry or publication is performed by local maintenance.
+
+## First registry publication and immutable artifact contract
+
+The 2026-10-30 YT-020 contract studied sixteen historical alpha.3 libraries at C
+`557ab76e03b619e959eae7529dbe03317fe1f952`, S/V `30baf25`. Current accepted
+distribution is [SDK alpha.8 / CLI0.4.0](RELEASE-READINESS.md).
+Select current cohort/version/source independently. Old nine/sixteen-package
+orders,404 name observations, owner-reported cargo login and private dry-runs
+provide no present name reservation, account/email/scope or upload authority.
+Package disclosure and repository visibility require their respective approval.
+Keep reachable private reporting/applicable security controls and concrete
+release/source/security acceptance bound to the selected distribution.
+
+### Historical first-name dependency correction
+
+The old normal DAG put Secrets before Config because Config optionally depends
+on Secrets. Secrets' development dependency on Config nevertheless created an
+initial-name cycle. The observed crates.io source derived normal/build/target/dev
+declarations from archive Cargo.toml and rejected unknown names even for dev
+dependencies. Altering upload JSON, native batch packaging or installing a token
+could not solve that condition. The dated upstream source observation did not
+attest the deployed service revision.
+
+The selected bounded correction moved listener-free `secrets_state` and its four
+synthetic settings files from Secrets to a distinct Config example directory,
+changed only the fixture path, registered Config's target behind `secret-provider`
+and removed Secrets' reverse Config dev edge. Core/Server dev edges remained.
+Preserve APIs/features/workspaces, update live commands/CI consumers when applying
+the correction, reconcile affected locks without unrelated upgrades and compile
+the relocated target before selecting a new source. Do not leave an example
+importing an omitted dependency or publish placeholder names. The isolated
+prototype proved16nodes/17all-kind declarations, one removed edge/no added edge
+and no cycle. Original signed alpha.3 had18declarations and remained blocked.
+
+The corrected historical layers were Actions/Core/Reactive/Signing/wgpu,
+then DOM/DOM-keyed/HTML, then Server Axum, then Request-ID/Secrets/Session/
+Session-Redis, then Auth/Config, then Rate Limit. Current batches derive order
+from every normal/build/dev/optional/target declaration and require intended
+prerequisite version/checksum indexed and downloaded before dependent upload.
+The older normal-only order cannot substitute for this all-kind gate.
+
+### Freeze, request and readback
+
+Build with normal Cargo extracted-package verification, staging each predecessor's
+final archive and actual checksum before packaging dependents. Keep dev entries
+in published manifests and actual predecessor checksums in packaged locks. Private
+prospective directory sources are a disclosed packaging model. They cannot claim
+live registry presence or form a live source-replacement publish configuration.
+Never bypass verification, remove checksums or transfer old signatures to changed
+archives. New source/version/archive bytes require new approved subjects.
+
+Freeze the full selected set and an immutable publication plan before writes.
+Reject missing/Pending plan fields. Retain subsequent receipts separately by plan
+digest and initialize outcomes as `not_attempted`. Future outcomes are completion
+gates rather than impossible prerequisites for the first operation.
+
+| Frozen binding | Required data |
+|---|---|
+| Source/version | Full commit/tree, selected version, source archive digest, recipe/toolchain/input-lock identities |
+| Cohort/artifact | Exact allowed names, version, filename, compressed size/SHA-256, normalized manifest/packaged-lock identity and provenance subject |
+| Metadata | Archive-derived JSON/README, aliases, normal/build/dev kinds, target, optional/default features and feature map, serialized metadata SHA-256 |
+| Order | All-kind acyclic prerequisites with exact intended version/index checksum |
+| Request | Framed body digest, metadata/archive lengths and fixed official crates.io endpoint, without arbitrary destination or redirects |
+| Authority | Approved source/cohort/batch, intended publisher, allowed attempts and failure limits |
+
+Transmit four-byte little-endian JSON length, JSON bytes, four-byte little-endian
+archive length and original compressed `.crate` bytes. Metadata/request hashes
+supplement archive hashes. Index/download SHA must equal the archive SHA.
+Reject name/version mismatch, unpacking/recompression, lock edits or repackaging
+after freeze. The exact-byte transport promotes verified archives through Cargo's
+official registry protocol. It does not run cargo publish to regenerate them.
+
+Use the selected supported credential arrangement explicitly, including a
+configured provider. Reuse owner-installed login where selected. Verify effective
+account, verified email and `publish-new` rights at the authorized stage without
+logging tokens or putting them in argv. Initial restricted credentials must have
+the selected names' required rights without implied yank/owner-management rights.
+The later deployed Environment token and90-day policy remain in the
+[rollout contract](#one-time-rollout-after-local-acceptance). Trusted Publishing
+setup/only-mode requires separately verified first-name ownership and actual
+repo/workflow/ref/trigger constraints. Registry authentication does not supply
+Sigstore trust or release approval.
+
+Upload sequentially once per allowed package. Wait for matching index and actual
+downloaded bytes before dependents. Record native attempt/response/readback as
+it occurs. Timeout,403,429, digest mismatch and uncertain writes stop with partial
+receipts. Inspect actual registry state before separately authorized continuation.
+Never automatically retry, overwrite versions, move tags, yank or split a batch.
+Complete every selected download and a fresh credential-free registry-resolved
+consumer without path/patch/source replacement before declaring completion.
+
+### Dated local evidence and remaining provenance
+
+On2026-10-30, normal Secrets and Config/secret-provider publish dry-runs passed
+under disclosed accepted-archive directory sources. The baseline offline command
+failed101 at required HTTP before sibling diagnosis. First Config failed101 at
+rustup concurrent stable updates, then passed with existing Rust1.99 compiler/
+rustdoc/toolchain pinned. Secrets' compiler proxy was not equivalently pinned.
+Source manifests/locks remained unchanged. VCS metadata in old vendor input was
+corrected once before Cargo by extracting accepted archives. Accepted versus
+dry-run archive hashes differed only through four added Yetlet checksums in each
+packaged lock. Their new archives did not form an approved closed registry set.
+
+| Package | Signed accepted SHA-256 | Dry-run SHA-256 |
+|---|---|---|
+| Secrets | `c4a3f8162f9451049b6528be15a6272640264d068b15ecb2de8764b976953a2b` | `a9e07c75bd1bc77336b9a6597f747cd0f5bb89f85a6a2c0f82c5c89388f38da3` |
+| Config | `0ad1d3fe2aee9fc02b7286ed923c7d5655c4973504f22767865ce3a9bb090d69` | `85dcaaaae592c91c25362b139c64022856d55ad4bf05dd1d7042e34fd9728044` |
+
+The isolated correction's offline/locked metadata and relocated example
+`cargo test --example secrets_state --features secret-provider --no-run` passed
+with pinned Rust/Cargo1.99. Sixteen offline envelopes decoded to original signed
+archives and manifest identities with zero HTTP/credential reads. They remained
+ineligible for upload. A graph wrapper first failed on string-versus-table
+dependencies. Independent review first failed because pre-upload requirements
+included post-upload results. Both original failures and smallest corrections
+remain retained. Re-review PASS0 accepted only contract/prototype scope.
+No original product suite was replayed. Raw stores are
+`target/yt020-first-publish-20261030/` and
+`target/yt020-registry-binding-20261030/`. The historical contract selected no
+new R/version/tag and left YT-020 Blocked. Later actual publications retain
+their own separate accepted records and cannot backdate those observations.

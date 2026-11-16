@@ -450,11 +450,13 @@ async fn connection() -> redis::aio::MultiplexedConnection {
 
 #[tokio::test]
 #[ignore = "requires isolated named-user Valkey with default disabled and TIME initially denied"]
-async fn yt184_named_acl_time_grant_unblocks_session_lifecycle() {
-    let app_url = std::env::var("YT184_LOCAL_APP_URL").expect("select named app fixture");
-    let control_url =
-        std::env::var("YT184_LOCAL_CONTROL_URL").expect("select isolated control fixture");
-    let namespace = std::env::var("YT184_LOCAL_NAMESPACE").expect("select isolated namespace");
+async fn named_acl_time_grant_unblocks_session_lifecycle() {
+    let app_url =
+        std::env::var("YETLET_SESSION_RECOVERY_APP_URL").expect("select named app fixture");
+    let control_url = std::env::var("YETLET_SESSION_RECOVERY_CONTROL_URL")
+        .expect("select isolated control fixture");
+    let namespace =
+        std::env::var("YETLET_SESSION_RECOVERY_NAMESPACE").expect("select isolated namespace");
     let client = redis::Client::open(app_url.clone())
         .unwrap_or_else(|_| panic!("valid private app endpoint"));
     let mut app_connection = client
@@ -485,13 +487,13 @@ async fn yt184_named_acl_time_grant_unblocks_session_lifecycle() {
         .expect("control client metadata");
     assert!(clients.lines().any(|line| {
         line.split_ascii_whitespace()
-            .any(|field| field == "user=yt184_app")
+            .any(|field| field == "user=session_acl_app")
     }));
     let denied: redis::RedisResult<Vec<String>> =
         redis::cmd("TIME").query_async(&mut app_connection).await;
     assert!(denied.is_err_and(|error| error.code() == Some("NOPERM")));
 
-    let c = RedisSessionConfig::new(namespace, "yt184_acl", Duration::from_secs(900), 4, 256)
+    let c = RedisSessionConfig::new(namespace, "session_acl", Duration::from_secs(900), 4, 256)
         .expect("bounded reference config");
     let a = Manager::<Cart>::connect(&app_url, c.clone())
         .await
@@ -502,7 +504,7 @@ async fn yt184_named_acl_time_grant_unblocks_session_lifecycle() {
 
     let granted: String = redis::cmd("ACL")
         .arg("SETUSER")
-        .arg("yt184_app")
+        .arg("session_acl_app")
         .arg("+time")
         .query_async(&mut control)
         .await
@@ -514,7 +516,7 @@ async fn yt184_named_acl_time_grant_unblocks_session_lifecycle() {
         .expect("app TIME after grant");
     assert!(clock.len() == 2 && clock.iter().all(|cell| cell.parse::<u64>().is_ok()));
     let outside: redis::RedisResult<Option<String>> = redis::cmd("GET")
-        .arg("outside-yt184-namespace")
+        .arg("outside-session-namespace")
         .query_async(&mut app_connection)
         .await;
     assert!(outside.is_err_and(|error| error.code() == Some("NOPERM")));
@@ -528,7 +530,7 @@ async fn yt184_named_acl_time_grant_unblocks_session_lifecycle() {
     let response = request(app(a.clone()), "/create", "POST", &HeaderMap::new()).await;
     assert_eq!(response.status(), StatusCode::CREATED);
     let cookie = response.headers()[header::SET_COOKIE].to_str().unwrap();
-    assert!(cookie.starts_with("__Host-yt184_acl="));
+    assert!(cookie.starts_with("__Host-session_acl="));
     assert!(cookie.contains("; Secure") && cookie.contains("; HttpOnly"));
     assert!(cookie.contains("; SameSite=Lax") && !cookie.contains("Domain="));
     let original = headers(&response);
@@ -670,14 +672,17 @@ async fn expiry_corruption_payload_and_unknown_outcome_fail_closed() {
 
 #[tokio::test(flavor = "multi_thread", worker_threads = 2)]
 #[ignore = "requires an owned persistent named-user Valkey container"]
-async fn yt184_service_restart_records_refusal_and_read_only_recovery() {
-    let endpoint = std::env::var("YT184_LOCAL_APP_URL").expect("select private app endpoint");
-    let namespace = std::env::var("YT184_LOCAL_NAMESPACE").expect("select private namespace");
-    let container = std::env::var("YT184_RECOVERY_CONTAINER").expect("select owned fixture");
-    assert!(container.starts_with("yt184-recovery-"));
+async fn service_restart_records_refusal_and_read_only_recovery() {
+    let endpoint =
+        std::env::var("YETLET_SESSION_RECOVERY_APP_URL").expect("select private app endpoint");
+    let namespace =
+        std::env::var("YETLET_SESSION_RECOVERY_NAMESPACE").expect("select private namespace");
+    let container =
+        std::env::var("YETLET_SESSION_RECOVERY_CONTAINER").expect("select owned fixture");
+    assert!(container.starts_with("session-recovery-"));
     let c = RedisSessionConfig::new(
         namespace,
-        "yt184_recovery",
+        "session_recovery",
         Duration::from_secs(900),
         4,
         256,
@@ -742,7 +747,7 @@ async fn yt184_service_restart_records_refusal_and_read_only_recovery() {
     }
     println!(
         "{}",
-        serde_json::json!({"yt184_read_only_recovery": observations})
+        serde_json::json!({"session_read_only_recovery": observations})
     );
     a.shutdown().await.unwrap();
     b.shutdown().await.unwrap();

@@ -6,7 +6,7 @@ framework closure; it invokes no Cargo, shell, Docker, registry or network clien
 No source paths, environment values, credentials or source exports are included.
 
 The `app` service references the exact operator-selected image. Build and audit
-that image separately using the YT-089b Docker generator's three sanitized source
+that image separately using the opt-in Docker generator's three sanitized source
 contexts and locked build instructions. The existing image contract is Linux
 OCI/amd64 with GNU/glibc, a non-root exec entrypoint and app-owned SIGTERM handling.
 Windows hosts generate the same Linux-targeted configuration. No image is built,

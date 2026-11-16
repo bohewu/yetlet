@@ -2,7 +2,7 @@
 
 - **Status:** Accepted and locally qualified at experimental prototype scope; reviewer-found lifetime repair and repeat M7 review passed
 - **Date:** 2026-10-09
-- **Related:** [ADR 0003](0003-renderers-and-loading.md), [Architecture](../ARCHITECTURE.md), [M7j verification](../M7J-VERIFICATION.md)
+- **Related:** [ADR 0003](0003-renderers-and-loading.md), [Architecture](../ARCHITECTURE.md), [M7j verification](https://github.com/bohewu/yetlet/blob/ac98cdc127ccd299cb1150fef922b0560453a1d4/docs/M7J-VERIFICATION.md)
 
 ## Context
 
@@ -89,4 +89,4 @@ These require separate evidence and bounded tasks rather than being inferred fro
 
 ## Verification basis
 
-The decision is based on M7a–M7j evidence, including 91 workspace tests, 5 doctests, six wasm32 package checks, Chrome 155 and Firefox 157 debug/release regressions, the full retained render-strategy workload, isolated keyed lifecycle tests, dependency graph checks, exact bundle comparison and a repeated local release baseline. See [M7j verification](../M7J-VERIFICATION.md) for commands, measurements and limitations.
+The decision is based on M7a–M7j evidence, including 91 workspace tests, 5 doctests, six wasm32 package checks, Chrome 155 and Firefox 157 debug/release regressions, the full retained render-strategy workload, isolated keyed lifecycle tests, dependency graph checks, exact bundle comparison and a repeated local release baseline. See [M7j verification](https://github.com/bohewu/yetlet/blob/ac98cdc127ccd299cb1150fef922b0560453a1d4/docs/M7J-VERIFICATION.md) for commands, measurements and limitations.

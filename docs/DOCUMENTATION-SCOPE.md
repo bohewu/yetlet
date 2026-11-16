@@ -31,9 +31,9 @@ revision and feature/target selection of any generated rustdoc. Existing tests
 and qualification records remain bound to their own source identities; publishing
 documentation does not renew that evidence or make an API stable.
 
-[The public documentation plan](PUBLIC-DOCS-PLAN.md) records GitHub Pages as
+[The public documentation plan](GITHUB-PAGES-PUBLICATION.md#public-guide-architecture-and-original-local-acceptance) records GitHub Pages as
 the reader entry point, with selected repository guides and version-matched API
-documentation. The [completed cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01)
+documentation. The [completed cutover](GITHUB-PAGES-PUBLICATION.md#authorized-yetlet-publication--2026-11-01)
 records the actual Yetlet-built public reader. A separate Wiki contract remains
 deferred. The plan's original setup order and doc-comment findings retain their
 historical scope; a plan alone does not authorize another deployment.
@@ -72,7 +72,7 @@ visibility alone does not promote them to recommended or supported Yetlet APIs.
 Generated output for optional or browser APIs must use the relevant feature and
 target; one native default build cannot represent every configuration.
 
-The [YT-205 current-C reconciliation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#reader-inventory-and-decision-reconciliation)
+The [YT-205 current-C reconciliation](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#reader-inventory-and-decision-reconciliation)
 binds46 exact reader manuscripts at technical candidate118f3d0 to the previously
 selected draft and retains native/WASM rustdoc input limits. Both Session README
 corrections are now in C's actual archives. This is a versioned source selection,
@@ -85,13 +85,13 @@ sources. This documentation-only addition does not revise the historical
 46-manuscript inventory at `118f3d0`, select another release candidate or
 publish a documentation site.
 
-The [YT-206 post-activation record](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#post-activation-status)
+The [YT-206 post-activation record](CI-SECURITY-REVIEW.md#public-source-preview-and-private-reporting)
 preserves the pre-public inventory and records the owner's source/history/Actions
 disclosure approval. PR12 is merged as d7065bb and the repository is Public as an
 Experimental source preview. GitHub private reporting is enabled, its public entry
 is visible and maintainer repository notifications are subscribed/not ignored;
 a separate mailbox/domain is optional. The [authenticated external-reporter form
-and actual notification delivery](YT-206-PUBLIC-PREVIEW-DISCLOSURE.md#reporting-completion)
+and actual notification delivery](CI-SECURITY-REVIEW.md#public-source-preview-and-private-reporting)
 now PASS: one authorized non-vulnerability private test reaches the maintainer's
 configured Gmail route and is closed without publication. Historical failures and
 earlier Not verified results are retained; independent completion Reviewer PASS,
@@ -100,15 +100,23 @@ sign artifacts, publish packages or resolve formal D1–D6/registry decisions.
 
 ## YT-242 inventory and semantic audit boundary — 2026-11-08
 
-[The audit report](YT-242-DOCUMENTATION-TRUTH.md) records corrections and remaining
-coverage. The baseline tracked inventory has **516 Markdown files**, including
-**413 under `docs/`** (ADRs and screenshot indexes included). Each path has one
-primary navigation role: **101 current-guidance**, **315 historical-evidence**,
-and **100 proposal-decision**. A role does not make every sentence in a mixed
-file current; completed proposals remain decisions, and current guides can retain
-explicit historical disclosures. The new YT-242 report is additional maintainer
-evidence, outside that baseline count. No role selects a site export.
-
+The [dated YT-242 report](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-242-DOCUMENTATION-TRUTH.md) records bounded
+corrections and remaining audit coverage. At its **2026-11-08** baseline,
+there were **516 tracked Markdown files** (413 under `docs/`) with
+**101 current-guidance**, **315 historical-evidence** and
+**100 proposal-decision** primary roles. These were the counts **at that
+original checkpoint**, not the current post-consolidation file total.
+Semantic inspection covered **54 current entry surfaces** for current
+availability/navigation/edition meaning, **not** line-by-line validation
+of all source files or every code example. Its initial Reviewer P2
+correction and final PASS remain original source-bound evidence.
+Other files and explicit historical text remain outside that audit.
+Current public SDK/CLI and Reader selection must instead come from the
+[accepted hosted release records](RELEASE-READINESS.md) and
+[Reader source manifest](../site/pages.toml), not the old SDK alpha.6 /
+CLI 0.2.0 audit checkpoint or a dev manifest. No role automatically
+includes a page in a public export, and audit PASS is not product or
+production qualification.
 | Role | Inventory boundary and disposition |
 |---|---|
 | Current guidance | Root reader/policy entries, current module guides, application/tool/template usage, and the explicitly selected current guides/SOPs above. Correct evidenced current availability/navigation claims; preserve embedded historical records |
@@ -138,6 +146,52 @@ The retained per-path inventory and section-level scope accompany the local
 YT-242 implementation handoff. Classification/counting alone is not semantic
 acceptance; independent review is pending. Later public guide promotion and
 YT-243 remain separate.
+
+## Historical Reader source and rollover evidence
+
+The site selects exactly **eight source chapters** via the
+reviewed `site/pages.toml` paths/stop markers and its
+independently controlled SDK/CLI **edition**. This selected
+edition is separate from Cargo workspace package versions.
+Local page builds use these actual checked-out sources and
+may include uncommitted href edits; an accepted published
+Reader is a separately source-/artifact-/workflow-bound
+result with exact Pages readback. Public documentation
+must update after **every verified SDK or CLI publication**;
+do not silently advance edition labels from development
+manifests or an unverified CLI/SDK pairing.
+
+Original YT-232 (2026-11-02) ran a selected **alpha.6 /
+CLI0.2.0** local reader-source preview, eight chapters,
+**15 public site files and 219 checked links**, plus a
+distinct **six-file static reference**; native and Wasm
+sources and exact reader-only SDK registry pins/locks
+were checked. Its browser-host access failure occurred
+**before** a tab was created, and an initial missing
+`wasm-bindgen` PATH lookup was corrected by selecting
+the already installed matching binary. Neither failure
+is retroactively browser PASS or live Pages acceptance.
+Original YT-249 separately tested the **alpha.7 / CLI0.3.0**
+reader/source rollover: native+Wasm and static build
+proof, generated first-app locked SDK receipt and
+selected compilation, link/manifest checks, and
+one 0700-output-parent correction. Historical owner
+approval for Reader publication still required actual
+protected-branch CI/merge/master CI and *live*
+Pages readback, not merely a green local build.
+
+The original reports, full version-bound locks,
+rejected first checks and frozen 8-source selection
+are recoverable locally at Git
+`8b3e13004a58380accf16ea440707f84e6271871`;
+task-local raw logs/receipts were separately stored and
+are not inherently in Git. This history does not change
+the **current published alpha.8 / CLI0.4.0 edition** or
+authorize a Pages update. The Z10 maintenance of a few
+Markdown hrefs in existing selected chapters keeps the
+edition and chapter paths stable; a **local nonpublishing
+Reader build** is required to demonstrate the repaired
+navigation. It is not a live public deployment.
 
 ## Retained evidence and maintainer material
 
@@ -190,3 +244,18 @@ Signing, registry and consumer outcomes remain separately scoped in those record
 an old Pending registry checkpoint is not current distribution status.
 Documentation preparation does not itself publish
 packages, sign artifacts, enable hosting or expand support.
+
+## Reader architecture and versioned API ownership
+
+The [public guide architecture](GITHUB-PAGES-PUBLICATION.md#public-guide-architecture-and-original-local-acceptance)
+keeps the README as the short entry, the guide as integration teaching and
+same-version rustdoc as callable API reference. Rustdoc must identify source,
+target and selected features. A native default build cannot represent optional
+browser APIs. Checkout improvements never change an already signed candidate's
+identity. A separately selected development edition must be labelled Development.
+The initial mdBook0.5.4 choice is historical, and the Yetlet-built static reader
+with optional Wasm search owns the current Pages path. Keep the exact eight
+chapters and SDKalpha.8/CLI0.4.0 selection, with no recursive report export or
+second manually maintained guide tree. Original task/source links preserve dated
+proof, while operating contracts live in maintained guides. Wiki and hosted
+rustdoc remain separate unselected publication surfaces.

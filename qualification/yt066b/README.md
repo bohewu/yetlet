@@ -1,6 +1,6 @@
 # YT-066b1 private Redis semantics spike
 
-This unpublished experiment tests one Redis primary. It is a separate Cargo workspace, not a framework crate, Session middleware or a dependency of the existing Memory provider. See [design](../../docs/YT-066B-REDIS-SESSION-DESIGN.md) and [execution evidence](../../docs/YT-066B1-VERIFICATION.md).
+This unpublished experiment tests one Redis primary. It is a separate Cargo workspace, not a framework crate, Session middleware or a dependency of the existing Memory provider. See [design](../../docs/PROVIDER-OPERATIONS.md#redis-session-cas-operation-outcome-and-cookie-ordering) and [execution evidence](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066B1-VERIFICATION.md).
 
 `redis = 1.7.1` uses only `tokio-comp`, `connection-manager` and `script` (default features disabled). State is one typed counter/note encoded as JSON in an opaque Redis Hash field. Lua handles version/revision, primary-clock absolute expiry, CAS, atomic rotation/revocation and independent operation results. The Rust wrapper demonstrates once-only callbacks and explicit unknown outcomes. `command` and raw keys are fixture fault-injection seams, not proposed provider APIs.
 
@@ -49,7 +49,7 @@ The latter three are **expected counterexamples** for the original single-name p
 
 ## Selected pure-SSR policy
 
-The later unique-name candidate failed independent review: delayed lower cookies could evict the replacement or logout marker and expose another still-live Session. Its tests and actual Chrome storage failure remain [historical evidence](../../docs/YT-066B-COOKIE-ORDERING.md).
+The later unique-name candidate failed independent review: delayed lower cookies could evict the replacement or logout marker and expose another still-live Session. Its tests and actual Chrome storage failure remain [historical evidence](../../docs/PROVIDER-OPERATIONS.md#redis-session-cas-operation-outcome-and-cookie-ordering).
 
 On 2026-10-11 the maintainer explicitly accepted no mandatory JS, preserved authorization safety, and possible login loss under extreme response reordering. The current `cookies` module uses one exact cookie name with Secure/HttpOnly/host-only/root-path/Lax defaults. Only a positively resolved create/rotate/replace may set it after a current Redis read. Reads, updates, errors and logout emit no Set/Clear; logout revokes in Redis. Missing, duplicate, malformed, expired, retired, corrupt or unavailable credentials fail closed. Loading never creates a Session, follows an old ID or chooses another cookie.
 

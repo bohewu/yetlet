@@ -5,9 +5,24 @@ independently reviewed at its bounded YT-098 scope, under
 [ADR 0005](adr/0005-opt-in-capability-modules.md) and
 [handler-first ADR 0006](adr/0006-handler-first-mvc-optional.md).
 [Sources and run instructions](../experiments/asset-contract/README.md) and
-[verification boundaries](YT-098-VERIFICATION.md) are separate from the accepted
-[Vite feasibility spike](VITE-SPIKE-VERIFICATION.md). No shared or stable Yetlet
+[verification boundaries](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-098-VERIFICATION.md) are separate from the accepted
+[Vite feasibility spike](#vite-feasibility-decisions-and-limits). No shared or stable Yetlet
 asset API is promoted by this task.
+
+### Historical optional asset and Vite proof boundaries
+
+The early YT-098 application-owned producer-neutral graph, YT-099
+production Vite build, YT-100 development bridge and YT-101 generated
+cloud configuration were separate bounded experiments. Their current
+usage follows the [CLI Vite instructions](CLI-GUIDE.md#vite-execution),
+[generator matrix](CLI-GUIDE.md#current-generator-source-matrix) and
+[deployment profiles](PRODUCTION-DEPLOYMENT-PROFILES.md), not the original
+task checklists. They did **not** add a mandatory framework asset/runtime
+registry, transparent global HMR, automatic deployment or generalized
+production/Windows/cloud qualification. Keep strict prebuilt manifest/source
+closure, CSP and app-owned public versus private asset separation. The dated
+verification/negative cases are recoverable from Git commit `b610acc7e098020b6b59dfa0d1ab2b75b059e656`
+(local original identity; GitHub reachability remains unverified).
 
 ## Two actual producers before extraction
 
@@ -111,13 +126,78 @@ Any future immutable policy must verify a content digest against its URL, and
 operators must retain **all** old digest assets needed by old HTML and lazy JS
 through the full cache/rollout lifetime. An in-process snapshot protects current
 requests only until that process exits. Cache expiry cannot repair missing lazy
-chunks after a rollout. [YT-101](YT-101-VERIFICATION.md) qualifies bounded cloud
-delivery of these snapshots. The optional application/deployment-owned
-[YT-103 plan](YT-103-ROLLING-ASSET-PLAN.md) compares retention options, and its
-[local evidence](YT-103-ROLLING-ASSET-VERIFICATION.md) records an independent
-static service retaining two complete build graphs through rollout and rollback.
-That arrangement does not add retention to these templates or core. The snapshot
+chunks after a rollout. [YT-101](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-101-VERIFICATION.md) qualifies bounded cloud
+delivery of these snapshots. The application/deployment-owned
+[YT-103 local qualification](ASSETS.md#historical-single-host-rolling-asset-qualification) actually
+validated a separate static service containing the complete two-version graph
+union (including late JS/CSS) through update, rollback, one Pod termination
+and old-tab lazy imports. All 2,364 measured SSR responses succeeded in that
+specific local K3s source/run and an eight-second held request completed after
+SIGTERM; missing/private-file handling, image identity and cleanup remained
+bounded. The original provider comparison and deployment-plan history are
+recoverable at fixed local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`.
+No production HA, node/zone failover, CDN retention guarantee or automatic
+snapshot retention is provided by Yetlet's generators or core. The snapshot
 caveat also applies to a digest URL produced by the unchanged YT-091 template.
+
+## Historical single-host rolling asset qualification
+
+The **2026-10-18** local `YT-103` verification used three Multipass K3s
+VMs on **one physical host** (`v1.36.4+k3s1`), three app replicas and two
+separate Nginx gateway/static replicas. Each release had seven reachable
+CSS/JS graph files; the union held **11** verified files. The real
+application/deployment-owned static service preserved v1/v2 asset bytes
+across an upgrade/rollback; publishing different bytes at the **same URL**
+was explicitly rejected. Original frozen image **index digests** and
+K3s imageID **config digests** were different identities, not an error.
+The complete original report (not its raw execution artifacts) is recoverable
+from **local Git** `47b0a99ffde069236eaa82ef9fac34c5c6348f3c`
+(public historical reachability unverified). The image/source receipts,
+raw logs and browser screenshots were recorded separately in Git-ignored
+`artifacts/yt103-rolling-20261018/`; Git history alone cannot restore
+those task-owned evidence bytes.
+
+| Measured local phase, 10 SSR requests/s | HTTP 200 | Observed p95 (ms) |
+|---|---:|---:|
+| v1 → v2 | 537 | 2.040 |
+| Rollback v2 → v1 | 627 | 2.114 |
+| Graceful single Pod deletion | 261 | 2.094 |
+| Final v2 rollout and retention | 939 | 1.947 |
+| **Combined** | **2,364** | Different phase populations; no pooled p95 asserted |
+
+Within only those finite observation windows there were **no observed SSR
+404, 5xx, connection error or timeout**. An eight-second in-flight handler
+returned **200** around 1.987s **after observed SIGTERM**; it did not prove
+hard kill, PDB enforcement or node failure behavior. Actual scheduling
+collapsed from app Pods on three VMs to two after rolling; these VMs shared
+one physical fault domain. No multi-host/zone HA, SLA, automatic rollback
+or persistent server-side asset retention follows.
+
+Two actually held Chrome155 pages loaded previously *unrequested* v1/v2
+lazy JS and CSS **200 after the opposite version had fully replaced app
+Pods**, without page reload. A separate favicon **404** remained in the
+browser console and is not silently counted as a lazy-load failure.
+The conservative old-build eligibility covered **30 seconds plus a 5-second
+margin** after the last v1 app Pod retired; **344** dedicated old/new lazy
+requests during that window returned 200 and matched SHA-256. After a
+separately invoked rollback-unpin and static-image GC, v1-only lazy JS/CSS
+returned **expected 404** while all seven v2 graph files survived. There was
+**no continuous SSR availability run during static-service GC**; the
+35-second lab window is not a production retention recommendation.
+
+Preserved original setup negatives: non-root app could not read exported
+public TOML due to inherited permissions; Nginx could not create its
+temporary cache directory; a lazy-asset HTML oracle accidentally matched
+DOM IDs; the browser wrapper's direct ESM import failed before an existing
+CommonJS alternative was used. These were bounded image/fixture/browser
+setup corrections, **not product-source upgrades**. The original execution
+receipts, failed image archive, verified screenshots, seven/eleven-file graph
+hashes and cleanup remain in local source/evidence history. Cleanup removed
+only the owned namespace, temporary images/uploads and test Docker tags;
+the three K3s nodes, pre-existing resource identities, Valkey/OpenBao and
+shared caches were preserved. Actual general serving continues to use
+`no-store`; an old hashed URL or in-process snapshot alone does not extend
+asset lifetime.
 
 ## Extraction decision and next boundary
 
@@ -138,11 +218,12 @@ implementation authorization. HMR, Windows Vite
 qualification, cloud delivery/retention, default/browser changes and public
 release are not implemented here. YT-092 through YT-096 remain untouched Todo.
 
-## Optional generated application CSS — YT-239 working tree
+## Optional generated application CSS
 
-The [YT-239 integration](YT-239-STYLE-INTEGRATION.md) supplies a separate small
-application-owned CSS consumer in selected CLI templates. It does not publish or
-change the experimental shared asset API above. Development uses a stable selected
+The [published CLI Style integration](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree) supplies a separate small
+application-owned CSS consumer in the opt-in Style templates, first published
+in CLI `0.3.0` and available in CLI `0.4.0`. The experimental shared asset API
+above has its own contract. Development uses a stable selected
 CSS URL. Successful standalone builds accept a private logical `app-css` record
 and `app.<full-lowercase-sha256>.css`; the consumer verifies that digest against
 its exact immutable startup snapshot before linking/serving. Only the selected
@@ -160,5 +241,71 @@ native loader refuse either unfinished intent even when current hashes match.
 Acceptance commits only at marker removal after all fallible writes/checks.
 Preserve evidence and explicitly verify rollback or rollforward before clearing a
 retained marker; ordinary startup/retry never reconciles it. This supplies no
-retention, HA, cleanup or deployment guarantee. Local implementation review is
-pending; real-browser/Windows rendering qualification remains YT-240.
+retention, HA, cleanup or deployment guarantee. The CLI guide records accepted
+publication and platform evidence, and Todo's qualification records its bounded
+Linux sample results. [CLI Style evidence](CLI-GUIDE.md#style-release-and-platform-evidence),
+[Todo CSS example](../examples/todo-server/README.md#app-owned-rust-styles-and-typed-tag-builders)
+and [original Linux qualification](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary)
+
+## M11 native CSS proof and retained-wrapper decision
+
+YT-070/072 (2026-10-12) selected exact Bootstrap5.3.8 CSS-only/MIT inputs,
+verified upstream SHA384/notices, deterministically externalized23 embedded SVG
+occurrences into22 hashed output files, and served a finite same-origin manifest.
+No Bootstrap JS, CDN, remote fonts, data: allowance, unsafe-inline/eval or CSP
+relaxation was selected. Plain framework licenses do not license commercial
+themes, icon/font/photo assets. Tailwind build-time literal-source scanning was
+an alternative; JS widgets remained a separately owned lifecycle/security cost.
+
+Todo Search's exact CSS/loader/icon digest, Dashboard's per-island file/existence
+fallback and the form proof's ordered/deduplicated MIME-bound assets had distinct
+availability/deployment policies. Focused regressions on all three justified
+**retaining application-owned wrappers**, with no new public stylesheet/head API,
+Page signature or default dependency. The later optional asset contract above
+has its own evidence and does not retroactively change that decision.
+
+Ten proof tests,27 selected package tests plus one selected Todo route test,
+asset checks and actual Chrome155 journey passed. A test-initializer Clippy
+failure was corrected before final checks. Computed styles/no overflow at390px,
+no external requests/CSP errors and missing/hostile manifest tests establish
+bounded behavior; screenshot access was refused by artifact policy, so no visual
+signoff was claimed. No alternate image path was used. The original
+[form/asset record](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M11-P-FORM-ASSET-VERIFICATION.md)
+is locally Git-verified; remote SHA reachability is unverified. Raw browser.json
+and images remain under original target/m11-form-proof, separate from Git.
+
+Use verified content-addressed caches with old-HTML retention; a missing optional
+enhancement preserves readable SSR. Required CSS absence must fail package/readiness
+checks and remain readable/reportable at runtime. Hashed filenames alone do not
+prove cache policy. Any future widget exclusively owns its subtree/listeners and
+retired callbacks; Yetlet must not reconcile the same children concurrently.
+
+## Vite feasibility decisions and limits
+
+The 2026-10-17 spike at base `6d1de322739fb3defd32dccd1f6ae3790aecdddd`
+selected producer-neutral boundaries with optional Vite and preserved the
+no-Node standalone Tailwind path. Its application-owned loader consumed plain
+Vite8.3.4 and official Tailwind/plugin4.3.3 manifests, static/dynamic JS imports,
+split CSS and one external SVG. The combined experimental package retained both
+profiles' devDependencies even when the plain build left the plugin inactive.
+The later production CLI templates have their own qualification.
+
+Startup validates and snapshots a bounded graph. Yetlet renders escaped HTML
+with same-origin external CSS/scripts, DEFAULT_CSP, no-store and nosniff.
+The spike disabled dotenv discovery, public-directory copying, data-URI inlining,
+source maps and the module-preload polyfill. Its canonical-path/symlink checks
+require an operator-owned quiescent tree. They supply no hostile-filesystem race
+isolation or SVG sanitization. Dependency-first CSS and cycle refusal were
+explicitly narrower than full Vite semantics. Filename appearance supplies no
+digest authentication, immutable cache or old-chunk retention.
+
+YT-098 subsequently qualified producer-neutral ordering/snapshot policy,
+YT-099 optional plain/official-plugin production integration, YT-100 a separate
+dev origin/WSS/nonce/process boundary, and YT-101 sanitized cloud-generated
+asset/configuration roots. Their current bounded Done states belong to the
+Backlog and the [existing CLI guide](CLI-GUIDE.md#vite-execution). The spike's
+original Todo list remains historical. It alone selected no shared stable asset
+crate, WASM bundling, Windows Vite, HMR, CI/CD, deployment or public release.
+[Original spike and independent acceptance](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/VITE-SPIKE-VERIFICATION.md)
+are locally Git-recoverable, with detailed results in the
+[qualification matrix](QUALIFICATION-MATRIX.md#browser-and-vite-feasibility-evidence).

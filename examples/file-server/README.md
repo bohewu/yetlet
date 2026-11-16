@@ -68,4 +68,4 @@ cargo tree --locked -p yetlet-file-server --edges normal
 cargo xtask check samples
 ```
 
-See [M9d evidence](../../docs/M9D-VERIFICATION.md) for source/validation/reviewer status. The libraries are ordinary application-selected dependencies; no file/upload/DB feature becomes a default in the Yetlet core or other samples.
+See [M9d evidence](../../docs/SAMPLES.md#file-server-acceptance) for source/validation/reviewer status. The libraries are ordinary application-selected dependencies; no file/upload/DB feature becomes a default in the Yetlet core or other samples.

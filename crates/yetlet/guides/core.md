@@ -14,7 +14,7 @@ conditions, follow [Write Views and reusable components](https://github.com/bohe
 
 This release includes `yetlet::view::tags`, 101 ordinary HTML constructors and
 convenience setters. These are absent from published SDKalpha.6. See the
-[typed tag guide](https://github.com/bohewu/yetlet/blob/master/docs/VIEW-COMPONENTS.md#optional-typed-tag-builders-unreleased-source-only-yt-234)
+[typed tag guide](https://github.com/bohewu/yetlet/blob/master/docs/VIEW-COMPONENTS.md)
 for the finite constructors, void/scoped setter rules and renderer boundary.
 The existing `Element::new` example below remains valid.
 

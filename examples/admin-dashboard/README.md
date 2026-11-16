@@ -1,7 +1,7 @@
 # SSR administration reference — YT-094
 
 YT-094 is Done at the selected reference-application scope. The
-[closeout matrix](../../docs/YT-094-CLOSEOUT.md) links the accepted evidence and
+[closeout matrix](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md) links the accepted evidence and
 limitations. Dated slice records below retain their original source/platform
 scope; their earlier overall task status is superseded by that closeout.
 
@@ -88,7 +88,7 @@ existing Vite/Rust/WASM enhancement. Native Open/Active/Blocked/Closed counts
 remain visible with JS off or if the chart fails. Totals cover all currently
 loaded items (at most 12), including unsaved status changes; filtering does not
 change their scope. Only an explicit Save writes to the server. See the
-[YT-106 slice record](../../docs/YT-106-CHART-VERIFICATION.md) for ownership,
+[YT-106 slice record](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-106-CHART-VERIFICATION.md) for ownership,
 fallback, browser/CLI checks and measured package cost.
 
 Description is enhanced with an app-owned CodeMirror plain-text editor on that
@@ -96,15 +96,15 @@ same page. Rust retains drafts and explicit Save; typing/undo/redo stays local,
 with a 4,000-character limit and fresh undo history on item switch or Reset.
 Only this HTML response receives a fresh style nonce. The native textarea stays
 usable if the package/nonce/styles are unavailable, and JS-off item links still
-reach the native editor. See the [editor record](../../docs/YT-106-CODEMIRROR-VERIFICATION.md)
-for policy, lifecycle and bounded verification.
+reach the native editor. See the [editor record](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-106-CODEMIRROR-VERIFICATION.md)
+for policy, lifecycle and bounded verification. A response-local nonce permits only the approved editor style-mod path; arbitrary inline attributes or an `unsafe-inline` CSP exception remain disallowed. The original research found that CSP mechanism feasible before the editor was separately implemented and browser-tested; neither trial adds a general frontend-plugin API or applies the result to all browsers. Complete original Chart/CodeMirror research, failed checks and review identities are recoverable from fixed local Git `983653adadcedb4ec196016b75281d39e2ed0acf` (public GitHub reachability not verified).
 
 Sign in → filter/sort/paginate work items → detail → edit → history. Native POST
 forms remain usable with JavaScript disabled. Validation and version conflicts
 preserve drafts; permissions and CSRF checks run on the server. Closing keeps the
 record and history. The existing opt-in live-status enhancement remains optional.
 
-The [YT-107 form/save guide](../../docs/YT-107-FORM-FEEDBACK.md#application-authoring-guide)
+The [YT-107 form/save guide](https://github.com/bohewu/yetlet/blob/b610acc7e098020b6b59dfa0d1ab2b75b059e656/docs/YT-107-FORM-FEEDBACK.md#application-authoring-guide)
 compares native forms, the WASM textarea/CodeMirror workspace and Todo, with
 source links and recovery boundaries. Native **Restore page values** resets to
 this document's initial values, including rejected values on a 422 page; its
@@ -128,10 +128,10 @@ sessions are a local demonstration. Separately selected OIDC, Valkey sessions
 and shared-SQLite evidence is linked in the closeout; production TLS, HA,
 backups, remote deployment and general all-OS support remain unqualified. The
 subsequent
-[Windows native slice](../../docs/YT-094-WINDOWS-VERIFICATION.md) records source-matched
+[Windows native slice](../../docs/QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) records source-matched
 MSVC tests, CLI lifecycle and native HTTP separately from browser/OS input.
 Service delivery from this edited application layout is not qualified. See the
-[closeout](../../docs/YT-094-CLOSEOUT.md) for accepted limits and the
+[closeout](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md) for accepted limits and the
 [backlog](../../docs/BACKLOG.md) for separate follow-ups.
 
 ## First-slice local evidence — 2026-10-19
@@ -172,8 +172,78 @@ the existing compiled app and Board test binaries (13/13 and 15/15); no reviewer
 rebuild or workspace mutation occurred. At that first-slice review YT-094 remained
 In progress, with OS IME/assistive-technology, external OIDC and broader host
 coverage still open. Later evidence and owner decisions are reconciled in the
-[closeout](../../docs/YT-094-CLOSEOUT.md); production TLS/deployment,
+[closeout](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md); production TLS/deployment,
 authenticated dev-server bridging and production storage/HA remain boundaries.
+
+## Historical Auth, Session, OIDC and local policy evidence
+
+This Administration/Board sample's Auth and Session features are **opt-in**,
+not a separate Yetlet identity product. Current commands and supported
+options remain in the sections below. The original YT-094/124–126/139/140
+dated reports, their first failed setup/proxy attempts, test status and
+review receipts are recoverable at fixed **local Git**
+`0ade9c62b67fe51ecb8e9ee6edc666daed24b5c1`; full raw browser,
+IdP and native/Valkey evidence is task-owned and may not live in Git.
+Original local-only Git SHA and remote GitHub URL reachability are
+different claims.
+
+For optional local OIDC, the application retains fresh
+**state/nonce/S256 PKCE**, a five-minute pending Session transaction,
+one-time atomic callback consume and strict existing verified-issuer/
+subject → configured **existing local identity** mapping. It never
+trusts provider roles/email to grant Board permissions. The real-IdP
+loopback journey was independently checked **after** an initial
+WAF/setup issue; a prior code-only review did not alone establish the
+real-provider proof. OIDC discovery/JWKS/subject and credentials use
+startup snapshots, not automatic refresh or upstream account-disable
+propagation; ID Token expiration is not a local Session logout.
+Public HTTPS/TLS/secure Cookie and federated logout need distinct
+owner/edge qualification.
+
+The optional fixed-origin proxy setting selects exactly
+`http://127.0.0.1:<canonical-nonzero-port-other-than-80>` and
+`/board/oidc/callback`; unknown public schemes, alternate hosts,
+paths/queries and untrusted forwarded headers are rejected. Two
+real loopback backends share one trusted static proxy that preserves
+canonical Host/Origin and strips `Forwarded`/`X-Forwarded-*`.
+A top-level callback may lack Origin, but a supplied Origin must be
+single, exactly matching, and not `null`; pending state cannot be
+replayed across replicas. This is a selected local reverse-proxy
+fixture, not certified public OIDC/load-balancer infrastructure.
+
+For selected Valkey Session (original Admin two-instance trial),
+opaque credentials share one isolated namespace, consistent path/name
+and non-sliding **1800-second default** Session expiry with bounded
+**1-second–30-day** application selection. The later TTL correction
+was tested separately from the initial 60-second fixture. The
+two-real-process YT-125/126 tests accepted cross-instance login,
+retired identity refusal after B logout, invalid/forged tenant/
+permission denial, fresh local authoritative policy and error
+handling under store/policy failures. Earlier missing Production
+settings overlay and selected test-method repairs remain **failed
+setup/checkpoint observations**, not retroactively clean runs.
+A local-policy change must be reread for selected protected work;
+Session data is not a source of permission truth. Remote Session
+availability does not make two local SQLite files one shared database
+and does not atomically fence SQL effects against Account disable.
+The independently tested two-Board **shared-file SQLite** case
+showed stale form **409** and held-writer safe Busy **503**
+under different lock timings; not all concurrent edits are guaranteed
+to reach version compare.
+
+Cross-replica recovery must preserve restrictive SQL authority and
+avoid resurrecting old credentials. Stop/drain consumers, rotate to a
+**new never-reused Session namespace**, then require re-login.
+Do not re-enable revoked policy from a restored Session or treat
+logout/response loss as proof of no commit. The selected Azure
+reference reviewed as **G4 actual Auth plus G5 separate remaining
+outage/VM restart**, with earlier failed generations and all owned
+cleanup preserved; it does not certify public HA, power-loss
+durability, upstream IdP disable latency or generalized disaster
+recovery. See [Provider Operations](../../docs/PROVIDER-OPERATIONS.md#historical-session-auth-and-oidc-contracts-and-failures),
+[Qualification Matrix](../../docs/QUALIFICATION-MATRIX.md#historical-session-auth-oidc-and-cross-host-evidence)
+and [Deployment Profiles](../../docs/PRODUCTION-DEPLOYMENT-PROFILES.md#historical-shared-authority-and-azure-persistence-qualification)
+for exact failure/scope boundaries.
 
 ## Opt-in OIDC
 
@@ -182,10 +252,10 @@ disables terminal-code login. Keep real provider/client settings and credentials
 outside Git. `YETLET_DEVELOPMENT_SECRET_FILE` explicitly selects a private TOML
 overlay only with `APP_ENVIRONMENT=Development`; selected secret values flow
 through the existing SecretProvider. Verified subjects need explicit application
-permission mappings. See the [OIDC contract and validation boundary](../../docs/YT-094-OIDC.md).
+permission mappings. See the [OIDC contract and validation boundary](README.md#historical-auth-session-oidc-and-local-policy-evidence).
 The default `false` preserves the earlier demonstration and qualification.
 
-The separately activated [YT-140 proxy/replica integration](../../docs/YT-140-OIDC-PROXY-REPLICAS.md)
+The separately activated [YT-140 proxy/replica integration](../../docs/PROVIDER-OPERATIONS.md#oidc-cross-instance-origin-and-callback)
 first reviews the canonical origin/callback, trusted proxy and cross-instance
 transaction/freshness contract, then selects the smallest new integration and
 proof. Initial independent contract Reviewer PASS, zero issues/required
@@ -223,13 +293,13 @@ Build with Cargo feature `valkey`, then select `session.backend="valkey"` throug
 the existing settings. The default remains `memory`; a build without that
 capability rejects selecting the remote backend. The application aliases and
 reuses the existing provider, with Valkey as the selected shared-session server.
-See the [contract and two-app results](../../docs/YT-094-VALKEY-SESSIONS.md) and
+See the [contract and two-app results](../../docs/PROVIDER-OPERATIONS.md#redis-session-cas-operation-outcome-and-cookie-ordering) and
 [local Compose fixture](../../qualification/yt094-valkey/README.md). Set
 `session.valkey.ttl_seconds` to choose an absolute lifetime from 1 second to
 30 days; the default is 1800 seconds (30 minutes), matching the local demo.
 Reads do not extend it. This shares sessions,
 not the replica-local SQLite business databases or production HA.
-The separately selected [shared-SQLite slice](../../docs/YT-094-SHARED-SQLITE.md)
+The separately selected [shared-SQLite slice](../../docs/PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority)
 adds an optional Compose volume override for two app instances on one host.
 
 ## Rust/WASM triage workspace
@@ -244,12 +314,12 @@ The frontend build now also needs the `wasm32-unknown-unknown` Rust target and
 `wasm-bindgen-cli` 0.2.129. `WASM_BINDGEN` can select that executable; the existing
 user-local Yetlet tools directory or PATH is the fallback. The existing settings
 and CLI build/run/stop workflow are unchanged. Generated bindings are ignored.
-See the [slice verification](../../docs/YT-094-WASM-TRIAGE.md) and
-[API observations](../../docs/YT-094-API-OBSERVATIONS.md). The earlier Windows
+See the [slice verification](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-WASM-TRIAGE.md) and
+[API observations](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-API-OBSERVATIONS.md). The earlier Windows
 native evidence does not qualify this changed slice; Windows browser and real
 OS input/assistive technology remain deferred to final qualification.
 
-The subsequent [Windows Rust/WASM verification](../../docs/YT-094-WINDOWS-WASM-VERIFICATION.md)
+The subsequent [Windows Rust/WASM verification](../../docs/QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence)
 records the candidate's native/browser checks and returned operator-attested
 IME/keyboard/Narrator journeys, with drain/exit-0 images and final cleanup. Those
 results supersede the pending Windows input status above at their bounded scope;
@@ -309,10 +379,10 @@ The final fresh principal is passed to the existing database save operation.
 There remains a race between the last authorization decision, queued SQL work
 and commit: a previously admitted write can commit after revocation. There is no
 cross-store fencing or strict write-after-revocation guarantee. See
-[YT-126 adoption record](../../docs/YT-126-ADMIN-VALKEY-AUTH-ADOPTION.md) for review
+[YT-126 adoption record](README.md#historical-auth-session-oidc-and-local-policy-evidence) for review
 status and the exact bounded evidence; this is not production/HA qualification.
 
-The separately activated [YT-138 ordering research](../../docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md)
+The separately activated [YT-138 ordering research](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-138-AUTHORIZATION-COMMIT-ORDERING.md)
 examines the native/triage save and independent Session/policy authorities,
 distinguishing authorization snapshots, revocation acknowledgment and business
 commit. Its accepted decision retains the existing pre-SQL race for this
@@ -320,7 +390,7 @@ application; independent Reviewer PASS, zero issues and required followups;
 Done at research scope. This documentation-only work adds no
 fencing, transactional authorization, runtime middleware or stronger guarantee.
 
-The separately activated [YT-139 authority/recovery reference](../../docs/YT-139-MULTI-INSTANCE-AUTHORITY-RECOVERY.md)
+The separately activated [YT-139 authority/recovery reference](../../docs/PROVIDER-OPERATIONS.md#local-auth-permissions-and-multi-instance-authority)
 selects a local two-Admin fixture sharing one SQLite business authority, current
 trusted policy and optional single-primary Valkey Sessions. Independent
 contract Reviewer PASS, zero issues/required followups; implementation of the
@@ -364,7 +434,7 @@ browser behavior, cross-host deployment or atomic revocation of business writes.
 ## Opt-in commit-time write authorization — YT-181
 
 The application feature `commit-write-auth` supplies the
-[YT-181 SQL-owned reference](../../docs/YT-181-SENSITIVE-WRITE-IMPLEMENTATION.md).
+[YT-181 SQL-owned reference](../../docs/PROVIDER-OPERATIONS.md#commit-time-authority-and-revocation).
 It is default-off and adds no Core/Auth API or generic AOP. The existing Session,
 CSRF, current file policy, item version, worker limits and response security
 remain in effect. Its extra SQL authority covers only Alice/project-one item
@@ -384,7 +454,7 @@ Stop/exclude all legacy writers; old binaries refuse v2 only at open.
 Board consumers use `Board::open_with_options` (or
 `open_with_oidc_and_options`) with `BoardOptions { write_authorization: true,
 ..BoardOptions::default() }`, supplying any selected frontend/Session fields.
-[YT-185](../../docs/YT-185-OPT-IN-OPTIONS.md) records the intentional pre-public
+[YT-185](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-185-OPT-IN-OPTIONS.md) records the intentional pre-public
 constructor migration; Cargo features and existing external settings are unchanged.
 Trusted application code can call
 `board.set_project_write_permission("alice", 1, false).await?` to revoke, or
@@ -411,7 +481,7 @@ The reference adds no retry, new queue, remote transaction or HA guarantee.
 
 ## Opt-in request and SQL-worker tracing — YT-182
 
-[The application reference](../../docs/YT-182-TRACING-WORKER-IMPLEMENTATION.md)
+[The application reference](../../docs/PROVIDER-OPERATIONS.md#request-tracing-and-owned-worker-spans)
 uses native middleware and Rust `tracing`, with no generic AOP or tracing crate.
 The `request-tracing` Cargo feature is default-off; compiling it does not
 activate tracing. Embedded consumers use `Board::open_with_options` or

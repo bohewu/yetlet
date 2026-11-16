@@ -1,4 +1,4 @@
-// App-owned YT-100 development bridge, never imported by production Rust/build.
+// App-owned Vite HMR development bridge, never imported by production Rust/build.
 import { randomBytes } from 'node:crypto';
 import { get } from 'node:http';
 import { readFileSync, realpathSync } from 'node:fs';

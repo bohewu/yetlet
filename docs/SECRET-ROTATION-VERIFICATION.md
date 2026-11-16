@@ -2,7 +2,7 @@
 
 Date: 2026-10-18 (Asia/Taipei). Task: separately authorized YT-090 follow-up.
 Status: local, native Windows and actual Azure checks passed;
-[independent review](SECRET-ROTATION-REVIEW.md) PASS, zero issues or required
+[independent review](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/SECRET-ROTATION-REVIEW.md) PASS, zero issues or required
 followups. Subsequent local commit is owner-authorized; no push occurred.
 
 The owner expanded the [initial read contract](SECRET-PROVIDERS.md) to try
@@ -97,7 +97,7 @@ this bounded experiment. YT-094 remains a separate next core discussion.
 
 ## Native Windows result
 
-The [native Windows record](SECRET-PROVIDER-WINDOWS-VERIFICATION.md) contains
+The [native Windows record](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/SECRET-PROVIDER-WINDOWS-VERIFICATION.md) contains
 the exact commands, tool identities, failures, results and cleanup references.
 
 WebCodex ran the real MSVC Cargo 1.99 toolchain in the isolated protected
@@ -204,7 +204,7 @@ cargo fmt --manifest-path crates/yetlet-secrets/Cargo.toml --check
 All-target tests passed 15 cases: one lock-poison unit test, four provider tests,
 three Azure parser tests and seven State/Loader tests. One rustdoc test passed.
 The documentation gate and independent review are recorded in the
-[review record](SECRET-ROTATION-REVIEW.md#minimal-local-contract-follow-up).
+[review record](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/SECRET-ROTATION-REVIEW.md#minimal-local-contract-follow-up).
 
 The guide also records supported local inputs and the recommended separation of
 business application reads/signing from operator or dedicated automation

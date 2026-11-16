@@ -40,4 +40,4 @@ cargo build --locked -p yetlet-rest-api
 cargo xtask smoke rest-api
 ```
 
-Retained scope and dependency evidence is recorded in [M8b verification](../../docs/M8B-VERIFICATION.md).
+Retained scope and dependency evidence is recorded in [M8b verification](../../docs/SAMPLES.md#rest-api-acceptance).

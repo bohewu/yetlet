@@ -1,16 +1,16 @@
-# GitHub Pages minimum publication plan — YT-218
+# GitHub Pages publication and Reader Edition cutover
 
 Date: 2026-10-31. Status: YT-218 Done after final independent Reviewer PASS0.
 The owner-adopted first-publication sequence completed at source
 `64d10742d62059c91dd2e46931aab1cb3b65d897`. That mdBook result remains accepted
 history. [The current public guide](https://bohewu.github.io/yetlet/) uses the
-Yetlet-built reader at source0ae6b93 under the later
-[YT-226 cutover](YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01).
+Yetlet-built Reader at source `0ae6b93` under the later
+[approved cutover](#authorized-yetlet-publication--2026-11-01).
 The historical preparation checkpoints below remain intact.
 
 ## Historical planning baseline and exact public scope
 
-[YT-217](YT-217-DOCS-PREVIEW.md) is Done at API-doc/local reader-preview scope.
+[YT-217](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-217-DOCS-PREVIEW.md) is Done at API-doc/local reader-preview scope.
 Local committed source is `9ef215c2bf9d754f587fc5b3130b107ff0664c68`;
 the observed remote `master` is `729fab315f7ea5c13da42cef87cf899a73d347f2`.
 The two local documentation commits have not been pushed. Repository metadata
@@ -223,6 +223,42 @@ These checks do not claim hosted Pages acceptance. Final clean-source public
 integration precedes Push; actual public URL/artifact/source readback follows
 the one authorized deployment. Mark YT-218 Done only after those outcomes exist.
 
+## Reader edition history and publication boundaries
+
+The current documented Reader is built from eight explicit
+`site/pages.toml` chapter paths with a version pair
+selected from **actual accepted SDK and CLI publication
+records**, not from a workspace `Cargo.toml` bump.
+A local preview and an official Pages release are different
+events: a local preview can contain working-tree Markdown
+and source-only href fixes; it does not prove
+`https://bohewu.github.io/yetlet/` serves them.
+The canonical [Reader source scope](DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence)
+retains YT-232’s old eight-chapter alpha.6 preview,
+219 linked targets, the separately checked six-file
+static reference and initial browser/tool failures.
+YT-249’s later alpha.7/CLI0.3.0 source/lock/receipt
+rollover has independent local acceptance, while
+protected Git delivery, official hosted readback
+and public edition activation are separate gates.
+
+Each future SDK or CLI publication must recheck its
+selected compatible package pair, generator/lock/
+browser consumer, the native and Wasm Reader,
+complete public-file inventory, protected
+`site/pages.toml` edition, release-document check
+and actual public Pages source correspondence.
+Do not treat a local `--public` flag as permission
+to Deploy or infer that an old source branch/Tag/Reader
+cohort is live. Z10’s href-only changes in existing
+Reader chapters require a **nonpublishing** local
+render and actual link/heading audit; neither
+modifies the published edition, signed assets,
+SDK/CLI package versions or Pages settings.
+Historical original raw source/evidence remains
+bounded to local Git and its task-owned retained
+records, not automatically accessible via GitHub.
+
 ## Completed delivery and first publication — 2026-10-31
 
 Implementation review PASS0 accepted the ten changed inputs without required
@@ -296,7 +332,7 @@ not incomplete first-publication criteria.
 ## Temporary automatic-update hold — 2026-11-01
 
 The owner subsequently authorizes PR44 Push and squash Merge after green CI,
-then a [Yetlet-built guide cutover plan](YT-226-PAGES-CUTOVER-PLAN.md), without
+then a [Yetlet-built guide cutover plan](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md), without
 deployment. Readback finds PAGES_DEPLOY_ENABLED true. To enforce that instruction,
 the repository CI variable is set false and read back before Merge. This stops
 new automatic publication; it neither unpublishes nor replaces the existing
@@ -313,7 +349,7 @@ tree6015c8d8c3ee4a412924b72c8c1ef278dfe00585, matching qualified headf73439b.
 All selected PR checks pass before Merge. The resulting master documentation
 run41277712999 succeeds with its deployment job skipped, confirming the hold.
 No manual dispatch or retry occurs; other automatic master checks remain a
-separate source-CI observation. The [cutover proposal](YT-226-PAGES-CUTOVER-PLAN.md)
+separate source-CI observation. The [cutover proposal](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md)
 does not implement a new deployment flow or re-enable this variable.
 
 Subsequent master MSRV/Stable, guide build and all four CodeQL analyses pass at
@@ -323,7 +359,7 @@ does not start implementation or re-enable publication; the hold remains false.
 
 ## Local Yetlet workflow integration — 2026-11-01
 
-The owner subsequently selects the [YT-226 minimal integration](YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01),
+The owner subsequently selects the [original minimal integration](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md#owner-selected-minimal-workflow-integration--2026-11-01),
 without Commit/Push or deployment. The checkout's single docs.yml now uses
 the accepted Yetlet builder; docs-preview.yml is removed. Build output is always
 clean/public-format HTML, independently of deployment eligibility. Only an
@@ -347,17 +383,53 @@ Run41289520993/attempt1 builds and deploys successfully; deployment7470678482
 serves the same HTTPS project URL. This supersedes the temporary false hold;
 relevant protected-master document updates can publish automatically again.
 
-The15-file archive/manifest/CLI receipts match the accepted master build.
-All8 public chapters and6 selected assets return200, exact bytes and correct
-MIME; native directory URLs, header search and touch navigation have retained
-observations. Browser checker mistakes, its final stale-H1 FAIL and the
-incidental root favicon404 are explicit in the YT-226 record, not erased or
-relabeled as clean script exits. Final independent Reviewer PASS0 accepts this
-bounded cutover, all8 document/83 evidence hashes and stated limits, with zero
-issues/followups; YT-226 is Done.
+The 15-file artifact/manifest/CLI receipts match accepted master source
+`0ae6b93`. Anonymous HTTPS readback checks all eight directory-route chapters
+and six CSS/JS/Wasm assets against the original hashes and MIME types; no old
+mdBook `.html` aliases or automatic redirect layer are provided. Reader
+navigation, keyboard, search and emulated touch observations are bounded rather
+than exhaustive browser/platform certification. The original Chrome/Firefox
+checker errors, **final Firefox stale-heading FAIL**, and incidental root
+favicon 404 remain explicitly recorded in the [immutable YT-226 evidence](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md#authorized-public-cutover--2026-11-01),
+not relabeled as clean test exits. Independent final Reviewer PASS0 accepts this
+bounded public cutover, including eight document/83 evidence hashes with no
+required followups; the [original accepted review](https://github.com/bohewu/yetlet/blob/f03e8886bc1dbe28f135e05e527b69e01eb3deba/docs/YT-226-PAGES-CUTOVER-PLAN.md#independent-final-acceptance--2026-11-01)
+retains its exact source and limitations. YT-226 is Done at that scope.
 
 The old42-file mdBook archive and pre-cutover live-home correspondence remain
 retained externally. No automatic rollback is implemented or executed. The
 master-only Environment, HTTPS, source scope, private-record exclusion and
 release protections are unchanged. No workflow/deployment retry or new
 Commit/Push accompanies these closeout documents.
+
+## Public guide architecture and original local acceptance
+
+The original public-doc decision kept one repository of canonical English
+Markdown, selected GitHub Pages for the guide and version-matched rustdoc for
+API signatures. Wiki, custom domain, organization split, translation, analytics,
+login and third-party JavaScript services were deferred. Navigation groups were
+Start, Write UI, Choose features, API reference, Examples/help and Status/policies.
+The exact eight export selections remain authoritative and nonrecursive.
+New Rust terms should be explained at first use, and existing working snippets
+reused. Necessary behavior/security limits survive reader editing.
+
+YT-217 selected two crate homepages, View/Element/Attribute and SessionConfig
+entry documentation, purpose/examples, ownership/errors and target/feature
+limits. It introduced no repository-wide missing-docs gate. Its four examples,
+selected native/Wasm rustdoc and mdBook0.5.4 local Chromium/emulated-mobile
+reader preview passed final independent review. Original stopped harness and
+authorized correction remain in the
+[execution record](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-217-DOCS-PREVIEW.md).
+Physical mobile, other browsers and hosted generated rustdoc stayed unqualified.
+
+YT-218 separately delivered the mdBook first publication at 64d1074 on 2026-10-31.
+YT-226's separately authorized2026-11-01 cutover at 0ae6b93 used the Yetlet-built
+application-owned static reader with optional Wasm search, one Pages workflow
+and run41289520993/1. Both received independent PASS0 at their recorded scope.
+mdBook remains an explicit historical/reference builder. The current accepted
+Reader pair is SDKalpha.8/CLI0.4.0 in site/pages.toml, with publication authority
+in the accepted hosted SDK/CLI records. Local documentation preview, source
+publication and actual hosted reader readback retain separate evidence.
+The [original plan](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/PUBLIC-DOCS-PLAN.md) is locally recoverable at the
+frozen SHA, while remote reachability and private raw evidence availability
+remain unverified. Its old edition labels describe their dated checkpoints.

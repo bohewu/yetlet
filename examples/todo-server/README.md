@@ -47,10 +47,11 @@ The server never compiles WASM on request. Browser artifacts are built ahead of 
 
 ## App-owned Rust styles and typed Tag Builders
 
-The Todo list, shell and interactive layout use `yetlet::view::tags` from this
-checkout's YT-234/235 source and are included in published SDK alpha.7. These
-helpers lower into the same `View` tree. Existing keyed list classes,
-DOM identity, local events and explicit remote HTTP actions are preserved.
+The Todo list, shell and interactive layout use `yetlet::view::tags` from the
+checkout. The SDK has included these typed Tag Builders since
+`0.9.0-alpha.7`. They lower into the same `View` tree and preserve keyed list
+classes, DOM identity, local events and explicit remote HTTP actions.
+[Typed Tag Builder API](../../docs/API-REFERENCE.md#published-typed-tag-builder--sdk-alpha7)
 
 The private, host-only `stylegen/` package copies the finite YT-239 builder.
 `styles::stylesheet()` explicitly composes `layout` and `tasks`; both the views
@@ -71,18 +72,21 @@ root; the record, manifest and generator sources are not public routes.
 The root keeps `Page::new` and strict `DEFAULT_CSP`; browser enhancement alone
 uses the existing WASM CSP token. CSS responses have a CSS MIME type, nosniff,
 no-store and strict CSP. No request runs Cargo or compiles CSS/WASM. See the
-[YT-240 qualification and platform limits](../../docs/YT-240-TODO-STYLE-QUALIFICATION.md).
+[Original YT-240 Linux sample verification](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary)
+retains the exact test matrix and first failures; current operation is documented
+here, not in a separate task report.
 
 ## Shared native draft controls
 
 The `/app` page includes the same [native control View](../todo-ui/src/controls.rs) used by `/controls`: input, textarea, single select, checkbox, readonly/disabled fields and explicit submit/reset buttons. Edits stay in the native controls through unrelated keyed list updates. Reset restores the current page's defaults; GET Preview shows bounded escaped query values without creating a Todo. It works without JS on `/controls`. Do not place secrets in this read-only preview's URL.
 
-The View also declares root-relative and fragment links. DOM mount resolves them through the browser URL parser with the [YT-110 same-origin contract](../../docs/YT-110-DOM-CAPABILITIES.md); native SSR retains its app-owned URL/CSP policy. No new binding runtime, persistence or CSRF/auth qualification is implied.
+The View also declares root-relative and fragment links. DOM mount resolves them through the browser URL parser with the [YT-110 same-origin contract](../../docs/BROWSER-APP.md#historical-native-dom-controls-and-navigation-boundaries); native SSR retains its app-owned URL/CSP policy. No new binding runtime, persistence or CSRF/auth qualification is implied.
 
 ## Verify
 
 ```bash
 cargo test --locked -p yetlet-todo-ui -p yetlet-todo-server --all-targets
+cargo xtask build todo-css    # CSS-only native build; no Wasm or wasm-bindgen requirement
 cargo build --locked -p yetlet-todo-server
 cargo xtask build browser
 cargo xtask smoke browser-chrome
@@ -91,6 +95,15 @@ cargo xtask check samples
 cargo xtask check docs
 ```
 
-Historical behavior evidence remains in [M7j verification](../../docs/M7J-VERIFICATION.md).
-YT-240 retains its bounded Linux source qualification. Style Showcase is now a
-separately reviewed native-first catalog entry with an optional WASM companion.
+Historical behavior evidence remains in [M7j verification](../../docs/QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence).
+YT-240 verified Todo's Linux debug layout and computed styles in Chrome at
+390px and 1280px and in Firefox at 1280px. Firefox clamped the requested 390px
+window to 500px, so the narrow layout remains unverified in that engine.
+[Original YT-240 result boundaries](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-240-TODO-STYLE-QUALIFICATION.md#platform-matrix-and-acceptance-boundary),
+[published CLI Style evidence](../../docs/CLI-GUIDE.md#style-release-and-platform-evidence).
+A CSS-only build writes the selected stylesheet/digest record for native SSR;
+restart the native server to pick it up. The separate full browser build prepares
+Wasm and its own content-addressed asset graph. Firefox's requested 390px window
+was clamped to 500px during the original test, so its true narrow layout remains
+unverified; Linux browser results do not certify physical mobile or new Windows
+runtime behavior.

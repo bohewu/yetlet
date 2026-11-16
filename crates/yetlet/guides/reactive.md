@@ -23,7 +23,7 @@ re-enter the graph and controls its own side effects. Clone may share
 interior-mutable application data, so this is not a deep-copy or freshness
 guarantee after return/await. The handle stays weak; a returned value adds no
 graph ownership beyond its own application data. The
-[YT-105 snapshot slice](https://github.com/bohewu/yetlet/blob/master/docs/YT-105-GRAPH-SNAPSHOT.md) records the bounded
+reviewed snapshot implementation records the bounded
 contract and verification, including Todo/Admin adoption. Todo's local executor
 reads the handle after dispatch; Admin reads it before constructing a save.
 Their separate committed-state mirrors have been removed. Initial rendering

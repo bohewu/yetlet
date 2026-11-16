@@ -30,7 +30,7 @@ cargo tree --locked -p yetlet-middleware-lab
 cargo xtask check samples
 ```
 
-This is a bounded anonymous local HTTP demonstration. It does not claim production instrumentation, distributed tracing, TLS/reverse-proxy trust, a separate middleware engine or zero runtime overhead. The streaming error route deliberately demonstrates an HTTP body failure, not a successful error recovery. See [M9b verification](../../docs/M9B-VERIFICATION.md).
+This is a bounded anonymous local HTTP demonstration. It does not claim production instrumentation, distributed tracing, TLS/reverse-proxy trust, a separate middleware engine or zero runtime overhead. The streaming error route deliberately demonstrates an HTTP body failure, not a successful error recovery. See [M9b verification](../../docs/SAMPLES.md#middleware-lab-acceptance).
 
 ## Opt-in deadline research — YT-029
 
@@ -53,4 +53,4 @@ cargo build --release --locked --offline -p yetlet-middleware-lab --bins
 target/release/deadline-bench
 ```
 
-The comparison uses the same empty GET and two-byte response for a plain Router, global envelope, no-op RequestContext middleware and explicitly installed deadline. It prints ten raw batch samples after warmup; it does not measure network latency or production load. See [YT-029 research and adoption decision](../../docs/YT-029-HTTP-DEADLINE-RESEARCH.md) for measurements, cancellation/body limits, source identity and validation. The helper is an application-owned research example, not a supported core deadline/provider API.
+The comparison uses the same empty GET and two-byte response for a plain Router, global envelope, no-op RequestContext middleware and explicitly installed deadline. It prints ten raw batch samples after warmup; it does not measure network latency or production load. See [YT-029 research and adoption decision](../../docs/HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing) for measurements, cancellation/body limits, source identity and validation. The helper is an application-owned research example, not a supported core deadline/provider API.

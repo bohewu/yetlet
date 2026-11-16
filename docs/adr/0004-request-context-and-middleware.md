@@ -30,7 +30,7 @@ The integration must preserve existing routes, status/error JSON, SSR/Islands, a
 
 ## Subsequent M6 integration
 
-M6 now implements the thin App facade, Page result, typed module setup and an independent opt-in Request ID provider, and migrates the Todo route assembly to those APIs. Native Axum/Tower remains authoritative. The original P0 acceptance and historical counts below are unchanged; see [M6 verification](../M6-VERIFICATION.md) and [Extensions](../EXTENSIONS.md) for the current integration and measured comparison. General authentication/session/tracing providers and production qualification remain deferred.
+M6 now implements the thin App facade, Page result, typed module setup and an independent opt-in Request ID provider, and migrates the Todo route assembly to those APIs. Native Axum/Tower remains authoritative. The original P0 acceptance and historical counts below are unchanged; see [M6 verification](https://github.com/bohewu/yetlet/blob/ac98cdc127ccd299cb1150fef922b0560453a1d4/docs/M6-VERIFICATION.md) and [Extensions](../EXTENSIONS.md) for the current integration and measured comparison. General authentication/session/tracing providers and production qualification remain deferred.
 
 ## Validation gate
 

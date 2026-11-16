@@ -1,10 +1,17 @@
 # Release Supply-Chain Design
 
+Current distribution is the accepted [SDKalpha.8 and CLI0.4.0](RELEASE-READINESS.md)
+pair. Dated source-only/preparation statements below preserve their original
+scope, not current unavailability. New releases follow the closed
+[cohort/freeze SOP](RELEASING.md), [publication contract](RELEASE-PUBLICATION.md)
+and unchanged normative signer/trust policies. A historical PASS is not reusable
+authority or evidence for changed bytes.
+
 **Owner-selected version update (2026-10-28):** The next sixteen-package
-Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](YT-096-ALPHA-VERSION-PREFLIGHT.md).
+Experimental preview is `0.9.0-alpha.1`; see the [alpha version preflight](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-096-ALPHA-VERSION-PREFLIGHT.md).
 The owner now selects guarded 59-path commit `5d7b91842f8188d45e5af22367245aebec7ca7d1`
 (tree `6adff26fc4fec65e9aa8f40d7172ff266b7e500d`) as the new immutable alpha candidate C.
-The [minimum hosted/readback plan](YT-096-ALPHA-HOSTED-PLAN.md) records the
+The [minimum hosted/readback plan](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints) records the
 remaining fixed-binding patch, consumed Guard-state disposition and separate
 execution-source selection/authorization gates. Existing `v0.1.0`, source
 `3eacfe3`, hosted/readback runs and retained bytes stay historical and unchanged;
@@ -16,7 +23,7 @@ is authorized by this migration.
 **Current release-signing contract (2026-10-28):** D1–D5 are adopted policy,
 with the owner's D1/D3 amendment selecting an independent fixed-SHA signer.
 [ADR 0009](adr/0009-release-build-and-signer-identities.md) and the
-[two-payload signer contract](YT-096-SIGNER-CONTRACT.md) preserve build
+[two-payload signer contract](RELEASE-SUPPLY-CHAIN.md#two-payloads-complete-assembly-and-independent-verification) preserve build
 `C_release` `3eacfe3`, unsigned `v0.1.0` and the accepted hosted/custody records.
 Future signing code/event/workflow identity `S` must be authenticated independently
 from build source `C_release`; a matching branch/SAN alone is insufficient.
@@ -33,7 +40,7 @@ their dated Pending statements do not undo later owner decisions.
 **Historical technical candidate checkpoint (2026-10-27):** After the guarded ten-path rebuild
 extension commit, the owner selects `118f3d0f496b487ef20fe243f4e73179f9eadc43`,
 tree `07faa3e90c0fca5d27a4e55262c75acf851d884a`. The
-[remaining verification order](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
+[remaining verification order](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#new-candidate-and-remaining-verification-order--2026-10-27)
 records the later authorized Push, required CI, sixteen-package hosted/local
 byte-identical rebuild and affected MSVC PASS. Final independent Reviewer PASS,
 zero issues/required followups, closes YT-205 technical scope. These notes remain
@@ -43,7 +50,7 @@ Earlier source, archive, signature and review identities remain intact.
 
 **Earlier sixteen-package technical candidate (2026-10-27):** The owner selects
 immutable `a2d6474`/tree`1c3eab` for experimental0.1.0
-[YT-205 reconciliation](YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md). Sixteen local
+[YT-205 reconciliation](RELEASE-READINESS.md#historical-release-and-hosted-source-checkpoints). Sixteen local
 C archive digests, retained versus new package/inventory results and an unsigned
 sixteen-subject proposal are bound explicitly. This does not rewrite the original
 nine-subject proposal or old provenance, complete current-C CI/rebuild/platform
@@ -54,19 +61,116 @@ separate authority. No new policy, ignore, Push or publication is introduced.
 **Task:** YT-064 / M10e
 **Original M10e status:** Design and local preflight accepted; independent reviewer `wc_job_CeUNYnHsO1yI_kBz` PASS. Actual experiments are recorded in M10e verification. Release activation, signing and independent rebuild are not performed; YT-020 remains Blocked.
 
-**Private preparation update (2026-10-11):** The maintainer selected experimental `0.1.0` and the original nine library candidates. [YT-020 preparation](YT-020-PRIVATE-RELEASE-PREP.md) records current metadata, source-package preflight, prepared support/release policies and remaining activation gates. It preserves this integrity contract and does not authorize a tag, signing, publication or visibility change. The M10e experiments below retain their original source identity.
+**Private preparation update (2026-10-11):** The maintainer selected experimental `0.1.0` and the original nine library candidates. [YT-020 preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) records current metadata, source-package preflight, prepared support/release policies and remaining activation gates. It preserves this integrity contract and does not authorize a tag, signing, publication or visibility change. The M10e experiments below retain their original source identity.
 
-**Integrity preparation update (2026-10-12):** [Private integrity preparation](YT-020-INTEGRITY-PREPARATION.md) records Rust/Cargo 1.99.0, byte-identical nine-crate source archives rebuilt on separate Ubuntu/Windows hosts with fresh caches, target-specific inventories, unsigned SLSA v1 drafts, and public upstream signature/provenance verification experiments. Both hosts remain under shared maintainer/agent control and use recorded uncommitted metadata overlays. This does not satisfy independently controlled trusted-release rebuilding, actual Yetlet signing, immutable source/tag approval or publication. The existing release contract below remains mandatory.
+**Integrity preparation update (2026-10-12):** [Private integrity preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) records Rust/Cargo 1.99.0, byte-identical nine-crate source archives rebuilt on separate Ubuntu/Windows hosts with fresh caches, target-specific inventories, unsigned SLSA v1 drafts, and public upstream signature/provenance verification experiments. Both hosts remain under shared maintainer/agent control and use recorded uncommitted metadata overlays. This does not satisfy independently controlled trusted-release rebuilding, actual Yetlet signing, immutable source/tag approval or publication. The existing release contract below remains mandatory.
 
-**Later Private follow-up (2026-10-12):** The maintainer authorized committing the reviewed preparation and continuing delivery/Private rebuilding. [Hosted rebuild preparation](YT-020-HOSTED-REBUILD.md) records the first-head required CI and completed protected-check migration, a bounded manual builder with a separately operated GitHub execution environment, and actual execution evidence retained separately. It retains unsigned-provenance limits and the existing transparency/signature contract; Private attestation availability or a provider without a transparency log cannot silently waive that release gate. No public activation or signing policy is selected implicitly.
+**Later Private follow-up (2026-10-12):** The maintainer authorized committing the reviewed preparation and continuing delivery/Private rebuilding. [Hosted rebuild preparation](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md) records the first-head required CI and completed protected-check migration, a bounded manual builder with a separately operated GitHub execution environment, and actual execution evidence retained separately. It retains unsigned-provenance limits and the existing transparency/signature contract; Private attestation availability or a provider without a transparency log cannot silently waive that release gate. No public activation or signing policy is selected implicitly.
 
-**Explicit Private trust decision (2026-10-12):** The maintainer selected [Cosign public-key preparation and future crates.io distribution](YT-020-PRIVATE-TRUST-POLICY.md). This documentation-only mode authenticates maintainer-approved bytes after separately authorized execution; it does not establish OIDC identity, certificate/chain, transparency/inclusion or authenticated builder evidence and does not replace any formal release guarantee below. Actual keys, signatures, registry activation and visibility changes remain unperformed.
+**Explicit Private trust decision (2026-10-12):** The maintainer selected [Cosign public-key preparation and future crates.io distribution](RELEASE-SUPPLY-CHAIN.md#private-maintainer-key-preparation-policy-and-historical-signatures). This documentation-only mode authenticates maintainer-approved bytes after separately authorized execution; it does not establish OIDC identity, certificate/chain, transparency/inclusion or authenticated builder evidence and does not replace any formal release guarantee below. Actual keys, signatures, registry activation and visibility changes remain unperformed.
 
-**Later authorized Private execution (2026-10-12):** [Private signing verification](YT-020-PRIVATE-SIGNING-VERIFICATION.md) records a dedicated encrypted key, public fingerprint, three actual preparation signatures, separate public-only verification and six expected negative outcomes. Formal log-required verification rejects the same no-log bundle. This updates Private execution status only; the release contract below, historical evidence identities and all formal guarantees remain mandatory. No push, tag, publication or visibility change occurred.
+**Later authorized Private execution (2026-10-12):** [Private signing verification](RELEASE-SUPPLY-CHAIN.md#private-maintainer-key-preparation-policy-and-historical-signatures) records a dedicated encrypted key, public fingerprint, three actual preparation signatures, separate public-only verification and six expected negative outcomes. Formal log-required verification rejects the same no-log bundle. This updates Private execution status only; the release contract below, historical evidence identities and all formal guarantees remain mandatory. No push, tag, publication or visibility change occurred.
+
+## Historical release evidence and packaging transitions
+
+This table is a **current reading guide to dated evidence**, not a new
+signing, registry, workflow or release approval. Its full source/negative
+results remain in the original eight Git blobs at local pre-consolidation
+commit `849c5894f73d9732db9c2ccaa765385dc9d8a819`; public GitHub reachability has **not been verified**.
+
+| Historical source | Acceptance and exclusions |
+|---|---|
+| YT-020 Private GitHub rebuild and sixteen-name registry inventory | Manual, separate ephemeral GitHub builder and protected CI were prepared; unsigned provenance did not establish independent trust, certificate inclusion or formal signing. On **2026-10-30** sixteen candidate crate names returned not-found (404) and a public account was observed; neither current name availability nor ownership, an authorized upload or a production trust chain follows. Keep distinct original nine-library `0.1.0` source identities |
+| YT-096 alpha.1 preflight and two-host nine-package comparison | The sixteen-library alpha.1 manifest/version preflight was locally reviewed, **not published** by that act. Linux and Windows MSVC nine-source-archive bytes matched at an earlier exact `ce56e08` candidate; this is source-archive reproducibility, not binary reproducibility, separately controlled signing, or later candidate acceptance |
+| YT-200 and YT-205 technical sixteen-package preparation | YT-200 defined a bounded feasibility/verification queue. The later sixteen-package rebuild extension and selected `118f3d0` technical candidate passed scoped local/source checks, while subsequent source, CI, hosted, signer, inventory and registry gates retain their own authorities. A technical candidate or guarded commit is **not** publication |
+| YT-209 Environment proposal and YT-210 one-package study | The hosted verifier/Environment plan was a proposal, not an activated signing grant; later actual protected setup and deliveries have separate verified records. YT-210 evaluated a `publish = false` one-implementation-package experiment; the later [two-package migration](COMPATIBILITY.md#two-package-feature-and-target-contract) selected `yetlet` and `yetlet-browser` instead. There was no publication of the one-package experiment |
+
+**Current distribution is separately established by actual release records:**
+[SDK `0.9.0-alpha.8`](ALPHA8-HOSTED-RECORD.md) and
+[independent CLI `0.4.0`](CLI-040-HOSTED-RECORD.md).
+The approved [release SOP](RELEASING.md) and
+[publication workflow contract](RELEASE-PUBLICATION.md) select a closed
+source/version-specific cohort; historical instructions below cannot be
+replayed for the current pair. Preserve preexisting FAIL, Pending, Blocked
+and negative evidence at their original dates, even where newer releases
+succeeded.
+
+## Historical candidate inventory and technical consolidation
+
+For **2026-10-20 C `ce56e0814e5423782440acd2c959ca777d572cd4`**, nine
+unpublished0.1.0 archives/locks bind23 default-feature package/target CycloneDX1.5
+SBOMs (nine GNU, nine MSVC, five wasm). All23 match filtered normal/build metadata;
+21 match normal/build Cargo trees exactly. Native server-axum's two SBOMs retain
+conservative `serde_derive1.0.229` from development-feature unification. No missing
+normal/build component was recorded; exact compiled feature equivalence was not.
+`--all` means transitive dependencies, not all workspaces/dev/test targets;
+cargo-cyclonedx0.5.9 excludes dev-only edges and test/example/bench/custom-build
+targets. Build-only components can be present with scope `excluded`.
+
+All23 license/source checks PASS with unchanged original policy and29 unused
+allowance warnings (BSD-3-Clause17/Unicode-3.0 12). Nine complete package-lock
+audits PASS/zero reported vulnerabilities or warnings against RustSec
+`999ec89d5d3f10f20be14750ec8c2d8b44e0ac9b`, completed2026-10-20 07:53:16 UTC;
+73 distinct third-party pairs include dev/build/inactive-target records. This is
+a dated database result, not a fresh scan or proof of vulnerability absence.
+
+Actual Azure compilation retained140 events:97 native-test events/70 package
+pairs and43 wasm events/32 pairs. Native68/70 occur in the GNU SBOM union;
+`tower-http0.6.11`/`bitflags2.13.2` are explained test/dev-only observations.
+All32 wasm pairs occur in the wasm union and every observed version is in the
+root lock. Aggregate events do not establish per-library compiled features,
+output hashes, Rust sysroot/native-linker/system closure or new Windows compiler
+events. JS/loader/glue assets remain outside Cargo inventory. The unchanged
+36-file unsigned bundle (nine archives,23 SBOMs,four supporting records), checksum
+manifest SHA256 `9e49da9da4991c97dc2c48d1a6f8937ff1cd426265cd255f509164c19bc4908a`,
+and separate hosted unsigned provenance do not authenticate a combined statement.
+The owner accepted only these bounded differences; missing evidence stayed
+Not verified and the original final candidate verdict stayed FAIL.
+
+For **2026-10-27 YT-205**, a2d6474's16 archives retained old source/package proof;
+ten locks moved Tokio1.53.2→1.53.3 and six contained no Tokio. Ten new normal
+package checks plus six exact compilation reuses are not16 fresh verifications.
+Fourteen affected normal/build inventory cells were regenerated and PASS;
+28 were reused (22 unchanged closures and six Core/Reactive cells). Audit
+containment used13 accepted live-lock results against RustSec
+`3279c99911354c400e1d41e47c7d60e39258b147`, unchanged RSA exception, no new ignore;
+old ten-warning outputs were not rewritten. Tokio's patched range does not
+promise fd ownership for every upstream API. The scoped120-regular/18-alias
+zero-reportable source scan was not a post-upgrade full/application scan.
+
+The successor118f3d0's local/hosted plain-Git-archive recipe matched all16 final
+archives after33 phases each: one vendor,16 bootstrap **collections only**,16
+normal verifications. Both bind source/epoch/tools/inputs/six locks; compiled
+OpenSSL3.5.9 executable digests differed honestly across hosts. Do not compare
+plain-export outputs against older checkout/VCS-attributed archives or call this
+compiled-output reproducibility. Fourteen-package MSVC default/integrated
+consumer PASS used CRLF-normalized Git-source equivalence, not Linux archive-byte
+identity. The result ZIP transfer was policy-rejected; original Windows text
+records were reviewed at source, with **no** received/locally verified ZIP claim.
+
+Initial missing p256 vendor source, extracted-package parent-workspace discovery,
+Windows newline assumption and denied ZIP transfer remain recorded. Forty-six
+reader manuscripts finally match C, including the two Session README corrections
+absent from a2d6474 archives; eight rustdoc commands/22 entries were local generation,
+not docs.rs/site publication. Manuscript selection and350 links to unselected
+files were not a sanitized ready-to-host site or confidentiality audit.
+Partial publication is non-atomic: preserve successful subjects/errors and stop;
+resume/new-version/yank decisions need their own authority, never overwrite,
+repackage or retag approved bytes.
+
+Full source/SBOM counts, tools, archive digests, original FAIL/Blocked/Pending and
+review identities remain in the18 original Z11 Markdown blobs at **local Git**
+`c440c4542c888671750738a5908a667d2124db15` (remote reachability unverified), including
+[inventory coverage](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-096-SUPPLY-CHAIN-DELTA.md#target-inventory-and-sbom-coverage)
+and [sixteen-package execution](https://github.com/bohewu/yetlet/blob/c440c4542c888671750738a5908a667d2124db15/docs/YT-205-RELEASE-EVIDENCE-CONSOLIDATION.md#authorized-current-c-execution--2026-10-27).
+Raw stores remain `artifacts/yt096-supply-chain-delta-20261020/` and the recorded
+`target/yetlet-yt205-*20261027-*` task roots; Git preserves their references, not
+availability of every original raw byte. Neither technical consolidation nor
+source-resolution SBOMs establish registry or formal trust acceptance.
 
 ## Current preparation source boundary (2026-10-12)
 
-The [T08 preparation record](YT-020-PRIVATE-RELEASE-PREP.md#current-preparation-boundary--t08--yt-068-2026-10-12) distinguishes historical signed source `8e557e760407a3d4b3f5a8b8f833748946be1387`, policy HEAD `abb2cce1253afe1d87a97e0a50f3f47efffe7280` and the current dirty research/documentation checkout. The current root manifest/lock and nine newly discovered package READMEs change future package/evidence inputs. T07 passed nine package file listings; those checks do not approve archives or provide current-source reproducibility, inventory, signature or registry assurance. The historical three signatures, 37 artifacts plus manifest and public-only/negative-case PASS results retain their old byte bindings.
+The [T08 preparation record](RELEASE-SUPPLY-CHAIN.md#current-preparation-source-boundary-2026-10-12) distinguishes historical signed source `8e557e760407a3d4b3f5a8b8f833748946be1387`, policy HEAD `abb2cce1253afe1d87a97e0a50f3f47efffe7280` and the current dirty research/documentation checkout. The current root manifest/lock and nine newly discovered package READMEs change future package/evidence inputs. T07 passed nine package file listings; those checks do not approve archives or provide current-source reproducibility, inventory, signature or registry assurance. The historical three signatures, 37 artifacts plus manifest and public-only/negative-case PASS results retain their old byte bindings.
 
 A separately approved immutable current-source candidate still needs package preflight, rebuild/provenance, selected target/feature SBOM/license evidence and signing verification under separate authority. This documentation reconciliation performs none of those operations. The complete formal OIDC/certificate/chain/transparency/inclusion/builder/source/approval and immutable promotion contract below is unchanged; YT-020 remains Blocked. A later local commit is not release activation. The independent delivery gate/result is recorded separately in the run; documentation-stage checks do not attest that gate.
 
@@ -96,9 +200,9 @@ The 19 packages with `publish = false` are `yetlet-auth-notes`, `yetlet-cart-ser
 
 ## License and source gate
 
-`deny.toml` targets cargo-deny **0.20.2**. It allows MIT, Apache-2.0, BSD-3-Clause and Unicode-3.0, plus the owner's explicit [YT-204 approval of Zlib, BSL-1.0 and ISC](YT-204-PACKAGE-SECURITY-COVERAGE.md#authorized-license-policy-followup--2026-10-27). It checks development/build dependencies and sets private-package ignore to false. All other licenses remain denied unless the checker can satisfy an alternative expression with an allowed license. At the original preflight, observed LLVM-exception, BSL, LGPL and Unlicense alternatives did not require additional approval when MIT or Apache-2.0 satisfied the expression. Current AND expressions still require every obligation; retain applicable notices in distributed artifacts.
+`deny.toml` targets cargo-deny **0.20.2**. It allows MIT, Apache-2.0, BSD-3-Clause and Unicode-3.0, plus the owner's explicit [YT-204 approval of Zlib, BSL-1.0 and ISC](RELEASE-SUPPLY-CHAIN.md#historical-license-and-advisory-qualification). It checks development/build dependencies and sets private-package ignore to false. All other licenses remain denied unless the checker can satisfy an alternative expression with an allowed license. At the original preflight, observed LLVM-exception, BSL, LGPL and Unlicense alternatives did not require additional approval when MIT or Apache-2.0 satisfied the expression. Current AND expressions still require every obligation; retain applicable notices in distributed artifacts.
 
-This is a policy-wide SPDX allowlist for the dependency graph checked by this configuration, including future dependencies with these license IDs; it is not a package/version-specific exception. It does not relicense Yetlet or third-party code, authorize publication, or waive copyright, license-text or modified-source notices. `BSL-1.0` means Boost Software License 1.0. Package-specific terms and eventual source/binary/browser-bundle contents still govern distribution obligations; see the [YT-204 scope summary](YT-204-PACKAGE-SECURITY-COVERAGE.md#license-scope-and-distribution-obligations).
+This is a policy-wide SPDX allowlist for the dependency graph checked by this configuration, including future dependencies with these license IDs; it is not a package/version-specific exception. It does not relicense Yetlet or third-party code, authorize publication, or waive copyright, license-text or modified-source notices. `BSL-1.0` means Boost Software License 1.0. Package-specific terms and eventual source/binary/browser-bundle contents still govern distribution obligations; see the [YT-204 scope summary](RELEASE-SUPPLY-CHAIN.md#historical-license-and-advisory-qualification).
 
 Unknown registries and Git sources are denied; only the crates.io registry is accepted. Workspace paths belong to the reviewed source snapshot, not a registry trust exemption. Do not suppress failures, add blanket exceptions or change package licenses to obtain a pass. A future dependency change requires renewed license/source review. Vulnerability audit remains the separate existing RustSec gate.
 
@@ -111,6 +215,62 @@ target/m10-tools/bin/cargo-deny --locked --offline --workspace \
 ```
 
 For release, regenerate metadata with the same target/features as each build; the unfiltered workspace check is additional coverage, not proof of every feature/target configuration. Preserve exit status, diagnostics, counts, input/policy/tool digests and exact coverage. The installed `--help` confirms the options above. See the upstream [license policy](https://embarkstudios.github.io/cargo-deny/checks/licenses/cfg.html) and [source policy](https://embarkstudios.github.io/cargo-deny/checks/sources/cfg.html).
+
+## Historical license and advisory qualification
+
+At the **2026-10-27** sixteen-package source checkpoint, `cargo-deny 0.20.2`
+assessed **42 selected target/feature license-and-source cells**. The first
+policy allowed only MIT, Apache-2.0, BSD-3-Clause and Unicode-3.0: **31 new
+cells PASS, five FAIL** with eight license errors; another six previously
+qualified cells were retained, for **37/42**, not a clean first pass.
+All new source checks reported **zero source errors**, which does not erase
+the five policy failures or establish full vulnerability absence.
+
+| Actually rejected before owner authorization | License expression requiring attention |
+|---|---|
+| Rate-limit default GNU and MSVC; wgpu WASM `browser` | `foldhash0.2.0` dependency used **Zlib** via `hashbrown0.16.1` |
+| Redis Session GNU default and `tls` | `xxhash-rust0.8.19` carried **BSL-1.0** (Boost Software License 1.0) |
+| Redis Session GNU `tls` additionally | `rustls-webpki0.103.16`/`untrusted0.9.0` carried **ISC**; `ring0.17.14` carried **Apache-2.0 AND ISC**, requiring both notices/obligations |
+
+The owner explicitly approved only adding **Zlib, BSL-1.0 and ISC** to the
+policy-wide SPDX allowlist and preserving matching source/distribution notices.
+Those **same five original failed inputs were subsequently rerun and all five
+PASS**, preserving source/metadata/notice hashes; together with the retained
+37 passing cells this is **42/42 selected coverage**, **not 42 freshly
+executed scans**. Six new *unused-allowance warnings* remained nonblocking.
+Original failed logs are still failures; no dependency upgrade, ignore rule,
+source exception or publication approval was implied.
+
+The policy applies across all dependency graphs evaluated by `deny.toml`,
+including future dependencies with those IDs; it is **not a package-specific
+license override**. Zlib's origin/modified-source notices, Boost BSL-1.0's
+copyright/license-text requirements and its narrow generated-object-code
+exception, ISC's retained copyright/permission text and conjunctive
+`Apache-2.0 AND ISC` obligations remain applicable to actual shipped
+source/native/browser artifacts. Passing cargo-deny does not fulfill notices,
+relicense Yetlet, authorize proprietary third-party use irrespective of terms,
+or certify eventual distributed binaries. Evaluate exact artifact contents
+and notices before publication.
+
+A separate dated **cargo-audit 0.22.2** run over sixteen package locks
+(252 distinct external name/version pairs) found **zero reported
+vulnerabilities** but **retained ten occurrences of informational
+RUSTSEC-2026-0386**, concerning Tokio **1.53.2** `AsyncFd` Unix
+file-descriptor lifetime. Observed grep of Yetlet's selected source showed
+no direct `AsyncFd` usage, **not** a proof that all dependencies/consumer
+applications avoid that path. Full lockfiles include unused target/dev
+dependencies, so ten warnings are not ten independent vulnerabilities or
+proof of default-browser linkage. Patch review, source/host input selection
+and fresh advisories remain separate future release obligations.
+
+Selected SBOM/source checks and existing accepted scan receipts do not cover
+all native libraries, tool binaries, JS/Wasm glue, system/runtime dependencies
+or later source graph changes. Complete original YT-204 **historical** findings,
+advisory/database identity, accepted notice hashes, policy changes, reviewers,
+failures and followed-up checks are locally recoverable from Git
+`a3f0519eaf0e8d04468b6b8f238121e08dcc754e`; the original raw
+scan evidence lives in ignored task-owned artifacts, **not in Git**.
+These dated results do not update today's vulnerability status.
 
 ## Tool-generated SBOM and artifact binding
 
@@ -147,7 +307,7 @@ This is a POSIX local preflight, not an archive extractor, provenance verifier o
 
 A future reproducibility claim requires a second isolated builder with independently controlled execution to rebuild the same reviewed source/lock/toolchain/target/features and compare every intended distributable digest. Retain both build records and explain mismatches before promotion. Rehashing existing files or two builds sharing a potentially compromised workspace/cache is not independent rebuild evidence. No such rebuild has run for M10e.
 
-Design pin: use mature [Cosign v3.1.3](https://github.com/sigstore/cosign/releases/tag/v3.1.3) for signature/bundle verification; before activation, approve and record its platform binary SHA-256 and trusted-root material. Installation/bootstrap and public-fixture verification have [Private preparation evidence](YT-020-INTEGRITY-PREPARATION.md#verifier-and-public-fixture-experiments); later [maintainer-key preparation signatures](YT-020-PRIVATE-SIGNING-VERIFICATION.md) do not establish formal release signing or release-policy approval, which remain pending. Fail closed if the verifier version/digest or policy identity is absent or mismatched; do not use floating `latest` or a custom verifier. Follow upstream [verification guidance](https://docs.sigstore.dev/cosign/verifying/verify/).
+Design pin: use mature [Cosign v3.1.3](https://github.com/sigstore/cosign/releases/tag/v3.1.3) for signature/bundle verification; before activation, approve and record its platform binary SHA-256 and trusted-root material. Installation/bootstrap and public-fixture verification have [Private preparation evidence](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12); later [maintainer-key preparation signatures](RELEASE-SUPPLY-CHAIN.md#private-maintainer-key-preparation-policy-and-historical-signatures) do not establish formal release signing or release-policy approval, which remain pending. Fail closed if the verifier version/digest or policy identity is absent or mismatched; do not use floating `latest` or a custom verifier. Follow upstream [verification guidance](https://docs.sigstore.dev/cosign/verifying/verify/).
 
 Before promotion, independently verify the signed subject digest against downloaded bytes and require the approved provenance predicate/build type, immutable source commit, tag/ref, toolchain/target/features, inputs and builder identity. For GitHub OIDC, require exact issuer `https://token.actions.githubusercontent.com`, approved repository `bohewu/yetlet`, exact release workflow identity/path, and the approved immutable tag ref/commit association; reject a valid signature from another repository, workflow, ref or issuer. Require certificate/chain and transparency/inclusion verification under the pinned verifier and approved trust roots. A valid signature alone does not prove source, build behavior or reproducibility. The release workflow path, signing identity, tag approval policy, binary digest and trust roots are unresolved activation gates, not broad wildcard permissions.
 
@@ -157,4 +317,249 @@ Promote only already verified immutable digests: do not rebuild, repackage or su
 
 ## Historical M10e and overlay boundary
 
-The M10e dirty snapshot and later YT-020 working overlays are development-only, not an immutable release source, trusted provenance, signed Yetlet artifacts or independently controlled trusted-release evidence. [M10e verification](M10E-VERIFICATION.md), [original Private preparation](YT-020-PRIVATE-RELEASE-PREP.md) and [integrity preparation](YT-020-INTEGRITY-PREPARATION.md) separate their actual source/run identities and experiments from pending activation. Independent reviewer PASS may accept their bounded design/preparation scopes only. Public activation and any application-selected production qualification remain separate; paid external security review is optional, not a framework publication prerequisite.
+The M10e dirty snapshot and later YT-020 working overlays are development-only, not an immutable release source, trusted provenance, signed Yetlet artifacts or independently controlled trusted-release evidence. [M10e verification](RELEASE-SUPPLY-CHAIN.md#m10-unsigned-supply-chain-preflight-evidence), [original Private preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) and [integrity preparation](QUALIFICATION-MATRIX.md#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12) separate their actual source/run identities and experiments from pending activation. Independent reviewer PASS may accept their bounded design/preparation scopes only. Public activation and any application-selected production qualification remain separate; paid external security review is optional, not a framework publication prerequisite.
+
+## Adopted release trust and disclosure policy — YT-096
+
+D1–D5 were adopted on 2026-10-27. The owner amended D1/D3 on 2026-10-28
+to separate the original builder C from signer S, as accepted in
+[ADR 0009](adr/0009-release-build-and-signer-identities.md). The earlier
+co-located signer recommendation is historical. D6 completed for the exact
+alpha.1 outputs on 2026-10-29. Future executions use the separately adopted
+[single-publication policy](RELEASE-PUBLICATION.md#owner-selected-policy).
+Historical Pending, Blocked and FAIL verdicts retain their original dates.
+
+| Decision | Binding requirement |
+|---|---|
+| D1 | Accept public workload identity, full selected statement and persistent certificate/log/TSA disclosure before issuance. Authenticate exact signer workflow digest S as well as issuer and SAN |
+| D2 | Keep the closed public provenance/DSSE bundle and reduced approval public. Keep complete evidence and private manifest body controlled. Ciphertext transport and safe verification metadata are the adopted supplemental custody disclosure |
+| D3 | Freeze the selected cohort, C/tree/tag, original build workflow/run/attempt and archive bytes. Select reviewed S independently. Signing cannot rewrite builder claims or move the product tag |
+| D4 | Authenticate pinned Cosign, current valid production roots/signing configuration and approved services before use. Verify chain/CT, log inclusion/checkpoint and selected timestamps without relaxed checks |
+| D5 | Bind actual source-package outputs and scoped evidence through in-toto Statement v1 / SLSA provenance v1. Preserve inventory omissions, failures and source-specific qualification limits |
+
+### Exact workload and public statement
+
+The OIDC issuer is `https://token.actions.githubusercontent.com`. The exact
+signer SAN is
+`https://github.com/bohewu/yetlet/.github/workflows/release-sign.yml@refs/heads/master`.
+Require cryptographically authenticated workflow/config/build-signer digest S,
+repository `bohewu/yetlet` ID1409587171 and owner `bohewu` ID35250002.
+Checkout, event, workflow and expected signer SHA must equal approved S.
+Protected master must equal the executing S, V or P at its gated execution.
+Verify the Environment subject separately from the SAN. The original
+`release-sign` subject is
+`repo:bohewu@35250002/yetlet@1409587171:environment:release-sign`.
+Reject wildcard, branch-only, foreign-workflow and personal-email identities.
+The CA issuer and application OIDC IdP are separate identities.
+
+The signer certificate describes actual `release-sign.yml`, S, protected master,
+`workflow_dispatch`, GitHub-hosted runner, public source visibility and actual
+signing invocation/times. Public URI/owner IDs, workflow display name, legacy
+certificate aliases, public key/serial/validity/chain/SCT, log ID/index/checkpoint/
+inclusion and TSA material may be disclosed. Review unexpected identity fields
+before issuance. The statement continues to describe original build C,
+`release.yml`, immutable product tag and original builder invocation.
+
+| Closed statement field | Required value or actual source |
+|---|---|
+| `_type` | `https://in-toto.io/Statement/v1` |
+| `subject[].name` / `digest.sha256` | Exactly the selected cohort's archive basenames and final compressed archive SHA-256 values |
+| `predicateType` | `https://slsa.dev/provenance/v1` |
+| `buildDefinition.buildType` | `urn:yetlet:build:cargo-source-package:v1` |
+| `externalParameters` | Approved workflow repository/path/tag ref and closed cohort input |
+| `internalParameters` | Pinned Rust1.99.0, GNU target, default-per-package feature policy, OpenSSL3.5.9 and actual source epoch for the original recipe |
+| `resolvedDependencies[]` | Logical name/URI and digest of actual Git source, source archive, selected locks, recipe/tools and used OpenSSL source/executable |
+| `runDetails.builder.id` | `https://github.com/actions/runner/github-hosted`, constrained by exact repository/workflow/source policy |
+| `runDetails.metadata` | Actual original `invocationId`, `startedOn`, `finishedOn` |
+| `runDetails.byproducts[]` | Logical names/SHA-256 of source-input, build-record, archive-index and inventory/coverage records |
+
+These paths are under `predicate` where applicable. Reject extra public fields
+without review. Use portable logical labels without private filesystem paths,
+internal URLs, contacts, raw commands/environment dumps, scan findings or secrets.
+Hashes can correlate known bytes. Treat the full statement/DSSE and certificate/
+transparency material as publicly copyable and persistent. GitHub authenticates
+the workload, Fulcio receives its authentication/public-key request, CT records
+the certificate, and Rekor/TSA receive selected signing material or timestamp
+digests. Deleting a repository or asset cannot retract those public records.
+Never disclose raw JWTs, credentials, private keys or plaintext handoff URLs.
+
+Source/repository visibility, package distribution and signing-service disclosure
+each retain their own authority. Public readers verify archives through public
+provenance. A verifier with authorized private access must additionally check
+every complete-manifest entry. A public summary cannot replace that manifest or
+claim that an unauthorised reader inspected private files.
+
+### Authenticated tool and service inputs
+
+The adopted D4 production pin is Cosign3.1.4, source
+`0e48502cf5ef34e2e60bbd3617aa19945712f705`. Linux amd64 binary SHA-256 is
+`424e2c97d0b45fd7a6b608a87f090f35633f4c23ece5f092d48bba11aaf4bbfa`.
+The reference root-signing snapshot is
+`f39569f398fa958b314611e75c637c8d92e6bd4f`, with `trusted_root.json` SHA-256
+`6494e21ea73fa7ee769f85f57d5a3e6a08725eae1e38c755fc3517c9e6bc0b66`
+and `signing_config_rekor_v2.v0.2.json` SHA-256
+`0f5f38554e29e770d4d5d6f0e1b51fcbf84f61dc6934530a09b7a901eaad5bee`.
+Reference hashes alone provide no bootstrap or validity proof. The 2026-10-28
+local integration authenticated these bytes through production TUF root10,
+authenticated artifact key/configuration, OpenSSL KMS-signature verification
+and upstream Google keyless verification before execution. A local synthetic
+supplied-statement case preserved exact bytes. Its initial missing TUF bootstrap
+argument and misplaced test-block failures remain retained.
+
+The approved production profile uses Fulcio `https://fulcio.sigstore.dev`,
+Rekor API2 `https://log2025-1.rekor.sigstore.dev` and API1
+`https://rekor.sigstore.dev` with adopted `ANY` selection, and TSA
+`https://timestamp.sigstore.dev/api/v1/timestamp`. Both logs are explicit policy
+choices. The interactive endpoint `https://oauth2.sigstore.dev/auth` does not
+authorize substituting personal authentication for GitHub workload OIDC.
+Review changed service/root/profile/output formats and other-platform binaries.
+Never select floating latest, staging, artifact-supplied roots or disabled
+identity/certificate/log checks. Cosign3.1.3 remains the historical private pin.
+
+### Two payloads, complete assembly and independent verification
+
+The source-package build type exports approved C without working overlays,
+preserves the original six independent manifests/locks and materializes only
+known license aliases. Its historical sixteen-package recipe uses fresh Cargo/
+target state, pinned Rust/Cargo1.99.0/GNU/OpenSSL3.5.9, recorded source epoch and
+default package features. Vendor the selected closure and record actual tools,
+inputs, commands, outputs and failures. Bootstrap collection cannot count as
+normal offline locked extracted-package verification. Later cohorts use their
+validated recipe and package order. Source-archive equality does not prove
+compiled executable reproducibility or complete system inventory.
+
+Sign original public provenance with supplied-statement DSSE, with decoded payload
+byte-identical to the original build output. Sign the actual complete private
+`RELEASE-CHECKSUMS.json` bytes with a detached blob signature. Sixteen subjects
+historically required two payload signatures. New cohorts derive their exact
+subjects from the validated release record.
+
+Review one exact flat allowlist with unique logical names, sizes, hashes,
+original sources and qualification/security/inventory/support/review/failure
+roles. Include selected archives, original provenance, source export, selected
+locks, recipes/tools, retained OpenSSL source/build records and explicitly reused
+evidence with its limits. A recorded executable digest does not imply possession
+of that binary. Preserve the original preparation manifest under a distinct
+label. Map duplicate OpenSSL extras to `BUILD-EXTRA-<original-name>` and retain
+the map in `EVIDENCE-CLOSURE.json`. Never discard a collision or overwrite proof.
+Apply the [existing checksum bounds](#bounded-unsigned-checksum-preflight).
+If complete closure exceeds them, stop for owner disposition.
+
+Verify original run/artifact ZIPs and authenticated custody inventory first,
+including `inventory.private_manifest_sha256` against restored manifest bytes.
+Safe transport/readback receipts, public checksum, retention index, inventory
+hash and ciphertext hash cannot substitute for that private-manifest hash.
+Materialize the reviewed selection once, create/verify the complete checksum
+manifest, freeze it and encrypt it. The final signing manifest may differ from
+the original private build manifest. Provenance is inside the final assembly
+and never hashes its containing manifest. Neither manifest hashes itself or its
+signature. Closure, preparation receipt, signature bundles and final approval
+retain their defined external bindings without cycles.
+
+The immutable safe preparation receipt binds C/S, both raw payload hashes,
+original build/verifier/preparation runs and attempts, artifact IDs/ZIP digests,
+source/signer/recipient/tool/root/config identities and closure/freeze binding.
+Record actual signing in a separate execution receipt linked to the approved
+preparation receipt. Preserve issuance-time Pending fields. Subsequent acceptance
+does not patch earlier receipts or frozen bytes. Pending S or payload SHA is
+ineligible. Sign consumes the same frozen encrypted assembly and rechecks every
+binding and raw hash before OIDC, with no rebuild, reassembly or payload edits.
+
+Independent verification at V uses downloaded original bytes and approved trust
+inputs, without signing authority or primary build cache. Check both bundles,
+exact decoded/raw payloads, every subject and complete private-manifest entry,
+separate builder C and authenticated signer S, actual run/attempt/Environment,
+issuer/SAN/repository/owner, predicate/build type/builder and source/tool/inventory
+bindings. Require normal certificate-chain/CT, approved Rekor inclusion proof
+and checkpoint, plus selected timestamp verification. Entry ID, inclusion promise
+or timestamp alone is insufficient. Preserve expected rejection of wrong
+identity/ref/source/predicate/builder/root, altered bytes and missing log proof.
+Same-job verification is separate from this required independent result.
+
+## Private maintainer-key preparation policy and historical signatures
+
+On 2026-10-12 the owner selected bounded private Cosign public-key preparation
+and future crates.io distribution. Owner `bohewu` enrolls public bytes, SHA-256
+of DER SubjectPublicKeyInfo, algorithm, approval date and preparation purpose
+through an independent private channel. An artifact-supplied key cannot enroll
+its own trust. Missing/mismatched approval fails closed. Keep a dedicated
+password-encrypted key and separately protected recovery copy outside Git/builds,
+archives, browser state, CI caches and evidence bundles. Supply unlock material
+privately through stdin. Minimum private modes are directories0700/files0600.
+KMS/hardware is an optional later choice.
+
+Rotation requires independent approval of the new key and an explicit old-key
+acceptance cutoff. Suspected compromise stops affected signatures and records
+rejected key/snapshot identities. Re-signing does not clear source/build concerns.
+Preserve old artifacts and require reviewed recovery evidence and approval.
+
+Actual signing used ECDSA P-256/SHA-256 fingerprint
+`6e995c563c322fe14912c8660932bb8b8c803bb837007b596c883bd9b4da5fef`,
+public PEM SHA-256
+`d6f71a4e794368f425c2546d267bc5c293b89a04a9a7a53e6fe93316622a7fea`,
+Cosign3.1.3 Linux binary SHA-256
+`4629c757b7618056f8ddd7e2625ae9fdd94c0372a65049520bc7d9df9efc7f71`.
+Source `8e557e760407a3d4b3f5a8b8f833748946be1387` and hosted run38195517029
+bind the nine archives and retained inventory. Policy commit
+`abb2cce1253afe1d87a97e0a50f3f47efffe7280` is a different source.
+The 37-artifact assembly plus manifest signed exactly `RELEASE-CHECKSUMS.json`,
+`PRIMARY-PROVENANCE.json` and `HOSTED-PROVENANCE.json`. Manifest SHA-256 is
+`a3e2aa936e673cd5ef5a5f9b3cf24d295dddf5a4d5338a2d9d240592f123abb3`.
+Detached bundles remain outside it. The retained signing-input identity maps
+original build-record names to primary/hosted copies without changing provenance.
+
+Network-disabled containers used explicit key, `--use-signing-config=false`,
+`--tlog-upload=false`, `--oidc-disable-ambient-providers=true`, read-only inputs,
+dropped capabilities and ephemeral scratch. Private no-log verification required
+`--insecure-ignore-tlog` with this exact version/mode. Formal verification keeps
+log checks enabled and rejects those bundles. No Yetlet service/log upload or
+OIDC occurred. Separate public-only verification accepted three signatures,
+37 artifacts, 54 Git inputs, 36 source-copy bindings and 18 historical SBOM hashes.
+Six expected rejections covered wrong key, altered manifest/provenance/subject,
+correctly signed older source and missing required log proof.
+
+These signatures establish authentication/integrity under the enrolled key.
+OIDC certificate identity, authenticated builder, trusted signing time, public
+transparency, SLSA level and release approval remained unverified. Both local
+builders/verifier shared maintainer control. The encrypted recovery copy was on
+the same workstation. The later dirty T08 research/README/root-lock changes
+received no old-signature coverage. Original key-header, symlink, container-owner
+and read-only-fixture failures remain with final proof under
+`target/yt020-private-signing-20261012/`. Git preserves the source narrative,
+while keys, raw signatures and receipts retain separate private custody.
+
+## M10 unsigned supply-chain preflight evidence
+
+YT-064 (2026-10-10) completed **design/preflight**, not signing or reproducibility.
+At baseline7c5d126 plus78 dirty paths, actual metadata contained131 packages,
+28 workspace members/103 registry dependencies, nine candidates and19
+nonpublishable examples. License/source default-deny checks with cargo-deny0.20.2
+passed against unfiltered locked/offline metadata. cargo-cyclonedx0.5.9 generated
+41 CycloneDX1.5 JSON BOMs for native x86_64 GNU/all-features/all-Cargo-targets
+from a disposable source copy, with original/copied lock and source unchanged.
+Those plus BUILD-IDENTITY formed42 unsigned local files; checksum create/verify
+and16 positive/negative cases passed. Initial diagnostic `--version` placement
+was wrong after successful installs; only the diagnostic was corrected.
+
+The experiment excludes Wasm, other OS/targets, sysroot/system-library contents,
+authenticated origin and independent rebuild. Dirty development bytes are not
+HEAD/tag identity. Reviewer `wc_job_CeUNYnHsO1yI_kBz` PASS closes this scope only;
+earlier executor-pending paragraphs were handoff history. Clean immutable source,
+coordinated path-dependency versions, artifact/feature selection, SBOM binding,
+independent rebuild, authenticated signer/issuer, pinned verifier/trust roots,
+approvers, revocation and rollback remained separate activation gates at that
+checkpoint; later accepted publication follows current release records above.
+The exact input/tool hashes and original checksum bounds/negative cases remain
+in [M10e's original record](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M10E-VERIFICATION.md),
+locally Git-verified with remote reachability unverified. Raw
+`target/m10-remaining/sbom-result.json`, SBOMs and license/source logs remain
+separate historical evidence. An SBOM is inventory; checksums alone do not
+authenticate artifacts or prove independent control.
+
+The subsequent M10 delivery Guard had two initial blockers: a machine-specific
+plan path and a credential-like redaction-test sentinel. Their bounded correction
+passed ten tests and reviewer `wc_job_GiP1-EnLMgPXkOlb` PASS. Staged/outgoing
+strict/builtin checks then exited0 with **warning** status:18 known license-alias
+coverage warnings and one absolute-drive-path test warning, not zero findings.
+The checked staged tree matched the delivered candidate. This dated receipt
+grants no present Git authority.

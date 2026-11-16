@@ -1,34 +1,41 @@
 # Production Readiness Phase 2 — bounded application capabilities
 
-Date: 2026-10-23. Status: registration accepted; YT-127 is **Done** at bounded A1 scope; YT-128 is **Done** after independent Reviewer PASS; YT-129 is **Done** at [independently reviewed local load/recovery scope](YT-129-LOAD-SOAK-RECOVERY.md); YT-130 is **Done** at [independently reviewed local restore/runbook scope](YT-130-BACKUP-RESTORE.md); YT-131 is **Done** at independently reviewed local C1 scope.
+Date: 2026-10-23. Status: registration accepted; YT-127 is **Done** at bounded A1 scope; YT-128 is **Done** after independent Reviewer PASS; YT-129 is **Done** at [independently reviewed local load/recovery scope](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts); YT-130 is **Done** at [independently reviewed local restore/runbook scope](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md); YT-131 is **Done** at independently reviewed local C1 scope.
 Independent registration Reviewer PASS, zero issues and required followups. This document consolidates accepted application work and remaining gaps, without claiming production readiness.
 
+## Current operational use and historical evidence
+
+**The Starter reference remains application-owned, not production-certified.**
+The [final A1–C1 matrix](#final-production-readiness-matrix) records the
+original source/host-specific PASS and FAIL populations. For actual run
+settings, trust, SQL and HTTP behavior use the
+[Production Starter guide](../examples/production-starter/README.md),
+[current-schema recovery](PRODUCTION-READINESS-PHASE2.md#current-schema-recovery-and-starter-ownership),
+[private deployment profile](PRODUCTION-DEPLOYMENT-PROFILES.md) and
+[bounded collection guide](../examples/production-starter/deployment/telemetry/README.md).
+
+Specifically, early HTTP/SQL capacity is **32/4 with zero added queues**,
+request deadline **5 seconds**, readiness budget **1 second** and shutdown
+grace **10 seconds**; saturation returns 503, while a 504 or disconnected
+caller **does not cancel a started blocking SQL write** or make retry safe.
+The optional local `/metrics` registry defaults off, is loopback/control-path
+scoped and must not expose raw identity, credentials, URLs or request bodies.
+Source/response time does not imply database commit. The historical B2
+v1/schema-1 ext4 restore deliberately excluded two acknowledged writes;
+its measured recovery windows do **not** select business RPO/RTO or prove
+schema-2 durability. C1 adds schema-2 status indexing and a separate
+versioned API but cannot safely keep writing through an undrained v1 process:
+drain/remove old writers and use forward-fix after new writes, not an
+unproven rolling downgrade. The later [YT-135 schema-2 restore reference](PRODUCTION-READINESS-PHASE2.md#current-schema-recovery-and-starter-ownership)
+has different inputs, storage and tests.
+
+Original detailed A1/A2/B2/C1 execution, rejected alternatives, failed
+attempts, source fingerprints, commands and Reviewer receipts remain in
+**local Git** `be337ff02826978a9baa1b88ddf85696cb4406b4` and the
+ignored original T1–T5 evidence root named below. Local SHA reachability
+does **not** establish that GitHub currently serves those files.
+
 ## Baseline and evidence boundaries
-
-T0 rechecked branch `docs/yt113-123-opt-in-capability-plan`, HEAD
-`5db8b8c61b6d319a641814dff4af493ce3e5d965`, and a clean worktree before these
-three documentation edits. Ignored pipeline observations are local execution
-artifacts. A final repository search found no YT-127–YT-131 references before
-registration. The T0 patch changed this document, [Backlog](BACKLOG.md)
-and [Roadmap](ROADMAP.md); T0 inspected runtime source at the stated baseline.
-Exact pre-edit observations and source SHA-256 identities are retained in
-`.pipeline-output/prod-readiness-phase2-20261023T020406Z/observations/T0/baseline.json`.
-Historical PASS results below retain their original source and environment;
-no historical runtime, browser/CSP or deployment qualification was rerun for T0.
-
-The previously registered backlog has YT-020 **Blocked** and YT-096 **In progress**;
-other existing task rows are Done at their selected scopes. YT-096 D1–D6 remain
-**Pending**, and immutable release candidate `ce56e08` and its original nine
-experimental libraries remain unchanged. M19 remains partial; M20 release gates
-are separate. M21 implementation and research completion does not implement
-all candidate providers. See [release readiness](RELEASE-READINESS.md),
-[current capability map](CAPABILITIES.md) and the [M21 plan](YT-113-123-OPT-IN-CAPABILITIES.md).
-
-The handoff's generator defect is stale: [YT-102 source closure](YT-102-GENERATOR-SOURCE-CLOSURE.md)
-records the bounded repair and independent acceptance. It is excluded here.
-YT-126's documented authorization-check-to-SQL race remains an accepted limit;
-sensitive-write transaction/fencing changes need separate tracking and authority.
-
 ## Baseline coverage and gap matrix
 
 All source paths in this table are under `examples/production-starter/` unless
@@ -36,11 +43,75 @@ linked otherwise. This table preserves the T0 pre-implementation baseline; the f
 
 | Capability | Existing source, tests and retained evidence | Missing requested capability / affected boundary |
 |---|---|---|
-| A1 / YT-127 | `src/store.rs`: four SQL permits held through `spawn_blocking`, two-second SQLite busy timeout; unit tests protect migration/reopen, conflicts and readiness damage. `src/main.rs` owns signals/readiness/Axum drain; `tests/http.rs` protects API, Session/CSRF and CSP. [Starter guide](../examples/production-starter/README.md), [deadline study](YT-029-HTTP-DEADLINE-RESEARCH.md) | `acquire_owned().await` has no explicit wait bound or overload result. Need application admission, deadline/cancellation outcomes and overload/shutdown cleanup across Store, HTTP, startup and typed settings; readiness shares Store capacity. SQL busy timeout and [YT-117 rate limiting](YT-117-RATE-LIMIT.md) do not prove capacity protection |
-| A2 / YT-128 | `src/web.rs::observe` emits JSON method/status/duration/process-local request ID; excludes URI/query/headers/bodies/errors. [YT-123](YT-123-TRACING-CORRELATION-STUDY.md) is accepted research with no new tracing runtime/API selected | No collection endpoint/equivalent or SQL wait/saturation diagnostics. Observer ends at Response return, not body completion/commit. Need opt-in app/configuration/Store/lifecycle instrumentation and real fault diagnosis |
-| B1 / YT-129 | Existing HTTP/Store tests and [YT-074](YT-074-QUALIFICATION.md) provide adjacent bounded evidence | No Starter workload, predefined thresholds, soak/recovery record or capacity range. YT-074 is a different application. Need isolated existing-tool workload and source/environment-bound measurements, without new general validation infrastructure |
-| B2 / YT-130 | WAL/schema version 1 and startup rejection in `src/store.rs`; Starter guide describes supported backup or stopped-process copy and separate restore. [YT-066 responsibility boundary](YT-066-PERSISTENCE-RECOVERY-PLAN.md) and [YT-094 closeout](YT-094-CLOSEOUT.md) retain provider/application recovery evidence | No Starter fresh-instance business-data restore/cutover runbook or measured RPO/RTO. Need selected local configuration, consistent backup, schema/data/readiness checks and explicit Session/Valkey policy; do not recertify SQLite or transfer other-app recovery claims |
-| C1 / YT-131 | `migrations/0001_init.sql`, fixed version checks and unsupported-schema tests. [Accepted YT-103](YT-103-ROLLING-ASSET-VERIFICATION.md) proves selected asset retention/update/rollback only | No real Starter v1-to-v2 API/schema/data scenario or mixed-version evidence. Need application migration/HTTP fixtures, stale-client policy and rollback/forward-fix decision; reuse unchanged YT-103 evidence without rerun or expansion |
+| A1 / YT-127 | `src/store.rs`: four SQL permits held through `spawn_blocking`, two-second SQLite busy timeout; unit tests protect migration/reopen, conflicts and readiness damage. `src/main.rs` owns signals/readiness/Axum drain; `tests/http.rs` protects API, Session/CSRF and CSP. [Starter guide](../examples/production-starter/README.md), [deadline study](HTTP-PIPELINE.md#application-owned-deadlines-streaming-and-admission-timing) | `acquire_owned().await` has no explicit wait bound or overload result. Need application admission, deadline/cancellation outcomes and overload/shutdown cleanup across Store, HTTP, startup and typed settings; readiness shares Store capacity. SQL busy timeout and [YT-117 rate limiting](EXTENSIONS.md#historical-opt-in-auth-session-and-rate-limiter-selection) do not prove capacity protection |
+| A2 / YT-128 | `src/web.rs::observe` emits JSON method/status/duration/process-local request ID; excludes URI/query/headers/bodies/errors. [YT-123](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-123-TRACING-CORRELATION-STUDY.md) is accepted research with no new tracing runtime/API selected | No collection endpoint/equivalent or SQL wait/saturation diagnostics. Observer ends at Response return, not body completion/commit. Need opt-in app/configuration/Store/lifecycle instrumentation and real fault diagnosis |
+| B1 / YT-129 | Existing HTTP/Store tests and [YT-074](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) provide adjacent bounded evidence | No Starter workload, predefined thresholds, soak/recovery record or capacity range. YT-074 is a different application. Need isolated existing-tool workload and source/environment-bound measurements, without new general validation infrastructure |
+| B2 / YT-130 | WAL/schema version 1 and startup rejection in `src/store.rs`; Starter guide describes supported backup or stopped-process copy and separate restore. [YT-066 responsibility boundary](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-066-PERSISTENCE-RECOVERY-PLAN.md) and [YT-094 closeout](https://github.com/bohewu/yetlet/blob/4ad0978f8a70b36c307f5e538aa1a3aa496a7403/docs/YT-094-CLOSEOUT.md) retain provider/application recovery evidence | No Starter fresh-instance business-data restore/cutover runbook or measured RPO/RTO. Need selected local configuration, consistent backup, schema/data/readiness checks and explicit Session/Valkey policy; do not recertify SQLite or transfer other-app recovery claims |
+| C1 / YT-131 | `migrations/0001_init.sql`, fixed version checks and unsupported-schema tests. [Accepted YT-103](ASSETS.md#historical-single-host-rolling-asset-qualification) proves selected asset retention/update/rollback only | No real Starter v1-to-v2 API/schema/data scenario or mixed-version evidence. Need application migration/HTTP fixtures, stale-client policy and rollback/forward-fix decision; reuse unchanged YT-103 evidence without rerun or expansion |
+
+## Retained rolling asset local evidence
+
+The [original app-owned single-host asset trial](ASSETS.md#historical-single-host-rolling-asset-qualification)
+completed upgrade, rollback and one graceful Pod deletion with **2,364**
+observed SSR 200s under finite 10/s sampling, then checked old/new late
+CSS/JS fetches and expected v1-only **404** after separate GC. This was
+three K3s VMs on one physical host, with no measured continuous SSR
+availability during static-image GC and no node/zone failure, production
+HA or general retention/lifetime qualification. Browser favicon 404,
+non-root image-preparation failures and post-retirement evidence are
+preserved in the dated original Git source, not silently converted into
+an unconditional PASS.
+
+## Current-schema recovery and Starter ownership
+
+The [Starter example](../examples/production-starter/README.md#single-instance-reference-and-schema-recovery-boundaries)
+owns its schema, SQL jobs, request admission, lifecycle, API and deployment
+boundaries; neither Yetlet Core nor a generalized HA/recovery middleware
+performs these operations automatically.
+
+The historical YT-133 single-process private deployment reference uses a
+trusted operator with SSH identity/host checking, local forwarding and a
+server-loopback reverse proxy; direct public app-port exposure or a public-SSH
+Azure control plane is **not** selected. Its 127.0.0.1 application listener,
+anonymous Memory Session/CSRF SSR and separately configured Bearer API are
+distinct: loopback is not identity, API forbids Origin and does not adopt an
+edge principal, and forwarding must preserve Origin, Host restrictions,
+cookies, no-store, CSP, CSRF and redacted logs. `/health/live`,
+`/health/ready` and enabled `/metrics` bypass business HTTP admission and
+do **not** have independent Auth; keep them private. Liveness has no SQL,
+readiness shares SQL permits and its 1s app budget, metrics default disabled.
+Startup validates the actual schema/database before bind and **must refuse**
+missing, replaced, malformed, unexpectedly empty or incompatible data rather
+than resetting a supposedly durable database. Private fixture restart or a
+`stopped` log does not itself establish real operator SLO, external service
+or physical fault recovery.
+
+The current-schema YT-135 local recovery source exercised the following
+**application/operator sequence**, not a framework-supplied recovery service:
+stop/withdraw the old writer and block new ingress; ensure no unknown
+in-flight/late writes; capture and verify consistent backup/schema-2/index
+source; select a private fresh root; refuse invalid/missing or stale candidates
+**without silently reseeding**; restore selected schema and protected
+configuration; verify `PRAGMA integrity_check` and version/index/data/
+acknowledged business state; start only the matching binary; check readiness,
+authenticated API, SSR/CSRF and actual business-history invariants before
+restoring eligibility. An old v1 process must be stopped/drained before
+schema-2 migration, because an already-running v1 can still write despite
+failing readiness; after new-schema writes prefer forward-fix over unverified
+rollback. Lost/ambiguous write acknowledgment requires reconciliation rather
+than blind retry.
+
+The bounded local YT-135 elapsed measurement was **113.14ms** from withdrawal
+to final *eligible* re-open, including an intentional refusal rehearsal.
+This is a fixture-specific **RTO proxy**, not consumer RPO/RTO, backup
+retention, cloud outage, live switch, multi-replica resilience or
+power-failure durability. Original independent proof/failed candidates and
+full operations are at fixed **local Git**
+`99906e421c0510231291bf527e2cbd2e7ad0ffda`; raw evidence remains
+separate and may not be reconstructible from Git. Distinct YT-134 release and
+Azure workload failures stay in
+[Qualification Matrix](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts)
+and [Deployment Profiles](PRODUCTION-DEPLOYMENT-PROFILES.md#bounded-private-and-azure-operations).
 
 ## Operational and architectural boundaries
 
@@ -113,7 +184,7 @@ claims remain excluded. Unchanged historical qualification is reused, not repeat
   admission proves no distributed capacity, rate quota or HA property.
 - **Reviewer gate / state:** Independent diff/consumer/evidence PASS with no
   unresolved P0–P2 findings before acceptance or YT-128. **Done** at bounded A1 scope.
-  [Implementation and local verification](YT-127-ADMISSION-OVERLOAD.md) and independent Reviewer PASS have zero issues and required followups.
+  [Implementation and local verification](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md) and independent Reviewer PASS have zero issues and required followups.
 
 ### YT-128 — A2 Opt-in application observability
 
@@ -134,7 +205,7 @@ claims remain excluded. Unchanged historical qualification is reused, not repeat
 - **Known limitations:** App-owned Prometheus registry and finite labels are implemented and independently accepted at local A2 scope;
   app-local telemetry alone establishes no cross-service tracing or durable audit.
 - **Reviewer gate / state:** Independent diff/consumer/evidence PASS with no
-  unresolved P0–P2 findings before acceptance or YT-129. **Done**. [Local verification and preserved failure history](YT-128-OBSERVABILITY.md): concurrent tests and actual localhost fault/correlation/privacy/recovery/cleanup pass; independent Reviewer PASS, zero issues and required followups.
+  unresolved P0–P2 findings before acceptance or YT-129. **Done**. [Local verification and preserved failure history](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md): concurrent tests and actual localhost fault/correlation/privacy/recovery/cleanup pass; independent Reviewer PASS, zero issues and required followups.
 
 ### YT-129 — B1 Load, soak and recovery qualification
 
@@ -152,7 +223,7 @@ claims remain excluded. Unchanged historical qualification is reused, not repeat
 - **Required evidence:** Exact source/configuration/environment/workload/thresholds,
   commands/exits and raw measurements/aggregates, complete recovery and cleanup;
   existing checks only as relevant to changed application artifacts.
-- **Known limitations:** [Local declaration and measurements](YT-129-LOAD-SOAK-RECOVERY.md) cover a short debug/tmpfs run only: passing paced normal points 43.64–467.01 rps and sustained 153.08 rps for 45 seconds; eight-client rejection/CPU failures remain visible. Persistent storage, long soak and general deployment capacity remain uncovered.
+- **Known limitations:** [Local declaration and measurements](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts) cover a short debug/tmpfs run only: passing paced normal points 43.64–467.01 rps and sustained 153.08 rps for 45 seconds; eight-client rejection/CPU failures remain visible. Persistent storage, long soak and general deployment capacity remain uncovered.
 - **Reviewer gate / state:** Independent workload/threshold/source/evidence review
   PASS with no unresolved P0–P2 findings before acceptance or YT-130. **Done**: one predeclared load/overload/recovery execution and cleanup complete; independent Reviewer PASS, zero issues and required followups.
 
@@ -175,7 +246,7 @@ claims remain excluded. Unchanged historical qualification is reused, not repeat
   nonpersistent Valkey proof is not restore qualification. Destination/persistence
   choices remain open; protection/retention and production operations need owners.
 - **Reviewer gate / state:** Independent runbook/data-integrity/failure/evidence
-  PASS with no unresolved P0–P2 findings before acceptance or YT-131. **Done**: [local runbook and fresh restore/refusal evidence](YT-130-BACKUP-RESTORE.md), full schema/data/sequence checks and measured RPO/RTO complete; independent Reviewer PASS, zero issues and required followups.
+  PASS with no unresolved P0–P2 findings before acceptance or YT-131. **Done**: [local runbook and fresh restore/refusal evidence](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md), full schema/data/sequence checks and measured RPO/RTO complete; independent Reviewer PASS, zero issues and required followups.
 
 ### YT-131 — C1 Mixed-version schema, API and asset compatibility
 
@@ -196,7 +267,7 @@ claims remain excluded. Unchanged historical qualification is reused, not repeat
   retained v1 refuses schema 2 at startup. Asset retention cannot
   establish API/schema compatibility or multi-host deployment availability.
 - **Reviewer gate / state:** Independent version/data/consumer/evidence PASS with
-  no unresolved P0–P2 findings before acceptance. **Done** at [local C1 scope](YT-131-MIXED-VERSION-COMPATIBILITY.md), after independent Reviewer PASS, zero issues and required followups, and controller acceptance.
+  no unresolved P0–P2 findings before acceptance. **Done** at [local C1 scope](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md), after independent Reviewer PASS, zero issues and required followups, and controller acceptance.
 
 ## Final Production Readiness Matrix
 
@@ -208,11 +279,11 @@ with zero issues and zero required followups. Historical failures remain evidenc
 
 | Capability | Implemented | Verified | Deployment-qualified | Known gap |
 |---|---|---|---|---|
-| Admission/overload / YT-127 (A1) | App-owned HTTP capacity 32, SQL capacity 4, zero permit queues; explicit 503/504 and drain. Cooperative request deadline 5 s, readiness 1 s, shutdown grace 10 s; SQLite busy timeout 2 s | [A1 delivery](YT-127-ADMISSION-OVERLOAD.md): 10 unit + 10 HTTP tests, normal writes, actual overload/recovery, stalled-upload deadlines and successful/failed shutdown. Independent T1 PASS. C1's later focused regression preserves A1 behavior; original fault proofs remain bound to T1 source/binary | No; original single-host Linux/debug/localhost fault configuration only | No TCP/header/body transport bounds, operation/filesystem watchdog, rate quota, distributed admission or deployment capacity. Started blocking writes can commit after timeout/disconnect; creates lack idempotency |
-| Observability / YT-128 (A2) | Default-off app-local prometheus 0.14.0 registry; `APP_METRICS__ENABLED=true` or typed settings enables `/metrics`; native HTTP/SQL correlation, bounded labels, SQL late-completion accounting and lifecycle events | [A2 delivery and preserved failure/resume](YT-128-OBSERVABILITY.md): 11 unit tests plus corrected 11-thread/11-test HTTP suite; real SQLite contention, enabled/disabled collection, privacy, recovery and shutdown. Independent T2 PASS; no Core/HTML/DOM/browser dependency expansion | No; loopback Production settings/debug binary and synthetic fault only | Volatile process-local snapshots; response creation is not body completion or durable commit. Zero permit wait is immediate admission, not SQLite lock wait. Protected collection, retention, external sinks and cross-service propagation need deployment decisions |
-| Load/soak/recovery / YT-129 (B1) | Predeclared closed-loop synthetic workload and [source-bound capacity/recovery record](YT-129-LOAD-SOAK-RECOVERY.md); no runtime change | One run, 42,043 requests: passing paced normal points 43.64–467.01 rps; two-client 45 s sustained phase 153.08 rps, p99 5.80 ms. Eight-client phase FAIL: 1.514% rejection and 341.73% CPU; excluded from passing range. Forced-lock overload/recovery and teardown complete; independent T3 PASS | No; single debug process, co-located clients/monitor, Linux host, `/tmp` tmpfs database, historical schema 1/A2 executable | No arrival-rate upper-capacity bound, release-build/persistent-disk capacity, long soak, HA or SLA. Short closed-loop results do not establish deployment limits or transfer to C1 v2 |
-| Backup/restore / YT-130 (B2) | [Operator backup/fresh-restore/cutover runbook](YT-130-BACKUP-RESTORE.md); existing supported SQLite backup, no runtime change | Historical v1 debug/ext4: three complete rows, full schema/versions/sequence restored; readiness/API 200. RPO proxy age 41.30 ms, acknowledged-write exposure 39.26 ms, two excluded acknowledged mutations; RTO 52.36 ms through local cutover eligibility. Schema 999 refused before bind; old Session cookie 403; independent T4 PASS | No; serial synthetic local v1/schema-1 instances on ext4, source writer paused for backup | No v2 recovery requalification, external traffic switch, storage-loss/power-loss durability, backup retention/security or production RPO/RTO. Memory Sessions are lost on restart; earlier nonpersistent Valkey evidence does not establish recovery |
-| Mixed-version compatibility / YT-131 (C1) | Schema-2 status index plus additive Bearer-protected `/api/v2/issues?status=...`; existing wire/source contracts retained; [upgrade/drain/rollback procedure](YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions) | 25 tests (13 unit/12 HTTP) and actual 26-response old/new matrix; exact rows/schema/sequence, refusal, stale Session 403 then fresh-session old form 303, stale version 409, restart/forward recovery. Retained v1 binary/source and v2 identities; independent T5 PASS and controller acceptance | No; synthetic local debug binaries, deliberate two-process overlap only for compatibility observation; unchanged YT-103 asset proof retained without rerun | Old live process becomes unready but still serves legacy writes: explicit removal/drain before cutover required. Old restart on schema 2 refuses service. Backup rollback loses newer writes; preserve schema 2 and forward-fix after new writes. No zero-downtime/rolling deployment or generic migration qualification |
+| Admission/overload / YT-127 (A1) | App-owned HTTP capacity 32, SQL capacity 4, zero permit queues; explicit 503/504 and drain. Cooperative request deadline 5 s, readiness 1 s, shutdown grace 10 s; SQLite busy timeout 2 s | [A1 delivery](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md): 10 unit + 10 HTTP tests, normal writes, actual overload/recovery, stalled-upload deadlines and successful/failed shutdown. Independent T1 PASS. C1's later focused regression preserves A1 behavior; original fault proofs remain bound to T1 source/binary | No; original single-host Linux/debug/localhost fault configuration only | No TCP/header/body transport bounds, operation/filesystem watchdog, rate quota, distributed admission or deployment capacity. Started blocking writes can commit after timeout/disconnect; creates lack idempotency |
+| Observability / YT-128 (A2) | Default-off app-local prometheus 0.14.0 registry; `APP_METRICS__ENABLED=true` or typed settings enables `/metrics`; native HTTP/SQL correlation, bounded labels, SQL late-completion accounting and lifecycle events | [A2 delivery and preserved failure/resume](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md): 11 unit tests plus corrected 11-thread/11-test HTTP suite; real SQLite contention, enabled/disabled collection, privacy, recovery and shutdown. Independent T2 PASS; no Core/HTML/DOM/browser dependency expansion | No; loopback Production settings/debug binary and synthetic fault only | Volatile process-local snapshots; response creation is not body completion or durable commit. Zero permit wait is immediate admission, not SQLite lock wait. Protected collection, retention, external sinks and cross-service propagation need deployment decisions |
+| Load/soak/recovery / YT-129 (B1) | Predeclared closed-loop synthetic workload and [source-bound capacity/recovery record](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts); no runtime change | One run, 42,043 requests: passing paced normal points 43.64–467.01 rps; two-client 45 s sustained phase 153.08 rps, p99 5.80 ms. Eight-client phase FAIL: 1.514% rejection and 341.73% CPU; excluded from passing range. Forced-lock overload/recovery and teardown complete; independent T3 PASS | No; single debug process, co-located clients/monitor, Linux host, `/tmp` tmpfs database, historical schema 1/A2 executable | No arrival-rate upper-capacity bound, release-build/persistent-disk capacity, long soak, HA or SLA. Short closed-loop results do not establish deployment limits or transfer to C1 v2 |
+| Backup/restore / YT-130 (B2) | [Operator backup/fresh-restore/cutover runbook](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md); existing supported SQLite backup, no runtime change | Historical v1 debug/ext4: three complete rows, full schema/versions/sequence restored; readiness/API 200. RPO proxy age 41.30 ms, acknowledged-write exposure 39.26 ms, two excluded acknowledged mutations; RTO 52.36 ms through local cutover eligibility. Schema 999 refused before bind; old Session cookie 403; independent T4 PASS | No; serial synthetic local v1/schema-1 instances on ext4, source writer paused for backup | No v2 recovery requalification, external traffic switch, storage-loss/power-loss durability, backup retention/security or production RPO/RTO. Memory Sessions are lost on restart; earlier nonpersistent Valkey evidence does not establish recovery |
+| Mixed-version compatibility / YT-131 (C1) | Schema-2 status index plus additive Bearer-protected `/api/v2/issues?status=...`; existing wire/source contracts retained; [upgrade/drain/rollback procedure](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md#upgrade-rollback-and-forward-fix-conditions) | 25 tests (13 unit/12 HTTP) and actual 26-response old/new matrix; exact rows/schema/sequence, refusal, stale Session 403 then fresh-session old form 303, stale version 409, restart/forward recovery. Retained v1 binary/source and v2 identities; independent T5 PASS and controller acceptance | No; synthetic local debug binaries, deliberate two-process overlap only for compatibility observation; unchanged YT-103 asset proof retained without rerun | Old live process becomes unready but still serves legacy writes: explicit removal/drain before cutover required. Old restart on schema 2 refuses service. Backup rollback loses newer writes; preserve schema 2 and forward-fix after new writes. No zero-downtime/rolling deployment or generic migration qualification |
 
 ## Delivery records and source bindings
 
@@ -229,11 +300,11 @@ The following relative paths are under that root:
 
 | Item delivery | Execution / source identity | Independent review |
 |---|---|---|
-| [YT-127 / A1](YT-127-ADMISSION-OVERLOAD.md) | `observations/T1/task-result.json`, `source-identity.json`, `commands.json`; executable `06624507302c6757c7ade2e69acd44e7de9e9433939b47f9df1eb1d7f3e44540` | `observations/T1/independent-review.json`: PASS, zero issues/followups |
-| [YT-128 / A2](YT-128-OBSERVABILITY.md) | `observations/T2/task-result.json` (initial blocked result), `debugger-diagnosis-1.json`, `resume-task-result.json`, `resume-source.json`, `resume-local-command.txt`; preserved initial parallel tracing failure, user-authorized +5 same-run continuation and one in-place tracing-fixture correction | `observations/T2/independent-review.json`: PASS, zero issues/followups |
-| [YT-129 / B1](YT-129-LOAD-SOAK-RECOVERY.md) | `observations/T3/task-result.json`; `observations/b1/source-environment-settings.json`, `predeclared-workload-thresholds.json`, `exact-workload-command.txt`, `threshold-analysis.json`, `after-source-cleanup.json` | `observations/T3/independent-review.json`: PASS, zero issues/followups |
-| [YT-130 / B2](YT-130-BACKUP-RESTORE.md) | `observations/T4/task-result.json`; `observations/b2/source-environment-settings.json`, `exact-recovery-command.txt`, `derived-recovery-timings.json`, `after-source-cleanup.json` | `observations/T4/independent-review.json`: PASS, zero issues/followups |
-| [YT-131 / C1](YT-131-MIXED-VERSION-COMPATIBILITY.md) | `observations/T5/task-result.json`; `observations/c1/v1-identity.json`, `v1-source-manifest.json`, `final-source.json`, `exact-matrix-command.txt`, `matrix-result.json`, `cleanup.json` | `observations/T5/independent-review.json`: PASS, zero issues/followups; `observations/T5/review-acceptance.json`: controller accepted |
+| [YT-127 / A1](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-127-ADMISSION-OVERLOAD.md) | `observations/T1/task-result.json`, `source-identity.json`, `commands.json`; executable `06624507302c6757c7ade2e69acd44e7de9e9433939b47f9df1eb1d7f3e44540` | `observations/T1/independent-review.json`: PASS, zero issues/followups |
+| [YT-128 / A2](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-128-OBSERVABILITY.md) | `observations/T2/task-result.json` (initial blocked result), `debugger-diagnosis-1.json`, `resume-task-result.json`, `resume-source.json`, `resume-local-command.txt`; preserved initial parallel tracing failure, user-authorized +5 same-run continuation and one in-place tracing-fixture correction | `observations/T2/independent-review.json`: PASS, zero issues/followups |
+| [YT-129 / B1](QUALIFICATION-MATRIX.md#historical-operations-capacity-and-recovery-cohorts) | `observations/T3/task-result.json`; `observations/b1/source-environment-settings.json`, `predeclared-workload-thresholds.json`, `exact-workload-command.txt`, `threshold-analysis.json`, `after-source-cleanup.json` | `observations/T3/independent-review.json`: PASS, zero issues/followups |
+| [YT-130 / B2](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-130-BACKUP-RESTORE.md) | `observations/T4/task-result.json`; `observations/b2/source-environment-settings.json`, `exact-recovery-command.txt`, `derived-recovery-timings.json`, `after-source-cleanup.json` | `observations/T4/independent-review.json`: PASS, zero issues/followups |
+| [YT-131 / C1](https://github.com/bohewu/yetlet/blob/be337ff02826978a9baa1b88ddf85696cb4406b4/docs/YT-131-MIXED-VERSION-COMPATIBILITY.md) | `observations/T5/task-result.json`; `observations/c1/v1-identity.json`, `v1-source-manifest.json`, `final-source.json`, `exact-matrix-command.txt`, `matrix-result.json`, `cleanup.json` | `observations/T5/independent-review.json`: PASS, zero issues/followups; `observations/T5/review-acceptance.json`: controller accepted |
 
 A2/B1/B2 share retained v1 executable SHA-256
 `4dc7dec913722dbcf86a8677790e69d20fa27a3676e855e31fd9f238a40fcb29`.
@@ -262,3 +333,45 @@ The next remaining decision is **YT-096 D1–D6**, all Pending. YT-096 remains
 In progress, YT-020 Blocked, and candidate `ce56e08` immutable and unchanged.
 No automatic signing, release, registry activation or deployment follows this
 matrix. No general production, HA, SLA or release qualification is claimed.
+
+## M11 Board acceptance and original blocked journeys
+
+The initial selected product was a **loopback, synthetic-identity** Board with
+Memory Session/CSRF, fixed server-owned Viewer/Operator/project policy, direct
+SQLite and transactional history/version checks. Persist business records in SQL,
+not Session; a restart may require login. Successful writes use303 PRG, invalid
+fields422, stale version409 with draft retained. A durable history row is the
+authority; bounded notifications are invalidations/versions, with authoritative
+refresh after reconnect/replay gap and no automatic mutation replay. Closed-loop
+UI, route visibility, client role fields or guessed IDs never grant permission.
+No real IdP, production data/rollout, CORS expansion or GPU was accepted here.
+
+The proposed25-user/10k-item/100k-history envelope was a planning assumption.
+Qualification instead seeded90k history to preserve finite write headroom below
+the100k cap; intentional cap rejection cannot count as successful throughput.
+Read p95<250ms, write p95<500ms, combined p99<1000ms, unexpected fraction<0.001,
+25 paced clients/10 SSE, SQLite WAL/FULL and no automatic write retry remained
+explicit gates. Broader identity, browsers, TLS/backup/HA need their own scope.
+
+| Original checkpoint | Result and later disposition |
+|---|---|
+| Initial implementation | Offline rusqlite default-feature resolution failed; aligned existing0.40.2 bundled/default-features=false. A form test expected400 instead of Axum422; corrected expectation preserved rejection. Twelve native tests/build/Clippy passed, including audit rollback, CAS, schema/caps, restart/session loss, worker drain and SSE logout. These were not browser acceptance |
+| First integrated Board journey | Helper `http` import collision failed before launch; after correction Job `wc_job_527eQkVSC7ar0N9I` failed exit1 at login navigation despite native/direct-HTTP success. Owned resources cleaned. Later diagnostic `wc_job_coYClslQmjZVENuW` observed403: no-referrer yielded Origin:null for native POST. Response policy same-origin fixed login while retaining exact Host/foreign/null-Origin rejection and CSRF |
+| Repaired browser journey | Intentional409 console network message initially failed a generic harness check; only that asserted negative message was admitted. Fourteen native tests, Chrome/Firefox create/edit/conflict/history/SSE/restart journeys passed. Application/UI improvements remained app-owned, without core policy widening |
+| Bounded load | Job `wc_job_dyJlYei47wcEM5Dq`:24k measured requests, zero unexpected responses, three60s rounds/300s soak; first write p99≈561ms. Fault/contention/unread-response/recovery/session-retirement/drain passed. This did not close the originally longer/manual gates |
+| Real desktop / first full failure | Chewing candidates/composition and exact stored Chinese title/multiline text,422 association/409 retained draft PASS. Initial Orca only echoed startup/keys; Board absent from AT-SPI, so content speech **Blocked**, not PASS. Edge SSH failed; owner selected retained Chrome/Firefox. A warmup-gate-placement error preceded a corrected full run failing first-round write p95548.299ms; later rounds/soak were not run |
+| Owner-amended mixed acceptance | App-local live-status repair enabled actual Firefox/Orca announcements; final Chrome/Firefox and14 Board tests passed. Five staggered cohorts explicitly approved; full62-minute mixed run2026-10-13T04:00:15Z,45k measured requests, zero errors, all latency gates PASS,99,300 history rows and cleanup. Fresh independent review PASS closed YT-074 at this selected scope, not synchronized bursts |
+| Retained synchronized/host failures | Two12-minute diagnostics each7,500 requests/zero errors passed; synchronized/staggered write p9576.133/45.240ms, but staggered retained a505.907ms WAL stall. Later original-Ubuntu full synchronized run failed round3 write p95548.889ms after22,500 responses/zero HTTP-SSE errors;30-minute soak Not run. Independent owned-file probing reproduced505–508ms ext4-journal/device-flush delay; precise driver/device/scheduling trigger remained unknown, no host/firmware repair claimed |
+| Windows/Azure continuation | Initial source-archive transfer was policy-rejected twice, respected without bypass; separately approved fixed source f79ccde enabled native Windows build/HTTP/restart/drain after private GNU prerequisites. Two full WebCodex attempts were Runner-lost with unknown native exits; partial7,475 requests were not full PASS. Subsequent native Windows44,850 and Azure Ubuntu45k formal synchronized runs each completed62 minutes/zero errors at original gates. Windows fsync timing stayed Not instrumented; Azure max timed fsync45.535ms. Azure first-SSE-login startup failed then received a two-line helper correction, short PASS and full PASS as distinct records; all dedicated resources/keys were removed |
+
+The original owner-permitted planning/non-GPU implementation **self-review** does
+not become independent security assurance. Independent mixed-load acceptance
+does not attest every later helper delta or all platforms; documentation/static
+reconciliation retained that limit. Source hashes, lost attempts, raw samples,
+slow tails, screenshots and spoken transcript remain at their original stores.
+Use the [Board sample evidence](../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence)
+for exact accepted measurements and [startup guide](BOARD-START.md) for usage.
+The original activation/Board/form/handoff/plan/research Markdown is recoverable
+at local Git `40b66f1ad9bd0eb5666a9e1c8f113310993a3544`; remote accessibility
+is unverified. None is current production, physical-device or universal-browser
+qualification, and no old commit/test authority authorizes a new run.

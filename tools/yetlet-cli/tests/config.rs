@@ -141,7 +141,7 @@ fn generated_config_apps_offline_contract() {
             "warnings",
         ]);
         if service {
-            // YT-101 now accepts exact service/config sources and public TOMLs.
+            // selected cloud generator now accepts exact service/config sources and public TOMLs.
             for generator in ["docker", "compose", "k8s"] {
                 let output = root.path().join(generator);
                 let mut cmd = Command::new(env!("CARGO_BIN_EXE_yetlet"));
@@ -239,7 +239,7 @@ mod native {
             (
                 "Development",
                 "YETLET_DEV_SECRETS",
-                "/nonexistent/yt097-private",
+                "/nonexistent/config-private",
             ),
             ("Development", "YETLET_DEV_SECRETS", "relative-private.env"),
         ] {

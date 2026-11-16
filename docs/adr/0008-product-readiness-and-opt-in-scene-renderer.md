@@ -3,11 +3,11 @@
 - **Status:** Accepted only for the bounded Experimental opt-in M11 product/renderer separation; not a stable API, publication or production endorsement.
 - **Date:** 2026-10-12.
 - **Task:** YT-069 / M11.
-- **Related:** [M11 plan](../M11-PLAN.md), [product research](../M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](../M11-WGPU-PLAN.md), [ADR 0003](0003-renderers-and-loading.md), [ADR 0005](0005-opt-in-capability-modules.md), [ADR 0007](0007-bounded-keyed-dom-and-local-graph.md).
+- **Related:** [M11 plan](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M11-PLAN.md), [product research](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M11-PRODUCT-READINESS-RESEARCH.md), [GPU plan](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M11-WGPU-PLAN.md), [ADR 0003](0003-renderers-and-loading.md), [ADR 0005](0005-opt-in-capability-modules.md), [ADR 0007](0007-bounded-keyed-dom-and-local-graph.md).
 
 ## Subsequent owner-approved experimental scope
 
-On 2026-10-14 the owner [explicitly approved the YT-079 Experimental opt-in candidate](../M11-G-EXPERIMENTAL-PROMOTION-DECISION.md), without performance guarantees and with a Reviewer PASS for every YT-078–YT-080 item. This accepts that bounded extraction direction, not unimplemented APIs, production support, a 3D engine or release. The original proposal below remains historical; implementation acceptance is established by the task evidence, not by this approval alone.
+On 2026-10-14 the owner [explicitly approved the YT-079 Experimental opt-in candidate](../ARCHITECTURE.md#m11-product-and-renderer-decisions), without performance guarantees and with a Reviewer PASS for every YT-078–YT-080 item. This accepts that bounded extraction direction, not unimplemented APIs, production support, a 3D engine or release. The original proposal below remains historical; implementation acceptance is established by the task evidence, not by this approval alone.
 
 ## Context
 
@@ -33,4 +33,4 @@ The proposed `yetlet-wgpu` candidate is first-party maintained, explicitly linke
 
 Optional integration increases maintenance and qualification combinations, so supported surfaces/targets must be explicit. Default no-JS SSR, local events, typed remote commands, CSP/escaping and unrelated browser assets are regression gates. Controls/text/IME/accessibility stay in semantic HTML rather than a newly built canvas UI toolkit.
 
-The owner authorized the bounded Experimental opt-in design, and M11-P plus YT-075–YT-080 now have their own scoped implementation and independent reviewer evidence. The [YT-081 selected closeout](../YT-081-M11-CLOSEOUT.md) reconciles those limits and a separate [cross-crate API review](../YT-081-API-CONTRACT-AUDIT.md). This ADR accepts architectural separation **only at those selected scopes**; documentation self-review is not implementation/security assurance. Existing YT-023/M7/M10 history remains historical, and YT-020 and the nine-candidate release inventory remain unchanged.
+The owner authorized the bounded Experimental opt-in design, and M11-P plus YT-075–YT-080 now have their own scoped implementation and independent reviewer evidence. The [YT-081 selected closeout](https://github.com/bohewu/yetlet/blob/983653adadcedb4ec196016b75281d39e2ed0acf/docs/YT-081-M11-CLOSEOUT.md) reconciles those limits and a separate [cross-crate API review](https://github.com/bohewu/yetlet/blob/dfb27dc816c452e8033ff24e2d853f88a451761a/docs/YT-081-API-CONTRACT-AUDIT.md). This ADR accepts architectural separation **only at those selected scopes**; documentation self-review is not implementation/security assurance. Existing YT-023/M7/M10 history remains historical, and YT-020 and the nine-candidate release inventory remain unchanged.

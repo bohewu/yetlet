@@ -1,4 +1,4 @@
-// Narrow YT-100 browser gate. This script is not scaffolded or used by production.
+// Narrow vite-hmr browser gate. This script is not scaffolded or used by production.
 // Run only against disposable, already-built generated Vite apps.
 import assert from 'node:assert/strict';
 import { spawn } from 'node:child_process';
@@ -8,7 +8,7 @@ import { join, resolve } from 'node:path';
 import { once } from 'node:events';
 import { chromium } from '../../../experiments/vite-integration/node_modules/playwright-core/index.mjs';
 
-// One bounded Linux headless product sequence for YT-112, using the existing
+// One bounded Linux headless product sequence for browser-watch, using the existing
 // starter, CLI, Vite and Playwright dependency. Requires a disposable prepared app.
 async function browserWatch() {
   const options = new Map();
@@ -21,11 +21,11 @@ async function browserWatch() {
   const app = resolve(options.get('--app')), cli = resolve(options.get('--cli'));
   const frontend = join(app, 'frontend'), out = resolve(options.get('--out'));
   const origin = 'http://127.0.0.1:5173';
-  const result = { task: 'YT-112', status: 'running', checks: {}, cleanup: {} };
+  const result = { task: 'browser-watch', status: 'running', checks: {}, cleanup: {} };
   const sources = new Map(), records = [], errors = [], violations = [];
-  const buildGate = join(app, 'build.rs'), activeGate = join(app, 'yt112-build-active');
+  const buildGate = join(app, 'build.rs'), activeGate = join(app, 'browserWatch-build-active');
   assert(!existsSync(buildGate) && !existsSync(activeGate), 'Disposable starter must not contain test gates');
-  const delayedBuild = 'fn main() { println!("cargo:rerun-if-changed=src/model.rs"); std::fs::write("yt112-build-active", "active").unwrap(); std::thread::sleep(std::time::Duration::from_secs(3)); let _ = std::fs::remove_file("yt112-build-active"); }\n';
+  const delayedBuild = 'fn main() { println!("cargo:rerun-if-changed=src/model.rs"); std::fs::write("browserWatch-build-active", "active").unwrap(); std::thread::sleep(std::time::Duration::from_secs(3)); let _ = std::fs::remove_file("browserWatch-build-active"); }\n';
 
   let context, page, log = '';
   await mkdir(out);
@@ -54,7 +54,7 @@ async function browserWatch() {
   function start(action) {
     const child = spawn(cli, [action, '--manifest-path', join(app, 'Cargo.toml')], {
       cwd: app, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'],
-      env: { ...process.env, APP_ENVIRONMENT: 'Production', APP_BACKEND_SENTINEL: 'yt112-private-selector', YETLET_DEV_SECRETS: 'yt112-private-file' },
+      env: { ...process.env, APP_ENVIRONMENT: 'Production', APP_BACKEND_SENTINEL: 'browserWatch-private-selector', YETLET_DEV_SECRETS: 'browserWatch-private-file' },
     });
     child.on('error', (error) => { log += String(error); });
     child.stdout.on('data', (data) => { log += data.toString(); });
@@ -87,7 +87,7 @@ async function browserWatch() {
     const original = sources.get('src/model.rs');
     assert(original.includes('Plan the next small slice'));
     // A failing initial generation serves an honest unavailable state, without a restart storm.
-    await writeFile(join(app, 'src/model.rs'), original + '\ncompile_error!("YT112 intentional initial error");\n');
+    await writeFile(join(app, 'src/model.rs'), original + '\ncompile_error!("Watch intentional initial error");\n');
     const watch = start('watch');
     await status(503);
     await until(() => log.includes('failed; runtime unavailable'), 180000);
@@ -99,8 +99,8 @@ async function browserWatch() {
     result.checks.initialFailureAndRecovery = 'pass';
     context = await chromium.launchPersistentContext(profile, { executablePath: '/usr/bin/google-chrome', headless: true, viewport: { width: 1100, height: 850 } });
     await context.addInitScript(() => {
-      window.__yt112Csp = [];
-      document.addEventListener('securitypolicyviolation', (event) => window.__yt112Csp.push(event.violatedDirective));
+      window.__browserWatchCsp = [];
+      document.addEventListener('securitypolicyviolation', (event) => window.__browserWatchCsp.push(event.violatedDirective));
     });
     await context.route('**/*', async (route) => {
       assert.equal(new URL(route.request().url()).origin, origin);
@@ -109,7 +109,7 @@ async function browserWatch() {
     page = await context.newPage();
     page.on('console', (message) => { if (message.type() === 'error') errors.push(message.text()); });
     page.on('pageerror', (error) => errors.push(error.message));
-    page.on('framenavigated', (frame) => { if (frame === page.mainFrame()) page.evaluate(() => window.__yt112Csp ?? []).then((items) => violations.push(...items)).catch(() => {}); });
+    page.on('framenavigated', (frame) => { if (frame === page.mainFrame()) page.evaluate(() => window.__browserWatchCsp ?? []).then((items) => violations.push(...items)).catch(() => {}); });
     const response = await page.goto(origin, { waitUntil: 'networkidle' });
     await ready();
     const csp = response.headers()['content-security-policy'];
@@ -121,24 +121,24 @@ async function browserWatch() {
     const firstNonce = /nonce="([^"]+)"/.exec(firstDocument)?.[1];
     const otherNonce = /nonce="([^"]+)"/.exec(other)?.[1];
     assert(firstNonce && otherNonce); assert.notEqual(firstNonce, otherNonce);
-    await addOnce('YT112 initial single action');
-    await page.evaluate(() => { window.__yt112Marker = 'css-keeps-document'; });
+    await addOnce('Watch initial single action');
+    await page.evaluate(() => { window.__browserWatchMarker = 'css-keeps-document'; });
     await writeFile(join(app, 'frontend/app.css'), sources.get('frontend/app.css') + '\n#workspace-label { border-left: 9px solid rgb(1, 2, 3); }\n');
     await page.waitForFunction(() => getComputedStyle(document.querySelector('#workspace-label')).borderLeftWidth === '9px');
-    assert.equal(await page.evaluate(() => window.__yt112Marker), 'css-keeps-document');
+    assert.equal(await page.evaluate(() => window.__browserWatchMarker), 'css-keeps-document');
     assert(await page.evaluate(() => [...document.querySelectorAll('style')].some((style) => style.nonce && style.nonce === document.querySelector('meta[property=csp-nonce]')?.nonce)));
-    await addOnce('YT112 after CSS');
+    await addOnce('Watch after CSS');
     result.checks.cssHmrAndSingleListeners = 'pass';
-    await writeFile(join(app, 'frontend/app.ts'), sources.get('frontend/app.ts') + '\ndocument.documentElement.dataset.yt112Ts = "changed";\n');
-    await page.waitForFunction(() => document.documentElement.dataset.yt112Ts === 'changed');
+    await writeFile(join(app, 'frontend/app.ts'), sources.get('frontend/app.ts') + '\ndocument.documentElement.dataset.browserWatchTs = "changed";\n');
+    await page.waitForFunction(() => document.documentElement.dataset.browserWatchTs === 'changed');
     await ready();
-    await addOnce('YT112 after TS');
+    await addOnce('Watch after TS');
     result.checks.viteTsReloadAndSingleListeners = 'pass';
-    const changed = original.replace('Plan the next small slice', 'YT112 Rust generation');
+    const changed = original.replace('Plan the next small slice', 'Watch Rust generation');
     await writeFile(join(app, 'src/model.rs'), changed);
-    await page.waitForFunction(() => document.querySelector('#tasks')?.textContent.includes('YT112 Rust generation'), null, { timeout: 180000 });
+    await page.waitForFunction(() => document.querySelector('#tasks')?.textContent.includes('Watch Rust generation'), null, { timeout: 180000 });
     await ready();
-    await addOnce('YT112 after Rust');
+    await addOnce('Watch after Rust');
     result.checks.rustRebuildFullReload = 'pass';
     const entry = await (await fetch(origin + '/app.ts')).text();
     const asset = /\/__yetlet_wasm\/[0-9]+\/tasks.js/.exec(entry)?.[0]; assert(asset);
@@ -159,27 +159,27 @@ async function browserWatch() {
     assert.equal(wasmResponse.headers.get('content-type'), 'application/wasm');
     const goodWasm = await wasmResponse.arrayBuffer();
     const offset = log.length;
-    await writeFile(join(app, 'src/model.rs'), changed + '\ncompile_error!("YT112 later error");\n');
+    await writeFile(join(app, 'src/model.rs'), changed + '\ncompile_error!("Watch later error");\n');
     await until(() => log.slice(offset).includes('keeping last good generation'), 180000);
     assert.deepEqual(await (await fetch(origin + asset)).arrayBuffer(), goodJs);
     assert.deepEqual(await (await fetch(origin + asset.replace('tasks.js', 'tasks_bg.wasm'))).arrayBuffer(), goodWasm);
-    await addOnce('YT112 last good works');
-    await writeFile(join(app, 'src/model.rs'), original.replace('Plan the next small slice', 'YT112 recovered'));
-    await page.waitForFunction(() => document.querySelector('#tasks')?.textContent.includes('YT112 recovered'), null, { timeout: 180000 });
-    await ready(); await addOnce('YT112 recovered once');
+    await addOnce('Watch last good works');
+    await writeFile(join(app, 'src/model.rs'), original.replace('Plan the next small slice', 'Watch recovered'));
+    await page.waitForFunction(() => document.querySelector('#tasks')?.textContent.includes('Watch recovered'), null, { timeout: 180000 });
+    await ready(); await addOnce('Watch recovered once');
     result.checks.compileFailureAtomicPairAndRecovery = 'pass';
     // A disposable real Cargo build script creates a deterministic in-build edit window.
     const queuedOffset = log.length;
     await writeFile(buildGate, delayedBuild);
     await until(() => existsSync(activeGate), 180000);
-    await writeFile(join(app, 'src/model.rs'), original.replace('Plan the next small slice', 'YT112 queued first'));
-    await writeFile(join(app, 'src/model.rs'), original.replace('Plan the next small slice', 'YT112 queued final'));
+    await writeFile(join(app, 'src/model.rs'), original.replace('Plan the next small slice', 'Watch queued first'));
+    await writeFile(join(app, 'src/model.rs'), original.replace('Plan the next small slice', 'Watch queued final'));
     await until(() => {
       const phases = [...log.slice(queuedOffset).matchAll(/YT_BROWSER_BUILD ([0-9]+) (started|published|failed)/g)];
       return phases.filter((item) => item[2] === 'published').length >= 2 && phases.at(-1)?.[2] === 'published';
     }, 180000);
-    await page.waitForFunction(() => document.querySelector('#tasks')?.textContent.includes('YT112 queued final'), null, { timeout: 180000 });
-    await ready(); await addOnce('YT112 after queued edits');
+    await page.waitForFunction(() => document.querySelector('#tasks')?.textContent.includes('Watch queued final'), null, { timeout: 180000 });
+    await ready(); await addOnce('Watch after queued edits');
     let building = false;
     for (const phase of log.slice(queuedOffset).matchAll(/YT_BROWSER_BUILD [0-9]+ (started|published|failed)/g)) {
       if (phase[1] === 'started') { assert.equal(building, false); building = true; }
@@ -191,9 +191,9 @@ async function browserWatch() {
     for (const path of ['/base.toml', '/Cargo.toml', '/Cargo.lock', '/.env', '/vite.config.mjs', '/serve.mjs', '/build-wasm.mjs', '/src/model.rs', '/@fs/etc/passwd', '/app.ts?raw']) {
       assert.equal((await fetch(origin + path)).status, 403, path);
     }
-    violations.push(...await page.evaluate(() => window.__yt112Csp));
+    violations.push(...await page.evaluate(() => window.__browserWatchCsp));
     assert.deepEqual(violations, []); assert.deepEqual(errors, []);
-    assert(!log.includes('yt112-private-selector') && !log.includes('yt112-private-file'));
+    assert(!log.includes('browserWatch-private-selector') && !log.includes('browserWatch-private-file'));
     await page.screenshot({ path: join(out, 'watch.png') });
     await writeFile(buildGate, delayedBuild + '// cancellation fixture\n');
     await until(() => existsSync(activeGate), 180000);
@@ -212,7 +212,7 @@ async function browserWatch() {
     assert(!/YETLET_REQUEST_NONCE|__yetlet_wasm|@vite\/client|csp-nonce/.test(html));
     const preview = start('run'); await status(200);
     await page.goto(origin, { waitUntil: 'networkidle' }); await ready();
-    await addOnce('YT112 static preview');
+    await addOnce('Watch static preview');
     await waitExit(preview, 'SIGINT'); await portClosed();
     result.checks.productionBuildAndStaticRun = 'pass';
     result.status = 'pass';
@@ -221,7 +221,7 @@ async function browserWatch() {
     result.consoleErrors = errors;
     if (page) {
       try {
-        result.pageFailure = { url: page.url(), text: (await page.locator('body').innerText()).slice(0,2000), csp: await page.evaluate(() => window.__yt112Csp ?? []) };
+        result.pageFailure = { url: page.url(), text: (await page.locator('body').innerText()).slice(0,2000), csp: await page.evaluate(() => window.__browserWatchCsp ?? []) };
         await page.screenshot({ path: join(out, 'failure.png') });
       } catch (captureError) { result.captureError = String(captureError); }
     }
@@ -269,8 +269,8 @@ const devBase = 'http://127.0.0.1:' + vitePort;
 const backendBase = 'http://127.0.0.1:3000';
 const cloud = Boolean(args.get('--cloud')), config = Boolean(args.get('--config'));
 const moduleHmr = Boolean(args.get('--module-hmr'));
-const token = '000123-yt100-synthetic';
-const result = { task: 'YT-100', mode, status: 'running', devBase, cloud, config, checks: {}, cleanup: {} };
+const token = '000123-viteHmr-synthetic';
+const result = { task: 'vite-hmr', mode, status: 'running', devBase, cloud, config, checks: {}, cleanup: {} };
 const processes = [];
 let browser;
 let page;
@@ -381,8 +381,8 @@ try {
     await route.continue();
   });
   await context.addInitScript(() => {
-    window.__yt100_csp = [];
-    document.addEventListener('securitypolicyviolation', (event) => window.__yt100_csp.push(event.violatedDirective));
+    window.__viteHmr_csp = [];
+    document.addEventListener('securitypolicyviolation', (event) => window.__viteHmr_csp.push(event.violatedDirective));
   });
   page = await context.newPage();
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
@@ -403,12 +403,12 @@ try {
   await page.waitForFunction(() => [...document.querySelectorAll('style')].some((s) => s.nonce && s.nonce === document.querySelector('meta[property=csp-nonce]')?.nonce));
   assert(websockets.some((url) => url.startsWith('ws://127.0.0.1:' + vitePort)), 'HMR websocket missing');
   result.checks.devStyleNonceAndWebSocket = 'pass';
-  await page.evaluate(() => { window.__yt100_marker = 'kept'; });
+  await page.evaluate(() => { window.__viteHmr_marker = 'kept'; });
   const updated = originalCss.replace('7px', '11px');
   await writeFile(cssPath, updated);
   await page.waitForFunction(() => getComputedStyle(document.querySelector('#shared-proof')).borderLeftWidth === '11px', null, { timeout: 20000 });
-  assert.equal(await page.evaluate(() => window.__yt100_marker), 'kept', 'Page was reloaded instead of CSS HMR');
-  assert.deepEqual(await page.evaluate(() => window.__yt100_csp), []);
+  assert.equal(await page.evaluate(() => window.__viteHmr_marker), 'kept', 'Page was reloaded instead of CSS HMR');
+  assert.deepEqual(await page.evaluate(() => window.__viteHmr_csp), []);
   assert.deepEqual(errors, []);
   result.checks.actualCssHmrNoDocumentReload = 'pass';
   // Give Vite's filesystem watcher a distinct update window for fixture restore.
@@ -419,16 +419,16 @@ try {
   result.checks.actualCssRestore = 'pass';
   if (moduleHmr) {
     await page.evaluate(() => {
-      window.__yt100_moduleNodes = {
+      window.__viteHmr_moduleNodes = {
         button: document.querySelector('#load-lazy'),
         result: document.querySelector('#lazy-result'),
       };
     });
     async function assertModuleState(text) {
-      assert.equal(await page.evaluate(() => window.__yt100_marker), 'kept', 'Module update reloaded the Document');
+      assert.equal(await page.evaluate(() => window.__viteHmr_marker), 'kept', 'Module update reloaded the Document');
       assert(await page.evaluate(() =>
-        window.__yt100_moduleNodes.button === document.querySelector('#load-lazy')
-        && window.__yt100_moduleNodes.result === document.querySelector('#lazy-result')),
+        window.__viteHmr_moduleNodes.button === document.querySelector('#load-lazy')
+        && window.__viteHmr_moduleNodes.result === document.querySelector('#lazy-result')),
       'Module update replaced the interaction DOM');
       assert.equal(await page.locator('#lazy-result').innerText(), text, 'Interaction state changed during module update');
     }
@@ -461,12 +461,12 @@ try {
       await updateModule('lazy.ts', originalModules.get('lazy.ts').replace(baseline, prefix), text);
       text = await clickOnce(prefix);
       await updateModule('shared.ts', originalModules.get('shared.ts')
-        + '\ndocument.documentElement.dataset.yt100SharedHmr = ' + JSON.stringify(String(round)) + ';\n', text);
-      assert.equal(await page.evaluate(() => document.documentElement.dataset.yt100SharedHmr), String(round));
+        + '\ndocument.documentElement.dataset.viteHmrSharedHmr = ' + JSON.stringify(String(round)) + ';\n', text);
+      assert.equal(await page.evaluate(() => document.documentElement.dataset.viteHmrSharedHmr), String(round));
       text = await clickOnce(prefix);
       await updateModule('app.ts', originalModules.get('app.ts')
-        + '\ndocument.documentElement.dataset.yt100EntryHmr = ' + JSON.stringify(String(round)) + ';\n', text);
-      assert.equal(await page.evaluate(() => document.documentElement.dataset.yt100EntryHmr), String(round));
+        + '\ndocument.documentElement.dataset.viteHmrEntryHmr = ' + JSON.stringify(String(round)) + ';\n', text);
+      assert.equal(await page.evaluate(() => document.documentElement.dataset.viteHmrEntryHmr), String(round));
       text = await clickOnce(prefix);
       for (const name of ['lazy.ts', 'shared.ts', 'app.ts']) {
         await updateModule(name, originalModules.get(name), text);
@@ -517,7 +517,7 @@ try {
       text = await clickOnce(baseline);
     }
     assert.equal(count, 21);
-    assert.deepEqual(await page.evaluate(() => window.__yt100_csp), []);
+    assert.deepEqual(await page.evaluate(() => window.__viteHmr_csp), []);
     assert.deepEqual(errors, []);
     result.checks.actualUserModuleHmrStateAndDomPreserved = { status: 'pass', typescriptEdits: 1, javascriptEdits: 1, restores: 2, clicks: count - 13, totalClicks: count };
   }

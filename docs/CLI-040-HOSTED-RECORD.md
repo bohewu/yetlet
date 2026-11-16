@@ -8,7 +8,7 @@ embedded SDK snapshot use `0.9.0-alpha.7`. Generated applications select
 their registry SDK independently. With the verified alpha.8 core archive
 and compatible flags, Native and Native Style use `App::serve()`.
 Alpha.7 uses the legacy listener. Settings, Vite, Service and Browser
-keep their documented startup profiles. [Scaffold contract](YT-259-CLI-NEW-STARTUP-CONTRACT.md)
+keep their documented startup profiles. [Scaffold contract](CLI-GUIDE.md#generated-startup-profiles)
 
 At this checkpoint CLI 0.4.0 is unsigned and unpublished. The published
 SDK is `0.9.0-alpha.8` and the published CLI is `0.3.1`. The Reader
@@ -84,7 +84,7 @@ security, inventory, support, review and failures. The checksum manifest
 covers 37 entries and has 6277 bytes with SHA-256
 `f5f0dac068bd4aad5970addf70eef178f70a4c61af355805ec1aec4ebbf6f993`.
 The source map, raw transport ZIPs and release notes are retained separately.
-[Supplemental transport contract](YT-096-SIGNER-CONTRACT.md#explicit-supplemental-input-transport)
+[Supplemental transport contract](RELEASING.md#supplemental-ciphertext-and-short-lived-intake)
 
 - Linux used the earlier local preparation archive for six generation variants
   and seven additional locked checks. Native Style passed HTTP, CSS and CSP.

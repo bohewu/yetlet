@@ -165,6 +165,51 @@ lifetime details; [troubleshooting](TROUBLESHOOTING.md#browser-builds-and-intera
 links the broader failure paths. Keep accepted failures and evidence separate
 from rebuildable output using the [artifact guide](DEV-ARTIFACTS.md).
 
+## Historical native DOM controls and navigation boundaries
+
+The original YT-110 source-bound browser/SSR exercise extended the finite
+DOM vocabulary with native text/textarea/select/checkbox controls,
+fieldset/legend, explicit reset/submit and labelled hints. An initial
+`value`, `checked`, or option `selected` attribute supplies a
+**browser default**, not a continuously synchronized live property.
+`readonly` values submit; **disabled/unchecked** fields do not.
+Boolean attributes use **presence** semantics, so the literal string
+`false` still means present/true. On reset, the browser restores the
+current page's captured defaults; stateful live edits/IME/focus restoration
+after View replacement remain application-owned.
+
+Native textarea content normalizes CRLF/CR to LF. The SSR serializer
+preserves a requested *leading LF* that the HTML parser ordinarily
+removes immediately after an opening textarea; do not add a second
+manual leading-newline sentinel in application views. The sample's
+`GET /controls` route is an escaped/bounded **preview only**, with
+no Todo mutation, authorization, file upload, or CSRF assurance.
+Do not put secrets in the GET query.
+
+The selected **static input grammar** admits a hash or a single
+root-relative slash for `href`, one root-relative slash for form
+`action`, and `get`/`post` for form `method`. Empty, absolute,
+protocol-relative, path-relative, backslash and control/whitespace
+values are rejected by the scoped DOM policy. On actual mount, URL
+resolution uses the effective document base and native URL parser:
+only same-origin HTTP(S) targets without credentials survive;
+the resolved URL is fixed on the detached replacement before
+publication, so a later base change cannot redirect it. Invalid
+structure, attribute or navigation **must leave the prior subtree
+untouched**. The SSR serializer has a distinct broader URL policy,
+and this small DOM restriction is **not** a universal sanitizer,
+redirect check, HTTP authorization, focus preservation or Content
+Security Policy.
+
+For current released features follow the
+[versioned DOM guide](../crates/yetlet-browser/guides/dom.md);
+for the dated finite-element/attribute matrix and negative cases see
+[HTML inventory history](API-CONTRACTS.md#historical-html-element-and-attribute-inventory)
+and the full original report at local Git
+`8b3e13004a58380accf16ea440707f84e6271871`.
+Original rejected shapes, browser fixtures and review results remain
+historical; this consolidation performs no new browser execution.
+
 ## API reference
 
 - [CLI browser template and prerequisites](../tools/yetlet-cli/templates/browser/README.md)
@@ -176,3 +221,110 @@ from rebuildable output using the [artifact guide](DEV-ARTIFACTS.md).
 
 This guide connects existing capabilities. It adds no runtime/API, platform
 qualification or documentation-site deployment, and selects no desktop host.
+
+## Keyed ownership and runtime retirement
+
+The renderer-neutral identity/key/slot vocabulary validates deterministic
+lowercase component/instance/slot tokens, nonempty control-free keys and inert
+attribute names. It does not authorize raw HTML, URL attributes, inline handlers,
+`style`, `srcdoc` or the reserved `data-yetlet-*` namespace. Renderers still own
+escaping and DOM admission. See [View ownership](VIEW-COMPONENTS.md#binding-metadata-and-explicit-lifetimes)
+and the [keyed module guide](../crates/yetlet-browser/guides/dom-keyed.md).
+
+Keyed children own the complete direct-child key/entry set and caller row state.
+Desired-key validation and creation of detached missing entries precede structural
+mutation; an attached create result is rejected. Retained entries are updated,
+then stale nodes removed and nodes inserted/moved. Removal disconnects the node
+and drops its state/listeners; disposal removes propagation while leaving DOM
+readable. Caller updates can mutate before returning an error and final browser
+DOM errors have no transactional rollback. Applications own callback atomicity.
+
+The M7b–M7d experimental fixture additionally preflights the exact SSR root,
+instance, keyed rows, attributes, direct child/text slots and input live/serialized
+values before installing listeners. It supports one controlled text input,
+one conditional text and one click path per fixed row, not arbitrary nested
+components/forms. It writes a live input value only when different, capturing
+focus/selection before successful keyed moves and restoring only a still-connected
+input. Removing the focused row deliberately does not focus a detached node.
+Chrome 155 and Firefox 157 verified input identity/value/focus/selection, keyed
+reorder/removal, detached input/click inertness and disposal; this is no real IME,
+WebKit/mobile, screen-reader or general focus-manager qualification.
+
+The synchronous graph owns committed state, reducer, commit callback, FIFO queue
+and observers. Handles/subscriptions are weak; unsubscribe/drop releases captures.
+An explicit outer batch reduces one cloned draft and commits/notifies once;
+empty batches do nothing. Re-entrant work runs in later FIFO passes, bounded by
+the experimental default 64. Reducer failure clears work and preserves usability;
+commit failure faults the graph without publishing the draft; pass exhaustion
+faults after any already-completed commits. Disposal clears owners/captures and
+weak dispatch returns Disposed. Arbitrary commit callbacks are responsible for
+external atomicity; observer panics are not caught. There is no automatic field
+dependency tracking, async effect scheduler, worker or heap/GC guarantee.
+The unchanged [M7g record](M7G-VERIFICATION.md) retains extraction evidence.
+
+Todo's production local list opts into these primitives; remote result/Search
+updates retain subtree replacement. Its route owner holds graph, listeners and a
+lifetime token. Retirement invalidates the token first, including tasks queued by
+`spawn_local`; HTTP completion checks it again after await before any DOM/status
+write. Remount owns a fresh token and one listener path. The first final M7
+review found this queued/in-flight race despite an earlier narrower PASS. Repaired
+Chrome/Firefox debug/release tests proved click-then-dispose starts neither local
+work nor HTTP, held old responses cannot mutate after remount, and retired nodes
+stay inert. [Dated validation and costs](QUALIFICATION-MATRIX.md#keyed-renderer-and-lifecycle-evidence)
+keep that FAIL separate from repeat final PASS.
+
+## M11 native form and safe-content decision
+
+The historical YT-071 outcome retained native SSR controls and an explicitly
+enabled application-owned **read-only text preview**. It did not widen the then
+generic DOM/URL allowlist or introduce controlled inputs, rich HTML, namespaces,
+keyed control reorder or arbitrary user destinations. Later released DOM
+coverage above is a separate source/qualification, not backdated M11 evidence.
+
+False booleans are omitted; defaults differ from dirty live properties. Preview
+reads current textarea/select/checkbox state, never rewrites user controls,
+preserves identity/selection and uses owned abortable listeners/queued work.
+Native reset restores defaults; synthetic composition suppression/end is not OS
+IME proof. Chrome155 tested remount's single listener, disposal cancellation,
+reset, native submit/303 PRG, no local mutation POST/event circuit and CSP.
+The proof was stateless/unauthenticated, without credentialed-CSRF assurance;
+Board supplied separate Session/authorization/CSRF/storage behavior.
+
+Safe View escaping is contextual encoding, not a rich-HTML sanitizer, universal
+URL/origin policy or protection for raw Axum Html/keyed callbacks. Store bounded
+plain text, not pre-escaped strings, and test edit/save/read/preview/history as
+one path. Page reapplies default CSP on its own error response; successful
+render-page helpers attach CSP, directly converted renderer errors differ, and
+string renderers cannot attach HTTP headers. Applications can overwrite headers.
+Do not infer namespace support from a URL-policy name or assume compound URL
+values/redirects are validated. Structured Markdown must reject raw HTML and
+validate destinations; imported rich HTML/editor integration would require a
+separately selected vetted sanitizer and mutation/parity/security review, not a
+regex or new unconstrained RawHtml escape hatch.
+
+Current-session self-review accepted this bounded application decision; it was
+not independent security assurance. A broadened HTML/URL/live-control security
+boundary or externally reachable authenticated product retains its separate
+independent gate. Exact research and form-proof records remain at local Git
+`40b66f1ad9bd0eb5666a9e1c8f113310993a3544`; remote access is unverified.
+
+## Browser DX research and selected follow-up
+
+The 2026-11-07 inspection used source
+`bebdd03660ca7dc33fdd1ed4c7e56b5680e055c1`, SDK alpha.6 and CLI0.2.0.
+It selected this connected walkthrough over adding a generator, event registry,
+state abstraction or desktop host. Existing template preparation, matching
+bindgen, frozen build, startup shell, listener disposal and frontend/dist
+ownership supplied the workflow. Future SDK work still requires a concrete
+separately selected limitation. This study selected no new API or platform test.
+
+The browser template owns its local graph, typed commands, keyed rows and
+listener handles. A caller-owned Rust closure, as in documentation search, is
+sufficient for smaller interactions. Subtree replacement requires rebinding and
+disposal, while keyed identity leaves live input, focus and selection to the app.
+The [View lifetime contract](VIEW-COMPONENTS.md#binding-metadata-and-explicit-lifetimes)
+and [asset contract](ASSETS.md#vite-feasibility-decisions-and-limits) retain those
+boundaries. The earlier YT-104 starter and YT-112 Linux Rust/Wasm loop, including
+its initial module-routing Reviewer FAIL, remain at local Git
+`ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`. The study added no selected Reader
+chapter and replayed no accepted build/browser/watch/platform qualification.

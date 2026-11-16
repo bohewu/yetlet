@@ -120,7 +120,7 @@ preserve all default-branch, weekly, and manually requested CodeQL runs,
 including pending jobs. The four-language matrix, triggers, and documented
 Markdown-only admission are unchanged. The observed Rust CodeQL PR execution
 was diff-informed but did not use an overlay-base cache; Rust overlay support
-is not presumed or forced. See [YT-236 diagnostics](YT-236-CODEQL-PR-CONCURRENCY.md).
+is not presumed or forced. See [YT-236 diagnostics](CODEQL-CI-PERFORMANCE.md#historical-codeql-pr-concurrency-and-rust-analysis-evidence).
 
 Activation is a separate delivery step. After the workflow is merged and its
 local checks pass, record the current default-setup settings, disable default
@@ -185,3 +185,148 @@ For source freezing, tags, protected jobs, signing and publication, switch to
 [the release workflow](RELEASING.md). The release freeze is a bounded promotion
 window, not a permanent block on development: feature branches may continue,
 while master merges wait only when the selected signer gate requires it.
+
+## Rust tooling migration contracts and historical inventory
+
+Use the repository-root `cargo xtask` route documented in
+[xtask usage](../xtask/README.md); it is independent of the published CLI.
+The alias's relative manifest path is **root-only**. From a subdirectory use
+the quoted absolute xtask/Cargo.toml path. The program locates its repository
+from its compiled manifest; explicit relative user outputs resolve against the
+invoking cwd. xtask is unpublished with its own workspace/lock/target; framework
+and browser production dependency graphs do not depend on it.
+
+M12's original inventory at7cfac613f908c5c19fa581438288386809870b56 contained
+**52 tracked Python files/14,006 lines**:35 scripts, eight scene, four Board,
+two form-proof, three Redis-qualification files, plus **three workflow surfaces**.
+Its sorted `<sha256>  <path>\n` inventory digest was
+59a2eb8eb822e6d6054591e6c26625cbfdd2f7620c78dd45a28f19767b66b4e5.
+The exact52 rows/file hashes, original direct cases, workflow/root-input hashes
+and changing checkpoint statuses remain in the
+[original migration ledger](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M12-PYTHON-MIGRATION.md#all-52-tracked-files)
+and [original adoption plan](https://github.com/bohewu/yetlet/blob/40b66f1ad9bd0eb5666a9e1c8f113310993a3544/docs/M12-RUST-TOOLCHAIN-PLAN.md).
+Those Git objects/headings are locally verified; remote reachability is
+unverified. They describe2026-10-15 migration, **not today's Python inventory**.
+Later release/docs helpers can exist; frozen sources are compatibility oracles,
+not a claim that every current task must avoid Python or that an old checker
+understands later catalogs. Do not run scripts/check_docs.py as the live gate:
+its historical REQUIRED list intentionally still names retired documents.
+
+| Accepted mapping family | Canonical Rust route and retained scope |
+|---|---|
+| Seven YT-084 builders | `build browser`, `keyed-bindings`, `multi-island-dashboard`, `render-bench`, `scene-island`, `form-css-proof`, `board-assets`; independent Todo/Search, Counter/Filter and nested scene/root counter builds, matching locks/tool profiles/assets, no interpreter wrapper |
+| Two checks/direct catalog test | `check docs`, `check samples`, `cargo test --locked --manifest-path xtask/Cargo.toml --test check_samples`; English/links/fences/whitespace/Backlog DAG and catalog types/path/route/command/dependency/source-marker negatives preserved |
+| Thirty YT-085 mappings | Separate native/browser/Board/scene scenarios, CDP/WebDriver/BiDi/PNG helpers and two direct harness suites; retain assertions, raw/native exit and ownership, not a generic successful smoke. Internal Redis browser fixtures take the already-owned base URL explicitly |
+| Twelve YT-086 mappings | `measure baseline`, `render-strategies`, `sample-dx`, `scene-dynamic`; `qualify local-operations`, `multi-instance`, `redis-three-app`, `board`; `release checksums create/verify`; three direct local-operation/Docker/checksum test counterparts as recorded in the ledger |
+| Additional invocation graph | Rust cookie_fencing caller launches the Rust fixture with explicit argv/status, not Python or recursive parent Cargo tests. Redis-three-app uses ported browser/Docker helpers. rust.yml, qualification.yml and private-rebuild.yml switched their mapped calls, including real inline private-rebuild archive/provenance/checksum logic, without widening gate/ref/token/timeout controls |
+
+Keep old supported options/defaults, profile selection, output schemas and
+report locations; unknown/repeated/unsupported flags are usage errors. Help and
+doctor launch no suites/server/browser. Doctor probes installed tools read-only,
+never installs; Cargo bootstrap itself can write cache and needs pre-resolved
+dependencies offline. Missing tools/targets/browser/driver/capabilities fail
+nonzero with Not run/Blocked, never a successful skip or automatic install.
+Explicit pinned CSS `--fetch` is separate from build/check, never fallback.
+
+Processes use literal native argv and explicit cwd/env, with spaces/non-ASCII
+and native separators preserved, no shell concatenation or Python/Node wrappers.
+Keep executable discovery and inherited configured environment, with tool
+identity verified and no global default change. Build children select
+RUSTUP_AUTO_INSTALL=0; rolling stable stays explicit. Match wasm-bindgen to the
+applicable root/nested lock (0.2.129 at migration), not a timeless hardcoded pin.
+stdout reports/progress and stderr diagnostics remain separate; continuously
+drain bounded captures without deadlocks or secret/raw-cookie/exception leakage.
+Monotonic readiness/protocol/process/cleanup deadlines preserve suite budgets;
+timeout never retries an uncertain write or truncates a chosen long profile.
+
+Success0 requires complete checks **and cleanup**; validation/capability1,
+usage2, owned timeout124, spawn/pipe/setup/cleanup infrastructure125, cancellation
+130 at the runner boundary. Preserve exact child-native exit/origin separately,
+including reserved-code collisions; Unix signals keep identity/128+signal,
+Windows DWORD survives separately from portable mapping/Cargo wrapper status.
+Register ownership immediately, including partial startup: Unix owned groups,
+Windows suspended child→Job Object→resume; terminate/escalate/wait/reap/close
+streams/remove owned profiles and verify absence on every path. Never kill by
+executable name or attach to user browsers. Detached daemon groups and Unix
+SIGKILL cleanup remain unsupported; unavailable Windows primitives fail closed.
+Keep first SIGINT/SIGTERM identity through final report write, even mixed signals;
+cleanup/report/removal failures prevent provisional PASS.
+
+Positive and negative parity precede live adoption. Preserve build digest
+domains (`yetlet-v1`, `yt075-v1`, isolated domains), sorted filename/NUL/bytes,
+truncation/JSON/generation bytes, target/output roots, asset MIME/cache/CSP and
+unrelated-bundle isolation. Explicit --check must reject missing/extra/stale CSS
+without writes. Catalog Rust-command representation/checker/README adoption must
+land together; no route/package/path/dependency assertion is dropped. New raw
+measurements/goldens/receipts stay distinct from old acceptance, with exact
+source/tools/argv/cwd hashes and no overwrite.
+
+Keep all original direct-case subassertions, not merely test counts: four
+catalog cases,10 local-operation cases,18 original Docker cleanup/signal cases,
+16 checksum cases,three browser-process cases and two shop-readiness cases.
+The existing test suites are the product verification; no generic migration
+framework is required. Controlled-PATH failing Python/Node sentinels prove only
+the branches actually executed. Source graph audit plus one branch cannot prove
+every unexecuted runtime/platform path. Full-load, physical IME/AT and cloud
+acceptance must not be rerun or borrowed merely for a language port; see the
+[migration qualification limits](QUALIFICATION-MATRIX.md#m12-migration-acceptance-and-unexecuted-paths).
+
+## Opt-in local HTTPS preparation and lifecycle
+
+Settings-enabled CLI scaffolds, including `new --vite`, declare public
+`server.tls` keys. Prepare a private application-owned `.dev/certs/` directory
+outside the frontend root and Git, then explicitly select Development:
+
+```toml
+[server.tls]
+enabled = true
+certificate = ".dev/certs/localhost.pem"
+private_key = ".dev/certs/localhost-key.pem"
+```
+
+Install mkcert separately and generate a loopback leaf from the app directory:
+
+```text
+mkcert -cert-file .dev/certs/localhost.pem -key-file .dev/certs/localhost-key.pem localhost 127.0.0.1 ::1
+```
+
+`mkcert -install` is an explicit operator trust-store action. Keep the CA private
+key under operator control and protect certificate/key parents and files.
+Public settings carry paths only. Normal CLI new/build/run never install trust
+or generate certificates. Supply existing app secret inputs separately. The
+usual loader precedence applies, and its public CLI projection skips the
+Development secret file.
+
+`build` selects optional `yetlet-dev-tls` compilation and configured frontend
+build without reading TLS material or starting listeners. Direct run/watch
+uses ordinary Axum with axum-server/rustls. Paired automatic Vite startup exposes
+HTTPS/WSS at 127.0.0.1:5173 and fixes its private Rust backend to HTTP
+127.0.0.1:3000. Disabling automatic Vite starts direct Rust HTTPS. The existing
+GET/HEAD root-page bridge retains exact Host/Origin, confined paths, nonce/CSP
+and no-cookie/no-credential forwarding. Frontend build environments remove TLS
+paths. Missing/invalid run material fails closed with owned-process teardown.
+See [CLI settings](CLI-CONTRACT.md#development-https) and
+[dated Linux/MSVC evidence](QUALIFICATION-MATRIX.md#development-https-evidence-and-original-failures).
+
+The 2026-10-18 Linux and MSVC checks used isolated CAROOT and explicit client CA
+trust with hostname validation. System browser trust, physical keyboard input,
+full browser HMR, Windows GNU and production TLS/PKI remain unqualified by those
+checks. Production TLS deployment guidance is separately scoped.
+
+## Protected Windows tools and historical exit 125
+
+Use physical protected executable directories and absolute PATH entries with
+trusted owners and no unrelated write grants or reparse traversal. Initialize
+Visual Studio's native compiler environment only for the selected process,
+then select its protected Cargo directory on PATH. Scope Cargo home/target and
+OpenSSL include/library/static settings to the task and retain source/tool hashes.
+An ordinary copy inheriting unsafe ACLs does not establish protection. Keep an
+attached processed-input console for run/cancellation checks.
+
+The original 2026-10-18 signing build failed before child creation or Job
+assignment because both rustup-proxy and physical MSVC Cargo allowed unrelated
+writes. Byte-identical protected Cargo changed the same build from125 to0.
+The [CLI guide](CLI-GUIDE.md#protected-windows-tool-preparation) owns setup and
+[qualification](QUALIFICATION-MATRIX.md#windows-exit-125-diagnosis-and-native-results)
+retains original errors, native results and source limits. Global ACLs and PATH
+were preserved during that historical remediation.

@@ -2,7 +2,7 @@
 
 Captured on 2026-10-13 from an owned, headful Firefox 157.0.1 window on Ubuntu 26.04.1 LTS / Xfce X11. The images are original GDK window-region captures, visually inspected without image editing. Fcitx5 5.1.19-1 and Chewing 5.1.10-1 received native OS key events; WebDriver Unicode typing, paste and synthetic composition were not used to produce the Chinese text.
 
-See the [desktop record](../../YT-074-DESKTOP-ACCEPTANCE.md) and [sanitized observations](../../YT-074-DESKTOP-EVIDENCE.json). The Board uses only synthetic identities and an isolated database. No login code, Cookie or CSRF value appears in these images. The small desktop tooltip is incidental desktop chrome, not Board content.
+See the [desktop record](../../../examples/lab-operations-board/README.md#historical-board-desktop-and-sqlite-concurrency-evidence) and [sanitized observations](../../YT-074-DESKTOP-EVIDENCE.json). The Board uses only synthetic identities and an isolated database. No login code, Cookie or CSRF value appears in these images. The small desktop tooltip is incidental desktop chrome, not Board content.
 
 | Image | Actual state |
 |---|---|

@@ -265,7 +265,7 @@ macro_rules! define_tags {
     };
 }
 
-// Pinned YT-219 standard HTML ordinary View inventory. The 7 document/head
+// Pinned standard HTML ordinary View inventory. The 7 document/head
 // tags and 5 forbidden executable/embedded tags are intentionally excluded.
 // Eleven entries are SSR-only because the current browser DOM admits 89 tags
 // by default, plus img with explicit ImagePolicy. Constructors alone never

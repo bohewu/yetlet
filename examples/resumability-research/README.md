@@ -29,8 +29,11 @@ automatic secret detection or redaction. Valid numeric tampering is deliberately
 accepted and tested. Remote mutations would still require the existing typed
 action boundary and server-side authorization/input checks.
 
-[Research record](../../docs/YT-022-RESUMABILITY-RESEARCH.md) describes the measured
-workload, version compatibility, security limits and adoption decision.
+[Architecture decision](../../docs/ARCHITECTURE.md#research-only-handler-resumption-and-native-composition)
+explains why finite descriptors do not constitute a supported resumability API.
+The [original research evidence](https://github.com/bohewu/yetlet/blob/42d8856b9acf5ddddab9a4b998b5bdd4c5e59210/docs/YT-022-RESUMABILITY-RESEARCH.md)
+retains the dated workload, version checks, security limits and measurements;
+that Git source is verified locally, not yet verified publicly reachable.
 [Raw observations](measurements.csv) retain actual encoded JSON/bytes and all
 100 native timing samples. Each phase gets three warmups and 20 measured batches
 of 40,000 operations on the same four descriptors. The command exits without

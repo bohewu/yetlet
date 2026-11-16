@@ -2,7 +2,7 @@
 
 Date: 2026-10-22. Scope: Experimental Rust APIs, CLI support vocabulary and
 application settings. This guide records the owner's single-canonical-name
-decision; [the audit response](NAMING-AUDIT-20261022.md) records its implementation.
+decision; [the audit response](#dated-naming-audit-dispositions) records its implementation.
 
 ## Rust conventions and semantic precision
 
@@ -133,7 +133,7 @@ avoid positional flags for another capability or a constructor per combination.
 Do not add a framework-wide options trait/registry or force identical IO shape.
 Board remains async; Shop opening remains synchronous.
 
-[The contract and migration table](YT-185-OPT-IN-OPTIONS.md) record five removed
+[The contract and migration table](https://github.com/bohewu/yetlet/blob/4792565e6cff7a94c8c2c860d1858f840f122cbe/docs/YT-185-OPT-IN-OPTIONS.md) record five removed
 capability-specific constructors, without stale aliases. Dated YT-181/182/183
 contracts and verification retain their former entry points and accepted
 results as history; current sample guides describe the options interface.
@@ -156,4 +156,33 @@ Feature names use Cargo kebab-case: `server-axum`, `auth-session`,
 `session-redis-tls`, `rate-limit`, `dom-keyed`, `wgpu-browser`. Rust modules use
 snake_case. Existing type/method names, application feature names, settings keys
 and wire formats remain unchanged. Historical release documentation keeps its
-original names. See the [migration map](YT-211-TWO-PACKAGE-MIGRATION.md).
+original names. See the [migration map](COMPATIBILITY.md#two-package-feature-and-target-contract).
+
+## Dated naming audit dispositions
+
+The 2026-10-22 audit attachment SHA256
+`2928a7923ad63ad42441ae2374272953cb36a102f78dbd8fecaec720af843229`
+matched 30 reported source hashes at checkpoint
+`83f417ea12dfc4cc2aa5c05e0f712706ba78565a`. The owner selected canonical
+pre-public Rust names over the attachment's alias suggestions. Delivery became
+`8c8fba3ae2e84c7493d56b74d0ccc8d8f26920ed` with separate subsequent generator
+repair. These historical dispositions preserve the accepted scope.
+
+| Finding | Accepted disposition |
+|---|---|
+| N01 | Help distinguishes native Watchexec rebuild/restart, browser Rust/Wasm full reload requiring both frontend auto flags, and Vite HMR. Inspect schema/runtime behavior was unchanged |
+| N02 | Root summary links source/platform matrices and discloses the settings-profile generator refusal discovered by the focused probe |
+| N03 | Error::Key replaces EnvironmentKey with source-neutral rustdoc and unchanged Display. Duplicate TOML syntax and app deserialization retain Toml/Settings |
+| N04 | PublicKeySet replaces PublicCertificates. Certificate-backed/free PublicMaterial and explicit trust/pins retain crypto behavior |
+| N05 | Authentication resolves/extracts verified identity. Resource/action authorization stays application-owned under ADR0005 |
+| N06 | Capability map distinguishes implemented carriers, app-owned OIDC/Valkey/Auth, research decisions and unselected candidates. Cookie primitives, Memory bridge and generic Cookie Auth differ |
+| N07 | M9 API inventory stays dated, with supplements for Config/Secrets/Signing/Auth/rate-limit and the original nine release candidates preserved |
+| N08 | Cli::New service/runtime_settings/tailwind/vite and create_service align support fields. Argv, removed-option diagnostics and real cloud-profile metadata retain their meanings |
+
+Stale Loader/Auth/rate-limit wrappers and re-exports were removed. Public-naming
+tests replaced compatibility-only test targets. These intentional enum/field
+source breaks preserved settings TOMLs, dependencies, locks, Display text,
+middleware and cryptography. Rust refill_interval_ms still uses the sole
+policy.interval_ms / RATE_LIMIT_POLICY__INTERVAL_MS wire spelling.
+[Focused results and the original generator/reviewer failures](QUALIFICATION-MATRIX.md#naming-audit-results-and-generator-failure)
+retain their dated source and OpenSSL/platform boundaries.

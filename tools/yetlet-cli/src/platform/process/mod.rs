@@ -292,12 +292,12 @@ mod static_deadline_tests {
     use super::*;
     #[test]
     #[ignore = "spawned only by the bounded static-export deadline test"]
-    fn yt223_sleep_helper() {
+    fn static_deadline_sleep_helper() {
         std::fs::write("child.pid", std::process::id().to_string()).unwrap();
         std::thread::sleep(std::time::Duration::from_secs(20));
     }
     #[test]
-    fn yt223_bounded_deadline_reaps_its_owned_child() {
+    fn bounded_deadline_reaps_its_owned_child() {
         let temp = tempfile::tempdir().unwrap();
         #[cfg(unix)]
         {
@@ -324,7 +324,7 @@ mod static_deadline_tests {
         let mut command = Command::new(executable);
         command.args([
             "--exact",
-            "platform::process::static_deadline_tests::yt223_sleep_helper",
+            "platform::process::static_deadline_tests::static_deadline_sleep_helper",
             "--ignored",
             "--nocapture",
         ]);
