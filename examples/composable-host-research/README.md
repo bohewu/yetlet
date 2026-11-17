@@ -1,39 +1,70 @@
-# YT-266 — Private caller-thread composition research
+# YT-266 / YT-267 — Private composable-host research
 
-**Scope:** M28-B1 only. This is an independent, unpublished Rust research
-package, **not** a Yetlet SDK API, game, Host trait or process supervisor.
+**Scope:** Independent, unpublished Rust research package, **not** a Yetlet
+SDK API, game runtime, public Host trait or process supervisor. The B1
+caller-thread example and B2 explicitly owned-worker variation are separate.
 
-`PanelHost` and `RuleHost` are two concrete, caller-driven hosts with distinct
+## B1 — Caller-thread hosts (YT-266)
+
+PanelHost and RuleHost are two concrete, caller-driven hosts with distinct
 Prepared → Running → Stopped lifecycles. Both operate on the same OS thread,
-use `Rc<RefCell<_>>`/`Rc<Cell<_>>` for their own non-`Send` local state,
-and submit typed commands to one bounded mailbox. Only `StateOwner` applies
-those commands to its private authoritative state. Both Hosts obtain the
-same immutable `Rc<Snapshot>` publication with generation/revision;
-old snapshots remain unchanged. Admission does not imply application.
+use non-Send Rc local state, and submit commands to one bounded mailbox.
+Only StateOwner changes the authoritative value. Both Hosts obtain the same
+immutable Rc Snapshot generation/revision, and old snapshots stay unchanged.
+Successful admission does not imply command application.
 
-The composition root explicitly starts both Hosts before opening domain
-ingress, drains a bounded batch, and stops each Host separately. One Host
-can stop without terminating the other or creating a worker. If closed
-with pending admitted commands, the owner reports a discard count; full
-readiness, failure propagation, deterministic shutdown completion and late
-generation recovery are **not** proven here and belong to YT-267.
+The caller starts both Hosts before opening ingress, explicitly applies a
+batch, and stops them independently. B1 creates no owned worker, socket,
+HTTP listener, GPU or runtime. Its close method reports the number of
+admitted but unapplied commands discarded, not a delivery guarantee.
 
-Run from the repository root with the pinned Rust toolchain:
+## B2 — Explicitly owned worker (YT-267)
+
+The worker module adds a **separate opt-in variation**, not a replacement for
+B1. The composition root spawns and owns exactly one std worker holding the
+authoritative numeric state; two concrete foreground host attachments remain
+on the caller thread and use Rc-backed local callback state. A borrowed
+CallerScheduler token remains usable after both Host attachments stop.
+
+Worker input is typed and bounded; Full, Closed and StaleGeneration admission
+are distinct from successfully applied domain changes. Immutable snapshots
+with generation/revision are published independently. Required startup failure
+of the second Host stops the first and joins the worker before returning the
+original cause. Required runtime Host failure or an injected worker fault
+closes ingress, coordinates stop, and keeps the primary failure distinct from
+cleanup status.
+
+The cancellation signal is **not** enqueued into the bounded data queue. A
+saturated or intentionally paused worker can therefore be stopped without
+unblocking the data queue. A zero-timeout cleanup returns TimedOut while the
+Group still retains the JoinHandle; a subsequent completion attempt can report
+Joined. Dropping an unjoined Worker is deliberately a blocking join fallback,
+not a misleading detach-as-cleanup success. No generic deadline enforcement or
+arbitrary blocked native IO termination is claimed.
+
+The negative fixture old_generation checks fencing without pretending a
+generation restart/reconnect implementation exists. The artificially paused
+worker and injected fault/delay options only exercise bounded test cases.
+Neither B1 nor B2 provides production-grade scheduling, browser/native UI,
+Window, GPU, game ticks, socket/protocol, multi-process or network support.
+
+## Run the examples
+
+From the repository root using the pinned Rust toolchain:
 
 ```sh
 cargo test --manifest-path examples/composable-host-research/Cargo.toml --locked --offline
 cargo run --manifest-path examples/composable-host-research/Cargo.toml --locked --offline
+cargo run --manifest-path examples/composable-host-research/Cargo.toml --bin worker-demo --locked --offline
 cargo clippy --manifest-path examples/composable-host-research/Cargo.toml --all-targets --locked --offline -- -D warnings
 ```
 
-The package declares its own `[workspace]` and `Cargo.lock`, with
-**no normal dependencies**. It does not modify the root workspace, CLI
-templates or SDK, and creates no HTTP listener, socket, window, GPU,
-Tokio runtime, background thread or second process. A `println!` in
-the demonstration shows the observed snapshot; it is not a UI renderer.
+The original B1 binary remains the default; worker-demo is explicitly
+selected. The package declares its own nested workspace and Cargo.lock,
+publish=false and **zero normal dependencies**. It does not change the root
+workspace, SDK, CLI, templates or base Web server feature graph.
 
-This POC deliberately does not implement Yetlet `ActionExecutor` or an
-async runtime: a local bounded queue accepts commands, while application
-is a separate explicit step. Integration/extraction into SDK abstractions
-is an evidence-gated M28-E choice, not implied by this research example.
-Pure API/SSR remains on the existing direct Axum path (YT-276).
+This is ordinary Rust composition, not integration with Yetlet ActionExecutor
+or a universal async runtime. Any future public Host/worker contract remains
+an evidence-gated M28-E decision. Pure Web/API/SSR continues along the
+unchanged native Axum path established at YT-276.

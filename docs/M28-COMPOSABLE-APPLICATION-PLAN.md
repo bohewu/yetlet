@@ -1,7 +1,7 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A and B0 accepted at their documented scopes. B1 / YT-266 complete at private same-thread research scope with independent Reviewer actual PASS; no framework Host API has been promoted. B2 through E remain unimplemented/unqualified.
+- **State:** M28-A and B0 accepted at their documented scopes; B1 / YT-266 committed private research; B2 / YT-267 private owned-worker lifecycle POC complete with focused 15/15 PASS, original R1 P2 retained and independent R2 actual PASS. M28-C/D/E remain unimplemented/unqualified.
 - **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
@@ -734,3 +734,69 @@ reliable completion of pending commands, timer/tick, GPU, HTTP, UDP,
 Wasm/browser rendering, Windows runtime, latency or memory measurements.
 These belong to B2–E or separate scopes. B1 does not revise B0's direct
 pure-Web/API/SSR behavior or claim complete cross-platform compatibility.
+
+
+## 12. B2 owned-worker and required-host lifecycle proof — YT-267
+
+**Selection:** After locally committing the reviewed B1 source as
+`77fd39633f641838e8e47e3364094b047d74639a`, the owner authorized
+continuing to B2. This remains an explicitly private variation in the same
+nested [composable-host-research](../examples/composable-host-research/README.md).
+It does **not** promote a public Application, Host, HostGroup or worker trait.
+
+### B2 ownership and execution contract
+
+The original B1 two-Host caller-thread path remains intact. B2 adds
+`worker::Group` and one explicitly owned std worker. The worker alone holds
+the authoritative numeric state; two caller-thread `Foreground` attachments
+have independent Host lifecycle and non-Send local `Rc<Cell<_>>` callback
+values. `CallerScheduler` represents caller-owned scheduling capability and
+remains usable after both Host attachments stop. It is a small ownership
+fixture, **not** actual Tokio/winit integration or proof of an arbitrary
+shared-runtime scheduling contract.
+
+The bounded `Ingress` accepts typed Credit/Debit commands without giving
+Hosts mutable state. Immutable `Arc<Snapshot>` publications carry generation
+and revision; enqueue acknowledgment is not an application acknowledgment.
+A second required Host startup failure stops the first Host, closes admission
+and joins the worker before reporting a failed start. A required Host runtime
+failure or worker command fault retains the primary cause while separately
+reporting cleanup status. A full data queue cannot block the out-of-band
+stop/condition-variable wakeup. Rejected old generation is demonstrated with
+a negative fixture only; actual restart/session replacement remains unbuilt.
+
+A timed-out `stop` returns `Stopping + TimedOut` **while retaining its
+JoinHandle**, and the caller can later observe `Joined`. A fallback Drop
+joins the owned thread rather than silently claiming a detached worker was
+cleaned up; the Drop fallback itself is not bounded. The synthetic pending
+command cancellation reports the discarded queue count and never promises
+delivery. Actual uncooperative IO or hard-kill cancellation is not proven.
+
+### B2 focused verification
+
+| Gate | Scope-bound evidence |
+|---|---|
+| Owner and Hosts | Two caller-thread Host attachments, one distinct actual worker ThreadId, one authoritative state writer; immutable shared snapshots |
+| Startup rollback | Second required host injected start failure; first stops, worker is joined, application never enters Running |
+| Runtime failures | Required Host failure and worker command failure each retain primary error, close ingress and actually join worker |
+| Saturation / stale ingress | Full vs Closed vs StaleGeneration differ; stop still works while consumer deliberately paused |
+| Cleanup deadline | Zero-timeout returns TimedOut and retains worker; subsequent bounded wait joins; no detach labeled PASS |
+| Scheduler boundary | Borrowed caller scheduler remains usable after both Host callbacks are disposed |
+| Native verification | Ubuntu 26.04.1 LTS / Rust 1.99; final 15/15 tests (seven original B1 plus eight B2), Fmt/Clippy -D warnings PASS; new focused fault-discard negative test 1/1 PASS |
+| Demonstration | Original B1 CLI remains default; new worker-demo prints `generation=1 revision=2 balance=5` and confirms Joined |
+| Feature boundary | Locked/offline normal dependency graph contains only private nested package and zero third-party dependencies |
+| Independent review | Original R1 `wc_job_Nh4ynWCpWGPFMEFG` actual FAIL (one P2 fault-discard accounting); retained unchanged. Targeted 1/1 regression plus full 15/15 PASS after smallest patch. Independent R2 `wc_job_UqJr-AVptjqv0L0D` terminal exit 0 actual JSON PASS, `issues=[]`, `required_followups=[]`, actual Codex model/effort `gpt-6-astra`/`high`; reviewed R2 source hashes unchanged. Independent role-directed Job, not native managed identity/formal assurance |
+
+Raw commands, original failures, focused output and dependency logs remain
+under `artifacts/verification/m28-b2-20261117/`, with rebuildable output
+separated under `.cache/yetlet/builds/m28-b2-20261117/`.
+Reviewer results and the next ignored handoff belong under
+`.pipeline-output/m28-b2-20261117/`.
+
+**Limits:** No Tokio-specific graceful shutdown or shared runtime was
+exercised, and no real browser, WebGL/WebGPU, native window, game tick, IPC,
+UDP, session reconnect, cross-process LAN or Windows behavior was tested.
+The stopped/failed states describe this private POC, not the published Yetlet
+SDK. The original Web API/SSR surface remains unchanged and its accepted B0
+source-bound baseline may be reused; no new performance or zero-overhead
+claim follows. ADR 0013 stays **Proposed** and M28-C/D/E remain Todo.

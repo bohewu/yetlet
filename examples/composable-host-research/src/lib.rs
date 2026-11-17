@@ -4,6 +4,9 @@
 //! the authoritative counter; the Hosts receive bounded CommandPort and immutable
 //! SnapshotPort values. No executor, transport, render backend or Host trait exists.
 
+// Optional B2 owned-worker variation. B1's caller-thread path stays intact.
+pub mod worker;
+
 use std::{
     cell::{Cell, RefCell},
     collections::VecDeque,
