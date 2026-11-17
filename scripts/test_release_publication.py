@@ -8,6 +8,7 @@ from pathlib import Path
 import struct
 import tarfile
 import tempfile
+import tomllib
 import unittest
 from unittest.mock import patch
 import zipfile
@@ -94,18 +95,19 @@ def archives(directory, cycle=False, consolidated=False, cli=False, cli_version=
 
 
 class RegistryTests(unittest.TestCase):
-    def test_resolver_cli_binds_one_archive_sdk7_and_shipped_policy_snapshot(self):
+    def test_resolver_cli_binds_versioned_build_sdk_and_shipped_policy_snapshot(self):
         package = HERE.parent / 'tools/yetlet-cli'
         current_policy = (package / 'resources/sdk-compatibility.json').read_bytes()
         for version, expected_policy in [('0.3.0', HISTORICAL_POLICY),
-                                         ('0.3.1', LATEST_POLICY), ('0.4.0', current_policy)]:
+                                         ('0.3.1', LATEST_POLICY), ('0.4.0', current_policy),
+                                         ('0.4.1', current_policy)]:
             with self.subTest(version=version), tempfile.TemporaryDirectory() as temp:
                 r, subjects = archives(Path(temp), cli=True, cli_version=version)
                 plan, bodies = registry.prepare(r, temp, subjects)
                 self.assertEqual([row['name'] for row in plan['packages']], ['yetlet-cli'])
                 size = struct.unpack_from('<I', bodies['yetlet-cli'])[0]
                 meta = json.loads(bodies['yetlet-cli'][4:4+size])
-                self.assertEqual(meta['deps'][0]['version_req'], '=0.9.0-alpha.7')
+                self.assertEqual(meta['deps'][0]['version_req'], '=' + records.cli_sdk_version(version))
                 self.assertIn('browser-style', meta['readme'])
                 self.assertIn(records.CLI_SDK_POLICIES[version], meta['readme'])
                 with tarfile.open(Path(temp) / f'yetlet-cli-{version}.crate') as archive:
@@ -118,6 +120,9 @@ class RegistryTests(unittest.TestCase):
                     self.assertIn('**Build SDK:** `=0.9.0-alpha.8`.',
                                   (package / 'README.md').read_text())
                     self.assertNotEqual(meta['readme'], (package / 'README.md').read_text())
+                if version == '0.4.1':
+                    self.assertIn('**Build SDK:** `=0.9.0-alpha.8`.', meta['readme'])
+                    self.assertIn('yetlet 0.4.1', meta['readme'])
                 r, subjects = archives(Path(temp), cli=True, cli_version=version, cli_sdk='0.9.0-alpha.6')
                 with self.assertRaises(ValueError): registry.prepare(r, temp, subjects)
 
@@ -327,10 +332,14 @@ class CliConsumerTests(unittest.TestCase):
         steps = workflow['jobs']['publish']['steps']
         setup = next(step for step in steps if step.get('name') ==
                      'Prepare resolver CLI browser consumer tools before publication')
-        self.assertEqual(setup['if'], "fromJSON(inputs.record).schema == 3 && "
-                         "(fromJSON(inputs.record).version == '0.3.0' || "
-                         "fromJSON(inputs.record).version == '0.3.1' || "
-                         "fromJSON(inputs.record).version == '0.4.0')")
+        # The schema-3 CLI cohort, not an aging version allowlist, owns these
+        # Browser/WASM tools. Validate the currently selected source release too.
+        self.assertEqual(setup['if'], 'fromJSON(inputs.record).schema == 3')
+        manifest = tomllib.loads((HERE.parent / 'tools/yetlet-cli/Cargo.toml').read_text())
+        selected = manifest['package']['version']
+        self.assertNotIn(selected, records.LEGACY_CLI_VERSIONS)
+        records.source_version({'schema': 3, 'cohort': 'cli', 'version': selected,
+                                'source': 'a' * 40}, HERE.parent)
         publish = next(step for step in steps if step.get('run') == 'python3 scripts/release-publish.py publish')
         self.assertLess(steps.index(setup), steps.index(publish))
         self.assertIn('rustup target add wasm32-unknown-unknown --toolchain 1.99.0', setup['run'])
