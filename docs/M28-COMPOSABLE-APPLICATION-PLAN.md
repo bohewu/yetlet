@@ -1,7 +1,7 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A/B0/B1/B2 accepted at their bounded scopes; B2 committed at `f2894d7`. C1 / YT-268 complete at private headless research scope: focused 13/13 PASS and independent Reviewer actual PASS. Git delivery separate; C2/C3/D/E remain unimplemented/unqualified.
+- **State:** M28-A/B0/B1/B2 and C1 accepted at separate bounded scopes; C1 locally committed `f405d4f`. C2 / YT-269 private native X11/winit/wgpu integration complete at focused source and bounded actual GPU/keyboard scope, with independent R3 `wc_job_Pi934pMwws_L1XwD` actual PASS; Git delivery separate. C3/D/E remain unimplemented/unqualified.
 - **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
@@ -869,3 +869,67 @@ worker thread, browser or cross-process protocol is added to C1. Display-free
 execution plus source/graph inspection is not syscall tracing or a new OS
 sandbox. No FPS, latency, memory, Windows, network or C2 visual claim follows.
 ADR 0013 remains **Proposed**; C2/C3/D/E are not authorized by this delivery.
+
+## 14. C2 opt-in native GameHost — YT-269
+
+**Selection:** The owner authorized a bounded native winit/wgpu GameHost
+research slice after locally committing C1 at `f405d4fb5fea13864da451c479dc316e715909fb`.
+C2 adds an independent nested `[workspace]` private package at
+[composable-host-research/native](../examples/composable-host-research/native/README.md),
+not a new public Yetlet Host/Renderer, root Cargo member, HTML/DOM renderer
+replacement, or mandatory Web/Headless dependency. ADR 0013 remains Proposed.
+
+### Architecture and lifetime
+
+- A concrete `GameHost` implements winit 0.30.13 `ApplicationHandler`,
+  constructs its Window only in the foreground `resumed` callback, and owns
+  Window, Surface, wgpu Device, Queue and instance buffer. `exiting` disposes
+  renderer resources before the Window. No GameHost-created simulation worker
+  or extra Tokio Runtime is involved.
+- The same C1 `Simulation::step` is called only by `GameDriver::step` from
+  the caller-thread scheduler; `WindowEvent::RedrawRequested` receives
+  only the latest immutable C1 Snapshot through the read-only `project`
+  function. The renderer does not own an authoritative state mutation.
+- W/A/S/D control Player One, arrow keys control Player Two; Space pauses,
+  Enter resumes and Escape exits. Physical key repeat is ignored; focus loss
+  releases held controls; pending typed Commands remain bounded by C1's
+  max 32 per Tick. Failure rejects without a partial new publication.
+  Resume clears Host key tracking only on the effective Paused-to-Running
+  transition projected from the last published Snapshot **and earlier pending
+  Pause/Resume commands**. Repeated Resume within one queued Tick is a no-op;
+  physical-key release and focus loss still submit Hold(Still).
+- The monotonic foreground scheduler targets 60 logical simulation ticks/s,
+  caps accepted elapsed time at 100 ms and advances at most four ticks/wake;
+  excess time debt is counted and discarded. A separate 30 Hz target requests
+  redraw; drawing does not advance the simulation. This is a small scheduling
+  contract, **not** 60 Hz real-time or frame-latency certification.
+- Actual rendering uses wgpu 27.0.1 Vulkan with a WGSL two-rectangle pipeline
+  and a 64-byte instance buffer generated from immutable scene projection.
+  Native X11 is explicitly selected for this Linux implementation. A
+  platform-neutral universal Renderer trait is not added.
+
+### C2 focused evidence and limits
+
+| Gate | Evidence-bound result |
+|---|---|
+| Environment | Ubuntu 26.04.1 X11 display `:0` reachable; active 1920x1080 Xorg session; Vulkan loader and `/dev/dri` present; native bounded attempt uses an actual NVIDIA GeForce RTX 4090 / Vulkan adapter |
+| Dependencies | winit 0.30.13 + wgpu 27.0.1 + pollster 0.4.0 are in the opt-in native nested Cargo workspace with its own lock; root SDK/CLI/Web and std-only C1 normal graph unchanged |
+| Native focused tests | Initial 9/9 PASS; after R1 P2 fix 10/10 PASS; after R2 P2 correction the same-Tick queued Resume/release/focus-loss regression 1/1 and complete C2 native library 11/11 PASS. Original B0/B1/B2/C1 test suites not rerun |
+| Native compilation | Locked/offline Native binary builds; Rustfmt and Clippy `-D warnings` PASS; original API mismatch/format attempts retained separately |
+| First actual window | winit created 960x640 Window and wgpu Vulkan Surface/Pipeline; bounded 45-tick run exit 0, rendered 24 frames, dropped debt 0, all owned resources released |
+| OS keyboard control | One bounded X11 XTest attempt targeted the exact winit window after checking its title and PID; D+Left then key release, Space Pause and Enter Resume reached native callbacks; exit0 at control Tick 210, Active Tick 177, positions (22,2)/(0,12), 106 rendered frames, dropped debt 0; original focus restored |
+| Pure Web preservation | Opt-in native `[workspace]` is not a root Cargo member; original std-only package remains one normal package, zero external dependencies; no Axum, CLI or Web default source changes |
+| Independent review | Original R1 `wc_job_BLgscEDX_x91p33c` and R2 `wc_job_L7Eq2gsTBng989Xo` actual FAIL (one P2 each) preserved. Native-only projected pending Pause/Resume fix passed targeted 1/1 and complete 11/11 tests plus Fmt/Clippy. Independent R3 `wc_job_Pi934pMwws_L1XwD` completed exit0, actual JSON PASS `issues=[]`/`required_followups=[]`, observed `gpt-6-astra`/`high`; all ten reviewed source and scoped evidence hashes matched at terminal. No public SDK/Host API promotion or C3 visual certification |
+
+Native test and retained failed-attempt logs:
+`artifacts/verification/m28-c2-20261117/`. Isolated native build output:
+`.cache/yetlet/builds/m28-c2-20261117/`. Reviewer/continuation output:
+`.pipeline-output/m28-c2-20261117/`. No evidence or cache cleanup.
+
+**Not yet qualified:** C3 real visual inspection and surface lifecycle matrix,
+resize/zero-size/minimize/recovery, keyboard layouts/platforms beyond the
+specific tested X11 key sequence, GPU loss/recovery, latency/FPS benchmarks,
+Windows, Wayland, browser, multiplayer transport or network LAN. The C2
+smoke proves actual native initialization, key event routing, renderer submit
+and bounded exit, not that all future renderer/Host combinations are valid.
+C3/C2 remain distinct; C3 and D/E are still Todo.

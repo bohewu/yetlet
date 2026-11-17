@@ -83,6 +83,16 @@ accessors return copies. Retained snapshots never change. Tests compare the
 Read-only observation cadence does not advance simulation. GPU/Window, sockets,
 HTTP, display variables, real-time scheduling and C2 remain out of scope.
 
+## C2 — Optional native GameHost (YT-269)
+
+[Native X11/Vulkan GameHost research](native/README.md) is a **different,
+explicitly selected nested workspace** with winit/wgpu dependencies. It
+calls the same C1 Simulation::step and read-only Scene projection, but
+does not add graphics dependencies or extra Runtime costs to this std-only
+B1/B2/C1 package, root Web server, SDK or CLI. Actual Ubuntu X11/Vulkan
+startup and a bounded keyboard interaction path were exercised; C3 reserves
+full visual, window lifecycle and performance qualification.
+
 ## Run the examples
 
 From the repository root using the pinned Rust toolchain:
