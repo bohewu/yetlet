@@ -603,6 +603,20 @@ def sync_published_docs(root, published, cli_sdk, edition):
                               lambda m, destination=destination: m[1] + destination + m[2],
                               subject + ' publication record link')])
 
+    # These two current-status references use narrative wording rather than the
+    # standard Published CLI field. Keep them source-derived and leave dated
+    # source/consumer evidence untouched.
+    apply("docs/RELEASE-PUBLICATION.md", [
+        pair(r"(Current accepted\s+distribution is \[SDK )" + VERSION_SHORT_PATTERN +
+             r"( / CLI)" + VERSION_PATTERN + r"(\]\(RELEASE-READINESS\.md\))",
+             sdk_short, cli, "current accepted SDK/CLI distribution"),
+    ])
+    apply("docs/CLI-GUIDE.md", [
+        (r"(\[hosted CLI release records\]\()[^)]+(\))",
+         lambda m: m.group(1) + links['CLI'].removeprefix('docs/') + m.group(2),
+         "current hosted CLI publication authority"),
+    ])
+
     apply("docs/API-REFERENCE.md", [
         one(r"(SDK \(" + tick + ")" + VERSION_PATTERN + r"(" + tick +
             r"\) from independent CLI tooling and checkout samples)", sdk, "published SDK"),

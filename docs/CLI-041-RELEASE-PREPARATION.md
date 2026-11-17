@@ -1,7 +1,7 @@
 # Yetlet CLI 0.4.1 — independent patch-release preparation (YT-264)
 
 **Date:** 2026-11-17 (Asia/Taipei)  
-**Status:** Source-preparation candidate, **not published**. No 0.4.1 tag, immutable C, signer S, independent verifier V, publication P or final owner approval has been selected by this document. The current accepted public CLI and Reader Edition remain **0.4.0**; the published SDK pair remains **0.9.0-alpha.8**. A source manifest at 0.4.1 is not registry availability.
+**Original preparation status (historical, superseded by owner approval):** Source-preparation candidate, **not yet published at this checkpoint**. No 0.4.1 tag, immutable C, signer S, independent verifier V, publication P or final owner approval has been selected by this document. The current accepted public CLI and Reader Edition remain **0.4.0**; the published SDK pair remains **0.9.0-alpha.8**. A source manifest at 0.4.1 is not registry availability.
 
 ## Selected release boundary
 

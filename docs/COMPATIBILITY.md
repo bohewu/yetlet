@@ -31,7 +31,7 @@ DOM's existing admission/URL/image policy. Selected typed attribute setters
 the typed builder; generic `attribute` retains append-only semantics.
 The shared `View` representation and renderer behavior are unchanged.
 Published SDK alpha.7 includes these builders; CLI 0.2.0 stays independently pinned.
-The published SDK alpha.8 and CLI 0.4.0 packages are independently versioned;
+The published SDK alpha.8 and CLI 0.4.1 packages are independently versioned;
 only the SDK includes the typed Tag Builder.
 
 See the [typed View guide](VIEW-COMPONENTS.md#standard-html-authoring-coverage),
@@ -44,15 +44,15 @@ in [alpha.7](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-con
 ## Current distribution — 2026-11-12
 
 The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.8`; the independently
-published CLI is `yetlet-cli` `0.4.0`, with release build SDKalpha.7.
+published CLI is `yetlet-cli` `0.4.1`, with release build SDKalpha.8.
 See the [SDK publication record](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
-and [CLI publication record](CLI-040-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-12)
+and [CLI publication record](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17)
 for the actual artifacts and consumers. YT-220/221's DOM vocabulary, pre handling
 and opt-in navigation/images are available in SDKalpha.6; YT-223's static export
 is available in CLI0.2.0. Existing defaults and Experimental API limits remain.
 
 The public reader/first-app edition remains explicitly pinned to
-SDKalpha.8/CLI0.4.0 in [the site manifest](../site/pages.toml).
+SDKalpha.8/CLI0.4.1 in [the site manifest](../site/pages.toml).
 
 Some registry-only
 reference examples retain their own SDKalpha.5 pins, independently of the
@@ -81,7 +81,7 @@ not inferred from this source-bound evidence.
 ## Published CLI Style authoring and checkout Showcase — 2026-11-10
 
 Optional application-local CSS generation and build/watch integration first
-shipped in **CLI 0.3.0**. Style templates are distributed in CLI 0.4.0.
+shipped in **CLI 0.3.0**. Style templates are distributed in CLI 0.4.1.
 The [current CLI Style guide](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree)
 and [original implementation evidence](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md)
 retain current usage versus dated source-only qualification.

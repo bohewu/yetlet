@@ -1,6 +1,6 @@
 # Release Supply-Chain Design
 
-Current distribution is the accepted [SDKalpha.8 and CLI0.4.0](RELEASE-READINESS.md)
+Current distribution is the accepted [SDKalpha.8 and CLI0.4.1](RELEASE-READINESS.md)
 pair. Dated source-only/preparation statements below preserve their original
 scope, not current unavailability. New releases follow the closed
 [cohort/freeze SOP](RELEASING.md), [publication contract](RELEASE-PUBLICATION.md)
@@ -87,7 +87,7 @@ commit `849c5894f73d9732db9c2ccaa765385dc9d8a819`; public GitHub reachability ha
 
 **Current distribution is separately established by actual release records:**
 [SDK `0.9.0-alpha.8`](ALPHA8-HOSTED-RECORD.md) and
-[independent CLI `0.4.0`](CLI-040-HOSTED-RECORD.md).
+[independent CLI `0.4.1`](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17).
 The approved [release SOP](RELEASING.md) and
 [publication workflow contract](RELEASE-PUBLICATION.md) select a closed
 source/version-specific cohort; historical instructions below cannot be

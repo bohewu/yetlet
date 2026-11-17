@@ -4,8 +4,8 @@ For registry installation, a native quickstart and the selected release, see the
 [package README](../tools/yetlet-cli/README.md). This guide covers the command
 reference, platform setup, project settings and source maintenance.
 
-Use the [current CLI contract](CLI-CONTRACT.md), [published CLI 0.4.0
-record](CLI-040-HOSTED-RECORD.md) and [published SDK alpha.8 record](ALPHA8-HOSTED-RECORD.md)
+Use the [current CLI contract](CLI-CONTRACT.md), [published CLI 0.4.1
+record](CLI-041-HOSTED-RECORD.md) and [published SDK alpha.8 record](ALPHA8-HOSTED-RECORD.md)
 for version and distribution authority. The CLI build SDK, its immutable
 packaged source snapshot and each generated application's selected SDK are
 **different identities**. The default latest resolver, exact `--sdk-version`,
@@ -94,7 +94,7 @@ archive and remain bound to that archive's checksum and immutable source.
 
 ### Generated startup profiles
 
-CLI `0.4.0` checks the selected exact SDK version against its packaged startup
+CLI `0.4.1` checks the selected exact SDK version against its packaged startup
 capability policy. A matching row must also match the registry index SHA-256 of
 the core `yetlet` archive. The packaged policy lists SDK `0.9.0-alpha.8`.
 An unlisted version, including `0.9.0-alpha.7`, uses the legacy listener for
@@ -167,7 +167,7 @@ An unlisted version remains eligible but emits the legacy
 simple native listener on *that same SDK*, not a downgrade.
 A listed checksum contradiction reports
 `SDK_INCOMPATIBLE/template-capability` with no destination.
-Published CLI0.4.0 advertises the verified alpha.8 capability
+Published CLI0.4.1 advertises the verified alpha.8 capability
 row; unlisted alpha.7 keeps legacy behavior. The simple
 capability-matched Native/Native Style `.serve()` path uses
 `127.0.0.1:7878` and ignores `YETLET_PORT`, while a legacy
@@ -194,7 +194,7 @@ passed anonymous install/version/help/`new` (original SDK
 alpha.5 pin) without rewriting 0.1.0 or claiming that
 generated applications compiled. Current distribution and
 newer versions are governed only by accepted
-[hosted CLI release records](CLI-040-HOSTED-RECORD.md).
+[hosted CLI release records](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17).
 Original failed, consumed and accepted records are retrievable
 at fixed **local Git**
 `8b3e13004a58380accf16ea440707f84e6271871`;
@@ -801,7 +801,7 @@ representation.
 ### Windows x64 MSVC first app and native watch
 
 This is the PowerShell counterpart of [First App](FIRST-APP.md), for the
-**published CLI `0.4.0` and SDK `0.9.0-alpha.8`** on native Windows x64
+**published CLI `0.4.1` and SDK `0.9.0-alpha.8`** on native Windows x64
 MSVC. Do not paste POSIX shell commands into PowerShell. This is a plain
 Native SSR workflow: Node, Vite, WASM and a database are not required.
 Keep the CLI installation, app SDK selection, app Cargo cache and optional
@@ -851,7 +851,7 @@ MSVC linker and any source-install OpenSSL headers/libraries. When using a
 separately prepared OpenSSL prefix, configure `OPENSSL_DIR` and related
 linker variables **only in this PowerShell process**. This prerequisite is
 for compiling the CLI; the generated plain Native app does not opt into
-signing. Alternatively, reuse an already installed, verified CLI `0.4.0`
+signing. Alternatively, reuse an already installed, verified CLI `0.4.1`
 from an accepted installation; no prebuilt executable is promised by the
 source release.
 
@@ -860,10 +860,10 @@ package**, choose an unused, owner-protected local prefix. The two version
 numbers are independent:
 
 ```powershell
-$cliRoot = Join-Path $env:LOCALAPPDATA 'YetletCli040'
+$cliRoot = Join-Path $env:LOCALAPPDATA 'YetletCli041'
 if (Test-Path -LiteralPath $cliRoot) { throw 'Choose an unused CLI prefix' }
 New-Item -ItemType Directory -Path $cliRoot -ErrorAction Stop | Out-Null
-& $cargo install yetlet-cli --version 0.4.0 --locked --root $cliRoot
+& $cargo install yetlet-cli --version 0.4.1 --locked --root $cliRoot
 if ($LASTEXITCODE -ne 0) { throw 'CLI installation failed; retain the Cargo error' }
 $yetlet = Join-Path $cliRoot 'bin\yetlet.exe'
 & $yetlet --version
@@ -993,7 +993,7 @@ is distinct from this Native-only MSVC result. Historical Windows GNU pair
 acceptance covers six separate Rust/Vite cases; the older MSVC pair
 qualification is compile-only. Historical single-Cargo MSVC evidence covers
 native cancellation and process ownership without proving this full
-current CLI 0.4.0 workflow.
+newly published CLI 0.4.1 workflow.
 
 ## Read-only project inspection (YT-111)
 
@@ -1102,9 +1102,9 @@ historical YT-104 qualification describes the earlier static starter scope.
 ## Application-owned Rust CSS
 
 Application-owned Rust CSS first shipped in CLI `0.3.0` and remains available
-in CLI `0.4.0`. The opt-in Style templates generate external CSS at build time
+in CLI `0.4.1`. The opt-in Style templates generate external CSS at build time
 through a private application tool. The current Reader Edition selects SDK
-`0.9.0-alpha.8` and CLI `0.4.0`. App SDK selection follows
+`0.9.0-alpha.8` and CLI `0.4.1`. App SDK selection follows
 [SDK resolution](#sdk-resolution-yt-247).
 
 `new --template native-style` and `new --template browser-style` opt into a private
@@ -1161,6 +1161,7 @@ itself a published CLI or public Style API.
 | `0.3.0` | Accepted supplement passed Native Style SSR/CSS and Browser Style Vite/Wasm/Chrome with SDK alpha.7. The original publisher's consumer preflight failure is retained. [Publication record](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10) | New Style-template revalidation remained unverified. [Publication record](CLI-030-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-10) |
 | `0.3.1` | Hosted consumer passed Native and Browser Style runtime with SDK alpha.7. [Publication record](CLI-031-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-11) | Corrected source passed Native SSR/CSS, Browser Vite/Wasm/Chrome and immediate port closure after Ctrl-Break for both apps. The reviewed formatting-only delta and package member comparison bind the tested source to the accepted archive. [Windows preparation](CLI-031-RELEASE-PREPARATION.md), [hosted archive record](CLI-031-HOSTED-RECORD.md#windows-corrected-replacement--2026-11-11) |
 | `0.4.0` | Hosted consumer passed Native Style HTTP/CSS and Browser Style Vite/Wasm/Chrome with exact SDK alpha.7. The separate alpha.8 first-app runtime check used plain Native. [Publication record](CLI-040-HOSTED-RECORD.md) | The preparation archive passed the locked SDK alpha.8 Native Style compile check, including SDK and startup-profile selection and lock preservation. Windows Style runtime evidence for this release remains unverified. [Qualification record](CLI-040-HOSTED-RECORD.md) |
+| `0.4.1` | Published [CLI 0.4.1 record](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17): registry-only CLI install, Native Style HTTP/CSS and Browser Style actual Chrome/WASM/CSS PASS, SDK alpha.8; package SHA read back from crates.io and GitHub | Original source-level Windows MSVC Ctrl+C regression and same-run OS-process cleanup accepted in PR #97; no new installed 0.4.1 Windows runtime matrix claimed |
 
 YT-243 records source qualification, including Linux release-profile browser
 checks and local Windows MSVC Native Style HTTP/CSS, Browser Style scaffold

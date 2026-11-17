@@ -1,10 +1,16 @@
-# Yetlet CLI 0.4.1 Experimental signing dossier
+# Yetlet CLI 0.4.1 Experimental — hosted publication record
 
-Status: unsigned candidate and independent encrypted-evidence readback accepted
-locally, not signed, not published. The accepted public CLI remains 0.4.0; the
-published SDK remains 0.9.0-alpha.8. This document does not select signer S,
-public-release ID, verifier V or publication P, authorize distribution, or
-replace the original receipts.
+**Current distribution (2026-11-17):** Yetlet CLI `0.4.1` is published as
+an Experimental pre-release, independently of SDK `0.9.0-alpha.8`.
+See the [owner-approved publication and installed consumer](#owner-approved-publication-and-installed-consumer--2026-11-17)
+below for the current authority. The earlier signing dossier, including its
+Pending states, is **historical pre-publication evidence**, not current status.
+
+**Original signer-dossier checkpoint (before publication):** This was an
+unsigned candidate with independent encrypted evidence readback; it was
+not yet signed or published. The accepted public CLI was `0.4.0`, with
+SDK `0.9.0-alpha.8`. The dossier did not then select signer S, public
+Release ID, verifier V or publication P or authorize distribution.
 
 ## Immutable source and review, 2026-11-17
 
@@ -92,9 +98,44 @@ existing reviewed-automation policy at S and require a separate independent
 result verification at V; publication preflight at P must re-derive the
 unchanged allowlisted five-file CLI package and registry plan.
 
-**Final owner action remains pending:** stop at the protected release-publish
-Environment owner approval. Do not click or bypass that approval, convert a
-Draft into a public GitHub pre-release, upload to crates.io, publish the SDK
-again, change Reader Edition or run a fresh registry consumer before approval.
-Unknown or failed external writes require readback and separate disposition,
-not automatic retries. No release publication has occurred for 0.4.1.
+**Historical signer-dossier gate (since completed):** At this checkpoint
+the final action was pending at the protected release-publish Environment.
+No automated agent was authorized to bypass owner approval or retry uncertain
+writes. The completed owner-approved publication is recorded below.
+
+## Owner-approved publication and installed consumer — 2026-11-17
+
+CLI `0.4.1` was approved by the owner through the protected
+`release-publish` Environment and published as an Experimental pre-release:
+[GitHub Release](https://github.com/bohewu/yetlet/releases/tag/yetlet-cli-v0.4.1)
+and [crates.io `yetlet-cli` 0.4.1](https://crates.io/crates/yetlet-cli/0.4.1).
+SDK `0.9.0-alpha.8` remains independently published and was **not** re-released.
+The public Reader Edition is promoted separately through a reviewed Git
+change to `site/pages.toml`.
+
+| Proof | Actual result |
+|---|---|
+| Product C / immutable tag | `7fbf918a5a0734f7ed125afd6c860837b1de55d1` / `yetlet-cli-v0.4.1` |
+| Signer / verifier / publication S=V=P | `e6a73d9ce13ba94d640339813e58ee1f110ed4b5` |
+| Source / dossier PRs | [#98](https://github.com/bohewu/yetlet/pull/98) and [#99](https://github.com/bohewu/yetlet/pull/99), merged; exact PR/master Rust, Docs and CodeQL CI PASS |
+| Original unsigned Build | [Run 44017724892](https://github.com/bohewu/yetlet/actions/runs/44017724892), attempt 1, PASS |
+| Independent encrypted Build readback | First Run `44018194331` failed metadata preflight; corrected [Run 44018677389](https://github.com/bohewu/yetlet/actions/runs/44018677389), attempt 1, PASS. Original failure retained |
+| Prepare and Sign | [Run 44021862161](https://github.com/bohewu/yetlet/actions/runs/44021862161) and [Run 44024521001](https://github.com/bohewu/yetlet/actions/runs/44024521001), attempt 1, PASS |
+| Independent signature Result Verifier | [Run 44024859783](https://github.com/bohewu/yetlet/actions/runs/44024859783), attempt 1, PASS |
+| Owner-approved publication | [Run 44025334874](https://github.com/bohewu/yetlet/actions/runs/44025334874), attempt 1, terminal SUCCESS, no automatic retry |
+| GitHub Release | ID `448163167`, `draft=false`, `prerelease=true`, exactly five public assets with original approved bytes |
+| CLI crate | `yetlet-cli-0.4.1.crate`, 541,417 bytes, SHA-256 `ac449f2dc415abb6c44ca8ee9b2b14a3f7f587e7e6f9b636cf0f5945c30dff0e` |
+| crates.io | Version 0.4.1 not yanked; registry index, CDN and GitHub downloads return identical source archive bytes and SHA-256 |
+| Installed registry consumer | Actual `CLI-CONSUMER.json` PASS: crates.io CLI 0.4.1, no local path patch or forwarded credentials, six project profiles using SDK alpha.8, real Native Style and Chrome Browser Style/WASM/CSS runtime PASS |
+| Original publication receipt | `PUBLICATION-RESULT.json`: `complete`; GitHub and Registry both `published_and_verified`, `automatic_retry=false` |
+
+Published CLI `0.4.0` remains an immutable historical archive built against
+SDK alpha.7. The Windows Ctrl+C cleanup correction from
+[PR #97](https://github.com/bohewu/yetlet/pull/97) is included in the 0.4.1
+source; original native MSVC evidence and earlier failures remain source-scoped.
+
+This Experimental release is not Stable API, broad production/GPU
+qualification, or an injected-inline-handler CSP negative test.
+The post-publication original receipts and private evidence are preserved
+under the owner-controlled
+`~/.local/state/yetlet/cli-041-release-guard-20261117/` directory.

@@ -9,7 +9,7 @@
 
 - [x] **Windows Browser first use and bounded CLI Ctrl+C race fix (YT-263).** Add the [PowerShell Browser guide](BROWSER-APP.md#windows-x64-msvc-powershell-first-use) with exact CLI/SDK pins, trusted physical Node selection and locked WASM/Vite preparation; reuse scoped Ubuntu Chrome evidence for shared Browser tasks and ordinary CSP without requiring Windows Chrome. The source-only Windows CLI cleanup fix has focused MSVC 1/1, same-invocation Ctrl+C native exit and process/5173 cleanup evidence plus independent CLI-only Reviewer PASS. Deliberate CSP negative-enforcement and Browser Watch/HMR remain out of scope. Integrated Reviewer PASS, Strict Guards PASS, [PR #97](https://github.com/bohewu/yetlet/pull/97) merged at `597c760` with exact PR/master Rust/Docs/CodeQL CI and live Pages readback PASS. No CLI package release; the source-only fix is reserved for the next candidate.
 
-- [ ] **CLI 0.4.1 patch-release preparation (YT-264).** Keep SDK alpha.8 / CLI 0.4.0 public Reader Edition while qualifying [the independent CLI cohort](CLI-041-RELEASE-PREPARATION.md) and the source-only Windows Ctrl+C fix. Prepare source/record/test/README identities, reviewed PR/master CI and immutable unsigned/signed evidence; stop before the protected final owner publication gate. No new SDK package release or premature Reader Edition change.
+- [x] **CLI 0.4.1 patch release (YT-264).** [Source preparation](CLI-041-RELEASE-PREPARATION.md) and [published Hosted Record](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17): CLI source PR #98, signer dossier PR #99, independent review, Strict Guard and CI PASS; immutable C/tag, original Build, encrypted readback, signer S and independent verifier PASS. Owner approved [publication Run 44025334874](https://github.com/bohewu/yetlet/actions/runs/44025334874), which published an exact five-asset GitHub Experimental pre-release and byte-identical crates.io CLI 0.4.1; installed registry-only consumer six cases with Native Style and Browser Style Chrome/WASM runtime PASS. SDK alpha.8 unchanged. The Reader Edition version selection is updated in this documentation-only follow-up, pending its own PR/CI/Pages delivery.
 
 The M27-A/B audit and prioritization are recorded in [DX Gap Report](M27-DX-GAP-REPORT.md) and [Prioritized Plan](M27-PRIORITIZED-PLAN.md). Both work items received independent plan Reviewer R4 PASS and independent implementation Reviewer `wc_job_ab4Zl3f_I3Q3_Fu4` PASS; YT-260 and YT-261 are complete at their bounded documentation scope.
 
@@ -35,8 +35,9 @@ The M27-A/B audit and prioritization are recorded in [DX Gap Report](M27-DX-GAP-
   `0.9.0-alpha.8` passed on Linux and Windows x64 MSVC. On both platforms,
   `/` and `/hello/Ada` returned HTTP 200 with the default CSP, and the app lock
   and creation receipt were preserved. The Windows run also verified Ctrl+C
-  shutdown and reuse of port `7878`. The Reader Edition selects SDK
-  `0.9.0-alpha.8` and CLI `0.4.0`.
+  shutdown and reuse of port `7878`. At that M26 checkpoint,
+  the Reader Edition selected SDK `0.9.0-alpha.8` and CLI `0.4.0`; the
+  current CLI0.4.1 edition is a separate publication.
   [CLI startup profiles](CLI-GUIDE.md#generated-startup-profiles) ·
   [CLI publication](CLI-040-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-12) ·
   [First App](FIRST-APP.md) · [Reader Edition selection](../site/pages.toml)
@@ -113,7 +114,7 @@ Yetlet-built cutover and current edition have separate records.
 
 **Historical release milestones (2026-10-29–11-02).** The dated gates in this
 table belong to their original source and checkpoint. Current distribution is
-SDK alpha.8 / CLI 0.4.0, established by the accepted records above. Formal item
+SDK alpha.8 / CLI 0.4.1, established by the accepted records above. Formal item
 states and substantive acceptance remain in [Backlog](BACKLOG.md).
 
 | Dated milestone | State, boundary and canonical proof |

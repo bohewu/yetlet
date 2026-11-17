@@ -1,17 +1,17 @@
 # Documentation sources and publication scope
 
-Date: 2026-10-26 classification, updated 2026-11-10 for published SDK/CLI and the separate reader edition.
+Date: 2026-10-26 classification, updated 2026-11-17 for the published CLI 0.4.1 and the selected reader edition.
 The published Experimental SDK is `yetlet` and `yetlet-browser`
-`0.9.0-alpha.8`; the independently published CLI is `yetlet-cli` `0.4.0`.
+`0.9.0-alpha.8`; the independently published CLI is `yetlet-cli` `0.4.1`.
 Use module guides and rustdoc from the version/revision you consume. The
 [SDK publication record](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12) and
-[CLI publication record](CLI-040-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-12)
+[CLI publication record](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17)
 retain their actual distribution/consumer evidence. Older previews retain their
 own package layouts, partial registry results and failure histories. This documentation
 classification activates no website/Wiki or additional publication, support or
 repository-visibility change. Historical candidate decisions retain their scope.
 
-The public reader/first-app edition is the explicitly selected SDKalpha.8/CLI0.4.0
+The public reader/first-app edition is the explicitly selected SDKalpha.8/CLI0.4.1
 pair in [the site manifest](../site/pages.toml). The new
 [browser-only walkthrough](BROWSER-APP.md) is repository guidance; it does not add
 a selected site chapter or promote the live site. The existing link rewriter
@@ -186,7 +186,7 @@ are recoverable locally at Git
 `8b3e13004a58380accf16ea440707f84e6271871`;
 task-local raw logs/receipts were separately stored and
 are not inherently in Git. This history does not change
-the **current published alpha.8 / CLI0.4.0 edition** or
+the **then-current alpha.8 / CLI0.4.0 edition** at that Z10 checkpoint or
 authorize a Pages update. The Z10 maintenance of a few
 Markdown hrefs in existing selected chapters keeps the
 edition and chapter paths stable; a **local nonpublishing
@@ -255,7 +255,7 @@ browser APIs. Checkout improvements never change an already signed candidate's
 identity. A separately selected development edition must be labelled Development.
 The initial mdBook0.5.4 choice is historical, and the Yetlet-built static reader
 with optional Wasm search owns the current Pages path. Keep the exact eight
-chapters and SDKalpha.8/CLI0.4.0 selection, with no recursive report export or
+chapters and the selected SDKalpha.8/CLI0.4.1 pairing, with no recursive report export or
 second manually maintained guide tree. Original task/source links preserve dated
 proof, while operating contracts live in maintained guides. Wiki and hosted
 rustdoc remain separate unselected publication surfaces.

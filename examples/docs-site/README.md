@@ -7,7 +7,7 @@ serves this Reader at https://bohewu.github.io/yetlet/ without adding a new SDK
 or CLI API. Local export commands do not change Pages. Static export is available in
 published CLI `0.2.0` and remains available in later releases; the reproducible
 source-bound build below uses the reviewed CLI from this checkout. The reader
-source edition/consumer is explicitly pinned to SDKalpha.8/CLI0.4.0 independently
+source edition/consumer is explicitly pinned to SDKalpha.8/CLI0.4.1 independently
 of future builder versions. [YT-249](../../docs/DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence)
 records this promotion and the mandatory update after each verified publication;
 [YT-232](../../docs/DOCUMENTATION-SCOPE.md#historical-reader-source-and-rollover-evidence) retains the prior edition's proof.

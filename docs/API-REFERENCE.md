@@ -105,7 +105,7 @@ companion. Both packages are built from the repository.
 
 ## CLI Style authoring and checkout Showcase
 
-Published SDKalpha.8/CLI0.4.0 artifacts serve separate roles. The Reader
+Published SDKalpha.8/CLI0.4.1 artifacts serve separate roles. The Reader
 Edition uses the pair selected in the site manifest.
 Application-owned Rust CSS first shipped in CLI `0.3.0`. The CLI ships Native
 and Browser Style templates with a private build-time generator, build/watch
