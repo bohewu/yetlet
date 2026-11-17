@@ -56,6 +56,11 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Maintainer entry points
 
+- [M28 composable application and multi-host study](M28-COMPOSABLE-APPLICATION-PLAN.md):
+  current source inventory, candidate tradeoffs and B–E acceptance plan;
+  [ADR 0013](adr/0013-composable-application-and-hosts.md) is Proposed.
+  This is documentation research, not a runtime POC or public API release.
+
 - [YT-250 CLI 0.3.1 release](CLI-031-RELEASE-PREPARATION.md): published
   Registry latest SemVer correction, retained exact app locking/provenance and
   Windows Browser Style shutdown verification. The Reader Edition adopted

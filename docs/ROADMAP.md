@@ -1,5 +1,26 @@
 # Yetlet Roadmap — Evidence-Gated Milestones
 
+## M28 — Composable Application and Multi-Host Research
+
+**Planning only.** The owner-selected research direction is Composable
+Application Framework; historical HTML-first wording does not limit the study.
+The [source inventory and plan](M28-COMPOSABLE-APPLICATION-PLAN.md) recommend
+ordinary Rust composition, one state owner, bounded commands, immutable snapshots
+and explicit foreground/background lifetime. [ADR 0013](adr/0013-composable-application-and-hosts.md)
+remains **Proposed**.
+
+- [x] **M28-A / YT-265:** source inventory, alternatives, boundaries, Proposed ADR and acceptance plan complete at documentation scope; independent Reviewer `wc_job_p58KYVEFdOUlz_1C` actual PASS (terminal exit 0, zero issues/followups). Runtime POC remains unrun.
+- [ ] **M28-B / YT-266–267:** two concrete hosts, one owner, no socket requirement; readiness/failure/shutdown and existing Axum compatibility.
+- [ ] **M28-C / YT-268–270:** the same fixed-tick simulation in HeadlessHost and a real native winit/wgpu GameHost; actual visual/backend evidence.
+- [ ] **M28-D / YT-271–273:** bounded internal protocol, native UDP in two independent processes, faults/reconnect/stop and headless network composition.
+- [ ] **Conditional LAN / YT-274:** two physical devices only when available; loopback never substitutes for this claim.
+- [ ] **M28-E / YT-275:** reviewed Promote/Simplify/Retain-private/Reject decision; public contract, packaging, optional Axum adapter, CLI template and positioning are evidence-gated choices.
+
+Only A is in this delivery. B–E remain unimplemented and require their own scope.
+No Axum refactor, public API, dependency/default-feature change, SDK/CLI release
+or public product-description rewrite is included. See the
+[complete task dependency table](M28-COMPOSABLE-APPLICATION-PLAN.md#7-work-breakdown-and-dependencies).
+
 ## M27 — Real-world Developer Experience
 
 - [x] **Correct CLI first-use lock guidance (YT-260).** Align the first-use sequence in `docs/CLI-GUIDE.md` with CLI 0.4.0: `yetlet new` already creates the exact app lock and SDK-resolution receipt; fetch the existing lock with `cargo fetch --locked` before build/run. Preserve explicit offline-cache and no-implicit-install boundaries. Independent final Reviewer `wc_job_ab4Zl3f_I3Q3_Fu4` PASS.
@@ -35,7 +56,7 @@ The M27-A/B audit and prioritization are recorded in [DX Gap Report](M27-DX-GAP-
   `0.9.0-alpha.8` passed on Linux and Windows x64 MSVC. On both platforms,
   `/` and `/hello/Ada` returned HTTP 200 with the default CSP, and the app lock
   and creation receipt were preserved. The Windows run also verified Ctrl+C
-  shutdown and reuse of port `7878`. At that M26 checkpoint,
+  shutdown and reuse of the selected test port. At that M26 checkpoint,
   the Reader Edition selected SDK `0.9.0-alpha.8` and CLI `0.4.0`; the
   current CLI0.4.1 edition is a separate publication.
   [CLI startup profiles](CLI-GUIDE.md#generated-startup-profiles) ·
