@@ -1,8 +1,8 @@
-# YT-266 / YT-267 — Private composable-host research
+# Private composable-host research — B1, B2 and C1
 
 **Scope:** Independent, unpublished Rust research package, **not** a Yetlet
-SDK API, game runtime, public Host trait or process supervisor. The B1
-caller-thread example and B2 explicitly owned-worker variation are separate.
+SDK API, public Host trait or process supervisor. B1 caller-thread composition,
+B2 worker lifecycle and C1 headless game simulation are separately selected.
 
 ## B1 — Caller-thread hosts (YT-266)
 
@@ -48,6 +48,41 @@ worker and injected fault/delay options only exercise bounded test cases.
 Neither B1 nor B2 provides production-grade scheduling, browser/native UI,
 Window, GPU, game ticks, socket/protocol, multi-process or network support.
 
+## C1 — Twin Squares headless simulation (YT-268)
+
+Twin Squares is an original, deliberately small 24 by 16 integer-grid arena.
+Two 2 by 2 squares start at (2,2) and (20,12), move one cardinal unit per
+active tick and clamp their entire footprint to the arena. Overlap is allowed;
+there is no collision engine, scoring system, ECS or floating-point physics.
+
+`HeadlessRunner` owns one `Simulation`. Each successful call advances one
+logical 1/60-second control tick through the single private `reduce` function.
+There is **no wall-clock pacing, elapsed-time accumulator or background worker**
+in C1. A future GameHost may call the same `Simulation::step`; no real GameHost
+or B2 worker-to-game adapter has been implemented by this slice.
+
+Inputs bind generation, tick and sequence to a typed Hold/Pause/Resume command.
+At most 32 commands are accepted per tick. The owner sorts by sequence, rejects
+duplicates/gaps/replays and requires contiguous numbering across its lifetime.
+The next control tick must be exact; wrong generation/tick, over-budget input
+or counter exhaustion rejects the **entire tick**, preserving the previous
+publication and consuming no sequence. The source queue/order comes from the
+caller, not a claim of deterministic live network arrival.
+
+Pause clears held movement; Hold commands while paused are consumed but ignored.
+Control tick/revision continue so Resume can be applied, while active game ticks
+and positions remain frozen. Resume clears held movement on transition and does
+not replay paused ticks; movement needs fresh input. Repeated Resume when already
+running is a no-op. Still releases a held direction. Tick, active-tick, revision
+and input sequence increments are checked; generation is a fixed nonzero lifetime
+ID, not a wrapping counter or a restart mechanism.
+
+Only the owner publishes immutable `Rc<Snapshot>` values; fields are private and
+accessors return copies. Retained snapshots never change. Tests compare the
+**complete state** at each tick, not an unspecified hash or only final positions.
+Read-only observation cadence does not advance simulation. GPU/Window, sockets,
+HTTP, display variables, real-time scheduling and C2 remain out of scope.
+
 ## Run the examples
 
 From the repository root using the pinned Rust toolchain:
@@ -56,11 +91,13 @@ From the repository root using the pinned Rust toolchain:
 cargo test --manifest-path examples/composable-host-research/Cargo.toml --locked --offline
 cargo run --manifest-path examples/composable-host-research/Cargo.toml --locked --offline
 cargo run --manifest-path examples/composable-host-research/Cargo.toml --bin worker-demo --locked --offline
+env -u DISPLAY -u WAYLAND_DISPLAY cargo run --manifest-path examples/composable-host-research/Cargo.toml --bin headless-demo --locked --offline
+cargo test --manifest-path examples/composable-host-research/Cargo.toml --lib simulation:: --locked --offline
 cargo clippy --manifest-path examples/composable-host-research/Cargo.toml --all-targets --locked --offline -- -D warnings
 ```
 
-The original B1 binary remains the default; worker-demo is explicitly
-selected. The package declares its own nested workspace and Cargo.lock,
+The original B1 binary remains the default; worker-demo and headless-demo are
+explicitly selected. The package declares its own nested workspace and Cargo.lock,
 publish=false and **zero normal dependencies**. It does not change the root
 workspace, SDK, CLI, templates or base Web server feature graph.
 

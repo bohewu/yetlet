@@ -4,6 +4,9 @@
 //! the authoritative counter; the Hosts receive bounded CommandPort and immutable
 //! SnapshotPort values. No executor, transport, render backend or Host trait exists.
 
+// C1 deterministic game domain and headless driver; no framework API.
+pub mod simulation;
+
 // Optional B2 owned-worker variation. B1's caller-thread path stays intact.
 pub mod worker;
 

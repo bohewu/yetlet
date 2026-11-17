@@ -1,7 +1,7 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A and B0 accepted at their documented scopes; B1 / YT-266 committed private research; B2 / YT-267 private owned-worker lifecycle POC complete with focused 15/15 PASS, original R1 P2 retained and independent R2 actual PASS. M28-C/D/E remain unimplemented/unqualified.
+- **State:** M28-A/B0/B1/B2 accepted at their bounded scopes; B2 committed at `f2894d7`. C1 / YT-268 complete at private headless research scope: focused 13/13 PASS and independent Reviewer actual PASS. Git delivery separate; C2/C3/D/E remain unimplemented/unqualified.
 - **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
@@ -800,3 +800,72 @@ The stopped/failed states describe this private POC, not the published Yetlet
 SDK. The original Web API/SSR surface remains unchanged and its accepted B0
 source-bound baseline may be reused; no new performance or zero-overhead
 claim follows. ADR 0013 stays **Proposed** and M28-C/D/E remain Todo.
+
+## 13. C1 deterministic headless Twin Squares — YT-268
+
+**Authority and source:** The owner selected C1 only after B2's guarded local
+commit `f2894d741411dbf97e4128528a72d7df69d73624`. This extends the existing
+private `examples/composable-host-research/` package, not a new Framework API.
+B1/B2 counter-domain examples and their accepted evidence remain intact. The
+existing physics-lab is a Rapier/floating-point 3D example and is not substituted
+for C1's dependency-free integer model.
+
+### Domain and ownership
+
+Twin Squares uses a fixed 24 by 16 integer arena with two 2 by 2 squares.
+They begin at (2,2) and (20,12), move one cardinal unit per active tick and
+clamp the entire square footprint to the arena. Overlap is allowed; scoring,
+collision physics and ECS are not part of this bounded simulation proof.
+
+One `Simulation` owns the authoritative publication. `HeadlessRunner` calls
+`Simulation::step`, which invokes one pure reducer and publishes only on success.
+Immutable `Rc<Snapshot>` has private fields, copied accessors and no mutable
+aliases. Old publications remain unchanged. This models caller-thread ownership;
+it does not integrate the game into B2's counter worker or implement C2 GameHost.
+The same step/reducer is the intended later host boundary, not proof of a
+currently working graphics backend.
+
+A step is one **logical 1/60-second interval**, never a sleep or measured 60 Hz
+wall-clock guarantee. All commands carry generation, target tick and sequence.
+The input batch limit is 32; the owner sorts this bounded set by sequence,
+requires contiguous unique sequence numbers across the lifetime and rejects
+wrong generation, wrong/skipped/repeated tick, duplicate/replayed/gapped
+sequence and excess batch size. Typed enums avoid invalid player/direction
+values in the local domain; parsing untrusted wire bytes is future D work.
+Validation and reduction are transactional: any error preserves the exact old
+publication and consumes no sequence, revision, tick or movement.
+
+Control tick and publication revision advance per successful step; active game
+ticks advance only when unpaused. Pause clears held directions, paused Hold
+commands are consumed without buffering movement, and Resume clears held input
+on transition. Repeated Resume while running does not release an active key.
+Resume never catches up paused time; new input is required for movement.
+Checked control/active ticks, revision and sequence never wrap. Private near-max
+unit fixtures test exhaustion without adding a public state-restoration API.
+Generation is fixed and nonzero; no restart/generation rotation is claimed.
+
+### C1 evidence
+
+| Gate | Evidence and limits |
+|---|---|
+| Deterministic reducer | Complete state equality at every tick across two headless replays and direct reducer; sorted input permutations agree |
+| Input/state separation | A validated batch is applied only by the owner; failure leaves the same snapshot pointer and state; read cadence does not affect advancement |
+| Pause/Resume | 100 paused control steps preserve positions and active game time; no held input or time backlog replay |
+| Bounds and exhaustion | Both players at all four whole-square edges; batch 32/33 boundary; duplicate/gap/replay/stale input; checked last-valid and exhausted counters |
+| Ubuntu focused tests | 13/13 new `simulation::` tests PASS, 0 failures/ignored, **15 existing B1/B2 tests filtered out**, not rerun |
+| Style/lint | Rustfmt check PASS; Clippy for library, headless binary and test compile with `-D warnings` PASS |
+| Native headless run | With DISPLAY and WAYLAND_DISPLAY unset: eight control ticks, five active ticks, revision eight, positions (4,4)/(18,10), full-state replay equality |
+| Dependencies | Locked/offline normal graph contains only the private crate; no new dependency, root workspace, SDK, CLI or default-feature change |
+| Independent review | `wc_job_9AM-fykfMMzURQb4` completed/exit 0, actual JSON PASS, issues=[] and required_followups=[]; observed `gpt-6-astra`/`high`. All seven input hashes and raw evidence matched at terminal. Only completion metadata added afterward. Independent role-directed Job, not native managed-role identity, formal assurance or API promotion |
+
+Raw output is retained under `artifacts/verification/m28-c1-20261117/`.
+The existing `.cache/yetlet/builds/m28-b2-20261117/` compiler cache is reused;
+no historical evidence or cache was cleaned. Review and handoff evidence stays
+under `.pipeline-output/m28-c1-20261117/`. Future affected checks are selected
+by changed source, not a blanket replay of the B0/B1/B2 test history.
+
+No window, GPU, renderer, socket, HTTP listener, real-time catch-up scheduler,
+worker thread, browser or cross-process protocol is added to C1. Display-free
+execution plus source/graph inspection is not syscall tracing or a new OS
+sandbox. No FPS, latency, memory, Windows, network or C2 visual claim follows.
+ADR 0013 remains **Proposed**; C2/C3/D/E are not authorized by this delivery.
