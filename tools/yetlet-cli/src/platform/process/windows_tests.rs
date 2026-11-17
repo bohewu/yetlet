@@ -145,6 +145,27 @@ fn owned_native_child_preserves_exit_bits_unicode_argv_cwd_and_environment() {
 }
 
 #[test]
+fn terminate_access_denied_requires_confirmed_exit() {
+    let mut child = fixture(&std::env::current_exe().unwrap(), "sleep")
+        .spawn()
+        .unwrap();
+    // A synchronization-only handle makes TerminateProcess return access denied
+    // deterministically while still allowing the exact process to be observed.
+    let raw = unsafe { OpenProcess(PROCESS_SYNCHRONIZE, 0, child.id()) };
+    assert!(!raw.is_null(), "{}", io::Error::last_os_error());
+    let process = unsafe { OwnedHandle::from_raw_handle(raw) };
+    let while_running = terminate_or_confirm_exited(&process, 125);
+    child.kill().unwrap();
+    child.wait().unwrap();
+
+    assert_eq!(
+        while_running.unwrap_err().raw_os_error(),
+        Some(ERROR_ACCESS_DENIED as i32)
+    );
+    terminate_or_confirm_exited(&process, 125).unwrap();
+}
+
+#[test]
 fn job_reaps_descendant_and_leaves_unrelated_native_child_running() {
     let root = tempfile::tempdir().unwrap();
     let app = app(root.path());

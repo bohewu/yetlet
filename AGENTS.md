@@ -20,6 +20,36 @@ Write **all repository documentation in English**, including the README, ADRs, a
 6. Do not commit, push, deploy or alter external environments without explicit instruction. Preserve unrelated work.
 7. When changing a fundamental architectural decision, update the relevant ADR and explain tradeoffs.
 
+## Evidence-scoped platform verification
+
+Choose verification environments by the behavior at risk, not a blanket
+Ubuntu-and-Windows matrix. State the exact platform, product version, source
+identity, tested actions and unverified limits for every reused result.
+
+- Native CLI installation/compilation, process supervision, console signals,
+  filesystem ownership and other OS integrations need focused checks on the
+  affected native platform (including Windows x64 MSVC when Windows behavior
+  changes). Reuse already accepted exact-source builds and runtime receipts;
+  unrelated web changes do not force another Windows CLI run.
+- Shared Browser DOM, JavaScript/WASM, CSS/Vite and normal CSP behavior can
+  qualify in one real, supported browser environment, ordinarily Ubuntu
+  Chrome. Windows Chrome is **not** a default release gate. Reuse older browser
+  evidence only after comparing SDK/CLI versions, generated template/source
+  identity and the specific changed contract; a difference needs a focused
+  check for that difference, not an entire second OS/browser matrix.
+- GPU/graphics checks require an actual supported device, driver/backend and
+  visual or engine evidence. Ubuntu GPU qualification is sufficient for a
+  platform-neutral renderer; add Windows or other hosts only for a named
+  platform-specific graphics backend or reproducible platform defect.
+- Preserve distinctions between a strict CSP declaration, successful normal
+  browser execution with zero violations, and deliberate negative enforcement
+  tests. Never label an unperformed inline-handler/blocking probe PASS. Security
+  changes that touch CSP or browser trust boundaries still need risk-appropriate
+  negative tests, but not automatic cross-OS duplication.
+- A platform or Browser control denial is **not** permission to launch through
+  an alternate route. Report the unsupported gate or accept independently
+  grounded cross-platform evidence within its proven scope.
+
 ## Development artifacts
 
 Follow `docs/DEV-ARTIFACTS.md` for new isolated verification runs, including

@@ -7,6 +7,8 @@
 - [x] **Windows x64 MSVC first-use and Native Watch (YT-262).** The [PowerShell CLI Guide](CLI-GUIDE.md#windows-x64-msvc-first-app-and-native-watch) and First App link cover CLI 0.4.0 / SDK alpha.8, environment-only Doctor, read-only Inspect and locked Native build/run/watch. Actual MSVC Native Watch edit/restart/Ctrl+Break (`0xC000013A`) and owned cleanup passed; the separate M26 first-app result supplies ordinary Run/Ctrl+C/CSP evidence. Windows docs and independent Reviewer `wc_job_6WNK0nuaj1AQDaRL` PASS. Documentation-only, no Browser/Vite or release qualification.
 
 
+- [ ] **Windows Browser first use and bounded CLI Ctrl+C race fix (YT-263).** Add the [PowerShell Browser guide](BROWSER-APP.md#windows-x64-msvc-powershell-first-use) with exact CLI/SDK pins, trusted physical Node selection and locked WASM/Vite preparation; reuse scoped Ubuntu Chrome evidence for shared Browser tasks and ordinary CSP without requiring Windows Chrome. The source-only Windows CLI cleanup fix has focused MSVC 1/1, same-invocation Ctrl+C native exit and process/5173 cleanup evidence plus independent CLI-only Reviewer PASS. Deliberate CSP negative-enforcement and Browser Watch/HMR remain out of scope. Final integrated review, guarded PR/CI and merge remain pending; no package release.
+
 The M27-A/B audit and prioritization are recorded in [DX Gap Report](M27-DX-GAP-REPORT.md) and [Prioritized Plan](M27-PRIORITIZED-PLAN.md). Both work items received independent plan Reviewer R4 PASS and independent implementation Reviewer `wc_job_ab4Zl3f_I3Q3_Fu4` PASS; YT-260 and YT-261 are complete at their bounded documentation scope.
 
 ## M26 — Application Startup & Sample Experience

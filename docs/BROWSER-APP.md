@@ -123,6 +123,132 @@ input values, focus or selection: the application writes those properties.
 The [search caller](../examples/docs-site/src/browser.rs) shows a smaller
 caller-owned Rust closure when a local graph/keyed collection is unnecessary.
 
+## Windows x64 MSVC PowerShell first use
+
+This companion covers the **same published CLI `0.4.0` and SDK
+`0.9.0-alpha.8` Browser template**, rather than another Windows-only sample.
+Prepare the native Rust 1.99 x64 MSVC toolchain, its
+`wasm32-unknown-unknown` target, `wasm-bindgen-cli 0.2.129`, Node.js
+22.12+ and npm before building. An installation of the CLI from source
+additionally requires Visual Studio 2022 x64 C++ tools and OpenSSL development
+libraries; follow the [Windows CLI installation guide](CLI-GUIDE.md#windows-x64-msvc-first-app-and-native-watch).
+An existing trusted, correctly versioned CLI installation can be reused.
+
+In PowerShell, select **physical, trusted executable paths**. In particular,
+fnm's `aliases/default` may be a junction: Node and its companion
+`node_modules/npm/bin/npm-cli.js` must be read through the actual physical
+Node version directory. The Windows CLI intentionally rejects untrusted/reparse
+executable paths. Do not disable that validation or change global PATH/ACLs
+to make it pass.
+
+```powershell
+$ErrorActionPreference = 'Stop'
+$cargo = (& rustup which --toolchain 1.99.0 cargo)
+if ($LASTEXITCODE -ne 0 -or !$cargo -or !(Test-Path -LiteralPath $cargo)) {
+    throw 'Prepare a physical Rust 1.99 x64 MSVC toolchain'
+}
+$rustBin = Split-Path -Parent $cargo
+& (Join-Path $rustBin 'rustc.exe') -vV
+& $cargo --version
+$targets = @(& rustup target list --installed --toolchain 1.99.0)
+if ($targets -notcontains 'wasm32-unknown-unknown') {
+    throw 'Install the wasm32-unknown-unknown target for this Rust 1.99 toolchain first'
+}
+$nodeDir = Split-Path -Parent (Get-Command node.exe -ErrorAction Stop).Source
+$nodeEntry = Get-Item -LiteralPath $nodeDir -Force
+if ($nodeEntry.Attributes -band [IO.FileAttributes]::ReparsePoint) {
+    if ($nodeEntry.LinkType -ne 'Junction' -or !$nodeEntry.Target) {
+        throw 'Select the owner-verified physical Node version directory'
+    }
+    $nodeDir = [string]$nodeEntry.Target
+}
+if ((Get-Item -LiteralPath $nodeDir -Force).Attributes -band [IO.FileAttributes]::ReparsePoint) {
+    throw 'Node version directory is not a physical path'
+}
+if (!(Test-Path -LiteralPath (Join-Path $nodeDir 'node_modules/npm/bin/npm-cli.js'))) {
+    throw 'Node/npm installation is incomplete'
+}
+$env:PATH = "$nodeDir;$rustBin;$env:PATH"
+& node.exe --version
+& npm.cmd --version
+& wasm-bindgen.exe --version
+
+# Select a previously installed, trusted published CLI. The source-built
+# Windows Ctrl+C correction is not part of the immutable CLI 0.4.0 package.
+$yetlet = (Get-Command yetlet.exe -ErrorAction Stop).Source
+& $yetlet --version
+& $yetlet doctor --json
+if ($LASTEXITCODE -ne 0) { throw 'CLI Doctor environment check failed' }
+```
+
+Confirm `rustc -vV` reports `host: x86_64-pc-windows-msvc`,
+`yetlet 0.4.0`, and `wasm-bindgen 0.2.129`; stop if any version
+differs. Run this creation block **once**, with an unused owner-protected
+local NTFS parent outside a Yetlet checkout. Do not use it to overwrite a
+previously created project or its locks.
+
+```powershell
+$parent = Join-Path $env:LOCALAPPDATA 'YetletBrowserApps'
+if (Test-Path -LiteralPath $parent) {
+    throw 'Choose another unused, owner-protected Browser app parent'
+}
+New-Item -ItemType Directory -Path $parent -ErrorAction Stop | Out-Null
+& $yetlet new firstbrowser --template browser --parent $parent --sdk-version 0.9.0-alpha.8
+if ($LASTEXITCODE -ne 0) { throw 'Browser creation failed; preserve diagnostic output' }
+$app = Join-Path $parent 'firstbrowser'
+$manifest = Join-Path $app 'Cargo.toml'
+foreach ($path in @('Cargo.lock', '.yetlet/sdk-resolution.json', 'frontend/package-lock.json')) {
+    if (!(Test-Path -LiteralPath (Join-Path $app $path))) {
+        throw "Created app is missing $path"
+    }
+}
+& $yetlet inspect --manifest-path $manifest --json
+if ($LASTEXITCODE -ne 0) { throw 'Project plan inspection failed' }
+Push-Location $app
+try {
+    & $cargo fetch --locked
+    if ($LASTEXITCODE -ne 0) { throw 'Locked Cargo fetch failed' }
+    & npm.cmd ci --prefix frontend --ignore-scripts --no-audit --no-fund
+    if ($LASTEXITCODE -ne 0) { throw 'Locked frontend installation failed' }
+    & $yetlet build --manifest-path $manifest
+    if ($LASTEXITCODE -ne 0) { throw 'Frozen WASM/Vite build failed' }
+    & npm.cmd run typecheck --prefix frontend
+    if ($LASTEXITCODE -ne 0) { throw 'TypeScript typecheck failed' }
+    & $yetlet run --manifest-path $manifest
+} finally {
+    Pop-Location
+}
+```
+
+Open `http://127.0.0.1:5173/` in a supported browser and stop the
+preview with **Ctrl+C in the owning PowerShell console**. `build`
+produces `frontend/dist/`; `run` serves that existing production
+output, without building or starting a native Rust HTTP backend.
+Verify source lock/receipt stability and that the owned child processes
+exit and port 5173 can be rebound. The reviewed source-only Windows
+console cleanup fix can return native `0xC000013A`; **do not assume
+the published CLI 0.4.0 contains that unshipped fix**. If an installed
+CLI returns 125 after Ctrl+C, preserve its logs and confirm actual
+owned-process cleanup instead of reporting cancellation PASS.
+
+### Qualification scope and cross-platform evidence
+
+The Windows x64 MSVC Browser first-use lane has accepted isolated
+`new`/SDK receipts, locked Rust WASM/Vite build, TypeScript,
+HTTP 200, seven asset byte/MIME matches (including
+`application/wasm`) and an unchanged strict CSP **declaration**.
+Ubuntu's existing real Chrome evidence covers the matching Browser
+task model (add, complete and filter locally under SDK alpha.7) and
+SDK alpha.8 Browser Style WASM startup/normal CSP with zero recorded
+console/network errors. The template's Browser model and runtime
+implementation are unchanged across the relevant source cohorts.
+These are **distinct source-scoped observations**, not a claim of
+Windows Chrome execution, identical build bytes, Browser Watch/HMR,
+or an injected-inline-handler CSP denial test. Browser/CSP-specific
+negative enforcement remains a separate risk-driven security check
+when its contract changes; see the platform policy in
+[repository instructions](../AGENTS.md).
+
 ## Expected result
 
 The page shows a loading status before WASM is ready, then three sample tasks.

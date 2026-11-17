@@ -21,8 +21,8 @@ use std::{
 };
 use windows_sys::Win32::{
     Foundation::{
-        DUPLICATE_SAME_ACCESS, DuplicateHandle, HANDLE, HANDLE_FLAG_INHERIT, INVALID_HANDLE_VALUE,
-        SetHandleInformation, WAIT_OBJECT_0, WAIT_TIMEOUT,
+        DUPLICATE_SAME_ACCESS, DuplicateHandle, ERROR_ACCESS_DENIED, HANDLE, HANDLE_FLAG_INHERIT,
+        INVALID_HANDLE_VALUE, SetHandleInformation, WAIT_OBJECT_0, WAIT_TIMEOUT,
     },
     Globalization::CompareStringOrdinal,
     Security::SECURITY_ATTRIBUTES,
@@ -412,6 +412,20 @@ impl Job {
     }
 }
 
+fn terminate_or_confirm_exited(process: &OwnedHandle, code: u32) -> io::Result<()> {
+    let Err(error) = win(unsafe { TerminateProcess(process.as_raw_handle(), code) }) else {
+        return Ok(());
+    };
+    // Windows can refuse termination if the child exited after the initial wait.
+    if error.raw_os_error() == Some(ERROR_ACCESS_DENIED as i32)
+        && unsafe { WaitForSingleObject(process.as_raw_handle(), CLEANUP.as_millis() as u32) }
+            == WAIT_OBJECT_0
+    {
+        return Ok(());
+    }
+    Err(error)
+}
+
 struct Child {
     process: OwnedHandle,
     thread: OwnedHandle,
@@ -427,7 +441,7 @@ impl Child {
         // TerminateProcess is also required when assignment failed: the suspended
         // child may not yet belong to our Job. Its HANDLE prevents PID reuse.
         if unsafe { WaitForSingleObject(self.process.as_raw_handle(), 0) } == WAIT_TIMEOUT {
-            win(unsafe { TerminateProcess(self.process.as_raw_handle(), code) })?;
+            terminate_or_confirm_exited(&self.process, code)?;
         }
         self.job.cleanup(code)?;
         match unsafe {
