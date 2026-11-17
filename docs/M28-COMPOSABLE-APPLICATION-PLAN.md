@@ -1,8 +1,8 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A complete at independently reviewed documentation scope. M28-B through M28-E are not implemented or qualified.
-- **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of this study.
+- **State:** M28-A and the owner clarification amendment are complete at independently reviewed documentation scope. M28-B through M28-E remain unimplemented/unqualified.
+- **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
 
@@ -97,70 +97,120 @@ exported class or trait.
 
 ## 3. Responsibility and ownership
 
-This is a proposed target diagram. None of the named new hosts is a shipped API.
+### Independent composition dimensions
+
+Host (events/resources/lifecycle), renderer (output), execution model
+(caller thread, task, worker or process), and state policy are independent
+choices. Orthogonal does not mean every pairing is valid: the selected data
+representation and environment must support it. A host may use zero, one or
+multiple compatible renderers; it does not select a backend by type alone.
+
+This output-capability map is not a deployment or shared-memory diagram.
+Queries/local state and simulation snapshots are alternative data sources.
+A remote browser has its own process/context and receives data explicitly.
 
 ```mermaid
-flowchart TD
-    T["UDP transport: bytes and endpoint"] --> P["Protocol: bounded decode and version"]
-    P --> N["NetworkHost: peer and session admission"]
-    G["GameHost: local input"] --> C["Bounded command ingress"]
-    A["Optional Axum adapter"] --> C
-    N --> C
-    C --> S["Single simulation owner"]
+flowchart LR
+    A["Application data: queries, local state or snapshots"] --> U["View projection"]
+    A --> S["Game scene projection"]
+    A --> D["API response data"]
+    U --> H["HTML renderer: SSR or static output"]
+    U --> B["DOM renderer: browser document"]
+    S --> G["Native GPU backend"]
+    S --> W["Browser GPU backend"]
+    D --> J["HTTP response: no UI renderer"]
+```
+
+The next diagram is specifically the proposed shared-game-state pattern, not a
+mandatory framework request pipeline. Only routes deliberately operating that
+simulation use its ingress; ordinary Web handlers call their services directly.
+
+```mermaid
+flowchart LR
+    I["Local host input"] --> C["Validated bounded commands"]
+    T["UDP transport"] --> P["Protocol and peer/session admission"]
+    P --> C
+    C --> S["Single simulation writer"]
     S --> V["Immutable snapshot"]
-    V --> D["Scene projection"]
-    D --> R["Renderer backend"]
-    V --> O["NetworkHost: snapshot encode and send"]
-    O --> T
+    V --> R["Optional View or scene projection"]
+    V --> N["Protocol encoding and transport output"]
 ```
 
 | Responsibility | Owner | Minimal boundary |
 |---|---|---|
-| Domain state and invariants | Application/simulation owner | The only mutable state reference stays here |
-| Input | Selected host | Converts events into semantic intent; OS callbacks are not domain state mutation |
-| Commands | Application ingress | Typed, bounded admission with explicit full/closed/stale rejection; state validation repeats at application time when necessary |
-| Snapshots | Application publisher | Owned values with generation, revision and tick; no mutable alias to authoritative state |
-| Host lifetime | Composition root and concrete host | Construction, readiness, failure, cancellation and joining are explicit |
-| Transport | Concrete transport adapter | Byte IO and endpoint/error metadata; no game rules |
-| Protocol | Pure bounded codec/contract | Message format, version, structural validation; no socket or runtime |
-| NetworkHost/Client | Network adapter | Peer/session policy, semantic admission, send budgets and replica freshness |
-| Scene/render data | Application projection | Finite drawable data derived from a snapshot |
-| Window/event loop | GameHost on main thread | Owns winit callbacks and window/surface lifetime coordination |
-| Renderer | Chosen backend | Owns GPU resources/presentation or HTML/DOM output; does not advance simulation |
-| UI layer | Application UI | Can use existing View/actions for suitable interfaces; full game scenes do not pass through HTML-like View |
+| Domain state/invariants | Application-selected state/service design | Shared simulation has one writer; Web services need not become one global actor |
+| Events/commands | Selected host and domain boundary | Semantic intent and validation; bounded queued admission where the application selects it |
+| Snapshots | Shared-state POC publisher | Immutable generation/revision/tick values, no mutable domain alias; not compulsory for Web requests |
+| Host lifecycle | Concrete host, coordinated by composition root | Readiness, failure, stop and resource release independent of execution thread count |
+| Execution topology | Caller/composition root | Owns scheduler, runtime and any selected workers; no implicit one-thread/process-per-host |
+| Transport and Protocol | Separate concrete adapters/codecs | IO versus message/version/validation; neither is a renderer |
+| Output projection | Application | View, SceneData or API DTO; no universal render-data representation |
+| Renderer | Compatible selected backend | HTML/DOM/GPU output without direct authoritative simulation mutation |
+| Window/surface | Foreground host and renderer with explicit lifetime | Main-thread callbacks and backend resource ownership remain distinct |
 
-Reusable concepts include identity, typed commands, explicitly owned
-subscriptions and deterministic disposal. Existing concrete UI primitives should
-be reused only where their semantics fit. Camera, mesh, material, textures,
-pipeline, scene hit testing and any scene hierarchy stay with the game/rendering
-example. Null rendering can simply mean no renderer is constructed; it does not
-require a public NullRenderer trait.
+Identity, typed actions and explicit subscription/disposal patterns remain
+reusable where their existing semantics fit. Camera, mesh, materials, textures,
+pipelines and hit testing stay game/rendering concerns. No rendering may simply
+mean that no renderer is constructed.
 
 ### Execution ownership
 
-For C/D, propose one native foreground thread, one simulation thread and one
-network worker when selected. This is a POC topology, not a framework requirement.
+Multiple hosts normally compose in one application process. A host can be
+caller-driven, comprise several async tasks on a shared runtime, or own an
+explicit worker when its workload needs one. Host count determines neither
+thread count nor process count. A caller-driven lifecycle is still a lifecycle.
 
-- The main thread owns winit, the window and foreground render callbacks.
-- The simulation thread owns GameState, reduces admitted commands and publishes snapshots.
-- The network worker owns its socket, bounded packet buffers and peer metadata.
-- An optional Axum host may use an explicitly owned Tokio runtime. Tokio never becomes a domain/core requirement.
-- Only values actually crossing threads need Send/Sync. Local hosts may own Rc values; the Application concept does not require every possible state to be Send.
-- A latest-snapshot slot may hold `Arc<Snapshot>` behind a short-lived mutex. Readers clone the Arc and release the lock before rendering, serializing or calling user code. The snapshot payload has no interior mutable alias to GameState.
-- winit notifications are coalesced wakeups to read bounded state, not an unbounded stream carrying every snapshot.
+| Mode | Example | Ownership rule |
+|---|---|---|
+| Caller-thread / event-loop driven | B1 cooperative hosts; native window callbacks | No new worker required; respect affinity and avoid blocking the loop |
+| Tasks on a shared runtime | Axum plus an explicitly async network adapter | Many tasks may share runtime threads; one host may own several tasks; host stop does not own runtime shutdown |
+| Dedicated worker | Selected simulation or blocking native socket worker | Explicit stop and completion/join; do not impose this on other hosts |
+| Separate application process | D's second player/client or future isolated deployment | Explicit protocol/transport and supervisor authority; no shared Rust Arc/state references across the boundary |
 
-The [winit event-loop contract](https://docs.rs/winit/0.30.13/winit/event_loop/struct.EventLoopBuilder.html)
-requires main-thread creation for portable use, with platform-specific exceptions.
-Its [application callbacks](https://docs.rs/winit/latest/winit/application/trait.ApplicationHandler.html)
-guide resumed/suspended initialization and redraw handling. This motivates
-separate foreground ownership. A synchronous wait for a window-ready signal
-before entering the event loop would deadlock startup; readiness progresses
-inside the required callbacks.
+For C/D, one foreground thread, a simulation worker and a network worker remain
+a proposed example topology, not an Application/Host requirement. The browser
+is its own event-loop environment, not a native background thread created by
+Axum. One native process can contain GameHost plus NetworkHost plus Axum without
+creating three child processes. Generic process supervision/IPC is deferred.
 
-The [Tokio bridging guide](https://tokio.rs/tokio/topics/bridging) supports
-a GUI thread alongside an async runtime. A current-thread runtime progresses
-only while driven. No hidden runtime or assumption that async tasks keep running
-after block_on returns is permitted.
+Only values actually crossing threads require the applicable Send/Sync bounds.
+B1 uses Rc-owned local data without universal Send. A latest-snapshot slot may
+hold Arc<Snapshot> behind a short-lived mutex; clone the Arc, release the lock,
+then render or serialize. Payloads contain no mutable alias to GameState.
+Across processes use explicit messages and keep a single authoritative
+simulation with read-only replicas, not independent authorities.
+
+The [winit contract](https://docs.rs/winit/latest/winit/event_loop/struct.EventLoopBuilder.html)
+requires main-thread event-loop creation for portable use. Callback-driven
+readiness avoids blocking before the loop can initialize its window. A shared
+foreground loop is a scarce platform resource, not something each Host creates.
+[Tokio tasks](https://docs.rs/tokio/latest/tokio/task/) are scheduled by a runtime,
+not one OS thread each. The [bridging guide](https://tokio.rs/tokio/topics/bridging)
+explains caller-owned runtime integration; a current-thread runtime must remain
+driven. These references constrain the design, not force a new dependency.
+
+### Pure Web preservation
+
+Pure API and SSR remain first-class application modes. No universal Application
+owner, HostGroup, actor, command queue, tick, snapshot publication, GPU renderer
+or additional supervisor/thread/process is required on their direct HTTP path.
+Existing App, native Router/Tower handlers/middleware, extractors/responses,
+state and explicit listener/runtime/graceful-shutdown control remain available.
+Existing Web CLI templates need no new bootstrap ceremony.
+
+API-only code need not construct or call a UI renderer. This does not claim a
+feature-graph change: current server-axum enables html, and that existing
+compile-time relationship is preserved. HTML serialization remains useful
+without an HTTP listener as well. Only a Web route explicitly controlling a
+shared simulation must use that simulation's command/snapshot boundary.
+
+The cost principle is **no mandatory composition overhead**, not a measured
+zero-overhead guarantee. Optional multi-host features may not add compulsory
+queues, allocations, locks, dependencies or workers to the existing Web path.
+Normal Axum/Tokio costs remain. B0 records current source/features/behavior;
+later HTTP-path changes require focused before/after evidence. Unchanged source
+and graphs do not manufacture a benchmark result; universal zero latency or
+throughput regression is not claimed.
 
 ## 4. State, scheduling and lifecycle contract
 
@@ -207,31 +257,38 @@ cross-device replay.
 
 ### Readiness, failure and shutdown
 
-Lifecycle phases are Prepared, Starting, Running, Stopping and terminal
-Stopped/Failed. Concrete code may use a smaller representation if these
-observable outcomes remain clear.
+Every host has a logical resource lifetime even when it has no dedicated thread.
+Use Prepared, Starting, Running, Stopping and Stopped as observable phases;
+a failure also records cleanup as pending, complete or timed out. Failed does
+not imply that an owned thread/task has terminated. No public lifecycle trait
+or separate supervisory thread is required to describe those outcomes.
 
-1. Validate configuration; construct one state owner and bounded ports without IO.
-2. Start required background workers in an admission-closed state. Each reports readiness or failure through bounded status storage.
-3. Enter the required foreground loop on the main thread. Window/GPU readiness is reported from lifecycle callbacks.
-4. Open domain ingress only when every required component is ready. No unrelated port or renderer is silently created.
-5. Required host failure, simulation failure or foreground exit closes ingress and requests group shutdown. Preserve the primary error and any cleanup errors.
-6. Cancel/wake workers using a control path that cannot be blocked by a full data queue. Reject late generations and stop publication.
-7. Join owned workers and release resources in reverse dependency order; GPU/surface work obeys its foreground lifetime, then the window may be released.
+The composition root coordinates its selected components; concrete hosts own
+their resources and report readiness/failure/completion. Shared scheduler/runtime
+ownership stays with the caller. Stopping one host must not shut down a borrowed
+runtime or unrelated tasks. For a single Web server, reuse existing native
+startup/graceful-shutdown behavior; do not add a new lifecycle API to App::serve().
 
-B/D use a proposed five-second bounded completion observation. A deadline expiry
-is a failed shutdown with the worker still active/uncertain, not proof it was
-killed or joined. std threads cannot safely be force-aborted by dropping a join
-handle. Never label detach as cleanup.
+For the shared-state POC:
 
-All hosts are required by default in the POC. A future optional observer can fail
-without ending gameplay only after the caller explicitly selects that policy
-and a concrete test proves it. There is no silent downgrade from LAN to local
-mode. A peer timeout removes that peer; it is not a NetworkHost failure. Host
-membership is static for B–D; peer reconnect is not dynamic host addition.
+1. Validate configuration and construct the owner/ports without implicit IO.
+2. Prepare selected hosts with ingress closed. Caller-driven hosts need no spawned worker; an explicitly owned worker reports readiness/failure.
+3. If a foreground host is selected, enter its event loop on the required thread. Window/GPU readiness is produced by callbacks, not a wait before entering the loop.
+4. Open ingress after all required components are ready. No unrelated listener, renderer or scheduler is created.
+5. Required host/owner failure or foreground exit closes ingress and requests coordinated stop, preserving the primary error.
+6. Reject late generations, cancel/wake owned work through a non-starvable control path, and stop publication. Detach callbacks/listeners/subscriptions where applicable.
+7. Observe completion of actual owned tasks/threads and release resources in dependency order. Do not join a nonexistent worker or terminate a caller-shared runtime; retain cleanup errors.
 
-Generations identify one application lifetime, session IDs identify one peer
-binding, snapshot revisions identify published changes, and ticks identify
+B2/D propose a five-second completion observation, not forced termination.
+A deadline expiry remains failed/incomplete cleanup with live/uncertain work;
+dropping a thread join handle is not joining it. Suspend/Resume/Pause are
+capability-specific behaviors, not compulsory lifecycle methods for all hosts.
+
+All POC hosts are required unless a selected optional policy is separately tested.
+There is no silent LAN-to-local downgrade. A peer timeout removes that peer,
+not its NetworkHost. Host membership stays static for B–D; reconnect is not
+host hot-plugging and does not require process creation.
+
 simulation advancement. They are not interchangeable. Use checked counters;
 exhaustion fails or creates a new explicitly fenced lifetime rather than wrapping
 into a valid old identity.
@@ -335,26 +392,37 @@ declaring its socket and workers released.
 
 ## 6. Renderer and GPU lifecycle
 
-Application state becomes a small scene projection, then the selected renderer
-consumes it. HTML/DOM may continue rendering suitable UI; they do not encode
-the game world. The native prototype needs only colored rectangles, a viewport
-and a small shader.
+Renderer choice is independent of Host identity, subject to compatible output
+data and environment capabilities. View is data; a browser is an execution
+environment. Neither is itself a rendering backend. An application may select
+zero, one or multiple compatible renderers without adding a universal trait.
 
-GameHost owns event-loop/window lifetime. WgpuRenderer owns surface configuration,
-device/queue, buffers and pipeline, with the window retained for the required
-surface lifetime. Redraw uses a snapshot; resize/minimize does not mutate
-GameState. Zero-size windows suspend presentation; outstanding frames are
-released before reconfiguration. Surface and device failures have explicit
-error/stop handling, not unlimited recovery loops. The
-[upstream surface documentation](https://docs.rs/wgpu/30.0.2/wgpu/struct.Surface.html)
-is a research reference, not the version selected for Yetlet; C must check these
-rules against its pinned version.
+| Output model | Compatible output path | Boundary |
+|---|---|---|
+| Existing Yetlet View | HTML serialization for SSR or static output; DOM rendering in a browser document | Preserve both existing paths; HTML serialization does not require an Axum listener |
+| Game SceneData | Native wgpu or browser WebGPU adapter where separately implemented/qualified | Do not promise one shared native/browser game backend or force scene objects into HTML View |
+| API DTO / domain response | Existing HTTP response/serialization | No UI renderer, game scene or simulation snapshot required |
+| Headless simulation | No rendering output | No window/GPU construction and no mandatory NullRenderer |
 
-Real visual evidence records backend, adapter/device type, driver/environment,
-window presentation and keyboard interaction. Offscreen readback, software
-rendering, actual hardware rendering and compilation are separate evidence
-classes. Existing offscreen and browser experiments do not qualify native M28.
+A browser application may combine DOM UI and a WebGPU canvas; a Web host may
+serve both API and SSR routes, or API only. Compatibility is not an automatic
+mapping from Host type to backend. A native window does not acquire DOM support
+without a separately chosen browser/WebView environment, which is outside this
+POC. Stateless HTML rendering need not implement an artificial start/stop loop;
+DOM owners dispose subscriptions/listeners and GPU owners release resources.
 
+For C, GameHost owns event-loop/window lifetime; the chosen WgpuRenderer owns
+surface configuration, device/queue, buffers and pipeline. It retains the
+window for the surface lifetime. Resize/minimize changes presentation, not
+GameState. Zero-size windows suspend rendering; outstanding frames are released
+before reconfiguration. Surface/device errors use bounded explicit handling.
+The [surface reference](https://docs.rs/wgpu/30.0.2/wgpu/struct.Surface.html)
+is research, not a selected upgrade; C checks its pinned version.
+
+Real visual evidence records backend, adapter/device type, environment, window
+presentation and keyboard interaction. Offscreen, software, hardware and compile
+results are separate evidence classes. The browser/native compatibility map is
+not additional C scope or proof that every pairing works today.
 ## 7. Work breakdown and dependencies
 
 Only YT-265 is in the current authorized implementation scope, and it is
@@ -363,42 +431,51 @@ authority to start runtime work.
 
 | ID | Stage | Deliverable and minimum acceptance | Dependencies |
 |---|---|---|---|
-| YT-265 | A | Source inventory, candidates, Proposed ADR, boundaries, risks, phased acceptance, roadmap/backlog; independent documentation review and guarded document commit | None |
-| YT-266 | B1 | Isolated research example with one owner and two concrete hosts sharing commands/snapshots; no socket, GPU, winit, Axum or Tokio requirement | YT-265 |
-| YT-267 | B2 | Readiness, required-host startup/runtime failure, bounded admission and coordinated stop; source compatibility/dependency evidence | YT-266 |
-| YT-268 | C1 | Original integer-coordinate two-square simulation and headless tick runner using the same reducer; deterministic ordered-input tests | YT-267 |
-| YT-269 | C2 | Native winit/wgpu GameHost; keyboard movement, Pause, independent render cadence and immutable scene input | YT-268 |
+| ID | Stage | Deliverable and minimum acceptance | Dependencies |
+|---|---|---|---|
+| YT-265 | A | Source inventory, candidates, Proposed ADR, corrected orthogonal boundaries and pure-Web preservation plan; independent document review | None |
+| YT-276 | B0 | Focused existing pure API/SSR compatibility baseline and normal feature graph; no new runtime API or universal actor; preserve native Axum lifecycle | YT-265 |
+| YT-266 | B1 | Private example: two cooperative caller-thread hosts, distinct lifetimes and one shared owner; bounded commands/snapshots, no socket/GPU/Tokio or dedicated worker required | YT-276 |
+| YT-267 | B2 | One explicitly owned worker variation plus readiness/failure/saturation/stop; cleanup respects shared scheduler ownership; preserve B0 Web path | YT-266 |
+| YT-268 | C1 | Original integer-coordinate two-square simulation and headless runner using the same reducer; deterministic ordered-input tests | YT-267 |
+| YT-269 | C2 | Native winit/wgpu GameHost with independently selected scene backend; keyboard movement, Pause and render cadence decoupling | YT-268 |
 | YT-270 | C3 | Actual native GPU/window controls, resize/minimize/error/exit evidence, bounded scheduling and measured costs | YT-269 |
-| YT-271 | D1 | Internal bounded wire/session contract, InMemory codec/admission/freshness tests; no transport trait promotion | YT-267, YT-268 |
-| YT-272 | D2 | Real UDP host and client in two independent processes, both players visible; host owns authority, client holds replica | YT-270, YT-271 |
-| YT-273 | D3 | Seeded loss/duplicate/reorder, freshness, overload, reconnect and stop tests over real sockets; headless plus NetworkHost | YT-272 |
-| YT-274 | D4 conditional | Two physical devices on a LAN with explicit interface and exact evidence, when devices are available | YT-273 |
-| YT-275 | E | Evidence-based Promote/Simplify/Retain-private/Reject decision; public API/crate/Axum adapter/CLI template/positioning choices and compatibility plan | YT-270, YT-273 |
+| YT-271 | D1 | Internal bounded wire/session contract and InMemory codec/admission/freshness tests; no transport trait promotion | YT-267, YT-268 |
+| YT-272 | D2 | Two independent application processes with real UDP: host process composes GameHost plus NetworkHost, client composes GameHost plus NetworkClient; only host owns authority | YT-270, YT-271 |
+| YT-273 | D3 | Seeded socket loss/duplicate/reorder, freshness, overload, reconnect/stop and headless network composition | YT-272 |
+| YT-274 | D4 conditional | Two physical LAN devices with explicit interface/evidence when available | YT-273 |
+| YT-275 | E | Evidence-based promotion decision including pure-Web preservation, API/crate/adapter/template/positioning scope | YT-276, YT-270, YT-273 |
 
-D1 can proceed independently of GPU implementation once C1 and B2 pass.
-D4 is not a prerequisite for making an honest E decision, but physical-LAN
-support cannot be claimed without it. A loopback-only result must remain labeled
-two-process loopback, including in any promotion decision.
+YT-276 is appended without renumbering existing IDs and runs first in B.
+D1 can proceed after C1/B2 independently of GPU work. D4 is optional for making
+an honest E decision, not for claiming physical-LAN support. Two-process D
+means two application instances, not one process for each Host.
 
 ### M28-B acceptance
 
 | Gate | Observable result |
 |---|---|
-| B1 single owner | Two concrete hosts affect the same owner through typed ingress; both read snapshots with the same generation/revision |
-| B1 local ownership | A caller-thread host with an Rc value works without requiring universal Send bounds |
-| B1 no IO assumption | The selected run creates no socket, window, GPU or HTTP listener; feature graph excludes those backends |
-| B2 startup | Second required host fails to start; the first and the owner stop and join; readiness never becomes Running |
-| B2 runtime failure | Required host/owner failure reaches the coordinator and stops the group, preserving cause |
+| B0 direct API path | Existing Axum handlers and native Router/Tower still serve API responses without constructing a renderer or game/composition runtime; preserve App, prelude, state and native escape hatches |
+| B0 SSR path | Existing View-to-HTML SSR remains usable; no GPU, game SceneData, global tick or snapshot subscription is introduced |
+| B0 optional costs | Locked normal dependency/feature inspection shows no new winit/wgpu/UDP-host dependency or compulsory scheduler. Compare with existing Web features; server-axum currently enables html, which is not a newly removable requirement |
+| B0 evidence scope | Use existing focused API-compatibility, startup, prelude and relevant HTTP/SSR tests; record exact source/features/results. Reuse unaffected platform receipts; no broad browser/Windows rerun or performance certification |
+| B1 same-thread composition | Two concrete hosts with separate lifecycle state cooperate on the same caller thread, including Rc-owned local data, using one owner and matching snapshot generation/revision; no one-thread-per-host assumption |
+| B1 no IO assumption | The selected POC creates no socket, window, GPU or HTTP listener; normal graph excludes those backends. B0's separate HTTP evidence is not attributed to this no-IO run |
+| B2 execution variation | One explicitly owned background worker uses the same domain contract; record which component owns it, without introducing a framework runtime |
+| B2 startup | A required host fails to start; already-started owned resources are stopped/released and worker completion is observed; group never becomes Running |
+| B2 runtime failure | Required host/owner failure reaches the coordinator and stops the group, preserving the cause |
 | B2 overload and stop | Queue full, closed ingress and late generation have explicit outcomes; stop is not blocked by saturation |
-| B2 cleanup | Normal exit and failure release owned workers/resources; timeout remains a failure |
-| B2 compatibility | Existing Axum startup/prelude/source paths remain unchanged; run only affected existing tests and focused dependency checks |
+| B2 lifecycle vs scheduler | Host cleanup releases its callbacks/subscriptions/tasks/resources without claiming ownership of a caller-shared scheduler. Host lifecycle can finish with no dedicated thread to join; shared scheduler stays usable |
+| B2 cleanup and compatibility | Actual owned workers are joined; timeout remains incomplete cleanup. B0's direct Web API/SSR path is unchanged; recheck only evidence invalidated by changes |
 
-The first slice YT-266 can be an isolated nested `publish = false` example under
-`examples/composable-host-research/`, with its own lock and no root default
-workspace expansion. Use concrete functions/structs and existing typed actions
-where helpful. No public `Application`, `Host`, `HostGroup` or transport API
-is introduced. YT-267 adds the lifecycle fault cases after that shared-state
-proof; do not begin a game during B.
+B0 records the existing compatibility baseline without creating another HTTP
+harness or rewriting product code. Then B1 uses an isolated publish=false
+example, proposed `examples/composable-host-research/`, with its own lock and
+no root default-workspace expansion. Use concrete functions/structs and existing
+typed actions where useful. No public Application, Host, HostGroup, Renderer or
+Transport API is introduced. B2 adds the worker/failure cases, C adds native
+rendering and D adds networking. A BrowserHost, dynamic host manager or generic
+process supervisor is not added to make the documentation matrix appear complete.
 
 ### M28-C acceptance
 
@@ -442,17 +519,18 @@ replace D2/D3 process/socket evidence.
 E produces a reviewed decision, not an automatic package release:
 
 1. Compare B–D evidence with the original target scenarios and report unsupported combinations.
-2. Extract a formal Application/Host contract only if real consumers share a useful invariant and extraction reduces application complexity.
-3. Decide whether a module, private example or independent crate is justified; no one-crate-per-noun rule.
-4. Keep Axum `App` source-compatible. An optional composition adapter may consume `into_router()`; a deeper split requires a separate compatibility decision.
-5. Decide whether a CLI game template has a repeatable supported dependency/tooling story. Do not ship it merely because the example compiles.
-6. Decide product positioning after the POC. Promote, simplify, retain private, or reject are all valid outcomes. Keep ADR Proposed until the owner accepts the evidence-based decision.
+2. Preserve the B0 pure-Web contract before promoting any shared runtime/module. Reuse exact-source evidence when unchanged; test only affected paths if an implementation changes HTTP or feature boundaries.
+3. Extract an Application/Host contract only where consumers demonstrate useful shared invariants. State policy, render-data policy and execution topology remain independent choices; no universal game actor.
+4. Decide whether a module, private example or independent crate is justified. Keep Axum App, native Router/Tower and its direct request path intact; an optional composition adapter may consume into_router().
+5. Decide whether a CLI game template has a repeatable supported dependency/tooling story. Existing Web templates remain equally supported and need no new HostGroup bootstrap.
+6. Decide product positioning only after POC evidence. Promote, simplify, retain private, or reject are valid outcomes; keep ADR Proposed until owner acceptance.
 
-The eventual target matrix includes Web/Axum, standalone GameHost, headless,
+The target matrix includes pure Web/API/SSR, standalone game, headless,
 GameHost plus NetworkHost, GameHost plus NetworkClient, headless plus network,
-game plus network plus Axum, and CustomHost. B–D deliberately do not prove the
-three-host Axum combination or every CustomHost; E must identify additional
-bounded work if those are selected for promotion.
+game plus network plus Axum, and CustomHost. Browser DOM and browser GPU are
+compatible output directions, not a newly implemented BrowserHost. B–D do not
+prove the three-host Axum combination, every renderer combination or CustomHost.
+E identifies any additional bounded work needed before claiming those capabilities.
 
 ## 8. Costs, risks and migration
 
@@ -496,8 +574,12 @@ handoff in ignored evidence locations. Keep a short reviewed result here only
 after terminal Reviewer output is available. The document review can complete
 YT-265; all B–E runtime gates remain open.
 
-**Independent review:** PASS. Job `wc_job_p58KYVEFdOUlz_1C` completed with exit 0 and actual JSON `overall_status = pass`, `issues = []`, `required_followups = []`, `optional_notes = []`. The role-directed Codex Job used the saved Reviewer configuration; its actual turn context records `gpt-6-astra` and effective `high`. This is independent review, not native managed-role identity or formal runtime assurance.
+### Initial M28-A acceptance at 4e5bdc1
 
-The six reviewed input hashes were unchanged at terminal observation. Only this completion record and the M28-A/Backlog completion metadata were updated afterward. The architecture and Proposed ADR content remain as reviewed. `cargo xtask check docs` passed (29 required documents, 272 backlog items); focused checks covered the six intended paths, new-file whitespace and 42 local links/anchors in the two new documents. Raw evidence and the complete ignored handoff remain under `.pipeline-output/m28-a-20261117/` and `artifacts/verification/m28-a-20261117/`.
+Independent Reviewer `wc_job_p58KYVEFdOUlz_1C` completed with exit 0, actual JSON PASS and no issues/followups. Its role-directed Codex Job recorded `gpt-6-astra` with effective `high`; this was independent documentation review, not native managed-role identity or runtime assurance. Six reviewed hashes were unchanged, with only declared completion metadata added afterward. The initial docs gate passed with 29 required documents and 272 backlog items; 42 local links/anchors in the two new documents were checked. Original evidence remains under `.pipeline-output/m28-a-20261117/` and `artifacts/verification/m28-a-20261117/`.
 
-**Runtime POC:** Not run. **ADR status:** Proposed. Document review does not qualify any M28-B through M28-E runtime capability.
+### Owner clarification amendment — 2026-11-17
+
+The owner confirmed preservation of View/HTML/DOM rendering, independent Host/Renderer composition, lifecycle separate from execution topology, and pure Web/API non-regression. This amendment corrects the general diagrams, bounds the single-writer model to the shared-state POC, and puts YT-276 / B0 before YT-266. Independent delta Reviewer `wc_job__Fg38dxSv31AqFr5` completed with exit 0, actual JSON PASS and no issues/followups. Observed model/effort were `gpt-6-astra` / `high`; this was a role-directed Job, not native managed-role dispatch. All five input hashes were unchanged at terminal observation. Only review/completion metadata and its header line break changed after review. Docs/DAG checks passed (29 required documents, 273 Backlog items), as did focused scope/whitespace and 42 local links/anchors. Evidence remains under `.pipeline-output/m28-a-web-preservation-20261117/`; original acceptance evidence is preserved separately.
+
+**Runtime POC:** Not run. **ADR status:** Proposed. Neither document review establishes runtime capabilities or measured zero overhead.

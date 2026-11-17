@@ -2,19 +2,21 @@
 
 ## M28 — Composable Application and Multi-Host Research
 
-**Planning only.** The owner-selected research direction is Composable
-Application Framework; historical HTML-first wording does not limit the study.
-The [source inventory and plan](M28-COMPOSABLE-APPLICATION-PLAN.md) recommend
-ordinary Rust composition, one state owner, bounded commands, immutable snapshots
-and explicit foreground/background lifetime. [ADR 0013](adr/0013-composable-application-and-hosts.md)
-remains **Proposed**.
+**Planning only.** The [M28 study](M28-COMPOSABLE-APPLICATION-PLAN.md) explores
+Composable Application Framework without replacing pure Web/API/SSR.
+Host, renderer and execution topology remain independent capability choices:
+View supports HTML/DOM; game scenes use separate GPU backends; hosts may select
+zero/one/multiple renderers and need not own dedicated threads/processes.
+Single-writer commands/snapshots apply to the shared simulation POC, not all
+HTTP requests. [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**.
 
-- [x] **M28-A / YT-265:** source inventory, alternatives, boundaries, Proposed ADR and acceptance plan complete at documentation scope; independent Reviewer `wc_job_p58KYVEFdOUlz_1C` actual PASS (terminal exit 0, zero issues/followups). Runtime POC remains unrun.
-- [ ] **M28-B / YT-266–267:** two concrete hosts, one owner, no socket requirement; readiness/failure/shutdown and existing Axum compatibility.
-- [ ] **M28-C / YT-268–270:** the same fixed-tick simulation in HeadlessHost and a real native winit/wgpu GameHost; actual visual/backend evidence.
-- [ ] **M28-D / YT-271–273:** bounded internal protocol, native UDP in two independent processes, faults/reconnect/stop and headless network composition.
-- [ ] **Conditional LAN / YT-274:** two physical devices only when available; loopback never substitutes for this claim.
-- [ ] **M28-E / YT-275:** reviewed Promote/Simplify/Retain-private/Reject decision; public contract, packaging, optional Axum adapter, CLI template and positioning are evidence-gated choices.
+- [x] **M28-A / YT-265 clarification:** initial review at `4e5bdc1` retained; independent delta Reviewer `wc_job__Fg38dxSv31AqFr5` actual PASS, terminal exit 0, no issues/followups; document checks PASS. Renderer/lifecycle/Web-preservation planning only, no runtime result implied.
+- [ ] **M28-B0 / YT-276:** preserve existing direct pure API/SSR behavior, source API, Web CLI ergonomics and opt-in dependency/runtime costs before adding composition.
+- [ ] **M28-B1/B2 / YT-266–267:** two same-thread hosts with separate lifetimes and one owner; then an explicit worker/failure/stop variation without taking over caller-shared schedulers. No socket/GPU in these POCs.
+- [ ] **M28-C / YT-268–270:** same fixed-tick reducer headless and under native winit with an independently selected wgpu backend; actual visual/lifecycle evidence.
+- [ ] **M28-D / YT-271–273:** bounded protocol and UDP between two application processes, each composing its required hosts; controlled faults, reconnect/stop and headless network mode.
+- [ ] **Conditional LAN / YT-274:** two physical devices when available; loopback never substitutes for that evidence.
+- [ ] **M28-E / YT-275:** promotion decision requires B0 pure-Web preservation as well as selected C/D evidence; no compulsory actor/queue/tick/HostGroup on Web requests. Packaging, template and positioning remain separate choices.
 
 Only A is in this delivery. B–E remain unimplemented and require their own scope.
 No Axum refactor, public API, dependency/default-feature change, SDK/CLI release

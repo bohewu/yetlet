@@ -18,18 +18,24 @@ The design rationale and dated evidence below retain the original proposal and M
 ## Proposed composable application research
 
 The owner-directed [M28 study](M28-COMPOSABLE-APPLICATION-PLAN.md) explores
-applications without HTTP and explicit combinations of foreground, headless,
-network and optional Axum hosts. Historical HTML-first positioning does not
-constrain that study. [ADR 0013](adr/0013-composable-application-and-hosts.md) is
-**Proposed**: ordinary Rust composition, one authoritative owner, bounded commands,
-immutable snapshots and explicit lifecycle are POC candidates, not current
-framework APIs. Host, renderer, transport and protocol remain separate.
+applications without HTTP while preserving pure Web/API/SSR as a first-class
+mode. Historical HTML-first positioning does not constrain the study.
+[ADR 0013](adr/0013-composable-application-and-hosts.md) remains **Proposed**.
 
-The study preserves the existing Axum App/startup/prelude contracts and the
-two-package opt-in dependency boundary. Native GameHost, NetworkHost,
-NetworkClient and a generic Application/HostGroup are not implemented by M28-A.
-No public positioning, Core API or SDK/CLI release changes occur here.
+Host lifecycle, execution topology and Renderer selection are separate:
+a host need not own a thread/process and may select zero/one/multiple compatible
+renderers. Existing View projects to HTML or browser DOM; game SceneData has
+separate backend paths. Browser is an environment, not itself a renderer.
+One writer plus bounded commands/immutable snapshots is the shared-simulation
+POC choice, not a mandatory global actor or HTTP request pipeline.
 
+M28-B starts with a focused pure-Web preservation baseline (YT-276), then
+same-thread multi-host composition and an explicit worker/lifecycle variation.
+Existing Axum App/Router/Tower, default features, direct requests and Web CLI
+bootstrap remain; no new supervisor, queue or GPU dependency is compulsory.
+No measured zero-overhead claim follows from this plan. GameHost, NetworkHost,
+NetworkClient, BrowserHost and generic Application/HostGroup are not implemented
+by A. No public positioning, Core API or SDK/CLI release change occurs here.
 ## Retained early Core and browser proof boundaries
 
 The M12–M19 source-only verification history predates the published SDK/CLI.
