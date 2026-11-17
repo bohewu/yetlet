@@ -426,10 +426,11 @@ YT-218 separately delivered the mdBook first publication at 64d1074 on 2026-10-3
 YT-226's separately authorized2026-11-01 cutover at 0ae6b93 used the Yetlet-built
 application-owned static reader with optional Wasm search, one Pages workflow
 and run41289520993/1. Both received independent PASS0 at their recorded scope.
-mdBook remains an explicit historical/reference builder. The current accepted
-Reader pair is SDKalpha.8/CLI0.4.0 in site/pages.toml, with publication authority
-in the accepted hosted SDK/CLI records. Local documentation preview, source
-publication and actual hosted reader readback retain separate evidence.
+mdBook remains an explicit historical/reference builder. The current selected
+Reader **source** pair is SDKalpha.8/CLI0.4.1 in site/pages.toml, with distribution
+authority in the accepted hosted SDK/CLI records. This source selection is not a
+claim of live Pages deployment; PR/CI/merge and hosted reader readback remain
+separate evidence.
 The [original plan](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/PUBLIC-DOCS-PLAN.md) is locally recoverable at the
 frozen SHA, while remote reachability and private raw evidence availability
 remain unverified. Its old edition labels describe their dated checkpoints.

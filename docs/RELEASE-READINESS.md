@@ -1,16 +1,16 @@
 # Yetlet Prototype Release Readiness
 
-**Current distribution (2026-11-12):** **Published SDK:** `0.9.0-alpha.8` (`yetlet` / `yetlet-browser`).
-**Published CLI:** `0.4.0` (`yetlet-cli`). The accepted
+**Current distribution (2026-11-17):** **Published SDK:** `0.9.0-alpha.8` (`yetlet` / `yetlet-browser`).
+**Published CLI:** `0.4.1` (`yetlet-cli`). The accepted
 [SDK publication record](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
-and [CLI publication record](CLI-040-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-12)
+and [CLI publication record](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17)
 record actual GitHub/crates.io delivery, exact archives, signatures and consumer limits.
 The typed Tag Builder first shipped in SDK alpha.7. SDK alpha.8 includes M26
 application startup methods and the optional Axum Prelude. The independent CLI
 ships private app Style generation/templates, SDK resolution with exact app
 pins and locks, and SDK-aware native startup scaffolds. Both published
 distributions passed their registry consumers. The Reader Edition source
-selects SDK alpha.8 and CLI 0.4.0. Development version equality does not
+selects SDK alpha.8 and CLI 0.4.1. Development version equality does not
 establish archive/source equality. This is not Stable API, production, SLSA
 level or universal platform qualification.
 
@@ -42,7 +42,7 @@ were unpublished then, YT-020 was Blocked and YT-096 trust gates incomplete.
 Exact local Git `42d8856b9acf5ddddab9a4b998b5bdd4c5e59210` retains that dated
 comparison, with remote reachability unverified. It selected no archives,
 registry consumer or new candidate. Current publication is the two-package
-SDK alpha.8 / independent CLI0.4.0 above. Optional app-owned Auth/Session/cache/
+SDK alpha.8 / independent CLI0.4.1 above. Optional app-owned Auth/Session/cache/
 renderer source proof and earlier signing cannot qualify another checkout,
 browser/platform or production deployment.
 [Compatibility](COMPATIBILITY.md) and [release SOP](RELEASING.md).
@@ -299,7 +299,7 @@ uncommitted/staged0; no Merge/signing/publication and D1–D6 Pending.
 ## Alpha.1 frozen inputs, signatures and acceptance — 2026-10-29
 
 This historical sixteen-source-package acceptance precedes the current published
-SDKalpha.8/CLI0.4.0 pair. The adopted
+SDKalpha.8/CLI0.4.1 pair. The adopted
 [two-payload contract](RELEASE-SUPPLY-CHAIN.md#two-payloads-complete-assembly-and-independent-verification)
 preserves independent builder/signer identities and all earlier failures.
 
@@ -410,6 +410,6 @@ at 0ae6b93 with run41289520993/1 and actual public-byte/MIME/reader observations
 Original failed/stopped harness and later passing proof retain their own
 sources in [Pages history](GITHUB-PAGES-PUBLICATION.md#public-guide-architecture-and-original-local-acceptance).
 They qualify neither physical mobile, other browsers, hosted rustdoc nor a new
-product release. The accepted published SDKalpha.8/CLI0.4.0 pair and protected
-site/pages.toml remain current. Local documentation consolidation does not
+product release. The current published SDKalpha.8/CLI0.4.1 pair and protected
+site/pages.toml are selected in source; live Pages require their own readback. Local documentation consolidation does not
 advance the edition or replace live Pages.

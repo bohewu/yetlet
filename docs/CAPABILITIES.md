@@ -33,7 +33,7 @@ The original YT-245 preparation selects local SDK `0.9.0-alpha.7` contents;
 these typed constructors are now distributed rather than checkout-only.
 
 
-Published SDKalpha.8/CLI0.4.0 artifacts serve separate roles. The independent CLI
+Published SDKalpha.8/CLI0.4.1 artifacts serve separate roles. The independent CLI
 ships native/browser Style templates and a private app generator. The Style
 walkthroughs verify SDK alpha.7 with exact app pins and locks. The
 [Style Showcase](../examples/style-showcase/README.md) remains a checkout sample.

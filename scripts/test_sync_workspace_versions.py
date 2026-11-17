@@ -31,7 +31,15 @@ def populate_current_docs(root):
     references = ('[SDK publication record](old-sdk.md#old)\n'
                   '[CLI publication record](old-cli.md#old)\n')
     for name in ['ARCHITECTURE', 'RELEASE-READINESS', 'RELEASE-PUBLICATION']:
-        put(root, 'docs/'+name+'.md', status + (references if name != 'ARCHITECTURE' else ''))
+        body = status + (references if name != 'ARCHITECTURE' else '')
+        if name == 'RELEASE-PUBLICATION':
+            body += ("Current accepted\ndistribution is [SDK alpha.6 / CLI0.1.0](RELEASE-READINESS.md).\n"
+                     "Historical checkpoint: SDK alpha.5 / CLI0.0.9 remains dated.\n")
+        put(root, 'docs/'+name+'.md', body)
+    put(root, 'docs/CLI-GUIDE.md',
+        "Current distribution and newer versions are governed only by accepted\n"
+        "[hosted CLI release records](CLI-040-HOSTED-RECORD.md).\n"
+        "Historical CLI 0.4.0 source evidence: [earlier Hosted Record](CLI-040-HOSTED-RECORD.md).\n")
     put(root, PUBLICATION_RECORDS['SDK'][0],
         "## Owner-approved publication and registry consumer — fixture\n"
         "https://github.com/bohewu/yetlet/releases/tag/v6.5.4-alpha.3)\n")
@@ -354,6 +362,39 @@ class WorkspaceManifestTests(unittest.TestCase):
                     self.assertNotIn(path, changed)
                     self.assertEqual((root / path).read_bytes(), original)
 
+
+    @patch.object(sync, 'cli_sdk_version', return_value='6.5.4-alpha.3')
+    def test_current_publication_narrative_and_link_derive_from_sot(self, binding):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            populate_current_docs(root)
+            published = {'SDK': '6.5.4-alpha.3', 'CLI': '2.2.0'}
+            edition = {'sdk': '6.5.4-alpha.3', 'cli': '2.2.0'}
+            changed = sync.sync_published_docs(root, published, '=6.5.4-alpha.3', edition)
+            status = changed['docs/RELEASE-PUBLICATION.md']
+            self.assertIn('Current accepted\ndistribution is [SDK alpha.3 / CLI2.2.0](RELEASE-READINESS.md).', status)
+            self.assertIn('Historical checkpoint: SDK alpha.5 / CLI0.0.9 remains dated.', status)
+            guide = changed['docs/CLI-GUIDE.md']
+            self.assertIn('[hosted CLI release records](' + PUBLICATION_RECORDS['CLI'][0].removeprefix('docs/') +
+                          '#owner-approved-publication-and-installed-consumer--fixture)', guide)
+            self.assertIn('[earlier Hosted Record](CLI-040-HOSTED-RECORD.md)', guide)
+            for relative in ('docs/RELEASE-PUBLICATION.md', 'docs/CLI-GUIDE.md'):
+                (root / relative).write_text(changed[relative], encoding='utf-8')
+            second = sync.sync_published_docs(root, published, '=6.5.4-alpha.3', edition)
+            self.assertNotIn('docs/RELEASE-PUBLICATION.md', second)
+            self.assertNotIn('docs/CLI-GUIDE.md', second)
+            binding.assert_called_with('2.2.0')
+
+    @patch.object(sync, 'cli_sdk_version', return_value='6.5.4-alpha.3')
+    def test_missing_current_cli_authority_anchor_fails_closed(self, binding):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            populate_current_docs(root)
+            put(root, 'docs/CLI-GUIDE.md', 'Historical CLI0.4.0 remains pinned to its old record.\n')
+            with self.assertRaisesRegex(ValueError, 'current hosted CLI publication authority'):
+                sync.sync_published_docs(
+                    root, {'SDK': '6.5.4-alpha.3', 'CLI': '2.2.0'},
+                    '=6.5.4-alpha.3', {'sdk': '6.5.4-alpha.3', 'cli': '2.2.0'})
 
     @patch.object(sync, 'cli_sdk_version', return_value='6.5.4-alpha.3')
     def test_published_sdk_does_not_advance_pinned_reader_index(self, binding):
