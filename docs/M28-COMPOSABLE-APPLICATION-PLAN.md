@@ -1,7 +1,7 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A and the owner clarification amendment are complete at independently reviewed documentation scope. M28-B through M28-E remain unimplemented/unqualified.
+- **State:** M28-A and its clarification are accepted at documentation scope. B0 / YT-276 is complete at independently reviewed existing-Web baseline scope; B1 through E remain unimplemented/unqualified.
 - **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
@@ -425,9 +425,9 @@ results are separate evidence classes. The browser/native compatibility map is
 not additional C scope or proof that every pairing works today.
 ## 7. Work breakdown and dependencies
 
-Only YT-265 is in the current authorized implementation scope, and it is
-documentation-only. B–E below are a proposed execution plan, not automatic
-authority to start runtime work.
+YT-265 covers the accepted architecture planning. The owner subsequently
+selected YT-276 / B0 for an existing pure-Web baseline only. B1 through E
+remain proposed work and require their own implementation scope.
 
 | ID | Stage | Deliverable and minimum acceptance | Dependencies |
 |---|---|---|---|
@@ -583,3 +583,94 @@ Independent Reviewer `wc_job_p58KYVEFdOUlz_1C` completed with exit 0, actual JSO
 The owner confirmed preservation of View/HTML/DOM rendering, independent Host/Renderer composition, lifecycle separate from execution topology, and pure Web/API non-regression. This amendment corrects the general diagrams, bounds the single-writer model to the shared-state POC, and puts YT-276 / B0 before YT-266. Independent delta Reviewer `wc_job__Fg38dxSv31AqFr5` completed with exit 0, actual JSON PASS and no issues/followups. Observed model/effort were `gpt-6-astra` / `high`; this was a role-directed Job, not native managed-role dispatch. All five input hashes were unchanged at terminal observation. Only review/completion metadata and its header line break changed after review. Docs/DAG checks passed (29 required documents, 273 Backlog items), as did focused scope/whitespace and 42 local links/anchors. Evidence remains under `.pipeline-output/m28-a-web-preservation-20261117/`; original acceptance evidence is preserved separately.
 
 **Runtime POC:** Not run. **ADR status:** Proposed. Neither document review establishes runtime capabilities or measured zero overhead.
+
+## 10. B0 existing Web baseline — YT-276
+
+**Date:** 2026-11-17. **Source:** `30b0625174e05546f0f26b53d59e112c05136884`.
+Ubuntu 26.04.1 LTS, Linux 7.0.0-43-generic x86_64; Rust/Cargo 1.99.0.
+This is a fresh, source-bound baseline of existing Web behavior, not a new
+Application/Host implementation or proof of future performance preservation.
+
+The product paths `crates`, `examples`, `tools`, root Cargo manifests/lock and
+`.cargo` have no changes from the initial `c9437357` study baseline to this
+source. The original M27-C file is unchanged. This task changes only this
+baseline record and the Roadmap/Backlog status, plus ignored evidence.
+No product tests, framework API, runtime, feature, dependency, template or
+verification framework was added. The accepted architecture and ADR are not
+re-reviewed; ADR 0013 stays Proposed.
+
+### Existing test results
+
+Five locked/offline Cargo invocations completed once, all exit 0. Counts below
+come from complete retained logs, not the shortened Job stdout summary.
+
+| Existing test selection | Actual result | Observed boundary |
+|---|---|---|
+| `server_axum_app_builder`, `server_axum_app_serve`, `server_axum_configuration`, `server_axum_handler_results`, `server_axum_http_pipeline`, `server_axum_prelude`, `server_axum_public_api_compat`; `yetlet --no-default-features --features server-axum` | 35 passed, 0 failed/ignored | Native App/Router/Tower, typed state/extractors/results, route/method behavior, middleware ordering/scope, streaming bodies, API/SSR and security headers, startup and source compatibility |
+| `yetlet --no-default-features --features html --lib html::` | 9 passed, 14 outside-filter tests not run | Existing View-to-HTML escaping, unsafe markup rejection, element/control output and no GPU dependency |
+| `yetlet --no-default-features --features server-axum --doc server_axum::` | 8 passed, 7 outside-filter doctests not run | Seven selected documentation cases plus the expected compile-fail rejection of unresolved `App<State>::serve`; the E0599 output is the successful negative test, not a build failure |
+| `yetlet-rest-api` and `yetlet-hello-world`, library tests | 7 API plus 3 SSR tests passed | Direct JSON/state/validation behavior without renderer invocation; View SSR without script/Wasm output, escaping and native status/header behavior |
+| Existing `rate_limit_middleware::actual_http_peer_spoof_scope_and_headers_with_owned_shutdown`, exact filter, explicit `server-axum,rate-limit` | 1 passed, 6 outside-filter tests not run | Real native loopback HTTP, caller-owned listener and Axum graceful-shutdown future, followed by refusal of a new connection |
+
+Total selected evidence is **55 tests plus 8 doctests**, not the full workspace
+suite. No test failed or was ignored. Filtered-out cases are not coverage claims.
+The optional rate-limit feature was selected only to reuse the existing owned
+shutdown fixture; it is not added to normal Web dependencies.
+
+The startup test actually exercised default `127.0.0.1:7878` and explicit-port
+HTTP plus bind-error propagation. Its occupied-default-port skip branch was
+not taken. That test deliberately aborts and awaits its owned server task;
+it is not graceful-shutdown evidence. The separate native fixture requests
+Axum graceful shutdown and checks listener closure; its timeout/panic fallback
+was not observed. It does not qualify OS Ctrl+C/SIGTERM, in-flight-request drain,
+Windows shutdown, or a multi-host lifecycle. All five Cargo processes and the
+single containing Job completed; no long-lived application was started.
+
+SSR checks prove rendered bytes and CSP/header declarations, including escaped
+untrusted input and no script/Wasm output in the selected fixtures. They do not
+constitute actual Browser execution or deliberate browser CSP-denial tests.
+
+### Dependency and source boundary
+
+Five locked/offline `cargo tree` observations exclude dev dependencies by using
+normal edges (the feature observation uses `normal,features`):
+
+| Selection | Observation |
+|---|---|
+| `yetlet --no-default-features` | Base package only; no normal external dependency |
+| Default `yetlet` | HTML feature, base package only; no mandatory native runtime |
+| `yetlet --no-default-features --features server-axum` | Existing Axum/Tower/Tokio dependencies present; winit/wgpu, yetlet-browser, Redis and Governor absent |
+| Same native server selection, normal feature edges | Existing Tokio net/rt integration remains; no normal `rt-multi-thread` requirement observed |
+| Default `yetlet-browser --target wasm32-unknown-unknown` | Browser DOM graph present; Axum/Tower/Tokio/winit/wgpu absent. Graph inspection only, not a Wasm build or browser test |
+
+The manifest still declares `server-axum` to enable `html`. An API that never
+renders a View is not an HTML-free compiled feature graph. Native test/dev
+features and application-selected features can be larger than these normal
+package graphs.
+
+`App` continues to delegate to its native Router, and `serve_on` binds a
+caller-runtime Tokio listener before `axum::serve(..., into_router())`.
+No global actor, tick, snapshot subscription, HostGroup or new worker enters the
+existing HTTP request path. CLI source/templates and their existing generation
+contracts are byte-unchanged from the pre-M28 source; this is preservation by
+source identity, not a fresh installed CLI/scaffold verification.
+
+### Evidence, limits and next boundary
+
+Raw commands, exits, full logs, source identities and counts are retained under
+`artifacts/verification/m28-b0-20261117/`: `source-manifest.json`,
+`test-commands.json`, `test-summary.json`, the five test logs/exits,
+`graph-commands.json` and five graph logs/exits. The 22 directly selected
+source/manifest hashes remained unchanged after tests. Rebuildable output reused
+`.cache/yetlet/builds/m28-a-20261117/`; no historical evidence/cache was deleted.
+The test execution is Job `wc_job_m2WmBz2zGtdOI9Rk`, terminal completed/exit 0.
+
+Independent B0 review: PASS. Job `wc_job_gxUREPbXwflV_qFr` completed with exit 0, actual JSON pass and no issues/followups. Actual model/effort were `gpt-6-astra` / `high`; this is independent role-directed Job evidence, not native managed-role identity. Three reviewed documents and all baseline evidence hashes were unchanged at terminal observation; only declared completion metadata changed afterward.
+Review/closure evidence is retained under `.pipeline-output/m28-b0-20261117/`. Documentation checks passed with 29 required documents and 273 backlog items; the original single EOF-blank-line failure is preserved separately.
+No staged index, commit, push, remote PR, release or deployment is part of this baseline execution.
+
+B0 establishes existing pure Web/API/SSR behavior and dependency boundaries at
+this source. It does not establish measured zero overhead, a benchmark result,
+new platform support, generic Host semantics or any B1–E POC. Later changes
+must compare the affected baseline surfaces, not automatically rerun all prior
+qualification. B1 / YT-266 remains Todo and has not been started.

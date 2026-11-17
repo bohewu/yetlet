@@ -4,14 +4,14 @@
 
 The [M28 plan](M28-COMPOSABLE-APPLICATION-PLAN.md) and
 [Proposed ADR 0013](adr/0013-composable-application-and-hosts.md) distinguish
-documentation acceptance from unimplemented runtime capabilities. Only YT-265
-is authorized in the current documentation slice. Later items require their
-own implementation scope; D4 is conditional on physical devices.
+documentation acceptance from unimplemented runtime capabilities. YT-265 is
+accepted; the owner selected YT-276's existing-Web verification next. Later
+implementation still requires its own scope; D4 is conditional on physical devices.
 
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
 | YT-265 | P1 | M | M28-A | Application, host, transport and renderer architecture study | — | [Plan and gates](M28-COMPOSABLE-APPLICATION-PLAN.md): initial review at 4e5bdc1 retained; independent owner-clarification delta Reviewer wc_job__Fg38dxSv31AqFr5 actual PASS, terminal exit 0, no issues/followups, observed gpt-6-astra/high; docs/DAG and focused scope/links PASS. ADR Proposed; no runtime evidence | Done |
-| YT-276 | P1 | S | M28-B0 | Pure Web/API/SSR preservation baseline | YT-265 | [B gates](M28-COMPOSABLE-APPLICATION-PLAN.md#m28-b-acceptance): focused existing Web tests and normal feature graphs; native App/Router/Tower and lifecycle preserved, API without rendering, SSR with View; no compulsory actor/queue/tick/snapshot/supervisor or changed Web template; no measured zero-overhead claim | Todo |
+| YT-276 | P1 | S | M28-B0 | Pure Web/API/SSR preservation baseline | YT-265 | [Source-bound baseline](M28-COMPOSABLE-APPLICATION-PLAN.md#10-b0-existing-web-baseline--yt-276) at 30b0625: 55 selected tests plus 8 doctests and five locked/offline normal dependency/feature observations PASS; existing App/Router/Tower, SSR/startup/native shutdown and unchanged CLI/template source retained. Independent Reviewer wc_job_gxUREPbXwflV_qFr actual PASS, terminal exit 0, no issues/followups; docs checks PASS. No new product APIs, performance or B1 claim; Git delivery separate | Done |
 | YT-266 | P1 | S | M28-B1 | One owner and two cooperative caller-thread hosts | YT-276 | [B gates](M28-COMPOSABLE-APPLICATION-PLAN.md#m28-b-acceptance): private example, distinct host lifecycles on one caller thread with Rc-owned data, bounded commands/immutable snapshots, no dedicated worker/socket/GPU/Tokio requirement or public Host API | Todo |
 | YT-267 | P1 | M | M28-B2 | Explicit worker variation and lifecycle failure handling | YT-266 | [B gates](M28-COMPOSABLE-APPLICATION-PLAN.md#m28-b-acceptance): one explicitly owned worker, startup/runtime failure, saturation, late generation and non-starvable stop; join actual owned workers and preserve caller-shared scheduler ownership; retain B0 Web path | Todo |
 | YT-268 | P1 | M | M28-C1 | Fixed-tick 2D simulation and headless runner | YT-267 | [C gates](M28-COMPOSABLE-APPLICATION-PLAN.md#m28-c-acceptance): original bounded game, ordered deterministic inputs, Pause/Resume, no window/GPU/socket headlessly; simulation is not a universal Application requirement | Todo |
