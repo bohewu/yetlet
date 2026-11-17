@@ -1,0 +1,12 @@
+[package]
+name = "yetlet-composable-host-research"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+description = "Private same-thread multi-host composition research (YT-266)"
+
+# An independent workspace: do not add this POC to the SDK root workspace.
+[workspace]
+
+[dependencies]

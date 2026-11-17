@@ -13,13 +13,15 @@ HTTP requests. [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Pro
 
 - [x] **M28-A / YT-265 clarification:** initial review at `4e5bdc1` retained; independent delta Reviewer `wc_job__Fg38dxSv31AqFr5` actual PASS, terminal exit 0, no issues/followups; document checks PASS. Renderer/lifecycle/Web-preservation planning only, no runtime result implied.
 - [x] **M28-B0 / YT-276:** [Existing Web baseline](M28-COMPOSABLE-APPLICATION-PLAN.md#10-b0-existing-web-baseline--yt-276) at `30b0625`: 55 selected tests plus 8 doctests and five normal dependency/feature observations PASS. Independent Reviewer `wc_job_gxUREPbXwflV_qFr` actual PASS, terminal exit 0, no issues/followups. No product/template changes, performance certification or new Host claim; Git delivery remains separate.
-- [ ] **M28-B1/B2 / YT-266–267:** two same-thread hosts with separate lifetimes and one owner; then an explicit worker/failure/stop variation without taking over caller-shared schedulers. No socket/GPU in these POCs.
+- [x] **M28-B1 / YT-266:** [Private same-thread POC](M28-COMPOSABLE-APPLICATION-PLAN.md#11-b1-private-same-thread-multi-host-proof--yt-266): two concrete independent-lifecycle hosts, one owner, bounded commands and immutable shared Snapshot with `Rc` local data. Focused 7/7, Fmt/Clippy, demo and zero-normal-dependency graph PASS. Independent Reviewer `wc_job_q8KjqtfssJDRTlml` actual PASS, terminal exit 0 with zero issues/followups; private research only, no public Host API or B2 evidence.
+- [ ] **M28-B2 / YT-267:** add a deliberately owned worker and bounded startup/failure/stop evidence without taking over a caller-shared scheduler. Do not begin during B1.
 - [ ] **M28-C / YT-268–270:** same fixed-tick reducer headless and under native winit with an independently selected wgpu backend; actual visual/lifecycle evidence.
 - [ ] **M28-D / YT-271–273:** bounded protocol and UDP between two application processes, each composing its required hosts; controlled faults, reconnect/stop and headless network mode.
 - [ ] **Conditional LAN / YT-274:** two physical devices when available; loopback never substitutes for that evidence.
 - [ ] **M28-E / YT-275:** promotion decision requires B0 pure-Web preservation as well as selected C/D evidence; no compulsory actor/queue/tick/HostGroup on Web requests. Packaging, template and positioning remain separate choices.
 
-A remains accepted at documentation scope; the owner selected only B0's existing-Web verification next. B1–E remain unimplemented and require their own scope.
+A and B0 remain accepted at their recorded scopes. The owner selected B1 only;
+B2–E remain unimplemented and require their own scope.
 No Axum refactor, public API, dependency/default-feature change, SDK/CLI release
 or public product-description rewrite is included. See the
 [complete task dependency table](M28-COMPOSABLE-APPLICATION-PLAN.md#7-work-breakdown-and-dependencies).

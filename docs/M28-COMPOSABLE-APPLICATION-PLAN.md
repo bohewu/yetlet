@@ -1,7 +1,7 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A and its clarification are accepted at documentation scope. B0 / YT-276 is complete at independently reviewed existing-Web baseline scope; B1 through E remain unimplemented/unqualified.
+- **State:** M28-A and B0 accepted at their documented scopes. B1 / YT-266 complete at private same-thread research scope with independent Reviewer actual PASS; no framework Host API has been promoted. B2 through E remain unimplemented/unqualified.
 - **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
@@ -673,4 +673,64 @@ B0 establishes existing pure Web/API/SSR behavior and dependency boundaries at
 this source. It does not establish measured zero overhead, a benchmark result,
 new platform support, generic Host semantics or any B1–E POC. Later changes
 must compare the affected baseline surfaces, not automatically rerun all prior
-qualification. B1 / YT-266 remains Todo and has not been started.
+qualification. B1 is a separate private research POC (section 11), not a public API.
+
+## 11. B1 private same-thread multi-host proof — YT-266
+
+**Selection:** The owner authorized B1 after the guarded B0 documentation
+commit `9b52970cf20b7a18f1fe0ee2dfbff2b8bf4947eb`. This evidence
+describes a private research example only; no generic Host/HostGroup,
+application actor, Tokio requirement or public SDK integration is accepted.
+ADR 0013 remains Proposed.
+
+The independent nested `[workspace]` example
+[composable-host-research](../examples/composable-host-research/README.md)
+contains `PanelHost` and `RuleHost` as two concrete caller-driven hosts.
+Both run on the caller's OS thread, each owns an independent
+Prepared/Running/Stopped lifecycle and non-Send `Rc` local UI/rule data.
+One `StateOwner` alone mutates the authoritative integer balance. The hosts
+can only submit typed credit/debit commands via a fixed-capacity
+`Rc<RefCell<_>>` mailbox; they read the same immutable, owned
+`Rc<Snapshot>` with explicit generation and publication revision.
+Successful queue admission is not completed application.
+
+The composition root starts both hosts before opening the mailbox, calls
+`apply_pending` explicitly, and stops each host separately. Stopping one
+does not stop the other. Full and closed ingress are explicit errors, and a
+pre-publication snapshot stays unchanged until the single owner drains.
+An arithmetic/revision overflow returns an error before changing state or
+the pending batch. Closing with outstanding admitted commands reports
+the number discarded; B2 must replace this minimal teaching behavior
+with an explicit failure/cancellation/cleanup contract before promotion.
+
+### B1 focused source and runtime evidence
+
+| Evidence | Actual bound result |
+|---|---|
+| Platform/source | Ubuntu 26.04.1 LTS, Rust/Cargo 1.99.0; B0-closed HEAD `9b52970` plus only the private example and B1 documentation changes |
+| POC test | 7 of 7 unit tests PASS; no ignored/failed tests, empty binary/doc test targets |
+| Style/lint | `cargo fmt --check` PASS; `cargo clippy --all-targets -- -D warnings` PASS |
+| Demonstration | `cargo run --locked --offline` printed `generation=1 revision=1 balance=5`; both hosts saw the same snapshot pointer |
+| Dependency boundary | `cargo tree --offline --locked --edges normal` showed only the private package; no third-party dependency, Axum, Tokio, winit, wgpu, socket or renderer |
+| Workspace boundary | Nested `[workspace]`, independent `Cargo.lock`, `publish=false`; root `Cargo.toml`, SDK, CLI, templates and root lock unchanged |
+| Web baseline | Previously reviewed B0 source/feature tests remain the valid unchanged-product baseline; no blanket browser/Windows tests or performance claims |
+| Independent review | Role-directed Reviewer `wc_job_q8KjqtfssJDRTlml` terminal/exit 0, actual JSON pass, issues=[] and required_followups=[]; observed Codex turn context `gpt-6-astra`/`high`; eight reviewed input file hashes unchanged. Independent review is not native managed-role identity or formal assurance |
+
+Tests also verify the single caller's `ThreadId`, two independent
+Host phases, `Rc`-backed local models, exact same-generation/revision
+snapshot identity, bounded queue admission, owner-only publication,
+prior-snapshot immutability, and explicit closed/not-running errors.
+
+The build cache and original command output are retained separately:
+`.cache/yetlet/builds/m28-b1-20261117/` and
+`artifacts/verification/m28-b1-20261117/`. The later reviewer observation
+and ignored continuation handoff belong under
+`.pipeline-output/m28-b1-20261117/`.
+
+**Not proven:** any actual new framework `Host` API or integration
+with Yetlet `ActionExecutor`; async task/worker/process execution,
+readiness rollback, stale generation recovery, graceful group failure,
+reliable completion of pending commands, timer/tick, GPU, HTTP, UDP,
+Wasm/browser rendering, Windows runtime, latency or memory measurements.
+These belong to B2–E or separate scopes. B1 does not revise B0's direct
+pure-Web/API/SSR behavior or claim complete cross-platform compatibility.
