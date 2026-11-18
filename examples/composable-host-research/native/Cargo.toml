@@ -4,6 +4,7 @@ version = "0.0.0"
 edition = "2024"
 rust-version = "1.99"
 publish = false
+default-run = "yetlet-native-gamehost-research"
 description = "Private opt-in native winit/wgpu C2 GameHost research (YT-269)"
 
 # Keep the B0 Web and B1/B2/C1 private std-only package untouched.

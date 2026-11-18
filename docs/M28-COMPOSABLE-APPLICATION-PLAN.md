@@ -1,7 +1,7 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A/B0/B1/B2/C1/C2/C3/D1 accepted at separately reviewed private scopes; C3 locally committed `f203709`. D1 / YT-271 private std-only bounded wire/session and InMemory authority/replica proof completed with 16/16 focused tests, no-socket Demo, zero external deps and independent Reviewer `wc_job_CjE2M88h6SNMhH7D` actual PASS. D1 Git delivery separate; D2/D3/E remain Todo, ADR 0013 Proposed.
+- **State:** M28-A/B0/B1/B2/C1/C2/C3/D1/D2 independently reviewed at their bounded private scopes; D1 locally committed `545153e`. D2 / YT-272 real Ubuntu two-PID 127.0.0.1 UDP Host+Client and two Vulkan X11 screenshots PASS, with post-E2E source-only corrections, selected D2 binary 3/3 tests and independent R3 `wc_job_yVREJyi-XD7-Ax2p` actual PASS. Original R1 FAIL3 and R2 FAIL1 preserved, one historical success Build Log filename collision disclosed, no post-fix E2E rerun. D2 Git delivery separate; D3/D4/E Todo, ADR 0013 Proposed.
 - **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
@@ -1102,3 +1102,110 @@ authentication/encryption, hostile LAN, handshake or reconnection
 retries. Session/Epoch IDs only mark routing/freshness. D2 handles real
 UDP/two processes; D3 handles controlled packet faults, stop/reconnect,
 and headless networking. M28-E still owns promotion decisions.
+## 17. D2 two independent native application processes over real loopback UDP — YT-272
+
+**Selected implementation:** A separate D2 opt-in Native binary in the
+existing private winit/wgpu nested package launches as either a Host
+application or Client application. Each OS process owns one foreground
+winit GameHost and one selected NetworkHost or NetworkClient. The Host
+process alone owns the existing C1 Simulation through the unchanged D1
+HostFixture; the Client owns only an immutable D1 ReplicaFixture. No
+per-Host process, task worker or public Host/Transport/RPC API exists.
+
+### UDP and composition contract
+
+- Both applications bind exclusively to explicit IPv4 loopback
+  127.0.0.1 with kernel-chosen ephemeral ports. The Client is started
+  with the Host's actual endpoint, and the Host binds one trusted
+  endpoint to a fixed single-client server-issued Peer/Session/Epoch
+  mapping for this bounded demonstration (Peer=22, Session=7101,
+  Epoch=1, Generation=1).
+- D1 canonical version-1 Hello/Welcome/HeldInput/Snapshot bytes are
+  sent through actual std::net::UdpSocket send_to/recv_from. This
+  bounded demo's Welcome does not echo the Hello nonce or implement
+  cryptographic authentication, a general reconnect handshake or
+  a secure session ID exchange. The Host binds the first accepted
+  loopback Hello to one exact source SocketAddr and then checks that
+  address, peer/session/epoch/sequence/tick through the D1 HostFixture
+  before forwarding HeldInput.
+- Nonblocking sockets, at most 8 receive attempts per foreground wake,
+  a 513-byte receive buffer to detect >512-byte application datagrams
+  without an untrusted allocation, one bound remote assignment, at
+  most three Welcome replies and one pending direction slot per Player
+  keep processing finite. The Host sends full immutable Snapshot
+  datagrams at 20/s (every third 60Hz control tick) while connected;
+  the Client responds to fresh authoritative Snapshot with a complete
+  HeldInput at no more than that observed rate.
+- The Host's local Player One and the mapped remote Player Two share
+  exactly one C1 Simulation::step. The owner stamps its own contiguous
+  C1 input sequence; the remote wire sequence is only a per-peer
+  freshness marker. The Client never constructs an authoritative C1
+  Simulation and renders only its latest read-only D1 full Replica.
+- Both live applications use the existing winit foreground event loop,
+  wgpu Vulkan two-square Scene shader and immutable render projections;
+  no separate network worker or NetworkHost-per-process shortcut.
+  Movement in this D2 proof is deterministic scripted demo input,
+  **not evidence of the two windows' keyboard interaction** (previous
+  C2 separately tested OS keyboard events).
+- Shutdown uses real WM_DELETE_WINDOW only for the two owned windows,
+  release of each Native Renderer/Window and explicit Socket drop
+  in the same application. A caller verifies both OS PIDs terminate
+  with exit code 0, exact Window IDs disappear, both kernel UDP ports
+  close, and prior X11 focus is restored.
+
+### Actual D2 bounded Ubuntu E2E
+
+The one completed bounded end-to-end attempt used Ubuntu 26.04.1 LTS,
+NVIDIA RTX 4090 Vulkan/wgpu 27 and real X11 display :0. Exact window
+title and _NET_WM_PID were verified before moving/capturing/closing.
+
+| Evidence gate | Directly observed result |
+|---|---|
+| Separate application PIDs | Host PID **900380** and Client PID **900381**, each created independently with its own Native GameHost and one network role |
+| True UDP loopback endpoints | Host **<selected-endpoint>**, Client **<selected-endpoint>**; both sockets shown by kernel ss during execution, no wildcard or LAN bind |
+| Actual datagrams | Host 34 received / 35 sent / 33 accepted, Client 35 received / 35 sent / 35 accepted; Host one rejected (no false zero-loss claim); Client sent 34 HeldInput and received full Snapshots |
+| Authority and replica | Both programs independently logged **Revision 90, Tick 90**, Player One X=22, Player Two X=0; source and received complete Snapshot values matched at this revision |
+| Real two-window visuals | Host and Client windows each 960×640, true XWD capture and independent PNG conversion; grounded blue [134,211,255], orange [255,199,139] and dark [63,75,97] pixel samples PASS; both PNG SHA256 equal (same frame content) |
+| Shutdown | WM_DELETE delivered only to the two verified owned Window IDs; both Exit 0, explicit Socket closed, GPU/Window resources dropped, kernel UDP ports absent, X11 Window IDs removed and original focus restored |
+| Focused Native tests | Four D2-selected tests PASS: real loopback ephemeral binding, Hello/Welcome/input on actual local UDP, rejection of foreign endpoint/oversized datagram without changing owner, and bounded receive configuration |
+| Independent Reviewer | Original R1 `wc_job_YfHgg6cq0ElmcFbT` exit0 actual FAIL3 (Client fake pre-Snapshot players, zero-frame tick exit, missing native default-run) and R2 `wc_job__nWJv7-x7VPY-qLT` exit0 actual FAIL1 (stalled wake advanced C1 beyond Tick300) preserved. Corrections ensure only real D1 Replica frames render, bounded tick exit independent of frame count, C2 default-run restored, due batch capped before C1 owner step. D2 binary 3/3 selected tests, Fmt/Clippy, native Build, Cargo default-run/docs PASS. Independent R3 `wc_job_yVREJyi-XD7-Ax2p` terminal exit0 actual JSON PASS `issues=[]`, `required_followups=[]`, observed `gpt-6.2-astra`/`high`; eight reviewed source hashes and scoped R3 evidence unchanged. Real two-PID UDP/X11 positive E2E original receipts preserved, not rerun after negative-path corrections. One prior R1 successful Native Build Log pathname was reused by later build; exact SHA drift disclosed in ignored evidence-collision-r3.json, not represented as unchanged. No D3 loss/reconnect, LAN or security certification |
+
+Raw Host/Client process logs, exact PIDs/endpoints, kernel socket and
+window evidence, original XWD and grounded PNG/SHA256 are preserved at
+artifacts/verification/m28-d2-20261118/. The bounded runner is ignored
+at .pipeline-output/m28-d2-20261118/e2e_two_process_x11.py. The
+initial preflight-only and first actual window-position/cropped-client
+harness failures are retained as separate receipts, never relabeled
+as successful. A later bounded correction positioned the Client window
+fully onscreen; no additional process/window launches were done after
+the verified success.
+
+The independent R1 findings after the real run exposed two paths not
+covered by the original happy-path screenshots: no validated Client
+Snapshot must mean **no player frame**, and a Window with zero rendered
+frames must still exit after its bounded control-Tick limit. Both are
+fixed in the private D2 Client/scheduler, with two selected non-GUI
+regressions. A third fix restores the previously accepted C2 default
+Cargo binary through an explicit private `default-run`. These repairs
+did **not** relaunch the real Host/Client GPU/UDP E2E, which remains
+source-bound positive-path evidence; no fresh network-failure UI proof
+is claimed from compilation or tests alone.
+
+R2's independent review then found one more bounded-scheduler path:
+when multiple ticks were due at control Tick 299, the Host could
+advance and publish through 303 before checking a 300-Tick limit.
+The corrected foreground code now computes
+`min(due, max_ticks.saturating_sub(control_ticks))` **before** every
+Host `Simulation::step`, so only the remaining budget can publish.
+The focused 299→300 negative regression and the preceding two
+non-GUI tests passed 3/3; no post-fix native GPU/UDP run is claimed.
+The original R1/R2 actual FAIL results remain preserved; R3 pending.
+
+**What remains unverified:** D3 seeded packet drops, duplication,
+reorder, flood/fairness, real reconnect/timeout, lost-release repair
+and HeadlessHost + NetworkHost, D4 two-physical-device LAN, NAT,
+firewall/Internet, hostile peer authentication/encryption, cross-OS
+Window/UDP behavior or any universal networking trait. D2 is one real
+loopback transport and Native visual proof only; ADR 0013 stays
+Proposed. Success here does not certify reliability under loss,
+cryptographic peer authenticity or game latency/FPS.

@@ -1,6 +1,9 @@
 //! C2 / YT-269: private native GameHost input, clock and scene projection.
 //! No Yetlet SDK API, universal Renderer trait, wall-clock reducer or transport.
 
+// D2 opt-in real loopback UDP adapter; never a root Yetlet SDK API.
+pub mod udp_d2;
+
 use std::{
     rc::Rc,
     time::{Duration, Instant},

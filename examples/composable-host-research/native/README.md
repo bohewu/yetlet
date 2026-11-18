@@ -88,6 +88,82 @@ was validated with a focused non-GUI scheduling test, not claimed as
 observed live Window behavior. The original GPU run was not repeated.
 All previously validated C2/B0/B1/B2/C1 sources/tests remain unchanged.
 
+
+## D2 — Two real Native GameHost processes, loopback UDP (YT-272)
+
+The opt-in `d2-loopback` binary launches as `host` or
+`client 127.0.0.1:<actual-port>`, each one independent OS process
+composing a caller-thread winit GameHost with a private NetworkHost or
+NetworkClient. Neither is a per-Host process/thread. Host alone owns
+D1 HostFixture and C1 Simulation. Client keeps the latest read-only
+D1 ReplicaFixture; both GPU renderers display immutable Scene data.
+The only network is explicit 127.0.0.1 UDP, with no wildcard bind,
+root Yetlet network dependency, firewall changes or LAN exposure.
+
+Host binds port zero, reports its actual endpoint, and accepts only
+one loopback peer Source for this bounded demo. D1 canonical Codec
+version 1 and Session/Epoch/Peer/Sequence/Tick checks apply before
+authority admission. Up to 8 nonblocking 513-byte datagram receives
+per wake, one remote assignment, up to three Hello responses and
+20 full Snapshot datagrams/s keep processing bounded. The scripted
+demo moves Host Player One East and Client Player Two West. This
+tests true datagrams and rendered state, not keyboard interaction,
+reliable transport or hostile peer authentication.
+
+Actual Ubuntu RTX4090/Vulkan X11 bounded E2E:
+Host PID 900380, <selected-endpoint>; Client PID 900381,
+127.0.0.1:32801. Both report identical authoritative Revision/Tick
+90 with player X positions 22 and 0. Two real 960×640 Native Window
+PNG screenshots have identical SHA256. Real Windows are closed via
+WM_DELETE; both Exit 0, exact Window IDs disappear, Socket and GPU
+ownership released, original X11 focus restored.
+
+Retained exact real screenshots:
+`artifacts/verification/m28-d2-20261118/d2-{host,client}-actual-window-r3.png`
+and source XWD files; exact SHA256 and process/socket counters in
+`d2-real-process-x11-udp-observation-r3.json`. The first two harness
+attempts are retained as failed evidence (preflight Git status and a
+Client Window positioned 5px beyond the screen), not hidden.
+
+Focused Native-only tests:
+
+    cargo test --manifest-path examples/composable-host-research/native/Cargo.toml --locked --offline --lib d2_
+
+The Host/Client Demo is separately selected and is not a default
+Yetlet service or runtime. D3 controlled packet loss/reorder,
+reconnect, headless networking and D4 physical LAN remain separate.
+Tokens/port matching are **not** cryptographic authentication.
+
+### D2 independent R1 findings and bounded fixes
+
+Original Reviewer R1 `wc_job_YfHgg6cq0ElmcFbT` actual FAIL with three
+material P2s is retained. In the corrected Client, rendering waits for
+a fully validated D1 Snapshot rather than showing fabricated players.
+The 300-control-Tick bounded exit now releases the owned Socket and
+Window even if the Window was obscured or zero frames rendered; it
+reports a no-frame result separately. The private Native manifest also
+restores `default-run = "yetlet-native-gamehost-research"`, so the
+previous C2 `cargo run ... --smoke-ticks` guidance remains selectable
+without naming a binary; D2 always explicitly uses `--bin d2-loopback`.
+Two focused non-GUI regressions, Fmt/Clippy/Native build and Cargo
+metadata checks PASS. The original two-PID wgpu/UDP E2E was not rerun
+for these post-review repairs; it remains evidence only for the
+unchanged successful synchronized path. Independent R2 pending.
+
+### D2 independent R2 bounded Tick repair
+
+Independent R2 `wc_job__nWJv7-x7VPY-qLT` actual FAIL found that
+one delayed callback could yield four due ticks when 299 of the
+selected 300 had already been processed. Host could then publish
+through Tick303 before exiting. The private foreground D2 scheduler
+now caps each due batch by the **remaining control-Tick budget before
+calling the sole C1 owner step**; selected tests assert 299+4→300,
+298+4→300, and zero work after exhaustion. Three/three selected D2
+binary regressions PASS with Fmt/Clippy and Native Build. R2 FAIL
+and prior R1 FAIL stay immutable; independent R3 pending. The prior
+successful two-PID UDP/wgpu run was not relaunched after this source
+repair; its original positive-path evidence remains retained.
+
 Run from the repository root:
 
 ```sh
