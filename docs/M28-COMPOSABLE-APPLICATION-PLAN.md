@@ -1,7 +1,7 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A/B0/B1/B2/C1/C2/C3/D1/D2/D3 independently reviewed at separately bounded private scopes; D2 locally committed `7fc70f2`. D3 / YT-273 std-only two-PID Headless 127.0.0.1 fault/reconnect proof and post-fault Replica Revision432 convergence PASS, with 14/14 selected tests and independent R2 `wc_job_-kuV4Ftw7m4omNAI` actual PASS. Original R1 `wc_job_-urFtaTTU_DO-UQn` actual FAIL3 retained; one older successful Clippy Log filename collision explicitly disclosed. Original two-PID E2E not rerun after R1 source-only fixes. D3 Git delivery separate; conditional D4 and M28-E Todo, ADR 0013 Proposed.
+- **State:** M28-A/B0/B1/B2/C1/C2/C3/D1/D2/D3 completed and locally committed at separately reviewed private scopes; D3 HEAD `cde0a03`, independent R2 `wc_job_-kuV4Ftw7m4omNAI` actual PASS and original R1 FAIL3 retained. D4 original physical two-device LAN remains **Not verified** after selected campus UDP ingress failure; two-Multipass-VM same-binary UDP via per-VM relays converged at Revision462 but is not physical D4 or direct non-loopback D3. M28-E/YT-275 [evidence-based promotion proposal](M28-E-PROMOTION-DECISION.md) completed independent documentation review: original R1 `wc_job_tHV6cHY7qckBm8pG` actual FAIL3 corrected, R2 `wc_job_yKyyePqAbLGP4xaz` terminal exit0 actual PASS with zero issues/followups; **owner decision still pending**, no public Host/Transport/Renderer API. ADR 0013 remains Proposed.
 - **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
@@ -1318,7 +1318,7 @@ Clippy all targets `-D warnings` and Headless Binary Build PASS.
 The already-accepted original two-headless-PID fault demonstration
 was **not rerun** after the source-only R1 corrections; no new
 post-correction multi-PID performance or LAN evidence is claimed.
-Independent R2 is pending.
+Independent R2 `wc_job_-kuV4Ftw7m4omNAI` later completed exit0 with actual JSON PASS after three R1 P2 repairs; original failed Reviewer and real E2E evidence remain preserved. See the D3 closeout in the reviewed [Backlog](BACKLOG.md#m28--composable-application-and-multi-host-research).
 
 Raw logs and exact runtime PID/socket/Session/evidence
 `artifacts/verification/m28-d3-20261118/d3-two-pid-real-loopback-observation-r1.json`
@@ -1334,3 +1334,28 @@ faults, physical D4 two-device LAN, production reliability or latency
 benchmarks, and any universal public networking contract. D4 remains
 conditional and M28-E retains the independent framework promotion
 decision. ADR 0013 remains **Proposed**.
+
+## 19. M28-E evidence-based promotion proposal — YT-275
+
+The independently scoped A/B0/B1/B2/C1/C2/C3/D1/D2/D3 proof chain plus the
+separate D4 physical LAN ingress blocker and the successfully relayed
+D4VM virtual-kernel supplement have been compiled into the
+[decision and evidence matrix](M28-E-PROMOTION-DECISION.md).
+
+**Proposed disposition:** document explicit application-owned composition
+and resource lifetime as architectural principles; keep host implementations,
+C1 GameState policy, D1/D3 private protocol, native wgpu and UDP network
+adapters private until a justified opt-in or production consumer gate exists.
+Do not introduce public universal Application/HostGroup/Renderer/Transport,
+new root dependencies or an actor/tick/queue on ordinary Web requests.
+The existing B0 Axum/Tower/SSR/HTML/DOM behavior remains first class.
+
+D4/YT-274 remains **Not verified for two physical devices**. Two Multipass
+VMs with matching binary SHA and relayed UDP successfully converged after
+faults, but both guests share one physical Ubuntu host and the unchanged
+D3 binary still binds localhost. This is supplemental Virtual LAN evidence,
+not a D4 PASS or untrusted LAN/network security certification.
+
+This M28-E proposal is for **independent document Reviewer and owner decision**.
+It does not accept ADR 0013, refactor Axum, add a public framework API,
+change packaging or CLI templates, or authorize Push/Merge/release.
