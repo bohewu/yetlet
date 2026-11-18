@@ -93,6 +93,43 @@ B1/B2/C1 package, root Web server, SDK or CLI. Actual Ubuntu X11/Vulkan
 startup and a bounded keyboard interaction path were exercised; C3 reserves
 full visual, window lifecycle and performance qualification.
 
+
+## D1 — Private bounded Codec and InMemory session (YT-271)
+
+The std-only private protocol module is NOT a public Yetlet
+Protocol/Transport/RPC API. It has no Socket, worker, Tokio or networking
+dependency. Canonical wire messages use ASCII YTP1, version 1, a strict
+12-byte header, zero reserved bits and a payload length in little-endian
+u16. The maximum frame is 512 bytes including header. The five exact
+kinds and sizes are: Hello=1 (20 bytes), Welcome=2 (53), HeldInput=3
+(53), Snapshot=4 (63), Leave=5 (44). Every invalid version/kind/bit,
+length, field or zero identity is rejected with no partial decode.
+
+Trusted in-memory Endpoint provenance is mapped by the Host to a
+server-issued peer/session/epoch/Player binding. A wire peer ID alone
+is not authority. Two peers may share a game session; peer and endpoint
+IDs remain distinct. Each remote input needs a fresh per-peer sequence
+(gaps allowed), never MAX, and exactly the next C1 owner Tick. Two
+latest directional slots are bounded; a local command and remote
+command use only the unchanged single C1 Simulation::step with its
+own consecutive authoritative input sequence. Admission is not
+application. Invalid inputs preserve the immutable Rc<Snapshot>.
+A finite InMemoryMailbox holds at most four complete packets.
+
+The read-only replica checks trusted host Endpoint plus expected
+Session/Epoch/Generation; duplicate, stale revision/tick and old
+session snapshots do not overwrite the latest immutable projection.
+Hello/Welcome/Leave are only Codec shapes, not network handshake or
+reconnect support. Session/epoch IDs are NOT authentication tokens.
+
+Focused D1-only tests and a runnable zero-Socket demo:
+
+    cargo test --manifest-path examples/composable-host-research/Cargo.toml --locked --offline --lib protocol::
+    cargo run --manifest-path examples/composable-host-research/Cargo.toml --locked --offline --bin protocol-demo
+
+Real UDP, independent process IDs and packet-fault qualification are
+reserved for D2/D3; D1 does not establish them.
+
 ## Run the examples
 
 From the repository root using the pinned Rust toolchain:

@@ -1,7 +1,7 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A/B0/B1/B2/C1/C2 accepted at separate bounded scopes; C2 locally committed `9be98e7`. C3 / YT-270 one supported Ubuntu X11/Vulkan real visual and Window lifecycle subset complete with original native screenshots, measured scheduling, explicit synthetic 0×0 and Lost/Outdated recovery branch limits, selected 3/3 tests and independent R2 `wc_job_oQRL1tjhmefNiWii` actual PASS. Git delivery separate; M28-D/E Todo, ADR 0013 Proposed.
+- **State:** M28-A/B0/B1/B2/C1/C2/C3/D1 accepted at separately reviewed private scopes; C3 locally committed `f203709`. D1 / YT-271 private std-only bounded wire/session and InMemory authority/replica proof completed with 16/16 focused tests, no-socket Demo, zero external deps and independent Reviewer `wc_job_CjE2M88h6SNMhH7D` actual PASS. D1 Git delivery separate; D2/D3/E remain Todo, ADR 0013 Proposed.
 - **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
@@ -1035,3 +1035,70 @@ physical LAN. C3 acceptance is only the evidence-bounded native
 Window/visual/lifecycle subset. ADR 0013 remains Proposed and M28-D/E
 remain Todo; any broader claims need additional independently reviewed
 evidence.
+## 16. D1 private bounded protocol and InMemory session proof — YT-271
+
+**Scope:** D1 implements a private, std-only binary Codec and trusted
+InMemory session admission around the unchanged C1 Simulation. It is part of
+the independent publish=false composable-host-research package, not a public
+Yetlet Protocol, Transport or RPC API. C3 is locally committed at f203709.
+No socket, network worker, listener, HTTP API or new root dependency exists.
+
+### Exact wire and admission contract
+
+| Kind / field | Contract |
+|---|---|
+| Header | 12 bytes: ASCII YTP1 magic (4), version 1 (u8), kind (u8), flags=0 (u8), reserved=0 (u8), payload length u16 LE, two zero reserved bytes |
+| Kind 1 Hello | Nonzero nonce u64; exactly 20 bytes including header |
+| Kind 2 Welcome | Nonzero peer/session/epoch/generation u64, tick u64, Player (u8 1/2); exactly 53 bytes |
+| Kind 3 HeldInput | Nonzero peer/session/epoch/sequence/tick u64, Direction (u8 0 Still / 1 North / 2 East / 3 South / 4 West); exactly 53 bytes |
+| Kind 4 Snapshot | Nonzero session/epoch/generation u64, revision/tick u64, two whole-square bounded x/y i16 positions, two held Direction bytes and one strict paused 0/1; exactly 63 bytes |
+| Kind 5 Leave | Nonzero peer/session/epoch/sequence u64; exactly 44 bytes |
+| All datagrams | At most 512 bytes including header; canonical little-endian encoding and exact message-specific lengths. Unknown version/kind, invalid bits/fields, nonzero flags/reserved, truncation, trailing input and oversize are rejected before admission |
+| InMemory budget | Four complete frames maximum in the fixture mailbox; two replaceable latest held-command slots, one per server-mapped Player, within the unchanged 32-input C1 tick budget |
+
+The future trusted NetworkHost must supply EndpointId as **out-of-band
+provenance**. HostFixture checks the bound EndpointId, server-provisioned
+Peer, Session, Epoch and Player before staging a remote held input. Peer
+identity cannot be self-assigned from a packet. Two peers may share a game
+Session, but endpoint and peer IDs must be distinct. A remote peer's
+sequence must be strictly greater than its last admitted sequence
+(gaps allowed for future lossy delivery), never u64::MAX; input target
+tick must equal C1's next authoritative control Tick. Neither pending
+admission nor invalid packets can mutate the existing Rc<Snapshot>.
+
+Local trusted input and verified remote input feed the **same** two
+bounded player slots and only the **one** C1 Simulation::step. The
+owner stamps its own contiguous C1 sequences in deterministic player
+order instead of trusting remote wire sequences as C1 authority.
+A rejected packet leaves the slot ledger and immutable game state
+unchanged; successful Step publishes one new immutable Snapshot.
+
+ReplicaFixture is read-only and retains at most the latest valid full
+Snapshot. It checks trusted host endpoint, Session, Epoch, Generation,
+strictly newer Revision and Tick. Replayed/out-of-order snapshots
+cannot overwrite newer projections; new sessions use a fresh fixture.
+Hello, Welcome and Leave are codec shapes, **not implemented
+handshake/reconnect/timeout side effects** in D1.
+
+### D1 focused evidence and unsupported behavior
+
+| Gate | Bounded result |
+|---|---|
+| Wire format | Five canonical messages, strict fixed lengths/flags/enums and invalid-bits/truncated/overlength negative tests |
+| Source and freshness | Trusted Endpoint→Peer/Session/Epoch→Player mapping, monotonic sequence, exact owner Tick, MAX sequence and epoch rollover rejects |
+| Single writer and replica | Local plus verified remote inputs reduce through one unchanged C1 owner; invalid input preserves prior Rc; old full Snapshot/session/epoch never replaces latest read-only replica |
+| Runtime budget | Two input slots plus finite four-frame mailbox, input and owner sequence boundaries, closed ingress; no socket or IO |
+| Validation | Focused D1-only Rust tests, runnable InMemory Demo, Fmt/Clippy -D warnings and standalone zero-normal-dependency graph PASS |
+| Reviewer | Independent R1 `wc_job_CjE2M88h6SNMhH7D` completed terminal exit0, actual JSON PASS, `issues=[]` and `required_followups=[]`, observed `gpt-6-astra`/`high`; all seven frozen source paths and nine scoped evidence SHA256s unchanged. Exactly 16/16 D1 focused tests, locked/offline Rustfmt/Clippy, no-socket Demo, docs 29/273 and zero external normal dependencies PASS. Not a public protocol acceptance or D2 UDP qualification |
+
+Actual selected logs are retained under
+artifacts/verification/m28-d1-20261118/; Reviewer data and ignored
+Handoff under .pipeline-output/m28-d1-20261118/. Original B0–C3
+evidence remains valid at unchanged source hashes and was not rerun.
+
+**No D1 claim** of real UDP, separate OS PIDs, rate-limited socket
+traffic, real timeout clocks, datagram loss/reordering, cryptographic
+authentication/encryption, hostile LAN, handshake or reconnection
+retries. Session/Epoch IDs only mark routing/freshness. D2 handles real
+UDP/two processes; D3 handles controlled packet faults, stop/reconnect,
+and headless networking. M28-E still owns promotion decisions.

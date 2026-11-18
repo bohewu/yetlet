@@ -4,6 +4,9 @@
 //! the authoritative counter; the Hosts receive bounded CommandPort and immutable
 //! SnapshotPort values. No executor, transport, render backend or Host trait exists.
 
+// D1 private bounded binary codec and in-memory session admission; no socket.
+pub mod protocol;
+
 // C1 deterministic game domain and headless driver; no framework API.
 pub mod simulation;
 
