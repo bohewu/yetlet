@@ -1,7 +1,7 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A/B0/B1/B2 and C1 accepted at separate bounded scopes; C1 locally committed `f405d4f`. C2 / YT-269 private native X11/winit/wgpu integration complete at focused source and bounded actual GPU/keyboard scope, with independent R3 `wc_job_Pi934pMwws_L1XwD` actual PASS; Git delivery separate. C3/D/E remain unimplemented/unqualified.
+- **State:** M28-A/B0/B1/B2/C1/C2 accepted at separate bounded scopes; C2 locally committed `9be98e7`. C3 / YT-270 one supported Ubuntu X11/Vulkan real visual and Window lifecycle subset complete with original native screenshots, measured scheduling, explicit synthetic 0×0 and Lost/Outdated recovery branch limits, selected 3/3 tests and independent R2 `wc_job_oQRL1tjhmefNiWii` actual PASS. Git delivery separate; M28-D/E Todo, ADR 0013 Proposed.
 - **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
@@ -933,3 +933,105 @@ Windows, Wayland, browser, multiplayer transport or network LAN. The C2
 smoke proves actual native initialization, key event routing, renderer submit
 and bounded exit, not that all future renderer/Host combinations are valid.
 C3/C2 remain distinct; C3 and D/E are still Todo.
+
+
+## 15. C3 bounded Ubuntu native visual and lifecycle qualification — YT-270
+
+**Scope:** One supported Ubuntu 26.04.1, X11 `:0`, NVIDIA RTX 4090,
+wgpu 27.0.1 Vulkan native GameHost path. C3 extends only the opt-in private
+Native source and task-fit tests; C1 Simulation::step, existing B0 pure
+Web/API/SSR, root manifests and the std-only B1/B2/C1 package remain
+unchanged. No public Host/Renderer API, network, UDP or multi-OS claim.
+
+### Actual rendered images and foreground lifecycle
+
+- The owned Native process was selected by its exact X11 title and
+  `_NET_WM_PID`, after confirming no other matching window. Three XWD
+  captures from the **actual live winit Window** were converted to PNG
+  without synthesis: initial 960×640, real-X11-resized 720×480 and
+  real-WM-minimized/restored 720×480. All three showed a blue square
+  at Player One's source-projected coordinates, an orange square at
+  Player Two's coordinates, and the dark background at a separate
+  grounded point; exact RGB samples and SHA256s are preserved.
+- Real `XResizeWindow` of the *owned* native Window produced a winit
+  `Resized(720,480)` event and actual wgpu Surface reconfiguration.
+  Real X11 Window Manager `XIconifyWindow` reached
+  `_NET_WM_STATE_HIDDEN` and restoration removed HIDDEN. The winit
+  app observed occlusion events and retained the correct frame after
+  restoring. These are actual WM interactions, not simulated keyboard
+  input or a compile-only screenshot.
+- The X11 protocol `WM_DELETE_WINDOW` was sent only to the verified
+  owned Window. winit saw CloseRequested; the process exited 0,
+  logged owned Renderer/Window disposal, and the exact X11 WindowId
+  disappeared. The original input focus was restored. No other
+  application/window was closed.
+- X11 does not accept an actual zero-sized window here, so the C3 QA
+  flag explicitly **injects** `PhysicalSize(0,0)` into the real
+  `GpuRenderer::resize` branch, verifies deferral of Surface configure
+  and render, then injects a return to the real nonzero Window size and
+  confirms a valid Surface configure. This is **not** proof of a
+  real zero-width OS resize.
+- The C3 QA flag also explicitly injects wgpu `SurfaceError::Outdated`
+  and `SurfaceError::Lost` into the same guarded recovery path used
+  by real acquisition errors. Both reconfigure successfully; source
+  logs label `synthetic=true`. No real driver loss, device removal,
+  unrecoverable OutOfMemory or arbitrary backend recovery is claimed.
+
+### Bounded scheduling and observed costs
+
+The existing fixed 60 logical ticks/s monotonic scheduler caps elapsed
+input at 100 ms and runs no more than four Simulation steps per wake;
+render requests remain separately targeted at 30 Hz and consume only
+immutable scene snapshots. C3 injects a **260 ms foreground callback
+delay** in the opted-in QA mode; the actual native run observed a
+`max_ticks_per_wake=4` and `dropped_debt_ns=193583014`
+(about 193.6 ms), without any unbounded catch-up in the observed run.
+The independent R1 review found a separate Occluded(true) busy-wakeup path;
+the repair waits only for the next Simulation Tick while hidden, and
+resets the Redraw deadline when visible. Three new focused C3 tests
+(including hidden/restore scheduling) PASS; the 11 previously accepted
+C2 tests were filtered, not rerun.
+
+On the one bounded native visual run: 125 control ticks, 61 actually
+submitted rendered frames, 2 real resize events, 4 occlusion events,
+1 WM CloseRequested, 1 QA zero-size deferral, 2 **synthetic**
+Lost/Outdated recovery reconfigurations and 5 total surface
+configurations. Reported CPU-side per-frame encode/queue submit/present
+mean/max was **2058.375/7080.547 µs**, and reducer step mean/max was
+**11.116/61.725 µs**. These are **one small single-run CPU-side
+observations**, not GPU execution duration, sustained FPS, cross-machine
+latency, overhead certification or benchmarking of a general workload.
+
+### Evidence matrix and deliberate gaps
+
+| Gate | Exact scope/result |
+|---|---|
+| Actual visual pixels | Original two-square native window PNGs initial, resized, restored, plus unchanged XWD sources, exact sample RGB/masks/size and source SHA256; real X11 screenshots, not mockups |
+| Actual resize/minimize | One verified exact title/PID Window, 960×640 → 720×480, real WM HIDDEN and restore; winit resized and four Occluded(false) events were recorded. A separate focused non-GUI test covers the reachable Occluded(true) deadline branch; postrestore screenshot PASS |
+| Zero-size branch | Test-only injected 0×0 renderer resize, defer and nonzero reconfigure PASS; no genuine OS zero-size claim |
+| Surface error branch | Test-only injected Lost/Outdated recovery PASS; no genuine GPU fault claim; unrecoverable errors remain outside this bounded proof |
+| Close and resource ownership | Real WM_DELETE to exact owned Window, exit0, Renderer/Window disposal log and verified WindowId disappearance; original focus restored |
+| Slow callback and hidden scheduling | 260 ms QA callback injection; max four ticks/wake, dropped debt 193.583 ms, CPU timings recorded. Independent R1 P2 found an Occluded(true) immediate-wake loop; fixed by tick-only deadline while obscured and resetting redraw timing on restore. Three/three focused C3 clock tests PASS |
+| Native source and formatting | Exact opt-in winit/wgpu source with C3 QA mode, Rustfmt check, Clippy all targets `-D warnings` and Native build PASS; prior C2 suite not rerun |
+| Independent review | Original R1 `wc_job_pdMh6r_u7KXKB1Eh` completed exit0 actual FAIL (one P2: Occluded(true) expired redraw busy-spin), preserved. Bounded repair waits for Simulation Tick while fully hidden and resets Redraw deadline on visibility restoration; selected C3 3/3 tests, Fmt/Clippy/Native build PASS. Independent R2 `wc_job_oQRL1tjhmefNiWii` terminal exit0 actual JSON PASS, `issues=[]`, `required_followups=[]`, observed `gpt-6-astra`/`high`; six reviewed source and scoped evidence hashes unchanged. Original actual X11 screenshots/WM lifecycle retained, GPU/GUI not rerun after repair; one Ubuntu configuration and synthetic error/zero-size limits remain explicit |
+
+Artifacts are isolated in
+`artifacts/verification/m28-c3-20261117/`: real
+`c3-native-initial.png`, `c3-native-resized.png`,
+`c3-native-restored.png`, corresponding `.xwd` originals,
+`native-c3-x11-observation.json` (exact Window/PID/events/RGB/hash),
+`native-c3-bounded-runtime.log` (GPU/Window/configuration/costs/exit),
+selected Rust tests, build/lint logs and preserved initial harness
+title-identification failure. The verification driver and
+review handoff are ignored under `.pipeline-output/m28-c3-20261117/`.
+No historical build cache or failure evidence was cleaned.
+
+**Limitations:** One actual Ubuntu X11/Vulkan/NVIDIA route only, and
+one bounded native run. Zero-size and GPU error events were synthetic
+QA branch injections, not real X11 zero-dimension or actual device loss.
+No Windows, Wayland, GPU readback synchronization latency, real-time
+FPS guarantees, benchmark confidence interval, multi-process UDP or
+physical LAN. C3 acceptance is only the evidence-bounded native
+Window/visual/lifecycle subset. ADR 0013 remains Proposed and M28-D/E
+remain Todo; any broader claims need additional independently reviewed
+evidence.

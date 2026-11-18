@@ -277,6 +277,21 @@ pub const RENDER_STEP: Duration = Duration::from_nanos(1_000_000_000 / 30);
 pub const MAX_ELAPSED: Duration = Duration::from_millis(100);
 pub const MAX_TICKS_PER_WAKE: u32 = 4;
 
+/// Draw cadence does not wake a fully obscured native window. Keeping an
+/// expired draw deadline while occluded would otherwise busy-spin the loop.
+/// The simulation tick deadline is still honored while rendering is hidden.
+pub fn c3_foreground_wake_delay(
+    occluded: bool,
+    next_tick: Duration,
+    next_draw: Duration,
+) -> Duration {
+    if occluded {
+        next_tick
+    } else {
+        next_tick.min(next_draw)
+    }
+}
+
 /// Monotonic foreground scheduler. Neither rendering nor window events
 /// mutate the game clock. C3 owns stress/performance qualification.
 pub struct TickClock {
@@ -495,6 +510,63 @@ mod tests {
             }
         }
         assert_eq!(a.snapshot(), b.snapshot());
+    }
+
+    #[test]
+    fn c3_occluded_expired_draw_deadline_waits_for_tick_and_restores_redraw() {
+        let start = Instant::now();
+        let mut clock = TickClock::new(start);
+        // After actual due work, the next simulation tick lies in the future.
+        assert_eq!(clock.advance(start + Duration::from_millis(37)), 2);
+        let future_tick = clock.next_tick_in();
+        assert!(future_tick > Duration::ZERO);
+        assert!(future_tick <= FIXED_STEP);
+
+        // The draw deadline is already expired, but hiding the surface must
+        // NOT turn WaitUntil into a continuous immediate wakeup.
+        assert_eq!(
+            c3_foreground_wake_delay(true, future_tick, Duration::ZERO),
+            future_tick,
+        );
+        // Once visible, a requested redraw may happen immediately.
+        assert_eq!(
+            c3_foreground_wake_delay(false, future_tick, Duration::ZERO),
+            Duration::ZERO,
+        );
+        // After requesting redraw on restoration, resetting that deadline
+        // permits bounded future waits instead of duplicate immediate wakes.
+        assert_eq!(
+            c3_foreground_wake_delay(false, future_tick, RENDER_STEP),
+            future_tick,
+        );
+    }
+    #[test]
+    fn c3_delayed_foreground_callback_caps_catchup_and_records_time_debt() {
+        let start = Instant::now();
+        let mut clock = TickClock::new(start);
+        let simulation = GameDriver::new(41).unwrap();
+        let original = simulation.snapshot();
+        let delay = Duration::from_millis(260);
+        let advanced = clock.advance(start + delay);
+        assert_eq!(advanced, MAX_TICKS_PER_WAKE);
+        assert!(clock.dropped_ns() >= 190_000_000);
+        assert_eq!(clock.next_tick_in(), FIXED_STEP);
+        assert_eq!(simulation.snapshot(), original); // no implicit step
+        assert_eq!(clock.advance(start + delay), 0);
+        // Discarded debt does not trigger an unbounded replay on next wake.
+        assert_eq!(clock.advance(start + delay + FIXED_STEP), 1);
+        assert_eq!(simulation.snapshot(), original);
+    }
+    #[test]
+    fn c3_zero_time_and_backwards_clock_observation_do_not_create_ticks() {
+        let start = Instant::now();
+        let mut clock = TickClock::new(start);
+        assert_eq!(clock.advance(start), 0);
+        assert_eq!(clock.advance(start - Duration::from_millis(1)), 0);
+        assert_eq!(clock.dropped_ns(), 0);
+        clock.reset(start);
+        assert_eq!(clock.advance(start + Duration::from_millis(2)), 0);
+        assert!(clock.next_tick_in() > Duration::ZERO);
     }
     #[test]
     fn clock_is_bounded_but_never_changes_simulation_without_step() {

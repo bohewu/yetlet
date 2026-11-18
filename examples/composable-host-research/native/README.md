@@ -44,6 +44,50 @@ These observations do not replace later C3 actual visual review, resize/
 minimize/recovery and performance checks. Do not extrapolate this to other
 display servers, GPU backends or native OSes.
 
+
+## C3 — One bounded native GPU/Window visual and lifecycle check (YT-270)
+
+The independent Native GameHost now accepts an opt-in
+`--c3-qa-ticks 480` flag for a **single bounded diagnostic** run.
+The unchanged default/`--smoke-ticks` paths do not inject events.
+The diagnostic mode injects one 260ms foreground callback delay and
+**synthetic** zero-size / Lost / Outdated input to the same guarded
+renderer branches. Do not mistake those injections for actual X11
+zero-size or genuine GPU device loss.
+
+A separately scoped ignored test driver (see
+`.pipeline-output/m28-c3-20261117/visual_lifecycle_x11.py`)
+verified exact owned X11 window and process identities, captured real
+XWD → PNG from the actual 960×640 Surface, resized the owned native
+window to 720×480 and captured a second image, minimized/restored it
+through the real Window Manager, captured again, then sent WM_DELETE to
+only that window. The original X11 focus was restored, and the owned
+WindowId no longer existed after normal exit.
+
+Real screenshots are retained under
+`artifacts/verification/m28-c3-20261117/c3-native-{initial,resized,restored}.png`,
+with their raw XWD counterparts. Per-image grounded sample colors,
+dimensions and SHA256 are in `native-c3-x11-observation.json`; host
+runtime logs report Surface configuration, deferred zero size,
+synthetic Lost/Outdated reconfigure, occlusion/resize/close and
+CPU-side timing. The original failed title-identification harness
+attempt is retained separately, not presented as a Native product fail.
+
+During the actual run: 125 control ticks, 61 rendered frames,
+two real resize events, four occlusion events, a single WM CloseRequested,
+at most four ticks per wake, ~193.583ms dropped debt from one injected
+260ms delay. CPU-side render encode/submit/present mean/max
+2058.375/7080.547 µs; pure reducer step mean/max 11.116/61.725 µs.
+These are single-run CPU timings, not GPU latency or sustained FPS
+certification. Three selected C3 clock tests pass. An independent
+R1 P2 found that while fully obscured the expired draw deadline could
+busy-spin; the bounded repair now waits only for the next Simulation
+Tick while hidden and resets the render deadline on restoration.
+The one native run emitted only Occluded(false) events, so Occluded(true)
+was validated with a focused non-GUI scheduling test, not claimed as
+observed live Window behavior. The original GPU run was not repeated.
+All previously validated C2/B0/B1/B2/C1 sources/tests remain unchanged.
+
 Run from the repository root:
 
 ```sh

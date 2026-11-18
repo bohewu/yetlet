@@ -2,7 +2,12 @@
 //! Window and Surface are created only within winit's foreground callbacks.
 //! Simulation::step is exclusively called from about_to_wait, never render.
 
-use std::{error::Error, sync::Arc, time::Instant};
+use std::{
+    error::Error,
+    sync::Arc,
+    thread,
+    time::{Duration, Instant},
+};
 
 use wgpu::util::DeviceExt;
 use winit::{
@@ -15,10 +20,21 @@ use winit::{
 };
 
 use yetlet_native_gamehost_research::{
-    GameDriver, InputError, KeyResult, RENDER_STEP, Scene, TickClock, map_key, project, scene_bytes,
+    GameDriver, InputError, KeyResult, RENDER_STEP, Scene, TickClock, c3_foreground_wake_delay,
+    map_key, project, scene_bytes,
 };
 
 type NativeResult<T> = Result<T, Box<dyn Error>>;
+
+#[derive(Default)]
+struct C3Qa {
+    enabled: bool,
+    zero_deferred: bool,
+    zero_restored: bool,
+    synthetic_outdated: bool,
+    synthetic_lost: bool,
+    slow_callback: bool,
+}
 
 struct GpuRenderer {
     // Drop Surface before window; Arc<Window> is also retained by the Host.
@@ -29,6 +45,13 @@ struct GpuRenderer {
     pipeline: wgpu::RenderPipeline,
     instance_buffer: wgpu::Buffer,
     adapter_backend: String,
+    ready: bool,
+    configure_count: u64,
+    zero_deferred_count: u64,
+    recover_count: u64,
+    render_cpu_samples: u64,
+    render_cpu_ns_total: u128,
+    render_cpu_ns_max: u128,
 }
 
 impl GpuRenderer {
@@ -108,31 +131,73 @@ impl GpuRenderer {
             pipeline,
             instance_buffer,
             adapter_backend: format!("{:?}", info.backend),
+            ready: true,
+            configure_count: 1,
+            zero_deferred_count: 0,
+            recover_count: 0,
+            render_cpu_samples: 0,
+            render_cpu_ns_total: 0,
+            render_cpu_ns_max: 0,
         })
     }
 
-    fn resize(&mut self, size: PhysicalSize<u32>) {
+    fn resize(&mut self, size: PhysicalSize<u32>, origin: &str) {
         if size.width == 0 || size.height == 0 {
-            return;
+            if self.ready {
+                self.ready = false;
+                self.zero_deferred_count += 1;
+                eprintln!("M28-C3 zero_size_deferred origin={origin}");
+            }
+            return; // Never configure an invalid zero-size surface.
         }
-        self.config.width = size.width;
-        self.config.height = size.height;
-        self.surface.configure(&self.device, &self.config);
+        let changed =
+            !self.ready || self.config.width != size.width || self.config.height != size.height;
+        self.ready = true;
+        if changed {
+            self.config.width = size.width;
+            self.config.height = size.height;
+            self.surface.configure(&self.device, &self.config);
+            self.configure_count += 1;
+            eprintln!(
+                "M28-C3 surface_configured origin={} width={} height={} total={}",
+                origin, size.width, size.height, self.configure_count
+            );
+        }
+    }
+
+    /// Both real driver-reported Lost/Outdated errors and explicitly labeled
+    /// diagnostic injections reach the same code; synthetic != real loss.
+    fn recover_surface(&mut self, issue: wgpu::SurfaceError, synthetic: bool) -> NativeResult<()> {
+        match issue {
+            wgpu::SurfaceError::Outdated | wgpu::SurfaceError::Lost => {
+                if self.ready {
+                    self.surface.configure(&self.device, &self.config);
+                    self.configure_count += 1;
+                    self.recover_count += 1;
+                    eprintln!(
+                        "M28-C3 surface_recovered issue={issue:?} synthetic={synthetic} total={}",
+                        self.recover_count
+                    );
+                }
+                Ok(())
+            }
+            wgpu::SurfaceError::Timeout => Ok(()),
+            problem => Err(format!("Unrecoverable native surface: {problem}").into()),
+        }
     }
 
     fn draw(&mut self, scene: &Scene) -> NativeResult<bool> {
-        if self.config.width == 0 || self.config.height == 0 {
+        if !self.ready {
             return Ok(false);
         }
         let frame = match self.surface.get_current_texture() {
             Ok(frame) => frame,
-            Err(wgpu::SurfaceError::Timeout) => return Ok(false),
-            Err(wgpu::SurfaceError::Outdated | wgpu::SurfaceError::Lost) => {
-                self.surface.configure(&self.device, &self.config);
+            Err(issue) => {
+                self.recover_surface(issue, false)?;
                 return Ok(false);
             }
-            Err(error) => return Err(format!("Failed to acquire native frame: {error}").into()),
         };
+        let cpu_start = Instant::now();
         self.queue
             .write_buffer(&self.instance_buffer, 0, &scene_bytes(scene));
         let view = frame.texture.create_view(&Default::default());
@@ -168,6 +233,10 @@ impl GpuRenderer {
         }
         self.queue.submit([encoder.finish()]);
         frame.present();
+        let elapsed = cpu_start.elapsed().as_nanos();
+        self.render_cpu_samples += 1;
+        self.render_cpu_ns_total += elapsed;
+        self.render_cpu_ns_max = self.render_cpu_ns_max.max(elapsed);
         Ok(true)
     }
 }
@@ -180,10 +249,21 @@ struct GameHost {
     last_requested_draw: Instant,
     rendered_frames: u64,
     smoke_ticks: Option<u64>,
+    qa: C3Qa,
+    occluded: bool,
+    resize_events: u64,
+    occlusion_events: u64,
+    close_events: u64,
+    suspended_events: u64,
+    sim_step_count: u64,
+    sim_cpu_ns_total: u128,
+    sim_cpu_ns_max: u128,
+    max_ticks_per_wake: u32,
+    started_at: Instant,
     failure: Option<String>,
 }
 impl GameHost {
-    fn new(smoke_ticks: Option<u64>) -> NativeResult<Self> {
+    fn new(smoke_ticks: Option<u64>, c3_qa: bool) -> NativeResult<Self> {
         let now = Instant::now();
         Ok(Self {
             window: None,
@@ -193,6 +273,20 @@ impl GameHost {
             last_requested_draw: now,
             rendered_frames: 0,
             smoke_ticks,
+            qa: C3Qa {
+                enabled: c3_qa,
+                ..Default::default()
+            },
+            occluded: false,
+            resize_events: 0,
+            occlusion_events: 0,
+            close_events: 0,
+            suspended_events: 0,
+            sim_step_count: 0,
+            sim_cpu_ns_total: 0,
+            sim_cpu_ns_max: 0,
+            max_ticks_per_wake: 0,
+            started_at: now,
             failure: None,
         })
     }
@@ -203,21 +297,75 @@ impl GameHost {
         event_loop.exit();
     }
 
-    fn schedule(&mut self, event_loop: &ActiveEventLoop) {
-        let Some(window) = self.window.as_ref() else {
+    /// One C3 bounded diagnostic sequence. The synthetic error/zero-size
+    /// branches are explicit, while actual X11 resize/minimize/close comes
+    /// from the separately targeted owned-window test driver.
+    fn c3_qa_tick(&mut self, tick: u64) {
+        if !self.qa.enabled {
             return;
-        };
+        }
+        if tick >= 42 && !self.qa.zero_deferred {
+            self.qa.zero_deferred = true;
+            if let Some(graphics) = self.graphics.as_mut() {
+                graphics.resize(PhysicalSize::new(0, 0), "qa_injected_zero_size");
+            }
+        }
+        if tick >= 48 && !self.qa.zero_restored {
+            self.qa.zero_restored = true;
+            if let (Some(graphics), Some(window)) = (self.graphics.as_mut(), self.window.as_ref()) {
+                graphics.resize(window.inner_size(), "qa_restore_nonzero");
+            }
+        }
+        if tick >= 82 && !self.qa.synthetic_outdated {
+            self.qa.synthetic_outdated = true;
+            if let Some(graphics) = self.graphics.as_mut() {
+                graphics
+                    .recover_surface(wgpu::SurfaceError::Outdated, true)
+                    .expect("C3 QA synthetic Outdated reconfiguration");
+            }
+        }
+        if tick >= 97 && !self.qa.synthetic_lost {
+            self.qa.synthetic_lost = true;
+            if let Some(graphics) = self.graphics.as_mut() {
+                graphics
+                    .recover_surface(wgpu::SurfaceError::Lost, true)
+                    .expect("C3 QA synthetic Lost reconfiguration");
+            }
+        }
+        if tick >= 120 && !self.qa.slow_callback {
+            self.qa.slow_callback = true;
+            let before = Instant::now();
+            thread::sleep(Duration::from_millis(260));
+            eprintln!(
+                "M28-C3 qa_injected_slow_callback elapsed_ms={:.3}",
+                before.elapsed().as_secs_f64() * 1000.0
+            );
+        }
+    }
+
+    fn schedule(&mut self, event_loop: &ActiveEventLoop) {
+        if self.window.is_none() {
+            return;
+        }
         let now = Instant::now();
         let due = self.clock.advance(now);
+        self.max_ticks_per_wake = self.max_ticks_per_wake.max(due);
         for _ in 0..due {
+            let step_start = Instant::now();
             if let Err(error) = self.driver.step() {
                 self.error_exit(event_loop, format!("Simulation step failed: {error}"));
                 return;
             }
+            let elapsed = step_start.elapsed().as_nanos();
+            self.sim_step_count += 1;
+            self.sim_cpu_ns_total += elapsed;
+            self.sim_cpu_ns_max = self.sim_cpu_ns_max.max(elapsed);
         }
-
-        if now.duration_since(self.last_requested_draw) >= RENDER_STEP {
-            window.request_redraw();
+        self.c3_qa_tick(self.driver.snapshot().tick());
+        if !self.occluded && now.duration_since(self.last_requested_draw) >= RENDER_STEP {
+            if let Some(window) = self.window.as_ref() {
+                window.request_redraw();
+            }
             self.last_requested_draw = now;
         }
         let snapshot = self.driver.snapshot();
@@ -229,11 +377,11 @@ impl GameHost {
             event_loop.exit();
             return;
         }
-
         let next_step = self.clock.next_tick_in();
         let next_draw =
             RENDER_STEP.saturating_sub(now.saturating_duration_since(self.last_requested_draw));
-        event_loop.set_control_flow(ControlFlow::WaitUntil(now + next_step.min(next_draw)));
+        let delay = c3_foreground_wake_delay(self.occluded, next_step, next_draw);
+        event_loop.set_control_flow(ControlFlow::WaitUntil(now + delay));
     }
 }
 
@@ -269,6 +417,7 @@ impl ApplicationHandler for GameHost {
         };
         self.graphics = Some(graphics);
         self.window = Some(window);
+        self.occluded = false;
         let now = Instant::now();
         self.clock.reset(now);
         self.last_requested_draw = now.checked_sub(RENDER_STEP).unwrap_or(now);
@@ -279,10 +428,29 @@ impl ApplicationHandler for GameHost {
             return;
         }
         match event {
-            WindowEvent::CloseRequested => event_loop.exit(),
+            WindowEvent::CloseRequested => {
+                self.close_events += 1;
+                eprintln!("M28-C3 close_requested");
+                event_loop.exit();
+            }
             WindowEvent::Resized(size) => {
+                self.resize_events += 1;
+                eprintln!("M28-C3 resized width={} height={}", size.width, size.height);
                 if let Some(graphics) = self.graphics.as_mut() {
-                    graphics.resize(size);
+                    graphics.resize(size, "x11_resized");
+                }
+            }
+            WindowEvent::Occluded(hidden) => {
+                self.occlusion_events += 1;
+                self.occluded = hidden;
+                eprintln!("M28-C3 occluded hidden={hidden}");
+                if !hidden {
+                    // Redraw is explicitly requested when visible again; the
+                    // obsolete pre-occlusion deadline must not cause a spin.
+                    self.last_requested_draw = Instant::now();
+                    if let Some(window) = self.window.as_ref() {
+                        window.request_redraw();
+                    }
                 }
             }
             WindowEvent::Focused(false) => {
@@ -309,6 +477,9 @@ impl ApplicationHandler for GameHost {
                 }
             }
             WindowEvent::RedrawRequested => {
+                if self.occluded {
+                    return;
+                }
                 let scene = project(&self.driver.snapshot());
                 if let Some(graphics) = self.graphics.as_mut() {
                     match graphics.draw(&scene) {
@@ -327,6 +498,8 @@ impl ApplicationHandler for GameHost {
     }
 
     fn suspended(&mut self, _event_loop: &ActiveEventLoop) {
+        self.suspended_events += 1;
+        eprintln!("M28-C3 suspended_foreground_release");
         // The owned surface and device are destroyed before the Window.
         self.graphics.take();
         self.window.take();
@@ -338,6 +511,23 @@ impl ApplicationHandler for GameHost {
             .graphics
             .as_ref()
             .map(|gpu| gpu.adapter_backend.clone());
+        if let Some(graphics) = self.graphics.as_ref() {
+            eprintln!(
+                "M28-C3 gpu_metrics configured={} deferred_zero={} recovered={} cpu_frames={} cpu_avg_us={:.3} cpu_max_us={:.3}",
+                graphics.configure_count,
+                graphics.zero_deferred_count,
+                graphics.recover_count,
+                graphics.render_cpu_samples,
+                if graphics.render_cpu_samples == 0 {
+                    0.0
+                } else {
+                    graphics.render_cpu_ns_total as f64
+                        / graphics.render_cpu_samples as f64
+                        / 1000.0
+                },
+                graphics.render_cpu_ns_max as f64 / 1000.0,
+            );
+        }
         self.graphics.take();
         self.window.take();
         let snapshot = self.driver.snapshot();
@@ -352,31 +542,55 @@ impl ApplicationHandler for GameHost {
             self.clock.dropped_ns(),
             renderer_backend,
         );
+        eprintln!(
+            "M28-C3 host_metrics control_ticks={} rendered_frames={} resize_events={} occlusion_events={} close_events={} suspended_events={} max_ticks_per_wake={} dropped_debt_ns={} sim_cpu_avg_us={:.3} sim_cpu_max_us={:.3} elapsed_ms={:.3} qa_zero={} qa_restore={} qa_outdated={} qa_lost={} qa_slow={}",
+            snapshot.tick(),
+            self.rendered_frames,
+            self.resize_events,
+            self.occlusion_events,
+            self.close_events,
+            self.suspended_events,
+            self.max_ticks_per_wake,
+            self.clock.dropped_ns(),
+            if self.sim_step_count == 0 {
+                0.0
+            } else {
+                self.sim_cpu_ns_total as f64 / self.sim_step_count as f64 / 1000.0
+            },
+            self.sim_cpu_ns_max as f64 / 1000.0,
+            self.started_at.elapsed().as_secs_f64() * 1000.0,
+            self.qa.zero_deferred,
+            self.qa.zero_restored,
+            self.qa.synthetic_outdated,
+            self.qa.synthetic_lost,
+            self.qa.slow_callback,
+        );
+        eprintln!("M28-C3 owned_renderer_and_window_dropped");
     }
 }
 
 fn main() -> NativeResult<()> {
     let mut args = std::env::args().skip(1);
-    let smoke_ticks = match args.next() {
-        None => None,
-        Some(arg) if arg == "--smoke-ticks" => {
+    let (smoke_ticks, c3_qa) = match args.next() {
+        None => (None, false),
+        Some(option) if option == "--smoke-ticks" || option == "--c3-qa-ticks" => {
             let count: u64 = args
                 .next()
-                .ok_or("Missing count for --smoke-ticks")?
+                .ok_or("Missing tick count for selected mode")?
                 .parse()?;
             if count == 0 || count > 600 {
-                return Err("Smoke ticks must be 1..=600".into());
+                return Err("Bounded tick count must be 1..=600".into());
             }
-            Some(count)
+            (Some(count), option == "--c3-qa-ticks")
         }
-        Some(_) => return Err("Usage: native-gamehost [--smoke-ticks 1..=600]".into()),
+        Some(_) => return Err("Usage: native-gamehost [--smoke-ticks N|--c3-qa-ticks N]".into()),
     };
     if args.next().is_some() {
         return Err("Unexpected extra CLI argument".into());
     }
     // The foreground caller owns winit's EventLoop, never each Host separately.
     let event_loop = EventLoop::new()?;
-    let mut host = GameHost::new(smoke_ticks)?;
+    let mut host = GameHost::new(smoke_ticks, c3_qa)?;
     event_loop.run_app(&mut host)?;
     if let Some(error) = host.failure {
         return Err(error.into());
