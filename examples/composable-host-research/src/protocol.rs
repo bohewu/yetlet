@@ -584,6 +584,39 @@ impl HostFixture {
         Ok(next)
     }
 
+    /// D3-only trusted Host rotation of the existing remote player's
+    /// Session/Epoch without creating another authoritative Simulation.
+    /// Rejected stale/downgrade rotations preserve old peer ledger and Rc.
+    /// After a successful rotation, the next C1 step releases the old Hold.
+    pub fn rotate_remote(
+        &mut self,
+        endpoint: EndpointId,
+        binding: Binding,
+    ) -> Result<(), AdmissionError> {
+        if !self.accepting {
+            return Err(AdmissionError::Closed);
+        }
+        let slot = self.slots[1];
+        if endpoint != slot.endpoint
+            || binding.player != Player::Two
+            || binding.peer != slot.binding.peer
+            || binding.session <= slot.binding.session
+            || binding.epoch <= slot.binding.epoch
+            || binding.session == 0
+            || binding.epoch == 0
+        {
+            return Err(AdmissionError::InvalidBinding);
+        }
+        self.slots[1] = Slot {
+            endpoint,
+            binding,
+            last_sequence: 0,
+            last_tick: 0,
+            pending: Some(Direction::Still),
+        };
+        Ok(())
+    }
+
     pub fn stop(&mut self) {
         self.accepting = false;
         for slot in &mut self.slots {
@@ -1213,6 +1246,39 @@ mod tests {
         assert_eq!(queue.len(), MAX_INMEMORY_FRAMES - 1);
     }
 
+    #[test]
+    fn d3_reconnect_rotates_remote_marker_without_resetting_owner() {
+        let mut host = host();
+        host.admit(binding_two().0, &input(1, 20, 1, Direction::West))
+            .unwrap();
+        let old = host.advance().unwrap();
+        let marker = Binding {
+            peer: binding_two().1.peer,
+            session: binding_two().1.session + 1,
+            epoch: binding_two().1.epoch + 1,
+            player: Player::Two,
+        };
+        assert_eq!(
+            host.rotate_remote(EndpointId(9999), marker),
+            Err(AdmissionError::InvalidBinding),
+        );
+        assert_eq!(host.slots[1].last_sequence, 20);
+        assert!(Rc::ptr_eq(&old, &host.snapshot()));
+        host.rotate_remote(binding_two().0, marker).unwrap();
+        assert!(Rc::ptr_eq(&old, &host.snapshot()));
+        assert_eq!(host.slots[1].last_sequence, 0);
+        assert_eq!(host.slots[1].pending, Some(Direction::Still));
+        assert_eq!(
+            host.admit(binding_two().0, &input(1, 21, 2, Direction::East)),
+            Err(AdmissionError::SessionMismatch)
+        );
+        assert_eq!(host.slots[1].last_sequence, 0);
+        assert!(Rc::ptr_eq(&old, &host.snapshot()));
+        let next = host.advance().unwrap();
+        assert_eq!(next.tick(), 2);
+        assert_eq!(next.held()[1], Direction::Still);
+        assert_eq!(next.positions()[1], old.positions()[1]);
+    }
     #[test]
     fn snapshot_encoding_projects_only_immutable_owner_values() {
         let mut host = host();

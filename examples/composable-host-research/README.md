@@ -130,6 +130,90 @@ Focused D1-only tests and a runnable zero-Socket demo:
 Real UDP, independent process IDs and packet-fault qualification are
 reserved for D2/D3; D1 does not establish them.
 
+
+
+## D3 — Faulted headless UDP Session and Replica proof (YT-273)
+
+This separately selected D3 private proof uses only the std-only
+research package: no winit, wgpu, HTTP or external normal dependency.
+The `d3-headless` executable runs in two *independent application
+processes*, Host (single authoritative C1 Simulation+NetworkHost)
+and Client (read-only D1 Replica+NetworkClient **plus an in-process
+bounded FaultProxy**). There is no process or thread for each Host.
+
+The UDP Proxy uses fixed seed `0xD32026111807`, two exact drops and
+one duplicate per **complete 20 eligible data datagrams**, and 0–100ms
+jitter to model reordering. At most 16 messages per direction (32
+total), 8 datagram receives and 4 sends per direction/wake are
+accepted. The real bounded 127.0.0.1 test saw 87 eligible packets,
+9 dropped, 4 duplicated and 7 reordered; max 4 pending. These are
+**user-space injected faults**, not real network/LAN chaos.
+
+Host-only stale HeldInput expiry (250ms) safely stages Still for
+the same C1 StateOwner; 3s without valid peer input unbinds the
+assignment. New Session/Epoch and increasing Join nonce fence old
+Input, Welcome, Leave, Hello and complete Snapshots without replacing
+the authoritative C1 state; the Client keeps only read-only
+immutable Replica data. Validated bound full-state input may be
+restamped to the Host's **exact next Tick** within a limited stale
+window (<=12 ticks): D1's canonical Codec and reducer are unchanged.
+Untrusted source, stale Sequence/Epoch, >512-byte frame, overload and
+invalid admission cannot mutate the authoritative game publication.
+Peer markers and Hello nonce **are not cryptographic authentication**.
+
+The actual run used Headless Host PID1086771 on
+`<selected-endpoint>` and Client PID1086787 with Client Socket
+`<selected-endpoint>` and Proxy Socket `<selected-endpoint>`.
+After disabling packet faults and reconnecting as Session7102/
+Epoch2, source and replica converged on **Revision432/Tick432**,
+both player X values **22/0**. Both PIDs exited0 and all three UDP
+ports were confirmed released. DISPLAY and WAYLAND_DISPLAY were unset.
+
+### D3 independent R1 corrections (source-bound)
+
+Independent Reviewer R1 `wc_job_-urFtaTTU_DO-UQn` actual FAIL3
+is retained, with its original source hashes and the untouched real
+two-PID UDP/Proxy success evidence. Three small corrections:
+- A Leave for the current endpoint/Peer/Session/Epoch requires a
+  Sequence **strictly newer than the last successfully admitted**
+  remote HeldInput. A delayed equal/older Leave does not clear the
+  current binding or pending input; a genuinely newer Leave stages
+  Still in the same C1 owner.
+- Immediate full Snapshot on Hello/Welcome and periodic full Snapshot
+  share one monotonic **50ms minimum send interval** (20/s limit).
+  Successful initial Hello still receives one complete Snapshot;
+  same-nonce retries cannot bypass the rate bound.
+- Every well-formed HeldInput from the current bound UDP endpoint
+  consumes the **30 attempts/s** quota, including obsolete
+  Session/Epoch/Peer and duplicate Sequence/Tick messages, before
+  domain admission. Rejected attempts leave the immutable authoritative
+  Snapshot and pending ledger unchanged.
+
+Three additional targeted real-loopback/non-GUI regressions plus the
+existing eleven selected tests are **14/14 PASS**, with Rustfmt,
+Clippy all targets `-D warnings` and Headless Binary Build PASS.
+The already-accepted original two-headless-PID fault demonstration
+was **not rerun** after the source-only R1 corrections; no new
+post-correction multi-PID performance or LAN evidence is claimed.
+Independent R2 is pending.
+
+D3 selected focused tests and actual bounded loopback fixture:
+
+```sh
+cargo test --manifest-path examples/composable-host-research/Cargo.toml --locked --offline --lib d3_
+cargo build --manifest-path examples/composable-host-research/Cargo.toml --locked --offline --bin d3-headless
+```
+
+The final selected D3-only suite passed **11/11**; previous unrelated
+B0–D2 tests and Native GPU/Window E2E were not rerun.
+
+The single owned headless E2E test driver is ignored:
+`.pipeline-output/m28-d3-20261118/e2e_headless_faults.py`.
+Evidence receipts and raw logs:
+`artifacts/verification/m28-d3-20261118/`. D3 does not
+implement a public Host/Transport trait, D4 physical LAN, authentication
+for untrusted peers, reliable UDP, Windows or GPU visual fault testing.
+
 ## Run the examples
 
 From the repository root using the pinned Rust toolchain:

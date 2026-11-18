@@ -4,6 +4,12 @@
 //! the authoritative counter; the Hosts receive bounded CommandPort and immutable
 //! SnapshotPort values. No executor, transport, render backend or Host trait exists.
 
+// D3 fixed-seed bounded real loopback datagram fault adapter; std-only.
+pub mod fault_d3;
+
+// D3 std-only loopback HeadlessHost + NetworkHost/Client; no GPU or HTTP.
+pub mod udp_headless_d3;
+
 // D1 private bounded binary codec and in-memory session admission; no socket.
 pub mod protocol;
 

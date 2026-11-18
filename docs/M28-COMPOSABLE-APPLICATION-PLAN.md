@@ -1,7 +1,7 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A/B0/B1/B2/C1/C2/C3/D1/D2 independently reviewed at their bounded private scopes; D1 locally committed `545153e`. D2 / YT-272 real Ubuntu two-PID 127.0.0.1 UDP Host+Client and two Vulkan X11 screenshots PASS, with post-E2E source-only corrections, selected D2 binary 3/3 tests and independent R3 `wc_job_yVREJyi-XD7-Ax2p` actual PASS. Original R1 FAIL3 and R2 FAIL1 preserved, one historical success Build Log filename collision disclosed, no post-fix E2E rerun. D2 Git delivery separate; D3/D4/E Todo, ADR 0013 Proposed.
+- **State:** M28-A/B0/B1/B2/C1/C2/C3/D1/D2/D3 independently reviewed at separately bounded private scopes; D2 locally committed `7fc70f2`. D3 / YT-273 std-only two-PID Headless 127.0.0.1 fault/reconnect proof and post-fault Replica Revision432 convergence PASS, with 14/14 selected tests and independent R2 `wc_job_-kuV4Ftw7m4omNAI` actual PASS. Original R1 `wc_job_-urFtaTTU_DO-UQn` actual FAIL3 retained; one older successful Clippy Log filename collision explicitly disclosed. Original two-PID E2E not rerun after R1 source-only fixes. D3 Git delivery separate; conditional D4 and M28-E Todo, ADR 0013 Proposed.
 - **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
@@ -1209,3 +1209,128 @@ Window/UDP behavior or any universal networking trait. D2 is one real
 loopback transport and Native visual proof only; ADR 0013 stays
 Proposed. Success here does not certify reliability under loss,
 cryptographic peer authenticity or game latency/FPS.
+
+## 18. D3 bounded real loopback faults, reconnect and headless composition — YT-273
+
+**Scope:** D3 is a separately selected, `publish=false`, std-only private
+Host/Client and deterministic UDP fault adapter in
+[composable-host-research](../examples/composable-host-research/README.md).
+It reuses D1's versioned Codec, HostFixture/ReplicaFixture and the
+*same* C1 Simulation::step authority, without running a winit Window,
+wgpu Renderer, HTTP Server, a per-Host process/thread or any Yetlet
+SDK public Host/Transport/RPC API. The D2 Native Vulkan and direct Web
+paths and their accepted evidence remain unchanged.
+
+### Exact selected resilience/resource contract
+
+| Dimension | Source-bound D3 behavior |
+|---|---|
+| Fault plan | Fixed seed `0xD32026111807`; each complete 20 eligible data messages selects exactly 2 drops (10%) and 1 duplicate (5%), with independent 0–100ms deterministic delay that can produce actual reordering; no faults on finite Hello/Welcome control. This is user-space UDP injection, not real LAN interference |
+| Bounded proxy | One in-Client-process, explicitly `127.0.0.1` loopback UDP Proxy with two directional queues of at most 16 messages each, total 32; 513-byte receive storage for D1 512-byte maximum, at most 8 receives/wake and 4 sends per direction/wake. Foreign, oversize, malformed or full admission never creates unbounded response or allocation |
+| Trusted sources | Exact Host and Client loopback endpoints, out-of-band server peer mapping; D1 Peer/Session/Epoch/Sequence and bounded Tick-lag checks before any C1 input admission. Server stamps its own exact next C1 Tick for *validated, bounded-lag* remote full-state input; D1's own exact-tick reducer and monotonic sequence remain unchanged |
+| Lost release | One latest held input per player; after 250ms without validated remote Input, monotonic Host clock safely stages Held(Still) for the same single C1 owner. Late packets cannot replay an old Session/Epoch or rewind immutable snapshots |
+| Join and timeout | At most three Hello reply attempts per second and three client Join attempts; after 3s without a validated peer message, the Host unbinds the peer and stages Still. Expired old Hello nonce cannot revive that session |
+| Reconnect | Fresh, increasing nonce and Host-assigned Session/Epoch (7101/1 → 7102/2) replace only the remote binding. The **existing C1 Simulation is not replaced**; old pending input is neutralized. Old Hello/Input/Leave and prior-session Welcome/Snapshot cannot activate or delete the new binding or overwrite the latest Replica |
+| Flood/fairness | Up to 30 bound-peer input attempts/s, including replays that otherwise fail freshness; maximum 8 input datagrams per Host poll, finite reply rate, bounded directional Proxy send quotas and explicit queue-full counters. Invalid rejected inputs do not mutate authoritative Rc<Snapshot> or slot sequence ledger |
+| Shutdown | Two actual OS application PIDs, Host+NetworkHost and Client+NetworkClient+FaultProxy, three actual 127.0.0.1 UDP sockets; each program explicitly stops only its owned sockets. No background worker and no GUI Window or GPU to tear down |
+
+**Security limitation:** The private D1 Welcome does **not** echo the Join
+nonce or perform cryptographic authentication. D3 uses an expected
+trusted endpoint plus pre-agreed Session/Epoch markers for this bounded
+local test. These IDs and socket ports are **not secrets or credentials**.
+D3 does not qualify an untrusted LAN or Internet deployment.
+
+### One actual bounded two-PID headless UDP fault run
+
+Ubuntu 26.04.1, 127.0.0.1 loopback, with DISPLAY/WAYLAND_DISPLAY unset
+in both processes. The trusted source C1 owner remained in Host PID
+`1086771` bound to `<selected-endpoint>`. The separate Client application
+PID `1086787` owned a read-only D1 Replica on `<selected-endpoint>`
+and composed the finite in-process UDP fault Proxy at
+`<selected-endpoint>` (**still only two OS processes**).
+
+Actual kernel sockets/ports were observed while the test ran and
+confirmed absent after both applications terminated normally (exit0).
+
+- The fixed-seed Proxy processed **87 fault-eligible data messages**:
+  **9 dropped, 4 duplicated, 7 reordered**, 78 with injected delay,
+  maximum pending queue **4/32**. Each configured per-packet jitter
+  was ≤100ms. Exact 10%/5% is a *full 20-message-cycle plan*, not a
+  claim that any arbitrary partial run has exactly these percentages.
+- The Client stopped sending a held direction; the Host recorded
+  **one 250ms stale-input release** setting remote Held to Still,
+  followed by **one 3s peer timeout**. The subsequent fresh Hello
+  selected **Session7102/Epoch2** while retaining the same C1
+  authoritative generation. Old Hello, HeldInput and Leave were sent
+  from the same bounded Client Socket and conservatively rejected.
+- After faults were disabled, the Host authoritative output and Client
+  read-only D1 Replica logged the same complete **Revision432/Tick432**
+  Snapshot (player X positions **22 and 0**); the Client retained its
+  old immutable Snapshot without mutating it. Host ultimately reached
+  bounded Tick500 and exited.
+- Host runtime counters: **73 received/156 sent**, 62 accepted inputs,
+  9 stale rejects, one stale-input release, one timeout, one reconnect,
+  at most 3 datagrams received in one poll. Client recorded
+  **130 received/74 sent** and 117 accepted complete Snapshots.
+- Both PIDs exited code0, all **three loopback UDP socket ports**
+  were confirmed released. No external endpoint, wildcard bind,
+  firewall change, native window, GPU, HTTP Server, network worker,
+  process-per-Host or D4 physical device was used.
+
+### Verification classes and exclusions
+
+| Gate | Evidence-bounded outcome |
+|---|---|
+| Focused negatives | D3-only Rust unit tests for fixed seeded ratios, bounded Proxy and opposite-direction fairness, 250ms Lost Release, 3s timeout, stale nonce/old epoch/leave/snapshot, exact Reconnect binding with one C1 owner, oversize/foreign/flood rejection and immutable Snapshot preservation |
+| Real UDP | Two actual independent Headless application PIDs, three kernel loopback sockets, finite user-space packet fault adapter with real datagrams, old marker rejection, Revision432 post-fault authoritative/Replica convergence and explicit port/process release |
+| Dependency boundary | Standalone std-only `publish=false` crate, one normal package and **zero external normal dependencies**, no Window/GPU/HTTP construct in HeadlessHost and no D2 Native/root default changes |
+| Validation | Rustfmt, Clippy all targets `-D warnings`, selected D3-only tests and headless real Loopback executable Build |
+| Independent Reviewer | Original R1 `wc_job_-urFtaTTU_DO-UQn` terminal exit0 actual FAIL3 (stale same-session Leave sequence, combined Join+periodic full Snapshot rate, old Epoch input attempt quota) retained. Corrected with strict fresh Leave sequence fence and Still release, common monotonic 50ms full Snapshot interval across Join/retry and periodic send, 30/s debit for all decoded bound-source input attempts before Session/Epoch checks. D3 selected 14/14 new focused tests PASS, Rustfmt/Clippy `-D warnings`, Headless build/docs and zero external normal deps PASS. Independent R2 `wc_job_-kuV4Ftw7m4omNAI` terminal exit0 actual JSON PASS, `issues=[]`, `required_followups=[]`, observed `gpt-6.2-astra`/`high`; exact nine R2-reviewed source and selected evidence SHA256 matched. Earlier real two-PID user-space fault E2E receipts retained, not rerun after source fixes; an old successful Clippy log pathname was reused by postreview Clippy and disclosed in ignored evidence-collision-r2.json, never claimed unchanged |
+
+Selected D3-only focused tests **14/14 PASS** (44 previously accepted non-D3
+library tests filtered, not rerun). Rustfmt, Clippy all targets
+`-D warnings`, binary Build and locked/offline zero-dependency graph PASS.
+The actual two-PID headless E2E is independent of the selected unit tests.
+
+### D3 independent R1 corrections (source-bound)
+
+Independent Reviewer R1 `wc_job_-urFtaTTU_DO-UQn` actual FAIL3
+is retained, with its original source hashes and the untouched real
+two-PID UDP/Proxy success evidence. Three small corrections:
+- A Leave for the current endpoint/Peer/Session/Epoch requires a
+  Sequence **strictly newer than the last successfully admitted**
+  remote HeldInput. A delayed equal/older Leave does not clear the
+  current binding or pending input; a genuinely newer Leave stages
+  Still in the same C1 owner.
+- Immediate full Snapshot on Hello/Welcome and periodic full Snapshot
+  share one monotonic **50ms minimum send interval** (20/s limit).
+  Successful initial Hello still receives one complete Snapshot;
+  same-nonce retries cannot bypass the rate bound.
+- Every well-formed HeldInput from the current bound UDP endpoint
+  consumes the **30 attempts/s** quota, including obsolete
+  Session/Epoch/Peer and duplicate Sequence/Tick messages, before
+  domain admission. Rejected attempts leave the immutable authoritative
+  Snapshot and pending ledger unchanged.
+
+Three additional targeted real-loopback/non-GUI regressions plus the
+existing eleven selected tests are **14/14 PASS**, with Rustfmt,
+Clippy all targets `-D warnings` and Headless Binary Build PASS.
+The already-accepted original two-headless-PID fault demonstration
+was **not rerun** after the source-only R1 corrections; no new
+post-correction multi-PID performance or LAN evidence is claimed.
+Independent R2 is pending.
+
+Raw logs and exact runtime PID/socket/Session/evidence
+`artifacts/verification/m28-d3-20261118/d3-two-pid-real-loopback-observation-r1.json`
+plus `d3-{host,client}-actual-r1.log`, test/build/check logs;
+ignored bounded runner and review receipts under
+`.pipeline-output/m28-d3-20261118/`. Earlier test or harness
+failures are retained, not overwritten or relabeled.
+
+**Remaining unverified:** Real packet corruption, bandwidth-congested
+or hostile LAN, NAT/IPv6/Internet paths, authentication/encryption,
+Windows/Wayland, actual Native wgpu gameplay under injected D3
+faults, physical D4 two-device LAN, production reliability or latency
+benchmarks, and any universal public networking contract. D4 remains
+conditional and M28-E retains the independent framework promotion
+decision. ADR 0013 remains **Proposed**.
