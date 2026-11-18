@@ -214,6 +214,27 @@ Evidence receipts and raw logs:
 implement a public Host/Transport trait, D4 physical LAN, authentication
 for untrusted peers, reliable UDP, Windows or GPU visual fault testing.
 
+## F0-B1 — Caller-local Headless Composition Root
+
+The private `headless_composition_f0b1` module composes **one** original C1
+`HeadlessRunner` with two concrete caller-local capabilities: a finite input
+frame source (1–8 queued frames, at most 32 commands each) and a read-only
+latest-`Rc<Snapshot>` observer. The application opens ingress only after both
+attachments start, uses the unchanged C1 reducer, and records the primary
+startup/domain failure separately from completed attachment cleanup. Stop is
+idempotent, discards queued-but-unapplied frames, and rejects late submission.
+No worker is created, so Join is explicitly *NotApplicable* rather than a
+fictitious successful join. Previously retained snapshot handles stay immutable.
+
+```sh
+cargo test --manifest-path examples/composable-host-research/Cargo.toml --locked --offline --lib f0b1_
+cargo run --manifest-path examples/composable-host-research/Cargo.toml --locked --offline --bin f0b1-headless-demo
+```
+
+This is a standalone private consumer, not a public Host/Composition trait or
+a Web adapter. F0-A's separate documented Web consumer and any shared helper
+remain unimplemented; no Tokio, Axum, GPU or UDP enters this std-only package.
+
 ## Run the examples
 
 From the repository root using the pinned Rust toolchain:

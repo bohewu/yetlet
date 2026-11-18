@@ -4,6 +4,9 @@
 //! the authoritative counter; the Hosts receive bounded CommandPort and immutable
 //! SnapshotPort values. No executor, transport, render backend or Host trait exists.
 
+// F0-B1 private caller-local C1 composition: finite input plus read-only observer.
+pub mod headless_composition_f0b1;
+
 // D3 fixed-seed bounded real loopback datagram fault adapter; std-only.
 pub mod fault_d3;
 
