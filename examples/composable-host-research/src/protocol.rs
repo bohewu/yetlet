@@ -549,17 +549,29 @@ impl HostFixture {
         Ok(())
     }
 
-    /// The single existing C1 reducer handles *all* local/remote game
-    /// commands. No independent network-side mutable game state exists.
-    /// Failure preserves the exact prior Rc publication and pending slots.
+    /// The unchanged default D1/D2/D3 path uses no application control.
     pub fn advance(&mut self) -> Result<Rc<Snapshot>, AdmissionError> {
+        self.advance_with_control(None)
+    }
+
+    /// YT-278: one trusted, caller-selected Pause/Resume control per C1 tick.
+    /// The original HostFixture remains the *only* Simulation authority.
+    /// An HTTP queue receipt is not execution; only this successful reducer
+    /// transaction applies the command and publishes the next revision.
+    pub fn advance_with_control(
+        &mut self,
+        control: Option<Command>,
+    ) -> Result<Rc<Snapshot>, AdmissionError> {
         if !self.accepting {
             return Err(AdmissionError::Closed);
+        }
+        if control.is_some_and(|command| !matches!(command, Command::Pause | Command::Resume)) {
+            return Err(AdmissionError::WrongKind);
         }
         let snapshot = self.owner.snapshot();
         let tick = self.next_tick()?;
         let mut sequence = snapshot.last_sequence();
-        let mut inputs = Vec::with_capacity(MAX_INPUT_SLOTS);
+        let mut inputs = Vec::with_capacity(MAX_INPUT_SLOTS + usize::from(control.is_some()));
         for slot in &self.slots {
             if let Some(direction) = slot.pending {
                 sequence = sequence
@@ -572,6 +584,17 @@ impl HostFixture {
                     command: Command::Hold(slot.binding.player, direction),
                 });
             }
+        }
+        if let Some(command) = control {
+            sequence = sequence
+                .checked_add(1)
+                .ok_or(AdmissionError::ExhaustedSequence)?;
+            inputs.push(Input {
+                generation: snapshot.generation(),
+                tick,
+                sequence,
+                command,
+            });
         }
         debug_assert!(inputs.len() <= MAX_COMMANDS_PER_TICK);
         let next = self
@@ -1083,6 +1106,52 @@ mod tests {
         let game = HostFixture::new(1, peers).unwrap();
         assert_eq!(game.snapshot().tick(), 0);
         assert_eq!(game.pending_count(), 0);
+    }
+
+    #[test]
+    fn yt278_trusted_controls_use_same_owner_and_preserve_original_ingress() {
+        let mut owner = host();
+        let before = owner.snapshot();
+        owner.admit_local(Player::One, Direction::East).unwrap();
+        owner
+            .admit(binding_two().0, &input(1, 1, 1, Direction::West))
+            .unwrap();
+        assert!(Rc::ptr_eq(&before, &owner.snapshot()));
+        assert_eq!(
+            owner.advance_with_control(Some(Command::Hold(Player::One, Direction::Still))),
+            Err(AdmissionError::WrongKind)
+        );
+        assert!(Rc::ptr_eq(&before, &owner.snapshot()));
+        assert_eq!(owner.pending_count(), 2);
+
+        let paused = owner.advance_with_control(Some(Command::Pause)).unwrap();
+        assert_eq!(paused.tick(), 1);
+        assert_eq!(paused.revision(), 1);
+        assert!(paused.paused());
+        assert_eq!(paused.last_sequence(), 3);
+        assert_eq!(paused.positions(), before.positions());
+        assert_eq!(owner.pending_count(), 0);
+        let wire = decode(&owner.snapshot_frame(101, 7).unwrap()).unwrap();
+        assert!(
+            matches!(wire, Message::Snapshot(snapshot) if snapshot.paused
+            && snapshot.revision == paused.revision()
+            && snapshot.tick == paused.tick()
+            && snapshot.positions == paused.positions())
+        );
+
+        let resumed = owner.advance_with_control(Some(Command::Resume)).unwrap();
+        assert!(!resumed.paused());
+        assert_eq!(resumed.revision(), 2);
+        assert_eq!(resumed.last_sequence(), 4);
+        owner.admit_local(Player::One, Direction::East).unwrap();
+        let moved = owner.advance().unwrap();
+        assert_eq!(moved.positions()[0], Position { x: 3, y: 2 });
+        assert_eq!(moved.last_sequence(), 5);
+        owner.stop();
+        assert_eq!(
+            owner.advance_with_control(Some(Command::Pause)),
+            Err(AdmissionError::Closed)
+        );
     }
 
     #[test]

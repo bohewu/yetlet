@@ -1,6 +1,8 @@
 //! YT-272 D2 — two real independently launched *applications*, each one
 //! foreground winit GameHost plus a selected NetworkHost or NetworkClient.
 //! No Host-per-process/thread, generic Transport API or network exposure.
+#[cfg(feature = "f1-web")]
+use std::time::Duration;
 use std::{error::Error, net::SocketAddrV4, sync::Arc, time::Instant};
 use wgpu::util::DeviceExt;
 use winit::{
@@ -18,6 +20,11 @@ use yetlet_composable_host_research::{
 use yetlet_native_gamehost_research::{
     RENDER_STEP, Rect, Scene, TickClock, c3_foreground_wake_delay, project, scene_bytes,
     udp_d2::{BIND_IP, NetworkClient, NetworkHost},
+};
+
+#[cfg(feature = "f1-web")]
+use yetlet_native_gamehost_research::f1_web::{
+    F1Completion, F1WebService, REQUIRED_WEB_EXIT_CAUSE, preserve_web_worker_cause,
 };
 
 type ResultAny<T> = Result<T, Box<dyn Error>>;
@@ -228,8 +235,23 @@ fn d2_tick_limit_reached(control_ticks: u64, max_ticks: u64) -> bool {
     control_ticks >= max_ticks
 }
 
+#[cfg(feature = "f1-web")]
+fn required_web_failure(web: Option<&F1WebService>) -> Option<&'static str> {
+    web.filter(|service| service.is_finished())
+        .map(|_| REQUIRED_WEB_EXIT_CAUSE)
+}
+
 struct D2App {
     network: Network,
+    // YT-277: only explicitly selected for the private host-web mode.
+    #[cfg(feature = "f1-web")]
+    web: Option<F1WebService>,
+    #[cfg(feature = "f1-web")]
+    web_exited_first: bool,
+    #[cfg(feature = "f1-web")]
+    last_applied_control: Option<u64>,
+    #[cfg(feature = "f1-web")]
+    last_f1_replica_revision: Option<u64>,
     window: Option<Arc<Window>>,
     renderer: Option<Renderer>,
     clock: TickClock,
@@ -248,6 +270,14 @@ impl D2App {
         let now = Instant::now();
         Self {
             network,
+            #[cfg(feature = "f1-web")]
+            web: None,
+            #[cfg(feature = "f1-web")]
+            web_exited_first: false,
+            #[cfg(feature = "f1-web")]
+            last_applied_control: None,
+            #[cfg(feature = "f1-web")]
+            last_f1_replica_revision: None,
             window: None,
             renderer: None,
             clock: TickClock::new(now),
@@ -262,9 +292,43 @@ impl D2App {
             waiting_logged: false,
         }
     }
+    fn record_failure(&mut self, detail: String) {
+        // Retain the initiating failure even if cleanup reveals another.
+        self.error.get_or_insert(detail);
+    }
+
+    /// YT-279: the actual native application's required-Web startup path.
+    /// A Web bind/readiness failure must STOP an already-prepared UDP/C1
+    /// authority, not merely rely on the host's eventual Drop.
+    #[cfg(feature = "f1-web")]
+    fn start_required_web(
+        &mut self,
+        start: impl FnOnce(
+            &yetlet_composable_host_research::simulation::Snapshot,
+        ) -> std::io::Result<F1WebService>,
+    ) -> std::io::Result<std::net::SocketAddr> {
+        let Network::Host(host) = &mut self.network else {
+            return Err(std::io::Error::other(
+                "required Web needs an authoritative Host",
+            ));
+        };
+        match start(&host.snapshot()) {
+            Ok(web) => {
+                let endpoint = web.endpoint();
+                self.web = Some(web);
+                Ok(endpoint)
+            }
+            Err(error) => {
+                host.stop();
+                self.record_failure(format!("F1 required Web startup failed: {error}"));
+                Err(error)
+            }
+        }
+    }
+
     fn fail(&mut self, event_loop: &ActiveEventLoop, detail: String) {
         eprintln!("D2_HOST_ERROR role={} reason={detail}", self.network.name());
-        self.error = Some(detail);
+        self.record_failure(detail);
         event_loop.exit();
     }
     /// Only the server-owned C1 State or a validated full Replica can be
@@ -279,6 +343,17 @@ impl D2App {
         if self.window.is_none() {
             return;
         }
+        #[cfg(feature = "f1-web")]
+        if let Some(detail) = required_web_failure(self.web.as_ref()) {
+            // This placeholder is replaced by the worker's actual Join
+            // failure after the native root exits. An earlier native error
+            // remains primary instead of being overwritten by cleanup.
+            if self.error.is_none() {
+                self.web_exited_first = true;
+            }
+            self.fail(event_loop, detail.to_owned());
+            return;
+        }
         let now = Instant::now();
         let poll = match &mut self.network {
             Network::Host(host) => host.poll(),
@@ -290,11 +365,49 @@ impl D2App {
         }
         let due = self.clock.advance(now);
         for _ in 0..d2_bounded_due(self.control_ticks, self.max_ticks, due) {
-            if let Network::Host(host) = &mut self.network
-                && let Err(error) = host.step()
-            {
-                self.fail(event_loop, format!("C1 owner step: {error}"));
-                return;
+            if let Network::Host(host) = &mut self.network {
+                #[cfg(feature = "f1-web")]
+                let result = (|| -> std::io::Result<()> {
+                    // One typed Web admission at most per C1 Tick, after UDP
+                    // poll but before the sole authoritative reducer step.
+                    let received = self.web.as_ref().and_then(F1WebService::pop_control);
+                    let accepted = received.filter(|request| {
+                        let valid = request.generation == host.snapshot().generation();
+                        if !valid {
+                            eprintln!(
+                                "F1_CONTROL_REJECTED pid={} receipt={} reason=stale_generation",
+                                std::process::id(),
+                                request.receipt_id,
+                            );
+                        }
+                        valid
+                    });
+                    host.step_with_control(accepted.map(|request| request.command))?;
+                    if let Some(web) = self.web.as_ref() {
+                        let published = host.snapshot();
+                        if let Some(request) = accepted {
+                            self.last_applied_control = Some(request.receipt_id);
+                            eprintln!(
+                                "F1_CONTROL_APPLIED pid={} receipt={} revision={} tick={} paused={}",
+                                std::process::id(),
+                                request.receipt_id,
+                                published.revision(),
+                                published.tick(),
+                                published.paused(),
+                            );
+                        }
+                        web.publish_snapshot(&published, self.last_applied_control)?;
+                    }
+                    Ok(())
+                })();
+
+                #[cfg(not(feature = "f1-web"))]
+                let result = host.step();
+
+                if let Err(error) = result {
+                    self.fail(event_loop, format!("C1 owner step: {error}"));
+                    return;
+                }
             }
             self.control_ticks += 1;
         }
@@ -308,6 +421,27 @@ impl D2App {
                 replica.revision, replica.tick, replica.positions[0].x, replica.positions[1].x,
             );
             self.last_logged_revision = replica.revision;
+        }
+        // The selected F1 client is an independent OS process; retain its
+        // exact wire-provided revision, positions and paused state so one
+        // pinned HTTP read can be matched to a real UDP replica publication.
+        #[cfg(feature = "f1-web")]
+        if let Network::Client(client) = &self.network
+            && let Some(replica) = client.snapshot()
+            && self.last_f1_replica_revision != Some(replica.revision)
+        {
+            eprintln!(
+                "F1_UDP_REPLICA pid={} revision={} tick={} p1_x={} p1_y={} p2_x={} p2_y={} paused={}",
+                std::process::id(),
+                replica.revision,
+                replica.tick,
+                replica.positions[0].x,
+                replica.positions[0].y,
+                replica.positions[1].x,
+                replica.positions[1].y,
+                replica.paused,
+            );
+            self.last_f1_replica_revision = Some(replica.revision);
         }
         if let Network::Host(host) = &self.network {
             let authoritative = host.snapshot();
@@ -383,6 +517,17 @@ impl ApplicationHandler for D2App {
         );
         self.window = Some(window);
         self.renderer = Some(renderer);
+        // All three actual required resources now exist: rendered Window,
+        // native UDP and the separately HTTP-probed owned Web service.
+        #[cfg(feature = "f1-web")]
+        if let (Network::Host(host), Some(web)) = (&self.network, &self.web) {
+            eprintln!(
+                "F1_THREE_HOST_READY pid={} authority=network_host window=true gpu=true udp={} web={} http_response=true",
+                std::process::id(),
+                host.endpoint(),
+                web.endpoint(),
+            );
+        }
         let now = Instant::now();
         self.clock.reset(now);
         self.last_draw = now.checked_sub(RENDER_STEP).unwrap_or(now);
@@ -426,6 +571,26 @@ impl ApplicationHandler for D2App {
                         Ok(true) => {
                             self.frame_count += 1;
                             self.displayed_revision = scene.revision;
+                            #[cfg(feature = "f1-web")]
+                            if self.web.is_some()
+                                && let Network::Host(host) = &self.network
+                            {
+                                let authority = host.snapshot();
+                                if authority.revision() == scene.revision {
+                                    eprintln!(
+                                        "F1_NATIVE_SCENE pid={} revision={} tick={} p1_x={} p1_y={} p2_x={} p2_y={} paused={} frame={}",
+                                        std::process::id(),
+                                        scene.revision,
+                                        scene.tick,
+                                        authority.positions()[0].x,
+                                        authority.positions()[0].y,
+                                        authority.positions()[1].x,
+                                        authority.positions()[1].y,
+                                        authority.paused(),
+                                        self.frame_count,
+                                    );
+                                }
+                            }
                         }
                         Ok(false) => (),
                         Err(error) => self.fail(event_loop, error.to_string()),
@@ -444,6 +609,22 @@ impl ApplicationHandler for D2App {
         self.clock.reset(Instant::now());
     }
     fn exiting(&mut self, _event_loop: &ActiveEventLoop) {
+        // A fresh command must not be admitted after the C1 owner closes.
+        // Web may remain alive briefly while the native resources unwind,
+        // but this path is now a real 503 admission boundary.
+        #[cfg(feature = "f1-web")]
+        if let Some(web) = self.web.as_mut() {
+            web.close_admission();
+            // Pending commands were admitted but NOT applied by C1. Discard
+            // them with bounded nonblocking receives, not a saturated queue
+            // that could stall required-component stop.
+            let discarded = web.discard_pending_after_close();
+            eprintln!(
+                "F1_WEB_ADMISSION_CLOSED pid={} pending_discarded={}",
+                std::process::id(),
+                discarded,
+            );
+        }
         let pid = std::process::id();
         let role = self.network.name();
         let scene = self.current_scene();
@@ -526,8 +707,20 @@ impl ApplicationHandler for D2App {
 }
 fn main() -> ResultAny<()> {
     let args = std::env::args().skip(1).collect::<Vec<_>>();
+    let web_mode = {
+        #[cfg(feature = "f1-web")]
+        {
+            matches!(args.as_slice(), [mode] if mode == "host-web")
+        }
+        #[cfg(not(feature = "f1-web"))]
+        {
+            false
+        }
+    };
     let network = match args.as_slice() {
         [mode] if mode == "host" => Network::Host(NetworkHost::bind()?),
+        #[cfg(feature = "f1-web")]
+        [mode] if mode == "host-web" => Network::Host(NetworkHost::bind()?),
         [mode, addr] if mode == "client" => {
             let address: SocketAddrV4 = addr.parse()?;
             if address.ip() != &BIND_IP || address.port() == 0 {
@@ -535,21 +728,77 @@ fn main() -> ResultAny<()> {
             }
             Network::Client(NetworkClient::bind(address)?)
         }
-        _ => return Err("usage: d2-loopback host | client 127.0.0.1:<port>".into()),
+        _ => return Err("usage: d2-loopback host | client 127.0.0.1:<port> | host-web [requires f1-web feature]".into()),
     };
     let (role, endpoint) = match &network {
         Network::Host(host) => (network.name(), host.endpoint()),
         Network::Client(client) => (network.name(), client.endpoint()),
     };
-    eprintln!(
-        "D2_READY role={} pid={} local={} windows=1 hosts_in_process=2 udp=true",
-        role,
-        std::process::id(),
-        endpoint
-    );
-    let mut app = D2App::new(network, 300);
+    if !web_mode {
+        eprintln!(
+            "D2_READY role={} pid={} local={} windows=1 hosts_in_process=2 udp=true",
+            role,
+            std::process::id(),
+            endpoint
+        );
+    }
     let event_loop = EventLoop::new()?;
-    event_loop.run_app(&mut app)?;
+    // F1's bounded 480-Tick host permits an HTTP command and an independent
+    // UDP client to observe the same exact publication. Original D2 remains 300.
+    let mut app = D2App::new(network, if web_mode { 480 } else { 300 });
+    #[cfg(feature = "f1-web")]
+    if web_mode {
+        let endpoint = app.start_required_web(F1WebService::start_game)?;
+        eprintln!(
+            "F1_WEB_HTTP_READY pid={} endpoint={} http_response=true",
+            std::process::id(),
+            endpoint,
+        );
+    }
+    let run_result = event_loop.run_app(&mut app);
+    #[cfg(feature = "f1-web")]
+    if let Some(mut web) = app.web.take() {
+        let endpoint = web.endpoint();
+        let observed = web.complete_within(Duration::from_secs(2));
+        let was_pending = matches!(&observed, Ok(F1Completion::Pending));
+        if was_pending {
+            eprintln!(
+                "F1_WEB_COMPLETION_PENDING pid={} endpoint={} original_join_retained=true cleanup_complete=false",
+                std::process::id(),
+                endpoint,
+            );
+            app.error.get_or_insert(
+                "F1 Web cleanup deadline exceeded; original JoinHandle retained".to_owned(),
+            );
+        }
+        // Pending is never silently detached: the same owner resumes its
+        // original join. On unrecoverable in-flight work the process stays
+        // pending rather than returning a false completed status.
+        let completion = match observed {
+            Ok(F1Completion::Complete) => Ok(()),
+            Ok(F1Completion::Pending) => web.stop_and_join(),
+            Err(error) => Err(error),
+        };
+        let joined = !web.has_pending_join();
+        let worker_ok = completion.is_ok();
+        eprintln!(
+            "F1_WEB_COMPLETION pid={} endpoint={} joined={} worker_ok={} result={} prior_pending={}",
+            std::process::id(),
+            endpoint,
+            joined,
+            worker_ok,
+            if worker_ok { "complete" } else { "failed" },
+            was_pending,
+        );
+        if let Err(error) = &completion {
+            eprintln!(
+                "F1_WEB_WORKER_CAUSE pid={} cause={error}",
+                std::process::id()
+            );
+        }
+        preserve_web_worker_cause(&mut app.error, app.web_exited_first, &completion);
+    }
+    run_result?;
     if let Some(error) = app.error {
         return Err(error.into());
     }
@@ -584,5 +833,109 @@ mod d2_regressions {
         assert!(!d2_tick_limit_reached(1, 2));
         assert!(d2_tick_limit_reached(2, 2)); // even with zero rendered frames
         assert!(d2_tick_limit_reached(3, 2)); // even if window stays occluded
+    }
+
+    #[cfg(feature = "f1-web")]
+    #[test]
+    fn yt279_required_web_early_completion_is_detected_and_original_join_retained() {
+        let mut web = F1WebService::start().unwrap();
+        assert_eq!(required_web_failure(Some(&web)), None);
+        web.request_stop();
+        for _ in 0..100 {
+            if web.is_finished() {
+                break;
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        assert_eq!(
+            required_web_failure(Some(&web)),
+            Some("F1 required Web service exited unexpectedly")
+        );
+        assert_eq!(
+            web.complete_within(Duration::from_secs(2)).unwrap(),
+            F1Completion::Complete
+        );
+        assert_eq!(required_web_failure(None), None);
+    }
+
+    #[cfg(feature = "f1-web")]
+    #[test]
+    fn yt279_required_failure_preserves_original_primary_cause() {
+        let host = NetworkHost::bind().unwrap();
+        let mut app = D2App::new(Network::Host(host), 4);
+        app.record_failure("original required UDP error".to_owned());
+        app.record_failure("later Web cleanup error".to_owned());
+        assert_eq!(app.error.as_deref(), Some("original required UDP error"));
+        if let Network::Host(host) = &mut app.network {
+            host.stop();
+            assert!(host.socket_closed());
+        }
+    }
+
+    #[cfg(feature = "f1-web")]
+    #[test]
+    fn yt279_actual_root_http_bind_failure_stops_prepared_udp_without_test_side_stop() {
+        use std::net::{Ipv4Addr, TcpListener, UdpSocket};
+        let host = NetworkHost::bind().unwrap();
+        let original_udp = host.endpoint();
+        let mut app = D2App::new(Network::Host(host), 2);
+        let reserved_http = TcpListener::bind((Ipv4Addr::LOCALHOST, 0)).unwrap();
+        let occupied_http = reserved_http.local_addr().unwrap();
+        let error = app
+            .start_required_web(|snapshot| F1WebService::start_game_on(snapshot, occupied_http))
+            .err()
+            .expect("root must fail when its actual Web bind is occupied");
+        assert!(error.to_string().contains("F1 Web setup"), "{error}");
+        assert!(app.web.is_none());
+        assert!(
+            app.error
+                .as_deref()
+                .is_some_and(|cause| cause.contains(&error.to_string())),
+            "the native root must retain its original Web bind failure"
+        );
+        let Network::Host(host) = &app.network else {
+            panic!("a Web bind error must never replace the original C1 owner");
+        };
+        assert!(host.socket_closed(), "native root must explicitly stop UDP");
+        assert_eq!(host.snapshot().revision(), 0);
+        let rebind_udp = UdpSocket::bind(original_udp).unwrap();
+        drop(rebind_udp);
+        drop(reserved_http);
+        let rebind_http = TcpListener::bind(occupied_http).unwrap();
+        drop(rebind_http);
+    }
+
+    #[cfg(feature = "f1-web")]
+    #[test]
+    fn yt279_foreground_worker_failure_result_keeps_real_cause_and_prior_native_error() {
+        let host = NetworkHost::bind().unwrap();
+        let mut app = D2App::new(Network::Host(host), 2);
+        app.web_exited_first = true;
+        app.record_failure(REQUIRED_WEB_EXIT_CAUSE.to_owned());
+        let failed_join: std::io::Result<()> = Err(std::io::Error::other(
+            "actual Web worker failed after readiness",
+        ));
+        assert!(preserve_web_worker_cause(
+            &mut app.error,
+            app.web_exited_first,
+            &failed_join
+        ));
+        assert!(
+            app.error
+                .as_deref()
+                .is_some_and(|message| message.contains("actual Web worker failed"))
+        );
+        app.error = Some("original Native UDP fault".to_owned());
+        app.web_exited_first = false;
+        assert!(preserve_web_worker_cause(
+            &mut app.error,
+            app.web_exited_first,
+            &failed_join
+        ));
+        assert_eq!(app.error.as_deref(), Some("original Native UDP fault"));
+        if let Network::Host(host) = &mut app.network {
+            host.stop();
+            assert!(host.socket_closed());
+        }
     }
 }

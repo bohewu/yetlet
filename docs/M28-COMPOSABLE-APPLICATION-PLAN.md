@@ -6,6 +6,8 @@
 - **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
 
+- **Current delivery follow-through (2026-11-19):** The owner reaffirmed same-process Game + Network + native Web, usable opt-in SDK composition and compatible custom Hosts. The [delivery plan](M28-MULTI-HOST-DELIVERY-PLAN.md) and YT-277–285 track the next work; F0-C retains its scoped no-extraction decision. Earlier research/decision evidence below is preserved; private examples do not complete the SDK objective. This update plans work only, with ADR0013 Proposed and physical D4 Not verified.
+
 ## Scope and authority
 
 The owner requested investigation of **Yetlet — Composable Application Framework**.

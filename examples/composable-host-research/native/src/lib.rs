@@ -4,6 +4,10 @@
 // D2 opt-in real loopback UDP adapter; never a root Yetlet SDK API.
 pub mod udp_d2;
 
+// YT-277 private opt-in concrete owned native Web lifetime.
+#[cfg(feature = "f1-web")]
+pub mod f1_web;
+
 use std::{
     rc::Rc,
     time::{Duration, Instant},

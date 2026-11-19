@@ -17,7 +17,7 @@ use yetlet_composable_host_research::{
         Binding, EndpointId, HostFixture, MAX_WIRE_BYTES, Message, ReplicaFixture, WireSnapshot,
         decode, encode,
     },
-    simulation::{Direction, Player, Snapshot},
+    simulation::{Command, Direction, Player, Snapshot},
 };
 
 pub const BIND_IP: Ipv4Addr = Ipv4Addr::LOCALHOST;
@@ -236,6 +236,12 @@ impl NetworkHost {
     }
 
     pub fn step(&mut self) -> io::Result<()> {
+        self.step_with_control(None)
+    }
+
+    /// YT-278: select one typed Pause/Resume for the same HostFixture owner.
+    /// The ordinary D2 path still delegates to this with no new control.
+    pub fn step_with_control(&mut self, control: Option<Command>) -> io::Result<()> {
         let next_tick = self
             .owner
             .next_tick()
@@ -251,7 +257,7 @@ impl NetworkHost {
             .map_err(|error| io::Error::other(format!("local admission: {error:?}")))?;
         let current = self
             .owner
-            .advance()
+            .advance_with_control(control)
             .map_err(|error| io::Error::other(format!("owner step: {error:?}")))?;
         if current.tick().is_multiple_of(SNAPSHOT_TICK_INTERVAL)
             && let (Some(peer), Some(sock)) = (self.peer, self.socket.as_ref())
