@@ -158,6 +158,21 @@ snake_case. Existing type/method names, application feature names, settings keys
 and wire formats remain unchanged. Historical release documentation keeps its
 original names. See the [migration map](COMPATIBILITY.md#two-package-feature-and-target-contract).
 
+## Native Window API semantic names — YT-282 naming follow-up
+
+The optional `yetlet_hosts::native_winit::WindowSlot` exposes
+`window()` as a borrowed `&Window` and `shared_window()` as a cloned
+`Arc<Window>` for an independently selected renderer. Avoid the former
+`window_handle()` spelling, which can be mistaken for a raw OS Window handle.
+`redraw_event_count()` is a monotonically increasing count of accepted
+Window redraw events, **not** a collection of events or the number of GPU
+Presents. These two pre-release Rust names intentionally replace the previous
+`window_handle()` and `redraw_events()` methods with **no aliases**; the
+selected Native examples and external Consumer use the canonical spellings.
+Original runtime diagnostic output labels are historical observation formats,
+not Rust public method names, and remain unchanged. This does not change
+Window ownership, EventLoop affinity, readiness or renderer lifecycle.
+
 ## Dated naming audit dispositions
 
 The 2026-10-22 audit attachment SHA256

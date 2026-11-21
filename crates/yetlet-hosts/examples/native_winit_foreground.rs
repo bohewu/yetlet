@@ -75,7 +75,7 @@ impl ApplicationHandler for Probe {
                 self.created_id = Some(id);
                 assert_eq!(slot.phase(), WindowPhase::Created);
                 assert!(!slot.is_ready());
-                let handle = slot.window_handle().expect("actual OS Window");
+                let handle = slot.shared_window().expect("actual OS Window");
                 let early_close = slot.close().unwrap_err();
                 self.rejected_early_close = early_close.kind() == io::ErrorKind::WouldBlock;
                 drop(handle); // actual Window stays in its sole foreground slot
@@ -127,7 +127,7 @@ impl ApplicationHandler for Probe {
                         "YT282_D1_WINDOW_READY pid={} window_id={id:?} size={:?} redraw_events={} gpu_present=false domain_revision={} root_phase={:?}",
                         std::process::id(),
                         slot.last_size(),
-                        slot.redraw_events(),
+                        slot.redraw_event_count(),
                         domain.revision.get(),
                         self.root.phase(),
                     );
@@ -140,13 +140,13 @@ impl ApplicationHandler for Probe {
                         slot.window().unwrap().set_visible(false);
                         assert_eq!(slot.window().unwrap().is_visible(), Some(false));
                         assert!(!slot.is_ready());
-                        let before = slot.redraw_events();
+                        let before = slot.redraw_event_count();
                         assert_eq!(
                             slot.observe_window_event(id, &WindowEvent::RedrawRequested),
                             WindowSignal::Ignored
                         );
                         assert_eq!(slot.phase(), WindowPhase::Created);
-                        assert_eq!(slot.redraw_events(), before);
+                        assert_eq!(slot.redraw_event_count(), before);
                         self.hidden_after_ready_rejected = true;
                         eprintln!(
                             "YT282_D1_HIDDEN_AFTER_READY_REJECTED pid={} actual_window={id:?} synthetic_redraw_rejected=true event_count_unchanged=true",

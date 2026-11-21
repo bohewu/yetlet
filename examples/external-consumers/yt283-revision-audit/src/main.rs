@@ -708,7 +708,7 @@ impl ApplicationHandler for Application {
             let id = n.window.resumed(active)?;
             let handle = n
                 .window
-                .window_handle()
+                .shared_window()
                 .ok_or_else(|| io::Error::other("window absent"))?;
             let size = handle.inner_size();
             let mut gpu = initialize(SurfaceRenderer::new(handle, size.width, size.height))??;

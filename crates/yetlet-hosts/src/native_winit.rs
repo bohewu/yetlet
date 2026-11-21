@@ -50,7 +50,7 @@ pub struct WindowSlot {
     last_size: Option<PhysicalSize<u32>>,
     occluded: bool,
     close_requested: bool,
-    redraw_events: u64,
+    redraw_event_count: u64,
     _foreground_only: PhantomData<Rc<()>>,
 }
 
@@ -64,7 +64,7 @@ impl WindowSlot {
             last_size: None,
             occluded: false,
             close_requested: false,
-            redraw_events: 0,
+            redraw_event_count: 0,
             _foreground_only: PhantomData,
         }
     }
@@ -94,16 +94,17 @@ impl WindowSlot {
     pub fn last_size(&self) -> Option<PhysicalSize<u32>> {
         self.last_size
     }
-    pub fn redraw_events(&self) -> u64 {
-        self.redraw_events
+    /// Count of accepted visible redraw events, not GPU frames presented.
+    pub fn redraw_event_count(&self) -> u64 {
+        self.redraw_event_count
     }
     pub fn close_requested(&self) -> bool {
         self.close_requested
     }
 
-    /// A separately selected renderer may clone the actual Window handle.
-    /// An outstanding clone prevents honest close/suspend completion.
-    pub fn window_handle(&self) -> Option<Arc<Window>> {
+    /// Clone the shared owned Window for an independently selected renderer.
+    /// An outstanding `Arc<Window>` prevents honest close/suspend completion.
+    pub fn shared_window(&self) -> Option<Arc<Window>> {
         (self.phase != WindowPhase::Destroyed)
             .then(|| self.window.clone())
             .flatten()
@@ -166,7 +167,7 @@ impl WindowSlot {
                     && self.last_size.is_some_and(nonzero_size) =>
             {
                 self.phase = WindowPhase::Ready;
-                self.redraw_events += 1;
+                self.redraw_event_count += 1;
                 WindowSignal::RedrawReady
             }
             WindowEvent::RedrawRequested => {
@@ -283,7 +284,7 @@ mod tests {
         let mut slot = WindowSlot::new(Window::default_attributes());
         assert_eq!(slot.phase(), WindowPhase::Prepared);
         assert!(!slot.is_ready());
-        assert_eq!(slot.redraw_events(), 0);
+        assert_eq!(slot.redraw_event_count(), 0);
         assert_eq!(slot.window_id(), None);
         assert_eq!(
             slot.request_redraw().unwrap_err().kind(),

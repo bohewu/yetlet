@@ -167,8 +167,9 @@ An `Ignored` WindowSignal does not consume the caller's event. Relative mouse
 `DeviceEvent` remains the caller's responsibility; it was not runtime-tested.
 
 The caller can use `window()` for direct Winit Window/cursor methods,
-`window_handle()` to give a selected renderer its `Arc<Window>` and
-`request_redraw()` to request a frame. Release external handles before close.
+`shared_window()` to clone an `Arc<Window>` for a selected renderer and
+`request_redraw()` to request a frame. `redraw_event_count()` counts accepted
+Window redraws, not GPU Presents. Release external shared owners before close.
 An engine already owning a Window may instead attach its Web/Network/custom
 resources via `yetlet::composition` and never create `WindowSlot`. No Yetlet
 KeyboardEvent, MouseEvent, input mapper, mandatory scheduler, scene or physics

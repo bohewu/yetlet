@@ -92,7 +92,7 @@ impl Foreground {
             size
         };
         let mut renderer = initialize(SurfaceRenderer::new(
-            self.window.window_handle().expect("owned safe target"),
+            self.window.shared_window().expect("owned safe target"),
             initial_size.width,
             initial_size.height,
         ))??;
@@ -194,7 +194,7 @@ impl Foreground {
                     self.window_ready = true;
                     eprintln!(
                         "YT282_D2_WINDOW_READY stimulus=actual_os_redraw window_id={id:?} accepted_redraws={} counters_before_draw={:?}",
-                        self.window.redraw_events(),
+                        self.window.redraw_event_count(),
                         renderer.counters()
                     );
                 }

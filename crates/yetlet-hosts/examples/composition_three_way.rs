@@ -398,7 +398,7 @@ impl Native {
         // composition callback owns all cleanup after a preparation failure.
         self.renderer = Some(initialize(SurfaceRenderer::new(
             self.window
-                .window_handle()
+                .shared_window()
                 .ok_or_else(|| io::Error::other("missing safe Window target"))?,
             size.width,
             size.height,
@@ -441,7 +441,7 @@ impl Native {
                 eprintln!(
                     "E1_WINDOW_REDRAW id={id:?} visible={} accepted={} presents_before={}",
                     self.window.is_ready(),
-                    self.window.redraw_events(),
+                    self.window.redraw_event_count(),
                     renderer.counters().present_calls
                 );
                 if renderer.phase() == SurfacePhase::Unconfigured {
