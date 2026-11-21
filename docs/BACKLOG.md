@@ -7,8 +7,9 @@ The [M28 research plan](M28-COMPOSABLE-APPLICATION-PLAN.md) and
 the original research proposal and accepted scoped F2 amendment from public SDK
 delivery. The owner requested the
 [delivery plan](M28-MULTI-HOST-DELIVERY-PLAN.md) records the completed source
-follow-through. The next selected item is YT-287, after review and local commit
-of the Core/View/Web replan below; original physical D4 remains Not verified.
+follow-through. The feature-first replan was reviewed and committed, and YT-287
+completed its independently reviewed contract. YT-288 is the next unblocked
+implementation item; original physical D4 remains Not verified.
 
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
@@ -51,15 +52,17 @@ authority. F1 alone does not deliver the SDK goal; physical D4 stays separate.
 The owner requests breaking next-alpha layering with minimal SDK packages and
 feature switches in the
 [ordered plan](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#14-replanned-public-delivery--yt-287-through-yt-294).
-Review and locally commit that plan before executing **YT-287 first**.
+Planning review and exact-index Strict/Builtin Guard passed; local commit
+`a60e038` records the plan and reviewed A/B work. **YT-287 was the first item
+executed afterward and is Done at its reviewed contract scope; YT-288 is next.**
 The existing A/B proofs are retained; these new IDs do not reuse the original
 M28 research phase names. YT-286 is the umbrella, not a dependency cycle.
 
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
-| YT-287 | P1 | S | M28 | Core/View/Web feature and migration contract | YT-284 | Source ownership/module inventory, minimal published cohort and feature/dependency map, App/HostGroup naming, optional command/state and HTTP wire split, async/owned-thread/native driver ownership, readiness/address/cancellation decisions and next-alpha cohort/CLI migration ledger. Existing design/ADR updated and configured independent Reviewer PASS; documentation scope only | Todo |
-| YT-288 | P1 | M | M28 | Built-in Core composition and generic Host defaults | YT-287 | One lifecycle engine behind generic HostGroup/ResourceGroup, inert acquisition plans, local/borrowed and Pending ownership, driver/extension compiling proof and Core-only dependency isolation; canonical API migration, focused checks and independent review | Todo |
-| YT-289 | P1 | M | M28 | Isolate optional View/HTML and migrate Browser DOM | YT-287 | Feature-gated View/Element/tags/binding/HTML in yetlet; Browser DOM/keyed-DOM features and reexports migrate with it; existing escaping and DOM semantics, Core-only/View/HTML/Wasm dependency isolation verified and independently reviewed | Todo |
+| YT-287 | P1 | S | M28 | Core/View/Web feature and migration contract | YT-284 | [Source-backed target contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract): minimal two-package SDK, explicit feature/module map, HostGroup/App intent, optional View/commands/state, associated action errors and portable HTTP wire types, caller-runtime/owned-thread/native drivers with cancellation ownership, address/readiness policy and old-CLI/normal-archive migration ledger. Executed after planning commit a60e038; configured independent R1 `wc_job_GwI4V4CCnZesLj9w` terminal exit0, actual PASS, issues=[]/required_followups=[]; seven-doc links/anchors/DAG and whitespace PASS. Documentation contract Done, no Rust feature/runtime or publication claim | Done |
+| YT-288 | P1 | M | M28 | Built-in Core composition and generic Host defaults | YT-287 | One lifecycle engine behind generic HostGroup/ResourceGroup, inert acquisition plans, local/borrowed and Pending ownership, driver/extension compiling proof and Core-module/default-off runtime dependency isolation; View/default cutover is YT-289; canonical API migration, focused checks and independent review | Todo |
+| YT-289 | P1 | M | M28 | Isolate optional View/HTML and migrate Browser DOM | YT-287 | Empty yetlet default and feature-gated View/Element/tags/binding/HTML; Browser DOM/keyed-DOM features and reexports migrate with it; existing escaping and DOM semantics, Core-only/View/HTML/Wasm dependency isolation verified and independently reviewed | Todo |
 | YT-290 | P1 | M | M28 | Isolate Web capability and HTTP protocol ownership | YT-288, YT-289 | Feature-gated yetlet Web module owns App/Page/SSR and classified HTTP capabilities, one serving implementation with no reverse yetlet-hosts dependency, optional Wasm-safe wire types separated from command semantics, direct consumers and Router/Tower/current-runtime checks; independent review | Todo |
 | YT-291 | P1 | M | M28 | Unify Web lifecycle across supported drivers | YT-290 | Shared lifecycle for direct async serving and multiple Web Hosts; current-thread Tokio progress, explicit owned-thread join, API-only readiness, rollback/drain/cancellation and managed dependency release verified; independent review | Todo |
 | YT-292 | P1 | M | M28 | Integrate optional Native, Network and custom Hosts | YT-288, YT-291 | Core-backed yetlet feature modules replace unpublished companion delivery, independent renderer, one native loop/multiple windows, pre-acquisition known conflict rejection, caller-driven UDP and local/borrowed custom resources; optional bridge ownership and focused native evidence; independent review | Todo |

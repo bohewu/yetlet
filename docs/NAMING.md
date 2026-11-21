@@ -176,8 +176,9 @@ Window ownership, EventLoop affinity, readiness or renderer lifecycle.
 ## Proposed Host lifecycle vocabulary — YT-286
 
 The [layered Host design](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) and
-[ADR 0014](adr/0014-layered-host-resource-lifecycle.md) propose Application/Host
-defaults with ResourceGroup customization over one lifecycle engine.
+[ADR 0014](adr/0014-layered-host-resource-lifecycle.md) originally proposed
+Application/Host defaults with ResourceGroup customization over one lifecycle
+engine. The next-alpha vocabulary below supersedes that outer name.
 The authorized [YT-286-A private prototype](../examples/host-lifecycle-research/README.md)
 uses `Application::new`, `with_host`, `ResourceGroup`, `with_resource`,
 `request_shutdown` and `shutdown_until`. The earlier `Application::builder`
@@ -209,6 +210,36 @@ as unexplained quickstart categories. A `try_` pair needs a documented
 operation-specific distinction; Result alone does not require that prefix.
 Deferred acquisition and dependency-safe release are behavioral additions
 requiring implementation proof, not consequences of renaming.
+
+## Next-alpha Host vocabulary — YT-287
+
+The [feature-first contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
+selects these intentions for the next API. Exact generic signatures remain
+proof-gated; the private Application spelling above is historical.
+
+| Target name / operation | Developer intent and lifecycle meaning |
+|---|---|
+| HostGroup | Group high-level Host lifetimes using the built-in Core coordinator. |
+| yetlet::web::App | Configure an HTTP service; retain Router/Tower interoperability. |
+| yetlet::web::WebHost | Run an HTTP service as a participant in a HostGroup lifetime. App::into_host is the target bridge after missing state is resolved. |
+| ResourceGroup | Customize typed owned/borrowed resources and explicit acquisition/release behavior. |
+| new / with_host / build | Describe, register and validate an inert plan; none starts a listener, thread or native loop. |
+| with_address | Configure a future Web bind address; actual acquisition belongs to the driver. |
+| serve / serve_on | Execute ordinary HTTP serving on caller-owned Tokio; a cancelled consuming future does not promise managed cleanup. |
+| run / run_async | Drive a compatible HostGroup through its documented synchronous/native or async driver. Managed async driving borrows a retained owner; the adapter must prove cancellation-safe storage. |
+| request_shutdown / shutdown_until | Request stop or advance shutdown toward terminal completion; Pending retains the original obligations. |
+| with_resource / with_managed_resource | Retain a passive Rust value or register an inert descriptor with explicit acquire/release semantics; do not conflate the two. |
+
+Ordinary participation needs no required marker. try_* is reserved for a
+documented operation-specific distinction and never means optional success,
+swallowed failure or automatic fallback. Do not substitute ready/worker or
+foreground for a precise resource/driver contract.
+
+Migrate the legacy required_* callbacks by their actual lifecycle phase;
+legacy local close-before-worker behavior is not equivalent to post-join
+resource release. Keep Composition as advanced engine vocabulary, not the
+unexplained quickstart entry. No permanent Application or server_axum aliases
+are selected for the breaking target; do not rewrite historical receipts.
 
 ## Dated naming audit dispositions
 

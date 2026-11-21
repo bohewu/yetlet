@@ -1,6 +1,6 @@
 # M28 — Layered Hosts and ResourceGroup Lifecycle Design
 
-**Status:** Reviewed A/B source proofs retained; owner-selected Core/View/Web replan, with detailed public contracts pending YT-287.
+**Status:** Owner-selected feature-first direction; YT-287 target contract independently reviewed and Done, with YT-288–294 implementation gates open.
 **Date:** 2026-11-21.
 **Tracking:** YT-286 public-delivery umbrella; ordered remaining items YT-287–294.
 **Decision:** [ADR 0014](adr/0014-layered-host-resource-lifecycle.md).
@@ -8,8 +8,10 @@
 
 The [current delivery sequence](#14-replanned-public-delivery--yt-287-through-yt-294)
 supersedes the earlier additive-only packaging and Application naming proposal.
-Sections 1–13 retain the original research and private-proof contracts; their
-historical authorization statements do not override the owner's later request.
+The [YT-287 contract](#15-yt-287--feature-first-architecture-and-driver-contract)
+defines the next-alpha feature/module and driver target. Sections 1–13 retain
+the original research and private-proof contracts; their historical authorization
+statements do not override the owner's later request.
 
 ## 1. Problem and owner requirements
 
@@ -730,8 +732,8 @@ sequence; dependencies express the minimum prerequisites.
 | Item | Bounded deliverable | Acceptance before Done | Depends on |
 |---|---|---|---|
 | YT-287 | Architecture, feature/import and execution-driver contract | Source-to-module inventory; minimal published cohort and feature/dependency matrix; Core/View/Web/adapter responsibilities; App versus HostGroup decision; optional command/state and HTTP wire ownership; caller-runtime versus owned-thread drivers; readiness/address/cancellation policy; breaking migration and CLI/cohort ledger. Update this design, ADR 0014, architecture/naming and development intent. Configured independent review; no implemented-feature claim. | YT-284 |
-| YT-288 | Built-in Core composition and generic Host defaults | Make composition available without a feature opt-in; promote the bounded generic HostGroup/ResourceGroup surface through one engine after compiling driver/extension contracts. Preserve local and borrowed ownership, original completion owners, global admission/join/final-release barrier and retained Pending. Core-only consumer has no View/HTTP/Tokio/Winit/wgpu or mandatory serde. No blind promotion of the private io::Error, sleep loop or four-Host proof limit. | YT-287 |
-| YT-289 | Optional View/HTML layer and Browser DOM migration | Isolate View, Element, tags, binding and pure HTML serialization behind the selected yetlet features. Migrate Browser DOM/keyed-DOM feature selection and reexports in the same slice. Core-only omits View; View/HTML adds no HTTP/runtime dependencies and has no internal composition dependency; DOM/Wasm has no native server dependency. Preserve escaping, validation and component-as-function semantics. | YT-287 |
+| YT-288 | Built-in Core composition and generic Host defaults | Make composition available without a feature opt-in; promote the bounded generic HostGroup/ResourceGroup surface through one engine after compiling driver/extension contracts. Preserve local and borrowed ownership, original completion owners, global admission/join/final-release barrier and retained Pending. Core module and default-off consumer add no HTTP/Tokio/Winit/wgpu or mandatory serde; the complete View/default-feature cutover is YT-289. No blind promotion of the private io::Error, sleep loop or four-Host proof limit. | YT-287 |
+| YT-289 | Optional View/HTML layer and Browser DOM migration | Switch yetlet to default=[] while isolating View, Element, tags, binding and pure HTML serialization behind the selected features. Migrate Browser DOM/keyed-DOM feature selection and reexports in the same slice. Core-only omits View; View/HTML adds no HTTP/runtime dependencies and has no internal composition dependency; DOM/Wasm has no native server dependency. Preserve escaping, validation and component-as-function semantics. | YT-287 |
 | YT-290 | Optional Web ownership and transport boundary | Move App, Router/Page/SSR integration and classified HTTP capabilities into the selected yetlet Web module/features; relocate existing HTTP serving ownership without a reverse dependency on the unpublished yetlet-hosts crate. Separate command semantics from HTTP error/envelope types with a Wasm-safe shared wire feature. Migrate affected direct consumers and preserve caller-owned runtime, Router/Tower behavior and explicitly selected defaults. Temporary driver differences remain named until YT-291. | YT-288, YT-289 |
 | YT-291 | One Web lifecycle with supported execution drivers | Use the same lifecycle/admission/failure/final-release contracts for direct async serving and multi-Web composition. Prove caller-runtime async progress and explicit owned-thread progress without blocking current-thread Tokio, nested runtime creation, detached original joins or false cancellation completion. Verify API-only routes, multiple Web Hosts, later-start rollback, admitted drain and managed-resource release. | YT-290 |
 | YT-292 | Optional Native/Network/custom Host integration | Move concrete adapters onto the public Core contracts through yetlet features, removing the unpublished yetlet-hosts crate from the new SDK delivery path; keep renderer selection independent. One root-owned native loop can manage multiple windows; known duplicate-loop plans fail before acquisition, with external/process-wide constraints checked honestly. Preserve caller-driven UDP and custom local/borrowed resources. Classify the generic command/snapshot bridge separately from HTTP and keep it optional. Focus native checks on changed behavior. | YT-288, YT-291 |
@@ -769,5 +771,333 @@ Exact public generic signatures and new runtime claims still require later
 compiling proofs. Arbitrary resource DAGs, live asynchronous owner adoption,
 automatic pools, process supervision and broad platform certification remain
 deferred unless a concrete later item is separately selected.
+
+## 15. YT-287 — feature-first architecture and driver contract
+
+**Contract baseline:** planning commit `a60e038781ac92f26f8b0e790c9981fbb0f4d29f`.
+This is the first item executed after the reviewed, Strict/Builtin-guarded
+planning commit. It defines the next-alpha target; it does not move Rust modules,
+change Cargo features, implement drivers, select a version or publish packages.
+The current manifests and published alpha.8 remain unchanged in this item.
+
+### 15.1 Publication and default boundary
+
+Retain two SDK packages: **yetlet** and **yetlet-browser**. The CLI stays its
+independent product/cohort. Use modules and additive Cargo features for capability
+selection; do not publish separate Core, View, Web, Host, Action or Resource
+packages for this migration. The current unpublished yetlet-hosts is a staging
+location whose active implementations/consumers migrate into yetlet; it is not a
+new registry dependency or a permanent compatibility facade.
+
+Select `default = []` for the next yetlet API. Built-in `composition`, generic
+`HostGroup`, the Host extension contract and `ResourceGroup` form the std-only
+foundation, without a `composition` opt-in. This is not a no_std promise.
+View, HTML, Web, native windows, UDP, GPU, serialization, reactive state and
+auxiliary native services are optional. No default executor, thread pool,
+process supervisor, global command bus or application-state owner is installed.
+
+A single archive can contain disabled adapter source and optional dependency
+declarations. The guarantee is a minimal enabled dependency/compilation graph,
+not a feature-trimmed download or a measured binary-size/zero-overhead claim.
+View consumers still compile the built-in Core module in the same package;
+View must have no semantic dependency on composition or Host lifecycle.
+
+### 15.2 Current source to target ownership
+
+The linked files are the inspected source at the baseline, not future paths.
+
+| Current source | Target responsibility / migration | Owning item |
+|---|---|---|
+| [Core module/exports](../crates/yetlet/src/lib.rs), [composition](../crates/yetlet/src/composition/mod.rs), [resource engine](../crates/yetlet/src/composition/resources.rs) | Built-in std-only lifetime coordination. Generic HostGroup/Host/ResourceGroup belong here; concrete adapters depend on this layer. | YT-288 |
+| [Private facade](../examples/host-lifecycle-research/src/lib.rs), [resources](../examples/host-lifecycle-research/src/resources.rs) | Promote the proven ownership semantics, not a blind copy of the io::Error-bound Activity, blocking sleep driver or one-to-four tuple limit. Resolve those public signatures through compiling consumers. | YT-288 |
+| [View](../crates/yetlet/src/view/mod.rs), [tags](../crates/yetlet/src/view/tags.rs), [binding](../crates/yetlet/src/view/binding.rs), [HTML](../crates/yetlet/src/html/mod.rs) | Optional yetlet::view and yetlet::html. View is an HTML-like owned tree used by HTML/DOM; components remain ordinary functions. Native GPU scenes are separate. | YT-289 |
+| [App](../crates/yetlet/src/server_axum/app.rs), [HTTP/Page/prelude](../crates/yetlet/src/server_axum/mod.rs) | yetlet::web owns App, Router/Tower interoperability, WebHost and serving drivers. Page/rendering/View-dependent prelude entries require HTML as well as Web. Preserve resolved App state before serving/hosting. | YT-290, YT-291 |
+| [Current Web adapter](../crates/yetlet-hosts/src/web_axum/mod.rs) | Move the actual HTTP worker/serving implementation to Web. Move the separate generic command/snapshot bridge to optional yetlet::command_bridge; do not move it into HTTP merely because the current file contains both. | YT-290, YT-292 |
+| [Actions](../crates/yetlet/src/actions/mod.rs), [Browser HTTP executor](../crates/yetlet-browser/src/actions/mod.rs) | Optional neutral command/executor semantics plus separately selected target-neutral HTTP errors/envelopes; native serving and browser Fetch stay in their adapters. | YT-290 |
+| [Reactive](../crates/yetlet/src/reactive/mod.rs) | Keep the optional synchronous caller-local graph. Application domain state, sharing and synchronization remain application-owned. | YT-289 regression scope |
+| [Host manifest](../crates/yetlet-hosts/Cargo.toml), [adapter exports](../crates/yetlet-hosts/src/lib.rs) | Move Native/Winit, UDP and native wgpu implementations into separately enabled yetlet modules; keep renderer and Host choices independent. | YT-292 |
+| [Browser manifest](../crates/yetlet-browser/Cargo.toml), [Browser exports](../crates/yetlet-browser/src/lib.rs) | Keep the browser package and its DOM/action/GPU adapters. Forward features to only their needed target-neutral yetlet modules; gate current unconditional View reexports. | YT-289, YT-290 |
+| [Core capability manifest](../crates/yetlet/Cargo.toml) | Retain independent native configuration, secret/provider and signing opt-ins; classify existing HTTP capabilities explicitly below. Static asset production stays application/CLI-owned rather than inventing a new Core asset API. | YT-290, YT-293 |
+
+The secret/provider classification uses the observed manifest, module gating
+and existing configuration contract. It is not a review of secret-handling
+implementation or a new security qualification.
+
+### 15.3 Target feature and import matrix
+
+Names below are the selected target vocabulary; complete manifests, Rust
+generic signatures and dependency flags must compile in their owning items.
+No new feature is available merely because it appears in this table.
+
+| Package feature | API responsibility | Required capability edges / exclusions |
+|---|---|---|
+| yetlet default [] | Core composition; root HostGroup / ResourceGroup exports | std only; no View, HTTP/runtime, serde, native window or GPU dependency |
+| view | yetlet::view; gated View/Element/Attribute reexports | No external dependency and no lifecycle use |
+| html | yetlet::html pure escaping/serialization | Enables view; no Web or browser runtime |
+| web | yetlet::web::App, WebHost, native HTTP/Router/Tower serving | Native Axum/Tower/Tokio/serde; no automatic html, actions, state graph, GPU or Winit |
+| web + html | Page, page/render helpers and View-related Web prelude | The SSR selection is this feature combination; no extra SSR package or required convenience feature |
+| actions | yetlet::actions::Command / ActionExecutor / LocalExecutor | No mandatory serde or transport error type; local futures need not be Send |
+| actions-http | yetlet::actions_http HTTP errors and serializable envelope | Enables actions and serde; target-neutral, no native Web/Axum/Tokio or browser Fetch |
+| reactive | yetlet::reactive local graph | No scheduler, I/O, View or shared-Host state service |
+| command-bridge | yetlet::command_bridge bounded command admission and immutable snapshots | Optional std-based native bridge, initially at its proven native scope; independent of HTTP and ActionExecutor |
+| udp | yetlet::udp caller-driven socket adapter | Native std networking; no Tokio/Web/window/GPU dependency |
+| native-winit | yetlet::native_winit native driver/windows | Winit only; no automatic Web, UDP or renderer |
+| renderer-wgpu | yetlet::renderer_wgpu native rendering | Native wgpu only; no automatic Winit, HTTP or View |
+| yetlet-browser dom / dom-keyed | Browser DOM renderers and View reexports | Select yetlet/view and their existing browser dependencies; never yetlet/web |
+| yetlet-browser actions | Browser HTTP executor | Select yetlet/actions-http plus target-specific Fetch/serialization dependencies; never native Web |
+| yetlet-browser wgpu / wgpu-browser | Browser scene contracts / optional GPU backend | Preserve their separate scope without selecting View/DOM solely for package reexports |
+
+Keep the browser package's current DOM convenience default. Its default-off,
+actions-only and GPU-only consumers must remain valid with only the features
+they need. Keep native dependencies behind native target conditions and browser
+bindings behind their actual Wasm target conditions. A native feature's absence
+on Wasm must be documented; it is not evidence that native behavior ran there.
+
+Cargo features are additive and can be unified through another dependency.
+Features expose capabilities; they cannot choose mutually exclusive execution
+owners. Select execution through driver APIs and validate native-loop conflicts
+at plan/start time. Verify minimal consumers in separate Cargo invocations, not
+only an all-features workspace build. Normal dependency graphs must exclude
+test/dev feature leakage. See the primary [Cargo features contract](https://doc.rust-lang.org/cargo/reference/features.html#feature-unification)
+and [resolver rules](https://doc.rust-lang.org/cargo/reference/resolver.html#feature-resolver-version-2).
+
+### 15.4 Existing optional native capabilities
+
+Keep these existing feature names unless implementation exposes a concrete
+reason to change one. Module residence alone must not broaden its dependency
+closure. Existing middleware installation, authentication/authorization and
+provider ownership remain explicit.
+
+| Feature family | Target ownership and dependency rule |
+|---|---|
+| request-id, session | Optional HTTP capabilities; replace their server-axum edge with web and omit HTML. Preserve existing request/cookie/CSRF contracts. |
+| auth | Existing optional HTTP authentication adapter; retain its narrow Axum dependency rather than forcing the full Web runtime. No mandatory Core Principal service. |
+| auth-session | Explicit auth + session bridge; no automatic installation or application authorization. |
+| session-redis, session-redis-tls | Optional native Web Session provider and TLS selection. Preserve the provider's actual runtime requirements; its current multi-thread Tokio feature is not a Core/basic-Web pool policy. |
+| rate-limit | Optional HTTP/Tower admission with Governor; keep its existing narrow dependencies, without forcing HTML or an unrelated runtime. |
+| config | Independent native startup configuration; no Web dependency. |
+| secrets, secret-provider | Independent native secrets and explicit config/secrets bridge, based on the observed feature contracts. |
+| signing | Independent native byte signing/verifying and caller-owned trust; OpenSSL remains opt-in. |
+
+### 15.5 Commands, state and components
+
+A Command is an application operation with a typed response. It is not a DOM
+event, Winit event, lifecycle stop request or mandatory cross-Host message.
+An ActionExecutor chooses how that operation runs. Change the neutral executor
+contract to an associated error type so local/custom executors can return their
+own domain errors; preserve local non-Send futures and application-owned state.
+
+The current ActionError includes endpoint/network/remote-HTTP variants, and the
+same module serializes ApiErrorEnvelope/ApiErrorBody. Assign those transport
+types to actions_http, with explicit application-error mapping at HTTP adapters.
+Preserve the existing wire envelope unless a separately justified protocol
+change is selected. Moving serde derives alone does not make the fixed-error
+ActionExecutor transport-neutral. LocalExecutor, BrowserHttpExecutor and the
+existing custom-action-transport/Todo/Board consumers need compile coverage for
+the associated-error change in YT-290.
+
+The optional command/snapshot bridge is a different contract: queue admission
+does not prove command execution, and published snapshots are immutable views of
+an application-owned authority. It does not require ActionExecutor and is not
+installed for every Host. Reactive remains a local Rc/RefCell graph; lifecycle
+composition does not synchronize arbitrary domain state. No universal Component
+trait, UI event bus or State container is introduced.
+
+### 15.6 One lifecycle, explicitly different drivers
+
+App describes an HTTP service; HostGroup groups Host lifetimes; ResourceGroup
+customizes owned/borrowed resources and their explicit management. They are
+different developer intentions. Use HostGroup rather than promoting the private
+Application spelling, and use with_host rather than required_* on the quick path.
+Keep Composition as advanced engine vocabulary.
+
+Construction and configuration are inert. build validates known topology,
+resource/driver compatibility and exclusive claims without binding, spawning or
+creating Winit. Acquisition stores each original/partial owner before the next
+fallible step. Readiness must be observed, then normal admission opens.
+Shutdown fences admission, progresses activity stop and original completion,
+then releases dependencies under the existing global barrier. Primary and
+secondary failures and terminal error versus Pending stay distinct.
+
+| Entry / driver | Selected execution contract |
+|---|---|
+| App::serve / serve_on | Caller-owned Tokio async driver; no new runtime or dedicated thread. Ordinary HTTP transport convenience, with the cancellation limit below. |
+| HostGroup::run_async with compatible Web/local Hosts | Caller-runtime Web by default. Progress yields to that runtime, including current-thread Tokio; no synchronous probe/sleep/join or nested runtime. Exact borrow/extension signatures require proof. |
+| Synchronous HostGroup::run with Web | The Web adapter's documented default is its owned service-thread driver; the group retains original handles. Local/core-only Hosts do not thereby acquire a runtime or thread. |
+| A NativeHost in synchronous composition | One root-owned native event-loop driver progresses readiness and local cleanup inside callbacks; Web may use its owned service-thread driver, while UDP remains bounded/caller-driven. |
+| Advanced explicit Web placement | Expose only actually supported driver choices. A requested placement must succeed or fail with its owner retained; do not silently fall back to a blocking native/caller thread. No generic best-effort process policy. |
+
+Core owns state and obligations, not a Tokio scheduler. Async adapter code owns
+its poll/wake integration and supplies truthful progress to the same coordinator.
+The two Web drivers share serving/admission/failure/final-release rules, not two
+independent lifecycle implementations. A Tokio Handle does not imply ownership
+of or permission to shut down the caller's runtime. No default thread pool or
+one-process-per-Host mechanism is added. Pools and process hosting still need
+separate concrete consumers, ownership and supervision contracts.
+
+#### Cancellation and retained owners
+
+The convenient consuming App::serve(self).await keeps its ordinary transport
+scope: dropping its future does **not** promise graceful drain or framework-managed
+resource finalization. App::with_state continues to carry application-owned
+state; it does not register an asynchronous finalizer. Do not add managed resource
+attachments to this consuming convenience without a proven ownership transfer.
+
+Use a retained HostGroup/managed owner and a borrowing async drive for managed
+resources or recoverable cancellation. The owner must outlive the cancelled
+future. The driver must store acquired/partial resources, original joins,
+in-flight cleanup state and terminal outcomes in retained owner storage before
+every suspension point that could otherwise lose an obligation. A borrowing
+signature alone is insufficient; cancelling a task that also owns the group can
+still drop that group. Do not describe dropping the owner as completed shutdown.
+
+After cancelling a drive, the caller can resume the same owner or request and
+drive shutdown. Pending and a deadline retain those same owners/dependencies.
+Normal terminal return may wait for uncooperative work; it must not hide a
+timeout by detaching. YT-291 must test cancellation during acquisition/readiness,
+running, signalling, original join observation and final release. A future
+supervisor/cleanup transfer is outside this contract until independently proved.
+
+#### Web address and readiness
+
+Preserve 127.0.0.1:7878 for App convenience and select the same default for the
+new public WebHost. This deliberately differs from the private proof's port 0.
+Multiple Web Hosts use explicit distinct addresses or port 0, with actual bound
+addresses observable after start. No silent port change after failure.
+Known identical nonzero exclusive endpoints may be rejected at build; OS/DNS
+or external occupancy still requires transactional startup rollback.
+
+Default Web readiness means the listener is acquired and the selected serving
+driver has actually initialized sufficiently to service admitted work.
+Constructing an unpolled serve future or merely allocating a thread is
+insufficient. An API-only Router may return 404 at GET / and still be ready.
+An optional explicitly configured HTTP probe keeps its exact route/method/status
+and startup-only admission exception; it must not open arbitrary application
+work before the group is ready. Probe failure remains primary and retains the
+original owner for rollback. This is an intentional next-alpha readiness change
+from the private root-200 proof, not evidence that the existing adapter does it.
+
+#### Native uniqueness
+
+One NativeHost/root driver owns one process-level Winit event loop and can own
+multiple windows. Multiple inert descriptions do not run loops; incompatible
+independent-loop requests fail before acquisition when detectable. Enabling
+native-winit twice through Cargo does not create two loops. Actual creation
+still enforces the platform entry-thread and process-wide limits, including a
+loop created outside Yetlet; a completed/dropped loop does not imply permission
+to recreate it. See the pinned [Winit 0.30.13 contract](https://docs.rs/winit/0.30.13/winit/event_loop/struct.EventLoopBuilder.html).
+Native callbacks must not wait for a future callback to complete readiness or
+cleanup. GPU backend qualification remains separate from feature availability.
+
+### 15.7 Intended developer shape
+
+These are target sketches, **not compiling current API examples**. The feature
+names/intent are selected here; YT-288/290/291 must prove the exact signatures.
+
+Simple HTTP uses yetlet with the web feature and an application-owned Tokio
+runtime. It does not need View or a separate Host package:
+
+~~~rust
+use yetlet::web::App;
+
+App::new()
+    .get("/health", health)
+    .serve()
+    .await?;
+~~~
+
+This consuming convenience has the cancellation limit above; no managed resource
+finalization is promised if its future is abandoned.
+
+Multiple Web Hosts use the same service/Host foundation and one retained owner:
+
+~~~rust
+use yetlet::HostGroup;
+use yetlet::web::{App, WebHost};
+
+let mut hosts = HostGroup::new()
+    .with_host(
+        App::new()
+            .get("/api", api)
+            .into_host()
+            .with_address("127.0.0.1:8080"),
+    )
+    .with_host(
+        WebHost::new(admin_router)
+            .with_address("127.0.0.1:8081"),
+    )
+    .build()?;
+
+hosts.run_async().await?;
+~~~
+
+The caller keeps hosts outside a cancellable task/scope when cancellation
+recovery is required. No root-GET handler is required merely for readiness.
+
+For advanced ownership, a custom Host supplies the same ResourceGroup plan:
+
+~~~rust
+use yetlet::ResourceGroup;
+
+let resources = ResourceGroup::new(activity)
+    .with_resource(borrowed_or_owned_passive_value)
+    .with_managed_resource("database", database_descriptor);
+~~~
+
+A passive value uses its normal Rust lifetime; a managed descriptor defines
+acquire/release progress. This is not an untyped resource registry or automatic
+DI. The supplied activity must still have its actual original completion
+contract. Built-in Host defaults use the same machinery internally.
+
+### 15.8 Breaking migration and compatibility ledger
+
+| Current contract / consumer | Required next-alpha change and evidence |
+|---|---|
+| yetlet default html; unconditional View exports; optional composition | YT-288/289 make Core built in, default empty and View exports conditional. Migrate required-features on tests/examples and consumer manifests. Core-only and HTML-only normal consumers must compile separately. |
+| Private Application and current required_* core vocabulary | Promote HostGroup with canonical intent names; migrate active public consumers without permanent synonym aliases. Legacy local close-before-worker behavior cannot be renamed into post-join resource release; map each callback to its actual lifecycle phase. Historical proof names/receipts remain unchanged. |
+| server_axum / server-axum; yetlet_hosts Web/native/UDP imports | YT-290/292 migrate active imports/features to yetlet modules. Keep App's resolved-state and Router/Tower escape hatches. Remove the staging companion from the new release path only after its active consumers move. |
+| View/HTML-dependent Web methods and preludes | Gate Page, page methods, document rendering and View imports on Web + HTML. A Web API-only compile must not rely on a dev-dependency activating HTML. |
+| Browser DOM/keyed-DOM, no-default and GPU-only modes | Forward DOM features to view and gate reexports; preserve GPU-only/no-default builds. Test normal Wasm consumers, not only native test stubs. |
+| ActionExecutor/LocalExecutor/custom transports and HTTP envelopes | Associated executor error; explicit transport mapping; shared actions-http wire module without native dependency. Migrate Todo, Board and custom-action-transport callers together and retain wire compatibility tests. |
+| Web/SQLite and external custom/native consumers | Reuse old receipts only for unchanged behavior. New facade/driver imports need current-source startup, admission, drain, original completion, partial rollback, dependency release and cancellation evidence. |
+| CLI scaffold/templates/resources | YT-293 updates tools/yetlet-cli templates, capability/version metadata, generated Cargo feature selection and fixtures. Inspect generated projects, not only template substitutions. |
+| Installed old CLI selecting the newest SDK | [Current selection code](../tools/yetlet-cli/src/sdk_version.rs) checks server-axum for native templates but reactive/dom/dom-keyed for browser templates. Removing server-axum can make native selection reject; it does not prove old Browser templates reject or compile. Test both old-CLI/new-SDK modes and new-CLI/selected-SDK modes. Preserve actionable SDK_INCOMPATIBLE and no silent older-version fallback; unsupported combinations need an explicit upgrade/pin path and publication disposition. |
+| Published SDK/CLI, normal archives and reader edition | Keep the [existing two-package cohort](RELEASING.md#current-two-package-development-boundary--yt-211) and exact dependency-order normal archive verification. Do not invent a new cohort schema when names/count stay unchanged. Current README/module guides/templates update with implementation; the separately pinned public guide changes only after actual accepted publication. |
+
+No permanent old-path aliases are selected. This is an announced experimental
+next-alpha source break, not a silent claim that published alpha.8 has changed.
+The precise release version, registry upload, CLI publication and live reader
+promotion remain outside YT-287. A newly generated project that passes only
+metadata selection but fails to compile is not a compatibility PASS.
+
+### 15.9 Acceptance and proof handoff
+
+YT-287's deliverable is this source-backed contract plus the corresponding
+architecture, naming, ADR, development-intent and task-state updates. Its
+independent Reviewer must check the actual feature/ownership/migration decisions.
+Documentation validation checks the changed English Markdown, local links,
+anchors, whitespace and the backlog DAG; historical unchanged failed receipts
+remain preserved. No Rust behavior or runtime result is claimed by this item.
+
+Configured independent R1 `wc_job_GwI4V4CCnZesLj9w` completed with exit0 and
+actual PASS, `issues=[]` and `required_followups=[]`, on the seven-document
+contract snapshot. Observed model/effort was gpt-6.2-astra/high. Scoped English,
+809 local links/anchors, the 291-item backlog DAG and whitespace checks passed.
+Receipts are retained under `.pipeline-output/m28-yt287-20261121/`.
+YT-287 is Done at documentation-contract scope; these completion annotations
+record that result without changing the reviewed technical contract.
+
+The implementation boundary is deliberately staged: YT-288 establishes built-in
+composition and the generic Host/resource contract without claiming final View
+exclusion. YT-289 changes the default set and conditional View exports together
+with Browser feature wiring, so the latter is not left relying on an unavailable
+unconditional export. No intermediate slice selects a release.
+
+The next implementation item is YT-288. Its compiling proof must settle generic
+error/Host extension signatures, typed owner storage and driver extension shape,
+including cancellation-safe owner placement. Later driver acceptance is YT-291;
+Native/UDP/public adapter qualification is YT-292. The private four-Host limit,
+live managed-owner adoption, arbitrary resource DAGs, automatic pools,
+process placement and broad platform qualification are not silently promoted.
 
 

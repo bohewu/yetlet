@@ -1,6 +1,6 @@
 # ADR 0014 — Layered Hosts with Default Resource Lifecycle Management
 
-- **Status:** Proposed detailed public contract; reviewed A/B proofs retained and owner-selected Core/View/Web replan scheduled.
+- **Status:** Owner-selected target direction; YT-287 feature/driver contract independently reviewed, public implementation pending.
 - **Date:** 2026-11-21.
 - **Tracking:** YT-286 umbrella remains Todo; YT-287–294 define the remaining delivery gates.
 - **Decision owner:** Project maintainer.
@@ -21,6 +21,94 @@ is reviewed and locally committed before YT-287 executes. YT-287 resolves the
 module/feature/import, App/HostGroup, command/state/wire and driver contracts in this
 ADR and the existing design. Public implementation and release claims wait for
 their own later gates; the recorded alpha.8 contracts are not rewritten.
+
+## YT-287 target decision — minimal packages, optional capabilities
+
+This section records the next-alpha target and supersedes conflicting
+Application naming, additive-only packaging, opt-in-Core and private Web
+default assumptions below. Historical A/B names and receipts remain unchanged.
+The [detailed contract and source inventory](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
+define the feature/import, driver and migration acceptance for YT-288–294.
+
+1. Keep the existing yetlet + yetlet-browser SDK cohort. Use modules and features
+   rather than new published Core/View/Web/Hosts packages. The unpublished
+   yetlet-hosts staging code migrates into optional yetlet modules.
+2. Select next-alpha yetlet default=[] with built-in std-only composition,
+   generic HostGroup/Host and ResourceGroup. There is no default runtime,
+   serialization, View, global state owner, command bus, pool or process policy.
+3. View is an optional HTML/DOM value layer; html enables view. Native web can
+   serve an API without HTML, while web + html enables SSR/Page helpers.
+   Browser DOM selects view; Browser actions select a target-neutral actions-http
+   feature without native Web. Keep independent native/network/renderer and
+   existing auxiliary native features.
+4. Name the generic lifetime root HostGroup; keep App for HTTP service
+   configuration in yetlet::web. Core composition is the one lifecycle engine
+   for built-in/custom Host defaults and advanced ResourceGroup management.
+   Construction/build are inert; original owner, admission, failure, join and
+   final-release rules remain explicit.
+5. Keep actions optional and make its executor error associated with the
+   implementation. HTTP errors/envelopes belong to actions_http; moving serde
+   alone is insufficient. Reactive is a local graph, and the optional native
+   command/snapshot bridge is separate from ActionExecutor.
+6. Direct App serving uses caller-owned Tokio. Managed async Web uses a yielding
+   caller-runtime driver; synchronous composition can select the documented
+   owned-thread Web driver. Native composition uses one root-owned event loop
+   with multiple windows. Features expose these APIs but cannot select or prove
+   valid execution topology.
+7. Preserve 127.0.0.1:7878 for App and select it for the new public WebHost;
+   multiple Web Hosts use explicit distinct addresses or port 0 and expose
+   their actual addresses. Default readiness observes listener plus functioning
+   serving-driver initialization, without requiring GET / to return 200.
+   Optional HTTP probes retain their explicit startup admission contract.
+8. Preserve the published alpha.8/CLI identities. Migrate active imports,
+   feature/default assumptions, Browser reexports, generated templates and
+   archive consumers coherently. No permanent old-name aliases or new package
+   cohort schema are selected merely for this restructuring.
+
+### Cancellation is an ownership contract
+
+App::serve(self).await remains the ordinary transport convenience. Dropping
+its future is not guaranteed graceful drain or framework-managed resource
+finalization; App::with_state does not register an async finalizer. Do not add
+managed attachments to that consuming path without proven owner transfer.
+
+Managed resources use a retained owner with a borrowing drive. Before each
+cancellation point, acquired/partial resources, original joins, in-flight cleanup
+state and terminal outcomes must be retained in that owner rather than solely
+inside a disposable future. The caller must also retain the owner outside the
+cancelled task/scope. Cancelling only the drive permits later progress with the
+same owner; dropping both does not constitute completed shutdown.
+
+One lifecycle foundation does not imply that every drive is cancellation-safe,
+or that cancelling a future has completed its obligations. YT-291 must prove
+these suspension-point invariants, current-thread runtime progress, rollback,
+admitted drain and final dependency release. No blocking sleep/probe/join in an
+async driver, replacement detached cleanup task, or automatic runtime shutdown
+can substitute for that proof.
+
+### Decision scope and alternatives
+
+The owner selected the composable framework direction and the minimal-package,
+feature-first constraint. YT-287 supplies the independently reviewed design
+contract (R1 `wc_job_GwI4V4CCnZesLj9w`, actual PASS with no issues/followups);
+later compiling proofs own exact generic signatures,
+extension traits and runtime implementation. Architecture acceptance does not
+claim that new features exist or qualify a registry release.
+
+| Alternative | Disposition |
+|---|---|
+| Publish one crate per logical layer | Reject for this migration; it conflicts with the owner's publication-minimization preference without a demonstrated need. |
+| Put generic HostGroup in the optional concrete-adapter package | Reject; a custom/local Host should use the Core lifetime foundation without concrete integrations. |
+| Make View/State/Actions universal Core services | Reject; each has a narrower optional responsibility. |
+| Put both Web modes over one blocking run loop | Reject; it cannot support caller-owned current-thread async progress. |
+| Separate lifecycle state machines for standalone and hosted Web | Reject; keep one owner/admission/failure/final-release contract with distinct drivers. |
+| Keep all capability modules in yetlet with explicit features | Select; independently verify feature closures and native/Wasm target isolation. |
+
+The remaining exact feature names/dependency edges for existing optional
+capabilities, the App/HostGroup sketches, installed old-CLI/native versus
+Browser risks and the package proof matrix are in the linked contract.
+The earlier proposal and proof records below remain evidence at their original
+scope; this section governs the selected next-alpha direction.
 
 ## Context
 

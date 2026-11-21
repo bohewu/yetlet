@@ -8,12 +8,47 @@ research prototypes retain their recorded scopes. The typed Tag Builder is part 
 the published alpha.7 SDK; private app Style tooling ships in CLI 0.3.0,
 while Showcase remains a checkout sample.
 Publication does not establish production or universal platform qualification.
-**Scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
+**Published scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
 **Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md), [application startup contract — ADR 0011](adr/0011-application-startup-api.md), [Axum adapter prelude — ADR 0012](adr/0012-server-axum-prelude.md).
 
 Current usage is documented in the [current module guides](API-REFERENCE.md), [HTTP pipeline](HTTP-PIPELINE.md) and [sample guide](SAMPLES.md). Shared owned Views feed escaped native HTML or explicitly built browser DOM/WASM. App/Page preserve native Axum/Tower handlers; local graph, keyed children, request correlation and Memory Session are explicit opt-ins. SQL/storage stay application-owned. No Controller, DI, plugin registry or ORM is required.
 
 The design rationale and dated evidence below retain the original proposal and M7 decision history. Diagram references to compiler/macros and candidate IR are exploratory, not implemented authoring APIs. Current research decisions are in the [completed studies index](README.md#completed-research-prototypes); historical execution is not transferred to today's dirty source.
+
+## Next-alpha target — YT-287 feature-first composition
+
+The owner selects a small, composable Rust application framework with minimal
+SDK publication: keep yetlet and yetlet-browser and expose optional capabilities
+through modules/features. The [YT-287 contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
+and [ADR 0014](adr/0014-layered-host-resource-lifecycle.md#yt-287-target-decision--minimal-packages-optional-capabilities)
+define the independently reviewed target. This is development direction, not a change to
+the published pair or current Cargo implementation.
+
+| Layer | Next-alpha responsibility |
+|---|---|
+| Core in yetlet, default=[] | Built-in composition and generic HostGroup/Host/ResourceGroup; std-only lifetime coordination without mandatory UI, runtime, state service or serialization. |
+| Optional View / HTML | Shared owned HTML/DOM values and pure serializer; no semantic dependency on lifecycle and no native scene-graph claim. |
+| Optional Web | App, WebHost and native HTTP integration; Web API without HTML, SSR with web + html. Caller-runtime and owned-thread drivers use the same lifecycle rules. |
+| Optional commands / state helpers | Neutral actions with executor-specific errors, target-neutral actions-http envelopes, local reactive graph and separately optional native command/snapshot bridge. |
+| Optional native integrations | Winit, UDP, native wgpu and existing auxiliary services; feature combinations expose capabilities while runtime plans enforce ownership/affinity. |
+| yetlet-browser | Existing separate browser adapters; DOM selects view and HTTP actions select actions-http, without enabling native Web. |
+
+App means HTTP service configuration. HostGroup means coordinated Host
+lifetimes. ResourceGroup is advanced resource ownership/control, not a DI
+container. A Host does not imply a thread, process or renderer.
+
+The consuming App::serve convenience retains ordinary cancellation semantics:
+dropping its future is not graceful-completion evidence. Managed resources
+require a retained owner, cancellation-safe driver storage and explicit
+completion progress. View/HTML-only users still consume the Core-containing
+package; feature isolation promises no unwanted adapter dependencies, not a
+separate Core-free archive.
+
+YT-287 is Done at contract scope; YT-288 is the next implementation item.
+All public-driver, external
+consumer, normal archive and next-alpha migration gates remain in the
+[ordered plan](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#14-replanned-public-delivery--yt-287-through-yt-294).
+The research history below retains its original default-feature/API assumptions.
 
 ## Proposed composable application research
 
