@@ -43,8 +43,8 @@ cargo clippy --offline --locked --manifest-path examples/external-consumers/yt28
 cargo fmt --manifest-path examples/external-consumers/yt283-revision-audit/Cargo.toml --check
 ```
 
-The default consumer is a local library with only std-only
-`yetlet/composition`; it needs no HTTP, GPU, window or worker. The optional
+The current-checkout default consumer uses built-in `yetlet::composition`
+with `default-features = false`; it needs no HTTP, GPU, window or worker. The optional
 `three-way` feature selects `yetlet-hosts` Web/Axum, UDP, Native/Winit and
 renderer-wgpu. One explicit smoke invocation briefly opens a visible 640×420
 window with two squares and exits after the finite client verifies both moves.

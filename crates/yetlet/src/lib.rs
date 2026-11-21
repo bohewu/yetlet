@@ -1,4 +1,8 @@
-//! HTML-first UI values, rendering and explicitly selected native integrations.
+//! Composable application lifetimes, UI values and optional integrations.
+//!
+//! Built-in [`HostGroup`], [`Host`] and [`ResourceGroup`] use the std-only
+//! [`composition`] engine. They create no executor, thread pool or process.
+//! Custom and local Hosts do not need an integration feature.
 //!
 //! Start with an owned [`View`] tree. Components are ordinary functions returning
 //! a View; constructing one does not escape or validate its contents. A renderer
@@ -10,6 +14,8 @@
 //! With the default `html` feature:
 //!
 //! ```
+//! # #[cfg(feature = "html")]
+//! # fn main() -> Result<(), yetlet::html::RenderError> {
 //! use yetlet::{Element, View};
 //!
 //! let page: View = Element::new("p")
@@ -17,7 +23,10 @@
 //!     .into();
 //! let html = yetlet::html::render_to_string(&page)?;
 //! assert_eq!(html, "<p>Hello, &lt;Yetlet&gt;!</p>");
-//! # Ok::<(), yetlet::html::RenderError>(())
+//! # Ok(())
+//! # }
+//! # #[cfg(not(feature = "html"))]
+//! # fn main() {}
 //! ```
 //!
 //! # Choose features explicitly
@@ -32,7 +41,7 @@
 //! | `config`, `secrets`, `secret-provider` | Optional native startup loading, secret lookup and their bridge |
 //! | `signing` | Optional native signing/verifying API with caller-owned trust and OpenSSL prerequisites |
 //! | `actions`, `reactive` | Typed action boundary and synchronous local state graph |
-//! | `composition` | Optional std-only typed resources, readiness and explicit owned completion |
+//! | Built-in Core | `HostGroup` / `Host` / `ResourceGroup`; advanced `composition` ownership, readiness and original completion |
 //!
 //! Cargo features make APIs available; application startup installs middleware,
 //! providers and typed state. Native capability modules are absent on `wasm32`.
@@ -53,8 +62,8 @@ pub use view::{Attribute, Element, View};
 pub mod actions;
 #[cfg(all(feature = "auth", not(target_arch = "wasm32")))]
 pub mod auth;
-#[cfg(feature = "composition")]
 pub mod composition;
+pub use composition::{Host, HostGroup, ResourceGroup};
 #[cfg(all(feature = "config", not(target_arch = "wasm32")))]
 pub mod config;
 #[cfg(feature = "html")]

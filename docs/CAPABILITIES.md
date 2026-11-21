@@ -43,6 +43,13 @@ Style authoring has a finite private app vocabulary, explicit registration and
 external build-time CSS; ordinary CSS remains the default and supplies unsupported
 syntax. There is no public style crate, renderer change or runtime style injection.
 
+The current checkout additionally provides built-in Core composition with
+HostGroup, custom Host extensions and ResourceGroup. YT-288 removes the
+composition feature opt-in without changing HTML defaults or View exports;
+the latter transition belongs to YT-289. See the [Core lifecycle contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
+and [independent consumer](../examples/external-consumers/yt288-core-hosts/src/main.rs).
+This source addition does not change published alpha.8 package contents.
+
 ## Framework packages and selected features
 
 | Carrier | Implemented scope and maturity | Original nine release candidates? | Authoritative contract |

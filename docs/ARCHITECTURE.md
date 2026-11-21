@@ -21,8 +21,8 @@ The owner selects a small, composable Rust application framework with minimal
 SDK publication: keep yetlet and yetlet-browser and expose optional capabilities
 through modules/features. The [YT-287 contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
 and [ADR 0014](adr/0014-layered-host-resource-lifecycle.md#yt-287-target-decision--minimal-packages-optional-capabilities)
-define the independently reviewed target. This is development direction, not a change to
-the published pair or current Cargo implementation.
+define the independently reviewed target. Implementation is staged; the published
+pair is unchanged. The built-in Core slice is described below.
 
 | Layer | Next-alpha responsibility |
 |---|---|
@@ -44,9 +44,16 @@ completion progress. View/HTML-only users still consume the Core-containing
 package; feature isolation promises no unwanted adapter dependencies, not a
 separate Core-free archive.
 
-YT-287 is Done at contract scope; YT-288 is the next implementation item.
-All public-driver, external
-consumer, normal archive and next-alpha migration gates remain in the
+YT-287 is Done at contract scope. [YT-288 Core](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
+now provides built-in composition and the generic HostGroup/Host/ResourceGroup
+surface, with an independent five-Host std-only consumer. Its borrowing poll
+and async drive retain original owners through Pending; shutdown uses the same
+Core engine. YT-288 is independently reviewed and Done. No runtime, pool, thread
+or process is created by Core. HTML defaults and View exports remain until
+YT-289 changes them together with Browser wiring.
+
+Concrete Web/native drivers, broader external consumers, normal archives and
+next-alpha migration gates remain in the
 [ordered plan](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#14-replanned-public-delivery--yt-287-through-yt-294).
 The research history below retains its original default-feature/API assumptions.
 

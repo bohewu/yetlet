@@ -11,7 +11,7 @@ default = []
 three-way = ["dep:yetlet-hosts", "dep:axum", "dep:winit"]
 
 [dependencies]
-yetlet = { path = "../../../crates/yetlet", default-features = false, features = ["composition"] }
+yetlet = { path = "../../../crates/yetlet", default-features = false }
 yetlet-hosts = { path = "../../../crates/yetlet-hosts", default-features = false, features = ["web-axum", "udp", "native-winit", "renderer-wgpu"], optional = true }
 axum = { version = "=0.8.9", optional = true }
 winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }

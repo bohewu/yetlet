@@ -11,8 +11,8 @@ description = "Independent package-surface compatibility consumer for Yetlet"
 [features]
 default = []
 pure-web = ["yetlet/server-axum", "dep:axum"]
-local-headless = ["yetlet/composition"]
-native-udp = ["yetlet/composition", "dep:yetlet-hosts", "dep:winit"]
+local-headless = []
+native-udp = ["dep:yetlet-hosts", "dep:winit"]
 
 [dependencies]
 yetlet = { path = "../../../crates/yetlet", default-features = false }

@@ -99,6 +99,14 @@ explicitly exposes the listener beyond loopback.
 
 ## Source-only checkout additions
 
+The current checkout includes built-in yetlet::composition and the root
+HostGroup, Host and ResourceGroup exports; no composition feature is required.
+The [independent Core consumer](../examples/external-consumers/yt288-core-hosts/src/main.rs)
+demonstrates custom Hosts, typed owned/borrowed resources and caller-driven
+polling without normal runtime dependencies. [YT-288](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
+records the Core contract and bounded verification; published alpha.8 and the
+pending YT-289 default/View transition retain their separate scopes.
+
 The native-first Style Showcase is a checkout sample with an optional Wasm
 companion. Both packages are built from the repository.
 [Style Showcase](../examples/style-showcase/README.md)

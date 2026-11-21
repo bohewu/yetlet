@@ -1,8 +1,13 @@
-//! Optional, statically typed application-owned resource composition.
+//! Built-in, statically typed application-owned lifetime composition.
 //!
-//! Enable the default-off `composition` feature. This module uses only `std`;
-//! it neither starts a runtime nor imposes `Send`/`Sync` on local resources.
-//! A custom Host is an ordinary value with caller-supplied callbacks.
+//! [HostGroup] groups high-level [Host] descriptions using their default
+//! [ResourceGroup] plans. [HostActivity] and [ManagedResource] are the custom
+//! extension contracts. This module uses only std, creates no runtime or thread,
+//! and imposes no blanket Send/Sync/'static bound on local or borrowed resources.
+//! No Cargo feature opt-in is needed.
+//!
+//! [Builder] and [Composition] remain the advanced callback engine. Their legacy
+//! local close-before-worker phase is distinct from post-Join resource release.
 //!
 //! # Local and borrowed resources
 //!
@@ -83,15 +88,128 @@
 //! ```
 
 use std::fmt;
+use std::task::{Context, Waker};
 use std::time::{Duration, Instant};
 
+mod hosts;
 mod lifecycle;
 mod resources;
+
+pub use hosts::{
+    BuiltHostGroup, ExclusiveClaim, Host, HostActivity, HostBuildError, HostFailure, HostGroup,
+    HostOperation, HostOutcome, Managed, ManagedResource, ResourceGroup, ResourcePlan, Retained,
+    ShutdownHandle, StartStatus,
+};
+
+#[doc(hidden)]
+pub use hosts::{HostList, HostParts};
 
 pub use resources::{
     ActivityBuilder, Group, ManagedWorker, ReleaseCompletion, ReleaseStatus, Resource,
     ResourceParts,
 };
+
+/// Internal callback storage that receives the caller's wake context.
+#[doc(hidden)]
+pub struct ContextCallback<F> {
+    callback: F,
+}
+
+pub(crate) trait RequestOp<T, E> {
+    fn request(&mut self, value: &mut T, cx: &mut Context<'_>) -> Result<(), E>;
+}
+
+impl<T, E, F> RequestOp<T, E> for F
+where
+    F: FnMut(&mut T) -> Result<(), E>,
+{
+    fn request(&mut self, value: &mut T, _: &mut Context<'_>) -> Result<(), E> {
+        self(value)
+    }
+}
+
+impl<T, E, F> RequestOp<T, E> for ContextCallback<F>
+where
+    F: FnMut(&mut T, &mut Context<'_>) -> Result<(), E>,
+{
+    fn request(&mut self, value: &mut T, cx: &mut Context<'_>) -> Result<(), E> {
+        (self.callback)(value, cx)
+    }
+}
+
+pub(crate) trait ObserveOp<T, E> {
+    fn observe(
+        &mut self,
+        value: &mut T,
+        cx: &mut Context<'_>,
+        budget: Duration,
+    ) -> Result<WorkerCompletion<E>, E>;
+}
+
+impl<T, E, F> ObserveOp<T, E> for F
+where
+    F: FnMut(&mut T, Duration) -> Result<WorkerCompletion<E>, E>,
+{
+    fn observe(
+        &mut self,
+        value: &mut T,
+        _: &mut Context<'_>,
+        budget: Duration,
+    ) -> Result<WorkerCompletion<E>, E> {
+        self(value, budget)
+    }
+}
+
+impl<T, E, F> ObserveOp<T, E> for ContextCallback<F>
+where
+    F: FnMut(&mut T, &mut Context<'_>, Duration) -> Result<WorkerCompletion<E>, E>,
+{
+    fn observe(
+        &mut self,
+        value: &mut T,
+        cx: &mut Context<'_>,
+        budget: Duration,
+    ) -> Result<WorkerCompletion<E>, E> {
+        (self.callback)(value, cx, budget)
+    }
+}
+
+pub(crate) trait ReleaseOp<T, E> {
+    fn release(
+        &mut self,
+        value: &mut T,
+        cx: &mut Context<'_>,
+        budget: Duration,
+    ) -> Result<ReleaseCompletion<E>, E>;
+}
+
+impl<T, E, F> ReleaseOp<T, E> for F
+where
+    F: FnMut(&mut T, Duration) -> Result<ReleaseCompletion<E>, E>,
+{
+    fn release(
+        &mut self,
+        value: &mut T,
+        _: &mut Context<'_>,
+        budget: Duration,
+    ) -> Result<ReleaseCompletion<E>, E> {
+        self(value, budget)
+    }
+}
+
+impl<T, E, F> ReleaseOp<T, E> for ContextCallback<F>
+where
+    F: FnMut(&mut T, &mut Context<'_>, Duration) -> Result<ReleaseCompletion<E>, E>,
+{
+    fn release(
+        &mut self,
+        value: &mut T,
+        cx: &mut Context<'_>,
+        budget: Duration,
+    ) -> Result<ReleaseCompletion<E>, E> {
+        (self.callback)(value, cx, budget)
+    }
+}
 
 /// Lifecycle progress; failure details are independently retained in [Failures].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -615,11 +733,15 @@ impl<E, P: lifecycle::Chain<E>> Composition<E, P> {
 
     /// Retain the first required failure and immediately request coordinated stop.
     pub fn fail_required(&mut self, error: E) {
+        self.fail_with_context(error, &mut Context::from_waker(Waker::noop()));
+    }
+
+    pub(crate) fn fail_with_context(&mut self, error: E, cx: &mut Context<'_>) {
         self.failures.record(error);
         if matches!(self.phase, Phase::Stopped | Phase::Failed) {
             self.phase = Phase::Failed;
         } else {
-            self.request_stop();
+            self.request_stop_with_context(cx);
         }
     }
 
@@ -631,19 +753,23 @@ impl<E, P: lifecycle::Chain<E>> Composition<E, P> {
     /// workers already confirmed Joined need no further shutdown signal.
     /// Repeating this method retries only unfinished operations.
     pub fn request_stop(&mut self) {
+        self.request_stop_with_context(&mut Context::from_waker(Waker::noop()));
+    }
+
+    pub(crate) fn request_stop_with_context(&mut self, cx: &mut Context<'_>) {
         if matches!(self.phase, Phase::Stopped | Phase::Failed) {
             return;
         }
         self.stop_requested = true;
         self.phase = Phase::Stopping;
         if !self.admission_closed {
-            self.admission_closed = self.parts.close_admission(&mut self.failures);
+            self.admission_closed = self.parts.close_admission(cx, &mut self.failures);
             if !self.admission_closed {
                 return;
             }
         }
         self.locals_stopped = self.parts.close_locals(&mut self.failures);
-        self.parts.signal_workers(&mut self.failures);
+        self.parts.signal_workers(cx, &mut self.failures);
     }
 
     /// Request stop and observe original workers within a cooperative time budget.
@@ -657,15 +783,23 @@ impl<E, P: lifecycle::Chain<E>> Composition<E, P> {
     /// and individual Join/release status. After admission closes, a failed signal does not
     /// prevent observation of an already finished worker.
     pub fn complete_until(&mut self, deadline: Instant) -> Completion {
-        self.request_stop();
+        self.complete_with_context(&mut Context::from_waker(Waker::noop()), deadline)
+    }
+
+    pub(crate) fn complete_with_context(
+        &mut self,
+        cx: &mut Context<'_>,
+        deadline: Instant,
+    ) -> Completion {
+        self.request_stop_with_context(cx);
         if !self.admission_closed {
             return Completion::Pending;
         }
         // A failed signal may mean the original worker already exited. Observe
         // after admission closes even if local cleanup or signal delivery failed.
-        let workers = self.parts.observe_owned(deadline, &mut self.failures);
+        let workers = self.parts.observe_owned(cx, deadline, &mut self.failures);
         let completion = if self.locals_stopped && workers == Completion::Complete {
-            self.parts.release_owned(deadline, &mut self.failures)
+            self.parts.release_owned(cx, deadline, &mut self.failures)
         } else {
             Completion::Pending
         };

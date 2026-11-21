@@ -214,8 +214,9 @@ requiring implementation proof, not consequences of renaming.
 ## Next-alpha Host vocabulary — YT-287
 
 The [feature-first contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
-selects these intentions for the next API. Exact generic signatures remain
-proof-gated; the private Application spelling above is historical.
+selects these intentions for the next API. The [YT-288 Core surface](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
+implements HostGroup, Host and ResourceGroup; remaining adapter signatures are
+proof-gated. The private Application spelling above is historical.
 
 | Target name / operation | Developer intent and lifecycle meaning |
 |---|---|
@@ -229,6 +230,15 @@ proof-gated; the private Application spelling above is historical.
 | run / run_async | Drive a compatible HostGroup through its documented synchronous/native or async driver. Managed async driving borrows a retained owner; the adapter must prove cancellation-safe storage. |
 | request_shutdown / shutdown_until | Request stop or advance shutdown toward terminal completion; Pending retains the original obligations. |
 | with_resource / with_managed_resource | Retain a passive Rust value or register an inert descriptor with explicit acquire/release semantics; do not conflate the two. |
+
+The current Core owner is BuiltHostGroup. poll_start reports readiness progress;
+poll_run advances the lifetime; poll_shutdown advances original completion and
+final release. run_async borrows the owner and uses the caller's executor.
+HostActivity names the custom activity contract, ManagedResource names explicit
+acquire/release management, and HostFailure retains the original typed error.
+No generic synchronous run loop is provided by this slice. Existing advanced
+Builder callbacks retain their established phase-specific behavior while the
+new Host path avoids the legacy required_* vocabulary.
 
 Ordinary participation needs no required marker. try_* is reserved for a
 documented operation-specific distinction and never means optional success,

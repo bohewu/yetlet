@@ -1,5 +1,3 @@
-#![cfg(feature = "composition")]
-
 use std::{
     cell::{Cell, RefCell},
     rc::Rc,

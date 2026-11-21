@@ -20,7 +20,7 @@ published SDK packages and optional features rather than one package per layer. 
 retains the reviewed A/B1/B2/B3 proofs and defines the remaining public work:
 
 - [x] YT-287: [source-backed feature/import and driver contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract) completed after the planning commit; configured independent R1 `wc_job_GwI4V4CCnZesLj9w` terminal exit0 actual PASS, no issues/followups. Seven-doc links/anchors/DAG and whitespace PASS; contract scope only.
-- [ ] YT-288: built-in Core composition and generic Host defaults.
+- [x] YT-288: [built-in Core composition and generic Host defaults](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes) implemented; 21+14 Core and 17 adapter tests, 11 doctests, five-Host consumer, strict Clippy/rustdoc/Fmt and native/Wasm compile checks pass. R1 owner-drop waker-cycle finding fixed and regression checked; configured independent R2 `wc_job_EGI9SDVODJoAu71u` terminal exit0 actual PASS, no issues/followups; nine-doc links/anchors/DAG and whitespace PASS.
 - [ ] YT-289: optional View/HTML and Browser DOM feature migration.
 - [ ] YT-290: optional Web module and HTTP protocol separation.
 - [ ] YT-291: shared Web lifecycle with caller-runtime and owned-thread drivers.

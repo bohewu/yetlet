@@ -1,6 +1,6 @@
 # M28 — Layered Hosts and ResourceGroup Lifecycle Design
 
-**Status:** Owner-selected feature-first direction; YT-287 target contract independently reviewed and Done, with YT-288–294 implementation gates open.
+**Status:** Owner-selected feature-first direction; YT-287 contract and YT-288 Core implementation Done; YT-289–294 gates open.
 **Date:** 2026-11-21.
 **Tracking:** YT-286 public-delivery umbrella; ordered remaining items YT-287–294.
 **Decision:** [ADR 0014](adr/0014-layered-host-resource-lifecycle.md).
@@ -1099,5 +1099,166 @@ including cancellation-safe owner placement. Later driver acceptance is YT-291;
 Native/UDP/public adapter qualification is YT-292. The private four-Host limit,
 live managed-owner adoption, arbitrary resource DAGs, automatic pools,
 process placement and broad platform qualification are not silently promoted.
+
+## 16. YT-288 — built-in Core Host lifetimes
+
+**Source baseline:** YT-287 commit `23f8d3df97b082365e6c9970bd7f48ef270d8da7`.
+**Scope:** Core implementation and compiling consumer; independently reviewed and complete at this scope.
+This section records the implemented Core surface. Section 15 continues to own
+the later Web, View, native and publication gates.
+
+### 16.1 Built-in surface and minimal dependencies
+
+Core composition is now available without a Cargo feature. The obsolete
+`composition` feature and its active dependency/test/example selections are
+removed. Root exports are `yetlet::{HostGroup, Host, ResourceGroup}`; advanced
+types remain under `yetlet::composition`. No extra SDK package is introduced.
+
+The current checkout still defaults to HTML and still exports View
+unconditionally. YT-289 changes both with Browser wiring. The independent
+[normal consumer](../examples/external-consumers/yt288-core-hosts/Cargo.toml)
+selects `default-features = false`; its normal/build dependency graph contains
+only that consumer and yetlet. This proves no mandatory runtime, HTTP, serde,
+Winit or wgpu dependency; it does not yet prove View exclusion or registry
+package qualification.
+
+### 16.2 Concrete public extension contract
+
+[HostGroup and Host](../crates/yetlet/src/composition/hosts.rs) use a recursive,
+statically typed list. There is no fixed one-to-four limit, erased resource
+registry or blanket Send/Sync/'static bound. Each group uses a common
+application-selected error type. A custom adapter maps its own concrete errors
+into that type when needed; Core does not require io::Error, Error, Clone,
+boxing or string conversion.
+
+A Host supplies its diagnostic name, optional inert validation and exact
+exclusive claims, then returns `ResourceGroup<Activity, Resources>`. The
+activity implements HostActivity; explicit resource descriptors implement
+ManagedResource. ResourceGroup::new(activity) uses no extra resource management
+configuration. Advanced callers append passive owned/borrowed values with
+with_resource and inert acquire/release descriptors with with_managed_resource.
+The provided ResourcePlan lists are sealed implementation support, not another
+lifecycle-extension engine.
+
+new, with_host and build acquire nothing. build validates the entire plan
+before conversion. Equal exclusive-claim kind/key pairs reject the inert plan
+with both Host names. Claims do not canonicalize endpoints, reserve OS
+resources or detect an event loop created outside the group; actual adapter
+acquisition retains that responsibility.
+
+The compiling [external example](../examples/external-consumers/yt288-core-hosts/src/main.rs)
+creates five different typed Host plans, a borrowed mutable managed journal,
+local Rc values, borrowed configuration and an application error borrowing
+a runtime-created string. It also compiles generic builder/driver helpers
+against the provided sealed HostList/HostParts bounds. Custom authors implement
+Host, HostActivity and ManagedResource, never the private traversal.
+
+### 16.3 Retained owner and caller-owned driving
+
+build returns BuiltHostGroup. Its relevant operations are:
+
+| Operation | Actual Core behavior |
+|---|---|
+| poll_start(cx) | Progress ordered acquisition and observed readiness; return Pending or StartStatus. Started activities remain observed while a later Host is Pending. Only all-ready plans open normal admission. |
+| poll_run(cx) | Progress startup, every running activity and coordinated shutdown once. The first observed activity termination stops the group; its actual outcome still belongs to original Join. |
+| run_async(&mut self) | Borrowing std Future drive over poll_run. No runtime, timer, thread or sleep loop. Returns only after terminal cleanup, borrowing the primary HostFailure on failure. |
+| request_shutdown() / ShutdownHandle | Request coordinated stop; the shared handle wakes the currently registered drive. No cleanup task or owner transfer is created. |
+| poll_shutdown(cx, deadline) | Advance the same Core barrier with a real wake context and cooperative absolute deadline. Pending retains original obligations. |
+| shutdown_until(deadline) | One explicitly caller-driven pass with a no-op wake context. The caller arranges another event/poll when necessary. |
+| failures() / outcomes() | Borrow original primary/secondary errors and inspect startup-attempt, Join and activity-release outcomes without replacing owners. |
+
+There is no generic synchronous run loop in this Core slice. Concrete native
+or owned-thread Web drivers remain YT-291/292 work. The generic borrowing
+run_async entry is implemented, but it is not evidence that current Web/native
+adapters already implement the new Host trait.
+
+HostActivity stores partial startup and terminal execution outcomes before
+returning. poll_finished reports availability of termination only; poll_join
+transfers the actual result exactly once. Core stores the error itself, with
+Host/resource/operation context. A terminal execution error is distinct from a
+retryable observation error.
+
+Admission fences and stop requests are bounded synchronous operations. They
+receive the current Context so a retryable error can register notification for
+later progress. They must not report success before the fence/signal exists.
+Drain and original completion are polled separately. Pending or retryable error
+must arrange a wake, or the application must explicitly arrange a future poll;
+Core does not install a polling timer or promise progress from an inert waker.
+RawWaker clone/drop/wake callbacks run outside the shutdown-handle mutex.
+
+### 16.4 One shutdown engine and cancellation boundaries
+
+The [Composition coordinator](../crates/yetlet/src/composition/mod.rs) remains
+authoritative. The private callback adaptation passes Context through existing
+admission, signal, original observation and final-release traversal. The public
+advanced synchronous callback signatures and their local close-before-worker
+semantics remain unchanged; no legacy Local callback is relabelled as a
+post-Join resource finalizer. The new default/custom Host path uses its
+intent-specific names without required_* markers or compatibility aliases.
+
+All admission must close before any local stop or activity signal. Observation
+can join an already-finished original even when signalling failed. Every local
+close and original Join across the whole group must complete before final
+release. Activities retire before their earlier dependencies; resources and
+groups release in reverse order. Pending and retryable release error block
+earlier dependencies. Released(Err) is terminal, is recorded once and does not
+repeat a completed finalizer.
+
+Acquisition-attempt state is stored before the first descriptor poll, so even
+partially acquired descriptors participate in rollback. Later unattempted
+descriptors skip managed release. Original activities, managed descriptors,
+in-flight state and original errors stay in the retained owner rather than
+inside a disposable borrowing drive.
+
+The focused cancellation test drops and recreates only run_async's borrowing
+future at pending acquisition, activity start, readiness, running, original
+Join, activity release and resource release. It verifies the same owner's
+completion without reacquisition. This establishes the Core/custom-extension
+storage path; Web/Tokio cancellation during its actual driver operations remains
+YT-291's separate acceptance.
+
+Dropping the owner clears Core's waker registration outside its mutex, then
+performs ordinary Rust field destruction. It does not signal, join or run
+managed finalizers and may detach an application-supplied worker. The caller
+must keep that owner outside a cancelled task/scope.
+Callbacks must obey their nonblocking, retained-owner and truthful-completion
+contracts; Core does not catch panics, preempt callbacks or guarantee that an
+uncooperative operation terminates.
+
+### 16.5 Verification and delivery boundary
+
+The changed Core tests cover inert validation, known exclusive claims, pending
+readiness, earlier termination during later startup, original non-Clone error
+identity, global Join/release ordering, partial-acquisition rollback, seven
+cancellation points, current-waker fence retries, failed-signal original Join,
+retryable/terminal release, Send/Sync preservation, reentrant waker destruction,
+owner-drop waker-cycle release and the ordinary Drop boundary. Existing lifecycle tests retain real original
+thread handles and legacy callback regression coverage.
+
+Focused native results: 21 existing composition tests, 14 HostGroup tests,
+11 no-default doctests, 8 UDP and 9 Web adapter tests pass. The separate
+five-Host executable, its generic driver helpers and minimal normal/build graph
+pass. Strict Core/consumer Clippy, changed-source formatting, private/Audit/compat
+consumer compilation and Browser wasm32 compilation pass. Wasm is compile-only
+evidence, not browser execution or a qualified browser Host driver.
+
+The original Clippy type-complexity and test-Waker lint failures are retained;
+an internal type alias and meaningful fixture wake behavior repair them. Strict
+rustdoc initially found 92 invalid-HTML diagnostics in the unchanged typed-tag
+macro. Backticks in its two generated documentation strings fix that actual
+documentation defect without changing View behavior; strict rustdoc now passes.
+Independent R1 found a Core waker/ShutdownHandle reference cycle on owner Drop.
+The owner now clears its registration without lifecycle callbacks; a Weak-based
+regression verifies destruction after one poll, without replacement polling or
+explicit shutdown. Focused tests, consumer execution, strict Clippy and doctests
+pass after the fix. Configured independent R2 `wc_job_EGI9SDVODJoAu71u`
+terminated exit0 with actual PASS, issues=[] and required_followups=[]. Nine-doc
+links/anchors, the backlog dependency DAG and whitespace checks pass. YT-288 is
+Done at this Core implementation scope; completion-only annotations follow review.
+Receipts are retained under `.pipeline-output/m28-yt288-20261121/`.
+
+Published alpha.8, CLI versions, pinned reader, Web/native adapter delivery,
+normal archive qualification and physical LAN evidence are unchanged. The next
+ordered item after YT-288 is YT-289.
 
 

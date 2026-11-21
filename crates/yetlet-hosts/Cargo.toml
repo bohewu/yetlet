@@ -16,7 +16,7 @@ native-winit = ["dep:winit"]
 renderer-wgpu = ["dep:wgpu"]
 
 [dependencies]
-yetlet = { path = "../yetlet", default-features = false, features = ["server-axum", "composition"], optional = true }
+yetlet = { path = "../yetlet", default-features = false, features = ["server-axum"], optional = true }
 axum = { version = "=0.8.9", optional = true }
 tokio = { version = "=1.53.3", default-features = false, features = ["rt", "net", "sync", "time"], optional = true }
 winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }
@@ -24,7 +24,7 @@ wgpu = { version = "=27.0.1", default-features = false, features = ["std", "vulk
 
 
 [dev-dependencies]
-yetlet = { path = "../yetlet", default-features = false, features = ["composition"] }
+yetlet = { path = "../yetlet", default-features = false }
 
 [[test]]
 name = "web_axum"

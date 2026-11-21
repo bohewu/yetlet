@@ -4,10 +4,11 @@
 //! do not have independent schedulers or stop/join state machines.
 
 use super::{
-    Attached, Builder, Completion, Failures, JoinStatus, PartMut, PartsMut, Worker,
-    WorkerCompletion,
+    Attached, Builder, Completion, ContextCallback, Failures, JoinStatus, ObserveOp, PartMut,
+    PartsMut, ReleaseOp, RequestOp, Worker, WorkerCompletion,
     lifecycle::{Chain, Part},
 };
+use std::task::Context;
 use std::time::{Duration, Instant};
 
 /// Progress of final resource release, distinct from successful application exit.
@@ -53,6 +54,9 @@ impl<T, R> Resource<T, R> {
     pub fn value(&self) -> Option<&T> {
         self.value.as_ref()
     }
+    pub(super) fn driver_value_mut(&mut self) -> Option<&mut T> {
+        self.value.as_mut()
+    }
     pub fn release_status(&self) -> ReleaseStatus {
         self.status
     }
@@ -76,6 +80,12 @@ impl<T, A, S, O, R> ManagedWorker<T, A, S, O, R> {
     }
     pub fn value(&self) -> &T {
         self.worker.value()
+    }
+    pub(super) fn driver_value_mut(&mut self) -> &mut T {
+        &mut self.worker.value
+    }
+    pub(super) fn mark_ready_for_driver(&mut self) {
+        self.worker.ready = true;
     }
     pub fn is_ready(&self) -> bool {
         self.worker.is_ready()
@@ -113,7 +123,7 @@ impl<P> Group<P> {
     pub fn parts(&self) -> &P {
         self.parts.as_ref().expect("owned group parts")
     }
-    fn parts_mut(&mut self) -> &mut P {
+    pub(super) fn parts_mut(&mut self) -> &mut P {
         self.parts.as_mut().expect("owned group parts")
     }
 }
@@ -150,6 +160,16 @@ impl<T, A, S, O, R> PartMut<'_, ManagedWorker<T, A, S, O, R>> {
 pub type ActivityBuilder<E, P, T, A, S, O, R> =
     Builder<E, Attached<P, ManagedWorker<T, A, S, O, R>>>;
 
+pub(crate) type PolledActivityBuilder<E, P, T, A, S, O, R> = ActivityBuilder<
+    E,
+    P,
+    T,
+    ContextCallback<A>,
+    ContextCallback<S>,
+    ContextCallback<O>,
+    ContextCallback<R>,
+>;
+
 impl<E, P> Builder<E, P> {
     /// Retain a supplied resource until final release after all original Joins.
     ///
@@ -167,6 +187,30 @@ impl<E, P> Builder<E, P> {
     ) -> Builder<E, Attached<P, Resource<T, R>>>
     where
         R: FnMut(&mut T, Duration) -> Result<ReleaseCompletion<E>, E>,
+    {
+        self.with_resource_op(label, value, release)
+    }
+
+    pub(crate) fn with_polled_resource<T, R>(
+        self,
+        label: &'static str,
+        value: T,
+        release: R,
+    ) -> Builder<E, Attached<P, Resource<T, ContextCallback<R>>>>
+    where
+        R: FnMut(&mut T, &mut Context<'_>, Duration) -> Result<ReleaseCompletion<E>, E>,
+    {
+        self.with_resource_op(label, value, ContextCallback { callback: release })
+    }
+
+    fn with_resource_op<T, R>(
+        self,
+        label: &'static str,
+        value: T,
+        release: R,
+    ) -> Builder<E, Attached<P, Resource<T, R>>>
+    where
+        R: ReleaseOp<T, E>,
     {
         self.push(Resource {
             value: Some(value),
@@ -195,6 +239,51 @@ impl<E, P> Builder<E, P> {
         S: FnMut(&mut T) -> Result<(), E>,
         O: FnMut(&mut T, Duration) -> Result<WorkerCompletion<E>, E>,
         R: FnMut(&mut T, Duration) -> Result<ReleaseCompletion<E>, E>,
+    {
+        self.with_activity_ops(label, value, admission, signal, observe, release)
+    }
+
+    pub(crate) fn with_polled_activity<T, A, S, O, R>(
+        self,
+        label: &'static str,
+        value: T,
+        admission: A,
+        signal: S,
+        observe: O,
+        release: R,
+    ) -> PolledActivityBuilder<E, P, T, A, S, O, R>
+    where
+        A: FnMut(&mut T, &mut Context<'_>) -> Result<(), E>,
+        S: FnMut(&mut T, &mut Context<'_>) -> Result<(), E>,
+        O: FnMut(&mut T, &mut Context<'_>, Duration) -> Result<WorkerCompletion<E>, E>,
+        R: FnMut(&mut T, &mut Context<'_>, Duration) -> Result<ReleaseCompletion<E>, E>,
+    {
+        self.with_activity_ops(
+            label,
+            value,
+            ContextCallback {
+                callback: admission,
+            },
+            ContextCallback { callback: signal },
+            ContextCallback { callback: observe },
+            ContextCallback { callback: release },
+        )
+    }
+
+    fn with_activity_ops<T, A, S, O, R>(
+        self,
+        label: &'static str,
+        value: T,
+        admission: A,
+        signal: S,
+        observe: O,
+        release: R,
+    ) -> ActivityBuilder<E, P, T, A, S, O, R>
+    where
+        A: RequestOp<T, E>,
+        S: RequestOp<T, E>,
+        O: ObserveOp<T, E>,
+        R: ReleaseOp<T, E>,
     {
         self.push(ManagedWorker {
             worker: Worker {
@@ -231,16 +320,21 @@ fn advance_release<T, E, R>(
     value: &mut T,
     release: &mut R,
     status: &mut ReleaseStatus,
+    cx: &mut Context<'_>,
     deadline: Instant,
     failures: &mut Failures<E>,
 ) -> Completion
 where
-    R: FnMut(&mut T, Duration) -> Result<ReleaseCompletion<E>, E>,
+    R: ReleaseOp<T, E>,
 {
     if *status != ReleaseStatus::Pending {
         return Completion::Complete;
     }
-    match release(value, deadline.saturating_duration_since(Instant::now())) {
+    match release.release(
+        value,
+        cx,
+        deadline.saturating_duration_since(Instant::now()),
+    ) {
         Ok(ReleaseCompletion::Pending) => Completion::Pending,
         Err(error) => {
             failures.record(error);
@@ -261,13 +355,18 @@ where
 
 impl<E, T, R> Part<E> for Resource<T, R>
 where
-    R: FnMut(&mut T, Duration) -> Result<ReleaseCompletion<E>, E>,
+    R: ReleaseOp<T, E>,
 {
     fn ready(&self) -> bool {
         self.status == ReleaseStatus::Pending
     }
 
-    fn release(&mut self, deadline: Instant, failures: &mut Failures<E>) -> Completion {
+    fn release(
+        &mut self,
+        cx: &mut Context<'_>,
+        deadline: Instant,
+        failures: &mut Failures<E>,
+    ) -> Completion {
         let Some(value) = self.value.as_mut() else {
             return Completion::Complete;
         };
@@ -275,6 +374,7 @@ where
             value,
             &mut self.release,
             &mut self.status,
+            cx,
             deadline,
             failures,
         );
@@ -287,31 +387,42 @@ where
 
 impl<E, T, A, S, O, R> Part<E> for ManagedWorker<T, A, S, O, R>
 where
-    A: FnMut(&mut T) -> Result<(), E>,
-    S: FnMut(&mut T) -> Result<(), E>,
-    O: FnMut(&mut T, Duration) -> Result<WorkerCompletion<E>, E>,
-    R: FnMut(&mut T, Duration) -> Result<ReleaseCompletion<E>, E>,
+    A: RequestOp<T, E>,
+    S: RequestOp<T, E>,
+    O: ObserveOp<T, E>,
+    R: ReleaseOp<T, E>,
 {
     fn ready(&self) -> bool {
         Part::ready(&self.worker)
     }
-    fn close_admission(&mut self, failures: &mut Failures<E>) -> bool {
-        Part::close_admission(&mut self.worker, failures)
+    fn close_admission(&mut self, cx: &mut Context<'_>, failures: &mut Failures<E>) -> bool {
+        Part::close_admission(&mut self.worker, cx, failures)
     }
     fn close_local(&mut self, failures: &mut Failures<E>) -> bool {
         Part::close_local(&mut self.worker, failures)
     }
-    fn signal(&mut self, failures: &mut Failures<E>) -> bool {
-        Part::signal(&mut self.worker, failures)
+    fn signal(&mut self, cx: &mut Context<'_>, failures: &mut Failures<E>) -> bool {
+        Part::signal(&mut self.worker, cx, failures)
     }
-    fn observe(&mut self, deadline: Instant, failures: &mut Failures<E>) -> Completion {
-        Part::observe(&mut self.worker, deadline, failures)
+    fn observe(
+        &mut self,
+        cx: &mut Context<'_>,
+        deadline: Instant,
+        failures: &mut Failures<E>,
+    ) -> Completion {
+        Part::observe(&mut self.worker, cx, deadline, failures)
     }
-    fn release(&mut self, deadline: Instant, failures: &mut Failures<E>) -> Completion {
+    fn release(
+        &mut self,
+        cx: &mut Context<'_>,
+        deadline: Instant,
+        failures: &mut Failures<E>,
+    ) -> Completion {
         advance_release(
             &mut self.worker.value,
             &mut self.release,
             &mut self.status,
+            cx,
             deadline,
             failures,
         )
@@ -322,19 +433,29 @@ impl<E, P: Chain<E>> Part<E> for Group<P> {
     fn ready(&self) -> bool {
         self.parts().all_ready()
     }
-    fn close_admission(&mut self, failures: &mut Failures<E>) -> bool {
-        self.parts_mut().close_admission(failures)
+    fn close_admission(&mut self, cx: &mut Context<'_>, failures: &mut Failures<E>) -> bool {
+        self.parts_mut().close_admission(cx, failures)
     }
     fn close_local(&mut self, failures: &mut Failures<E>) -> bool {
         self.parts_mut().close_locals(failures)
     }
-    fn signal(&mut self, failures: &mut Failures<E>) -> bool {
-        self.parts_mut().signal_workers(failures)
+    fn signal(&mut self, cx: &mut Context<'_>, failures: &mut Failures<E>) -> bool {
+        self.parts_mut().signal_workers(cx, failures)
     }
-    fn observe(&mut self, deadline: Instant, failures: &mut Failures<E>) -> Completion {
-        self.parts_mut().observe_owned(deadline, failures)
+    fn observe(
+        &mut self,
+        cx: &mut Context<'_>,
+        deadline: Instant,
+        failures: &mut Failures<E>,
+    ) -> Completion {
+        self.parts_mut().observe_owned(cx, deadline, failures)
     }
-    fn release(&mut self, deadline: Instant, failures: &mut Failures<E>) -> Completion {
-        self.parts_mut().release_owned(deadline, failures)
+    fn release(
+        &mut self,
+        cx: &mut Context<'_>,
+        deadline: Instant,
+        failures: &mut Failures<E>,
+    ) -> Completion {
+        self.parts_mut().release_owned(cx, deadline, failures)
     }
 }

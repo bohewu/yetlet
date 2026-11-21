@@ -1,6 +1,6 @@
 # ADR 0014 — Layered Hosts with Default Resource Lifecycle Management
 
-- **Status:** Owner-selected target direction; YT-287 feature/driver contract independently reviewed, public implementation pending.
+- **Status:** Owner-selected target direction; YT-287 contract and YT-288 Core implementation independently reviewed and Done; remaining capability implementation pending.
 - **Date:** 2026-11-21.
 - **Tracking:** YT-286 umbrella remains Todo; YT-287–294 define the remaining delivery gates.
 - **Decision owner:** Project maintainer.
@@ -109,6 +109,32 @@ capabilities, the App/HostGroup sketches, installed old-CLI/native versus
 Browser risks and the package proof matrix are in the linked contract.
 The earlier proposal and proof records below remain evidence at their original
 scope; this section governs the selected next-alpha direction.
+
+## YT-288 implementation checkpoint — built-in Core
+
+The [Core implementation](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes) now exposes HostGroup, Host and
+ResourceGroup without a composition feature opt-in. A recursive typed Host list
+replaces the private tuple limit, with one application error type and no mandatory
+Error/Clone/Send/Sync/'static bound. Custom HostActivity/ManagedResource polling
+stores partial owners and cleanup state in the retained group.
+
+Context-aware callback adapters use the existing Composition admission,
+local-stop, original-Join and reverse-final-release coordinator. Bounded fence
+and signal requests receive wake context for retry. Earlier started activities
+remain observed while later startup is Pending. Build only validates exact known
+exclusive claims; actual platform availability still belongs to acquisition.
+
+BuiltHostGroup offers caller polling and a borrowing, executor-neutral run_async.
+Core creates no runtime, thread, timer or sleep driver. Cancelling that borrowing
+future preserves the root; dropping the owner does not complete shutdown.
+The five-Host independent consumer and targeted Core cancellation/ownership
+tests are implementation evidence, not qualification of Web or native drivers.
+
+YT-288 is Done at the independently reviewed Core implementation scope; the
+[completion record](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#165-verification-and-delivery-boundary)
+retains the R1 finding, repair and R2 PASS. HTML defaults/View exports remain for YT-289's coordinated Browser
+transition. The existing two-package SDK cohort and all published identities
+remain unchanged; no new adapter or release claim is made.
 
 ## Context
 
