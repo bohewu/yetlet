@@ -25,7 +25,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use tokio::sync::oneshot;
-use yetlet::server_axum::App;
+use yetlet::web::App;
 use yetlet_composable_host_research::simulation::{Command, Snapshot};
 
 const HTTP_READY_REQUEST: &[u8] =

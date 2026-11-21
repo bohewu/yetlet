@@ -21,6 +21,8 @@ This proposal does not accept all of M28-E or ADR 0013 on the owner's behalf. It
 ## 2. Source inventory and remaining gaps
 
 The references below name inspected source at the baseline, not new test results.
+File links follow current source locations; the recorded contracts and evidence
+remain at their original baseline.
 
 | Existing surface | Actual contract | Consequence for F0-A |
 |---|---|---|
@@ -29,7 +31,7 @@ The references below name inspected source at the baseline, not new test results
 | [C1 simulation](../examples/composable-host-research/src/simulation.rs) | Simulation contains Rc<Snapshot>; HeadlessRunner drives its single reducer with explicit logical ticks and at most 32 validated commands per tick | Preserve caller-local ownership; do not move an existing Simulation across a thread boundary |
 | [C1 demo](../examples/composable-host-research/src/bin/headless-demo.rs) | Two independent simulations compare deterministic replay | Replay comparison is not evidence that two host capabilities share one authoritative state |
 | [Research manifest](../examples/composable-host-research/Cargo.toml) | Independent workspace, publish=false, no external normal dependencies | Headless composition can remain std-only; GPU/Web dependencies need a separate selection |
-| [Axum App](../crates/yetlet/src/server_axum/app.rs) | Owns Router<S>; S denotes missing state. configure/try_configure/with_state/into_router already provide typed composition. serve/serve_on use the caller's Tokio runtime | Preserve the native path; new lifecycle coordination belongs in an optional consumer, not this public facade |
+| [Axum App](../crates/yetlet/src/web/app.rs) | Owns Router<S>; S denotes missing state. configure/try_configure/with_state/into_router already provide typed composition. serve/serve_on use the caller's Tokio runtime | Preserve the native path; new lifecycle coordination belongs in an optional consumer, not this public facade |
 | [Minimal Web example](../crates/yetlet/examples/server_axum/minimal.rs) and [ADR 0011](adr/0011-application-startup-api.md) | Existing API/SSR application can directly call App::serve; custom listener/address/drain control uses into_router and native Axum/Tokio | A composition root must remain optional. Router construction does not imply a listening server |
 | [Yetlet manifest](../crates/yetlet/Cargo.toml) | Default html; server-axum opts into html/Axum/Serde/Tower/Tokio, with Tokio net/rt directly selected | “Pure Web adds no new mandatory dependency” preserves this existing feature selection; it does not mean HTTP has no Tokio or that server-axum omits html |
 | [Actions](../crates/yetlet/src/actions/mod.rs) | ActionExecutor returns the command's response; LocalExecutor invokes its handler; no universal Send bound | Do not redefine public command completion as queue admission |

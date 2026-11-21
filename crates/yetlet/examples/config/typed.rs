@@ -5,8 +5,8 @@ use secrecy::{ExposeSecret, SecretString};
 use serde::Deserialize;
 use std::{net::SocketAddr, path::PathBuf, sync::Arc};
 use yetlet::config::{Loader, SecretFormat};
-use yetlet::server_axum::{App, Page};
 use yetlet::view::View;
+use yetlet::web::{App, Page};
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]

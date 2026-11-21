@@ -3,9 +3,13 @@
 //! Axum owns routing, request extraction, responses, state and Tower execution.
 //! No MVC controller hierarchy, model binder, or parallel router is created.
 
-use crate::server_axum::Page;
+#[cfg(feature = "html")]
 use crate::view::View;
-use std::{borrow::Cow, convert::Infallible, future::Future};
+#[cfg(feature = "html")]
+use crate::web::Page;
+use std::convert::Infallible;
+#[cfg(feature = "html")]
+use std::{borrow::Cow, future::Future};
 
 use axum::{
     Router,
@@ -27,19 +31,14 @@ use tower::{Layer, Service};
 /// Ordinary handler functions return native Axum results, without Controllers.
 ///
 /// ```rust
-/// use axum::{Json, Router, response::Response};
-/// use yetlet::view::View;
-/// use yetlet::server_axum::{App, HtmlPageError, render_page};
+/// use axum::{Json, Router};
+/// use yetlet::web::App;
 ///
-/// async fn home() -> Result<Response, HtmlPageError> {
-///     render_page("Home", &View::text("Hello"))
-/// }
 /// async fn ping() -> Json<&'static str> {
 ///     Json("ready")
 /// }
 ///
 /// let router: Router = App::new()
-///     .get("/", home)
 ///     .group("/api", |api| api.get("/ping", ping))
 ///     .into_router();
 /// ```
@@ -71,7 +70,7 @@ impl App<()> {
     /// owned by your application.
     ///
     /// ```no_run
-    /// use yetlet::server_axum::App;
+    /// use yetlet::web::App;
     ///
     /// async fn home() -> &'static str { "Hello from Yetlet" }
     ///
@@ -84,7 +83,7 @@ impl App<()> {
     /// An application with unresolved state cannot call this method:
     ///
     /// ```compile_fail
-    /// use yetlet::server_axum::App;
+    /// use yetlet::web::App;
     ///
     /// #[derive(Clone)]
     /// struct AppState;
@@ -112,7 +111,7 @@ impl App<()> {
     /// The caller owns and starts the Tokio runtime; this method does not create one.
     ///
     /// ```no_run
-    /// use yetlet::server_axum::App;
+    /// use yetlet::web::App;
     ///
     /// async fn home() -> &'static str { "Hello from Yetlet" }
     ///
@@ -126,7 +125,7 @@ impl App<()> {
     ///
     /// ```no_run
     /// use axum::{Router, routing::get};
-    /// use yetlet::server_axum::App;
+    /// use yetlet::web::App;
     ///
     /// async fn home() -> &'static str { "Hello from Yetlet" }
     ///
@@ -147,7 +146,7 @@ impl App<()> {
         A: tokio::net::ToSocketAddrs,
     {
         let listener = tokio::net::TcpListener::bind(address).await?;
-        axum::serve(listener, self.into_router()).await
+        super::serving::serve_router(listener, self.into_router(), None).await
     }
 }
 
@@ -204,10 +203,11 @@ where
     ///
     /// ```
     /// use yetlet::view::View;
-    /// use yetlet::server_axum::App;
+    /// use yetlet::web::App;
     /// async fn home() -> View { View::text("Hello") }
     /// let app: axum::Router = App::new().page("/", "Home", home).into_router();
     /// ```
+    #[cfg(feature = "html")]
     pub fn page<H, F>(self, path: &str, title: impl Into<Cow<'static, str>>, handler: H) -> Self
     where
         H: Fn() -> F + Clone + Send + Sync + 'static,

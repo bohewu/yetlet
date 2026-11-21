@@ -13,14 +13,15 @@ include = ["src/**", "guides/**", "tests/**", "examples/**", "README.md", "LICEN
 default = []
 view = []
 html = ["view"]
-actions = ["dep:serde"]
+actions = []
+actions-http = ["actions", "dep:serde"]
 reactive = []
-server-axum = ["html", "dep:axum", "dep:serde", "dep:tower", "dep:tokio"]
-request-id = ["server-axum"]
-session = ["server-axum", "dep:cookie", "dep:getrandom", "dep:subtle"]
+web = ["dep:axum", "dep:serde", "dep:tower", "dep:tokio", "tokio/sync"]
+request-id = ["web"]
+session = ["web", "dep:cookie", "dep:getrandom", "dep:subtle"]
 auth = ["dep:axum"]
 auth-session = ["auth", "session"]
-session-redis = ["server-axum", "tokio/macros", "tokio/rt-multi-thread", "tokio/sync", "tokio/time", "dep:redis", "dep:serde", "dep:serde_json", "dep:getrandom", "dep:sha2", "dep:subtle"]
+session-redis = ["web", "tokio/macros", "tokio/rt-multi-thread", "tokio/sync", "tokio/time", "dep:redis", "dep:serde", "dep:serde_json", "dep:getrandom", "dep:sha2", "dep:subtle"]
 session-redis-tls = ["session-redis", "redis/tokio-rustls-comp", "dep:rustls"]
 config = ["dep:serde", "dep:toml", "dep:dotenvy", "dep:libc"]
 secrets = ["dep:secrecy"]
@@ -76,31 +77,31 @@ name = "composition_local"
 
 [[test]]
 name = "server_axum_handler_results"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[test]]
 name = "server_axum_http_pipeline"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[test]]
 name = "server_axum_configuration"
-required-features = ["server-axum"]
+required-features = ["web"]
 
 [[test]]
 name = "server_axum_app_builder"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[test]]
 name = "server_axum_app_serve"
-required-features = ["server-axum"]
+required-features = ["web"]
 
 [[test]]
 name = "server_axum_prelude"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[test]]
 name = "server_axum_public_api_compat"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[test]]
 name = "request_id_opt_in"
@@ -112,11 +113,11 @@ required-features = ["auth"]
 
 [[test]]
 name = "auth_authentication"
-required-features = ["auth", "server-axum"]
+required-features = ["auth", "web", "html"]
 
 [[test]]
 name = "auth_session_http"
-required-features = ["auth-session"]
+required-features = ["auth-session", "html"]
 
 [[test]]
 name = "session_redis_provider"
@@ -149,22 +150,22 @@ required-features = ["rate-limit"]
 [[example]]
 name = "server-axum-minimal"
 path = "examples/server_axum/minimal.rs"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[example]]
 name = "config-secrets-state"
 path = "examples/config/secrets_state.rs"
-required-features = ["config", "secret-provider", "server-axum"]
+required-features = ["config", "secret-provider", "web", "html"]
 
 [[example]]
 name = "config-secret-provider"
 path = "examples/config/secret_provider.rs"
-required-features = ["config", "secret-provider", "server-axum"]
+required-features = ["config", "secret-provider", "web", "html"]
 
 [[example]]
 name = "config-typed"
 path = "examples/config/typed.rs"
-required-features = ["config", "server-axum"]
+required-features = ["config", "web", "html"]
 
 [[example]]
 name = "secrets-azure-cli"

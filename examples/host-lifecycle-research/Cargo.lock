@@ -638,16 +638,6 @@ dependencies = [
  "tempfile",
  "tokio",
  "yetlet",
- "yetlet-hosts",
-]
-
-[[package]]
-name = "yetlet-hosts"
-version = "0.9.0-alpha.8"
-dependencies = [
- "axum",
- "tokio",
- "yetlet",
 ]
 
 [[package]]

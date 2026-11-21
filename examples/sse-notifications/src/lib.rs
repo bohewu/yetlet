@@ -26,7 +26,7 @@ use axum::{
 use futures_util::{Stream, StreamExt, stream};
 use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc;
-use yetlet::server_axum::App;
+use yetlet::web::App;
 
 const REPLAY_CAPACITY: usize = 16;
 const SUBSCRIBER_QUEUE_CAPACITY: usize = 4;

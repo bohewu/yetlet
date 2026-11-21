@@ -12,11 +12,11 @@ use axum::{
     response::{IntoResponse, Redirect, Response},
 };
 use serde::Deserialize;
-use yetlet::server_axum::{App, Page};
 use yetlet::session::{
     Session, SessionConfig, SessionConfigError, SessionError, SessionManager, SessionUpdateError,
 };
 use yetlet::view::{Element, View};
+use yetlet::web::{App, Page};
 
 const MAX_FORM_BODY: usize = 2 * 1024;
 const MAX_LINES: usize = 3;

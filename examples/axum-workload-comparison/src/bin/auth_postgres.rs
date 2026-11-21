@@ -27,11 +27,11 @@ use std::{
 };
 use tokio::time::timeout;
 use yetlet::auth::{Authenticated, Authentication, Principal, ResolveFuture, authenticate};
-use yetlet::view::{Element, View};
-use yetlet::server_axum::{App, DEFAULT_CSP, DocumentMetadata, LanguageTag, Page};
 use yetlet::session_redis::{
     RedisSession, RedisSessionConfig, RedisSessionError, RedisSessionManager, session_middleware,
 };
+use yetlet::view::{Element, View};
+use yetlet::web::{App, DEFAULT_CSP, DocumentMetadata, LanguageTag, Page};
 
 #[cfg(feature = "auth-workload-observation")]
 #[path = "auth_postgres/observation.rs"]

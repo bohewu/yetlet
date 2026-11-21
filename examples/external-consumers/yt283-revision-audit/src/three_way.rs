@@ -22,9 +22,10 @@ use std::{
     },
     time::Duration,
 };
+use yetlet::web::HttpWorker;
 use yetlet_hosts::{
     udp::{SendOutcome, UdpEndpoint},
-    web_axum::{AdmissionError, CommandBridge, CommandIngress, HttpWorker, SnapshotReader},
+    web_axum::{AdmissionError, CommandBridge, CommandIngress, SnapshotReader},
 };
 
 pub const IO_BUDGET: Duration = Duration::from_millis(400);

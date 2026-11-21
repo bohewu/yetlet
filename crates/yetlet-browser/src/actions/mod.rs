@@ -1,9 +1,8 @@
 //! Browser HTTP executor using shared Yetlet action contracts.
 #[cfg(target_arch = "wasm32")]
 use serde::Serialize;
-pub use yetlet::actions::{
-    ActionError, ActionExecutor, ApiErrorBody, ApiErrorEnvelope, Command, LocalExecutor,
-};
+pub use yetlet::actions::{ActionExecutor, Command, LocalExecutor};
+pub use yetlet::actions_http::{ActionError, ApiErrorBody, ApiErrorEnvelope};
 /// A remote executor is always explicit and only accepts same-origin paths.
 #[derive(Debug, Clone)]
 pub struct HttpExecutor {
@@ -37,7 +36,9 @@ where
     C: Command + Serialize,
     C::Response: serde::de::DeserializeOwned,
 {
-    async fn execute(&self, command: C) -> Result<C::Response, ActionError> {
+    type Error = ActionError;
+
+    async fn execute(&self, command: C) -> Result<C::Response, Self::Error> {
         use wasm_bindgen::{JsCast, JsValue};
         use wasm_bindgen_futures::JsFuture;
         use web_sys::{Request, RequestInit, Response};
@@ -95,7 +96,9 @@ mod tests {
 
     #[tokio::test]
     async fn local_executor_maps_typed_input_and_output() {
-        let executor = LocalExecutor::new(|increment: Increment| Ok(Updated(increment.0 + 1)));
+        let executor = LocalExecutor::new(|increment: Increment| {
+            Ok::<_, std::convert::Infallible>(Updated(increment.0 + 1))
+        });
         assert_eq!(executor.execute(Increment(41)).await, Ok(Updated(42)));
     }
 

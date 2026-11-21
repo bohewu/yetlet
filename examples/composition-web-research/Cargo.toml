@@ -10,7 +10,7 @@ description = "F0-B2 private opt-in native Axum composition consumer"
 [workspace]
 
 [dependencies]
-yetlet = { path = "../../crates/yetlet", default-features = false, features = ["server-axum"] }
+yetlet = { path = "../../crates/yetlet", default-features = false, features = ["web", "html"] }
 axum = "=0.8.9"
 tokio = { version = "=1.53.3", features = ["rt", "macros", "net", "time", "sync"] }
 

@@ -18,7 +18,7 @@ use std::{
     },
     time::Duration,
 };
-use yetlet_hosts::web_axum::HttpWorker;
+use yetlet::web::HttpWorker;
 
 #[derive(Default)]
 struct WebState {

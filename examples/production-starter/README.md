@@ -306,10 +306,11 @@ into a separate local directory and verify the application can open it before
 switching an instance. This example does not qualify network filesystems,
 multiple replicas, migration rollback, long-load performance or HA.
 
-Copy this directory and retain its `Cargo.lock`. Until Yetlet is published, adjust
-the five Yetlet dependency paths in `Cargo.toml` to your framework checkout;
-`yetlet::server_axum` resolves its companion local crates there. No registry
-release is assumed. Application-specific SQL lives in `migrations/`, settings in
+Copy this directory and retain its `Cargo.lock`. This sample uses the current
+source checkout: adjust the `yetlet` dependency path in `Cargo.toml` to your
+framework checkout. Its `web` and `html` features provide `yetlet::web` and SSR;
+other native capabilities remain explicitly selected. Published SDK alpha.8 is
+unchanged by this source migration. Application-specific SQL lives in `migrations/`, settings in
 `src/config.rs`, handlers/views in `src/web.rs`, persistence in `src/store.rs`,
 and startup/signal ownership in `src/main.rs`. There is no ORM, DI container or
 required Controller. Authentication, pagination and deletion are later app choices.

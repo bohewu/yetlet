@@ -36,13 +36,15 @@
 //! |---|---|
 //! | `view` | `view`: owned HTML/DOM trees, typed tags and binding metadata; no renderer or runtime |
 //! | `html` | Enables `view`; `html` serializes escaped fragments; HTTP document/header ownership stays separate |
-//! | `server-axum` | `server_axum`: native Axum handlers, pages, routing and Tower interoperability |
+//! | `web` | `web`: native HTTP serving, routing and Tower interoperability; add `html` for pages/SSR |
 //! | `session`, `auth`, `auth-session` | Separate native Session/identity APIs and an explicit Memory Session bridge; business authorization stays application-owned |
 //! | `session-redis`, `session-redis-tls` | Optional native asynchronous remote Session provider and checked TLS transport |
 //! | `request-id`, `rate-limit` | Explicit native request correlation and per-process admission |
 //! | `config`, `secrets`, `secret-provider` | Optional native startup loading, secret lookup and their bridge |
 //! | `signing` | Optional native signing/verifying API with caller-owned trust and OpenSSL prerequisites |
-//! | `actions`, `reactive` | Typed action boundary and synchronous local state graph |
+//! | `actions` | Transport-neutral commands/executors with implementation-owned errors; no serialization dependency |
+//! | `actions-http` | Enables `actions`; shared HTTP action errors and serializable wire envelopes |
+//! | `reactive` | Synchronous local state graph |
 //! | Default Core | `HostGroup` / `Host` / `ResourceGroup`; advanced `composition` ownership, readiness and original completion; no optional dependencies |
 //!
 //! Cargo features make APIs available; application startup installs middleware,
@@ -65,6 +67,8 @@ pub mod view;
 pub use view::{Attribute, Element, View};
 #[cfg(feature = "actions")]
 pub mod actions;
+#[cfg(feature = "actions-http")]
+pub mod actions_http;
 #[cfg(all(feature = "auth", not(target_arch = "wasm32")))]
 pub mod auth;
 pub mod composition;
@@ -81,11 +85,11 @@ pub mod reactive;
 pub mod request_id;
 #[cfg(all(feature = "secrets", not(target_arch = "wasm32")))]
 pub mod secrets;
-#[cfg(all(feature = "server-axum", not(target_arch = "wasm32")))]
-pub mod server_axum;
 #[cfg(all(feature = "session", not(target_arch = "wasm32")))]
 pub mod session;
 #[cfg(all(feature = "session-redis", not(target_arch = "wasm32")))]
 pub mod session_redis;
 #[cfg(all(feature = "signing", not(target_arch = "wasm32")))]
 pub mod signing;
+#[cfg(all(feature = "web", not(target_arch = "wasm32")))]
+pub mod web;

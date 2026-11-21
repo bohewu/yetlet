@@ -10,7 +10,7 @@ description = "Independent package-surface compatibility consumer for Yetlet"
 
 [features]
 default = []
-pure-web = ["yetlet/server-axum", "dep:axum"]
+pure-web = ["yetlet/web", "dep:axum"]
 local-headless = []
 native-udp = ["dep:yetlet-hosts", "dep:winit"]
 

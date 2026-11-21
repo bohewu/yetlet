@@ -215,16 +215,17 @@ requiring implementation proof, not consequences of renaming.
 
 The [feature-first contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
 selects these intentions for the next API. The [YT-288 Core surface](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
-implements HostGroup, Host and ResourceGroup; remaining adapter signatures are
-proof-gated. The private Application spelling above is historical.
+implements HostGroup, Host and ResourceGroup. [YT-290](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership) places HTTP service
+configuration at `yetlet::web::App`; managed WebHost integration remains YT-291
+work. The private Application spelling above is historical.
 
 | Target name / operation | Developer intent and lifecycle meaning |
 |---|---|
 | HostGroup | Group high-level Host lifetimes using the built-in Core coordinator. |
-| yetlet::web::App | Configure an HTTP service; retain Router/Tower interoperability. |
-| yetlet::web::WebHost | Run an HTTP service as a participant in a HostGroup lifetime. App::into_host is the target bridge after missing state is resolved. |
+| yetlet::web::App | Configure an HTTP service; retain Router/Tower interoperability. Available with `web`; Page/View rendering additionally needs `html`. |
+| yetlet::web::WebHost | Planned in YT-291: run an HTTP service as a participant in a HostGroup lifetime. App::into_host is the target bridge after missing state is resolved. |
 | ResourceGroup | Customize typed owned/borrowed resources and explicit acquisition/release behavior. |
-| new / with_host / build | Describe, register and validate an inert plan; none starts a listener, thread or native loop. |
+| HostGroup planning: new / with_host / build | Describe, register and validate an inert plan; none starts a listener, thread or native loop. |
 | with_address | Configure a future Web bind address; actual acquisition belongs to the driver. |
 | serve / serve_on | Execute ordinary HTTP serving on caller-owned Tokio; a cancelled consuming future does not promise managed cleanup. |
 | run / run_async | Drive a compatible HostGroup through its documented synchronous/native or async driver. Managed async driving borrows a retained owner; the adapter must prove cancellation-safe storage. |
@@ -250,6 +251,27 @@ legacy local close-before-worker behavior is not equivalent to post-join
 resource release. Keep Composition as advanced engine vocabulary, not the
 unexplained quickstart entry. No permanent Application or server_axum aliases
 are selected for the breaking target; do not rewrite historical receipts.
+
+### Current checkout Web and Action names — YT-290
+
+Use `web` for the HTTP capability and `App` for HTTP service configuration.
+`HostGroup` names the group lifetime; `ResourceGroup` names custom resource
+ownership. Those names describe different developer intentions. Direct
+`App::serve` / `serve_on` use caller-owned Tokio.
+
+The existing advanced `yetlet::web::HttpWorker` names an owned-thread HTTP
+adapter for custom lifecycle integration. It is not the high-level Host
+quickstart or a new managed `WebHost` API. Keep this distinction explicit while
+YT-291 supplies the managed bridge; moving the adapter does not rename its
+lifecycle operations or add cancellation guarantees.
+
+Neutral `actions` keeps `Command`, `ActionExecutor` and `LocalExecutor`,
+with the executor's associated `Error` naming its own failure contract.
+`actions-http` selects the `actions_http` module and its HTTP
+`ActionError` / API error envelopes. Browser `actions` forwards that protocol
+contract. The [checkout migration](COMPATIBILITY.md#current-checkout--web-and-http-protocol-ownership)
+records the canonical feature/module paths without old aliases. Published
+alpha.8 examples and historical naming receipts retain their original spelling.
 
 ## Dated naming audit dispositions
 

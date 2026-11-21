@@ -1,6 +1,6 @@
 # ADR 0014 — Layered Hosts with Default Resource Lifecycle Management
 
-- **Status:** Owner-selected target direction; YT-287–289 independently reviewed and Done; remaining capabilities pending.
+- **Status:** Owner-selected target direction; YT-287–290 independently reviewed and Done; remaining capabilities pending.
 - **Date:** 2026-11-21.
 - **Tracking:** YT-286 umbrella remains Todo; YT-287–294 define the remaining delivery gates.
 - **Decision owner:** Project maintainer.
@@ -155,6 +155,35 @@ Focused verification and configured independent review `wc_job_THsX4ibX3uyjN_qf`
 issues=[] and required_followups=[]. Published alpha.8/CLI identities remain unchanged.
 Web/protocol isolation, driver integration and general migration retain their
 later task gates; no additional SDK package or compatibility alias is added.
+
+## YT-290 implementation checkpoint — optional Web and HTTP protocol
+
+The [Web/protocol implementation](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership)
+now exposes web independently of HTML. App and the relocated advanced
+HttpWorker use one private serving function; yetlet has no reverse dependency
+on the staging package. Page, document rendering and View-related prelude
+entries require web + html. App keeps resolved-state serving, Router/Tower
+interoperability and its caller-owned runtime.
+
+Actions now choose an associated executor Error without serde or an HTTP
+error dependency. The target-neutral actions-http module preserves the wire
+contract and is selected by Browser actions. Todo, Board and custom TCP
+consumers move together with explicit domain/transport error boundaries.
+HTTP auxiliary features omit HTML while independent narrow features keep
+their existing dependency scope. Old public module/feature aliases are absent.
+
+Focused native tests, 14 isolated native/Wasm consumers and six narrow normal
+graphs, eight disabled-surface probes, migrated consumers and strict quality
+checks pass. The stale-lock failure is repaired without dependency upgrades.
+Independent R1 found an active qualification workflow/test still selecting the
+removed feature. Both now select web; the existing xtask test and actual workflow
+feature compilation pass. Original failed evidence remains; configured independent
+R2 `wc_job_3w96W4sl3X2sGtmx` completed with exit0 and actual PASS,
+issues=[] and required_followups=[]. Scoped documentation checks pass;
+YT-290 is Done at this Web/protocol implementation scope.
+This slice does not implement managed WebHost or new readiness/cancellation
+semantics: those remain YT-291. Published alpha.8, CLI, reader and later
+normal-archive gates retain their existing identities and scopes.
 
 ## Context
 

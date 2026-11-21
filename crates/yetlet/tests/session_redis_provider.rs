@@ -17,11 +17,11 @@ use std::{
     time::Duration,
 };
 use tower::ServiceExt;
-use yetlet::server_axum::App;
 use yetlet::session_redis::{
     RedisOperationStatus, RedisSession, RedisSessionConfig, RedisSessionError as Error,
     RedisSessionManager as Manager, RedisSessionUpdateError as UpdateError,
 };
+use yetlet::web::App;
 
 #[derive(Clone, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]

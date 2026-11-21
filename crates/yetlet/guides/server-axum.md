@@ -1,11 +1,15 @@
-# yetlet::server_axum
+# yetlet::web
 
-Build native HTML pages and JSON endpoints with a small facade over Axum/Tower.
-The server adapter does not install browser, Session or configuration capabilities.
+Build native JSON endpoints and optional HTML pages with a small facade over
+Axum/Tower. The Web capability does not install browser, Session or configuration
+services.
 
-**Experimental SDK `0.9.0-alpha.8` package contents.** Select the
-`server-axum` feature. The commands below run checkout examples; application
-authors can start without cloning using the [first-app guide](https://github.com/bohewu/yetlet/blob/master/docs/FIRST-APP.md).
+**Current-checkout API.** Select `web` for native HTTP and add `html` for SSR.
+Published SDK `0.9.0-alpha.8` still uses the `server-axum` feature and
+`yetlet::server_axum` imports; its artifact has not changed. The commands and
+imports below target this checkout. Registry users should follow the
+[first-app guide](https://github.com/bohewu/yetlet/blob/master/docs/FIRST-APP.md)
+at their selected published revision.
 
 
 ## Prerequisites
@@ -16,28 +20,52 @@ WASM target or optional provider is required for this path.
 
 ## Minimal integration
 
+### Choose the required capability
+
+| Checkout selection | Available surface |
+|---|---|
+| `web` | `App`, native extractors/responses, RequestContext, Router/Tower integration and advanced `HttpWorker`; no View or HTML |
+| `html` | Pure HTML serialization with View; no HTTP serving |
+| `web,html` | Web plus `Page`, `App::page`, document/render helpers and View-related prelude imports |
+
+An API-only application can use the Web prelude or explicit imports without
+enabling HTML:
+
+```rust
+use yetlet::web::{App, response::Json};
+
+async fn status() -> Json<&'static str> {
+    Json("ready")
+}
+
+let app: App = App::new().get("/api/status", status);
+```
+
+Construction does not bind or start a runtime. Call `app.serve().await` from the
+application's Tokio runtime when ready to serve it.
+
 ### Start a native page and JSON API
 
 From the repository root, run the existing complete example:
 
 ```bash
-cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
+cargo run --locked -p yetlet --features web,html --example server-axum-minimal
 ```
 
 The checkout example uses this package's `App::serve()` and opts into the curated
-`yetlet::server_axum::prelude` for imports such as `App`, `View` and `Json`.
+`yetlet::web::prelude` for imports such as `App`, `View` and `Json`.
 `App::serve()` binds exactly to `127.0.0.1:7878` for local plain HTTP, serving
 `/` and `/api/status`. Use `App::serve_on(address)` to choose an explicit bind
 address. All-interface addresses expose the listener on other network interfaces.
 Both methods run on the application's Tokio runtime and return bind errors.
 
 Use `into_router()` and native Tokio/Axum for listener ownership, direct TLS or
-application-owned shutdown with `with_graceful_shutdown`. The following
-explicit-listener example also works with published SDK alpha.7.
+application-owned shutdown with `with_graceful_shutdown`. This checkout
+explicit-listener example requires `web,html`.
 
 ```rust
 use yetlet::view::View;
-use yetlet::server_axum::{App, response::Json};
+use yetlet::web::{App, response::Json};
 
 async fn home() -> View {
     View::text("Hello from Yetlet")
@@ -65,6 +93,20 @@ at `/api/status`. The checkout command uses `http://127.0.0.1:7878/`.
 `Page` produces escaped complete documents with the default strict CSP. Ctrl+C
 stops the foreground listener; a Router setup alone does not bind a listener.
 
+## Execution ownership
+
+`App::serve` and `serve_on` use the caller's Tokio runtime and create no dedicated
+thread. Their consuming futures provide ordinary HTTP serving; cancelling one
+does not promise graceful drain or framework-managed resource finalization.
+
+The advanced `yetlet::web::HttpWorker` is the explicitly selected owned-thread
+alternative. `start` retains the loopback ephemeral-port default; `start_on`
+takes an explicit address. Its HTTP 200 readiness probe is explicit, and the
+caller retains the worker through stop, Pending and observation of the original
+Join. Dropping its handle cannot prove completion. This low-level API retains
+its existing worker contract; managed WebHost drivers and their default
+readiness policy are separate work.
+
 ## Configuration and errors
 
 ### Native interoperability
@@ -81,13 +123,14 @@ Views are escaped through `yetlet::html`. Rendering errors become a generic HTTP
 
 ## API reference
 
-Use the [source/rustdoc entry](../src/server_axum/mod.rs) and [current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md).
+Use the [source/rustdoc entry](../src/web/mod.rs) and [current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md).
 Native upstream routing and extraction contracts remain Axum/Tower-owned.
 
 ### License and compatibility
 
 Dual-licensed under [MIT](https://github.com/bohewu/yetlet/blob/master/LICENSE-MIT) or [Apache-2.0](https://github.com/bohewu/yetlet/blob/master/LICENSE-APACHE).
-This guide describes SDK `0.9.0-alpha.8` contents; APIs remain Experimental. Read
+This guide describes the current checkout; published alpha.8 retains its
+original feature/import contract. APIs remain Experimental. Read
 [compatibility](https://github.com/bohewu/yetlet/blob/master/docs/COMPATIBILITY.md) and the
 [current API reference](https://github.com/bohewu/yetlet/blob/master/docs/API-REFERENCE.md) at the matching revision.
 The historical evidence below retains its original candidate and scope; it does

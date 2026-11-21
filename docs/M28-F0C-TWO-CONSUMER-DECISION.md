@@ -19,7 +19,7 @@ The successful outcome of F0-C is an evidence-based decision. It does not requir
 
 ## 2. Source map and accepted evidence
 
-Line references in this document refer to the inspected HEAD above. They are navigation aids; the ignored source manifest contains SHA256 identities.
+Line references in this document refer to the inspected HEAD above. They are navigation aids; the ignored source manifest contains SHA256 identities. File links follow current source locations; the line references and source identities retain that historical HEAD.
 
 | Key | Inspected source | Relevant locations |
 |---|---|---|
@@ -27,7 +27,7 @@ Line references in this document refer to the inspected HEAD above. They are nav
 | S | [C1 simulation](../examples/composable-host-research/src/simulation.rs) | Simulation owns Rc at 132–169; HeadlessRunner 243–259 |
 | D | [Headless demo](../examples/composable-host-research/src/bin/f0b1-headless-demo.rs) | Concrete synchronous call sequence 7–28 |
 | W | [Pure Web composition](../examples/composition-web-research/src/lib.rs) | SiteState/handlers 14–53; configure_router 55–70; test-only module 72–278; bind 160–172; serving/drain 175–275 |
-| A | [Existing Axum App](../crates/yetlet/src/server_axum/app.rs) | Router ownership 46–48; native state bounds 154–157; into_router 170–173; try_configure 191–198; with_state 277–284 |
+| A | [Existing Axum App](../crates/yetlet/src/web/app.rs) | Router ownership 46–48; native state bounds 154–157; into_router 170–173; try_configure 191–198; with_state 277–284 |
 | HM | [Headless manifest](../examples/composable-host-research/Cargo.toml) | Independent unpublished std-only research workspace |
 | WM | [Web manifest](../examples/composition-web-research/Cargo.toml) and [private lock](../examples/composition-web-research/Cargo.lock) | Independent unpublished workspace; existing server-axum selection, Axum 0.8.9 and Tokio 1.53.3 |
 

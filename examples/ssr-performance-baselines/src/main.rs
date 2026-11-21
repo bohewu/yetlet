@@ -25,7 +25,7 @@ mod page_comparison;
 use std::time::Instant;
 use std::{error::Error, hint::black_box, path::Path};
 use yetlet::view::{Element, View};
-use yetlet::server_axum::{DocumentMetadata, LanguageTag, render_document_with_metadata};
+use yetlet::web::{DocumentMetadata, LanguageTag, render_document_with_metadata};
 
 const CASES: [(&str, usize); 3] = [("small", 8), ("medium", 128), ("large", 1024)];
 const PHASES: [&str; 4] = ["construct", "body", "document", "combined"];

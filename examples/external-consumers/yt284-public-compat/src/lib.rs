@@ -3,7 +3,7 @@
 
 #[cfg(feature = "pure-web")]
 pub fn pure_web_router() -> axum::Router {
-    use yetlet::server_axum::App;
+    use yetlet::web::App;
 
     async fn status() -> &'static str {
         "ready"

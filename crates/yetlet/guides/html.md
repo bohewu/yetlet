@@ -21,7 +21,11 @@ Call `render_to_string(&view)` to receive `Result<String, RenderError>`. Text an
 cargo run --locked -p yetlet-hello-world
 ```
 
-Open `http://127.0.0.1:3003/hello/World`. Use `yetlet::server_axum::Page` with the `server-axum` feature when you need a complete HTTP document with strict CSP; this serializer itself returns a fragment and owns neither response headers nor document metadata.
+Open `http://127.0.0.1:3003/hello/World`. In this checkout, use
+`yetlet::web::Page` with `web,html` when you need a complete HTTP document with
+strict CSP. Published alpha.8 retains `yetlet::server_axum::Page` and its
+`server-axum` feature. This serializer itself returns a fragment and owns neither
+response headers nor document metadata.
 
 ## Policy and errors
 

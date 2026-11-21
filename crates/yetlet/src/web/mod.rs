@@ -1,15 +1,25 @@
-//! Axum HTTP response integration. Yetlet deliberately does not reimplement HTTP.
+//! Optional native Web capabilities over Axum and Tower.
+//!
+//! API-only serving needs `web`. Page/document helpers additionally need `html`.
+//! `App` uses the caller's runtime; the advanced `HttpWorker` owns an explicitly
+//! requested service thread. No thread or runtime is created by enabling a feature.
 
 mod app;
 mod context;
+#[cfg(feature = "html")]
 mod document;
 pub mod middleware;
 pub mod response;
+mod serving;
+mod worker;
 pub use app::App;
 pub use axum::http;
 pub use context::RequestContext;
+#[cfg(feature = "html")]
 pub use document::{DocumentMetadata, LanguageTag, LanguageTagError};
+#[cfg(feature = "html")]
 pub use response::Page;
+pub use worker::HttpWorker;
 
 /// Native Axum extractors; no separate Yetlet model-binding implementation.
 pub mod extract {
@@ -21,46 +31,55 @@ pub mod extract {
 
 /// Common native server imports for small Yetlet applications.
 ///
-/// The prelude is an opt-in convenience; the original explicit paths remain
+/// The prelude is an opt-in convenience; explicit Web module paths remain
 /// available, and advanced Axum/Tower APIs should be imported explicitly.
 ///
 /// ```
-/// use yetlet::server_axum::prelude::*;
+/// use yetlet::web::prelude::*;
 ///
-/// async fn home() -> View { View::text("Hello") }
+/// async fn ping() -> &'static str { "ready" }
 ///
-/// let _app: App = App::new().page("/", "Home", home);
+/// let _app: App = App::new().get("/ping", ping);
 /// ```
 pub mod prelude {
     pub use super::extract::{DefaultBodyLimit, Extension, Form, Path, Query, State};
     pub use super::http::{HeaderMap, HeaderValue, StatusCode};
     pub use super::response::{IntoResponse, Json, Redirect, Response};
+    pub use super::{App, RequestContext};
+    #[cfg(feature = "html")]
     pub use super::{
-        App, DEFAULT_CSP, DocumentMetadata, HtmlPageError, LanguageTag, LanguageTagError, Page,
-        RequestContext, render_document, render_document_with_metadata, render_page,
-        render_page_with_metadata,
+        DEFAULT_CSP, DocumentMetadata, HtmlPageError, LanguageTag, LanguageTagError, Page,
+        render_document, render_document_with_metadata, render_page, render_page_with_metadata,
     };
+    #[cfg(feature = "html")]
     pub use crate::{Attribute, Element, View};
 }
+#[cfg(feature = "html")]
 use crate::html::{RenderError, escape_text, render_to_string};
+#[cfg(feature = "html")]
 use crate::view::View;
+#[cfg(feature = "html")]
 use axum::{
     http::{HeaderValue, StatusCode, header},
     response::{Html, IntoResponse, Response},
 };
 
 /// Strict by default; browser island assets may be loaded from our own origin.
+#[cfg(feature = "html")]
 pub const DEFAULT_CSP: &str = "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
 
+#[cfg(feature = "html")]
 #[derive(Debug)]
 pub struct HtmlPageError(pub RenderError);
 
+#[cfg(feature = "html")]
 impl From<RenderError> for HtmlPageError {
     fn from(error: RenderError) -> Self {
         Self(error)
     }
 }
 
+#[cfg(feature = "html")]
 impl IntoResponse for HtmlPageError {
     fn into_response(self) -> Response {
         // A rendered error should not leak application or template details.
@@ -74,13 +93,14 @@ impl IntoResponse for HtmlPageError {
 
 /// Build a complete HTML document with the legacy default language.
 ///
-/// Existing callers remain source-compatible. Use
-/// [`render_document_with_metadata`] when the root language is explicit.
+/// Use [`render_document_with_metadata`] when the root language is explicit.
+#[cfg(feature = "html")]
 pub fn render_document(title: &str, view: &View) -> Result<String, RenderError> {
     render_document_with_metadata(&DocumentMetadata::new(title), view)
 }
 
 /// Build a complete HTML document from bounded title/language metadata.
+#[cfg(feature = "html")]
 pub fn render_document_with_metadata(
     metadata: &DocumentMetadata,
     view: &View,
@@ -100,11 +120,13 @@ pub fn render_document_with_metadata(
 }
 
 /// Turn a view into a normal HTTP response using the legacy metadata default.
+#[cfg(feature = "html")]
 pub fn render_page(title: &str, view: &View) -> Result<Response, HtmlPageError> {
     render_page_with_metadata(&DocumentMetadata::new(title), view)
 }
 
 /// Turn a view and bounded document metadata into a normal HTTP response.
+#[cfg(feature = "html")]
 pub fn render_page_with_metadata(
     metadata: &DocumentMetadata,
     view: &View,
@@ -118,7 +140,7 @@ pub fn render_page_with_metadata(
     Ok(response)
 }
 
-#[cfg(test)]
+#[cfg(all(test, feature = "html"))]
 mod tests {
     use super::{
         DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document, render_document_with_metadata,

@@ -7,7 +7,7 @@ pub mod style_names;
 
 use serde::{Deserialize, Serialize};
 use style_names::*;
-use yetlet::actions::{ActionError, Command};
+use yetlet::actions::Command;
 use yetlet::view::{Element, View, tags};
 
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
@@ -61,6 +61,33 @@ impl Command for TodoCommand {
     type Response = TodoSnapshot;
 }
 
+/// Failures of the Todo domain transition, independent of its execution mode.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TodoError {
+    Validation(&'static str),
+    NotFound,
+    CapacityReached,
+    RevisionOverflow,
+}
+
+impl TodoError {
+    pub fn code(&self) -> &'static str {
+        match self {
+            Self::Validation(code) => code,
+            Self::NotFound => "not_found",
+            Self::CapacityReached => "capacity_reached",
+            Self::RevisionOverflow => "revision_overflow",
+        }
+    }
+}
+
+impl std::fmt::Display for TodoError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(formatter, "Todo command failed: {}", self.code())
+    }
+}
+impl std::error::Error for TodoError {}
+
 pub const MAX_TODOS: usize = 100;
 pub const MAX_TITLE_LENGTH: usize = 100;
 
@@ -69,21 +96,21 @@ pub const MAX_TITLE_LENGTH: usize = 100;
 pub fn apply_todo_command(
     snapshot: &mut TodoSnapshot,
     command: TodoCommand,
-) -> Result<TodoSnapshot, ActionError> {
+) -> Result<TodoSnapshot, TodoError> {
     let revision = snapshot
         .revision
         .checked_add(1)
-        .ok_or(ActionError::RevisionOverflow)?;
+        .ok_or(TodoError::RevisionOverflow)?;
     match command {
         TodoCommand::Toggle { id } => {
             if id == 0 {
-                return Err(ActionError::Validation("invalid_id"));
+                return Err(TodoError::Validation("invalid_id"));
             }
             let item = snapshot
                 .items
                 .iter_mut()
                 .find(|item| item.id == id)
-                .ok_or(ActionError::NotFound)?;
+                .ok_or(TodoError::NotFound)?;
             item.completed = !item.completed;
         }
         TodoCommand::Create { title } => {
@@ -92,10 +119,10 @@ pub fn apply_todo_command(
                 || trimmed.chars().count() > MAX_TITLE_LENGTH
                 || trimmed.chars().any(char::is_control)
             {
-                return Err(ActionError::Validation("invalid_title"));
+                return Err(TodoError::Validation("invalid_title"));
             }
             if snapshot.items.len() >= MAX_TODOS {
-                return Err(ActionError::CapacityReached);
+                return Err(TodoError::CapacityReached);
             }
             let next_id = snapshot
                 .items
@@ -104,7 +131,7 @@ pub fn apply_todo_command(
                 .max()
                 .unwrap_or(0)
                 .checked_add(1)
-                .ok_or(ActionError::RevisionOverflow)?;
+                .ok_or(TodoError::RevisionOverflow)?;
             snapshot.items.push(Todo {
                 id: next_id,
                 title: trimmed.into(),
@@ -422,11 +449,10 @@ pub fn search_page_with_todos(todos: &[Todo]) -> Result<View, SearchStateError> 
 #[cfg(test)]
 mod tests {
     use super::{
-        SearchStateError, Todo, TodoCommand, TodoSnapshot, apply_todo_command, browser_page,
-        decode_search_state, encode_search_state, filtered_todos, initial_todos, search_page,
-        search_page_with_todos, search_results, todo_list, toggle_first,
+        SearchStateError, Todo, TodoCommand, TodoError, TodoSnapshot, apply_todo_command,
+        browser_page, decode_search_state, encode_search_state, filtered_todos, initial_todos,
+        search_page, search_page_with_todos, search_results, todo_list, toggle_first,
     };
-    use yetlet::actions::ActionError;
     use yetlet::html::render_to_string;
 
     #[test]
@@ -535,11 +561,11 @@ mod tests {
                     title: "   ".to_owned(),
                 },
             ),
-            Err(ActionError::Validation("invalid_title")),
+            Err(TodoError::Validation("invalid_title")),
         );
         assert_eq!(
             apply_todo_command(&mut snapshot, TodoCommand::Toggle { id: 99 }),
-            Err(ActionError::NotFound),
+            Err(TodoError::NotFound),
         );
         assert_eq!(snapshot, before, "rejected actions must not mutate state");
     }

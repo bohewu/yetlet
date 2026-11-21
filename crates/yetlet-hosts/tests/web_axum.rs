@@ -21,9 +21,8 @@ use axum::{
 };
 use tokio::sync::Notify;
 use yetlet::composition::{Builder, Completion, JoinStatus, WorkerCompletion};
-use yetlet_hosts::web_axum::{
-    AdmissionError, CommandBridge, CommandIngress, HttpWorker, SnapshotReader,
-};
+use yetlet::web::HttpWorker;
+use yetlet_hosts::web_axum::{AdmissionError, CommandBridge, CommandIngress, SnapshotReader};
 
 const BUDGET: Duration = Duration::from_secs(4);
 
@@ -232,7 +231,7 @@ fn real_inflight_http_drains_and_original_join_stays_pending_until_release() {
 
 #[test]
 fn existing_direct_pure_web_router_is_still_native_axum() {
-    let router = yetlet::server_axum::App::new()
+    let router = yetlet::web::App::new()
         .get("/ready", || async { "ready" })
         .into_router();
     let mut worker = HttpWorker::start(router).unwrap();

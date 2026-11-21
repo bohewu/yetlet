@@ -1,9 +1,9 @@
 # F0-B2 — Private Pure Web Composition Consumer
 
-This is an independent unpublished, opt-in Cargo workspace using the
-existing Yetlet `server-axum` feature and native Axum/Tower. It does not
-modify the root workspace, Yetlet SDK public API, CLI templates, default
-features or direct `App::serve()` path.
+This is an independent unpublished, opt-in Cargo workspace. The current
+checkout selects Yetlet's `web` and `html` features and imports HTTP APIs from
+`yetlet::web`, using native Axum/Tower. This consumer does not modify the root
+workspace, SDK public API, CLI templates, defaults or direct `App::serve()` path.
 
 The concrete composition root is an ordinary `configure_router(SiteState)`
 function. It uses the already supported `App::<SiteState>::new()`,
@@ -40,6 +40,11 @@ cargo test --manifest-path examples/composition-web-research/Cargo.toml --locked
 cargo clippy --manifest-path examples/composition-web-research/Cargo.toml --all-targets --locked --offline -- -D warnings
 cargo fmt --manifest-path examples/composition-web-research/Cargo.toml --check
 ```
+
+### Original F0-B2 checkpoint
+
+The following scope describes the original proof, before the current
+feature/import migration. It does not qualify the migrated source.
 
 Only the new private Web consumer is selected. Earlier B0–D3/F0-B1
 acceptance is reused, not replayed, because public Yetlet Web/API and

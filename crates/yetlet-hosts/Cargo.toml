@@ -10,21 +10,20 @@ publish = false
 
 [features]
 default = []
-web-axum = ["dep:yetlet", "dep:axum", "dep:tokio"]
+web-axum = []
 udp = []
 native-winit = ["dep:winit"]
 renderer-wgpu = ["dep:wgpu"]
 
 [dependencies]
-yetlet = { path = "../yetlet", default-features = false, features = ["server-axum"], optional = true }
-axum = { version = "=0.8.9", optional = true }
-tokio = { version = "=1.53.3", default-features = false, features = ["rt", "net", "sync", "time"], optional = true }
 winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }
 wgpu = { version = "=27.0.1", default-features = false, features = ["std", "vulkan", "wgsl"], optional = true }
 
 
 [dev-dependencies]
-yetlet = { path = "../yetlet", default-features = false }
+yetlet = { path = "../yetlet", default-features = false, features = ["web"] }
+axum = { version = "=0.8.9" }
+tokio = { version = "=1.53.3", default-features = false, features = ["rt", "net", "sync", "time"] }
 
 [[test]]
 name = "web_axum"

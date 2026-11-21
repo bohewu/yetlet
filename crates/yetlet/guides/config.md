@@ -5,6 +5,10 @@ This native-only module requires the `config` feature; it is not a global
 Settings service. Native APIs are absent from browser Wasm. Publication does
 not establish production qualification.
 
+The commands below use the current checkout: the HTTP/SSR composition example
+explicitly selects `web,html`. Published alpha.8 retains `server-axum` for that
+example. The independent `config` feature enables neither Web nor HTML.
+
 ## Prerequisites
 
 Use source/rustdoc matching your selected SDK version. Select a
@@ -42,15 +46,16 @@ composition. From the repository root, use a synthetic value:
 (
   export YTSECRETS_SERVICE__TOKEN=example
   cargo run --offline --locked -p yetlet --features config \
-    --example config-secrets-state --features secret-provider,server-axum
+    --example config-secrets-state --features secret-provider,web,html
 )
 ```
 
 Expected output: `Example request status: 200 OK`. This example moved from
 `yetlet::secrets`; the provider package no longer depends on Config in tests.
-The public Settings/provider APIs and default feature selection are unchanged.
+The public Settings/provider APIs are unchanged; the checkout example explicitly
+selects its optional Web and HTML capabilities.
 Its focused test target is `cargo test --offline --locked --manifest-path
-crates/yetlet/Cargo.toml --example config-secrets-state --features secret-provider,server-axum`.
+crates/yetlet/Cargo.toml --example config-secrets-state --features secret-provider,web,html`.
 
 `Error` exposes bounded categories, including `Error::Key` for key selection,
 without raw parser/IO diagnostics or secret values. Read the OS-specific file

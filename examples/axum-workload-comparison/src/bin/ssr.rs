@@ -3,8 +3,8 @@
 use axum::{Router, extract::Path, http::StatusCode};
 use yetlet::view::{Element, View};
 #[cfg(not(feature = "ssr-context-study"))]
-use yetlet::server_axum::App;
-use yetlet::server_axum::{DocumentMetadata, LanguageTag, Page};
+use yetlet::web::App;
+use yetlet::web::{DocumentMetadata, LanguageTag, Page};
 
 #[cfg(all(feature = "ssr-stage-probe", feature = "ssr-context-study"))]
 compile_error!("select only one SSR diagnostic feature");

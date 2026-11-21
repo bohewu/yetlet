@@ -10,7 +10,7 @@ use std::sync::{
 };
 use tower::ServiceExt;
 use yetlet::request_id::{HEADER, InvalidStart, RequestId, RequestIds};
-use yetlet::server_axum::{
+use yetlet::web::{
     App, RequestContext,
     extract::Extension,
     http::{Request, StatusCode},

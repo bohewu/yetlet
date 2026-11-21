@@ -55,8 +55,16 @@ keyed-DOM each enable View and their corresponding reexports. Actions/GPU-only
 Browser selections remain independent. Focused verification and configured
 independent review pass; YT-289 is Done. Published alpha.8 is unchanged.
 
-Concrete Web/native drivers, broader external consumers, normal archives and
-next-alpha migration gates remain in the
+[YT-290 Web/protocol ownership](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership)
+now separates web from HTML and neutral actions from actions-http. App and the
+relocated advanced HttpWorker share one Web-owned serving implementation;
+active source consumers use the new module/feature names. Focused native tests,
+isolated feature/target graphs and probes, migrated consumers and strict quality
+checks and configured independent review pass; YT-290 is Done. The moved worker
+retains its existing advanced lifecycle.
+
+Managed WebHost/caller-runtime integration, concrete native drivers, broader
+external consumers, normal archives and next-alpha migration gates remain in the
 [ordered plan](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#14-replanned-public-delivery--yt-287-through-yt-294).
 The research history below retains its original default-feature/API assumptions.
 

@@ -8,7 +8,7 @@ publish = false
 
 [features]
 default = []
-three-way = ["dep:yetlet-hosts", "dep:axum", "dep:winit"]
+three-way = ["yetlet/web", "dep:yetlet-hosts", "dep:axum", "dep:winit"]
 
 [dependencies]
 yetlet = { path = "../../../crates/yetlet", default-features = false }

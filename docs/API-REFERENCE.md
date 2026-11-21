@@ -110,6 +110,23 @@ tags and binding, or html for serialization (which enables view). Browser dom
 and dom-keyed select view and expose the same types; default-off actions/GPU
 selections do not. Published alpha.8 retains its original feature contract.
 
+[YT-290](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership) moves native HTTP to `yetlet::web`. Select `web` for
+routing, middleware and HTTP serving; select `web` plus `html` for `Page`,
+document metadata and View rendering. Web alone does not select View or HTML.
+`App` configures an HTTP service and serves on the caller's Tokio runtime.
+The existing `yetlet::web::HttpWorker` is an advanced owned-thread adapter;
+managed `WebHost` / `App::into_host` remain YT-291 work.
+
+The `actions` feature keeps `Command`, `ActionExecutor` and `LocalExecutor`
+transport-neutral. Executors choose an associated `Error`; local execution
+accepts the caller's error type without requiring serialization. Select
+`actions-http` for `yetlet::actions_http::{ActionError, ApiErrorEnvelope, ApiErrorBody}`.
+Browser `actions` forwards this HTTP contract and retains its Wasm HTTP executor
+without selecting native Web. The checkout removes the old `server-axum`
+feature and `server_axum` module without aliases; see the
+[checkout migration](COMPATIBILITY.md#current-checkout--web-and-http-protocol-ownership).
+Published alpha.8 retains the startup API shown above.
+
 The native-first Style Showcase is a checkout sample with an optional Wasm
 companion. Both packages are built from the repository.
 [Style Showcase](../examples/style-showcase/README.md)
@@ -132,19 +149,22 @@ template's required packages and features.
 
 ## HTML, HTTP and browser modules
 
-These modules provide the main HTML, HTTP and browser building blocks. Their
-feature selection remains explicit; see the [first-app guide](FIRST-APP.md). Renderer validation
-and native Axum/Tower semantics remain separate responsibilities.
+This map describes the current checkout and its explicit feature selections.
+For the published alpha.8 startup contract, use the section above and the
+[first-app guide](FIRST-APP.md). Renderer validation and native Axum/Tower
+semantics remain separate responsibilities.
 
-| Package and current guide | Main entry points | Selection, ownership and failure boundary |
+| Checkout module and guide | Main entry points | Selection, ownership and failure boundary |
 |---|---|---|
 | [`yetlet::view`](../crates/yetlet/guides/core.md) | `View`, `Element`, `binding` validated vocabulary | Owned renderer-neutral values; construction does not sanitize HTML. Binding validation can return `BindingContractError`; the renderer owns output policy |
 | [`yetlet::html`](../crates/yetlet/guides/html.md) | `render_to_string`, `escape_text`, `RenderError` | Borrow a View, return an owned escaped fragment or policy error. Complete buffering; no raw HTML escape hatch or HTTP-header ownership |
-| [`yetlet::server_axum`](../crates/yetlet/guides/server-axum.md) | `App`, `Page`, `RequestContext`, `DocumentMetadata`, `LanguageTag`, `middleware` | Native routing/extractors/State/Extensions; fallible rendering maps to generic HTTP 500. Metadata and strict CSP stay bounded; no mandatory Session, configuration, MVC or DI |
+| [`yetlet::web`](../crates/yetlet/guides/server-axum.md) | `App`, `RequestContext`, `middleware`, advanced `HttpWorker`; with `html`: `Page`, `DocumentMetadata`, `LanguageTag` | `web` selects native routing/extractors/State/Extensions and caller-runtime serving. `web` plus `html` adds View rendering; rendering failures map to generic HTTP 500. Metadata and strict CSP retain their bounds |
 | [`yetlet_browser::dom`](../crates/yetlet-browser/guides/dom.md) | `validate`, `validate_with_options`, `DomOptions`, `NavigationPolicy`, `ImagePolicy`; WASM `mount`, `mount_with_options` | Optional browser subtree replacement, finite DOM policy with explicit per-mount options. Static validation returns `DomPolicyError`; browser failures use `JsValue`. No general identity preservation; mount can reject navigation that static validation accepted |
 | [`yetlet_browser::dom_keyed`](../crates/yetlet-browser/guides/dom-keyed.md) | `validate_keyed_order`; WASM `KeyedChildren`, `KeyedEntry`, `DomEventListener` | Explicit keyed/listener lifetime; duplicate-key preflight and browser failures. Callbacks and DOM failures do not provide transactional rollback or a generic sanitizer |
 | [`yetlet::reactive`](../crates/yetlet/guides/reactive.md) | `LocalGraph`, `GraphHandle`, `Subscription`, `ReactiveError` | Synchronous thread-local reducer/commit ownership; weak handles and explicit disposal. Snapshot clones published state; faults and queued re-entrant work retain their documented semantics |
-| [`yetlet::actions`](../crates/yetlet/guides/actions.md) | `Command`, `ActionExecutor`, `LocalExecutor`, `ActionError`; browser `yetlet_browser::actions::HttpExecutor` | Explicit local versus typed HTTP actions; native HTTP-executor construction is not native fetch execution. WASM executes HTTP; no implicit Auth/CSRF, retries or remote DOM-event circuit |
+| [`yetlet::actions`](../crates/yetlet/guides/actions.md) | `Command`, `ActionExecutor`, `LocalExecutor` | `actions` selects transport-neutral execution with an associated executor `Error`; local commands and errors require no serialization contract |
+| [`yetlet::actions_http`](../crates/yetlet/guides/actions.md) | `ActionError`, `ApiErrorEnvelope`, `ApiErrorBody` | `actions-http` selects the existing HTTP error variants and serialized envelope shape; it enables neutral Actions without selecting native Web or HTML |
+| [`yetlet_browser::actions`](../crates/yetlet/guides/actions.md) | `HttpExecutor`; shared neutral traits and HTTP error/envelope reexports | Browser `actions` forwards `yetlet/actions-http`. HTTP execution is Wasm-only; native construction does not provide native fetch. No implicit Auth/CSRF, retries or remote DOM-event circuit |
 | [`yetlet::request_id`](../crates/yetlet/guides/request-id.md) | `RequestIds`, `RequestId`, `HEADER`, `InvalidStart` | Explicit scoped/global installation. Clones share a bounded numeric counter; independent providers/restarts do not. Generated IDs replace untrusted inbound values; overflow refuses with 503, not distributed trace identity |
 | [`yetlet::session`](../crates/yetlet/guides/session.md) | `SessionConfig`, `SessionManager`, `Session`, typed Session errors | Explicit bounded Memory store, synchronous operations, cookie/CSRF and rotation/revocation. Process-local state disappears on restart; anonymous Session is not authentication or durable business storage |
 
@@ -230,7 +250,7 @@ qualification. Published archives retain their original documentation:
 | Inspected entry | Current documentation | Remaining boundary |
 |---|---|---|
 | [`yetlet` crate root](../crates/yetlet/src/lib.rs) and [`yetlet-browser` crate root](../crates/yetlet-browser/src/lib.rs) | First example, feature/target map, startup ownership and guide links | Other feature-specific examples remain in their existing guides; no all-API coverage claim |
-| [`server_axum::App`](../crates/yetlet/src/server_axum/app.rs) | Existing module context, application example, state/ownership explanation and method comments | Unchanged in YT-217; native Axum semantics remain authoritative |
+| [`web::App`](../crates/yetlet/src/web/app.rs) | Existing module context, application example, state/ownership explanation and method comments | Unchanged in YT-217; native Axum semantics remain authoritative. YT-290 supplies the current module path |
 | [`View` / `Element`](../crates/yetlet/src/view/mod.rs) | Variant/field docs, builder/accessor semantics, an owned-tree example and renderer trust boundaries | Constructors still perform no sanitization or renderer validation |
 | [`session::SessionConfig`](../crates/yetlet/src/session/mod.rs) | Constructor/example/error-variant docs, exact TTL/capacity/name validation, Secure default and guide link | No provider installation, authenticated identity, cookie-prefix validation or remote-provider qualification |
 
@@ -248,7 +268,7 @@ Rust tokens and public API.
 From the repository root, select features and target explicitly:
 
 ```sh
-cargo doc --offline --locked --no-deps -p yetlet --features server-axum,auth-session,rate-limit,config,secret-provider
+cargo doc --offline --locked --no-deps -p yetlet --features web,html,actions-http,auth-session,rate-limit,config,secret-provider
 cargo doc --offline --locked --no-deps -p yetlet-browser --target wasm32-unknown-unknown --all-features
 ```
 

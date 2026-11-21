@@ -47,8 +47,11 @@ let tree: View = Element::new("ul")
 Import `yetlet::view::{Element, View}` in the caller. To see the shared component in an application, read [Todo UI](https://github.com/bohewu/yetlet/blob/master/examples/todo-ui/src/lib.rs) and run native SSR from the repository root:
 
 ```bash
-cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
+cargo run --locked -p yetlet --features web,html --example server-axum-minimal
 ```
+
+The checkout HTTP example selects both `web` and `html`; constructing View
+values alone needs neither HTTP serving nor an HTML renderer.
 
 ## Contracts and limits
 

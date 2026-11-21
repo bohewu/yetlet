@@ -1,7 +1,8 @@
 //! App-owned triage contract. No database, session, secret or server capability.
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
-use yetlet::actions::{ActionError, Command};
+use yetlet::actions::Command;
+use yetlet::actions_http::ActionError;
 
 #[cfg(target_arch = "wasm32")]
 mod browser;

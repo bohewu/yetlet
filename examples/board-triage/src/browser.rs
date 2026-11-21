@@ -11,7 +11,7 @@ use wasm_bindgen_futures::{JsFuture, spawn_local};
 use web_sys::{
     Document, Element, HtmlButtonElement, HtmlInputElement, HtmlSelectElement, HtmlTextAreaElement,
 };
-use yetlet::actions::{ActionError, ApiErrorEnvelope};
+use yetlet::actions_http::{ActionError, ApiErrorEnvelope};
 use yetlet::reactive::{GraphHandle, LocalGraph};
 use yetlet::view::binding::BindingKey;
 use yetlet_browser::actions::HttpExecutor;

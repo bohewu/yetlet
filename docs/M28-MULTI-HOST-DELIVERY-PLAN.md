@@ -33,9 +33,12 @@ or authorize runtime implementation in this planning turn.
 
 ## 2. What exists and what remains
 
+This table records the planning baseline above. File links follow current source
+locations; the historical status and evidence remain at their recorded scope.
+
 | Surface | Current grounded status | Missing delivery |
 |---|---|---|
-| Web | Public [App and native Router integration](../crates/yetlet/src/server_axum/app.rs); the private [F0-B2 root](../examples/composition-web-research/src/lib.rs) configures a Router and leaves serving/drain ownership to its caller | No public type named WebHost or public multi-host application coordinator |
+| Web | Public [App and native Router integration](../crates/yetlet/src/web/app.rs); the private [F0-B2 root](../examples/composition-web-research/src/lib.rs) configures a Router and leaves serving/drain ownership to its caller | No public type named WebHost or public multi-host application coordinator |
 | Game and UDP | Private [D2 native application](../examples/composable-host-research/native/src/bin/d2-loopback.rs) already combines foreground rendering and [NetworkHost](../examples/composable-host-research/native/src/udp_d2.rs) in one application, with a separate client application | No SDK GameHost/NetworkHost and no three-way Web integration |
 | Local/headless composition | Private [F0-B1 concrete owner](../examples/composable-host-research/src/headless_composition_f0b1.rs), plus earlier B/C/D evidence | No reusable public HeadlessHost or compatible custom-Host composition API |
 | Physical LAN | [D4 / YT-274](M28-E-PROMOTION-DECISION.md#d4-physical-device-gate-versus-supplementary-virtual-network-evidence) remains Not verified after blocked application UDP ingress | Native selected-NIC operation and real two-physical-computer application evidence |

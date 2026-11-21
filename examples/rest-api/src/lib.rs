@@ -20,7 +20,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use yetlet::request_id::RequestIds;
-use yetlet::server_axum::{
+use yetlet::web::{
     App, RequestContext,
     middleware::{Next, from_fn},
 };

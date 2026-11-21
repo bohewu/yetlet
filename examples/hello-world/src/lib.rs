@@ -2,11 +2,11 @@
 //! No optional Session, request ID, database, DOM or WASM dependencies.
 
 use axum::{Router, extract::Path};
-use yetlet::server_axum::{App, Page};
 use yetlet::view::{
     View,
     tags::{h1, main},
 };
+use yetlet::web::{App, Page};
 async fn home() -> View {
     main().child(h1().text("Hello, world!")).into()
 }

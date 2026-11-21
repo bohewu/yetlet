@@ -9,7 +9,7 @@ use axum::{
 use std::time::Instant;
 use tracing::{Dispatch, Instrument, Span};
 use yetlet::request_id::{RequestId, RequestIds, assign_request_id};
-use yetlet::server_axum::middleware::with_global;
+use yetlet::web::middleware::with_global;
 
 pub const TARGET: &str = "yetlet_lab_operations_board::request_tracing";
 const HTTP_SPAN: &str = "board_request";

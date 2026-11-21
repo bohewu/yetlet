@@ -37,13 +37,20 @@ alpha.8 package retains its original unconditional View reexports. These source
 changes do not alter that registry artifact or require a new feature on an
 alpha.8 registry dependency.
 
+The current Browser `actions` feature forwards `yetlet/actions-http` for the
+shared HTTP errors/envelopes and adds its target-specific Fetch dependencies.
+It does not enable native `web`, View, HTML or DOM. The executor implements the
+neutral `ActionExecutor` with its associated HTTP error type; local executors
+can use their own domain errors. Published alpha.8 keeps its original combined
+Action/HTTP contract, while its registry dependency syntax above remains valid.
+
 ## Features and guides
 
 | Capability | Feature | Guide |
 |---|---|---|
 | Subtree DOM mount | `dom` (default) | [DOM](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/guides/dom.md) |
 | Keyed children/listeners | `dom-keyed` | [Keyed DOM](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/guides/dom-keyed.md) |
-| HTTP Action executor | `actions` | [Portable contracts and browser transport](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
+| HTTP Action executor | `actions` (forwards `yetlet/actions-http` in this checkout) | [Portable contracts and browser transport](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
 | CPU scene model/validation | `wgpu` | [Scene](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/guides/wgpu.md) |
 | Actual WebGPU backend | `wgpu-browser` | [Support](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/guides/wgpu-support.md) |
 

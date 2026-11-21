@@ -1,7 +1,7 @@
 # Yetlet
 
 A small, composable Rust application framework with built-in Core lifetimes
-and explicitly selected View, HTML and integration capabilities in this checkout.
+and explicitly selected View, HTML, Web and auxiliary capabilities in this checkout.
 Published SDK `0.9.0-alpha.8` retains its original feature contract; see
 [GitHub releases](https://github.com/bohewu/yetlet/releases) for published artifacts.
 Earlier tags retain their package layout and qualification evidence. The source
@@ -56,12 +56,16 @@ assert!(yetlet::html::render_to_string(&view).unwrap().contains("Hello &lt;Yetle
 
 ## Native application startup
 
-This release includes simple startup with the opt-in `server-axum` feature.
-`App::serve()` listens for plain HTTP on `127.0.0.1:7878`.
-`App::serve_on(address)` takes an explicit bind address. The application owns
-its Tokio runtime and can use `App::into_router()` for native Axum listener and
-lifecycle control. Import `yetlet::server_axum::prelude::*` to opt into the
-curated server imports.
+In this checkout, select `web` and import `yetlet::web::prelude::*` for native
+HTTP service configuration. API-only Web does not enable View or HTML; add `html`
+for `Page`, page helpers and View-related prelude imports. `App::serve()` listens
+for plain HTTP on `127.0.0.1:7878`; `App::serve_on(address)` takes an explicit bind
+address. The application owns its Tokio runtime and can use `App::into_router()`
+for native Axum listener and lifecycle control.
+
+Published alpha.8 keeps the historical `server-axum` feature and
+`yetlet::server_axum` imports. Those names describe the published artifact;
+the current checkout uses `web` without an old-path compatibility alias.
 
 ## Current-checkout features and guides
 
@@ -70,9 +74,10 @@ curated server imports.
 | Core lifetimes | Built in, no feature opt-in | [Lifecycle design](https://github.com/bohewu/yetlet/blob/master/docs/M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) |
 | Shared HTML/DOM values | `view` | [View](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/core.md) |
 | HTML serializer | `html` (enables `view`) | [HTML](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/html.md) |
-| Portable command contracts | `actions` | [Actions](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
+| Neutral commands and caller-selected executor errors | `actions` (no serde) | [Actions](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
+| Portable HTTP action errors/envelopes | `actions-http` (enables `actions` and serde) | [Actions](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
 | Local reactive graph | `reactive` | [Reactive](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/reactive.md) |
-| Native Axum integration | `server-axum` | [Server](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/server-axum.md) |
+| Native HTTP/Router/Tower integration | `web`; add `html` for SSR | [Server](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/server-axum.md) |
 | Request correlation | `request-id` | [Request ID](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/request-id.md) |
 | Memory Session | `session` | [Session](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/session.md) |
 | Authentication / Memory bridge | `auth` / `auth-session` | [Auth](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/auth.md) |

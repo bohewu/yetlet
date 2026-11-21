@@ -1,6 +1,6 @@
 # M28 — Layered Hosts and ResourceGroup Lifecycle Design
 
-**Status:** Owner-selected feature-first direction; YT-287–289 independently reviewed and Done; YT-290–294 gates open.
+**Status:** Owner-selected feature-first direction; YT-287–290 independently reviewed and Done; YT-291–294 gates open.
 **Date:** 2026-11-21.
 **Tracking:** YT-286 public-delivery umbrella; ordered remaining items YT-287–294.
 **Decision:** [ADR 0014](adr/0014-layered-host-resource-lifecycle.md).
@@ -804,14 +804,16 @@ View must have no semantic dependency on composition or Host lifecycle.
 
 ### 15.2 Current source to target ownership
 
-The linked files are the inspected source at the baseline, not future paths.
+This table records the inspected baseline responsibilities. Links follow current
+file locations after a move; the later implementation checkpoints record which
+parts of the target have actually been delivered.
 
 | Current source | Target responsibility / migration | Owning item |
 |---|---|---|
 | [Core module/exports](../crates/yetlet/src/lib.rs), [composition](../crates/yetlet/src/composition/mod.rs), [resource engine](../crates/yetlet/src/composition/resources.rs) | Built-in std-only lifetime coordination. Generic HostGroup/Host/ResourceGroup belong here; concrete adapters depend on this layer. | YT-288 |
 | [Private facade](../examples/host-lifecycle-research/src/lib.rs), [resources](../examples/host-lifecycle-research/src/resources.rs) | Promote the proven ownership semantics, not a blind copy of the io::Error-bound Activity, blocking sleep driver or one-to-four tuple limit. Resolve those public signatures through compiling consumers. | YT-288 |
 | [View](../crates/yetlet/src/view/mod.rs), [tags](../crates/yetlet/src/view/tags.rs), [binding](../crates/yetlet/src/view/binding.rs), [HTML](../crates/yetlet/src/html/mod.rs) | Optional yetlet::view and yetlet::html. View is an HTML-like owned tree used by HTML/DOM; components remain ordinary functions. Native GPU scenes are separate. | YT-289 |
-| [App](../crates/yetlet/src/server_axum/app.rs), [HTTP/Page/prelude](../crates/yetlet/src/server_axum/mod.rs) | yetlet::web owns App, Router/Tower interoperability, WebHost and serving drivers. Page/rendering/View-dependent prelude entries require HTML as well as Web. Preserve resolved App state before serving/hosting. | YT-290, YT-291 |
+| [App](../crates/yetlet/src/web/app.rs), [HTTP/Page/prelude](../crates/yetlet/src/web/mod.rs) | yetlet::web owns App, Router/Tower interoperability, WebHost and serving drivers. Page/rendering/View-dependent prelude entries require HTML as well as Web. Preserve resolved App state before serving/hosting. | YT-290, YT-291 |
 | [Current Web adapter](../crates/yetlet-hosts/src/web_axum/mod.rs) | Move the actual HTTP worker/serving implementation to Web. Move the separate generic command/snapshot bridge to optional yetlet::command_bridge; do not move it into HTTP merely because the current file contains both. | YT-290, YT-292 |
 | [Actions](../crates/yetlet/src/actions/mod.rs), [Browser HTTP executor](../crates/yetlet-browser/src/actions/mod.rs) | Optional neutral command/executor semantics plus separately selected target-neutral HTTP errors/envelopes; native serving and browser Fetch stay in their adapters. | YT-290 |
 | [Reactive](../crates/yetlet/src/reactive/mod.rs) | Keep the optional synchronous caller-local graph. Application domain state, sharing and synchronization remain application-owned. | YT-289 regression scope |
@@ -1358,4 +1360,123 @@ only. Verification and review receipts are retained in
 required_followups=[]. YT-289 is Done at this feature-isolation scope;
 completion-only annotations follow review.
 
+## 18. YT-290 — optional Web and HTTP protocol ownership
 
+**Implementation baseline:** YT-289 commit `39978af7aadb145d6136047ced07a36b1622e901`.
+This checkpoint implements the Web/protocol slice of section 15. It preserves
+the two-package SDK cohort and published alpha.8/CLI identities. YT-290 is Done
+at the independently reviewed Web/protocol scope; this is not a release record.
+
+### 18.1 Current feature and ownership boundary
+
+| Selection | Current checkout surface | Dependency boundary |
+|---|---|---|
+| yetlet default [] | Built-in Core composition and generic HostGroup/ResourceGroup | Unchanged std-only foundation. |
+| actions | Command, ActionExecutor and LocalExecutor | No serde or HTTP error; the executor selects its associated Error. |
+| actions-http | actions_http::ActionError, ApiErrorEnvelope and ApiErrorBody | Enables actions and serde; target-neutral, without native Web or browser Fetch. |
+| web | web::App, request/extractor/response/middleware APIs and advanced HttpWorker | Native Axum/Tower/Tokio/serde; no automatic View, HTML, actions, Reactive, Winit or GPU. |
+| web + html | Page, document metadata/render helpers, App::page and View-related prelude entries | HTML explicitly enables View; API-only Web omits this surface. |
+| yetlet-browser actions, defaults disabled | Explicit same-origin HttpExecutor and its neutral/wire reexports | Selects actions-http; native Web and View remain absent. |
+
+The former server_axum module is physically moved to
+[web](../crates/yetlet/src/web/mod.rs); the server-axum feature and old public
+module path are removed without aliases. Existing internal test target names
+and the server-axum.md guide filename remain identifiers for their retained
+tests/navigation, not public compatibility APIs. Current module guides explain
+the source/published distinction.
+
+[App](../crates/yetlet/src/web/app.rs) still consumes a resolved App<()> on the
+caller's Tokio runtime, with the unchanged 127.0.0.1:7878 convenience default.
+Router conversion, native extractors/handlers and Tower middleware stay explicit.
+Page/rendering and View exports require HTML; string/JSON routes need only Web.
+
+### 18.2 Serving implementation and lifecycle scope
+
+The actual [HttpWorker](../crates/yetlet/src/web/worker.rs) implementation moves
+out of yetlet-hosts. App and that worker call one private
+[serving function](../crates/yetlet/src/web/serving.rs). The base package has no
+reverse dependency on yetlet-hosts. The former web_axum staging module retains
+only its separate std-based command/snapshot bridge; its later relocation is
+YT-292, not an HTTP concern.
+
+HttpWorker remains an advanced, explicitly started owned-thread adapter with
+its existing loopback/port-0 default, explicit HTTP-200 startup probe, stop
+signal and original-join behavior. The move does not redefine those semantics
+as the new public WebHost defaults. App::serve retains ordinary future
+cancellation; dropping it does not prove graceful drain or managed finalization.
+YT-291 still owns the managed WebHost facade, caller-runtime/owned-thread
+lifecycle integration, new readiness/address policy and cancellation proof.
+
+### 18.3 Neutral commands, wire compatibility and consumers
+
+[ActionExecutor](../crates/yetlet/src/actions/mod.rs) now has an unconstrained
+associated Error. LocalExecutor propagates the supplied handler error and
+retains caller-owned, non-Send state/futures. The
+[HTTP wire module](../crates/yetlet/src/actions_http/mod.rs) preserves the existing
+ActionError variants, error codes and serialized envelope fields.
+
+Todo UI uses its own domain error; the server maps it explicitly at HTTP.
+Browser-local execution keeps a local error while the remote executor returns
+the HTTP error. The custom TCP consumer uses its own transport error and
+preserves its existing TCP reply protocol without inventing an HTTP status.
+Board consumers explicitly select HTTP errors/envelopes where their feedback
+actually depends on HTTP status. Browser Fetch behavior is unchanged.
+
+Active path consumers move together: API-only examples select web, SSR users
+select web + html, and worker consumers import yetlet::web::HttpWorker.
+Request ID, Memory Session and Redis Session select web without HTML. Auth
+keeps its narrow Axum edge; rate limiting keeps Axum/Tower/Governor; independent
+configuration, secret/provider and signing edges remain independent.
+This classification does not newly qualify external providers.
+
+Published registry examples, pinned reader content and CLI templates retain
+their selected versions. General migration/old-CLI selection is YT-293 and
+normal-archive acceptance is YT-294. Obsolete excluded experiments are not
+silently promoted as compiling current consumers.
+
+### 18.4 Verification and delivery boundary
+
+The first eight focused checks pass: API-only App serving/configuration,
+Web + HTML behavior and Router/Tower/state compatibility, neutral and HTTP
+actions, Browser actions, request/session middleware, the moved worker and
+the migrated Todo/custom-TCP/Board consumers. The latter five packages pass
+47 tests; the moved worker passes nine real HTTP/stop/join tests.
+
+An isolated consumer passes nine native executions and five Wasm compilations,
+each with a normal/build graph. Core and neutral actions have no external normal
+dependency; Web omits View/HTML/actions and basic Web does not enable Tokio's
+multi-thread runtime feature. Actions HTTP and Browser actions omit native Web.
+Six additional graph-only checks preserve narrow Auth/rate-limit/configuration/
+secret/provider/signing selections. Eight disabled-surface probes produce the
+intended E0432/E0599 diagnostics, including removed names and Wasm-native gates.
+
+All 31 workspace packages compile with all targets. Eleven changed standalone
+consumers compile or pass their selected tests, including three current-thread
+Web composition tests, eleven F1 Web tests and the Web/SQLite facade's 13 lifecycle,
+six resource and five integration tests. Auth/Session HTTP adds 22 passing
+tests. Actual Todo Browser and Board Wasm libraries compile separately.
+
+The first external-consumer pass retained one lockfile failure for YT283.
+Cargo reconciliation removes only obsolete Hosts dependency edges and the
+unused Hosts package in the lifecycle consumer; it adds/upgrades no dependency.
+Both affected consumers then pass with locked resolution. The original failed
+receipt remains. Strict Core/Browser/worker Clippy, 93-file changed-source Fmt,
+four feature-selected doctest commands and five strict rustdoc builds pass.
+The scoped documentation check's four missing EOF newlines were repaired.
+
+Configured independent R1 `wc_job_OIrnOoBP9snNOTBl` returned FAIL for a concrete
+active-consumer omission: the [qualification workflow](../.github/workflows/qualification.yml)
+and its [existing feature-selection test](../xtask/tests/release_preparation.rs)
+still selected the removed server-axum feature. Both now select web; the
+workflow already selects html. The focused existing xtask test and an actual
+all-target compile using the workflow's exact feature selection pass.
+No hosted workflow or additional platform execution is claimed; R1 is retained.
+
+These are native tests, source checks and Wasm compilations, not new browser
+Fetch, native-window/GPU, production-provider or publication qualification.
+Receipts are retained in `.pipeline-output/m28-yt290-20261122/`.
+Configured independent R2 `wc_job_3w96W4sl3X2sGtmx` completed with exit0 and
+actual PASS, issues=[] and required_followups=[]. Scoped R3 checks pass for
+27 documents, 1,136 local links, 681 anchors and the 291-item backlog DAG.
+YT-290 is Done at this bounded implementation scope. Completion-only annotations
+follow review; Strict/Builtin staged Guard remains the final local commit gate.

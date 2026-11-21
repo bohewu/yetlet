@@ -4,6 +4,11 @@
 `0.9.0-alpha.8`, selected through the `secrets` feature. Its only runtime dependency is `secrecy`. It does not register with
 Yetlet Core, App, configuration, the CLI, or browser code. Browser WASM is rejected.
 
+The composition commands below target the current checkout and explicitly select
+`web,html` for their HTTP/SSR response. Published alpha.8 retains `server-axum`;
+its artifact is unchanged. The standalone `secrets` feature remains independent
+of Web and HTML.
+
 `SecretProvider: Send + Sync` exposes object-safe asynchronous
 `get(name) -> Result<Option<SecretString>, SecretError>` through a boxed Send
 future. Applications inject `Arc<dyn SecretProvider>` into their own ordinary
@@ -74,7 +79,7 @@ and the example reports HTTP 503; a runtime override supplies a configured value
 
 ```sh
 YTSECRETS_SERVICE__TOKEN="${YTSECRETS_SERVICE__TOKEN:?Set a local test value first}" cargo run --offline --locked \
-  -p yetlet --features config --example config-secrets-state --features secret-provider,server-axum
+  -p yetlet --features config --example config-secrets-state --features secret-provider,web,html
 ```
 
 For an explicit local development secret file, application startup can retain the
@@ -98,7 +103,7 @@ errors, protected ownership, and redacted Debug/errors.
 The State example and its four fixtures now belong to `yetlet::config`, behind
 its existing `secret-provider` feature. Run that target with `cargo test --offline
 --locked -p yetlet --features config --example config-secrets-state
---features secret-provider,server-axum`. The provider-only commands below do not run the
+--features secret-provider,web,html`. The provider-only commands below do not run the
 moved composition target. This removes the reverse Config development dependency
 for first publication without changing provider APIs or runtime dependencies.
 

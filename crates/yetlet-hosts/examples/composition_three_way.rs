@@ -35,13 +35,14 @@ use yetlet::composition::{
     Attached, Builder, Completion, Composition, Empty, JoinStatus, Local, Phase, Worker,
     WorkerCompletion,
 };
+use yetlet::web::HttpWorker;
 use yetlet_hosts::{
     native_winit::{WindowPhase, WindowSignal, WindowSlot},
     renderer_wgpu::{
         DrawReceipt, FatalError, RenderCounters, RenderError, SurfacePhase, SurfaceRenderer, wgpu,
     },
     udp::{SendOutcome, UdpEndpoint},
-    web_axum::{AdmissionError, CommandBridge, CommandIngress, HttpWorker, SnapshotReader},
+    web_axum::{AdmissionError, CommandBridge, CommandIngress, SnapshotReader},
 };
 
 const QUEUE: usize = 4;

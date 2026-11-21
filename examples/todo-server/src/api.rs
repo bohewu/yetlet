@@ -11,9 +11,10 @@ use axum::{
     http::{HeaderMap, Method, StatusCode, header},
     response::{IntoResponse, Response},
 };
-use yetlet::actions::{ActionError, ActionExecutor, ApiErrorBody, ApiErrorEnvelope, LocalExecutor};
-use yetlet::server_axum::{RequestContext, middleware::Next};
-use yetlet_todo_ui::{TodoCommand, TodoSnapshot, apply_todo_command};
+use yetlet::actions::{ActionExecutor, LocalExecutor};
+use yetlet::actions_http::{ActionError, ApiErrorBody, ApiErrorEnvelope};
+use yetlet::web::{RequestContext, middleware::Next};
+use yetlet_todo_ui::{TodoCommand, TodoError, TodoSnapshot, apply_todo_command};
 
 pub(crate) const MAX_ACTION_BODY: usize = 4 * 1024;
 
@@ -53,6 +54,15 @@ fn api_error(status: StatusCode, code: &str, message: &str) -> Response {
             },
         },
     )
+}
+
+fn http_action_error(error: TodoError) -> ActionError {
+    match error {
+        TodoError::Validation(code) => ActionError::Validation(code),
+        TodoError::NotFound => ActionError::NotFound,
+        TodoError::CapacityReached => ActionError::CapacityReached,
+        TodoError::RevisionOverflow => ActionError::RevisionOverflow,
+    }
 }
 
 fn command_error(error: ActionError) -> Response {
@@ -130,7 +140,7 @@ pub async fn mutate_todos(
     // used by the browser's explicit HTTP executor.
     let executor = LocalExecutor::new(move |command: TodoCommand| {
         let mut snapshot = state.snapshot.lock().map_err(|_| ActionError::Internal)?;
-        apply_todo_command(&mut snapshot, command)
+        apply_todo_command(&mut snapshot, command).map_err(http_action_error)
     });
     match executor.execute(command).await {
         Ok(snapshot) => response_json(StatusCode::OK, snapshot),

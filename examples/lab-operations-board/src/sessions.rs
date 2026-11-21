@@ -2,13 +2,13 @@
 use crate::{Failure, domain::LoginSession};
 use axum::{extract::FromRequestParts, http::request::Parts};
 use std::time::Duration;
-use yetlet::server_axum::App;
 use yetlet::session::{Session as MemorySession, SessionConfig, SessionManager};
 #[cfg(feature = "valkey")]
 use yetlet::session_redis::{
     RedisSession, RedisSessionConfig, RedisSessionError, RedisSessionManager,
     RedisSessionUpdateError,
 };
+use yetlet::web::App;
 
 /// Explicit selection. Endpoint values are never formatted or sent to a browser.
 #[derive(Default)]

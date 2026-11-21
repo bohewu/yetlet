@@ -163,6 +163,39 @@ part of published alpha.8, so registry-pinned consumers keep their original
 contract. Normal package/archive, old-CLI/new-SDK selection and publication
 qualification retain their later gates.
 
+### Current checkout — Web and HTTP protocol ownership
+
+[YT-290](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership) separates native HTTP service code from optional HTML rendering,
+and neutral Action execution from HTTP protocol errors. This is an intentional
+next-alpha source break with these current-checkout migrations:
+
+| Previous selection or API | Current checkout |
+|---|---|
+| `yetlet` feature `server-axum` | Select `web` for HTTP; select both `web` and `html` for SSR/Page/document rendering |
+| `yetlet::server_axum` | Import `yetlet::web`; the old feature and module have no aliases |
+| `yetlet::actions::{Command, ActionExecutor, LocalExecutor}` | Keep these neutral paths. Each executor supplies an associated `Error`; `LocalExecutor` uses its callback's error type without a serialization requirement |
+| `yetlet::actions::{ActionError, ApiErrorEnvelope, ApiErrorBody}` | Select `actions-http` and import these types from `yetlet::actions_http` |
+| `yetlet-browser` feature `actions` | The feature name stays; it forwards `yetlet/actions-http`. `yetlet_browser::actions` reexports the neutral traits and HTTP types, with Wasm HTTP execution and no native Web selection |
+| `yetlet_hosts::web_axum::HttpWorker` | Use the existing advanced adapter at `yetlet::web::HttpWorker`; no old reexport |
+
+The HTTP Action error variants and serialized envelope shape are preserved.
+Domain/local executors can keep their own error types; custom implementations
+add `type Error`, and successful-only local callbacks may need an explicit error
+type such as `Infallible` for inference.
+
+`App` configures an HTTP service. Its construction is inert, and
+`App::serve` / `serve_on` use the caller's Tokio runtime without creating a
+hidden runtime or thread. `HttpWorker` is the existing advanced owned-thread
+adapter for explicit lifecycle integration. Managed `WebHost` and
+`App::into_host` belong to YT-291; the module move does not supply those APIs or
+new cancellation guarantees.
+
+The `web` and `actions-http` features and their new module paths are not part
+of published alpha.8. Registry-pinned consumers and its startup examples retain
+their original contract. CLI template and SDK-selection migration belongs to
+YT-293; normal package/archive and publication qualification retain their
+later gates.
+
 ## Historical two-package pre-publication source — 2026-10-30
 
 The unreleased development train is `0.9.0-alpha.5`, with exactly `yetlet` and

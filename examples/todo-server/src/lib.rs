@@ -16,7 +16,7 @@ use axum::{
 use serde_json::{Value, json};
 use tower_http::services::ServeDir;
 use yetlet::request_id::{RequestId, RequestIds};
-use yetlet::server_axum::{App, DEFAULT_CSP, Page, middleware::from_fn, render_document};
+use yetlet::web::{App, DEFAULT_CSP, Page, middleware::from_fn, render_document};
 use yetlet_todo_ui::{home_page, search_page};
 
 async fn root(

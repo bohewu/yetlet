@@ -23,11 +23,12 @@ Begin with [Hello World](hello-world/README.md) for native SSR or [REST API](res
 
 ## Source-checkout startup
 
-Use `App::new().page(...).serve().await` for the shortest application startup,
-with plain HTTP at `127.0.0.1:7878`. The non-catalog SDK example demonstrates it.
+With `web` and `html` enabled, use `App::new().page(...).serve().await` for
+application startup with plain HTTP at `127.0.0.1:7878`. The non-catalog SDK
+example demonstrates it.
 
 ```bash
-cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
+cargo run --locked -p yetlet --features web,html --example server-axum-minimal
 ```
 
 Hello World and the other basic HTTP samples retain their own environment ports

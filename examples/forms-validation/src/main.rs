@@ -1,5 +1,5 @@
 use std::net::SocketAddr;
-use yetlet::server_axum::prelude::*;
+use yetlet::web::prelude::*;
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {

@@ -10,9 +10,7 @@ use axum::{
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::{path::Path, sync::Arc};
-use yetlet::server_axum::{
-    DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document_with_metadata,
-};
+use yetlet::web::{DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document_with_metadata};
 
 // Exact existing opt-in policy from todo-server; no additional exception.
 pub const BROWSER_CSP: &str = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";

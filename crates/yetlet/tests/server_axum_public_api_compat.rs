@@ -8,11 +8,11 @@ use axum::{
 };
 use std::borrow::Cow;
 use tower::ServiceExt;
-use yetlet::server_axum::{
+use yetlet::view::View;
+use yetlet::web::{
     App, DEFAULT_CSP, DocumentMetadata, LanguageTag, Page, render_document,
     render_document_with_metadata, render_page, render_page_with_metadata,
 };
-use yetlet::view::View;
 
 async fn legacy_home() -> View {
     View::text("legacy")

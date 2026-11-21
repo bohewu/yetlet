@@ -3,10 +3,14 @@
 Compose native global, group and route middleware while keeping request-owned
 parts/body separate from typed application state. Axum/Tower owns HTTP transport.
 
-**Experimental SDK integration.** These modules are distributed in SDK
-`0.9.0-alpha.8`; use the documented features/target and source matching the
-version you consume. [Release readiness](RELEASE-READINESS.md) records distribution
-and its qualification limits.
+**Experimental SDK integration.** Published SDK `0.9.0-alpha.8` exposes these
+modules through `yetlet::server_axum` and the `server-axum` feature. The current
+checkout uses `yetlet::web` with `web`; middleware and RequestContext do not
+require View or HTML. Add `html` for SSR Page/document helpers. Current integration
+examples below use that checkout namespace, while dated measurements and
+historical commands retain their original source scope. Published alpha.8 is
+unchanged. [Release readiness](RELEASE-READINESS.md) records distribution and
+its qualification limits.
 
 
 ## Application-owned deadlines, streaming and admission timing
@@ -180,7 +184,7 @@ A body-owning RequestContext must be the last body-consuming extractor; use
 ```rust
 use axum::{Router, response::Response, routing::get};
 use tower::ServiceBuilder;
-use yetlet::server_axum::{RequestContext, middleware::{Next, from_fn, with_global}};
+use yetlet::web::{RequestContext, middleware::{Next, from_fn, with_global}};
 
 #[derive(Clone)]
 struct RequestLabel(&'static str);
@@ -269,7 +273,7 @@ Axum MethodRouter::route_layer (different from Router::route_layer) skips its me
 
 `RequestContext<S>` has three fields: original HTTP `parts`, the streaming `body`, and typed application `state`. The core does **not** automatically create `RequestId`, trace/span metadata, sessions, cookie jars, principals or cache handles. Existing request fields come from the incoming HTTP request; matched-route metadata becomes available only after routing; query/path parameters are decoded on demand.
 
-The Todo example **explicitly installs** `RequestIds::new().global(app)` from the optional `yetlet::request_id` crate. A per-provider Arc<AtomicU64> starting at 1 generates a numeric RequestId extension and x-yetlet-request-id response header. M6 also supports group-scoped installation; the core has no dependency on this provider. The native home route intentionally selects only the number for an inert data-request-id attribute. No request extensions are automatically serialized.
+The Todo example **explicitly installs** `RequestIds::new().global(app)` from the optional `yetlet::request_id` module. A per-provider Arc<AtomicU64> starting at 1 generates a numeric RequestId extension and x-yetlet-request-id response header. M6 also supports group-scoped installation; the core has no dependency on this provider. The native home route intentionally selects only the number for an inert data-request-id attribute. No request extensions are automatically serialized.
 
 The example counter resets for a new application instance and is not globally unique across server nodes. Applications needing trace correlation should opt into a provider with an intentional ID and trusted propagation policy. See [ADR 0005](adr/0005-opt-in-capability-modules.md).
 
@@ -289,7 +293,7 @@ This is **not zero overhead**: S is cloned during extraction, native middleware 
 
 ## API reference
 
-Use [server source/rustdoc](../crates/yetlet/src/server_axum/mod.rs),
+Use [Web source/rustdoc](../crates/yetlet/src/web/mod.rs),
 [composition](EXTENSIONS.md) and the [current API reference](API-REFERENCE.md).
 Current middleware contracts above preserve native routing, errors and streaming.
 The old P0/P1 delivery assessment below is a dated checkpoint, not a current Todo list.

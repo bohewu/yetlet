@@ -34,7 +34,7 @@
 //! |---|---|
 //! | Default `dom` | Shared View values and native/WASM validation; WASM `dom::mount` replaces one owned subtree |
 //! | `dom-keyed` | Shared View values and keyed reconciliation/listener lifetime; actual DOM operations are WASM-only |
-//! | `actions` | Shared typed actions plus WASM HTTP execution; no implicit authentication, CSRF or retry policy |
+//! | `actions` | Shared `actions-http` wire types plus WASM HTTP execution; no native Web, implicit authentication, CSRF or retry policy |
 //! | `wgpu` | CPU-side bounded scene APIs, independent of DOM/CSS |
 //! | `wgpu-browser` | Explicit WASM WebGPU backend, requiring browser/device support |
 //!

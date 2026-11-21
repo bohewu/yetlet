@@ -7,8 +7,8 @@
 
 use axum::{Json, Router, extract::State};
 use yetlet::{
-    server_axum::{App, Page},
     view::View,
+    web::{App, Page},
 };
 
 #[derive(Clone, Debug)]

@@ -5,7 +5,7 @@
 //! application scheduler is introduced.
 #![forbid(unsafe_code)]
 
-/// Real owned Axum/Tokio Web worker plus typed domain bridge.
+/// Temporary std-only domain bridge; native HTTP workers live in `yetlet::web`.
 #[cfg(feature = "web-axum")]
 pub mod web_axum;
 
