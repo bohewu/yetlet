@@ -146,6 +146,23 @@ No provider, retry policy, authorization rule or runtime service was added by
 repackaging. See [release cohort rules](RELEASING.md#current-two-package-development-boundary--yt-211)
 and [source-specific migration proof](QUALIFICATION-MATRIX.md#historical-two-package-migration-and-style-source-qualification).
 
+### Current checkout — Core and optional View
+
+The source-only [YT-288 Core](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
+and [YT-289 feature split](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#17-yt-289--optional-view-and-browser-feature-isolation)
+change the checkout to built-in composition with default=[]. View/Element/
+Attribute, tags and binding require view; html enables view. Browser dom and
+dom-keyed each supply that feature and gate the shared reexports. Browser
+defaults still select dom; default-off actions/GPU selections do not select
+View or HTML.
+
+This is an intentional next-alpha source break. Path consumers that previously
+relied on implicit View/HTML must request their capability; HTML users can
+select html explicitly on both old and new source. The new view feature is not
+part of published alpha.8, so registry-pinned consumers keep their original
+contract. Normal package/archive, old-CLI/new-SDK selection and publication
+qualification retain their later gates.
+
 ## Historical two-package pre-publication source — 2026-10-30
 
 The unreleased development train is `0.9.0-alpha.5`, with exactly `yetlet` and

@@ -1,24 +1,26 @@
 # Yetlet
 
-HTML-first views and explicitly selected native capabilities, version
-`0.9.0-alpha.8`. See [GitHub releases](https://github.com/bohewu/yetlet/releases)
-for published artifacts. Earlier tags retain their original package layout and
-qualification evidence.
+A small, composable Rust application framework with built-in Core lifetimes
+and explicitly selected View, HTML and integration capabilities in this checkout.
+Published SDK `0.9.0-alpha.8` retains its original feature contract; see
+[GitHub releases](https://github.com/bohewu/yetlet/releases) for published artifacts.
+Earlier tags retain their package layout and qualification evidence. The source
+feature changes below do not change the contents of a published artifact.
 
 ## Minimal integration
 
-Use Rust 1.99+ and this exact registry dependency once this version is available:
+Use Rust 1.99+ and this exact registry dependency for HTML rendering:
 
 ```toml
 [dependencies]
-yetlet = "=0.9.0-alpha.8"
+yetlet = { version = "=0.9.0-alpha.8", default-features = false, features = ["html"] }
 ```
 
-For local preparation, use an explicitly reviewed checkout at the matching version:
+For the current checkout, enable the same HTML capability explicitly:
 
 ```toml
 [dependencies]
-yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.8" }
+yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.8", default-features = false, features = ["html"] }
 ```
 
 ```rust
@@ -27,13 +29,18 @@ let view: View = Element::new("p").child(View::text("Hello <Yetlet>")).into();
 assert_eq!(yetlet::html::render_to_string(&view).unwrap(), "<p>Hello &lt;Yetlet&gt;</p>");
 ```
 
-Defaults select `html`. With `default-features = false`, the shared View model
-has no external normal dependencies. Browser integrations are separately owned
-by [yetlet-browser](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/README.md), using this same View type.
+The explicit `html` selection works with both published alpha.8 and this checkout.
+Published alpha.8 retains its HTML default and always-available View API. This
+checkout has `default = []` with built-in Core composition, `HostGroup`, `Host`
+and `ResourceGroup`. Select `view` for the optional View/Element/Attribute, tags
+and binding APIs, or `html` for serialization; `html` enables `view`. Core-only
+omits View, and View/HTML add no external normal dependencies or HTTP runtime.
+Browser integrations are separately owned by
+[yetlet-browser](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/README.md), whose DOM features enable the same View type.
 
 ## Typed Tag Builder API
 
-This release includes `yetlet::view::tags` with 101 ordinary HTML constructors
+Published alpha.8 and this checkout include `yetlet::view::tags` with 101 ordinary HTML constructors
 and `TagElement<T>` builders, producing the same owned `Element` / `View` tree.
 Typed void tags have no child/text methods; selected setters are scoped to
 applicable tags. `.id` and `.class` replace, `.add_class` merges distinct tokens,
@@ -56,12 +63,13 @@ its Tokio runtime and can use `App::into_router()` for native Axum listener and
 lifecycle control. Import `yetlet::server_axum::prelude::*` to opt into the
 curated server imports.
 
-## Features and guides
+## Current-checkout features and guides
 
 | Capability | Feature | Guide |
 |---|---|---|
-| Shared values | Always available | [View](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/core.md) |
-| HTML serializer | `html` (default) | [HTML](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/html.md) |
+| Core lifetimes | Built in, no feature opt-in | [Lifecycle design](https://github.com/bohewu/yetlet/blob/master/docs/M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) |
+| Shared HTML/DOM values | `view` | [View](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/core.md) |
+| HTML serializer | `html` (enables `view`) | [HTML](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/html.md) |
 | Portable command contracts | `actions` | [Actions](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
 | Local reactive graph | `reactive` | [Reactive](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/reactive.md) |
 | Native Axum integration | `server-axum` | [Server](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/server-axum.md) |

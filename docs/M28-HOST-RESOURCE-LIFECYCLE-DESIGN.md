@@ -1,6 +1,6 @@
 # M28 — Layered Hosts and ResourceGroup Lifecycle Design
 
-**Status:** Owner-selected feature-first direction; YT-287 contract and YT-288 Core implementation Done; YT-289–294 gates open.
+**Status:** Owner-selected feature-first direction; YT-287–289 independently reviewed and Done; YT-290–294 gates open.
 **Date:** 2026-11-21.
 **Tracking:** YT-286 public-delivery umbrella; ordered remaining items YT-287–294.
 **Decision:** [ADR 0014](adr/0014-layered-host-resource-lifecycle.md).
@@ -1260,5 +1260,102 @@ Receipts are retained under `.pipeline-output/m28-yt288-20261121/`.
 Published alpha.8, CLI versions, pinned reader, Web/native adapter delivery,
 normal archive qualification and physical LAN evidence are unchanged. The next
 ordered item after YT-288 is YT-289.
+
+## 17. YT-289 — optional View and Browser feature isolation
+
+**Source baseline:** YT-288 commit `a989c0c9c93b16315fdf0c1665ecaa6f0eed6a77`.
+**Scope:** Current-checkout feature isolation and existing consumer migration;
+focused verification and configured independent review PASS; YT-289 Done.
+
+### 17.1 Implemented feature boundary
+
+The current yetlet manifest selects `default = []`. Built-in composition and
+the root HostGroup, Host and ResourceGroup API remain available. View is an
+optional HTML/DOM value layer in the same package; it adds no semantic dependency
+on the lifecycle coordinator. No new published package is introduced.
+
+| Selection | Current API / dependency effect |
+|---|---|
+| yetlet default / no-default | Built-in std-only Core; no View, HTML, runtime, serde, native window or GPU dependency. |
+| yetlet view | View/Element/Attribute, typed tags and binding vocabulary; no renderer or external normal dependency. |
+| yetlet html | Enables view and the existing pure HTML serializer; no Web/browser runtime. |
+| yetlet reactive | Existing independent local graph; no View or renderer selection. |
+| Browser default / dom | Retains default DOM convenience and enables yetlet/view; no HTML or native Web. |
+| Browser dom-keyed only | Independently enables yetlet/view and keyed bindings; does not depend on the dom feature being selected. |
+| Browser no-default | No adapter or View reexports. |
+| Browser actions only | Existing portable action/serde plus target-specific Fetch closure; no View, HTML or native Web. |
+| Browser wgpu / wgpu-browser only | Existing CPU scene / optional Wasm backend; no View or DOM selection. |
+
+Browser reexports of view, View, Element and Attribute require dom or dom-keyed.
+Enabling yetlet/view through some other dependency alone does not enable those
+Browser reexports. Set default-features=false for actions-only/GPU-only Browser
+selection; keeping Browser defaults deliberately includes DOM.
+
+Features remain additive. An application can enable more capabilities through
+another dependency; isolation evidence therefore uses separate Cargo invocations
+and a separate workspace, with normal/build edges and resolved features recorded.
+This is an enabled-graph guarantee, not a feature-trimmed archive or binary-size
+claim. Published alpha.8 retains its original HTML default and View exports.
+
+### 17.2 Existing consumers and documentation
+
+Three path consumers require explicit View after the default change:
+
+- [Todo UI](../examples/todo-ui/Cargo.toml): normal actions + view dependency;
+  its dev-only html selection must not mask a missing normal View edge.
+- [Style Showcase](../examples/style-showcase/Cargo.toml): target-neutral view
+  for its shared library; native server-axum cannot supply that edge on Wasm.
+- [Style authoring fixture](../experiments/style-authoring/Cargo.toml): view
+  for typed authoring, without adding HTML serialization.
+
+Existing DOM/keyed consumers receive View through their explicitly selected
+Browser adapters. Server consumers still receive HTML/View through server-axum
+in this slice. Registry-pinned alpha.8 examples remain on that published feature
+contract; they must not request the checkout-only view feature.
+
+Package READMEs and View/HTML guides distinguish current source from published
+artifacts. Their HTML dependency examples explicitly select html, which works in
+both scopes. Root rustdoc examples and links remain valid when optional View or
+DOM APIs are absent. No version, public reader or release identity is promoted.
+
+### 17.3 Verification and limits
+
+The View, tags, binding, HTML, reactive, DOM and keyed-DOM implementation sources
+are unchanged from the baseline. Focused existing native tests exercise their
+value, escaping, output-policy and reconciliation contracts under separate
+feature selections. Core default, View-only and HTML-only consumers are compiled
+separately; Browser default, keyed-only, actions-only and GPU selections are
+likewise isolated. Disabled-surface probes must fail with the intended missing
+import/module diagnostics, not merely an arbitrary nonzero Cargo result.
+
+Wasm library compilation is separate evidence from actual browser execution.
+This feature migration does not claim new DOM mounting/listener/GPU runtime,
+CSP-denial, native platform or normal archive qualification. Existing target-
+specific test-only dependencies are not widened to claim Wasm test execution.
+
+The implementation preserves server-axum -> html, current action protocol types
+and their serde edge. YT-290 owns Web module/HTTP protocol isolation; YT-291 owns
+Web driver/cancellation integration. CLI/general migration and archive acceptance
+remain YT-293/294. The next ordered item after YT-289 is YT-290.
+
+Focused native tests pass with separate selections: 21 composition and 14
+HostGroup tests under the new default, 12 View-only, 23 HTML, 16 Reactive,
+20 default Browser DOM and 1 keyed-only test. The three changed consumer paths
+compile, including native/Wasm Style Showcase and its keyed Browser companion.
+
+The isolated consumer passes 21 positive selections: 11 native executions and
+10 Wasm compilations, each with a normal/build feature graph. Core/View/HTML
+have no external normal dependency; Browser actions/GPU selections omit View/
+HTML and native HTTP; normal Todo UI gets View without its dev-only HTML edge.
+Seven native disabled-surface probes return the intended missing-import
+diagnostics (E0432/E0433), proving the absent API boundary.
+
+Strict Core/Browser Clippy, changed-source formatting, six feature-selected
+doctest sets and six strict rustdoc builds pass. Wasm results are compilation
+only. Verification and review receipts are retained in
+`.pipeline-output/m28-yt289-20261121/`. Configured independent review
+`wc_job_THsX4ibX3uyjN_qf` completed with exit0 and actual PASS, issues=[] and
+required_followups=[]. YT-289 is Done at this feature-isolation scope;
+completion-only annotations follow review.
 
 

@@ -1,6 +1,6 @@
 # ADR 0014 — Layered Hosts with Default Resource Lifecycle Management
 
-- **Status:** Owner-selected target direction; YT-287 contract and YT-288 Core implementation independently reviewed and Done; remaining capability implementation pending.
+- **Status:** Owner-selected target direction; YT-287–289 independently reviewed and Done; remaining capabilities pending.
 - **Date:** 2026-11-21.
 - **Tracking:** YT-286 umbrella remains Todo; YT-287–294 define the remaining delivery gates.
 - **Decision owner:** Project maintainer.
@@ -132,9 +132,29 @@ tests are implementation evidence, not qualification of Web or native drivers.
 
 YT-288 is Done at the independently reviewed Core implementation scope; the
 [completion record](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#165-verification-and-delivery-boundary)
-retains the R1 finding, repair and R2 PASS. HTML defaults/View exports remain for YT-289's coordinated Browser
-transition. The existing two-package SDK cohort and all published identities
+retains the R1 finding, repair and R2 PASS. That checkpoint retained HTML
+defaults/View exports; the YT-289 transition is recorded below. The existing two-package SDK cohort and all published identities
 remain unchanged; no new adapter or release claim is made.
+
+## YT-289 implementation checkpoint — optional View
+
+The [feature implementation](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#17-yt-289--optional-view-and-browser-feature-isolation)
+sets yetlet default=[] and gates View, Element, Attribute, tags and binding
+behind view. HTML enables view. Browser dom and dom-keyed independently enable
+view and gate the corresponding reexports; default-off actions/GPU consumers
+remain independent. The existing DOM convenience default is retained.
+
+Only feature declarations, root exports/rustdoc and three necessary View
+consumer manifests change. Renderer, binding and reactive behavior remains
+unchanged. Separate normal graphs and actual disabled-import checks prevent
+workspace/dev feature unification from hiding a missing edge. Wasm evidence is
+library compilation, not new browser/GPU runtime qualification.
+
+YT-289 is Done at the independently reviewed feature-isolation scope.
+Focused verification and configured independent review `wc_job_THsX4ibX3uyjN_qf` PASS;
+issues=[] and required_followups=[]. Published alpha.8/CLI identities remain unchanged.
+Web/protocol isolation, driver integration and general migration retain their
+later task gates; no additional SDK package or compatibility alias is added.
 
 ## Context
 

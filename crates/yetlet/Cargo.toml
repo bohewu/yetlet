@@ -5,13 +5,14 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "HTML-first Rust framework with explicit optional native capabilities"
+description = "Composable Rust application framework with explicit optional capabilities"
 readme = "README.md"
 include = ["src/**", "guides/**", "tests/**", "examples/**", "README.md", "LICENSE-*", "Cargo.toml", "Cargo.lock"]
 
 [features]
-default = ["html"]
-html = []
+default = []
+view = []
+html = ["view"]
 actions = ["dep:serde"]
 reactive = []
 server-axum = ["html", "dep:axum", "dep:serde", "dep:tower", "dep:tokio"]

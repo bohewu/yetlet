@@ -5,17 +5,23 @@
 Read source/rustdoc at the revision you consume; package selection does not
 establish registry availability or production qualification.
 
-`yetlet::html` serializes a `yetlet::view::View` into escaped HTML on native Rust. Its only dependency is `yetlet::view`; it installs no HTTP server or browser runtime.
+`yetlet::html` serializes a `yetlet::view::View` into escaped HTML. It uses the
+shared View module and installs no HTTP server or browser runtime.
+
+Select `features = ["html"]` explicitly on the Yetlet dependency. This selection
+works with both published SDK alpha.8 and the current checkout. The checkout has
+an empty default feature set, and `html` enables `view`; published alpha.8 retains
+its original HTML default. Selecting `view` alone does not enable serialization.
 
 ## Render a View
 
-Call `render_to_string(&view)` to receive `Result<String, RenderError>`. Text and attribute values are escaped; `escape_text` is also available for text escaping. Build the View using `Element` and `View` from core. The complete [Hello World handler](https://github.com/bohewu/yetlet/blob/master/examples/hello-world/src/lib.rs) uses this path through the server adapter. From the repository root:
+Call `render_to_string(&view)` to receive `Result<String, RenderError>`. Text and attribute values are escaped; `escape_text` is also available for text escaping. Build the View using `Element` and `View` from `yetlet::view`. The complete [Hello World handler](https://github.com/bohewu/yetlet/blob/master/examples/hello-world/src/lib.rs) uses this path through the server adapter. From the repository root:
 
 ```bash
 cargo run --locked -p yetlet-hello-world
 ```
 
-Open `http://127.0.0.1:3003/hello/World`. Use `yetlet-server-axum::Page` when you need a complete HTTP document with strict CSP; this serializer itself returns a fragment and owns neither response headers nor document metadata.
+Open `http://127.0.0.1:3003/hello/World`. Use `yetlet::server_axum::Page` with the `server-axum` feature when you need a complete HTTP document with strict CSP; this serializer itself returns a fragment and owns neither response headers nor document metadata.
 
 ## Policy and errors
 

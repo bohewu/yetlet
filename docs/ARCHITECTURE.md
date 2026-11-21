@@ -49,8 +49,11 @@ now provides built-in composition and the generic HostGroup/Host/ResourceGroup
 surface, with an independent five-Host std-only consumer. Its borrowing poll
 and async drive retain original owners through Pending; shutdown uses the same
 Core engine. YT-288 is independently reviewed and Done. No runtime, pool, thread
-or process is created by Core. HTML defaults and View exports remain until
-YT-289 changes them together with Browser wiring.
+or process is created by Core. [YT-289 feature isolation](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#17-yt-289--optional-view-and-browser-feature-isolation)
+now selects an empty default and gates View/HTML explicitly; Browser DOM and
+keyed-DOM each enable View and their corresponding reexports. Actions/GPU-only
+Browser selections remain independent. Focused verification and configured
+independent review pass; YT-289 is Done. Published alpha.8 is unchanged.
 
 Concrete Web/native drivers, broader external consumers, normal archives and
 next-alpha migration gates remain in the

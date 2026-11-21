@@ -45,8 +45,10 @@ syntax. There is no public style crate, renderer change or runtime style injecti
 
 The current checkout additionally provides built-in Core composition with
 HostGroup, custom Host extensions and ResourceGroup. YT-288 removes the
-composition feature opt-in without changing HTML defaults or View exports;
-the latter transition belongs to YT-289. See the [Core lifecycle contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
+composition feature opt-in. [YT-289](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#17-yt-289--optional-view-and-browser-feature-isolation)
+now selects default=[], optional view and html -> view; Browser DOM/keyed
+features select View and gate its reexports. Default-off actions/GPU selections
+do not add View, HTML or native Web. See the [Core lifecycle contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
 and [independent consumer](../examples/external-consumers/yt288-core-hosts/src/main.rs).
 This source addition does not change published alpha.8 package contents.
 

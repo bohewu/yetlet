@@ -1,11 +1,26 @@
 # yetlet::view
 
-**Experimental SDK module.** Requires Rust 1.99 or newer. Included in
-`yetlet` SDK `0.9.0-alpha.8`; this guide describes the selected package contents.
-Read source/rustdoc at the revision you consume; package selection does not
-establish registry availability or production qualification.
+**Experimental SDK module.** Requires Rust 1.99 or newer. Published
+`yetlet` SDK `0.9.0-alpha.8` provides View without a feature gate. The current
+checkout requires `view`; `html` and the Browser `dom`/`dom-keyed` features
+select it transitively. Read source/rustdoc at the revision you consume;
+these checkout feature changes do not alter the published alpha.8 artifact.
 
-`yetlet::view` describes UI as owned Rust values shared by the native HTML and browser DOM renderers. With `yetlet` default features disabled it has no external normal dependencies, browser runtime, server transport or implicit state scheduler.
+`yetlet::view` describes HTML/DOM UI as owned Rust values shared by the HTML and
+browser DOM renderers. The `view` feature adds no external normal dependencies,
+browser runtime, server transport or implicit state scheduler. Built-in Core
+composition remains available in the same package without a semantic dependency
+from View to Host lifecycle.
+
+For a View-only dependency on this checkout:
+
+```toml
+[dependencies]
+yetlet = { path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["view"] }
+```
+
+The `view` feature in this path example is checkout-specific; published alpha.8
+registry consumers retain their existing View dependency configuration.
 
 For a first-app continuation covering typed data, reusable functions, lists and
 conditions, follow [Write Views and reusable components](https://github.com/bohewu/yetlet/blob/master/docs/VIEW-COMPONENTS.md).
@@ -37,7 +52,7 @@ cargo run --locked -p yetlet --features server-axum --example server-axum-minima
 
 ## Contracts and limits
 
-`Element` stores tag/attribute names and values without validating or escaping them. `View::text` also stores untrusted text as-is: the selected renderer must enforce its own policy. Select `yetlet::html` for HTML serialization or explicitly select a browser renderer for WASM; core alone does not render. Tags and attribute names have static string lifetimes, while dynamic values and children are owned.
+`Element` stores tag/attribute names and values without validating or escaping them. `View::text` also stores untrusted text as-is: the selected renderer must enforce its own policy. Select the `html` feature for HTML serialization or a Browser DOM feature for WASM; View values alone do not render. Tags and attribute names have static string lifetimes, while dynamic values and children are owned.
 
 The `binding` module supplies `ComponentIdentity`, `BindingKey`, `SlotName`, `InertAttributeName` and `SlotDescriptor`. Validated identity/key/slot types reject values outside their bounded syntax through `BindingContractError`; this vocabulary does not implement event handlers, a template compiler, hydration or resumability. See [the binding source](../src/view/binding.rs) and [ADR 0007](https://github.com/bohewu/yetlet/blob/master/docs/adr/0007-bounded-keyed-dom-and-local-graph.md).
 
