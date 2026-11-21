@@ -1,0 +1,19 @@
+[package]
+name = "yetlet-host-lifecycle-research"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+description = "Private typed Host lifecycle and managed SQLite integration research"
+
+[workspace]
+
+[dependencies]
+yetlet = { path = "../../crates/yetlet", default-features = false, features = ["composition"] }
+yetlet-hosts = { path = "../../crates/yetlet-hosts", default-features = false, features = ["web-axum"] }
+axum = "=0.8.9"
+
+[dev-dependencies]
+tokio = { version = "=1.53.3", default-features = false, features = ["sync"] }
+rusqlite = { version = "=0.41.1", default-features = false, features = ["bundled"] }
+tempfile = "=3.27.0"

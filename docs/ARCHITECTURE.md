@@ -20,7 +20,9 @@ The design rationale and dated evidence below retain the original proposal and M
 The owner-directed [M28 study](M28-COMPOSABLE-APPLICATION-PLAN.md) explores
 applications without HTTP while preserving pure Web/API/SSR as a first-class
 mode. Historical HTML-first positioning does not constrain the study.
-[ADR 0013](adr/0013-composable-application-and-hosts.md) remains **Proposed**.
+[ADR 0013](adr/0013-composable-application-and-hosts.md) has an accepted scoped
+F2 amendment for the typed lifecycle core; broader high-level application
+contracts remain separately proposed.
 
 Host lifecycle, execution topology and Renderer selection are separate:
 a host need not own a thread/process and may select zero/one/multiple compatible
@@ -33,9 +35,47 @@ M28-B starts with a focused pure-Web preservation baseline (YT-276), then
 same-thread multi-host composition and an explicit worker/lifecycle variation.
 Existing Axum App/Router/Tower, default features, direct requests and Web CLI
 bootstrap remain; no new supervisor, queue or GPU dependency is compulsory.
-No measured zero-overhead claim follows from this plan. GameHost, NetworkHost,
-NetworkClient, BrowserHost and generic Application/HostGroup are not implemented
-by A. No public positioning, Core API or SDK/CLI release change occurs here.
+The initial M28-A plan made no measured zero-overhead claim and did not
+implement GameHost, NetworkHost, NetworkClient, BrowserHost or generic
+Application/HostGroup. That initial scope made no public positioning, Core API
+or SDK/CLI release change.
+
+The 2026-11-21 [layered Host design](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) and
+[ADR 0014](adr/0014-layered-host-resource-lifecycle.md) propose default Host
+resource management with optional ResourceGroup customization over one evolved
+lifecycle engine. At its reviewed checkpoint, the
+[YT-286-A private prototype](../examples/host-lifecycle-research/README.md) proved
+a compiling Application/Web/custom facade, deferred activity acquisition and
+passive RAII retention through original joins using the unchanged core.
+
+The subsequently authorized B1/B2 source proof adds opt-in Composition resources,
+managed activities and structural groups. One root admission/local/original-join
+barrier precedes final release. Reverse resource/group traversal retains earlier
+dependencies on Pending or retryable progress failure; terminal release failure
+is recorded once and does not repeat an already completed finalizer. Existing
+Local close-before-worker semantics remain unchanged. The private facade adds
+inert managed descriptors with deferred acquisition and cooperative release while
+preserving supplied passive resources. This introduces no separate coordinator,
+automatic executor, general dependency DAG or global Send/Sync/'static bound.
+
+B1/B2 acceptance requires focused evidence and configured independent review.
+The separately authorized B3 integration applies this contract to real SQLite
+work behind Web handlers in the private research workspace. One SQLite worker
+owns its Connection; a typed bounded client uses a shared command sender and
+oneshot replies. The registered Web activity drains and joins before SQLite
+final release closes that sender and joins the original database thread. A
+failed explicit close retains its live Connection for retry. Pending represents
+unfinished cleanup/observation and does not prove the Connection is still open.
+
+The [Web/SQLite integration source](../examples/host-lifecycle-research/examples/web_with_sqlite.rs)
+and [focused cases](../examples/host-lifecycle-research/tests/sqlite_web.rs) define
+the bounded runtime acceptance surface. Actual test and independent review
+receipts are required before claiming B3 acceptance. Its SQLite dependencies
+are private dev-dependencies; the normal Application API and core/SDK feature
+selection are unchanged. Native/shared drivers, full configuration overrides,
+live managed-owner adoption, arbitrary graphs, pools/processes and public facade
+promotion remain open under YT-286.
+
 ## Retained early Core and browser proof boundaries
 
 The M12–M19 source-only verification history predates the published SDK/CLI.

@@ -937,3 +937,512 @@ fn live_worker_is_observed_pending_while_signal_fails_then_original_handle_joins
     assert_eq!(signal_attempts.get(), 2);
     assert_eq!(app.parts().last().value().observation_calls, 3);
 }
+
+#[cfg(test)]
+mod final_release {
+    use super::*;
+    use yetlet::composition::{ReleaseCompletion, ReleaseStatus};
+
+    #[test]
+    fn resource_release_waits_for_the_original_join_across_group_boundary() {
+        let (worker, control) = HeldWorker::start(Outcome::Success);
+        let drops = Rc::new(Cell::new(0));
+        let activity_releases = Rc::new(Cell::new(0));
+        let releases = activity_releases.clone();
+        let dependency_gate = activity_releases.clone();
+        let mut app = Builder::<Error>::new()
+            .with_resource("dependency", DropProbe(drops.clone()), move |_, _| {
+                assert_eq!(dependency_gate.get(), 1);
+                Ok(ReleaseCompletion::Released(Ok(())))
+            })
+            .with_group(
+                "service",
+                Builder::<Error>::new().with_activity(
+                    "original worker",
+                    worker,
+                    HeldWorker::close_admission,
+                    HeldWorker::signal_stop,
+                    HeldWorker::observe,
+                    move |worker, _| {
+                        assert!(
+                            worker.join.is_none(),
+                            "final release requires the original Join"
+                        );
+                        releases.set(releases.get() + 1);
+                        Ok(ReleaseCompletion::Released(Ok(())))
+                    },
+                ),
+            )
+            .build();
+        assert!(app.parts_mut().last().parts_mut().last().mark_ready());
+        assert!(app.all_required_ready());
+        app.request_stop();
+        control.wait_for_stop();
+
+        assert_eq!(app.complete_until(Instant::now()), Completion::Pending);
+        assert_eq!(drops.get(), 0);
+        assert_eq!(activity_releases.get(), 0);
+        assert!(app.parts().previous().last().value().is_some());
+        let held = app.parts().last().parts().last().value();
+        assert_eq!(
+            held.join.as_ref().unwrap().thread().id(),
+            control.original_id
+        );
+
+        control.release();
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(drops.get(), 1);
+        assert!(app.parts().previous().last().value().is_none());
+        assert_eq!(
+            app.parts().previous().last().release_status(),
+            ReleaseStatus::Succeeded
+        );
+        let activity = app.parts().last().parts().last();
+        assert_eq!(activity.join_status(), JoinStatus::Succeeded);
+        assert_eq!(activity.release_status(), ReleaseStatus::Succeeded);
+        assert!(activity.value().join.is_none());
+        assert_eq!(
+            activity.value().observed_ids,
+            [control.original_id, control.original_id]
+        );
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(activity_releases.get(), 1);
+        assert_eq!(
+            app.parts().last().parts().last().value().observation_calls,
+            2
+        );
+    }
+
+    #[test]
+    fn pending_and_retryable_release_error_preserve_earlier_dependencies() {
+        let earlier_drops = Rc::new(Cell::new(0));
+        let held_drops = Rc::new(Cell::new(0));
+        let latest_drops = Rc::new(Cell::new(0));
+        let earlier_calls = Rc::new(Cell::new(0));
+        let held_calls = Rc::new(Cell::new(0));
+        let latest_calls = Rc::new(Cell::new(0));
+        let before = earlier_calls.clone();
+        let held_drop_observer = held_drops.clone();
+        let held_attempts = held_calls.clone();
+        let latest_attempts = latest_calls.clone();
+        let mut app = Builder::<Error>::new()
+            .with_resource("earlier", DropProbe(earlier_drops.clone()), move |_, _| {
+                assert_eq!(
+                    held_drop_observer.get(),
+                    1,
+                    "dependent value must already be dropped"
+                );
+                before.set(before.get() + 1);
+                Ok(ReleaseCompletion::Released(Ok(())))
+            })
+            .with_resource("held", DropProbe(held_drops.clone()), move |_, _| {
+                held_attempts.set(held_attempts.get() + 1);
+                match held_attempts.get() {
+                    1 => Ok(ReleaseCompletion::Pending),
+                    2 => Err("release temporarily unavailable"),
+                    _ => Ok(ReleaseCompletion::Released(Ok(()))),
+                }
+            })
+            .with_resource("latest", DropProbe(latest_drops.clone()), move |_, _| {
+                latest_attempts.set(latest_attempts.get() + 1);
+                Ok(ReleaseCompletion::Released(Ok(())))
+            })
+            .build();
+
+        assert_eq!(app.complete_until(Instant::now()), Completion::Pending);
+        assert_eq!(latest_calls.get(), 1);
+        assert_eq!(latest_drops.get(), 1);
+        assert_eq!(held_drops.get(), 0);
+        assert_eq!(earlier_calls.get(), 0);
+        assert!(app.parts().previous().last().value().is_some());
+        assert!(app.parts().previous().previous().last().value().is_some());
+
+        assert_eq!(app.complete_until(Instant::now()), Completion::Pending);
+        assert_eq!(
+            app.failures().primary(),
+            Some(&"release temporarily unavailable")
+        );
+        assert_eq!(
+            app.parts().previous().last().release_status(),
+            ReleaseStatus::Pending
+        );
+        assert_eq!(earlier_drops.get(), 0);
+        assert_eq!(held_drops.get(), 0);
+        assert_eq!(latest_calls.get(), 1);
+
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(app.phase(), Phase::Failed);
+        assert_eq!(held_calls.get(), 3);
+        assert_eq!(earlier_calls.get(), 1);
+        assert_eq!(held_drops.get(), 1);
+        assert_eq!(earlier_drops.get(), 1);
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(held_calls.get(), 3);
+        assert_eq!(earlier_calls.get(), 1);
+        assert_eq!(latest_calls.get(), 1);
+    }
+
+    struct OrderedDrop {
+        label: &'static str,
+        events: Rc<RefCell<Vec<&'static str>>>,
+    }
+
+    impl Drop for OrderedDrop {
+        fn drop(&mut self) {
+            self.events.borrow_mut().push(self.label);
+        }
+    }
+
+    #[test]
+    fn terminal_release_error_drops_value_before_earlier_finalizer_and_latches_once() {
+        let events = Rc::new(RefCell::new(Vec::new()));
+        let earlier_events = events.clone();
+        let later_events = events.clone();
+        let mut app = Builder::<Error>::new()
+            .with_resource(
+                "earlier",
+                OrderedDrop {
+                    label: "earlier dropped",
+                    events: events.clone(),
+                },
+                move |_, _| {
+                    assert_eq!(
+                        &*earlier_events.borrow(),
+                        &["later finalizer", "later dropped"]
+                    );
+                    earlier_events.borrow_mut().push("earlier finalizer");
+                    Ok(ReleaseCompletion::Released(Ok(())))
+                },
+            )
+            .with_resource(
+                "later",
+                OrderedDrop {
+                    label: "later dropped",
+                    events: events.clone(),
+                },
+                move |_, _| {
+                    later_events.borrow_mut().push("later finalizer");
+                    Ok(ReleaseCompletion::Released(Err("terminal release failed")))
+                },
+            )
+            .build();
+
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(app.phase(), Phase::Failed);
+        assert_eq!(app.failures().primary(), Some(&"terminal release failed"));
+        assert!(app.failures().secondary().is_empty());
+        assert_eq!(app.parts().last().release_status(), ReleaseStatus::Failed);
+        assert_eq!(
+            app.parts().previous().last().release_status(),
+            ReleaseStatus::Succeeded
+        );
+        assert!(app.parts().last().value().is_none());
+        assert!(app.parts().previous().last().value().is_none());
+        assert_eq!(
+            &*events.borrow(),
+            &[
+                "later finalizer",
+                "later dropped",
+                "earlier finalizer",
+                "earlier dropped"
+            ]
+        );
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        drop(app);
+        assert_eq!(
+            events.borrow().len(),
+            4,
+            "terminal release and Drop must not repeat"
+        );
+    }
+
+    #[test]
+    fn later_start_failure_keeps_primary_through_retry_and_terminal_release_errors() {
+        let drops = Rc::new(Cell::new(0));
+        let attempts = Rc::new(Cell::new(0));
+        let observed_attempts = attempts.clone();
+        let result = Builder::<Error>::new()
+            .with_resource("dependency", DropProbe(drops.clone()), move |_, _| {
+                observed_attempts.set(observed_attempts.get() + 1);
+                if observed_attempts.get() == 1 {
+                    Err("cleanup observation failed")
+                } else {
+                    Ok(ReleaseCompletion::Released(Err("cleanup terminal failure")))
+                }
+            })
+            .try_required_local(
+                "later start",
+                || Err::<(), _>("original startup failure"),
+                |_| Ok(()),
+            );
+        let failure = match result {
+            Err(failure) => failure,
+            Ok(_) => panic!("the later factory must fail"),
+        };
+        assert_eq!(
+            failure.root().failures().primary(),
+            Some(&"original startup failure")
+        );
+        assert_eq!(drops.get(), 0);
+        assert_eq!(attempts.get(), 0, "request_stop must not run final release");
+        let mut app = failure.into_root();
+        assert_eq!(app.complete_until(Instant::now()), Completion::Pending);
+        assert_eq!(app.failures().primary(), Some(&"original startup failure"));
+        assert_eq!(app.failures().secondary(), &["cleanup observation failed"]);
+        assert!(app.parts().last().value().is_some());
+        assert_eq!(drops.get(), 0);
+
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(app.phase(), Phase::Failed);
+        assert_eq!(app.failures().primary(), Some(&"original startup failure"));
+        assert_eq!(
+            app.failures().secondary(),
+            &["cleanup observation failed", "cleanup terminal failure"]
+        );
+        assert_eq!(app.parts().last().release_status(), ReleaseStatus::Failed);
+        assert_eq!(drops.get(), 1);
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(attempts.get(), 2);
+    }
+
+    #[test]
+    fn failed_original_join_is_terminal_before_dependency_release() {
+        let (worker, control) = HeldWorker::start(Outcome::WorkerError);
+        let joined = Rc::new(Cell::new(false));
+        let joined_for_release = joined.clone();
+        let joined_for_observe = joined.clone();
+        let drops = Rc::new(Cell::new(0));
+        let mut app = Builder::<Error>::new()
+            .with_resource("dependency", DropProbe(drops.clone()), move |_, _| {
+                assert!(
+                    joined_for_release.get(),
+                    "failed Join still precedes final release"
+                );
+                Ok(ReleaseCompletion::Released(Ok(())))
+            })
+            .required_worker(
+                "failing worker",
+                worker,
+                HeldWorker::close_admission,
+                HeldWorker::signal_stop,
+                move |worker, remaining| {
+                    let result = worker.observe(remaining);
+                    if matches!(&result, Ok(WorkerCompletion::Joined(_))) {
+                        joined_for_observe.set(true);
+                    }
+                    result
+                },
+            )
+            .build();
+        app.request_stop();
+        control.wait_for_stop();
+        control.release();
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(app.phase(), Phase::Failed);
+        assert_eq!(app.failures().primary(), Some(&"worker operation failed"));
+        assert_eq!(app.parts().last().join_status(), JoinStatus::Failed);
+        assert!(app.parts().last().value().join.is_none());
+        assert_eq!(
+            app.parts().last().value().observed_ids,
+            [control.original_id]
+        );
+        assert_eq!(drops.get(), 1);
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(app.parts().last().value().observation_calls, 1);
+        assert_eq!(drops.get(), 1);
+    }
+
+    #[test]
+    fn nested_groups_keep_one_expired_deadline_for_observe_and_release() {
+        let events = Rc::new(RefCell::new(Vec::new()));
+        let observed = events.clone();
+        let activity_release = events.clone();
+        let inner_release = events.clone();
+        let outer_release = events.clone();
+        let root_release = events.clone();
+        let caller_owned = Cell::new(0);
+        let inner = Builder::<Error>::new()
+            .with_resource("inner dependency", (), move |_, remaining| {
+                inner_release.borrow_mut().push(("inner", remaining));
+                Ok(ReleaseCompletion::Released(Ok(())))
+            })
+            .with_activity(
+                "local activity",
+                (),
+                |_| Ok(()),
+                |_| Ok(()),
+                move |_, remaining| {
+                    observed.borrow_mut().push(("observe", remaining));
+                    Ok(WorkerCompletion::Joined(Ok(())))
+                },
+                move |_, remaining| {
+                    activity_release.borrow_mut().push(("activity", remaining));
+                    Ok(ReleaseCompletion::Released(Ok(())))
+                },
+            );
+        let outer = Builder::<Error>::new()
+            .with_resource("outer dependency", (), move |_, remaining| {
+                outer_release.borrow_mut().push(("outer", remaining));
+                Ok(ReleaseCompletion::Released(Ok(())))
+            })
+            .with_group("inner group", inner);
+        let mut app = Builder::<Error>::new()
+            .with_resource("caller borrow", &caller_owned, move |counter, remaining| {
+                counter.set(counter.get() + 1);
+                root_release.borrow_mut().push(("root", remaining));
+                Ok(ReleaseCompletion::Released(Ok(())))
+            })
+            .with_group("outer group", outer)
+            .build();
+        assert!(
+            app.parts_mut()
+                .last()
+                .parts_mut()
+                .last()
+                .parts_mut()
+                .last()
+                .mark_ready()
+        );
+        assert!(app.all_required_ready());
+        let expired = Instant::now();
+        assert_eq!(app.complete_until(expired), Completion::Complete);
+        assert!(app.failures().primary().is_none());
+        let log = events.borrow();
+        let order: Vec<_> = log.iter().map(|(label, _)| *label).collect();
+        assert_eq!(order, ["observe", "activity", "inner", "outer", "root"]);
+        assert!(log.iter().all(|(_, remaining)| remaining.is_zero()));
+        drop(log);
+        drop(app);
+        assert_eq!(caller_owned.get(), 1);
+        caller_owned.set(2);
+    }
+
+    #[test]
+    fn failed_admission_and_unfinished_legacy_local_each_block_final_release() {
+        let (worker, control) = HeldWorker::start(Outcome::Success);
+        let admission_allowed = Rc::new(Cell::new(false));
+        let local_allowed = Rc::new(Cell::new(false));
+        let admission_gate = admission_allowed.clone();
+        let local_gate = local_allowed.clone();
+        let local_attempts = Rc::new(Cell::new(0));
+        let local_calls = local_attempts.clone();
+        let releases = Rc::new(Cell::new(0));
+        let release_calls = releases.clone();
+        let drops = Rc::new(Cell::new(0));
+        let mut app = Builder::<Error>::new()
+            .with_resource("final dependency", DropProbe(drops.clone()), move |_, _| {
+                release_calls.set(release_calls.get() + 1);
+                Ok(ReleaseCompletion::Released(Ok(())))
+            })
+            .required_local("legacy local", (), move |_| {
+                local_calls.set(local_calls.get() + 1);
+                if local_gate.get() {
+                    Ok(())
+                } else {
+                    Err("legacy local not closed")
+                }
+            })
+            .required_worker(
+                "original worker",
+                worker,
+                move |worker| {
+                    if admission_gate.get() {
+                        worker.close_admission()
+                    } else {
+                        Err("admission not closed")
+                    }
+                },
+                HeldWorker::signal_stop,
+                HeldWorker::observe,
+            )
+            .build();
+        assert_eq!(app.complete_until(Instant::now()), Completion::Pending);
+        assert_eq!(local_attempts.get(), 0);
+        assert_eq!(app.parts().last().value().signal_calls, 0);
+        assert_eq!(app.parts().last().value().observation_calls, 0);
+        assert_eq!(releases.get(), 0);
+        assert_eq!(drops.get(), 0);
+
+        admission_allowed.set(true);
+        app.request_stop();
+        control.wait_for_stop();
+        control.release();
+        assert_eq!(app.complete_until(deadline()), Completion::Pending);
+        assert_eq!(app.parts().last().join_status(), JoinStatus::Succeeded);
+        assert_eq!(app.parts().last().value().observation_calls, 1);
+        assert_eq!(releases.get(), 0);
+        assert_eq!(drops.get(), 0);
+        assert!(app.parts().previous().previous().last().value().is_some());
+
+        local_allowed.set(true);
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(app.failures().primary(), Some(&"admission not closed"));
+        assert!(
+            app.failures()
+                .secondary()
+                .contains(&"legacy local not closed")
+        );
+        assert_eq!(app.parts().last().value().observation_calls, 1);
+        assert_eq!(releases.get(), 1);
+        assert_eq!(drops.get(), 1);
+    }
+
+    #[test]
+    fn managed_activity_release_pending_and_retry_do_not_repeat_original_join() {
+        let (worker, control) = HeldWorker::start(Outcome::Success);
+        let attempts = Rc::new(Cell::new(0));
+        let release_attempts = attempts.clone();
+        let drops = Rc::new(Cell::new(0));
+        let mut app = Builder::<Error>::new()
+            .with_resource("dependency", DropProbe(drops.clone()), |_, _| {
+                Ok(ReleaseCompletion::Released(Ok(())))
+            })
+            .with_activity(
+                "managed worker",
+                worker,
+                HeldWorker::close_admission,
+                HeldWorker::signal_stop,
+                HeldWorker::observe,
+                move |worker, _| {
+                    assert!(worker.join.is_none());
+                    release_attempts.set(release_attempts.get() + 1);
+                    match release_attempts.get() {
+                        1 => Ok(ReleaseCompletion::Pending),
+                        2 => Err("activity finalization retry"),
+                        _ => Ok(ReleaseCompletion::Released(Ok(()))),
+                    }
+                },
+            )
+            .build();
+        app.request_stop();
+        control.wait_for_stop();
+        control.release();
+        assert_eq!(app.complete_until(deadline()), Completion::Pending);
+        assert_eq!(app.parts().last().join_status(), JoinStatus::Succeeded);
+        assert_eq!(app.parts().last().release_status(), ReleaseStatus::Pending);
+        assert!(app.parts().last().value().join.is_none());
+        assert_eq!(drops.get(), 0);
+        assert_eq!(app.complete_until(deadline()), Completion::Pending);
+        assert_eq!(
+            app.failures().primary(),
+            Some(&"activity finalization retry")
+        );
+        assert_eq!(app.parts().last().value().observation_calls, 1);
+        assert_eq!(drops.get(), 0);
+
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(
+            app.parts().last().release_status(),
+            ReleaseStatus::Succeeded
+        );
+        assert_eq!(app.parts().last().value().observation_calls, 1);
+        assert_eq!(
+            app.parts().last().value().observed_ids,
+            [control.original_id]
+        );
+        assert_eq!(attempts.get(), 3);
+        assert_eq!(drops.get(), 1);
+        assert_eq!(app.complete_until(deadline()), Completion::Complete);
+        assert_eq!(attempts.get(), 3);
+    }
+}

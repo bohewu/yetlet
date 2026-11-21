@@ -15,7 +15,10 @@ pub(super) trait Part<E> {
     fn signal(&mut self, _: &mut Failures<E>) -> bool {
         true
     }
-    fn observe(&mut self, _: Duration, _: &mut Failures<E>) -> Completion {
+    fn observe(&mut self, _: Instant, _: &mut Failures<E>) -> Completion {
+        Completion::Complete
+    }
+    fn release(&mut self, _: Instant, _: &mut Failures<E>) -> Completion {
         Completion::Complete
     }
 }
@@ -26,6 +29,9 @@ pub(super) trait Chain<E> {
     fn close_locals(&mut self, failures: &mut Failures<E>) -> bool;
     fn signal_workers(&mut self, failures: &mut Failures<E>) -> bool;
     fn observe_owned(&mut self, deadline: Instant, failures: &mut Failures<E>) -> Completion;
+    fn release_owned(&mut self, deadline: Instant, failures: &mut Failures<E>) -> Completion;
+    // Ordinary RAII destruction for structural groups; no lifecycle callbacks.
+    fn drop_parts_reverse(self);
 }
 
 impl<E> Chain<E> for Empty {
@@ -44,6 +50,10 @@ impl<E> Chain<E> for Empty {
     fn observe_owned(&mut self, _: Instant, _: &mut Failures<E>) -> Completion {
         Completion::Complete
     }
+    fn release_owned(&mut self, _: Instant, _: &mut Failures<E>) -> Completion {
+        Completion::Complete
+    }
+    fn drop_parts_reverse(self) {}
 }
 
 impl<E, P: Chain<E>, T: Part<E>> Chain<E> for Attached<P, T> {
@@ -70,15 +80,25 @@ impl<E, P: Chain<E>, T: Part<E>> Chain<E> for Attached<P, T> {
     }
 
     fn observe_owned(&mut self, deadline: Instant, failures: &mut Failures<E>) -> Completion {
-        let last = self
-            .last
-            .observe(deadline.saturating_duration_since(Instant::now()), failures);
+        let last = self.last.observe(deadline, failures);
         let previous = self.previous.observe_owned(deadline, failures);
         if last == Completion::Pending || previous == Completion::Pending {
             Completion::Pending
         } else {
             Completion::Complete
         }
+    }
+
+    fn release_owned(&mut self, deadline: Instant, failures: &mut Failures<E>) -> Completion {
+        if self.last.release(deadline, failures) == Completion::Pending {
+            return Completion::Pending;
+        }
+        self.previous.release_owned(deadline, failures)
+    }
+
+    fn drop_parts_reverse(self) {
+        drop(self.last);
+        self.previous.drop_parts_reverse();
     }
 }
 
@@ -158,11 +178,14 @@ where
         }
     }
 
-    fn observe(&mut self, remaining: Duration, failures: &mut Failures<E>) -> Completion {
+    fn observe(&mut self, deadline: Instant, failures: &mut Failures<E>) -> Completion {
         if self.join_status != JoinStatus::Pending {
             return Completion::Complete;
         }
-        match (self.observe)(&mut self.value, remaining) {
+        match (self.observe)(
+            &mut self.value,
+            deadline.saturating_duration_since(Instant::now()),
+        ) {
             Ok(WorkerCompletion::Pending) => Completion::Pending,
             Err(error) => {
                 // Failure to observe is not proof that the original task ended.

@@ -9,7 +9,30 @@ Host, renderer and execution topology remain independent capability choices:
 View supports HTML/DOM; game scenes use separate GPU backends; hosts may select
 zero/one/multiple renderers and need not own dedicated threads/processes.
 Single-writer commands/snapshots apply to the shared simulation POC, not all
-HTTP requests. [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**.
+HTTP requests. [ADR 0013](adr/0013-composable-application-and-hosts.md) retains
+its original research proposal and the separately accepted scoped F2 decision.
+
+### Current selected sequence — YT-286 replan
+
+The owner selected breaking next-alpha Core/View/Web layering, with minimal
+published SDK packages and optional features rather than one package per layer. The
+[ordered delivery plan](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#14-replanned-public-delivery--yt-287-through-yt-294)
+retains the reviewed A/B1/B2/B3 proofs and defines the remaining public work:
+
+- [ ] YT-287: source-backed architecture, feature/import and driver contract.
+- [ ] YT-288: built-in Core composition and generic Host defaults.
+- [ ] YT-289: optional View/HTML and Browser DOM feature migration.
+- [ ] YT-290: optional Web module and HTTP protocol separation.
+- [ ] YT-291: shared Web lifecycle with caller-runtime and owned-thread drivers.
+- [ ] YT-292: optional Native/Network/custom Host integration.
+- [ ] YT-293: CLI, remaining consumers, docs and minimal-cohort feature migration.
+- [ ] YT-294: external consumers, normal archives and public source qualification.
+
+Review and locally commit this plan before starting YT-287. New feature/API boundaries,
+runtime behavior and next-alpha publication are not delivered by planning.
+The [backlog](BACKLOG.md#yt-286-replan--core-view-and-web-delivery) owns current
+states/dependencies; older entries below retain their checkpoint-specific scope.
+Physical F3/D4 remains independent.
 
 ### Planned delivery follow-through
 

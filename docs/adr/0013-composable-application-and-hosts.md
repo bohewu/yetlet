@@ -6,6 +6,14 @@
 - **Decision owner:** Project maintainer, explicit scoped F2 adoption on 2026-11-19 after private F1 and YT-281/282-A evidence.
 - **Related:** [M28 plan and source inventory](../M28-COMPOSABLE-APPLICATION-PLAN.md), [ADR 0001](0001-separation-of-concerns.md), [ADR 0003](0003-renderers-and-loading.md), [ADR 0005](0005-opt-in-capability-modules.md), [ADR 0011](0011-application-startup-api.md), [ADR 0012](0012-server-axum-prelude.md).
 
+## Layered Host follow-up — 2026-11-21
+
+[ADR 0014](0014-layered-host-resource-lifecycle.md) and its
+[research/design document](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) propose
+high-level Host defaults with optional ResourceGroup customization. That new
+proposal remains unimplemented and Proposed; its review does not amend the
+accepted F2 baseline below or constitute public API adoption.
+
 ## Context
 
 The owner wants to investigate Yetlet as a Composable Application Framework:

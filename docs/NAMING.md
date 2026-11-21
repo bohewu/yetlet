@@ -173,6 +173,43 @@ Original runtime diagnostic output labels are historical observation formats,
 not Rust public method names, and remain unchanged. This does not change
 Window ownership, EventLoop affinity, readiness or renderer lifecycle.
 
+## Proposed Host lifecycle vocabulary — YT-286
+
+The [layered Host design](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) and
+[ADR 0014](adr/0014-layered-host-resource-lifecycle.md) propose Application/Host
+defaults with ResourceGroup customization over one lifecycle engine.
+The authorized [YT-286-A private prototype](../examples/host-lifecycle-research/README.md)
+uses `Application::new`, `with_host`, `ResourceGroup`, `with_resource`,
+`request_shutdown` and `shutdown_until`. The earlier `Application::builder`
+spelling was illustrative and is not retained as an alias. These names are not
+yet an accepted public replacement for the current Composition API.
+
+B1/B2 adds bounded source interfaces with distinct responsibilities:
+
+| Layer and spelling | Meaning |
+|---|---|
+| Private `ResourceGroup::with_resource(value)` / `WebHost::with_resource(value)` | Retain a supplied passive owned or borrowed value; the A ownership contract remains. |
+| Private `with_managed_resource(label, descriptor)` | Register an inert resource whose `acquire` and `release_within` have explicit ownership contracts. |
+| Core `Builder::with_resource(label, value, release)` | Install a typed final-release dependency; registration does not acquire it. |
+| Core `Builder::with_activity` | Attach an original activity with a post-join final-release callback. |
+| Core `Builder::with_group` | Nest typed parts under the same coordinator and failure ledger. |
+| `ReleaseCompletion::Pending` | Cleanup is incomplete and its original owner remains retained. |
+| `ReleaseCompletion::Released(result)` | Cleanup is terminal; an error in `result` records failure without repeating release. |
+| `ReleaseStatus` | Read the latched Pending/Succeeded/Failed release outcome. |
+
+An outer error from `release_within` means retryable progress failure and retains
+ownership. It differs from terminal `Released(Err(...))`. The sealed
+`ResourceParts` bound is generic storage support, not a custom coordinator
+extension interface. These additions do not rename the accepted Local/Worker
+API or promote the private Host facade.
+
+The proposed rule is to name resource ownership, acquisition and shutdown
+operations by intent. Do not use `required`, `foreground` or `ready/worker`
+as unexplained quickstart categories. A `try_` pair needs a documented
+operation-specific distinction; Result alone does not require that prefix.
+Deferred acquisition and dependency-safe release are behavioral additions
+requiring implementation proof, not consequences of renaming.
+
 ## Dated naming audit dispositions
 
 The 2026-10-22 audit attachment SHA256

@@ -43,6 +43,13 @@
 //! retry their signal. Aggregate completion also requires local cleanup and is
 //! separate from success: inspect [Composition::failures].
 //!
+//! Opt-in [Resource] and [ManagedWorker] finalizers run only after that global
+//! local/Join barrier. They release in reverse registration order, including
+//! nested [Group] parts, using the same absolute deadline. Pending or a retryable
+//! error retains earlier dependencies; terminal release errors are latched and
+//! do not repeat a finished finalizer. Resource values are dropped on terminal
+//! release, while legacy Local/Worker value containers retain their old behavior.
+//!
 //! Callbacks must preserve resources on errors/Pending and truthfully report
 //! readiness, closure and Join. A factory that returns an error must clean up
 //! resources it never returned. Panics are not caught. Shutdown/observation is
@@ -79,6 +86,12 @@ use std::fmt;
 use std::time::{Duration, Instant};
 
 mod lifecycle;
+mod resources;
+
+pub use resources::{
+    ActivityBuilder, Group, ManagedWorker, ReleaseCompletion, ReleaseStatus, Resource,
+    ResourceParts,
+};
 
 /// Lifecycle progress; failure details are independently retained in [Failures].
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
@@ -98,7 +111,7 @@ pub enum Phase {
 /// Whether explicit cleanup and all owned completion have been confirmed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Completion {
-    /// All locals closed and all workers joined; inspect failures for the outcome.
+    /// All locals closed, workers joined and managed resources released; inspect failures.
     Complete,
     /// Original owners remain stored and need further caller-driven completion.
     Pending,
@@ -638,8 +651,10 @@ impl<E, P: lifecycle::Chain<E>> Composition<E, P> {
     /// All callbacks receive the same overall deadline as remaining time.
     /// Callbacks may exceed it; no preemption, automatic retry loop or hard timeout
     /// is promised. Pending retains the same root and worker storage. Complete
-    /// means locals closed and workers joined, including failed Joins; inspect
-    /// failures and status. After admission closes, a failed signal does not
+    /// means locals closed, workers joined (including failed Joins), and opt-in
+    /// finalizers terminal. Final release uses the same remaining deadline;
+    /// Pending/retryable failure retains earlier dependencies. Inspect failures
+    /// and individual Join/release status. After admission closes, a failed signal does not
     /// prevent observation of an already finished worker.
     pub fn complete_until(&mut self, deadline: Instant) -> Completion {
         self.request_stop();
@@ -650,7 +665,7 @@ impl<E, P: lifecycle::Chain<E>> Composition<E, P> {
         // after admission closes even if local cleanup or signal delivery failed.
         let workers = self.parts.observe_owned(deadline, &mut self.failures);
         let completion = if self.locals_stopped && workers == Completion::Complete {
-            Completion::Complete
+            self.parts.release_owned(deadline, &mut self.failures)
         } else {
             Completion::Pending
         };
