@@ -10,6 +10,31 @@ This repository contains an Experimental SDK and independent CLI with accepted p
 
 Write **all repository documentation in English**, including the README, ADRs, architecture, roadmap, backlog, validation records, and future Markdown files. Preserve the original technical meaning, acceptance evidence, links, IDs, and decision status when editing. Run `cargo xtask check docs` to verify language, references, and backlog structure.
 
+### Known ignored evidence diagnostics
+
+Historical, intentionally retained `.pipeline-output/` handoffs, review
+requests, failed-run logs and receipts can be Git-ignored yet still be scanned
+by `cargo xtask check docs`. Git ignore status does **not** imply checker PASS.
+
+- Preserve original ignored evidence and the actual nonzero checker result;
+  never delete/edit evidence, bypass checks or call a failing command PASS to
+  clear historical diagnostics.
+- If a failure is wholly attributable to previously identified, unchanged
+  ignored evidence, record its source paths/count and classification in the
+  ignored task handoff once. **Do not repeatedly foreground or re-run the same
+  known non-actionable failure** in later progress reports or handoffs.
+- Continue scoped validation of new or touched source/doc files. Newly
+  introduced findings, changed identities/counts, tracked-file failures,
+  dependencies, CI/Commit Guard/release gates or product defects remain
+  actionable. Investigate and report them; an ignored-path error can still
+  matter if it actually blocks a required gate.
+- If a required broad command still exits nonzero, preserve its true result
+  in detailed evidence and qualify any completion claim. Reuse unchanged-source
+  receipts instead of rerunning a known failing global check for bookkeeping.
+  Keep routine summaries focused on changed tests, reviewers, Git state and
+  open product gates; mention historical-only findings again only if they
+  materially change a decision.
+
 ## Work sequence
 
 1. Read this file, the relevant ADR(s), the targeted backlog item(s), and any higher-priority workspace policies before making changes.

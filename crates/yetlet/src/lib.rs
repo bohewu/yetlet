@@ -32,6 +32,7 @@
 //! | `config`, `secrets`, `secret-provider` | Optional native startup loading, secret lookup and their bridge |
 //! | `signing` | Optional native signing/verifying API with caller-owned trust and OpenSSL prerequisites |
 //! | `actions`, `reactive` | Typed action boundary and synchronous local state graph |
+//! | `composition` | Optional std-only typed resources, readiness and explicit owned completion |
 //!
 //! Cargo features make APIs available; application startup installs middleware,
 //! providers and typed state. Native capability modules are absent on `wasm32`.
@@ -52,6 +53,8 @@ pub use view::{Attribute, Element, View};
 pub mod actions;
 #[cfg(all(feature = "auth", not(target_arch = "wasm32")))]
 pub mod auth;
+#[cfg(feature = "composition")]
+pub mod composition;
 #[cfg(all(feature = "config", not(target_arch = "wasm32")))]
 pub mod config;
 #[cfg(feature = "html")]

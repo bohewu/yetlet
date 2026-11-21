@@ -246,6 +246,15 @@ Host compose via public APIs with observable state and lifecycle behavior.
 Document restrictions for incompatible foreground schedulers instead of promising
 that every arbitrary runtime can be combined without an adapter.
 
+**Maintainer scope clarification (2026-11-21):** Yetlet supplies a thin,
+opt-in Native Window/EventLoop Host; a future Game Engine would be a separate
+SDK. The consumer retains raw Winit Keyboard/Mouse/Focus/Resize/DeviceEvent,
+input mapping, game loop, simulation, scenes and application network protocol.
+A consumer with its own Window/EventLoop may compose Yetlet's other Hosts
+without creating another Window. No new framework Input Manager, engine API,
+YTP1/Replica/Reconnect or precise frame-pacing gate is required for YT-283.
+YT-284 remains the independent package/compatibility gate.
+
 ### YT-284 - Public consumer, compatibility and documentation gate
 
 Check the exact selected candidate package contents with independent consumers;

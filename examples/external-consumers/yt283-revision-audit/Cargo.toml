@@ -1,0 +1,22 @@
+[package]
+name = "yt283-revision-audit"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[workspace]
+
+[features]
+default = []
+three-way = ["dep:yetlet-hosts", "dep:axum", "dep:winit"]
+
+[dependencies]
+yetlet = { path = "../../../crates/yetlet", default-features = false, features = ["composition"] }
+yetlet-hosts = { path = "../../../crates/yetlet-hosts", default-features = false, features = ["web-axum", "udp", "native-winit", "renderer-wgpu"], optional = true }
+axum = { version = "=0.8.9", optional = true }
+winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }
+
+[[bin]]
+name = "revision-audit-three-way"
+path = "src/main.rs"
+required-features = ["three-way"]

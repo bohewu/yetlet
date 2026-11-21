@@ -6,6 +6,9 @@
 
 // F0-B1 private caller-local C1 composition: finite input plus read-only observer.
 pub mod headless_composition_f0b1;
+// YT-282-A: test-only std-only typed static-root feasibility proof; no SDK API.
+#[cfg(test)]
+mod composition_f2a;
 
 // D3 fixed-seed bounded real loopback datagram fault adapter; std-only.
 pub mod fault_d3;

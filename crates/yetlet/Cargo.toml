@@ -14,6 +14,7 @@ default = ["html"]
 html = []
 actions = ["dep:serde"]
 reactive = []
+composition = []
 server-axum = ["html", "dep:axum", "dep:serde", "dep:tower", "dep:tokio"]
 request-id = ["server-axum"]
 session = ["server-axum", "dep:cookie", "dep:getrandom", "dep:subtle"]
@@ -66,6 +67,14 @@ futures = { version = "0.3", default-features = false, features = ["executor"] }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(yetlet_session_admission_probe)'] }
+
+[[test]]
+name = "composition"
+required-features = ["composition"]
+
+[[example]]
+name = "composition_local"
+required-features = ["composition"]
 
 [[test]]
 name = "server_axum_handler_results"

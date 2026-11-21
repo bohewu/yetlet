@@ -1,0 +1,21 @@
+[package]
+name = "yt284-public-compat"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Independent package-surface compatibility consumer for Yetlet"
+
+# Keep this outside Yetlet's workspace to test the public Cargo boundary.
+[workspace]
+
+[features]
+default = []
+pure-web = ["yetlet/server-axum", "dep:axum"]
+local-headless = ["yetlet/composition"]
+native-udp = ["yetlet/composition", "dep:yetlet-hosts", "dep:winit"]
+
+[dependencies]
+yetlet = { path = "../../../crates/yetlet", default-features = false }
+yetlet-hosts = { path = "../../../crates/yetlet-hosts", default-features = false, features = ["native-winit", "udp"], optional = true }
+axum = { version = "=0.8.9", optional = true }
+winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }

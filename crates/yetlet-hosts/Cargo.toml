@@ -1,0 +1,47 @@
+[package]
+name = "yetlet-hosts"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Optional concrete native host adapters for Yetlet"
+publish = false
+
+[features]
+default = []
+web-axum = ["dep:yetlet", "dep:axum", "dep:tokio"]
+udp = []
+native-winit = ["dep:winit"]
+renderer-wgpu = ["dep:wgpu"]
+
+[dependencies]
+yetlet = { path = "../yetlet", default-features = false, features = ["server-axum", "composition"], optional = true }
+axum = { version = "=0.8.9", optional = true }
+tokio = { version = "=1.53.3", default-features = false, features = ["rt", "net", "sync", "time"], optional = true }
+winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }
+wgpu = { version = "=27.0.1", default-features = false, features = ["std", "vulkan", "wgsl"], optional = true }
+
+
+[dev-dependencies]
+yetlet = { path = "../yetlet", default-features = false, features = ["composition"] }
+
+[[test]]
+name = "web_axum"
+required-features = ["web-axum"]
+
+[[test]]
+name = "udp"
+required-features = ["udp"]
+
+[[example]]
+name = "native_winit_foreground"
+required-features = ["native-winit"]
+
+[[example]]
+name = "native_wgpu_triangle"
+required-features = ["native-winit", "renderer-wgpu"]
+
+[[example]]
+name = "composition_three_way"
+required-features = ["native-winit", "renderer-wgpu", "udp", "web-axum"]

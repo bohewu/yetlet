@@ -1,9 +1,9 @@
 # ADR 0013 — Composable Application and Explicit Host Ownership
 
-- **Status:** Proposed.
+- **Status:** Accepted for the scoped F2 amendment on 2026-11-19; remaining implementation gates stay open.
 - **Date:** 2026-11-17.
 - **Tracking:** YT-265, M28-A.
-- **Decision owner:** Project maintainers after M28-B through M28-E evidence.
+- **Decision owner:** Project maintainer, explicit scoped F2 adoption on 2026-11-19 after private F1 and YT-281/282-A evidence.
 - **Related:** [M28 plan and source inventory](../M28-COMPOSABLE-APPLICATION-PLAN.md), [ADR 0001](0001-separation-of-concerns.md), [ADR 0003](0003-renderers-and-loading.md), [ADR 0005](0005-opt-in-capability-modules.md), [ADR 0011](0011-application-startup-api.md), [ADR 0012](0012-server-axum-prelude.md).
 
 ## Context
@@ -32,6 +32,126 @@ Separate Host identity, Renderer selection, state policy and execution topology.
 A Host retains lifecycle without requiring its own thread/process. The amended
 plan inserts YT-276 / B0 Web preservation before multi-host implementation.
 This remains a Proposed design, not public API or measured performance evidence.
+
+## Accepted scoped F2 decision — 2026-11-19
+
+The project maintainer explicitly accepted the bounded F2 amendment in the
+original WebCodex conversation on 2026-11-19 and authorized YT-282-B public
+std-only core implementation, focused validation and independent review.
+This satisfies the distinct owner-decision gate; it does not authorize a
+commit, push, publication, version change or another adapter increment.
+
+The accepted decision is the independently reviewed proposal at ADR SHA256
+`cc98ae4d768af7f8b9848cdc4e9e8f5ed9549aed7ba5b1e5054d46dc1af3f8cd`
+and promotion-packet SHA256
+`108d2f19696df5b6bfb6b5e398d4fbf205be297d3b1682a6ca9f20a88e6ca6d3`.
+Independent proposal Reviewer R1 `wc_job_b4AiE5FZQ86zwJB6` completed with
+exit 0 and actual JSON PASS, `issues=[]`. The YT-281 illustrative signatures
+remain design evidence, not a frozen public API.
+
+Accepted scope: default-off `yetlet::composition` through the additive
+`composition` feature; statically typed application-owned resources and
+custom Host callbacks; caller-local `Rc`, borrowed resources and foreground
+execution; required readiness, first-failure retention, admission-before-domain
+stop, separate shutdown signal, and truthful original-worker Join/Pending.
+No generic public Host/Transport/Renderer trait, dynamic registry, DI,
+mandatory scheduler or automatic per-Host thread/process is adopted.
+
+Separate optional `yetlet-hosts` adapter directions remain later increments.
+The present implementation authority is **YT-282-B std-only core only**.
+Real Web/UDP/Native/GPU adapters, F1 migration, external YT-283 consumers,
+YT-284 package qualification, F3 and physical D4 are deferred. Existing
+default HTML, direct Axum/Tower APIs, browser separation and CLI stay intact.
+Physical D4 remains **Not verified**; historical Docs FAIL18 and current
+FAIL19 evidence remain retained. F2 overall is still open.
+
+The historical proposal below records the pre-adoption reasoning and gates.
+Its then-pending wording is superseded only by this bounded decision.
+
+## 2026-11-19 — F2 scoped promotion amendment candidate (decision pending)
+
+**Status: Proposed only; this section is not an accepted/public API decision.**
+The earlier B–D instruction not to publish a generic Application/Host/HostGroup
+remains applicable to those private proofs. After the bounded [F1 three-host
+acceptance](../M28-MULTI-HOST-DELIVERY-PLAN.md) and [YT-281 source-grounded
+contract](../M28-F2-PUBLIC-COMPOSITION-CONTRACT.md), F2 has one newly justified
+coordination responsibility: an *opt-in, application-owned, statically typed*
+composition of resources with required readiness, explicit admission-first stop,
+rollback, and truthful owned completion. This is an additive **candidate
+amendment** to the historical POC direction, not a universal `Host` trait.
+
+The [promotion decision packet](../M28-F2-ADR-PROMOTION-BOUNDARY.md) records the
+exact pending maintainer choice and acceptance gates. The [YT-282-A private
+test-only proof](../../examples/composable-host-research/src/composition_f2a.rs)
+compiles a minimal static-chain ownership algorithm in an unpublished research
+crate (12 focused tests); it is not an implemented public `yetlet` module or
+real native/Web adapter.
+
+### Proposed public scope, contingent on owner acceptance
+
+- **Core opt-in:** add an off-by-default `composition` feature under the
+  existing `yetlet` package, exposing `yetlet::composition`. The core remains
+  standard-library-only, with no compulsory Axum/Tokio/winit/wgpu/UDP, new
+  scheduler, app-wide `Send`/`Sync` bound, or HTML-centric framework assumption.
+  The existing default `html`, browser separation, and direct
+  `server_axum::App`/`Router`/`serve`/`serve_on` stay unchanged.
+- **Optional native adapters:** one candidate companion `yetlet-hosts` with
+  no default features and independently selected `native-winit`,
+  `renderer-wgpu`, `udp`, and `web-axum` features. Its name, package layout and
+  individual features are *proposed*, not present in Cargo or promised as
+  released products. `server-axum` integration reuses native Axum/Tower.
+- **Typed attachments, no universal Host Trait:** proposed local, fallibly
+  prepared, owned-worker, required foreground, and borrowed-part operations;
+  statically preserved concrete types and caller callbacks for stop/join. A
+  user-defined Host supplies the same typed attachment operations with real
+  behavior and cleanup rather than registering into a global trait object,
+  service locator, DI container or runtime registry.
+- **Resource lifetime:** the caller retains winit foreground execution and
+  any borrowed Tokio/runtime resources. The application owns its domain and
+  selects any single-authority policy, including the F1 one-C1-owner case.
+  Only actual cross-thread adapter messages/publications require appropriate
+  `Send`/`Sync`; local `Rc` and mutable borrows remain caller-thread-local.
+- **Required lifecycle invariant:** actual readiness (not worker creation);
+  on failure, preserve the first cause, close previously owned resources and
+  separately report secondary cleanup issues. Stop new Web command admission
+  **before** stopping its C1 authority; if admission closure fails, keep C1 and
+  owned workers alive and return Pending until safe retry. A distinct control
+  signal stops/drains HTTP, not the bounded data queue. Stop/cleanup/signal
+  outcomes and original JoinHandle ownership remain observable; timeouts
+  return `Pending`, not successful completion or detached workers.
+- **Domain/transport separation:** byte-oriented UDP and Native renderer
+  lifecycle may become optional adapters, but F1 Twin Squares, `YTP1`
+  codec/session policy, player permissions, game Snapshot and fixed tick
+  remain consumer-specific. This decision does not introduce a general
+  Transport/Renderer trait, reliable/authenticated UDP, physical LAN proof
+  or a second authoritative Simulation.
+
+### Decision and implementation gates
+
+The maintainer must **explicitly accept or reject this amendment** before
+mutating the published `yetlet` API/feature graph or adding `yetlet-hosts`.
+Design review, a subsequent "continue" instruction, or a private proof alone
+does not convey that approval. If accepted, update this ADR's status through
+a distinct, recorded maintainer decision; acceptance chooses *direction*, not
+automatic source/registry publication or version promotion.
+
+Implement F2 in bounded increments **after** that decision: (1) compile and
+test the small public std-only typed core with consumer-driven signatures;
+(2) real owned Web bridge/drain; (3) UDP byte/socket adapter separated from
+game/session policy; (4) caller-driven Native/Winit and optional wgpu;
+(5) migrate the actual F1 three-way application while retaining the sole
+authority. Each changed adapter gets behavior-specific focused tests and
+independent review. An actual external custom Host and local `Rc` consumer
+must compile via only public package APIs in YT-283; exact package/dependency
+and compatibility tests belong to YT-284. F2 is **not Done** until all its
+public consumer/feature/lifecycle gates are satisfied. Physical D4 remains
+**Not verified** independently of F2.
+
+**Not yet frozen:** the exact Rust generic/receiver shapes in the YT-281
+illustrative examples. YT-282's first compiling public consumer must resolve
+them without introducing a blanket Send bound or hiding an unfinished
+original worker behind `Drop`. Reject a candidate if actual consumer code
+cannot preserve those invariants with reasonable static types.
 
 ## Proposed direction
 
