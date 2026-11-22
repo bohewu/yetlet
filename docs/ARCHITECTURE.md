@@ -8,12 +8,144 @@ research prototypes retain their recorded scopes. The typed Tag Builder is part 
 the published alpha.7 SDK; private app Style tooling ships in CLI 0.3.0,
 while Showcase remains a checkout sample.
 Publication does not establish production or universal platform qualification.
-**Scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
+**Published scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
 **Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md), [application startup contract — ADR 0011](adr/0011-application-startup-api.md), [Axum adapter prelude — ADR 0012](adr/0012-server-axum-prelude.md).
 
 Current usage is documented in the [current module guides](API-REFERENCE.md), [HTTP pipeline](HTTP-PIPELINE.md) and [sample guide](SAMPLES.md). Shared owned Views feed escaped native HTML or explicitly built browser DOM/WASM. App/Page preserve native Axum/Tower handlers; local graph, keyed children, request correlation and Memory Session are explicit opt-ins. SQL/storage stay application-owned. No Controller, DI, plugin registry or ORM is required.
 
 The design rationale and dated evidence below retain the original proposal and M7 decision history. Diagram references to compiler/macros and candidate IR are exploratory, not implemented authoring APIs. Current research decisions are in the [completed studies index](README.md#completed-research-prototypes); historical execution is not transferred to today's dirty source.
+
+## Next-alpha target — YT-287 feature-first composition
+
+The owner selects a small, composable Rust application framework with minimal
+SDK publication: keep yetlet and yetlet-browser and expose optional capabilities
+through modules/features. The [YT-287 contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
+and [ADR 0014](adr/0014-layered-host-resource-lifecycle.md#yt-287-target-decision--minimal-packages-optional-capabilities)
+define the independently reviewed target. Implementation is staged; the published
+pair is unchanged. The built-in Core slice is described below.
+
+| Layer | Next-alpha responsibility |
+|---|---|
+| Core in yetlet, default=[] | Built-in composition and generic HostGroup/Host/ResourceGroup; std-only lifetime coordination without mandatory UI, runtime, state service or serialization. |
+| Optional View / HTML | Shared owned HTML/DOM values and pure serializer; no semantic dependency on lifecycle and no native scene-graph claim. |
+| Optional Web | App, WebHost and native HTTP integration; Web API without HTML, SSR with web + html. Caller-runtime and owned-thread drivers use the same lifecycle rules. |
+| Optional commands / state helpers | Neutral actions with executor-specific errors, target-neutral actions-http envelopes, local reactive graph and separately optional native command/snapshot bridge. |
+| Optional native integrations | Winit, UDP, native wgpu and existing auxiliary services; feature combinations expose capabilities while runtime plans enforce ownership/affinity. |
+| yetlet-browser | Existing separate browser adapters; DOM selects view and HTTP actions select actions-http, without enabling native Web. |
+
+App means HTTP service configuration. HostGroup means coordinated Host
+lifetimes. ResourceGroup is advanced resource ownership/control, not a DI
+container. A Host does not imply a thread, process or renderer.
+
+The consuming App::serve convenience retains ordinary cancellation semantics:
+dropping its future is not graceful-completion evidence. Managed resources
+require a retained owner, cancellation-safe driver storage and explicit
+completion progress. View/HTML-only users still consume the Core-containing
+package; feature isolation promises no unwanted adapter dependencies, not a
+separate Core-free archive.
+
+YT-287 is Done at contract scope. [YT-288 Core](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
+now provides built-in composition and the generic HostGroup/Host/ResourceGroup
+surface, with an independent five-Host std-only consumer. Its borrowing poll
+and async drive retain original owners through Pending; shutdown uses the same
+Core engine. YT-288 is independently reviewed and Done. No runtime, pool, thread
+or process is created by Core. [YT-289 feature isolation](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#17-yt-289--optional-view-and-browser-feature-isolation)
+now selects an empty default and gates View/HTML explicitly; Browser DOM and
+keyed-DOM each enable View and their corresponding reexports. Actions/GPU-only
+Browser selections remain independent. Focused verification and configured
+independent review pass; YT-289 is Done. Published alpha.8 is unchanged.
+
+[YT-290 Web/protocol ownership](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership)
+now separates web from HTML and neutral actions from actions-http. App and the
+relocated advanced HttpWorker share one Web-owned serving implementation;
+active source consumers use the new module/feature names. Focused native tests,
+isolated feature/target graphs and probes, migrated consumers and strict quality
+checks and configured independent review pass; YT-290 is Done. The moved worker
+retains its existing advanced lifecycle.
+
+[YT-291 managed Web](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#19-yt-291--managed-web-lifecycle-and-drivers)
+connects App/WebHost to that same Core coordinator. One retained service
+implementation supports caller-runtime and owned-thread drivers, with actual
+initialization readiness, admission fencing, original completion and dependency
+release. Core adds explicit pre-acquisition driver preparation and a std-only
+blocking drive; no automatic pool or process policy is introduced.
+[YT-292 native integration](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration)
+adds canonical command-bridge/UDP/Winit/renderer feature modules. A typed root
+driver advances the same coordinator inside Winit callbacks through all final
+release, with multiple windows under one NativeHost. UDP remains caller-driven;
+Web may retain its owned-thread placement. No dependency or renderer is added
+to default Core. [YT-293 migration](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection)
+removes the final staging package, migrates its consumers and selects CLI template
+features/imports from the chosen SDK metadata. Core and concrete Host lifecycles
+are unchanged. SDK publication keeps two packages.
+[YT-294 archive qualification](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#22-yt-294--normal-archives-and-external-consumer-qualification)
+verifies normal Core then Browser archives and six independent consumer families
+with explicit feature/target graphs. The local development archives are distinct
+from published alpha.8; a unique release and compatible CLI must qualify registry
+scaffolding before publication. Configured independent review passes; YT-294 and
+YT-286 are Done at source/package delivery scope.
+The research history below retains its original default-feature/API assumptions.
+
+## Proposed composable application research
+
+The owner-directed [M28 study](M28-COMPOSABLE-APPLICATION-PLAN.md) explores
+applications without HTTP while preserving pure Web/API/SSR as a first-class
+mode. Historical HTML-first positioning does not constrain the study.
+[ADR 0013](adr/0013-composable-application-and-hosts.md) has an accepted scoped
+F2 amendment for the typed lifecycle core; broader high-level application
+contracts remain separately proposed.
+
+Host lifecycle, execution topology and Renderer selection are separate:
+a host need not own a thread/process and may select zero/one/multiple compatible
+renderers. Existing View projects to HTML or browser DOM; game SceneData has
+separate backend paths. Browser is an environment, not itself a renderer.
+One writer plus bounded commands/immutable snapshots is the shared-simulation
+POC choice, not a mandatory global actor or HTTP request pipeline.
+
+M28-B starts with a focused pure-Web preservation baseline (YT-276), then
+same-thread multi-host composition and an explicit worker/lifecycle variation.
+Existing Axum App/Router/Tower, default features, direct requests and Web CLI
+bootstrap remain; no new supervisor, queue or GPU dependency is compulsory.
+The initial M28-A plan made no measured zero-overhead claim and did not
+implement GameHost, NetworkHost, NetworkClient, BrowserHost or generic
+Application/HostGroup. That initial scope made no public positioning, Core API
+or SDK/CLI release change.
+
+The 2026-11-21 [layered Host design](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) and
+[ADR 0014](adr/0014-layered-host-resource-lifecycle.md) propose default Host
+resource management with optional ResourceGroup customization over one evolved
+lifecycle engine. At its reviewed checkpoint, the
+[YT-286-A private prototype](../examples/host-lifecycle-research/README.md) proved
+a compiling Application/Web/custom facade, deferred activity acquisition and
+passive RAII retention through original joins using the unchanged core.
+
+The subsequently authorized B1/B2 source proof adds opt-in Composition resources,
+managed activities and structural groups. One root admission/local/original-join
+barrier precedes final release. Reverse resource/group traversal retains earlier
+dependencies on Pending or retryable progress failure; terminal release failure
+is recorded once and does not repeat an already completed finalizer. Existing
+Local close-before-worker semantics remain unchanged. The private facade adds
+inert managed descriptors with deferred acquisition and cooperative release while
+preserving supplied passive resources. This introduces no separate coordinator,
+automatic executor, general dependency DAG or global Send/Sync/'static bound.
+
+B1/B2 acceptance requires focused evidence and configured independent review.
+The separately authorized B3 integration applies this contract to real SQLite
+work behind Web handlers in the private research workspace. One SQLite worker
+owns its Connection; a typed bounded client uses a shared command sender and
+oneshot replies. The registered Web activity drains and joins before SQLite
+final release closes that sender and joins the original database thread. A
+failed explicit close retains its live Connection for retry. Pending represents
+unfinished cleanup/observation and does not prove the Connection is still open.
+
+The [Web/SQLite integration source](../examples/host-lifecycle-research/examples/web_with_sqlite.rs)
+and [focused cases](../examples/host-lifecycle-research/tests/sqlite_web.rs) define
+the bounded runtime acceptance surface. Actual test and independent review
+receipts are required before claiming B3 acceptance. Its SQLite dependencies
+are private dev-dependencies; the normal Application API and core/SDK feature
+selection are unchanged. Native/shared drivers, full configuration overrides,
+live managed-owner adoption, arbitrary graphs, pools/processes and public facade
+promotion remain open under YT-286.
 
 ## Retained early Core and browser proof boundaries
 

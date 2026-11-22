@@ -10,8 +10,8 @@ use std::{collections::BTreeMap, path::PathBuf, sync::Arc};
 use tower::ServiceExt;
 use yetlet::config::Loader;
 use yetlet::secrets::{ExposeSecret, SecretError, SecretProvider, SecretString, SettingsSecrets};
-use yetlet::server_axum::{App, Page};
 use yetlet::view::View;
+use yetlet::web::{App, Page};
 
 #[derive(Debug, Deserialize)]
 #[serde(deny_unknown_fields)]

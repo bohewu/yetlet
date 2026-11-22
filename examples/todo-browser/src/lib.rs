@@ -27,18 +27,34 @@ mod runtime {
     use wasm_bindgen::{JsCast, JsValue, prelude::wasm_bindgen};
     use wasm_bindgen_futures::{JsFuture, spawn_local};
     use web_sys::{Document, Element, HtmlInputElement, Node};
-    use yetlet::actions::{ActionError, ActionExecutor};
+    use yetlet::actions::ActionExecutor;
+    use yetlet::actions_http::ActionError;
     use yetlet::reactive::{GraphHandle, LocalGraph, ReactiveError};
     use yetlet::view::binding::BindingKey;
     use yetlet_browser::actions::HttpExecutor;
     use yetlet_browser::dom::mount as mount_view;
     use yetlet_browser::dom_keyed::{DomEventListener, KeyedChildren, KeyedEntry};
     use yetlet_todo_ui::{
-        Todo, TodoCommand, TodoSnapshot, apply_todo_command, browser_page, todo_list,
+        Todo, TodoCommand, TodoError, TodoSnapshot, apply_todo_command, browser_page, todo_list,
     };
 
-    type TodoGraph = LocalGraph<TodoSnapshot, TodoCommand, ActionError>;
-    type TodoGraphHandle = GraphHandle<TodoSnapshot, TodoCommand, ActionError>;
+    #[derive(Debug)]
+    enum LocalActionError {
+        Domain(TodoError),
+        Internal,
+    }
+
+    impl LocalActionError {
+        fn code(&self) -> &'static str {
+            match self {
+                Self::Domain(error) => error.code(),
+                Self::Internal => "internal_error",
+            }
+        }
+    }
+
+    type TodoGraph = LocalGraph<TodoSnapshot, TodoCommand, LocalActionError>;
+    type TodoGraphHandle = GraphHandle<TodoSnapshot, TodoCommand, LocalActionError>;
 
     struct TodoRow {
         text: Node,
@@ -50,7 +66,9 @@ mod runtime {
     }
 
     impl ActionExecutor<TodoCommand> for LocalGraphExecutor {
-        async fn execute(&self, command: TodoCommand) -> Result<TodoSnapshot, ActionError> {
+        type Error = LocalActionError;
+
+        async fn execute(&self, command: TodoCommand) -> Result<TodoSnapshot, Self::Error> {
             self.handle.dispatch(command).map_err(graph_action_error)?;
             self.handle.snapshot().map_err(graph_action_error)
         }
@@ -102,13 +120,13 @@ mod runtime {
             .ok_or_else(|| JsValue::from_str(&format!("missing #{identifier}")))
     }
 
-    fn graph_action_error(error: ReactiveError<ActionError>) -> ActionError {
+    fn graph_action_error(error: ReactiveError<LocalActionError>) -> LocalActionError {
         match error {
             ReactiveError::Reducer(error) | ReactiveError::Commit(error) => error,
             ReactiveError::Disposed
             | ReactiveError::Faulted
             | ReactiveError::ObserverIdExhausted
-            | ReactiveError::ReentrantLimit { .. } => ActionError::Internal,
+            | ReactiveError::ReentrantLimit { .. } => LocalActionError::Internal,
         }
     }
 
@@ -314,7 +332,11 @@ mod runtime {
         list_host.set_attribute("data-yetlet-local-runtime", "keyed-graph")?;
         let graph = LocalGraph::new(
             initial,
-            |state, command| apply_todo_command(state, command).map(|_| ()),
+            |state, command| {
+                apply_todo_command(state, command)
+                    .map(|_| ())
+                    .map_err(LocalActionError::Domain)
+            },
             {
                 let list = Rc::clone(&list);
                 move |snapshot: &TodoSnapshot| {
@@ -326,7 +348,7 @@ mod runtime {
                     );
                     if let Err(error) = result {
                         web_sys::console::error_1(&error);
-                        return Err(ActionError::Internal);
+                        return Err(LocalActionError::Internal);
                     }
                     Ok(())
                 }

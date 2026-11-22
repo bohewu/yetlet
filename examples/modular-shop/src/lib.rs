@@ -22,8 +22,8 @@ use axum::{
     http::StatusCode,
     response::{IntoResponse, Redirect, Response},
 };
-use yetlet::server_axum::prelude::{App, Element, View};
 use yetlet::session::{Session, SessionConfig, SessionConfigError, SessionError, SessionManager};
+use yetlet::web::prelude::{App, Element, View};
 
 pub use database::{Database, DatabaseOptions};
 pub use identity::DemoIdentities;

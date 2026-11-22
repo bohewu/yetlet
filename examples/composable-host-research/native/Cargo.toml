@@ -1,0 +1,26 @@
+[package]
+name = "yetlet-native-gamehost-research"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+default-run = "yetlet-native-gamehost-research"
+description = "Private opt-in native winit/wgpu C2 GameHost research (YT-269)"
+
+# Keep the B0 Web and B1/B2/C1 private std-only package untouched.
+[workspace]
+
+[features]
+default = []
+# F1 native Web is only selected by the private three-host research consumer.
+f1-web = ["dep:yetlet", "dep:axum", "dep:tokio", "dep:serde"]
+
+[dependencies]
+yetlet-composable-host-research = { path = ".." }
+winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"] }
+wgpu = { version = "=27.0.1", default-features = false, features = ["std", "vulkan", "wgsl"] }
+pollster = "=0.4.0"
+yetlet = { version = "0.9.0-alpha.8", path = "../../../crates/yetlet", default-features = false, features = ["web"], optional = true }
+axum = { version = "=0.8.9", optional = true }
+tokio = { version = "=1.53.3", default-features = false, features = ["rt", "net", "sync", "time"], optional = true }
+serde = { version = "=1.0.229", features = ["derive"], optional = true }

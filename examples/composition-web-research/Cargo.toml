@@ -1,0 +1,19 @@
+[package]
+name = "yetlet-private-web-composition-research"
+version = "0.0.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+description = "F0-B2 private opt-in native Axum composition consumer"
+
+# A separate unpublished workspace; not a Yetlet SDK/root workspace member.
+[workspace]
+
+[dependencies]
+yetlet = { version = "0.9.0-alpha.8", path = "../../crates/yetlet", default-features = false, features = ["web", "html"] }
+axum = "=0.8.9"
+tokio = { version = "=1.53.3", features = ["rt", "macros", "net", "time", "sync"] }
+
+[dev-dependencies]
+tower = { version = "=0.5.3", features = ["util"] }
+reqwest = { version = "=0.12.28", default-features = false }

@@ -1,11 +1,12 @@
 # Yetlet
 
-**A small, composable, extensible Rust web framework.**
+**A small, composable Rust application framework with explicit capabilities.**
 
-Yetlet is a small, composable Rust web framework built around explicit capabilities
-and clear separation of concerns. HTML rendering is a first-class feature,
-including server-side rendering that works without JavaScript. Browser
-interactivity and additional capabilities are opt-in.
+Yetlet separates application lifetimes, HTTP services, shared Views and rendering.
+Choose the capabilities an application needs. The published Web/SSR SDK described
+below renders useful HTML without JavaScript and adds browser interaction only
+when selected. The [development checkout](#development-checkout) also provides
+built-in Core lifetimes and optional Web, Native, UDP and renderer modules.
 
 Build server-rendered pages and HTTP APIs with ordinary Axum handlers. Share
 Rust Views with optional browser WASM when a screen needs local interaction.
@@ -64,15 +65,19 @@ including its OpenSSL dependency, before installing.
 Use the pinned Rust/Cargo 1.99.0 toolchain. Native SSR needs no Node.js or WASM
 toolchain. APIs may change; see [compatibility](docs/COMPATIBILITY.md).
 
-From the repository root:
+From the repository root of the
+[published alpha.8 source tag](https://github.com/bohewu/yetlet/tree/v0.9.0-alpha.8):
 
 ```sh
 cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
 ```
 
+The development checkout uses the feature selections documented below; its
+manifest version alone does not make it identical to this published source.
+
 Open `http://127.0.0.1:7878/` for HTML and
 `http://127.0.0.1:7878/api/status` for JSON. Stop the server with Ctrl+C.
-The complete [running example](crates/yetlet/examples/server_axum/minimal.rs) is:
+The complete [published example](https://github.com/bohewu/yetlet/blob/v0.9.0-alpha.8/crates/yetlet/examples/server_axum/minimal.rs) is:
 
 ```rust
 use yetlet::server_axum::prelude::*;
@@ -99,6 +104,48 @@ Use `App::serve_on(address)` to choose a different bind address.
 `App::into_router()` returns a native Axum Router for custom listeners or
 graceful shutdown. For parameters or fallible handlers, use ordinary extractors
 and `Page` or `Result<Page, E>`. See the [server guide](crates/yetlet/guides/server-axum.md).
+
+## Development checkout
+
+This source tree uses the next-alpha feature contract. It does not change the
+published SDK or the Reader Edition above. Use this checkout's CLI when selecting
+a feature-module SDK; the published CLI's exact compatibility limits and upgrade
+or pin path are recorded in the [compatibility guide](docs/COMPATIBILITY.md).
+
+`yetlet` has `default = []`. `HostGroup`, `Host` and `ResourceGroup` are built in;
+Core adds no HTTP runtime, View layer, thread pool or process supervisor. SDK
+publication remains the two packages `yetlet` and `yetlet-browser`.
+
+| Application need | Explicit selection |
+|---|---|
+| Custom/local Host lifetimes | Core only, no feature |
+| Shared HTML/DOM values | `view` |
+| HTML serialization | `html` (enables `view`) |
+| HTTP API | `web` |
+| Server-rendered HTTP pages | `web` + `html` |
+| One native event loop with multiple windows | `native-winit` |
+| Bounded caller-driven UDP | `udp` |
+| Bounded command/snapshot bridge | `command-bridge` |
+| Independent native GPU renderer | `renderer-wgpu` |
+| Browser DOM | `yetlet-browser` with `dom` or `dom-keyed` |
+
+For this checkout's HTTP example:
+
+```sh
+cargo run --locked -p yetlet --no-default-features --features web,html --example server-axum-minimal
+```
+
+The existing example target name is retained; its source imports `yetlet::web`.
+`App` configures one HTTP service. Convert it with `App::into_host()` when its
+lifetime must be coordinated with other Hosts. Ordinary consumers compose
+`HostGroup::new().with_host(...)`; advanced callers customize resources through
+`ResourceGroup`. Constructors and `build()` do not acquire resources.
+
+See the [current API map](docs/API-REFERENCE.md#source-only-checkout-additions),
+[managed Web consumer](examples/external-consumers/web-hosts/README.md) and
+[two-window/UDP/Web/custom-resource consumer](examples/external-consumers/native-hosts/README.md).
+These examples describe source capabilities; GPU/platform and normal-archive
+qualification require their own evidence.
 
 ## Choose your next step
 

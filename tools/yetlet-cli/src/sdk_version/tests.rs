@@ -513,6 +513,121 @@ fn rust_metadata_does_not_impose_a_cli_admission_ceiling() {
 }
 
 #[test]
+fn feature_module_selection_uses_declared_features_without_new_policy_fields() {
+    let version = "0.10.0";
+    for fields in [false, true] {
+        let mut core = row("yetlet", version);
+        let features = serde_json::json!({
+            "default": [], "view": [], "web": ["view"], "html": ["view"],
+            "reactive": [], "config": []
+        });
+        core["features"] = serde_json::json!({"server-axum": []});
+        core[if fields { "features2" } else { "features" }] = features;
+        let records = [
+            record("yetlet", &[row("yetlet", A7), core]),
+            record("yetlet-browser", &[row("yetlet-browser", version)]),
+        ];
+        for template in [
+            Template::Native,
+            Template::NativeStyle,
+            Template::Browser,
+            Template::BrowserStyle,
+        ] {
+            for settings in [false, true] {
+                let sdk = select(
+                    Request {
+                        settings,
+                        ..request(template, None, false)
+                    },
+                    &records,
+                    "fixture",
+                    &policy(),
+                )
+                .unwrap();
+                assert_eq!(sdk.version, version);
+                assert_eq!(sdk.api, SdkApi::FeatureModules);
+                assert!(!sdk.m26_startup);
+                let receipt = serde_json::to_value(sdk).unwrap();
+                assert!(receipt.get("api").is_none());
+                assert_eq!(receipt["policy"], "sdk-latest-v2");
+            }
+        }
+    }
+}
+
+#[test]
+fn invalid_or_mixed_module_features_do_not_fall_back_to_legacy_or_older_sdk() {
+    let version = "0.10.0";
+    for (template, settings, features, missing) in [
+        (
+            Template::Native,
+            false,
+            serde_json::json!({"view": [], "server-axum": []}),
+            "web",
+        ),
+        (
+            Template::Native,
+            false,
+            serde_json::json!({"web": [], "server-axum": []}),
+            "html",
+        ),
+        (
+            Template::Native,
+            false,
+            serde_json::json!({"web": ["missing"], "html": [], "server-axum": []}),
+            "web",
+        ),
+        (
+            Template::Native,
+            true,
+            serde_json::json!({"web": [], "html": [], "server-axum": []}),
+            "config",
+        ),
+        (
+            Template::Browser,
+            false,
+            serde_json::json!({"web": [], "reactive": [], "server-axum": []}),
+            "view",
+        ),
+        (
+            Template::Browser,
+            false,
+            serde_json::json!({"view": ["missing"], "reactive": [], "server-axum": []}),
+            "view",
+        ),
+    ] {
+        let mut core = row("yetlet", version);
+        core["features"] = features;
+        let records = [
+            record("yetlet", &[row("yetlet", A7), core]),
+            record(
+                "yetlet-browser",
+                &[row("yetlet-browser", A7), row("yetlet-browser", version)],
+            ),
+        ];
+        for exact in [None, Some(version)] {
+            let error = select(
+                Request {
+                    settings,
+                    ..request(template, exact, false)
+                },
+                &records,
+                "fixture",
+                &policy(),
+            )
+            .unwrap_err();
+            assert!(error.starts_with("SDK_INCOMPATIBLE: 0.10.0"), "{error}");
+            assert!(
+                error.contains(&format!("required feature {missing}")),
+                "{error}"
+            );
+            assert!(error.contains("--sdk-version"), "{error}");
+            assert!(error.contains("no fallback was selected"), "{error}");
+        }
+    }
+}
+
+#[test]
 fn latest_feature_or_dependency_failure_does_not_select_an_older_sdk() {
     for (template, problem) in [
         (Template::Native, "server-axum"),

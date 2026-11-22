@@ -12,12 +12,12 @@ use axum::{
 };
 use serde::Deserialize;
 use tower::ServiceExt;
-use yetlet::server_axum::{
+use yetlet::view::{Element, View};
+use yetlet::web::{
     App, DEFAULT_CSP, HtmlPageError, RequestContext,
     middleware::{Next, with_global},
     render_page,
 };
-use yetlet::view::{Element, View};
 
 async fn homepage() -> Result<Response, HtmlPageError> {
     let content: View = Element::new("h1").child(View::text("<Yetlet>")).into();

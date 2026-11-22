@@ -50,7 +50,7 @@ jobs:
         run: |
           set -euo pipefail
           packages=(-p yetlet -p yetlet-browser)
-          features=(--no-default-features --features 'yetlet/html,yetlet/actions,yetlet/reactive,yetlet/server-axum,yetlet/request-id,yetlet/session,yetlet-browser/dom,yetlet-browser/dom-keyed,yetlet-browser/actions')
+          features=(--no-default-features --features 'yetlet/html,yetlet/actions,yetlet/reactive,yetlet/web,yetlet/request-id,yetlet/session,yetlet-browser/dom,yetlet-browser/dom-keyed,yetlet-browser/actions')
           cargo +stable check --locked --all-targets "${packages[@]}" "${features[@]}" 2>&1 | tee target/qualification/native-check.log
           cargo +stable test --locked --all-targets "${packages[@]}" "${features[@]}" 2>&1 | tee target/qualification/native-test.log
           cargo +stable test --locked --doc "${packages[@]}" "${features[@]}" 2>&1 | tee target/qualification/native-doc.log

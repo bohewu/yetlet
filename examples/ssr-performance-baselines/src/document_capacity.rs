@@ -311,7 +311,7 @@ mod tests {
         assert!(document.starts_with("<!doctype html><html lang=\"en-US\">"));
         assert!(document.contains("<title>&lt;&gt;&amp;&quot;&#39;café</title>"));
         assert!(document.ends_with("<body><p>&lt;&amp;&gt;</p></body></html>"));
-        let default = yetlet::server_axum::render_document("<&>", &View::text("<&>")).unwrap();
+        let default = yetlet::web::render_document("<&>", &View::text("<&>")).unwrap();
         assert!(default.starts_with("<!doctype html><html lang=\"zh-Hant\">"));
         assert!(default.contains("<title>&lt;&amp;&gt;</title>"));
         for (view, error) in [

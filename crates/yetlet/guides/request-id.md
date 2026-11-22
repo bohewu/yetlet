@@ -1,18 +1,18 @@
 # yetlet::request_id
 
-**Experimental SDK module.** Requires Rust 1.99 or newer. Included in
-`yetlet` SDK `0.9.0-alpha.8`; this guide describes the selected package contents.
-Read source/rustdoc at the revision you consume; package selection does not
-establish registry availability or production qualification.
+**Experimental SDK module.** Requires Rust 1.99 or newer. Published SDK
+`0.9.0-alpha.8` includes this module with its original `server-axum` dependency.
+The example below uses this checkout's `yetlet::web` imports. The published
+artifact is unchanged; read source/rustdoc at the revision you consume.
 
-`yetlet::request_id` adds explicitly installed process-local numeric request correlation to an Axum/Yetlet app. It depends on Axum and `yetlet::server_axum` and has no browser dependency. An app that does not select it allocates no provider counter.
+`yetlet::request_id` adds explicitly installed process-local numeric request correlation to an Axum/Yetlet app. In this checkout, `request-id` enables `web` without enabling View or HTML, and has no browser dependency. An app that does not select it allocates no provider counter.
 
 ## Install a scoped provider
 
 This example is copied verbatim from the existing `RequestIds::scoped` rustdoc:
 
 ```rust
-use yetlet::server_axum::{App, extract::Extension};
+use yetlet::web::{App, extract::Extension};
 use yetlet::request_id::{RequestId, RequestIds};
 async fn item(Extension(id): Extension<RequestId>) -> String { id.0.to_string() }
 let app: axum::Router = App::new().group("/api", |api| {

@@ -119,7 +119,7 @@ fn snapshot_digests_and_recorded_source_are_independent_of_current_sdk_checkout(
 
 fn contains_numbered_marker(bytes: &[u8]) -> bool {
     for i in 0..bytes.len().saturating_sub(2) {
-        if bytes[i].to_ascii_lowercase() != b'y' || bytes[i + 1].to_ascii_lowercase() != b't' {
+        if !bytes[i].eq_ignore_ascii_case(&b'y') || !bytes[i + 1].eq_ignore_ascii_case(&b't') {
             continue;
         }
         let digit = if bytes.get(i + 2) == Some(&b'-') {
@@ -135,6 +135,10 @@ fn contains_numbered_marker(bytes: &[u8]) -> bool {
 }
 
 #[test]
+#[expect(
+    clippy::byte_char_slices,
+    reason = "Byte arrays avoid embedding numbered labels in this self-scanned source."
+)]
 fn package_sources_omit_numbered_work_items() {
     fn check(path: &Path) {
         let metadata = std::fs::symlink_metadata(path).unwrap();

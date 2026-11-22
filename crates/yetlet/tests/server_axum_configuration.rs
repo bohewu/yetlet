@@ -9,7 +9,7 @@ use std::sync::{
     atomic::{AtomicUsize, Ordering},
 };
 use tower::ServiceExt;
-use yetlet::server_axum::{
+use yetlet::web::{
     App,
     extract::Extension,
     http::{Request, StatusCode},

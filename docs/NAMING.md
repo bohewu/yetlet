@@ -158,6 +158,143 @@ snake_case. Existing type/method names, application feature names, settings keys
 and wire formats remain unchanged. Historical release documentation keeps its
 original names. See the [migration map](COMPATIBILITY.md#two-package-feature-and-target-contract).
 
+## Native Window API semantic names — YT-282 naming follow-up
+
+The optional `yetlet::native_winit::WindowSlot` (formerly in the source-only
+`yetlet_hosts` companion) exposes
+`window()` as a borrowed `&Window` and `shared_window()` as a cloned
+`Arc<Window>` for an independently selected renderer. Avoid the former
+`window_handle()` spelling, which can be mistaken for a raw OS Window handle.
+`redraw_event_count()` is a monotonically increasing count of accepted
+Window redraw events, **not** a collection of events or the number of GPU
+Presents. These two pre-release Rust names intentionally replace the previous
+`window_handle()` and `redraw_events()` methods with **no aliases**; the
+selected Native examples and external Consumer use the canonical spellings.
+Original runtime diagnostic output labels are historical observation formats,
+not Rust public method names, and remain unchanged. This does not change
+Window ownership, EventLoop affinity, readiness or renderer lifecycle.
+
+## Proposed Host lifecycle vocabulary — YT-286
+
+The [layered Host design](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) and
+[ADR 0014](adr/0014-layered-host-resource-lifecycle.md) originally proposed
+Application/Host defaults with ResourceGroup customization over one lifecycle
+engine. The next-alpha vocabulary below supersedes that outer name.
+The authorized [YT-286-A private prototype](../examples/host-lifecycle-research/README.md)
+uses `Application::new`, `with_host`, `ResourceGroup`, `with_resource`,
+`request_shutdown` and `shutdown_until`. The earlier `Application::builder`
+spelling was illustrative and is not retained as an alias. These names are not
+yet an accepted public replacement for the current Composition API.
+
+B1/B2 adds bounded source interfaces with distinct responsibilities:
+
+| Layer and spelling | Meaning |
+|---|---|
+| Private `ResourceGroup::with_resource(value)` / `WebHost::with_resource(value)` | Retain a supplied passive owned or borrowed value; the A ownership contract remains. |
+| Private `with_managed_resource(label, descriptor)` | Register an inert resource whose `acquire` and `release_within` have explicit ownership contracts. |
+| Core `Builder::with_resource(label, value, release)` | Install a typed final-release dependency; registration does not acquire it. |
+| Core `Builder::with_activity` | Attach an original activity with a post-join final-release callback. |
+| Core `Builder::with_group` | Nest typed parts under the same coordinator and failure ledger. |
+| `ReleaseCompletion::Pending` | Cleanup is incomplete and its original owner remains retained. |
+| `ReleaseCompletion::Released(result)` | Cleanup is terminal; an error in `result` records failure without repeating release. |
+| `ReleaseStatus` | Read the latched Pending/Succeeded/Failed release outcome. |
+
+An outer error from `release_within` means retryable progress failure and retains
+ownership. It differs from terminal `Released(Err(...))`. The sealed
+`ResourceParts` bound is generic storage support, not a custom coordinator
+extension interface. These additions do not rename the accepted Local/Worker
+API or promote the private Host facade.
+
+The proposed rule is to name resource ownership, acquisition and shutdown
+operations by intent. Do not use `required`, `foreground` or `ready/worker`
+as unexplained quickstart categories. A `try_` pair needs a documented
+operation-specific distinction; Result alone does not require that prefix.
+Deferred acquisition and dependency-safe release are behavioral additions
+requiring implementation proof, not consequences of renaming.
+
+## Next-alpha Host vocabulary — YT-287
+
+The [feature-first contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
+selects these intentions for the next API. The [YT-288 Core surface](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
+implements HostGroup, Host and ResourceGroup. [YT-290](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership) places HTTP service
+configuration at `yetlet::web::App`; [YT-291](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#19-yt-291--managed-web-lifecycle-and-drivers)
+connects it to managed WebHost lifetimes. The private Application spelling above
+is historical.
+
+| Target name / operation | Developer intent and lifecycle meaning |
+|---|---|
+| HostGroup | Group high-level Host lifetimes using the built-in Core coordinator. |
+| yetlet::web::App | Configure an HTTP service; retain Router/Tower interoperability. Available with `web`; Page/View rendering additionally needs `html`. |
+| yetlet::web::WebHost | Run an HTTP service as a participant in a HostGroup lifetime. App::into_host bridges a resolved-state App into that inert description. |
+| yetlet::native_winit::NativeHost / with_window | Describe one root native loop and add windows to that same loop; construction creates no OS resource. |
+| yetlet::udp::UdpHost / on_datagram | Describe a managed nonblocking UDP endpoint and a bounded borrowed packet callback. |
+| ResourceGroup | Customize typed owned/borrowed resources and explicit acquisition/release behavior. |
+| HostGroup planning: new / with_host / build | Describe, register and validate an inert plan; none starts a listener, thread or native loop. |
+| with_address | Configure a future Web or UDP bind address; actual acquisition belongs to the driver. |
+| serve / serve_on | Execute ordinary HTTP serving on caller-owned Tokio; a cancelled consuming future does not promise managed cleanup. |
+| run / run_async | Drive the retained HostGroup synchronously or asynchronously. A fresh run selects owned-thread Web; a fresh run_async selects caller-runtime Web. The selection remains with the owner across cancellation. |
+| request_shutdown / shutdown_until | Request stop or advance shutdown toward terminal completion; Pending retains the original obligations. |
+| with_resource / with_managed_resource | Retain a passive Rust value or register an inert descriptor with explicit acquire/release semantics; do not conflate the two. |
+| with_blocking_driver | Advanced customization: retain one typed caller-thread driver for the same lifecycle, including final resource release. |
+
+The current Core owner is BuiltHostGroup. poll_start reports readiness progress;
+poll_run advances the lifetime; poll_shutdown advances original completion and
+final release. run_async borrows the owner and uses the caller's executor.
+HostActivity names the custom activity contract, ManagedResource names explicit
+acquire/release management, and HostFailure retains the original typed error.
+YT-291 adds the std-only blocking run loop and HostRunMode preparation before
+acquisition. HostRunError::ModeMismatch rejects a live Async owner's switch to
+blocking drive without altering its obligations. WebDriver is an explicit Web
+placement choice; WebHandle reports actual address, readiness and admission.
+ResourceGroup::map_activity transforms an inert activity for advanced error or
+behavior adaptation while retaining its dependency plan. Existing advanced
+Builder callbacks keep their phase-specific behavior; the Host quick path
+needs no required_* marker.
+`AdmissionOutcome::Opened` means the custom activity opened ordinary admission;
+`Closed` means termination has fenced it. A closed gate triggers coordinated
+shutdown while the original Join remains authoritative. These advanced outcomes
+do not introduce an optional-participation marker on the ordinary Host path.
+
+[YT-292](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration)
+adds NativeHandle/UdpHandle for adapter observations and explicit requests.
+BlockingDriver is an advanced event-driving contract; it is not a thread-pool
+preference. DriverReturnedEarly reports retained unfinished obligations, while
+HostOperation::Drive retains the original driver error, even after final release.
+A second NativeHost requests a second root loop and is rejected; with_window
+expresses the supported multiple-window intent directly.
+
+Ordinary participation needs no required marker. try_* is reserved for a
+documented operation-specific distinction and never means optional success,
+swallowed failure or automatic fallback. Do not substitute ready/worker or
+foreground for a precise resource/driver contract.
+
+Migrate the legacy required_* callbacks by their actual lifecycle phase;
+legacy local close-before-worker behavior is not equivalent to post-join
+resource release. Keep Composition as advanced engine vocabulary, not the
+unexplained quickstart entry. No permanent Application or server_axum aliases
+are selected for the breaking target; do not rewrite historical receipts.
+
+### Current checkout Web and Action names — YT-290
+
+Use `web` for the HTTP capability and `App` for HTTP service configuration.
+`HostGroup` names the group lifetime; `ResourceGroup` names custom resource
+ownership. Those names describe different developer intentions. Direct
+`App::serve` / `serve_on` use caller-owned Tokio.
+
+The existing advanced `yetlet::web::HttpWorker` names an owned-thread HTTP
+adapter for custom lifecycle integration. The high-level managed entry is
+`WebHost` / `App::into_host`, supplied by YT-291. HttpWorker's existing explicit
+probe/stop/join operations retain their own contract; its module move did not
+add managed cancellation guarantees.
+
+Neutral `actions` keeps `Command`, `ActionExecutor` and `LocalExecutor`,
+with the executor's associated `Error` naming its own failure contract.
+`actions-http` selects the `actions_http` module and its HTTP
+`ActionError` / API error envelopes. Browser `actions` forwards that protocol
+contract. The [checkout migration](COMPATIBILITY.md#current-checkout--web-and-http-protocol-ownership)
+records the canonical feature/module paths without old aliases. Published
+alpha.8 examples and historical naming receipts retain their original spelling.
+
 ## Dated naming audit dispositions
 
 The 2026-10-22 audit attachment SHA256

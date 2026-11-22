@@ -183,22 +183,37 @@ enum StartupProfile {
     M26AppServe,
     ConfiguredAxum,
     ServiceAxum,
+    WebAppServe,
+    WebConfigured,
+    WebService,
     BrowserWasm,
 }
 
 impl StartupProfile {
-    fn select(options: Options, m26_startup: bool) -> Self {
+    fn select(options: Options, sdk: &ResolvedSdk) -> Self {
         if options.template.browser() {
             Self::BrowserWasm
+        } else if sdk.api == crate::sdk_api::SdkApi::FeatureModules {
+            if options.service {
+                Self::WebService
+            } else if options.settings || options.vite {
+                Self::WebConfigured
+            } else {
+                Self::WebAppServe
+            }
         } else if options.service {
             Self::ServiceAxum
         } else if options.settings || options.vite {
             Self::ConfiguredAxum
-        } else if m26_startup {
+        } else if sdk.m26_startup {
             Self::M26AppServe
         } else {
             Self::LegacyAxum
         }
+    }
+
+    fn app_serve(self) -> bool {
+        matches!(self, Self::M26AppServe | Self::WebAppServe)
     }
 
     fn as_str(self) -> &'static str {
@@ -207,6 +222,9 @@ impl StartupProfile {
             Self::M26AppServe => "m26-app-serve",
             Self::ConfiguredAxum => "configured-axum",
             Self::ServiceAxum => "service-axum",
+            Self::WebAppServe => "web-app-serve",
+            Self::WebConfigured => "web-configured",
+            Self::WebService => "web-service",
             Self::BrowserWasm => "browser-wasm",
         }
     }
@@ -219,7 +237,7 @@ fn render(
     options: Options,
     sdk: &ResolvedSdk,
 ) -> Result<(RenderedFiles, StartupProfile), String> {
-    let profile = StartupProfile::select(options, sdk.m26_startup);
+    let profile = StartupProfile::select(options, sdk);
     let result = (|| {
         let mut entries = if options.template.browser() {
             crate::browser::files_version(name, options.tailwind, &sdk.version)?
@@ -245,13 +263,15 @@ fn render(
                 options.vite || options.template.browser(),
             )?;
         }
-        if profile == StartupProfile::M26AppServe {
+        if profile.app_serve() {
             scaffold::m26_startup(&mut entries, styles, options.tailwind)?;
         }
+        sdk.api
+            .apply_to_template(&mut entries, options.template.browser())?;
         Ok((entries, profile))
     })();
     result.map_err(|reason: String| {
-        if profile == StartupProfile::M26AppServe {
+        if profile.app_serve() || sdk.api == crate::sdk_api::SdkApi::FeatureModules {
             format!("SDK_INCOMPATIBLE: {} template={} policy={} policy_sha256={}: template-capability {reason}",
                 sdk.version, options.template.selector(), sdk.policy, sdk.policy_sha256)
         } else {
@@ -395,6 +415,152 @@ mod tests {
 
     fn file<'a>(entries: &'a [(&str, String)], path: &str) -> &'a str {
         &entries.iter().find(|entry| entry.0 == path).unwrap().1
+    }
+
+    #[test]
+    fn feature_module_profiles_cover_composed_templates_without_legacy_imports() {
+        let version = "0.10.0";
+        let rows = [
+            serde_json::json!({
+                "name":"yetlet", "vers":version, "cksum":"f".repeat(64), "yanked":false,
+                "features":{"default":[]},
+                "features2":{"view":[],"web":["view"],"html":["view"],"config":[],"reactive":[]},
+                "deps":[], "v":2
+            }),
+            serde_json::json!({
+                "name":"yetlet-browser", "vers":version, "cksum":"e".repeat(64), "yanked":false,
+                "features":{"dom":[],"dom-keyed":[]},
+                "deps":[{"name":"yetlet","req":format!("={version}")}], "v":2
+            }),
+        ];
+        let records: Vec<_> = rows
+            .iter()
+            .map(|row| {
+                let body = row.to_string() + "\n";
+                sdk_registry::Record {
+                    name: row["name"].as_str().unwrap().into(),
+                    sha256: sdk::digest(body.as_bytes()),
+                    body,
+                    validated_at: 100,
+                    etag: None,
+                }
+            })
+            .collect();
+        let policy = sdk::Policy::parse(&policy(None)).unwrap();
+        let retained =
+            std::env::var_os("YETLET_TEST_FEATURE_MODULE_APPS").map(std::path::PathBuf::from);
+        if let Some(parent) = &retained {
+            std::fs::create_dir_all(parent).unwrap();
+        }
+        for template in [
+            Template::Native,
+            Template::NativeStyle,
+            Template::Browser,
+            Template::BrowserStyle,
+        ] {
+            for flags in 0..16 {
+                let options = Options {
+                    template,
+                    service: flags & 1 != 0,
+                    settings: flags & 2 != 0,
+                    tailwind: flags & 4 != 0,
+                    vite: flags & 8 != 0,
+                };
+                if template.browser() && options.service {
+                    continue;
+                }
+                let sdk = sdk::select(
+                    Request {
+                        exact: Some(version),
+                        template,
+                        settings: options.settings || options.vite,
+                        offline: false,
+                    },
+                    &records,
+                    "feature-module-fixture",
+                    &policy,
+                )
+                .unwrap();
+                let name = format!("{}-{flags}", template.selector());
+                let (entries, profile) = render(&name, options, &sdk).unwrap();
+                let expected_profile = if template.browser() {
+                    StartupProfile::BrowserWasm
+                } else if options.service {
+                    StartupProfile::WebService
+                } else if options.settings || options.vite {
+                    StartupProfile::WebConfigured
+                } else {
+                    StartupProfile::WebAppServe
+                };
+                assert_eq!(profile, expected_profile, "{name}");
+                let manifest: toml::Value = file(&entries, "Cargo.toml").parse().unwrap();
+                let dependencies = if template.browser() {
+                    &manifest["target"]["cfg(target_arch = \"wasm32\")"]["dependencies"]
+                } else {
+                    &manifest["dependencies"]
+                };
+                let expected_features = if template.browser() {
+                    vec!["reactive", "view"]
+                } else if options.settings || options.vite {
+                    vec!["web", "html", "config"]
+                } else {
+                    vec!["web", "html"]
+                };
+                assert_eq!(
+                    dependencies["yetlet"]["features"].as_array().unwrap(),
+                    &expected_features
+                        .iter()
+                        .map(|feature| toml::Value::String((*feature).into()))
+                        .collect::<Vec<_>>(),
+                    "{name}"
+                );
+                assert_eq!(
+                    dependencies["yetlet"]["default-features"].as_bool(),
+                    Some(false),
+                    "{name}"
+                );
+                for (path, source) in &entries {
+                    if path.ends_with(".rs") {
+                        assert!(!source.contains("server_axum"), "{name}: {path}");
+                        syn::parse_file(source)
+                            .unwrap_or_else(|error| panic!("{name}: {path}: {error}"));
+                    }
+                }
+                if template.browser() {
+                    assert!(file(&entries, "src/lib.rs").contains("yetlet::view::"));
+                } else {
+                    let main = file(&entries, "src/main.rs");
+                    assert!(main.contains("yetlet::web::"));
+                    let readme = file(&entries, "README.md");
+                    assert!(readme.contains("legacy `server-axum` source and lock representation"));
+                    assert!(readme.contains("SDK profile is not supported by those generators"));
+                    assert!(readme.contains("including with `--service`"));
+                    for command in ["docker", "compose", "k8s"] {
+                        assert!(!readme.contains(&format!("yetlet generate {command} --output")));
+                    }
+                    if options.service {
+                        assert!(readme.contains("## Service profile (`--service`)"));
+                        assert!(readme.contains("GET /health/live"));
+                        assert!(readme.contains("GET /health/ready"));
+                    }
+                    if profile == StartupProfile::WebAppServe {
+                        assert!(main.contains(".serve()"));
+                        assert!(!main.contains("YETLET_PORT"));
+                        assert!(file(&entries, "README.md").contains("127.0.0.1:7878"));
+                    } else {
+                        assert!(main.contains("TcpListener::bind"));
+                        if options.settings || options.vite {
+                            assert!(main.contains("config::serve("));
+                        } else {
+                            assert!(main.contains("with_graceful_shutdown"));
+                        }
+                    }
+                }
+                if let Some(parent) = &retained {
+                    crate::platform::fs::create_project(parent, &name, &entries).unwrap();
+                }
+            }
+        }
     }
 
     #[test]

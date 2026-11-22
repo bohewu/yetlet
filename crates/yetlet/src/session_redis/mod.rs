@@ -10,7 +10,7 @@ mod store;
 #[doc(hidden)]
 pub mod admission_trace;
 
-use crate::server_axum::App;
+use crate::web::App;
 use axum::{
     extract::{Request, State},
     http::{HeaderMap, HeaderValue, StatusCode, header},

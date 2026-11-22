@@ -1,9 +1,8 @@
 #![cfg(any(target_os = "linux", windows))]
 use std::{fs, path::Path, process::Command};
 
-#[cfg(windows)]
-fn fixture_framework(root: &Path) -> std::path::PathBuf {
-    // A self-contained framework identity fixture: this test verifies safe
+fn fixture_legacy_framework(root: &Path) -> std::path::PathBuf {
+    // A self-contained legacy SDK identity fixture: this test verifies safe
     // scaffolding, not a production image build or a framework compilation.
     let source = root.join("framework");
     fs::create_dir_all(&source).unwrap();
@@ -12,16 +11,14 @@ fn fixture_framework(root: &Path) -> std::path::PathBuf {
         "[workspace]\n[workspace.package]\nrust-version='1.99'\n",
     )
     .unwrap();
-    for name in ["yetlet"] {
-        let dir = source.join("crates").join(name);
-        fs::create_dir_all(dir.join("src")).unwrap();
-        fs::write(
-            dir.join("Cargo.toml"),
-            format!("[package]\nname='{name}'\n"),
-        )
-        .unwrap();
-        fs::write(dir.join("src/lib.rs"), "// fixture only\n").unwrap();
-    }
+    let dir = source.join("crates").join("yetlet");
+    fs::create_dir_all(dir.join("src")).unwrap();
+    fs::write(
+        dir.join("Cargo.toml"),
+        "[package]\nname='yetlet'\n\n[features]\ndefault=[]\nserver-axum=[]\n",
+    )
+    .unwrap();
+    fs::write(dir.join("src/lib.rs"), "// fixture only\n").unwrap();
     source
 }
 
@@ -44,13 +41,7 @@ fn both_profiles_use_safe_no_replace_without_subprocess_lock_or_extra_files() {
     let root = tempfile::tempdir().unwrap();
     let parent = root.path().join("apps");
     fs::create_dir(&parent).unwrap();
-    #[cfg(windows)]
-    let framework = fixture_framework(root.path());
-    #[cfg(target_os = "linux")]
-    let framework = Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../..")
-        .canonicalize()
-        .unwrap();
+    let framework = fixture_legacy_framework(root.path());
     for (name, cloud) in [("ordinary", false), ("cloudapp", true)] {
         let output = scaffold(&parent, &framework, name, cloud);
         assert!(output.is_ok(), "{output:?}");
@@ -81,7 +72,7 @@ fn both_profiles_use_safe_no_replace_without_subprocess_lock_or_extra_files() {
         );
         assert_eq!(fs::read_dir(app.join("src")).unwrap().count(), 1);
         let manifest = fs::read(app.join("Cargo.toml")).unwrap();
-        // Keep layout-independent template bytes; SDK declarations migrate together.
+        // Preserve legacy template bytes against the explicit legacy SDK fixture.
         let framework_package =
             toml::Value::String(framework.join("crates/yetlet").to_str().unwrap().into());
         let signal = if cloud { ", \"signal\"" } else { "" };
@@ -107,6 +98,49 @@ fn both_profiles_use_safe_no_replace_without_subprocess_lock_or_extra_files() {
         2,
         "no staging residue"
     );
+}
+
+#[cfg(target_os = "linux")]
+#[test]
+fn current_checkout_profiles_select_canonical_web_imports_and_features() {
+    let root = tempfile::tempdir().unwrap();
+    let parent = root.path().join("apps");
+    fs::create_dir(&parent).unwrap();
+    let framework = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .canonicalize()
+        .unwrap();
+    for (name, cloud) in [("ordinary", false), ("cloudapp", true)] {
+        let output = scaffold(&parent, &framework, name, cloud);
+        assert!(output.is_ok(), "{output:?}");
+        let app = parent.join(name);
+        let main = fs::read_to_string(app.join("src/main.rs")).unwrap();
+        assert!(main.contains("use yetlet::web::{App, Page};"));
+        assert!(main.contains("use yetlet::view::{Element, View};"));
+        assert!(!main.contains("yetlet::server_axum"));
+        let manifest = fs::read_to_string(app.join("Cargo.toml")).unwrap();
+        let parsed: toml::Value = manifest.parse().unwrap();
+        let sdk = &parsed["dependencies"]["yetlet"];
+        assert_eq!(sdk["default-features"].as_bool(), Some(false));
+        let features: Vec<_> = sdk["features"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|feature| feature.as_str().unwrap())
+            .collect();
+        assert_eq!(features, ["web", "html"]);
+        assert_eq!(
+            sdk["path"].as_str(),
+            framework.join("crates/yetlet").to_str()
+        );
+
+        assert!(scaffold(&parent, &framework, name, !cloud).is_err());
+        assert_eq!(
+            fs::read_to_string(app.join("Cargo.toml")).unwrap(),
+            manifest
+        );
+        assert_eq!(fs::read_to_string(app.join("src/main.rs")).unwrap(), main);
+    }
 }
 
 #[test]

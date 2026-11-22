@@ -49,6 +49,24 @@ pub(crate) fn validate(path: &Path) -> Result<PathBuf, &'static str> {
     Ok(path)
 }
 
+pub(crate) fn sdk_api(root: &Path) -> Result<crate::sdk_api::SdkApi, &'static str> {
+    let value = manifest(&root.join("crates/yetlet/Cargo.toml"))?;
+    let features = value.get("features").and_then(toml::Value::as_table);
+    let api = crate::sdk_api::SdkApi::from_features(
+        features
+            .into_iter()
+            .flat_map(|features| features.keys().map(String::as_str)),
+    );
+    if api == crate::sdk_api::SdkApi::FeatureModules
+        && ["web", "html"]
+            .iter()
+            .any(|name| !features.is_some_and(|features| features.contains_key(*name)))
+    {
+        return Err("framework Web scaffold requires explicit web and html features");
+    }
+    Ok(api)
+}
+
 fn manifest(path: &Path) -> Result<toml::Value, &'static str> {
     let data = read(path).map_err(|_| "framework manifest is unavailable or unsafe")?;
     std::str::from_utf8(&data)

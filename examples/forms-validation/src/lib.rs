@@ -8,8 +8,8 @@ use axum::{
     response::{IntoResponse, Redirect, Response},
 };
 use serde::Deserialize;
-use yetlet::server_axum::{App, DocumentMetadata, LanguageTag, Page};
 use yetlet::view::{Element, View};
+use yetlet::web::{App, DocumentMetadata, LanguageTag, Page};
 
 const MAX_FORM_BYTES: usize = 2 * 1024;
 

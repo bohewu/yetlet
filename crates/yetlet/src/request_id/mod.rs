@@ -5,7 +5,7 @@
 //! Server-generated IDs replace any untrusted inbound value; no propagation
 //! policy is inferred. Clones share one counter, independent instances do not.
 
-use crate::server_axum::{
+use crate::web::{
     App,
     middleware::{Next, from_fn_with_state, with_global},
 };
@@ -83,7 +83,7 @@ impl RequestIds {
     /// Install only on previously registered routes in this App/group.
     ///
     /// ```
-    /// use yetlet::server_axum::{App, extract::Extension};
+    /// use yetlet::web::{App, extract::Extension};
     /// use yetlet::request_id::{RequestId, RequestIds};
     /// async fn item(Extension(id): Extension<RequestId>) -> String { id.0.to_string() }
     /// let app: axum::Router = App::new().group("/api", |api| {

@@ -62,7 +62,7 @@ fn executor(peer: &Peer) -> TcpExecutor {
 async fn explicit_selection_and_typed_network_result() {
     let peer = Peer::start(serve_connection).await;
     let local = LocalExecutor::new(|command: Add| {
-        Ok(Sum {
+        Ok::<_, std::convert::Infallible>(Sum {
             value: command.left + command.right,
         })
     });
@@ -137,12 +137,11 @@ async fn remote_validation_is_not_a_success() {
     peer.finish().await.unwrap();
     assert_eq!(
         result,
-        Err(ActionError::Remote {
-            status: 422,
+        Err(TcpError::Remote {
             code: "overflow".into()
         })
     );
-    println!("typed overflow -> Remote(422, overflow); no retry");
+    println!("typed overflow -> TCP Remote(overflow); no retry");
 }
 
 #[tokio::test]
@@ -180,7 +179,7 @@ async fn malformed_and_missing_responses_are_not_successes() {
         .await;
         let result = executor(&peer).execute(Add { left: 1, right: 2 }).await;
         peer.finish().await.unwrap();
-        assert_eq!(result, Err(ActionError::InvalidResponse));
+        assert_eq!(result, Err(TcpError::InvalidResponse));
         println!("bad peer reply {:?} -> InvalidResponse", response);
     }
 }
@@ -218,7 +217,7 @@ async fn deadline_and_caller_cancellation_close_owned_client() {
         if caller_cancels {
             assert_eq!(result, None);
         } else {
-            assert_eq!(result, Some(Err(ActionError::Network)));
+            assert_eq!(result, Some(Err(TcpError::Network)));
         }
         println!(
             "{} closes client socket; peer sees EOF",
@@ -235,7 +234,7 @@ async fn deadline_and_caller_cancellation_close_owned_client() {
 async fn endpoint_restriction_and_network_failure() {
     assert!(matches!(
         TcpExecutor::new("192.0.2.1:1234".parse().unwrap(), Duration::from_secs(1)),
-        Err(ActionError::InvalidEndpoint)
+        Err(TcpError::InvalidEndpoint)
     ));
     let listener = TcpListener::bind("127.0.0.1:0").await.unwrap();
     let endpoint = listener.local_addr().unwrap();
@@ -244,7 +243,7 @@ async fn endpoint_restriction_and_network_failure() {
         .unwrap()
         .execute(Add { left: 1, right: 2 })
         .await;
-    assert_eq!(result, Err(ActionError::Network));
+    assert_eq!(result, Err(TcpError::Network));
     println!(
         "cleanup: dropped {} listener; refused connect -> Network",
         endpoint

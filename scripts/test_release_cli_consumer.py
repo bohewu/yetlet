@@ -92,36 +92,197 @@ class ResolutionEvidenceTests(unittest.TestCase):
         (project / '.yetlet/sdk-resolution.json').write_text(json.dumps(receipt))
         return cache, policy, receipt
 
-    def extended_fixture(self, root, template='native', capable=True, **options):
-        cache, _, receipt = self.fixture(root, template=template, requested='0.9.0-alpha.7')
+    def extended_fixture(self, root, template='native', capable=True, *, feature_modules=False,
+                         feature_map='features', mutate=None, **options):
+        selected = '0.9.0-alpha.9' if feature_modules else '0.9.0-alpha.7'
+        def metadata(name, rows):
+            if feature_modules and name == 'yetlet':
+                row = rows[-1]
+                row['features'].pop('server-axum')
+                row.setdefault(feature_map, {}).update({'web': [], 'html': ['view'], 'view': []})
+            if mutate:
+                mutate(name, rows)
+        cache, _, receipt = self.fixture(
+            root, template=template, requested=selected,
+            versions=['0.9.0-alpha.7', selected] if feature_modules else None, mutate=metadata)
         row = {'sdk_version': receipt['sdk']['version'], 'yetlet_sha256': 'f'*64}
         policy = json.dumps({'revision': 'sdk-latest-v2', 'selection': 'latest-semver',
-                             'scaffold_capabilities': {'m26_startup': [row] if capable else []}}).encode()
+                             'scaffold_capabilities': {
+                                 'm26_startup': [row] if capable and not feature_modules else []}}).encode()
         receipt['sdk']['policy_sha256'] = consumer.sha(policy)
         browser = template.startswith('browser')
         configured = options.get('settings') or options.get('vite')
         service = options.get('service', False)
-        profile = ('browser-wasm' if browser else 'service-axum' if service else
+        profile = ('browser-wasm' if browser else
+                   ('web-service' if service else 'web-configured' if configured else 'web-app-serve')
+                   if feature_modules else 'service-axum' if service else
                    'configured-axum' if configured else 'm26-app-serve' if capable else 'legacy-axum')
         receipt['startup_profile'] = profile
         source = ''
+        if feature_modules:
+            receipt['cli_version'] = '0.4.1'
+            source = f"use yetlet::{'view' if browser else 'web'}::prelude::*;\n"
         if browser:
-            source = '#[wasm_bindgen] pub fn mount_tasks() {}'
+            source += '#[wasm_bindgen] pub fn mount_tasks() {}'
         else:
             if configured: source += 'mod config;\n'
             if options.get('vite'): source += 'mod vite;\n'
             if options.get('tailwind') and not options.get('vite'): source += 'mod tailwind;\n'
-            if profile == 'm26-app-serve':
+            if profile in ('m26-app-serve', 'web-app-serve'):
                 source += ('App::from_router(app)' if template == 'native-style' or options.get('tailwind')
                            else 'App::new()') + '.serve().await?;'
             else:
                 source += 'let listener = TcpListener::bind(address).await?;\n'
                 if service: source += 'let shutdown = shutdown_signal(readiness)?;\n'
                 source += 'config::serve(listener, app, tls, shutdown).await?;' if configured else 'axum::serve(listener, app).await?;'
+        if feature_modules:
+            manifest = root / 'Cargo.toml'
+            text = manifest.read_text()
+            features = ['reactive', 'view'] if browser else ['web', 'html']
+            if configured and not browser:
+                features.append('config')
+            packages = [('yetlet', features)]
+            if browser:
+                packages.append(('yetlet-browser', ['dom', 'dom-keyed']))
+            for name, enabled in packages:
+                text = text.replace(f'{name}={{version="={selected}"}}',
+                                    f'{name}={{version="={selected}",default-features=false,'
+                                    f'features={json.dumps(enabled)}}}')
+            manifest.write_text(text)
         (root / 'src').mkdir()
         (root / ('src/lib.rs' if browser else 'src/main.rs')).write_text(source)
         (root / '.yetlet/sdk-resolution.json').write_text(json.dumps(receipt))
         return cache, policy, receipt
+
+    def test_feature_modules_follow_selected_metadata_and_emitted_options(self):
+        for feature_map in ('features', 'features2'):
+            for template, options in [
+                    ('native', {}), ('native-style', {}), ('native', {'tailwind': True}),
+                    ('native', {'settings': True}), ('native', {'service': True}),
+                    ('native-style', {'settings': True, 'service': True}),
+                    ('native-style', {'vite': True, 'tailwind': True}),
+                    ('native', {'service': True, 'vite': True, 'tailwind': True}),
+                    ('browser', {}), ('browser-style', {'vite': True, 'tailwind': True})]:
+                with self.subTest(feature_map=feature_map, template=template, options=options), \
+                        tempfile.TemporaryDirectory() as temp:
+                    root = Path(temp)
+                    def requested_modules(name, rows):
+                        if name == 'yetlet' and template.startswith('browser'):
+                            for key in ('web', 'html'):
+                                rows[-1][feature_map].pop(key)
+                    cache, policy, receipt = self.extended_fixture(
+                        root, template, feature_modules=True, feature_map=feature_map,
+                        mutate=requested_modules, **options)
+                    self.assertEqual(consumer.inspect_project(
+                        root, '0.4.1', template, '0.9.0-alpha.9', 'registry-refresh',
+                        cache, policy, context='source', **options), receipt)
+
+    def test_declared_feature_modules_never_fall_back_to_legacy_features(self):
+        for feature_map in ('features', 'features2'):
+            for missing, template, options in [
+                    ('web', 'native', {}), ('html', 'native', {}),
+                    ('view', 'browser', {}), ('reactive', 'browser', {}),
+                    ('config', 'native', {'settings': True}), ('closure', 'native', {})]:
+                with self.subTest(feature_map=feature_map, missing=missing), \
+                        tempfile.TemporaryDirectory() as temp:
+                    def incomplete(name, rows):
+                        if name != 'yetlet':
+                            return
+                        row = rows[-1]
+                        row['features']['server-axum'] = []
+                        if missing == 'closure':
+                            row[feature_map]['web'] = ['missing-feature']
+                        else:
+                            row['features'].pop(missing, None)
+                            row.get('features2', {}).pop(missing, None)
+                    root = Path(temp)
+                    cache, policy, _ = self.extended_fixture(
+                        root, template, feature_modules=True, feature_map=feature_map,
+                        mutate=incomplete, **options)
+                    with self.assertRaisesRegex(ValueError, 'required feature missing or invalid'):
+                        consumer.inspect_project(
+                            root, '0.4.1', template, '0.9.0-alpha.9', 'registry-refresh',
+                            cache, policy, context='source', **options)
+
+    def test_new_api_marker_rejects_otherwise_valid_legacy_output(self):
+        for feature_map in ('features', 'features2'):
+            for marker in ('web', 'view'):
+                with self.subTest(feature_map=feature_map, marker=marker), \
+                        tempfile.TemporaryDirectory() as temp:
+                    def mixed_api(name, rows):
+                        if name == 'yetlet':
+                            rows[-1].setdefault(feature_map, {})[marker] = ['missing-feature']
+                    root = Path(temp)
+                    cache, policy, _ = self.extended_fixture(root, capable=False, mutate=mixed_api)
+                    with self.assertRaisesRegex(ValueError, 'required feature missing or invalid'):
+                        consumer.inspect_project(
+                            root, '0.3.1', 'native', '0.9.0-alpha.7', 'registry-refresh',
+                            cache, policy, context='source')
+
+    def test_feature_module_manifest_requires_explicit_opt_ins(self):
+        for template, package, missing in [
+                ('native', 'yetlet', 'html'), ('browser', 'yetlet', 'view'),
+                ('browser', 'yetlet-browser', 'dom-keyed')]:
+            for defect in ('features', 'defaults'):
+                with self.subTest(template=template, package=package, defect=defect), tempfile.TemporaryDirectory() as temp:
+                    root = Path(temp)
+                    cache, policy, _ = self.extended_fixture(root, template, feature_modules=True)
+                    manifest = root / 'Cargo.toml'
+                    text = manifest.read_text()
+                    original = next(line for line in text.splitlines() if line.startswith(package + '='))
+                    mutated = (original.replace(', "' + missing + '"', '', 1) if defect == 'features'
+                               else original.replace('default-features=false', 'default-features=true'))
+                    self.assertNotEqual(original, mutated)
+                    manifest.write_text(text.replace(original, mutated, 1))
+                    with self.assertRaisesRegex(ValueError, 'manifest opt-ins differ'):
+                        consumer.inspect_project(
+                            root, '0.4.1', template, '0.9.0-alpha.9', 'registry-refresh',
+                            cache, policy, context='source')
+
+    def test_feature_module_startup_rejects_legacy_receipts_and_imports(self):
+        for template in ('native', 'browser'):
+            for defect in ('profile', 'imports', 'historical-receipt'):
+                with self.subTest(template=template, defect=defect), tempfile.TemporaryDirectory() as temp:
+                    root = Path(temp)
+                    cache, policy, receipt = self.extended_fixture(root, template, feature_modules=True)
+                    if defect == 'profile':
+                        receipt['startup_profile'] = 'legacy-axum'
+                    if defect == 'imports':
+                        path = root / ('src/lib.rs' if template == 'browser' else 'src/main.rs')
+                        module = 'view' if template == 'browser' else 'web'
+                        path.write_text(path.read_text().replace(f'yetlet::{module}::', 'yetlet::server_axum::'))
+                    if defect == 'historical-receipt':
+                        policy = LATEST_POLICY
+                        receipt['sdk']['policy_sha256'] = consumer.sha(policy)
+                        receipt.pop('startup_profile')
+                    (root / '.yetlet/sdk-resolution.json').write_text(json.dumps(receipt))
+                    with self.assertRaises(ValueError):
+                        consumer.inspect_project(
+                            root, '0.4.1', template, '0.9.0-alpha.9', 'registry-refresh',
+                            cache, policy, context='source')
+
+    def test_app_serve_profiles_share_fixed_port_preflight(self):
+        for profile in ('m26-app-serve', 'web-app-serve', 'web-configured'):
+            with self.subTest(profile=profile), tempfile.TemporaryDirectory() as temp, \
+                    patch.object(consumer.socket, 'socket') as socket, \
+                    patch.object(consumer.smoke, 'port_number', return_value=49152) as choose_port, \
+                    patch.object(consumer.smoke, 'stop_owned_process'), \
+                    patch.object(consumer.subprocess, 'Popen', side_effect=RuntimeError('stop at launch')) as launch:
+                root = Path(temp)
+                socket.return_value.__enter__.return_value.connect_ex.return_value = 1
+                with self.assertRaisesRegex(RuntimeError, 'stop at launch'):
+                    consumer.runtime(root / 'yetlet', root, {'PATH': '/usr/bin:/bin'},
+                                     root, False, profile)
+                fixed = profile != 'web-configured'
+                self.assertEqual(launch.call_args.kwargs['env']['YETLET_PORT'],
+                                 '7878' if fixed else '49152')
+                probe = socket.return_value.__enter__.return_value
+                if fixed:
+                    probe.bind.assert_called_once_with(('127.0.0.1', 7878))
+                    choose_port.assert_not_called()
+                else:
+                    probe.bind.assert_not_called()
+                    choose_port.assert_called_once_with()
 
     def test_extended_receipts_match_policy_options_and_emitted_startup(self):
         for template, options in [('native', {}), ('native-style', {}),

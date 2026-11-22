@@ -219,7 +219,7 @@ macro_rules! define_tag {
             const NAME: &'static str = stringify!($name);
         }
         impl ChildTag for $marker {}
-        #[doc = concat!("Create a typed <", stringify!($name), "> builder.")]
+        #[doc = concat!("Create a typed `<", stringify!($name), ">` builder.")]
         pub fn $name() -> TagElement<$marker> {
             TagElement::new()
         }
@@ -231,7 +231,7 @@ macro_rules! define_tag {
         impl HtmlTag for $marker {
             const NAME: &'static str = stringify!($name);
         }
-        #[doc = concat!("Create a typed <", stringify!($name), "> builder.")]
+        #[doc = concat!("Create a typed `<", stringify!($name), ">` builder.")]
         pub fn $name() -> TagElement<$marker> {
             TagElement::new()
         }

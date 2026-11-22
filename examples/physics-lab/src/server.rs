@@ -15,9 +15,7 @@ use std::{
     sync::Arc,
 };
 use yetlet::view::{Element, View};
-use yetlet::server_axum::{
-    DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document_with_metadata,
-};
+use yetlet::web::{DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document_with_metadata};
 const CSP: &str = "default-src 'none'; script-src 'self' 'wasm-unsafe-eval'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
 const NAMES: [&str; 6] = [
     "loader.js",

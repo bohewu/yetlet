@@ -23,12 +23,12 @@ use std::{
 };
 use tower::{ServiceBuilder, ServiceExt};
 use tower_http::set_header::SetResponseHeaderLayer;
-use yetlet::server_axum::{
+use yetlet::view::{Element, View};
+use yetlet::web::{
     HtmlPageError, RequestContext,
     middleware::{Next, from_fn, with_global},
     render_page,
 };
-use yetlet::view::{Element, View};
 
 #[derive(Clone)]
 struct Trace(Arc<Mutex<Vec<&'static str>>>);

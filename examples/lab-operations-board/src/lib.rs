@@ -35,10 +35,8 @@ use serde::Deserialize;
 use sessions::{Manager as SessionManager, ProtectedSession, Session};
 use std::{convert::Infallible, net::SocketAddr, path::Path, sync::Arc, time::Duration};
 use tokio::sync::{Semaphore, watch};
-use yetlet::server_axum::{
-    App, DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document_with_metadata,
-};
 use yetlet::view::View;
+use yetlet::web::{App, DEFAULT_CSP, DocumentMetadata, LanguageTag, render_document_with_metadata};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Failure {
@@ -114,7 +112,7 @@ impl IntoResponse for Failure {
         }
         let mut response = (
             self.status(),
-            yetlet::server_axum::Page::with_metadata(
+            yetlet::web::Page::with_metadata(
                 DocumentMetadata::with_language(
                     "Lab Operations",
                     LanguageTag::new("en").expect("static language"),
@@ -494,8 +492,7 @@ impl Board {
         } else {
             app
         };
-        let router =
-            yetlet::server_axum::middleware::with_global(app, from_fn_with_state(state, security));
+        let router = yetlet::web::middleware::with_global(app, from_fn_with_state(state, security));
         Ok(Self {
             router,
             database,

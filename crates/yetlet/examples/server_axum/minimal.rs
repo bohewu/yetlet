@@ -1,5 +1,5 @@
 //! Minimal SSR/JSON application. No optional provider or Controller needed.
-use yetlet::server_axum::prelude::*;
+use yetlet::web::prelude::*;
 
 async fn home() -> View {
     View::text("Hello from Yetlet")

@@ -1,10 +1,11 @@
 # Current capability and API carrier map
 
-Updated: 2026-11-12. The published Experimental SDK has two implementation packages:
+Updated: 2026-11-22. The published Experimental SDK has two implementation packages:
 `yetlet` and `yetlet-browser`, version `0.9.0-alpha.8`, available from crates.io.
-The module map below describes capabilities, not additional installable crates.
-Base defaults select HTML; Browser defaults select DOM. Native capabilities and
-GPU/action integrations are additive opt-ins with explicit startup wiring.
+For those published packages, base defaults select HTML and Browser defaults
+select DOM. Native capabilities and GPU/action integrations are additive opt-ins
+with explicit startup wiring. The checkout map below describes capabilities,
+not additional installable crates.
 Earlier sixteen-package releases and qualification records keep their original
 sources. Opt-in static HTML export through the [independent CLI](CLI-GUIDE.md#static-html-build)
 is distributed in [CLI `0.2.0`](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02);
@@ -18,7 +19,7 @@ classifies reader inputs and retained evidence; this inventory does not select
 publication of its linked execution records.
 
 SDK alpha.8 includes [simple application startup and the optional Axum Prelude](API-REFERENCE.md#published-application-startup--sdk-alpha8)
-with the opt-in `server-axum` feature. Published CLI `0.4.0` generates
+with the opt-in `server-axum` feature. Published CLI `0.4.1` generates
 `App::serve()` for Native and Native Style with verified SDK alpha.8 and
 compatible options. It records the selected startup profile in the scaffold
 receipt. [CLI startup profiles](CLI-GUIDE.md#sdk-resolution-yt-247)
@@ -43,17 +44,65 @@ Style authoring has a finite private app vocabulary, explicit registration and
 external build-time CSS; ordinary CSS remains the default and supplies unsupported
 syntax. There is no public style crate, renderer change or runtime style injection.
 
+The current checkout additionally provides built-in Core composition with
+HostGroup, custom Host extensions and ResourceGroup. YT-288 removes the
+composition feature opt-in. [YT-289](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#17-yt-289--optional-view-and-browser-feature-isolation)
+selects `default = []`, optional `view` and `html -> view`; Browser DOM/keyed
+features select View and gate its reexports. Default-off actions/GPU selections
+do not add View, HTML or native Web. See the [Core lifecycle contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
+and [independent consumer](../examples/external-consumers/yt288-core-hosts/src/main.rs).
+
+[YT-290](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership) supplies native HTTP through `web`, with `html` additionally
+required for Page/document/View rendering. Neutral `actions` has an associated
+executor `Error`; `actions-http` separately owns `ActionError` and the serialized
+API error envelopes. Browser `actions` forwards `yetlet/actions-http` without
+selecting native Web. There is no checkout `server-axum` feature or
+`server_axum` compatibility module.
+
+`App` is HTTP service configuration and direct serving uses caller-owned Tokio.
+[YT-291](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#19-yt-291--managed-web-lifecycle-and-drivers)
+adds managed `WebHost` / `App::into_host`, caller-runtime and owned-thread drivers,
+API-only readiness and cancellation recovery through the retained HostGroup.
+Custom ResourceGroup management uses the same coordinator. The existing
+`HttpWorker` retains its advanced low-level contract. These source changes do
+not change published alpha.8 package contents or its startup examples.
+
+[YT-292](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration)
+adds canonical optional native modules without changing the empty default.
+NativeHost contributes one caller-thread root loop for multiple windows; UDP
+remains bounded and caller-driven. Web, renderer and command bridge selections
+are independent. YT-293 migrates the remaining checkout consumers directly to
+these features and removes the temporary yetlet-hosts companion. SDK publication
+still contains only yetlet and yetlet-browser.
+[YT-294](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#22-yt-294--normal-archives-and-external-consumer-qualification)
+verifies both normal local archives, six independent consumer families, 16 actions,
+15 feature graphs and 13 actual tests. This qualifies selected source/package
+capabilities; it does not republish alpha.8 or add browser/GPU/platform runtime
+claims. Configured independent review passes; YT-294 and YT-286 are Done at
+source/package delivery scope.
+
+The source CLI uses selected SDK feature metadata to choose its generated imports
+and explicit opt-ins. Native remains HTTP/SSR with web+html; Browser chooses
+view+reactive and DOM/keyed-DOM. Invalid new metadata fails without a legacy or
+older-version fallback. [CLI source profiles](../tools/yetlet-cli/README.md#current-source-sdk-feature-profiles)
+retain the existing release identity and explain the source-only support.
+
 ## Framework packages and selected features
 
-| Carrier | Implemented scope and maturity | Original nine release candidates? | Authoritative contract |
+| Checkout carrier | Implemented scope and maturity | Original nine release candidates? | Authoritative contract |
 |---|---|---|---|
 | `yetlet::view` | Renderer-neutral Views/components and bounded binding vocabulary; M9 classification applies | Yes | [Core guide](../crates/yetlet/guides/core.md) |
 | `yetlet::html` | Escaped HTML serialization and allowlisted elements/attributes; M9 classification applies | Yes | [HTML guide](../crates/yetlet/guides/html.md) |
 | `yetlet_browser::dom` | Native validation/Wasm-only owned mount. Since SDKalpha.6:89 default tags,90 with explicit ImagePolicy; SDKalpha.5 has38. Independent per-mount HTTPS link/image policies retain strict defaults and same-origin forms. Not full HTML conformance | Yes | [DOM guide](../crates/yetlet-browser/guides/dom.md), [dated coverage inventory](API-CONTRACTS.md#historical-html-element-and-attribute-inventory) |
 | `yetlet_browser::dom_keyed` | Optional keyed children and disposable listener/entry ownership | Yes | [Keyed DOM guide](../crates/yetlet-browser/guides/dom-keyed.md) |
 | `yetlet::reactive` | Optional synchronous local reducer/commit graph with explicit lifetime | Yes | [Reactive guide](../crates/yetlet/guides/reactive.md) |
-| `yetlet::actions` | Typed commands and explicit local/HTTP execution boundaries | Yes | [Actions guide](../crates/yetlet/guides/actions.md) |
-| `yetlet::server_axum` | App/Page, request context and native Axum/Tower routing/composition | Yes | [Server guide](../crates/yetlet/guides/server-axum.md) |
+| `yetlet::actions` | `actions`: transport-neutral Command/ActionExecutor/LocalExecutor; the executor selects its associated Error | Yes | [Actions guide](../crates/yetlet/guides/actions.md) |
+| `yetlet::actions_http` | `actions-http`: HTTP ActionError and serialized API error envelopes; Browser `actions` forwards this contract | No; separated from the former Actions carrier | [Actions guide](../crates/yetlet/guides/actions.md), [YT-290](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership) |
+| `yetlet::web` | `web`: native App, managed WebHost, request context, Axum/Tower routing and advanced HttpWorker; add `html` for Page/document/View rendering | Yes; formerly `server_axum` | [Web guide](../crates/yetlet/guides/server-axum.md) |
+| `yetlet::command_bridge` | `command-bridge`: native bounded command admission and immutable snapshots; independent of HTTP and ActionExecutor | No | [Native integration contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration) |
+| `yetlet::udp` | `udp`: managed UdpHost and explicit low-level UdpEndpoint; std-only bounded nonblocking progress | No | [Native consumer](../examples/external-consumers/native-hosts/README.md) |
+| `yetlet::native_winit` | `native-winit`: one caller-thread NativeHost loop with multiple windows; no renderer or Web runtime | No | [Native integration contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration) |
+| `yetlet::renderer_wgpu` | `renderer-wgpu`: independently selected native Vulkan Surface renderer; backend qualification stays separate | No | [Native integration contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration) |
 | `yetlet::request_id` | Explicit scoped/global process-local numeric correlation | Yes | [Request ID guide](../crates/yetlet/guides/request-id.md) |
 | `yetlet::session` | Opt-in bounded Memory Session, anonymous state, expiry, CSRF, cookie lifecycle, rotation/revocation; synchronous API | Yes | [Session guide](../crates/yetlet/guides/session.md) |
 | `yetlet::session_redis` | Opt-in native module in the published SDK. Original qualification is single-host, single-primary, no persistence; later bounded TLS/restart evidence is listed separately below | No | [Provider guide](../crates/yetlet/guides/session-redis.md), [Valkey evidence](PROVIDER-OPERATIONS.md#redis-session-cas-operation-outcome-and-cookie-ordering) |

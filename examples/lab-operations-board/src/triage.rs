@@ -2,7 +2,7 @@
 use super::*;
 use axum::{Json, extract::rejection::JsonRejection};
 use domain::WorkItem;
-use yetlet::actions::{ApiErrorBody, ApiErrorEnvelope};
+use yetlet::actions_http::{ApiErrorBody, ApiErrorEnvelope};
 use yetlet::view::Element;
 use yetlet_board_triage::{
     Bootstrap, Item, MAX_ITEMS, STATUS_LABELS, Save, ValidationBody, ValidationEnvelope,

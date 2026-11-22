@@ -1,17 +1,21 @@
-//! Native HTTP results: a small SSR value plus unchanged Axum result types.
+//! Native HTTP results, with an optional SSR Page when HTML is enabled.
 //!
 //! JSON, redirects, status/header tuples and Result<T, E> use Axum directly.
 //! No ActionResult hierarchy or exception-to-status mapping is introduced.
 
+#[cfg(feature = "html")]
 use crate::view::View;
+#[cfg(feature = "html")]
 use axum::http::{HeaderValue, header};
 pub use axum::{
     Json,
     response::{IntoResponse, Redirect, Response},
 };
+#[cfg(feature = "html")]
 use std::borrow::Cow;
 
-use crate::server_axum::{DEFAULT_CSP, DocumentMetadata, render_page_with_metadata};
+#[cfg(feature = "html")]
+use crate::web::{DEFAULT_CSP, DocumentMetadata, render_page_with_metadata};
 
 /// An owned SSR page rendered only when converted into an HTTP response.
 ///
@@ -21,19 +25,21 @@ use crate::server_axum::{DEFAULT_CSP, DocumentMetadata, render_page_with_metadat
 ///
 /// ```
 /// use yetlet::view::View;
-/// use yetlet::server_axum::{App, Page};
+/// use yetlet::web::{App, Page};
 ///
 /// async fn home() -> Page {
 ///     Page::new("Home", View::text("Hello"))
 /// }
 /// let app: axum::Router = App::new().get("/", home).into_router();
 /// ```
+#[cfg(feature = "html")]
 #[derive(Debug)]
 pub struct Page {
     metadata: DocumentMetadata,
     view: View,
 }
 
+#[cfg(feature = "html")]
 impl Page {
     /// Create a page with the legacy `zh-Hant` root language.
     pub fn new(title: impl Into<Cow<'static, str>>, view: impl Into<View>) -> Self {
@@ -50,6 +56,7 @@ impl Page {
     }
 }
 
+#[cfg(feature = "html")]
 impl IntoResponse for Page {
     fn into_response(self) -> Response {
         let mut response = render_page_with_metadata(&self.metadata, &self.view)

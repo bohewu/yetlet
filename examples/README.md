@@ -23,11 +23,12 @@ Begin with [Hello World](hello-world/README.md) for native SSR or [REST API](res
 
 ## Source-checkout startup
 
-Use `App::new().page(...).serve().await` for the shortest application startup,
-with plain HTTP at `127.0.0.1:7878`. The non-catalog SDK example demonstrates it.
+With `web` and `html` enabled, use `App::new().page(...).serve().await` for
+application startup with plain HTTP at `127.0.0.1:7878`. The non-catalog SDK
+example demonstrates it.
 
 ```bash
-cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
+cargo run --locked -p yetlet --features web,html --example server-axum-minimal
 ```
 
 Hello World and the other basic HTTP samples retain their own environment ports
@@ -38,13 +39,22 @@ and Multi-Island Dashboard retain native `TcpListener`, `axum::serve` and gracef
 shutdown. `into_router()` and optional Prelude imports preserve native Axum/Tower
 composition. The [startup and port table](../docs/SAMPLES.md#startup-paths-in-this-checkout)
 and [source API examples](../docs/API-REFERENCE.md#source-only-checkout-additions)
-describe these checkout additions after published SDK alpha.7.
+describe the current checkout's capability and import choices. Published SDK
+alpha.8 and its pinned reader recipes retain their original feature names.
 
 Todo and Dashboard build their browser assets explicitly. Style Showcase runs
 natively through its catalog command and has an optional browser companion.
 The startup helpers use the application's Tokio runtime and provide plain HTTP.
 TLS/HTTPS requires explicit edge or native integration, with no inferred TLS or
 hidden runtime.
+
+## Managed Web lifetimes in this checkout
+
+The isolated [Web Hosts consumer](external-consumers/web-hosts/README.md) uses
+`web` without HTML. It creates two API-only services, observes actual bound
+addresses and drives finite graceful shutdown through HostGroup. Its focused
+SQLite proof demonstrates custom managed dependencies. This current-source
+consumer is separate from the published sample catalog and its versioned gates.
 
 ## Research and internal fixtures
 

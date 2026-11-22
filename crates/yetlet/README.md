@@ -1,24 +1,28 @@
 # Yetlet
 
-HTML-first views and explicitly selected native capabilities, version
+A small, composable Rust application framework. The current manifest selects version
 `0.9.0-alpha.8`. See [GitHub releases](https://github.com/bohewu/yetlet/releases)
-for published artifacts. Earlier tags retain their original package layout and
-qualification evidence.
+for published artifacts.
+
+This checkout has built-in Core lifetimes and explicitly selected View, HTML, Web,
+Native, UDP, renderer and auxiliary capabilities. Published artifacts retain their
+original feature contracts, package layouts and qualification evidence. The source
+feature changes below do not change the contents of a published artifact.
 
 ## Minimal integration
 
-Use Rust 1.99+ and this exact registry dependency once this version is available:
+Use Rust 1.99+ and this exact registry dependency for HTML rendering:
 
 ```toml
 [dependencies]
-yetlet = "=0.9.0-alpha.8"
+yetlet = { version = "=0.9.0-alpha.8", default-features = false, features = ["html"] }
 ```
 
-For local preparation, use an explicitly reviewed checkout at the matching version:
+For the current checkout, enable the same HTML capability explicitly:
 
 ```toml
 [dependencies]
-yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.8" }
+yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.8", default-features = false, features = ["html"] }
 ```
 
 ```rust
@@ -27,13 +31,44 @@ let view: View = Element::new("p").child(View::text("Hello <Yetlet>")).into();
 assert_eq!(yetlet::html::render_to_string(&view).unwrap(), "<p>Hello &lt;Yetlet&gt;</p>");
 ```
 
-Defaults select `html`. With `default-features = false`, the shared View model
-has no external normal dependencies. Browser integrations are separately owned
-by [yetlet-browser](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/README.md), using this same View type.
+The explicit `html` selection works with both published alpha.8 and this checkout.
+Published alpha.8 retains its HTML default and always-available View API. This
+checkout has `default = []` with built-in Core composition, `HostGroup`, `Host`
+and `ResourceGroup`. Select `view` for the optional View/Element/Attribute, tags
+and binding APIs, or `html` for serialization; `html` enables `view`. Core-only
+omits View, and View/HTML add no external normal dependencies or HTTP runtime.
+Browser integrations are separately owned by
+[yetlet-browser](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/README.md), whose DOM features enable the same View type.
+
+## Core and managed Hosts in this checkout
+
+For Core lifetimes alone, use the same source revision without a capability:
+
+```toml
+[dependencies]
+yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.8", default-features = false }
+```
+
+`HostGroup` coordinates startup, observed readiness, admission, original
+completion and final resource release. Ordinary code adds Hosts with
+`HostGroup::new().with_host(...)`; `ResourceGroup` customizes owned or borrowed
+resources. No default runtime, pool, process or universal state owner is created.
+
+Enable `web` for an HTTP `App` or `WebHost`; add `html` for page helpers.
+`App::into_host()` joins the shared lifecycle. Enable `native-winit` for one
+root event loop with multiple windows, `udp` for bounded caller-driven datagrams,
+`command-bridge` for bounded commands/snapshots, or `renderer-wgpu` independently
+for native GPU rendering. Feature selection exposes APIs; the application must
+still select a compatible driver and explicitly drive managed shutdown.
+
+See the [mixed Host consumer](https://github.com/bohewu/yetlet/blob/master/examples/external-consumers/native-hosts/README.md)
+and [lifecycle contract](https://github.com/bohewu/yetlet/blob/master/docs/M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md).
+These checkout APIs do not imply that the identically versioned registry archive
+contains the new feature map.
 
 ## Typed Tag Builder API
 
-This release includes `yetlet::view::tags` with 101 ordinary HTML constructors
+Published alpha.8 and this checkout include `yetlet::view::tags` with 101 ordinary HTML constructors
 and `TagElement<T>` builders, producing the same owned `Element` / `View` tree.
 Typed void tags have no child/text methods; selected setters are scoped to
 applicable tags. `.id` and `.class` replace, `.add_class` merges distinct tokens,
@@ -49,22 +84,32 @@ assert!(yetlet::html::render_to_string(&view).unwrap().contains("Hello &lt;Yetle
 
 ## Native application startup
 
-This release includes simple startup with the opt-in `server-axum` feature.
-`App::serve()` listens for plain HTTP on `127.0.0.1:7878`.
-`App::serve_on(address)` takes an explicit bind address. The application owns
-its Tokio runtime and can use `App::into_router()` for native Axum listener and
-lifecycle control. Import `yetlet::server_axum::prelude::*` to opt into the
-curated server imports.
+In this checkout, select `web` and import `yetlet::web::prelude::*` for native
+HTTP service configuration. API-only Web does not enable View or HTML; add `html`
+for `Page`, page helpers and View-related prelude imports. `App::serve()` listens
+for plain HTTP on `127.0.0.1:7878`; `App::serve_on(address)` takes an explicit bind
+address. The application owns its Tokio runtime and can use `App::into_router()`
+for native Axum listener and lifecycle control.
 
-## Features and guides
+Published alpha.8 keeps the historical `server-axum` feature and
+`yetlet::server_axum` imports. Those names describe the published artifact;
+the current checkout uses `web` without an old-path compatibility alias.
+
+## Current-checkout features and guides
 
 | Capability | Feature | Guide |
 |---|---|---|
-| Shared values | Always available | [View](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/core.md) |
-| HTML serializer | `html` (default) | [HTML](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/html.md) |
-| Portable command contracts | `actions` | [Actions](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
+| Core lifetimes | Built in, no feature opt-in | [Lifecycle design](https://github.com/bohewu/yetlet/blob/master/docs/M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) |
+| Shared HTML/DOM values | `view` | [View](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/core.md) |
+| HTML serializer | `html` (enables `view`) | [HTML](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/html.md) |
+| Neutral commands and caller-selected executor errors | `actions` (no serde) | [Actions](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
+| Portable HTTP action errors/envelopes | `actions-http` (enables `actions` and serde) | [Actions](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
 | Local reactive graph | `reactive` | [Reactive](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/reactive.md) |
-| Native Axum integration | `server-axum` | [Server](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/server-axum.md) |
+| Native HTTP/Router/Tower integration | `web`; add `html` for SSR | [Server](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/server-axum.md) |
+| Native windows and root event loop | `native-winit` | [Mixed Hosts](https://github.com/bohewu/yetlet/blob/master/examples/external-consumers/native-hosts/README.md) |
+| Caller-driven datagrams | `udp` | [Mixed Hosts](https://github.com/bohewu/yetlet/blob/master/examples/external-consumers/native-hosts/README.md) |
+| Bounded commands and snapshots | `command-bridge` | [Lifecycle](https://github.com/bohewu/yetlet/blob/master/docs/M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) |
+| Independent native GPU renderer | `renderer-wgpu` | [Renderer](https://github.com/bohewu/yetlet/blob/master/docs/M28-F2-WGPU-RENDERER.md) |
 | Request correlation | `request-id` | [Request ID](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/request-id.md) |
 | Memory Session | `session` | [Session](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/session.md) |
 | Authentication / Memory bridge | `auth` / `auth-session` | [Auth](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/auth.md) |

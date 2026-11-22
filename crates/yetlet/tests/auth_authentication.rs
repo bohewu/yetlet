@@ -25,7 +25,7 @@ use yetlet::auth::{
     Authenticated, Authentication, MAX_AUTHENTICATION_NAME_BYTES, MAX_ISSUER_BYTES,
     MAX_SUBJECT_BYTES, MAX_TENANT_BYTES, Principal, ResolveFuture, authenticate,
 };
-use yetlet::server_axum::{App, DEFAULT_CSP, Page, RequestContext};
+use yetlet::web::{App, DEFAULT_CSP, Page, RequestContext};
 
 #[derive(Clone)]
 struct Fixture {

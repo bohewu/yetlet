@@ -20,7 +20,7 @@ use axum::{
 use futures_util::stream;
 use tower::ServiceBuilder;
 use tower_http::set_header::SetResponseHeaderLayer;
-use yetlet::server_axum::{
+use yetlet::web::{
     App, RequestContext,
     middleware::{Next, from_fn, with_global},
 };

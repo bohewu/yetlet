@@ -10,15 +10,17 @@ Begin with [Hello World](../examples/hello-world/README.md) for native SSR or [R
 
 ## Startup paths in this checkout
 
-The [SDK `0.9.0-alpha.8` startup API](API-REFERENCE.md#published-application-startup--sdk-alpha8) includes
-`App::new().page(...).serve()`, `App::from_router(router).serve_on(address)`
-and the optional Axum adapter prelude.
+The current checkout uses `yetlet::web::App` with explicit `web,html`
+features for the minimal SSR example below. Its `new().page(...).serve()` and
+`from_router(...).serve_on(address)` startup paths retain the address and runtime
+contracts described below. The [published SDK `0.9.0-alpha.8` startup API](API-REFERENCE.md#published-application-startup--sdk-alpha8)
+uses `App` and the historical `server-axum` feature.
 
 The non-catalog SDK minimal example uses the fixed `127.0.0.1:7878` HTTP default.
 Run it from the repository root with the following command.
 
 ```bash
-cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
+cargo run --locked -p yetlet --features web,html --example server-axum-minimal
 ```
 
 The thirteen catalog applications preserve their own environment/port contracts.

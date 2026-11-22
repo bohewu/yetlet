@@ -5,21 +5,27 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "HTML-first Rust framework with explicit optional native capabilities"
+description = "Composable Rust application framework with explicit optional capabilities"
 readme = "README.md"
 include = ["src/**", "guides/**", "tests/**", "examples/**", "README.md", "LICENSE-*", "Cargo.toml", "Cargo.lock"]
 
 [features]
-default = ["html"]
-html = []
-actions = ["dep:serde"]
+default = []
+view = []
+html = ["view"]
+actions = []
+actions-http = ["actions", "dep:serde"]
 reactive = []
-server-axum = ["html", "dep:axum", "dep:serde", "dep:tower", "dep:tokio"]
-request-id = ["server-axum"]
-session = ["server-axum", "dep:cookie", "dep:getrandom", "dep:subtle"]
+command-bridge = []
+udp = []
+native-winit = ["dep:winit"]
+renderer-wgpu = ["dep:wgpu"]
+web = ["dep:axum", "dep:serde", "dep:tower", "dep:tokio", "tokio/sync", "tokio/io-util", "tokio/time"]
+request-id = ["web"]
+session = ["web", "dep:cookie", "dep:getrandom", "dep:subtle"]
 auth = ["dep:axum"]
 auth-session = ["auth", "session"]
-session-redis = ["server-axum", "tokio/macros", "tokio/rt-multi-thread", "tokio/sync", "tokio/time", "dep:redis", "dep:serde", "dep:serde_json", "dep:getrandom", "dep:sha2", "dep:subtle"]
+session-redis = ["web", "tokio/macros", "tokio/rt-multi-thread", "tokio/sync", "tokio/time", "dep:redis", "dep:serde", "dep:serde_json", "dep:getrandom", "dep:sha2", "dep:subtle"]
 session-redis-tls = ["session-redis", "redis/tokio-rustls-comp", "dep:rustls"]
 config = ["dep:serde", "dep:toml", "dep:dotenvy", "dep:libc"]
 secrets = ["dep:secrecy"]
@@ -31,6 +37,8 @@ rate-limit = ["dep:axum", "dep:tower", "dep:governor"]
 serde = { version = "=1.0.229", features = ["derive"], optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }
+wgpu = { version = "=27.0.1", default-features = false, features = ["std", "vulkan", "wgsl"], optional = true }
 axum = { version = "=0.8.9", optional = true }
 tower = { version = "=0.5.3", optional = true }
 cookie = { version = "0.18", optional = true }
@@ -68,32 +76,74 @@ futures = { version = "0.3", default-features = false, features = ["executor"] }
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(yetlet_session_admission_probe)'] }
 
 [[test]]
+name = "composition"
+
+[[example]]
+name = "composition_local"
+
+[[example]]
+name = "native_winit_foreground"
+required-features = ["native-winit"]
+
+[[example]]
+name = "native_wgpu_triangle"
+required-features = ["native-winit", "renderer-wgpu"]
+
+[[example]]
+name = "composition_three_way"
+required-features = ["native-winit", "renderer-wgpu", "udp", "command-bridge", "web"]
+
+[[test]]
 name = "server_axum_handler_results"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[test]]
 name = "server_axum_http_pipeline"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[test]]
 name = "server_axum_configuration"
-required-features = ["server-axum"]
+required-features = ["web"]
 
 [[test]]
 name = "server_axum_app_builder"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[test]]
 name = "server_axum_app_serve"
-required-features = ["server-axum"]
+required-features = ["web"]
+
+[[test]]
+name = "command_bridge"
+required-features = ["command-bridge"]
+
+[[test]]
+name = "command_bridge_http"
+required-features = ["web", "command-bridge"]
+
+[[test]]
+name = "udp"
+required-features = ["udp"]
+
+[[test]]
+name = "udp_hosts"
+required-features = ["udp"]
+
+[[test]]
+name = "native_hosts"
+required-features = ["native-winit"]
+
+[[test]]
+name = "web_hosts"
+required-features = ["web"]
 
 [[test]]
 name = "server_axum_prelude"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[test]]
 name = "server_axum_public_api_compat"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[test]]
 name = "request_id_opt_in"
@@ -105,11 +155,11 @@ required-features = ["auth"]
 
 [[test]]
 name = "auth_authentication"
-required-features = ["auth", "server-axum"]
+required-features = ["auth", "web", "html"]
 
 [[test]]
 name = "auth_session_http"
-required-features = ["auth-session"]
+required-features = ["auth-session", "html"]
 
 [[test]]
 name = "session_redis_provider"
@@ -142,22 +192,22 @@ required-features = ["rate-limit"]
 [[example]]
 name = "server-axum-minimal"
 path = "examples/server_axum/minimal.rs"
-required-features = ["server-axum"]
+required-features = ["web", "html"]
 
 [[example]]
 name = "config-secrets-state"
 path = "examples/config/secrets_state.rs"
-required-features = ["config", "secret-provider", "server-axum"]
+required-features = ["config", "secret-provider", "web", "html"]
 
 [[example]]
 name = "config-secret-provider"
 path = "examples/config/secret_provider.rs"
-required-features = ["config", "secret-provider", "server-axum"]
+required-features = ["config", "secret-provider", "web", "html"]
 
 [[example]]
 name = "config-typed"
 path = "examples/config/typed.rs"
-required-features = ["config", "server-axum"]
+required-features = ["config", "web", "html"]
 
 [[example]]
 name = "secrets-azure-cli"

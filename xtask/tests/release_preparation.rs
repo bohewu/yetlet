@@ -22,7 +22,7 @@ fn qualification_selects_the_original_capabilities_through_two_packages() {
             "yetlet/html",
             "yetlet/actions",
             "yetlet/reactive",
-            "yetlet/server-axum",
+            "yetlet/web",
             "yetlet/request-id",
             "yetlet/session",
             "yetlet-browser/dom",

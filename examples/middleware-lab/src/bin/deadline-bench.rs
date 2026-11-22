@@ -13,7 +13,7 @@ use axum::{
     routing::get,
 };
 use tower::{ServiceBuilder, ServiceExt};
-use yetlet::server_axum::{
+use yetlet::web::{
     RequestContext,
     middleware::{Next, from_fn, with_global},
 };

@@ -2,13 +2,38 @@
 
 ## Intent and scope
 
-Build a **small, HTML-first Rust universal UI framework**. The guiding contract is in `README.md` and `docs/MVP.md`; architecture, proposal status, milestone gates and task dependencies are in `docs/ARCHITECTURE.md`, `docs/adr/`, `docs/ROADMAP.md` and `docs/BACKLOG.md`.
+Build a **small, composable Rust application framework**. The owner-selected next-alpha direction keeps Core composition/lifecycle built in and View, Web, native/network/renderer and auxiliary services optional through features. Minimize published SDK packages; the selected starting cohort remains `yetlet` and `yetlet-browser`. The target contract and its implementation gates are in `docs/adr/0014-layered-host-resource-lifecycle.md`, `docs/M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md`, `docs/ARCHITECTURE.md`, `docs/ROADMAP.md` and `docs/BACKLOG.md`. `README.md` and `docs/MVP.md` retain the current published Web/SSR contracts until the corresponding implementation/migration gates update them. Do not present target feature/API sketches as already implemented or published.
 
 This repository contains an Experimental SDK and independent CLI with accepted public releases. Use the publication records linked from `docs/RELEASE-READINESS.md` for distribution identity and `site/pages.toml` for the selected guide edition. Later checkout additions can be source-only even when development manifests retain a published version. Production qualification remains open. Do not assume undocumented or deferred interfaces exist.
 
 ## Documentation language
 
 Write **all repository documentation in English**, including the README, ADRs, architecture, roadmap, backlog, validation records, and future Markdown files. Preserve the original technical meaning, acceptance evidence, links, IDs, and decision status when editing. Run `cargo xtask check docs` to verify language, references, and backlog structure.
+
+### Known ignored evidence diagnostics
+
+Historical, intentionally retained `.pipeline-output/` handoffs, review
+requests, failed-run logs and receipts can be Git-ignored yet still be scanned
+by `cargo xtask check docs`. Git ignore status does **not** imply checker PASS.
+
+- Preserve original ignored evidence and the actual nonzero checker result;
+  never delete/edit evidence, bypass checks or call a failing command PASS to
+  clear historical diagnostics.
+- If a failure is wholly attributable to previously identified, unchanged
+  ignored evidence, record its source paths/count and classification in the
+  ignored task handoff once. **Do not repeatedly foreground or re-run the same
+  known non-actionable failure** in later progress reports or handoffs.
+- Continue scoped validation of new or touched source/doc files. Newly
+  introduced findings, changed identities/counts, tracked-file failures,
+  dependencies, CI/Commit Guard/release gates or product defects remain
+  actionable. Investigate and report them; an ignored-path error can still
+  matter if it actually blocks a required gate.
+- If a required broad command still exits nonzero, preserve its true result
+  in detailed evidence and qualify any completion claim. Reuse unchanged-source
+  receipts instead of rerunning a known failing global check for bookkeeping.
+  Keep routine summaries focused on changed tests, reviewers, Git state and
+  open product gates; mention historical-only findings again only if they
+  materially change a decision.
 
 ## Work sequence
 

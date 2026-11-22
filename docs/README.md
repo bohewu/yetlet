@@ -56,6 +56,15 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Maintainer entry points
 
+- [Original M28 study](M28-COMPOSABLE-APPLICATION-PLAN.md) retains the research
+  inventory and candidate tradeoffs. [ADR 0013](adr/0013-composable-application-and-hosts.md)
+  accepted the scoped F2 lifecycle work. The current feature-first direction and
+  delivery gates are in [ADR 0014](adr/0014-layered-host-resource-lifecycle.md) and
+  the [Host lifecycle design](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md). Checkout
+  implementation and published SDK qualification remain separately recorded.
+  The [dated physical qualification checkpoints](M28-MULTI-HOST-DELIVERY-PLAN.md#yt-285-readiness-checkpoint-2026-11-22)
+  distinguish UDP-path readiness from subsequent private application acceptance.
+
 - [YT-250 CLI 0.3.1 release](CLI-031-RELEASE-PREPARATION.md): published
   Registry latest SemVer correction, retained exact app locking/provenance and
   Windows Browser Style shutdown verification. The Reader Edition adopted
@@ -555,17 +564,19 @@ local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`; no product runtime was req
 These module guides describe the consolidated SDK and its practical limits.
 Use source/rustdoc matching the version you consume and Rust 1.99 or newer;
 native SSR needs no browser build. The [API reference](API-REFERENCE.md) covers
-additional modules and explicitly labels later source-only additions.
+additional modules and explicitly labels later source-only additions. In the
+current checkout, Core lifecycle is built in with an empty default feature set;
+View, HTML and Web are selected explicitly.
 
 | Area | Package guide |
 |---|---|
-| Shared View and binding vocabulary | [yetlet::view](../crates/yetlet/guides/core.md) |
-| Native escaped HTML | [yetlet::html](../crates/yetlet/guides/html.md) |
+| Optional shared View and binding vocabulary | [yetlet::view](../crates/yetlet/guides/core.md) |
+| Optional native escaped HTML | [yetlet::html](../crates/yetlet/guides/html.md) |
 | Browser subtree mount | [yetlet_browser::dom](../crates/yetlet-browser/guides/dom.md) |
 | Optional keyed children/listeners | [yetlet_browser::dom_keyed](../crates/yetlet-browser/guides/dom-keyed.md) |
 | Optional owned local update graph | [yetlet::reactive](../crates/yetlet/guides/reactive.md) |
 | Explicit typed actions | [yetlet::actions](../crates/yetlet/guides/actions.md) |
-| Native handlers, routing and Page responses | [yetlet::server_axum](../crates/yetlet/guides/server-axum.md) |
+| Optional native HTTP; add HTML for Page responses | [yetlet::web](../crates/yetlet/guides/server-axum.md) |
 | Optional request correlation | [yetlet::request_id](../crates/yetlet/guides/request-id.md) |
 | Optional Memory Session | [yetlet::session](../crates/yetlet/guides/session.md) |
 

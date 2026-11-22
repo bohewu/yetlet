@@ -14,7 +14,7 @@ use tokio::{
     task::JoinHandle,
     time::{Instant, sleep},
 };
-use yetlet::server_axum::App;
+use yetlet::web::App;
 
 const DEFAULT_ADDRESS: &str = "127.0.0.1:7878";
 

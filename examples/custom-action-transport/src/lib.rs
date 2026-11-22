@@ -6,7 +6,34 @@ use futures_util::{SinkExt, StreamExt};
 use serde::{Deserialize, Serialize};
 use tokio::{net::TcpStream, time::timeout};
 use tokio_util::codec::{Framed, LengthDelimitedCodec};
-use yetlet::actions::{ActionError, ActionExecutor, Command};
+use yetlet::actions::{ActionExecutor, Command};
+
+/// Errors of this application's TCP adapter; no HTTP status is synthesized.
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub enum TcpError {
+    InvalidEndpoint,
+    Network,
+    InvalidResponse,
+    Remote { code: String },
+}
+
+impl TcpError {
+    pub fn code(&self) -> &str {
+        match self {
+            Self::InvalidEndpoint => "invalid_endpoint",
+            Self::Network => "network_error",
+            Self::InvalidResponse => "invalid_response",
+            Self::Remote { code } => code,
+        }
+    }
+}
+
+impl std::fmt::Display for TcpError {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(formatter, "TCP action failed: {}", self.code())
+    }
+}
+impl std::error::Error for TcpError {}
 
 pub const MAX_FRAME_BYTES: usize = 1024;
 pub const SERVER_DEADLINE: Duration = Duration::from_secs(1);
@@ -52,41 +79,42 @@ pub struct TcpExecutor {
 }
 
 impl TcpExecutor {
-    pub fn new(endpoint: SocketAddr, deadline: Duration) -> Result<Self, ActionError> {
+    pub fn new(endpoint: SocketAddr, deadline: Duration) -> Result<Self, TcpError> {
         if !endpoint.ip().is_loopback() || endpoint.port() == 0 || deadline.is_zero() {
-            return Err(ActionError::InvalidEndpoint);
+            return Err(TcpError::InvalidEndpoint);
         }
         Ok(Self { endpoint, deadline })
     }
 }
 
 impl ActionExecutor<Add> for TcpExecutor {
-    async fn execute(&self, command: Add) -> Result<Sum, ActionError> {
+    type Error = TcpError;
+
+    async fn execute(&self, command: Add) -> Result<Sum, Self::Error> {
         timeout(self.deadline, async {
-            let request = serde_json::to_vec(&command).map_err(|_| ActionError::InvalidResponse)?;
+            let request = serde_json::to_vec(&command).map_err(|_| TcpError::InvalidResponse)?;
             let socket = TcpStream::connect(self.endpoint)
                 .await
-                .map_err(|_| ActionError::Network)?;
+                .map_err(|_| TcpError::Network)?;
             let mut wire = framed(socket);
             wire.send(request.into())
                 .await
-                .map_err(|_| ActionError::Network)?;
+                .map_err(|_| TcpError::Network)?;
             let response = wire
                 .next()
                 .await
-                .ok_or(ActionError::InvalidResponse)?
-                .map_err(|_| ActionError::InvalidResponse)?;
+                .ok_or(TcpError::InvalidResponse)?
+                .map_err(|_| TcpError::InvalidResponse)?;
             let reply: Reply =
-                serde_json::from_slice(&response).map_err(|_| ActionError::InvalidResponse)?;
+                serde_json::from_slice(&response).map_err(|_| TcpError::InvalidResponse)?;
             match reply {
                 Reply::Ok { value } => Ok(Sum { value }),
-                // Status is an app-owned compatibility mapping, not a TCP/HTTP status.
-                Reply::Error { code } => Err(ActionError::Remote { status: 422, code }),
+                Reply::Error { code } => Err(TcpError::Remote { code }),
             }
             // Dropping `wire` closes the connection, also on error/cancellation.
         })
         .await
-        .map_err(|_| ActionError::Network)?
+        .map_err(|_| TcpError::Network)?
     }
 }
 

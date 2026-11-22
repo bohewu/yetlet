@@ -29,7 +29,7 @@ use rusqlite::{
 };
 use serde::{Deserialize, Serialize};
 use tokio::sync::Semaphore;
-use yetlet::server_axum::App;
+use yetlet::web::App;
 
 #[cfg(unix)]
 use std::os::unix::fs::OpenOptionsExt;

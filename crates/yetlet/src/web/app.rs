@@ -3,9 +3,13 @@
 //! Axum owns routing, request extraction, responses, state and Tower execution.
 //! No MVC controller hierarchy, model binder, or parallel router is created.
 
-use crate::server_axum::Page;
+#[cfg(feature = "html")]
 use crate::view::View;
-use std::{borrow::Cow, convert::Infallible, future::Future};
+#[cfg(feature = "html")]
+use crate::web::Page;
+use std::convert::Infallible;
+#[cfg(feature = "html")]
+use std::{borrow::Cow, future::Future};
 
 use axum::{
     Router,
@@ -27,19 +31,14 @@ use tower::{Layer, Service};
 /// Ordinary handler functions return native Axum results, without Controllers.
 ///
 /// ```rust
-/// use axum::{Json, Router, response::Response};
-/// use yetlet::view::View;
-/// use yetlet::server_axum::{App, HtmlPageError, render_page};
+/// use axum::{Json, Router};
+/// use yetlet::web::App;
 ///
-/// async fn home() -> Result<Response, HtmlPageError> {
-///     render_page("Home", &View::text("Hello"))
-/// }
 /// async fn ping() -> Json<&'static str> {
 ///     Json("ready")
 /// }
 ///
 /// let router: Router = App::new()
-///     .get("/", home)
 ///     .group("/api", |api| api.get("/ping", ping))
 ///     .into_router();
 /// ```
@@ -56,9 +55,43 @@ where
     }
 }
 
-const DEFAULT_LISTEN_ADDRESS: &str = "127.0.0.1:7878";
-
 impl App<()> {
+    /// Describe this service as a managed Host without binding or starting it.
+    ///
+    /// Build a retained [crate::HostGroup] to coordinate multiple services,
+    /// graceful shutdown and managed resource release. The default address is
+    /// `127.0.0.1:7878`; select distinct addresses or port 0 for multiple Hosts.
+    ///
+    /// ```no_run
+    /// use yetlet::{HostGroup, web::App};
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    ///
+    /// let host = App::new()
+    ///     .get("/api", async || "hello")
+    ///     .into_host()
+    ///     .with_address("127.0.0.1:0");
+    /// let address = host.handle();
+    /// let mut hosts = HostGroup::new().with_host(host).build()?;
+    /// assert!(address.local_addr().is_none());
+    /// if let Err(failure) = hosts.run_async().await {
+    ///     eprintln!("Host group failed: {failure}");
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// Only resolved Axum state can become a serving Host:
+    ///
+    /// ```compile_fail
+    /// use yetlet::web::App;
+    /// #[derive(Clone)]
+    /// struct State;
+    /// let _host = App::<State>::new().into_host();
+    /// ```
+    pub fn into_host(self) -> super::WebHost {
+        super::WebHost::new(self.into_router())
+    }
+
     /// Serve this application over HTTP on the loopback development default.
     ///
     /// The listener binds exactly `127.0.0.1:7878`; it is not reachable from
@@ -68,10 +101,12 @@ impl App<()> {
     ///
     /// The application must already have resolved Axum state to `App<()>`.
     /// This method does not create a Tokio runtime; call it from the runtime
-    /// owned by your application.
+    /// owned by your application. Dropping this consuming future does not promise
+    /// graceful drain or managed finalization. Use [Self::into_host] and retain the
+    /// built HostGroup outside a cancelled drive when those obligations matter.
     ///
     /// ```no_run
-    /// use yetlet::server_axum::App;
+    /// use yetlet::web::App;
     ///
     /// async fn home() -> &'static str { "Hello from Yetlet" }
     ///
@@ -84,7 +119,7 @@ impl App<()> {
     /// An application with unresolved state cannot call this method:
     ///
     /// ```compile_fail
-    /// use yetlet::server_axum::App;
+    /// use yetlet::web::App;
     ///
     /// #[derive(Clone)]
     /// struct AppState;
@@ -99,7 +134,7 @@ impl App<()> {
     /// cannot be bound. After binding, Axum owns the serving loop and its
     /// native accept-error behavior.
     pub async fn serve(self) -> std::io::Result<()> {
-        self.serve_on(DEFAULT_LISTEN_ADDRESS).await
+        self.serve_on(super::DEFAULT_LISTEN_ADDRESS).await
     }
 
     /// Serve this application over plain HTTP on an explicit TCP address.
@@ -110,9 +145,10 @@ impl App<()> {
     /// do not use that on an untrusted network without a secure network edge.
     /// These helpers do not infer HTTPS, load certificates, or enable TLS.
     /// The caller owns and starts the Tokio runtime; this method does not create one.
+    /// Its cancellation boundary is the same as [Self::serve].
     ///
     /// ```no_run
-    /// use yetlet::server_axum::App;
+    /// use yetlet::web::App;
     ///
     /// async fn home() -> &'static str { "Hello from Yetlet" }
     ///
@@ -126,7 +162,7 @@ impl App<()> {
     ///
     /// ```no_run
     /// use axum::{Router, routing::get};
-    /// use yetlet::server_axum::App;
+    /// use yetlet::web::App;
     ///
     /// async fn home() -> &'static str { "Hello from Yetlet" }
     ///
@@ -147,7 +183,7 @@ impl App<()> {
         A: tokio::net::ToSocketAddrs,
     {
         let listener = tokio::net::TcpListener::bind(address).await?;
-        axum::serve(listener, self.into_router()).await
+        super::serving::serve_router(listener, self.into_router(), None).await
     }
 }
 
@@ -204,10 +240,11 @@ where
     ///
     /// ```
     /// use yetlet::view::View;
-    /// use yetlet::server_axum::App;
+    /// use yetlet::web::App;
     /// async fn home() -> View { View::text("Hello") }
     /// let app: axum::Router = App::new().page("/", "Home", home).into_router();
     /// ```
+    #[cfg(feature = "html")]
     pub fn page<H, F>(self, path: &str, title: impl Into<Cow<'static, str>>, handler: H) -> Self
     where
         H: Fn() -> F + Clone + Send + Sync + 'static,

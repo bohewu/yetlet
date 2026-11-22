@@ -712,9 +712,9 @@ use axum::{
     routing::get,
 };
 use std::{io, sync::Arc};
-use yetlet::server_axum::DEFAULT_CSP;
+use yetlet::web::DEFAULT_CSP;
 #[cfg(test)]
-use {axum::response::Html, yetlet::view::View, yetlet::server_axum::render_document};
+use {axum::response::Html, yetlet::view::View, yetlet::web::render_document};
 
 impl Snapshot {
     pub(crate) fn load_selected(frontend: &str) -> io::Result<Arc<Self>> {

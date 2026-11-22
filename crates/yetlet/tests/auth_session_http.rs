@@ -30,11 +30,11 @@ use tower::{ServiceBuilder, ServiceExt};
 use yetlet::auth::{
     Authenticated, Authentication, Principal, ResolveFuture, authenticate, session,
 };
-use yetlet::server_axum::Page;
 use yetlet::session::{
     Session, SessionClock, SessionClockError, SessionConfig, SessionError, SessionManager,
 };
 use yetlet::view::{Element, View};
+use yetlet::web::Page;
 
 #[derive(Default, Clone)]
 struct IdentityRef {

@@ -11,7 +11,7 @@ use axum::{
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
 use std::{path::Path, sync::Arc};
-use yetlet::server_axum::{DEFAULT_CSP, Page};
+use yetlet::web::{DEFAULT_CSP, Page};
 
 #[derive(Clone, Default)]
 pub(crate) struct NativeCss(Option<Arc<Snapshot>>);

@@ -6,13 +6,13 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use tower::ServiceExt;
-use yetlet::server_axum::{
+use yetlet::view::{Element, View};
+use yetlet::web::{
     App, DEFAULT_CSP, Page,
     extract::{Json, Path, Query, State},
     http::{Request, StatusCode, header},
     response::{Redirect, Response},
 };
-use yetlet::view::{Element, View};
 
 async fn send(app: Router, path: &str) -> Response {
     app.oneshot(Request::builder().uri(path).body(Body::empty()).unwrap())

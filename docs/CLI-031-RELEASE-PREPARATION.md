@@ -7,7 +7,7 @@ connections. The Windows process wrapper now receives the interactive mode from
 the CLI caller. This lets it supervise npm even when the script path occupies
 the first argument, and wait for its owned Job to finish before returning.
 
-On the same NCUT-BOHE runner, the corrected CLI passed actual Native and Browser
+On the same selected physical Windows Runner, the corrected CLI passed actual Native and Browser
 Style build and runtime checks. Chrome mounted the browser Wasm, preserved
 computed Style after a keyed update, and recorded no console errors or failed
 responses. After targeted Ctrl-Break, the first connection probe following CLI
@@ -31,7 +31,7 @@ with five opt-in cases ignored. The Linux CI-aligned CLI selection passed
 149 cases, with five ignored. The first CI formatting rejection and the first
 review's three corrected batch-test call sites remain recorded.
 
-On NCUT-BOHE, the native and browser runtime ports were 42230 and 42288. Each
+On that physical Windows Runner, both native and browser runtime endpoints were recorded in restricted receipts. Each
 first connection probe immediately after the CLI exited with Windows status
 `0xc000013a` found its port closed. Chrome also mounted the served Wasm and
 retained toolbar flex layout, 12px padding and weight 700 after a keyed update.

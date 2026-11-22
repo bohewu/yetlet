@@ -105,8 +105,28 @@ fn create_with_profile(
     validate_name(name).map_err(str::to_owned)?;
     crate::platform::fs::ensure_create_supported()?;
     let framework = crate::framework::validate(framework).map_err(str::to_owned)?;
-    let entries = files(name, &framework, service)?;
+    let mut entries = files(name, &framework, service)?;
+    apply_source_api(&framework, &mut entries)?;
     crate::platform::fs::create_project(dir, name, &entries)
+}
+
+fn apply_source_api(
+    framework: &Path,
+    entries: &mut [(&'static str, String)],
+) -> Result<(), String> {
+    let api = crate::framework::sdk_api(framework).map_err(str::to_owned)?;
+    api.apply_to_template(entries, false)?;
+    if api == crate::sdk_api::SdkApi::FeatureModules {
+        for (path, content) in entries {
+            if *path == "README.md" {
+                *content = content.replace(
+                    "Cargo.toml contains explicit absolute local path dependencies on `yetlet-core`\nand `yetlet-server-axum`, with independent package metadata. If moving the\nframework checkout, edit both paths and explicitly refresh this app's lockfile\noffline before the next frozen build. These crates are not fetched from a\nregistry or Git.",
+                    "Cargo.toml selects the local `yetlet` package with default features disabled\nand explicit `web` and `html` features. The adapter API is `yetlet::web`. If\nmoving the framework checkout, edit the dependency path and explicitly refresh\nthis app's lockfile offline before the next frozen build. This SDK dependency\nis not fetched from a registry or Git.",
+                );
+            }
+        }
+    }
+    Ok(())
 }
 
 pub(crate) fn files(
@@ -159,7 +179,8 @@ pub fn create_config(
     crate::platform::fs::ensure_create_supported()?;
     let framework = crate::framework::validate(framework).map_err(str::to_owned)?;
     crate::framework::validate_config(&framework).map_err(str::to_owned)?;
-    let entries = config_files(name, &framework, service)?;
+    let mut entries = config_files(name, &framework, service)?;
+    apply_source_api(&framework, &mut entries)?;
     crate::platform::fs::create_project(dir, name, &entries)
 }
 
@@ -212,7 +233,8 @@ pub fn create_tailwind(
     if runtime_settings {
         crate::framework::validate_config(&framework).map_err(str::to_owned)?;
     }
-    let entries = tailwind_files(name, &framework, service, runtime_settings)?;
+    let mut entries = tailwind_files(name, &framework, service, runtime_settings)?;
+    apply_source_api(&framework, &mut entries)?;
     crate::platform::fs::create_project(dir, name, &entries)
 }
 
@@ -327,7 +349,8 @@ pub fn create_vite(
     if runtime_settings {
         crate::framework::validate_config(&framework).map_err(str::to_owned)?;
     }
-    let entries = vite_files(name, &framework, service, runtime_settings, tailwind)?;
+    let mut entries = vite_files(name, &framework, service, runtime_settings, tailwind)?;
+    apply_source_api(&framework, &mut entries)?;
     crate::platform::fs::create_project(dir, name, &entries)
 }
 
@@ -374,6 +397,7 @@ pub fn create_vite_dev(
             include_str!("../templates/vite/vite.dev.bridge.mjs").into(),
         ),
     ]);
+    apply_source_api(&framework, &mut entries)?;
     crate::platform::fs::create_project(dir, name, &entries)
 }
 

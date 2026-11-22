@@ -1,5 +1,5 @@
 #[cfg(not(target_arch = "wasm32"))]
-use yetlet::server_axum::prelude::*;
+use yetlet::web::prelude::*;
 
 #[cfg(not(target_arch = "wasm32"))]
 #[tokio::main]

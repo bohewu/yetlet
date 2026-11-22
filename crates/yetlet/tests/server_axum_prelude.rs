@@ -8,7 +8,7 @@ use axum::{
 };
 use serde::{Deserialize, Serialize};
 use tower::ServiceExt;
-use yetlet::server_axum::prelude::*;
+use yetlet::web::prelude::*;
 
 #[derive(Serialize, Deserialize)]
 struct Payload {
@@ -150,10 +150,10 @@ fn prelude_exposes_only_the_selected_support_types() {
     let redirect: Response = Redirect::to("/").into_response();
     assert_eq!(redirect.status(), StatusCode::SEE_OTHER);
 
-    let _: yetlet::server_axum::extract::Form<Payload> = Form(Payload {
+    let _: yetlet::web::extract::Form<Payload> = Form(Payload {
         message: "ok".into(),
     });
-    let _: yetlet::server_axum::extract::Json<Payload> = Json(Payload {
+    let _: yetlet::web::extract::Json<Payload> = Json(Payload {
         message: "ok".into(),
     });
 }
