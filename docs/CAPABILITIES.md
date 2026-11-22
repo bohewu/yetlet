@@ -73,8 +73,13 @@ NativeHost contributes one caller-thread root loop for multiple windows; UDP
 remains bounded and caller-driven. Web, renderer and command bridge selections
 are independent. YT-293 migrates the remaining checkout consumers directly to
 these features and removes the temporary yetlet-hosts companion. SDK publication
-still contains only yetlet and yetlet-browser; exact archive qualification remains
-YT-294.
+still contains only yetlet and yetlet-browser.
+[YT-294](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#22-yt-294--normal-archives-and-external-consumer-qualification)
+verifies both normal local archives, six independent consumer families, 16 actions,
+15 feature graphs and 13 actual tests. This qualifies selected source/package
+capabilities; it does not republish alpha.8 or add browser/GPU/platform runtime
+claims. Configured independent review passes; YT-294 and YT-286 are Done at
+source/package delivery scope.
 
 The source CLI uses selected SDK feature metadata to choose its generated imports
 and explicit opt-ins. Native remains HTTP/SSR with web+html; Browser chooses

@@ -77,9 +77,13 @@ Web may retain its owned-thread placement. No dependency or renderer is added
 to default Core. [YT-293 migration](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection)
 removes the final staging package, migrates its consumers and selects CLI template
 features/imports from the chosen SDK metadata. Core and concrete Host lifecycles
-are unchanged. SDK publication keeps two packages; normal selected archives retain
-YT-294 qualification in the
-[ordered plan](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#14-replanned-public-delivery--yt-287-through-yt-294).
+are unchanged. SDK publication keeps two packages.
+[YT-294 archive qualification](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#22-yt-294--normal-archives-and-external-consumer-qualification)
+verifies normal Core then Browser archives and six independent consumer families
+with explicit feature/target graphs. The local development archives are distinct
+from published alpha.8; a unique release and compatible CLI must qualify registry
+scaffolding before publication. Configured independent review passes; YT-294 and
+YT-286 are Done at source/package delivery scope.
 The research history below retains its original default-feature/API assumptions.
 
 ## Proposed composable application research

@@ -1,8 +1,8 @@
 # ADR 0014 — Layered Hosts with Default Resource Lifecycle Management
 
-- **Status:** Owner-selected target direction; YT-287–293 independently reviewed and Done; YT-294 qualification pending.
+- **Status:** Owner-selected target direction; YT-287–294 independently reviewed and Done at source/package delivery scope.
 - **Date:** 2026-11-21.
-- **Tracking:** YT-286 umbrella remains Todo; YT-287–294 define the remaining delivery gates.
+- **Tracking:** YT-286 source/package umbrella is Done through YT-287–294; publication and physical LAN remain separate.
 - **Decision owner:** Project maintainer.
 - **Related:** [Research and API design](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md), [ADR 0013](0013-composable-application-and-hosts.md), [ADR 0011](0011-application-startup-api.md), [naming guide](../NAMING.md).
 
@@ -354,6 +354,39 @@ wc_job_DjxGN41kOxQ3Y-SU reached terminal exit 0 with actual PASS, issues=[]
 and required_followups=[]; all reviewed source/evidence inputs stayed unchanged.
 YT-293 is Done. Local Git delivery uses the Strict/Builtin staged Guard; selected
 normal archives and external-consumer qualification remain YT-294.
+
+## YT-294 qualification checkpoint — normal archives and consumers
+
+The [archive qualification](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#22-yt-294--normal-archives-and-external-consumer-qualification)
+builds and verifies the clean YT-293 baseline as exactly two normal SDK archives.
+Core is packaged first; Browser verifies against that final Core archive's exact
+checksum. Neither packaging verification nor normalized dependency identity is
+bypassed. Six independent external consumer families use those archives with
+explicit feature selections and no SDK path/git override.
+
+All 16 consumer actions, 15 normal/build feature graphs and 13 actual tests pass.
+The initial graph assessor's same-name/different-version mistake is retained and
+corrected without replaying its 13 successful Cargo actions. Core remains empty
+by default; Native+UDP excludes Web/Tokio, and Browser GPU backend selection is
+explicit. Pure Web does not acquire View/HTML through development dependencies.
+Current archive compilation/headless checks and unchanged runtime-source identity
+carry the accepted YT-292 correction chain alongside its earlier X11 execution;
+this is not a fresh archive UI/GPU/platform qualification.
+
+The development version fields still say alpha.8, while the local archive hashes
+differ from published alpha.8. Actual current CLI Native and Browser commands
+reject that mismatch before lock or destination creation. Historical checksum
+enforcement remains intact. Direct local archive consumption is qualified;
+successful registry scaffolding requires a separately selected unique SDK
+release and compatible CLI before publication. Published records and the pinned
+reader do not change.
+
+Configured independent R1 wc_job_UjwLgXAwgKl0hNz1 reached terminal exit 0
+with actual PASS, issues=[] and required_followups=[]. All 21 selected source
+hashes and 109 evidence inputs remained unchanged during review. YT-294 and
+YT-286 are Done at source/package delivery scope. Final ordinary local Git
+delivery uses the Strict/Builtin staged Guard with receipts retained in the
+handoff; physical YT-285/YT-274 and publication remain independent.
 
 ## Context
 

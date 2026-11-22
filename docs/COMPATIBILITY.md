@@ -245,17 +245,38 @@ No release schema, SDK version or CLI version changes in this source slice.
 The executable experiment uses source-derived metadata labeled synthetic 0.10.0,
 not a selected release. It captures generated files at an intentionally failed
 lock step, then separately compiles copies with only SDK dependency source fields
-changed to the checkout. It fabricates no app lock or creation receipt. Actual
-normal archive consumption and successful registry creation remain YT-294 gates;
-Browser compilation is not a browser runtime result.
+changed to the checkout. It fabricates no app lock or creation receipt. YT-294
+now qualifies direct consumption of exact normal local archives across six
+independent consumer families. Browser compilation is not a browser runtime result.
 
 The immutable old Native diagnostic lacks explicit upgrade/pin wording. Existing
 installed users can use `yetlet new my-app --template native --sdk-version 0.9.0-alpha.8`.
 Next-SDK publication must identify and qualify a CLI release containing the new
 profile support, provide that upgrade/pin guidance, and avoid claiming old Native
-CLI compatibility. This slice selects neither release nor reader promotion.
+CLI compatibility. A successful registry creation is a gate for that separately
+selected unique SDK release and compatible CLI, not for reusing an existing
+published version with different bytes. This slice selects neither release nor
+reader promotion.
 See the [CLI guide](CLI-GUIDE.md#source-only-feature-module-profiles) and
 [migration evidence](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection).
+
+### Current checkout — exact archive identity
+
+[YT-294 normal packaging](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#22-yt-294--normal-archives-and-external-consumer-qualification)
+verifies Core first, then Browser against that exact Core checksum. Independent
+consumers resolve the normal archives through a local Cargo directory source with
+exact SDK version/checksum locks and no SDK path/git override. The development
+manifest versions remain 0.9.0-alpha.8; these bytes differ from the published
+alpha.8 identity and are not candidates for republishing that version.
+
+Actual current CLI Native and Browser commands use private metadata projected
+from the selected archives. Both reject with SDK_INCOMPATIBLE because the Core
+checksum contradicts alpha.8's historical m26_startup capability. Rejection occurs
+before lock generation or destination creation; neither a successful creation
+receipt nor a registry publication is claimed. This preserves the existing
+identity check and leaves published SDK/CLI records and reader pins unchanged.
+The earlier wording assigning successful registry creation to YT-294 is
+superseded by this explicit release/cohort disposition.
 
 ## Historical two-package pre-publication source — 2026-10-30
 

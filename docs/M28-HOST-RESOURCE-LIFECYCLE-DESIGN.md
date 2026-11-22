@@ -1,8 +1,8 @@
 # M28 — Layered Hosts and ResourceGroup Lifecycle Design
 
-**Status:** Owner-selected feature-first direction; YT-287–293 independently reviewed and Done; YT-294 gate open.
+**Status:** Owner-selected feature-first direction; YT-287–294 independently reviewed and Done at source/package delivery scope.
 **Date:** 2026-11-21.
-**Tracking:** YT-286 public-delivery umbrella; ordered remaining items YT-287–294.
+**Tracking:** YT-286 source/package delivery complete through YT-287–294; publication and physical LAN remain separate.
 **Decision:** [ADR 0014](adr/0014-layered-host-resource-lifecycle.md).
 **Source baseline:** `dec423a5ef6f7100e5f31cb93d0cbbec84652d71`.
 
@@ -2055,3 +2055,136 @@ review, not native agent_type dispatch or formal assurance. YT-293 is Done.
 Final local Git delivery uses the Strict/Builtin staged Guard; its final tree and
 commit receipts are retained with the local handoff. Normal archives and selected
 external-consumer qualification remain YT-294; no release or publication is selected.
+
+## 22. YT-294 — Normal archives and external-consumer qualification
+
+Status: Done after normal archive/consumer verification and configured independent
+R1 actual PASS; YT-286 source/package delivery is complete.
+Date: 2026-11-22.
+Baseline: 19993131f02fa4477296542f6bbe0b1774a744b7 (completed YT-293).
+
+### Exact package inputs and dependency order
+
+This qualification keeps the two-package SDK cohort, empty Core defaults and
+the current development version fields. It selects no new release identity.
+Both normal archives are built from the clean baseline above; subsequent changes
+in this item are repository documentation outside their package inputs.
+
+The existing release-doc sync plan required zero changes, and its check passed.
+Cargo vendors the existing locked external dependency set. Normal offline/locked
+Core packaging completes Packaging, Verifying, Compiling and Finished. That final
+archive is then extracted unchanged into the invocation-local directory source,
+with Cargo's package checksum bound to the archive SHA-256. Normal Browser
+packaging verifies against that exact Core identity. There is no bootstrap package,
+path patch, reverse development edge, archive rewrite or skipped verification.
+
+| Normal archive | Bytes | SHA-256 |
+|---|---:|---|
+| yetlet-0.9.0-alpha.8.crate | 323654 | ea267e20bd424aa1c7772140d2269655575f3b0743ac887fa49eabba4c60412b |
+| yetlet-browser-0.9.0-alpha.8.crate | 53669 | bd7921536aba61d937337be7223ee883b207af59eff0e10c60faa983b674a1eb |
+
+Both archived VCS records name the baseline and report a clean source tree.
+Browser's archived Cargo.lock binds Core to the checksum above. Normalized
+manifests have no path/git dependency overrides. Package inventories retain
+the moved examples/tests, their feature gates and both required WGSL assets.
+These local development archives differ from published alpha.8 bytes; their
+shared development version is not a new registry publication identity.
+
+### Independent consumers and feature graphs
+
+Six standalone fixture families request exact SDK versions with defaults disabled.
+Their Rust comes from the existing accepted consumers/tests without changes.
+Only fixture dependency sources, required target declarations and first-time
+fixture locks are adapted. Cargo resolves the selected normal archives through
+an invocation-local directory source; no fixture uses an SDK path/git dependency
+or patch, and no fixture configuration changes the repository's Cargo setup.
+
+| Family | Actual archive-backed verification |
+|---|---|
+| Core | Finite five-Host execution with caller-local/borrowed resources, inert build, Pending wake and ordered Join/release; native and Wasm normal graphs contain only the consumer and Core |
+| View and HTML | Separate View-only and HTML-only finite executions; HTML Wasm compile; explicit feature graphs retain no unrelated normal/build dependencies |
+| Browser | Real Wasm compilation for no-default, DOM/keyed-DOM, GPU-only, GPU-backend and actions selections; actions selects actions-http without native Web, and only gpu-backend selects wgpu |
+| Pure Web | Finite two-Web-Host execution and two existing SQLite cancellation/drain/original-owner/release tests; normal web graph excludes HTML/View and SQLite development dependencies |
+| Native and UDP | Native-only consumer compilation, four headless Native lifecycle tests and seven real-loopback UDP tests; no Web/Tokio/renderer in the selected normal graph |
+| Combined and custom Hosts | Native+UDP+Web+caller-local custom-Host consumer compiles; selected graph adds Web/Tokio explicitly, while the Wasm native-feature guard excludes platform-only dependencies |
+
+All 16 run/check/test actions and 15 unique normal/build graph observations pass.
+The actual test total is 13 passed, zero failed and zero ignored. Native fixture
+locks add no external package identities relative to their accepted seed inputs.
+Older View/Browser-action seed locks reconcile to the selected baseline vendor
+versions; these are first-time qualification fixture locks, not repository
+dependency changes. All copied Rust and prepared manifests retain their hashes.
+
+The initial matrix Job wc_job_mIgK1Gt7kbK0jQBu terminated with exit 1 after
+13 successful Cargo actions: a supplemental graph assessment keyed packages only
+by name and rejected coexisting rustix versions. Its output remains retained.
+The correction keys package identity by name and version, reuses the original
+successful command/graph outputs, and completes only the three remaining actions.
+Continuation wc_job_TzeymSj71koIgweG terminates with exit 0. This assessment
+repair changes no product code and repeats no successful compiler command.
+
+### Native runtime evidence and its limits
+
+The selected archive's 23 relevant Core/Web/Native/UDP runtime files match the
+final accepted YT-292 source and current baseline. The Native consumer Rust is
+unchanged, and its earlier manifest adaptation only adds the SDK version field.
+The current archive compiles and headless tests complement the retained YT-292
+bounded X11 run: one application, two windows, loopback UDP, Web and a caller-local
+Host, followed by observed final completion and cleanup.
+
+That earlier executable predates YT-292's Reviewer repairs. Its runtime evidence
+is carried together with the 12 accepted correction checks and independent R2
+PASS; it is not an execution of the current archive binary. This item performs
+no new visible Native run. Browser/Wasm and GPU-backend compilation do not claim
+browser execution or GPU runtime. Windows, Wayland, physical LAN and broad
+platform qualification remain outside these results.
+
+### Version and CLI compatibility disposition
+
+The current source CLI is built once and invoked for Native and Browser against
+private metadata projected from these exact archive manifests and checksums.
+Both commands reject with SDK_INCOMPATIBLE before lock generation, destination
+publication or a successful creation receipt. Their only Cargo invocation is
+the tool-version probe. The selected alpha.8 Core checksum contradicts the
+published startup capability identity; rejection preserves the existing rule.
+
+YT-293's synthetic source captures and old/current CLI behavior remain separately
+identified. The original compatibility ledger permits unsupported combinations
+with explicit upgrade/pin guidance and a publication disposition. The additional
+YT-293 wording that put successful registry creation into YT-294 is corrected:
+these local normal archives are qualified directly, while a successful registry
+creation remains a gate for a separately selected unique SDK release and
+compatible CLI before publication. No historical checksum, version, startup
+capability, release record or pinned reader authority is rewritten to manufacture
+a successful scaffold result.
+
+Existing installed users retain the published alpha.8 pin documented in the
+[compatibility guide](COMPATIBILITY.md#current-checkout--cli-and-selected-sdk).
+A future publication must select the new SDK identity, qualify its matching CLI
+and generated registry consumers, and then follow the existing release and reader
+promotion gates. Source/package delivery does not authorize those operations.
+
+### Evidence, independent review and local delivery
+
+The paired run m28-yt294-20261122 uses existing cache/evidence layout rules.
+Normal archives, immutable consumer inputs and command logs are retained under
+artifacts/verification/m28-yt294-20261122/. Receipts under
+.pipeline-output/m28-yt294-20261122/ include SOURCE-BASELINE,
+PACKAGE-INPUTS-R1, NORMAL-ARCHIVES-R1, CONSUMER-PREPARATION, CONSUMER-LOCKS-R1,
+CONSUMERS-R1/R2, CLI-ARCHIVE-IDENTITY-R1 and RUNTIME-CARRYFORWARD-SOURCE-R1.
+The failed graph assessment and its passing continuation remain distinct.
+
+Configured independent R1 wc_job_UjwLgXAwgKl0hNz1 reached terminal exit 0
+with actual PASS, issues=[] and required_followups=[]. The saved Reviewer model
+and observed effort were gpt-6.2-astra/high under the unchanged operator launcher.
+All 21 selected source hashes and 109 evidence inputs remained unchanged during
+review. This is ordinary role-directed independent review, not native agent_type
+dispatch or formal assurance.
+
+Release-document and scoped English/link/anchor/backlog/whitespace checks pass.
+The 39 historical global-document diagnostics remain retained without replay;
+this is not a new globally clean documentation claim. YT-294 is Done and closes
+the dependent YT-286 umbrella at source/package delivery scope. Final ordinary
+local Git delivery uses the Strict/Builtin staged Guard; exact tree/commit
+receipts are retained with the local handoff. Publication, live reader promotion
+and physical YT-285/YT-274 remain separate.
