@@ -21,8 +21,10 @@ The owner selects a small, composable Rust application framework with minimal
 SDK publication: keep yetlet and yetlet-browser and expose optional capabilities
 through modules/features. The [YT-287 contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
 and [ADR 0014](adr/0014-layered-host-resource-lifecycle.md#yt-287-target-decision--minimal-packages-optional-capabilities)
-define the independently reviewed target. Implementation is staged; the published
-pair is unchanged. The built-in Core slice is described below.
+define the architecture implemented in the current source. The SDK candidate
+takes its version from the [workspace manifest](../Cargo.toml). Both packages
+inherit that version, and the Browser package requires the exact matching base
+package with its defaults disabled.
 
 | Layer | Next-alpha responsibility |
 |---|---|

@@ -312,6 +312,8 @@ class WorkspaceManifestTests(unittest.TestCase):
             for relative, value in updates.items():
                 (root / relative).write_text(value, encoding="utf-8")
             self.assertEqual(sync.plan(root)[-1], {})
+            browser = tomllib.loads((root / "crates/yetlet-browser/Cargo.toml").read_text())
+            self.assertEqual(browser["dependencies"]["yetlet"]["version"], "=7.8.9-alpha.2")
             self.assertEqual(
                 (root / "examples/docs-site/Cargo.toml").read_text(encoding="utf-8"),
                 reader_manifest_before,

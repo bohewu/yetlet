@@ -56,6 +56,10 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
 
 ## Maintainer entry points
 
+- [M28 SDK alpha.9 and CLI 0.4.2 preparation](ALPHA9-RELEASE-PREPARATION.md)
+  records the breaking SDK migration, installed CLI compatibility, pre-freeze
+  evidence and ordered publication gates.
+
 - [Original M28 study](M28-COMPOSABLE-APPLICATION-PLAN.md) retains the research
   inventory and candidate tradeoffs. [ADR 0013](adr/0013-composable-application-and-hosts.md)
   accepted the scoped F2 lifecycle work. The current feature-first direction and

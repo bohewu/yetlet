@@ -37,6 +37,14 @@ The [backlog](BACKLOG.md#yt-286-replan--core-view-and-web-delivery) owns current
 states/dependencies; older entries below retain their checkpoint-specific scope.
 Physical F3/D4 remains independent.
 
+### Experimental rollout
+
+The [alpha.9 SDK and CLI 0.4.2 handoff](ALPHA9-RELEASE-PREPARATION.md) records
+the pre-review archive and compatibility evidence. The published pair remains
+alpha.8/0.4.1. YT-295 tracks the independent CLI rollout first, and YT-296
+tracks SDK Core followed by Browser. Each release requires its own registry
+consumer and Reader Edition closeout.
+
 ### Planned delivery follow-through
 
 The owner reaffirmed the multi-host SDK goal on 2026-11-19. The

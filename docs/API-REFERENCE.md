@@ -99,8 +99,10 @@ explicitly exposes the listener beyond loopback.
 
 ## Source-only checkout additions
 
-The current checkout includes built-in yetlet::composition and the root
-HostGroup, Host and ResourceGroup exports; no composition feature is required.
+The current SDK candidate includes built-in `yetlet::composition` and reexports
+`HostGroup`, `Host` and `ResourceGroup` at the package root. These types need no
+Cargo features. The [workspace manifest](../Cargo.toml) selects the candidate
+version for both packages.
 The [independent Core consumer](../examples/external-consumers/yt288-core-hosts/src/main.rs)
 demonstrates custom Hosts, typed owned/borrowed resources and caller-driven
 polling without normal runtime dependencies. [YT-288](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
@@ -150,10 +152,10 @@ Native HTTP/SSR starters choose web+html and import yetlet::web; Browser starter
 choose view+reactive, with DOM/keyed-DOM in yetlet-browser. Settings and Vite add
 config. An incomplete new profile is rejected rather than using legacy imports.
 Older SDK metadata retains its established templates and startup capability rules.
-See [CLI source profiles](../tools/yetlet-cli/README.md#current-source-sdk-feature-profiles)
+See [CLI source profiles](../tools/yetlet-cli/README.md#sdk-feature-profiles)
 and the [migration checkpoint](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection).
-This source support does not select a new CLI/SDK release or change the pinned
-reader's published recipes.
+Generated-app compatibility depends on the CLI's own release and the selected
+SDK. The published recipes use the [Reader Edition](../site/pages.toml).
 
 The native-first Style Showcase is a checkout sample with an optional Wasm
 companion. Both packages are built from the repository.

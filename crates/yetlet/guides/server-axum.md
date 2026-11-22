@@ -4,10 +4,8 @@ Build native JSON endpoints and optional HTML pages with a small facade over
 Axum/Tower. The Web capability does not install browser, Session or configuration
 services.
 
-**Current-checkout API.** Select `web` for native HTTP and add `html` for SSR.
-Published SDK `0.9.0-alpha.8` still uses the `server-axum` feature and
-`yetlet::server_axum` imports; its artifact has not changed. The commands and
-imports below target this checkout. Registry users should follow the
+Select `web` for native HTTP and add `html` for SSR. SDK alpha.8 uses the
+`server-axum` feature and `yetlet::server_axum` imports. For that API, follow the
 [first-app guide](https://github.com/bohewu/yetlet/blob/master/docs/FIRST-APP.md)
 at their selected published revision.
 

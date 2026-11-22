@@ -107,10 +107,10 @@ and `Page` or `Result<Page, E>`. See the [server guide](crates/yetlet/guides/ser
 
 ## Development checkout
 
-This source tree uses the next-alpha feature contract. It does not change the
-published SDK or the Reader Edition above. Use this checkout's CLI when selecting
-a feature-module SDK; the published CLI's exact compatibility limits and upgrade
-or pin path are recorded in the [compatibility guide](docs/COMPATIBILITY.md).
+The workspace selects SDK `0.9.0-alpha.9` for local release preparation.
+Use the table below for the candidate and the quickstart above for the published
+Reader Edition. For generated projects, consult the CLI's version and feature
+requirements in the [compatibility guide](docs/COMPATIBILITY.md).
 
 `yetlet` has `default = []`. `HostGroup`, `Host` and `ResourceGroup` are built in;
 Core adds no HTTP runtime, View layer, thread pool or process supervisor. SDK
