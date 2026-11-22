@@ -396,7 +396,10 @@ def sync_manifests(root, paths, version):
             continue
         aliases = sorted({alias for _, alias, _, _ in dependencies})
         inventory.append((relative.as_posix(), aliases))
-        updated = rewrite_manifest(root, relative, text, dependencies, version)
+        # Cargo strips the path when packaging the Browser crate. Its registry
+        # dependency must select the matching Core archive.
+        requirement = '=' + version if relative == Path('crates/yetlet-browser/Cargo.toml') else version
+        updated = rewrite_manifest(root, relative, text, dependencies, requirement)
         if updated != text:
             updates[relative.as_posix()] = updated
     return updates, inventory

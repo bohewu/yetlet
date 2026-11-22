@@ -100,7 +100,7 @@ class RegistryTests(unittest.TestCase):
         current_policy = (package / 'resources/sdk-compatibility.json').read_bytes()
         for version, expected_policy in [('0.3.0', HISTORICAL_POLICY),
                                          ('0.3.1', LATEST_POLICY), ('0.4.0', current_policy),
-                                         ('0.4.1', current_policy)]:
+                                         ('0.4.1', current_policy), ('0.4.2', current_policy)]:
             with self.subTest(version=version), tempfile.TemporaryDirectory() as temp:
                 r, subjects = archives(Path(temp), cli=True, cli_version=version)
                 plan, bodies = registry.prepare(r, temp, subjects)
@@ -120,9 +120,9 @@ class RegistryTests(unittest.TestCase):
                     self.assertIn('**Build SDK:** `=0.9.0-alpha.8`.',
                                   (package / 'README.md').read_text())
                     self.assertNotEqual(meta['readme'], (package / 'README.md').read_text())
-                if version == '0.4.1':
+                if version in ('0.4.1', '0.4.2'):
                     self.assertIn('**Build SDK:** `=0.9.0-alpha.8`.', meta['readme'])
-                    self.assertIn('yetlet 0.4.1', meta['readme'])
+                    self.assertIn('yetlet ' + version, meta['readme'])
                 r, subjects = archives(Path(temp), cli=True, cli_version=version, cli_sdk='0.9.0-alpha.6')
                 with self.assertRaises(ValueError): registry.prepare(r, temp, subjects)
 

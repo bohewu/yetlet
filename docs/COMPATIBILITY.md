@@ -228,6 +228,16 @@ its generated API from the selected SDK capability metadata.
 
 ### Current checkout — CLI and selected SDK
 
+The selected preparation versions are SDK `0.9.0-alpha.9` and independent CLI
+`0.4.2`. In local tests with the exact candidate archives, published CLI 0.4.1
+passed Browser creation and Chrome runtime but rejected Native and Service
+because alpha.9 removed `server-axum`. Archive-installed CLI 0.4.2 passed all
+three template paths and retained creation against published alpha.8. An installed
+CLI 0.4.1 can pin `--sdk-version 0.9.0-alpha.8` for Native and Service.
+[Release notes, migration and verification limits](ALPHA9-RELEASE-PREPARATION.md#cli-release-notes-and-compatibility).
+
+At the earlier YT-293 checkpoint:
+
 The source CLI chooses an internal API profile from the selected core SDK's
 feature metadata. Declaring web or view selects the new profile before validation.
 Native SSR explicitly requests web+html, adding config for Settings/Vite; Browser

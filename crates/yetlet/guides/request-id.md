@@ -1,9 +1,7 @@
 # yetlet::request_id
 
-**Experimental SDK module.** Requires Rust 1.99 or newer. Published SDK
-`0.9.0-alpha.8` includes this module with its original `server-axum` dependency.
-The example below uses this checkout's `yetlet::web` imports. The published
-artifact is unchanged; read source/rustdoc at the revision you consume.
+**Experimental SDK module.** Requires Rust 1.99 or newer. The example below
+uses `yetlet::web`. SDK alpha.8 used `server-axum` for this integration.
 
 `yetlet::request_id` adds explicitly installed process-local numeric request correlation to an Axum/Yetlet app. In this checkout, `request-id` enables `web` without enabling View or HTML, and has no browser dependency. An app that does not select it allocates no provider counter.
 

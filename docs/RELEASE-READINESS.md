@@ -14,6 +14,15 @@ selects SDK alpha.8 and CLI 0.4.1. Development version equality does not
 establish archive/source equality. This is not Stable API, production, SLSA
 level or universal platform qualification.
 
+## M28 release preparation — 2026-11-22
+
+The local SDK `0.9.0-alpha.9` and independent CLI `0.4.2` passed their
+scoped archive checks. Both await integrated review and the immutable-source,
+CI and publication gates. Install and Reader Edition guidance still follows the
+accepted pair above. The rollout calls for CLI first, then SDK Core and Browser,
+with a verified Reader Edition closeout after each publication.
+[Release handoff and notes](ALPHA9-RELEASE-PREPARATION.md).
+
 For a new release, use [RELEASING.md](RELEASING.md), including its current
 version-binding/tooling gaps. This page retains historical readiness decisions,
 not a runnable release sequence. The dated Pending/FAIL/unpublished states below

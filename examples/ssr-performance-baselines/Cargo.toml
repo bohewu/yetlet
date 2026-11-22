@@ -25,4 +25,4 @@ document-capacity = ["buffer-study"]
 latency-study = []
 
 [dependencies]
-yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.8", default-features = false, features = ["html", "web"] }
+yetlet = { path = "../../crates/yetlet", version = "0.9.0-alpha.9", default-features = false, features = ["html", "web"] }

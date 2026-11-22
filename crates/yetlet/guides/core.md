@@ -1,10 +1,8 @@
 # yetlet::view
 
-**Experimental SDK module.** Requires Rust 1.99 or newer. Published
-`yetlet` SDK `0.9.0-alpha.8` provides View without a feature gate. The current
-checkout requires `view`; `html` and the Browser `dom`/`dom-keyed` features
-select it transitively. Read source/rustdoc at the revision you consume;
-these checkout feature changes do not alter the published alpha.8 artifact.
+**Experimental SDK module.** Requires Rust 1.99 or newer. This package requires `view`.
+The `html` feature and the Browser `dom` and `dom-keyed` features select it
+transitively. SDK alpha.8 exposed View by default.
 
 `yetlet::view` describes HTML/DOM UI as owned Rust values shared by the HTML and
 browser DOM renderers. The `view` feature adds no external normal dependencies,
@@ -16,11 +14,8 @@ For a View-only dependency on this checkout:
 
 ```toml
 [dependencies]
-yetlet = { version = "=0.9.0-alpha.8", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["view"] }
+yetlet = { version = "=0.9.0-alpha.9", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["view"] }
 ```
-
-The `view` feature in this path example is checkout-specific; published alpha.8
-registry consumers retain their existing View dependency configuration.
 
 For a first-app continuation covering typed data, reusable functions, lists and
 conditions, follow [Write Views and reusable components](https://github.com/bohewu/yetlet/blob/master/docs/VIEW-COMPONENTS.md).

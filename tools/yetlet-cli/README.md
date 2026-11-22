@@ -6,15 +6,15 @@ building and running [Yetlet](https://github.com/bohewu/yetlet) applications.
 ## Install
 
 Prepare Rust/Cargo 1.99 or later, a native C toolchain and OpenSSL development
-files. Run the registry install once the selected version is available.
+files, then install the CLI from the registry.
 
 ```sh
-cargo +1.99.0 install yetlet-cli --version 0.4.1 --locked
+cargo +1.99.0 install yetlet-cli --version 0.4.2 --locked
 yetlet --version
 ```
 
 `yetlet --version` reports exactly
-`yetlet 0.4.1`.
+`yetlet 0.4.2`.
 
 ## Create a native app
 
@@ -55,20 +55,14 @@ for platform setup, settings and the full command reference, or follow the
 [browser app guide](https://bohewu.github.io/yetlet/browser/) for a Wasm starter.
 [GitHub releases](https://github.com/bohewu/yetlet/releases) record published versions.
 
-**CLI release:** `0.4.1`. **Build SDK:** `=0.9.0-alpha.8`.
+**CLI release:** `0.4.2`. **Build SDK:** `=0.9.0-alpha.8`.
 
-Version boundary: the preceding CLI 0.4.0 release remains immutable and was
-built against SDK alpha.7. This CLI version selects SDK alpha.8 for its own
-build and embedded SDK snapshot; generated applications resolve their SDK
-independently. Install the exact version above only after registry availability
-is verified. A source-version change does not establish publication.
+The CLI builds against SDK alpha.8 and embeds the matching SDK snapshot for
+its source exporters. Applications resolve their SDK independently.
 
-## Current source SDK feature profiles
+## SDK feature profiles
 
-The current source also recognizes SDKs that declare the optional `web` or
-`view` feature. This is source support for the composable SDK architecture;
-it does not select or announce another CLI or SDK release. The published
-identities and embedded SDK snapshot above remain unchanged.
+The CLI recognizes SDKs that declare the optional `web` or `view` feature.
 
 For those SDKs, Native starters explicitly select `web` and `html`, adding
 `config` for Settings or Vite. They import `yetlet::web`; simple starters use

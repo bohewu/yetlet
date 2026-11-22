@@ -1,6 +1,6 @@
 # Experimental Valkey / Redis-protocol Session provider
 
-**Status: focused integration tests and independent implementation review passed at a bounded source/host scope. Do not treat this crate as production-qualified.** The separately reviewed later three-application qualification covered one single-host, single-primary topology with persistence disabled; it did not establish production recovery or cross-host HA. It is included as the optional `session-redis` module/feature of `yetlet` SDK `0.9.0-alpha.8`, outside default application dependency graphs. The existing synchronous Memory provider is unchanged.
+**Status: focused integration tests and independent implementation review passed at a bounded source/host scope. Do not treat this crate as production-qualified.** The separately reviewed later three-application qualification covered one single-host, single-primary topology with persistence disabled; it did not establish production recovery or cross-host HA. It is included as the optional `session-redis` module/feature of `yetlet` SDK `0.9.0-alpha.9`, outside default application dependency graphs. The existing synchronous Memory provider is unchanged.
 
 This is a separate, explicitly selected async Session implementation, not an authentication system. It uses the reviewed single-primary Lua semantics and selected pure-SSR Cookie ordering and stale-request rejection contract. No JavaScript, plugin registry, DI container, implicit Memory fallback or synchronous Redis facade is added.
 

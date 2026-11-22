@@ -1,8 +1,8 @@
 # yetlet::actions
 
 **Experimental SDK modules.** Requires Rust 1.99 or newer. This guide describes
-the current checkout's neutral `actions` and optional `actions-http` capabilities.
-Published SDK `0.9.0-alpha.8` retains its original contract: its `actions` feature
+the neutral `actions` and optional `actions-http` capabilities.
+In SDK alpha.8 the `actions` feature
 selects serde, HTTP types live in `yetlet::actions`, and executors have a fixed
 `ActionError`. The source migration below does not change that registry artifact.
 Use source and rustdoc at the revision you consume.

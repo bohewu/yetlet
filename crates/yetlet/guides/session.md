@@ -3,11 +3,9 @@
 Add bounded, process-local Memory Session state, cookie lifecycle and explicit
 CSRF checks to a native application. Session can be anonymous and is not authentication.
 
-**Experimental SDK module.** Included in published `yetlet` SDK
-`0.9.0-alpha.8` with its original `server-axum` dependency. In this checkout,
-`session` enables `web` without View or HTML. The SSR cart explicitly selects
-HTML as well; API-only Session applications do not need it. Published alpha.8
-is unchanged; use the documented feature/target and source matching your version.
+**Experimental SDK module.** The `session` feature enables `web`. The SSR cart
+also selects `html`, while API-only Session applications can omit rendering.
+SDK alpha.8 used `server-axum` for this integration.
 
 
 ## Prerequisites

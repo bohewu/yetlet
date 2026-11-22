@@ -44,8 +44,9 @@ Style authoring has a finite private app vocabulary, explicit registration and
 external build-time CSS; ordinary CSS remains the default and supplies unsupported
 syntax. There is no public style crate, renderer change or runtime style injection.
 
-The current checkout additionally provides built-in Core composition with
-HostGroup, custom Host extensions and ResourceGroup. YT-288 removes the
+The SDK candidate adds built-in Core composition with `HostGroup`, custom Hosts
+and `ResourceGroup`. Its two package versions are selected by the [workspace
+manifest](../Cargo.toml). YT-288 removes the
 composition feature opt-in. [YT-289](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#17-yt-289--optional-view-and-browser-feature-isolation)
 selects `default = []`, optional `view` and `html -> view`; Browser DOM/keyed
 features select View and gate its reexports. Default-off actions/GPU selections
@@ -84,8 +85,9 @@ source/package delivery scope.
 The source CLI uses selected SDK feature metadata to choose its generated imports
 and explicit opt-ins. Native remains HTTP/SSR with web+html; Browser chooses
 view+reactive and DOM/keyed-DOM. Invalid new metadata fails without a legacy or
-older-version fallback. [CLI source profiles](../tools/yetlet-cli/README.md#current-source-sdk-feature-profiles)
-retain the existing release identity and explain the source-only support.
+older-version fallback. The [CLI source profiles](../tools/yetlet-cli/README.md#sdk-feature-profiles)
+describe template selection. Published CLI support is recorded separately in
+the [compatibility guide](COMPATIBILITY.md).
 
 ## Framework packages and selected features
 
