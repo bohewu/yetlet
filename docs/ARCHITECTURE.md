@@ -63,8 +63,14 @@ isolated feature/target graphs and probes, migrated consumers and strict quality
 checks and configured independent review pass; YT-290 is Done. The moved worker
 retains its existing advanced lifecycle.
 
-Managed WebHost/caller-runtime integration, concrete native drivers, broader
-external consumers, normal archives and next-alpha migration gates remain in the
+[YT-291 managed Web](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#19-yt-291--managed-web-lifecycle-and-drivers)
+connects App/WebHost to that same Core coordinator. One retained service
+implementation supports caller-runtime and owned-thread drivers, with actual
+initialization readiness, admission fencing, original completion and dependency
+release. Core adds explicit pre-acquisition driver preparation and a std-only
+blocking drive; no automatic pool or process policy is introduced.
+Concrete native drivers, broader external consumers, normal archives and
+next-alpha migration gates remain in the
 [ordered plan](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#14-replanned-public-delivery--yt-287-through-yt-294).
 The research history below retains its original default-feature/API assumptions.
 

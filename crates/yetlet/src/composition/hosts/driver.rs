@@ -1,14 +1,78 @@
-use super::{HostFailure, HostOutcome, HostParts};
+use super::{AdmissionOutcome, HostFailure, HostOutcome, HostParts};
 use crate::composition::{Completion, Composition, Failures, Phase, ResourceParts};
 use std::{
+    error::Error,
+    fmt,
     future::poll_fn,
     sync::{
         Arc, Mutex,
         atomic::{AtomicBool, Ordering},
     },
-    task::{Context, Poll, Waker},
-    time::Instant,
+    task::{Context, Poll, Wake, Waker},
+    thread,
+    time::{Duration, Instant},
 };
+
+/// The selected progress environment for an entire retained Host group.
+///
+/// Selection is latched before any acquisition. Core creates no executor or
+/// service thread; each adapter validates and prepares its supported placement.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum HostRunMode {
+    /// Nonblocking caller-driven progress; the default for polling/run_async.
+    Async,
+    /// The calling thread drives run; adapters may own explicit service threads.
+    Blocking,
+}
+
+/// A synchronous drive rejection or the group's retained original failure.
+///
+/// A mode mismatch leaves the owner and admission state unchanged. Resume its
+/// existing nonblocking drive instead of abandoning the retained obligations.
+#[derive(Debug)]
+pub enum HostRunError<'a, E> {
+    ModeMismatch {
+        selected: HostRunMode,
+        requested: HostRunMode,
+    },
+    HostFailure(&'a HostFailure<E>),
+}
+
+impl<E: fmt::Display> fmt::Display for HostRunError<'_, E> {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::ModeMismatch {
+                selected,
+                requested,
+            } => write!(
+                f,
+                "cannot drive a {selected:?} Host group with {requested:?}; resume its selected driver"
+            ),
+            Self::HostFailure(error) => fmt::Display::fmt(error, f),
+        }
+    }
+}
+
+impl<E: Error + 'static> Error for HostRunError<'_, E> {
+    fn source(&self) -> Option<&(dyn Error + 'static)> {
+        match self {
+            Self::HostFailure(error) => Some(*error),
+            Self::ModeMismatch { .. } => None,
+        }
+    }
+}
+
+struct ThreadWake(thread::Thread);
+
+impl Wake for ThreadWake {
+    fn wake(self: Arc<Self>) {
+        self.0.unpark();
+    }
+
+    fn wake_by_ref(self: &Arc<Self>) {
+        self.0.unpark();
+    }
+}
 
 #[derive(Default)]
 struct ShutdownState {
@@ -103,6 +167,8 @@ pub enum StartStatus {
 pub struct BuiltHostGroup<E, P> {
     core: Composition<HostFailure<E>, P>,
     shutdown: ShutdownHandle,
+    run_mode: Option<HostRunMode>,
+    driver_prepared: bool,
 }
 
 impl<E, P> Drop for BuiltHostGroup<E, P> {
@@ -116,7 +182,12 @@ impl<E, P> Drop for BuiltHostGroup<E, P> {
 
 impl<E, P> BuiltHostGroup<E, P> {
     pub(super) fn new(core: Composition<HostFailure<E>, P>, shutdown: ShutdownHandle) -> Self {
-        Self { core, shutdown }
+        Self {
+            core,
+            shutdown,
+            run_mode: None,
+            driver_prepared: false,
+        }
     }
 
     pub fn phase(&self) -> Phase {
@@ -150,6 +221,19 @@ impl<E, P: HostParts<E> + ResourceParts<HostFailure<E>>> BuiltHostGroup<E, P> {
         if self.core.phase() == Phase::Running {
             return Poll::Ready(StartStatus::Running);
         }
+        if !self.driver_prepared {
+            let mode = *self.run_mode.get_or_insert(HostRunMode::Async);
+            let prepared = self.core.parts.prepare_driver(mode);
+            self.driver_prepared = true;
+            if let Err(error) = prepared {
+                self.core.fail_with_context(error, cx);
+                return Poll::Ready(StartStatus::Stopping);
+            }
+            if self.shutdown.is_requested() {
+                self.core.request_stop_with_context(cx);
+                return Poll::Ready(StartStatus::Stopping);
+            }
+        }
         let progress = self.core.parts.poll_start(cx, &self.shutdown);
         if let Poll::Ready(Err(error)) = progress {
             self.core.fail_with_context(error, cx);
@@ -171,9 +255,17 @@ impl<E, P: HostParts<E> + ResourceParts<HostFailure<E>>> BuiltHostGroup<E, P> {
             return Poll::Pending;
         }
         assert!(self.core.all_required_ready());
-        if let Err(error) = self.core.parts.open(&self.shutdown) {
-            self.core.fail_with_context(error, cx);
-            return Poll::Ready(StartStatus::Stopping);
+        match self.core.parts.open(&self.shutdown) {
+            Ok(AdmissionOutcome::Opened) => {}
+            Ok(AdmissionOutcome::Closed) => {
+                self.shutdown.request_shutdown();
+                self.core.request_stop_with_context(cx);
+                return Poll::Ready(StartStatus::Stopping);
+            }
+            Err(error) => {
+                self.core.fail_with_context(error, cx);
+                return Poll::Ready(StartStatus::Stopping);
+            }
         }
         if self.shutdown.is_requested() {
             self.core.request_stop_with_context(cx);
@@ -232,9 +324,46 @@ impl<E, P: HostParts<E> + ResourceParts<HostFailure<E>>> BuiltHostGroup<E, P> {
         self.poll_shutdown(cx, Instant::now())
     }
 
+    /// Drive this retained owner synchronously on the calling thread.
+    ///
+    /// A fresh owner selects Blocking before any dependency acquisition. An
+    /// ongoing Async owner is rejected without stopping, replacing or detaching
+    /// its work. A terminal owner simply reports its existing outcome.
+    ///
+    /// The loop uses a real wake context and parks between polls. A bounded
+    /// recheck also supports caller-driven completion observations. Core creates
+    /// no runtime, worker thread or pool; adapters prepare their own placement.
+    /// Pending retains the same owners for as long as completion requires.
+    pub fn run(&mut self) -> Result<(), HostRunError<'_, E>> {
+        if !matches!(self.core.phase(), Phase::Stopped | Phase::Failed) {
+            match self.run_mode {
+                None => self.run_mode = Some(HostRunMode::Blocking),
+                Some(HostRunMode::Blocking) => {}
+                Some(selected) => {
+                    return Err(HostRunError::ModeMismatch {
+                        selected,
+                        requested: HostRunMode::Blocking,
+                    });
+                }
+            }
+            let waker = Waker::from(Arc::new(ThreadWake(thread::current())));
+            let mut cx = Context::from_waker(&waker);
+            while self.poll_run(&mut cx).is_pending() {
+                // unpark stores a token, including a wake between poll and park.
+                thread::park_timeout(Duration::from_millis(10));
+            }
+        }
+        match self.core.failures().primary() {
+            Some(error) => Err(HostRunError::HostFailure(error)),
+            None => Ok(()),
+        }
+    }
+
     /// Borrowing, executor-neutral drive. Only terminal cleanup returns a
     /// result. The first original failure is borrowed; all later failures stay
     /// available through failures(). No error cloning/string conversion occurs.
+    /// A fresh owner selects Async; resumption honors its already selected
+    /// placement and does not recreate or migrate any service.
     ///
     /// This Core extension proof is not qualification of any Web/Tokio/native
     /// adapter. Those adapters must obey the nonblocking/wake/retained-owner

@@ -96,9 +96,9 @@ mod lifecycle;
 mod resources;
 
 pub use hosts::{
-    BuiltHostGroup, ExclusiveClaim, Host, HostActivity, HostBuildError, HostFailure, HostGroup,
-    HostOperation, HostOutcome, Managed, ManagedResource, ResourceGroup, ResourcePlan, Retained,
-    ShutdownHandle, StartStatus,
+    AdmissionOutcome, BuiltHostGroup, ExclusiveClaim, Host, HostActivity, HostBuildError,
+    HostFailure, HostGroup, HostOperation, HostOutcome, HostRunError, HostRunMode, Managed,
+    ManagedResource, ResourceGroup, ResourcePlan, Retained, ShutdownHandle, StartStatus,
 };
 
 #[doc(hidden)]

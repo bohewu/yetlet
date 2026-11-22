@@ -47,6 +47,14 @@ The startup helpers use the application's Tokio runtime and provide plain HTTP.
 TLS/HTTPS requires explicit edge or native integration, with no inferred TLS or
 hidden runtime.
 
+## Managed Web lifetimes in this checkout
+
+The isolated [Web Hosts consumer](external-consumers/web-hosts/README.md) uses
+`web` without HTML. It creates two API-only services, observes actual bound
+addresses and drives finite graceful shutdown through HostGroup. Its focused
+SQLite proof demonstrates custom managed dependencies. This current-source
+consumer is separate from the published sample catalog and its versioned gates.
+
 ## Research and internal fixtures
 
 The [five completed research prototypes](../docs/README.md#completed-research-prototypes) have separate bounded decisions and evidence: HTTP deadlines in Middleware Lab, incremental SSR, one custom typed transport, constrained handler/capture descriptors and an independent native scene renderer. They remain application-owned experiments. Browser companions, shared UI and benchmark fixtures also remain outside the thirteen user-facing catalog entries. Use [the current module guides](../docs/API-REFERENCE.md) for API and source-only boundaries.

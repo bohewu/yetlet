@@ -17,9 +17,9 @@ use std::{
 use yetlet::{
     Host, HostGroup, ResourceGroup,
     composition::{
-        BuiltHostGroup, HostActivity, HostBuildError, HostFailure, HostList, HostParts, JoinStatus,
-        ManagedResource, Phase, ReleaseCompletion, ReleaseStatus, ResourceParts, ResourcePlan,
-        StartStatus, WorkerCompletion,
+        AdmissionOutcome, BuiltHostGroup, HostActivity, HostBuildError, HostFailure, HostList,
+        HostParts, JoinStatus, ManagedResource, Phase, ReleaseCompletion, ReleaseStatus,
+        ResourceParts, ResourcePlan, StartStatus, WorkerCompletion,
     },
 };
 
@@ -146,9 +146,9 @@ impl<'a> HostActivity for LocalActivity<'a> {
         }
     }
 
-    fn open_admission(&mut self) -> Result<(), Self::Error> {
+    fn open_admission(&mut self) -> Result<AdmissionOutcome, Self::Error> {
         count(&self.calls.opened);
-        Ok(())
+        Ok(AdmissionOutcome::Opened)
     }
 
     fn close_admission(&mut self, _cx: &mut Context<'_>) -> Result<(), Self::Error> {

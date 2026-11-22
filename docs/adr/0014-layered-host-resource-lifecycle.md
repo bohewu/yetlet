@@ -1,6 +1,6 @@
 # ADR 0014 — Layered Hosts with Default Resource Lifecycle Management
 
-- **Status:** Owner-selected target direction; YT-287–290 independently reviewed and Done; remaining capabilities pending.
+- **Status:** Owner-selected target direction; YT-287–291 independently reviewed and Done; remaining capabilities pending.
 - **Date:** 2026-11-21.
 - **Tracking:** YT-286 umbrella remains Todo; YT-287–294 define the remaining delivery gates.
 - **Decision owner:** Project maintainer.
@@ -184,6 +184,85 @@ YT-290 is Done at this Web/protocol implementation scope.
 This slice does not implement managed WebHost or new readiness/cancellation
 semantics: those remain YT-291. Published alpha.8, CLI, reader and later
 normal-archive gates retain their existing identities and scopes.
+
+## YT-291 implementation checkpoint — managed Web lifetimes
+
+The [managed Web implementation](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#19-yt-291--managed-web-lifecycle-and-drivers)
+adds inert App::into_host and WebHost descriptions backed by the same
+HostGroup/ResourceGroup coordinator. Web alone supports API-only Hosts; View
+and HTML remain optional. App's consuming direct-serving cancellation boundary
+is unchanged.
+
+Core prepares the entire plan with an explicit HostRunMode before acquiring
+any resource. Fresh async driving defaults to caller-runtime Web, while fresh
+blocking run defaults to owned Web service threads. Explicit WebDriver selection
+must be compatible; there is no fallback based on runtime presence.
+The owner retains its selected mode across cancellation. Blocking run rejects
+a live Async-selected owner without changing its obligations. Core's blocking
+driver uses std wake/parking only and creates no runtime, pool or helper thread.
+
+Caller-runtime and owned-thread Web use one serving implementation and the
+existing admission/stop/original-completion/final-release contract. A serving
+listener is ready only after actual driver initialization; root GET 200 is
+unnecessary. An optional HTTP probe has an exact startup method/target/status
+contract and cannot admit unrelated work before aggregate readiness.
+The default address is 127.0.0.1:7878; multiple Hosts choose explicit addresses
+or port 0 and observe their actual bound endpoints.
+
+Pinned service/probe progress and original completion handles remain in retained
+activity storage. R1 found that is_finished does not fence application thread-local
+destruction. OwnedThread now uses a service thread and a retained join observer.
+The observer performs the exact service Join and returns its raw result; it runs
+no application callbacks, wakers, runtime or failure-payload conversion. The
+caller observes only the observer's std-only exit tail and then interprets the
+result. Async timer rechecks and blocking parked rechecks preserve progress in
+both modes. This adds one dedicated observer per owned service, not a shared
+pool, Core runtime dependency or detached cleanup substitute. It is ordinary
+std completion observation, not a hard latency guarantee.
+
+R1 also found that a successful HTTP exchange could beat an expired timeout
+when a cancelled drive resumed. Probe success now checks the original absolute
+deadline before readiness; a late buffered matching response remains TimedOut.
+ResourceGroup::map_activity supports application-local error adaptation without
+changing dependency ownership or adding generic Send/Clone constraints.
+
+R2 identified a separate interval after one Host becomes ready but before the
+whole group opens admission. The original service may fail while its TLS and
+Join remain pending. Advanced `open_admission` now returns `AdmissionOutcome`
+with `Opened` or `Closed`; termination closure stops later admission and triggers
+the existing rollback, without fabricating a replacement error. Web reports its
+shared closure as termination notification while retaining the original Join.
+Core continues to hold every dependency until all original completions, and the
+original execution failure supplies the primary error. This also handles closure
+between the termination poll and the atomic admission attempt.
+
+R3 found that runtime destruction could wait for application blocking work before
+the owned service sent its exit notification. The existing guard now notifies
+before owned-runtime destruction, including service success, failure and unwind;
+runtime-construction failure keeps its early notification. Core can wake and
+fence sibling Hosts while teardown is still pending. Original Join remains the
+sole terminal-result and dependency-release authority.
+
+Focused verification passes: Core 21+19, managed Web 12+10, direct HTTP 7,
+advanced worker 9 and SQLite 2 tests; finite two-Web and five-Core consumers;
+13 doctests; strict Clippy/Fmt/rustdoc and scoped docs. The Web consumer's normal
+graph excludes HTML/View and multi-thread Tokio; Core remains std-only and
+compiles for Wasm. The new consumer lock uses existing workspace identities.
+Original intermediate failures and all actual review failures remain recorded.
+The R1 repair covers real handler TLS, partial spawn failure, expired responses
+and retained panic payloads. Arbitrary panic payloads stay owned by the returned
+error, so terminal observation and diagnostic formatting do not run their custom
+destructors. After the R2 admission repair, 13 focused verification groups pass,
+including three-Host Core and two-Web closure regressions, original non-Clone/I/O
+error identity and retained dependencies through original Join. The R3 repair
+adds an independently scheduled drive held behind real runtime blocking work;
+sibling fencing occurs before unblocking, while original Join and resources
+remain retained. Focused Web/SQLite, strict Web Clippy and formatting pass.
+Configured independent R4 `wc_job_Ju-yzZ1wX5TXj91c` completed exit0 with actual
+PASS, issues=[] and required_followups=[].
+Native/Network integration remains YT-292,
+general migration YT-293 and normal-archive qualification YT-294.
+Published alpha.8/CLI identities stay fixed.
 
 ## Context
 

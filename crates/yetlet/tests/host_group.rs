@@ -6,14 +6,16 @@ use std::{
     sync::{
         Arc,
         atomic::{AtomicUsize, Ordering},
+        mpsc,
     },
     task::{Context, Poll, Wake, Waker},
+    thread,
     time::{Duration, Instant},
 };
 use yetlet::composition::{
-    ExclusiveClaim, HostActivity, HostBuildError, HostOperation, JoinStatus, ManagedResource,
-    Phase, ReleaseCompletion, ReleaseStatus, ResourcePlan, ShutdownHandle, StartStatus,
-    WorkerCompletion,
+    AdmissionOutcome, ExclusiveClaim, HostActivity, HostBuildError, HostOperation, HostRunError,
+    HostRunMode, JoinStatus, ManagedResource, Phase, ReleaseCompletion, ReleaseStatus,
+    ResourcePlan, ShutdownHandle, StartStatus, WorkerCompletion,
 };
 use yetlet::{Host, HostGroup, ResourceGroup};
 
@@ -74,6 +76,7 @@ impl Drop for Lease {
 struct Controls {
     name: &'static str,
     log: Log,
+    prepared: Rc<RefCell<Vec<HostRunMode>>>,
     start: Gate,
     ready: Gate,
     finished: Gate,
@@ -88,6 +91,7 @@ impl Controls {
         Self {
             name,
             log: log.clone(),
+            prepared: Rc::default(),
             start: Gate::new(true),
             ready: Gate::new(true),
             finished: Gate::new(false),
@@ -111,7 +115,10 @@ impl Controls {
         Activity {
             controls: self.clone(),
             owner: None,
+            prepare_error: None,
+            running_waker: None,
             start_error: None,
+            admission_outcome: AdmissionOutcome::Opened,
             join_error: None,
             release_error: None,
         }
@@ -120,6 +127,7 @@ impl Controls {
         Dependency {
             controls: self.clone(),
             owner: None,
+            prepare_error: None,
             acquire_error: None,
             release_error: None,
             retry_error: None,
@@ -130,13 +138,21 @@ impl Controls {
 struct Activity {
     controls: Controls,
     owner: Option<Lease>,
+    prepare_error: Option<DomainError>,
+    running_waker: Option<mpsc::Sender<Waker>>,
     start_error: Option<DomainError>,
+    admission_outcome: AdmissionOutcome,
     join_error: Option<DomainError>,
     release_error: Option<DomainError>,
 }
 
 impl HostActivity for Activity {
     type Error = DomainError;
+    fn prepare_driver(&mut self, mode: HostRunMode) -> Result<(), DomainError> {
+        self.controls.record("prepare");
+        self.controls.prepared.borrow_mut().push(mode);
+        self.prepare_error.take().map_or(Ok(()), Err)
+    }
     fn poll_start(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), DomainError>> {
         self.controls.record("start");
         self.owner.get_or_insert_with(|| Lease {
@@ -157,15 +173,18 @@ impl HostActivity for Activity {
         }
     }
     fn poll_finished(&mut self, cx: &mut Context<'_>) -> Poll<()> {
+        if let Some(sender) = self.running_waker.take() {
+            sender.send(cx.waker().clone()).unwrap();
+        }
         if self.controls.finished.poll(cx) {
             Poll::Ready(())
         } else {
             Poll::Pending
         }
     }
-    fn open_admission(&mut self) -> Result<(), DomainError> {
+    fn open_admission(&mut self) -> Result<AdmissionOutcome, DomainError> {
         self.controls.record("open");
-        Ok(())
+        Ok(self.admission_outcome)
     }
     fn close_admission(&mut self, cx: &mut Context<'_>) -> Result<(), DomainError> {
         self.controls.record("close");
@@ -215,6 +234,7 @@ impl HostActivity for Activity {
 struct Dependency {
     controls: Controls,
     owner: Option<Lease>,
+    prepare_error: Option<DomainError>,
     acquire_error: Option<DomainError>,
     release_error: Option<DomainError>,
     retry_error: Option<DomainError>,
@@ -222,6 +242,11 @@ struct Dependency {
 
 impl ManagedResource for Dependency {
     type Error = DomainError;
+    fn prepare_driver(&mut self, mode: HostRunMode) -> Result<(), DomainError> {
+        self.controls.record("prepare");
+        self.controls.prepared.borrow_mut().push(mode);
+        self.prepare_error.take().map_or(Ok(()), Err)
+    }
     fn poll_acquire(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), DomainError>> {
         self.controls.record("acquire");
         self.owner.get_or_insert_with(|| Lease {
@@ -393,6 +418,86 @@ fn earlier_termination_wakes_and_rolls_back_while_later_readiness_is_pending() {
     assert_eq!(a.count("open") + b.count("open"), 0);
     assert_eq!((a.count("joined"), b.count("joined")), (1, 1));
     assert_eq!(hosts.phase(), Phase::Stopped);
+}
+
+#[test]
+fn closed_admission_stops_later_opens_and_retains_original_join_and_dependencies() {
+    let log = Log::default();
+    let a = Controls::new("a", &log);
+    let b = Controls::new("b", &log);
+    let c = Controls::new("c", &log);
+    let ra = Controls::new("ra", &log);
+    let rb = Controls::new("rb", &log);
+    b.join.close();
+    let failure = error("original execution");
+    let identity = failure.identity.clone();
+    let mut closed = b.activity();
+    closed.admission_outcome = AdmissionOutcome::Closed;
+    closed.join_error = Some(failure);
+    let mut hosts = HostGroup::new()
+        .with_host(host(
+            "a",
+            ResourceGroup::new(a.activity()).with_managed_resource("ra", ra.resource()),
+        ))
+        .with_host(host(
+            "b",
+            ResourceGroup::new(closed).with_managed_resource("rb", rb.resource()),
+        ))
+        .with_host(host("c", ResourceGroup::new(c.activity())))
+        .build()
+        .unwrap();
+    let (_, waker) = wake_context();
+    let mut cx = Context::from_waker(&waker);
+
+    // The preceding termination poll was Pending. Closure is first observed
+    // inside admission, before the original execution outcome is available.
+    assert_eq!(
+        hosts.poll_start(&mut cx),
+        Poll::Ready(StartStatus::Stopping)
+    );
+    assert_eq!(hosts.phase(), Phase::Stopping);
+    assert_eq!(
+        (a.count("open"), b.count("open"), c.count("open")),
+        (1, 1, 0)
+    );
+    assert!(hosts.failures().primary().is_none());
+    assert!(hosts.poll_shutdown(&mut cx, Instant::now()).is_pending());
+    assert_eq!(
+        (a.count("joined"), b.count("joined"), c.count("joined")),
+        (1, 0, 1)
+    );
+    assert_eq!(ra.count("release") + rb.count("release"), 0);
+    assert_eq!(
+        a.count("drop") + b.count("drop") + c.count("drop") + ra.count("drop") + rb.count("drop"),
+        0
+    );
+    assert!(hosts.failures().primary().is_none());
+    {
+        let events = log.borrow();
+        let last_close = events.iter().rposition(|(_, op)| *op == "close").unwrap();
+        let first_signal = events.iter().position(|(_, op)| *op == "signal").unwrap();
+        assert!(last_close < first_signal);
+    }
+
+    b.join.open();
+    assert!(hosts.poll_shutdown(&mut cx, Instant::now()).is_ready());
+    assert_eq!(hosts.phase(), Phase::Failed);
+    let primary = hosts.failures().primary().unwrap();
+    assert_eq!(primary.operation, HostOperation::Join);
+    assert!(Rc::ptr_eq(&identity, &primary.error().identity));
+    assert!(hosts.failures().secondary().is_empty());
+    assert_eq!(
+        (a.count("open"), b.count("open"), c.count("open")),
+        (1, 1, 0)
+    );
+    assert_eq!(
+        (a.count("joined"), b.count("joined"), c.count("joined")),
+        (1, 1, 1)
+    );
+    assert_eq!((ra.count("release"), rb.count("release")), (1, 1));
+    let before = log.borrow().clone();
+    assert!(hosts.poll_shutdown(&mut cx, Instant::now()).is_ready());
+    assert_eq!(*log.borrow(), before);
 }
 
 #[test]
@@ -784,4 +889,323 @@ fn early_drop_is_ordinary_destruction_not_shutdown() {
         0
     );
     assert_eq!(a.count("drop") + r.count("drop"), 2);
+}
+
+#[test]
+fn driver_preparation_precedes_all_acquisition_and_survives_drive_cancellation() {
+    let log = Log::default();
+    let a = Controls::new("a", &log);
+    let b = Controls::new("b", &log);
+    let ra = Controls::new("ra", &log);
+    let rb = Controls::new("rb", &log);
+    b.ready.close();
+    let mut hosts = HostGroup::new()
+        .with_host(host(
+            "a",
+            ResourceGroup::new(a.activity()).with_managed_resource("ra", ra.resource()),
+        ))
+        .with_host(host(
+            "b",
+            ResourceGroup::new(b.activity()).with_managed_resource("rb", rb.resource()),
+        ))
+        .build()
+        .unwrap();
+    assert!(log.borrow().is_empty());
+    let (_, first) = wake_context();
+    {
+        let mut drive = Box::pin(hosts.run_async());
+        assert!(
+            drive
+                .as_mut()
+                .poll(&mut Context::from_waker(&first))
+                .is_pending()
+        );
+    }
+    assert_eq!(
+        &log.borrow()[..4],
+        &[
+            ("ra", "prepare"),
+            ("a", "prepare"),
+            ("rb", "prepare"),
+            ("b", "prepare")
+        ]
+    );
+    assert_eq!(log.borrow()[4], ("ra", "acquire"));
+    let (_, replacement) = wake_context();
+    let mut cx = Context::from_waker(&replacement);
+    {
+        let mut resumed = Box::pin(hosts.run_async());
+        assert!(resumed.as_mut().poll(&mut cx).is_pending());
+    }
+    for control in [&ra, &a, &rb, &b] {
+        assert_eq!(*control.prepared.borrow(), [HostRunMode::Async]);
+    }
+    let before = log.borrow().clone();
+    let phase = hosts.phase();
+    assert!(matches!(
+        hosts.run(),
+        Err(HostRunError::ModeMismatch {
+            selected: HostRunMode::Async,
+            requested: HostRunMode::Blocking,
+        })
+    ));
+    assert_eq!(*log.borrow(), before);
+    assert_eq!(hosts.phase(), phase);
+    assert!(!hosts.shutdown_handle().is_requested());
+    assert_eq!(a.count("drop") + b.count("drop"), 0);
+    hosts.shutdown_handle().request_shutdown();
+    {
+        let mut resumed = Box::pin(hosts.run_async());
+        assert!(matches!(
+            resumed.as_mut().poll(&mut cx),
+            Poll::Ready(Ok(()))
+        ));
+    }
+    assert_eq!(hosts.phase(), Phase::Stopped);
+    assert_eq!(a.count("start") + b.count("start"), 2);
+    let completed = log.borrow().clone();
+    assert!(hosts.run().is_ok());
+    assert_eq!(*log.borrow(), completed);
+}
+
+#[test]
+fn preparation_failure_preserves_original_error_before_any_group_acquisition() {
+    for resource_failure in [false, true] {
+        let log = Log::default();
+        let a = Controls::new("a", &log);
+        let b = Controls::new("b", &log);
+        let ra = Controls::new("ra", &log);
+        let rb = Controls::new("rb", &log);
+        let failure = error("driver incompatible");
+        let identity = failure.identity.clone();
+        let mut activity = b.activity();
+        let mut resource = rb.resource();
+        if resource_failure {
+            resource.prepare_error = Some(failure);
+        } else {
+            activity.prepare_error = Some(failure);
+        }
+        let mut hosts = HostGroup::new()
+            .with_host(host(
+                "a",
+                ResourceGroup::new(a.activity()).with_managed_resource("ra", ra.resource()),
+            ))
+            .with_host(host(
+                "b",
+                ResourceGroup::new(activity).with_managed_resource("rb", resource),
+            ))
+            .build()
+            .unwrap();
+        let (_, waker) = wake_context();
+        let mut cx = Context::from_waker(&waker);
+        {
+            let mut drive = Box::pin(hosts.run_async());
+            let Poll::Ready(Err(failure)) = drive.as_mut().poll(&mut cx) else {
+                panic!("inert preparation failure must complete ordinary rollback");
+            };
+            assert_eq!(failure.operation, HostOperation::PrepareDriver);
+            assert_eq!(failure.host, "b");
+            assert_eq!(failure.resource, resource_failure.then_some("rb"));
+            assert!(Rc::ptr_eq(&identity, &failure.error().identity));
+        }
+        for control in [&ra, &a, &rb, &b] {
+            assert_eq!(control.count("acquire") + control.count("start"), 0);
+            assert_eq!(control.count("release") + control.count("drop"), 0);
+        }
+        assert_eq!(hosts.phase(), Phase::Failed);
+        assert!(
+            hosts
+                .outcomes()
+                .iter()
+                .all(|outcome| !outcome.start_attempted)
+        );
+    }
+}
+
+#[test]
+fn synchronous_drive_uses_current_thread_wakes_and_preserves_local_error_identity() {
+    let log = Log::default();
+    let a = Controls::new("a", &log);
+    let r = Controls::new("resource", &log);
+    let failure = error("original synchronous completion");
+    let identity = failure.identity.clone();
+    let (sender, receiver) = mpsc::channel();
+    let mut activity = a.activity();
+    activity.join_error = Some(failure);
+    activity.running_waker = Some(sender);
+    let mut hosts = HostGroup::new()
+        .with_host(host(
+            "a",
+            ResourceGroup::new(activity).with_managed_resource("resource", r.resource()),
+        ))
+        .build()
+        .unwrap();
+    let stop = hosts.shutdown_handle();
+    let controller = thread::spawn(move || {
+        let waker = receiver.recv_timeout(Duration::from_secs(2)).unwrap();
+        stop.request_shutdown();
+        waker.wake();
+    });
+    match hosts.run() {
+        Err(HostRunError::HostFailure(failure)) => {
+            assert_eq!(failure.operation, HostOperation::Join);
+            assert!(Rc::ptr_eq(&identity, &failure.error().identity));
+        }
+        result => panic!("expected retained completion failure, got {result:?}"),
+    }
+    controller.join().unwrap();
+    assert_eq!(*a.prepared.borrow(), [HostRunMode::Blocking]);
+    assert_eq!(*r.prepared.borrow(), [HostRunMode::Blocking]);
+    assert_eq!(a.count("joined"), 1);
+    assert_eq!(r.count("release"), 1);
+    assert_eq!(hosts.phase(), Phase::Failed);
+    let before = log.borrow().clone();
+    let (_, waker) = wake_context();
+    {
+        let mut terminal = Box::pin(hosts.run_async());
+        assert!(matches!(
+            terminal.as_mut().poll(&mut Context::from_waker(&waker)),
+            Poll::Ready(Err(_))
+        ));
+    }
+    assert_eq!(*log.borrow(), before);
+}
+
+struct TextActivity {
+    prepared: Rc<Cell<Option<HostRunMode>>>,
+}
+
+impl HostActivity for TextActivity {
+    type Error = &'static str;
+
+    fn prepare_driver(&mut self, mode: HostRunMode) -> Result<(), Self::Error> {
+        self.prepared.set(Some(mode));
+        Ok(())
+    }
+
+    fn poll_start(&mut self, _: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+        Poll::Ready(Err("transport startup"))
+    }
+
+    fn poll_ready(&mut self, _: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+        Poll::Ready(Ok(()))
+    }
+
+    fn request_shutdown(&mut self, _: &mut Context<'_>) -> Result<(), Self::Error> {
+        Ok(())
+    }
+
+    fn poll_join(
+        &mut self,
+        _: &mut Context<'_>,
+        _: Duration,
+    ) -> Result<WorkerCompletion<Self::Error>, Self::Error> {
+        Ok(WorkerCompletion::Joined(Ok(())))
+    }
+}
+
+struct MappedTextActivity {
+    inner: TextActivity,
+    identity: Rc<()>,
+}
+
+impl MappedTextActivity {
+    fn map_error(&self, message: &'static str) -> DomainError {
+        DomainError {
+            message,
+            identity: self.identity.clone(),
+        }
+    }
+}
+
+impl HostActivity for MappedTextActivity {
+    type Error = DomainError;
+
+    fn prepare_driver(&mut self, mode: HostRunMode) -> Result<(), Self::Error> {
+        self.inner
+            .prepare_driver(mode)
+            .map_err(|e| self.map_error(e))
+    }
+
+    fn poll_start(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+        self.inner.poll_start(cx).map_err(|e| self.map_error(e))
+    }
+
+    fn poll_ready(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>> {
+        self.inner.poll_ready(cx).map_err(|e| self.map_error(e))
+    }
+
+    fn request_shutdown(&mut self, cx: &mut Context<'_>) -> Result<(), Self::Error> {
+        self.inner
+            .request_shutdown(cx)
+            .map_err(|e| self.map_error(e))
+    }
+
+    fn poll_join(
+        &mut self,
+        cx: &mut Context<'_>,
+        budget: Duration,
+    ) -> Result<WorkerCompletion<Self::Error>, Self::Error> {
+        Ok(
+            match self
+                .inner
+                .poll_join(cx, budget)
+                .map_err(|e| self.map_error(e))?
+            {
+                WorkerCompletion::Pending => WorkerCompletion::Pending,
+                WorkerCompletion::Joined(result) => {
+                    WorkerCompletion::Joined(result.map_err(|e| self.map_error(e)))
+                }
+            },
+        )
+    }
+}
+
+#[test]
+fn map_activity_preserves_resources_and_accepts_a_local_common_error() {
+    let log = Log::default();
+    let r = Controls::new("managed", &log);
+    let prepared = Rc::new(Cell::new(None));
+    let identity = Rc::new(());
+    let mapped_identity = identity.clone();
+    let resources = ResourceGroup::new(TextActivity {
+        prepared: prepared.clone(),
+    })
+    .with_resource(Lease {
+        name: "passive",
+        log: log.clone(),
+    })
+    .map_activity(move |inner| MappedTextActivity {
+        inner,
+        identity: mapped_identity,
+    })
+    .with_managed_resource("managed", r.resource());
+    let mut hosts = HostGroup::new()
+        .with_host(host("mapped", resources))
+        .build()
+        .unwrap();
+    let (_, waker) = wake_context();
+    {
+        let mut drive = Box::pin(hosts.run_async());
+        let Poll::Ready(Err(failure)) = drive.as_mut().poll(&mut Context::from_waker(&waker))
+        else {
+            panic!("mapped startup failure must retain its original error");
+        };
+        assert_eq!(failure.operation, HostOperation::Start);
+        assert_eq!(failure.error().message, "transport startup");
+        assert!(Rc::ptr_eq(&identity, &failure.error().identity));
+    }
+    assert_eq!(prepared.get(), Some(HostRunMode::Async));
+    assert_eq!(r.count("acquire"), 1);
+    assert_eq!(r.count("release"), 1);
+    let events = log.borrow();
+    let release = events
+        .iter()
+        .position(|event| *event == ("managed", "release"))
+        .unwrap();
+    let passive_drop = events
+        .iter()
+        .position(|event| *event == ("passive", "drop"))
+        .unwrap();
+    assert!(release < passive_drop);
 }

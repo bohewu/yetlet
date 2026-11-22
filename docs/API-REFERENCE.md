@@ -114,8 +114,15 @@ selections do not. Published alpha.8 retains its original feature contract.
 routing, middleware and HTTP serving; select `web` plus `html` for `Page`,
 document metadata and View rendering. Web alone does not select View or HTML.
 `App` configures an HTTP service and serves on the caller's Tokio runtime.
-The existing `yetlet::web::HttpWorker` is an advanced owned-thread adapter;
-managed `WebHost` / `App::into_host` remain YT-291 work.
+[YT-291](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#19-yt-291--managed-web-lifecycle-and-drivers)
+adds `App::into_host()` / `WebHost::new(router)` for retained HostGroup lifetimes.
+Fresh async driving uses caller-owned Tokio; synchronous `run()` uses an owned
+Web service thread plus its dedicated join observer. Explicit `WebDriver`
+selection is optional. Multiple Hosts,
+API-only readiness, admission/drain and managed final release use the same Core
+coordinator. See the [Web lifecycle guide](../crates/yetlet/guides/server-axum.md#execution-ownership)
+and [finite consumer](../examples/external-consumers/web-hosts/README.md).
+The existing `HttpWorker` retains its advanced low-level contract.
 
 The `actions` feature keeps `Command`, `ActionExecutor` and `LocalExecutor`
 transport-neutral. Executors choose an associated `Error`; local execution

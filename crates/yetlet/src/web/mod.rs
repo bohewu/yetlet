@@ -1,13 +1,16 @@
 //! Optional native Web capabilities over Axum and Tower.
 //!
 //! API-only serving needs `web`. Page/document helpers additionally need `html`.
-//! `App` uses the caller's runtime; the advanced `HttpWorker` owns an explicitly
-//! requested service thread. No thread or runtime is created by enabling a feature.
+//! `App` configures HTTP services. `WebHost` connects them to a retained HostGroup
+//! with caller-runtime or explicitly owned-thread execution. The advanced
+//! `HttpWorker` retains its separate low-level contract. Enabling a feature or
+//! building a Host description creates no thread, runtime or listener.
 
 mod app;
 mod context;
 #[cfg(feature = "html")]
 mod document;
+mod host;
 pub mod middleware;
 pub mod response;
 mod serving;
@@ -17,9 +20,12 @@ pub use axum::http;
 pub use context::RequestContext;
 #[cfg(feature = "html")]
 pub use document::{DocumentMetadata, LanguageTag, LanguageTagError};
+pub use host::{HttpProbe, WebActivity, WebDriver, WebError, WebHandle, WebHost};
 #[cfg(feature = "html")]
 pub use response::Page;
 pub use worker::HttpWorker;
+
+const DEFAULT_LISTEN_ADDRESS: &str = "127.0.0.1:7878";
 
 /// Native Axum extractors; no separate Yetlet model-binding implementation.
 pub mod extract {
@@ -45,7 +51,7 @@ pub mod prelude {
     pub use super::extract::{DefaultBodyLimit, Extension, Form, Path, Query, State};
     pub use super::http::{HeaderMap, HeaderValue, StatusCode};
     pub use super::response::{IntoResponse, Json, Redirect, Response};
-    pub use super::{App, RequestContext};
+    pub use super::{App, RequestContext, WebHost};
     #[cfg(feature = "html")]
     pub use super::{
         DEFAULT_CSP, DocumentMetadata, HtmlPageError, LanguageTag, LanguageTagError, Page,

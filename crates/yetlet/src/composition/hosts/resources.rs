@@ -1,4 +1,4 @@
-use super::{HostFailure, HostOperation, ShutdownHandle};
+use super::{HostFailure, HostOperation, HostRunMode, ShutdownHandle};
 use crate::composition::{
     Attached, Builder, ContextCallback, Empty, ReleaseCompletion, Resource, ResourceParts,
 };
@@ -16,6 +16,13 @@ use std::{
 /// protocol for already-live asynchronous owners.
 pub trait ManagedResource {
     type Error;
+
+    /// Validate/configure the selected driver without acquiring resources.
+    /// Every group descriptor prepares before any acquisition. Ordinary Drop
+    /// must remain sufficient; this hook must not create cleanup obligations.
+    fn prepare_driver(&mut self, _mode: HostRunMode) -> Result<(), Self::Error> {
+        Ok(())
+    }
 
     fn poll_acquire(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>>;
 
@@ -49,6 +56,7 @@ mod sealed {
 pub trait ResourcePlan<E>: sealed::Plan {
     type Parts: ResourceParts<HostFailure<E>>;
     fn into_builder(self, host: &'static str) -> Builder<HostFailure<E>, Self::Parts>;
+    fn prepare_driver(parts: &mut Self::Parts, mode: HostRunMode) -> Result<(), HostFailure<E>>;
     fn poll_acquire(
         parts: &mut Self::Parts,
         cx: &mut Context<'_>,
@@ -62,6 +70,10 @@ impl<E> ResourcePlan<E> for () {
 
     fn into_builder(self, _: &'static str) -> Builder<HostFailure<E>> {
         Builder::new()
+    }
+
+    fn prepare_driver(_: &mut Empty, _: HostRunMode) -> Result<(), HostFailure<E>> {
+        Ok(())
     }
 
     fn poll_acquire(
@@ -98,6 +110,10 @@ impl<E, R, P: ResourcePlan<E>> ResourcePlan<E> for Retained<R, P> {
         )
     }
 
+    fn prepare_driver(parts: &mut Self::Parts, mode: HostRunMode) -> Result<(), HostFailure<E>> {
+        P::prepare_driver(&mut parts.previous, mode)
+    }
+
     fn poll_acquire(
         parts: &mut Self::Parts,
         cx: &mut Context<'_>,
@@ -118,6 +134,12 @@ pub struct ResourceSlot<R> {
 }
 
 impl<R: ManagedResource> ResourceSlot<R> {
+    fn prepare_driver(&mut self, mode: HostRunMode) -> Result<(), HostFailure<R::Error>> {
+        self.descriptor.prepare_driver(mode).map_err(|e| {
+            HostFailure::resource(self.host, self.name, HostOperation::PrepareDriver, e)
+        })
+    }
+
     fn poll_acquire(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), HostFailure<R::Error>>> {
         if self.acquired {
             return Poll::Ready(Ok(()));
@@ -182,6 +204,15 @@ impl<E, R: ManagedResource<Error = E>, P: ResourcePlan<E>> ResourcePlan<E> for M
             },
             ResourceSlot::<R>::release as fn(&mut ResourceSlot<R>, &mut Context<'_>, Duration) -> _,
         )
+    }
+
+    fn prepare_driver(parts: &mut Self::Parts, mode: HostRunMode) -> Result<(), HostFailure<E>> {
+        P::prepare_driver(&mut parts.previous, mode)?;
+        parts
+            .last
+            .driver_value_mut()
+            .expect("resource retained before acquisition")
+            .prepare_driver(mode)
     }
 
     fn poll_acquire(

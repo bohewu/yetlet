@@ -16,7 +16,7 @@ html = ["view"]
 actions = []
 actions-http = ["actions", "dep:serde"]
 reactive = []
-web = ["dep:axum", "dep:serde", "dep:tower", "dep:tokio", "tokio/sync"]
+web = ["dep:axum", "dep:serde", "dep:tower", "dep:tokio", "tokio/sync", "tokio/io-util", "tokio/time"]
 request-id = ["web"]
 session = ["web", "dep:cookie", "dep:getrandom", "dep:subtle"]
 auth = ["dep:axum"]
@@ -93,6 +93,10 @@ required-features = ["web", "html"]
 
 [[test]]
 name = "server_axum_app_serve"
+required-features = ["web"]
+
+[[test]]
+name = "web_hosts"
 required-features = ["web"]
 
 [[test]]

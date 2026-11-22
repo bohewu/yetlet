@@ -55,9 +55,43 @@ where
     }
 }
 
-const DEFAULT_LISTEN_ADDRESS: &str = "127.0.0.1:7878";
-
 impl App<()> {
+    /// Describe this service as a managed Host without binding or starting it.
+    ///
+    /// Build a retained [crate::HostGroup] to coordinate multiple services,
+    /// graceful shutdown and managed resource release. The default address is
+    /// `127.0.0.1:7878`; select distinct addresses or port 0 for multiple Hosts.
+    ///
+    /// ```no_run
+    /// use yetlet::{HostGroup, web::App};
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    ///
+    /// let host = App::new()
+    ///     .get("/api", async || "hello")
+    ///     .into_host()
+    ///     .with_address("127.0.0.1:0");
+    /// let address = host.handle();
+    /// let mut hosts = HostGroup::new().with_host(host).build()?;
+    /// assert!(address.local_addr().is_none());
+    /// if let Err(failure) = hosts.run_async().await {
+    ///     eprintln!("Host group failed: {failure}");
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// Only resolved Axum state can become a serving Host:
+    ///
+    /// ```compile_fail
+    /// use yetlet::web::App;
+    /// #[derive(Clone)]
+    /// struct State;
+    /// let _host = App::<State>::new().into_host();
+    /// ```
+    pub fn into_host(self) -> super::WebHost {
+        super::WebHost::new(self.into_router())
+    }
+
     /// Serve this application over HTTP on the loopback development default.
     ///
     /// The listener binds exactly `127.0.0.1:7878`; it is not reachable from
@@ -67,7 +101,9 @@ impl App<()> {
     ///
     /// The application must already have resolved Axum state to `App<()>`.
     /// This method does not create a Tokio runtime; call it from the runtime
-    /// owned by your application.
+    /// owned by your application. Dropping this consuming future does not promise
+    /// graceful drain or managed finalization. Use [Self::into_host] and retain the
+    /// built HostGroup outside a cancelled drive when those obligations matter.
     ///
     /// ```no_run
     /// use yetlet::web::App;
@@ -98,7 +134,7 @@ impl App<()> {
     /// cannot be bound. After binding, Axum owns the serving loop and its
     /// native accept-error behavior.
     pub async fn serve(self) -> std::io::Result<()> {
-        self.serve_on(DEFAULT_LISTEN_ADDRESS).await
+        self.serve_on(super::DEFAULT_LISTEN_ADDRESS).await
     }
 
     /// Serve this application over plain HTTP on an explicit TCP address.
@@ -109,6 +145,7 @@ impl App<()> {
     /// do not use that on an untrusted network without a secure network edge.
     /// These helpers do not infer HTTPS, load certificates, or enable TLS.
     /// The caller owns and starts the Tokio runtime; this method does not create one.
+    /// Its cancellation boundary is the same as [Self::serve].
     ///
     /// ```no_run
     /// use yetlet::web::App;

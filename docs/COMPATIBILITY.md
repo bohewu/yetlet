@@ -185,10 +185,20 @@ type such as `Infallible` for inference.
 
 `App` configures an HTTP service. Its construction is inert, and
 `App::serve` / `serve_on` use the caller's Tokio runtime without creating a
-hidden runtime or thread. `HttpWorker` is the existing advanced owned-thread
-adapter for explicit lifecycle integration. Managed `WebHost` and
-`App::into_host` belong to YT-291; the module move does not supply those APIs or
-new cancellation guarantees.
+hidden runtime or thread. Their consuming futures retain ordinary cancellation
+semantics. `HttpWorker` keeps its advanced explicit worker contract.
+
+[YT-291](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#19-yt-291--managed-web-lifecycle-and-drivers)
+adds managed `WebHost` and `App::into_host` through the built-in HostGroup.
+The new Host defaults to `127.0.0.1:7878` and observes actual serving initialization
+without requiring root GET 200. These are intentional differences from the
+private research facade and existing HttpWorker. Multiple Hosts select distinct
+addresses or port 0. Fresh `run_async` uses caller-owned Tokio; fresh blocking
+`run` uses owned Web threads. Explicit placement is checked before acquisition,
+and an ongoing Async-selected owner cannot silently switch to blocking drive.
+The retained owner must outlive a cancelled borrowing drive for graceful drain
+and managed finalization to remain recoverable. No Application or private-facade
+compatibility aliases are introduced.
 
 The `web` and `actions-http` features and their new module paths are not part
 of published alpha.8. Registry-pinned consumers and its startup examples retain

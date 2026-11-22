@@ -18,7 +18,7 @@ use std::{
 
 mod driver;
 mod resources;
-pub use driver::{BuiltHostGroup, ShutdownHandle, StartStatus};
+pub use driver::{BuiltHostGroup, HostRunError, HostRunMode, ShutdownHandle, StartStatus};
 pub use resources::{Managed, ManagedResource, ResourcePlan, Retained};
 
 /// A custom or built-in Host is an inert description of one activity and its
@@ -49,6 +49,16 @@ pub trait Host {
     fn into_resources(self) -> ResourceGroup<Self::Activity, Self::Resources>;
 }
 
+/// The result of synchronously opening an activity's ordinary admission.
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum AdmissionOutcome {
+    /// Ordinary work may be admitted.
+    Opened,
+    /// Admission is permanently closed. Stop the group and observe the retained
+    /// original completion through [HostActivity::poll_join] before release.
+    Closed,
+}
+
 /// Nonblocking activity progress in an application-owned execution environment.
 ///
 /// Before returning Pending or an error, retain partial acquisition, in-flight
@@ -67,6 +77,13 @@ pub trait Host {
 pub trait HostActivity {
     type Error;
 
+    /// Validate/configure placement without acquiring resources. The complete
+    /// group prepares once before any dependency or activity starts. Retain no
+    /// obligation that requires asynchronous cleanup from this inert hook.
+    fn prepare_driver(&mut self, _mode: HostRunMode) -> Result<(), Self::Error> {
+        Ok(())
+    }
+
     /// Acquire/start while retaining even partial owners before returning.
     fn poll_start(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), Self::Error>>;
 
@@ -80,8 +97,12 @@ pub trait HostActivity {
     }
 
     /// Enable ordinary admission only after every Host has observed readiness.
-    fn open_admission(&mut self) -> Result<(), Self::Error> {
-        Ok(())
+    ///
+    /// If termination has already closed the gate, return [AdmissionOutcome::Closed]
+    /// without replacing the retained original execution outcome with an admission
+    /// error. Core stops the group and observes that outcome through poll_join.
+    fn open_admission(&mut self) -> Result<AdmissionOutcome, Self::Error> {
+        Ok(AdmissionOutcome::Opened)
     }
 
     /// Fence new work before any group activity is stopped.
@@ -137,6 +158,7 @@ impl ExclusiveClaim {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum HostOperation {
     Validate,
+    PrepareDriver,
     Acquire,
     Start,
     Readiness,
@@ -263,6 +285,18 @@ impl<A: HostActivity> ResourceGroup<A> {
 }
 
 impl<A, D> ResourceGroup<A, D> {
+    /// Transform the inert activity while preserving all dependency storage.
+    ///
+    /// Custom Hosts can wrap an adapter to map its errors into their common
+    /// application error. Existing managed descriptors must still use the new
+    /// activity's error type; this method does not transform resource errors.
+    pub fn map_activity<B: HostActivity>(self, map: impl FnOnce(A) -> B) -> ResourceGroup<B, D> {
+        ResourceGroup {
+            activity: map(self.activity),
+            resources: self.resources,
+        }
+    }
+
     /// Retain an ordinary owned value or borrow through final release. This is
     /// normal Rust ownership, not an automatically managed runtime/Join handle.
     pub fn with_resource<R>(self, value: R) -> ResourceGroup<A, Retained<R, D>> {
@@ -477,6 +511,14 @@ pub struct ActivitySlot<A> {
 }
 
 impl<A: HostActivity> ActivitySlot<A> {
+    fn prepare_driver(&mut self, mode: HostRunMode) -> Result<(), HostFailure<A::Error>> {
+        self.activity
+            .as_mut()
+            .expect("activity retained before acquisition")
+            .prepare_driver(mode)
+            .map_err(|e| HostFailure::new(self.host, HostOperation::PrepareDriver, e))
+    }
+
     fn poll_start(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), HostFailure<A::Error>>> {
         self.attempted = true;
         let activity = self
@@ -493,7 +535,7 @@ impl<A: HostActivity> ActivitySlot<A> {
             .map_err(|e| HostFailure::new(self.host, HostOperation::Readiness, e))
     }
 
-    fn open(&mut self) -> Result<(), HostFailure<A::Error>> {
+    fn open(&mut self) -> Result<AdmissionOutcome, HostFailure<A::Error>> {
         self.activity
             .as_mut()
             .expect("ready activity")
@@ -661,12 +703,13 @@ impl<E, A: HostActivity<Error = E>, R: ResourcePlan<E>> Part<HostFailure<E>> for
 #[doc(hidden)]
 pub trait HostParts<E>: sealed::Parts {
     const COUNT: usize;
+    fn prepare_driver(&mut self, mode: HostRunMode) -> Result<(), HostFailure<E>>;
     fn poll_start(
         &mut self,
         cx: &mut Context<'_>,
         shutdown: &ShutdownHandle,
     ) -> Poll<Result<(), HostFailure<E>>>;
-    fn open(&mut self, shutdown: &ShutdownHandle) -> Result<(), HostFailure<E>>;
+    fn open(&mut self, shutdown: &ShutdownHandle) -> Result<AdmissionOutcome, HostFailure<E>>;
     fn poll_finished(&mut self, cx: &mut Context<'_>) -> bool;
     fn outcomes(&self, result: &mut Vec<HostOutcome>);
 }
@@ -674,6 +717,9 @@ pub trait HostParts<E>: sealed::Parts {
 impl sealed::Parts for Empty {}
 impl<E> HostParts<E> for Empty {
     const COUNT: usize = 0;
+    fn prepare_driver(&mut self, _: HostRunMode) -> Result<(), HostFailure<E>> {
+        Ok(())
+    }
     fn poll_start(
         &mut self,
         _: &mut Context<'_>,
@@ -681,8 +727,8 @@ impl<E> HostParts<E> for Empty {
     ) -> Poll<Result<(), HostFailure<E>>> {
         Poll::Ready(Ok(()))
     }
-    fn open(&mut self, _: &ShutdownHandle) -> Result<(), HostFailure<E>> {
-        Ok(())
+    fn open(&mut self, _: &ShutdownHandle) -> Result<AdmissionOutcome, HostFailure<E>> {
+        Ok(AdmissionOutcome::Opened)
     }
     fn poll_finished(&mut self, _: &mut Context<'_>) -> bool {
         false
@@ -695,6 +741,13 @@ impl<E, P: HostParts<E>, A: HostActivity<Error = E>, R: ResourcePlan<E>> HostPar
     for Attached<P, Hosted<A, R>>
 {
     const COUNT: usize = P::COUNT + 1;
+
+    fn prepare_driver(&mut self, mode: HostRunMode) -> Result<(), HostFailure<E>> {
+        self.previous.prepare_driver(mode)?;
+        let parts = self.last.group.parts_mut();
+        R::prepare_driver(&mut parts.previous, mode)?;
+        parts.last.driver_value_mut().prepare_driver(mode)
+    }
 
     fn poll_start(
         &mut self,
@@ -717,12 +770,11 @@ impl<E, P: HostParts<E>, A: HostActivity<Error = E>, R: ResourcePlan<E>> HostPar
         Poll::Ready(Ok(()))
     }
 
-    fn open(&mut self, shutdown: &ShutdownHandle) -> Result<(), HostFailure<E>> {
-        self.previous.open(shutdown)?;
-        if !shutdown.is_requested() {
-            self.last.group.parts_mut().last.driver_value_mut().open()?;
+    fn open(&mut self, shutdown: &ShutdownHandle) -> Result<AdmissionOutcome, HostFailure<E>> {
+        if self.previous.open(shutdown)? == AdmissionOutcome::Closed || shutdown.is_requested() {
+            return Ok(AdmissionOutcome::Closed);
         }
-        Ok(())
+        self.last.group.parts_mut().last.driver_value_mut().open()
     }
 
     fn poll_finished(&mut self, cx: &mut Context<'_>) -> bool {

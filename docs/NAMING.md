@@ -216,19 +216,20 @@ requiring implementation proof, not consequences of renaming.
 The [feature-first contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
 selects these intentions for the next API. The [YT-288 Core surface](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
 implements HostGroup, Host and ResourceGroup. [YT-290](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership) places HTTP service
-configuration at `yetlet::web::App`; managed WebHost integration remains YT-291
-work. The private Application spelling above is historical.
+configuration at `yetlet::web::App`; [YT-291](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#19-yt-291--managed-web-lifecycle-and-drivers)
+connects it to managed WebHost lifetimes. The private Application spelling above
+is historical.
 
 | Target name / operation | Developer intent and lifecycle meaning |
 |---|---|
 | HostGroup | Group high-level Host lifetimes using the built-in Core coordinator. |
 | yetlet::web::App | Configure an HTTP service; retain Router/Tower interoperability. Available with `web`; Page/View rendering additionally needs `html`. |
-| yetlet::web::WebHost | Planned in YT-291: run an HTTP service as a participant in a HostGroup lifetime. App::into_host is the target bridge after missing state is resolved. |
+| yetlet::web::WebHost | Run an HTTP service as a participant in a HostGroup lifetime. App::into_host bridges a resolved-state App into that inert description. |
 | ResourceGroup | Customize typed owned/borrowed resources and explicit acquisition/release behavior. |
 | HostGroup planning: new / with_host / build | Describe, register and validate an inert plan; none starts a listener, thread or native loop. |
 | with_address | Configure a future Web bind address; actual acquisition belongs to the driver. |
 | serve / serve_on | Execute ordinary HTTP serving on caller-owned Tokio; a cancelled consuming future does not promise managed cleanup. |
-| run / run_async | Drive a compatible HostGroup through its documented synchronous/native or async driver. Managed async driving borrows a retained owner; the adapter must prove cancellation-safe storage. |
+| run / run_async | Drive the retained HostGroup synchronously or asynchronously. A fresh run selects owned-thread Web; a fresh run_async selects caller-runtime Web. The selection remains with the owner across cancellation. |
 | request_shutdown / shutdown_until | Request stop or advance shutdown toward terminal completion; Pending retains the original obligations. |
 | with_resource / with_managed_resource | Retain a passive Rust value or register an inert descriptor with explicit acquire/release semantics; do not conflate the two. |
 
@@ -237,9 +238,18 @@ poll_run advances the lifetime; poll_shutdown advances original completion and
 final release. run_async borrows the owner and uses the caller's executor.
 HostActivity names the custom activity contract, ManagedResource names explicit
 acquire/release management, and HostFailure retains the original typed error.
-No generic synchronous run loop is provided by this slice. Existing advanced
-Builder callbacks retain their established phase-specific behavior while the
-new Host path avoids the legacy required_* vocabulary.
+YT-291 adds the std-only blocking run loop and HostRunMode preparation before
+acquisition. HostRunError::ModeMismatch rejects a live Async owner's switch to
+blocking drive without altering its obligations. WebDriver is an explicit Web
+placement choice; WebHandle reports actual address, readiness and admission.
+ResourceGroup::map_activity transforms an inert activity for advanced error or
+behavior adaptation while retaining its dependency plan. Existing advanced
+Builder callbacks keep their phase-specific behavior; the Host quick path
+needs no required_* marker.
+`AdmissionOutcome::Opened` means the custom activity opened ordinary admission;
+`Closed` means termination has fenced it. A closed gate triggers coordinated
+shutdown while the original Join remains authoritative. These advanced outcomes
+do not introduce an optional-participation marker on the ordinary Host path.
 
 Ordinary participation needs no required marker. try_* is reserved for a
 documented operation-specific distinction and never means optional success,
@@ -260,10 +270,10 @@ ownership. Those names describe different developer intentions. Direct
 `App::serve` / `serve_on` use caller-owned Tokio.
 
 The existing advanced `yetlet::web::HttpWorker` names an owned-thread HTTP
-adapter for custom lifecycle integration. It is not the high-level Host
-quickstart or a new managed `WebHost` API. Keep this distinction explicit while
-YT-291 supplies the managed bridge; moving the adapter does not rename its
-lifecycle operations or add cancellation guarantees.
+adapter for custom lifecycle integration. The high-level managed entry is
+`WebHost` / `App::into_host`, supplied by YT-291. HttpWorker's existing explicit
+probe/stop/join operations retain their own contract; its module move did not
+add managed cancellation guarantees.
 
 Neutral `actions` keeps `Command`, `ActionExecutor` and `LocalExecutor`,
 with the executor's associated `Error` naming its own failure contract.

@@ -1,0 +1,18 @@
+[package]
+name = "yetlet-web-hosts-consumer"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+description = "Independent API-only consumer of managed Yetlet Web Hosts"
+
+# Resolve normal dependencies independently of the SDK's development dependencies.
+[workspace]
+
+[dependencies]
+yetlet = { path = "../../../crates/yetlet", default-features = false, features = ["web"] }
+tokio = { version = "=1.53.3", default-features = false, features = ["macros", "rt", "net", "io-util", "sync", "time"] }
+
+[dev-dependencies]
+rusqlite = { version = "=0.41.1", default-features = false, features = ["bundled"] }
+tempfile = "=3.27.0"
