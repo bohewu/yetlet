@@ -72,13 +72,13 @@ def feature_available(row, name, seen=None):
 
 
 def check_startup(project, receipt, policy, template, *, settings=False, service=False,
-                  vite=False, tailwind=False):
+                  vite=False, tailwind=False, feature_modules=False):
     """Independently bind the additive receipt to request, policy and emitted startup."""
-    if 'scaffold_capabilities' not in policy:
+    if 'scaffold_capabilities' not in policy and not feature_modules:
         return  # Published receipts retain their historical shape.
     require(template in ('native', 'native-style', 'browser', 'browser-style'), 'startup template')
     sdk = receipt['sdk']
-    rows = policy['scaffold_capabilities']['m26_startup']
+    rows = policy.get('scaffold_capabilities', {}).get('m26_startup', [])
     match = next((row for row in rows if row['sdk_version'] == sdk['version']), None)
     if match:
         core = [p for p in sdk['packages'] if p['name'] == 'yetlet']
@@ -87,28 +87,37 @@ def check_startup(project, receipt, policy, template, *, settings=False, service
     browser = template.startswith('browser')
     configured = settings or vite
     require(not browser or not service, 'unsupported Browser startup options')
-    expected = ('browser-wasm' if browser else 'service-axum' if service else
-                'configured-axum' if configured else 'm26-app-serve' if match else 'legacy-axum')
+    if browser:
+        expected = 'browser-wasm'
+    elif feature_modules:
+        expected = 'web-service' if service else 'web-configured' if configured else 'web-app-serve'
+    else:
+        expected = ('service-axum' if service else 'configured-axum' if configured else
+                    'm26-app-serve' if match else 'legacy-axum')
     require(receipt.get('startup_profile') == expected, 'startup profile differs from selected SDK/options')
     path = project / ('src/lib.rs' if browser else 'src/main.rs')
     require(path.is_file(), 'generated startup source missing')
     source = path.read_text()
     # These are the existing generator's startup anchors, not an arbitrary Rust parser.
     compact = re.sub(r'\s+', '', source)
-    m26 = '.serve().await?' in compact
+    if feature_modules:
+        module = 'view' if browser else 'web'
+        require(f'yetlet::{module}::' in compact and 'yetlet::server_axum' not in compact,
+                'feature-module generated imports differ')
+    app_serve = '.serve().await?' in compact
     listener = 'TcpListener::bind(' in compact
     configured_call = 'config::serve(' in compact
     axum_call = 'axum::serve(' in compact
     if browser:
         require('pubfnmount_tasks(' in compact and 'wasm_bindgen' in source
-                and not (m26 or listener or configured_call or axum_call), 'Browser startup differs')
-    elif expected == 'm26-app-serve':
+                and not (app_serve or listener or configured_call or axum_call), 'Browser startup differs')
+    elif expected in ('m26-app-serve', 'web-app-serve'):
         assets = template == 'native-style' or tailwind
-        require(m26 and not (listener or configured_call or axum_call)
+        require(app_serve and not (listener or configured_call or axum_call)
                 and ('App::from_router(' if assets else 'App::new()') in compact,
-                'M26 generated startup differs')
+                'App::serve generated startup differs')
     else:
-        require(listener and not m26 and (configured_call if configured else axum_call)
+        require(listener and not app_serve and (configured_call if configured else axum_call)
                 and not (axum_call if configured else configured_call), 'native generated startup differs')
         require(('shutdown_signal(' in compact) == service, 'Service startup differs')
     if not browser:
@@ -160,6 +169,10 @@ def inspect_project(project, cli_version, template, requested, source, cache, po
     require(eligible and sdk['version'] in eligible
             and sdk['version'] == (requested if requested is not None else max(eligible, key=selection_key)),
             'selection differs from captured metadata and policy')
+    core_row = rows['yetlet'][sdk['version']]
+    # A declared new API marker selects that profile even when its closure is invalid.
+    feature_modules = any(marker in core_row.get(field, {})
+                          for field in ('features', 'features2') for marker in ('web', 'view'))
     manifest = tomllib.loads((project / 'Cargo.toml').read_text())
     require(not {'patch', 'replace'} & manifest.keys(), 'SDK source override')
     dependencies = dict(manifest.get('dependencies', {}))
@@ -173,10 +186,20 @@ def inspect_project(project, cli_version, template, requested, source, cache, po
                 and record['validated_at'] == package['validated_at'], 'metadata provenance')
         row = rows[name][sdk['version']]
         dependency = dependencies[name]
-        required = ('dom', 'dom-keyed') if name == 'yetlet-browser' else (
-            ('reactive',) if template.startswith('browser') else ('server-axum',))
-        require(all(feature_available(row, f) for f in set(required) | set(dependency.get('features', []))),
+        if name == 'yetlet-browser':
+            required = ('dom', 'dom-keyed')
+        elif template.startswith('browser'):
+            required = ('reactive', 'view') if feature_modules else ('reactive',)
+        else:
+            required = ('web', 'html') if feature_modules else ('server-axum',)
+            if settings or vite:
+                required += ('config',)
+        enabled = set(dependency.get('features', []))
+        require(all(feature_available(row, f) for f in set(required) | enabled),
                 'selected SDK required feature missing or invalid')
+        if feature_modules:
+            require(dependency.get('default-features') is False and set(required) <= enabled,
+                    'feature-module SDK manifest opt-ins differ')
         require(dependency['version'] == '=' + sdk['version']
                 and not {'path', 'git', 'registry', 'registry-index'} & dependency.keys(), 'exact registry pin')
         locked = [p for p in packages if p['name'] == name]
@@ -193,7 +216,7 @@ def inspect_project(project, cli_version, template, requested, source, cache, po
                                  'yetlet ' + sdk['version'] + ' (registry+https://github.com/rust-lang/crates.io-index)')
                         for edge in locked[0].get('dependencies', [])), 'browser lock dependency differs')
     check_startup(project, receipt, policy, template, settings=settings, service=service,
-                  vite=vite, tailwind=tailwind)
+                  vite=vite, tailwind=tailwind, feature_modules=feature_modules)
     return receipt
 
 
@@ -251,9 +274,10 @@ def chrome_smoke(base, root, output, env):
 
 def runtime(executable, project, env, output, browser, startup_profile=None):
     label = 'browser' if browser else 'native'
-    port = 7878 if startup_profile == 'm26-app-serve' else smoke.port_number()
+    fixed_port = startup_profile in ('m26-app-serve', 'web-app-serve')
+    port = 7878 if fixed_port else smoke.port_number()
     base = f'http://127.0.0.1:{port}/'
-    if startup_profile == 'm26-app-serve':
+    if fixed_port:
         # A fixed-port consumer must not observe or stop someone else's app.
         with socket.socket() as probe:
             probe.bind(('127.0.0.1', port))

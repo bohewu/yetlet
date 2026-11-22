@@ -56,7 +56,7 @@ pub fn local_rc_custom_host() {
 
 #[cfg(feature = "native-udp")]
 pub fn non_web_native_udp() -> std::io::Result<()> {
-    use yetlet_hosts::{native_winit::WindowSlot, udp::UdpEndpoint};
+    use yetlet::{native_winit::WindowSlot, udp::UdpEndpoint};
 
     // Prepare the native slot without an OS window/event loop or renderer.
     let slot = WindowSlot::new(winit::window::Window::default_attributes());

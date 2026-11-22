@@ -131,7 +131,7 @@ if let Err(failure) = hosts.run_async().await {
 }
 ```
 
-The [finite external consumer](../../../examples/external-consumers/web-hosts/README.md)
+The [finite external consumer](https://github.com/bohewu/yetlet/blob/master/examples/external-consumers/web-hosts/README.md)
 shows real requests, address observation and explicit terminal shutdown. Neither
 construction nor build binds a listener or starts a thread. A WebHost defaults
 to `127.0.0.1:7878`; use distinct addresses or port 0 for multiple services.

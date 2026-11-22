@@ -24,25 +24,25 @@ use axum::{
     http::StatusCode,
     routing::{get, post},
 };
-use winit::{
+use yetlet::composition::{
+    Attached, Builder, Completion, Composition, Empty, JoinStatus, Local, Phase, Worker,
+    WorkerCompletion,
+};
+use yetlet::native_winit::winit::{
     application::ApplicationHandler,
     dpi::LogicalSize,
     event::WindowEvent,
     event_loop::{ActiveEventLoop, ControlFlow, EventLoop},
     window::{Window, WindowId},
 };
-use yetlet::composition::{
-    Attached, Builder, Completion, Composition, Empty, JoinStatus, Local, Phase, Worker,
-    WorkerCompletion,
-};
 use yetlet::web::HttpWorker;
-use yetlet_hosts::{
+use yetlet::{
+    command_bridge::{AdmissionError, CommandBridge, CommandIngress, SnapshotReader},
     native_winit::{WindowPhase, WindowSignal, WindowSlot},
     renderer_wgpu::{
         DrawReceipt, FatalError, RenderCounters, RenderError, SurfacePhase, SurfaceRenderer, wgpu,
     },
     udp::{SendOutcome, UdpEndpoint},
-    web_axum::{AdmissionError, CommandBridge, CommandIngress, SnapshotReader},
 };
 
 const QUEUE: usize = 4;

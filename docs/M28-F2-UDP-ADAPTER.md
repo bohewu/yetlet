@@ -11,9 +11,13 @@
   also needs a composition uses its own explicit `yetlet::composition`
   dependency; the focused test demonstrates that combination.
 
+This dated record retains the original companion dependency graph and tests.
+YT-292/293 move the adapter into yetlet behind its std-only `udp` feature;
+the source link follows its current location.
+
 ## Public behavior
 
-[`udp`](../crates/yetlet-hosts/src/udp.rs) exposes a concrete
+[`udp`](../crates/yetlet/src/udp.rs) exposes a concrete
 `UdpEndpoint` (owned `std::net::UdpSocket`), `SendOutcome`,
 `PollReport`, `MAX_DATAGRAM_BYTES` and `MAX_PACKETS_PER_POLL`.
 

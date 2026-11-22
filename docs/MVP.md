@@ -3,7 +3,15 @@
 **Status:** Original MVP specification; M0–M5 A01–A10 locally verified at their
 recorded prototype scope. Current Experimental distribution is recorded in
 [Release readiness](RELEASE-READINESS.md); production qualification remains open.
-**Product goal:** Demonstrate that the same Rust component source can serve native SSR and browser WASM without mandatory client JavaScript on SSR-only routes or a persistent server-side event circuit.
+**Original MVP goal:** Demonstrate that the same Rust component source can serve native SSR and browser WASM without mandatory client JavaScript on SSR-only routes or a persistent server-side event circuit.
+
+**Current framework scope:** The development checkout now has built-in Core
+composition/lifetimes and optional View, HTML, Web, Native, UDP and renderer
+capabilities. This document preserves the original Web/SSR vertical-slice
+acceptance contract; its original exclusions are not a prohibition on later
+Host integrations. See [architecture](ARCHITECTURE.md) and the
+[layered lifecycle decision](adr/0014-layered-host-resource-lifecycle.md) for the
+current boundaries. Published SDK and reader identities retain their own scope.
 
 This remains the acceptance contract for the **complete MVP**. M1 native SSR, M2 browser/WASM DOM, M3 lazy Search Island/state v1, M4 typed actions/API and M4.1 RequestContext/middleware passed local prototype tests. M5 provides a bounded [A01–A10 acceptance and performance baseline](QUALIFICATION-MATRIX.md#early-ssr-and-handler-measurements) using Chrome 155 and Firefox 157. This does not establish generic resumability, production authentication/CSRF, complete IME/accessibility compatibility, or release approval. Consult [Release readiness](RELEASE-READINESS.md) before publishing.
 

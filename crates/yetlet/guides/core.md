@@ -16,7 +16,7 @@ For a View-only dependency on this checkout:
 
 ```toml
 [dependencies]
-yetlet = { path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["view"] }
+yetlet = { version = "=0.9.0-alpha.8", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["view"] }
 ```
 
 The `view` feature in this path example is checkout-specific; published alpha.8

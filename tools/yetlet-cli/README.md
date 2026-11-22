@@ -63,4 +63,24 @@ build and embedded SDK snapshot; generated applications resolve their SDK
 independently. Install the exact version above only after registry availability
 is verified. A source-version change does not establish publication.
 
+## Current source SDK feature profiles
+
+The current source also recognizes SDKs that declare the optional `web` or
+`view` feature. This is source support for the composable SDK architecture;
+it does not select or announce another CLI or SDK release. The published
+identities and embedded SDK snapshot above remain unchanged.
+
+For those SDKs, Native starters explicitly select `web` and `html`, adding
+`config` for Settings or Vite. They import `yetlet::web`; simple starters use
+`App::serve()`, while Settings, Vite and Service retain their explicit listener
+lifecycle. Browser starters explicitly select `reactive` and `view`, with the
+companion's `dom` and `dom-keyed` features. Every generated SDK dependency keeps
+`default-features = false`.
+
+The existing receipt records `web-app-serve`, `web-configured` or `web-service`
+for those Native profiles; Browser remains `browser-wasm`. Older SDKs retain
+their established feature selections and startup profiles. Incomplete or
+invalid selected feature metadata returns `SDK_INCOMPATIBLE` with upgrade or
+explicit-pin guidance; it never silently selects an older SDK.
+
 **SDK policy:** `sdk-latest-v2`.

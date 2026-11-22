@@ -4676,17 +4676,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "yetlet-hosts"
-version = "0.9.0-alpha.8"
-dependencies = [
- "axum",
- "tokio",
- "wgpu",
- "winit",
- "yetlet",
-]
-
-[[package]]
 name = "yetlet-keyed-bindings"
 version = "0.9.0-alpha.8"
 dependencies = [

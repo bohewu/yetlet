@@ -1,7 +1,8 @@
 # Yetlet Browser
 
 Opt-in DOM, action transport and GPU integrations. DOM adapters share the single
-View type from `yetlet`. Published version `0.9.0-alpha.8`; see [GitHub releases](https://github.com/bohewu/yetlet/releases)
+View type from `yetlet`.
+Version `0.9.0-alpha.8`; see [GitHub releases](https://github.com/bohewu/yetlet/releases)
 for published artifacts.
 Use Rust 1.99+, `wasm32-unknown-unknown`, and the matching wasm-bindgen toolchain
 when building actual browser assets.

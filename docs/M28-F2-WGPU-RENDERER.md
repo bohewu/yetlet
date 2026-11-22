@@ -16,6 +16,11 @@ This increment follows [ADR 0013](adr/0013-composable-application-and-hosts.md)
 and the separately reviewed [D1 Window slot](M28-F2-NATIVE-WINIT-ADAPTER.md).
 No published SDK/CLI or reader edition changes.
 
+This dated record retains its original companion package graph and runtime
+evidence. YT-292/293 move the renderer and example into yetlet; current consumers
+select `yetlet/renderer-wgpu` and select Native separately when needed. Source
+links below follow the moved files.
+
 ## Selection and ownership
 
 `yetlet-hosts` has no default features. `renderer-wgpu` independently selects
@@ -29,7 +34,7 @@ and descriptor libraries. The target-specific WGPU support package name
 No browser renderer, game protocol, universal Host/Renderer trait, registry,
 DI, scheduler or automatically started worker is added.
 
-[`SurfaceRenderer<'window>`](../crates/yetlet-hosts/src/renderer_wgpu.rs) accepts
+[`SurfaceRenderer<'window>`](../crates/yetlet/src/renderer_wgpu/mod.rs) accepts
 `impl Into<wgpu::SurfaceTarget<'window>>` plus physical width/height. The module
 reexports the exact selected `wgpu` API. A caller may pass an owned safe handle
 such as `Arc<Window>` or a borrowed safe target whose lifetime remains enforced.
@@ -194,7 +199,7 @@ no explicit blocking wait, busy loop or `Device::poll` wait.
 
 ## Concrete caller-driven consumer
 
-[`native_wgpu_triangle`](../crates/yetlet-hosts/examples/native_wgpu_triangle.rs)
+[`native_wgpu_triangle`](../crates/yetlet/examples/native_wgpu_triangle.rs)
 requires both features and uses only public Yetlet/host APIs. It owns the one
 caller-thread Winit EventLoop and ApplicationHandler. One caller-local
 `Rc<C1Domain>` is attached through public Composition and never advanced by the

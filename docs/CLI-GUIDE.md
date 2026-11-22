@@ -87,7 +87,7 @@ or frontend dependencies are installed by new. The dependency-free nested Style
 generator lock remains separate and unchanged.
 
 The package README's Build SDK field describes the CLI's own exact dependency. The embedded
-snapshot is alpha.7 at its recorded SDK source/digests for the existing
+snapshot is alpha.8 at its recorded SDK source/digests for the existing
 qualified native source exporter; app SDK resolution does not expand Docker or
 Compose source support. Policy and snapshot identity resources ship in the CLI
 archive and remain bound to that archive's checksum and immutable source.
@@ -125,6 +125,42 @@ The top-level `startup_profile` in the schema 1 creation receipt at
 `sdk.policy_sha256` identifies the packaged policy bytes used at creation, and
 `cargo_lock_sha256` identifies the generated lockfile bytes. The receipt records
 creation provenance. The manifest and lockfile govern subsequent builds.
+
+### Source-only feature-module profiles
+
+The current source CLI also recognizes selected core SDK metadata declaring web
+or view. It chooses that API profile before validating its feature closure; an
+incomplete new profile fails with SDK_INCOMPATIBLE and upgrade/explicit-pin
+guidance. It does not fall back to legacy imports or an older SDK. Legacy metadata
+retains the published startup table above and its checksum-bound capability rule.
+
+| Source profile | Explicit core features | Startup receipt |
+|---|---|---|
+| Simple Native or Native Style, optionally Tailwind | web, html | web-app-serve |
+| Native with Settings or Vite | web, html, config | web-configured |
+| Native with Service | web, html; config when Settings/Vite is selected | web-service |
+| Browser or Browser Style | reactive, view; companion selects dom and dom-keyed | browser-wasm |
+
+All generated SDK dependencies disable defaults. Native uses yetlet::web and
+continues to mean native HTTP/SSR, not a Winit Host. Style, Tailwind and Vite
+composition finish before the shared API-profile conversion. No policy or receipt
+schema expansion, version bump or publication is selected by this source support.
+
+The preserved published-contract CLI 0.4.1 rejects the new Native feature map
+because server-axum is absent. Its existing diagnostic does not include explicit
+upgrade wording. Installed users can retain the published Native contract with:
+
+```sh
+yetlet new my-app --template native --sdk-version 0.9.0-alpha.8
+```
+
+Use a separately qualified CLI release containing feature-module support when
+selecting the next SDK. Its release/version has not been selected here. Old
+Browser output has separately compiled for Wasm against the new source because
+DOM/keyed-DOM forwards View; that result does not establish normal archive
+creation or browser runtime qualification. See the
+[compatibility assessment](COMPATIBILITY.md#current-checkout--cli-and-selected-sdk)
+and [bounded evidence](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection).
 
 ## Historical SDK resolver, startup and first CLI release evidence
 
@@ -718,8 +754,11 @@ publicly reachable. These historical checks are not a fresh test of
 the published CLI 0.4.0 binary.
 ## Current generator source matrix
 
-Generators accept the following exact current `new --service` source shapes after
-explicit compatible local Cargo path overrides and separately prepared locks:
+The deployment exporters retain their separately qualified legacy SDK source
+representation. Feature-module template support does not expand that source
+allowlist. Within the retained representation, generators accept these exact
+`new --service` shapes after explicit compatible local Cargo path overrides and
+separately prepared locks:
 
 | Current creation choice | Source shape and current acceptance |
 |---|---|
@@ -962,7 +1001,7 @@ native Run/Watch and plain Native scaffold code are unchanged.
 | Native new/lock | Initial offline metadata cache miss retained (`first-use/yetlet-new.exit` = 1); separate online `new` exit 0, exact SDK alpha.8, `m26-app-serve` and lock/receipt SHA match (`first-use/yetlet-new-online-summary.json`) | Registry metadata is distinct from `cargo fetch`; offline failure was not a successful first pass |
 | Fetch and Inspect | `cargo fetch --locked` exit 0; `inspect` exit 0 and schema 1 `project-execution-plan`; `inspect/files-before.json` / `files-after.json` are unchanged | Settings-derived plan only; no runtime readiness proof |
 | Build and ordinary Run | Reuse the **separate** accepted published CLI 0.4.0/SDK alpha.8 Windows Native locked first-app result ([M26 Roadmap](ROADMAP.md#m26--application-startup--sample-experience), [CLI release record](CLI-040-HOSTED-RECORD.md)); HTTP 200 at two routes, strict CSP, ordinary Run Ctrl+C and port reuse | This M27-C run did not replay standalone `build`/`run`; their original archive/source identity remains separate from the local source-built executable |
-| Native Watch | **New native MSVC runtime**: Watchexec `2.8.0` (SHA-256 `0a362aa3bb944337f9d2e8d37f8a4fdc4aba2f3a6d83e5d69df43a7eedfbfd14`); initial HTTP 200, changed-source HTTP 200, distinct PID, old generation reaped, owned tree and port 7878 closed (`native-watch-summary.json`, `native-watch-process-tree.json`) | Test sent **Ctrl+Break**, not Ctrl+C; native cancel exit `0xC000013A` is expected and not exit 0. No Browser/Vite/Node runtime |
+| Native Watch | **New native MSVC runtime**: Watchexec `2.8.0` (SHA-256 `0a362aa3bb944337f9d2e8d37f8a4fdc4aba2f3a6d83e5d69df43a7eedfbfd14`); initial HTTP 200, changed-source HTTP 200, distinct PID, old generation reaped, owned tree and development listener closed (`native-watch-summary.json`, `native-watch-process-tree.json`) | Test sent **Ctrl+Break**, not Ctrl+C; native cancel exit `0xC000013A` is expected and not exit 0. No Browser/Vite/Node runtime |
 | Historical comparison | Windows GNU Rust/Vite pair and older MSVC single-Cargo/process or compile qualifications remain in [Qualification Matrix](QUALIFICATION-MATRIX.md#historical-windows-native-browser-and-cli-evidence) | GNU does not establish current MSVC Browser/Vite; current Native Watch does not retroactively pass historical cases |
 
 Keep all failed setup/test attempts alongside successful evidence, including

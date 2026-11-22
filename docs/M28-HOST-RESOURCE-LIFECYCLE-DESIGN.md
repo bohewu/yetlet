@@ -1,6 +1,6 @@
 # M28 — Layered Hosts and ResourceGroup Lifecycle Design
 
-**Status:** Owner-selected feature-first direction; YT-287–292 independently reviewed and Done; YT-293–294 gates open.
+**Status:** Owner-selected feature-first direction; YT-287–293 independently reviewed and Done; YT-294 gate open.
 **Date:** 2026-11-21.
 **Tracking:** YT-286 public-delivery umbrella; ordered remaining items YT-287–294.
 **Decision:** [ADR 0014](adr/0014-layered-host-resource-lifecycle.md).
@@ -51,10 +51,10 @@ These are observations of the named baseline, not proposed behavior.
 | Same core, `required_local` and `required_foreground` | Both retain a local value. The former starts marked ready; the latter waits for caller attestation. Neither allocates a thread or enforces main-thread affinity. | State, execution constraints and resource ownership need distinct concepts. |
 | Same core, `try_required_local` and `try_required_worker` | A factory runs immediately, once, on the calling thread. Failure retains the original root in `StartFailure::into_root()` after requesting stop. | Deferred acquisition in the proposed high-level layer is a new contract, not a mechanical rename. |
 | [Lifecycle chain](../crates/yetlet/src/composition/lifecycle.rs) and core | Close all admission gates, close locals in reverse attachment order, signal workers, then observe original workers. `Pending` retains owners; no implicit stop/join in Drop. | General dependency-safe resource release needs an engine extension. Existing sequencing alone cannot ensure that a database outlives a worker using it. |
-| [Native adapter](../crates/yetlet-hosts/src/native_winit.rs) | `WindowSlot::new` prepares attributes; the caller supplies the active Winit loop when creating a window. The slot is caller-local. | Window preparation, actual native acquisition and event-loop ownership are separate. |
-| [Web adapter](../crates/yetlet-hosts/src/web_axum/mod.rs) | `HttpWorker::start_on` binds a listener and spawns one owned OS thread; that thread drives a Tokio current-thread runtime. Original thread completion is observable. | The current Web adapter has a concrete topology, although Composition itself has no scheduler. There is no shared framework thread pool. |
-| [UDP adapter](../crates/yetlet-hosts/src/udp.rs) | `UdpEndpoint` owns a nonblocking socket and exposes bounded caller-driven polling. It creates no worker thread. | Several Hosts can share a driver without each needing a thread. |
-| [Three-way consumer](../crates/yetlet-hosts/examples/composition_three_way.rs) | App-local Native/Network/Web values compose a caller-driven native/domain/UDP path with the owned HTTP service. The caller explicitly drives readiness and shutdown. | A high-level layer should package this coordination without making its particular topology universal. |
+| [Native adapter](../crates/yetlet/src/native_winit.rs) | `WindowSlot::new` prepares attributes; the caller supplies the active Winit loop when creating a window. The slot is caller-local. | Window preparation, actual native acquisition and event-loop ownership are separate. |
+| [Web adapter](../crates/yetlet/src/web/worker.rs) | `HttpWorker::start_on` binds a listener and spawns one owned OS thread; that thread drives a Tokio current-thread runtime. Original thread completion is observable. | The current Web adapter has a concrete topology, although Composition itself has no scheduler. There is no shared framework thread pool. |
+| [UDP adapter](../crates/yetlet/src/udp.rs) | `UdpEndpoint` owns a nonblocking socket and exposes bounded caller-driven polling. It creates no worker thread. | Several Hosts can share a driver without each needing a thread. |
+| [Three-way consumer](../crates/yetlet/examples/composition_three_way.rs) | App-local Native/Network/Web values compose a caller-driven native/domain/UDP path with the owned HTTP service. The caller explicitly drives readiness and shutdown. | A high-level layer should package this coordination without making its particular topology universal. |
 
 The public-source F2 work and its existing tests support these bounded facts.
 They do not validate the new facade, resource hierarchy, placement planner or
@@ -814,10 +814,10 @@ parts of the target have actually been delivered.
 | [Private facade](../examples/host-lifecycle-research/src/lib.rs), [resources](../examples/host-lifecycle-research/src/resources.rs) | Promote the proven ownership semantics, not a blind copy of the io::Error-bound Activity, blocking sleep driver or one-to-four tuple limit. Resolve those public signatures through compiling consumers. | YT-288 |
 | [View](../crates/yetlet/src/view/mod.rs), [tags](../crates/yetlet/src/view/tags.rs), [binding](../crates/yetlet/src/view/binding.rs), [HTML](../crates/yetlet/src/html/mod.rs) | Optional yetlet::view and yetlet::html. View is an HTML-like owned tree used by HTML/DOM; components remain ordinary functions. Native GPU scenes are separate. | YT-289 |
 | [App](../crates/yetlet/src/web/app.rs), [HTTP/Page/prelude](../crates/yetlet/src/web/mod.rs) | yetlet::web owns App, Router/Tower interoperability, WebHost and serving drivers. Page/rendering/View-dependent prelude entries require HTML as well as Web. Preserve resolved App state before serving/hosting. | YT-290, YT-291 |
-| [Current Web adapter](../crates/yetlet-hosts/src/web_axum/mod.rs) | Move the actual HTTP worker/serving implementation to Web. Move the separate generic command/snapshot bridge to optional yetlet::command_bridge; do not move it into HTTP merely because the current file contains both. | YT-290, YT-292 |
+| [Current Web adapter](../crates/yetlet/src/web/worker.rs), [command bridge](../crates/yetlet/src/command_bridge.rs) | Move the actual HTTP worker/serving implementation to Web. Move the separate generic command/snapshot bridge to optional yetlet::command_bridge; do not move it into HTTP merely because the current file contains both. | YT-290, YT-292 |
 | [Actions](../crates/yetlet/src/actions/mod.rs), [Browser HTTP executor](../crates/yetlet-browser/src/actions/mod.rs) | Optional neutral command/executor semantics plus separately selected target-neutral HTTP errors/envelopes; native serving and browser Fetch stay in their adapters. | YT-290 |
 | [Reactive](../crates/yetlet/src/reactive/mod.rs) | Keep the optional synchronous caller-local graph. Application domain state, sharing and synchronization remain application-owned. | YT-289 regression scope |
-| [Host manifest](../crates/yetlet-hosts/Cargo.toml), [adapter exports](../crates/yetlet-hosts/src/lib.rs) | Move Native/Winit, UDP and native wgpu implementations into separately enabled yetlet modules; keep renderer and Host choices independent. | YT-292 |
+| [SDK capability manifest](../crates/yetlet/Cargo.toml), [current adapter exports](../crates/yetlet/src/lib.rs) | Move Native/Winit, UDP and native wgpu implementations into separately enabled yetlet modules; keep renderer and Host choices independent. | YT-292 |
 | [Browser manifest](../crates/yetlet-browser/Cargo.toml), [Browser exports](../crates/yetlet-browser/src/lib.rs) | Keep the browser package and its DOM/action/GPU adapters. Forward features to only their needed target-neutral yetlet modules; gate current unconditional View reexports. | YT-289, YT-290 |
 | [Core capability manifest](../crates/yetlet/Cargo.toml) | Retain independent native configuration, secret/provider and signing opt-ins; classify existing HTTP capabilities explicitly below. Static asset production stays application/CLI-owned rather than inventing a new Core asset API. | YT-290, YT-293 |
 
@@ -1902,3 +1902,156 @@ General CLI/consumer migration remains YT-293; normal
 archives and selected external package qualification remain YT-294. Published
 alpha.8 and the pinned reader retain their original contracts; no publication
 or physical LAN qualification is included.
+
+## 21. YT-293 — CLI, consumers and minimal SDK feature selection
+
+Status: Done after focused verification and configured independent R2 actual
+PASS. R1 findings and correction evidence remain retained below.
+Date: 2026-11-22.
+Baseline: 76dfe9099c307705e48c97edad9520b9d13da090 (completed YT-292).
+
+### Scope and packaging
+
+Keep exactly yetlet and yetlet-browser as the SDK publication cohort. The CLI
+remains independently packaged. This slice selects no release or version bump:
+published SDK alpha.8, CLI 0.4.1, SDK identity, checksum-bound historical startup
+capabilities and the pinned reader edition retain their existing authority.
+
+The final source consumers select canonical yetlet features directly. Three
+low-level Native/renderer/combined examples move into yetlet/examples, and seven
+HTTP/command-bridge integration tests move into yetlet/tests. Their target gates
+are explicit. The temporary yetlet-hosts forwarding crate is removed, including
+its workspace membership. The revision-audit and public-compat consumers use
+canonical imports; render-bench declares its direct View dependency.
+
+Normal package file lists include the moved examples/tests, optional source and
+renderer shaders. Disabled capabilities may be present in the archive without
+being enabled in its dependency graph. Core default=[] has no normal/build
+runtime dependencies; Native+UDP does not select Web, Tokio or the renderer.
+Exact selected archives and their external consumers remain YT-294.
+
+### Selected SDK and generated source
+
+The current CLI derives an internal API profile from the selected SDK's feature
+metadata. Declaring web or view selects the feature-module profile before its
+requirements are checked; incomplete new metadata cannot fall back to legacy
+server-axum. Native SSR requires web+html and optional configuration requires
+config. Browser requires explicit view+reactive, plus the browser package's
+DOM/keyed-DOM capabilities. New generated core dependencies disable defaults.
+The CLI's Native template continues to mean native HTTP/SSR, not a Winit Host.
+
+Legacy metadata retains the existing templates and historical startup capability
+rules. New templates use canonical yetlet::web paths and truthful web-app-serve,
+web-configured or web-service startup receipt labels; Browser keeps browser-wasm.
+Profile finalization occurs after Style, Tailwind and Vite composition, so these
+choices share the same SDK/import decision. Selection errors keep the selected
+SDK identity and actionable upgrade/pin guidance without silently choosing an
+older SDK. The release consumer verifier independently checks metadata, manifest
+feature opt-ins and generated startup source; no new release schema is needed.
+
+### Verification checkpoint
+
+The preserved baseline CLI executable and all 163 tracked CLI source hashes
+identify the old installed-contract input. Its SHA-256 is
+d6eb5a8eb498449a505bab555d838b40016092c716055a7d33ef28fb63abf6c1;
+the migration capture binary, before the README-only review correction, is
+dba99db1ddcd39f76891aa824f6a505a2d43cf423fb5e87994124c8c250bd9c5.
+Actual old Native selection rejects the new map with SDK_INCOMPATIBLE before
+locking. Actual old Browser selection emits its template; that exact Rust/assets
+compile for Wasm against current source because DOM/keyed-DOM forwards View.
+Actual current Native and Browser command outputs also compile.
+
+These executable checks use source-derived metadata labeled synthetic 0.10.0.
+A bounded recorder captures generated files and deliberately fails the lock step;
+no successful creation receipt or registry lock is fabricated. Copies compile with
+only the SDK dependency source fields changed to current paths. This is source
+compatibility evidence, not normal archive or publication qualification. The old
+Native diagnostic lacks upgrade wording. The current guides give an explicit
+alpha.8 pin and require a separately qualified compatible CLI for next-SDK
+publication. No release/version is selected.
+
+All 32 focused CLI tests pass, including 48 composed template shapes; the CLI
+package marker regression and 18 independent release-consumer verifier tests pass.
+Nine representative generated Native/Style/Service/Settings/Tailwind/Vite/Browser
+projects compile, followed by the three actual command captures above. The
+existing two ignored registry-environment tests are not reported as executed.
+All generated Rust and assets remain unchanged by source-dependency adaptation.
+
+Current-source consumer checks pass: three moved examples compile, all seven
+HTTP tests pass, the revision consumer passes 68 library plus 14 binary tests,
+and the compatibility consumer passes three tests. Render-bench compiles. Root
+and the two changed standalone locks reconcile without new external package
+identities. Ordinary package --list and metadata checks confirm the retained
+cohort and target gates; they do not claim built or qualified archives.
+
+Full CLI all-target Clippy and moved SDK-target Clippy pass with warnings denied;
+the initial 15 changed Rust files match rustfmt. The existing package marker test keeps
+its intentional byte-array fixtures with a narrow explained lint expectation;
+its actual case-insensitive marker behavior remains checked. Release-doc checks
+pass after restoring current README/guide version shapes, eight path-consumer
+version fields and a package-safe Web-guide URL. Historical authority files,
+reader edition and both registry-pinned reader manifests remain unchanged.
+
+Initial failures remain retained: the source-capture tool preflight rejected
+existing writable tool directories, a retained generation parent was not private,
+and release-doc normalization found stale tracked deletion/index and document
+shapes. Only task-owned fixture paths were made private. Exact copied tools and
+libraries plus a bounded ELF recorder completed the actual executable check;
+no product trust rule or existing installation permission was changed.
+
+A supplemental generated-lock assertion initially used an overly narrow workspace
+identity set. All nine compiler commands already passed. Configured templates'
+existing optional TLS dependencies produce first-time fixture locks; those are
+recorded separately. Comparison of all 31 tracked Cargo.lock files confirms only
+the three intended lock changes and no added external package identity. No
+compiler invocation was repeated for this assessment correction.
+
+Current documentation explains Core, optional View/HTML/Web and Host lifecycle,
+while retaining alpha.8 registry recipes and dated execution records. Source
+links follow moved files. Evidence is retained in
+.pipeline-output/m28-yt293-20261122/: CONSUMERS-R1, CLI-R1/R2,
+GENERATED-R1/R2/R3, COMMAND-SOURCE-R1, METADATA-R1 through R6, QUALITY-R1/R2
+and old-cli-capture-r2 identify their distinct results and limits. No new UI/GPU
+execution or publication is part of this migration.
+
+### Independent review corrections
+
+Configured independent R1 wc_job_OWehrdzPxuUGPYWb completed with exit 0 and
+an actual FAIL verdict containing four material P2 findings. Reviewed source and
+evidence hashes remained unchanged throughout that review. All four findings
+were admitted against the existing migration contract and repaired:
+
+- Feature-module manifest validation now checks explicit required opt-ins and
+  disabled defaults for both yetlet and yetlet-browser. Companion-only negative
+  cases remove dom-keyed or enable defaults while leaving the core valid.
+- Generated Native README guidance describes the retained legacy-only Docker,
+  Compose and Kubernetes exporter boundary, including Service. Its historical
+  template/resource bytes and Legacy Service instructions remain unchanged.
+- The existing cloud scaffold test uses an explicit legacy fixture for historical
+  byte assertions. A current-checkout case checks ordinary and Service canonical
+  imports, web/html opt-ins, disabled defaults and existing no-replace behavior.
+- The current samples command selects web,html with the retained
+  server-axum-minimal target; published alpha.8 guidance is separately identified.
+
+Correction verification passes: 18 release-consumer tests, 10 SDK/template tests
+and both ordinary cloud-suite tests. The existing generated-runtime cloud test
+remains ignored. Full CLI all-target Clippy passes with warnings denied, and
+all three Rust correction files match rustfmt. REVIEW-FIX-QUALITY-R1 retains
+successful tests/Clippy and two formatting mismatches; R2 closes four test-only
+line-wrapping hunks without repeating those successful commands.
+
+All 48 composed profiles were generated again for the changed README behavior.
+Of 1128 files, only 32 Native READMEs changed; the remaining 1096 files, including
+all Rust, manifests and assets, are byte-identical. The earlier twelve source
+compiles and executable captures therefore remain applicable to their stated
+source scope without replay. REVIEW-FIX-PYTHON-R1, REVIEW-FIX-CLI-R1,
+REVIEW-FIX-QUALITY-R1/R2 and REVIEW-FIX-GENERATED-DELTA-R1 retain these checks.
+Configured independent R2 wc_job_DjxGN41kOxQ3Y-SU completed with terminal
+exit 0 and actual PASS, issues=[] and required_followups=[]. The saved Reviewer
+model and observed effort were gpt-6.2-astra/high under the unchanged operator
+launcher. All 61 current source hashes, ten absent paths and 164 evidence inputs
+remained unchanged across review. This is ordinary role-directed independent
+review, not native agent_type dispatch or formal assurance. YT-293 is Done.
+Final local Git delivery uses the Strict/Builtin staged Guard; its final tree and
+commit receipts are retained with the local handoff. Normal archives and selected
+external-consumer qualification remain YT-294; no release or publication is selected.

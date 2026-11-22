@@ -8,9 +8,13 @@
   with X11/rwh_06 on tested Ubuntu. No required wgpu/GPU, Axum, Tokio,
   UDP, extra game tick, browser dependency or generic Host Trait.
 
+This dated record retains its original package and execution evidence. YT-292/293
+move the adapter and example into yetlet; current consumers select
+`yetlet/native-winit`. Source links below follow the moved files.
+
 ## Actual public capability and ownership
 
-[`native_winit::WindowSlot`](../crates/yetlet-hosts/src/native_winit.rs)
+[`native_winit::WindowSlot`](../crates/yetlet/src/native_winit.rs)
 is a concrete !Send/!Sync foreground-owned Window slot:
 
 - The application creates and runs its own `winit::EventLoop` on the supported
@@ -52,7 +56,7 @@ is a concrete !Send/!Sync foreground-owned Window slot:
 
 ## Focused actual source evidence
 
-The public [`native_winit_foreground`](../crates/yetlet-hosts/examples/native_winit_foreground.rs)
+The public [`native_winit_foreground`](../crates/yetlet/examples/native_winit_foreground.rs)
 is a standalone source-only consumer using **one** caller-local
 `Rc<C1Domain>`, the actual public typed Composition Core with a required
 Native Window part, and a main-thread Winit EventLoop.

@@ -1,6 +1,6 @@
 # ADR 0014 — Layered Hosts with Default Resource Lifecycle Management
 
-- **Status:** Owner-selected target direction; YT-287–291 independently reviewed and Done; remaining capabilities pending.
+- **Status:** Owner-selected target direction; YT-287–293 independently reviewed and Done; YT-294 qualification pending.
 - **Date:** 2026-11-21.
 - **Tracking:** YT-286 umbrella remains Todo; YT-287–294 define the remaining delivery gates.
 - **Decision owner:** Project maintainer.
@@ -316,6 +316,44 @@ R2 wc_job_JOQWTmAmTSZNi--j reached terminal exit 0 with actual PASS,
 issues=[] and required_followups=[]; reviewed source/receipt hashes were
 unchanged. YT-292 is Done. General migration and normal archives remain
 YT-293/294.
+
+## YT-293 implementation checkpoint — consumers and feature selection
+
+The [migration checkpoint](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection)
+retains exactly two SDK packages and removes the temporary yetlet-hosts forwarding
+crate after migrating its final examples, tests and external source consumers.
+Core, optional capabilities and independent renderer ownership remain unchanged.
+Normal package lists include these targets with explicit feature gates; exact
+archive qualification remains YT-294.
+
+CLI template selection follows the selected SDK's feature metadata. New web/view
+markers select the new profile before validation, requiring explicit feature
+opt-ins and canonical paths. Incomplete new metadata cannot use legacy fallback.
+Historical metadata retains its original template/startup capability rules.
+Native remains HTTP/SSR; Browser still builds Wasm. The release consumer verifier
+checks selected metadata, generated manifest, startup receipt and source together.
+
+No version bump, publication, pinned reader promotion or release-schema expansion
+is selected. Current docs distinguish checkout capabilities from registry alpha.8.
+Focused source-consumer and generated-app verification passes: 92 moved/consumer
+tests, 32 CLI tests plus the package marker regression, 18 release-consumer tests,
+48 template shapes, nine generated compiles and three actual command-output
+compiles. Old Native selection rejects the new feature map; old Browser output
+compiles through DOM-to-View feature forwarding. Executable capture uses clearly
+synthetic metadata and an intentional lock failure, not a successful registry
+creation claim. Guides supply the old Native upgrade/pin disposition. Strict
+quality and release-doc checks pass. Independent R1 wc_job_OWehrdzPxuUGPYWb
+returned actual FAIL with four P2 findings. The corrections cover companion
+manifest opt-ins, profile-specific generated exporter guidance, legacy/current
+scaffold-test inputs and the current sample feature command. All 18 verifier,
+10 SDK/template and two cloud regressions pass; the ignored cloud runtime test
+remains unexecuted. Across 48 regenerated profiles, only 32 READMEs differ and
+all Rust/manifests/assets retain their earlier compiled bytes. Final correction
+formatting and strict CLI Clippy pass. Configured independent R2
+wc_job_DjxGN41kOxQ3Y-SU reached terminal exit 0 with actual PASS, issues=[]
+and required_followups=[]; all reviewed source/evidence inputs stayed unchanged.
+YT-293 is Done. Local Git delivery uses the Strict/Builtin staged Guard; selected
+normal archives and external-consumer qualification remain YT-294.
 
 ## Context
 

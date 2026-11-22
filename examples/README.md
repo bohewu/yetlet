@@ -39,7 +39,8 @@ and Multi-Island Dashboard retain native `TcpListener`, `axum::serve` and gracef
 shutdown. `into_router()` and optional Prelude imports preserve native Axum/Tower
 composition. The [startup and port table](../docs/SAMPLES.md#startup-paths-in-this-checkout)
 and [source API examples](../docs/API-REFERENCE.md#source-only-checkout-additions)
-describe these checkout additions after published SDK alpha.7.
+describe the current checkout's capability and import choices. Published SDK
+alpha.8 and its pinned reader recipes retain their original feature names.
 
 Todo and Dashboard build their browser assets explicitly. Style Showcase runs
 natively through its catalog command and has an optional browser companion.

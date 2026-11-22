@@ -24,7 +24,7 @@ use yetlet::composition::{
     Attached, Builder, Completion, Composition, Empty, JoinStatus, Local, Phase, Worker,
     WorkerCompletion,
 };
-use yetlet_hosts::{
+use yetlet::{
     native_winit::{WindowSignal, WindowSlot},
     renderer_wgpu::{
         DrawReceipt, FatalError, RectInstance, RenderError, SurfacePhase, SurfaceRenderer,
@@ -184,7 +184,7 @@ fn close_window_after_surface(
     // SurfaceRenderer::close releases its Surface even on FrameCleanupFailed.
     // Always attempt this, including later retries of a Window close blocker.
     let result = window.close();
-    if window.phase() == yetlet_hosts::native_winit::WindowPhase::Closed {
+    if window.phase() == yetlet::native_winit::WindowPhase::Closed {
         eprintln!("NATIVE_WINDOW_CLOSED");
     }
     match retained {
@@ -668,8 +668,7 @@ impl Application {
             // A persistent driver blocker is retained. Do not hammer it after
             // the original HTTP worker has reached terminal Join.
             let blocked = native(&self.root).cleanup_failure.is_some()
-                && native(&self.root).window.phase()
-                    == yetlet_hosts::native_winit::WindowPhase::Closed
+                && native(&self.root).window.phase() == yetlet::native_winit::WindowPhase::Closed
                 && self.root.parts().last().join_status() != JoinStatus::Pending;
             if !blocked
                 && self
@@ -997,7 +996,7 @@ fn main() -> io::Result<()> {
     }
     if !app.complete
         && !(native(&app.root).cleanup_failure.is_some()
-            && native(&app.root).window.phase() == yetlet_hosts::native_winit::WindowPhase::Closed
+            && native(&app.root).window.phase() == yetlet::native_winit::WindowPhase::Closed
             && app.root.parts().last().join_status() != JoinStatus::Pending)
     {
         app.complete = app
@@ -1042,7 +1041,7 @@ fn main() -> io::Result<()> {
 mod tests {
     use super::*;
     use std::cell::Cell;
-    use yetlet_hosts::{
+    use yetlet::{
         native_winit::WindowPhase,
         renderer_wgpu::{DeviceLostError, wgpu},
     };

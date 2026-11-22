@@ -23,9 +23,9 @@ use std::{
     time::Duration,
 };
 use yetlet::web::HttpWorker;
-use yetlet_hosts::{
+use yetlet::{
+    command_bridge::{AdmissionError, CommandBridge, CommandIngress, SnapshotReader},
     udp::{SendOutcome, UdpEndpoint},
-    web_axum::{AdmissionError, CommandBridge, CommandIngress, SnapshotReader},
 };
 
 pub const IO_BUDGET: Duration = Duration::from_millis(400);
@@ -411,7 +411,7 @@ fn decode(bytes: &[u8]) -> io::Result<Request> {
 ///
 /// ```compile_fail,E0616
 /// use std::net::UdpSocket;
-/// use yetlet_hosts::udp::UdpEndpoint;
+/// use yetlet::udp::UdpEndpoint;
 /// use yt283_revision_audit::three_way::Network;
 /// let client = UdpSocket::bind("127.0.0.1:0").unwrap();
 /// let mut network = Network::new(&client).unwrap();

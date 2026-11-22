@@ -1,7 +1,6 @@
 [workspace]
 members = [
     "crates/yetlet",
-    "crates/yetlet-hosts",
     "crates/yetlet-browser",
     "examples/todo-ui",
     "examples/todo-browser",

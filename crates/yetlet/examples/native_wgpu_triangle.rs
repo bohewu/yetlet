@@ -12,15 +12,15 @@ use std::{
     thread,
     time::{Duration, Instant},
 };
-use winit::{
+use yetlet::composition::{Attached, Builder, Completion, Composition, Empty, Local, Phase};
+use yetlet::native_winit::winit::{
     application::ApplicationHandler,
     dpi::{LogicalSize, PhysicalSize},
     event::WindowEvent,
     event_loop::{ActiveEventLoop, ControlFlow, EventLoop},
     window::{Window, WindowId},
 };
-use yetlet::composition::{Attached, Builder, Completion, Composition, Empty, Local, Phase};
-use yetlet_hosts::{
+use yetlet::{
     native_winit::{WindowPhase, WindowSignal, WindowSlot},
     renderer_wgpu::{
         DrawReceipt, FatalError, RenderCounters, RenderError, SurfacePhase, SurfaceRenderer, wgpu,

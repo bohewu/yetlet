@@ -74,8 +74,11 @@ adds canonical command-bridge/UDP/Winit/renderer feature modules. A typed root
 driver advances the same coordinator inside Winit callbacks through all final
 release, with multiple windows under one NativeHost. UDP remains caller-driven;
 Web may retain its owned-thread placement. No dependency or renderer is added
-to default Core. Remaining consumer/CLI migration and normal archives retain
-YT-293/294 gates in the
+to default Core. [YT-293 migration](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection)
+removes the final staging package, migrates its consumers and selects CLI template
+features/imports from the chosen SDK metadata. Core and concrete Host lifecycles
+are unchanged. SDK publication keeps two packages; normal selected archives retain
+YT-294 qualification in the
 [ordered plan](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#14-replanned-public-delivery--yt-287-through-yt-294).
 The research history below retains its original default-feature/API assumptions.
 

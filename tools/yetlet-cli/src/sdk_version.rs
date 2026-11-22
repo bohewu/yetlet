@@ -1,4 +1,5 @@
 //! Application SDK policy and selection, independent of the CLI's build SDK.
+use crate::sdk_api::SdkApi;
 use semver::{Version, VersionReq};
 use serde::{Deserialize, Serialize};
 use std::collections::{BTreeMap, BTreeSet};
@@ -54,6 +55,8 @@ pub(crate) struct ResolvedSdk {
     pub prerelease: bool,
     #[serde(skip)]
     pub(crate) m26_startup: bool,
+    #[serde(skip)]
+    pub(crate) api: SdkApi,
 }
 
 impl ResolvedSdk {
@@ -240,10 +243,23 @@ fn feature(row: &IndexVersion, name: &str, seen: &mut BTreeSet<String>) -> bool 
 // Validate the selected version, never use these checks to choose an older SDK.
 // Cargo owns toolchain and transitive dependency feasibility; the CLI build SDK
 // and its Rust minimum do not bound application SDK selection.
-fn compatible(request: Request<'_>, version: &str, rows: &[&IndexVersion]) -> Result<(), String> {
+fn compatible(
+    request: Request<'_>,
+    version: &str,
+    rows: &[&IndexVersion],
+    api: SdkApi,
+) -> Result<(), String> {
     for row in rows {
         let required: &[&str] = if row.name == "yetlet-browser" {
             &["dom", "dom-keyed"]
+        } else if api == SdkApi::FeatureModules {
+            if request.template.browser() {
+                &["reactive", "view"]
+            } else if request.settings {
+                &["web", "html", "config"]
+            } else {
+                &["web", "html"]
+            }
         } else if request.template.browser() {
             &["reactive"]
         } else if request.settings {
@@ -252,7 +268,11 @@ fn compatible(request: Request<'_>, version: &str, rows: &[&IndexVersion]) -> Re
             &["server-axum"]
         };
         for feature_name in required {
-            if !feature(row, feature_name, &mut BTreeSet::new()) {
+            let declared = row.features.contains_key(*feature_name)
+                || row.features2.contains_key(*feature_name);
+            if (api == SdkApi::FeatureModules && row.name == "yetlet" && !declared)
+                || !feature(row, feature_name, &mut BTreeSet::new())
+            {
                 return Err(format!(
                     "{} required feature {feature_name} is missing or invalid",
                     row.name
@@ -346,9 +366,16 @@ pub(crate) fn select(
             policy.sha256
         ));
     }
-    compatible(request, &version, &rows).map_err(|reason| {
+    let api = SdkApi::from_features(
+        rows[0]
+            .features
+            .keys()
+            .chain(rows[0].features2.keys())
+            .map(String::as_str),
+    );
+    compatible(request, &version, &rows, api).map_err(|reason| {
         format!(
-            "SDK_INCOMPATIBLE: {version} template={} policy={}: {reason}",
+            "SDK_INCOMPATIBLE: {version} template={} policy={}: {reason}; upgrade the CLI or explicitly select a compatible SDK with --sdk-version; no fallback was selected",
             request.template.selector(),
             policy.revision
         )
@@ -376,6 +403,7 @@ pub(crate) fn select(
         template: request.template.selector(),
         requested: request.exact.map(str::to_owned),
         m26_startup: capability.is_some(),
+        api,
     })
 }
 

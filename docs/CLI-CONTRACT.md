@@ -125,10 +125,18 @@ generates an app Cargo.lock and records provenance before publication. Build,
 run and watch retain their frozen lock behavior. These capabilities first shipped in
 [CLI 0.3.0](CLI-030-HOSTED-RECORD.md); that checkpoint's Reader Edition had
 the older SDK alpha.6 / CLI 0.2.0 pair. The **current selected Reader Edition**
-is SDK `0.9.0-alpha.8` / CLI `0.4.0` (see `site/pages.toml`), and the
+is SDK `0.9.0-alpha.8` / CLI `0.4.1` (see `site/pages.toml`), and the
 [CLI 0.4.0 publication](CLI-040-HOSTED-RECORD.md) additionally qualifies the
 finite generated-startup policy. Earlier releases keep their exact source-
 bound behavior; the CLI's own source snapshot does not float with app SDK.
+
+The current source adds [feature-module SDK profiles](CLI-GUIDE.md#source-only-feature-module-profiles)
+without changing the resolver policy or historical checksum capabilities. The
+selected metadata determines required features, canonical generated imports and
+truthful startup labels. New profile failures retain the selected SDK identity;
+legacy templates remain available for legacy metadata. The
+[YT-293 checkpoint](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection)
+separates source compilation from future archive and publication qualification.
 
 ## Historical CLI source qualification and process constraints
 

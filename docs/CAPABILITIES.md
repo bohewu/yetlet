@@ -1,6 +1,6 @@
 # Current capability and API carrier map
 
-Updated: 2026-11-12. The published Experimental SDK has two implementation packages:
+Updated: 2026-11-22. The published Experimental SDK has two implementation packages:
 `yetlet` and `yetlet-browser`, version `0.9.0-alpha.8`, available from crates.io.
 For those published packages, base defaults select HTML and Browser defaults
 select DOM. Native capabilities and GPU/action integrations are additive opt-ins
@@ -19,7 +19,7 @@ classifies reader inputs and retained evidence; this inventory does not select
 publication of its linked execution records.
 
 SDK alpha.8 includes [simple application startup and the optional Axum Prelude](API-REFERENCE.md#published-application-startup--sdk-alpha8)
-with the opt-in `server-axum` feature. Published CLI `0.4.0` generates
+with the opt-in `server-axum` feature. Published CLI `0.4.1` generates
 `App::serve()` for Native and Native Style with verified SDK alpha.8 and
 compatible options. It records the selected startup profile in the scaffold
 receipt. [CLI startup profiles](CLI-GUIDE.md#sdk-resolution-yt-247)
@@ -71,8 +71,16 @@ not change published alpha.8 package contents or its startup examples.
 adds canonical optional native modules without changing the empty default.
 NativeHost contributes one caller-thread root loop for multiple windows; UDP
 remains bounded and caller-driven. Web, renderer and command bridge selections
-are independent. The unpublished companion only forwards remaining historical
-consumers; normal package qualification stays a later gate.
+are independent. YT-293 migrates the remaining checkout consumers directly to
+these features and removes the temporary yetlet-hosts companion. SDK publication
+still contains only yetlet and yetlet-browser; exact archive qualification remains
+YT-294.
+
+The source CLI uses selected SDK feature metadata to choose its generated imports
+and explicit opt-ins. Native remains HTTP/SSR with web+html; Browser chooses
+view+reactive and DOM/keyed-DOM. Invalid new metadata fails without a legacy or
+older-version fallback. [CLI source profiles](../tools/yetlet-cli/README.md#current-source-sdk-feature-profiles)
+retain the existing release identity and explain the source-only support.
 
 ## Framework packages and selected features
 

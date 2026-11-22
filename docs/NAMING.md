@@ -160,7 +160,8 @@ original names. See the [migration map](COMPATIBILITY.md#two-package-feature-and
 
 ## Native Window API semantic names — YT-282 naming follow-up
 
-The optional `yetlet_hosts::native_winit::WindowSlot` exposes
+The optional `yetlet::native_winit::WindowSlot` (formerly in the source-only
+`yetlet_hosts` companion) exposes
 `window()` as a borrowed `&Window` and `shared_window()` as a cloned
 `Arc<Window>` for an independently selected renderer. Avoid the former
 `window_handle()` spelling, which can be mistaken for a raw OS Window handle.

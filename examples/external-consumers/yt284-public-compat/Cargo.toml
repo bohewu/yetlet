@@ -12,10 +12,9 @@ description = "Independent package-surface compatibility consumer for Yetlet"
 default = []
 pure-web = ["yetlet/web", "dep:axum"]
 local-headless = []
-native-udp = ["dep:yetlet-hosts", "dep:winit"]
+native-udp = ["yetlet/native-winit", "yetlet/udp", "dep:winit"]
 
 [dependencies]
-yetlet = { path = "../../../crates/yetlet", default-features = false }
-yetlet-hosts = { path = "../../../crates/yetlet-hosts", default-features = false, features = ["native-winit", "udp"], optional = true }
+yetlet = { version = "0.9.0-alpha.8", path = "../../../crates/yetlet", default-features = false }
 axum = { version = "=0.8.9", optional = true }
 winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }

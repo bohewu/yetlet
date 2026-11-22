@@ -11,7 +11,11 @@
 
 ## Concrete public boundary
 
-[`web_axum`](../crates/yetlet-hosts/src/web_axum/mod.rs) exposes:
+The original `web_axum` adapter exposed the boundary below. This dated record
+retains its original API names and execution evidence. Its current
+[`HttpWorker`](../crates/yetlet/src/web/worker.rs) and
+[command bridge](../crates/yetlet/src/command_bridge.rs) live in separately
+enabled `web` and `command-bridge` modules after YT-290/292/293:
 
 - `HttpWorker::start(router)` binds loopback ephemeral TCP and owns one Tokio
   runtime thread plus its original `JoinHandle` and independent graceful

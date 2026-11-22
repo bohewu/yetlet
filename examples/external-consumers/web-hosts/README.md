@@ -2,8 +2,7 @@
 
 This independent workspace uses the current checkout's public `yetlet::web`
 and Core Host lifecycle APIs. Its normal Yetlet dependency selects only `web`,
-with defaults disabled. It does not select HTML, View, Actions, or the staging
-Hosts package.
+with defaults disabled. HTML, View and Actions remain separate opt-ins.
 
 ## Run the finite API-only example
 

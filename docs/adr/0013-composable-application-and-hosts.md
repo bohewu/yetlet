@@ -9,10 +9,11 @@
 ## Layered Host follow-up — 2026-11-21
 
 [ADR 0014](0014-layered-host-resource-lifecycle.md) and its
-[research/design document](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) propose
-high-level Host defaults with optional ResourceGroup customization. That new
-proposal remains unimplemented and Proposed; its review does not amend the
-accepted F2 baseline below or constitute public API adoption.
+[research/design document](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) now record
+owner-selected Core Host defaults, optional capabilities and ResourceGroup
+customization. Their YT-287–294 checkpoints distinguish implemented checkout
+slices from remaining consumer/archive qualification. The historical accepted
+F2 boundary and evidence below retain their original scope.
 
 ## Context
 

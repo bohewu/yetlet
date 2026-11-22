@@ -145,6 +145,16 @@ feature and `server_axum` module without aliases; see the
 [checkout migration](COMPATIBILITY.md#current-checkout--web-and-http-protocol-ownership).
 Published alpha.8 retains the startup API shown above.
 
+The source CLI now recognizes the selected SDK's feature-module vocabulary.
+Native HTTP/SSR starters choose web+html and import yetlet::web; Browser starters
+choose view+reactive, with DOM/keyed-DOM in yetlet-browser. Settings and Vite add
+config. An incomplete new profile is rejected rather than using legacy imports.
+Older SDK metadata retains its established templates and startup capability rules.
+See [CLI source profiles](../tools/yetlet-cli/README.md#current-source-sdk-feature-profiles)
+and the [migration checkpoint](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection).
+This source support does not select a new CLI/SDK release or change the pinned
+reader's published recipes.
+
 The native-first Style Showcase is a checkout sample with an optional Wasm
 companion. Both packages are built from the repository.
 [Style Showcase](../examples/style-showcase/README.md)

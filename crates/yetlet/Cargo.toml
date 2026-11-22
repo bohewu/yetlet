@@ -81,6 +81,18 @@ name = "composition"
 [[example]]
 name = "composition_local"
 
+[[example]]
+name = "native_winit_foreground"
+required-features = ["native-winit"]
+
+[[example]]
+name = "native_wgpu_triangle"
+required-features = ["native-winit", "renderer-wgpu"]
+
+[[example]]
+name = "composition_three_way"
+required-features = ["native-winit", "renderer-wgpu", "udp", "command-bridge", "web"]
+
 [[test]]
 name = "server_axum_handler_results"
 required-features = ["web", "html"]
@@ -104,6 +116,10 @@ required-features = ["web"]
 [[test]]
 name = "command_bridge"
 required-features = ["command-bridge"]
+
+[[test]]
+name = "command_bridge_http"
+required-features = ["web", "command-bridge"]
 
 [[test]]
 name = "udp"

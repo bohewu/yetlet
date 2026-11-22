@@ -7,9 +7,12 @@ Status: **YT-282-E1 source-only Done**, after independent Reviewer R2
 The external raw TCP observers remain **PARTIAL/FAIL** as qualified below;
 full YT-282/F2, YT-283/284 and physical D4 remain open.
 
-The [example](../crates/yetlet-hosts/examples/composition_three_way.rs) consumes
-only public `yetlet::composition`, concrete `yetlet_hosts::{native_winit,
-renderer_wgpu,udp,web_axum}`, Winit, standard Rust and native Axum APIs.
+The current [example](../crates/yetlet/examples/composition_three_way.rs) consumes
+public `yetlet::{composition,native_winit,renderer_wgpu,udp,web,command_bridge}`,
+Winit, standard Rust and native Axum APIs. YT-293 relocates the consumer after
+the canonical modules moved to yetlet. The execution evidence below retains its
+original source, package names and bounded qualification; this import migration
+does not claim another graphics run.
 It follows the [accepted scoped ADR0013 direction](adr/0013-composable-application-and-hosts.md#accepted-scoped-f2-decision--2026-11-19).
 The historical YT-281 signatures and private F1 code are not compiled consumer
 interfaces. No private implementation is imported, included or copied.
@@ -20,8 +23,8 @@ From this checkout, with the existing Rust toolchain and supported X11/Vulkan
 hardware available:
 
 ```sh
-cargo build --offline --locked -p yetlet-hosts --no-default-features \
-  --features native-winit,renderer-wgpu,udp,web-axum \
+cargo build --offline --locked -p yetlet --no-default-features \
+  --features native-winit,renderer-wgpu,udp,command-bridge,web \
   --example composition_three_way
 DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/1000 WINIT_UNIX_BACKEND=x11 \
   target/debug/examples/composition_three_way --smoke
@@ -29,11 +32,11 @@ DISPLAY=:0 XDG_RUNTIME_DIR=/run/user/1000 WINIT_UNIX_BACKEND=x11 \
 
 This finite demonstration briefly opens one visible 640 by 420 Window. It
 requires a discrete Vulkan adapter for its bounded hardware proof. It does not
-provide an interactive application or a new public protocol. All four example
+provide an interactive application or a new public protocol. All five example
 `required-features` are explicit in the
-[manifest](../crates/yetlet-hosts/Cargo.toml); features and dependency declarations
-are otherwise unchanged. Defaults remain empty. The companion crate remains
-`publish = false`; no package version or published guide edition changes.
+[manifest](../crates/yetlet/Cargo.toml). Defaults remain empty. YT-293 retires
+the staging companion; SDK publication retains only yetlet and yetlet-browser,
+with no package version or published guide edition change.
 
 ## One authority and explicit ownership
 

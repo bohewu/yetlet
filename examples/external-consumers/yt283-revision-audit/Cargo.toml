@@ -8,11 +8,18 @@ publish = false
 
 [features]
 default = []
-three-way = ["yetlet/web", "dep:yetlet-hosts", "dep:axum", "dep:winit"]
+three-way = [
+    "yetlet/web",
+    "yetlet/command-bridge",
+    "yetlet/udp",
+    "yetlet/native-winit",
+    "yetlet/renderer-wgpu",
+    "dep:axum",
+    "dep:winit",
+]
 
 [dependencies]
-yetlet = { path = "../../../crates/yetlet", default-features = false }
-yetlet-hosts = { path = "../../../crates/yetlet-hosts", default-features = false, features = ["web-axum", "udp", "native-winit", "renderer-wgpu"], optional = true }
+yetlet = { version = "0.9.0-alpha.8", path = "../../../crates/yetlet", default-features = false }
 axum = { version = "=0.8.9", optional = true }
 winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }
 

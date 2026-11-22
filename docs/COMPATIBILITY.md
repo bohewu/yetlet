@@ -160,8 +160,8 @@ This is an intentional next-alpha source break. Path consumers that previously
 relied on implicit View/HTML must request their capability; HTML users can
 select html explicitly on both old and new source. The new view feature is not
 part of published alpha.8, so registry-pinned consumers keep their original
-contract. Normal package/archive, old-CLI/new-SDK selection and publication
-qualification retain their later gates.
+contract. The current source CLI uses the SDK's declared feature profile;
+normal selected archives and publication qualification retain their later gates.
 
 ### Current checkout — Web and HTTP protocol ownership
 
@@ -202,18 +202,19 @@ compatibility aliases are introduced.
 
 The `web` and `actions-http` features and their new module paths are not part
 of published alpha.8. Registry-pinned consumers and its startup examples retain
-their original contract. CLI template and SDK-selection migration belongs to
-YT-293; normal package/archive and publication qualification retain their
-later gates.
+their original contract. [YT-293](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection)
+adds current CLI template and SDK-selection support; normal selected archives and
+publication qualification retain their later gates.
 
 ### Current checkout — optional Native, UDP and renderer
 
 [YT-292](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration)
 provides `command-bridge`, `udp`, `native-winit` and `renderer-wgpu` in yetlet,
 with canonical snake_case module paths and an unchanged empty default.
-The unpublished yetlet-hosts modules temporarily re-export these implementations
-for remaining source consumers. New consumers select yetlet features directly;
-this forwarding stage is not a published compatibility package or permanent alias.
+YT-293 removes the temporary yetlet-hosts forwarding package after migrating
+its remaining examples, HTTP tests and external source consumers. Select the
+capabilities directly on yetlet and import the matching modules; no companion
+package or compatibility alias remains. SDK publication retains two packages.
 
 NativeHost owns one caller-thread loop and adds windows through with_window.
 Known duplicate loop/driver claims reject before acquisition. Winit still owns
@@ -221,8 +222,40 @@ process-wide and platform entry-thread restrictions; an exited loop is not
 recreatable. Managed Native/UDP reject Async drive before acquiring resources.
 A driver returning before final release retains owners and reports incomplete
 shutdown. Renderer selection remains independent of Winit/Web/View, and backend
-runtime evidence is narrower than feature availability. Published alpha.8,
-CLI templates and the pinned reader retain their existing contracts.
+runtime evidence is narrower than feature availability. Published alpha.8 and
+the pinned reader retain their existing contracts; the current CLI chooses
+its generated API from the selected SDK capability metadata.
+
+### Current checkout — CLI and selected SDK
+
+The source CLI chooses an internal API profile from the selected core SDK's
+feature metadata. Declaring web or view selects the new profile before validation.
+Native SSR explicitly requests web+html, adding config for Settings/Vite; Browser
+explicitly requests view+reactive and the companion's DOM/keyed-DOM capabilities.
+Incomplete new metadata cannot fall back to the legacy profile or an older SDK.
+No release schema, SDK version or CLI version changes in this source slice.
+
+| CLI and selected feature map | Bounded observed behavior |
+|---|---|
+| Preserved CLI 0.4.1, new Native map | Rejects the selected SDK with SDK_INCOMPATIBLE because server-axum is missing; no lock generation or published destination |
+| Preserved CLI 0.4.1, new Browser map | Accepts the metadata and emits the old Browser template; its actual output compiles for wasm32-unknown-unknown against current source because companion DOM/keyed-DOM selects View |
+| Current source CLI, new Native/Browser map | Emits canonical feature opt-ins/imports; both actual command outputs compile against current source |
+| Current source CLI, legacy map | Retains the established template and checksum-bound startup behavior |
+
+The executable experiment uses source-derived metadata labeled synthetic 0.10.0,
+not a selected release. It captures generated files at an intentionally failed
+lock step, then separately compiles copies with only SDK dependency source fields
+changed to the checkout. It fabricates no app lock or creation receipt. Actual
+normal archive consumption and successful registry creation remain YT-294 gates;
+Browser compilation is not a browser runtime result.
+
+The immutable old Native diagnostic lacks explicit upgrade/pin wording. Existing
+installed users can use `yetlet new my-app --template native --sdk-version 0.9.0-alpha.8`.
+Next-SDK publication must identify and qualify a CLI release containing the new
+profile support, provide that upgrade/pin guidance, and avoid claiming old Native
+CLI compatibility. This slice selects neither release nor reader promotion.
+See the [CLI guide](CLI-GUIDE.md#source-only-feature-module-profiles) and
+[migration evidence](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection).
 
 ## Historical two-package pre-publication source — 2026-10-30
 

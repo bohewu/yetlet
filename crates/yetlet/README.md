@@ -1,10 +1,12 @@
 # Yetlet
 
-A small, composable Rust application framework with built-in Core lifetimes
-and explicitly selected View, HTML, Web and auxiliary capabilities in this checkout.
-Published SDK `0.9.0-alpha.8` retains its original feature contract; see
-[GitHub releases](https://github.com/bohewu/yetlet/releases) for published artifacts.
-Earlier tags retain their package layout and qualification evidence. The source
+A small, composable Rust application framework. The current manifest selects version
+`0.9.0-alpha.8`. See [GitHub releases](https://github.com/bohewu/yetlet/releases)
+for published artifacts.
+
+This checkout has built-in Core lifetimes and explicitly selected View, HTML, Web,
+Native, UDP, renderer and auxiliary capabilities. Published artifacts retain their
+original feature contracts, package layouts and qualification evidence. The source
 feature changes below do not change the contents of a published artifact.
 
 ## Minimal integration
@@ -37,6 +39,32 @@ and binding APIs, or `html` for serialization; `html` enables `view`. Core-only
 omits View, and View/HTML add no external normal dependencies or HTTP runtime.
 Browser integrations are separately owned by
 [yetlet-browser](https://github.com/bohewu/yetlet/blob/master/crates/yetlet-browser/README.md), whose DOM features enable the same View type.
+
+## Core and managed Hosts in this checkout
+
+For Core lifetimes alone, use the same source revision without a capability:
+
+```toml
+[dependencies]
+yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.8", default-features = false }
+```
+
+`HostGroup` coordinates startup, observed readiness, admission, original
+completion and final resource release. Ordinary code adds Hosts with
+`HostGroup::new().with_host(...)`; `ResourceGroup` customizes owned or borrowed
+resources. No default runtime, pool, process or universal state owner is created.
+
+Enable `web` for an HTTP `App` or `WebHost`; add `html` for page helpers.
+`App::into_host()` joins the shared lifecycle. Enable `native-winit` for one
+root event loop with multiple windows, `udp` for bounded caller-driven datagrams,
+`command-bridge` for bounded commands/snapshots, or `renderer-wgpu` independently
+for native GPU rendering. Feature selection exposes APIs; the application must
+still select a compatible driver and explicitly drive managed shutdown.
+
+See the [mixed Host consumer](https://github.com/bohewu/yetlet/blob/master/examples/external-consumers/native-hosts/README.md)
+and [lifecycle contract](https://github.com/bohewu/yetlet/blob/master/docs/M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md).
+These checkout APIs do not imply that the identically versioned registry archive
+contains the new feature map.
 
 ## Typed Tag Builder API
 
@@ -78,6 +106,10 @@ the current checkout uses `web` without an old-path compatibility alias.
 | Portable HTTP action errors/envelopes | `actions-http` (enables `actions` and serde) | [Actions](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/actions.md) |
 | Local reactive graph | `reactive` | [Reactive](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/reactive.md) |
 | Native HTTP/Router/Tower integration | `web`; add `html` for SSR | [Server](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/server-axum.md) |
+| Native windows and root event loop | `native-winit` | [Mixed Hosts](https://github.com/bohewu/yetlet/blob/master/examples/external-consumers/native-hosts/README.md) |
+| Caller-driven datagrams | `udp` | [Mixed Hosts](https://github.com/bohewu/yetlet/blob/master/examples/external-consumers/native-hosts/README.md) |
+| Bounded commands and snapshots | `command-bridge` | [Lifecycle](https://github.com/bohewu/yetlet/blob/master/docs/M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md) |
+| Independent native GPU renderer | `renderer-wgpu` | [Renderer](https://github.com/bohewu/yetlet/blob/master/docs/M28-F2-WGPU-RENDERER.md) |
 | Request correlation | `request-id` | [Request ID](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/request-id.md) |
 | Memory Session | `session` | [Session](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/session.md) |
 | Authentication / Memory bridge | `auth` / `auth-session` | [Auth](https://github.com/bohewu/yetlet/blob/master/crates/yetlet/guides/auth.md) |

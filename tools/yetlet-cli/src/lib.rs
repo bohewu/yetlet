@@ -15,6 +15,7 @@ mod k8s;
 pub mod key;
 mod platform;
 pub mod scaffold;
+mod sdk_api;
 mod sdk_registry;
 mod sdk_version;
 mod settings;

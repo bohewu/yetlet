@@ -1,4 +1,8 @@
-#![cfg(feature = "web-axum")]
+#![cfg(all(
+    feature = "web",
+    feature = "command-bridge",
+    not(target_arch = "wasm32")
+))]
 
 use std::{
     cell::Cell,
@@ -20,9 +24,9 @@ use axum::{
     routing::{get, post},
 };
 use tokio::sync::Notify;
+use yetlet::command_bridge::{AdmissionError, CommandBridge, CommandIngress, SnapshotReader};
 use yetlet::composition::{Builder, Completion, JoinStatus, WorkerCompletion};
 use yetlet::web::HttpWorker;
-use yetlet_hosts::web_axum::{AdmissionError, CommandBridge, CommandIngress, SnapshotReader};
 
 const BUDGET: Duration = Duration::from_secs(4);
 
