@@ -18,8 +18,12 @@ use std::{
 
 mod driver;
 mod resources;
-pub use driver::{BuiltHostGroup, HostRunError, HostRunMode, ShutdownHandle, StartStatus};
-pub use resources::{Managed, ManagedResource, ResourcePlan, Retained};
+pub use driver::{
+    BlockingDriver, BuiltHostGroup, HostRunError, HostRunMode, NoDriver, ShutdownHandle,
+    StartStatus,
+};
+use driver::{DriverList, DriverPlan};
+pub use resources::{Driven, Managed, ManagedResource, ResourcePlan, Retained};
 
 /// A custom or built-in Host is an inert description of one activity and its
 /// dependencies. Conversion and validation must not acquire external resources.
@@ -159,6 +163,7 @@ impl ExclusiveClaim {
 pub enum HostOperation {
     Validate,
     PrepareDriver,
+    Drive,
     Acquire,
     Start,
     Readiness,
@@ -229,6 +234,10 @@ impl<E: Error + 'static> Error for HostFailure<E> {
 #[derive(Debug)]
 pub enum HostBuildError<E> {
     InvalidHost(HostFailure<E>),
+    MultipleBlockingDrivers {
+        first: &'static str,
+        second: &'static str,
+    },
     ConflictingClaim {
         first: &'static str,
         second: &'static str,
@@ -240,6 +249,12 @@ impl<E: fmt::Display> fmt::Display for HostBuildError<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidHost(error) => fmt::Display::fmt(error, f),
+            Self::MultipleBlockingDrivers { first, second } => {
+                write!(
+                    f,
+                    "{first} and {second} both select a blocking group driver"
+                )
+            }
             Self::ConflictingClaim {
                 first,
                 second,
@@ -259,7 +274,7 @@ impl<E: Error + 'static> Error for HostBuildError<E> {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             Self::InvalidHost(error) => Some(error),
-            Self::ConflictingClaim { .. } => None,
+            Self::ConflictingClaim { .. } | Self::MultipleBlockingDrivers { .. } => None,
         }
     }
 }
@@ -289,11 +304,29 @@ impl<A, D> ResourceGroup<A, D> {
     ///
     /// Custom Hosts can wrap an adapter to map its errors into their common
     /// application error. Existing managed descriptors must still use the new
-    /// activity's error type; this method does not transform resource errors.
+    /// activity's error type; this method does not transform resource or driver errors.
     pub fn map_activity<B: HostActivity>(self, map: impl FnOnce(A) -> B) -> ResourceGroup<B, D> {
         ResourceGroup {
             activity: map(self.activity),
             resources: self.resources,
+        }
+    }
+
+    /// Select one inert, typed caller-thread driver for the entire Host group.
+    /// Dependency additions and map_activity preserve this selection. The group
+    /// rejects multiple selected drivers before any acquisition.
+    pub fn with_blocking_driver<B>(self, driver: B) -> ResourceGroup<A, Driven<B, D>>
+    where
+        A: HostActivity,
+        D: ResourcePlan<A::Error, Driver = NoDriver>,
+        B: BlockingDriver<A::Error>,
+    {
+        ResourceGroup {
+            activity: self.activity,
+            resources: Driven {
+                driver,
+                previous: self.resources,
+            },
         }
     }
 
@@ -382,11 +415,19 @@ impl<E, H: HostList<E>> HostGroup<E, H> {
     /// Validate the complete plan, then install descriptors in the shared engine.
     /// Build errors have no acquired obligations to dispose. Ordinary supplied
     /// RAII values still follow their normal destruction/lifetime rules.
-    pub fn build(self) -> Result<BuiltHostGroup<E, H::Parts>, HostBuildError<E>> {
+    pub fn build(self) -> Result<BuiltHostGroup<E, H::Parts, H::Drivers>, HostBuildError<E>> {
         self.hosts.validate(&mut Vec::new())?;
+        let (builder, drivers) = self.hosts.into_builder();
+        let mut names = Vec::new();
+        drivers.names(&mut names);
+        if let [first, second, ..] = names.as_slice() {
+            return Err(HostBuildError::MultipleBlockingDrivers { first, second });
+        }
         Ok(BuiltHostGroup::new(
-            self.hosts.into_builder().build(),
+            builder.build(),
             self.shutdown,
+            drivers,
+            names.first().copied(),
         ))
     }
 }
@@ -416,16 +457,18 @@ pub struct HostListNode<P, H> {
 #[doc(hidden)]
 pub trait HostList<E>: sealed::List {
     type Parts: HostParts<E> + ResourceParts<HostFailure<E>>;
+    type Drivers: DriverPlan<E>;
     fn validate(
         &self,
         claims: &mut Vec<(&'static str, ExclusiveClaim)>,
     ) -> Result<(), HostBuildError<E>>;
-    fn into_builder(self) -> Builder<HostFailure<E>, Self::Parts>;
+    fn into_builder(self) -> (Builder<HostFailure<E>, Self::Parts>, Self::Drivers);
 }
 
 impl sealed::List for Empty {}
 impl<E> HostList<E> for Empty {
     type Parts = Empty;
+    type Drivers = NoDriver;
 
     fn validate(
         &self,
@@ -434,14 +477,15 @@ impl<E> HostList<E> for Empty {
         Ok(())
     }
 
-    fn into_builder(self) -> Builder<HostFailure<E>> {
-        Builder::new()
+    fn into_builder(self) -> (Builder<HostFailure<E>>, NoDriver) {
+        (Builder::new(), NoDriver)
     }
 }
 
 impl<P, H> sealed::List for HostListNode<P, H> {}
 impl<E, P: HostList<E>, H: Host<Error = E>> HostList<E> for HostListNode<P, H> {
     type Parts = Attached<P::Parts, Hosted<H::Activity, H::Resources>>;
+    type Drivers = DriverList<P::Drivers, <H::Resources as ResourcePlan<E>>::Driver>;
 
     fn validate(
         &self,
@@ -465,14 +509,15 @@ impl<E, P: HostList<E>, H: Host<Error = E>> HostList<E> for HostListNode<P, H> {
         Ok(())
     }
 
-    fn into_builder(self) -> Builder<HostFailure<E>, Self::Parts> {
-        let previous = self.previous.into_builder();
+    fn into_builder(self) -> (Builder<HostFailure<E>, Self::Parts>, Self::Drivers) {
+        let (previous, drivers) = self.previous.into_builder();
         let name = self.host.name();
         let ResourceGroup {
             activity,
             resources,
         } = self.host.into_resources();
-        let parts = resources.into_builder(name).with_polled_activity(
+        let (parts, driver) = resources.into_builder(name);
+        let parts = parts.with_polled_activity(
             name,
             ActivitySlot {
                 activity: Some(activity),
@@ -494,10 +539,16 @@ impl<E, P: HostList<E>, H: Host<Error = E>> HostList<E> for HostListNode<P, H> {
             .build()
             .parts
             .last;
-        previous.push(Hosted {
-            group,
-            resources: PhantomData,
-        })
+        (
+            previous.push(Hosted {
+                group,
+                resources: PhantomData,
+            }),
+            DriverList {
+                previous: drivers,
+                last: driver,
+            },
+        )
     }
 }
 

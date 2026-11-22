@@ -13,9 +13,9 @@ use std::{
     time::{Duration, Instant},
 };
 use yetlet::composition::{
-    AdmissionOutcome, ExclusiveClaim, HostActivity, HostBuildError, HostOperation, HostRunError,
-    HostRunMode, JoinStatus, ManagedResource, Phase, ReleaseCompletion, ReleaseStatus,
-    ResourcePlan, ShutdownHandle, StartStatus, WorkerCompletion,
+    AdmissionOutcome, BlockingDriver, ExclusiveClaim, HostActivity, HostBuildError, HostOperation,
+    HostRunError, HostRunMode, JoinStatus, ManagedResource, Phase, ReleaseCompletion,
+    ReleaseStatus, ResourcePlan, ShutdownHandle, StartStatus, WorkerCompletion,
 };
 use yetlet::{Host, HostGroup, ResourceGroup};
 
@@ -1208,4 +1208,581 @@ fn map_activity_preserves_resources_and_accepts_a_local_common_error() {
         .position(|event| *event == ("passive", "drop"))
         .unwrap();
     assert!(release < passive_drop);
+}
+
+#[derive(Clone, Default)]
+struct DriverProbe {
+    calls: Rc<Cell<usize>>,
+    dropped: Rc<Cell<bool>>,
+    inside_driver: Rc<Cell<bool>>,
+}
+
+enum DriverExit {
+    Early(Option<DomainError>),
+    StoppingEarly(Option<DomainError>),
+    Complete(Option<DomainError>),
+}
+
+struct CallbackDriver {
+    preparations: Vec<Controls>,
+    exits: std::collections::VecDeque<DriverExit>,
+    probe: DriverProbe,
+    log: Log,
+    caller: thread::ThreadId,
+}
+
+fn callback_driver(
+    preparations: Vec<Controls>,
+    exits: Vec<DriverExit>,
+    log: &Log,
+) -> (CallbackDriver, DriverProbe) {
+    let probe = DriverProbe::default();
+    (
+        CallbackDriver {
+            preparations,
+            exits: exits.into(),
+            probe: probe.clone(),
+            log: log.clone(),
+            caller: thread::current().id(),
+        },
+        probe,
+    )
+}
+
+impl Drop for CallbackDriver {
+    fn drop(&mut self) {
+        self.probe.dropped.set(true);
+    }
+}
+
+impl BlockingDriver<DomainError> for CallbackDriver {
+    fn run(
+        &mut self,
+        shutdown: &ShutdownHandle,
+        progress: &mut dyn FnMut(&mut Context<'_>) -> Poll<()>,
+    ) -> Result<(), DomainError> {
+        assert_eq!(thread::current().id(), self.caller);
+        for control in &self.preparations {
+            assert_eq!(*control.prepared.borrow(), [HostRunMode::Blocking]);
+        }
+        self.probe.calls.set(self.probe.calls.get() + 1);
+        self.log.borrow_mut().push(("driver", "enter"));
+        self.probe.inside_driver.set(true);
+        let (_, waker) = wake_context();
+        let mut cx = Context::from_waker(&waker);
+        let first = progress(&mut cx);
+        let result = match self
+            .exits
+            .pop_front()
+            .expect("unexpected replacement drive")
+        {
+            DriverExit::Early(error) => {
+                assert!(first.is_pending());
+                error.map_or(Ok(()), Err)
+            }
+            DriverExit::StoppingEarly(error) => {
+                assert!(first.is_pending());
+                shutdown.request_shutdown();
+                assert!(progress(&mut cx).is_pending());
+                error.map_or(Ok(()), Err)
+            }
+            DriverExit::Complete(error) => {
+                if first.is_pending() {
+                    shutdown.request_shutdown();
+                    assert!(progress(&mut cx).is_ready());
+                }
+                error.map_or(Ok(()), Err)
+            }
+        };
+        self.probe.inside_driver.set(false);
+        self.log.borrow_mut().push(("driver", "return"));
+        result
+    }
+}
+
+struct AffineDependency {
+    dependency: Dependency,
+    inside_driver: Rc<Cell<bool>>,
+}
+
+impl ManagedResource for AffineDependency {
+    type Error = DomainError;
+
+    fn prepare_driver(&mut self, mode: HostRunMode) -> Result<(), DomainError> {
+        self.dependency.prepare_driver(mode)
+    }
+
+    fn poll_acquire(&mut self, cx: &mut Context<'_>) -> Poll<Result<(), DomainError>> {
+        assert!(
+            self.inside_driver.get(),
+            "acquisition outside retained driver"
+        );
+        self.dependency.poll_acquire(cx)
+    }
+
+    fn poll_release(
+        &mut self,
+        cx: &mut Context<'_>,
+        budget: Duration,
+    ) -> Result<ReleaseCompletion<DomainError>, DomainError> {
+        assert!(self.inside_driver.get(), "release outside retained driver");
+        self.dependency.poll_release(cx, budget)
+    }
+}
+
+#[test]
+fn typed_driver_prepares_whole_plan_and_survives_resource_and_activity_mapping() {
+    let log = Log::default();
+    let a = Controls::new("a", &log);
+    let b = Controls::new("b", &log);
+    let ra = Controls::new("ra", &log);
+    let rb = Controls::new("rb", &log);
+    let (driver, probe) = callback_driver(
+        vec![ra.clone(), a.clone(), rb.clone(), b.clone()],
+        vec![DriverExit::Complete(None)],
+        &log,
+    );
+    let resources = ResourceGroup::new(a.activity())
+        .with_blocking_driver(driver)
+        .with_resource(Lease {
+            name: "passive",
+            log: log.clone(),
+        })
+        .with_managed_resource("ra", ra.resource())
+        .map_activity(std::convert::identity);
+    let mut hosts = HostGroup::new()
+        .with_host(host("a", resources))
+        .with_host(host(
+            "b",
+            ResourceGroup::new(b.activity()).with_managed_resource("rb", rb.resource()),
+        ))
+        .build()
+        .unwrap();
+    assert!(log.borrow().is_empty());
+    assert!(hosts.run().is_ok());
+    assert_eq!(hosts.phase(), Phase::Stopped);
+    assert_eq!(probe.calls.get(), 1);
+    assert!(!probe.dropped.get());
+    for control in [&a, &b, &ra, &rb] {
+        assert_eq!(control.count("prepare"), 1);
+        assert_eq!(control.count("release"), 1);
+        assert_eq!(control.count("drop"), 1);
+    }
+    let events = log.borrow();
+    assert_eq!(events[4], ("driver", "enter"));
+    assert_eq!(events[5], ("ra", "acquire"));
+    assert_eq!(events.last(), Some(&("driver", "return")));
+    drop(events);
+    drop(hosts);
+    assert!(probe.dropped.get());
+}
+
+#[test]
+fn typed_driver_never_enters_when_later_preparation_rejects() {
+    let log = Log::default();
+    let a = Controls::new("a", &log);
+    let b = Controls::new("b", &log);
+    let ra = Controls::new("ra", &log);
+    let failure = error("later placement rejected");
+    let identity = failure.identity.clone();
+    let mut activity = b.activity();
+    activity.prepare_error = Some(failure);
+    let (driver, probe) = callback_driver(vec![], vec![], &log);
+    let mut hosts = HostGroup::new()
+        .with_host(host(
+            "a",
+            ResourceGroup::new(a.activity())
+                .with_managed_resource("ra", ra.resource())
+                .with_blocking_driver(driver),
+        ))
+        .with_host(host("b", ResourceGroup::new(activity)))
+        .build()
+        .unwrap();
+    match hosts.run() {
+        Err(HostRunError::HostFailure(failure)) => {
+            assert_eq!(failure.operation, HostOperation::PrepareDriver);
+            assert!(Rc::ptr_eq(&identity, &failure.error().identity));
+        }
+        result => panic!("expected preparation failure, got {result:?}"),
+    }
+    assert_eq!(hosts.phase(), Phase::Failed);
+    assert_eq!(probe.calls.get(), 0);
+    assert!(!probe.dropped.get());
+    assert_eq!(a.count("start") + b.count("start") + ra.count("acquire"), 0);
+    assert_eq!(
+        a.count("release") + b.count("release") + ra.count("release"),
+        0
+    );
+}
+
+#[test]
+fn actual_duplicate_blocking_drivers_reject_before_any_acquisition() {
+    let log = Log::default();
+    let a = Controls::new("a", &log);
+    let b = Controls::new("b", &log);
+    let (first, first_probe) = callback_driver(vec![], vec![], &log);
+    let (second, second_probe) = callback_driver(vec![], vec![], &log);
+    let result = HostGroup::new()
+        .with_host(host(
+            "a",
+            ResourceGroup::new(a.activity()).with_blocking_driver(first),
+        ))
+        .with_host(host(
+            "b",
+            ResourceGroup::new(b.activity()).with_blocking_driver(second),
+        ))
+        .build();
+    assert!(matches!(
+        result,
+        Err(HostBuildError::MultipleBlockingDrivers {
+            first: "a",
+            second: "b",
+        })
+    ));
+    assert!(log.borrow().is_empty());
+    assert_eq!(first_probe.calls.get() + second_probe.calls.get(), 0);
+    assert!(first_probe.dropped.get() && second_probe.dropped.get());
+}
+
+#[test]
+fn early_driver_ok_or_error_retains_owners_without_outside_cleanup_and_resumes_same_driver() {
+    for with_error in [false, true] {
+        let log = Log::default();
+        let a = Controls::new("a", &log);
+        let r = Controls::new("resource", &log);
+        let failure = with_error.then(|| error("early backend return"));
+        let identity = failure.as_ref().map(|failure| failure.identity.clone());
+        let (driver, probe) = callback_driver(
+            vec![r.clone(), a.clone()],
+            vec![DriverExit::Early(failure), DriverExit::Complete(None)],
+            &log,
+        );
+        let mut hosts = HostGroup::new()
+            .with_host(host(
+                "a",
+                ResourceGroup::new(a.activity())
+                    .with_managed_resource("resource", r.resource())
+                    .with_blocking_driver(driver),
+            ))
+            .build()
+            .unwrap();
+        assert!(matches!(
+            hosts.run(),
+            Err(HostRunError::DriverReturnedEarly { host: "a" })
+        ));
+        assert_eq!(hosts.phase(), Phase::Stopping);
+        assert!(hosts.shutdown_handle().is_requested());
+        assert_eq!(probe.calls.get(), 1);
+        assert!(!probe.dropped.get());
+        for operation in ["close", "signal", "observe", "release", "drop"] {
+            assert_eq!(a.count(operation), 0);
+        }
+        assert_eq!(r.count("release") + r.count("drop"), 0);
+        if let Some(identity) = &identity {
+            let failure = hosts.failures().primary().unwrap();
+            assert_eq!(failure.operation, HostOperation::Drive);
+            assert!(Rc::ptr_eq(identity, &failure.error().identity));
+        } else {
+            assert!(hosts.failures().primary().is_none());
+        }
+        let frozen_callbacks = log.borrow().clone();
+        let (_, waker) = wake_context();
+        let mut cx = Context::from_waker(&waker);
+        assert!(hosts.poll_start(&mut cx).is_pending());
+        assert!(hosts.poll_run(&mut cx).is_pending());
+        assert!(hosts.poll_shutdown(&mut cx, Instant::now()).is_pending());
+        assert_eq!(
+            hosts.shutdown_until(Instant::now()),
+            yetlet::composition::Completion::Pending
+        );
+        hosts.request_shutdown();
+        {
+            let mut drive = Box::pin(hosts.run_async());
+            assert!(drive.as_mut().poll(&mut cx).is_pending());
+        }
+        assert_eq!(*log.borrow(), frozen_callbacks);
+        assert_eq!(hosts.phase(), Phase::Stopping);
+        assert_eq!(probe.calls.get(), 1);
+        assert!(!probe.dropped.get());
+        let resumed = hosts.run();
+        if with_error {
+            assert!(matches!(resumed, Err(HostRunError::HostFailure(_))));
+            assert_eq!(hosts.phase(), Phase::Failed);
+        } else {
+            assert!(resumed.is_ok());
+            assert_eq!(hosts.phase(), Phase::Stopped);
+        }
+        assert_eq!(probe.calls.get(), 2);
+        assert_eq!(a.count("prepare") + r.count("prepare"), 2);
+        assert_eq!(a.count("start") + r.count("acquire"), 2);
+        assert_eq!(a.count("joined"), 1);
+        assert_eq!(a.count("release") + r.count("release"), 2);
+        assert!(!probe.dropped.get());
+    }
+}
+
+#[test]
+fn pending_affine_release_cannot_progress_through_public_polling_after_driver_return() {
+    for with_error in [false, true] {
+        let log = Log::default();
+        let a = Controls::new("a", &log);
+        let r = Controls::new("resource", &log);
+        r.release.close();
+        let failure = with_error.then(|| error("backend returned with release pending"));
+        let identity = failure.as_ref().map(|failure| failure.identity.clone());
+        let (driver, probe) = callback_driver(
+            vec![r.clone(), a.clone()],
+            vec![
+                DriverExit::StoppingEarly(failure),
+                DriverExit::Complete(None),
+            ],
+            &log,
+        );
+        let resource = AffineDependency {
+            dependency: r.resource(),
+            inside_driver: probe.inside_driver.clone(),
+        };
+        let mut hosts = HostGroup::new()
+            .with_host(host(
+                "a",
+                ResourceGroup::new(a.activity())
+                    .with_managed_resource("resource", resource)
+                    .with_blocking_driver(driver),
+            ))
+            .build()
+            .unwrap();
+        assert!(matches!(
+            hosts.run(),
+            Err(HostRunError::DriverReturnedEarly { host: "a" })
+        ));
+        assert_eq!(hosts.phase(), Phase::Stopping);
+        assert_eq!(a.count("joined"), 1);
+        assert_eq!(a.count("release"), 1);
+        assert_eq!(a.count("drop"), 1);
+        assert_eq!(r.count("release"), 1);
+        assert_eq!(r.count("drop"), 0);
+        assert!(!probe.inside_driver.get());
+
+        // The finalizer can now finish, but only inside its retained driver.
+        r.release.open();
+        let frozen_callbacks = log.borrow().clone();
+        let (_, waker) = wake_context();
+        let mut cx = Context::from_waker(&waker);
+        assert!(hosts.poll_start(&mut cx).is_pending());
+        assert!(hosts.poll_run(&mut cx).is_pending());
+        assert!(hosts.poll_shutdown(&mut cx, Instant::now()).is_pending());
+        assert_eq!(
+            hosts.shutdown_until(Instant::now()),
+            yetlet::composition::Completion::Pending
+        );
+        hosts.request_shutdown();
+        {
+            let mut drive = Box::pin(hosts.run_async());
+            assert!(drive.as_mut().poll(&mut cx).is_pending());
+        }
+        assert_eq!(*log.borrow(), frozen_callbacks);
+        assert_eq!(hosts.phase(), Phase::Stopping);
+        assert_eq!(probe.calls.get(), 1);
+        assert!(!probe.dropped.get());
+        assert_eq!(r.count("drop"), 0);
+        if let Some(identity) = &identity {
+            let failure = hosts.failures().primary().unwrap();
+            assert_eq!(failure.operation, HostOperation::Drive);
+            assert!(Rc::ptr_eq(identity, &failure.error().identity));
+        } else {
+            assert!(hosts.failures().primary().is_none());
+        }
+
+        let resumed = hosts.run();
+        if with_error {
+            assert!(matches!(resumed, Err(HostRunError::HostFailure(_))));
+            assert_eq!(hosts.phase(), Phase::Failed);
+            let failure = hosts.failures().primary().unwrap();
+            assert!(Rc::ptr_eq(
+                identity.as_ref().unwrap(),
+                &failure.error().identity
+            ));
+        } else {
+            assert!(resumed.is_ok());
+            assert_eq!(hosts.phase(), Phase::Stopped);
+        }
+        assert_eq!(probe.calls.get(), 2);
+        assert_eq!(a.count("prepare") + r.count("prepare"), 2);
+        assert_eq!(a.count("start") + r.count("acquire"), 2);
+        assert_eq!(a.count("joined"), 1);
+        assert_eq!(r.count("release"), 2);
+        assert_eq!(r.count("drop"), 1);
+        assert!(!probe.dropped.get());
+    }
+}
+
+#[test]
+fn late_driver_error_survives_terminal_activity_release_and_keeps_failure_order() {
+    for earlier_failure in [false, true] {
+        let log = Log::default();
+        let a = Controls::new("a", &log);
+        let mut activity = a.activity();
+        if earlier_failure {
+            activity.join_error = Some(error("original activity failure"));
+        }
+        let failure = error("late backend failure");
+        let identity = failure.identity.clone();
+        let (driver, probe) = callback_driver(
+            vec![a.clone()],
+            vec![DriverExit::Complete(Some(failure))],
+            &log,
+        );
+        let mut hosts = HostGroup::new()
+            .with_host(host(
+                "a",
+                ResourceGroup::new(activity).with_blocking_driver(driver),
+            ))
+            .build()
+            .unwrap();
+        assert!(matches!(hosts.run(), Err(HostRunError::HostFailure(_))));
+        assert_eq!(hosts.phase(), Phase::Failed);
+        assert_eq!(a.count("joined"), 1);
+        assert_eq!(a.count("drop"), 1);
+        assert_eq!(hosts.outcomes()[0].release, ReleaseStatus::Succeeded);
+        let failure = if earlier_failure {
+            assert_eq!(
+                hosts.failures().primary().unwrap().operation,
+                HostOperation::Join
+            );
+            &hosts.failures().secondary()[0]
+        } else {
+            hosts.failures().primary().unwrap()
+        };
+        assert_eq!(failure.operation, HostOperation::Drive);
+        assert!(Rc::ptr_eq(&identity, &failure.error().identity));
+        assert!(!probe.dropped.get());
+        assert!(matches!(hosts.run(), Err(HostRunError::HostFailure(_))));
+        assert_eq!(probe.calls.get(), 1);
+    }
+}
+
+#[test]
+fn driver_shutdown_interrupts_later_pending_acquisition_before_activity_start() {
+    let log = Log::default();
+    let a = Controls::new("a", &log);
+    let b = Controls::new("b", &log);
+    let pending = Controls::new("pending", &log);
+    pending.start.close();
+    let (driver, probe) = callback_driver(
+        vec![a.clone(), pending.clone(), b.clone()],
+        vec![DriverExit::Complete(None)],
+        &log,
+    );
+    let mut hosts = HostGroup::new()
+        .with_host(host(
+            "a",
+            ResourceGroup::new(a.activity()).with_blocking_driver(driver),
+        ))
+        .with_host(host(
+            "b",
+            ResourceGroup::new(b.activity()).with_managed_resource("pending", pending.resource()),
+        ))
+        .build()
+        .unwrap();
+    assert!(hosts.run().is_ok());
+    assert_eq!(hosts.phase(), Phase::Stopped);
+    assert_eq!(probe.calls.get(), 1);
+    assert_eq!(a.count("start"), 1);
+    assert_eq!(b.count("start"), 0);
+    assert_eq!(pending.count("acquire"), 1);
+    assert_eq!(pending.count("release"), 1);
+    assert_eq!(a.count("joined"), 1);
+}
+
+#[derive(Debug)]
+struct BorrowedDriveError<'a> {
+    message: &'a str,
+    identity: Rc<()>,
+}
+
+struct BorrowedDriver<'a> {
+    message: &'a str,
+    identity: Rc<()>,
+    calls: &'a Cell<usize>,
+}
+
+impl<'a> BlockingDriver<BorrowedDriveError<'a>> for BorrowedDriver<'a> {
+    fn run(
+        &mut self,
+        shutdown: &ShutdownHandle,
+        progress: &mut dyn FnMut(&mut Context<'_>) -> Poll<()>,
+    ) -> Result<(), BorrowedDriveError<'a>> {
+        self.calls.set(self.calls.get() + 1);
+        let (_, waker) = wake_context();
+        let mut cx = Context::from_waker(&waker);
+        assert!(progress(&mut cx).is_pending());
+        shutdown.request_shutdown();
+        assert!(progress(&mut cx).is_ready());
+        Err(BorrowedDriveError {
+            message: self.message,
+            identity: self.identity.clone(),
+        })
+    }
+}
+
+struct BareActivity<E>(std::marker::PhantomData<fn() -> E>);
+
+impl<E> HostActivity for BareActivity<E> {
+    type Error = E;
+    fn poll_start(&mut self, _: &mut Context<'_>) -> Poll<Result<(), E>> {
+        Poll::Ready(Ok(()))
+    }
+    fn poll_ready(&mut self, _: &mut Context<'_>) -> Poll<Result<(), E>> {
+        Poll::Ready(Ok(()))
+    }
+    fn request_shutdown(&mut self, _: &mut Context<'_>) -> Result<(), E> {
+        Ok(())
+    }
+    fn poll_join(&mut self, _: &mut Context<'_>, _: Duration) -> Result<WorkerCompletion<E>, E> {
+        Ok(WorkerCompletion::Joined(Ok(())))
+    }
+}
+
+struct DriverHost<A, R>(ResourceGroup<A, R>);
+
+impl<A: HostActivity, R: ResourcePlan<A::Error>> Host for DriverHost<A, R> {
+    type Error = A::Error;
+    type Activity = A;
+    type Resources = R;
+    fn name(&self) -> &'static str {
+        "borrowed"
+    }
+    fn into_resources(self) -> ResourceGroup<A, R> {
+        self.0
+    }
+}
+
+#[test]
+fn selected_driver_and_original_error_may_borrow_and_remain_non_send() {
+    let message = String::from("borrowed backend error");
+    let identity = Rc::new(());
+    let calls = Cell::new(0);
+    let driver = BorrowedDriver {
+        message: &message,
+        identity: identity.clone(),
+        calls: &calls,
+    };
+    let mut hosts = HostGroup::new()
+        .with_host(DriverHost(
+            ResourceGroup::new(BareActivity(std::marker::PhantomData)).with_blocking_driver(driver),
+        ))
+        .build()
+        .unwrap();
+    match hosts.run() {
+        Err(HostRunError::HostFailure(failure)) => {
+            assert_eq!(failure.operation, HostOperation::Drive);
+            assert!(std::ptr::eq(failure.error().message, message.as_str()));
+            assert!(Rc::ptr_eq(&identity, &failure.error().identity));
+        }
+        result => panic!("expected original borrowed error, got {result:?}"),
+    }
+    assert_eq!(hosts.phase(), Phase::Failed);
+    assert_eq!(calls.get(), 1);
+    drop(hosts);
+    drop(message);
 }

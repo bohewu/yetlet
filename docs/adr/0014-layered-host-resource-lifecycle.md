@@ -264,6 +264,59 @@ Native/Network integration remains YT-292,
 general migration YT-293 and normal-archive qualification YT-294.
 Published alpha.8/CLI identities stay fixed.
 
+## YT-292 implementation checkpoint — optional native integrations
+
+The [Native/UDP integration](../M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration)
+moves command-bridge, udp, native-winit and renderer-wgpu into independent
+default-off yetlet features/modules. Core remains dependency-free by default.
+The unpublished companion temporarily forwards historical consumers; it is not
+an additional SDK release and has no reverse dependency from yetlet.
+
+A NativeHost owns one root Winit loop and may describe multiple windows.
+Native and UDP use the same Host/ResourceGroup lifecycle as Web and custom local
+Hosts. Typed BlockingDriver metadata preserves borrowed/non-Send values and the
+default Core auto traits; the entire plan prepares before driver entry, and
+known duplicate root drivers reject before acquisition. The supplied shutdown
+handle lets native close/suspend interrupt pending managed acquisition.
+
+The root driver outlives activity completion and dependency finalization.
+Native windows are acquired before later renderer resources and released after
+them. Readiness requires each window's actual usable redraw. Core retains the
+startup observation; later resize/occlusion is temporary unusability, not a
+permanent admission fence. Async driving of
+Native or managed std UDP rejects before acquisition; native callbacks and the
+ordinary blocking driver supply bounded UDP progress without adding a reactor,
+thread pool or process policy.
+
+Original driver errors remain observable even after terminal activity release.
+An early return retains unfinished owners and reports DriverReturnedEarly;
+cleanup is never silently moved out of the selected event environment. The
+same generic driver can resume if it supports that contract. Public polling,
+async driving and shutdown polling remain Pending while that selected Blocking
+driver owns unfinished callbacks; only the same driver's run can advance them.
+A consumed Winit
+loop cannot be recreated as recovery. Failure before its first progress callback
+can retire only inert descriptors on the same caller thread.
+
+The existing renderer implementation/shaders retain their behavior; command
+admission remains independent of HTTP/action execution. Focused verification
+passes: 135 tests, 17 doctests, nine independent feature graph/compile pairs,
+two intended disabled-import failures, strict quality checks and both consumer
+feature variants. One real X11 execution proves two ready windows, UDP echo,
+HTTP 200 and caller-local Pending resource release before window destruction;
+all four Host outcomes succeed and the process/windows are gone. No GPU present
+or Windows runtime proof is inferred from these checks. Original intermediate
+failures and their bounded corrections remain in the evidence directory.
+Configured independent R1 identified a manual-polling driver bypass, transient
+Native readiness misclassification and an existing Core consumer generic-signature
+regression. Narrow repairs, original-error/affine-finalizer regressions and the
+five-Host consumer's finite execution pass in the 12-step focused correction
+check. The earlier X11 run is retained without replay. Configured independent
+R2 wc_job_JOQWTmAmTSZNi--j reached terminal exit 0 with actual PASS,
+issues=[] and required_followups=[]; reviewed source/receipt hashes were
+unchanged. YT-292 is Done. General migration and normal archives remain
+YT-293/294.
+
 ## Context
 
 The owner requests layered exposure: ordinary developers create high-level

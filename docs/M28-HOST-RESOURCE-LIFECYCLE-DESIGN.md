@@ -1,6 +1,6 @@
 # M28 — Layered Hosts and ResourceGroup Lifecycle Design
 
-**Status:** Owner-selected feature-first direction; YT-287–291 independently reviewed and Done; YT-292–294 gates open.
+**Status:** Owner-selected feature-first direction; YT-287–292 independently reviewed and Done; YT-293–294 gates open.
 **Date:** 2026-11-21.
 **Tracking:** YT-286 public-delivery umbrella; ordered remaining items YT-287–294.
 **Decision:** [ADR 0014](adr/0014-layered-host-resource-lifecycle.md).
@@ -1711,3 +1711,194 @@ source identities. Configured independent R4 `wc_job_Ju-yzZ1wX5TXj91c` completed
 exit0 with actual PASS, issues=[] and required_followups=[]. Strict/Builtin
 staged Guard remains the final ordinary local commit gate. No push, publication,
 browser/native-window execution or YT-292 integration is included.
+
+## 20. YT-292 — optional Native, UDP and custom Host integration
+
+**Status:** Done after implementation, focused verification and configured
+independent Reviewer approval; the ordinary staged local commit gate follows.
+
+### Optional carriers and ordinary entry points
+
+All four native capabilities now have canonical implementations inside yetlet,
+behind explicit default-off features. The SDK default remains [] and introduces
+no new published package.
+
+| Feature | Canonical module | Dependency and execution boundary |
+|---|---|---|
+| command-bridge | yetlet::command_bridge | Std-only bounded command admission and immutable snapshots; independent of HTTP, ActionExecutor and application state authority. |
+| udp | yetlet::udp | Std nonblocking UdpEndpoint plus managed UdpHost; bounded caller-driven packet polling, no Tokio, Web, Winit or renderer dependency. |
+| native-winit | yetlet::native_winit | One main/entry-thread NativeHost driver and multiple windows; Winit only, no implicit renderer, Web runtime or extra thread. |
+| renderer-wgpu | yetlet::renderer_wgpu | The existing Vulkan Surface renderer, independently selected; accepts caller-provided handles without a Winit, View or Web dependency. |
+
+The unpublished yetlet-hosts companion contains forwarding modules while the
+remaining historical consumers migrate in YT-293. It no longer owns duplicated
+bridge, UDP, Window or renderer implementations. Its direct optional Winit/wgpu
+dependencies remain only for old example imports; yetlet never depends on this
+companion. Native modules and native dependencies are absent on wasm32.
+
+The [independent consumer](../examples/external-consumers/native-hosts/README.md)
+uses ordinary Host descriptions, one retained HostGroup and an optional Web
+feature. Its minimal selection is native-winit plus udp. A mixed plan follows
+this shape; each constructor is inert:
+
+~~~rust
+use yetlet::{HostGroup, native_winit::{NativeHost, winit}, udp::UdpHost};
+use yetlet::web::App;
+
+let native = NativeHost::new(winit::window::Window::default_attributes())
+    .with_window(winit::window::Window::default_attributes());
+let network = UdpHost::new().with_address("127.0.0.1:0".parse()?);
+let web = App::new().get("/api", || async { "ready" })
+    .into_host().with_address("127.0.0.1:0");
+let mut hosts = HostGroup::new()
+    .with_host(native).with_host(network).with_host(web).build()?;
+hosts.run().map_err(|error| std::io::Error::other(error.to_string()))?;
+~~~
+
+Native and UDP infer the group's error type, including WebError in that mixed
+plan, through their adapter-local From<io::Error> requirement. They impose no
+Clone, Send, Sync or 'static requirement on application callbacks/errors.
+Native/UDP-only code selects HostGroup::<std::io::Error>::new() or annotates the
+standalone Host error parameter. Web itself remains optional.
+
+### One retained lifecycle and one root native driver
+
+Advanced ResourceGroup::with_blocking_driver stores a concrete BlockingDriver
+through typed Driven metadata. Passive resources, managed resources and
+map_activity preserve it; NoDriver keeps ordinary Core groups' existing auto
+traits. Building rejects multiple selected root drivers before acquisition.
+Known duplicate native-loop and nonzero UDP endpoint claims also reject inert
+plans; external ownership and OS conflicts still require actual startup checks.
+
+BlockingDriver receives the same ShutdownHandle and lifecycle polling callback.
+The whole plan prepares for Blocking before driver entry. Native callbacks
+advance the existing Core engine through startup, admission, original completion
+and final release. A stop request can interrupt a later pending managed
+acquisition without waiting for NativeActivity to start.
+
+NativeHost::with_window adds a window to the same loop. Actual window creation
+happens inside Winit's supported callbacks. Every configured window must
+observe its own visible, nonzero, unoccluded redraw before aggregate readiness.
+After admission, on_event receives original window events and bounded Tick
+opportunities on the same caller thread. This proves Window readiness, not a
+GPU present, engine frame rate or View renderer. Core retains that startup
+observation while sibling Hosts start. Later resize/occlusion may make
+NativeHandle::is_ready false temporarily, but only actual stop/release closes
+admission permanently; temporary unusability does not shut down the group.
+
+Windows are the first managed Native dependency. Later custom renderer
+resources therefore release before windows, while the root driver remains
+active through all finalizers. Closing/destroying any managed window, or
+suspension, requests coordinated whole-group shutdown. This adapter does not
+restart after suspend or create a replacement Winit loop. Original builder,
+Window and loop errors remain available through the chosen application error.
+
+A driver error after the last cleanup callback is still a Drive failure and
+changes the final phase to Failed. A driver return while obligations remain
+instead produces DriverReturnedEarly, retains the concrete driver and original
+owners/errors, and requests deferred stop without invoking affine cleanup from
+a fallback context. Generic resumable drivers can resume the same instance;
+Winit run_app consumes its loop and cannot promise that recovery. A builder
+failure before any progress can retire only the still-inert plan on the same
+caller thread. No async cleanup thread or silent loop recreation is introduced.
+While a selected Blocking driver still owns unfinished obligations, public
+poll_start, poll_run, run_async and shutdown polling cannot advance callbacks
+outside it. They retain Pending; shutdown requests only defer stop. Only run
+through the same retained driver can resume progress. NoDriver polling and
+terminal observation retain their ordinary behavior.
+
+### Caller-driven UDP and optional command bridge
+
+UdpHost defaults to loopback port 0, exposes the actual bound address through
+a weak metadata handle and opens admission with the same aggregate barrier.
+on_datagram borrows the received bytes/socket only for its callback; reply and
+send_to retain explicit bounded outcomes. Packet count and datagram size are
+finite. Closing admission is permanent; original callback/I/O errors remain
+owned until terminal Join and dependency release. Exact bind failure has no
+fallback address.
+
+NativeHost and managed UdpHost reject Async preparation before any acquisition.
+The std UDP socket has no registered async reactor; ordinary synchronous run
+or the selected native callbacks provide bounded progress. Advanced callers may
+still drive UdpEndpoint explicitly in their own event environment.
+
+The optional command bridge preserves its existing bounded queue, immutable
+snapshot and admission semantics. Enqueuing a command is not execution success.
+It neither installs a universal domain state service nor requires ActionExecutor.
+Renderer production behavior and shaders are relocated unchanged; package/API
+availability and renderer backend qualification remain separate claims.
+
+### Verification and delivery boundary
+
+Focused source verification passes: 48 Core lifecycle tests (21 existing
+coordinator and 27 Host-group tests), 16 UDP tests, 14 Native tests, four pure
+bridge tests, 24 synthetic renderer tests, 22 managed Web regressions and seven
+remaining companion HTTP tests. The 17 positive/compile-fail doctests, strict
+Clippy, strict rustdoc, both native consumer feature variants, companion example
+compilation and all 24 changed Rust files' formatting pass. Formatting-only
+changes do not require replaying the native execution.
+
+Nine independent feature selections each pass a normal/build graph and library
+compilation check; two intended disabled-import failures verify export absence.
+Default Core, bridge-only and UDP-only native graphs contain only the consumer
+and yetlet. Native-only selects Winit without renderer/Web/Tokio; renderer-only
+selects wgpu without Winit/Web/Tokio. Combined selections do not add View, HTML,
+Actions, Reactive or auxiliary services. Wasm default and all-four-native-feature
+graphs contain only Core, with native exports unavailable. These are compilation
+and dependency checks, not additional OS/browser/backend execution claims.
+
+One bounded Ubuntu X11 combined consumer run, PID 948749, exits 0. Two actual
+windows (60817410 and 60817411) deliver post-admission redraws on ThreadId(1).
+The external client receives a 17-byte UDP echo and HTTP 200. The custom borrowed
+resource returns Pending once and observes both windows live on both release
+passes. Web, Native, UDP and local Hosts all report successful original Join and
+final release. The same receipt confirms both window IDs absent afterward and
+the process gone; no second UI launch is used as redundant proof. This run
+explicitly has gpu_present=false. The later R1 corrections below are verified
+by deterministic regressions and compilation; this native run is not replayed.
+
+The initial renderer test-path and companion SyncSender import omissions were
+relocation compile defects; focused repairs and checks pass. Consumer-only
+Clippy findings and a Native-test formatting failure are likewise preserved
+with their corrected checks. Supplemental review also repaired an actual
+Windows oversized-datagram path: WSAEMSGSIZE is counted as a consumed/rejected
+packet within the same budget. The portable incoming-size regression passes on
+Linux; Windows runtime behavior is not claimed. Native builder panic diagnostics
+now cache display text and expose nonblocking try_with_payload inspection, with
+a no-OS regression for nested inspection/formatting and retained payload Drop.
+
+Cargo generated the new consumer lock and aligned it to existing workspace
+version/source/checksum identities. Temporary resolution constraints were removed
+before consumer validation. Existing dependency versions were not upgraded.
+The feature probe's 225 registry identities also match the baseline and all
+31 existing locks remain unchanged by that probe. Original resolution conflicts
+and the pre-Cargo PATH setup failure remain recorded with their successful
+bounded corrections.
+
+Configured independent R1 wc_job_2cg2c1vQJjQxDYFR returned three material
+findings: public polling could bypass an early-returned driver, transient
+Native usability loss could masquerade as permanent closure, and the existing
+five-Host Core consumer's generic helpers omitted the new driver parameter.
+All three are repaired. Regressions exercise every public progression route,
+a pending affine finalizer after activity release, and observed Native
+readiness followed by usability loss while a sibling starts. The existing
+Core consumer now carries H::Drivers and a generic driver parameter; its
+ordinary finite execution and strict Clippy pass without changing its lock.
+The 12-step focused correction check passes, including immediate Web/UDP
+regressions, both Native consumer variants, doctests, strict rustdoc and Wasm
+Core. The current total is 135 tests plus 17 doctests; unaffected renderer,
+bridge and companion evidence is retained rather than redundantly replayed.
+
+Receipts are retained in .pipeline-output/m28-yt292-20261122/: TEST-R1/R2,
+REPAIR-R3, CONSUMER-R4, COMPANION-R3, FEATURE-PROBE-R1, FORMAT-FINAL-R4,
+REVIEW-FIX-R1, TEST-COUNTS-R3 and NATIVE-R1 identify their separate scopes. The scoped documentation check
+preserves the historical global diagnostics without replaying them.
+Configured independent R2 wc_job_JOQWTmAmTSZNi--j reached terminal exit 0
+with actual PASS, issues=[] and required_followups=[]. The configured model
+and resolver-selected effort were observed, and all reviewed source/receipt
+hashes remained unchanged. Only completion annotations follow that review;
+Strict/Builtin staged Guard remains the final ordinary local commit gate.
+General CLI/consumer migration remains YT-293; normal
+archives and selected external package qualification remain YT-294. Published
+alpha.8 and the pinned reader retain their original contracts; no publication
+or physical LAN qualification is included.

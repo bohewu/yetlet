@@ -67,6 +67,13 @@ Custom ResourceGroup management uses the same coordinator. The existing
 `HttpWorker` retains its advanced low-level contract. These source changes do
 not change published alpha.8 package contents or its startup examples.
 
+[YT-292](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration)
+adds canonical optional native modules without changing the empty default.
+NativeHost contributes one caller-thread root loop for multiple windows; UDP
+remains bounded and caller-driven. Web, renderer and command bridge selections
+are independent. The unpublished companion only forwards remaining historical
+consumers; normal package qualification stays a later gate.
+
 ## Framework packages and selected features
 
 | Checkout carrier | Implemented scope and maturity | Original nine release candidates? | Authoritative contract |
@@ -79,6 +86,10 @@ not change published alpha.8 package contents or its startup examples.
 | `yetlet::actions` | `actions`: transport-neutral Command/ActionExecutor/LocalExecutor; the executor selects its associated Error | Yes | [Actions guide](../crates/yetlet/guides/actions.md) |
 | `yetlet::actions_http` | `actions-http`: HTTP ActionError and serialized API error envelopes; Browser `actions` forwards this contract | No; separated from the former Actions carrier | [Actions guide](../crates/yetlet/guides/actions.md), [YT-290](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership) |
 | `yetlet::web` | `web`: native App, managed WebHost, request context, Axum/Tower routing and advanced HttpWorker; add `html` for Page/document/View rendering | Yes; formerly `server_axum` | [Web guide](../crates/yetlet/guides/server-axum.md) |
+| `yetlet::command_bridge` | `command-bridge`: native bounded command admission and immutable snapshots; independent of HTTP and ActionExecutor | No | [Native integration contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration) |
+| `yetlet::udp` | `udp`: managed UdpHost and explicit low-level UdpEndpoint; std-only bounded nonblocking progress | No | [Native consumer](../examples/external-consumers/native-hosts/README.md) |
+| `yetlet::native_winit` | `native-winit`: one caller-thread NativeHost loop with multiple windows; no renderer or Web runtime | No | [Native integration contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration) |
+| `yetlet::renderer_wgpu` | `renderer-wgpu`: independently selected native Vulkan Surface renderer; backend qualification stays separate | No | [Native integration contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration) |
 | `yetlet::request_id` | Explicit scoped/global process-local numeric correlation | Yes | [Request ID guide](../crates/yetlet/guides/request-id.md) |
 | `yetlet::session` | Opt-in bounded Memory Session, anonymous state, expiry, CSRF, cookie lifecycle, rotation/revocation; synchronous API | Yes | [Session guide](../crates/yetlet/guides/session.md) |
 | `yetlet::session_redis` | Opt-in native module in the published SDK. Original qualification is single-host, single-primary, no persistence; later bounded TLS/restart evidence is listed separately below | No | [Provider guide](../crates/yetlet/guides/session-redis.md), [Valkey evidence](PROVIDER-OPERATIONS.md#redis-session-cas-operation-outcome-and-cookie-ordering) |

@@ -213,11 +213,11 @@ impl Wake for WakeCount {
 // implementing another coordinator or exposing mutable completion storage.
 fn build<E, H: HostList<E>>(
     plan: HostGroup<E, H>,
-) -> Result<BuiltHostGroup<E, H::Parts>, HostBuildError<E>> {
+) -> Result<BuiltHostGroup<E, H::Parts, H::Drivers>, HostBuildError<E>> {
     plan.build()
 }
 
-fn poll_once<E, P>(group: &mut BuiltHostGroup<E, P>, cx: &mut Context<'_>) -> Poll<()>
+fn poll_once<E, P, D>(group: &mut BuiltHostGroup<E, P, D>, cx: &mut Context<'_>) -> Poll<()>
 where
     P: HostParts<E> + ResourceParts<HostFailure<E>>,
 {

@@ -96,9 +96,10 @@ mod lifecycle;
 mod resources;
 
 pub use hosts::{
-    AdmissionOutcome, BuiltHostGroup, ExclusiveClaim, Host, HostActivity, HostBuildError,
-    HostFailure, HostGroup, HostOperation, HostOutcome, HostRunError, HostRunMode, Managed,
-    ManagedResource, ResourceGroup, ResourcePlan, Retained, ShutdownHandle, StartStatus,
+    AdmissionOutcome, BlockingDriver, BuiltHostGroup, Driven, ExclusiveClaim, Host, HostActivity,
+    HostBuildError, HostFailure, HostGroup, HostOperation, HostOutcome, HostRunError, HostRunMode,
+    Managed, ManagedResource, NoDriver, ResourceGroup, ResourcePlan, Retained, ShutdownHandle,
+    StartStatus,
 };
 
 #[doc(hidden)]
@@ -734,6 +735,24 @@ impl<E, P: lifecycle::Chain<E>> Composition<E, P> {
     /// Retain the first required failure and immediately request coordinated stop.
     pub fn fail_required(&mut self, error: E) {
         self.fail_with_context(error, &mut Context::from_waker(Waker::noop()));
+    }
+
+    // Driver exit can occur outside its affine callback environment. Retain the
+    // same failure/stop state without invoking any lifecycle callback here.
+    pub(crate) fn fail_deferred(&mut self, error: E) {
+        self.failures.record(error);
+        if matches!(self.phase, Phase::Stopped | Phase::Failed) {
+            self.phase = Phase::Failed;
+        } else {
+            self.request_stop_deferred();
+        }
+    }
+
+    pub(crate) fn request_stop_deferred(&mut self) {
+        if !matches!(self.phase, Phase::Stopped | Phase::Failed) {
+            self.stop_requested = true;
+            self.phase = Phase::Stopping;
+        }
     }
 
     pub(crate) fn fail_with_context(&mut self, error: E, cx: &mut Context<'_>) {

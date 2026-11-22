@@ -69,8 +69,13 @@ implementation supports caller-runtime and owned-thread drivers, with actual
 initialization readiness, admission fencing, original completion and dependency
 release. Core adds explicit pre-acquisition driver preparation and a std-only
 blocking drive; no automatic pool or process policy is introduced.
-Concrete native drivers, broader external consumers, normal archives and
-next-alpha migration gates remain in the
+[YT-292 native integration](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration)
+adds canonical command-bridge/UDP/Winit/renderer feature modules. A typed root
+driver advances the same coordinator inside Winit callbacks through all final
+release, with multiple windows under one NativeHost. UDP remains caller-driven;
+Web may retain its owned-thread placement. No dependency or renderer is added
+to default Core. Remaining consumer/CLI migration and normal archives retain
+YT-293/294 gates in the
 [ordered plan](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#14-replanned-public-delivery--yt-287-through-yt-294).
 The research history below retains its original default-feature/API assumptions.
 

@@ -44,6 +44,10 @@
 //! | `signing` | Optional native signing/verifying API with caller-owned trust and OpenSSL prerequisites |
 //! | `actions` | Transport-neutral commands/executors with implementation-owned errors; no serialization dependency |
 //! | `actions-http` | Enables `actions`; shared HTTP action errors and serializable wire envelopes |
+//! | `command-bridge` | Native bounded command admission and immutable snapshots; independent of HTTP and action executors |
+//! | `udp` | Native nonblocking datagrams and managed UDP Hosts; no async runtime |
+//! | `native-winit` | Caller-thread Winit Host with multiple windows under one root event loop; no renderer |
+//! | `renderer-wgpu` | Independent native Vulkan Surface renderer; no Winit, Web or View dependency |
 //! | `reactive` | Synchronous local state graph |
 //! | Default Core | `HostGroup` / `Host` / `ResourceGroup`; advanced `composition` ownership, readiness and original completion; no optional dependencies |
 //!
@@ -71,16 +75,22 @@ pub mod actions;
 pub mod actions_http;
 #[cfg(all(feature = "auth", not(target_arch = "wasm32")))]
 pub mod auth;
+#[cfg(all(feature = "command-bridge", not(target_arch = "wasm32")))]
+pub mod command_bridge;
 pub mod composition;
 pub use composition::{Host, HostGroup, ResourceGroup};
 #[cfg(all(feature = "config", not(target_arch = "wasm32")))]
 pub mod config;
 #[cfg(feature = "html")]
 pub mod html;
+#[cfg(all(feature = "native-winit", not(target_arch = "wasm32")))]
+pub mod native_winit;
 #[cfg(all(feature = "rate-limit", not(target_arch = "wasm32")))]
 pub mod rate_limit;
 #[cfg(feature = "reactive")]
 pub mod reactive;
+#[cfg(all(feature = "renderer-wgpu", not(target_arch = "wasm32")))]
+pub mod renderer_wgpu;
 #[cfg(all(feature = "request-id", not(target_arch = "wasm32")))]
 pub mod request_id;
 #[cfg(all(feature = "secrets", not(target_arch = "wasm32")))]
@@ -91,5 +101,7 @@ pub mod session;
 pub mod session_redis;
 #[cfg(all(feature = "signing", not(target_arch = "wasm32")))]
 pub mod signing;
+#[cfg(all(feature = "udp", not(target_arch = "wasm32")))]
+pub mod udp;
 #[cfg(all(feature = "web", not(target_arch = "wasm32")))]
 pub mod web;

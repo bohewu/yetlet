@@ -225,13 +225,16 @@ is historical.
 | HostGroup | Group high-level Host lifetimes using the built-in Core coordinator. |
 | yetlet::web::App | Configure an HTTP service; retain Router/Tower interoperability. Available with `web`; Page/View rendering additionally needs `html`. |
 | yetlet::web::WebHost | Run an HTTP service as a participant in a HostGroup lifetime. App::into_host bridges a resolved-state App into that inert description. |
+| yetlet::native_winit::NativeHost / with_window | Describe one root native loop and add windows to that same loop; construction creates no OS resource. |
+| yetlet::udp::UdpHost / on_datagram | Describe a managed nonblocking UDP endpoint and a bounded borrowed packet callback. |
 | ResourceGroup | Customize typed owned/borrowed resources and explicit acquisition/release behavior. |
 | HostGroup planning: new / with_host / build | Describe, register and validate an inert plan; none starts a listener, thread or native loop. |
-| with_address | Configure a future Web bind address; actual acquisition belongs to the driver. |
+| with_address | Configure a future Web or UDP bind address; actual acquisition belongs to the driver. |
 | serve / serve_on | Execute ordinary HTTP serving on caller-owned Tokio; a cancelled consuming future does not promise managed cleanup. |
 | run / run_async | Drive the retained HostGroup synchronously or asynchronously. A fresh run selects owned-thread Web; a fresh run_async selects caller-runtime Web. The selection remains with the owner across cancellation. |
 | request_shutdown / shutdown_until | Request stop or advance shutdown toward terminal completion; Pending retains the original obligations. |
 | with_resource / with_managed_resource | Retain a passive Rust value or register an inert descriptor with explicit acquire/release semantics; do not conflate the two. |
+| with_blocking_driver | Advanced customization: retain one typed caller-thread driver for the same lifecycle, including final resource release. |
 
 The current Core owner is BuiltHostGroup. poll_start reports readiness progress;
 poll_run advances the lifetime; poll_shutdown advances original completion and
@@ -250,6 +253,14 @@ needs no required_* marker.
 `Closed` means termination has fenced it. A closed gate triggers coordinated
 shutdown while the original Join remains authoritative. These advanced outcomes
 do not introduce an optional-participation marker on the ordinary Host path.
+
+[YT-292](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration)
+adds NativeHandle/UdpHandle for adapter observations and explicit requests.
+BlockingDriver is an advanced event-driving contract; it is not a thread-pool
+preference. DriverReturnedEarly reports retained unfinished obligations, while
+HostOperation::Drive retains the original driver error, even after final release.
+A second NativeHost requests a second root loop and is rejected; with_window
+expresses the supported multiple-window intent directly.
 
 Ordinary participation needs no required marker. try_* is reserved for a
 documented operation-specific distinction and never means optional success,

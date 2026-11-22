@@ -206,6 +206,24 @@ their original contract. CLI template and SDK-selection migration belongs to
 YT-293; normal package/archive and publication qualification retain their
 later gates.
 
+### Current checkout — optional Native, UDP and renderer
+
+[YT-292](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration)
+provides `command-bridge`, `udp`, `native-winit` and `renderer-wgpu` in yetlet,
+with canonical snake_case module paths and an unchanged empty default.
+The unpublished yetlet-hosts modules temporarily re-export these implementations
+for remaining source consumers. New consumers select yetlet features directly;
+this forwarding stage is not a published compatibility package or permanent alias.
+
+NativeHost owns one caller-thread loop and adds windows through with_window.
+Known duplicate loop/driver claims reject before acquisition. Winit still owns
+process-wide and platform entry-thread restrictions; an exited loop is not
+recreatable. Managed Native/UDP reject Async drive before acquiring resources.
+A driver returning before final release retains owners and reports incomplete
+shutdown. Renderer selection remains independent of Winit/Web/View, and backend
+runtime evidence is narrower than feature availability. Published alpha.8,
+CLI templates and the pinned reader retain their existing contracts.
+
 ## Historical two-package pre-publication source — 2026-10-30
 
 The unreleased development train is `0.9.0-alpha.5`, with exactly `yetlet` and

@@ -4539,6 +4539,8 @@ dependencies = [
  "toml",
  "tower",
  "tower-http",
+ "wgpu",
+ "winit",
 ]
 
 [[package]]

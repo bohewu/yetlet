@@ -1,4 +1,4 @@
-use super::{AdmissionOutcome, HostFailure, HostOutcome, HostParts};
+use super::{AdmissionOutcome, HostFailure, HostOperation, HostOutcome, HostParts};
 use crate::composition::{Completion, Composition, Failures, Phase, ResourceParts};
 use std::{
     error::Error,
@@ -12,6 +12,123 @@ use std::{
     thread,
     time::{Duration, Instant},
 };
+
+/// A caller-thread driver for the group's existing lifecycle polling.
+///
+/// Construction is inert. Core prepares the whole plan before calling run.
+/// Keep partial driver ownership in self, and pass the supplied progress callback
+/// a valid wake context from the selected event environment. The shutdown handle
+/// can interrupt pending acquisition without waiting for activity readiness.
+///
+/// Normal completion calls progress until it returns Ready. Returning earlier
+/// retains the driver and all unfinished obligations in BuiltHostGroup; Core
+/// requests stop without running affine cleanup outside this driver. A later
+/// run borrows this same instance and never repeats preparation or replaces it.
+/// Drivers that cannot resume after backend exit must report that limitation.
+///
+/// E is the application's original error type; no Clone, Send, Sync or 'static
+/// bound is imposed. Panics are not caught.
+pub trait BlockingDriver<E> {
+    fn run(
+        &mut self,
+        shutdown: &ShutdownHandle,
+        progress: &mut dyn FnMut(&mut Context<'_>) -> Poll<()>,
+    ) -> Result<(), E>;
+}
+
+/// Default typed metadata for plans without a platform event-loop driver.
+#[derive(Debug, Default, Clone, Copy)]
+pub struct NoDriver;
+
+mod sealed {
+    pub trait Driver {}
+}
+
+/// Sealed storage for selected drivers, independent of lifecycle ownership.
+#[doc(hidden)]
+pub trait DriverPlan<E>: sealed::Driver {
+    fn names(&self, names: &mut Vec<&'static str>);
+    fn has_driver(&self) -> bool;
+    fn run(
+        &mut self,
+        shutdown: &ShutdownHandle,
+        progress: &mut dyn FnMut(&mut Context<'_>) -> Poll<()>,
+    ) -> Result<(), HostFailure<E>>;
+}
+
+impl sealed::Driver for NoDriver {}
+impl<E> DriverPlan<E> for NoDriver {
+    fn names(&self, _: &mut Vec<&'static str>) {}
+    fn has_driver(&self) -> bool {
+        false
+    }
+    fn run(
+        &mut self,
+        _: &ShutdownHandle,
+        progress: &mut dyn FnMut(&mut Context<'_>) -> Poll<()>,
+    ) -> Result<(), HostFailure<E>> {
+        let waker = Waker::from(Arc::new(ThreadWake(thread::current())));
+        let mut cx = Context::from_waker(&waker);
+        while progress(&mut cx).is_pending() {
+            // unpark stores a token, including a wake between poll and park.
+            thread::park_timeout(Duration::from_millis(10));
+        }
+        Ok(())
+    }
+}
+
+#[doc(hidden)]
+pub struct SelectedDriver<D> {
+    pub(super) driver: D,
+    pub(super) host: &'static str,
+}
+
+impl<D> sealed::Driver for SelectedDriver<D> {}
+impl<E, D: BlockingDriver<E>> DriverPlan<E> for SelectedDriver<D> {
+    fn names(&self, names: &mut Vec<&'static str>) {
+        names.push(self.host);
+    }
+    fn has_driver(&self) -> bool {
+        true
+    }
+    fn run(
+        &mut self,
+        shutdown: &ShutdownHandle,
+        progress: &mut dyn FnMut(&mut Context<'_>) -> Poll<()>,
+    ) -> Result<(), HostFailure<E>> {
+        self.driver
+            .run(shutdown, progress)
+            .map_err(|error| HostFailure::new(self.host, HostOperation::Drive, error))
+    }
+}
+
+#[doc(hidden)]
+pub struct DriverList<P, D> {
+    pub(super) previous: P,
+    pub(super) last: D,
+}
+
+impl<P, D> sealed::Driver for DriverList<P, D> {}
+impl<E, P: DriverPlan<E>, D: DriverPlan<E>> DriverPlan<E> for DriverList<P, D> {
+    fn names(&self, names: &mut Vec<&'static str>) {
+        self.previous.names(names);
+        self.last.names(names);
+    }
+    fn has_driver(&self) -> bool {
+        self.previous.has_driver() || self.last.has_driver()
+    }
+    fn run(
+        &mut self,
+        shutdown: &ShutdownHandle,
+        progress: &mut dyn FnMut(&mut Context<'_>) -> Poll<()>,
+    ) -> Result<(), HostFailure<E>> {
+        if self.last.has_driver() {
+            self.last.run(shutdown, progress)
+        } else {
+            self.previous.run(shutdown, progress)
+        }
+    }
+}
 
 /// The selected progress environment for an entire retained Host group.
 ///
@@ -35,6 +152,12 @@ pub enum HostRunError<'a, E> {
         selected: HostRunMode,
         requested: HostRunMode,
     },
+    /// The selected driver returned while lifecycle obligations remain owned.
+    /// Any original driver error is retained in failures(). Only resuming the
+    /// same retained driver may advance its unfinished lifecycle callbacks.
+    DriverReturnedEarly {
+        host: &'static str,
+    },
     HostFailure(&'a HostFailure<E>),
 }
 
@@ -48,6 +171,10 @@ impl<E: fmt::Display> fmt::Display for HostRunError<'_, E> {
                 f,
                 "cannot drive a {selected:?} Host group with {requested:?}; resume its selected driver"
             ),
+            Self::DriverReturnedEarly { host } => write!(
+                f,
+                "{host} driver returned before terminal cleanup; unfinished owners are retained"
+            ),
             Self::HostFailure(error) => fmt::Display::fmt(error, f),
         }
     }
@@ -57,7 +184,7 @@ impl<E: Error + 'static> Error for HostRunError<'_, E> {
     fn source(&self) -> Option<&(dyn Error + 'static)> {
         match self {
             Self::HostFailure(error) => Some(*error),
-            Self::ModeMismatch { .. } => None,
+            Self::ModeMismatch { .. } | Self::DriverReturnedEarly { .. } => None,
         }
     }
 }
@@ -164,14 +291,20 @@ pub enum StartStatus {
 /// hosts.with_host(());
 /// ```
 #[must_use = "Keep this owner across Pending and drive explicit terminal shutdown"]
-pub struct BuiltHostGroup<E, P> {
+pub struct BuiltHostGroup<E, P, D = NoDriver> {
+    state: HostState<E, P>,
+    driver: D,
+    driver_host: Option<&'static str>,
+}
+
+struct HostState<E, P> {
     core: Composition<HostFailure<E>, P>,
     shutdown: ShutdownHandle,
     run_mode: Option<HostRunMode>,
     driver_prepared: bool,
 }
 
-impl<E, P> Drop for BuiltHostGroup<E, P> {
+impl<E, P> Drop for HostState<E, P> {
     fn drop(&mut self) {
         // A caller's waker can own a ShutdownHandle back to this registration.
         // Break that cycle before ordinary field destruction; clearing the
@@ -180,7 +313,7 @@ impl<E, P> Drop for BuiltHostGroup<E, P> {
     }
 }
 
-impl<E, P> BuiltHostGroup<E, P> {
+impl<E, P> HostState<E, P> {
     pub(super) fn new(core: Composition<HostFailure<E>, P>, shutdown: ShutdownHandle) -> Self {
         Self {
             core,
@@ -203,7 +336,24 @@ impl<E, P> BuiltHostGroup<E, P> {
     }
 }
 
-impl<E, P: HostParts<E> + ResourceParts<HostFailure<E>>> BuiltHostGroup<E, P> {
+impl<E, P: HostParts<E> + ResourceParts<HostFailure<E>>> HostState<E, P> {
+    fn prepare_driver(&mut self, cx: &mut Context<'_>) -> bool {
+        if !self.driver_prepared {
+            let mode = *self.run_mode.get_or_insert(HostRunMode::Async);
+            let prepared = self.core.parts.prepare_driver(mode);
+            self.driver_prepared = true;
+            if let Err(error) = prepared {
+                self.core.fail_with_context(error, cx);
+                return false;
+            }
+            if self.shutdown.is_requested() {
+                self.core.request_stop_with_context(cx);
+                return false;
+            }
+        }
+        true
+    }
+
     /// Sequential acquisition/readiness, then admission for all Hosts. A failure
     /// requests rollback in this same owner and returns Stopping, never an error
     /// that carries cleanup ownership and can accidentally be discarded with ?.
@@ -221,18 +371,8 @@ impl<E, P: HostParts<E> + ResourceParts<HostFailure<E>>> BuiltHostGroup<E, P> {
         if self.core.phase() == Phase::Running {
             return Poll::Ready(StartStatus::Running);
         }
-        if !self.driver_prepared {
-            let mode = *self.run_mode.get_or_insert(HostRunMode::Async);
-            let prepared = self.core.parts.prepare_driver(mode);
-            self.driver_prepared = true;
-            if let Err(error) = prepared {
-                self.core.fail_with_context(error, cx);
-                return Poll::Ready(StartStatus::Stopping);
-            }
-            if self.shutdown.is_requested() {
-                self.core.request_stop_with_context(cx);
-                return Poll::Ready(StartStatus::Stopping);
-            }
+        if !self.prepare_driver(cx) {
+            return Poll::Ready(StartStatus::Stopping);
         }
         let progress = self.core.parts.poll_start(cx, &self.shutdown);
         if let Poll::Ready(Err(error)) = progress {
@@ -294,15 +434,6 @@ impl<E, P: HostParts<E> + ResourceParts<HostFailure<E>>> BuiltHostGroup<E, P> {
         }
     }
 
-    /// One caller-driven shutdown pass. Event-loop users arrange later progress;
-    /// async users use poll_shutdown so adapters receive a real wake context.
-    pub fn shutdown_until(&mut self, deadline: Instant) -> Completion {
-        match self.poll_shutdown(&mut Context::from_waker(Waker::noop()), deadline) {
-            Poll::Ready(()) => Completion::Complete,
-            Poll::Pending => Completion::Pending,
-        }
-    }
-
     /// Advance startup/running/shutdown once. Every running Host is polled per
     /// pass. The first finished activity requests coordinated group shutdown;
     /// its actual execution outcome is retained until original Join.
@@ -324,20 +455,135 @@ impl<E, P: HostParts<E> + ResourceParts<HostFailure<E>>> BuiltHostGroup<E, P> {
         self.poll_shutdown(cx, Instant::now())
     }
 
-    /// Drive this retained owner synchronously on the calling thread.
+    pub fn outcomes(&self) -> Vec<HostOutcome> {
+        let mut result = Vec::with_capacity(P::COUNT);
+        self.core.parts.outcomes(&mut result);
+        result
+    }
+}
+
+impl<E, P, D> BuiltHostGroup<E, P, D> {
+    pub(super) fn new(
+        core: Composition<HostFailure<E>, P>,
+        shutdown: ShutdownHandle,
+        driver: D,
+        driver_host: Option<&'static str>,
+    ) -> Self {
+        Self {
+            state: HostState::new(core, shutdown),
+            driver,
+            driver_host,
+        }
+    }
+
+    fn requires_blocking_driver(&self) -> bool {
+        self.driver_host.is_some()
+            && self.state.run_mode == Some(HostRunMode::Blocking)
+            && !matches!(self.state.phase(), Phase::Stopped | Phase::Failed)
+    }
+
+    pub fn phase(&self) -> Phase {
+        self.state.phase()
+    }
+
+    pub fn failures(&self) -> &Failures<HostFailure<E>> {
+        self.state.failures()
+    }
+
+    pub fn shutdown_handle(&self) -> ShutdownHandle {
+        self.state.shutdown_handle()
+    }
+}
+
+impl<E, P: HostParts<E> + ResourceParts<HostFailure<E>>, D> BuiltHostGroup<E, P, D> {
+    /// Prepare the complete plan, acquire sequentially and observe all readiness
+    /// before opening admission. Startup failure retains rollback in this owner.
+    /// Pending also retains progress that requires the selected blocking driver.
+    pub fn poll_start(&mut self, cx: &mut Context<'_>) -> Poll<StartStatus> {
+        if self.requires_blocking_driver() {
+            return Poll::Pending;
+        }
+        self.state.poll_start(cx)
+    }
+
+    /// Request admission closure and coordinated shutdown on the calling thread.
+    /// If a selected blocking driver is required, defer its callbacks until that
+    /// same driver resumes; this request never bypasses its execution boundary.
+    pub fn request_shutdown(&mut self) {
+        if self.requires_blocking_driver() {
+            self.state.shutdown.request_shutdown();
+            self.state.core.request_stop_deferred();
+        } else {
+            self.state.request_shutdown();
+        }
+    }
+
+    /// Advance the original coordinator without moving or discarding owners.
+    /// The deadline is a cooperative budget, not preemption. If an unfinished
+    /// selected blocking driver is required, request stop and return Pending
+    /// without invoking lifecycle callbacks outside that driver.
+    pub fn poll_shutdown(&mut self, cx: &mut Context<'_>, deadline: Instant) -> Poll<()> {
+        if self.requires_blocking_driver() {
+            self.request_shutdown();
+            return Poll::Pending;
+        }
+        self.state.poll_shutdown(cx, deadline)
+    }
+
+    /// Perform one caller-driven shutdown pass. Pending selected-driver work
+    /// must resume through run; another outside poll does not authorize cleanup.
+    pub fn shutdown_until(&mut self, deadline: Instant) -> Completion {
+        match self.poll_shutdown(&mut Context::from_waker(Waker::noop()), deadline) {
+            Poll::Ready(()) => Completion::Complete,
+            Poll::Pending => Completion::Pending,
+        }
+    }
+
+    /// Advance the same startup/running/shutdown state used by both drive modes.
+    /// The first finished activity requests coordinated group shutdown. Work
+    /// requiring an unfinished selected blocking driver stays Pending here.
+    pub fn poll_run(&mut self, cx: &mut Context<'_>) -> Poll<()> {
+        if self.requires_blocking_driver() {
+            return Poll::Pending;
+        }
+        self.state.poll_run(cx)
+    }
+
+    /// Borrow this retained owner without creating a runtime or thread.
+    /// Cancelling this borrowing future preserves progress in the owner.
+    /// The returned failure borrows its original, unmodified application error.
+    /// After a selected blocking driver returns early, this future stays Pending
+    /// without invoking callbacks. Cancel the borrowing future and resume the
+    /// same retained driver through run; no outside executor can replace it.
+    pub async fn run_async(&mut self) -> Result<(), &HostFailure<E>> {
+        poll_fn(|cx| self.poll_run(cx)).await;
+        match self.state.core.failures().primary() {
+            Some(error) => Err(error),
+            None => Ok(()),
+        }
+    }
+
+    pub fn outcomes(&self) -> Vec<HostOutcome> {
+        self.state.outcomes()
+    }
+}
+
+impl<E, P: HostParts<E> + ResourceParts<HostFailure<E>>, D: DriverPlan<E>> BuiltHostGroup<E, P, D> {
+    /// Drive the retained owner synchronously on the calling thread.
     ///
-    /// A fresh owner selects Blocking before any dependency acquisition. An
-    /// ongoing Async owner is rejected without stopping, replacing or detaching
-    /// its work. A terminal owner simply reports its existing outcome.
+    /// All descriptors prepare in Blocking mode before a selected driver may
+    /// create its event loop. A plan without a driver uses the ordinary parked
+    /// polling loop. Core creates no runtime, worker thread or pool.
     ///
-    /// The loop uses a real wake context and parks between polls. A bounded
-    /// recheck also supports caller-driven completion observations. Core creates
-    /// no runtime, worker thread or pool; adapters prepare their own placement.
-    /// Pending retains the same owners for as long as completion requires.
+    /// An ongoing Async owner is rejected without altering its work. A selected
+    /// driver that returns early remains stored with every unfinished owner.
+    /// Core defers stop and records its original error without running affine
+    /// cleanup outside that driver. A later run borrows the same driver again;
+    /// resumption support is the driver's contract, not an automatic replacement.
     pub fn run(&mut self) -> Result<(), HostRunError<'_, E>> {
-        if !matches!(self.core.phase(), Phase::Stopped | Phase::Failed) {
-            match self.run_mode {
-                None => self.run_mode = Some(HostRunMode::Blocking),
+        if !matches!(self.state.core.phase(), Phase::Stopped | Phase::Failed) {
+            match self.state.run_mode {
+                None => self.state.run_mode = Some(HostRunMode::Blocking),
                 Some(HostRunMode::Blocking) => {}
                 Some(selected) => {
                     return Err(HostRunError::ModeMismatch {
@@ -346,39 +592,32 @@ impl<E, P: HostParts<E> + ResourceParts<HostFailure<E>>> BuiltHostGroup<E, P> {
                     });
                 }
             }
-            let waker = Waker::from(Arc::new(ThreadWake(thread::current())));
-            let mut cx = Context::from_waker(&waker);
-            while self.poll_run(&mut cx).is_pending() {
-                // unpark stores a token, including a wake between poll and park.
-                thread::park_timeout(Duration::from_millis(10));
+            let mut cx = Context::from_waker(Waker::noop());
+            if !self.state.driver_prepared
+                && (self.state.shutdown.is_requested() || !self.state.prepare_driver(&mut cx))
+            {
+                // Preparation is inert: no driver or dependency was acquired.
+                // Unattempted descriptors require only ordinary retirement.
+                let _ = self.state.poll_shutdown(&mut cx, Instant::now());
+            } else {
+                let shutdown = self.state.shutdown.clone();
+                let state = &mut self.state;
+                let result = self.driver.run(&shutdown, &mut |cx| state.poll_run(cx));
+                if let Err(error) = result {
+                    self.state.core.fail_deferred(error);
+                }
+            }
+            if !matches!(self.state.core.phase(), Phase::Stopped | Phase::Failed) {
+                self.state.shutdown.request_shutdown();
+                self.state.core.request_stop_deferred();
+                return Err(HostRunError::DriverReturnedEarly {
+                    host: self.driver_host.unwrap_or("HostGroup"),
+                });
             }
         }
-        match self.core.failures().primary() {
+        match self.state.core.failures().primary() {
             Some(error) => Err(HostRunError::HostFailure(error)),
             None => Ok(()),
         }
-    }
-
-    /// Borrowing, executor-neutral drive. Only terminal cleanup returns a
-    /// result. The first original failure is borrowed; all later failures stay
-    /// available through failures(). No error cloning/string conversion occurs.
-    /// A fresh owner selects Async; resumption honors its already selected
-    /// placement and does not recreate or migrate any service.
-    ///
-    /// This Core extension proof is not qualification of any Web/Tokio/native
-    /// adapter. Those adapters must obey the nonblocking/wake/retained-owner
-    /// contract through acquisition, readiness, running, Join and release.
-    pub async fn run_async(&mut self) -> Result<(), &HostFailure<E>> {
-        poll_fn(|cx| self.poll_run(cx)).await;
-        match self.core.failures().primary() {
-            Some(error) => Err(error),
-            None => Ok(()),
-        }
-    }
-
-    pub fn outcomes(&self) -> Vec<HostOutcome> {
-        let mut result = Vec::with_capacity(P::COUNT);
-        self.core.parts.outcomes(&mut result);
-        result
     }
 }

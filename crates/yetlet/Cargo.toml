@@ -16,6 +16,10 @@ html = ["view"]
 actions = []
 actions-http = ["actions", "dep:serde"]
 reactive = []
+command-bridge = []
+udp = []
+native-winit = ["dep:winit"]
+renderer-wgpu = ["dep:wgpu"]
 web = ["dep:axum", "dep:serde", "dep:tower", "dep:tokio", "tokio/sync", "tokio/io-util", "tokio/time"]
 request-id = ["web"]
 session = ["web", "dep:cookie", "dep:getrandom", "dep:subtle"]
@@ -33,6 +37,8 @@ rate-limit = ["dep:axum", "dep:tower", "dep:governor"]
 serde = { version = "=1.0.229", features = ["derive"], optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }
+wgpu = { version = "=27.0.1", default-features = false, features = ["std", "vulkan", "wgsl"], optional = true }
 axum = { version = "=0.8.9", optional = true }
 tower = { version = "=0.5.3", optional = true }
 cookie = { version = "0.18", optional = true }
@@ -94,6 +100,22 @@ required-features = ["web", "html"]
 [[test]]
 name = "server_axum_app_serve"
 required-features = ["web"]
+
+[[test]]
+name = "command_bridge"
+required-features = ["command-bridge"]
+
+[[test]]
+name = "udp"
+required-features = ["udp"]
+
+[[test]]
+name = "udp_hosts"
+required-features = ["udp"]
+
+[[test]]
+name = "native_hosts"
+required-features = ["native-winit"]
 
 [[test]]
 name = "web_hosts"

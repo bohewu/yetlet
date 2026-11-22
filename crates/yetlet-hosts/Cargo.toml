@@ -5,17 +5,19 @@ edition.workspace = true
 rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Optional concrete native host adapters for Yetlet"
+description = "Unpublished forwarding adapters for Yetlet migration examples"
 publish = false
 
 [features]
 default = []
-web-axum = []
-udp = []
-native-winit = ["dep:winit"]
-renderer-wgpu = ["dep:wgpu"]
+web-axum = ["dep:yetlet", "yetlet/command-bridge"]
+udp = ["dep:yetlet", "yetlet/udp"]
+native-winit = ["dep:yetlet", "yetlet/native-winit", "dep:winit"]
+renderer-wgpu = ["dep:yetlet", "yetlet/renderer-wgpu", "dep:wgpu"]
 
-[dependencies]
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+yetlet = { path = "../yetlet", default-features = false, optional = true }
+# Direct dependencies remain only for historical example imports until migration.
 winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }
 wgpu = { version = "=27.0.1", default-features = false, features = ["std", "vulkan", "wgsl"], optional = true }
 
@@ -28,10 +30,6 @@ tokio = { version = "=1.53.3", default-features = false, features = ["rt", "net"
 [[test]]
 name = "web_axum"
 required-features = ["web-axum"]
-
-[[test]]
-name = "udp"
-required-features = ["udp"]
 
 [[example]]
 name = "native_winit_foreground"

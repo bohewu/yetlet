@@ -124,6 +124,17 @@ coordinator. See the [Web lifecycle guide](../crates/yetlet/guides/server-axum.m
 and [finite consumer](../examples/external-consumers/web-hosts/README.md).
 The existing `HttpWorker` retains its advanced low-level contract.
 
+[YT-292](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#20-yt-292--optional-native-udp-and-custom-host-integration) adds explicit native `command-bridge`, `udp`, `native-winit` and
+`renderer-wgpu` features. Their matching modules contain the canonical bridge,
+`UdpHost`/`UdpEndpoint`, `NativeHost`/`WindowSlot` and independent renderer.
+One NativeHost uses `.with_window(...)` for multiple windows under the same
+caller-thread loop. Native/UDP ordinary hosting uses synchronous `run()`;
+`run_async()` rejects them before acquisition. Advanced custom resources may
+supply a typed `BlockingDriver` through `ResourceGroup::with_blocking_driver`.
+See the [finite native consumer](../examples/external-consumers/native-hosts/README.md)
+for Native/UDP and optional Web with borrowed local resources. These APIs remain
+checkout-only; feature availability is not renderer/backend qualification.
+
 The `actions` feature keeps `Command`, `ActionExecutor` and `LocalExecutor`
 transport-neutral. Executors choose an associated `Error`; local execution
 accepts the caller's error type without requiring serialization. Select

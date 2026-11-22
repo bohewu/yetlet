@@ -1,6 +1,6 @@
 //! Real std UDP loopback evidence for the opt-in byte/socket adapter.
 //! No F1 YTP1/Twin Squares protocol, simulated transport or physical LAN.
-#![cfg(feature = "udp")]
+#![cfg(not(target_arch = "wasm32"))]
 
 use std::{
     cell::Cell,
@@ -12,9 +12,7 @@ use std::{
 };
 
 use yetlet::composition::{Builder, Completion};
-use yetlet_hosts::udp::{
-    MAX_DATAGRAM_BYTES, MAX_PACKETS_PER_POLL, PollReport, SendOutcome, UdpEndpoint,
-};
+use yetlet::udp::{MAX_DATAGRAM_BYTES, MAX_PACKETS_PER_POLL, PollReport, SendOutcome, UdpEndpoint};
 
 const MAX_WAIT: Duration = Duration::from_secs(2);
 
@@ -139,6 +137,69 @@ fn oversized_datagram_is_consumed_and_rejected_not_truncated_or_delivered() {
     assert_eq!(aggregate.rejected_oversize, 1);
     assert_eq!(aggregate.delivered, 1);
     assert_eq!(delivered, [vec![0, 0xff, 1, 3]]);
+}
+
+#[test]
+fn datagram_larger_than_receive_buffer_spends_one_budget_slot_and_keeps_endpoint_usable() {
+    const CAPACITY: usize = 4;
+    let sender = UdpSocket::bind((Ipv4Addr::LOCALHOST, 0)).unwrap();
+    let mut receiver = UdpEndpoint::bind_loopback(CAPACITY).unwrap();
+    let destination = receiver.local_addr().unwrap();
+    // Exceed the endpoint's capacity plus its extra sentinel byte. On Windows
+    // this exercises WSAEMSGSIZE, rather than a successful over-capacity read.
+    let oversized = [0xff; CAPACITY + 2];
+    assert_eq!(
+        sender.send_to(&oversized, destination).unwrap(),
+        oversized.len()
+    );
+    assert_eq!(sender.send_to(b"ok", destination).unwrap(), 2);
+
+    let mut delivered = Vec::new();
+    let mut received = Vec::new();
+    let deadline = Instant::now() + MAX_WAIT;
+    while received.len() < 2 {
+        let report = receiver
+            .poll_bounded(1, |bytes, _| {
+                delivered.push(bytes.to_vec());
+                Ok(())
+            })
+            .unwrap();
+        assert!(report.received <= 1);
+        assert_eq!(report.delivered + report.rejected_oversize, report.received);
+        if report.received != 0 {
+            received.push(report);
+        } else {
+            assert!(report.would_block);
+            thread::sleep(Duration::from_millis(1));
+        }
+        assert!(Instant::now() < deadline, "missing loopback datagram");
+    }
+    assert_eq!(
+        received,
+        [
+            PollReport {
+                received: 1,
+                rejected_oversize: 1,
+                budget_reached: true,
+                ..PollReport::default()
+            },
+            PollReport {
+                received: 1,
+                delivered: 1,
+                budget_reached: true,
+                ..PollReport::default()
+            },
+        ]
+    );
+    assert_eq!(delivered, [b"ok".to_vec()]);
+    assert!(!receiver.is_closed());
+    assert_eq!(receiver.local_addr().unwrap(), destination);
+    let idle = receiver
+        .poll_bounded(1, |_, _| panic!("both datagrams were already consumed"))
+        .unwrap();
+    assert_eq!(idle.received, 0);
+    assert!(idle.would_block);
+    assert!(!idle.budget_reached);
 }
 
 #[test]
