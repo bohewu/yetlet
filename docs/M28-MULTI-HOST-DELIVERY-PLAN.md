@@ -1,10 +1,10 @@
 # M28 follow-through - Multi-Host Delivery Plan
 
 - **Date:** 2026-11-19 (Asia/Taipei).
-- **Status:** Planned work, not an implementation or qualification claim.
+- **Status:** Original delivery plan with separately dated implementation and qualification checkpoints; see section 6 for YT-285 readiness.
 - **Baseline:** `b91313dc5b2233125074f52f2bdbde6925781d8a` on `docs/m28-composable-architecture`.
 - **Tracking:** [Follow-through backlog](BACKLOG.md#m28-follow-through--multi-host-sdk-delivery); [roadmap](ROADMAP.md#m28--composable-application-and-multi-host-research).
-- **This change:** Planning documents and an ignored handoff only. Product source, SDK/CLI, Cargo features, ADR status and historical evidence are unchanged. No Stage, Commit or Push is authorized by this plan.
+- **Original planning change:** Planning documents and an ignored handoff only. Product source, SDK/CLI, Cargo features, ADR status and historical evidence are unchanged. No Stage, Commit or Push is authorized by this plan.
 
 ## 1. Delivery objective and F0 boundary
 
@@ -297,6 +297,98 @@ changes require their own authorization; none follows from this plan.
 application UDP path between the two selected physical hosts are ready.
 Unresolved ingress is a blocked gate, not permission to substitute VM evidence.
 
+#### YT-285 readiness checkpoint 2026-11-22
+
+**Status: YT-285 Done at native endpoint and selected physical-path readiness scope.**
+Configured independent Reviewer `wc_job_njZ3jGWe6WmFO-rC` completed with exit 0
+and actual JSON PASS: `issues=[]`, `required_followups=[]`. The saved Reviewer
+model was `gpt-6.2-astra`; observed effort was `high`. All 17 selected source
+files and 47 evidence inputs remained unchanged during review. This was an
+ordinary role-directed review, not formal assurance. Final local Git delivery
+uses the scoped document check and exact-index Strict/Builtin Commit Guard.
+
+This checkpoint selects the current public SDK UDP implementation and the original
+direct campus path. It does not reuse the old D3 loopback/relay application.
+
+The source baseline is `52b67fa75b88f8bacd9717ba750f5de0a7f0948c`.
+Both builds consume the unchanged normal YT-294 Core archive
+`yetlet-0.9.0-alpha.8.crate`, SHA-256
+`ea267e20bd424aa1c7772140d2269655575f3b0743ac887fa49eabba4c60412b`,
+whose recorded Git source is `19993131f02fa4477296542f6bbe0b1774a744b7`.
+The intervening commit does not change the SDK, workspace manifest or lockfile.
+The selected `src/udp.rs` hash is
+`d7d3a04682aa50466bf7e7b7de3dd2e9609164775b197e7b02067274626a4d18`;
+`src/udp/host.rs` is
+`95f2287bc10efa86778d3c8bae406ce41b53e340c401e097f9083584706be5a7`.
+
+| Selected physical host | Native environment | Explicit endpoint and route |
+|---|---|---|
+| `physical Linux authority`, ASUS physical host; virtualization detection returned `none` | Linux `7.0.0-44-generic`; Rust `1.99.0`, `x86_64-unknown-linux-gnu` | `<selected-endpoint>`, `enp4s0`; direct on-link route to Windows |
+| `physical Windows replica`, ASUS EXPERTCENTER D900TA_M900TA physical host | Windows 11 Pro `10.0.26300`; Rust `1.99.0`, native `x86_64-pc-windows-msvc` | `<selected-endpoint>`, `vEthernet (External)` interface 20 on the physical host; on-link `<selected-gateway>`, next hop `0.0.0.0` |
+
+The existing ZeroTier interfaces were inspected as an initial candidate only.
+`SELECTED-PATH-R2.json` explicitly supersedes that candidate in `BASELINE.json`;
+neither executed exchange used an overlay, VM or relay. No firewall, routing,
+network-profile or ZeroTier setting was changed. Current success does not identify
+the cause of the original 2026-11-18 zero-packet results.
+
+**Evidence stages remain distinct:**
+
+| Stage | Ubuntu valid received challenges / acknowledgements | Windows valid received challenges / acknowledgements | Completion |
+|---|---|---|---|
+| Native Python path preflight, 20 challenges sent per host | 17 / 18 | 18 / 17 | Both exit 0; both original sockets closed and selected endpoints rebound |
+| Actual SDK consumer, 20 challenges sent per host | 9 / 10 | 10 / 9 | Both exit 0 after their full 20-second windows; both original endpoints closed and rebound |
+
+The SDK consumer uses public `UdpEndpoint::bind_on`, `send_to`,
+`poll_bounded` and `close`. Its shared source SHA-256 is
+`8dc72eeaf9076d05e64352cfb87121ac975350f5d0e4655b9b8679057e9fbc98`.
+It checks the exact peer tuple before parsing or replying, then validates the
+selected run, opposite role and echoed per-process nonce. Its bounds are 256-byte
+payload capacity, 16 packets per poll, 20 challenge attempts, 32 acknowledgement
+attempts and one 20-second monotonic window. Four focused configuration/frame
+fixtures pass; the no-argument invocation binds loopback on an ephemeral port,
+sends no packets, closes and successfully rebinds. The SDK's loopback defaults and
+caller-owned peer policy are unchanged.
+
+Both native builds compile the std-only Core plus `udp` from that archive directly
+with Rust 1.99. This is source-bound native compilation and execution evidence;
+normal Cargo/archive consumption remains the separately qualified YT-294 scope.
+The Linux binary SHA-256 is
+`2a6fdb2185a91cffe5f3666a86c6919637066ac415df6f3b0de3b3dee09f6989`;
+the Windows MSVC executable SHA-256 is
+`100f57be56ac404f9b3a5ee46b3a5cbe5cb460843fb4a6bb364446736e5d72a3`.
+The Windows tracked checkout remains unchanged at
+`7fbf918a5a0734f7ed125afd6c860837b1de55d1`; the tested SDK comes from the
+SHA-verified archive transfer, not that historical checkout.
+
+SDK Jobs `wc_job_q6B9LvSTVt-z_y0Q` and `wc_job_Pg9TnA_7jgRawICN`
+completed with exit 0, running native PIDs 1463055 and 49456 respectively.
+Each recorded valid peer traffic, matching cross-peer nonces, no errors,
+owned close and successful same-address rebind. Fresh post-run observations
+found neither selected process nor selected UDP-port owner. The earlier native
+path Jobs `wc_job_bOndpswRTs2zdD2M` and `wc_job_vTzNG2BF-mkAYNVl`
+also completed with exit 0. The different receive totals reflect separate
+observation windows and are not a packet-loss or reliability measurement.
+
+Ignored evidence is rooted at `.pipeline-output/m28-yt285-20261122/`:
+`SDK-PATH-R1.json` binds source/build identities, actual SDK receipts,
+cross-peer nonce agreement and cleanup; `SELECTED-PATH-R2.json` binds the
+direct-path choice; `UBUNTU-HOST-INVENTORY-R1.json` and
+`WINDOWS-HOST-INVENTORY-R1.json` retain the host observations.
+`ARTIFACT-TRANSFERS-R1.json` records verified transfers, and
+`windows-evidence-r1/` contains the transferred native Windows receipts.
+The finite consumer and local build/fixture receipts are under
+`artifacts/verification/m28-yt285-20261122/sdk-consumer/`.
+These are ordinary task artifacts, not a new supported test framework.
+
+This establishes YT-285 native endpoint and selected physical-path readiness.
+The transport remains a byte/socket facility with caller-owned trust and
+application protocol policy. YT-274 remains **Not verified**: actual remote
+application input, authoritative publication/replica agreement, selected
+disconnect/reconnect and owned application shutdown still require their own
+source-bound physical execution. The original failed D4 probes and successful
+VM supplement retain their historical scopes.
+
 ### Existing YT-274 - Physical application qualification
 
 Continue the original D4 item. Record both physical host identities, exact source,
@@ -311,6 +403,8 @@ qualified source is an older research application, report only that scope; do
 not promote it into a claim about an untested SDK transport.
 
 ## 7. Verification, authority and immediate next work
+
+**Historical planning checkpoint (2026-11-19):** The instructions below record the original planning scope. Later user-authorized delivery is recorded in the dated checkpoints above.
 
 This turn adds documentation only. A scoped document check can establish valid
 links, English text, backlog dependencies and whitespace; it cannot establish
