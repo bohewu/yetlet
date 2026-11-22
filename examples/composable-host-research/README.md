@@ -214,6 +214,22 @@ Evidence receipts and raw logs:
 implement a public Host/Transport trait, D4 physical LAN, authentication
 for untrusted peers, reliable UDP, Windows or GPU visual fault testing.
 
+## D4 — Two physical hosts, private headless application (YT-274)
+
+The later YT-274 research application reuses this crate's original single C1 authority, bounded UDP HeldInput admission, and immutable Snapshot Replica. The opt-in `d4-physical` binary requires exactly one role and concrete IPv4 bind/peer pair. It does not make the private D3 game protocol a public Yetlet SDK or introduce authentication.
+
+On two individually authorized physical hosts, build using the same source checkout and run with explicit peer selection:
+
+```sh
+# Ubuntu host (replace addresses and choose allowed network policy first)
+cargo run --manifest-path examples/composable-host-research/Cargo.toml --locked --bin d4-physical -- host --bind <host-ip>:<host-port> --peer <client-ip>:<client-port>
+# Windows client, using the same source revision
+cargo run --manifest-path examples/composable-host-research/Cargo.toml --locked --bin d4-physical -- client --bind <client-ip>:<client-port> --peer <host-ip>:<host-port>
+```
+
+The bounded application exercises real remote movement, input expiry, newer Session/Epoch reconnection and a read-only replica while keeping one authority. In the 2026-11-22 source-bound physical R4, both processes exited 0 and closed/rebound their UDP addresses; the host accepted 25 remote inputs and **all 63 client Snapshot frames matched original host-publication bytes** across Sessions `7101` and `7102`. The original R1–R3 failures remain retained; R4 followed owner-approved narrowly scoped Ubuntu UDP ingress, not a tool-side firewall change.
+
+Full source/binary identities, physical endpoints, actual process results, cleanup, per-session canonical bytes and limitations appear in [M28 multi-host delivery plan](../../docs/M28-MULTI-HOST-DELIVERY-PLAN.md#yt-274-physical-application-qualification--2026-11-22). This does not qualify GPU windows, public SDK application transport, arbitrary LANs, untrusted-peer authentication or general UDP reliability.
 ## F0-B1 — Caller-local Headless Composition Root
 
 The private `headless_composition_f0b1` module composes **one** original C1

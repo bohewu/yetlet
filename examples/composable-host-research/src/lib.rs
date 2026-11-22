@@ -13,7 +13,7 @@ mod composition_f2a;
 // D3 fixed-seed bounded real loopback datagram fault adapter; std-only.
 pub mod fault_d3;
 
-// D3 std-only loopback HeadlessHost + NetworkHost/Client; no GPU or HTTP.
+// D3/D4 private headless UDP: loopback defaults or an explicit selected peer.
 pub mod udp_headless_d3;
 
 // D1 private bounded binary codec and in-memory session admission; no socket.

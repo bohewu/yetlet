@@ -45,6 +45,10 @@ The IDs below identify **separate reviewed source milestones**, not a single sim
 
 At the original 2026-11-18 decision checkpoint, **YT-274 / D4 physical LAN acceptance was `Not verified — selected UDP ingress blocked`**. D4VM provided additional confidence without changing that result. The later [2026-11-22 YT-285 readiness checkpoint](M28-MULTI-HOST-DELIVERY-PLAN.md#yt-285-readiness-checkpoint-2026-11-22) records selected direct physical UDP readiness separately. YT-274 remains **Not verified** pending full physical application qualification. The historical table above retains its original sources, environments and limits; current readiness does not retroactively qualify the old D3 application or establish broader feature/release support.
 
+### 2026-11-22 subsequent physical application checkpoint
+
+The [YT-285 native UDP readiness result](M28-MULTI-HOST-DELIVERY-PLAN.md#yt-285-readiness-checkpoint-2026-11-22) was followed by a separately source-bound [YT-274 private headless application run](M28-MULTI-HOST-DELIVERY-PLAN.md#yt-274-physical-application-qualification--2026-11-22). After the user added narrow inbound UFW permission on the selected Ubuntu interface, the two native Linux/Windows application processes completed remote input, one-authority state publication and newer Session/Epoch reconnect. All 63 client Replica Snapshot frames matched actual host-published bytes (45 initial, 18 replacement); both processes exited 0 and released/rebound their own UDP ports. This newer result does not rewrite the original failed 2026-11-18 probes or its separate VM-relay claim. Configured independent Reviewer `wc_job_ZAtDIjA5lHjgElJ4` returned actual PASS with no issues/followups; local Git delivery follows the exact-index Strict/Builtin Commit Guard. It does not establish arbitrary network, GPU/GUI, authenticated untrusted-LAN or public SDK release qualification.
+
 ## 3. Requested workload and combination coverage
 
 | Target scenario | Evidence status | Required scope qualifier |

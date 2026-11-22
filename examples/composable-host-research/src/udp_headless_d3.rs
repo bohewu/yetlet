@@ -1,6 +1,8 @@
-//! D3 bounded HeadlessHost+NetworkHost and NetworkClient over real
-//! loopback UDP. No GPU, Window, HTTP, background thread or public Yetlet API.
-//! Session/epoch markers and exact loopback source are NOT authentication.
+//! Private D3/D4 bounded HeadlessHost+NetworkHost and NetworkClient over UDP.
+//! Existing constructors and proxy selection retain their loopback-only defaults;
+//! explicit endpoints pin one exact peer before decoding or session admission.
+//! No GPU, Window, HTTP, background thread or public Yetlet API.
+//! Session/epoch markers and selected source addresses are NOT authentication.
 use crate::{
     protocol::{
         Binding, EndpointId, HostFixture, MAX_WIRE_BYTES, Message, ReplicaFixture, WireSnapshot,
@@ -67,11 +69,36 @@ fn bind() -> io::Result<(UdpSocket, SocketAddrV4)> {
     let addr = loopback(socket.local_addr()?).ok_or_else(|| err("IPv4 loopback bind failed"))?;
     Ok((socket, addr))
 }
-fn send(sock: &UdpSocket, to: SocketAddrV4, frame: &[u8]) -> io::Result<bool> {
-    if to.ip() != &Ipv4Addr::LOCALHOST || to.port() == 0 || frame.len() > MAX_WIRE_BYTES {
+fn concrete_endpoint(address: SocketAddrV4) -> bool {
+    address.port() != 0
+        && !address.ip().is_unspecified()
+        && !address.ip().is_multicast()
+        && !address.ip().is_broadcast()
+}
+fn validate_selected_pair(local: SocketAddrV4, peer: SocketAddrV4) -> io::Result<()> {
+    if !concrete_endpoint(local) || !concrete_endpoint(peer) || local == peer {
         return Err(io::Error::new(
             io::ErrorKind::InvalidInput,
-            "D3 explicit loopback/size only",
+            "selected endpoints require distinct concrete IPv4 addresses and nonzero ports",
+        ));
+    }
+    Ok(())
+}
+fn bind_selected(local: SocketAddrV4) -> io::Result<(UdpSocket, SocketAddrV4)> {
+    let socket = UdpSocket::bind(local)?;
+    socket.set_nonblocking(true)?;
+    if socket.local_addr()? != SocketAddr::V4(local) {
+        return Err(err(
+            "selected IPv4 bind did not retain the requested endpoint",
+        ));
+    }
+    Ok((socket, local))
+}
+fn send(sock: &UdpSocket, to: SocketAddrV4, frame: &[u8]) -> io::Result<bool> {
+    if !concrete_endpoint(to) || frame.len() > MAX_WIRE_BYTES {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "D3/D4 concrete destination and bounded frame required",
         ));
     }
     match sock.send_to(frame, to) {
@@ -86,6 +113,7 @@ pub struct HeadlessNetworkHost {
     socket: Option<UdpSocket>,
     local: SocketAddrV4,
     owner: HostFixture,
+    allowed_peer: Option<SocketAddrV4>,
     peer: Option<SocketAddrV4>,
     nonce: Option<u64>,
     session: u64,
@@ -96,6 +124,7 @@ pub struct HeadlessNetworkHost {
     last_wire_tick: u64,
     last_input_sequence: u64,
     last_snapshot_at: Option<Instant>,
+    last_sent_snapshot_frame: Option<Vec<u8>>,
     rate_window: Instant,
     inputs_in_window: u32,
     joins_in_window: u32,
@@ -104,6 +133,25 @@ pub struct HeadlessNetworkHost {
 impl HeadlessNetworkHost {
     pub fn bind(now: Instant) -> io::Result<Self> {
         let (socket, local) = bind()?;
+        Self::from_bound(socket, local, None, now)
+    }
+    /// Explicit private-application route; only this exact peer may begin or
+    /// replace a session. The allowance survives peer timeout and Leave.
+    pub fn bind_on(
+        now: Instant,
+        local: SocketAddrV4,
+        exact_peer: SocketAddrV4,
+    ) -> io::Result<Self> {
+        validate_selected_pair(local, exact_peer)?;
+        let (socket, local) = bind_selected(local)?;
+        Self::from_bound(socket, local, Some(exact_peer), now)
+    }
+    fn from_bound(
+        socket: UdpSocket,
+        local: SocketAddrV4,
+        allowed_peer: Option<SocketAddrV4>,
+        now: Instant,
+    ) -> io::Result<Self> {
         let owner = HostFixture::new(
             HOST_GENERATION,
             [
@@ -132,6 +180,7 @@ impl HeadlessNetworkHost {
             socket: Some(socket),
             local,
             owner,
+            allowed_peer,
             peer: None,
             nonce: None,
             session: INITIAL_SESSION,
@@ -142,6 +191,7 @@ impl HeadlessNetworkHost {
             last_wire_tick: 0,
             last_input_sequence: 0,
             last_snapshot_at: None,
+            last_sent_snapshot_frame: None,
             rate_window: now,
             inputs_in_window: 0,
             joins_in_window: 0,
@@ -162,6 +212,12 @@ impl HeadlessNetworkHost {
     }
     pub fn snapshot(&self) -> Rc<Snapshot> {
         self.owner.snapshot()
+    }
+    /// One canonical Snapshot frame from the last complete OS submission.
+    /// This is not a delivery acknowledgement. It may identify the prior epoch
+    /// until a newer frame is submitted and remains historical after stop.
+    pub fn last_sent_snapshot_frame(&self) -> Option<&[u8]> {
+        self.last_sent_snapshot_frame.as_deref()
     }
     pub fn socket_closed(&self) -> bool {
         self.socket.is_none()
@@ -348,7 +404,12 @@ impl HeadlessNetworkHost {
                 self.stats.oversize += 1;
                 continue;
             }
-            let Some(source) = loopback(address) else {
+            let source = match self.allowed_peer {
+                Some(expected) if address == SocketAddr::V4(expected) => Some(expected),
+                Some(_) => None,
+                None => loopback(address),
+            };
+            let Some(source) = source else {
                 self.stats.foreign += 1;
                 continue;
             };
@@ -462,6 +523,7 @@ impl HeadlessNetworkHost {
             self.stats.sent += 1;
             self.stats.snapshots_sent += 1;
             self.last_snapshot_at = Some(now);
+            self.last_sent_snapshot_frame = Some(bytes);
         }
         Ok(())
     }
@@ -471,6 +533,7 @@ pub struct HeadlessNetworkClient {
     socket: Option<UdpSocket>,
     local: SocketAddrV4,
     expected_proxy: SocketAddrV4,
+    initial_proxy_selectable: bool,
     expected_session: u64,
     expected_epoch: u64,
     nonce: u64,
@@ -503,10 +566,50 @@ impl HeadlessNetworkClient {
             ));
         }
         let (socket, local) = bind()?;
-        Ok(Self {
+        Ok(Self::from_bound(
+            socket,
+            local,
+            expected_proxy,
+            session,
+            epoch,
+            nonce,
+            true,
+        ))
+    }
+    /// Explicit private-application route with an immutable exact host.
+    pub fn bind_on(
+        local: SocketAddrV4,
+        exact_host: SocketAddrV4,
+        session: u64,
+        epoch: u64,
+        nonce: u64,
+    ) -> io::Result<Self> {
+        validate_selected_pair(local, exact_host)?;
+        if session == 0 || epoch == 0 || nonce == 0 {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "trusted D4 client markers",
+            ));
+        }
+        let (socket, local) = bind_selected(local)?;
+        Ok(Self::from_bound(
+            socket, local, exact_host, session, epoch, nonce, false,
+        ))
+    }
+    fn from_bound(
+        socket: UdpSocket,
+        local: SocketAddrV4,
+        expected_proxy: SocketAddrV4,
+        session: u64,
+        epoch: u64,
+        nonce: u64,
+        initial_proxy_selectable: bool,
+    ) -> Self {
+        Self {
             socket: Some(socket),
             local,
             expected_proxy,
+            initial_proxy_selectable,
             expected_session: session,
             expected_epoch: epoch,
             nonce,
@@ -519,13 +622,14 @@ impl HeadlessNetworkClient {
             silence: false,
             direction: Direction::West,
             stats: NetworkStats::default(),
-        })
+        }
     }
     /// The client Socket may bind before the separately owned in-process
     /// fault relay gets its ephemeral port. This selection is legal only
     /// before any Hello or trusted Replica; it is not a remote retarget API.
     pub fn select_initial_proxy(&mut self, proxy: SocketAddrV4) -> io::Result<()> {
-        if proxy.ip() != &Ipv4Addr::LOCALHOST
+        if !self.initial_proxy_selectable
+            || proxy.ip() != &Ipv4Addr::LOCALHOST
             || proxy.port() == 0
             || self.hello_count != 0
             || self.replica.is_some()
@@ -663,7 +767,7 @@ impl HeadlessNetworkClient {
                 self.stats.oversize += 1;
                 continue;
             }
-            if loopback(from) != Some(self.expected_proxy) {
+            if from != SocketAddr::V4(self.expected_proxy) {
                 self.stats.foreign += 1;
                 continue;
             }
@@ -1140,6 +1244,228 @@ mod tests {
         assert!(Rc::ptr_eq(&fresh, &client.snapshot().unwrap()));
         client.stop();
     }
+    fn d4_reserved_loopback() -> (UdpSocket, SocketAddrV4) {
+        let socket = UdpSocket::bind((Ipv4Addr::LOCALHOST, 0)).unwrap();
+        let address = loopback(socket.local_addr().unwrap()).unwrap();
+        (socket, address)
+    }
+
+    #[test]
+    fn d4_selected_configuration_preserves_loopback_and_proxy_defaults() {
+        let now = Instant::now();
+        let local = SocketAddrV4::new(Ipv4Addr::LOCALHOST, 32001);
+        let peer = SocketAddrV4::new(Ipv4Addr::LOCALHOST, 32002);
+        for invalid in [
+            SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 32003),
+            SocketAddrV4::new(Ipv4Addr::BROADCAST, 32003),
+            SocketAddrV4::new(Ipv4Addr::new(239, 1, 2, 3), 32003),
+            SocketAddrV4::new(Ipv4Addr::LOCALHOST, 0),
+        ] {
+            assert_eq!(
+                HeadlessNetworkHost::bind_on(now, invalid, peer)
+                    .err()
+                    .unwrap()
+                    .kind(),
+                io::ErrorKind::InvalidInput,
+            );
+            assert_eq!(
+                HeadlessNetworkHost::bind_on(now, local, invalid)
+                    .err()
+                    .unwrap()
+                    .kind(),
+                io::ErrorKind::InvalidInput,
+            );
+            assert_eq!(
+                HeadlessNetworkClient::bind_on(invalid, peer, INITIAL_SESSION, INITIAL_EPOCH, 100)
+                    .err()
+                    .unwrap()
+                    .kind(),
+                io::ErrorKind::InvalidInput,
+            );
+            assert_eq!(
+                HeadlessNetworkClient::bind_on(local, invalid, INITIAL_SESSION, INITIAL_EPOCH, 100)
+                    .err()
+                    .unwrap()
+                    .kind(),
+                io::ErrorKind::InvalidInput,
+            );
+        }
+        assert!(HeadlessNetworkHost::bind_on(now, local, local).is_err());
+        assert!(
+            HeadlessNetworkClient::bind_on(local, local, INITIAL_SESSION, INITIAL_EPOCH, 100)
+                .is_err()
+        );
+        for (session, epoch, nonce) in [(0, 1, 100), (7101, 0, 100), (7101, 1, 0)] {
+            assert_eq!(
+                HeadlessNetworkClient::bind_on(local, peer, session, epoch, nonce)
+                    .err()
+                    .unwrap()
+                    .kind(),
+                io::ErrorKind::InvalidInput,
+            );
+        }
+        let mut host = HeadlessNetworkHost::bind(now).unwrap();
+        assert_eq!(host.endpoint().ip(), &Ipv4Addr::LOCALHOST);
+        assert_ne!(host.endpoint().port(), 0);
+        assert!(host.last_sent_snapshot_frame().is_none());
+        assert!(
+            HeadlessNetworkClient::bind(
+                SocketAddrV4::new(Ipv4Addr::new(192, 0, 2, 1), 32002),
+                INITIAL_SESSION,
+                INITIAL_EPOCH,
+                100,
+            )
+            .is_err()
+        );
+        let mut legacy =
+            HeadlessNetworkClient::bind(peer, INITIAL_SESSION, INITIAL_EPOCH, 100).unwrap();
+        assert_eq!(legacy.endpoint().ip(), &Ipv4Addr::LOCALHOST);
+        legacy.select_initial_proxy(host.endpoint()).unwrap();
+        assert_eq!(legacy.bound_host(), host.endpoint());
+        legacy.stop();
+        host.stop();
+    }
+
+    #[test]
+    fn d4_selected_peer_is_fenced_before_hello_and_decode_after_timeout() {
+        let now = Instant::now();
+        let (peer, peer_address) = d4_reserved_loopback();
+        let (reservation, local) = d4_reserved_loopback();
+        drop(reservation);
+        let mut host = HeadlessNetworkHost::bind_on(now, local, peer_address).unwrap();
+        let (foreign, _) = d4_reserved_loopback();
+        let before = host.snapshot();
+        foreign
+            .send_to(&encode(&Message::Hello { nonce: 999 }).unwrap(), local)
+            .unwrap();
+        foreign.send_to(b"not a protocol frame", local).unwrap();
+        host.poll(now).unwrap();
+        assert!(!host.connected());
+        assert_eq!(host.stats.foreign, 2);
+        assert_eq!(host.stats.malformed, 0);
+        assert_eq!(host.stats.welcomes, 0);
+        assert!(host.last_sent_snapshot_frame().is_none());
+        assert!(Rc::ptr_eq(&before, &host.snapshot()));
+
+        peer.send_to(&encode(&Message::Hello { nonce: 100 }).unwrap(), local)
+            .unwrap();
+        host.poll(now).unwrap();
+        assert!(host.connected());
+        let expired = now + PEER_TIMEOUT + Duration::from_millis(1);
+        host.poll(expired).unwrap();
+        assert!(!host.connected());
+        foreign
+            .send_to(&encode(&Message::Hello { nonce: 1000 }).unwrap(), local)
+            .unwrap();
+        host.poll(expired + Duration::from_millis(1)).unwrap();
+        assert!(!host.connected());
+        assert_eq!(host.nonce, Some(100));
+        assert_eq!(host.session(), INITIAL_SESSION);
+        assert_eq!(host.stats.foreign, 3);
+        assert!(Rc::ptr_eq(&before, &host.snapshot()));
+
+        peer.send_to(&encode(&Message::Hello { nonce: 101 }).unwrap(), local)
+            .unwrap();
+        host.poll(expired + Duration::from_millis(20)).unwrap();
+        assert!(host.connected());
+        assert_eq!(host.session(), INITIAL_SESSION + 1);
+        assert_eq!(host.epoch(), INITIAL_EPOCH + 1);
+        assert!(Rc::ptr_eq(&before, &host.snapshot()));
+        host.stop();
+        assert!(host.socket_closed());
+        drop(UdpSocket::bind(local).unwrap());
+    }
+
+    #[test]
+    fn d4_selected_publication_matches_replica_and_same_peer_reconnect() {
+        fn assert_publication(
+            host: &HeadlessNetworkHost,
+            client: &HeadlessNetworkClient,
+        ) -> Vec<u8> {
+            let bytes = host.last_sent_snapshot_frame().unwrap();
+            assert!(bytes.len() <= MAX_WIRE_BYTES);
+            let Message::Snapshot(sent) = decode(bytes).unwrap() else {
+                panic!("Snapshot frame");
+            };
+            assert_eq!(&sent, client.snapshot().unwrap().as_ref());
+            assert_eq!(encode(&Message::Snapshot(sent)).unwrap(), bytes);
+            bytes.to_vec()
+        }
+
+        let now = Instant::now();
+        let (peer_reservation, peer_address) = d4_reserved_loopback();
+        let (host_reservation, local) = d4_reserved_loopback();
+        drop(host_reservation);
+        let mut host = HeadlessNetworkHost::bind_on(now, local, peer_address).unwrap();
+        drop(peer_reservation);
+        let mut client = HeadlessNetworkClient::bind_on(
+            peer_address,
+            local,
+            INITIAL_SESSION,
+            INITIAL_EPOCH,
+            100,
+        )
+        .unwrap();
+        assert!(client.select_initial_proxy(local).is_err());
+        assert_eq!(client.bound_host(), local);
+        assert!(host.last_sent_snapshot_frame().is_none());
+        client.poll(now).unwrap();
+        host.poll(now).unwrap();
+        client.poll(now).unwrap();
+        let initial_frame = assert_publication(&host, &client);
+        host.poll(now).unwrap();
+        let before_input = host.snapshot();
+        host.step(now + Duration::from_millis(10)).unwrap();
+        assert_ne!(host.snapshot().positions()[1], before_input.positions()[1]);
+        assert_eq!(host.last_sent_snapshot_frame().unwrap(), initial_frame);
+        host.step(now + Duration::from_millis(60)).unwrap();
+        host.step(now + Duration::from_millis(80)).unwrap();
+        client.poll(now + Duration::from_millis(80)).unwrap();
+        let old_frame = assert_publication(&host, &client);
+        assert_ne!(old_frame, initial_frame);
+        let old_replica = client.snapshot().unwrap();
+        let old_generation = host.snapshot().generation();
+
+        let expired = now + PEER_TIMEOUT + Duration::from_millis(100);
+        host.poll(expired).unwrap();
+        assert!(!host.connected());
+        assert_eq!(host.stats.timed_out, 1);
+        let before_rotation = host.snapshot();
+        let rejoined = expired + Duration::from_millis(100);
+        client
+            .reconnect(INITIAL_SESSION + 1, INITIAL_EPOCH + 1, 101)
+            .unwrap();
+        assert!(client.snapshot().is_none());
+        client.set_direction(Direction::Still);
+        client.poll(rejoined).unwrap();
+        host.poll(rejoined).unwrap();
+        assert!(Rc::ptr_eq(&before_rotation, &host.snapshot()));
+        client.poll(rejoined).unwrap();
+        assert_publication(&host, &client);
+        host.poll(rejoined).unwrap();
+        host.step(rejoined + Duration::from_millis(10)).unwrap();
+        host.step(rejoined + Duration::from_millis(30)).unwrap();
+        host.step(rejoined + Duration::from_millis(60)).unwrap();
+        client.poll(rejoined + Duration::from_millis(60)).unwrap();
+        let final_frame = assert_publication(&host, &client);
+        let fresh = client.snapshot().unwrap();
+        assert_eq!(fresh.session, INITIAL_SESSION + 1);
+        assert_eq!(fresh.epoch, INITIAL_EPOCH + 1);
+        assert_eq!(fresh.generation, old_generation);
+        assert!(fresh.tick > old_replica.tick);
+        assert_eq!(old_replica.session, INITIAL_SESSION);
+        assert_eq!(old_replica.epoch, INITIAL_EPOCH);
+        assert_eq!(host.stats.reconnects, 1);
+        assert!(host.stats.accepted_inputs >= 2);
+        client.stop();
+        host.stop();
+        assert!(client.socket_closed());
+        assert!(host.socket_closed());
+        assert_eq!(host.last_sent_snapshot_frame().unwrap(), final_frame);
+        drop(UdpSocket::bind(peer_address).unwrap());
+        drop(UdpSocket::bind(local).unwrap());
+    }
+
     #[test]
     fn d3_client_expected_new_session_rejects_old_welcome_and_snapshot() {
         let now = Instant::now();
