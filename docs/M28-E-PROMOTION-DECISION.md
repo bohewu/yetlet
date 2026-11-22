@@ -2,10 +2,15 @@
 
 - **Date:** 2026-11-18.
 - **Source baseline:** isolated M28 worktree `docs/m28-composable-architecture` at `cde0a03f712e01ffb48811a2f1121afc1e976f7b`.
-- **Decision state:** **Proposed for owner acceptance**. This is a documentation and architecture recommendation, not an accepted public API or an implementation authorization.
+- **Original decision state (2026-11-18):** **Proposed for owner acceptance**. This is a documentation and architecture recommendation, not an accepted public API or an implementation authorization.
 - **Parent:** [M28 plan](M28-COMPOSABLE-APPLICATION-PLAN.md), particularly [M28-E promotion gate](M28-COMPOSABLE-APPLICATION-PLAN.md#m28-e-promotion-gate).
-- **Related:** [ADR 0013](adr/0013-composable-application-and-hosts.md) remains **Proposed**; [M28 roadmap](ROADMAP.md#m28--composable-application-and-multi-host-research), [YT-275 and conditional YT-274](BACKLOG.md#m28--composable-application-and-multi-host-research).
-- **Review:** Original independent R1 `wc_job_tHV6cHY7qckBm8pG` terminal exit0 actual FAIL3 (wire frame-size wording, public ActionExecutor semantics and B0 source provenance); all three factual/documentation defects corrected. Independent R2 `wc_job_yKyyePqAbLGP4xaz` terminal exit0 actual JSON **PASS**, `issues=[]`, `required_followups=[]`; original R1 FAIL remains retained. No product tests were rerun. **Owner acceptance and any public implementation remain separate.**
+- **Related:** [ADR 0013](adr/0013-composable-application-and-hosts.md) was **Proposed** at this checkpoint; [M28 roadmap](ROADMAP.md#m28--composable-application-and-multi-host-research), [YT-275 and conditional YT-274](BACKLOG.md#m28--composable-application-and-multi-host-research).
+- **Review:** Original independent R1 `wc_job_tHV6cHY7qckBm8pG` terminal exit0 actual FAIL3 (wire frame-size wording, public ActionExecutor semantics and B0 source provenance); all three factual/documentation defects corrected. Independent R2 `wc_job_yKyyePqAbLGP4xaz` terminal exit0 actual JSON **PASS**, `issues=[]`, `required_followups=[]`; original R1 FAIL remains retained. No product tests were rerun. **This review did not itself authorize owner acceptance or public implementation.**
+
+This document preserves the original disposition and its evidence. Subsequent
+accepted amendments are recorded in [ADR 0013](adr/0013-composable-application-and-hosts.md)
+and [ADR 0014](adr/0014-layered-host-resource-lifecycle.md); current delivery and
+physical qualification are recorded in the [dated delivery checkpoints](M28-MULTI-HOST-DELIVERY-PLAN.md).
 
 ## 1. Decision proposed
 
@@ -41,9 +46,9 @@ The IDs below identify **separate reviewed source milestones**, not a single sim
 | Experiment | Real result | What it establishes | What it does **not** establish |
 |---|---|---|---|
 | D4 campus LAN preflight (ignored receipt: `.pipeline-output/m28-d4-20261118/NETWORK-PREFLIGHT-BLOCKED-HANDOFF.md`) | Three distinct physical hosts found; exact campus IPv4 interfaces chosen. Native UDP probes between Ubuntu↔Windows and Windows↔Windows **received zero valid application packets**, despite some ICMP/ARP reachability. All probes terminated and test sockets closed | Physical-host inventory, actual routing and a **blocking UDP ingress condition** on selected ports | Windows MSVC same-source D3 app, functional cross-host game/Session/Replica, or blanket proof of which firewall/ACL caused the block |
-| D4VM Multipass supplement (ignored receipt: `.pipeline-output/m28-d4vm-20261118/VM-UDP-PASS-PHYSICAL-D4-NOT-VERIFIED-HANDOFF.md`) | Two separate Ubuntu 26.04 VM kernels on **one physical Ubuntu host** exchanged actual `<isolated-vm-network>` UDP via test-only per-VM relays with identical binary SHA256 `f9085aebcdd2a4f085ce241dffc4178fdb0f04d582deabc9fe00fc6b4e910ba9`. After fault injection and reconnect the owner/Replica matched **Revision462/Tick462, X=(22,0)**; all four process commands exited0; all guest UDP ports closed and both disposable VMs purged | Actual canonical D3 bytes crossed two virtual kernels; the source/replica protocol recovered via relay on the virtual LAN | Two **physical** devices; D3 **native** non-loopback bind (D3 still bound `127.0.0.1` inside each VM), Windows/MSVC, untrusted LAN authentication, hardware-independent fault realism or original D4 qualification |
+| D4VM Multipass supplement (ignored receipt: `.pipeline-output/m28-d4vm-20261118/VM-UDP-PASS-PHYSICAL-D4-NOT-VERIFIED-HANDOFF.md`) | Two separate Ubuntu 26.04 VM kernels on **one physical Ubuntu host** exchanged actual virtual-LAN UDP via test-only per-VM relays with identical binary SHA256 `f9085aebcdd2a4f085ce241dffc4178fdb0f04d582deabc9fe00fc6b4e910ba9`. After fault injection and reconnect the owner/Replica matched **Revision462/Tick462, X=(22,0)**; all four process commands exited0; all guest UDP ports closed and both disposable VMs purged | Actual canonical D3 bytes crossed two virtual kernels; the source/replica protocol recovered via relay on the virtual LAN | Two **physical** devices; D3 **native** non-loopback bind (D3 still bound `127.0.0.1` inside each VM), Windows/MSVC, untrusted LAN authentication, hardware-independent fault realism or original D4 qualification |
 
-At the original 2026-11-18 decision checkpoint, **YT-274 / D4 physical LAN acceptance was `Not verified — selected UDP ingress blocked`**. D4VM provided additional confidence without changing that result. The later [2026-11-22 YT-285 readiness checkpoint](M28-MULTI-HOST-DELIVERY-PLAN.md#yt-285-readiness-checkpoint-2026-11-22) records selected direct physical UDP readiness separately. YT-274 remains **Not verified** pending full physical application qualification. The historical table above retains its original sources, environments and limits; current readiness does not retroactively qualify the old D3 application or establish broader feature/release support.
+At the original 2026-11-18 decision checkpoint, **YT-274 / D4 physical LAN acceptance was `Not verified — selected UDP ingress blocked`**. D4VM provided additional confidence without changing that result. The later [2026-11-22 YT-285 readiness checkpoint](M28-MULTI-HOST-DELIVERY-PLAN.md#yt-285-readiness-checkpoint-2026-11-22) records selected direct physical UDP readiness separately. Application qualification was still outstanding at the YT-285 readiness checkpoint; the subsequent source-bound R4 result is recorded below. The historical table above retains its original sources, environments and limits; current readiness does not retroactively qualify the old D3 application or establish broader feature/release support.
 
 ### 2026-11-22 subsequent physical application checkpoint
 
@@ -110,12 +115,14 @@ Do not assign a new backlog identifier implicitly. Obtain owner scope/authorizat
 
 ## 7. Explicit owner decision requested
 
-The proposed choice is **A — accept M28-E as a reviewed evidence-based disposition, keeping ADR 0013 Proposed and all Host/Transport code private pending another authorization**.
+This section records the original 2026-11-18 owner decision request. Later accepted amendments and qualification are linked at the top of this document.
+
+The proposed choice was **A — accept M28-E as a reviewed evidence-based disposition, keeping ADR 0013 Proposed and all Host/Transport code private pending another authorization**.
 
 Alternative **B — authorize a separate narrow opt-in composition adapter experiment** only after a concrete shared Host consumer, public signature options and preservation gates are specified and reviewed. This is **not** authorized by selecting A or by merely completing M28-E.
 
 **Reject C — immediately publish a universal Application/HostGroup/Renderer/Transport runtime**, because B0, C, D and D4 evidence cannot justify its mandatory costs, cross-platform/physical networking guarantees or lifecycle semantics.
 
-In parallel, D4/YT-274 stays **Not verified** until a separately authorized physical-device UDP ingress fix and same-source cross-device application test. The successful D4VM supplement may be cited as a distinct virtual-kernel transport proof but cannot close D4. Any future owner acceptance of the architectural principle should explicitly state whether ADR 0013 remains Proposed or is amended in a *separate* reviewed ADR decision.
+At that checkpoint, D4/YT-274 remained **Not verified** pending a separately authorized physical-device UDP ingress change and same-source cross-device application test. The successful D4VM supplement remained a distinct virtual-kernel transport proof and did not close D4. The subsequent [2026-11-22 application result](M28-MULTI-HOST-DELIVERY-PLAN.md#yt-274-physical-application-qualification--2026-11-22) and separate accepted ADR amendments retain their own authorization and evidence.
 
 **No source code, root manifest, public product description, CLI template, ADR status or release is modified by this M28-E proposal.**

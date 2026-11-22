@@ -1,7 +1,7 @@
 # M28 follow-through - Multi-Host Delivery Plan
 
 - **Date:** 2026-11-19 (Asia/Taipei).
-- **Status:** Original delivery plan with separately dated implementation and qualification checkpoints; see section 6 for YT-285 readiness.
+- **Status:** Original delivery plan with separately dated implementation and qualification checkpoints; see section 6 for YT-285 readiness and YT-274 application qualification.
 - **Baseline:** `b91313dc5b2233125074f52f2bdbde6925781d8a` on `docs/m28-composable-architecture`.
 - **Tracking:** [Follow-through backlog](BACKLOG.md#m28-follow-through--multi-host-sdk-delivery); [roadmap](ROADMAP.md#m28--composable-application-and-multi-host-research).
 - **Original planning change:** Planning documents and an ignored handoff only. Product source, SDK/CLI, Cargo features, ADR status and historical evidence are unchanged. No Stage, Commit or Push is authorized by this plan.
@@ -36,12 +36,12 @@ or authorize runtime implementation in this planning turn.
 This table records the planning baseline above. File links follow current source
 locations; the historical status and evidence remain at their recorded scope.
 
-| Surface | Current grounded status | Missing delivery |
+| Surface | Status at the original planning checkpoint | Missing delivery |
 |---|---|---|
 | Web | Public [App and native Router integration](../crates/yetlet/src/web/app.rs); the private [F0-B2 root](../examples/composition-web-research/src/lib.rs) configures a Router and leaves serving/drain ownership to its caller | No public type named WebHost or public multi-host application coordinator |
 | Game and UDP | Private [D2 native application](../examples/composable-host-research/native/src/bin/d2-loopback.rs) already combines foreground rendering and [NetworkHost](../examples/composable-host-research/native/src/udp_d2.rs) in one application, with a separate client application | No SDK GameHost/NetworkHost and no three-way Web integration |
 | Local/headless composition | Private [F0-B1 concrete owner](../examples/composable-host-research/src/headless_composition_f0b1.rs), plus earlier B/C/D evidence | No reusable public HeadlessHost or compatible custom-Host composition API |
-| Physical LAN | [D4 / YT-274](M28-E-PROMOTION-DECISION.md#d4-physical-device-gate-versus-supplementary-virtual-network-evidence) remains Not verified after blocked application UDP ingress | Native selected-NIC operation and real two-physical-computer application evidence |
+| Physical LAN | [D4 / YT-274](M28-E-PROMOTION-DECISION.md#d4-physical-device-gate-versus-supplementary-virtual-network-evidence) was Not verified after blocked application UDP ingress | Native selected-NIC operation and real two-physical-computer application evidence |
 | Virtual supplement | D4VM crossed two VM kernels through test-only relays on one physical host | Does not establish physical D4, native non-loopback bind or Windows qualification |
 
 These are source- and environment-scoped historical facts. No old tests,
@@ -321,10 +321,13 @@ The selected `src/udp.rs` hash is
 `src/udp/host.rs` is
 `95f2287bc10efa86778d3c8bae406ce41b53e340c401e097f9083584706be5a7`.
 
-| Selected physical host | Native environment | Explicit endpoint and route |
+| Selected physical host | Native environment | Selected route |
 |---|---|---|
-| `physical Linux authority`, ASUS physical host; virtualization detection returned `none` | Linux `7.0.0-44-generic`; Rust `1.99.0`, `x86_64-unknown-linux-gnu` | `<selected-endpoint>`, `enp4s0`; direct on-link route to Windows |
-| `physical Windows replica`, ASUS EXPERTCENTER D900TA_M900TA physical host | Windows 11 Pro `10.0.26300`; Rust `1.99.0`, native `x86_64-pc-windows-msvc` | `<selected-endpoint>`, `vEthernet (External)` interface 20 on the physical host; on-link `<selected-gateway>`, next hop `0.0.0.0` |
+| Physical Linux host | Rust `1.99.0`, native `x86_64-unknown-linux-gnu` | Direct physical interface; on-link Windows peer |
+| Physical Windows host | Rust `1.99.0`, native `x86_64-pc-windows-msvc` | Physical host network interface; on-link Linux peer |
+
+Exact machine, interface and endpoint identities are retained only in restricted
+verification receipts. Tracked documentation uses platform and role aliases.
 
 The existing ZeroTier interfaces were inspected as an initial candidate only.
 `SELECTED-PATH-R2.json` explicitly supersedes that candidate in `BASELINE.json`;
@@ -381,26 +384,26 @@ The finite consumer and local build/fixture receipts are under
 `artifacts/verification/m28-yt285-20261122/sdk-consumer/`.
 These are ordinary task artifacts, not a new supported test framework.
 
-This establishes YT-285 native endpoint and selected physical-path readiness.
-The transport remains a byte/socket facility with caller-owned trust and
-application protocol policy. YT-274 remains **Not verified**: actual remote
-application input, authoritative publication/replica agreement, selected
-disconnect/reconnect and owned application shutdown still require their own
-source-bound physical execution. The original failed D4 probes and successful
-VM supplement retain their historical scopes.
+This established YT-285 native endpoint and selected physical-path readiness.
+The transport remained a byte/socket facility with caller-owned trust and
+application protocol policy. At that readiness checkpoint, YT-274 application
+input, authoritative publication/replica agreement, disconnect/reconnect and
+owned shutdown still required their own source-bound physical execution.
+The later application result follows below; the original failed D4 probes and
+successful VM supplement retain their historical scopes.
 
 ### Existing YT-274 - Physical application qualification
 
-Continue the original D4 item. Record both physical host identities, exact source,
-binaries/builds, selected endpoints and actual application processes. Demonstrate
-real remote input, authoritative publication/replica agreement, the selected
-disconnect/reconnect behavior and owned shutdown. If Windows is part of the
-selected claim, obtain the necessary native Windows evidence for that source.
+The original D4 qualification criteria required exact physical-host, endpoint,
+source, native build and process identities in restricted verification receipts.
+Tracked documentation reports role aliases, source/build provenance and the
+scoped acceptance outcome. Acceptance requires real remote input, authoritative
+publication/replica agreement, selected disconnect/reconnect behavior and owned
+shutdown. A Windows claim also requires native Windows evidence for that source.
 
-Physical acceptance remains **Not verified** until this succeeds. A VM relay,
-ping, ARP, localhost packet, matching fixture or plan cannot satisfy it. If the
-qualified source is an older research application, report only that scope; do
-not promote it into a claim about an untested SDK transport.
+A VM relay, ping, ARP, localhost packet, matching fixture or plan cannot satisfy
+these criteria. Qualification of a private research application does not extend
+to an untested SDK transport. The completed selected result is recorded below.
 
 #### YT-274 physical application qualification — 2026-11-22
 
@@ -408,18 +411,23 @@ not promote it into a claim about an untested SDK transport.
 
 The exact 17-file source snapshot is preserved as `artifacts/verification/m28-yt274-20261122/d4-physical-source-r1.zip` (SHA-256 `09fbfc2a75ba35c18a6681b0d9bc68dfff7a2f2882967d5f0b374fab37f7e741`). The associated manifest is `D4-SOURCE-MANIFEST-R1.json` (SHA-256 `36316297b208fcac60348472b2793f16b99da6ad4d4141664ca0de25dc76a9ec`). It includes the original one-C1-owner D3 game/protocol and new private `d4-physical` driver with explicit peer addressing. On both machines the source was built natively with Rust 1.99, Linux x86_64 and Windows x64 MSVC; the Windows tracked historical checkout remained unchanged.
 
-| Role | Physical host / selected endpoint | Native executable SHA-256 | Real R4 process |
+Current argument-test fixtures use documentation-only endpoint values. The
+retained source archive and native binary hashes above identify the original
+R4 source that was actually executed; they are not hashes of a rebuilt redacted
+checkout. Runtime behavior is unchanged by the fixture and documentation cleanup.
+
+| Role | Physical environment | Native executable SHA-256 | Real R4 result |
 |---|---|---|---|
-| Authority / Host | `physical Linux authority` physical ASUS, `<selected-endpoint>`, `enp4s0` | `8f261e3670bad21df23da69c8a697b399e7491bbb0b27fb41117ad8beb4cc272` | PID `1562193`, exit 0 |
-| Replica / Client | `physical Windows replica` physical ASUS Windows 11, `<selected-endpoint>`, physical-host external vSwitch | `5a1bb165952744a02414f87f1a511b4dc82c4d8225d2be16070375b0868448d6` | PID `21876`, exit 0 |
+| Authority / Host | Physical Linux host, direct network interface | `8f261e3670bad21df23da69c8a697b399e7491bbb0b27fb41117ad8beb4cc272` | Native process exited 0 |
+| Replica / Client | Physical Windows host, direct network interface | `5a1bb165952744a02414f87f1a511b4dc82c4d8225d2be16070375b0868448d6` | Native process exited 0 |
 
 **R4 real application acceptance:** the host accepted 25 actual remote inputs, observed initial westward movement, neutral input expiry after 250 ms, two 3-second peer timeouts, one newer Session/Epoch reconnect (`7101`/`1` → `7102`/`2`) and replacement eastward movement. The single authority retained Generation `1` and progressed to Revision/Tick `1937`. The remote client received 2 Welcome messages and 63 Replica Snapshot frames, observed westward movement, an updated neutral publication, reconnection, replacement movement and the new Still publication. Its final accepted Replica was Revision/Tick `1755` in Session `7102`, Epoch `2`; final values need not match the host's later stop-time revision.
 
 **Raw wire convergence:** the R4 reconciliation compared each client's original canonical Snapshot frame against the host's actually submitted publication bytes: **63/63 exact matches**, comprising **45/45** in Session `7101` and **18/18** in Session `7102`. Both hosts completed their native lifetimes, closed their owned sockets, successfully rebound their exact selected addresses, and left no application process or port owner. This verifies actual remote input and state publication across two physical devices, rather than synthetic fixtures, local loopback, or a virtual relay.
 
-**Prior failure records are preserved:** R1 had no overlapping process lifetime; R2 overlapped but received zero host datagrams; R3 again overlapped with zero host datagrams despite the user's earlier Windows Public program allow. The owner then explicitly added a narrow Ubuntu UFW rule permitting inbound UDP `<physical-linux-port>` from Windows `<physical-windows-address>` via `enp4s0` to `<physical-linux-address>`. R4 succeeded with the identical source and binary identities. This sequence is consistent with an inbound-policy constraint, but the exact earlier packet drop point was not independently measured. The assistant made no firewall, route or profile configuration changes; the user-owned UFW rule remains for the owner to manage.
+**Prior failure records are preserved:** R1 had no overlapping process lifetime; R2 overlapped but received zero host datagrams; R3 again overlapped with zero host datagrams despite the user's earlier Windows program permission. The owner then added narrowly scoped UDP ingress permission for the selected peer and interface. R4 succeeded with identical source and binary identities. This sequence is consistent with an inbound-policy constraint, but the exact earlier packet drop point was not independently measured. The assistant made no firewall, route or profile changes. Temporary network permission remains owner-managed; this historical checkpoint does not assert its current state.
 
-**Quality and limits:** changed UDP module focused tests **13/13**, driver argument tests **3/3**, Ubuntu build/strict Clippy/format and Windows native MSVC build all passed. Original application receipts, failed attempts, raw logs, SHA checks, post-run cleanup and exact-byte reconciliation are retained at `artifacts/verification/m28-yt274-20261122/`. The root handoff at `.pipeline-output/m28-yt274-20261122/HANDOFF.md` records the review/delivery boundary. This is a private **headless** research application demonstration, not GUI/GameHost GPU verification, arbitrary-device reliability, authenticated untrusted LAN networking, generalized public `yetlet::udp` application protocol, registry publication or release qualification.
+**Quality and limits:** changed UDP module focused tests **13/13**, driver argument tests **3/3**, Ubuntu build/strict Clippy/format and Windows native MSVC build all passed. Original application receipts, failed attempts, raw logs, SHA checks, post-run cleanup and exact-byte reconciliation are retained at `artifacts/verification/m28-yt274-20261122/`. The completed handoff at `.pipeline-output/m28-yt274-20261122/R4-COMPLETED-HANDOFF.md` records the final review and local delivery. The earlier `HANDOFF.md` remains the original blocked checkpoint; raw receipts are restricted evidence, not publication artifacts. This is a private **headless** research application demonstration, not GUI/GameHost GPU verification, arbitrary-device reliability, authenticated untrusted LAN networking, generalized public `yetlet::udp` application protocol, registry publication or release qualification.
 ## 7. Verification, authority and immediate next work
 
 **Historical planning checkpoint (2026-11-19):** The instructions below record the original planning scope. Later user-authorized delivery is recorded in the dated checkpoints above.

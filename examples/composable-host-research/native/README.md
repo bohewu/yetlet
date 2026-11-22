@@ -112,8 +112,8 @@ tests true datagrams and rendered state, not keyboard interaction,
 reliable transport or hostile peer authentication.
 
 Actual Ubuntu RTX4090/Vulkan X11 bounded E2E:
-Host PID 900380, <selected-endpoint>; Client PID 900381,
-127.0.0.1:32801. Both report identical authoritative Revision/Tick
+Separate Host and Client processes owned their selected loopback UDP sockets.
+Both report identical authoritative Revision/Tick
 90 with player X positions 22 and 0. Two real 960×640 Native Window
 PNG screenshots have identical SHA256. Real Windows are closed via
 WM_DELETE; both Exit 0, exact Window IDs disappear, Socket and GPU
@@ -334,7 +334,7 @@ One bounded actual Ubuntu X11/Vulkan normal-close run predates those two
 source-only R1 repairs: own `host-web` PID **3329304**, Game/UDP/Web Ready,
 authoritative C1 Tick/Revision **480/480**, closed command admission,
 stopped native resources, joined Web and exited **0**. The selected
-HTTP <selected-endpoint> and UDP <selected-endpoint> ports were released.
+The selected loopback HTTP and UDP listeners were released.
 Original logs are under ignored `.pipeline-output/m28-f1-20261119/yt279`.
 **That run is not a post-repair full Native/UDP/HTTP retest.**
 
@@ -378,8 +378,7 @@ tick budgets. Host shutdown closed admission before authority/socket stop,
 released Native Window/GPU owners and joined the original Web thread:
 joined=true, worker_ok=true, result=complete, prior_pending=false.
 Every observed application thread and both original PIDs were gone.
-The selected Host UDP <selected-endpoint>, Client UDP <selected-endpoint> and
-HTTP <selected-endpoint> endpoints were successfully rebound.
+The selected loopback Host UDP, Client UDP and HTTP endpoints were successfully rebound.
 
 The existing source-unchanged YT-279 focused held-HTTP test supplies the
 in-flight drain and Pending/original-Join proof; that test-only route was

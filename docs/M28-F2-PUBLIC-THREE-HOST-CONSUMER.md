@@ -174,9 +174,9 @@ global Docs failure.
 
 The original pre-repair `DISPLAY=:0` run executed PID **169769**, exit **0**
 in about **2.2 seconds**, with real viewable X11 Window **0x600002**, 640 by 420,
-NVIDIA GeForce **RTX 4090**, Vulkan driver **595.99.02**. Real endpoints were
-HTTP `<selected-endpoint>`, application UDP `<selected-endpoint>` and trusted client
-UDP `<selected-endpoint>`. The foreground was ThreadId(1), client-only ThreadId(3),
+NVIDIA GeForce **RTX 4090**, Vulkan driver **595.99.02**. The real HTTP,
+application UDP and trusted client UDP endpoints were observed on loopback.
+The foreground was ThreadId(1), client-only ThreadId(3),
 and both command applications occurred on ThreadId(1).
 
 Exact generation **1795138106814624176**, revision **2**, paused **false** matched
@@ -207,10 +207,10 @@ the original observer as PASS. Independent review must assess this evidence.
 Exactly one new repaired-source `DISPLAY=:0` run executed PID **206510**, exit
 **0** in **2.235 seconds**, without forced termination. The real viewable X11
 Window **0x600002** was 640 by 420 and was absent after exit. RTX4090 Vulkan
-driver **595.99.02** returned **46** real Draw/Submit/Present calls. HTTP
-`<selected-endpoint>`, application UDP `<selected-endpoint>` and trusted peer
-`<selected-endpoint>` agreed on generation **1795139176261158488**, revision **2**,
-paused **false**, with real HTTP200 readiness and HTTP202 admission.
+driver **595.99.02** returned **46** real Draw/Submit/Present calls. The HTTP,
+application UDP and trusted peer loopback endpoints agreed on generation
+**1795139176261158488**, revision **2**, paused **false**, with real HTTP200
+readiness and HTTP202 admission.
 
 Final state was Complete/Stopped, exact original Web Join Succeeded, finite
 client joined, sole C1 owner, no secondary failures, and admission-first

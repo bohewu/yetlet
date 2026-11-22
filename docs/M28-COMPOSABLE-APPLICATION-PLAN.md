@@ -1,12 +1,14 @@
 # M28 — Composable Application and Multi-Host Plan
 
 - **Date:** 2026-11-17.
-- **State:** M28-A/B0/B1/B2/C1/C2/C3/D1/D2/D3 completed and locally committed at separately reviewed private scopes; D3 HEAD `cde0a03`, independent R2 `wc_job_-kuV4Ftw7m4omNAI` actual PASS and original R1 FAIL3 retained. D4 original physical two-device LAN remains **Not verified** after selected campus UDP ingress failure; two-Multipass-VM same-binary UDP via per-VM relays converged at Revision462 but is not physical D4 or direct non-loopback D3. M28-E/YT-275 [evidence-based promotion proposal](M28-E-PROMOTION-DECISION.md) completed independent documentation review: original R1 `wc_job_tHV6cHY7qckBm8pG` actual FAIL3 corrected, R2 `wc_job_yKyyePqAbLGP4xaz` terminal exit0 actual PASS with zero issues/followups; **owner decision still pending**, no public Host/Transport/Renderer API. ADR 0013 remains Proposed.
+- **Historical research state (2026-11-18):** M28-A/B0/B1/B2/C1/C2/C3/D1/D2/D3 completed and locally committed at separately reviewed private scopes; D3 HEAD `cde0a03`, independent R2 `wc_job_-kuV4Ftw7m4omNAI` actual PASS and original R1 FAIL3 retained. D4 original physical two-device LAN was **Not verified** after selected campus UDP ingress failure; two-Multipass-VM same-binary UDP via per-VM relays converged at Revision462 but is not physical D4 or direct non-loopback D3. M28-E/YT-275 [evidence-based promotion proposal](M28-E-PROMOTION-DECISION.md) completed independent documentation review: original R1 `wc_job_tHV6cHY7qckBm8pG` actual FAIL3 corrected, R2 `wc_job_yKyyePqAbLGP4xaz` terminal exit0 actual PASS with zero issues/followups; **owner decision was still pending**, no public Host/Transport/Renderer API. ADR 0013 was Proposed at that checkpoint.
 - **Source baseline:** `c9437357b2bb9e88a13a09435ed9645cea5462a8`, observed remote master at the start of the initial study; this amendment starts from `4e5bdc1c52f4e724f093467478958563dd98ede2`.
-- **Decision:** [ADR 0013](adr/0013-composable-application-and-hosts.md) is **Proposed**. A successful document review does not accept its runtime design.
+- **Historical decision (2026-11-18):** [ADR 0013](adr/0013-composable-application-and-hosts.md) was **Proposed**. A successful document review does not accept its runtime design.
 - **Tracking:** [M28 backlog](BACKLOG.md#m28--composable-application-and-multi-host-research), [milestone gates](ROADMAP.md#m28--composable-application-and-multi-host-research).
 
-- **Current delivery follow-through (2026-11-19):** The owner reaffirmed same-process Game + Network + native Web, usable opt-in SDK composition and compatible custom Hosts. The [delivery plan](M28-MULTI-HOST-DELIVERY-PLAN.md) and YT-277–285 track the next work; F0-C retains its scoped no-extraction decision. Earlier research/decision evidence below is preserved; private examples do not complete the SDK objective. This update plans work only, with ADR0013 Proposed and physical D4 Not verified.
+- **Historical delivery planning checkpoint (2026-11-19):** The owner reaffirmed same-process Game + Network + native Web, usable opt-in SDK composition and compatible custom Hosts. The [delivery plan](M28-MULTI-HOST-DELIVERY-PLAN.md) and YT-277–285 tracked the next work; F0-C retains its scoped no-extraction decision. Earlier research/decision evidence below is preserved; private examples do not complete the SDK objective. That update planned work only, with ADR0013 Proposed and physical D4 Not verified at that time.
+
+- **Subsequent decisions and delivery:** [ADR 0013](adr/0013-composable-application-and-hosts.md) and [ADR 0014](adr/0014-layered-host-resource-lifecycle.md) record accepted lifecycle amendments. The [delivery plan](M28-MULTI-HOST-DELIVERY-PLAN.md) records later source/package delivery and the separate dated native UDP readiness and private headless physical application results. Earlier research evidence below retains its original scope.
 
 ## Scope and authority
 
@@ -1167,7 +1169,7 @@ title and _NET_WM_PID were verified before moving/capturing/closing.
 | Evidence gate | Directly observed result |
 |---|---|
 | Separate application PIDs | Host PID **900380** and Client PID **900381**, each created independently with its own Native GameHost and one network role |
-| True UDP loopback endpoints | Host **<selected-endpoint>**, Client **<selected-endpoint>**; both sockets shown by kernel ss during execution, no wildcard or LAN bind |
+| True UDP loopback endpoints | Separate Host and Client endpoints; both sockets shown by kernel ss during execution, no wildcard or LAN bind. Exact assignments remain in restricted receipts |
 | Actual datagrams | Host 34 received / 35 sent / 33 accepted, Client 35 received / 35 sent / 35 accepted; Host one rejected (no false zero-loss claim); Client sent 34 HeldInput and received full Snapshots |
 | Authority and replica | Both programs independently logged **Revision 90, Tick 90**, Player One X=22, Player Two X=0; source and received complete Snapshot values matched at this revision |
 | Real two-window visuals | Host and Client windows each 960×640, true XWD capture and independent PNG conversion; grounded blue [134,211,255], orange [255,199,139] and dark [63,75,97] pixel samples PASS; both PNG SHA256 equal (same frame content) |
@@ -1247,12 +1249,11 @@ D3 does not qualify an untrusted LAN or Internet deployment.
 
 ### One actual bounded two-PID headless UDP fault run
 
-Ubuntu 26.04.1, 127.0.0.1 loopback, with DISPLAY/WAYLAND_DISPLAY unset
-in both processes. The trusted source C1 owner remained in Host PID
-`1086771` bound to `<selected-endpoint>`. The separate Client application
-PID `1086787` owned a read-only D1 Replica on `<selected-endpoint>`
-and composed the finite in-process UDP fault Proxy at
-`<selected-endpoint>` (**still only two OS processes**).
+Ubuntu 26.04.1 loopback, with DISPLAY/WAYLAND_DISPLAY unset in both processes.
+The trusted source C1 owner remained in the Host process with its own UDP socket.
+The separate Client application owned a read-only D1 Replica and client socket,
+and composed the finite in-process UDP fault Proxy with its own socket
+(**still only two OS processes**). Exact assignments remain in restricted receipts.
 
 Actual kernel sockets/ports were observed while the test ran and
 confirmed absent after both applications terminated normally (exit0).

@@ -161,9 +161,9 @@ Untrusted source, stale Sequence/Epoch, >512-byte frame, overload and
 invalid admission cannot mutate the authoritative game publication.
 Peer markers and Hello nonce **are not cryptographic authentication**.
 
-The actual run used Headless Host PID1086771 on
-`<selected-endpoint>` and Client PID1086787 with Client Socket
-`<selected-endpoint>` and Proxy Socket `<selected-endpoint>`.
+The actual run used two Headless processes: the Host owned its UDP endpoint,
+while the Client owned a client socket and the finite fault Proxy socket.
+Exact loopback assignments remain in the original restricted receipts.
 After disabling packet faults and reconnecting as Session7102/
 Epoch2, source and replica converged on **Revision432/Tick432**,
 both player X values **22/0**. Both PIDs exited0 and all three UDP
@@ -195,7 +195,8 @@ Clippy all targets `-D warnings` and Headless Binary Build PASS.
 The already-accepted original two-headless-PID fault demonstration
 was **not rerun** after the source-only R1 corrections; no new
 post-correction multi-PID performance or LAN evidence is claimed.
-Independent R2 is pending.
+Independent R2 later passed after the recorded R1 corrections; see the
+[D3 closeout](../../docs/M28-COMPOSABLE-APPLICATION-PLAN.md#18-d3-bounded-real-loopback-faults-reconnect-and-headless-composition--yt-273).
 
 D3 selected focused tests and actual bounded loopback fixture:
 
@@ -204,8 +205,9 @@ cargo test --manifest-path examples/composable-host-research/Cargo.toml --locked
 cargo build --manifest-path examples/composable-host-research/Cargo.toml --locked --offline --bin d3-headless
 ```
 
-The final selected D3-only suite passed **11/11**; previous unrelated
-B0–D2 tests and Native GPU/Window E2E were not rerun.
+The original selected D3-only suite passed **11/11** before the three R1
+regressions described above brought the corrected selection to **14/14**.
+Unrelated B0–D2 tests and Native GPU/Window E2E were not rerun.
 
 The single owned headless E2E test driver is ignored:
 `.pipeline-output/m28-d3-20261118/e2e_headless_faults.py`.
@@ -222,14 +224,15 @@ On two individually authorized physical hosts, build using the same source check
 
 ```sh
 # Ubuntu host (replace addresses and choose allowed network policy first)
-cargo run --manifest-path examples/composable-host-research/Cargo.toml --locked --bin d4-physical -- host --bind <host-ip>:<host-port> --peer <client-ip>:<client-port>
+cargo run --manifest-path examples/composable-host-research/Cargo.toml --locked --bin d4-physical -- host --bind "<host-ip>:<host-port>" --peer "<client-ip>:<client-port>"
 # Windows client, using the same source revision
-cargo run --manifest-path examples/composable-host-research/Cargo.toml --locked --bin d4-physical -- client --bind <client-ip>:<client-port> --peer <host-ip>:<host-port>
+cargo run --manifest-path examples/composable-host-research/Cargo.toml --locked --bin d4-physical -- client --bind "<client-ip>:<client-port>" --peer "<host-ip>:<host-port>"
 ```
 
 The bounded application exercises real remote movement, input expiry, newer Session/Epoch reconnection and a read-only replica while keeping one authority. In the 2026-11-22 source-bound physical R4, both processes exited 0 and closed/rebound their UDP addresses; the host accepted 25 remote inputs and **all 63 client Snapshot frames matched original host-publication bytes** across Sessions `7101` and `7102`. The original R1–R3 failures remain retained; R4 followed owner-approved narrowly scoped Ubuntu UDP ingress, not a tool-side firewall change.
 
-Full source/binary identities, physical endpoints, actual process results, cleanup, per-session canonical bytes and limitations appear in [M28 multi-host delivery plan](../../docs/M28-MULTI-HOST-DELIVERY-PLAN.md#yt-274-physical-application-qualification--2026-11-22). This does not qualify GPU windows, public SDK application transport, arbitrary LANs, untrusted-peer authentication or general UDP reliability.
+The [redacted qualification summary and retained restricted evidence](../../docs/M28-MULTI-HOST-DELIVERY-PLAN.md#yt-274-physical-application-qualification--2026-11-22) record source/binary provenance, actual results, cleanup, per-session byte comparison and limitations. Exact physical endpoints and machine identities remain restricted. This does not qualify GPU windows, public SDK application transport, arbitrary LANs, untrusted-peer authentication or general UDP reliability.
+
 ## F0-B1 — Caller-local Headless Composition Root
 
 The private `headless_composition_f0b1` module composes **one** original C1

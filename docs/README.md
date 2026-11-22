@@ -62,6 +62,8 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   delivery gates are in [ADR 0014](adr/0014-layered-host-resource-lifecycle.md) and
   the [Host lifecycle design](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md). Checkout
   implementation and published SDK qualification remain separately recorded.
+  The [dated physical qualification checkpoints](M28-MULTI-HOST-DELIVERY-PLAN.md#yt-285-readiness-checkpoint-2026-11-22)
+  distinguish UDP-path readiness from subsequent private application acceptance.
 
 - [YT-250 CLI 0.3.1 release](CLI-031-RELEASE-PREPARATION.md): published
   Registry latest SemVer correction, retained exact app locking/provenance and

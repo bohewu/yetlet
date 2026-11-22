@@ -101,9 +101,9 @@ The [native Windows record](https://github.com/bohewu/yetlet/blob/c0a40af80a4893
 the exact commands, tool identities, failures, results and cleanup references.
 
 WebCodex ran the real MSVC Cargo 1.99 toolchain in the isolated protected
-`windows-secret-rotation-20261018` directory on project
-`agent:ncut-bohe-244143825ae3488e:localtasks`, session
-`wc_sess_v49VHB4rF9p5ckzy`. Job `wc_job_dg3H7A3qqxAhZevz` completed with exit 0.
+`windows-secret-rotation-20261018` directory on the selected Windows Runner.
+Exact project/session identities remain in restricted verification receipts.
+Job `wc_job_dg3H7A3qqxAhZevz` completed with exit 0.
 All-target tests passed the same 13 cases, including actual Loader file
 rotation and same-handle service injection; one rustdoc test also passed.
 Strict Clippy and formatting exited 0. The configured State example exited 0

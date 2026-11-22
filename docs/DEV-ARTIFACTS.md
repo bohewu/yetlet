@@ -262,3 +262,60 @@ This describes completed historical cleanup. New evidence belongs outside
 rebuildable caches under the current layout above. Original source Markdown is
 recoverable at local Git `c0a40af80a48932f3cdf7c593f36fe563e4ec669`.
 Git does not recover ignored/private evidence or prove remote SHA reachability.
+
+## Publishing verification summaries
+
+Tracked documentation and shared review summaries use platform/role aliases for
+test hosts. Keep actual Runner addresses, operational port assignments, interface
+and machine identifiers, local account paths and access credentials in restricted
+verification receipts. Copyable examples use placeholders; parser fixtures use
+documentation-only addresses. Documented SDK defaults and synthetic loopback
+fixtures keep their public contract meaning.
+
+An ignored file is not automatically safe to share. Raw logs, source archives,
+transferred evidence and historical Git backups may retain environment values;
+preserve their original bytes and access restrictions, and publish only a
+redacted summary. Source and binary hashes continue to identify the exact
+historical material tested, even when a current fixture is later anonymized.
+
+Before publishing a branch, check both its current files and every outgoing
+commit. A redaction commit alone leaves earlier values reachable. For unpublished
+history, retain a restricted recovery archive and old-to-new commit map, verify
+the sanitized successor and use the normal review and Commit Guard gates.
+Published refs require a separate authorized remediation decision.
+
+## Owner-authorized M28 cache cleanup — 2026-11-22
+
+The owner requested cleanup of the Runners used for the M28 work. The bounded
+operation removed only completed-run Cargo internals: `.fingerprint`, `deps`,
+`build` and `incremental`. Existing profile locks remained held during deletion.
+Final executables, libraries, PDBs, layout markers, source/vendor/package trees,
+original verification receipts and failure records stayed in place.
+
+| Selected Runner | Removed directories | Logical bytes selected | Bytes with all hard links selected | Observed free-space increase |
+|---|---:|---:|---:|---:|
+| Linux | 48 | 7,153,231,155 | 6,433,850,371 | 6,482,292,736 |
+| Windows | 4 | 35,739,805 | 30,969,501 | 31,473,664 |
+
+Sizes are point-in-time measurements. Logical sizes, exclusive hard-link
+estimates and filesystem free-space observations are different quantities;
+other host activity can affect the last column. The Linux operation verified
+23,411 retained cache files and 724 original evidence files unchanged; Windows
+verified 12 retained cache files and 177 original evidence files unchanged.
+The Windows tracked checkout remained clean at its original revision.
+
+Both original zero-deletion attempts remain recorded. The Linux guard detected
+its own held lock descriptors. Windows recorded a preflight permission error
+before deletion; the original receipt omitted the failing path. The conflicting
+lock-file readback order is an evidence-supported diagnosis, not a recovered
+exception trace. Bounded verification corrections preserved the same cleanup
+scope and lock protection, without changing permissions or Runner configuration.
+The corrected operations completed successfully.
+
+Each Runner retains its frozen plan, preservation manifest, original failure,
+journal and `RESULT-R2.json` under the restricted
+`.pipeline-output/m28-runner-cache-cleanup-20261122/` directory. Legacy mixed
+`target/` trees, global Cargo caches, unrelated projects and the small final-output
+YT-285 caches were preserved. An older cache without sufficient cleanup-scope
+evidence also remains. This one-off operation creates no automatic retention
+policy or ongoing deletion authority.
