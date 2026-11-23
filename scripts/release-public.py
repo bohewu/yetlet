@@ -207,7 +207,7 @@ def release(p, draft, authenticated=True):
     return r
 
 
-def assets(p, authenticated=True, complete=True):
+def assets(p, authenticated=True, complete=True, *, public_download=False):
     items = api('/releases/' + str(s.RELEASE_ID) + '/assets?per_page=100', authenticated)
     expected = {a['name']: a for a in p['assets']}
     s.require(type(items) is list and len(items) <= len(expected))
@@ -218,7 +218,13 @@ def assets(p, authenticated=True, complete=True):
         seen.add(a['name']); ids.add(a['id'])
         wanted = expected[a['name']]
         s.require(a['size'] == wanted['size'] and a['digest'] == 'sha256:' + wanted['sha256'])
-        raw = http(API + '/releases/assets/' + str(a['id']), binary=True, authenticated=authenticated)
+        if public_download:
+            url = ('https://github.com/bohewu/yetlet/releases/download/' +
+                   urllib.parse.quote(s.TAG, safe='') + '/' + urllib.parse.quote(a['name'], safe=''))
+            s.require(a['browser_download_url'] == url)
+            raw = http(url, binary=True, authenticated=False)
+        else:
+            raw = http(API + '/releases/assets/' + str(a['id']), binary=True, authenticated=authenticated)
         s.require(len(raw) == wanted['size'] and s.sha(raw) == wanted['sha256'])
     s.require(not complete or seen == set(expected))
     return items
