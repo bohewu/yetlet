@@ -831,7 +831,7 @@ class PublicationContinuationTests(unittest.TestCase):
                       patch.object(publication, 'cli_continuation_distribution', return_value=(p, {}, reg, bodies)),
                       patch.object(publication.pub, 'release') as release,
                       patch.object(publication.pub, 'assets', side_effect=ValueError if drift else None,
-                                   return_value=public),
+                                   return_value=public) as assets,
                       patch.object(publication.pub, 'api', return_value=None),
                       patch.object(publication.pub, 'operate') as mutate,
                       patch.object(registry, 'require_absent') as absent,
@@ -843,7 +843,8 @@ class PublicationContinuationTests(unittest.TestCase):
                     else:
                         publication.main()
                 mutate.assert_not_called()
-                release.assert_called_with(p, False, authenticated=False)
+                release.assert_called_with(p, False)
+                assets.assert_called_with(p, public_download=True)
                 if mode == 'publish' and not drift:
                     gate.assert_called_with(r, True)
                     self.assertEqual(absent.call_count, 2)
@@ -852,6 +853,29 @@ class PublicationContinuationTests(unittest.TestCase):
                 else:
                     upload.assert_not_called()
                     consumer.assert_not_called()
+
+    def test_cli_continuation_reads_metadata_with_auth_and_downloads_only_the_public_url(self):
+        name = 'yetlet-cli-0.4.2.crate'
+        content = b'original crate'
+        digest = registry.sha(content)
+        with tempfile.TemporaryDirectory() as temporary:
+            self.fixture(Path(temporary), cli=True)
+            url = 'https://github.com/bohewu/yetlet/releases/download/yetlet-cli-v0.4.2/' + name
+            plan = {'assets': [{'name': name, 'size': len(content), 'sha256': digest}]}
+            asset = {'id': 1, 'name': name, 'state': 'uploaded', 'size': len(content),
+                     'digest': 'sha256:' + digest, 'browser_download_url': url}
+            with (patch.object(publication.pub, 'api', return_value=[asset]) as metadata,
+                  patch.object(publication.pub, 'http', return_value=content) as download):
+                self.assertEqual(publication.pub.assets(plan, public_download=True), [asset])
+                metadata.assert_called_once_with('/releases/15/assets?per_page=100', True)
+                download.assert_called_once_with(url, binary=True, authenticated=False)
+                for changed in ('https://example.invalid/untrusted', url + '?changed=1'):
+                    with self.subTest(changed=changed):
+                        asset['browser_download_url'] = changed
+                        download.reset_mock()
+                        with self.assertRaises(ValueError):
+                            publication.pub.assets(plan, public_download=True)
+                        download.assert_not_called()
 
     def test_published_asset_identity_and_content_drift_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:

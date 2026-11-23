@@ -316,13 +316,22 @@ This schema-3 continuation is limited to the recorded run
 SHA-256. The closed `continuation` object carries those identities with
 `existing=[]` and `remaining=["yetlet-cli"]`. The workflow reconstructs the
 original request and matches both frozen plans. Its read-only preflight
-checks the approved failure receipt, the anonymous public release metadata
-and asset bytes, and absence of the exact version in the registry. A new
+checks the approved failure receipt, the public release metadata with the
+read-only GitHub token and asset bytes through the canonical anonymous
+downloads. It also confirms absence of the exact version in the registry. A new
 protected `registry-continuation` job requires the owner's approval, repeats
 the checks, then sends the original archive once to crates.io. It uses
 read-only GitHub permissions and writes a separate continuation receipt.
 The fresh crates.io-installed consumer runs after package readback. Any
 attempted registry write falls outside this continuation contract.
+
+The first [continuation run](https://github.com/bohewu/yetlet/actions/runs/45089671256)
+also stopped on HTTP 403 while checking the public release. Its receipt
+records no GitHub or registry write attempt. The continuation now uses
+authenticated release and asset metadata and validates each fixed
+`github.com` public download URL before fetching bytes without a credential.
+The original plan's release identity, asset sizes and SHA-256 checks still
+apply in both phases.
 
 ## Local verification and remaining limits
 
