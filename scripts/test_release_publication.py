@@ -329,21 +329,25 @@ class CliConsumerTests(unittest.TestCase):
         import yaml
         workflow = yaml.load((HERE.parent / '.github/workflows/release-publish.yml').read_text(),
                              Loader=yaml.BaseLoader)
-        steps = workflow['jobs']['publish']['steps']
-        setup = next(step for step in steps if step.get('name') ==
-                     'Prepare resolver CLI browser consumer tools before publication')
         # The schema-3 CLI cohort, not an aging version allowlist, owns these
         # Browser/WASM tools. Validate the currently selected source release too.
-        self.assertEqual(setup['if'], 'fromJSON(inputs.record).schema == 3')
         manifest = tomllib.loads((HERE.parent / 'tools/yetlet-cli/Cargo.toml').read_text())
         selected = manifest['package']['version']
         self.assertNotIn(selected, records.LEGACY_CLI_VERSIONS)
         records.source_version({'schema': 3, 'cohort': 'cli', 'version': selected,
                                 'source': 'a' * 40}, HERE.parent)
-        publish = next(step for step in steps if step.get('run') == 'python3 scripts/release-publish.py publish')
-        self.assertLess(steps.index(setup), steps.index(publish))
-        self.assertIn('rustup target add wasm32-unknown-unknown --toolchain 1.99.0', setup['run'])
-        self.assertIn('cargo +1.99.0 install wasm-bindgen-cli --version 0.2.129 --locked', setup['run'])
+        for job in ('publish', 'registry-continuation'):
+            steps = workflow['jobs'][job]['steps']
+            setup = next(step for step in steps if step.get('name') ==
+                         'Prepare resolver CLI browser consumer tools before publication')
+            self.assertEqual(setup['if'], 'fromJSON(inputs.record).schema == 3')
+            publish = next(step for step in steps if step.get('run') == 'python3 scripts/release-publish.py publish')
+            self.assertLess(steps.index(setup), steps.index(publish))
+            self.assertIn('rustup target add wasm32-unknown-unknown --toolchain 1.99.0', setup['run'])
+            self.assertIn('cargo +1.99.0 install wasm-bindgen-cli --version 0.2.129 --locked', setup['run'])
+        continuation = workflow['jobs']['registry-continuation']
+        self.assertEqual(continuation['permissions'], {'actions': 'read', 'contents': 'read'})
+        self.assertEqual(continuation['environment'], 'release-publish')
 
     def test_unknown_cli_binding_is_rejected_before_install(self):
         with tempfile.TemporaryDirectory() as temp, patch.object(publication.subprocess, 'run') as run:
@@ -672,8 +676,8 @@ class PublicationTests(unittest.TestCase):
 
 
 class PublicationContinuationTests(unittest.TestCase):
-    def fixture(self, root):
-        rec, subjects = archives(root)
+    def fixture(self, root, *, cli=False):
+        rec, subjects = archives(root, cli=cli, cli_version='0.4.2')
         reg, bodies = registry.prepare(rec, root, subjects)
         publication.s.bind_record(rec)
         old = {'publication_commit': 'e'*40, 'verifier_commit': 'd'*40, 'verifier_run': '21',
@@ -701,6 +705,11 @@ class PublicationContinuationTests(unittest.TestCase):
         request = dict(old, publication_commit='f'*40, continuation={'run': '31', 'attempt': '1',
             'artifact': '32', 'sha256': 'c'*64, 'existing': ['yetlet-actions'],
             'remaining': [r['name'] for r in reg['packages'][1:]]})
+        if cli:
+            request['continuation'].update(existing=[], remaining=['yetlet-cli'])
+            del prior['GITHUB-PUBLICATION.json'], prior['REGISTRY-RESULT.json']
+            prior['PUBLICATION-RESULT.json'].update(github='publish_attempted', registry='not_attempted',
+                failure={'phase': 'github-publish', 'operation': 'api-read', 'class': 'http', 'http_status': 403})
         return rec, request, old, p, reg, bodies, github, prior
 
     def prior_api(self, request, raw):
@@ -757,6 +766,92 @@ class PublicationContinuationTests(unittest.TestCase):
                         for name, value in prior.items():
                             self.assertEqual((work/'prior'/name).read_bytes(), records.canonical(value))
                 mutate.assert_not_called()
+
+    def test_cli_continuation_keeps_the_original_failure_and_accepts_only_an_unattempted_registry(self):
+        for corruption in (None, 'registry', 'failure', 'plan', 'extra-receipt'):
+            with self.subTest(corruption=corruption), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                rec, r, old, p, reg, bodies, _, prior = self.fixture(root, cli=True)
+                if corruption == 'registry':
+                    prior['PUBLICATION-RESULT.json']['registry'] = 'attempted'
+                if corruption == 'failure':
+                    prior['PUBLICATION-RESULT.json']['failure']['phase'] = 'registry-publish'
+                if corruption == 'plan':
+                    prior['REGISTRY-PLAN.json'] = dict(reg, release_id='16')
+                if corruption == 'extra-receipt':
+                    prior['REGISTRY-RESULT.json'] = {}
+                raw = self.prior_zip(prior)
+                api = self.prior_api(r, raw)
+                work = root / 'work'
+                work.mkdir()
+                with (patch.object(publication.pub, 'api', side_effect=api.__getitem__),
+                      patch.object(publication.s, 'download', return_value=raw),
+                      patch.object(publication, 'distribution', return_value=(p, {}, reg, bodies)) as derive,
+                      patch.object(publication.pub, 'operate') as mutate):
+                    if corruption:
+                        with self.assertRaises(ValueError):
+                            publication.cli_continuation_distribution(r, work)
+                    else:
+                        self.assertEqual(publication.cli_continuation_distribution(r, work), (p, {}, reg, bodies))
+                        self.assertEqual(derive.call_args.args[0], old)
+                mutate.assert_not_called()
+
+    def test_cli_continuation_accepts_only_the_selected_run_and_artifact(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            rec, r, *_ = self.fixture(Path(temporary), cli=True)
+            r['continuation'] = copy.deepcopy(publication.CLI_CONTINUATION)
+            for field, alternate in ((None, None), ('run', '31'), ('attempt', '2'),
+                                     ('artifact', '32'), ('sha256', 'a' * 64),
+                                     ('remaining', ['yetlet-cli', 'yetlet'])):
+                with self.subTest(field=field):
+                    candidate = copy.deepcopy(r)
+                    if field:
+                        candidate['continuation'][field] = alternate
+                    with patch.dict(os.environ, {'RELEASE_RECORD': json.dumps(rec),
+                                                 'PUBLICATION_REQUEST': json.dumps(candidate)}):
+                        if field:
+                            with self.assertRaises(ValueError):
+                                publication.request()
+                        else:
+                            self.assertEqual(publication.request(), r)
+
+    def test_cli_continuation_stops_before_upload_if_public_bytes_do_not_match(self):
+        for mode, drift in (('preflight', False), ('publish', True), ('publish', False)):
+            with self.subTest(mode=mode, drift=drift), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                rec, r, _, p, reg, bodies, _, _ = self.fixture(root, cli=True)
+                r['continuation'] = copy.deepcopy(publication.CLI_CONTINUATION)
+                public = [dict(asset, id=i, digest='sha256:' + asset['sha256'])
+                          for i, asset in enumerate(p['assets'], 1)]
+                with (patch.object(publication.sys, 'argv', ['release-publish.py', mode]),
+                      patch.dict(os.environ, {'RELEASE_RECORD': json.dumps(rec),
+                          'PUBLICATION_REQUEST': json.dumps(r), 'PUBLICATION_OUTPUT': str(root / 'out'),
+                          'GITHUB_STEP_SUMMARY': str(root / 'summary')}),
+                      patch.object(publication, 'gate') as gate,
+                      patch.object(publication, 'cli_continuation_distribution', return_value=(p, {}, reg, bodies)),
+                      patch.object(publication.pub, 'release') as release,
+                      patch.object(publication.pub, 'assets', side_effect=ValueError if drift else None,
+                                   return_value=public),
+                      patch.object(publication.pub, 'api', return_value=None),
+                      patch.object(publication.pub, 'operate') as mutate,
+                      patch.object(registry, 'require_absent') as absent,
+                      patch.object(registry, 'publish', return_value={'status': 'registry_verified_consumer_pending'}) as upload,
+                      patch.object(publication, 'consumer', return_value={'status': 'PASS'}) as consumer):
+                    if drift:
+                        with self.assertRaises(ValueError):
+                            publication.main()
+                    else:
+                        publication.main()
+                mutate.assert_not_called()
+                release.assert_called_with(p, False, authenticated=False)
+                if mode == 'publish' and not drift:
+                    gate.assert_called_with(r, True)
+                    self.assertEqual(absent.call_count, 2)
+                    upload.assert_called_once_with(reg, bodies, root / 'out/REGISTRY-RESULT.json')
+                    consumer.assert_called_once_with('0.4.2', root / 'out')
+                else:
+                    upload.assert_not_called()
+                    consumer.assert_not_called()
 
     def test_published_asset_identity_and_content_drift_is_rejected(self):
         with tempfile.TemporaryDirectory() as temporary:
