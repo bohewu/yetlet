@@ -89,7 +89,7 @@ The research history below retains its original default-feature/API assumptions.
 
 ## Proposed composable application research
 
-The owner-directed [M28 study](M28-COMPOSABLE-APPLICATION-PLAN.md) explores
+The owner-directed [M28 study](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-COMPOSABLE-APPLICATION-PLAN.md) explores
 applications without HTTP while preserving pure Web/API/SSR as a first-class
 mode. Historical HTML-first positioning does not constrain the study.
 [ADR 0013](adr/0013-composable-application-and-hosts.md) has an accepted scoped

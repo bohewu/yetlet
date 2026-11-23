@@ -196,7 +196,7 @@ The already-accepted original two-headless-PID fault demonstration
 was **not rerun** after the source-only R1 corrections; no new
 post-correction multi-PID performance or LAN evidence is claimed.
 Independent R2 later passed after the recorded R1 corrections; see the
-[D3 closeout](../../docs/M28-COMPOSABLE-APPLICATION-PLAN.md#18-d3-bounded-real-loopback-faults-reconnect-and-headless-composition--yt-273).
+[D3 closeout](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-COMPOSABLE-APPLICATION-PLAN.md#18-d3-bounded-real-loopback-faults-reconnect-and-headless-composition--yt-273).
 
 D3 selected focused tests and actual bounded loopback fixture:
 

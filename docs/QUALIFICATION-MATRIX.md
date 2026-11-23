@@ -32,6 +32,16 @@ which explicitly set `RUSTUP_TOOLCHAIN=stable`. [Integrity preparation](QUALIFIC
 records the retained source boundaries. [Hosted rebuild preparation](https://github.com/bohewu/yetlet/blob/849c5894f73d9732db9c2ccaa765385dc9d8a819/docs/YT-020-HOSTED-REBUILD.md)
 records the later authorized protected-check migration after actual Rust 1.99 CI PASS.
 
+## M28 archive, registry and physical-network evidence
+
+| Checkpoint | Observed result | Qualification boundary |
+|---|---|---|
+| [YT-284 source/package checkpoint](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-F2-PACKAGE-COMPATIBILITY.md) | Independent consumers of the earlier F2 source and local packages passed at their recorded targets | Applies to that earlier packaging layout and candidate bytes |
+| [YT-294 normal archives](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#22-yt-294--normal-archives-and-external-consumer-qualification) | Core then Browser archives passed six independent consumer families, 15 feature graphs and 13 focused tests | Source/package evidence before the distinct SDK alpha.9 registry publication |
+| [SDK alpha.9 public consumer](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23) | Public Core and Browser archives were read back in publication order. Crates.io CLI 0.4.2 passed Linux Native, Service and Chrome/Wasm against the published SDK | Registry evidence for those package identities and consumer paths |
+| [YT-285 physical-path readiness](M28-MULTI-HOST-DELIVERY-PLAN.md#yt-285-readiness-checkpoint-2026-11-22) | Native Linux and Windows MSVC hosts verified the selected direct UDP path with the retained YT-294 Core archive | Bounded native endpoint and selected-path readiness |
+| [YT-274 physical application](M28-MULTI-HOST-DELIVERY-PLAN.md#yt-274-physical-application-qualification--2026-11-22) | The selected private headless application passed its two-host runtime check, including remote input, replica convergence and reconnect | Application-specific result. The [earlier blocked probes and separate VM relay](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-E-PROMOTION-DECISION.md#d4-physical-device-gate-versus-supplementary-virtual-network-evidence) retain their original results |
+
 ## Historical nine-package candidate platform and builder evidence
 
 Earlier [private preparation and tool fixtures](#private-nine-package-preparation-and-verifier-fixtures--2026-10-11-and-12)

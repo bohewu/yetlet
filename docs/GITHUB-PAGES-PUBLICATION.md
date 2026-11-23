@@ -434,3 +434,19 @@ separate evidence.
 The [original plan](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/PUBLIC-DOCS-PLAN.md) is locally recoverable at the
 frozen SHA, while remote reachability and private raw evidence availability
 remain unverified. Its old edition labels describe their dated checkpoints.
+
+## SDK alpha.9 and CLI 0.4.2 Reader rollover — 2026-11-23
+
+[PR #108](https://github.com/bohewu/yetlet/pull/108) delivered the root README,
+selected guide sources and exact SDK pins for the published pair. The clean
+[master documentation build](https://github.com/bohewu/yetlet/actions/runs/45104545335)
+and both [required Rust checks](https://github.com/bohewu/yetlet/actions/runs/45104545288)
+passed for `5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e`. After restoring the Pages
+deployment switch, [run 45105173923](https://github.com/bohewu/yetlet/actions/runs/45105173923)
+built and deployed that same source.
+
+Anonymous HTTPS readback matched the deployment manifest's sizes and SHA-256
+hashes for all eight directory-route chapters and six CSS, JavaScript and Wasm
+assets. All eight chapters identify SDK `0.9.0-alpha.9`, CLI `0.4.2` and the
+deployed source. The homepage also contains the README's locked CLI install
+command. This closes the Reader Edition portion of YT-295 and YT-296.
