@@ -303,6 +303,27 @@ not a guarantee of an unknown production/account allowance. No quota is probed
 by uploading, and no override is requested. Any HTTP429 or other failure stops
 with the original partial receipts, without retry or automatic batch splitting.
 
+## CLI registry-only continuation after a GitHub readback failure
+
+The original [CLI 0.4.2 publication run](https://github.com/bohewu/yetlet/actions/runs/45086142841)
+made the GitHub pre-release public and then stopped on an HTTP 403 read
+in the GitHub publish phase. The receipt records that no registry upload
+was attempted. Later anonymous downloads matched the original five-asset
+plan. Preserve the original failed run and public Release.
+
+This schema-3 continuation is limited to the recorded run
+`45086142841`, attempt 1, artifact `14779392510`, and its verified ZIP
+SHA-256. The closed `continuation` object carries those identities with
+`existing=[]` and `remaining=["yetlet-cli"]`. The workflow reconstructs the
+original request and matches both frozen plans. Its read-only preflight
+checks the approved failure receipt, the anonymous public release metadata
+and asset bytes, and absence of the exact version in the registry. A new
+protected `registry-continuation` job requires the owner's approval, repeats
+the checks, then sends the original archive once to crates.io. It uses
+read-only GitHub permissions and writes a separate continuation receipt.
+The fresh crates.io-installed consumer runs after package readback. Any
+attempted registry write falls outside this continuation contract.
+
 ## Local verification and remaining limits
 
 Focused policy/protocol/order/receipt tests and the revised Cargo preparation

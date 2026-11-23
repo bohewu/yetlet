@@ -22,6 +22,11 @@ s = pub.s
 REQUEST_FIELDS = {'publication_commit', 'verifier_commit', 'verifier_run', 'verifier_attempt',
     'artifact', 'artifact_sha256', 'verification_sha256', 'name', 'notes', 'notes_sha256', 'registry_plan_sha256'}
 FIRST_NAME_INTERVAL_SECONDS = 660  # Reviewed fixed policy; request JSON cannot disable it.
+CLI_CONTINUATION = {
+    'run': '45086142841', 'attempt': '1', 'artifact': '14779392510',
+    'sha256': '0004cd1c663bdb4256cc455072a45f6bf432b0d6f9ca87af8191e0ae7885dd85',
+    'existing': [], 'remaining': ['yetlet-cli'],
+}
 
 
 def request():
@@ -38,14 +43,17 @@ def request():
     s.require(type(r['notes']) is str and 0 < len(r['notes'].encode()) <= 8192
               and s.sha(r['notes'].encode()) == r['notes_sha256'])
     if 'continuation' in r:
-        s.require(s.RECORD['schema'] == 1)
+        s.require(s.RECORD['schema'] in (1, 3))
         c = r['continuation']
         s.require(type(c) is dict and set(c) == {'run', 'attempt', 'artifact', 'sha256', 'existing', 'remaining'})
         s.require(all(s.records.token(c[k], s.records.NUM) for k in ('run', 'attempt', 'artifact')))
-        s.require(s.records.token(c['sha256'], s.records.SHA) and c['existing'] == ['yetlet-actions'])
-        s.require(type(c['remaining']) is list and len(c['remaining']) == 15
-                  and all(type(n) is str for n in c['remaining'])
-                  and set(c['remaining']) == s.PACKAGES - {'yetlet-actions'})
+        s.require(s.records.token(c['sha256'], s.records.SHA))
+        if s.RECORD['schema'] == 3:
+            s.require(c == CLI_CONTINUATION)
+        else:
+            s.require(c['existing'] == ['yetlet-actions'] and type(c['remaining']) is list
+                      and len(c['remaining']) == 15 and all(type(n) is str for n in c['remaining'])
+                      and set(c['remaining']) == s.PACKAGES - {'yetlet-actions'})
     return r
 
 
@@ -120,8 +128,8 @@ def distribution(r, work):
     return plan, blobs, reg, bodies
 
 
-def continuation_distribution(r, work):
-    """Bind the known failed publication to its original, already-public plans."""
+def original_publication(r, work, names):
+    """Recover the exact plans from an owner-approved failed run."""
     c = r['continuation']
     run = pub.api('/actions/runs/' + c['run'] + '/attempts/' + c['attempt'])
     s.require(run['id'] == int(c['run']) and run['run_attempt'] == int(c['attempt'])
@@ -138,8 +146,6 @@ def continuation_distribution(r, work):
     approvals = pub.api('/actions/runs/' + c['run'] + '/approvals')
     s.require(any(v['state'] == 'approved' and v['user']['id'] == 35250002
         and any(e['id'] == env['id'] for e in v['environments']) for v in approvals))
-    names = {'PUBLICATION-PLAN.json', 'REGISTRY-PLAN.json', 'PUBLICATION-RESULT.json',
-             'GITHUB-PUBLICATION.json', 'REGISTRY-RESULT.json'}
     prior = work / 'prior'
     s.unpack_zip(s.download('/actions/artifacts/' + c['artifact'] + '/zip'), c['sha256'], prior,
                  {name: 65536 for name in names})
@@ -150,6 +156,14 @@ def continuation_distribution(r, work):
     p, blobs, reg, bodies = distribution(original, frozen)
     s.require(s.load(s.read(prior / 'PUBLICATION-PLAN.json')) == p
               and s.load(s.read(prior / 'REGISTRY-PLAN.json')) == reg)
+    return p, blobs, reg, bodies, prior, original
+
+
+def continuation_distribution(r, work):
+    names = {'PUBLICATION-PLAN.json', 'REGISTRY-PLAN.json', 'PUBLICATION-RESULT.json',
+             'GITHUB-PUBLICATION.json', 'REGISTRY-RESULT.json'}
+    p, blobs, reg, bodies, prior, original = original_publication(r, work, names)
+    c = r['continuation']
     result = s.load(s.read(prior / 'PUBLICATION-RESULT.json'))
     s.require(result['schema'] == 1 and result['status'] == 'incomplete'
         and result['github'] == 'published_and_verified' and result['registry'] == 'attempted'
@@ -169,6 +183,28 @@ def continuation_distribution(r, work):
         and github['tag'] == s.TAG and github['notes_sha256'] == p['notes_sha256']
         and github['automatic_retry'] is False and github['registry_upload'] is False)
     return p, blobs, reg, bodies, github
+
+
+def cli_continuation_distribution(r, work):
+    names = {'PUBLICATION-PLAN.json', 'REGISTRY-PLAN.json', 'PUBLICATION-RESULT.json'}
+    p, blobs, reg, bodies, prior, original = original_publication(r, work, names)
+    result = s.load(s.read(prior / 'PUBLICATION-RESULT.json'))
+    s.require(result == {'schema': 1, 'status': 'incomplete', 'automatic_retry': False,
+        'github': 'publish_attempted', 'registry': 'not_attempted',
+        'record_sha256': s.records.digest(s.RECORD), 'publication_request_sha256': s.records.digest(original),
+        'failure': {'phase': 'github-publish', 'operation': 'api-read', 'class': 'http', 'http_status': 403}})
+    return p, blobs, reg, bodies
+
+
+def public_cli_release(p):
+    pub.release(p, False, authenticated=False)
+    assets = pub.assets(p, authenticated=False)
+    latest = pub.api('/releases/latest', authenticated=False)
+    s.require(latest is None or latest['id'] != s.RELEASE_ID)
+    return {'schema': 1, 'action': 'preserved_existing_release', 'release_id': p['release_id'],
+            'original_plan_sha256': s.records.digest(p), 'github_mutations': False,
+            'assets': [{'id': a['id'], 'name': a['name'], 'size': a['size'], 'sha256': a['digest'][7:]}
+                       for a in assets]}
 
 
 def published_release(p, previous):
@@ -328,12 +364,22 @@ def main():
         'publication_request_sha256': s.records.digest(r), 'status': 'not_attempted',
         'github': 'not_attempted', 'registry': 'not_attempted', 'automatic_retry': False}
     phase = 'gate'
+    cli_continuation = 'continuation' in r and s.RECORD['schema'] == 3
     try:
         gate(r, approved)
         with tempfile.TemporaryDirectory(prefix='yetlet-publication-') as temporary:
             phase = 'distribution'
             selection = None
-            if 'continuation' in r:
+            if cli_continuation:
+                p, blobs, reg, bodies = cli_continuation_distribution(r, Path(temporary))
+                phase = 'continuation-state'
+                public_cli_release(p)
+                s.json_write(output / 'CONTINUATION-PLAN.json', {'schema': 1,
+                    'record_sha256': s.records.digest(s.RECORD), 'publication_request_sha256': s.records.digest(r),
+                    'prior': r['continuation'], 'original_public_plan_sha256': s.records.digest(p),
+                    'registry_plan_sha256': s.records.digest(reg), 'existing': [], 'remaining': ['yetlet-cli'],
+                    'github_mutations': False, 'automatic_retry': False})
+            elif 'continuation' in r:
                 p, blobs, reg, bodies, previous_github = continuation_distribution(r, Path(temporary))
                 phase = 'continuation-state'
                 published_release(p, previous_github)
@@ -355,15 +401,20 @@ def main():
             s.json_write(output / 'PUBLICATION-PLAN.json', p)
             s.json_write(output / 'REGISTRY-PLAN.json', reg)
             if not approved:
+                if cli_continuation:
+                    destination = 'Registry-only: preserve the existing GitHub release and publish the exact CLI package.\n'
+                elif selection is not None:
+                    destination = ('Registry-only: preserve existing GitHub release and yetlet-actions; '
+                        'publish only the selected fifteen packages. '
+                        'Wait 11 minutes before every unique PUT (165 minutes total); job bound 210 minutes. '
+                        'Recheck source/owner approval/release after each wait; stop on any error including429.\n')
+                else:
+                    destination = 'Destinations: GitHub pre-release, then crates.io (' + str(len(s.PACKAGES)) + ' packages).\n'
                 with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as summary:
                     summary.write('Publication preflight PASS\n\nSource: `' + s.C + '`\n\nVersion: `' +
                         s.RECORD['version'] + '`\n\nRequest SHA256: `' + s.records.digest(r) +
                         '`\n\nGitHub plan SHA256: `' + s.records.digest(p) + '`\n\nRegistry plan SHA256: `' +
-                        s.records.digest(reg) + '`\n\n' + ('Registry-only: preserve existing GitHub release and '
-                        'yetlet-actions; publish only the selected fifteen packages. '
-                        'Wait 11 minutes before every unique PUT (165 minutes total); job bound 210 minutes. '
-                        'Recheck source/owner approval/release after each wait; stop on any error including429.\n' if selection is not None else
-                        'Destinations: GitHub pre-release, then crates.io (' + str(len(s.PACKAGES)) + ' packages).\n'))
+                        s.records.digest(reg) + '`\n\n' + destination)
                 receipt['status'] = 'preflight_pass'
                 return
             phase = 'publication-recheck'
@@ -371,9 +422,9 @@ def main():
             if s.RECORD['schema'] == 3:
                 registry.require_absent(reg['packages'][0], s.RECORD['version'])
             receipt['status'] = 'attempted'
-            if selection is not None:
+            if 'continuation' in r:
                 phase = 'published-release-recheck'
-                preserved = published_release(p, previous_github)
+                preserved = public_cli_release(p) if cli_continuation else published_release(p, previous_github)
                 s.json_write(output / 'GITHUB-PRESERVED.json', preserved)
                 receipt['github'] = 'existing_public_release_verified'
                 receipt['continuation'] = r['continuation']
