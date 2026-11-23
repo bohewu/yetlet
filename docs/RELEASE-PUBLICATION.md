@@ -164,9 +164,10 @@ needed for local protocol tests.
    Draft API reads require the approved job's contents-write token; the read-only
    preflight deliberately does not access those endpoints.
    It stages only the closed public set (six files for schema2, twenty for
-   schema1) using `gh api`, publishes the
-   existing Experimental pre-release without Latest, and completes authenticated
-   and anonymous byte readback. Only then does it PUT the unchanged archive bytes
+   schema1) using `gh api` and publishes the existing Experimental pre-release
+   without Latest. Schema 2 verifies authenticated metadata and anonymous asset
+   bytes. The historical schema-1 path verifies both authenticated and anonymous
+   asset downloads. Only then does it PUT the unchanged archive bytes
    to crates.io in dependency order. No `cargo package` regeneration is allowed.
    Each upload needs exact index checksum and downloaded-byte readback before a
    dependent upload. A fresh registry-only consumer pins both schema2 versions
@@ -203,8 +204,13 @@ digest and prerelease identity; preserve `draft=false`, `prerelease=true` and
 operator assertion, not owner authorization. Validate all local bytes first;
 reject duplicates, unexpected existing assets and clobber. Upload each missing
 asset once, verify actual downloaded names/IDs/sizes/hashes, and stop on failure
-with partial state retained. Anonymous metadata and actual bytes must agree after
-publication; failed observation never authorizes republishing.
+with partial state retained. Public metadata and anonymous download bytes must
+agree after publication. Failed observation never authorizes republishing.
+
+The schema-2 protected publisher verifies public release and asset metadata
+with its GitHub token. It downloads each approved asset anonymously from
+its canonical public URL and compares the exact size and SHA-256 before the
+first registry upload. The CLI registry continuation uses the same readback.
 
 The public set derives from the cohort: archives, original unsigned provenance,
 public checksum, public DSSE bundle and reduced signing approval (twenty files

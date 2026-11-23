@@ -587,11 +587,14 @@ class PublicTests(unittest.TestCase):
                 result=pub.operate('publish',self.p,self.blobs,self.notes,'publish-exact-approved-plan')
             self.assertEqual(state['uploads'],6); self.assertEqual(len(result['assets']),6)
             self.assertFalse(state['draft'])
+            self.assertCountEqual(state['anonymous'], [a['browser_download_url'] for a in state['assets']])
 
     def remote(self, count=20, fail_upload=False):
         state = {'draft': True, 'assets': [], 'writes': [], 'anonymous': [], 'uploads': 0}
         def asset(a, ident):
-            return dict(id=ident, name=a['name'], size=a['size'], digest='sha256:' + a['sha256'], state='uploaded')
+            download = 'https://github.com/bohewu/yetlet/releases/download/' + pub.s.TAG + '/' + a['name']
+            return dict(id=ident, name=a['name'], size=a['size'], digest='sha256:' + a['sha256'],
+                        state='uploaded', browser_download_url=download)
         state['assets'] = [asset(a, 100 + i) for i, a in enumerate(self.p['assets'][:count])]
         def http(url, method='GET', body=None, binary=False, authenticated=True, **kwargs):
             if not authenticated: state['anonymous'].append(url)
@@ -614,6 +617,11 @@ class PublicTests(unittest.TestCase):
             if '/assets?per_page=100' in url: return copy.deepcopy(state['assets'])
             if '/releases/assets/' in url:
                 a = next(a for a in state['assets'] if str(a['id']) == url.rsplit('/', 1)[1])
+                return self.blobs[a['name']]
+            if url.startswith('https://github.com/bohewu/yetlet/releases/download/'):
+                self.assertTrue(binary)
+                self.assertFalse(authenticated)
+                a = next(a for a in state['assets'] if a['browser_download_url'] == url)
                 return self.blobs[a['name']]
             if url.endswith('/releases/latest'): return None
             self.fail('unexpected API path')
