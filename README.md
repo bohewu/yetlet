@@ -12,16 +12,14 @@ Rust Views with optional browser WASM when a screen needs local interaction.
 
 ## Why Yetlet
 
-- **First-class HTML rendering.** Serve useful pages and native forms without
-  JavaScript or a persistent server-side UI connection.
-- **Keep native Rust HTTP.** Use Axum extractors, Tower middleware and typed state
-  alongside a small `App`/`Page` facade.
-- **Share Views across targets.** Reuse Rust UI values for SSR and opt-in browser
-  DOM updates; keep local interactions and remote actions explicit.
-- **Choose capabilities as needed.** Add Session, authentication, rate limiting,
-  configuration or request correlation through explicit dependencies and setup.
-- **Use bounded output policies.** HTML escaping and strict page CSP are built
-  into the server rendering path; application authorization stays explicit.
+- **Compose application lifecycles.** Coordinate HTTP services, native windows,
+  UDP endpoints, and custom hosts in one application.
+- **Enable only what you need.** Start with a small Core and opt into Web, View,
+  HTML, or native adapters as your application needs them.
+- **Start with HTML.** Serve pages and native forms without JavaScript. Reuse
+  Rust Views in the browser when you opt into Wasm.
+- **Keep Axum and Tower.** Use ordinary handlers, extractors, middleware, and
+  typed state alongside Yetlet’s `App` and `Page`.
 
 ## Current published releases
 
