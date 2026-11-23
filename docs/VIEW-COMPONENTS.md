@@ -3,7 +3,7 @@
 Continue [your first native application](FIRST-APP.md) by expanding its initial
 heading into a small page. Use ordinary Rust functions and the existing
 `View`/`Element` API to pass data, compose components and render a list.
-**Experimental SDK `0.9.0-alpha.8`, published on crates.io.** This guide
+**Experimental SDK `0.9.0-alpha.9`, published on crates.io.** This guide
 continues the registry-first application from the linked walkthrough.
 
 ## Prerequisites
@@ -19,15 +19,13 @@ Its existing imports, Tokio main, listener and route registration remain needed.
 
 ## Minimal integration
 
-Keep exactly one `use yetlet::view::{Element, View};` import as shown below;
-the plain scaffold already has it. Replace the original `home` function with
-the following type, helper functions and `home` handler. Keep the other imports,
-`hello` route/handler and main function. The existing `.page("/", "Yetlet", home)` registration can call
+Keep the generated `use yetlet::web::prelude::*;` import. It already
+brings `Element` and `View` into scope. Replace the original `home` function
+with the following type, helpers and handler. Keep the `hello` route and
+handler and the main function. The existing `.page("/", "Yetlet", home)` registration can call
 this same no-argument async `View` handler without a Controller or adapter.
 
 ```rust
-use yetlet::view::{Element, View};
-
 struct Task {
     title: String,
     completed: bool,
@@ -113,7 +111,7 @@ walkthrough. A no-JS page needs none of those optional browser capabilities.
 `0.9.0-alpha.7`** and retained by later SDK versions. It offers typed
 constructors as a simpler alternative to the existing `Element::new` API,
 without a new rendering runtime, an extra crate or an automatic browser
-feature. They are also available from published SDK `0.9.0-alpha.8`.
+feature. They are also available from published SDK `0.9.0-alpha.9`.
 The first-app example above intentionally retains the reviewed
 [Reader Edition](../site/pages.toml), which is independently pinned to its
 published SDK and CLI. See the [alpha.7 publication and registry consumer](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)

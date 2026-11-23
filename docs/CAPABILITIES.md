@@ -1,11 +1,10 @@
 # Current capability and API carrier map
 
-Updated: 2026-11-22. The published Experimental SDK has two implementation packages:
-`yetlet` and `yetlet-browser`, version `0.9.0-alpha.8`, available from crates.io.
-For those published packages, base defaults select HTML and Browser defaults
-select DOM. Native capabilities and GPU/action integrations are additive opt-ins
-with explicit startup wiring. The checkout map below describes capabilities,
-not additional installable crates.
+Updated: 2026-11-23. The published Experimental SDK has two implementation packages:
+`yetlet` and `yetlet-browser`, version `0.9.0-alpha.9`, available from crates.io.
+Core defaults are empty. Browser defaults select DOM and thereby Core View.
+Native Web, HTML rendering and GPU/action integrations have explicit feature
+selection and startup wiring. The map below shows capabilities in the two packages.
 Earlier sixteen-package releases and qualification records keep their original
 sources. Opt-in static HTML export through the [independent CLI](CLI-GUIDE.md#static-html-build)
 is distributed in [CLI `0.2.0`](CLI-020-RELEASE-PREPARATION.md#owner-approved-publication-and-installed-consumer--2026-11-02);
@@ -18,11 +17,10 @@ ownership/error boundaries and local rustdoc. [Documentation scope](DOCUMENTATIO
 classifies reader inputs and retained evidence; this inventory does not select
 publication of its linked execution records.
 
-SDK alpha.8 includes [simple application startup and the optional Axum Prelude](API-REFERENCE.md#published-application-startup--sdk-alpha8)
-with the opt-in `server-axum` feature. Published CLI `0.4.1` generates
-`App::serve()` for Native and Native Style with verified SDK alpha.8 and
-compatible options. It records the selected startup profile in the scaffold
-receipt. [CLI startup profiles](CLI-GUIDE.md#sdk-resolution-yt-247)
+SDK alpha.9 provides [simple startup and the optional Web Prelude](API-REFERENCE.md#published-application-startup--sdk-alpha9)
+through `web`; add `html` for SSR. CLI `0.4.2` generates
+`App::serve()` with those features for Native and Native Style with compatible
+options. The receipt records the `web-app-serve` startup profile. [CLI startup profiles](CLI-GUIDE.md#sdk-resolution-yt-247)
 
 ## Published typed authoring and CLI Style tooling
 
@@ -34,17 +32,17 @@ The original YT-245 preparation selects local SDK `0.9.0-alpha.7` contents;
 these typed constructors are now distributed rather than checkout-only.
 
 
-Published SDKalpha.8/CLI0.4.1 artifacts serve separate roles. The independent CLI
+Published SDKalpha.9/CLI0.4.2 artifacts serve separate roles. The independent CLI
 ships native/browser Style templates and a private app generator. The Style
 walkthroughs verify SDK alpha.7 with exact app pins and locks. The
 [Style Showcase](../examples/style-showcase/README.md) remains a checkout sample.
-See the [API carrier map](API-REFERENCE.md#source-only-checkout-additions)
+See the [API carrier map](API-REFERENCE.md#published-application-composition)
 and [Style contract](CLI-CONTRACT.md#application-owned-rust-style-registration-and-css-publication).
 Style authoring has a finite private app vocabulary, explicit registration and
 external build-time CSS; ordinary CSS remains the default and supplies unsupported
 syntax. There is no public style crate, renderer change or runtime style injection.
 
-The SDK candidate adds built-in Core composition with `HostGroup`, custom Hosts
+SDK alpha.9 includes built-in Core composition with `HostGroup`, custom Hosts
 and `ResourceGroup`. Its two package versions are selected by the [workspace
 manifest](../Cargo.toml). YT-288 removes the
 composition feature opt-in. [YT-289](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#17-yt-289--optional-view-and-browser-feature-isolation)
@@ -57,8 +55,8 @@ and [independent consumer](../examples/external-consumers/yt288-core-hosts/src/m
 required for Page/document/View rendering. Neutral `actions` has an associated
 executor `Error`; `actions-http` separately owns `ActionError` and the serialized
 API error envelopes. Browser `actions` forwards `yetlet/actions-http` without
-selecting native Web. There is no checkout `server-axum` feature or
-`server_axum` compatibility module.
+selecting native Web. This SDK uses `web` and `yetlet::web` in place of the earlier
+`server-axum` feature and `server_axum` module.
 
 `App` is HTTP service configuration and direct serving uses caller-owned Tokio.
 [YT-291](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#19-yt-291--managed-web-lifecycle-and-drivers)

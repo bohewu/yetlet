@@ -2,8 +2,8 @@
 
 Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 choose a [runnable sample](SAMPLES.md). The two-package
-[SDK `0.9.0-alpha.8`](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
-and independent [CLI `0.4.1`](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17)
+[SDK `0.9.0-alpha.9`](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+and independent [CLI `0.4.2`](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
 are published on crates.io with matching Experimental GitHub pre-releases.
 The first-app instructions and selected reader sources use the edition pinned
 in [the site manifest](../site/pages.toml). The live reader labels its deployed edition and
@@ -27,7 +27,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   [Style Showcase checkout sample](../examples/style-showcase/README.md).
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
-- [Build your first Yetlet app](FIRST-APP.md): CLI0.4.1 → protected standalone project → SDK0.9.0-alpha.8 → app lock/cache → first build/run with `App::serve()`. The optional
+- [Build your first Yetlet app](FIRST-APP.md): CLI0.4.2 → protected standalone project → SDK0.9.0-alpha.9 → app lock/cache → first build/run with `App::serve()`. The optional
   [static-export path](FIRST-APP.md#next-export-a-static-site) uses a separate example.
 - [Build a browser-only Yetlet app](BROWSER-APP.md): published CLI/SDK → explicit tool and lock preparation → local state/events → build/preview/watch → static ship directory.
 - [Write Views and reusable components](VIEW-COMPONENTS.md): typed data → functions → lists/conditions → existing SSR handler.
@@ -317,7 +317,7 @@ continued availability of those raw bytes.
 - [Current capability and API carrier map](CAPABILITIES.md): implemented packages/features, application integrations, research decisions and release inclusion.
 - [M9 API classification and historical supplements](API-CONTRACTS.md) and [Compatibility](COMPATIBILITY.md): the original classification and pre-public stability limits; later packages have separate contracts in the current map.
 - [CLI contract](CLI-CONTRACT.md) and [current CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory):
-  published CLI `0.4.1`, settings-first grammar, finite SDK resolution/startup
+  published CLI `0.4.2`, settings-first grammar, finite SDK resolution/startup
   policy and explicit `inspect`, `run/watch` and generator boundaries.
 - [Browser-only app walkthrough](BROWSER-APP.md) and
   [Browser DX evidence boundaries](BROWSER-APP.md#browser-dx-research-and-selected-follow-up): project-owned
@@ -568,8 +568,7 @@ local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`; no product runtime was req
 These module guides describe the consolidated SDK and its practical limits.
 Use source/rustdoc matching the version you consume and Rust 1.99 or newer;
 native SSR needs no browser build. The [API reference](API-REFERENCE.md) covers
-additional modules and explicitly labels later source-only additions. In the
-current checkout, Core lifecycle is built in with an empty default feature set;
+the modules shipped in SDK alpha.9. Core lifecycle is built in with an empty default feature set;
 View, HTML and Web are selected explicitly.
 
 | Area | Package guide |

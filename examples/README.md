@@ -38,7 +38,7 @@ actual address reporting. File Server, Auth Notes, Modular Shop, SSE, SQLite CRU
 and Multi-Island Dashboard retain native `TcpListener`, `axum::serve` and graceful
 shutdown. `into_router()` and optional Prelude imports preserve native Axum/Tower
 composition. The [startup and port table](../docs/SAMPLES.md#startup-paths-in-this-checkout)
-and [source API examples](../docs/API-REFERENCE.md#source-only-checkout-additions)
+and [source API examples](../docs/API-REFERENCE.md#published-application-composition)
 describe the current checkout's capability and import choices. Published SDK
 alpha.8 and its pinned reader recipes retain their original feature names.
 

@@ -79,3 +79,16 @@ while the release is public, before the first registry upload.
 Core upload and public byte readback precede Browser upload. The final exact
 publication run requires the owner's approval in the protected
 `release-publish` environment.
+
+## Owner-approved publication and registry consumer — 2026-11-23
+
+The owner-approved [publication run](https://github.com/bohewu/yetlet/actions/runs/45097826989)
+passed. The [Experimental GitHub release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.9)
+and the public crates.io downloads exposed the exact approved archives. Core
+index and archive readback passed before Browser upload. Both versions are
+public and non-yanked.
+
+A clean Linux consumer installed CLI `0.4.2` from crates.io and selected
+the exact public `0.9.0-alpha.9` SDK. Native HTTP, Service HTTP with both
+health endpoints, and Browser build and interaction in Chrome with real
+Wasm passed. This verifies the published pair for those consumer paths.

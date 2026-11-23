@@ -1,32 +1,31 @@
 # Yetlet Architecture
 
-**Status:** Experimental. **Published SDK:** `0.9.0-alpha.8` (`yetlet` / `yetlet-browser`).
-**Published CLI:** `0.4.1` (`yetlet-cli`).
+**Status:** Experimental. **Published SDK:** `0.9.0-alpha.9` (`yetlet` / `yetlet-browser`).
+**Published CLI:** `0.4.2` (`yetlet-cli`).
 [Release readiness](RELEASE-READINESS.md) links the accepted publication records.
 M0–M9 implementation, selected M10 qualification and five application-owned
 research prototypes retain their recorded scopes. The typed Tag Builder is part of
 the published alpha.7 SDK; private app Style tooling ships in CLI 0.3.0,
 while Showcase remains a checkout sample.
 Publication does not establish production or universal platform qualification.
-**Published scope:** Native Rust server, HTML SSR, browser DOM/WASM, HTTP data APIs, optional islands.
+**Published scope:** Core lifetimes and optional native Web, View/HTML, browser DOM/Wasm, Native, UDP and renderer modules.
 **Related:** [MVP](MVP.md), [Roadmap](ROADMAP.md), [Backlog](BACKLOG.md), [ADRs](adr/0001-separation-of-concerns.md), [application startup contract — ADR 0011](adr/0011-application-startup-api.md), [Axum adapter prelude — ADR 0012](adr/0012-server-axum-prelude.md).
 
 Current usage is documented in the [current module guides](API-REFERENCE.md), [HTTP pipeline](HTTP-PIPELINE.md) and [sample guide](SAMPLES.md). Shared owned Views feed escaped native HTML or explicitly built browser DOM/WASM. App/Page preserve native Axum/Tower handlers; local graph, keyed children, request correlation and Memory Session are explicit opt-ins. SQL/storage stay application-owned. No Controller, DI, plugin registry or ORM is required.
 
 The design rationale and dated evidence below retain the original proposal and M7 decision history. Diagram references to compiler/macros and candidate IR are exploratory, not implemented authoring APIs. Current research decisions are in the [completed studies index](README.md#completed-research-prototypes); historical execution is not transferred to today's dirty source.
 
-## Next-alpha target — YT-287 feature-first composition
+## Feature-first composition — YT-287
 
 The owner selects a small, composable Rust application framework with minimal
 SDK publication: keep yetlet and yetlet-browser and expose optional capabilities
 through modules/features. The [YT-287 contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
 and [ADR 0014](adr/0014-layered-host-resource-lifecycle.md#yt-287-target-decision--minimal-packages-optional-capabilities)
-define the architecture implemented in the current source. The SDK candidate
-takes its version from the [workspace manifest](../Cargo.toml). Both packages
+define the architecture shipped in SDK alpha.9. The workspace takes its version from the [workspace manifest](../Cargo.toml). Both packages
 inherit that version, and the Browser package requires the exact matching base
 package with its defaults disabled.
 
-| Layer | Next-alpha responsibility |
+| Layer | Responsibility |
 |---|---|
 | Core in yetlet, default=[] | Built-in composition and generic HostGroup/Host/ResourceGroup; std-only lifetime coordination without mandatory UI, runtime, state service or serialization. |
 | Optional View / HTML | Shared owned HTML/DOM values and pure serializer; no semantic dependency on lifecycle and no native scene-graph claim. |
@@ -55,7 +54,7 @@ or process is created by Core. [YT-289 feature isolation](M28-HOST-RESOURCE-LIFE
 now selects an empty default and gates View/HTML explicitly; Browser DOM and
 keyed-DOM each enable View and their corresponding reexports. Actions/GPU-only
 Browser selections remain independent. Focused verification and configured
-independent review pass; YT-289 is Done. Published alpha.8 is unchanged.
+independent review pass; YT-289 is Done.
 
 [YT-290 Web/protocol ownership](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership)
 now separates web from HTML and neutral actions from actions-http. App and the
@@ -82,10 +81,10 @@ features/imports from the chosen SDK metadata. Core and concrete Host lifecycles
 are unchanged. SDK publication keeps two packages.
 [YT-294 archive qualification](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#22-yt-294--normal-archives-and-external-consumer-qualification)
 verifies normal Core then Browser archives and six independent consumer families
-with explicit feature/target graphs. The local development archives are distinct
-from published alpha.8; a unique release and compatible CLI must qualify registry
-scaffolding before publication. Configured independent review passes; YT-294 and
-YT-286 are Done at source/package delivery scope.
+with explicit feature/target graphs. Configured independent review passed;
+YT-294 and YT-286 are Done at source/package delivery scope. Separate
+[registry evidence](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+verifies the released SDK with CLI 0.4.2.
 The research history below retains its original default-feature/API assumptions.
 
 ## Proposed composable application research

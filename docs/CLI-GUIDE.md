@@ -4,8 +4,8 @@ For registry installation, a native quickstart and the selected release, see the
 [package README](../tools/yetlet-cli/README.md). This guide covers the command
 reference, platform setup, project settings and source maintenance.
 
-Use the [current CLI contract](CLI-CONTRACT.md), [published CLI 0.4.1
-record](CLI-041-HOSTED-RECORD.md) and [published SDK alpha.8 record](ALPHA8-HOSTED-RECORD.md)
+Use the [current CLI contract](CLI-CONTRACT.md), [published CLI 0.4.2
+record](CLI-042-HOSTED-RECORD.md) and [published SDK alpha.9 record](ALPHA9-HOSTED-RECORD.md)
 for version and distribution authority. The CLI build SDK, its immutable
 packaged source snapshot and each generated application's selected SDK are
 **different identities**. The default latest resolver, exact `--sdk-version`,
@@ -52,7 +52,7 @@ The CLI's build dependency and embedded snapshot are independent of the SDK
 chosen for each new project.
 
 ```sh
-yetlet new demo --sdk-version 0.9.0-alpha.8
+yetlet new demo --sdk-version 0.9.0-alpha.9
 yetlet new cached-demo --offline
 ```
 
@@ -94,7 +94,7 @@ archive and remain bound to that archive's checksum and immutable source.
 
 ### Generated startup profiles
 
-CLI `0.4.1` checks the selected exact SDK version against its packaged startup
+For legacy SDK feature maps, CLI `0.4.2` checks the selected exact SDK version against its packaged startup
 capability policy. A matching row must also match the registry index SHA-256 of
 the core `yetlet` archive. The packaged policy lists SDK `0.9.0-alpha.8`.
 An unlisted version, including `0.9.0-alpha.7`, uses the legacy listener for
@@ -126,25 +126,24 @@ The top-level `startup_profile` in the schema 1 creation receipt at
 `cargo_lock_sha256` identifies the generated lockfile bytes. The receipt records
 creation provenance. The manifest and lockfile govern subsequent builds.
 
-### Source-only feature-module profiles
+<a id="source-only-feature-module-profiles"></a>
+### Published feature-module profiles
 
-The current source CLI also recognizes selected core SDK metadata declaring web
+Published CLI 0.4.2 also recognizes selected core SDK metadata declaring web
 or view. It chooses that API profile before validating its feature closure; an
 incomplete new profile fails with SDK_INCOMPATIBLE and upgrade/explicit-pin
 guidance. It does not fall back to legacy imports or an older SDK. Legacy metadata
-retains the published startup table above and its checksum-bound capability rule.
+uses the startup table above and its checksum-bound capability rule.
 
-| Source profile | Explicit core features | Startup receipt |
+| Generated template selection | Explicit core features | Startup receipt |
 |---|---|---|
 | Simple Native or Native Style, optionally Tailwind | web, html | web-app-serve |
 | Native with Settings or Vite | web, html, config | web-configured |
 | Native with Service | web, html; config when Settings/Vite is selected | web-service |
 | Browser or Browser Style | reactive, view; companion selects dom and dom-keyed | browser-wasm |
 
-All generated SDK dependencies disable defaults. Native uses yetlet::web and
-continues to mean native HTTP/SSR, not a Winit Host. Style, Tailwind and Vite
-composition finish before the shared API-profile conversion. No policy or receipt
-schema expansion, version bump or publication is selected by this source support.
+All generated SDK dependencies disable defaults. Native uses `yetlet::web` for HTTP/SSR. Winit Hosts use the SDK's separate `native-winit` feature. Style, Tailwind and Vite
+composition finish before the shared API-profile conversion. The policy and receipt schemas are unchanged.
 
 The preserved published-contract CLI 0.4.1 rejects the new Native feature map
 because server-axum is absent. Its existing diagnostic does not include explicit
@@ -154,11 +153,9 @@ upgrade wording. Installed users can retain the published Native contract with:
 yetlet new my-app --template native --sdk-version 0.9.0-alpha.8
 ```
 
-Use a separately qualified CLI release containing feature-module support when
-selecting the next SDK. Its release/version has not been selected here. Old
-Browser output has separately compiled for Wasm against the new source because
-DOM/keyed-DOM forwards View; that result does not establish normal archive
-creation or browser runtime qualification. See the
+Use CLI `0.4.2` for SDK alpha.9. The
+[public alpha.9 consumer](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+passed Native, Service and Chrome/Wasm checks with that pair. See the
 [compatibility assessment](COMPATIBILITY.md#current-checkout--cli-and-selected-sdk)
 and [bounded evidence](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection).
 
@@ -230,7 +227,7 @@ passed anonymous install/version/help/`new` (original SDK
 alpha.5 pin) without rewriting 0.1.0 or claiming that
 generated applications compiled. Current distribution and
 newer versions are governed only by accepted
-[hosted CLI release records](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17).
+[hosted CLI release records](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23).
 Original failed, consumed and accepted records are retrievable
 at fixed **local Git**
 `8b3e13004a58380accf16ea440707f84e6271871`;
@@ -839,9 +836,9 @@ representation.
 
 ### Windows x64 MSVC first app and native watch
 
-This is the PowerShell counterpart of [First App](FIRST-APP.md), for the
-**published CLI `0.4.1` and SDK `0.9.0-alpha.8`** on native Windows x64
-MSVC. Do not paste POSIX shell commands into PowerShell. This is a plain
+This PowerShell walkthrough keeps the earlier published CLI `0.4.1`
+and SDK `0.9.0-alpha.8` pair used in the Windows x64 MSVC reference.
+The current Linux/POSIX [First App](FIRST-APP.md) selects the newer pair. Do not paste POSIX shell commands into PowerShell. This is a plain
 Native SSR workflow: Node, Vite, WASM and a database are not required.
 Keep the CLI installation, app SDK selection, app Cargo cache and optional
 Watchexec installation separate. The CLI installs none of those tools.
@@ -1141,9 +1138,9 @@ historical YT-104 qualification describes the earlier static starter scope.
 ## Application-owned Rust CSS
 
 Application-owned Rust CSS first shipped in CLI `0.3.0` and remains available
-in CLI `0.4.1`. The opt-in Style templates generate external CSS at build time
+in CLI `0.4.2`. The opt-in Style templates generate external CSS at build time
 through a private application tool. The current Reader Edition selects SDK
-`0.9.0-alpha.8` and CLI `0.4.1`. App SDK selection follows
+`0.9.0-alpha.9` and CLI `0.4.2`. App SDK selection follows
 [SDK resolution](#sdk-resolution-yt-247).
 
 `new --template native-style` and `new --template browser-style` opt into a private

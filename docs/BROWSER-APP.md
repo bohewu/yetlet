@@ -1,7 +1,7 @@
 # Build a browser-only Yetlet app
 
-Create a standalone interactive app with published CLI `0.4.1` and SDK
-`0.9.0-alpha.8`, without cloning Yetlet. Rust owns local state and interaction;
+Create a standalone interactive app with published CLI `0.4.2` and SDK
+`0.9.0-alpha.9`, without cloning Yetlet. Rust owns local state and interaction;
 JavaScript starts the WASM module. The finished app needs an HTTP(S) static host.
 These instructions use the pinned reader edition and existing APIs; commands
 below are a walkthrough, not evidence of a new execution.
@@ -34,7 +34,7 @@ Install the two native tools once and add the WASM target:
 ```sh
 (
     set -eu
-    cargo +1.99.0 install yetlet-cli --version 0.4.1 --locked
+    cargo +1.99.0 install yetlet-cli --version 0.4.2 --locked
     rustup target add --toolchain 1.99.0 wasm32-unknown-unknown
     cargo +1.99.0 install wasm-bindgen-cli --version 0.2.129 --locked \
         --root "$HOME/.local/share/yetlet-tools"
@@ -44,7 +44,7 @@ Install the two native tools once and add the WASM target:
 )
 ```
 
-Expected identities are `yetlet 0.4.1` and `wasm-bindgen 0.2.129`. The latter
+Expected identities are `yetlet 0.4.2` and `wasm-bindgen 0.2.129`. The latter
 matches the generated app's exact bindgen dependency. With a custom Cargo install
 root or tool installation, select its actual protected executable directory on
 PATH; do not weaken the CLI's filesystem checks.
@@ -63,7 +63,7 @@ deliberately use an existing protected parent and omit only its creation.
     export PATH="$(dirname "$(rustup which --toolchain 1.99.0 cargo)"):$HOME/.cargo/bin:$HOME/.local/share/yetlet-tools/bin:$PATH"
     yetlet_parent="$HOME/yetlet-browser-apps"
     mkdir -m 700 "$yetlet_parent"
-    yetlet new firstbrowser --template browser --parent "$yetlet_parent" --sdk-version 0.9.0-alpha.8
+    yetlet new firstbrowser --template browser --parent "$yetlet_parent" --sdk-version 0.9.0-alpha.9
     cd "$yetlet_parent/firstbrowser"
     cargo fetch --locked
     npm ci --prefix frontend --ignore-scripts --no-audit --no-fund
@@ -125,8 +125,9 @@ caller-owned Rust closure when a local graph/keyed collection is unnecessary.
 
 ## Windows x64 MSVC PowerShell first use
 
-This companion covers the **same published CLI `0.4.1` and SDK
-`0.9.0-alpha.8` Browser template**, rather than another Windows-only sample.
+This companion uses the same published CLI `0.4.2` and SDK
+`0.9.0-alpha.9` Browser template. Windows evidence below retains the scope
+of the previously verified release pair.
 Prepare the native Rust 1.99 x64 MSVC toolchain, its
 `wasm32-unknown-unknown` target, `wasm-bindgen-cli 0.2.129`, Node.js
 22.12+ and npm before building. An installation of the CLI from source
@@ -173,8 +174,7 @@ $env:PATH = "$nodeDir;$rustBin;$env:PATH"
 & npm.cmd --version
 & wasm-bindgen.exe --version
 
-# Select a previously installed, trusted published CLI. The source-built
-# The CLI 0.4.1 source includes the reviewed Windows Ctrl+C correction.
+# Select a previously installed, trusted CLI 0.4.2.
 $yetlet = (Get-Command yetlet.exe -ErrorAction Stop).Source
 & $yetlet --version
 & $yetlet doctor --json
@@ -182,7 +182,7 @@ if ($LASTEXITCODE -ne 0) { throw 'CLI Doctor environment check failed' }
 ```
 
 Confirm `rustc -vV` reports `host: x86_64-pc-windows-msvc`,
-`yetlet 0.4.1`, and `wasm-bindgen 0.2.129`; stop if any version
+`yetlet 0.4.2`, and `wasm-bindgen 0.2.129`; stop if any version
 differs. Run this creation block **once**, with an unused owner-protected
 local NTFS parent outside a Yetlet checkout. Do not use it to overwrite a
 previously created project or its locks.
@@ -193,7 +193,7 @@ if (Test-Path -LiteralPath $parent) {
     throw 'Choose another unused, owner-protected Browser app parent'
 }
 New-Item -ItemType Directory -Path $parent -ErrorAction Stop | Out-Null
-& $yetlet new firstbrowser --template browser --parent $parent --sdk-version 0.9.0-alpha.8
+& $yetlet new firstbrowser --template browser --parent $parent --sdk-version 0.9.0-alpha.9
 if ($LASTEXITCODE -ne 0) { throw 'Browser creation failed; preserve diagnostic output' }
 $app = Join-Path $parent 'firstbrowser'
 $manifest = Join-Path $app 'Cargo.toml'
@@ -225,9 +225,8 @@ preview with **Ctrl+C in the owning PowerShell console**. `build`
 produces `frontend/dist/`; `run` serves that existing production
 output, without building or starting a native Rust HTTP backend.
 Verify source lock/receipt stability and that the owned child processes
-exit and port 5173 can be rebound. The reviewed Windows console cleanup repair, now included in the
-published CLI 0.4.1 source, can return native `0xC000013A`; **do not assume
-the historical CLI 0.4.0 included the later 0.4.1 fix**. If an installed
+exit and port 5173 can be rebound. The reviewed Windows console cleanup repair
+first shipped in CLI 0.4.1. A Ctrl+C stop can return native `0xC000013A`. If an installed
 CLI returns 125 after Ctrl+C, preserve its logs and confirm actual
 owned-process cleanup instead of reporting cancellation PASS.
 

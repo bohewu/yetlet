@@ -427,7 +427,7 @@ YT-226's separately authorized2026-11-01 cutover at 0ae6b93 used the Yetlet-buil
 application-owned static reader with optional Wasm search, one Pages workflow
 and run41289520993/1. Both received independent PASS0 at their recorded scope.
 mdBook remains an explicit historical/reference builder. The current selected
-Reader **source** pair is SDKalpha.8/CLI0.4.1 in site/pages.toml, with distribution
+Reader **source** pair is SDK alpha.9 / CLI 0.4.2 in `site/pages.toml`, with distribution
 authority in the accepted hosted SDK/CLI records. This source selection is not a
 claim of live Pages deployment; PR/CI/merge and hosted reader readback remain
 separate evidence.
