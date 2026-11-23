@@ -230,6 +230,14 @@ def assets(p, authenticated=True, complete=True, *, public_download=False):
     return items
 
 
+def published_assets(p):
+    release(p, False)
+    items = assets(p, public_download=True)
+    latest = api('/releases/latest')
+    s.require(latest is None or latest['id'] != s.RELEASE_ID)
+    return items
+
+
 def operate(action, p, blobs, notes, confirm=None):
     # Exact Draft, tag and all pre-existing bytes must pass before the first write.
     if action == 'stage':
@@ -250,12 +258,15 @@ def operate(action, p, blobs, notes, confirm=None):
         body = {'tag_name': s.TAG, 'target_commitish': s.C, 'name': p['name'], 'body': notes.decode('utf-8'),
                 'draft': False, 'prerelease': True, 'make_latest': 'false'}
         http(API + '/releases/' + str(s.RELEASE_ID), 'PATCH', s.records.canonical(body))
-        release(p, False)
-        items = assets(p)
-        release(p, False, False)
-        assets(p, False)  # Includes actual anonymous public-bundle download, no auth forwarding.
-        latest = api('/releases/latest', False)
-        s.require(latest is None or latest['id'] != s.RELEASE_ID)
+        if s.RECORD['schema'] == 2:
+            items = published_assets(p)
+        else:
+            release(p, False)
+            items = assets(p)
+            release(p, False, False)
+            assets(p, False)  # Includes actual anonymous public-bundle download, no auth forwarding.
+            latest = api('/releases/latest', False)
+            s.require(latest is None or latest['id'] != s.RELEASE_ID)
     else:
         s.require(action == 'readback')
         current = api('/releases/' + str(s.RELEASE_ID))

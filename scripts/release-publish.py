@@ -197,10 +197,7 @@ def cli_continuation_distribution(r, work):
 
 
 def public_cli_release(p):
-    pub.release(p, False)
-    assets = pub.assets(p, public_download=True)
-    latest = pub.api('/releases/latest')
-    s.require(latest is None or latest['id'] != s.RELEASE_ID)
+    assets = pub.published_assets(p)
     return {'schema': 1, 'action': 'preserved_existing_release', 'release_id': p['release_id'],
             'original_plan_sha256': s.records.digest(p), 'github_mutations': False,
             'assets': [{'id': a['id'], 'name': a['name'], 'size': a['size'], 'sha256': a['digest'][7:]}
