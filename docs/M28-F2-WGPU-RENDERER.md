@@ -13,7 +13,7 @@ JSON PASS, `issues=[]`, `required_followups=[]`. The rectangle renderer
 source remained unchanged after the earlier R2-source Vulkan proof.
 Full YT-282, YT-283/284 and F2 remain open.
 This increment follows [ADR 0013](adr/0013-composable-application-and-hosts.md)
-and the separately reviewed [D1 Window slot](M28-F2-NATIVE-WINIT-ADAPTER.md).
+and the separately reviewed [D1 Window slot](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-F2-NATIVE-WINIT-ADAPTER.md).
 No published SDK/CLI or reader edition changes.
 
 This dated record retains its original companion package graph and runtime

@@ -9,9 +9,9 @@ SDK alpha.9 includes empty-default Core composition, optional View/HTML
 and the Web namespace. The independent CLI resolves each app's SDK and records
 exact pins and locks. It builds against alpha.8 and generates scaffolds for
 alpha.9. Both published distributions passed their registry consumers. The
-Reader Edition source selects SDK alpha.9 and CLI 0.4.2; its live Pages closeout
-remains open while deployment is paused. Development version equality does not
-establish archive/source equality. This is not Stable API, production, SLSA
+Reader Edition source selects SDK alpha.9 and CLI 0.4.2. The
+[live Pages readback](GITHUB-PAGES-PUBLICATION.md#sdk-alpha9-and-cli-042-reader-rollover--2026-11-23) matched the eight chapters and six assets. Development version equality
+does not establish archive/source equality. This is not Stable API, production, SLSA
 level or universal platform qualification.
 
 ## M28 release preparation — 2026-11-22

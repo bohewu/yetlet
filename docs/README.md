@@ -60,14 +60,18 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   records the breaking SDK migration, installed CLI compatibility, pre-freeze
   evidence and ordered publication gates.
 
-- [Original M28 study](M28-COMPOSABLE-APPLICATION-PLAN.md) retains the research
-  inventory and candidate tradeoffs. [ADR 0013](adr/0013-composable-application-and-hosts.md)
-  accepted the scoped F2 lifecycle work. The current feature-first direction and
-  delivery gates are in [ADR 0014](adr/0014-layered-host-resource-lifecycle.md) and
-  the [Host lifecycle design](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md). Checkout
-  implementation and published SDK qualification remain separately recorded.
-  The [dated physical qualification checkpoints](M28-MULTI-HOST-DELIVERY-PLAN.md#yt-285-readiness-checkpoint-2026-11-22)
-  distinguish UDP-path readiness from subsequent private application acceptance.
+- [M28 architecture](ARCHITECTURE.md#feature-first-composition--yt-287) describes
+  the shipped layering. [ADR 0013](adr/0013-composable-application-and-hosts.md)
+  records the scoped F2 decision, and [ADR 0014](adr/0014-layered-host-resource-lifecycle.md)
+  owns the feature-first direction with the detailed
+  [Host lifecycle design](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md).
+  The [Core](../crates/yetlet/guides/core.md) and
+  [Web](../crates/yetlet/guides/server-axum.md) guides cover current usage.
+  The [Qualification Matrix](QUALIFICATION-MATRIX.md#m28-archive-registry-and-physical-network-evidence)
+  links the dated archive, registry and network results.
+- [M27 developer experience](ROADMAP.md#m27--real-world-developer-experience)
+  links the maintained CLI first-use and Service instructions and the original
+  audit, gap report and priority decision.
 
 - [YT-250 CLI 0.3.1 release](CLI-031-RELEASE-PREPARATION.md): published
   Registry latest SemVer correction, retained exact app locking/provenance and

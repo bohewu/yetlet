@@ -58,7 +58,7 @@ These are observations of the named baseline, not proposed behavior.
 
 The public-source F2 work and its existing tests support these bounded facts.
 They do not validate the new facade, resource hierarchy, placement planner or
-new shutdown ordering. The [package compatibility record](M28-F2-PACKAGE-COMPATIBILITY.md)
+new shutdown ordering. The [package compatibility record](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-F2-PACKAGE-COMPATIBILITY.md)
 also distinguishes local source consumption from registry publication.
 
 ## 3. External research

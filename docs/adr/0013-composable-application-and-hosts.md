@@ -4,7 +4,7 @@
 - **Date:** 2026-11-17.
 - **Tracking:** YT-265, M28-A.
 - **Decision owner:** Project maintainer, explicit scoped F2 adoption on 2026-11-19 after private F1 and YT-281/282-A evidence.
-- **Related:** [M28 plan and source inventory](../M28-COMPOSABLE-APPLICATION-PLAN.md), [ADR 0001](0001-separation-of-concerns.md), [ADR 0003](0003-renderers-and-loading.md), [ADR 0005](0005-opt-in-capability-modules.md), [ADR 0011](0011-application-startup-api.md), [ADR 0012](0012-server-axum-prelude.md).
+- **Related:** [M28 plan and source inventory](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-COMPOSABLE-APPLICATION-PLAN.md), [ADR 0001](0001-separation-of-concerns.md), [ADR 0003](0003-renderers-and-loading.md), [ADR 0005](0005-opt-in-capability-modules.md), [ADR 0011](0011-application-startup-api.md), [ADR 0012](0012-server-axum-prelude.md).
 
 ## Layered Host follow-up — 2026-11-21
 
@@ -89,7 +89,7 @@ composition of resources with required readiness, explicit admission-first stop,
 rollback, and truthful owned completion. This is an additive **candidate
 amendment** to the historical POC direction, not a universal `Host` trait.
 
-The [promotion decision packet](../M28-F2-ADR-PROMOTION-BOUNDARY.md) records the
+The [promotion decision packet](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-F2-ADR-PROMOTION-BOUNDARY.md) records the
 exact pending maintainer choice and acceptance gates. The [YT-282-A private
 test-only proof](../../examples/composable-host-research/src/composition_f2a.rs)
 compiles a minimal static-chain ownership algorithm in an unpublished research
@@ -361,7 +361,7 @@ separate implementation authority.
 - E may promote, simplify, retain private or reject. Pure-Web preservation and capability-compatible render selection are mandatory before promotion; keep this ADR Proposed until owner acceptance.
 - Hidden runtimes, compulsory game machinery on HTTP paths, unsafe ownership or unjustified compatibility changes are reasons to simplify or retain private composition.
 
-The [M28 plan](../M28-COMPOSABLE-APPLICATION-PLAN.md) contains the phased backlog
+The [M28 plan](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-COMPOSABLE-APPLICATION-PLAN.md) contains the phased backlog
 and bounded evidence requirements. This ADR neither executes a runtime POC nor
 establishes measured zero overhead.
 

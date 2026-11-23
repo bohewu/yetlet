@@ -17,8 +17,9 @@ A private integration demonstration is an intermediate deliverable. The SDK goal
 is incomplete while users must copy private research implementations or their
 startup, failure and shutdown machinery.
 
-[F0-C](M28-F0C-TWO-CONSUMER-DECISION.md) remains valid: the reviewed Headless and
-Pure Web roots do not contain a common ownership-sensitive operation that
+The [original F0-A private composition contract](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-F0A-PRIVATE-COMPOSITION-CONTRACT.md)
+defines the prototype boundary.
+[F0-C](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-F0C-TWO-CONSUMER-DECISION.md) evaluated the reviewed Headless and Pure Web roots. They do not contain a common ownership-sensitive operation that
 justifies extracting a shared helper or generic lifecycle trait. That bounded
 finding does not close the multi-host SDK objective. Keep those Concrete Roots.
 Do not start F0-B3 or implement an abstraction merely to standardize names.
@@ -27,7 +28,7 @@ smallest useful public composition contract. A universal Host trait is a design
 option requiring evidence, not the definition of success.
 
 This continuation records the owner's clarified delivery direction. It does not
-retroactively accept every recommendation in the [M28-E proposal](M28-E-PROMOTION-DECISION.md),
+retroactively accept every recommendation in the [M28-E proposal](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-E-PROMOTION-DECISION.md),
 rewrite reviewed evidence, accept [ADR 0013](adr/0013-composable-application-and-hosts.md),
 or authorize runtime implementation in this planning turn.
 
@@ -41,7 +42,7 @@ locations; the historical status and evidence remain at their recorded scope.
 | Web | Public [App and native Router integration](../crates/yetlet/src/web/app.rs); the private [F0-B2 root](../examples/composition-web-research/src/lib.rs) configures a Router and leaves serving/drain ownership to its caller | No public type named WebHost or public multi-host application coordinator |
 | Game and UDP | Private [D2 native application](../examples/composable-host-research/native/src/bin/d2-loopback.rs) already combines foreground rendering and [NetworkHost](../examples/composable-host-research/native/src/udp_d2.rs) in one application, with a separate client application | No SDK GameHost/NetworkHost and no three-way Web integration |
 | Local/headless composition | Private [F0-B1 concrete owner](../examples/composable-host-research/src/headless_composition_f0b1.rs), plus earlier B/C/D evidence | No reusable public HeadlessHost or compatible custom-Host composition API |
-| Physical LAN | [D4 / YT-274](M28-E-PROMOTION-DECISION.md#d4-physical-device-gate-versus-supplementary-virtual-network-evidence) was Not verified after blocked application UDP ingress | Native selected-NIC operation and real two-physical-computer application evidence |
+| Physical LAN | [D4 / YT-274](https://github.com/bohewu/yetlet/blob/5d57fce472f4ec01ce9bf17b3a387a43d3e38a5e/docs/M28-E-PROMOTION-DECISION.md#d4-physical-device-gate-versus-supplementary-virtual-network-evidence) was Not verified after blocked application UDP ingress | Native selected-NIC operation and real two-physical-computer application evidence |
 | Virtual supplement | D4VM crossed two VM kernels through test-only relays on one physical host | Does not establish physical D4, native non-loopback bind or Windows qualification |
 
 These are source- and environment-scoped historical facts. No old tests,
