@@ -1,10 +1,10 @@
 # Single-gate release automation and registry promotion
 
-Current distribution checkpoint, 2026-11-12:
-**Published SDK:** `0.9.0-alpha.8` (`yetlet` / `yetlet-browser`).
-**Published CLI:** `0.4.1` (`yetlet-cli`).
-The [SDK publication record](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
-and [CLI publication record](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17)
+Current distribution checkpoint, 2026-11-23:
+**Published SDK:** `0.9.0-alpha.9` (`yetlet` / `yetlet-browser`).
+**Published CLI:** `0.4.2` (`yetlet-cli`).
+The [SDK publication record](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+and [CLI publication record](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
 retain separate GitHub/crates.io archives, actual signatures and consumers. The
 CLI resolves the latest available non-yanked SDK per project by default and writes exact pins/locks;
 its build SDK/snapshot remain separate fixed release inputs. The public Reader
@@ -425,7 +425,7 @@ Environment change, hosted retry or publication is performed by local maintenanc
 
 The 2026-10-30 YT-020 contract studied sixteen historical alpha.3 libraries at C
 `557ab76e03b619e959eae7529dbe03317fe1f952`, S/V `30baf25`. Current accepted
-distribution is [SDK alpha.8 / CLI0.4.1](RELEASE-READINESS.md).
+distribution is [SDK alpha.9 / CLI0.4.2](RELEASE-READINESS.md).
 Select current cohort/version/source independently. Old nine/sixteen-package
 orders,404 name observations, owner-reported cargo login and private dry-runs
 provide no present name reservation, account/email/scope or upload authority.

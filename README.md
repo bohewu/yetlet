@@ -3,10 +3,9 @@
 **A small, composable Rust application framework with explicit capabilities.**
 
 Yetlet separates application lifetimes, HTTP services, shared Views and rendering.
-Choose the capabilities an application needs. The published Web/SSR SDK described
-below renders useful HTML without JavaScript and adds browser interaction only
-when selected. The [development checkout](#development-checkout) also provides
-built-in Core lifetimes and optional Web, Native, UDP and renderer modules.
+Choose the capabilities an application needs. The published SDK includes built-in Core lifetimes and optional Web, View,
+HTML, Native, UDP and renderer capabilities. Its Web/SSR path renders useful
+HTML without JavaScript, and browser interaction is opt-in.
 
 Build server-rendered pages and HTTP APIs with ordinary Axum handlers. Share
 Rust Views with optional browser WASM when a screen needs local interaction.
@@ -26,16 +25,17 @@ Rust Views with optional browser WASM when a screen needs local interaction.
 
 ## Current published releases
 
-**Published SDK:** `0.9.0-alpha.8` (`yetlet` / `yetlet-browser`).
-**Published CLI:** `0.4.1` (`yetlet-cli`).
-The [SDK publication record](docs/ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
-and [CLI publication record](docs/CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17)
+**Published SDK:** `0.9.0-alpha.9` (`yetlet` / `yetlet-browser`).
+**Published CLI:** `0.4.2` (`yetlet-cli`).
+The [SDK publication record](docs/ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+and [CLI publication record](docs/CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
 retain exact GitHub/crates.io archives, signatures and consumer evidence. The SDK
-includes typed Tag Builders, `App::serve()`, `App::serve_on()` and the optional
-Axum adapter Prelude. The independent CLI resolves SDK versions, writes exact
-app pins and locks, and generates simple native startup with verified SDK
-alpha.8. Its opt-in native/browser Style templates use a private app CSS
-generator. The Style walkthroughs select SDK alpha.7 explicitly.
+uses an empty Core feature default and exposes native HTTP through `yetlet::web`.
+The independent CLI still builds against SDK alpha.8. It resolves each generated
+app's SDK separately, writes exact pins and locks, and generates native startup
+for alpha.9 with `web` and `html`. Its opt-in native/browser Style templates
+use a private app CSS generator. The original Style walkthroughs retain their
+explicit SDK alpha.7 selection.
 
 The quickstart follows the verified Reader Edition in [site/pages.toml](site/pages.toml).
 Each SDK or CLI publication includes a reviewed reader, README and Pages update
@@ -43,22 +43,22 @@ before release closeout. Development manifest changes alone do not promote it.
 
 ## Start with native SSR
 
-**Experimental alpha.** This quickstart uses SDK `0.9.0-alpha.8` and the
-independently versioned CLI `0.4.1`. The SDK is available
+**Experimental alpha.** This quickstart uses SDK `0.9.0-alpha.9` and the
+independently versioned CLI `0.4.2`. The SDK is available
 on crates.io:
-[`yetlet`](https://crates.io/crates/yetlet/0.9.0-alpha.8) and
-[`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.8), version
-`0.9.0-alpha.8`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.8)
+[`yetlet`](https://crates.io/crates/yetlet/0.9.0-alpha.9) and
+[`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.9), version
+`0.9.0-alpha.9`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.9)
 contains the archives and verification material. To create a standalone app,
 follow [Build your first Yetlet app](docs/FIRST-APP.md). The independently
-published CLI `0.4.1` creates apps without a repository clone:
+published CLI `0.4.2` creates apps without a repository clone:
 
 ```sh
-cargo +1.99.0 install yetlet-cli --version 0.4.1 --locked
+cargo +1.99.0 install yetlet-cli --version 0.4.2 --locked
 yetlet --version
 ```
 
-Expected output: `yetlet 0.4.1`. Cargo builds the CLI from source; see the
+Expected output: `yetlet 0.4.2`. Cargo builds the CLI from source; see the
 [native build prerequisites](docs/CLI-GUIDE.md#first-use-prerequisites),
 including its OpenSSL dependency, before installing.
 
@@ -66,10 +66,10 @@ Use the pinned Rust/Cargo 1.99.0 toolchain. Native SSR needs no Node.js or WASM
 toolchain. APIs may change; see [compatibility](docs/COMPATIBILITY.md).
 
 From the repository root of the
-[published alpha.8 source tag](https://github.com/bohewu/yetlet/tree/v0.9.0-alpha.8):
+[published alpha.9 source tag](https://github.com/bohewu/yetlet/tree/v0.9.0-alpha.9):
 
 ```sh
-cargo run --locked -p yetlet --features server-axum --example server-axum-minimal
+cargo run --locked -p yetlet --no-default-features --features web,html --example server-axum-minimal
 ```
 
 The development checkout uses the feature selections documented below; its
@@ -77,10 +77,10 @@ manifest version alone does not make it identical to this published source.
 
 Open `http://127.0.0.1:7878/` for HTML and
 `http://127.0.0.1:7878/api/status` for JSON. Stop the server with Ctrl+C.
-The complete [published example](https://github.com/bohewu/yetlet/blob/v0.9.0-alpha.8/crates/yetlet/examples/server_axum/minimal.rs) is:
+The complete [published example](https://github.com/bohewu/yetlet/blob/v0.9.0-alpha.9/crates/yetlet/examples/server_axum/minimal.rs) is:
 
 ```rust
-use yetlet::server_axum::prelude::*;
+use yetlet::web::prelude::*;
 
 async fn home() -> View {
     View::text("Hello from Yetlet")
@@ -107,10 +107,9 @@ and `Page` or `Result<Page, E>`. See the [server guide](crates/yetlet/guides/ser
 
 ## Development checkout
 
-The workspace selects SDK `0.9.0-alpha.9` for local release preparation.
-Use the table below for the candidate and the quickstart above for the published
-Reader Edition. For generated projects, consult the CLI's version and feature
-requirements in the [compatibility guide](docs/COMPATIBILITY.md).
+The table covers feature selection in the current SDK and checkout.
+For generated projects, consult the CLI version and feature requirements in the
+[compatibility guide](docs/COMPATIBILITY.md).
 
 `yetlet` has `default = []`. `HostGroup`, `Host` and `ResourceGroup` are built in;
 Core adds no HTTP runtime, View layer, thread pool or process supervisor. SDK
@@ -129,19 +128,12 @@ publication remains the two packages `yetlet` and `yetlet-browser`.
 | Independent native GPU renderer | `renderer-wgpu` |
 | Browser DOM | `yetlet-browser` with `dom` or `dom-keyed` |
 
-For this checkout's HTTP example:
-
-```sh
-cargo run --locked -p yetlet --no-default-features --features web,html --example server-axum-minimal
-```
-
-The existing example target name is retained; its source imports `yetlet::web`.
 `App` configures one HTTP service. Convert it with `App::into_host()` when its
 lifetime must be coordinated with other Hosts. Ordinary consumers compose
 `HostGroup::new().with_host(...)`; advanced callers customize resources through
 `ResourceGroup`. Constructors and `build()` do not acquire resources.
 
-See the [current API map](docs/API-REFERENCE.md#source-only-checkout-additions),
+See the [current API map](docs/API-REFERENCE.md#published-application-composition),
 [managed Web consumer](examples/external-consumers/web-hosts/README.md) and
 [two-window/UDP/Web/custom-resource consumer](examples/external-consumers/native-hosts/README.md).
 These examples describe source capabilities; GPU/platform and normal-archive
@@ -154,7 +146,7 @@ qualification require their own evidence.
 | Create my own standalone app | [Build your first Yetlet app](docs/FIRST-APP.md) |
 | Create a browser-only WASM app | [Browser first-app walkthrough](docs/BROWSER-APP.md) |
 | Write Views and reusable components | [View/component guide](docs/VIEW-COMPONENTS.md) |
-| Use typed tags and optional Style authoring | [SDK/CLI API map](docs/API-REFERENCE.md#source-only-checkout-additions) · [Style Showcase](examples/style-showcase/README.md) (checkout sample) |
+| Use typed tags and optional Style authoring | [SDK/CLI API map](docs/API-REFERENCE.md#published-application-composition) · [Style Showcase](examples/style-showcase/README.md) (checkout sample) |
 | Build an SSR page or JSON API | [Hello World](examples/hello-world/README.md) · [REST API](examples/rest-api/README.md) |
 | Add browser interaction | [Todo and Search Island](examples/todo-server/README.md) · [browser DOM guide](crates/yetlet-browser/guides/dom.md) |
 | Handle forms and Session state | [Forms](examples/forms-validation/README.md) · [Session cart](examples/cart-server/README.md) |

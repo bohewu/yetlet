@@ -3,9 +3,8 @@
 Date: 2026-10-18 (Asia/Taipei). Task: YT-102, accepted CLI contract and authorized local implementation slice.
 
 - **Present distribution:** the [CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory)
-  describes current public CLI behavior; the independent [CLI 0.4.0 release](CLI-040-HOSTED-RECORD.md)
-  and [SDK alpha.8 release](ALPHA8-HOSTED-RECORD.md) establish verified distribution,
-  rather than the original unpublished 2026-10-18 implementation checkpoint.
+  describes current public CLI behavior; the independent [CLI 0.4.2 release](CLI-042-HOSTED-RECORD.md)
+  and [SDK alpha.9 release](ALPHA9-HOSTED-RECORD.md) establish verified distribution.
 - **Original contract design:** this settings-first grammar superseded the earlier
   `dev` naming and opt-in flags, with `new --vite` implying Settings while
   plain Native remains simple. The original source-only grammar and acceptance
@@ -125,18 +124,18 @@ generates an app Cargo.lock and records provenance before publication. Build,
 run and watch retain their frozen lock behavior. These capabilities first shipped in
 [CLI 0.3.0](CLI-030-HOSTED-RECORD.md); that checkpoint's Reader Edition had
 the older SDK alpha.6 / CLI 0.2.0 pair. The **current selected Reader Edition**
-is SDK `0.9.0-alpha.8` / CLI `0.4.1` (see `site/pages.toml`), and the
+is SDK `0.9.0-alpha.9` / CLI `0.4.2` (see `site/pages.toml`), and the
 [CLI 0.4.0 publication](CLI-040-HOSTED-RECORD.md) additionally qualifies the
 finite generated-startup policy. Earlier releases keep their exact source-
 bound behavior; the CLI's own source snapshot does not float with app SDK.
 
-The current source adds [feature-module SDK profiles](CLI-GUIDE.md#source-only-feature-module-profiles)
+CLI `0.4.2` provides [feature-module SDK profiles](CLI-GUIDE.md#published-feature-module-profiles)
 without changing the resolver policy or historical checksum capabilities. The
 selected metadata determines required features, canonical generated imports and
 truthful startup labels. New profile failures retain the selected SDK identity;
 legacy templates remain available for legacy metadata. The
 [YT-293 checkpoint](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection)
-separates source compilation from future archive and publication qualification.
+records the original source compilation. The [public SDK consumer](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23) verifies the published pair.
 
 ## Historical CLI source qualification and process constraints
 

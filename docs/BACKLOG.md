@@ -74,8 +74,8 @@ M28 research phase names. YT-286 is the umbrella, not a dependency cycle.
 
 | ID | Pri | Size | Milestone | Work item | Depends on | Acceptance / evidence | State |
 |---|---|---|---|---|---|---|---|
-| YT-295 | P1 | M | M28 | Release independent CLI 0.4.2 | YT-293, YT-294 | [Pre-review CLI handoff](ALPHA9-RELEASE-PREPARATION.md#cli-release-notes-and-compatibility): local archive and installed comparison passed. Complete frozen-source release gates, owner-approved publication, registry-only installed consumers on alpha.8 and verified Reader Edition closeout | Todo |
-| YT-296 | P1 | M | M28 | Release SDK Core and Browser alpha.9 | YT-294, YT-295 | [Pre-review SDK handoff](ALPHA9-RELEASE-PREPARATION.md#publication-order-and-owner-gates): local archives and consumers passed. Complete frozen-source release gates, owner-approved Core-then-Browser publication, registry-only SDK and installed CLI consumers and verified Reader Edition closeout | Todo |
+| YT-295 | P1 | M | M28 | Release independent CLI 0.4.2 | YT-293, YT-294 | [CLI publication and registry-installed consumer](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23) passed. Reader Edition live Pages closeout pending | In progress |
+| YT-296 | P1 | M | M28 | Release SDK Core and Browser alpha.9 | YT-294, YT-295 | [Core then Browser publication and registry consumer](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23) passed. Reader Edition live Pages closeout pending | In progress |
 
 ## YT-237–YT-250 — Style delivery, SDK resolution and release preparation
 

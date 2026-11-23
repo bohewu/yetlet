@@ -6,7 +6,7 @@
 `0.9.0-alpha.7`, including
 `yetlet::view::tags` with typed fluent constructors and additive convenience
 methods. These were absent from alpha.6, first shipped in `0.9.0-alpha.7` and
-are now **published in SDK `0.9.0-alpha.8`**.
+are now **published in SDK `0.9.0-alpha.9`**.
 The historical CLI0.2.0 registry pin remains immutable. The current reader
 edition follows the verified publication pair through the required release
 closeout; a development manifest change alone does not promote it. The existing owned
@@ -31,7 +31,7 @@ DOM's existing admission/URL/image policy. Selected typed attribute setters
 the typed builder; generic `attribute` retains append-only semantics.
 The shared `View` representation and renderer behavior are unchanged.
 Published SDK alpha.7 includes these builders; CLI 0.2.0 stays independently pinned.
-The published SDK alpha.8 and CLI 0.4.1 packages are independently versioned;
+The published SDK alpha.9 and CLI 0.4.2 packages are independently versioned;
 only the SDK includes the typed Tag Builder.
 
 See the [typed View guide](VIEW-COMPONENTS.md#standard-html-authoring-coverage),
@@ -41,18 +41,18 @@ for inclusion/exclusion and the original verification limits. Actual SDK
 publication and registry-only consumer qualification are recorded separately
 in [alpha.7](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09).
 
-## Current distribution — 2026-11-12
+## Current distribution — 2026-11-23
 
-The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.8`; the independently
-published CLI is `yetlet-cli` `0.4.1`, with release build SDKalpha.8.
-See the [SDK publication record](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12)
-and [CLI publication record](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17)
+The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.9`; the independently
+published CLI is `yetlet-cli` `0.4.2`, with release build SDKalpha.8.
+See the [SDK publication record](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+and [CLI publication record](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
 for the actual artifacts and consumers. YT-220/221's DOM vocabulary, pre handling
 and opt-in navigation/images are available in SDKalpha.6; YT-223's static export
-is available in CLI0.2.0. Existing defaults and Experimental API limits remain.
+is available in CLI0.2.0. Core defaults are empty in alpha.9; Browser defaults to DOM. The SDK remains Experimental.
 
 The public reader/first-app edition remains explicitly pinned to
-SDKalpha.8/CLI0.4.1 in [the site manifest](../site/pages.toml).
+SDKalpha.9/CLI0.4.2 in [the site manifest](../site/pages.toml).
 
 Some registry-only
 reference examples retain their own SDKalpha.5 pins, independently of the
@@ -81,11 +81,11 @@ not inferred from this source-bound evidence.
 ## Published CLI Style authoring and checkout Showcase — 2026-11-10
 
 Optional application-local CSS generation and build/watch integration first
-shipped in **CLI 0.3.0**. Style templates are distributed in CLI 0.4.1.
+shipped in **CLI 0.3.0**. Style templates are distributed in CLI 0.4.2.
 The [current CLI Style guide](CLI-GUIDE.md#optional-application-owned-rust-css-yt-239-working-tree)
 and [original implementation evidence](https://github.com/bohewu/yetlet/blob/e49657922bcdfe238cd1f79061178a32a4622a01/docs/YT-239-STYLE-INTEGRATION.md)
 retain current usage versus dated source-only qualification.
-The build SDK and embedded source snapshot are alpha.7; app SDK selection follows
+The CLI 0.4.2 build SDK and embedded source snapshot are alpha.8; app SDK selection follows
 the separate reviewed resolver policy, exact pins and project Cargo.lock.
 [Showcase](../examples/style-showcase/README.md) demonstrates the current typed
 Views and finite app-owned Style vocabulary with external build-time CSS.
@@ -148,26 +148,25 @@ and [source-specific migration proof](QUALIFICATION-MATRIX.md#historical-two-pac
 
 ### Current checkout — Core and optional View
 
-The source-only [YT-288 Core](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
+The [YT-288 Core](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
 and [YT-289 feature split](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#17-yt-289--optional-view-and-browser-feature-isolation)
-change the checkout to built-in composition with default=[]. View/Element/
+give SDK alpha.9 built-in composition with default=[]. View/Element/
 Attribute, tags and binding require view; html enables view. Browser dom and
 dom-keyed each supply that feature and gate the shared reexports. Browser
 defaults still select dom; default-off actions/GPU selections do not select
 View or HTML.
 
-This is an intentional next-alpha source break. Path consumers that previously
+This is an intentional alpha.9 source break. Consumers that previously
 relied on implicit View/HTML must request their capability; HTML users can
 select html explicitly on both old and new source. The new view feature is not
 part of published alpha.8, so registry-pinned consumers keep their original
-contract. The current source CLI uses the SDK's declared feature profile;
-normal selected archives and publication qualification retain their later gates.
+contract. CLI 0.4.2 uses the selected SDK's declared feature profile.
 
 ### Current checkout — Web and HTTP protocol ownership
 
 [YT-290](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#18-yt-290--optional-web-and-http-protocol-ownership) separates native HTTP service code from optional HTML rendering,
 and neutral Action execution from HTTP protocol errors. This is an intentional
-next-alpha source break with these current-checkout migrations:
+alpha.9 source break with these migrations:
 
 | Previous selection or API | Current checkout |
 |---|---|
@@ -200,11 +199,9 @@ The retained owner must outlive a cancelled borrowing drive for graceful drain
 and managed finalization to remain recoverable. No Application or private-facade
 compatibility aliases are introduced.
 
-The `web` and `actions-http` features and their new module paths are not part
-of published alpha.8. Registry-pinned consumers and its startup examples retain
-their original contract. [YT-293](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection)
-adds current CLI template and SDK-selection support; normal selected archives and
-publication qualification retain their later gates.
+The `web` and `actions-http` features and their module paths ship in alpha.9.
+Pinned alpha.8 consumers retain their original contract. [YT-293](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection)
+records the CLI template and SDK-selection migration that shipped in CLI 0.4.2.
 
 ### Current checkout — optional Native, UDP and renderer
 
@@ -222,18 +219,18 @@ process-wide and platform entry-thread restrictions; an exited loop is not
 recreatable. Managed Native/UDP reject Async drive before acquiring resources.
 A driver returning before final release retains owners and reports incomplete
 shutdown. Renderer selection remains independent of Winit/Web/View, and backend
-runtime evidence is narrower than feature availability. Published alpha.8 and
-the pinned reader retain their existing contracts; the current CLI chooses
-its generated API from the selected SDK capability metadata.
+runtime evidence is narrower than feature availability. The Reader Edition selects alpha.9. The CLI chooses its generated API from
+the selected SDK capability metadata.
 
 ### Current checkout — CLI and selected SDK
 
-The selected preparation versions are SDK `0.9.0-alpha.9` and independent CLI
-`0.4.2`. In local tests with the exact candidate archives, published CLI 0.4.1
-passed Browser creation and Chrome runtime but rejected Native and Service
-because alpha.9 removed `server-axum`. Archive-installed CLI 0.4.2 passed all
-three template paths and retained creation against published alpha.8. An installed
-CLI 0.4.1 can pin `--sdk-version 0.9.0-alpha.8` for Native and Service.
+Use published CLI `0.4.2` to create Native, Service and Browser apps with
+SDK `0.9.0-alpha.9`. All three passed the
+[public registry consumer](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23).
+The CLI itself still builds against alpha.8. CLI 0.4.1 expects the old
+`server-axum` feature for Native and Service; users of that CLI can pin
+`--sdk-version 0.9.0-alpha.8` for those templates. The earlier candidate
+comparison also passed Browser creation and Chrome runtime with CLI 0.4.1.
 [Release notes, migration and verification limits](ALPHA9-RELEASE-PREPARATION.md#cli-release-notes-and-compatibility).
 
 At the earlier YT-293 checkpoint:
@@ -267,7 +264,7 @@ CLI compatibility. A successful registry creation is a gate for that separately
 selected unique SDK release and compatible CLI, not for reusing an existing
 published version with different bytes. This slice selects neither release nor
 reader promotion.
-See the [CLI guide](CLI-GUIDE.md#source-only-feature-module-profiles) and
+See the [CLI guide](CLI-GUIDE.md#published-feature-module-profiles) and
 [migration evidence](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection).
 
 ### Current checkout — exact archive identity

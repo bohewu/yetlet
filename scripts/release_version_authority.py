@@ -4,8 +4,8 @@ import re
 
 
 PUBLICATION_RECORDS = {
-    "SDK": ("docs/ALPHA8-HOSTED-RECORD.md", "registry consumer"),
-    "CLI": ("docs/CLI-041-HOSTED-RECORD.md", "installed consumer"),
+    "SDK": ("docs/ALPHA9-HOSTED-RECORD.md", "registry consumer"),
+    "CLI": ("docs/CLI-042-HOSTED-RECORD.md", "installed consumer"),
 }
 
 

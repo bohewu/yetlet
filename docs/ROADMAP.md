@@ -40,10 +40,12 @@ Physical F3/D4 remains independent.
 ### Experimental rollout
 
 The [alpha.9 SDK and CLI 0.4.2 handoff](ALPHA9-RELEASE-PREPARATION.md) records
-the pre-review archive and compatibility evidence. The published pair remains
-alpha.8/0.4.1. YT-295 tracks the independent CLI rollout first, and YT-296
-tracks SDK Core followed by Browser. Each release requires its own registry
-consumer and Reader Edition closeout.
+the pre-review archive and compatibility evidence. The independent
+[CLI 0.4.2](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
+(YT-295) was published and verified first. The
+[SDK alpha.9 Core and Browser](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+(YT-296) followed in that order. Both passed registry consumers. Reader Edition
+source selects the published pair; live Pages deployment and readback are pending.
 
 ### Planned delivery follow-through
 

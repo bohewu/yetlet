@@ -13,8 +13,8 @@ Begin with [Hello World](../examples/hello-world/README.md) for native SSR or [R
 The current checkout uses `yetlet::web::App` with explicit `web,html`
 features for the minimal SSR example below. Its `new().page(...).serve()` and
 `from_router(...).serve_on(address)` startup paths retain the address and runtime
-contracts described below. The [published SDK `0.9.0-alpha.8` startup API](API-REFERENCE.md#published-application-startup--sdk-alpha8)
-uses `App` and the historical `server-axum` feature.
+contracts described below. The [published SDK `0.9.0-alpha.9` startup API](API-REFERENCE.md#published-application-startup--sdk-alpha9)
+uses `App` through `web`; its SSR example below also selects `html`.
 
 The non-catalog SDK minimal example uses the fixed `127.0.0.1:7878` HTTP default.
 Run it from the repository root with the following command.

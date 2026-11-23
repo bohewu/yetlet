@@ -82,3 +82,16 @@ The owner then approves the exact `release-publish` run. The post-publication
 check installs the CLI from crates.io and exercises generated apps against the
 published SDK before SDK alpha.9 publication begins. Pages deployment remains
 paused. [Publication procedure](RELEASE-PUBLICATION.md#each-version).
+
+## Owner-approved publication and installed consumer — 2026-11-23
+
+The [Experimental GitHub release](https://github.com/bohewu/yetlet/releases/tag/yetlet-cli-v0.4.2)
+and crates.io serve the same approved CLI archive. The owner-approved
+[continuation run](https://github.com/bohewu/yetlet/actions/runs/45093965886)
+verified the published archive, installed it from crates.io and passed
+Native and Browser consumer checks on Linux, including live Chrome/Wasm
+on independently selected SDK alpha.8. A separate public CLI installation
+passed the Service HTTP and health checks. The
+[SDK alpha.9 public consumer](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+subsequently verified this same CLI with the new SDK. The CLI package build
+continues to use its exact alpha.8 SDK dependency.

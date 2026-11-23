@@ -5,7 +5,7 @@ Axum/Tower middleware, typed State and request Extensions. No capability registr
 or mandatory Settings/Auth/Session installation is involved.
 
 **Experimental SDK integration.** These modules are distributed in SDK
-`0.9.0-alpha.8`; use the documented features/target and source matching the
+`0.9.0-alpha.9`; use the documented features/target and source matching the
 version you consume. [Release readiness](RELEASE-READINESS.md) records distribution
 and its qualification limits.
 
@@ -13,17 +13,17 @@ and its qualification limits.
 ## Prerequisites
 
 Use the pinned Rust/Cargo toolchain and a native Axum/Yetlet application. Select
-each optional module feature explicitly. Examples below are setup fragments; keep resource
+the `web` feature and add `html` for SSR. Select provider features separately. Examples below are setup fragments; keep resource
 handles in typed state and register routes before applying the intended scope.
 For an existing complete app, use the [REST guide](../examples/rest-api/README.md).
 
 ## Minimal integration
 
-### The baseline has no optional capability
+### Native SSR baseline
 
 ```rust
 use yetlet::view::View;
-use yetlet::server_axum::App;
+use yetlet::web::App;
 
 async fn home() -> View { View::text("Hello") }
 let app: axum::Router = App::new().page("/", "Home", home).into_router();
@@ -37,7 +37,7 @@ This requires no `yetlet::request_id`, Session, Cookie Auth or Cache dependency.
 
 ```rust
 use yetlet::request_id::{RequestId, RequestIds};
-use yetlet::server_axum::{App, extract::Extension};
+use yetlet::web::{App, extract::Extension};
 
 async fn item(Extension(id): Extension<RequestId>) -> String { id.0.to_string() }
 let app: axum::Router = App::new()
@@ -55,7 +55,7 @@ Global correlation instead **finalizes** a fully assembled `App<()>`:
 
 ```rust
 use yetlet::request_id::RequestIds;
-use yetlet::server_axum::App;
+use yetlet::web::App;
 let router = RequestIds::new().global(App::new().get("/", || async { "ok" }));
 ```
 
@@ -86,7 +86,7 @@ A module can register routes, call `route_layer`, customize its native Router th
 
 ```rust
 use std::time::Duration;
-use yetlet::server_axum::App;
+use yetlet::web::App;
 use yetlet::session::{SessionConfig, SessionManager};
 
 #[derive(Clone, Default)]

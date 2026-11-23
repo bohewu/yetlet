@@ -1,17 +1,17 @@
 # Documentation sources and publication scope
 
-Date: 2026-10-26 classification, updated 2026-11-17 for the published CLI 0.4.1 and the selected reader edition.
+Date: 2026-10-26 classification, updated 2026-11-23 for the published pair and selected Reader Edition.
 The published Experimental SDK is `yetlet` and `yetlet-browser`
-`0.9.0-alpha.8`; the independently published CLI is `yetlet-cli` `0.4.1`.
+`0.9.0-alpha.9`; the independently published CLI is `yetlet-cli` `0.4.2`.
 Use module guides and rustdoc from the version/revision you consume. The
-[SDK publication record](ALPHA8-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-12) and
-[CLI publication record](CLI-041-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-17)
+[SDK publication record](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23) and
+[CLI publication record](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
 retain their actual distribution/consumer evidence. Older previews retain their
 own package layouts, partial registry results and failure histories. This documentation
 classification activates no website/Wiki or additional publication, support or
 repository-visibility change. Historical candidate decisions retain their scope.
 
-The public reader/first-app edition is the explicitly selected SDKalpha.8/CLI0.4.1
+The public reader/first-app edition is the explicitly selected SDKalpha.9/CLI0.4.2
 pair in [the site manifest](../site/pages.toml). The new
 [browser-only walkthrough](BROWSER-APP.md) is repository guidance; it does not add
 a selected site chapter or promote the live site. The existing link rewriter
@@ -255,7 +255,7 @@ browser APIs. Checkout improvements never change an already signed candidate's
 identity. A separately selected development edition must be labelled Development.
 The initial mdBook0.5.4 choice is historical, and the Yetlet-built static reader
 with optional Wasm search owns the current Pages path. Keep the exact eight
-chapters and the selected SDKalpha.8/CLI0.4.1 pairing, with no recursive report export or
+chapters and the edition selected in `site/pages.toml`, with no recursive report export or
 second manually maintained guide tree. Original task/source links preserve dated
 proof, while operating contracts live in maintained guides. Wiki and hosted
 rustdoc remain separate unselected publication surfaces.

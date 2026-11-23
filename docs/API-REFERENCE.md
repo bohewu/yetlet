@@ -1,7 +1,7 @@
 # Current API reference
 
-Updated: 2026-11-12. This map distinguishes the published Experimental two-package
-SDK (`0.9.0-alpha.8`) from independent CLI tooling and checkout samples. `yetlet` contains the shared View and opt-in
+Updated: 2026-11-23. This map distinguishes the published Experimental two-package
+SDK (`0.9.0-alpha.9`) from independent CLI tooling and checkout samples. `yetlet` contains the shared View and opt-in
 native capabilities; `yetlet-browser` contains browser integrations and depends
 one-way on the same View. Both packages are available from crates.io at this version.
 Earlier release tags retain their original layouts and evidence.
@@ -45,7 +45,35 @@ the reviewed Reader Edition selected in [the site manifest](../site/pages.toml).
 [SDK alpha.7 publication and registry consumer](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
 
 
+## Published application startup — SDK alpha.9
+
+Select `web` for native HTTP and add `html` for SSR pages. SDK alpha.9
+keeps `App::serve()` and `App::serve_on(address)` under `yetlet::web`.
+For the two-feature SSR case, the optional prelude includes `App` and
+`View`. The application declares and owns its Tokio runtime.
+
+```rust
+use yetlet::web::prelude::*;
+
+async fn home() -> View {
+    View::text("Hello from Yetlet")
+}
+
+#[tokio::main]
+async fn main() -> std::io::Result<()> {
+    App::new().page("/", "Yetlet", home).serve().await
+}
+```
+
+The convenience methods serve plain HTTP. `serve()` binds
+`127.0.0.1:7878`; `serve_on(address)` takes an explicit address. For a custom
+listener or graceful shutdown, use the native Router from `App::into_router()`.
+For coordinated services, see [managed Web lifetimes](../crates/yetlet/guides/server-axum.md#execution-ownership).
+[First-app walkthrough](FIRST-APP.md)
+
 ## Published application startup — SDK alpha.8
+
+This section preserves the original SDK alpha.8 contract for pinned consumers.
 
 ### Application startup and optional Prelude — YT-258
 
@@ -53,7 +81,7 @@ the reviewed Reader Edition selected in [the site manifest](../site/pages.toml).
 optional native `server_axum::prelude` ship in SDK `0.9.0-alpha.8`.
 Select `server-axum` and declare the application's Tokio runtime explicitly.
 
-Published CLI `0.4.0` generates this simple startup for Native and Native
+CLI `0.4.0` introduced generation of this simple startup for Native and Native
 Style with verified SDK alpha.8 and compatible options. The creation receipt
 records `startup_profile` as `m26-app-serve`. SDK alpha.7 still uses the legacy
 native listener. [CLI startup profiles](CLI-GUIDE.md#sdk-resolution-yt-247)
@@ -97,9 +125,9 @@ They never infer TLS from ports, hostnames or environment, provision certificate
 or create a hidden runtime. Binding all interfaces with `0.0.0.0` or `::`
 explicitly exposes the listener beyond loopback.
 
-## Source-only checkout additions
+## Published application composition
 
-The current SDK candidate includes built-in `yetlet::composition` and reexports
+SDK alpha.9 includes built-in `yetlet::composition` and reexports
 `HostGroup`, `Host` and `ResourceGroup` at the package root. These types need no
 Cargo features. The [workspace manifest](../Cargo.toml) selects the candidate
 version for both packages.
@@ -107,7 +135,7 @@ The [independent Core consumer](../examples/external-consumers/yt288-core-hosts/
 demonstrates custom Hosts, typed owned/borrowed resources and caller-driven
 polling without normal runtime dependencies. [YT-288](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#16-yt-288--built-in-core-host-lifetimes)
 records the Core contract and bounded verification. [YT-289](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#17-yt-289--optional-view-and-browser-feature-isolation)
-sets the checkout default to []; select view for View/Element/Attribute, typed
+sets the SDK default to `[]`; select view for View/Element/Attribute, typed
 tags and binding, or html for serialization (which enables view). Browser dom
 and dom-keyed select view and expose the same types; default-off actions/GPU
 selections do not. Published alpha.8 retains its original feature contract.
@@ -134,20 +162,19 @@ caller-thread loop. Native/UDP ordinary hosting uses synchronous `run()`;
 `run_async()` rejects them before acquisition. Advanced custom resources may
 supply a typed `BlockingDriver` through `ResourceGroup::with_blocking_driver`.
 See the [finite native consumer](../examples/external-consumers/native-hosts/README.md)
-for Native/UDP and optional Web with borrowed local resources. These APIs remain
-checkout-only; feature availability is not renderer/backend qualification.
+for Native/UDP and optional Web with borrowed local resources. These APIs ship in alpha.9. Renderer and backend qualification have their own evidence.
 
 The `actions` feature keeps `Command`, `ActionExecutor` and `LocalExecutor`
 transport-neutral. Executors choose an associated `Error`; local execution
 accepts the caller's error type without requiring serialization. Select
 `actions-http` for `yetlet::actions_http::{ActionError, ApiErrorEnvelope, ApiErrorBody}`.
 Browser `actions` forwards this HTTP contract and retains its Wasm HTTP executor
-without selecting native Web. The checkout removes the old `server-axum`
+without selecting native Web. Alpha.9 removes the old `server-axum`
 feature and `server_axum` module without aliases; see the
 [checkout migration](COMPATIBILITY.md#current-checkout--web-and-http-protocol-ownership).
-Published alpha.8 retains the startup API shown above.
+Pinned alpha.8 consumers retain the historical startup API shown above.
 
-The source CLI now recognizes the selected SDK's feature-module vocabulary.
+Published CLI 0.4.2 recognizes the selected SDK's feature-module vocabulary.
 Native HTTP/SSR starters choose web+html and import yetlet::web; Browser starters
 choose view+reactive, with DOM/keyed-DOM in yetlet-browser. Settings and Vite add
 config. An incomplete new profile is rejected rather than using legacy imports.
@@ -163,7 +190,7 @@ companion. Both packages are built from the repository.
 
 ## CLI Style authoring and checkout Showcase
 
-Published SDKalpha.8/CLI0.4.1 artifacts serve separate roles. The Reader
+Published SDKalpha.9/CLI0.4.2 artifacts serve separate roles. The Reader
 Edition uses the pair selected in the site manifest.
 Application-owned Rust CSS first shipped in CLI `0.3.0`. The CLI ships Native
 and Browser Style templates with a private build-time generator, build/watch
@@ -179,12 +206,12 @@ template's required packages and features.
 
 ## HTML, HTTP and browser modules
 
-This map describes the current checkout and its explicit feature selections.
-For the published alpha.8 startup contract, use the section above and the
+This map describes the published SDK's explicit feature selections.
+For current application startup, see the section above and the
 [first-app guide](FIRST-APP.md). Renderer validation and native Axum/Tower
 semantics remain separate responsibilities.
 
-| Checkout module and guide | Main entry points | Selection, ownership and failure boundary |
+| SDK module and guide | Main entry points | Selection, ownership and failure boundary |
 |---|---|---|
 | [`yetlet::view`](../crates/yetlet/guides/core.md) | `View`, `Element`, `binding` validated vocabulary | Owned renderer-neutral values; construction does not sanitize HTML. Binding validation can return `BindingContractError`; the renderer owns output policy |
 | [`yetlet::html`](../crates/yetlet/guides/html.md) | `render_to_string`, `escape_text`, `RenderError` | Borrow a View, return an owned escaped fragment or policy error. Complete buffering; no raw HTML escape hatch or HTTP-header ownership |
