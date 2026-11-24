@@ -19,6 +19,9 @@ cargo xtask check samples
 
 ## Getting started
 
+Use the standalone [HostGroup starter](hostgroup/README.md) to run a local
+Host and add an optional HTTP service with the published SDK.
+
 Begin with [Hello World](hello-world/README.md) for native SSR or [REST API](rest-api/README.md) for HTTP-only development. [Todo](todo-server/README.md) adds explicitly built WASM; [Session cart](cart-server/README.md) adds an opt-in server capability. The [developer documentation index](../docs/README.md) separates current guidance from retained milestone evidence.
 
 ## Source-checkout startup
