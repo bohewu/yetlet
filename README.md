@@ -142,6 +142,7 @@ qualification require their own evidence.
 | I want to… | Start here |
 |---|---|
 | Create my own standalone app | [Build your first Yetlet app](docs/FIRST-APP.md) |
+| Compose a local Host and optional HTTP service | [HostGroup starter](examples/hostgroup/README.md) |
 | Create a browser-only WASM app | [Browser first-app walkthrough](docs/BROWSER-APP.md) |
 | Write Views and reusable components | [View/component guide](docs/VIEW-COMPONENTS.md) |
 | Use typed tags and optional Style authoring | [SDK/CLI API map](docs/API-REFERENCE.md#published-application-composition) · [Style Showcase](examples/style-showcase/README.md) (checkout sample) |

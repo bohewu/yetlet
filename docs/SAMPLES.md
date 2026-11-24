@@ -6,6 +6,9 @@ Yetlet samples exist to validate application ergonomics, dependency isolation an
 
 ## Choose a starting point
 
+Use the standalone [HostGroup starter](../examples/hostgroup/README.md) to
+compose a local Host and optional HTTP service with the published SDK.
+
 Begin with [Hello World](../examples/hello-world/README.md) for native SSR or [REST API](../examples/rest-api/README.md) for HTTP-only development. Use [Todo](../examples/todo-server/README.md) for shared SSR/WASM Views and [Session cart](../examples/cart-server/README.md) for an explicit server capability. Use [Style Showcase](../examples/style-showcase/README.md) to compare native previews with real Rust View, Style and generated CSS sources. Each sample-local README provides exact commands and limitations. The [documentation index](README.md) separates current guidance from historical qualification.
 
 ## Startup paths in this checkout

@@ -1,0 +1,17 @@
+[package]
+name = "yetlet-hostgroup-example"
+version = "0.1.0"
+edition = "2024"
+rust-version = "1.99"
+publish = false
+
+[workspace]
+resolver = "3"
+
+[features]
+default = []
+web = ["yetlet/web", "dep:tokio"]
+
+[dependencies]
+yetlet = { version = "=0.9.0-alpha.9", default-features = false }
+tokio = { version = "=1.53.3", default-features = false, features = ["macros", "rt", "signal"], optional = true }
