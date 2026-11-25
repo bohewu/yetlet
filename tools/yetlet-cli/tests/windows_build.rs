@@ -360,20 +360,7 @@ fn native_cli_build_debug_release_and_lock_cache_errors_are_frozen() {
     assert!(!cache.path().join("registry/cache").exists());
 }
 
-#[test]
-fn untrusted_cargo_reports_executable_stage_before_spawn_and_trusted_copy_builds() {
-    let root = tempfile::tempdir().unwrap();
-    let app = fixture(root.path());
-    let manifest = app.join("Cargo.toml");
-    fs::write(
-        app.join("Cargo.lock"),
-        "version=4\n[[package]]\nname='winprocess_fixture'\nversion='0.1.0'\n",
-    )
-    .unwrap();
-    let unsafe_tools = app.join("untrusted-tools");
-    fs::create_dir(&unsafe_tools).unwrap();
-    let cargo = unsafe_tools.join("cargo.exe");
-    fs::copy(app.join(".winprocess-private-cargo/cargo.exe"), &cargo).unwrap();
+fn grant_fixture_world_write(file: &Path) {
     let sddl: Vec<_> = "D:P(A;;FA;;;WD)".encode_utf16().chain([0]).collect();
     let mut descriptor = null_mut();
     // SAFETY: set only this disposable executable's DACL, preserving its owner.
@@ -389,7 +376,7 @@ fn untrusted_cargo_reports_executable_stage_before_spawn_and_trusted_copy_builds
         );
     }
     let descriptor = Local(descriptor);
-    let path: Vec<_> = cargo.as_os_str().encode_wide().chain([0]).collect();
+    let path: Vec<_> = file.as_os_str().encode_wide().chain([0]).collect();
     assert_ne!(
         unsafe {
             windows_sys::Win32::Security::SetFileSecurityW(
@@ -400,18 +387,148 @@ fn untrusted_cargo_reports_executable_stage_before_spawn_and_trusted_copy_builds
         },
         0
     );
-    let output = code(
-        cli(&manifest).env("PATH", &unsafe_tools).output().unwrap(),
-        125,
+}
+
+#[test]
+fn doctor_windows_distinguishes_missing_refused_unavailable_and_protected_tools() {
+    let root = tempfile::tempdir().unwrap();
+    let app = fixture(root.path());
+    let private = app.join(".winprocess-private-cargo");
+    let rustc = std::env::split_paths(&std::env::var_os("PATH").unwrap())
+        .filter(|dir| dir.is_absolute())
+        .map(|dir| dir.join("rustc.exe"))
+        .find(|path| path.is_file())
+        .unwrap();
+    // Preserve the destination's inherited, owner-only ACL while copying bytes.
+    io::copy(
+        &mut fs::File::open(rustc).unwrap(),
+        &mut fs::File::create(private.join("rustc.exe")).unwrap(),
+    )
+    .unwrap();
+    let cwd = root.path().join("empty");
+    fs::create_dir(&cwd).unwrap();
+    let report = |paths: &std::ffi::OsStr, status, json| {
+        let mut cmd = Command::new(env!("CARGO_BIN_EXE_yetlet"));
+        cmd.arg("doctor");
+        if json {
+            cmd.arg("--json");
+        }
+        let output = code(
+            cmd.current_dir(&cwd)
+                .env("PATH", paths)
+                .env("DOCTOR_TEST_PRIVATE", "unused-private-sentinel")
+                .output()
+                .unwrap(),
+            status,
+        );
+        assert!(output.stderr.is_empty());
+        let text = String::from_utf8(output.stdout).unwrap();
+        assert!(!text.contains("unused-private-sentinel"));
+        assert_eq!(fs::read_dir(&cwd).unwrap().count(), 0);
+        text
+    };
+    let diagnostic = |text: &str, tool: &str| {
+        let value: serde_json::Value = serde_json::from_str(text).unwrap();
+        assert_eq!(value["schema_version"], 1);
+        assert_eq!(value["completed"], true);
+        value["diagnostics"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|entry| entry["capability"] == tool)
+            .unwrap()
+            .clone()
+    };
+    let missing = report(cwd.as_os_str(), 1, true);
+    for tool in ["cargo", "rustc"] {
+        let diag = diagnostic(&missing, tool);
+        assert_eq!(diag["status"], "fail");
+        assert!(
+            diag["message"]
+                .as_str()
+                .unwrap()
+                .contains(&format!("no {tool} executable found"))
+        );
+    }
+    // Keep the original toolchain's DLLs available for direct rustc binaries.
+    let mut paths = vec![private.clone()];
+    paths.extend(std::env::split_paths(&std::env::var_os("PATH").unwrap()));
+    let protected = report(&std::env::join_paths(&paths).unwrap(), 0, true);
+    for tool in ["cargo", "rustc"] {
+        assert_eq!(diagnostic(&protected, tool)["status"], "pass");
+    }
+
+    let first = app.join("refused-tools");
+    fs::create_dir(&first).unwrap();
+    let cargo = first.join("cargo.exe");
+    fs::write(&cargo, b"private probe output sentinel").unwrap();
+    grant_fixture_world_write(&cargo);
+    paths.insert(0, first);
+    let paths = std::env::join_paths(paths).unwrap();
+    let rejected = report(&paths, 1, true);
+    let human = report(&paths, 1, false);
+    let diag = diagnostic(&rejected, "cargo");
+    assert_eq!(diag["status"], "fail");
+    let message = diag["message"].as_str().unwrap();
+    let expected = format!(
+        "rejected \"{}\" (untrusted writable ACL)",
+        cargo.as_os_str().as_encoded_bytes().escape_ascii()
     );
-    let error = String::from_utf8_lossy(&output.stderr);
-    assert!(error.contains("CLI_PROCESS stage=executable:"), "{error}");
+    assert!(message.contains(&expected), "{message}");
+    assert!(message.contains("first on PATH"));
     assert!(
-        error.contains("kind=Other, native_os_error=None"),
-        "{error}"
+        human
+            .lines()
+            .any(|line| line == format!("DOCTOR_CARGO_VERSION fail cargo: {message}"))
     );
-    assert!(error.contains("no untrusted write access"), "{error}");
-    assert!(!error.contains(cargo.to_string_lossy().as_ref()));
+    for text in [&rejected, &human] {
+        assert!(!text.contains(".winprocess-private-cargo"));
+        assert!(!text.contains("private probe output sentinel"));
+        assert!(!text.contains("--version"));
+    }
+
+    // A sharing violation during discovery cannot prove absence or bad ACLs.
+    let _exclusive = fs::OpenOptions::new()
+        .read(true)
+        .share_mode(0)
+        .open(&cargo)
+        .unwrap();
+    let unavailable = report(&paths, 1, true);
+    assert_eq!(
+        diagnostic(&unavailable, "cargo")["message"],
+        "local executable unavailable or unsafe; use a protected Rust/Cargo 1.99 installation"
+    );
+}
+
+#[test]
+fn untrusted_cargo_reports_executable_stage_before_spawn_and_trusted_copy_builds() {
+    let root = tempfile::tempdir().unwrap();
+    let app = fixture(root.path());
+    let manifest = app.join("Cargo.toml");
+    fs::write(
+        app.join("Cargo.lock"),
+        "version=4\n[[package]]\nname='winprocess_fixture'\nversion='0.1.0'\n",
+    )
+    .unwrap();
+    let unsafe_tools = app.join("untrusted-tools");
+    fs::create_dir(&unsafe_tools).unwrap();
+    let cargo = unsafe_tools.join("cargo.exe");
+    fs::copy(app.join(".winprocess-private-cargo/cargo.exe"), &cargo).unwrap();
+    grant_fixture_world_write(&cargo);
+    let mut run = dev_cli(&manifest);
+    run.creation_flags(CREATE_NEW_CONSOLE);
+    for mut command in [cli(&manifest), run] {
+        let output = code(command.env("PATH", &unsafe_tools).output().unwrap(), 125);
+        let error = String::from_utf8_lossy(&output.stderr);
+        assert!(error.contains("CLI_PROCESS stage=executable:"), "{error}");
+        assert!(
+            error.contains("kind=Other, native_os_error=None"),
+            "{error}"
+        );
+        assert!(error.contains("no untrusted write access"), "{error}");
+        assert!(!error.contains("untrusted-tools"));
+        assert!(!String::from_utf8_lossy(&output.stdout).contains("untrusted-tools"));
+    }
     assert!(
         !app.join("target").exists(),
         "untrusted Cargo must not start"

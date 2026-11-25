@@ -155,7 +155,7 @@ pub(crate) fn pin_cwd(app: &App, command: &mut Command) -> io::Result<()> {
     Ok(())
 }
 
-pub(super) fn executable(program: &OsStr) -> io::Result<Executable> {
+pub(super) fn executable_path(program: &OsStr) -> io::Result<Option<std::path::PathBuf>> {
     // Only absolute PATH entries are eligible. Never ask Windows to search the
     // selected application directory or invoke cmd/bat/PowerShell.
     if matches!(
@@ -175,17 +175,22 @@ pub(super) fn executable(program: &OsStr) -> io::Result<Executable> {
             // This probe only skips missing PATH entries. Authorization and all
             // executable reads use the pinned, no-reparse handle open below.
             if path.try_exists()? {
-                return Executable::open(&path);
+                return Ok(Some(path));
             }
         }
-        return Err(io::ErrorKind::NotFound.into());
+        return Ok(None);
     }
     // Direct absolute native fixture executables are an internal test seam.
     #[cfg(test)]
     if std::path::Path::new(program).is_absolute() {
-        return Executable::open(std::path::Path::new(program));
+        return Ok(Some(program.into()));
     }
     Err(io::ErrorKind::Unsupported.into())
+}
+
+fn executable(program: &OsStr) -> io::Result<Executable> {
+    let path = executable_path(program)?.ok_or(io::ErrorKind::NotFound)?;
+    Ok(Executable::open(&path)?)
 }
 
 // Windows CRT argv quoting. No shell is involved, including for Unicode/spaces.

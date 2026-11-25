@@ -246,7 +246,7 @@ fn discovery_is_exclusive_scoped_and_needs_no_project_or_tools() {
 }
 
 #[test]
-fn doctor_json_is_one_environment_report_even_when_tools_are_unavailable() {
+fn doctor_json_is_one_environment_report_when_tools_are_missing() {
     let root = tempfile::tempdir().unwrap();
     let output = code(
         Command::new(env!("CARGO_BIN_EXE_yetlet"))
@@ -303,6 +303,13 @@ fn doctor_json_is_one_environment_report_even_when_tools_are_unavailable() {
         for field in ["code", "origin", "capability", "status", "message"] {
             assert!(d[field].is_string());
         }
+        if matches!(d["capability"].as_str(), Some("rustc" | "cargo")) {
+            assert_eq!(d["status"], "fail");
+            let tool = d["capability"].as_str().unwrap();
+            let message = d["message"].as_str().unwrap();
+            assert!(message.contains(&format!("no {tool} executable found")));
+            assert!(message.contains("first on PATH"));
+        }
         if ![
             "DOCTOR_RUSTC_VERSION",
             "DOCTOR_CARGO_VERSION",
@@ -315,6 +322,63 @@ fn doctor_json_is_one_environment_report_even_when_tools_are_unavailable() {
         }
     }
     assert_eq!(fs::read_dir(root.path()).unwrap().count(), 0);
+}
+
+#[test]
+fn doctor_rejects_first_unsafe_candidate_before_executing_or_falling_back() {
+    use std::os::unix::fs::{MetadataExt, symlink};
+    let root = tempfile::tempdir().unwrap();
+    let first = root.path().join("first");
+    let second = root.path().join("later-private-path");
+    fs::create_dir(&first).unwrap();
+    fs::create_dir(&second).unwrap();
+    fs::set_permissions(&first, fs::Permissions::from_mode(0o775)).unwrap();
+    let marker = root.path().join("executed");
+    for tool in ["rustc", "cargo"] {
+        let script = first.join(tool);
+        fs::write(&script, b"#!/bin/sh\n: > \"$DOCTOR_MARKER\"\n").unwrap();
+        fs::set_permissions(script, fs::Permissions::from_mode(0o755)).unwrap();
+        symlink("/bin/true", second.join(tool)).unwrap();
+    }
+    // On a shared temp root the descriptor walk can refuse an earlier ancestor.
+    let first = first.canonicalize().unwrap();
+    let rejected = first
+        .ancestors()
+        .collect::<Vec<_>>()
+        .into_iter()
+        .rev()
+        .find(|dir| dir.metadata().unwrap().mode() & 0o022 != 0)
+        .unwrap();
+    let expected = format!(
+        "rejected \"{}\"",
+        rejected.as_os_str().as_encoded_bytes().escape_ascii()
+    );
+    let output = code(
+        Command::new(env!("CARGO_BIN_EXE_yetlet"))
+            .args(["doctor", "--json"])
+            .env("PATH", std::env::join_paths([&first, &second]).unwrap())
+            .env("DOCTOR_MARKER", &marker)
+            .output()
+            .unwrap(),
+        1,
+    );
+    assert!(output.stderr.is_empty());
+    let value: serde_json::Value = serde_json::from_slice(&output.stdout).unwrap();
+    for code in ["DOCTOR_RUSTC_VERSION", "DOCTOR_CARGO_VERSION"] {
+        let diagnostic = value["diagnostics"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|d| d["code"] == code)
+            .unwrap();
+        assert_eq!(diagnostic["status"], "fail");
+        let message = diagnostic["message"].as_str().unwrap();
+        assert!(message.contains(&expected), "{message}");
+        assert!(message.contains("writable"));
+        assert!(message.contains("first on PATH"));
+        assert!(!message.contains("later-private-path"));
+    }
+    assert!(!marker.exists());
 }
 
 fn inspection_project() -> tempfile::TempDir {
