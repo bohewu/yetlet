@@ -30,7 +30,9 @@ use windows_sys::{
     Win32::{
         Foundation::{
             GENERIC_ALL, GENERIC_WRITE, HANDLE, INVALID_HANDLE_VALUE, LocalFree,
-            OBJ_CASE_INSENSITIVE, OBJ_DONT_REPARSE, RtlNtStatusToDosError, UNICODE_STRING,
+            OBJ_CASE_INSENSITIVE, OBJ_DONT_REPARSE, RtlNtStatusToDosError,
+            STATUS_FILE_IS_A_DIRECTORY, STATUS_NOT_A_DIRECTORY, STATUS_REPARSE_POINT_ENCOUNTERED,
+            UNICODE_STRING,
         },
         Security::{
             ACCESS_ALLOWED_ACE, ACE_HEADER,
@@ -49,7 +51,7 @@ use windows_sys::{
             IO::IO_STATUS_BLOCK,
             SystemServices::{ACCESS_ALLOWED_ACE_TYPE, ACCESS_DENIED_ACE_TYPE},
             Threading::{GetCurrentProcess, OpenProcessToken},
-            WindowsProgramming::DRIVE_FIXED,
+            WindowsProgramming::{DRIVE_FIXED, DRIVE_NO_ROOT_DIR, DRIVE_UNKNOWN},
         },
     },
 };
@@ -235,6 +237,58 @@ pub(crate) fn read_app_input(
     Ok((bytes, modified))
 }
 
+// Preserve the original I/O error for ordinary callers. Only doctor attaches
+// the selected path to an explicit policy refusal.
+#[derive(Debug)]
+pub(in crate::platform) struct PathCheckError {
+    error: io::Error,
+    reason: Option<&'static str>,
+    // Number of Windows path components through the failed ancestor, including
+    // the drive prefix and root. None identifies the executable itself.
+    components: Option<usize>,
+}
+
+impl PathCheckError {
+    fn refused(reason: &'static str) -> Self {
+        Self::from(io::Error::other(reason)).with_reason(reason)
+    }
+
+    fn with_reason(mut self, reason: &'static str) -> Self {
+        self.reason = Some(reason);
+        self
+    }
+
+    fn through(mut self, components: usize) -> Self {
+        self.components = Some(components);
+        self
+    }
+
+    pub(in crate::platform) fn refusal(&self, candidate: &Path) -> Option<(PathBuf, &'static str)> {
+        let reason = self.reason?;
+        let path = match self.components {
+            Some(count) => candidate.components().take(count).collect(),
+            None => candidate.to_owned(),
+        };
+        Some((path, reason))
+    }
+}
+
+impl From<io::Error> for PathCheckError {
+    fn from(error: io::Error) -> Self {
+        Self {
+            error,
+            reason: None,
+            components: None,
+        }
+    }
+}
+
+impl From<PathCheckError> for io::Error {
+    fn from(failure: PathCheckError) -> Self {
+        failure.error
+    }
+}
+
 // An explicit executable path, not CreateProcess's app-cwd-first search. Pin its
 // ancestry and bytes against substitution for the whole child lifetime too.
 pub(in crate::platform) struct Executable {
@@ -244,15 +298,15 @@ pub(in crate::platform) struct Executable {
     id: Identity,
 }
 impl Executable {
-    pub(in crate::platform) fn open(path: &Path) -> io::Result<Self> {
+    pub(in crate::platform) fn open(path: &Path) -> Result<Self, PathCheckError> {
         if !path.is_absolute() {
-            return Err(io::Error::other("executable path must be absolute"));
+            return Err(PathCheckError::refused("executable path must be absolute"));
         }
-        let parent = Anchor::open(
+        let parent = Anchor::checked_open(
             path.parent()
                 .ok_or_else(|| io::Error::other("missing executable parent"))?,
         )?;
-        let file = relative_access(
+        let file = checked_relative_access(
             parent.directory(),
             path.file_name()
                 .ok_or_else(|| io::Error::other("missing executable name"))?,
@@ -270,17 +324,18 @@ impl Executable {
             id,
         })
     }
-    pub(in crate::platform) fn verify(&self) -> io::Result<()> {
-        self.parent.verify()?;
-        let actual = relative(
+    pub(in crate::platform) fn verify(&self) -> Result<(), PathCheckError> {
+        self.parent.checked_verify()?;
+        let actual = checked_relative_access(
             self.parent.directory(),
             self.path.file_name().unwrap(),
             false,
             false,
             None,
+            0,
         )?;
         if inspect(&actual, false)? != self.id || inspect(&self.file, false)? != self.id {
-            return Err(io::Error::other("executable identity changed"));
+            return Err(PathCheckError::refused("executable identity changed"));
         }
         protected(&self.file, false)
     }
@@ -300,7 +355,7 @@ fn trusted_sid(
     }
 }
 
-fn protected(file: &File, require_user_owner: bool) -> io::Result<()> {
+fn protected(file: &File, require_user_owner: bool) -> Result<(), PathCheckError> {
     let current = private_security()?;
     let mut current_sid = null_mut();
     let mut defaulted = 0;
@@ -323,16 +378,18 @@ fn protected(file: &File, require_user_owner: bool) -> io::Result<()> {
         )
     };
     if code != 0 {
-        return Err(io::Error::from_raw_os_error(code as i32));
+        return Err(io::Error::from_raw_os_error(code as i32).into());
     }
     let _sd = Local(sd);
     // SAFETY: owner/DACL belong to the returned security descriptor.
-    if owner.is_null()
-        || dacl.is_null()
-        || unsafe { IsValidSid(owner) == 0 || IsValidAcl(dacl) == 0 }
-        || !trusted_sid(owner, current_sid, require_user_owner)
-    {
-        return Err(io::Error::other("untrusted owner or missing/invalid DACL"));
+    if owner.is_null() || unsafe { IsValidSid(owner) == 0 } {
+        return Err(PathCheckError::refused("missing or invalid owner SID"));
+    }
+    if dacl.is_null() || unsafe { IsValidAcl(dacl) == 0 } {
+        return Err(PathCheckError::refused("missing or invalid DACL"));
+    }
+    if !trusted_sid(owner, current_sid, require_user_owner) {
+        return Err(PathCheckError::refused("untrusted owner"));
     }
     let mutating = GENERIC_ALL
         | GENERIC_WRITE
@@ -355,21 +412,24 @@ fn protected(file: &File, require_user_owner: bool) -> io::Result<()> {
         match header.AceType as u32 {
             ACCESS_DENIED_ACE_TYPE => continue,
             ACCESS_ALLOWED_ACE_TYPE => {}
-            _ => return Err(io::Error::other("unsupported security ACE")),
+            _ => return Err(PathCheckError::refused("unsupported security ACE")),
         }
         let sid_offset = offset_of!(ACCESS_ALLOWED_ACE, SidStart);
         if (header.AceSize as usize) < sid_offset + 8 {
-            return Err(io::Error::other("invalid security ACE"));
+            return Err(PathCheckError::refused("invalid security ACE"));
         }
         let allowed = ace.cast::<ACCESS_ALLOWED_ACE>();
         let sid = unsafe { ace.cast::<u8>().add(sid_offset) };
         // Check the variable SID tail before asking the SDK to inspect it.
         if sid_offset + 8 + 4 * unsafe { *sid.add(1) } as usize > header.AceSize as usize
             || unsafe { IsValidSid(sid.cast()) == 0 }
-            || (unsafe { (*allowed).Mask } & mutating != 0
-                && !trusted_sid(sid.cast(), current_sid, false))
         {
-            return Err(io::Error::other("untrusted writable ACL"));
+            return Err(PathCheckError::refused("invalid security ACE"));
+        }
+        if unsafe { (*allowed).Mask } & mutating != 0
+            && !trusted_sid(sid.cast(), current_sid, false)
+        {
+            return Err(PathCheckError::refused("untrusted writable ACL"));
         }
     }
     Ok(())
@@ -466,10 +526,10 @@ fn private_security() -> io::Result<Local> {
     Ok(Local(descriptor))
 }
 
-fn component(name: &OsStr) -> io::Result<Vec<u16>> {
+fn component(name: &OsStr) -> Result<Vec<u16>, PathCheckError> {
     let text = name
         .to_str()
-        .ok_or_else(|| io::Error::other("path must be Unicode"))?;
+        .ok_or_else(|| PathCheckError::refused("path must be Unicode"))?;
     let stem = text
         .split('.')
         .next()
@@ -495,7 +555,7 @@ fn component(name: &OsStr) -> io::Result<Vec<u16>> {
         || wide.len() > 255
         || text.chars().any(|c| c < ' ' || "\\/:*?\"<>|".contains(c))
     {
-        return Err(io::Error::other("ambiguous Windows path component"));
+        return Err(PathCheckError::refused("ambiguous Windows path component"));
     }
     Ok(wide)
 }
@@ -519,6 +579,17 @@ fn relative_access(
     security: Option<&Local>,
     extra_access: u32,
 ) -> io::Result<File> {
+    checked_relative_access(parent, name, dir, create, security, extra_access).map_err(Into::into)
+}
+
+fn checked_relative_access(
+    parent: &File,
+    name: &OsStr,
+    dir: bool,
+    create: bool,
+    security: Option<&Local>,
+    extra_access: u32,
+) -> Result<File, PathCheckError> {
     let mut name = component(name)?;
     let bytes = (name.len() * 2) as u16;
     let name = UNICODE_STRING {
@@ -576,7 +647,15 @@ fn relative_access(
             0,
         )
     };
-    nt(code)?;
+    nt(code).map_err(|error| {
+        let error = PathCheckError::from(error);
+        match code {
+            STATUS_REPARSE_POINT_ENCOUNTERED => error.with_reason("reparse point is forbidden"),
+            STATUS_FILE_IS_A_DIRECTORY => error.with_reason("expected a regular file"),
+            STATUS_NOT_A_DIRECTORY => error.with_reason("expected a directory"),
+            _ => error,
+        }
+    })?;
     // SAFETY: successful synchronous NtCreateFile returned an owned file handle.
     let file = unsafe { File::from_raw_handle(result) };
     if let Err(error) = inspect(&file, dir) {
@@ -593,16 +672,19 @@ struct Identity {
     volume: u64,
     id: [u8; 16],
 }
-fn inspect(file: &File, dir: bool) -> io::Result<Identity> {
+fn inspect(file: &File, dir: bool) -> Result<Identity, PathCheckError> {
     let mut info = BY_HANDLE_FILE_INFORMATION::default();
     // SAFETY: valid handle and correctly sized output record.
     win(unsafe { GetFileInformationByHandle(handle(file), &mut info) })?;
-    if info.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT != 0
-        || (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY != 0) != dir
-    {
-        return Err(io::Error::other(
-            "reparse points or unexpected object types are forbidden",
-        ));
+    if info.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT != 0 {
+        return Err(PathCheckError::refused("reparse point is forbidden"));
+    }
+    if (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY != 0) != dir {
+        return Err(PathCheckError::refused(if dir {
+            "expected a directory"
+        } else {
+            "expected a regular file"
+        }));
     }
     let mut id = FILE_ID_INFO::default();
     // SAFETY: SDK class and output record/size match.
@@ -626,31 +708,57 @@ struct Anchor {
 }
 impl Anchor {
     fn open(path: &Path) -> io::Result<Self> {
-        let path = crate::framework::absolute(path)?;
+        Self::checked_open(path).map_err(Into::into)
+    }
+
+    fn checked_open(path: &Path) -> Result<Self, PathCheckError> {
+        let path = crate::framework::absolute(path).map_err(|error| {
+            let error = PathCheckError::from(error);
+            match path
+                .components()
+                .position(|part| part == Component::ParentDir)
+            {
+                Some(index) => error
+                    .with_reason("parent traversal is forbidden")
+                    .through(index + 1),
+                None => error,
+            }
+        })?;
         let mut parts = path.components();
         let drive = match parts.next() {
             Some(Component::Prefix(p)) => match p.kind() {
                 Prefix::Disk(letter) => letter,
                 _ => {
-                    return Err(io::Error::other(
+                    return Err(PathCheckError::refused(
                         "UNC/device/verbatim paths are unsupported",
-                    ));
+                    )
+                    .through(1));
                 }
             },
-            _ => return Err(io::Error::other("expected absolute drive path")),
+            _ => return Err(PathCheckError::refused("expected absolute drive path")),
         };
         if parts.next() != Some(Component::RootDir) {
-            return Err(io::Error::other("drive-relative paths are unsupported"));
+            return Err(PathCheckError::refused(
+                "drive-relative paths are unsupported",
+            ));
         }
         let root_path: Vec<_> = format!("{}:\\", drive as char)
             .encode_utf16()
             .chain([0])
             .collect();
         // SAFETY: terminated drive-root path.
-        if unsafe { GetDriveTypeW(root_path.as_ptr()) } != DRIVE_FIXED {
-            return Err(io::Error::other(
-                "only local fixed NTFS volumes are supported",
-            ));
+        match unsafe { GetDriveTypeW(root_path.as_ptr()) } {
+            DRIVE_FIXED => {}
+            // Unknown drive type or unavailable root does not establish a policy violation.
+            DRIVE_UNKNOWN | DRIVE_NO_ROOT_DIR => {
+                return Err(io::Error::other("only local fixed NTFS volumes are supported").into());
+            }
+            _ => {
+                return Err(
+                    PathCheckError::refused("only local fixed NTFS volumes are supported")
+                        .through(2),
+                );
+            }
         }
         // Deny delete sharing for EVERY ancestor. Share-write is required by the
         // OS's rename target-directory open (FILE_RENAME_INFORMATION remarks).
@@ -672,11 +780,11 @@ impl Anchor {
             )
         };
         if raw == INVALID_HANDLE_VALUE {
-            return Err(io::Error::last_os_error());
+            return Err(io::Error::last_os_error().into());
         }
         // SAFETY: CreateFileW success transfers one owned handle.
         let root = unsafe { File::from_raw_handle(raw) };
-        inspect(&root, true)?;
+        inspect(&root, true).map_err(|error| error.through(2))?;
         let mut fs_name = [0_u16; 32];
         // SAFETY: live root handle and bounded filesystem-name output buffer.
         win(unsafe {
@@ -692,23 +800,27 @@ impl Anchor {
             )
         })?;
         if fs_name[..5] != [b'N' as u16, b'T' as u16, b'F' as u16, b'S' as u16, 0] {
-            return Err(io::Error::other("only NTFS is supported"));
+            return Err(PathCheckError::refused("only NTFS is supported").through(2));
         }
         let mut anchor = Self {
             root,
             chain: Vec::new(),
         };
-        for part in parts {
+        for (index, part) in parts.enumerate() {
+            let at_child = |error: PathCheckError| error.through(index + 3);
             let Component::Normal(name) = part else {
-                return Err(io::Error::other("unsupported path component"));
+                return Err(at_child(PathCheckError::refused(
+                    "unsupported path component",
+                )));
             };
-            let child = relative(anchor.directory(), name, true, false, None)?;
-            let id = inspect(&child, true)?;
+            let child = checked_relative_access(anchor.directory(), name, true, false, None, 0)
+                .map_err(at_child)?;
+            let id = inspect(&child, true).map_err(at_child)?;
             anchor
                 .chain
                 .push((name.to_str().unwrap().into(), child, id));
         }
-        anchor.verify()?;
+        anchor.checked_verify()?;
         Ok(anchor)
     }
     fn directory(&self) -> &File {
@@ -731,12 +843,20 @@ impl Anchor {
         Ok(file)
     }
     fn verify(&self) -> io::Result<()> {
+        self.checked_verify().map_err(Into::into)
+    }
+
+    fn checked_verify(&self) -> Result<(), PathCheckError> {
         let mut parent = &self.root;
-        inspect(parent, true)?;
-        for (name, expected, id) in &self.chain {
-            let actual = relative(parent, name.as_ref(), true, false, None)?;
-            if inspect(&actual, true)? != *id || inspect(expected, true)? != *id {
-                return Err(io::Error::other("parent identity changed"));
+        inspect(parent, true).map_err(|error| error.through(2))?;
+        for (index, (name, expected, id)) in self.chain.iter().enumerate() {
+            let at_child = |error: PathCheckError| error.through(index + 3);
+            let actual = checked_relative_access(parent, name.as_ref(), true, false, None, 0)
+                .map_err(at_child)?;
+            if inspect(&actual, true).map_err(at_child)? != *id
+                || inspect(expected, true).map_err(at_child)? != *id
+            {
+                return Err(at_child(PathCheckError::refused("parent identity changed")));
             }
             parent = expected;
         }

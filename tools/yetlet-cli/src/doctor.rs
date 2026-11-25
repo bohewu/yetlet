@@ -57,23 +57,50 @@ impl Report {
     }
 }
 
+#[cfg(any(target_os = "linux", windows))]
+fn quoted_path(path: &std::path::Path) -> String {
+    let mut text = String::new();
+    for &byte in path.as_os_str().as_encoded_bytes() {
+        let escaped = std::ascii::escape_default(byte);
+        if text.len() + escaped.len() > 256 {
+            return format!("\"{text}\" (truncated)");
+        }
+        text.extend(escaped.map(char::from));
+    }
+    format!("\"{text}\"")
+}
+
 pub fn check() -> Report {
     let mut diagnostics = Vec::new();
     for tool in ["rustc", "cargo"] {
         match probe(tool) {
             Ok(output) => diagnostics.push(version(tool, &output)),
             Err(error) => {
-                let message = match error {
+                let message: String = match &error {
+                    #[cfg(any(target_os = "linux", windows))]
+                    ProbeError::Missing => format!(
+                        "no {tool} executable found; put the bin directory of an installed Rust 1.99 or newer toolchain first on PATH"
+                    ),
+                    #[cfg(target_os = "linux")]
+                    ProbeError::Rejected { path, reason } => format!(
+                        "rejected {} ({reason}); put the bin directory of a protected Rust 1.99 or newer toolchain first on PATH. Its executable and parent directories must be owned by you or root with no group or other write bits",
+                        quoted_path(path)
+                    ),
+                    #[cfg(windows)]
+                    ProbeError::Rejected { path, reason } => format!(
+                        "rejected {} ({reason}); put the bin directory of a protected Rust 1.99 or newer toolchain first on PATH. Use an absolute local fixed NTFS path without reparse points and executables owned by you, SYSTEM or Administrators with no untrusted write access",
+                        quoted_path(path)
+                    ),
                     ProbeError::Unavailable => {
-                        "local executable unavailable or unsafe; use a protected Rust/Cargo 1.99 installation"
+                        "local executable unavailable or unsafe; use a protected Rust/Cargo 1.99 installation".into()
                     }
-                    ProbeError::Failed => "local version probe failed; no installation attempted",
-                    ProbeError::Timeout => "local version probe exceeded its 3-second deadline",
+                    ProbeError::Failed => "local version probe failed; no installation attempted".into(),
+                    ProbeError::Timeout => "local version probe exceeded its 3-second deadline".into(),
                     ProbeError::OutputLimit => {
-                        "local version probe exceeded its 64-KiB output bound"
+                        "local version probe exceeded its 64-KiB output bound".into()
                     }
                     ProbeError::Cleanup => {
-                        "local version probe cleanup could not be verified within 2 seconds"
+                        "local version probe cleanup could not be verified within 2 seconds".into()
                     }
                 };
                 diagnostics.push(diagnostic(tool, "fail", message));
@@ -121,7 +148,7 @@ pub fn check() -> Report {
     Report(diagnostics)
 }
 
-fn diagnostic(tool: &'static str, status: &'static str, message: &str) -> Diagnostic {
+fn diagnostic(tool: &'static str, status: &'static str, message: impl Into<String>) -> Diagnostic {
     Diagnostic {
         code: if tool == "rustc" {
             "DOCTOR_RUSTC_VERSION"
@@ -160,7 +187,7 @@ pub fn version(tool: &'static str, bytes: &[u8]) -> Diagnostic {
             } else {
                 "fail"
             },
-            &format!(
+            format!(
                 "{tool} {major}.{minor}.{patch}; requires stable 1.99 or newer (other output redacted)"
             ),
         ),
@@ -175,6 +202,37 @@ pub fn version(tool: &'static str, bytes: &[u8]) -> Diagnostic {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn quoted_path_escapes_arbitrary_bytes_and_marks_truncation() {
+        use std::{ffi::OsStr, os::unix::ffi::OsStrExt, path::Path};
+        let path = Path::new(OsStr::from_bytes(b"/bin/\n\x1b\x7f\xff\"\\"));
+        assert_eq!(quoted_path(path), r#""/bin/\n\x1b\x7f\xff\"\\""#);
+        let prefix = "a".repeat(255);
+        let path = format!("{prefix}\n");
+        assert_eq!(
+            quoted_path(Path::new(&path)),
+            format!("\"{prefix}\" (truncated)")
+        );
+    }
+
+    #[cfg(windows)]
+    #[test]
+    fn quoted_windows_path_escapes_native_units_and_marks_truncation() {
+        use std::{ffi::OsString, os::windows::ffi::OsStringExt, path::Path};
+        let mut units: Vec<_> = "C:\\bin\\\n\u{1b}\u{7f}\"".encode_utf16().collect();
+        units.push(0xd800);
+        let path = OsString::from_wide(&units);
+        let quoted = quoted_path(Path::new(&path));
+        assert!(quoted.starts_with(r#""C:\\bin\\\n\x1b\x7f\""#));
+        assert!(quoted.is_ascii() && !quoted.bytes().any(|byte| byte.is_ascii_control()));
+        let prefix = "a".repeat(255);
+        assert_eq!(
+            quoted_path(Path::new(&format!("{prefix}\n"))),
+            format!("\"{prefix}\" (truncated)")
+        );
+    }
 
     #[test]
     fn report_requires_all_environment_checks_and_never_counts_unchecked_as_pass() {

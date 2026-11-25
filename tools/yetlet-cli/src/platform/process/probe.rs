@@ -6,8 +6,15 @@ const CLEANUP: Duration = Duration::from_secs(2);
 const LIMIT: usize = 64 * 1024;
 const POLL: Duration = Duration::from_millis(5);
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+#[derive(Debug, Eq, PartialEq)]
 pub(crate) enum ProbeError {
+    #[cfg(any(target_os = "linux", windows))]
+    Missing,
+    #[cfg(any(target_os = "linux", windows))]
+    Rejected {
+        path: std::path::PathBuf,
+        reason: &'static str,
+    },
     Unavailable,
     Failed,
     Timeout,
@@ -64,38 +71,61 @@ mod native {
         process::{Command, Stdio},
     };
 
-    fn trusted(file: &File, directory: bool) -> io::Result<()> {
-        let meta = file.metadata()?;
-        if (meta.uid() != 0 && meta.uid() != unsafe { libc::geteuid() })
-            || meta.mode() & 0o022 != 0
-            || if directory {
-                !meta.is_dir()
-            } else {
-                !meta.is_file() || meta.mode() & 0o111 == 0
-            }
-        {
-            return Err(io::ErrorKind::PermissionDenied.into());
-        }
-        Ok(())
+    #[derive(Clone, Copy)]
+    enum Kind {
+        Directory,
+        Executable,
+        Settings,
     }
 
-    fn pinned(path: &Path, executable: bool) -> io::Result<File> {
-        let path = path.canonicalize()?;
+    fn trusted(file: &File, path: &Path, kind: Kind) -> Result<(), ProbeError> {
+        let meta = file.metadata().map_err(|_| ProbeError::Unavailable)?;
+        let reason = if meta.uid() != 0 && meta.uid() != unsafe { libc::geteuid() } {
+            "owner is neither root nor the current user"
+        } else if meta.mode() & 0o020 != 0 {
+            "group-writable"
+        } else if meta.mode() & 0o002 != 0 {
+            "world-writable"
+        } else {
+            match kind {
+                Kind::Directory if !meta.is_dir() => "expected a directory",
+                Kind::Executable | Kind::Settings if !meta.is_file() => "expected a regular file",
+                Kind::Executable if meta.mode() & 0o111 == 0 => "no execute permission bits",
+                _ => return Ok(()),
+            }
+        };
+        Err(ProbeError::Rejected {
+            path: path.to_owned(),
+            reason,
+        })
+    }
+
+    fn pinned(path: &Path, kind: Kind) -> Result<File, ProbeError> {
+        let path = path.canonicalize().map_err(|err| {
+            if matches!(kind, Kind::Executable) && err.kind() == io::ErrorKind::NotFound {
+                ProbeError::Missing
+            } else {
+                ProbeError::Unavailable
+            }
+        })?;
         let mut file = OpenOptions::new()
             .read(true)
             .custom_flags(libc::O_DIRECTORY | libc::O_NOFOLLOW)
-            .open("/")?;
-        trusted(&file, true)?;
-        let parts: Vec<_> = path
+            .open("/")
+            .map_err(|_| ProbeError::Unavailable)?;
+        let mut checked = std::path::PathBuf::from("/");
+        trusted(&file, &checked, Kind::Directory)?;
+        let mut parts = path
             .components()
             .filter_map(|part| match part {
                 Component::Normal(name) => Some(name),
                 _ => None,
             })
-            .collect();
-        for (index, name) in parts.iter().enumerate() {
-            let last = index + 1 == parts.len();
-            let name = CString::new(name.as_bytes())?;
+            .peekable();
+        while let Some(name) = parts.next() {
+            let last = parts.peek().is_none();
+            checked.push(name);
+            let name = CString::new(name.as_bytes()).map_err(|_| ProbeError::Unavailable)?;
             let fd = unsafe {
                 libc::openat(
                     file.as_raw_fd(),
@@ -108,20 +138,10 @@ mod native {
                 )
             };
             if fd < 0 {
-                return Err(io::Error::last_os_error());
+                return Err(ProbeError::Unavailable);
             }
             file = unsafe { File::from_raw_fd(fd) };
-            if last && !executable {
-                let meta = file.metadata()?;
-                if !meta.is_file()
-                    || (meta.uid() != 0 && meta.uid() != unsafe { libc::geteuid() })
-                    || meta.mode() & 0o022 != 0
-                {
-                    return Err(io::ErrorKind::PermissionDenied.into());
-                }
-            } else {
-                trusted(&file, !last)?;
-            }
+            trusted(&file, &checked, if last { kind } else { Kind::Directory })?;
         }
         Ok(file)
     }
@@ -137,7 +157,7 @@ mod native {
                 Err(_) => return Err(ProbeError::Unavailable),
             };
             if path.file_name() != Some(std::ffi::OsStr::new("rustup")) {
-                return pinned(&path, true).map_err(|_| ProbeError::Unavailable);
+                return pinned(&path, Kind::Executable);
             }
             // Recognized rustup proxies are never executed. Select only an
             // already installed default/explicit local toolchain, independent
@@ -154,8 +174,7 @@ mod native {
                 Ok(selected) => selected,
                 Err(std::env::VarError::NotUnicode(_)) => return Err(ProbeError::Unavailable),
                 Err(std::env::VarError::NotPresent) => {
-                    let file = pinned(&home.join("settings.toml"), false)
-                        .map_err(|_| ProbeError::Unavailable)?;
+                    let file = pinned(&home.join("settings.toml"), Kind::Settings)?;
                     let mut bytes = Vec::new();
                     file.take((LIMIT + 1) as u64)
                         .read_to_end(&mut bytes)
@@ -187,11 +206,10 @@ mod native {
                     .join(selected)
                     .join("bin")
                     .join(tool),
-                true,
-            )
-            .map_err(|_| ProbeError::Unavailable);
+                Kind::Executable,
+            );
         }
-        Err(ProbeError::Unavailable)
+        Err(ProbeError::Missing)
     }
 
     pub(super) fn probe(tool: &str) -> Result<Vec<u8>, ProbeError> {
@@ -475,7 +493,15 @@ mod native {
     }
 
     pub(super) fn probe(tool: &str) -> Result<Vec<u8>, ProbeError> {
-        let program = owned::executable(OsStr::new(tool)).map_err(|_| ProbeError::Unavailable)?;
+        let path = owned::executable_path(OsStr::new(tool))
+            .map_err(|_| ProbeError::Unavailable)?
+            .ok_or(ProbeError::Missing)?;
+        let classify = |refusal| match refusal {
+            Some((path, reason)) => ProbeError::Rejected { path, reason },
+            None => ProbeError::Unavailable,
+        };
+        let program = crate::platform::fs::Executable::open(&path)
+            .map_err(|error| classify(error.refusal(&path)))?;
         let mut command = Command::new(&program.path);
         command
             .arg("--version")
@@ -539,7 +565,9 @@ mod native {
         ] = handles;
         startup.lpAttributeList = attributes.0.as_mut_ptr().cast();
         let job = Job::new().map_err(|_| ProbeError::Unavailable)?;
-        program.verify().map_err(|_| ProbeError::Unavailable)?;
+        program
+            .verify()
+            .map_err(|error| classify(error.refusal(&path)))?;
         let deadline = Instant::now() + DEADLINE;
         let mut info = PROCESS_INFORMATION::default();
         owned::win(unsafe {
@@ -572,7 +600,9 @@ mod native {
                 AssignProcessToJobObject(job.0.as_raw_handle(), process.as_raw_handle())
             })
             .map_err(|_| ProbeError::Unavailable)?;
-            program.verify().map_err(|_| ProbeError::Unavailable)?;
+            program
+                .verify()
+                .map_err(|error| classify(error.refusal(&path)))?;
             if unsafe { ResumeThread(thread.as_raw_handle()) } != 1 {
                 return Err(ProbeError::Failed);
             }
