@@ -151,6 +151,40 @@ repeat the build/run commands. Ordinary `run` does not watch files by default.
 It uses native frozen `cargo run`, which can compile changed Rust once; it is
 not a binary-only launch or a state-preserving reload promise.
 
+Continue with [your first CSS and JavaScript](#add-your-first-css-and-javascript)
+to style a form and add a live preview.
+
+## Add your first CSS and JavaScript
+
+Stop the running First App and keep the generated app directory and shell
+variables above. From a local copy of the Yetlet repository containing the
+[example source](../examples/first-web-assets/README.md), set
+`yetlet_source` to the absolute path of that repository. Copy the three files
+into the generated app. This replaces its starter `src/main.rs`.
+
+```sh
+yetlet_example="$yetlet_source/examples/first-web-assets/src"
+cp "$yetlet_example/main.rs" "$yetlet_example/app.css" "$yetlet_example/app.js" "$yetlet_app/src/"
+cd "$yetlet_app"
+(
+    export PATH="$yetlet_rust_bin:$PATH"
+    cargo fetch --locked
+    yetlet build
+    yetlet run
+)
+```
+
+Open `http://127.0.0.1:7878/` and type `Hello <Yetlet> & Rust!` into **Message**.
+The stylesheet gives the form a green submit button. JavaScript shows a live
+preview as you type. Choose **Submit message** to see the submitted text in
+the server-rendered result. Disable JavaScript, reload `/`, and submit again
+to see the same result through the native form.
+
+The document head links CSS and a deferred script at two same-origin paths.
+The app serves both from files embedded at build time, sends the SDK's
+`DEFAULT_CSP`, and uses Yetlet's escaped text rendering for the result.
+The generated manifest, lock, and CLI settings carry over from First App.
+
 ## Configuration and errors
 
 To choose a different loopback port, replace `.serve()` in `src/main.rs` with
