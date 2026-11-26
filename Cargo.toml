@@ -28,6 +28,7 @@ members = [
     "examples/auth-notes",
     "examples/modular-shop",
     "examples/todo-server",
+    "examples/sfc-todo",
     "examples/style-showcase",
     "examples/style-showcase-browser",
 ]

@@ -1,0 +1,51 @@
+<template draft="text" limit="text" invalid="text" error="text">
+  <form class="todo-form" data-todo-form="" method="post" action="/todos" aria-labelledby="task-label">
+    <label id="task-label" for="task">New task <span>(required)</span></label>
+    <div class="todo-form-row">
+      <input id="task" name="title" type="text" value="{draft}" maxlength="{limit}" required=""
+             aria-invalid="{invalid}" aria-describedby="task-error" />
+      <button type="submit">Add task</button>
+    </div>
+    <p id="task-error" class="todo-form-error" role="alert">{error}</p>
+    <p class="todo-form-count" data-todo-count="" hidden=""></p>
+  </form>
+</template>
+<style>
+.todo-form { margin-block: 2rem 1.5rem; }
+.todo-form label { display: block; font-weight: 600; margin-bottom: .5rem; }
+.todo-form label span { color: #535e57; font-size: .875rem; font-weight: normal; }
+.todo-form-row { display: flex; flex-wrap: wrap; gap: .5rem; }
+.todo-form input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  box-sizing: border-box;
+  min-height: 3rem;
+  border: 1px solid #768279;
+  border-radius: .5rem;
+  padding-inline: .75rem;
+  background: white;
+  color: inherit;
+  font: inherit;
+}
+.todo-form input[aria-invalid="true"] { border-color: #942c24; }
+.todo-form button { background: #215a46; border-color: #215a46; color: white; }
+.todo-form button:hover { background: #164331; }
+.todo-form-error, .todo-form-count { margin: .5rem 0 0; font-size: .875rem; }
+.todo-form-count { color: #535e57; }
+.todo-form-error { color: #942c24; }
+.todo-form-error:empty { display: none; }
+</style>
+<script>
+const todoForm = document.querySelector("[data-todo-form]");
+const taskInput = todoForm?.elements.namedItem("title");
+const characterCount = todoForm?.querySelector("[data-todo-count]");
+
+if (taskInput && characterCount) {
+  const updateCount = () => {
+    characterCount.textContent = taskInput.value.length + " / " + taskInput.maxLength;
+  };
+  taskInput.addEventListener("input", updateCount);
+  updateCount();
+  characterCount.hidden = false;
+}
+</script>

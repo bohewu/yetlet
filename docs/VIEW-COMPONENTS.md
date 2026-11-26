@@ -279,3 +279,65 @@ retirement are separate obligations. The [browser ownership contract](BROWSER-AP
 explains mutation failures and input/focus limits. The historical fixed-list
 `KeyedListTemplate`/`BoundKeyedList` authoring fixture is experimental and is not
 a current general component, forms, signals or resumability API.
+
+## Single-file components in the source checkout
+
+The checkout adds an experimental, default-off `sfc` build feature. Use the
+same local `yetlet` path in both Cargo sections. Select `features = ["html"]`
+in `[dependencies]` for SSR and `features = ["sfc"]` in
+`[build-dependencies]`. The published alpha.9 walkthrough above uses plain Rust.
+
+The runnable [SFC Todo sample](../examples/sfc-todo/README.md) shows an add
+form and repeated task items built from separate component files.
+
+For example, save this trusted source as `src/Notice.yetlet`.
+
+```html
+<template message="text" visible="bool">
+  <aside class="notice"><p when="visible">{message}</p></aside>
+</template>
+<style>
+.notice p { font-weight: bold; }
+</style>
+<script>
+for (const notice of document.querySelectorAll(".notice")) {
+  notice.addEventListener("click", () => notice.classList.toggle("selected"));
+}
+</script>
+```
+
+Give all three sections opening and closing tags on separate lines. Each
+template has one XML-style root element. Template attributes declare borrowed
+text or boolean props. Write one `{text_prop}` per text node or attribute value,
+optionally surrounded by literal text. Use `when="bool_prop"` on a child to
+conditionally include its subtree. The existing View renderer handles escaping.
+The compiler copies the style and script bodies verbatim. Scope selectors and
+DOM queries to the component you intend to affect.
+
+In the application’s `build.rs`, assign each component a distinct lowercase
+asset ID. IDs start with a letter and may contain letters, digits and hyphens.
+
+```rust
+fn main() -> std::io::Result<()> {
+    yetlet::sfc::compile(
+        &[("notice", "src/Notice.yetlet")],
+        std::env::var_os("OUT_DIR").unwrap(),
+    )
+}
+```
+
+Include the resulting Rust file in its own module and pass the generated props.
+
+```rust
+mod notice {
+    include!(concat!(env!("OUT_DIR"), "/sfc-notice.rs"));
+}
+let view = notice::render(&notice::Props { message: "Ready", visible: true });
+```
+
+The generated `notice::STYLE` and `notice::SCRIPT` each contain
+`(filename, contents)`. For example, mount `notice::STYLE.1` as `text/css` at
+the URL formed by joining your asset prefix and `notice::STYLE.0`. Link that
+URL in the document and serve the script the same way with a JavaScript MIME
+type and an external deferred script tag. Asset URLs and cache policy belong
+to the application.

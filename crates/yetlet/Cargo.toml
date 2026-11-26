@@ -12,6 +12,7 @@ include = ["src/**", "guides/**", "tests/**", "examples/**", "README.md", "LICEN
 [features]
 default = []
 view = []
+sfc = ["dep:roxmltree"]
 html = ["view"]
 actions = []
 actions-http = ["actions", "dep:serde"]
@@ -37,6 +38,7 @@ rate-limit = ["dep:axum", "dep:tower", "dep:governor"]
 serde = { version = "=1.0.229", features = ["derive"], optional = true }
 
 [target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+roxmltree = { version = "=0.21.2", optional = true }
 winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }
 wgpu = { version = "=27.0.1", default-features = false, features = ["std", "vulkan", "wgsl"], optional = true }
 axum = { version = "=0.8.9", optional = true }
