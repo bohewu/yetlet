@@ -71,9 +71,9 @@ a route/method to the key intentionally partitions it. Attach native
 native GET includes HEAD. Later-added methods are not automatically covered.
 Intentional stacked layers each charge once, without cross-layer refunds.
 
-Choose route scope and key scope together. In a Waiting Room, one fixed key on
-the status route makes all applicants share an allowance. Heavy polling can
-exhaust that allowance and delay other applicants from learning about an offer.
+Choose route scope and key scope together. With one fixed key on a status route,
+all callers share an allowance. Frequent polling by some callers can exhaust
+that allowance and cause other callers to receive 429 responses.
 
 Governor 0.10.4 implements GCRA: the example policy initially admits five
 requests, then refills one cell every two seconds. It is not a rolling-window
