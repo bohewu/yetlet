@@ -28,6 +28,8 @@ or loading settings does not select that installation automatically.
 
 ### Shared budget wiring
 
+This extractor-based wiring works with published SDK `0.9.0-alpha.9`.
+
 ```rust
 use axum::{Router, http::request::Parts, routing::get};
 use std::time::Duration;
@@ -44,6 +46,10 @@ let app: Router = Router::new()
     .route("/second", get(|| async { "second" }).route_layer(layer));
 # Ok::<(), InvalidRateLimitInput>(())
 ```
+
+In this checkout, fixed-key groups can use
+`RateLimitLayer::fixed_key(shared, Key::new("group-total")?)` in place of the
+constructor and extractor above. This captures the validated key at setup.
 
 ## Expected result
 
@@ -64,6 +70,10 @@ a route/method to the key intentionally partitions it. Attach native
 `MethodRouter::route_layer` after registering methods to preserve 404/405;
 native GET includes HEAD. Later-added methods are not automatically covered.
 Intentional stacked layers each charge once, without cross-layer refunds.
+
+Choose route scope and key scope together. With one fixed key on a status route,
+all callers share an allowance. Frequent polling by some callers can exhaust
+that allowance and cause other callers to receive 429 responses.
 
 Governor 0.10.4 implements GCRA: the example policy initially admits five
 requests, then refills one cell every two seconds. It is not a rolling-window

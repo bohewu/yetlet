@@ -10,10 +10,19 @@ use std::sync::{
 };
 use tower::ServiceExt;
 use yetlet::web::{
-    App,
+    App, DEFAULT_CSP,
     extract::Extension,
-    http::{Request, StatusCode},
+    http::{HeaderValue, Request, StatusCode},
 };
+
+#[test]
+fn strict_csp_is_available_in_the_web_only_api() {
+    assert_eq!(yetlet::web::prelude::DEFAULT_CSP, DEFAULT_CSP);
+    assert_eq!(
+        HeaderValue::from_static(DEFAULT_CSP),
+        "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'"
+    );
+}
 
 #[derive(Clone)]
 struct Enabled(&'static str);

@@ -214,17 +214,37 @@ impl Budget {
     }
 }
 
-/// Binds an explicit budget to synchronous, immutable request-parts extraction.
+#[derive(Clone)]
+enum KeySource<F> {
+    Extract(F),
+    Fixed(Key),
+}
+
+/// Binds an explicit budget to a fixed key or synchronous request-parts extraction.
 /// Install with native `MethodRouter::route_layer` after registering methods to
 /// preserve 404/405. Extractors return a trusted Key or an explicit Response.
 #[derive(Clone)]
 pub struct RateLimitLayer<F> {
     budget: Budget,
-    extract: F,
+    key_source: KeySource<F>,
 }
 impl<F> RateLimitLayer<F> {
     pub fn new(budget: Budget, extract: F) -> Self {
-        Self { budget, extract }
+        Self {
+            budget,
+            key_source: KeySource::Extract(extract),
+        }
+    }
+}
+impl RateLimitLayer<fn(&Parts) -> Result<Key, Response>> {
+    /// Charge every request admitted by this layer to the same validated key.
+    ///
+    /// Layers using the same Budget and key share one allowance.
+    pub fn fixed_key(budget: Budget, key: Key) -> Self {
+        Self {
+            budget,
+            key_source: KeySource::Fixed(key),
+        }
     }
 }
 impl<S, F: Clone> Layer<S> for RateLimitLayer<F> {
@@ -233,7 +253,7 @@ impl<S, F: Clone> Layer<S> for RateLimitLayer<F> {
         RateLimitService {
             inner,
             budget: self.budget.clone(),
-            extract: self.extract.clone(),
+            key_source: self.key_source.clone(),
         }
     }
 }
@@ -242,7 +262,7 @@ impl<S, F: Clone> Layer<S> for RateLimitLayer<F> {
 pub struct RateLimitService<S, F> {
     inner: S,
     budget: Budget,
-    extract: F,
+    key_source: KeySource<F>,
 }
 impl<S, F, B> Service<Request<B>> for RateLimitService<S, F>
 where
@@ -263,9 +283,11 @@ where
     )]
     fn call(&mut self, request: Request<B>) -> Self::Future {
         let (parts, body) = request.into_parts();
-        let result = (self.extract)(&parts)
-            .map_err(no_store)
-            .and_then(|key| self.budget.check(key).map_err(rejection));
+        let key = match &self.key_source {
+            KeySource::Extract(extract) => extract(&parts).map_err(no_store),
+            KeySource::Fixed(key) => Ok(key.clone()),
+        };
+        let result = key.and_then(|key| self.budget.check(key).map_err(rejection));
         if let Err(response) = result {
             return Box::pin(async move { Ok(response) });
         }
