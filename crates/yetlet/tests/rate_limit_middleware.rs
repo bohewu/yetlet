@@ -42,8 +42,10 @@ fn req(method: &str, path: &str) -> Request<Body> {
 }
 
 #[tokio::test]
-async fn shared_methods_routes_scopes_native_404_405_and_head() {
-    let layer = RateLimitLayer::new(budget(2, 1), fixed);
+async fn fixed_key_shares_budget_and_preserves_native_route_behavior() {
+    let shared = budget(2, 1);
+    let key = Key::new("group").unwrap();
+    let layer = RateLimitLayer::fixed_key(shared.clone(), key.clone());
     let app = Router::new()
         .route(
             "/a",
@@ -52,6 +54,10 @@ async fn shared_methods_routes_scopes_native_404_405_and_head() {
                 .route_layer(layer.clone()),
         )
         .route("/b", get(|| async { "b" }).route_layer(layer))
+        .route(
+            "/c",
+            get(|| async { "c" }).route_layer(RateLimitLayer::fixed_key(shared, key)),
+        )
         .route("/public", get(|| async { "public" }));
     for (method, path, expected) in [
         ("DELETE", "/a", StatusCode::METHOD_NOT_ALLOWED),
@@ -59,6 +65,7 @@ async fn shared_methods_routes_scopes_native_404_405_and_head() {
         ("HEAD", "/a", StatusCode::OK),
         ("POST", "/a", StatusCode::OK),
         ("GET", "/b", StatusCode::TOO_MANY_REQUESTS),
+        ("GET", "/c", StatusCode::TOO_MANY_REQUESTS),
         ("GET", "/a", StatusCode::TOO_MANY_REQUESTS),
         ("GET", "/public", StatusCode::OK),
         ("DELETE", "/a", StatusCode::METHOD_NOT_ALLOWED),

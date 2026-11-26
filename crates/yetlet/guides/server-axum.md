@@ -42,6 +42,10 @@ let app: App = App::new().get("/api/status", status);
 Construction does not bind or start a runtime. Call `app.serve().await` from the
 application's Tokio runtime when ready to serve it.
 
+In this checkout, `yetlet::web::DEFAULT_CSP` and its prelude export are available
+with `web` alone for custom responses. In published SDK `0.9.0-alpha.9`, these
+exports require both `web` and `html`.
+
 ### Start a native page and JSON API
 
 From the repository root, run the existing complete example:

@@ -24,6 +24,22 @@ address with `with_address`; the adapter does not silently select another port.
 The handle's `local_addr` is acquired-address metadata. Readiness and normal
 admission have separate observations.
 
+## Start a Web Host on demand
+
+Run the [dynamic Web Hosts example](examples/dynamic_web_hosts.rs) from the
+root of the current source checkout.
+
+```sh
+cargo run --manifest-path examples/external-consumers/web-hosts/Cargo.toml --example dynamic_web_hosts --locked --offline
+```
+
+After the controller answers `GET /status`, the application builds a child
+Web Host in its own `HostGroup`. Both bind to `127.0.0.1:0`. Each request
+waits for admission and uses the address reported by `WebHandle::local_addr`.
+After `GET /job`, the application requests child shutdown and awaits the
+child group's original `run_async()` drive. The controller answers one more
+status request before its own group shuts down and joins.
+
 ## Managed SQLite resource proof
 
 The integration test uses an application-owned SQLite actor through

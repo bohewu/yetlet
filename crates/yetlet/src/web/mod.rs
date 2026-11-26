@@ -51,11 +51,11 @@ pub mod prelude {
     pub use super::extract::{DefaultBodyLimit, Extension, Form, Path, Query, State};
     pub use super::http::{HeaderMap, HeaderValue, StatusCode};
     pub use super::response::{IntoResponse, Json, Redirect, Response};
-    pub use super::{App, RequestContext, WebHost};
+    pub use super::{App, DEFAULT_CSP, RequestContext, WebHost};
     #[cfg(feature = "html")]
     pub use super::{
-        DEFAULT_CSP, DocumentMetadata, HtmlPageError, LanguageTag, LanguageTagError, Page,
-        render_document, render_document_with_metadata, render_page, render_page_with_metadata,
+        DocumentMetadata, HtmlPageError, LanguageTag, LanguageTagError, Page, render_document,
+        render_document_with_metadata, render_page, render_page_with_metadata,
     };
     #[cfg(feature = "html")]
     pub use crate::{Attribute, Element, View};
@@ -71,7 +71,6 @@ use axum::{
 };
 
 /// Strict by default; browser island assets may be loaded from our own origin.
-#[cfg(feature = "html")]
 pub const DEFAULT_CSP: &str = "default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; img-src 'self'; base-uri 'none'; object-src 'none'; form-action 'self'; frame-ancestors 'none'";
 
 #[cfg(feature = "html")]
