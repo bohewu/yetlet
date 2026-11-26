@@ -1,0 +1,30 @@
+<template title="text" action="text" completed="bool" state="text" change="text" button="text">
+  <li class="todo-item {state}">
+    <div>
+      <span class="todo-item-title">{title}</span>
+      <span class="todo-item-status" when="completed">Completed</span>
+    </div>
+    <form method="post" action="{action}" aria-label="{title}">
+      <button type="submit" name="change" value="{change}">{button}</button>
+      <button type="submit" name="change" value="delete" aria-label="Delete {title}">Delete</button>
+    </form>
+  </li>
+</template>
+<style>
+.todo-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  border-block-start: 1px solid #d5ded5;
+  padding-block: .75rem;
+}
+.todo-item > div { min-width: 0; flex: 1 1 12rem; overflow-wrap: anywhere; }
+.todo-item form { display: flex; flex-wrap: wrap; gap: .5rem; }
+.todo-item.done .todo-item-title { color: #535e57; text-decoration: line-through; }
+.todo-item-status { display: block; color: #535e57; font-size: .875rem; }
+.todo-item button[value="delete"] { color: #842b24; }
+</style>
+<script>
+</script>

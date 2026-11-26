@@ -1,6 +1,6 @@
 # Sample Applications
 
-**Status:** Thirteen catalog applications are locally verified at bounded prototype scope. The original twelve-application M8/M9 compatibility/evidence freeze remains historical; YT-241 Style Showcase was independently reviewed and then promoted separately.
+**Status:** Fourteen catalog applications are locally verified at bounded prototype scope. The original twelve-application M8/M9 compatibility/evidence freeze remains historical. Style Showcase and the source-only SFC Todo were added separately.
 
 Yetlet samples exist to validate application ergonomics, dependency isolation and security boundaries. They are not a parallel tutorial framework and do not authorize new core abstractions merely to make a demo look shorter.
 
@@ -10,6 +10,9 @@ Use the standalone [HostGroup starter](../examples/hostgroup/README.md) to
 compose a local Host and optional HTTP service with the published SDK.
 
 Begin with [Hello World](../examples/hello-world/README.md) for native SSR or [REST API](../examples/rest-api/README.md) for HTTP-only development. Use [Todo](../examples/todo-server/README.md) for shared SSR/WASM Views and [Session cart](../examples/cart-server/README.md) for an explicit server capability. Use [Style Showcase](../examples/style-showcase/README.md) to compare native previews with real Rust View, Style and generated CSS sources. Each sample-local README provides exact commands and limitations. The [documentation index](README.md) separates current guidance from historical qualification.
+
+Use [SFC Todo](../examples/sfc-todo/README.md) for a small two-component
+application built with the experimental `sfc` feature in this source checkout.
 
 ## Startup paths in this checkout
 
@@ -26,7 +29,7 @@ Run it from the repository root with the following command.
 cargo run --locked -p yetlet --features web,html --example server-axum-minimal
 ```
 
-The thirteen catalog applications preserve their own environment/port contracts.
+Each catalog application owns its environment and port settings.
 
 | Sample | Environment variable | Default HTTP address | Startup |
 |---|---|---|---|
@@ -41,6 +44,7 @@ The thirteen catalog applications preserve their own environment/port contracts.
 | SSE Notifications | `YETLET_SSE_LISTEN` | `127.0.0.1:3008` | Native listener and graceful shutdown |
 | SQLite CRUD | `YETLET_SQLITE_LISTEN` | `127.0.0.1:3007` | Native listener and graceful shutdown |
 | Todo | `YETLET_LISTEN` | `127.0.0.1:3000` | `from_router(...).serve_on(address)` |
+| SFC Todo | `YETLET_SFC_TODO_PORT` | `127.0.0.1:3012` | Native loopback listener and `axum::serve` |
 | Multi-Island Dashboard | `YETLET_DASHBOARD_LISTEN` | `127.0.0.1:3009` | Native listener and graceful shutdown |
 | Style Showcase | `YETLET_SHOWCASE_LISTEN` | `127.0.0.1:3011` | `from_router(...).serve_on(address)` |
 
@@ -95,6 +99,7 @@ Catalog paths, route sources, build scripts and evidence must resolve inside the
 |---|---|---|---:|---|
 | `hello-world` | `yetlet-hello-world` | Server rendered | No | Minimal native SSR, HTML escaping, strict CSP and zero optional providers |
 | `todo` | `yetlet-todo-server` | Full stack | Yes | SSR, Browser/WASM, Search Island, typed HTTP actions and keyed local updates |
+| `sfc-todo` | `yetlet-sfc-todo` | Server rendered | No | Source-only single-file components, typed task props and native form mutations |
 | `rest-api` | `yetlet-rest-api` | API | No | Typed Book CRUD, RequestContext policy, structured errors and request correlation |
 | `session-cart` | `yetlet-cart-server` | Server rendered | No | Opt-in server-side Session, native forms, CSRF boundary and refresh persistence |
 | `auth-notes` | `yetlet-auth-notes` | Server rendered | No | Synthetic authentication, Session rotation, CSRF and per-user note authorization |

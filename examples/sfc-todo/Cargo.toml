@@ -1,0 +1,21 @@
+[package]
+name = "yetlet-sfc-todo"
+description = "A small server-rendered Todo example using single-file components"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+publish = false
+
+[dependencies]
+axum.workspace = true
+serde = { version = "1", features = ["derive"] }
+tokio.workspace = true
+yetlet = { path = "../../crates/yetlet", default-features = false, features = ["web", "html"] }
+
+[build-dependencies]
+yetlet = { path = "../../crates/yetlet", default-features = false, features = ["sfc"] }
+
+[dev-dependencies]
+tower = { version = "0.5", features = ["util"] }

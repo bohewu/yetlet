@@ -41,6 +41,27 @@ optional_dependencies = ["yetlet", "yetlet-browser"]
 evidence = "docs/SAMPLES.md"
 
 [[sample]]
+id = "sfc-todo"
+title = "Todo with Single-File Components"
+package = "yetlet-sfc-todo"
+path = "examples/sfc-todo"
+kind = "server-rendered"
+status = "verified"
+command = "cargo run -p yetlet-sfc-todo --locked"
+companion_packages = []
+routes = [
+  { path = "/", source = "examples/sfc-todo/src/main.rs", markers = ['.get("/", home)'] },
+  { path = "/todos", source = "examples/sfc-todo/src/main.rs", markers = ['.post("/todos", add)'] },
+  { path = "/todos/{id}", source = "examples/sfc-todo/src/main.rs", markers = ['.post("/todos/{id}", change)'] },
+  { path = "/assets/{name}", source = "examples/sfc-todo/src/main.rs", markers = ['.get(&format!("/assets/{name}")'] },
+]
+browser_runtime = false
+browser_packages = []
+browser_build = ""
+optional_dependencies = ["yetlet"]
+evidence = "examples/sfc-todo/README.md"
+
+[[sample]]
 id = "rest-api"
 title = "API-only Typed REST"
 package = "yetlet-rest-api"

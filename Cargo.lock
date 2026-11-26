@@ -2946,6 +2946,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "roxmltree"
+version = "0.21.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9da7f59328b09405b181fee1018925fad50f157afb43c0c0f5c522c256dd5907"
+dependencies = [
+ "memchr",
+]
+
+[[package]]
 name = "rsa"
 version = "0.9.10"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4529,6 +4538,7 @@ dependencies = [
  "openssl-sys",
  "redis",
  "reqwest",
+ "roxmltree",
  "rustls",
  "secrecy",
  "serde",
@@ -4792,6 +4802,17 @@ dependencies = [
  "web-sys",
  "yetlet-browser",
  "yetlet-todo-ui",
+]
+
+[[package]]
+name = "yetlet-sfc-todo"
+version = "0.9.0-alpha.9"
+dependencies = [
+ "axum",
+ "serde",
+ "tokio",
+ "tower",
+ "yetlet",
 ]
 
 [[package]]

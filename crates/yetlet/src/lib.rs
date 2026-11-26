@@ -35,6 +35,7 @@
 //! | Feature | Entry point and responsibility |
 //! |---|---|
 //! | `view` | `view`: owned HTML/DOM trees, typed tags and binding metadata; no renderer or runtime |
+//! | `sfc` | Experimental native build-script compiler for source-checkout single-file components |
 //! | `html` | Enables `view`; `html` serializes escaped fragments; HTTP document/header ownership stays separate |
 //! | `web` | `web`: native HTTP serving, routing and Tower interoperability; add `html` for pages/SSR |
 //! | `session`, `auth`, `auth-session` | Separate native Session/identity APIs and an explicit Memory Session bridge; business authorization stays application-owned |
@@ -99,6 +100,8 @@ pub mod secrets;
 pub mod session;
 #[cfg(all(feature = "session-redis", not(target_arch = "wasm32")))]
 pub mod session_redis;
+#[cfg(all(feature = "sfc", not(target_arch = "wasm32")))]
+pub mod sfc;
 #[cfg(all(feature = "signing", not(target_arch = "wasm32")))]
 pub mod signing;
 #[cfg(all(feature = "udp", not(target_arch = "wasm32")))]
