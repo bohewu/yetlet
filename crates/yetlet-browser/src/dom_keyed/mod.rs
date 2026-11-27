@@ -47,6 +47,7 @@ mod browser {
     use std::collections::{HashMap, HashSet};
 
     use wasm_bindgen::{JsCast, JsValue, closure::Closure};
+    use web_sys::js_sys::{Function, Reflect};
     use web_sys::{Document, Element, Event, EventTarget, Node};
 
     use super::{BindingKey, validate_keyed_order};
@@ -303,7 +304,7 @@ mod browser {
                     .is_some_and(|node| node.is_same_node(Some(element)))
                 {
                     let reference: Option<Node> = current.map(Into::into);
-                    self.root.insert_before(element, reference.as_ref())?;
+                    place_child(&self.root, element, reference.as_ref(), was_existing)?;
                     if was_existing {
                         stats.moved += 1;
                     }
@@ -334,6 +335,28 @@ mod browser {
                 self.entries.clear();
             }
         }
+    }
+
+    fn place_child(
+        root: &Element,
+        element: &Element,
+        reference: Option<&Node>,
+        retained: bool,
+    ) -> Result<(), JsValue> {
+        if retained
+            && element.parent_element().as_ref() == Some(root)
+            && let Some(move_before) =
+                Reflect::get(root, &JsValue::from_str("moveBefore"))?.dyn_ref::<Function>()
+        {
+            move_before.call2(
+                root,
+                element,
+                reference.map_or(&JsValue::NULL, AsRef::as_ref),
+            )?;
+        } else {
+            root.insert_before(element, reference)?;
+        }
+        Ok(())
     }
 
     fn direct_element_children(root: &Element) -> Result<Vec<Element>, JsValue> {

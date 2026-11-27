@@ -17,6 +17,8 @@ On all targets, `validate_keyed_order` accepts validated `BindingKey` values and
 
 On WASM, use `KeyedEntry<State>` for an element plus caller-defined cached slots/listeners. Construct `KeyedChildren` from matching existing direct children with `from_existing`, or from an empty root with `empty`. `reconcile` takes the complete desired item list and explicit key/update/create callbacks. `ReconcileStats` reports retained, inserted, removed and moved entries.
 
+**Source checkout.** When a retained child moves within its keyed root, `reconcile` uses the browser's `moveBefore()` when available. This preserves focus and text selection inside the moved row. New children and children moved back from outside the root use `insertBefore()`. Browsers without a callable `moveBefore()` also use `insertBefore()` for reorders, which can blur the active editor.
+
 The complete [Todo Browser binding](https://github.com/bohewu/yetlet/blob/master/examples/todo-browser/src/lib.rs) demonstrates preflight, keyed reconciliation and owned listeners. Follow [Todo setup](https://github.com/bohewu/yetlet/blob/master/examples/todo-server/README.md), or run from the repository root after installing its browser prerequisites:
 
 ```bash
