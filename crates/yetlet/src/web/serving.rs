@@ -7,10 +7,7 @@ use std::{
 };
 
 use axum::{Router, serve::Listener};
-use tokio::{
-    net::{TcpListener, TcpStream},
-    sync::oneshot,
-};
+use tokio::{net::TcpListener, sync::oneshot};
 
 pub(super) async fn serve_router(
     listener: TcpListener,
@@ -21,7 +18,7 @@ pub(super) async fn serve_router(
 }
 
 pub(super) async fn serve_router_observed(
-    listener: TcpListener,
+    listener: impl Listener<Addr = SocketAddr>,
     router: Router,
     shutdown: Option<oneshot::Receiver<()>>,
     initialized: Option<oneshot::Sender<()>>,
@@ -43,21 +40,21 @@ pub(super) async fn serve_router_observed(
     }
 }
 
-struct ObservedListener {
-    listener: TcpListener,
+struct ObservedListener<L> {
+    listener: L,
     initialized: Option<oneshot::Sender<()>>,
 }
 
-impl Listener for ObservedListener {
-    type Io = TcpStream;
-    type Addr = SocketAddr;
+impl<L: Listener> Listener for ObservedListener<L> {
+    type Io = L::Io;
+    type Addr = L::Addr;
 
     async fn accept(&mut self) -> (Self::Io, Self::Addr) {
         let initialized = &mut self.initialized;
-        let accept = <TcpListener as Listener>::accept(&mut self.listener);
+        let accept = self.listener.accept();
         let mut accept = std::pin::pin!(accept);
         poll_fn(|cx| {
-            // Delegation preserves Axum's existing TCP accept-error handling.
+            // Delegate to the selected transport before reporting initialization.
             // The acknowledgment is sent only after real serving execution has
             // polled acceptance, never merely after constructing its future.
             let result = accept.as_mut().poll(cx);
