@@ -14,6 +14,8 @@ mod host;
 pub mod middleware;
 pub mod response;
 mod serving;
+#[cfg(feature = "web-tls")]
+mod tls;
 mod worker;
 pub use app::App;
 pub use axum::http;
@@ -23,6 +25,8 @@ pub use document::{DocumentMetadata, LanguageTag, LanguageTagError};
 pub use host::{HttpProbe, WebActivity, WebDriver, WebError, WebHandle, WebHost};
 #[cfg(feature = "html")]
 pub use response::Page;
+#[cfg(feature = "web-tls")]
+pub use tls::{WebTls, WebTlsReloader};
 pub use worker::HttpWorker;
 
 const DEFAULT_LISTEN_ADDRESS: &str = "127.0.0.1:7878";

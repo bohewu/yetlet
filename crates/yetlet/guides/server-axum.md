@@ -23,6 +23,7 @@ WASM target or optional provider is required for this path.
 | Checkout selection | Available surface |
 |---|---|
 | `web` | `App`, managed `WebHost`, native extractors/responses, RequestContext, Router/Tower integration and advanced `HttpWorker`; no View or HTML |
+| `web-tls` | Web plus fixed or reloadable HTTPS on individual managed Hosts (source checkout) |
 | `html` | Pure HTML serialization with View; no HTTP serving |
 | `web,html` | Web plus `Page`, `App::page`, document/render helpers and View-related prelude imports |
 
@@ -94,6 +95,38 @@ The explicit-listener code above serves HTML at `http://127.0.0.1:3000/` and JSO
 at `/api/status`. The checkout command uses `http://127.0.0.1:7878/`.
 `Page` produces escaped complete documents with the default strict CSP. Ctrl+C
 stops the foreground listener; a Router setup alone does not bind a listener.
+
+## Per-host HTTPS in the source checkout
+
+Select `web-tls` to serve HTTPS through a managed `WebHost` on either Web
+driver. Each Host defaults to plain HTTP. Pass a leaf-first PEM certificate
+chain and its matching unencrypted PEM private key to configure a fixed
+identity or obtain a reload handle. The application supplies the PEM bytes.
+
+```rust
+use yetlet::web::{App, WebError, WebHost, WebTls, WebTlsReloader};
+
+fn hosts(chain: &[u8], key: &[u8]) -> Result<(WebHost, WebHost, WebTlsReloader), WebError> {
+    let fixed = App::new().into_host().with_name("fixed").with_address("127.0.0.1:8443")
+        .with_tls(WebTls::fixed(chain, key)?);
+    let (tls, reloader) = WebTls::reloadable(chain, key)?;
+    let rotating = App::new().into_host().with_name("rotating").with_address("127.0.0.1:9443")
+        .with_tls(tls);
+    Ok((fixed, rotating, reloader))
+}
+```
+
+Install the Hosts in a `HostGroup`. When new material is available, call
+`reloader.reload(new_chain, new_key)?`. A successful call publishes both for
+newly accepted connections on that Host. Established connections, including
+open SSE responses, continue using their original TLS session. An invalid
+PEM or mismatched key returns an error and preserves the previous identity.
+Clients verify the certificate chain and hostname against their own trust roots.
+
+TLS Hosts use listener initialization for readiness and the usual group
+admission gate. The optional `HttpProbe` sends plain HTTP. Combining it with
+`with_tls` returns a host validation error from `HostGroup::build()` before
+any listener binds.
 
 ## Execution ownership
 

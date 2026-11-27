@@ -159,6 +159,8 @@ pub struct WebHost {
     router: Router,
     driver: Option<WebDriver>,
     probe: Option<HttpProbe>,
+    #[cfg(feature = "web-tls")]
+    tls: Option<super::WebTls>,
     shared: Arc<Shared>,
 }
 
@@ -170,6 +172,8 @@ impl WebHost {
             router,
             driver: None,
             probe: None,
+            #[cfg(feature = "web-tls")]
+            tls: None,
             shared: Arc::new(Shared::new()),
         }
     }
@@ -196,6 +200,13 @@ impl WebHost {
         self
     }
 
+    /// Serve HTTPS on this Host using its fixed or reloadable certificate.
+    #[cfg(feature = "web-tls")]
+    pub fn with_tls(mut self, tls: super::WebTls) -> Self {
+        self.tls = Some(tls);
+        self
+    }
+
     pub fn with_http_probe(mut self, probe: HttpProbe) -> Self {
         self.probe = Some(probe);
         self
@@ -218,6 +229,13 @@ impl Host for WebHost {
     fn validate(&self) -> Result<(), Self::Error> {
         validate_address(&self.address)?;
         if let Some(probe) = &self.probe {
+            #[cfg(feature = "web-tls")]
+            if self.tls.is_some() {
+                return Err(WebError::message(
+                    io::ErrorKind::InvalidInput,
+                    "HttpProbe requires a plain HTTP WebHost",
+                ));
+            }
             probe.validate()?;
         }
         Ok(())
@@ -268,12 +286,10 @@ type ProbeFuture = Pin<Box<dyn Future<Output = Result<(), WebError>> + Send>>;
 /// borrowing drives, Pending and deadlines. Use Host/ResourceGroup adapters for
 /// custom management; there is no mutable replacement access to live ownership.
 pub struct WebActivity {
-    address: String,
-    router: Option<Router>,
+    host: Option<WebHost>,
     configured_driver: Option<WebDriver>,
     selected_driver: Option<WebDriver>,
     run_mode: Option<HostRunMode>,
-    probe: Option<HttpProbe>,
     shared: Arc<Shared>,
     owner: Option<DriverOwner>,
     stop: Option<oneshot::Sender<()>>,
@@ -291,13 +307,11 @@ pub struct WebActivity {
 impl WebActivity {
     fn new(host: WebHost) -> Self {
         Self {
-            address: host.address,
-            router: Some(host.router),
             configured_driver: host.driver,
             selected_driver: None,
             run_mode: None,
-            probe: host.probe,
-            shared: host.shared,
+            shared: host.shared.clone(),
+            host: Some(host),
             owner: None,
             stop: None,
             bound: None,
@@ -324,10 +338,7 @@ impl WebActivity {
         self.bound = Some(bound_receiver);
         self.initialized = Some(initialized_receiver);
         let future: ServiceFuture = Box::pin(run_service(
-            self.address.clone(),
-            self.router.take().expect("unstarted Web router"),
-            self.shared.clone(),
-            self.probe.clone(),
+            self.host.take().expect("unstarted Web host"),
             stopping,
             bound,
             initialized,
@@ -575,7 +586,7 @@ impl HostActivity for WebActivity {
             return Ok(ReleaseCompletion::Pending);
         }
         self.shared.close();
-        self.router = None;
+        self.host = None;
         self.bound = None;
         self.initialized = None;
         self.stop = None;
@@ -612,14 +623,20 @@ impl Drop for CloseOnExit {
 }
 
 async fn run_service(
-    address: String,
-    router: Router,
-    shared: Arc<Shared>,
-    probe: Option<HttpProbe>,
+    host: WebHost,
     stop: oneshot::Receiver<()>,
     bound: oneshot::Sender<SocketAddr>,
     ready: oneshot::Sender<Result<(), WebError>>,
 ) -> Result<(), WebError> {
+    let WebHost {
+        address,
+        router,
+        shared,
+        probe,
+        #[cfg(feature = "web-tls")]
+        tls,
+        ..
+    } = host;
     let _close_on_exit = CloseOnExit(shared.clone());
     if shared.is_closed() {
         return Ok(());
@@ -636,12 +653,20 @@ async fn run_service(
         return Ok(());
     }
     let (initialized, mut initialization) = oneshot::channel();
-    let mut server = Box::pin(super::serving::serve_router_observed(
-        listener,
-        router,
-        Some(stop),
-        Some(initialized),
-    ));
+    let mut server = Box::pin(async move {
+        use super::serving::serve_router_observed;
+        #[cfg(feature = "web-tls")]
+        if let Some(tls) = tls {
+            return serve_router_observed(
+                super::tls::TlsListener::new(listener, tls),
+                router,
+                Some(stop),
+                Some(initialized),
+            )
+            .await;
+        }
+        serve_router_observed(listener, router, Some(stop), Some(initialized)).await
+    });
     let mut ready = Some(ready);
     let mut initialized = false;
     let mut probe_future: Option<ProbeFuture> = None;
