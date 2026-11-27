@@ -24,6 +24,8 @@ pub(super) fn command(app: &App, frontend_root: &str) -> Command {
         "--filter",
         "**/*.rs",
         "--filter",
+        "**/*.yetlet",
+        "--filter",
         "Cargo.toml",
         "--filter",
         "Cargo.lock",
@@ -171,6 +173,30 @@ impl Events {
 mod tests {
     use super::*;
     use std::{io::Cursor, thread, time::Duration};
+
+    #[test]
+    #[cfg(any(target_os = "linux", windows))]
+    fn watch_includes_authored_components_and_excludes_cli_metadata() {
+        let root = tempfile::tempdir().unwrap();
+        #[cfg(target_os = "linux")]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            std::fs::set_permissions(root.path(), std::fs::Permissions::from_mode(0o700)).unwrap();
+        }
+        fs::create_project(root.path(), "app", &[]).unwrap();
+        let app = fs::open_directory(&root.path().join("app")).unwrap();
+        let watcher = command(&app, "frontend");
+        let args: Vec<_> = watcher.get_args().collect();
+
+        assert!(
+            args.windows(2)
+                .any(|pair| pair == ["--filter", "**/*.yetlet"])
+        );
+        assert!(
+            args.windows(2)
+                .any(|pair| pair == ["--ignore", ".yetlet/**"])
+        );
+    }
 
     #[test]
     fn cargo_target_ignore_normalizes_relative_components_without_filesystem_reads() {
