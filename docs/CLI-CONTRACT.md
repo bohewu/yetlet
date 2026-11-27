@@ -489,7 +489,17 @@ Invoke `yetlet watch` to enable Rust watch for this invocation. It shares the `r
 
 Watchexec emits JSON file events only. The parent CLI owns the initial frozen/offline Cargo run and each later Rust generation, separately from the watcher and optional Vite tree. A relevant event stops and reaps the old Rust tree before starting its replacement. A compile error or Rust runtime exit is reported and leaves watch waiting for the next change. Rust restarts retain the same Vite process. User cancellation, Vite exit or watcher death ends the session and cleans up all owned trees; cleanup uncertainty remains failure.
 
-Watch scope is the selected app root: Rust `*.rs` files (including `build.rs`), Cargo.toml and Cargo.lock. It excludes the configured frontend root, target, node_modules and dist directories, plus CARGO_TARGET_DIR when it is under the app root. Symlinks are not followed. Local dependencies outside the app root are not watched. Special target directories selected through Cargo configuration need separate exclusion if required; use CARGO_TARGET_DIR for an excluded in-root target directory or keep it outside the watched root.
+Watch scope is the selected app root and includes Rust `*.rs` files (including
+`build.rs`), `Cargo.toml` and `Cargo.lock`. The CLI built from this checkout adds
+authored `*.yetlet` single-file components. A corrected component save after a
+compile error starts a new generation in the same watch session. The published
+CLI 0.4.2 does not trigger a rebuild on component saves alone.
+
+Watch excludes the configured frontend root, `target`, `node_modules`, `dist`,
+the `.yetlet/` metadata directory and `CARGO_TARGET_DIR` when under the app root.
+It does not follow symlinks or watch local dependencies outside the app root.
+Set `CARGO_TARGET_DIR` to exclude a custom in-root target directory, or keep the
+directory outside the watched root.
 
 CLI policy settings are loaded once per run; restart the CLI to change that policy. Each fresh backend process reads its own runtime settings. Rust restart does not promise browser refresh, preservation of in-process state or graceful request draining. Native watch lifecycle evidence is recorded separately from the historical Vite-pair verification; the earlier pair results do not qualify this added mode.
 

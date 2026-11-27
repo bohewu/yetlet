@@ -703,12 +703,17 @@ change. Compile errors and Rust runtime exits are reported, then wait for the
 next change. Vite keeps the same process through Rust restarts. Cancellation,
 Vite exit or watcher death ends the session and cleans up all owned trees.
 
-Watch covers app-root Rust `*.rs` (including build.rs), Cargo.toml and Cargo.lock.
-It excludes the configured frontend root, target, node_modules and dist, plus
-CARGO_TARGET_DIR when under the app root, and does not follow symlinks. Outside-app
-local dependencies are not watched. Special target directories from Cargo config
-need separate exclusion if required; select CARGO_TARGET_DIR for an excluded
-in-root location or put the directory outside the watched root.
+Watch covers app-root Rust `*.rs` (including `build.rs`), `Cargo.toml` and
+`Cargo.lock`. The CLI built from this checkout also watches authored `*.yetlet`
+single-file components under the app root. Saving a correction after a component
+compile error triggers another build in the same session. Component saves alone
+do not trigger a rebuild in the published CLI 0.4.2.
+
+Watch excludes the configured frontend root, `target`, `node_modules`, `dist`,
+the `.yetlet/` metadata directory and `CARGO_TARGET_DIR` when under the app root.
+It does not follow symlinks or watch local dependencies outside the app root.
+For a special target directory from Cargo config, set `CARGO_TARGET_DIR` to
+exclude an in-root location or put the directory outside the watched root.
 
 CLI settings are loaded once per run; rerun the CLI to change watch/Vite policy.
 The fresh backend reads its runtime settings on each restart. Browser refresh,
