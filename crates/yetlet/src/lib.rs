@@ -108,3 +108,6 @@ pub mod signing;
 pub mod udp;
 #[cfg(all(feature = "web", not(target_arch = "wasm32")))]
 pub mod web;
+
+#[cfg(all(feature = "acme", not(target_arch = "wasm32")))]
+pub mod acme;

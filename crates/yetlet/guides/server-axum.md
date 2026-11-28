@@ -24,6 +24,7 @@ WASM target or optional provider is required for this path.
 |---|---|
 | `web` | `App`, managed `WebHost`, native extractors/responses, RequestContext, Router/Tower integration and advanced `HttpWorker`; no View or HTML |
 | `web-tls` | Web plus fixed or reloadable HTTPS on individual managed Hosts (source checkout) |
+| `acme` | Experimental single-site HTTP-01 certificate provisioning and renewal for managed Web Hosts ([guide](acme-http01.md), source checkout) |
 | `html` | Pure HTML serialization with View; no HTTP serving |
 | `web,html` | Web plus `Page`, `App::page`, document/render helpers and View-related prelude imports |
 

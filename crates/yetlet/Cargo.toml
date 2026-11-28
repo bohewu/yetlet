@@ -23,6 +23,7 @@ native-winit = ["dep:winit"]
 renderer-wgpu = ["dep:wgpu"]
 web = ["dep:axum", "dep:serde", "dep:tower", "dep:tokio", "tokio/sync", "tokio/io-util", "tokio/time"]
 web-tls = ["web", "dep:rustls", "dep:tokio-rustls", "dep:futures-util", "tokio/macros"]
+acme = ["web-tls", "dep:instant-acme", "dep:hyper-rustls", "dep:hyper-util", "dep:rustls-native-certs", "dep:serde_json", "dep:tempfile", "dep:x509-parser"]
 request-id = ["web"]
 session = ["web", "dep:cookie", "dep:getrandom", "dep:subtle"]
 auth = ["dep:axum"]
@@ -52,6 +53,12 @@ tokio-rustls = { version = "0.26", default-features = false, features = ["ring",
 futures-util = { version = "0.3", default-features = false, features = ["alloc"], optional = true }
 redis = { version = "=1.7.1", default-features = false, features = ["tokio-comp", "connection-manager", "script"], optional = true }
 rustls = { version = "0.23", default-features = false, features = ["std", "ring", "tls12"], optional = true }
+instant-acme = { version = "=0.8.5", default-features = false, features = ["ring", "hyper-rustls"], optional = true }
+hyper-rustls = { version = "=0.27.10", default-features = false, features = ["http1", "tls12"], optional = true }
+hyper-util = { version = "=0.1.21", features = ["client-legacy", "http1", "tokio"], optional = true }
+rustls-native-certs = { version = "=0.8.3", optional = true }
+tempfile = { version = "=3.27.0", optional = true }
+x509-parser = { version = "=0.18.1", optional = true }
 serde_json = { version = "=1.0.151", optional = true }
 sha2 = { version = "0.10", optional = true }
 toml = { version = "=0.9.12", default-features = false, features = ["std", "parse", "serde"], optional = true }
@@ -86,6 +93,10 @@ name = "composition"
 
 [[example]]
 name = "composition_local"
+
+[[example]]
+name = "acme_http01"
+required-features = ["acme"]
 
 [[example]]
 name = "native_winit_foreground"

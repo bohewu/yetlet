@@ -124,6 +124,7 @@ jobs:
           cargo test --workspace --all-targets --locked
           cargo test --workspace --doc --locked
           cargo test --locked -p yetlet --no-default-features --features web-tls --test web_host_tls
+          cargo test --locked -p yetlet --no-default-features --features acme --lib --example acme_http01
       - name: Independent CLI Style regression tests
         if: steps.scope.outputs.release_only != 'true'
         run: |
