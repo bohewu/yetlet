@@ -3,7 +3,7 @@
 Install native identity resolution only on selected routes. Authentication
 establishes a verified identity; business authorization remains application-owned.
 
-**Experimental SDK module.** Included in `yetlet` SDK `0.9.0-alpha.9`;
+**Experimental SDK module.** Included in `yetlet` SDK `1.0.0-rc.1`;
 use the documented feature/target and source matching the version you consume.
 
 

@@ -45,8 +45,8 @@ Construction does not bind or start a runtime. Call `app.serve().await` from the
 application's Tokio runtime when ready to serve it.
 
 In this checkout, `yetlet::web::DEFAULT_CSP` and its prelude export are available
-with `web` alone for custom responses. In published SDK `0.9.0-alpha.9`, these
-exports require both `web` and `html`.
+with `web` alone for custom responses. The published `0.9.0-alpha.9` SDK
+requires both `web` and `html` for these exports.
 
 ### Start a native page and JSON API
 

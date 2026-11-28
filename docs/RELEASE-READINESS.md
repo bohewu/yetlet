@@ -14,6 +14,61 @@ Reader Edition source selects SDK alpha.9 and CLI 0.4.2. The
 does not establish archive/source equality. This is not Stable API, production, SLSA
 level or universal platform qualification.
 
+## SDK 1.0 release candidate acceptance
+
+**Status:** Local source freeze for SDK `1.0.0-rc.1`. The rehearsal started from
+verified Git commit `f3920d45b0c071976163aa8fa09c5719643262dd`. The two SDK
+packages inherit `0.9.0-alpha.9` at that commit. The release source adds the SDK
+version synchronization, including the exact Browser-to-Core pin, affected
+lock entries and release documentation required by the version change. The
+rehearsal record identifies the tested delta and rehearsal archive digests. The
+owner approved the 1.0 compatibility scope below and the local release commit.
+Final archive qualification and publication remain open.
+
+The published alpha.9 pair is the migration baseline. Use the independent CLI
+0.4.2 release to verify the consumer path.
+
+### Approved 1.0 compatibility scope
+
+Apply SemVer to the documented Rust APIs and behavior below for the `yetlet`
+and `yetlet-browser` package pair. Retain Rust 1.99 as the minimum supported
+version. The initial target is `x86_64-unknown-linux-gnu` for native
+Core, View/HTML, Reactive and Web, and `wasm32-unknown-unknown` in Chrome on
+Linux for portable Core, View/HTML, Reactive and Browser DOM. Other target and
+browser support requires separate qualification. The approved scope follows the
+current Core/View/Web sections of [Compatibility](COMPATIBILITY.md) and the
+implementation checkpoints in [ADR 0014](adr/0014-layered-host-resource-lifecycle.md).
+
+| Package and feature | Commitment |
+|---|---|
+| `yetlet` Core (`default = []`) | Built-in `HostGroup`, `Host` and `ResourceGroup` composition with caller-owned drive. Retain startup and observed readiness, rollback, stop/drain, completion and final release, including the retained owner's ability to resume cleanup after a cancelled borrowing drive. Core starts no runtime. |
+| `yetlet/view` and `yetlet/html` | Shared `View`, `Element`, `Attribute`, typed tags and binding APIs. `html` enables `view` and adds escaped HTML serialization. View and HTML remain independent of HTTP and Browser. |
+| `yetlet/web` | Native API-only HTTP and managed `App`/`WebHost` startup and shutdown. Retain `App::into_router()` and the documented Axum/Tower interoperability boundary. Axum, Tower and Tokio own their upstream APIs and runtime policies. `web` works independently of HTML. Adding `html` enables page and document rendering with usable server-rendered output when JavaScript or Wasm is unavailable. |
+| `yetlet/reactive` | The Browser starter uses the optional `LocalGraph` API. Retain synchronous reducer/commit ordering, snapshots, weak handles and owned subscriptions for local updates. |
+| `yetlet-browser/dom` (default) and `yetlet-browser/dom-keyed` | Retain shared View reexports, subtree mount and DOM admission/URL policies with `dom`, and keyed reconciliation, retained entry ownership and listener cleanup with `dom-keyed`. Both independently enable `yetlet/view`. Reordering uses `moveBefore()` where available and retains the `insertBefore()` fallback, which can interrupt focus or selection. |
+
+Other opt-ins remain experimental under this scope. For `yetlet`, these are
+`sfc`, `actions`, `actions-http`, `command-bridge`, `udp`, `native-winit`,
+`renderer-wgpu`, `web-tls`, `acme`, `request-id`, `session`, `auth`,
+`auth-session`, `session-redis`, `session-redis-tls`, `config`, `secrets`,
+`secret-provider`, `signing` and `rate-limit`. For `yetlet-browser`, they are
+`actions`, `wgpu` and `wgpu-browser`.
+
+| Area | Required acceptance evidence |
+|---|---|
+| Public contract | Compare the candidate manifests and documented API paths with the approved feature boundaries and minimum Rust version above. |
+| Lifecycle and service | Verify readiness, rollback, draining and resource release for the documented Host paths. The [external Web Host consumer](../examples/external-consumers/web-hosts/README.md) covers shutdown with an active SSE stream and a task awaiting a TCP receipt. Use the [Production Starter controlled-arrival scenario](../examples/production-starter/deployment/performance/README.md) for bounded load and recovery evidence, with the workload, limits and observed errors recorded. |
+| Clean consumers and upgrade | Build the `yetlet` archive first, then `yetlet-browser` against that exact Core archive and checksum. Build clean Native, Service and Browser consumers from the pair. Migrate an existing alpha.9 app, recording changed imports, features and lock entries. Check CLI 0.4.2 with explicit `--sdk-version` and its default resolver against the candidate metadata. A higher non-yanked prerelease can become the default selection, so verify the chosen version and generated locks. |
+| Browser and native targets | On a supported browser, verify the generated Wasm app, the no-JS SSR path, CSP and keyed reordering. Qualify native behavior on the platforms in the selected support scope. Reuse exact-source results where they cover the same contract and record unverified limits in the [qualification matrix](QUALIFICATION-MATRIX.md). |
+
+Before selecting the candidate commit or packaging, run the
+[release documentation gate](RELEASING.md#release-documentation-gate) and review
+the package guides, capability map and upgrade instructions against the selected
+scope. Use [the per-version publication procedure](RELEASE-PUBLICATION.md#each-version)
+for exact-source CI, artifact verification and owner approval. Record the commit,
+toolchain, archive digests and consumer outcomes together. Public registry
+consumers and the Reader Edition update follow verified publication.
+
 ## M28 release preparation — 2026-11-22
 
 At the 2026-11-22 checkpoint, the local SDK `0.9.0-alpha.9` and CLI `0.4.2`

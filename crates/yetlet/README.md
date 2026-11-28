@@ -1,7 +1,7 @@
 # Yetlet
 
 A small, composable Rust application framework. This guide covers version
-`0.9.0-alpha.9`. See [GitHub releases](https://github.com/bohewu/yetlet/releases)
+`1.0.0-rc.1`. See [GitHub releases](https://github.com/bohewu/yetlet/releases)
 for published artifacts.
 
 Core provides application lifetimes. Select View, HTML, Web, native windows, UDP,
@@ -13,14 +13,14 @@ Use Rust 1.99+ and this exact registry dependency for HTML rendering:
 
 ```toml
 [dependencies]
-yetlet = { version = "=0.9.0-alpha.9", default-features = false, features = ["html"] }
+yetlet = { version = "=1.0.0-rc.1", default-features = false, features = ["html"] }
 ```
 
 For the current checkout, enable the same HTML capability explicitly:
 
 ```toml
 [dependencies]
-yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.9", default-features = false, features = ["html"] }
+yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=1.0.0-rc.1", default-features = false, features = ["html"] }
 ```
 
 ```rust
@@ -43,7 +43,7 @@ For Core lifetimes alone, select the package without optional features:
 
 ```toml
 [dependencies]
-yetlet = { version = "=0.9.0-alpha.9", default-features = false }
+yetlet = { version = "=1.0.0-rc.1", default-features = false }
 ```
 
 `HostGroup` coordinates startup, observed readiness, admission, original

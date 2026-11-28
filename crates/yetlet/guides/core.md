@@ -14,7 +14,7 @@ For a View-only dependency on this checkout:
 
 ```toml
 [dependencies]
-yetlet = { version = "=0.9.0-alpha.9", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["view"] }
+yetlet = { version = "=1.0.0-rc.1", path = "/absolute/yetlet/crates/yetlet", default-features = false, features = ["view"] }
 ```
 
 For a first-app continuation covering typed data, reusable functions, lists and

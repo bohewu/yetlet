@@ -3,7 +3,7 @@
 Apply native endpoint/group rate limits using explicit per-process memory
 budgets. Configuration reuse and shared accounting are separate choices.
 
-**Experimental SDK module.** Included in `yetlet` SDK `0.9.0-alpha.9`;
+**Experimental SDK module.** Included in `yetlet` SDK `1.0.0-rc.1`;
 use the documented feature/target and source matching the version you consume.
 
 
@@ -28,7 +28,7 @@ or loading settings does not select that installation automatically.
 
 ### Shared budget wiring
 
-This extractor-based wiring works with published SDK `0.9.0-alpha.9`.
+This extractor-based wiring works with the published `0.9.0-alpha.9` SDK.
 
 ```rust
 use axum::{Router, http::request::Parts, routing::get};

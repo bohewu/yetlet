@@ -15,6 +15,6 @@ local-headless = []
 native-udp = ["yetlet/native-winit", "yetlet/udp", "dep:winit"]
 
 [dependencies]
-yetlet = { version = "0.9.0-alpha.9", path = "../../../crates/yetlet", default-features = false }
+yetlet = { version = "1.0.0-rc.1", path = "../../../crates/yetlet", default-features = false }
 axum = { version = "=0.8.9", optional = true }
 winit = { version = "=0.30.13", default-features = false, features = ["rwh_06", "x11"], optional = true }

@@ -2,7 +2,7 @@
 
 Opt-in DOM, action transport and GPU integrations. DOM adapters share the single
 View type from `yetlet`.
-Version `0.9.0-alpha.9`; see [GitHub releases](https://github.com/bohewu/yetlet/releases)
+Version `1.0.0-rc.1`; see [GitHub releases](https://github.com/bohewu/yetlet/releases)
 for published artifacts.
 Use Rust 1.99+, `wasm32-unknown-unknown`, and the matching wasm-bindgen toolchain
 when building actual browser assets.
@@ -13,16 +13,16 @@ Use these exact registry dependencies for the Browser DOM default:
 
 ```toml
 [dependencies]
-yetlet = { version = "=0.9.0-alpha.9", default-features = false }
-yetlet-browser = "=0.9.0-alpha.9"
+yetlet = { version = "=1.0.0-rc.1", default-features = false }
+yetlet-browser = "=1.0.0-rc.1"
 ```
 
 For the current checkout, select matching source revisions for both crates:
 
 ```toml
 [dependencies]
-yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=0.9.0-alpha.9", default-features = false }
-yetlet-browser = { path = "/absolute/yetlet/crates/yetlet-browser", version = "=0.9.0-alpha.9" }
+yetlet = { path = "/absolute/yetlet/crates/yetlet", version = "=1.0.0-rc.1", default-features = false }
+yetlet-browser = { path = "/absolute/yetlet/crates/yetlet-browser", version = "=1.0.0-rc.1" }
 ```
 
 Both configurations select the Browser `dom` default and accept the shared View
