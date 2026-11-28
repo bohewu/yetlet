@@ -4853,6 +4853,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "yetlet-batch-import"
+version = "0.9.0-alpha.9"
+dependencies = [
+ "rusqlite",
+ "tempfile",
+ "yetlet",
+]
+
+[[package]]
 name = "yetlet-board-triage"
 version = "0.9.0-alpha.9"
 dependencies = [
@@ -5125,6 +5134,23 @@ dependencies = [
  "serde_json",
  "tokio",
  "tower",
+ "yetlet",
+]
+
+[[package]]
+name = "yetlet-streamed-jobs"
+version = "0.9.0-alpha.9"
+dependencies = [
+ "axum",
+ "futures-util",
+ "http-body-util",
+ "hyper-util",
+ "serde",
+ "serde_json",
+ "sha2 0.10.9",
+ "tempfile",
+ "tokio",
+ "tokio-util",
  "yetlet",
 ]
 
