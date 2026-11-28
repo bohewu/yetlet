@@ -1,7 +1,7 @@
 # Current capability and API carrier map
 
 Updated: 2026-11-23. The published Experimental SDK has two implementation packages:
-`yetlet` and `yetlet-browser`, version `0.9.0-alpha.9`, available from crates.io.
+`yetlet` and `yetlet-browser`, version `1.0.0-rc.1`, available from crates.io.
 Core defaults are empty. Browser defaults select DOM and thereby Core View.
 Native Web, HTML rendering and GPU/action integrations have explicit feature
 selection and startup wiring. The map below shows capabilities in the two packages.
@@ -17,7 +17,7 @@ ownership/error boundaries and local rustdoc. [Documentation scope](DOCUMENTATIO
 classifies reader inputs and retained evidence; this inventory does not select
 publication of its linked execution records.
 
-SDK alpha.9 provides [simple startup and the optional Web Prelude](API-REFERENCE.md#published-application-startup--sdk-alpha9)
+SDK rc.1 provides [simple startup and the optional Web Prelude](API-REFERENCE.md#published-application-startup--sdk-rc1)
 through `web`; add `html` for SSR. CLI `0.4.2` generates
 `App::serve()` with those features for Native and Native Style with compatible
 options. The receipt records the `web-app-serve` startup profile. [CLI startup profiles](CLI-GUIDE.md#sdk-resolution-yt-247)
@@ -32,7 +32,7 @@ The original YT-245 preparation selects local SDK `0.9.0-alpha.7` contents;
 these typed constructors are now distributed rather than checkout-only.
 
 
-Published SDKalpha.9/CLI0.4.2 artifacts serve separate roles. The independent CLI
+Published SDKrc.1/CLI0.4.2 artifacts serve separate roles. The independent CLI
 ships native/browser Style templates and a private app generator. The Style
 walkthroughs verify SDK alpha.7 with exact app pins and locks. The
 [Style Showcase](../examples/style-showcase/README.md) remains a checkout sample.
@@ -42,7 +42,7 @@ Style authoring has a finite private app vocabulary, explicit registration and
 external build-time CSS; ordinary CSS remains the default and supplies unsupported
 syntax. There is no public style crate, renderer change or runtime style injection.
 
-SDK alpha.9 includes built-in Core composition with `HostGroup`, custom Hosts
+SDK rc.1 includes built-in Core composition with `HostGroup`, custom Hosts
 and `ResourceGroup`. Its two package versions are selected by the [workspace
 manifest](../Cargo.toml). YT-288 removes the
 composition feature opt-in. [YT-289](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#17-yt-289--optional-view-and-browser-feature-isolation)

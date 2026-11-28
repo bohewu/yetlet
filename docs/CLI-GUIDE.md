@@ -5,7 +5,7 @@ For registry installation, a native quickstart and the selected release, see the
 reference, platform setup, project settings and source maintenance.
 
 Use the [current CLI contract](CLI-CONTRACT.md), [published CLI 0.4.2
-record](CLI-042-HOSTED-RECORD.md) and [published SDK alpha.9 record](ALPHA9-HOSTED-RECORD.md)
+record](CLI-042-HOSTED-RECORD.md) and [published SDK rc.1 record](SDK-RC1-HOSTED-RECORD.md)
 for version and distribution authority. The CLI build SDK, its immutable
 packaged source snapshot and each generated application's selected SDK are
 **different identities**. The default latest resolver, exact `--sdk-version`,
@@ -52,7 +52,7 @@ The CLI's build dependency and embedded snapshot are independent of the SDK
 chosen for each new project.
 
 ```sh
-yetlet new demo --sdk-version 0.9.0-alpha.9
+yetlet new demo --sdk-version 1.0.0-rc.1
 yetlet new cached-demo --offline
 ```
 
@@ -153,9 +153,9 @@ upgrade wording. Installed users can retain the published Native contract with:
 yetlet new my-app --template native --sdk-version 0.9.0-alpha.8
 ```
 
-Use CLI `0.4.2` for SDK alpha.9. The
-[public alpha.9 consumer](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
-passed Native, Service and Chrome/Wasm checks with that pair. See the
+Use CLI `0.4.2` for SDK `1.0.0-rc.1`. The
+[public rc.1 consumer](SDK-RC1-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-28)
+records native SSR, Service health endpoints and Chrome/Wasm verification. See the
 [compatibility assessment](COMPATIBILITY.md#current-checkout--cli-and-selected-sdk)
 and [bounded evidence](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#21-yt-293--cli-consumers-and-minimal-sdk-feature-selection).
 
@@ -1145,7 +1145,7 @@ historical YT-104 qualification describes the earlier static starter scope.
 Application-owned Rust CSS first shipped in CLI `0.3.0` and remains available
 in CLI `0.4.2`. The opt-in Style templates generate external CSS at build time
 through a private application tool. The current Reader Edition selects SDK
-`0.9.0-alpha.9` and CLI `0.4.2`. App SDK selection follows
+`1.0.0-rc.1` and CLI `0.4.2`. App SDK selection follows
 [SDK resolution](#sdk-resolution-yt-247).
 
 `new --template native-style` and `new --template browser-style` opt into a private

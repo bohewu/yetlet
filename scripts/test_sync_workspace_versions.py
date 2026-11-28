@@ -88,8 +88,11 @@ def populate_current_docs(root):
         "The SDK " + tick + "0.1.0" + tick + " and independent source-installed CLI "
         + tick + "0.1.0" + tick + " are published Experimental versions.\n")
     put(root, "docs/BROWSER-APP.md",
-        "published CLI " + tick + "0.1.0" + tick + " and SDK\n"
-        + tick + "0.9.0-alpha.6" + tick + ".\n")
+        "Create a standalone interactive app with published CLI " + tick + "0.1.0" + tick + " and SDK\n"
+        + tick + "0.9.0-alpha.6" + tick + ".\n"
+        "yetlet new firstbrowser --sdk-version 0.9.0-alpha.6\n"
+        "## Windows x64 MSVC PowerShell first use\n"
+        "& $yetlet new firstbrowser --sdk-version 0.9.0-alpha.6\n")
     put(root, "docs/README.md",
         "[SDK " + tick + "0.1.0" + tick + "](ALPHA7-HOSTED-RECORD.md)\n"
         "[CLI " + tick + "0.1.0" + tick + "](CLI-020-RELEASE-PREPARATION.md)\n"
@@ -443,6 +446,20 @@ class WorkspaceManifestTests(unittest.TestCase):
                           '#owner-approved-publication-and-installed-consumer--fixture)', changes['README.md'])
             self.assertIn(PUBLICATION_RECORDS['CLI'][0].removeprefix('docs/') +
                           '#owner-approved-publication-and-installed-consumer--fixture)', changes['docs/README.md'])
+
+    def test_release_candidate_rolls_posix_reader_and_preserves_windows_guide(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            populate_current_docs(root)
+            changes = sync.sync_published_docs(
+                root, {'SDK': '1.0.0-rc.1', 'CLI': '0.4.2'}, '=0.9.0-alpha.8',
+                {'sdk': '1.0.0-rc.1', 'cli': '0.4.2'})
+            self.assertIn('SDK1.0.0-rc.1/CLI0.4.2 in [the site manifest]',
+                          changes['docs/COMPATIBILITY.md'])
+            self.assertIn('https://crates.io/crates/yetlet/1.0.0-rc.1', changes['README.md'])
+            browser = changes['docs/BROWSER-APP.md']
+            self.assertIn('yetlet new firstbrowser --sdk-version 1.0.0-rc.1', browser)
+            self.assertIn('& $yetlet new firstbrowser --sdk-version 0.9.0-alpha.6', browser)
 
 
 class ReaderManifestTests(unittest.TestCase):

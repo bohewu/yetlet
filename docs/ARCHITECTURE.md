@@ -1,6 +1,6 @@
 # Yetlet Architecture
 
-**Status:** Experimental. **Published SDK:** `0.9.0-alpha.9` (`yetlet` / `yetlet-browser`).
+**Status:** Experimental. **Published SDK:** `1.0.0-rc.1` (`yetlet` / `yetlet-browser`).
 **Published CLI:** `0.4.2` (`yetlet-cli`).
 [Release readiness](RELEASE-READINESS.md) links the accepted publication records.
 M0–M9 implementation, selected M10 qualification and five application-owned
@@ -21,7 +21,7 @@ The owner selects a small, composable Rust application framework with minimal
 SDK publication: keep yetlet and yetlet-browser and expose optional capabilities
 through modules/features. The [YT-287 contract](M28-HOST-RESOURCE-LIFECYCLE-DESIGN.md#15-yt-287--feature-first-architecture-and-driver-contract)
 and [ADR 0014](adr/0014-layered-host-resource-lifecycle.md#yt-287-target-decision--minimal-packages-optional-capabilities)
-define the architecture shipped in SDK alpha.9. The workspace takes its version from the [workspace manifest](../Cargo.toml). Both packages
+define the architecture shipped in SDK rc.1. The workspace takes its version from the [workspace manifest](../Cargo.toml). Both packages
 inherit that version, and the Browser package requires the exact matching base
 package with its defaults disabled.
 

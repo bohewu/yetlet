@@ -427,10 +427,10 @@ YT-226's separately authorized2026-11-01 cutover at 0ae6b93 used the Yetlet-buil
 application-owned static reader with optional Wasm search, one Pages workflow
 and run41289520993/1. Both received independent PASS0 at their recorded scope.
 mdBook remains an explicit historical/reference builder. The current selected
-Reader **source** pair is SDK alpha.9 / CLI 0.4.2 in `site/pages.toml`, with distribution
+Reader **source** pair is SDK `1.0.0-rc.1` / CLI `0.4.2` in `site/pages.toml`, with distribution
 authority in the accepted hosted SDK/CLI records. This source selection is not a
-claim of live Pages deployment; PR/CI/merge and hosted reader readback remain
-separate evidence.
+claim of live Pages deployment. Live Pages still serves the alpha.9 edition
+below. PR/CI/merge and hosted reader readback remain open for rc.1.
 The [original plan](https://github.com/bohewu/yetlet/blob/c0a40af80a48932f3cdf7c593f36fe563e4ec669/docs/PUBLIC-DOCS-PLAN.md) is locally recoverable at the
 frozen SHA, while remote reachability and private raw evidence availability
 remain unverified. Its old edition labels describe their dated checkpoints.

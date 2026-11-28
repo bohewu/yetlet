@@ -25,7 +25,7 @@ either side of a SQLite commit and resume from the last durable row.
 The current checkout uses `yetlet::web::App` with explicit `web,html`
 features for the minimal SSR example below. Its `new().page(...).serve()` and
 `from_router(...).serve_on(address)` startup paths retain the address and runtime
-contracts described below. The [published SDK `0.9.0-alpha.9` startup API](API-REFERENCE.md#published-application-startup--sdk-alpha9)
+contracts described below. The [published SDK `1.0.0-rc.1` startup API](API-REFERENCE.md#published-application-startup--sdk-rc1)
 uses `App` through `web`; its SSR example below also selects `html`.
 
 The non-catalog SDK minimal example uses the fixed `127.0.0.1:7878` HTTP default.

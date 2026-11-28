@@ -1,7 +1,7 @@
 # Current API reference
 
-Updated: 2026-11-23. This map distinguishes the published Experimental two-package
-SDK (`0.9.0-alpha.9`) from independent CLI tooling and checkout samples. `yetlet` contains the shared View and opt-in
+Updated: 2026-11-28. This map distinguishes the published Experimental two-package
+SDK (`1.0.0-rc.1`) from independent CLI tooling and checkout samples. `yetlet` contains the shared View and opt-in
 native capabilities; `yetlet-browser` contains browser integrations and depends
 one-way on the same View. Both packages are available from crates.io at this version.
 Earlier release tags retain their original layouts and evidence.
@@ -45,9 +45,9 @@ the reviewed Reader Edition selected in [the site manifest](../site/pages.toml).
 [SDK alpha.7 publication and registry consumer](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
 
 
-## Published application startup — SDK alpha.9
+## Published application startup — SDK rc.1
 
-Select `web` for native HTTP and add `html` for SSR pages. SDK alpha.9
+Select `web` for native HTTP and add `html` for SSR pages. SDK rc.1
 keeps `App::serve()` and `App::serve_on(address)` under `yetlet::web`.
 For the two-feature SSR case, the optional prelude includes `App` and
 `View`. The application declares and owns its Tokio runtime.
@@ -70,6 +70,11 @@ The convenience methods serve plain HTTP. `serve()` binds
 listener or graceful shutdown, use the native Router from `App::into_router()`.
 For coordinated services, see [managed Web lifetimes](../crates/yetlet/guides/server-axum.md#execution-ownership).
 [First-app walkthrough](FIRST-APP.md)
+
+### Published application startup — SDK alpha.9
+
+SDK alpha.9 introduced this Web namespace and feature selection.
+[Alpha.9 publication and consumer evidence](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23).
 
 ## Published application startup — SDK alpha.8
 
@@ -127,7 +132,7 @@ explicitly exposes the listener beyond loopback.
 
 ## Published application composition
 
-SDK alpha.9 includes built-in `yetlet::composition` and reexports
+SDK rc.1 includes built-in `yetlet::composition` and reexports
 `HostGroup`, `Host` and `ResourceGroup` at the package root. These types need no
 Cargo features. The [workspace manifest](../Cargo.toml) selects the candidate
 version for both packages.
@@ -162,7 +167,7 @@ caller-thread loop. Native/UDP ordinary hosting uses synchronous `run()`;
 `run_async()` rejects them before acquisition. Advanced custom resources may
 supply a typed `BlockingDriver` through `ResourceGroup::with_blocking_driver`.
 See the [finite native consumer](../examples/external-consumers/native-hosts/README.md)
-for Native/UDP and optional Web with borrowed local resources. These APIs ship in alpha.9. Renderer and backend qualification have their own evidence.
+for Native/UDP and optional Web with borrowed local resources. These APIs ship in SDK rc.1. Renderer and backend qualification have their own evidence.
 
 The `actions` feature keeps `Command`, `ActionExecutor` and `LocalExecutor`
 transport-neutral. Executors choose an associated `Error`; local execution
@@ -190,7 +195,7 @@ companion. Both packages are built from the repository.
 
 ## CLI Style authoring and checkout Showcase
 
-Published SDKalpha.9/CLI0.4.2 artifacts serve separate roles. The Reader
+Published SDKrc.1/CLI0.4.2 artifacts serve separate roles. The Reader
 Edition uses the pair selected in the site manifest.
 Application-owned Rust CSS first shipped in CLI `0.3.0`. The CLI ships Native
 and Browser Style templates with a private build-time generator, build/watch

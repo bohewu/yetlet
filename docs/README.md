@@ -2,7 +2,7 @@
 
 Start with the [native SSR quickstart](../README.md#start-with-native-ssr), then
 choose a [runnable sample](SAMPLES.md). The two-package
-[SDK `0.9.0-alpha.9`](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+[SDK `1.0.0-rc.1`](SDK-RC1-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-28)
 and independent [CLI `0.4.2`](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
 are published on crates.io with matching Experimental GitHub pre-releases.
 The first-app instructions and selected reader sources use the edition pinned
@@ -27,7 +27,7 @@ and distribution versus qualification to [Release readiness](RELEASE-READINESS.m
   [Style Showcase checkout sample](../examples/style-showcase/README.md).
 
 - [Troubleshooting common problems](TROUBLESHOOTING.md): symptom → possible cause → correction → existing guide.
-- [Build your first Yetlet app](FIRST-APP.md): CLI0.4.2 → protected standalone project → SDK0.9.0-alpha.9 → app lock/cache → first build/run with `App::serve()`. The optional
+- [Build your first Yetlet app](FIRST-APP.md): CLI0.4.2 → protected standalone project → SDK1.0.0-rc.1 → app lock/cache → first build/run with `App::serve()`. The optional
   [static-export path](FIRST-APP.md#next-export-a-static-site) uses a separate example.
 - [Build a browser-only Yetlet app](BROWSER-APP.md): published CLI/SDK → explicit tool and lock preparation → local state/events → build/preview/watch → static ship directory.
 - [Write Views and reusable components](VIEW-COMPONENTS.md): typed data → functions → lists/conditions → existing SSR handler.
@@ -572,7 +572,7 @@ local Git `ed7a082b1f9f72430f06866f7d550b0ed9ecbae9`; no product runtime was req
 These module guides describe the consolidated SDK and its practical limits.
 Use source/rustdoc matching the version you consume and Rust 1.99 or newer;
 native SSR needs no browser build. The [API reference](API-REFERENCE.md) covers
-the modules shipped in SDK alpha.9. Core lifecycle is built in with an empty default feature set;
+the modules shipped in SDK rc.1. Core lifecycle is built in with an empty default feature set;
 View, HTML and Web are selected explicitly.
 
 | Area | Package guide |

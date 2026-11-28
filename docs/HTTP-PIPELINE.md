@@ -4,7 +4,7 @@ Compose native global, group and route middleware while keeping request-owned
 parts/body separate from typed application state. Axum/Tower owns HTTP transport.
 
 **Experimental SDK integration.** These modules are distributed in SDK
-`0.9.0-alpha.9` through `yetlet::web` and the `web` feature. Middleware and
+`1.0.0-rc.1` through `yetlet::web` and the `web` feature. Middleware and
 `RequestContext` work without View or HTML. Add `html` for SSR Page/document
 helpers. Dated measurements and commands retain their original source scope. [Release readiness](RELEASE-READINESS.md) records distribution and
 its qualification limits.

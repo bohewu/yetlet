@@ -2,7 +2,7 @@
 
 **Static export has been available since published CLI `0.2.0` (YT-223/YT-229).**
 CLI `0.1.1` does not implement build --static. This reference application is
-explicitly pinned to the reader SDK in [Cargo.toml](Cargo.toml) alongside the introductory guide and
+explicitly pinned to the reader SDK `1.0.0-rc.1` in [Cargo.toml](Cargo.toml) alongside the introductory guide and
 can be copied outside the repository without SDK source/path overrides.
 See the [static export contract](../../docs/CLI-CONTRACT.md#historical-static-export-protocol-and-guardrails) and
 [historical implementation evidence](https://github.com/bohewu/yetlet/blob/b9873f15bcfd4c36a2274508ef7517e5a83b807b/docs/YT-223-STATIC-HTML-IMPLEMENTATION.md).
@@ -36,6 +36,7 @@ demonstration choices inside a subshell.
     cd examples/static-site
     mkdir -p artifacts
     chmod go-w . src frontend public artifacts
+    cargo +1.99.0 fetch --locked
     RUSTUP_TOOLCHAIN=1.99.0 ../../tools/yetlet-cli/target/debug/yetlet build \
         --static --export-bin site-export --output artifacts/site-v1 \
         --base-path /yetlet/ --release
