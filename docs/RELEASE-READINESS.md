@@ -23,10 +23,37 @@ version synchronization, including the exact Browser-to-Core pin, affected
 lock entries and release documentation required by the version change. The
 rehearsal record identifies the tested delta and rehearsal archive digests. The
 owner approved the 1.0 compatibility scope below and the local release commit.
-Final archive qualification and publication remain open.
+Hosted source qualification is recorded below. Publication requires the
+protected owner gate.
 
 The published alpha.9 pair is the migration baseline. Use the independent CLI
 0.4.2 release to verify the consumer path.
+
+### Hosted RC source and package evidence
+
+The immutable product source is `45ee6b3d7990ba106f03a74a5be7cbf90e6668f3`
+from [PR #122](https://github.com/bohewu/yetlet/pull/122). Tag
+`v1.0.0-rc.1` points to that commit. Master CI and the unsigned
+[package build](https://github.com/bohewu/yetlet/actions/runs/46145102924/attempts/1)
+passed. The protected [custody readback](https://github.com/bohewu/yetlet/actions/runs/46145436791/attempts/1)
+verified the original encrypted inventory and private manifest.
+
+| Unsigned package | Bytes | SHA-256 |
+|---|---:|---|
+| `yetlet-1.0.0-rc.1.crate` | 347034 | `72d9fbdcf7cf0c8a029ab2ac83f6c33759fb3b19d12586057311fced5740531a` |
+| `yetlet-browser-1.0.0-rc.1.crate` | 53787 | `53201337df415b80b717337988014c271326cf5c360dcd0672e8fb6a70d3419b` |
+
+The merged source tree matches the reviewed local source used for Linux Chrome
+and CLI verification. The hosted archive omits local VCS metadata. Browser's
+packaged lock carries the exact hosted Core checksum. After accounting for
+those two packaging differences, all other archive members matched the local
+pair. The original provenance binds the hosted packages to the merged source.
+
+The Chrome runs exercised actual Wasm loading, focused keyed moves, fallback
+reordering and CSP enforcement. Released CLI 0.4.2 selected the RC for explicit
+and default Native, Service and Browser requests in an isolated offline
+registry fixture. The three default scaffolds built. Registry delivery and
+registry-only consumers are release gates.
 
 ### Approved 1.0 compatibility scope
 
