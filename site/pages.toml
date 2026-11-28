@@ -3,7 +3,7 @@ mdbook-version = "0.5.4"
 
 # Verified publication closeout selects this pair; development versions do not promote it.
 [edition]
-sdk = "0.9.0-alpha.9"
+sdk = "1.0.0-rc.1"
 cli = "0.4.2"
 
 [[pages]]

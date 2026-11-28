@@ -44,8 +44,12 @@ the pre-review archive and compatibility evidence. The independent
 [CLI 0.4.2](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
 (YT-295) was published and verified first. The
 [SDK alpha.9 Core and Browser](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
-(YT-296) followed in that order. Both passed registry consumers. The [Reader Edition](GITHUB-PAGES-PUBLICATION.md#sdk-alpha9-and-cli-042-reader-rollover--2026-11-23) is live on the published pair. PR #108
+(YT-296) followed in that order. Both passed registry consumers. The [alpha.9 Reader Edition](GITHUB-PAGES-PUBLICATION.md#sdk-alpha9-and-cli-042-reader-rollover--2026-11-23) is live on the published pair. PR #108
 delivered the README and Pages sources. Public readback matched the deployment.
+
+[SDK rc.1 publication and registry consumers](SDK-RC1-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-28)
+passed. The Reader Edition source selects rc.1 with CLI 0.4.2. Live Pages
+readback for this source is still open.
 
 ### Planned delivery follow-through
 

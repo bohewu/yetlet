@@ -3,7 +3,7 @@
 Continue [your first native application](FIRST-APP.md) by expanding its initial
 heading into a small page. Use ordinary Rust functions and the existing
 `View`/`Element` API to pass data, compose components and render a list.
-**Experimental SDK `0.9.0-alpha.9`, published on crates.io.** This guide
+**Experimental SDK `1.0.0-rc.1`, published on crates.io.** This guide
 continues the registry-first application from the linked walkthrough.
 
 ## Prerequisites
@@ -111,7 +111,7 @@ walkthrough. A no-JS page needs none of those optional browser capabilities.
 `0.9.0-alpha.7`** and retained by later SDK versions. It offers typed
 constructors as a simpler alternative to the existing `Element::new` API,
 without a new rendering runtime, an extra crate or an automatic browser
-feature. They are also available from published SDK `0.9.0-alpha.9`.
+feature. They are also available from published SDK `1.0.0-rc.1`.
 The first-app example above intentionally retains the reviewed
 [Reader Edition](../site/pages.toml), which is independently pinned to its
 published SDK and CLI. See the [alpha.7 publication and registry consumer](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09)
@@ -285,7 +285,7 @@ a current general component, forms, signals or resumability API.
 The checkout adds an experimental, default-off `sfc` build feature. Use the
 same local `yetlet` path in both Cargo sections. Select `features = ["html"]`
 in `[dependencies]` for SSR and `features = ["sfc"]` in
-`[build-dependencies]`. The published alpha.9 walkthrough above uses plain Rust.
+`[build-dependencies]`. The published rc.1 walkthrough above uses plain Rust.
 
 The runnable [SFC Todo sample](../examples/sfc-todo/README.md) shows an add
 form and repeated task items built from separate component files.

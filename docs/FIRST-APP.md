@@ -1,9 +1,9 @@
 # Build your first Yetlet app
 
 Create a standalone native SSR app with the published source-installed CLI and
-`yetlet` SDK `0.9.0-alpha.9`. This Linux/POSIX walkthrough uses the existing
+`yetlet` SDK `1.0.0-rc.1`. This Linux/POSIX walkthrough uses the existing
 scaffold; the app needs no local SDK source or Cargo path overrides. APIs remain
-Experimental. CLI `0.4.2` and SDK `0.9.0-alpha.9` have independent versions.
+Experimental. CLI `0.4.2` and SDK `1.0.0-rc.1` have independent versions.
 
 For an app whose UI and state run in the browser without a native HTTP backend,
 choose the separate [browser-only WASM walkthrough](BROWSER-APP.md).
@@ -62,7 +62,7 @@ env PATH="$yetlet_rust_bin:$PATH" yetlet doctor --json
 ```
 
 For an isolated prefix, add `--root /absolute/owned/cli-prefix` to the install
-command and invoke `/absolute/owned/cli-prefix/bin/yetlet`. The CLI version is independent of SDK `0.9.0-alpha.9`. CLI 0.4.2 itself
+command and invoke `/absolute/owned/cli-prefix/bin/yetlet`. The CLI version is independent of SDK `1.0.0-rc.1`. CLI 0.4.2 itself
 builds against SDK alpha.8 and resolves the application's SDK separately.
 `--locked` allows downloading locked dependencies. A version or doctor result
 identifies a tool/environment, not application readiness. For a Rustup setup,
@@ -82,7 +82,7 @@ parent and skip its creation.
 ```sh
 yetlet_parent="$HOME/yetlet-first-apps"
 mkdir -m 700 "$yetlet_parent"
-env PATH="$yetlet_rust_bin:$PATH" yetlet new firstapp --parent "$yetlet_parent" --sdk-version 0.9.0-alpha.9
+env PATH="$yetlet_rust_bin:$PATH" yetlet new firstapp --parent "$yetlet_parent" --sdk-version 1.0.0-rc.1
 yetlet_app="$yetlet_parent/firstapp"
 ```
 
@@ -92,10 +92,10 @@ Plain `new` selects the existing native template. It writes `Cargo.toml`,
 server. The app declares its own
 standalone `[workspace]`; it is not added to Yetlet's workspace.
 
-With SDK `0.9.0-alpha.9`, the generated `src/main.rs` imports `yetlet::web`,
+With SDK `1.0.0-rc.1`, the generated `src/main.rs` imports `yetlet::web`,
 registers both routes and calls `.serve().await`. The receipt records
 `"startup_profile": "web-app-serve"`.
-[Application startup API](API-REFERENCE.md#published-application-startup--sdk-alpha9)
+[Application startup API](API-REFERENCE.md#published-application-startup--sdk-rc1)
 
 The explicit SDK selection keeps this walkthrough on its reviewed reader
 edition as newer SDK releases arrive. Omitting it selects the latest available
@@ -109,7 +109,7 @@ the optional runtime Settings loader. This path needs no `--settings`,
 
 ### 3. Prepare the app lock/cache, then build and run
 
-The generated manifest already selects `yetlet = "=0.9.0-alpha.9"` from crates.io
+The generated manifest already selects `yetlet = "=1.0.0-rc.1"` from crates.io
 with defaults disabled and features `web` and `html`. Keep that feature selection. No manifest
 editing, SDK checkout, `[patch]` or path override is required. Work in the new
 app directory, outside the Yetlet checkout:
@@ -227,7 +227,7 @@ scaffold into an exporter. There is no `yetlet new --static` option.
 
 Start with the [standalone static-site example](../examples/static-site/README.md)
 and its explicit `site-export` binary, using the same published SDK
-`0.9.0-alpha.9`. Its [exporter source](../examples/static-site/src/main.rs)
+`1.0.0-rc.1`. Its [exporter source](../examples/static-site/src/main.rs)
 shows finite public pages/assets and escaped Views. After preparing that
 application's own lock/cache, run from its protected directory with the
 installed CLI and selected physical Rust toolchain:
@@ -236,6 +236,7 @@ installed CLI and selected physical Rust toolchain:
 (
     export PATH="$yetlet_rust_bin:$PATH"
     mkdir -m 700 artifacts
+    cargo fetch --locked
     yetlet build --static --export-bin site-export \
         --output artifacts/site-v1 --base-path /yetlet/
 )
@@ -273,7 +274,7 @@ state and private business data out of exported Views and assets.
 
 The [CLI 0.4.2 publication record](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
 records the registry-only installation. The
-[SDK alpha.9 consumer](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
-records Linux Native, Service and Browser runtime verification for this pair.
+[SDK rc.1 consumer](SDK-RC1-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-28)
+records Linux native SSR, Service health endpoints and Chrome/Wasm verification.
 The earlier isolated CLI 0.4.0 first-app check retains its original scope in the
 [historical CLI 0.4.0 record](CLI-040-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-12).

@@ -23,15 +23,15 @@ Rust Views with optional browser WASM when a screen needs local interaction.
 
 ## Current published releases
 
-**Published SDK:** `0.9.0-alpha.9` (`yetlet` / `yetlet-browser`).
+**Published SDK:** `1.0.0-rc.1` (`yetlet` / `yetlet-browser`).
 **Published CLI:** `0.4.2` (`yetlet-cli`).
-The [SDK publication record](docs/ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+The [SDK publication record](docs/SDK-RC1-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-28)
 and [CLI publication record](docs/CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
 retain exact GitHub/crates.io archives, signatures and consumer evidence. The SDK
 uses an empty Core feature default and exposes native HTTP through `yetlet::web`.
 The independent CLI still builds against SDK alpha.8. It resolves each generated
 app's SDK separately, writes exact pins and locks, and generates native startup
-for alpha.9 with `web` and `html`. Its opt-in native/browser Style templates
+for SDK `1.0.0-rc.1` with `web` and `html`. Its opt-in native/browser Style templates
 use a private app CSS generator. The original Style walkthroughs retain their
 explicit SDK alpha.7 selection.
 
@@ -41,12 +41,12 @@ before release closeout. Development manifest changes alone do not promote it.
 
 ## Start with native SSR
 
-**Experimental alpha.** This quickstart uses SDK `0.9.0-alpha.9` and the
+**Experimental release candidate.** This quickstart uses SDK `1.0.0-rc.1` and the
 independently versioned CLI `0.4.2`. The SDK is available
 on crates.io:
-[`yetlet`](https://crates.io/crates/yetlet/0.9.0-alpha.9) and
-[`yetlet-browser`](https://crates.io/crates/yetlet-browser/0.9.0-alpha.9), version
-`0.9.0-alpha.9`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v0.9.0-alpha.9)
+[`yetlet`](https://crates.io/crates/yetlet/1.0.0-rc.1) and
+[`yetlet-browser`](https://crates.io/crates/yetlet-browser/1.0.0-rc.1), version
+`1.0.0-rc.1`. The [matching GitHub pre-release](https://github.com/bohewu/yetlet/releases/tag/v1.0.0-rc.1)
 contains the archives and verification material. To create a standalone app,
 follow [Build your first Yetlet app](docs/FIRST-APP.md). The independently
 published CLI `0.4.2` creates apps without a repository clone:
@@ -64,7 +64,7 @@ Use the pinned Rust/Cargo 1.99.0 toolchain. Native SSR needs no Node.js or WASM
 toolchain. APIs may change; see [compatibility](docs/COMPATIBILITY.md).
 
 From the repository root of the
-[published alpha.9 source tag](https://github.com/bohewu/yetlet/tree/v0.9.0-alpha.9):
+[published SDK source tag](https://github.com/bohewu/yetlet/tree/v1.0.0-rc.1):
 
 ```sh
 cargo run --locked -p yetlet --no-default-features --features web,html --example server-axum-minimal
@@ -75,7 +75,7 @@ manifest version alone does not make it identical to this published source.
 
 Open `http://127.0.0.1:7878/` for HTML and
 `http://127.0.0.1:7878/api/status` for JSON. Stop the server with Ctrl+C.
-The complete [published example](https://github.com/bohewu/yetlet/blob/v0.9.0-alpha.9/crates/yetlet/examples/server_axum/minimal.rs) is:
+The complete [published example](https://github.com/bohewu/yetlet/blob/v1.0.0-rc.1/crates/yetlet/examples/server_axum/minimal.rs) is:
 
 ```rust
 use yetlet::web::prelude::*;

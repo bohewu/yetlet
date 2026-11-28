@@ -4,7 +4,7 @@ Date: 2026-10-18 (Asia/Taipei). Task: YT-102, accepted CLI contract and authoriz
 
 - **Present distribution:** the [CLI guide](CLI-GUIDE.md#current-command-and-capability-inventory)
   describes current public CLI behavior; the independent [CLI 0.4.2 release](CLI-042-HOSTED-RECORD.md)
-  and [SDK alpha.9 release](ALPHA9-HOSTED-RECORD.md) establish verified distribution.
+  and [SDK rc.1 release](SDK-RC1-HOSTED-RECORD.md) establish verified distribution.
 - **Original contract design:** this settings-first grammar superseded the earlier
   `dev` naming and opt-in flags, with `new --vite` implying Settings while
   plain Native remains simple. The original source-only grammar and acceptance
@@ -124,7 +124,7 @@ generates an app Cargo.lock and records provenance before publication. Build,
 run and watch retain their frozen lock behavior. These capabilities first shipped in
 [CLI 0.3.0](CLI-030-HOSTED-RECORD.md); that checkpoint's Reader Edition had
 the older SDK alpha.6 / CLI 0.2.0 pair. The **current selected Reader Edition**
-is SDK `0.9.0-alpha.9` / CLI `0.4.2` (see `site/pages.toml`), and the
+is SDK `1.0.0-rc.1` / CLI `0.4.2` (see `site/pages.toml`), and the
 [CLI 0.4.0 publication](CLI-040-HOSTED-RECORD.md) additionally qualifies the
 finite generated-startup policy. Earlier releases keep their exact source-
 bound behavior; the CLI's own source snapshot does not float with app SDK.

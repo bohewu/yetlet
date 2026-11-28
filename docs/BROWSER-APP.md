@@ -1,7 +1,7 @@
 # Build a browser-only Yetlet app
 
 Create a standalone interactive app with published CLI `0.4.2` and SDK
-`0.9.0-alpha.9`, without cloning Yetlet. Rust owns local state and interaction;
+`1.0.0-rc.1`, without cloning Yetlet. Rust owns local state and interaction;
 JavaScript starts the WASM module. The finished app needs an HTTP(S) static host.
 These instructions use the pinned reader edition and existing APIs; commands
 below are a walkthrough, not evidence of a new execution.
@@ -63,7 +63,7 @@ deliberately use an existing protected parent and omit only its creation.
     export PATH="$(dirname "$(rustup which --toolchain 1.99.0 cargo)"):$HOME/.cargo/bin:$HOME/.local/share/yetlet-tools/bin:$PATH"
     yetlet_parent="$HOME/yetlet-browser-apps"
     mkdir -m 700 "$yetlet_parent"
-    yetlet new firstbrowser --template browser --parent "$yetlet_parent" --sdk-version 0.9.0-alpha.9
+    yetlet new firstbrowser --template browser --parent "$yetlet_parent" --sdk-version 1.0.0-rc.1
     cd "$yetlet_parent/firstbrowser"
     cargo fetch --locked
     npm ci --prefix frontend --ignore-scripts --no-audit --no-fund
@@ -125,9 +125,9 @@ caller-owned Rust closure when a local graph/keyed collection is unnecessary.
 
 ## Windows x64 MSVC PowerShell first use
 
-This companion uses the same published CLI `0.4.2` and SDK
-`0.9.0-alpha.9` Browser template. Windows evidence below retains the scope
-of the previously verified release pair.
+This companion uses published CLI `0.4.2` and the earlier SDK
+`0.9.0-alpha.9` Browser template. The Windows evidence below applies to its
+recorded release pair.
 Prepare the native Rust 1.99 x64 MSVC toolchain, its
 `wasm32-unknown-unknown` target, `wasm-bindgen-cli 0.2.129`, Node.js
 22.12+ and npm before building. An installation of the CLI from source

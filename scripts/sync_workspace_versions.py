@@ -571,6 +571,7 @@ def sync_published_docs(root, published, cli_sdk, edition):
     cli_sdk_value = cli_sdk_version(cli)
     cli_sdk_short = re.sub(r"^[0-9]+\.[0-9]+\.[0-9]+-", "", cli_sdk_value)
     reader_sdk_short = re.sub(r"^[0-9]+\.[0-9]+\.[0-9]+-", "", edition["sdk"])
+    reader_edition_label = reader_sdk_short if reader_sdk_short.startswith("alpha.") else edition["sdk"]
     tick = re.escape(chr(96))
     changes = {}
 
@@ -645,7 +646,7 @@ def sync_published_docs(root, published, cli_sdk, edition):
          lambda m: m.group(1) + cli + tick + ', with release build SDK' + cli_sdk_short + m.group(2),
          "current published CLI and immutable build SDK"),
         pair(r"(SDK)" + VERSION_SHORT_PATTERN + r"(/CLI)" + VERSION_PATTERN + r"( in \[the site manifest\])",
-             reader_sdk_short, edition["cli"], "public reader edition"),
+             reader_edition_label, edition["cli"], "public reader edition"),
         one(r"(Style templates are distributed in CLI )" + VERSION_PATTERN + r"(\.)",
             cli, "published Style CLI"),
     ])
@@ -662,7 +663,7 @@ def sync_published_docs(root, published, cli_sdk, edition):
              sdk, cli, "published SDK/CLI scope"),
         pair(r"(public reader/first-app edition is the explicitly selected SDK)" +
              VERSION_SHORT_PATTERN + r"(/CLI)" + VERSION_PATTERN + r"(\s)",
-             reader_sdk_short, edition["cli"], "reader edition scope"),
+             reader_edition_label, edition["cli"], "reader edition scope"),
     ])
 
     for relative in (
@@ -698,14 +699,15 @@ def sync_published_docs(root, published, cli_sdk, edition):
              sdk, cli, "published SDK/CLI"),
     ])
     apply("docs/BROWSER-APP.md", [
-        pair(r"(published CLI " + tick + ")" + VERSION_PATTERN +
+        pair(r"(Create a standalone interactive app with published CLI " + tick + ")" + VERSION_PATTERN +
              r"(" + tick + r" and SDK\s*\n" + tick + ")" +
              VERSION_PATTERN + r"(" + tick + r")",
              edition["cli"], edition["sdk"], "reader CLI/SDK pair"),
     ])
     relative = "docs/BROWSER-APP.md"
     text = changes.get(relative, (root / relative).read_text(encoding="utf-8"))
-    updated = sync_reader_commands(text, edition)
+    active, heading, windows = text.partition("\n## Windows x64 MSVC PowerShell first use")
+    updated = sync_reader_commands(active, edition) + heading + windows
     if updated != text:
         changes[relative] = updated
     apply("docs/README.md", [
@@ -726,7 +728,10 @@ def sync_published_docs(root, published, cli_sdk, edition):
     if start < 0 or end < 0:
         raise ValueError("README.md: native SSR reader section not found")
     section = text[start:end]
-    section = re.sub(r"0\.9\.0-alpha\.[0-9]+", edition["sdk"], section)
+    section = re.sub(r"(?m)(\bSDK\s+" + tick + r"|^" + tick +
+                     r"|/v|/crates/yetlet(?:-browser)?/)" + VERSION_PATTERN + r"(?=" +
+                     tick + r"|[)/]|$)",
+                     lambda m: m[1] + edition["sdk"], section)
     section = re.sub(
         r"(CLI " + tick + ")" + VERSION_PATTERN + r"(" + tick + ")",
         lambda m: m.group(1) + edition["cli"] + m.group(2), section)
@@ -748,7 +753,6 @@ def sync_published_docs(root, published, cli_sdk, edition):
     if end < 0:
         raise ValueError(f"{relative}: reader edition introduction not found")
     intro = text[:end]
-    intro = re.sub(r"0\.9\.0-alpha\.[0-9]+", edition["sdk"], intro)
     intro = re.sub(
         r"(CLI " + tick + ")" + VERSION_PATTERN + r"(" + tick + ")",
         lambda m: m.group(1) + edition["cli"] + m.group(2), intro)

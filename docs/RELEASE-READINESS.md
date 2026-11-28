@@ -1,30 +1,31 @@
 # Yetlet Prototype Release Readiness
 
-**Current distribution (2026-11-23):** **Published SDK:** `0.9.0-alpha.9` (`yetlet` / `yetlet-browser`).
+**Current distribution (2026-11-28):** **Published SDK:** `1.0.0-rc.1` (`yetlet` / `yetlet-browser`).
 **Published CLI:** `0.4.2` (`yetlet-cli`). The accepted
-[SDK publication record](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+[SDK publication record](SDK-RC1-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-28)
 and [CLI publication record](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
 record actual GitHub/crates.io delivery, exact archives, signatures and consumer limits.
-SDK alpha.9 includes empty-default Core composition, optional View/HTML
-and the Web namespace. The independent CLI resolves each app's SDK and records
-exact pins and locks. It builds against alpha.8 and generates scaffolds for
-alpha.9. Both published distributions passed their registry consumers. The
-Reader Edition source selects SDK alpha.9 and CLI 0.4.2. The
-[live Pages readback](GITHUB-PAGES-PUBLICATION.md#sdk-alpha9-and-cli-042-reader-rollover--2026-11-23) matched the eight chapters and six assets. Development version equality
-does not establish archive/source equality. This is not Stable API, production, SLSA
-level or universal platform qualification.
+SDK rc.1 includes empty-default Core composition, optional View/HTML and the
+Web namespace. CLI 0.4.2 builds against alpha.8 and resolves each app's SDK
+separately with exact pins and locks. Both published distributions passed
+their registry consumers. The Reader Edition source selects SDK `1.0.0-rc.1`
+and CLI `0.4.2`. Live Pages still serves the previously verified
+[alpha.9 edition](GITHUB-PAGES-PUBLICATION.md#sdk-alpha9-and-cli-042-reader-rollover--2026-11-23).
+The support scope remains Experimental.
 
 ## SDK 1.0 release candidate acceptance
 
-**Status:** Local source freeze for SDK `1.0.0-rc.1`. The rehearsal started from
+**Status:** SDK `1.0.0-rc.1` is published and its registry consumers passed.
+The source-freeze rehearsal started from
 verified Git commit `f3920d45b0c071976163aa8fa09c5719643262dd`. The two SDK
 packages inherit `0.9.0-alpha.9` at that commit. The release source adds the SDK
 version synchronization, including the exact Browser-to-Core pin, affected
 lock entries and release documentation required by the version change. The
 rehearsal record identifies the tested delta and rehearsal archive digests. The
 owner approved the 1.0 compatibility scope below and the local release commit.
-Hosted source qualification is recorded below. Publication requires the
-protected owner gate.
+The [accepted publication record](SDK-RC1-HOSTED-RECORD.md) records the completed
+owner gate, registry delivery and public consumer results. Reader Edition
+closeout remains open through reviewed delivery and live Pages readback.
 
 The published alpha.9 pair is the migration baseline. Use the independent CLI
 0.4.2 release to verify the consumer path.
@@ -52,8 +53,8 @@ pair. The original provenance binds the hosted packages to the merged source.
 The Chrome runs exercised actual Wasm loading, focused keyed moves, fallback
 reordering and CSP enforcement. Released CLI 0.4.2 selected the RC for explicit
 and default Native, Service and Browser requests in an isolated offline
-registry fixture. The three default scaffolds built. Registry delivery and
-registry-only consumers are release gates.
+registry fixture. The three default scaffolds built. The later registry results
+are recorded in the accepted publication record.
 
 ### Approved 1.0 compatibility scope
 
@@ -132,7 +133,7 @@ were unpublished then, YT-020 was Blocked and YT-096 trust gates incomplete.
 Exact local Git `42d8856b9acf5ddddab9a4b998b5bdd4c5e59210` retains that dated
 comparison, with remote reachability unverified. It selected no archives,
 registry consumer or new candidate. Current publication is the two-package
-SDK alpha.9 / independent CLI 0.4.2 above. Optional app-owned Auth/Session/cache/
+SDK rc.1 / independent CLI 0.4.2 above. Optional app-owned Auth/Session/cache/
 renderer source proof and earlier signing cannot qualify another checkout,
 browser/platform or production deployment.
 [Compatibility](COMPATIBILITY.md) and [release SOP](RELEASING.md).

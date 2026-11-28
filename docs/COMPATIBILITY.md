@@ -6,7 +6,7 @@
 `0.9.0-alpha.7`, including
 `yetlet::view::tags` with typed fluent constructors and additive convenience
 methods. These were absent from alpha.6, first shipped in `0.9.0-alpha.7` and
-are now **published in SDK `0.9.0-alpha.9`**.
+are now **published in SDK `1.0.0-rc.1`**.
 The historical CLI0.2.0 registry pin remains immutable. The current reader
 edition follows the verified publication pair through the required release
 closeout; a development manifest change alone does not promote it. The existing owned
@@ -31,7 +31,7 @@ DOM's existing admission/URL/image policy. Selected typed attribute setters
 the typed builder; generic `attribute` retains append-only semantics.
 The shared `View` representation and renderer behavior are unchanged.
 Published SDK alpha.7 includes these builders; CLI 0.2.0 stays independently pinned.
-The published SDK alpha.9 and CLI 0.4.2 packages are independently versioned;
+The published SDK rc.1 and CLI 0.4.2 packages are independently versioned;
 only the SDK includes the typed Tag Builder.
 
 See the [typed View guide](VIEW-COMPONENTS.md#standard-html-authoring-coverage),
@@ -41,18 +41,18 @@ for inclusion/exclusion and the original verification limits. Actual SDK
 publication and registry-only consumer qualification are recorded separately
 in [alpha.7](ALPHA7-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-09).
 
-## Current distribution — 2026-11-23
+## Current distribution — 2026-11-28
 
-The published SDK is `yetlet` / `yetlet-browser` `0.9.0-alpha.9`; the independently
+The published SDK is `yetlet` / `yetlet-browser` `1.0.0-rc.1`; the independently
 published CLI is `yetlet-cli` `0.4.2`, with release build SDKalpha.8.
-See the [SDK publication record](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23)
+See the [SDK publication record](SDK-RC1-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-28)
 and [CLI publication record](CLI-042-HOSTED-RECORD.md#owner-approved-publication-and-installed-consumer--2026-11-23)
 for the actual artifacts and consumers. YT-220/221's DOM vocabulary, pre handling
 and opt-in navigation/images are available in SDKalpha.6; YT-223's static export
-is available in CLI0.2.0. Core defaults are empty in alpha.9; Browser defaults to DOM. The SDK remains Experimental.
+is available in CLI0.2.0. Core has no default features. Browser defaults to DOM. The SDK remains Experimental.
 
 The public reader/first-app edition remains explicitly pinned to
-SDKalpha.9/CLI0.4.2 in [the site manifest](../site/pages.toml).
+SDK1.0.0-rc.1/CLI0.4.2 in [the site manifest](../site/pages.toml).
 
 Some registry-only
 reference examples retain their own SDKalpha.5 pins, independently of the
@@ -219,14 +219,14 @@ process-wide and platform entry-thread restrictions; an exited loop is not
 recreatable. Managed Native/UDP reject Async drive before acquiring resources.
 A driver returning before final release retains owners and reports incomplete
 shutdown. Renderer selection remains independent of Winit/Web/View, and backend
-runtime evidence is narrower than feature availability. The Reader Edition selects alpha.9. The CLI chooses its generated API from
+runtime evidence is narrower than feature availability. The Reader Edition selects `1.0.0-rc.1`. The CLI chooses its generated API from
 the selected SDK capability metadata.
 
 ### Current checkout — CLI and selected SDK
 
 Use published CLI `0.4.2` to create Native, Service and Browser apps with
-SDK `0.9.0-alpha.9`. All three passed the
-[public registry consumer](ALPHA9-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-23).
+SDK `1.0.0-rc.1`. The [public registry consumer](SDK-RC1-HOSTED-RECORD.md#owner-approved-publication-and-registry-consumer--2026-11-28)
+records native SSR, Service health endpoints and Chrome/Wasm verification.
 The CLI itself still builds against alpha.8. CLI 0.4.1 expects the old
 `server-axum` feature for Native and Service; users of that CLI can pin
 `--sdk-version 0.9.0-alpha.8` for those templates. The earlier candidate
