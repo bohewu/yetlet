@@ -1,7 +1,7 @@
 # yetlet::html
 
 **Experimental SDK module.** Requires Rust 1.99 or newer. Included in
-`yetlet` SDK `0.9.0-alpha.9`; this guide describes the selected package contents.
+`yetlet` SDK `1.0.0-rc.1`; this guide describes the selected package contents.
 Read source/rustdoc at the revision you consume; package selection does not
 establish registry availability or production qualification.
 

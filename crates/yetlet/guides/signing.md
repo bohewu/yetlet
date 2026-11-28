@@ -1,6 +1,6 @@
 # yetlet::signing
 
-Experimental module included in `yetlet` SDK `0.9.0-alpha.9`. Requires Rust 1.99+ and
+Experimental module included in `yetlet` SDK `1.0.0-rc.1`. Requires Rust 1.99+ and
 a native OpenSSL development/runtime configuration compatible with the pinned
 Rust bindings. Select the `signing` feature explicitly; Core/HTML/browser consumers do
 not acquire it automatically. Publication eligibility does not activate release
