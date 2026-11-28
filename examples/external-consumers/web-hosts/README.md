@@ -40,6 +40,71 @@ After `GET /job`, the application requests child shutdown and awaits the
 child group's original `run_async()` drive. The controller answers one more
 status request before its own group shuts down and joins.
 
+## Stop an open SSE stream and a pending TCP receipt
+
+The [SSE shutdown example](examples/sse_shutdown.rs) runs one managed Web Host
+and one application-owned Tokio task. The task sends `RECEIPT?\n` to a TCP peer
+and waits for the four bytes `ACK\n`. To observe cancellation with the receipt
+still outstanding, use three terminals.
+
+In the first terminal, start a loopback peer that prints its address, reads the
+request, and keeps the connection open until the application closes it.
+
+```sh
+python3 -u - <<'PYTHON'
+import socket
+
+with socket.create_server(("127.0.0.1", 0)) as listener:
+    print(f"TCP peer: 127.0.0.1:{listener.getsockname()[1]}")
+    conn, _ = listener.accept()
+    with conn, conn.makefile("rb") as reader:
+        assert reader.readline() == b"RECEIPT?\n"
+        print("Request received. Withholding ACK.")
+        assert reader.read(1) == b""
+        print("TCP peer observed EOF.")
+PYTHON
+```
+
+In the second terminal, run these commands from the repository root. Paste the
+peer's printed `127.0.0.1:PORT` at the prompt.
+
+```sh
+printf 'TCP peer address: '
+read -r peer
+cargo run --locked --offline --manifest-path examples/external-consumers/web-hosts/Cargo.toml --example sse_shutdown -- "$peer"
+```
+
+In the third terminal, paste the full SSE endpoint URL printed by the
+application. Curl prints the first event and continues reading the same response.
+
+```sh
+printf 'SSE endpoint URL: '
+read -r url
+curl --http1.1 --fail --silent --show-error --no-buffer "$url"
+```
+
+Once curl shows `data: ready` and the peer shows `Withholding ACK.`, press Ctrl+C
+in the **application terminal**. Leave curl and the peer running. The
+application signals the SSE body and the pending TCP task, requests HostGroup
+shutdown, and waits for both the original task and the group. Curl exits
+successfully at the end of the response. The peer observes EOF. The application
+prints `TCP task joined: cancelled on shutdown` and `Web Host stopped.`.
+
+After the application exits, run this in the curl terminal to bind the same
+Web Host address again. The separate TCP peer owns the other listener.
+
+```sh
+python3 - "$url" <<'PYTHON'
+import socket
+import sys
+from urllib.parse import urlsplit
+
+url = urlsplit(sys.argv[1])
+with socket.create_server((url.hostname, url.port)) as listener:
+    print("Web Host address rebound:", listener.getsockname())
+PYTHON
+```
+
 ## Managed SQLite resource proof
 
 The integration test uses an application-owned SQLite actor through

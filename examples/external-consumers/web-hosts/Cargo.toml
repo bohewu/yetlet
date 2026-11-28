@@ -14,5 +14,8 @@ yetlet = { version = "0.9.0-alpha.9", path = "../../../crates/yetlet", default-f
 tokio = { version = "=1.53.3", default-features = false, features = ["macros", "rt", "net", "io-util", "sync", "time"] }
 
 [dev-dependencies]
+axum = { version = "0.8", default-features = false }
+futures-util = { version = "0.3", default-features = false }
+tokio = { version = "=1.53.3", default-features = false, features = ["signal"] }
 rusqlite = { version = "=0.41.1", default-features = false, features = ["bundled"] }
 tempfile = "=3.27.0"
