@@ -14,6 +14,12 @@ Begin with [Hello World](../examples/hello-world/README.md) for native SSR or [R
 Use [SFC Todo](../examples/sfc-todo/README.md) for a small two-component
 application built with the experimental `sfc` feature in this source checkout.
 
+Use [Streamed Jobs](../examples/streamed-jobs/README.md) to send a synthetic file
+between two loopback services and reconnect to a running job over SSE.
+
+Use [Batch Import](../examples/batch-import/README.md) to stop a CSV worker on
+either side of a SQLite commit and resume from the last durable row.
+
 ## Startup paths in this checkout
 
 The current checkout uses `yetlet::web::App` with explicit `web,html`

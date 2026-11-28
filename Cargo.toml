@@ -22,6 +22,8 @@ members = [
     "examples/file-server",
     "examples/sqlite-crud",
     "examples/sse-notifications",
+    "examples/streamed-jobs",
+    "examples/batch-import",
     "examples/dashboard-counter-island",
     "examples/dashboard-filter-island",
     "examples/multi-island-dashboard",
